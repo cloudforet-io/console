@@ -1,67 +1,62 @@
-import { computed, reactive } from 'vue';
+import type { ComputedRef } from 'vue';
+import { computed } from 'vue';
 
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
 import type { FolderModel } from '@/schema/dashboard/_types/folder-type';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { useAppContextStore } from '@/store/app-context/app-context-store';
-
-import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 
 
+interface UseDashboardControlMenuItems {
+    isAdminMode: ComputedRef<boolean>;
+    isWorkspaceOwner: ComputedRef<boolean>;
+    dashboardList?: ComputedRef<DashboardModel[]>;
+    folderList?: ComputedRef<FolderModel[]>;
+}
+interface UseDashboardControlMenuItemsReturn {
+    getControlMenuItems: (id: string) => ComputedRef<MenuItem[]>|MenuItem[];
+}
 
-export const useDashboardControlButtons = () => {
-    const appContextStore = useAppContextStore();
-    const dashboardPageControlStore = useDashboardPageControlStore();
-    const dashboardPageControlGetters = dashboardPageControlStore.getters;
-    const storeState = reactive({
-        isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
-        isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    });
-    const state = reactive({
-        cloneMenuItems: computed<MenuItem[]>(() => ([
-            {
-                type: 'item', name: 'clone', label: i18n.t('DASHBOARDS.DETAIL.CLONE'), icon: 'ic_clone',
-            },
-        ])),
-    });
-
-    const isDashboardManageable = (dashboard: DashboardModel) => {
+export const useDashboardControlMenuItems = ({
+    isAdminMode, isWorkspaceOwner, dashboardList, folderList,
+}: UseDashboardControlMenuItems): UseDashboardControlMenuItemsReturn => {
+    const _getDashboardManageable = (dashboard: DashboardModel): boolean => {
         if (dashboard.dashboard_id.startsWith('private')) return true;
-        if (storeState.isAdminMode) return true;
-        if (storeState.isWorkspaceOwner) {
+        if (isAdminMode.value) return true;
+        if (isWorkspaceOwner.value) {
             return dashboard?.workspace_id !== '*';
         }
         return false;
     };
-    const isFolderManageable = (folder: FolderModel) => {
+    const _getFolderManageable = (folder: FolderModel): boolean => {
         if (folder.folder_id.startsWith('private')) return true;
-        if (storeState.isAdminMode) return true;
-        if (storeState.isWorkspaceOwner) {
+        if (isAdminMode.value) return true;
+        if (isWorkspaceOwner.value) {
             return folder?.workspace_id !== '*';
         }
         return false;
     };
-    const getDashboardControlButtonItems = (dashboardId: string): MenuItem[] => {
+    const _getDashboardControlMenuItems = (dashboardId: string): ComputedRef<MenuItem[]>|MenuItem[] => {
         const _isPrivate = dashboardId.startsWith('private');
-        const _allDashboardItems = [...dashboardPageControlGetters.allDashboardItems, ...dashboardPageControlGetters.deprecatedDashboardItems];
-        const _dashboard = _allDashboardItems.find((item: DashboardModel) => item.dashboard_id === dashboardId);
+        const _dashboard = dashboardList?.value.find((item) => item.dashboard_id === dashboardId);
         if (!_dashboard) return [];
 
         const _isDeprecated = _dashboard.version === '1.0';
-        const _isDashboardManageable = isDashboardManageable(_dashboard);
+        const _isDashboardManageable = _getDashboardManageable(_dashboard);
         if (!_isDashboardManageable) {
             if (_isDeprecated) return [];
-            return state.cloneMenuItems;
+            return computed(() => ([
+                {
+                    type: 'item', name: 'clone', label: i18n.t('DASHBOARDS.DETAIL.CLONE'), icon: 'ic_clone',
+                },
+            ]));
         }
         if (_isDeprecated) {
-            return [{
+            return computed(() => ([{
                 type: 'item', name: 'delete', label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.DELETE'), icon: 'ic_delete',
-            }];
+            }]));
         }
 
         const _isShared = !!_dashboard.shared;
@@ -73,7 +68,7 @@ export const useDashboardControlButtons = () => {
                 icon: 'ic_share',
             },
         ];
-        return [
+        return computed(() => ([
             {
                 type: 'item',
                 name: 'edit',
@@ -95,15 +90,21 @@ export const useDashboardControlButtons = () => {
             {
                 type: 'item', name: 'delete', label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.DELETE'), icon: 'ic_delete',
             },
-        ];
+        ]));
     };
-    const getFolderControlButtonItems = (folderId: string): MenuItem[] => {
+    const _getFolderControlMenuItems = (folderId: string): ComputedRef<MenuItem[]>|MenuItem[] => {
         const _isPrivate = folderId.startsWith('private');
-        const _folder: FolderModel = dashboardPageControlGetters.allFolderItems.find((item) => item.folder_id === folderId);
+        const _folder = folderList?.value.find((item) => item.folder_id === folderId);
         if (!_folder) return [];
 
-        const _isFolderManageable = isFolderManageable(_folder);
-        if (!_isFolderManageable) return state.cloneMenuItems;
+        const _isFolderManageable = _getFolderManageable(_folder);
+        if (!_isFolderManageable) {
+            return computed(() => ([
+                {
+                    type: 'item', name: 'clone', label: i18n.t('DASHBOARDS.DETAIL.CLONE'), icon: 'ic_clone',
+                },
+            ]));
+        }
 
         const _isShared = !!_folder?.shared;
         const _shareMenuItems: MenuItem[] = [
@@ -114,7 +115,7 @@ export const useDashboardControlButtons = () => {
                 icon: 'ic_share',
             },
         ];
-        return [
+        return computed(() => ([
             {
                 type: 'item', name: 'edit', label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.EDIT_NAME'), icon: 'ic_edit-text',
             },
@@ -127,88 +128,14 @@ export const useDashboardControlButtons = () => {
             {
                 type: 'item', name: 'delete', label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.DELETE'), icon: 'ic_delete',
             },
-        ];
+        ]));
     };
-    const getControlButtonItems = (id: string): MenuItem[] => {
-        if (id.includes('folder')) return getFolderControlButtonItems(id);
-        return getDashboardControlButtonItems(id);
-    };
-
-    /* Event */
-    // Single (Folder or Dashboard)
-    const clickEditNameMenu = (id: string) => {
-        if (id.includes('folder')) {
-            dashboardPageControlStore.setFolderFormModalType('UPDATE');
-            dashboardPageControlStore.setSelectedFolderId(id);
-            dashboardPageControlStore.setFolderFormModalVisible(true);
-        } else {
-            dashboardPageControlStore.setSelectedDashboardId(id);
-            dashboardPageControlStore.setDashboardNameEditModalVisible(true);
-        }
-    };
-    const clickShareMenu = (id: string) => {
-        if (id.includes('folder')) {
-            dashboardPageControlStore.setSelectedFolderId(id);
-            dashboardPageControlStore.setBundleShareModalVisible(true);
-        } else {
-            dashboardPageControlStore.setSelectedDashboardId(id);
-            dashboardPageControlStore.setBundleShareModalVisible(true);
-        }
-    };
-    const clickShareWithCodeMenu = (dashboardId: string) => {
-        dashboardPageControlStore.setSelectedDashboardId(dashboardId);
-        dashboardPageControlStore.setDashboardShareWithCodeModalVisible(true);
-    };
-    const clickCloneMenu = (id: string) => {
-        if (id.includes('folder')) {
-            dashboardPageControlStore.setSelectedFolderId(id);
-            dashboardPageControlStore.setBundleCloneModalVisible(true);
-        } else {
-            dashboardPageControlStore.setSelectedDashboardId(id);
-            dashboardPageControlStore.setDashboardCloneModalVisible(true);
-        }
-    };
-    const clickDeleteMenu = (id: string) => {
-        if (id.includes('folder')) {
-            dashboardPageControlStore.setSelectedFolderId(id);
-            dashboardPageControlStore.setBundleDeleteModalVisible(true);
-        } else {
-            dashboardPageControlStore.setSelectedDashboardId(id);
-            dashboardPageControlStore.setDashboardDeleteModalVisible(true);
-        }
-    };
-    const clickMoveMenu = (dashboardId: string) => {
-        dashboardPageControlStore.setSelectedDashboardId(dashboardId);
-        dashboardPageControlStore.setDashboardFolderSingleMoveModalVisible(true);
-    };
-
-    // Bundle (Folder + Dashboard)
-    const clickBundleCloneMenu = (type: 'PRIVATE'|'PUBLIC') => {
-        dashboardPageControlStore.setFolderModalType(type);
-        dashboardPageControlStore.setBundleCloneModalVisible(true);
-    };
-    const clickBundleMoveMenu = (type: 'PRIVATE'|'PUBLIC') => {
-        dashboardPageControlStore.setFolderModalType(type);
-        dashboardPageControlStore.setBundleMoveModalVisible(true);
-    };
-    const clickBundleDeleteMenu = (type: 'PRIVATE'|'PUBLIC') => {
-        dashboardPageControlStore.setFolderModalType(type);
-        dashboardPageControlStore.setBundleDeleteModalVisible(true);
+    const getControlMenuItems = (id: string): ComputedRef<MenuItem[]>|MenuItem[] => {
+        if (id.includes('folder')) return _getFolderControlMenuItems(id);
+        return _getDashboardControlMenuItems(id);
     };
 
     return {
-        // single (folder or dashboard)
-        clickEditNameMenu,
-        clickShareMenu,
-        clickShareWithCodeMenu,
-        clickCloneMenu,
-        clickDeleteMenu,
-        clickMoveMenu,
-        // bundle
-        clickBundleCloneMenu,
-        clickBundleMoveMenu,
-        clickBundleDeleteMenu,
-        // control button
-        getControlButtonItems,
+        getControlMenuItems,
     };
 };

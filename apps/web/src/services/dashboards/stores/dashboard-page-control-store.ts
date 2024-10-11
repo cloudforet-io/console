@@ -181,37 +181,104 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
 
     /* Actions */
     const reset = () => {
-        setFolderFormModalVisible(false);
-        setFolderFormModalType('CREATE');
-        setSelectedFolderId(undefined);
-        setBundleDeleteModalVisible(false);
-        setFolderModalType('PUBLIC');
-        setBundleCloneModalVisible(false);
-        setBundleShareModalVisible(false);
-        setDashboardNameEditModalVisible(false);
-        setDashboardDeleteModalVisible(false);
-        setDashboardCloneModalVisible(false);
-        setDashboardShareWithCodeModalVisible(false);
-        setDashboardFolderSingleMoveModalVisible(false);
-        setBundleMoveModalVisible(false);
-        setSelectedDashboardId(undefined);
-        setSelectedFolderId(undefined);
-        setSelectedPublicIdMap({});
-        setSelectedPrivateIdMap({});
+        state.folderFormModalVisible = false;
+        state.dashboardNameEditModalVisible = false;
+        state.dashboardDeleteModalVisible = false;
+        state.dashboardCloneModalVisible = false;
+        state.dashboardShareWithCodeModalVisible = false;
+        state.dashboardFolderSingleMoveModalVisible = false;
+        state.bundleShareModalVisible = false;
+        state.bundleMoveModalVisible = false;
+        state.bundleCloneModalVisible = false;
+        state.bundleDeleteModalVisible = false;
+        state.selectedFolderId = undefined;
+        state.selectedDashboardId = undefined;
+        state.selectedPublicIdMap = {};
+        state.selectedPrivateIdMap = {};
     };
     const resetSelectedIdMap = (type?: 'PUBLIC'|'PRIVATE') => {
         if (type === 'PUBLIC') {
-            setSelectedPublicIdMap({});
+            state.selectedPublicIdMap = {};
         } else if (type === 'PRIVATE') {
-            setSelectedPrivateIdMap({});
+            state.selectedPrivateIdMap = {};
         } else {
-            setSelectedPublicIdMap({});
-            setSelectedPrivateIdMap({});
+            state.selectedPublicIdMap = {};
+            state.selectedPrivateIdMap = {};
         }
+    };
+
+    // Single (Folder or Dashboard)
+    const openEditNameModal = (id: string) => {
+        if (id.includes('folder')) {
+            state.folderFormModalType = 'UPDATE';
+            state.selectedFolderId = id;
+            state.folderFormModalVisible = true;
+        } else {
+            state.selectedDashboardId = id;
+            state.dashboardNameEditModalVisible = true;
+        }
+    };
+    const openShareModal = (id: string) => {
+        if (id.includes('folder')) {
+            state.selectedFolderId = id;
+            state.bundleShareModalVisible = true;
+        } else {
+            state.selectedDashboardId = id;
+            state.bundleShareModalVisible = true;
+        }
+    };
+    const openShareWithCodeModal = (dashboardId: string) => {
+        state.selectedDashboardId = dashboardId;
+        state.dashboardShareWithCodeModalVisible = true;
+    };
+    const openCloneModal = (id: string) => {
+        if (id.includes('folder')) {
+            state.selectedFolderId = id;
+            state.bundleCloneModalVisible = true;
+        } else {
+            state.selectedDashboardId = id;
+            state.dashboardCloneModalVisible = true;
+        }
+    };
+    const openDeleteModal = (id: string) => {
+        if (id.includes('folder')) {
+            state.selectedFolderId = id;
+            state.bundleDeleteModalVisible = true;
+        } else {
+            state.selectedDashboardId = id;
+            state.dashboardDeleteModalVisible = true;
+        }
+    };
+    const openMoveModal = (dashboardId: string) => {
+        state.selectedDashboardId = dashboardId;
+        state.dashboardFolderSingleMoveModalVisible = true;
+    };
+
+    // Bundle (Folder + Dashboard)
+    const openBundleCloneModal = (type: 'PRIVATE'|'PUBLIC') => {
+        state.folderModalType = type;
+        state.bundleCloneModalVisible = true;
+    };
+    const openBundleMoveModal = (type: 'PRIVATE'|'PUBLIC') => {
+        state.folderModalType = type;
+        state.bundleMoveModalVisible = true;
+    };
+    const openBundleDeleteModal = (type: 'PRIVATE'|'PUBLIC') => {
+        state.folderModalType = type;
+        state.bundleDeleteModalVisible = true;
     };
     const actions = {
         reset,
         resetSelectedIdMap,
+        openEditNameModal,
+        openShareModal,
+        openShareWithCodeModal,
+        openCloneModal,
+        openDeleteModal,
+        openMoveModal,
+        openBundleCloneModal,
+        openBundleMoveModal,
+        openBundleDeleteModal,
     };
 
     return {
