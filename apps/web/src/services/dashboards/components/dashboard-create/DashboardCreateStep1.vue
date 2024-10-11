@@ -96,7 +96,6 @@ const filterState = reactive({
     inputValue: '',
     selectedLabels: [] as string[],
     selectedProviders: [] as string[],
-    selectedStartOption: 'templates',
 });
 
 /* Util */
@@ -122,11 +121,6 @@ const handleSelectLabels = (labels: FilterLabelItem[]) => {
 const handleSelectProvider = (providers: FilterLabelItem[]) => {
     filterState.selectedProviders = providers.map((d) => d.label.toLowerCase());
 };
-const handleSelectStartOption = (startOption: string) => {
-    filterState.selectedStartOption = startOption;
-    dashboardCreatePageStore.setSelectedOotbIdMap({});
-    dashboardCreatePageStore.setSelectedExistingDashboardIdMap({});
-};
 const handleClickCancel = () => {
     router.push(getProperRouteLocation({ name: DASHBOARDS_ROUTE._NAME }));
 };
@@ -142,32 +136,23 @@ onMounted(() => {
             <dashboard-create-step1-search-filter :labels="state.allExistingLabels"
                                                   @select-label="handleSelectLabels"
                                                   @select-provider="handleSelectProvider"
-                                                  @select-start-option="handleSelectStartOption"
             />
             <div class="template-contents-area">
                 <p-search :value.sync="filterState.inputValue"
                           class="search-wrapper"
                 />
-                <template v-if="filterState.selectedStartOption === 'templates'">
-                    <dashboard-create-blank-board-item :template-sets="state.blankTemplate"
-                                                       class="blank-board"
-                    />
-                    <p-field-title :label="i18n.t('DASHBOARDS.CREATE.OOTB_DASHBOARD')"
-                                   class="field-title"
-                                   required
-                    />
-                    <dashboard-folder-tree :selected-id-map="dashboardCreatePageState.selectedOotbIdMap"
-                                           :dashboard-tree-data="state.ootbTemplateTreeData"
-                                           readonly-mode
-                                           disable-link
-                                           @update:selectedIdMap="dashboardCreatePageStore.setSelectedOotbIdMap"
-                    />
-                </template>
-                <dashboard-folder-tree v-else
-                                       :selected-id-map="dashboardCreatePageState.selectedExistingDashboardIdMap"
-                                       :dashboard-tree-data="state.existingDashboardTreeData"
+                <dashboard-create-blank-board-item :template-sets="state.blankTemplate"
+                                                   class="blank-board"
+                />
+                <p-field-title :label="i18n.t('DASHBOARDS.CREATE.OOTB_DASHBOARD')"
+                               class="field-title"
+                               required
+                />
+                <dashboard-folder-tree :selected-id-map="dashboardCreatePageState.selectedOotbIdMap"
+                                       :dashboard-tree-data="state.ootbTemplateTreeData"
                                        readonly-mode
-                                       @update:selectedIdMap="dashboardCreatePageStore.setSelectedExistingDashboardIdMap"
+                                       disable-link
+                                       @update:selectedIdMap="dashboardCreatePageStore.setSelectedOotbIdMap"
                 />
                 <p-empty v-if="!state.ootbTemplateTreeData.length && !state.existingDashboardTreeData.length"
                          show-image
