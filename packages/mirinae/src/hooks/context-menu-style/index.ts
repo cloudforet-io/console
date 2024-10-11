@@ -61,6 +61,7 @@ export const useContextMenuStyle = ({
                             const style: Partial<CSSStyleDeclaration> = {
                                 minWidth: (state.menuWidth === 'target-width' || state.menuWidth === 'auto' || !state.menuWidth) ? `${rects.reference.width}px` : state.menuWidth,
                                 width: state.menuWidth === 'target-width' ? `${rects.reference.width}px` : state.menuWidth,
+                                maxWidth: state.menuWidth === 'target-width' ? `${rects.reference.width}px` : state.menuWidth,
                             };
 
                             if (availableHeight < MAX_HEIGHT) {
