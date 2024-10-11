@@ -118,6 +118,12 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         translationId: 'COST_EXPLORER.ANOMALY_DETECTION_CONFIGURATION',
         highlightTag: 'new',
     },
+    [MENU_ID.CURRENCY_CONVERTER]: {
+        menuId: MENU_ID.CURRENCY_CONVERTER,
+        routeName: COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.CURRENCY_CONVERTER._NAME,
+        translationId: 'COST_EXPLORER.CURRENCY_CONVERTER',
+        highlightTag: 'new',
+    },
     [MENU_ID.ALERT_MANAGER]: {
         menuId: MENU_ID.ALERT_MANAGER,
         routeName: ALERT_MANAGER_ROUTE._NAME,
