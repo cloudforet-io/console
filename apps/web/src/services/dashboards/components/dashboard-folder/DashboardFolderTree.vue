@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PI, PCheckbox, PIconButton, PButton,
+    PI, PCheckbox, PButton,
 } from '@cloudforet/mirinae';
 import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
 
@@ -12,13 +12,7 @@ import DashboardFolderTreeItem from '@/services/dashboards/components/dashboard-
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
 
 
-interface ControlButton {
-    name: string;
-    icon: string;
-    clickEvent: () => void;
-    disabled?: boolean;
-    styleType?: string;
-}
+
 interface Props {
     selectedIdMap: Record<string, boolean>;
     dashboardTreeData: TreeNode<DashboardTreeDataType>[];
@@ -33,9 +27,6 @@ const props = withDefaults(defineProps<Props>(), {
     buttonDisableMap: () => ({}),
 });
 const emit = defineEmits<{(e: 'update:selectedIdMap', selectedIdMap: Record<string, boolean>): void;
-    (e: 'click-delete');
-    (e: 'click-move');
-    (e: 'click-clone');
 }>();
 const state = reactive({
     proxySelectedIdMap: useProxyValue('selectedIdMap', props, emit),
@@ -52,30 +43,6 @@ const state = reactive({
         return Object.values(state.proxySelectedIdMap).some((v) => v);
     }),
     childrenShowMap: {} as Record<string, boolean>,
-    controlButtons: computed<ControlButton[]>(() => {
-        if (props.readonlyMode) return [];
-        return [
-            {
-                name: 'clone',
-                icon: 'ic_clone',
-                clickEvent: () => emit('click-clone'),
-                disabled: !!props.buttonDisableMap?.clone,
-            },
-            {
-                name: 'move',
-                icon: 'ic_move',
-                clickEvent: () => emit('click-move'),
-                disabled: !!props.buttonDisableMap?.move,
-            },
-            {
-                name: 'delete',
-                icon: 'ic_delete',
-                clickEvent: () => emit('click-delete'),
-                disabled: !!props.buttonDisableMap?.delete,
-                styleType: 'negative-transparent',
-            },
-        ];
-    }),
     showAll: false,
     slicedTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => {
         if (props.readonlyMode) return props.dashboardTreeData;
@@ -152,16 +119,6 @@ const handleClickShowAll = () => {
                             @change="handleChangeAllSelected"
                 />
                 <span>{{ $t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.NAME') }}</span>
-            </div>
-            <div class="right-part">
-                <p-icon-button v-for="controlButton in state.controlButtons"
-                               :key="`control-button-${controlButton.name}`"
-                               :name="controlButton.icon"
-                               :disabled="controlButton.disabled"
-                               :style-type="controlButton.styleType || 'transparent'"
-                               size="sm"
-                               @click="controlButton.clickEvent"
-                />
             </div>
         </div>
         <div v-for="treeData in state.slicedTreeData"

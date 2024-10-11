@@ -41,14 +41,12 @@ import { useQueryTags } from '@/common/composables/query-tags';
 import DashboardFolderTree from '@/services/dashboards/components/dashboard-folder/DashboardFolderTree.vue';
 import DashboardFolderTreeTitle from '@/services/dashboards/components/dashboard-folder/DashboardFolderTreeTitle.vue';
 import DashboardMainBoardList from '@/services/dashboards/components/dashboard-main/DashboardMainBoardList.vue';
-import { useDashboardControlButtons } from '@/services/dashboards/composables/use-dashboard-control-buttons';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
 
 
 
-const controlButtonsHelper = useDashboardControlButtons();
 const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
@@ -346,9 +344,6 @@ onUnmounted(() => {
                                        :dashboard-tree-data="state.refinedPublicTreeData"
                                        :button-disable-map="state.publicTreeControlButtonDisableMap"
                                        @update:selectedIdMap="handleUpdateSelectedIdMap('PUBLIC', $event)"
-                                       @click-clone="controlButtonsHelper.clickBundleCloneMenu('PUBLIC')"
-                                       @click-delete="controlButtonsHelper.clickBundleDeleteMenu('PUBLIC')"
-                                       @click-move="controlButtonsHelper.clickBundleMoveMenu('PUBLIC')"
                 />
             </div>
             <div v-if="!storeState.isAdminMode && state.refinedPrivateTreeData.length"
@@ -362,9 +357,6 @@ onUnmounted(() => {
                                        :dashboard-tree-data="state.refinedPrivateTreeData"
                                        :button-disable-map="dashboardPageControlGetters.privateTreeControlButtonDisableMap"
                                        @update:selectedIdMap="handleUpdateSelectedIdMap('PRIVATE', $event)"
-                                       @click-clone="controlButtonsHelper.clickBundleCloneMenu('PRIVATE')"
-                                       @click-delete="controlButtonsHelper.clickBundleDeleteMenu('PRIVATE')"
-                                       @click-move="controlButtonsHelper.clickBundleMoveMenu('PRIVATE')"
                 />
             </div>
             <dashboard-main-board-list v-if="dashboardPageControlGetters.deprecatedDashboardItems.length"

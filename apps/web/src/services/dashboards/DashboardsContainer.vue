@@ -58,34 +58,45 @@ callApiWithGrantGuard();
         <!-- Single (Dashboard) -->
         <dashboard-name-edit-modal :visible="dashboardPageControlState.dashboardNameEditModalVisible"
                                    :dashboard-id="dashboardPageControlState.selectedDashboardId"
+                                   @update:visible="dashboardPageControlStore.setDashboardNameEditModalVisible"
         />
         <dashboard-clone-modal :visible="dashboardPageControlState.dashboardCloneModalVisible"
                                :dashboard-id="dashboardPageControlState.selectedDashboardId"
+                               @update:visible="dashboardPageControlStore.setDashboardCloneModalVisible"
         />
         <dashboard-folder-single-move-modal :visible="dashboardPageControlState.dashboardFolderSingleMoveModalVisible"
                                             :dashboard-id="dashboardPageControlState.selectedDashboardId"
+                                            @update:visible="dashboardPageControlStore.setDashboardFolderSingleMoveModalVisible"
         />
         <dashboard-share-with-code-modal :visible="dashboardPageControlState.dashboardShareWithCodeModalVisible"
                                          :dashboard-id="dashboardPageControlState.selectedDashboardId"
+                                         @update:visible="dashboardPageControlStore.setDashboardShareWithCodeModalVisible"
         />
         <dashboard-delete-modal :visible="dashboardPageControlState.dashboardDeleteModalVisible"
                                 :dashboard-id="dashboardPageControlState.selectedDashboardId"
+                                @update:visible="dashboardPageControlStore.setDashboardDeleteModalVisible"
         />
         <!-- Single (Folder) -->
         <dashboard-folder-form-modal :visible="dashboardPageControlState.folderFormModalVisible"
                                      :folder-id="dashboardPageControlState.selectedFolderId"
+                                     @update:visible="dashboardPageControlStore.setFolderFormModalVisible"
         />
         <!-- Bundle (Folder & Dashboard)-->
         <dashboard-bundle-share-modal :visible="dashboardPageControlState.bundleShareModalVisible"
                                       :dashboard-id="dashboardPageControlState.selectedDashboardId"
                                       :folder-id="dashboardPageControlState.selectedFolderId"
+                                      @update:visible="dashboardPageControlStore.setBundleShareModalVisible"
         />
         <dashboard-bundle-clone-modal :visible="dashboardPageControlState.bundleCloneModalVisible"
                                       :folder-id="dashboardPageControlState.selectedFolderId"
+                                      @update:visible="dashboardPageControlStore.setBundleCloneModalVisible"
         />
         <dashboard-bundle-delete-modal :visible="dashboardPageControlState.bundleDeleteModalVisible"
                                        :folder-id="dashboardPageControlState.selectedFolderId"
+                                       @update:visible="dashboardPageControlStore.setBundleDeleteModalVisible"
         />
-        <dashboard-bundle-move-modal :visible="dashboardPageControlState.bundleMoveModalVisible" />
+        <dashboard-bundle-move-modal :visible="dashboardPageControlState.bundleMoveModalVisible"
+                                     @update:visible="dashboardPageControlStore.setBundleMoveModalVisible"
+        />
     </fragment>
 </template>
