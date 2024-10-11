@@ -17,7 +17,7 @@ import { gray } from '@/styles/colors';
 
 import DashboardControlButtons from '@/services/dashboards/components/dashboard-detail/DashboardControlButtons.vue';
 import DashboardLabelsButton from '@/services/dashboards/components/dashboard-detail/DashboardLabelsButton.vue';
-import { useDashboardControlButtons } from '@/services/dashboards/composables/use-dashboard-control-buttons';
+import { useDashboardControlMenuItems } from '@/services/dashboards/composables/use-dashboard-control-buttons';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 
@@ -27,7 +27,6 @@ interface Props {
     templateName?: string;
 }
 const props = defineProps<Props>();
-const controlButtonsHelper = useDashboardControlButtons();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailGetters = dashboardDetailStore.getters;
@@ -37,6 +36,11 @@ const appContextStore = useAppContextStore();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+});
+const { getControlMenuItems } = useDashboardControlMenuItems({
+    isAdminMode: computed(() => storeState.isAdminMode),
+    isWorkspaceOwner: computed(() => storeState.isWorkspaceOwner),
+    dashboardList: computed(() => dashboardPageControlGetters.allDashboardItems),
 });
 const state = reactive({
     loading: false,
@@ -75,12 +79,12 @@ const state = reactive({
 
 /* Event */
 const handleSelectItem = (item: MenuItem) => {
-    if (item.name === 'edit') controlButtonsHelper.clickEditNameMenu(props.dashboardId);
-    if (item.name === 'clone') controlButtonsHelper.clickCloneMenu(props.dashboardId);
-    if (item.name === 'move') controlButtonsHelper.clickMoveMenu(props.dashboardId);
-    if (item.name === 'share') controlButtonsHelper.clickShareMenu(props.dashboardId);
-    if (item.name === 'shareWithCode') controlButtonsHelper.clickShareWithCodeMenu(props.dashboardId);
-    if (item.name === 'delete') controlButtonsHelper.clickDeleteMenu(props.dashboardId);
+    if (item.name === 'edit') dashboardPageControlStore.openEditNameModal(props.dashboardId);
+    if (item.name === 'clone') dashboardPageControlStore.openCloneModal(props.dashboardId);
+    if (item.name === 'move') dashboardPageControlStore.openMoveModal(props.dashboardId);
+    if (item.name === 'share') dashboardPageControlStore.openShareModal(props.dashboardId);
+    if (item.name === 'shareWithCode') dashboardPageControlStore.openShareWithCodeModal(props.dashboardId);
+    if (item.name === 'delete') dashboardPageControlStore.openDeleteModal(props.dashboardId);
 };
 </script>
 
@@ -119,7 +123,7 @@ const handleSelectItem = (item: MenuItem) => {
                                    style-type="tertiary-icon-button"
                                    button-icon="ic_ellipsis-horizontal"
                                    size="sm"
-                                   :menu="controlButtonsHelper.getControlButtonItems(props.dashboardId)"
+                                   :menu="getControlMenuItems(props.dashboardId)"
                                    :selected="[]"
                                    use-fixed-menu-style
                                    reset-selection-on-menu-close

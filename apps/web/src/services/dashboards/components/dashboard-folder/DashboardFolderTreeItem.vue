@@ -10,6 +10,8 @@ import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-vi
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 import type { QueryTag } from '@cloudforet/mirinae/types/inputs/search/query-search-tags/type';
 
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -21,7 +23,7 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { gray, indigo, violet } from '@/styles/colors';
 
-import { useDashboardControlButtons } from '@/services/dashboards/composables/use-dashboard-control-buttons';
+import { useDashboardControlMenuItems } from '@/services/dashboards/composables/use-dashboard-control-buttons';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
@@ -43,9 +45,18 @@ const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
-const controlButtonsHelper = useDashboardControlButtons();
-const state = reactive({
+const dashboardPageControlGetters = dashboardPageControlStore.getters;
+const { getControlMenuItems } = useDashboardControlMenuItems({
+    isAdminMode: computed(() => storeState.isAdminMode),
+    isWorkspaceOwner: computed(() => storeState.isWorkspaceOwner),
+    dashboardList: computed(() => dashboardPageControlGetters.allDashboardItems),
+    folderList: computed(() => dashboardPageControlGetters.allFolderItems),
+});
+const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+});
+const state = reactive({
     slicedLabels: computed(() => props.treeData.data?.labels?.slice(0, LABELS_LIMIT) || []),
     showMoreLabels: computed(() => {
         if (!props.treeData?.data?.labels) return false;
@@ -63,7 +74,7 @@ const getSharedColor = (node: TreeNode<DashboardTreeDataType>): string|undefined
 };
 const getSharedText = (node: TreeNode<DashboardTreeDataType>): TranslateResult|undefined => {
     if (node.data.shared) {
-        if (state.isAdminMode) {
+        if (storeState.isAdminMode) {
             if (node.data.projectId === '*') return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
             return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_WORKSPACES');
         }
@@ -104,12 +115,12 @@ const handleClickLabel = (label: string) => {
     ]);
 };
 const handleSelectControlButton = (id: string, item: MenuItem) => {
-    if (item.name === 'edit') controlButtonsHelper.clickEditNameMenu(id);
-    if (item.name === 'clone') controlButtonsHelper.clickCloneMenu(id);
-    if (item.name === 'move') controlButtonsHelper.clickMoveMenu(id);
-    if (item.name === 'share') controlButtonsHelper.clickShareMenu(id);
-    if (item.name === 'shareWithCode') controlButtonsHelper.clickShareWithCodeMenu(id);
-    if (item.name === 'delete') controlButtonsHelper.clickDeleteMenu(id);
+    if (item.name === 'edit') dashboardPageControlStore.openEditNameModal(id);
+    if (item.name === 'clone') dashboardPageControlStore.openCloneModal(id);
+    if (item.name === 'move') dashboardPageControlStore.openMoveModal(id);
+    if (item.name === 'share') dashboardPageControlStore.openShareModal(id);
+    if (item.name === 'shareWithCode') dashboardPageControlStore.openShareWithCodeModal(id);
+    if (item.name === 'delete') dashboardPageControlStore.openDeleteModal(id);
 };
 </script>
 
@@ -149,7 +160,7 @@ const handleSelectControlButton = (id: string, item: MenuItem) => {
                         >
                             <p-select-dropdown style-type="tertiary-icon-button"
                                                button-icon="ic_ellipsis-horizontal"
-                                               :menu="controlButtonsHelper.getControlButtonItems(node.data.id)"
+                                               :menu="getControlMenuItems(node.data.id)"
                                                :selected="[]"
                                                size="sm"
                                                menu-position="left"
