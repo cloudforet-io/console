@@ -4,11 +4,14 @@ import type { TranslateResult } from 'vue-i18n';
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PI, PIconButton, PTreeItem, PLabel, PPopover,
+    PI, PTreeItem, PLabel, PPopover, PSelectDropdown,
 } from '@cloudforet/mirinae';
 import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 import type { QueryTag } from '@cloudforet/mirinae/types/inputs/search/query-search-tags/type';
 
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -20,6 +23,7 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { gray, indigo, violet } from '@/styles/colors';
 
+import { useDashboardControlMenuItems } from '@/services/dashboards/composables/use-dashboard-control-menu-items';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
@@ -41,27 +45,18 @@ const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
-const state = reactive({
+const dashboardPageControlGetters = dashboardPageControlStore.getters;
+const { getControlMenuItems } = useDashboardControlMenuItems({
+    isAdminMode: computed(() => storeState.isAdminMode),
+    isWorkspaceOwner: computed(() => storeState.isWorkspaceOwner),
+    dashboardList: computed(() => dashboardPageControlGetters.allDashboardItems),
+    folderList: computed(() => dashboardPageControlGetters.allFolderItems),
+});
+const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    folderControlButtons: computed(() => {
-        if (props.readonlyMode) return [];
-        const _defaultButtons = [{
-            name: 'edit',
-            icon: 'ic_edit-text',
-            clickEvent: handleEditFolderName,
-        }];
-        if (props.treeData.data.id.startsWith('private')) {
-            return _defaultButtons;
-        }
-        return [
-            ..._defaultButtons,
-            {
-                name: 'share',
-                icon: 'ic_share',
-                clickEvent: handleShareFolder,
-            },
-        ];
-    }),
+    isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+});
+const state = reactive({
     slicedLabels: computed(() => props.treeData.data?.labels?.slice(0, LABELS_LIMIT) || []),
     showMoreLabels: computed(() => {
         if (!props.treeData?.data?.labels) return false;
@@ -79,7 +74,7 @@ const getSharedColor = (node: TreeNode<DashboardTreeDataType>): string|undefined
 };
 const getSharedText = (node: TreeNode<DashboardTreeDataType>): TranslateResult|undefined => {
     if (node.data.shared) {
-        if (state.isAdminMode) {
+        if (storeState.isAdminMode) {
             if (node.data.projectId === '*') return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
             return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_WORKSPACES');
         }
@@ -109,15 +104,6 @@ const handleClickTreeItem = (): void => {
     }
     router.push(_location);
 };
-const handleEditFolderName = () => {
-    dashboardPageControlStore.setFolderFormModalType('UPDATE');
-    dashboardPageControlStore.setSelectedFolderId(props.treeData.data.id);
-    dashboardPageControlStore.setFolderFormModalVisible(true);
-};
-const handleShareFolder = () => {
-    dashboardPageControlStore.setSelectedFolderId(props.treeData.data.id);
-    dashboardPageControlStore.setFolderShareModalVisible(true);
-};
 const handleClickLabel = (label: string) => {
     dashboardPageControlStore.setSearchQueryTags([
         ...dashboardPageControlState.searchQueryTags,
@@ -127,6 +113,14 @@ const handleClickLabel = (label: string) => {
             operator: '=',
         } as QueryTag,
     ]);
+};
+const handleSelectControlButton = (id: string, item: MenuItem) => {
+    if (item.name === 'edit') dashboardPageControlStore.openEditNameModal(id);
+    if (item.name === 'clone') dashboardPageControlStore.openCloneModal(id);
+    if (item.name === 'move') dashboardPageControlStore.openMoveModal(id);
+    if (item.name === 'share') dashboardPageControlStore.openShareModal(id);
+    if (item.name === 'shareWithCode') dashboardPageControlStore.openShareWithCodeModal(id);
+    if (item.name === 'delete') dashboardPageControlStore.openDeleteModal(id);
 };
 </script>
 
@@ -161,7 +155,18 @@ const handleClickLabel = (label: string) => {
                              width="0.75rem"
                              height="0.75rem"
                         />
-                        <div class="hidden-wrapper">
+                        <div v-if="!props.readonlyMode"
+                             class="hidden-wrapper"
+                        >
+                            <p-select-dropdown style-type="tertiary-icon-button"
+                                               button-icon="ic_ellipsis-horizontal"
+                                               :menu="getControlMenuItems(node.data.id)"
+                                               :selected="[]"
+                                               size="sm"
+                                               menu-position="left"
+                                               reset-selection-on-menu-close
+                                               @select="handleSelectControlButton(node.data.id, $event)"
+                            />
                             <favorite-button v-if="node.data.type === 'DASHBOARD' && !props.readonlyMode"
                                              :item-id="node.data.id"
                                              :favorite-type="FAVORITE_TYPE.DASHBOARD"
@@ -174,19 +179,7 @@ const handleClickLabel = (label: string) => {
                         </div>
                     </div>
                     <div class="right-part">
-                        <div v-if="props.treeData.data.type === 'FOLDER'"
-                             class="folder-button-wrapper hidden-wrapper"
-                        >
-                            <p-icon-button v-for="controlButton in state.folderControlButtons"
-                                           :key="`folder-control-button-${node.data.id}-${controlButton.name}`"
-                                           :name="controlButton.icon"
-                                           size="sm"
-                                           style-type="tertiary"
-                                           shape="square"
-                                           @click.stop="controlButton.clickEvent"
-                            />
-                        </div>
-                        <template v-else>
+                        <template v-if="props.treeData.data.type === 'DASHBOARD'">
                             <div class="flex gap-1">
                                 <p-label v-for="label in node.data?.labels?.slice(0, LABELS_LIMIT)"
                                          :key="`${node.data.id}-label-${label}`"
@@ -291,13 +284,6 @@ const handleClickLabel = (label: string) => {
             .shared-text {
                 display: none;
             }
-        }
-        .folder-button-wrapper {
-            position: absolute;
-            right: 0;
-            top: -0.25rem;
-            display: flex;
-            gap: 0.25rem;
         }
     }
 }

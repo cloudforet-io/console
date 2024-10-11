@@ -17,6 +17,7 @@ import { gray } from '@/styles/colors';
 
 import DashboardControlButtons from '@/services/dashboards/components/dashboard-detail/DashboardControlButtons.vue';
 import DashboardLabelsButton from '@/services/dashboards/components/dashboard-detail/DashboardLabelsButton.vue';
+import { useDashboardControlMenuItems } from '@/services/dashboards/composables/use-dashboard-control-menu-items';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 
@@ -26,7 +27,6 @@ interface Props {
     templateName?: string;
 }
 const props = defineProps<Props>();
-
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailGetters = dashboardDetailStore.getters;
@@ -36,6 +36,11 @@ const appContextStore = useAppContextStore();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+});
+const { getControlMenuItems } = useDashboardControlMenuItems({
+    isAdminMode: computed(() => storeState.isAdminMode),
+    isWorkspaceOwner: computed(() => storeState.isWorkspaceOwner),
+    dashboardList: computed(() => dashboardPageControlGetters.allDashboardItems),
 });
 const state = reactive({
     loading: false,
@@ -65,83 +70,6 @@ const state = reactive({
         }
         return '';
     }),
-    menuItems: computed<MenuItem[]>(() => {
-        if (dashboardDetailGetters.isDeprecatedDashboard) {
-            return [
-                {
-                    type: 'item',
-                    name: 'edit',
-                    label: i18n.t('DASHBOARDS.DETAIL.EDIT_DASHBOARD_NAME'),
-                    icon: 'ic_edit-text',
-                },
-                {
-                    type: 'item',
-                    name: 'delete',
-                    label: i18n.t('DASHBOARDS.DETAIL.DELETE'),
-                    icon: 'ic_delete',
-                },
-            ];
-        }
-        if (dashboardDetailGetters.disableManageButtons) {
-            return [{
-                type: 'item',
-                name: 'duplicate',
-                label: i18n.t('DASHBOARDS.DETAIL.CLONE'),
-                icon: 'ic_clone',
-            }];
-        }
-        let _shareMenuItems: MenuItem[] = [];
-        if (storeState.isAdminMode) {
-            _shareMenuItems = [{
-                type: 'item',
-                name: state.isSharedDashboard ? 'unshare' : 'share',
-                label: state.isSharedDashboard ? i18n.t('DASHBOARDS.DETAIL.UNSHARE_DASHBOARD') : i18n.t('DASHBOARDS.DETAIL.SHARE_DASHBOARD'),
-                icon: 'ic_share',
-            }];
-        } else if (dashboardDetailState.dashboardScope !== 'PRIVATE') {
-            _shareMenuItems = [{
-                type: 'item',
-                name: 'share',
-                label: state.isSharedDashboard ? i18n.t('DASHBOARDS.DETAIL.UNSHARE_FROM_ALL_PROJECTS') : i18n.t('DASHBOARDS.DETAIL.SHARE_TO_ALL_PROJECTS'),
-                icon: 'ic_share',
-            }];
-        }
-        return [
-            {
-                type: 'item',
-                name: 'edit',
-                label: i18n.t('DASHBOARDS.DETAIL.EDIT_DASHBOARD_NAME'),
-                icon: 'ic_edit-text',
-            },
-            {
-                type: 'item',
-                name: 'duplicate',
-                label: i18n.t('DASHBOARDS.DETAIL.CLONE'),
-                icon: 'ic_clone',
-            },
-            {
-                type: 'item',
-                name: 'move',
-                label: i18n.t('DASHBOARDS.DETAIL.MOVE'),
-                icon: 'ic_move',
-            },
-            { type: 'divider', name: 'divider' },
-            {
-                type: 'item',
-                name: 'shareWithCode',
-                label: i18n.t('DASHBOARDS.DETAIL.SHARE_WITH_CODE'),
-                icon: 'ic_share-code',
-            },
-            ..._shareMenuItems,
-            { type: 'divider', name: 'divider' },
-            {
-                type: 'item',
-                name: 'delete',
-                label: i18n.t('DASHBOARDS.DETAIL.DELETE'),
-                icon: 'ic_delete',
-            },
-        ];
-    }),
     folderName: computed<string|undefined>(() => {
         const _folderId = dashboardPageControlGetters.allDashboardItems.find((d) => d.dashboard_id === props.dashboardId)?.folder_id;
         const folder = dashboardPageControlGetters.allFolderItems.find((d) => d.folder_id === _folderId);
@@ -150,20 +78,13 @@ const state = reactive({
 });
 
 /* Event */
-const handleSelectItem = (selected: MenuItem) => {
-    if (selected.name === 'edit') dashboardDetailStore.setDashboardNameEditModalVisible(true);
-    if (selected.name === 'duplicate') dashboardDetailStore.setDashboardCloneModalVisible(true);
-    if (selected.name === 'shareWithCode') dashboardDetailStore.setShareWithCodeModalVisible(true);
-    if (selected.name === 'delete') dashboardDetailStore.setDashboardDeleteModalVisible(true);
-    if (selected.name === 'share') {
-        dashboardDetailStore.setDashboardShareModalType('SHARE');
-        dashboardDetailStore.setDashboardShareModalVisible(true);
-    }
-    if (selected.name === 'unshare') {
-        dashboardDetailStore.setDashboardShareModalType('UNSHARE');
-        dashboardDetailStore.setDashboardShareModalVisible(true);
-    }
-    if (selected.name === 'move') dashboardDetailStore.setFolderMoveModalVisible(true);
+const handleSelectItem = (item: MenuItem) => {
+    if (item.name === 'edit') dashboardPageControlStore.openEditNameModal(props.dashboardId);
+    if (item.name === 'clone') dashboardPageControlStore.openCloneModal(props.dashboardId);
+    if (item.name === 'move') dashboardPageControlStore.openMoveModal(props.dashboardId);
+    if (item.name === 'share') dashboardPageControlStore.openShareModal(props.dashboardId);
+    if (item.name === 'shareWithCode') dashboardPageControlStore.openShareWithCodeModal(props.dashboardId);
+    if (item.name === 'delete') dashboardPageControlStore.openDeleteModal(props.dashboardId);
 };
 </script>
 
@@ -202,7 +123,7 @@ const handleSelectItem = (selected: MenuItem) => {
                                    style-type="tertiary-icon-button"
                                    button-icon="ic_ellipsis-horizontal"
                                    size="sm"
-                                   :menu="state.menuItems"
+                                   :menu="getControlMenuItems(props.dashboardId)"
                                    :selected="[]"
                                    use-fixed-menu-style
                                    reset-selection-on-menu-close

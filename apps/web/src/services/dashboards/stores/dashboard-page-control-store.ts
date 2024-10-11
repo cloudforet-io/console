@@ -47,14 +47,24 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
         isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     });
     const state = reactive({
+        // folder
         folderFormModalVisible: false,
         folderFormModalType: 'CREATE' as 'CREATE' | 'UPDATE',
         folderModalType: 'PUBLIC' as 'PUBLIC' | 'PRIVATE',
-        folderDeleteModalVisible: false,
-        folderMoveModalVisible: false,
-        folderCloneModalVisible: false,
-        folderShareModalVisible: false,
         selectedFolderId: undefined as string | undefined,
+        // dashboard
+        dashboardNameEditModalVisible: false,
+        dashboardDeleteModalVisible: false,
+        dashboardCloneModalVisible: false,
+        dashboardShareWithCodeModalVisible: false,
+        dashboardFolderSingleMoveModalVisible: false,
+        selectedDashboardId: undefined as string | undefined,
+        // bundle
+        bundleShareModalVisible: false,
+        bundleMoveModalVisible: false,
+        bundleCloneModalVisible: false,
+        bundleDeleteModalVisible: false,
+        //
         selectedPublicIdMap: {} as Record<string, boolean>,
         selectedPrivateIdMap: {} as Record<string, boolean>,
         newIdList: [] as string[],
@@ -102,17 +112,12 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
             const _privateDeprecated = dashboardState.privateDashboardItems.filter((d) => d.version === '1.0');
             return [..._publicDeprecated, ..._privateDeprecated];
         }),
-        //
+        // etc
         allDashboardItems: computed<DashboardModel[]>(() => [...getters.publicDashboardItems, ...getters.privateDashboardItems]),
         allFolderItems: computed<FolderModel[]>(() => [...getters.publicFolderItems, ...getters.privateFolderItems]),
         existingFolderNameList: computed<string[]>(() => {
             const _publicNames = dashboardState.publicFolderItems.map((d) => d.name);
             const _privateNames = dashboardState.privateFolderItems.map((d) => d.name);
-            return [..._publicNames, ..._privateNames];
-        }),
-        existingDashboardNameList: computed<string[]>(() => {
-            const _publicNames = dashboardState.publicDashboardItems.map((d) => d.name);
-            const _privateNames = dashboardState.privateDashboardItems.map((d) => d.name);
             return [..._publicNames, ..._privateNames];
         }),
         loading: computed<boolean>(() => dashboardState.loading),
@@ -128,15 +133,6 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
     const setSelectedFolderId = (folderId: string | undefined) => {
         state.selectedFolderId = folderId;
     };
-    const setFolderDeleteModalVisible = (visible: boolean) => {
-        state.folderDeleteModalVisible = visible;
-    };
-    const setFolderMoveModalVisible = (visible: boolean) => {
-        state.folderMoveModalVisible = visible;
-    };
-    const setFolderCloneModalVisible = (visible: boolean) => {
-        state.folderCloneModalVisible = visible;
-    };
     const setSelectedPublicIdMap = (idMap: Record<string, boolean>) => {
         state.selectedPublicIdMap = idMap;
     };
@@ -149,59 +145,140 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
     const setNewIdList = (newIdList: string[]) => {
         state.newIdList = newIdList;
     };
-    const setFolderShareModalVisible = (visible: boolean) => {
-        state.folderShareModalVisible = visible;
-    };
     const setSearchQueryTags = (queryTags: QueryTag[] = []) => {
         state.searchQueryTags = queryTags;
     };
+    const setDashboardNameEditModalVisible = (visible: boolean) => { state.dashboardNameEditModalVisible = visible; };
+    const setDashboardDeleteModalVisible = (visible: boolean) => { state.dashboardDeleteModalVisible = visible; };
+    const setDashboardCloneModalVisible = (visible: boolean) => { state.dashboardCloneModalVisible = visible; };
+    const setDashboardShareWithCodeModalVisible = (visible: boolean) => { state.dashboardShareWithCodeModalVisible = visible; };
+    const setDashboardFolderSingleMoveModalVisible = (visible: boolean) => { state.dashboardFolderSingleMoveModalVisible = visible; };
+    const setBundleShareModalVisible = (visible: boolean) => { state.bundleShareModalVisible = visible; };
+    const setBundleMoveModalVisible = (visible: boolean) => { state.bundleMoveModalVisible = visible; };
+    const setBundleCloneModalVisible = (visible: boolean) => { state.bundleCloneModalVisible = visible; };
+    const setBundleDeleteModalVisible = (visible: boolean) => { state.bundleDeleteModalVisible = visible; };
+    const setSelectedDashboardId = (dashboardId: string | undefined) => { state.selectedDashboardId = dashboardId; };
     const mutations = {
         setFolderFormModalVisible,
         setFolderFormModalType,
         setSelectedFolderId,
-        setFolderDeleteModalVisible,
-        setFolderMoveModalVisible,
+        setBundleDeleteModalVisible,
         setSelectedPublicIdMap,
         setSelectedPrivateIdMap,
         setFolderModalType,
-        setFolderCloneModalVisible,
+        setBundleCloneModalVisible,
         setNewIdList,
-        setFolderShareModalVisible,
+        setBundleShareModalVisible,
         setSearchQueryTags,
+        setDashboardNameEditModalVisible,
+        setDashboardDeleteModalVisible,
+        setDashboardCloneModalVisible,
+        setDashboardShareWithCodeModalVisible,
+        setDashboardFolderSingleMoveModalVisible,
+        setBundleMoveModalVisible,
+        setSelectedDashboardId,
     };
 
     /* Actions */
     const reset = () => {
-        setFolderFormModalVisible(false);
-        setFolderFormModalType('CREATE');
-        setSelectedFolderId(undefined);
-        setFolderDeleteModalVisible(false);
-        setFolderMoveModalVisible(false);
-        setFolderModalType('PUBLIC');
-        setFolderCloneModalVisible(false);
-        setFolderShareModalVisible(false);
+        state.folderFormModalVisible = false;
+        state.dashboardNameEditModalVisible = false;
+        state.dashboardDeleteModalVisible = false;
+        state.dashboardCloneModalVisible = false;
+        state.dashboardShareWithCodeModalVisible = false;
+        state.dashboardFolderSingleMoveModalVisible = false;
+        state.bundleShareModalVisible = false;
+        state.bundleMoveModalVisible = false;
+        state.bundleCloneModalVisible = false;
+        state.bundleDeleteModalVisible = false;
+        state.selectedFolderId = undefined;
+        state.selectedDashboardId = undefined;
+        state.selectedPublicIdMap = {};
+        state.selectedPrivateIdMap = {};
     };
     const resetSelectedIdMap = (type?: 'PUBLIC'|'PRIVATE') => {
         if (type === 'PUBLIC') {
-            setSelectedPublicIdMap({});
+            state.selectedPublicIdMap = {};
         } else if (type === 'PRIVATE') {
-            setSelectedPrivateIdMap({});
+            state.selectedPrivateIdMap = {};
         } else {
-            setSelectedPublicIdMap({});
-            setSelectedPrivateIdMap({});
+            state.selectedPublicIdMap = {};
+            state.selectedPrivateIdMap = {};
         }
     };
-    const setSelectedIdMap = (idMap: Record<string, boolean>, type: 'PUBLIC'|'PRIVATE') => {
-        if (type === 'PUBLIC') {
-            setSelectedPublicIdMap(idMap);
+
+    // Single (Folder or Dashboard)
+    const openEditNameModal = (id: string) => {
+        if (id.includes('folder')) {
+            state.folderFormModalType = 'UPDATE';
+            state.selectedFolderId = id;
+            state.folderFormModalVisible = true;
         } else {
-            setSelectedPrivateIdMap(idMap);
+            state.selectedDashboardId = id;
+            state.dashboardNameEditModalVisible = true;
         }
+    };
+    const openShareModal = (id: string) => {
+        if (id.includes('folder')) {
+            state.selectedFolderId = id;
+            state.bundleShareModalVisible = true;
+        } else {
+            state.selectedDashboardId = id;
+            state.bundleShareModalVisible = true;
+        }
+    };
+    const openShareWithCodeModal = (dashboardId: string) => {
+        state.selectedDashboardId = dashboardId;
+        state.dashboardShareWithCodeModalVisible = true;
+    };
+    const openCloneModal = (id: string) => {
+        if (id.includes('folder')) {
+            state.selectedFolderId = id;
+            state.bundleCloneModalVisible = true;
+        } else {
+            state.selectedDashboardId = id;
+            state.dashboardCloneModalVisible = true;
+        }
+    };
+    const openDeleteModal = (id: string) => {
+        if (id.includes('folder')) {
+            state.selectedFolderId = id;
+            state.bundleDeleteModalVisible = true;
+        } else {
+            state.selectedDashboardId = id;
+            state.dashboardDeleteModalVisible = true;
+        }
+    };
+    const openMoveModal = (dashboardId: string) => {
+        state.selectedDashboardId = dashboardId;
+        state.dashboardFolderSingleMoveModalVisible = true;
+    };
+
+    // Bundle (Folder + Dashboard)
+    const openBundleCloneModal = (type: 'PRIVATE'|'PUBLIC') => {
+        state.folderModalType = type;
+        state.bundleCloneModalVisible = true;
+    };
+    const openBundleMoveModal = (type: 'PRIVATE'|'PUBLIC') => {
+        state.folderModalType = type;
+        state.bundleMoveModalVisible = true;
+    };
+    const openBundleDeleteModal = (type: 'PRIVATE'|'PUBLIC') => {
+        state.folderModalType = type;
+        state.bundleDeleteModalVisible = true;
     };
     const actions = {
         reset,
         resetSelectedIdMap,
-        setSelectedIdMap,
+        openEditNameModal,
+        openShareModal,
+        openShareWithCodeModal,
+        openCloneModal,
+        openDeleteModal,
+        openMoveModal,
+        openBundleCloneModal,
+        openBundleMoveModal,
+        openBundleDeleteModal,
     };
 
     return {

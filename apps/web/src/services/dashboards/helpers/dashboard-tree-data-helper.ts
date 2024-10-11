@@ -108,6 +108,7 @@ export const convertTreeDataToDataTableItems = (treeData: TreeNode<DashboardTree
                     location: node.data.name,
                     type: 'DASHBOARD',
                     isFolderSelected: true,
+                    folderId: node.data.id,
                 });
             });
         } else {
@@ -118,6 +119,7 @@ export const convertTreeDataToDataTableItems = (treeData: TreeNode<DashboardTree
                 name: node.data.name,
                 location: _folderName,
                 type: 'DASHBOARD',
+                folderId: _folderId,
             });
         }
     });
