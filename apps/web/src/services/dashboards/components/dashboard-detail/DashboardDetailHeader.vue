@@ -17,7 +17,7 @@ import { gray } from '@/styles/colors';
 
 import DashboardControlButtons from '@/services/dashboards/components/dashboard-detail/DashboardControlButtons.vue';
 import DashboardLabelsButton from '@/services/dashboards/components/dashboard-detail/DashboardLabelsButton.vue';
-import { useDashboardControlMenuItems } from '@/services/dashboards/composables/use-dashboard-control-buttons';
+import { useDashboardControlMenuItems } from '@/services/dashboards/composables/use-dashboard-control-menu-items';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 

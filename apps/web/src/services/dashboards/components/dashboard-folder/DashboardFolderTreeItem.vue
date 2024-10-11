@@ -23,7 +23,7 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { gray, indigo, violet } from '@/styles/colors';
 
-import { useDashboardControlMenuItems } from '@/services/dashboards/composables/use-dashboard-control-buttons';
+import { useDashboardControlMenuItems } from '@/services/dashboards/composables/use-dashboard-control-menu-items';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';

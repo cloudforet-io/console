@@ -21,7 +21,7 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { gray } from '@/styles/colors';
 
-import { useDashboardControlMenuItems } from '@/services/dashboards/composables/use-dashboard-control-buttons';
+import { useDashboardControlMenuItems } from '@/services/dashboards/composables/use-dashboard-control-menu-items';
 import { getDashboardTreeData } from '@/services/dashboards/helpers/dashboard-tree-data-helper';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
