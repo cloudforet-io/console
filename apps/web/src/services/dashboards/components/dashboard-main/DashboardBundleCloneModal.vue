@@ -79,6 +79,7 @@ const state = reactive({
                     location: _folderName,
                     folderId: d.folder_id,
                     type: 'DASHBOARD',
+                    isFolderSelected: true,
                 }));
             return [..._folderItems, ..._dashboardItems];
         }
@@ -130,6 +131,7 @@ const handleCloneConfirm = async () => {
         showErrorMessage(i18n.t('DASHBOARDS.ALL_DASHBOARDS.ALT_E_CLONE_DASHBOARD', { count: _failedCount }), '');
     }
     await dashboardStore.load();
+    dashboardPageControlStore.reset();
     state.loading = false;
     state.proxyVisible = false;
 };
@@ -153,7 +155,6 @@ const handleChangePrivate = (id: string, value: boolean) => {
 /* Watcher */
 watch(() => state.proxyVisible, (visible) => {
     if (!visible) {
-        dashboardPageControlStore.reset();
         state.privateMap = {};
     }
 });

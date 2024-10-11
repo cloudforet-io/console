@@ -212,6 +212,7 @@ const handleConfirm = async () => {
         const _updatedDashboard = dashboardPageControlGetters.allDashboardItems.find((d) => d.dashboard_id === props.dashboardId);
         dashboardDetailStore.setDashboardInfo(_updatedDashboard);
     }
+    dashboardPageControlStore.reset();
     state.proxyVisible = false;
 };
 const handleChangeTarget = (value: 'WORKSPACE' | 'PROJECT') => {
@@ -221,7 +222,6 @@ const handleChangeTarget = (value: 'WORKSPACE' | 'PROJECT') => {
 /* Watcher */
 watch(() => state.proxyVisible, (visible) => {
     if (!visible) {
-        dashboardPageControlStore.reset();
         state.selectedTarget = 'WORKSPACE';
     }
 });

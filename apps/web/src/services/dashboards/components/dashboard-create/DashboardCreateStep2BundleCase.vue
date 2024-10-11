@@ -8,7 +8,6 @@ import { isEmpty } from 'lodash';
 import {
     PDataTable, PI, PToggleButton,
 } from '@cloudforet/mirinae';
-import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
 import { getClonedName } from '@cloudforet/utils';
 
 import { SpaceRouter } from '@/router';
@@ -27,21 +26,15 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 
 import { gray } from '@/styles/colors';
 
-import {
-    convertTreeDataToDataTableItems,
-    getDashboardTreeData,
-    getSelectedTreeData,
-} from '@/services/dashboards/helpers/dashboard-tree-data-helper';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
-import type { DashboardDataTableItem, DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
+import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
 
 
 
 const TABLE_FIELDS = [
     { name: 'name', label: 'Name' },
-    { name: 'location', label: 'Location' },
     { name: 'private', label: 'Make Private' },
 ];
 const { getProperRouteLocation } = useProperRouteLocation();
@@ -67,15 +60,6 @@ const state = reactive({
         if (state.bundleCaseType === 'TEMPLATE') return TABLE_FIELDS.filter((f) => f.name !== 'location');
         return TABLE_FIELDS;
     }),
-    dataTableItems: computed(() => {
-        if (state.bundleCaseType === 'TEMPLATE') return state.ootbItems;
-        return state.existingDashboardItems;
-    }),
-    existingFolderNameList: computed<string[]>(() => {
-        const _publicNames = dashboardPageControlGetters.publicFolderItems.map((d) => d.name);
-        const _privateNames = dashboardPageControlGetters.privateFolderItems.map((d) => d.name);
-        return [..._publicNames, ..._privateNames];
-    }),
     // template
     ootbItems: computed<DashboardDataTableItem[]>(() => {
         const _selectedOotbList = dashboardCreatePageState.dashboardTemplates.filter((d) => dashboardCreatePageState.selectedOotbIdMap[d.template_id]);
@@ -84,13 +68,6 @@ const state = reactive({
             name: d.name,
             type: 'DASHBOARD',
         }));
-    }),
-    // existing dashboard
-    existingDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getDashboardTreeData(dashboardPageControlGetters.allFolderItems, dashboardPageControlGetters.allDashboardItems)),
-    existingSelectedTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getSelectedTreeData(state.existingDashboardTreeData, dashboardCreatePageState.selectedExistingDashboardIdMap)),
-    existingDashboardItems: computed<DashboardDataTableItem[]>(() => {
-        const _items = convertTreeDataToDataTableItems(state.existingDashboardTreeData, state.existingSelectedTreeData);
-        return _items;
     }),
     existingPublicDashboardNameList: computed<string[]>(() => dashboardPageControlGetters.publicDashboardItems.map((d) => d.name)),
     existingPrivateDashboardNameList: computed<string[]>(() => dashboardPageControlGetters.privateDashboardItems.map((d) => d.name)),
@@ -128,36 +105,13 @@ const createBundleOotb = async () => {
         _promises.push(dashboardStore.createDashboard(_createType, _dashboardParams));
     }));
     const _results = await Promise.allSettled(_promises);
-    // TODO: set new id list
-    if (_results.every((r) => r.status === 'fulfilled')) {
-        showSuccessMessage(i18n.t('DASHBOARDS.CREATE.ALT_S_CREATE_DASHBOARD'), '');
-    } else {
-        const _failedCount = _results.map((r) => r.status !== 'fulfilled').length;
-        showErrorMessage(i18n.t('DASHBOARDS.CREATE.ALT_E_CREATE_DASHBOARD', { count: _failedCount }), '');
-    }
-};
-const createBundleDashboards = async () => {
-    const _promises: Promise<DashboardModel>[] = [];
-    await Promise.allSettled(state.existingSelectedTreeData.map(async (node) => {
-        const _isPrivate = state.privateMap[node.id];
-        if (node.data.type === 'FOLDER') {
-            const createdFolderId = await dashboardStore.createFolder(node.data.name, _isPrivate);
-            if (!createdFolderId) return;
-            addToNewIdList(createdFolderId);
-            node.children?.forEach((child) => {
-                _promises.push(dashboardStore.cloneDashboard(child.data.id, _isPrivate, createdFolderId));
-            });
-        } else {
-            _promises.push(dashboardStore.cloneDashboard(node.data.id, _isPrivate));
-        }
-    }));
-    const _results = await Promise.allSettled(_promises);
     const _fulfilledResults = _results.filter((r) => r.status === 'fulfilled');
     _fulfilledResults.forEach((v) => addToNewIdList(v.value?.dashboard_id as string));
     if (_results.every((r) => r.status === 'fulfilled')) {
         showSuccessMessage(i18n.t('DASHBOARDS.CREATE.ALT_S_CREATE_DASHBOARD'), '');
     } else {
-        showErrorMessage(i18n.t('DASHBOARDS.CREATE.ALT_E_CREATE_DASHBOARD', { count: _fulfilledResults.length }), '');
+        const _failedCount = _results.map((r) => r.status !== 'fulfilled').length;
+        showErrorMessage(i18n.t('DASHBOARDS.CREATE.ALT_E_CREATE_DASHBOARD', { count: _failedCount }), '');
     }
 };
 
@@ -167,25 +121,10 @@ const handleChangePrivate = (id: string, value: boolean) => {
         ...state.privateMap,
         [id]: value,
     };
-
-    const _isFolder = id.includes('folder');
-    if (_isFolder) {
-        state.existingSelectedTreeData.find((item) => item.data.id === id)?.children.forEach((child) => {
-            state.privateMap = {
-                ...state.privateMap,
-                [child.data.id]: value,
-            };
-        });
-    }
 };
 const handleConfirm = async () => {
     dashboardCreatePageStore.setLoading(true);
-    const _isOotbSelected = Object.values(dashboardCreatePageState.selectedOotbIdMap).some((v) => v);
-    if (_isOotbSelected) {
-        await createBundleOotb();
-    } else {
-        await createBundleDashboards();
-    }
+    await createBundleOotb();
     await dashboardStore.load();
     await SpaceRouter.router.push(getProperRouteLocation({
         name: DASHBOARDS_ROUTE._NAME,
@@ -200,7 +139,7 @@ defineExpose({
 
 <template>
     <div class="dashboard-create-step2-bundle-case">
-        <p-data-table :items="state.dataTableItems"
+        <p-data-table :items="state.ootbItems"
                       :fields="state.tableFields"
         >
             <template #col-name-format="{item}">
@@ -213,22 +152,9 @@ defineExpose({
                     <span>{{ item.name }}</span>
                 </div>
             </template>
-            <template #col-location-format="{item}">
-                <div v-if="item.location && item.isFolderSelected"
-                     class="table-column"
-                >
-                    <p-i name="ic_folder"
-                         :color="gray[600]"
-                         width="1rem"
-                         height="1rem"
-                    />
-                    <span>{{ item.location }}</span>
-                </div>
-            </template>
             <template #col-private-format="{item}">
                 <div class="table-column">
                     <p-toggle-button :value="state.privateMap[item.id]"
-                                     :disabled="item.isFolderSelected"
                                      @change-toggle="handleChangePrivate(item.id, $event)"
                     />
                 </div>
