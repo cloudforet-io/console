@@ -9,13 +9,14 @@
                            @click="$emit('click-back-button',$event)"
             />
         </span>
-        <span class="title-left-extra"><slot name="title-left-extra" /></span>
-        <h2 :class="{'has-left': !!$slots['title-left-extra'], 'has-right': useTotalCount || !!$slots['title-right-extra']}">
+        <slot name="title-left-extra" />
+        <h2 :class="{
+            'has-left': !!$slots['title-left-extra'],
+            'has-right': useTotalCount || !!$slots['title-right-extra']}"
+        >
             <slot>
                 <slot name="title">
-                    <span class="title">
-                        {{ title.length ? title : '&zwnj;' }}
-                    </span>
+                    {{ title.length ? title : '&zwnj;' }}
                 </slot>
             </slot>
         </h2>
@@ -95,30 +96,30 @@ export default defineComponent<Props>({
 
 <style lang="postcss">
 .p-heading {
-    vertical-align: top;
-    line-height: 2rem;
+    vertical-align: middle;
+    > .back-button {
+        display: inline-flex;
+        line-height: 2rem;
+        margin-right: 0.25rem;
+    }
     > h2 {
         @apply text-2xl;
         display: inline;
         word-break: break-word;
+        line-height: 1.875rem;
         &.has-left {
             margin-left: 0.5rem;
         }
     }
-    > .back-button {
-        display: inline-flex;
-        line-height: inherit;
-        margin-right: 0.25rem;
-    }
     > .total-count {
         font-size: 1.125rem;
-        line-height: inherit;
+        line-height: 2rem;
         font-weight: normal;
         margin-right: 0.5rem;
+        vertical-align: sub;
     }
     &.heading-main {
         width: 100%;
-        line-height: 2rem;
         > h2 {
             font-weight: bold;
             &.has-right {
@@ -130,10 +131,13 @@ export default defineComponent<Props>({
         }
     }
     &.heading-sub {
-        line-height: 1.2;
+        > h2 {
+            &.has-right {
+                margin-right: 0.125rem;
+            }
+        }
         > .total-count {
             @apply text-gray-500;
-            padding-left: 0.125rem;
         }
     }
 }
