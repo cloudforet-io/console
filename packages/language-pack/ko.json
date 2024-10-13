@@ -48,9 +48,10 @@
 			"AUTHENTICATION_CODE": "인증 코드",
 			"AUTHENTICATION_CODE_LOWER": "인증 코드",
 			"CONFIRM": "확인",
-			"EMAIL_INFO": "{code}가 입력한 이메일로 발송 되었습니다:",
+			"EMAIL_INFO": "",
 			"ENTER_CODE": "코드 입력",
 			"GO_BACK": "로그인 하러 가기",
+			"PROBLEM_TITLE": "",
 			"SUB_TITLE": "멀티 팩터 인증을 사용하여 계정 확인이 필요합니다.",
 			"TITLE": "멀티 팩터\n인증"
 		},
