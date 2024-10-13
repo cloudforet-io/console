@@ -12,9 +12,9 @@ import { NOTIFY_LEVEL_MAP } from '@/services/cost-explorer/constants/anomaly-det
 
 <template>
     <div class="anomaly-detection-history-detail-page">
-        <p-heading title="detail page"
+        <p-heading class="mb-6"
+                   title="detail page"
                    show-back-button
-                   class="heading"
                    @click-back-button="$router.go(-1)"
         >
             <template #title-left-extra>
@@ -25,7 +25,7 @@ import { NOTIFY_LEVEL_MAP } from '@/services/cost-explorer/constants/anomaly-det
                          height="1rem"
                          width="1rem"
                          :color="NOTIFY_LEVEL_MAP['CRITICAL'].color"
-                         class="icon"
+                         class="error-icon"
                     />
                     <span>critical</span>
                 </p-badge>
@@ -37,10 +37,8 @@ import { NOTIFY_LEVEL_MAP } from '@/services/cost-explorer/constants/anomaly-det
 
 <style scoped lang="postcss">
 .anomaly-detection-history-detail-page {
-    .heading {
-        .icon {
-            margin-right: 0.25rem;
-        }
+    .error-icon {
+        margin-right: 0.25rem;
     }
 }
 </style>

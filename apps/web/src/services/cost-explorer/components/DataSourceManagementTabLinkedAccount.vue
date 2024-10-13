@@ -158,7 +158,7 @@ onUnmounted(() => {
                    :selected-count="storeState.selectedLinkedAccountsIndices.length"
                    :title="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.TAB_LINKED_ACCOUNT_TITLE')"
                    :total-count="storeState.linkedAccountsTotalCount"
-                   class="title"
+                   class="pt-8 px-4 pb-4"
         >
             <template v-if="props.hasReadWriteAccess"
                       #extra

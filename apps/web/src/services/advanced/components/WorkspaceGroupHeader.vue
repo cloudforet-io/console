@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PHeading, PButton } from '@cloudforet/mirinae';
+import { PHeading, PButton, PHeadingLayout } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 
@@ -28,11 +28,14 @@ const handleCreateButtonClick = () => {
 
 <template>
     <section class="workspace-group-header">
-        <p-heading class="workspace-group-header"
-                   :title="$t('IAM.WORKSPACE_GROUP.TITLE')"
-                   use-total-count
-                   :total-count="workspaceGroupState.totalCount"
-        >
+        <p-heading-layout class="mb-6">
+            <template #heading>
+                <p-heading class="workspace-group-header"
+                           :title="$t('IAM.WORKSPACE_GROUP.TITLE')"
+                           use-total-count
+                           :total-count="workspaceGroupState.totalCount"
+                />
+            </template>
             <template v-if="props.hasReadWriteAccess"
                       #extra
             >
@@ -43,6 +46,6 @@ const handleCreateButtonClick = () => {
                     {{ $t('IAM.WORKSPACE_GROUP.CREATE') }}
                 </p-button>
             </template>
-        </p-heading>
+        </p-heading-layout>
     </section>
 </template>

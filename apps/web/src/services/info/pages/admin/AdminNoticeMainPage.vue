@@ -1,6 +1,9 @@
 <template>
     <div class="notice-page">
-        <p-heading :title="$t('INFO.NOTICE.MAIN.NOTICE_TITLE')">
+        <p-heading-layout class="mb-6">
+            <template #heading>
+                <p-heading :title="$t('INFO.NOTICE.MAIN.NOTICE_TITLE')" />
+            </template>
             <template v-if="state.hasReadWriteAccess"
                       #extra
             >
@@ -12,7 +15,7 @@
                     {{ $t('INFO.NOTICE.FORM.CREATE_NOTICE') }}
                 </p-button>
             </template>
-        </p-heading>
+        </p-heading-layout>
         <notice-list />
     </div>
 </template>
@@ -24,7 +27,7 @@ import { useRoute, useRouter } from 'vue-router/composables';
 import { clone } from 'lodash';
 
 import {
-    PButton, PHeading,
+    PButton, PHeading, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
 import { store } from '@/store';
@@ -45,6 +48,7 @@ export default {
         PHeading,
         PButton,
         NoticeList,
+        PHeadingLayout,
     },
     setup() {
         const router = useRouter();

@@ -39,11 +39,7 @@ const handleClickCloseButton = () => {
         </p>
         <p-heading v-if="props.title"
                    :title="props.title"
-        >
-            <template #extra>
-                <div class="empty-space-for-close-button" />
-            </template>
-        </p-heading>
+        />
         <p v-if="props.description"
            class="description"
         >
@@ -74,12 +70,10 @@ const handleClickCloseButton = () => {
     }
     > .p-heading {
         margin-bottom: 0.3125rem;
+        width: calc(100% - 1rem);
     }
     > .description {
         @apply text-label-md text-gray-700;
-    }
-    .empty-space-for-close-button {
-        width: 1rem;
     }
     > .close-button {
         position: absolute;

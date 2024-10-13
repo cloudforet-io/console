@@ -6,7 +6,7 @@ import {
 import { useRoute } from 'vue-router/composables';
 
 import {
-    PHeading, PButton, PContextMenu, PIconButton,
+    PHeading, PButton, PContextMenu, PIconButton, PHeadingLayout,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
@@ -146,58 +146,61 @@ onUnmounted(() => {
 
 <template>
     <div class="page-wrapper">
-        <p-heading :title="state.currentProjectGroupId ? storeState.projectGroups[state.currentProjectGroupId]?.name : $t('PROJECT.LANDING.ALL_PROJECTS')">
-            <template #title-right-extra>
-                <div v-if="state.currentProjectGroupId"
-                     class="title-right-button-wrapper"
-                >
-                    <template v-if="projectPageState.isWorkspaceOwner">
-                        <p-icon-button name="ic_edit-text"
-                                       style-type="transparent"
-                                       @click="handleClickProjectGroupEditButton"
-                        />
-                        <p-icon-button name="ic_move"
-                                       style-type="transparent"
-                                       @click="handleOpenProjectGroupMoveModal"
-                        />
-                        <p-icon-button name="ic_delete"
-                                       style-type="transparent"
-                                       @click="handleClickProjectGroupDeleteButton"
-                        />
-                    </template>
-                </div>
-                <div class="top-button-box">
-                    <p-button v-if="state.currentProjectGroupId"
-                              style-type="tertiary"
-                              icon-left="ic_member"
-                              class="mr-4"
-                              @click="handleClickAddProjectGroupMember"
-                    >
-                        <span>{{ $t('PROJECT.LANDING.GROUP_MEMBER') }}</span>
-                        <span v-if="state.projectGroupMemberCount"
-                              class="pl-1"
-                        >({{ state.projectGroupMemberCount }})</span>
-                    </p-button>
-                    <div v-if="projectPageState.isWorkspaceOwner"
-                         class="create-button-wrapper"
-                    >
-                        <p-button ref="targetRef"
-                                  icon-left="ic_plus_bold"
-                                  @click="handleClickCreateButton"
+        <p-heading-layout class="mb-6">
+            <template #heading>
+                <p-heading :title="state.currentProjectGroupId ? storeState.projectGroups[state.currentProjectGroupId]?.name : $t('PROJECT.LANDING.ALL_PROJECTS')">
+                    <template #title-right-extra>
+                        <div v-if="state.currentProjectGroupId"
+                             class="title-right-button-wrapper"
                         >
-                            {{ $t('PROJECT.LANDING.CREATE') }}
-                        </p-button>
-                        <p-context-menu v-show="state.createMenuVisible"
-                                        ref="menuRef"
-                                        class="create-context-menu"
-                                        no-select-indication
-                                        :menu="state.createDropdownMenuItems"
-                                        @select="handleSelectCreateMenu"
-                        />
-                    </div>
+                            <template v-if="projectPageState.isWorkspaceOwner">
+                                <p-icon-button name="ic_edit-text"
+                                               style-type="transparent"
+                                               @click="handleClickProjectGroupEditButton"
+                                />
+                                <p-icon-button name="ic_move"
+                                               style-type="transparent"
+                                               @click="handleOpenProjectGroupMoveModal"
+                                />
+                                <p-icon-button name="ic_delete"
+                                               style-type="transparent"
+                                               @click="handleClickProjectGroupDeleteButton"
+                                />
+                            </template>
+                        </div>
+                    </template>
+                </p-heading>
+            </template>
+            <template #extra>
+                <p-button v-if="state.currentProjectGroupId"
+                          style-type="tertiary"
+                          icon-left="ic_member"
+                          @click="handleClickAddProjectGroupMember"
+                >
+                    <span>{{ $t('PROJECT.LANDING.GROUP_MEMBER') }}</span>
+                    <span v-if="state.projectGroupMemberCount"
+                          class="pl-1"
+                    >({{ state.projectGroupMemberCount }})</span>
+                </p-button>
+                <div v-if="projectPageState.isWorkspaceOwner"
+                     class="create-button-wrapper"
+                >
+                    <p-button ref="targetRef"
+                              icon-left="ic_plus_bold"
+                              @click="handleClickCreateButton"
+                    >
+                        {{ $t('PROJECT.LANDING.CREATE') }}
+                    </p-button>
+                    <p-context-menu v-show="state.createMenuVisible"
+                                    ref="menuRef"
+                                    class="create-context-menu"
+                                    no-select-indication
+                                    :menu="state.createDropdownMenuItems"
+                                    @select="handleSelectCreateMenu"
+                    />
                 </div>
             </template>
-        </p-heading>
+        </p-heading-layout>
         <project-main />
         <project-group-member-management-modal v-if="state.projectGroupMemberManagementModalVisible"
                                                :visible.sync="state.projectGroupMemberManagementModalVisible"
@@ -227,30 +230,20 @@ onUnmounted(() => {
     @apply flex flex-col w-full h-full;
 }
 
-.p-heading {
-    @apply pb-5 border-b border-gray-200;
-}
-
 .title-right-button-wrapper {
-    margin-right: 0.5rem;
     display: inline-flex;
     align-items: center;
 }
-.top-button-box {
-    display: flex;
-    align-self: center;
-    margin-left: auto;
-    .create-context-menu {
-        @apply absolute;
-        top: 100%;
-        right: 0;
-        z-index: 10;
-        width: max-content;
-    }
-    .create-button-wrapper {
-        @apply relative inline-block;
-        height: 2rem;
-    }
+.create-context-menu {
+    @apply absolute;
+    top: 100%;
+    right: 0;
+    z-index: 10;
+    width: max-content;
+}
+.create-button-wrapper {
+    @apply relative inline-block;
+    height: 2rem;
 }
 
 .parents-info {

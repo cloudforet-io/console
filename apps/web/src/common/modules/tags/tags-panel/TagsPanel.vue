@@ -8,7 +8,7 @@ import { get, camelCase } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PDataTable, PHeading, PButton,
+    PDataTable, PHeading, PButton, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
@@ -137,11 +137,14 @@ watch(
 </script>
 <template>
     <div>
-        <p-heading heading-type="sub"
-                   :use-total-count="true"
-                   :total-count="state.isCustomMode ? props.customItems.length : state.items.length"
-                   :title="$t('COMMON.TAGS.TITLE')"
-        >
+        <p-heading-layout class="pt-8 px-4 pb-4">
+            <template #heading>
+                <p-heading heading-type="sub"
+                           :use-total-count="true"
+                           :total-count="state.isCustomMode ? props.customItems.length : state.items.length"
+                           :title="$t('COMMON.TAGS.TITLE')"
+                />
+            </template>
             <template #extra>
                 <p-button v-if="!appContextGetters.isAdminMode"
                           style-type="secondary"
@@ -152,7 +155,7 @@ watch(
                     {{ props.tagEditButtonText ?? $t('COMMON.TAGS.EDIT') }}
                 </p-button>
             </template>
-        </p-heading>
+        </p-heading-layout>
         <slot name="table-top" />
         <p-data-table :fields="state.isCustomMode ? props.customFields : state.fields"
                       :items="state.isCustomMode ? props.customItems : state.items"

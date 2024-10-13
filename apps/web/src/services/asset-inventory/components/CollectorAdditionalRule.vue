@@ -179,7 +179,7 @@ const isEditModeByOrder = (order: number) => state.editModeCardOrder === order;
 
 <template>
     <p-pane-layout class="collector-create-form-rule">
-        <p-heading class="additional-options-label"
+        <p-heading class="pt-8 px-4 pb-4"
                    :title="$t('INVENTORY.COLLECTOR.ADDITIONAL_RULE')"
                    heading-type="sub"
         />
@@ -285,10 +285,6 @@ const isEditModeByOrder = (order: number) => state.editModeCardOrder === order;
 <style lang="postcss" scoped>
 
 .collector-create-form-rule {
-    .additional-options-label {
-        margin-bottom: 0.5rem;
-    }
-
     .card-list-wrapper {
         @apply flex flex-col gap-4;
         margin: 1.5rem 1rem 0 1rem;

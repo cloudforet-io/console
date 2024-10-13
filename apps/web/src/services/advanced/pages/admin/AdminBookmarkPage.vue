@@ -6,7 +6,9 @@ import { useRoute } from 'vue-router/composables';
 
 import { at, clone } from 'lodash';
 
-import { PHeading, PButton, PContextMenu } from '@cloudforet/mirinae';
+import {
+    PHeading, PButton, PContextMenu, PHeadingLayout,
+} from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
 
 import { store } from '@/store';
@@ -84,37 +86,38 @@ const handleClickDeleteButton = () => {
 
 <template>
     <div class="admin-bookmark-page">
-        <p-heading :title="$t('IAM.BOOKMARK.ALL_BOOKMARK')"
-                   class="title"
-        >
+        <p-heading-layout class="mb-6">
+            <template #heading>
+                <p-heading :title="$t('IAM.BOOKMARK.ALL_BOOKMARK')"
+                           class="title"
+                />
+            </template>
             <template v-if="state.hasReadWriteAccess"
                       #extra
             >
-                <div class="extra">
-                    <p-button style-type="tertiary"
-                              icon-left="ic_delete"
-                              :disabled="storeState.selectedIndices.length === 0"
-                              @click="handleClickDeleteButton"
+                <p-button style-type="tertiary"
+                          icon-left="ic_delete"
+                          :disabled="storeState.selectedIndices.length === 0"
+                          @click="handleClickDeleteButton"
+                >
+                    {{ $t('IAM.BOOKMARK.DELETE') }} {{ storeState.selectedIndices.length || ' ' }}
+                </p-button>
+                <div class="create-button-wrapper">
+                    <p-button icon-left="ic_plus"
+                              @click="handleClickCreateButton"
                     >
-                        {{ $t('IAM.BOOKMARK.DELETE') }} {{ storeState.selectedIndices.length || ' ' }}
+                        {{ $t('IAM.BOOKMARK.ADD_GLOBAL_BOOKMARK') }}
                     </p-button>
-                    <div class="create-button-wrapper">
-                        <p-button icon-left="ic_plus"
-                                  @click="handleClickCreateButton"
-                        >
-                            {{ $t('IAM.BOOKMARK.ADD_GLOBAL_BOOKMARK') }}
-                        </p-button>
-                        <p-context-menu v-show="state.visibleMenu"
-                                        class="create-context-menu"
-                                        reset-selected-on-unmounted
-                                        :selected="[]"
-                                        :menu="state.createMenu"
-                                        @select="handleSelectMenuItem"
-                        />
-                    </div>
+                    <p-context-menu v-show="state.visibleMenu"
+                                    class="create-context-menu"
+                                    reset-selected-on-unmounted
+                                    :selected="[]"
+                                    :menu="state.createMenu"
+                                    @select="handleSelectMenuItem"
+                    />
                 </div>
             </template>
-        </p-heading>
+        </p-heading-layout>
         <bookmark-management-table :has-read-write-access="state.hasReadWriteAccess" />
     </div>
 </template>
@@ -122,19 +125,15 @@ const handleClickDeleteButton = () => {
 <style lang="postcss" scoped>
 .admin-bookmark-page {
     .title {
-        .extra {
-            @apply flex;
-            gap: 1rem;
-            .create-button-wrapper {
-                @apply relative;
-                .create-context-menu {
-                    @apply absolute;
-                    min-width: unset;
-                    width: 9rem;
-                    top: 2rem;
-                    right: 0;
-                    z-index: 10;
-                }
+        .create-button-wrapper {
+            @apply relative;
+            .create-context-menu {
+                @apply absolute;
+                min-width: unset;
+                width: 9rem;
+                top: 2rem;
+                right: 0;
+                z-index: 10;
             }
         }
     }

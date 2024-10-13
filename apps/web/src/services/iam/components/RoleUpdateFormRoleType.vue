@@ -75,9 +75,9 @@ watch(() => props.initialData, (initialData) => {
 
 <template>
     <p-pane-layout class="role-update-page-role-type">
-        <p-heading heading-type="sub"
+        <p-heading class="mt-8 mx-4 mb-6"
+                   heading-type="sub"
                    :title="$t('IAM.ROLE.DETAIL.ROLE_TYPE')"
-                   class="heading"
         />
         <div class="select-card-wrapper">
             <p-select-card v-for="(roleType, index) in state.roleTypes"
@@ -110,9 +110,6 @@ watch(() => props.initialData, (initialData) => {
 <style scoped lang="postcss">
 .role-update-page-role-type {
     max-width: 100%;
-    .heading {
-        margin-bottom: 1.5rem;
-    }
     .select-card-wrapper {
         @apply flex flex-wrap mx-4 mb-8;
         max-width: 60rem;

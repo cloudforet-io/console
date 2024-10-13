@@ -304,7 +304,8 @@ onActivated(() => {
             @export="onExport"
         >
             <template #toolbox-top>
-                <p-heading heading-type="sub"
+                <p-heading class="pt-8 px-4 pb-4"
+                           heading-type="sub"
                            use-total-count
                            :total-count="state.totalCount"
                            :title="$t('PROJECT.DETAIL.SUBTAB_WEBHOOK')"

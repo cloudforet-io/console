@@ -6,7 +6,8 @@ import BudgetCreateForm from '@/services/cost-explorer/components/BudgetCreateFo
 
 <template>
     <div>
-        <p-heading :title="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE_BUDGET')"
+        <p-heading class="mb-6"
+                   :title="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE_BUDGET')"
                    show-back-button
                    @click-back-button="$router.go(-1)"
         />

@@ -108,9 +108,9 @@ watch(() => props.menuItems, (menuItems) => {
 
 <template>
     <div class="role-update-page-access">
-        <p-heading heading-type="sub"
+        <p-heading class="pt-8 pb-2"
+                   heading-type="sub"
                    :title="$t('IAM.ROLE.DETAIL.PAGE_ACCESS')"
-                   class="heading"
         />
         <div v-if="props.roleType === ROLE_TYPE.DOMAIN_ADMIN">
             <div class="page-access-info-wrapper">
@@ -207,11 +207,6 @@ watch(() => props.menuItems, (menuItems) => {
     @apply flex flex-col;
     margin: 0 1rem 0.5rem 1rem;
     gap: 0.5rem;
-    .heading {
-        margin-right: 0;
-        margin-bottom: 0.5rem;
-        margin-left: 0;
-    }
     .page-access-menu {
         @apply border border-gray-200 rounded-md;
         font-size: 0.875rem;

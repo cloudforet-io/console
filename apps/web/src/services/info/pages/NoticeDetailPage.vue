@@ -23,7 +23,8 @@ onUnmounted(() => {
 
 <template>
     <div>
-        <p-heading :title="noticeDetailState.post?.title"
+        <p-heading class="mb-6"
+                   :title="noticeDetailState.post?.title"
                    show-back-button
                    @click-back-button="$router.go(-1)"
         />

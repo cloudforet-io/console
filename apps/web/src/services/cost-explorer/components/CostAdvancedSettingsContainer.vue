@@ -37,7 +37,9 @@ const state = reactive({
 
 <template>
     <section class="cost-advanced-settings-container">
-        <p-heading :title="state.headingTitle" />
+        <p-heading class="mb-6"
+                   :title="state.headingTitle"
+        />
         <div class="page-content-wrapper">
             <router-view />
         </div>

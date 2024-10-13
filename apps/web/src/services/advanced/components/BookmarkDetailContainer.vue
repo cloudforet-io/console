@@ -8,7 +8,7 @@ import { useRoute, useRouter } from 'vue-router/composables';
 import { at, clone } from 'lodash';
 
 import {
-    PHeading, PButton, PContextMenu, PI, PIconButton, PStatus,
+    PHeading, PButton, PContextMenu, PI, PIconButton, PStatus, PHeadingLayout,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
 
@@ -155,61 +155,57 @@ const handleSelectMenuItem = (value: MenuItem) => {
 
 <template>
     <div class="bookmark-detail-container">
-        <p-heading :title="state.headingTitle"
-                   :show-back-button="!!state.folder"
-                   class="title"
-                   @click-back-button="handleClickGoBackButton"
-        >
-            <template #title-left-extra>
-                <div v-if="!state.folder"
-                     class="title-extra"
+        <p-heading-layout class="mb-6">
+            <template #heading>
+                <p-heading :title="state.headingTitle"
+                           :show-back-button="!!state.folder"
+                           class="title"
+                           @click-back-button="handleClickGoBackButton"
                 >
-                    <p-i v-if="state.group === 'global'"
-                         name="ic_globe-filled"
-                         :color="gray[500]"
-                         width="1.5rem"
-                         height="1.5rem"
-                    />
-                    <workspace-logo-icon v-else
-                                         :text="state.workspaceInfo?.name || ''"
-                                         :theme="state.workspaceInfo?.tags?.theme"
-                                         size="sm"
-                    />
-                </div>
-                <div v-else
-                     class="title-extra"
-                >
-                    <p-i name="ic_folder"
-                         :color="gray[900]"
-                         width="1.25rem"
-                         height="1.25rem"
-                    />
-                </div>
-            </template>
-            <template #title-right-extra>
-                <p-status v-if="state.workspaceInfo?.is_dormant"
-                          v-bind="workspaceStateFormatter( WORKSPACE_STATE.DORMANT)"
-                          class="capitalize state"
-                />
-                <div v-if="state.folder && state.group === 'global'"
-                     class="title-extra"
-                >
-                    <p-icon-button name="ic_edit-text"
-                                   style-type="transparent"
-                                   @click="handleClickEditFolderButton"
-                    />
-                    <p-icon-button name="ic_delete"
-                                   style-type="transparent"
-                                   @click="handleClickDeleteFolderButton"
-                    />
-                </div>
+                    <template #title-left-extra>
+                        <template v-if="!state.folder">
+                            <p-i v-if="state.group === 'global'"
+                                 name="ic_globe-filled"
+                                 :color="gray[500]"
+                                 width="1.5rem"
+                                 height="1.5rem"
+                            />
+                            <workspace-logo-icon v-else
+                                                 :text="state.workspaceInfo?.name || ''"
+                                                 :theme="state.workspaceInfo?.tags?.theme"
+                                                 size="sm"
+                            />
+                        </template>
+                        <template v-else>
+                            <p-i name="ic_folder"
+                                 :color="gray[900]"
+                                 width="1.25rem"
+                                 height="1.25rem"
+                            />
+                        </template>
+                    </template>
+                    <template #title-right-extra>
+                        <p-status v-if="state.workspaceInfo?.is_dormant"
+                                  v-bind="workspaceStateFormatter( WORKSPACE_STATE.DORMANT)"
+                                  class="capitalize state"
+                        />
+                        <template v-if="state.folder && state.group === 'global'">
+                            <p-icon-button name="ic_edit-text"
+                                           style-type="transparent"
+                                           @click="handleClickEditFolderButton"
+                            />
+                            <p-icon-button name="ic_delete"
+                                           style-type="transparent"
+                                           @click="handleClickDeleteFolderButton"
+                            />
+                        </template>
+                    </template>
+                </p-heading>
             </template>
             <template v-if="state.hasReadWriteAccess"
                       #extra
             >
-                <div v-if="state.group === 'global'"
-                     class="extra"
-                >
+                <template v-if="state.group === 'global'">
                     <p-button style-type="tertiary"
                               icon-left="ic_delete"
                               :disabled="storeState.selectedIndices.length === 0"
@@ -231,7 +227,7 @@ const handleSelectMenuItem = (value: MenuItem) => {
                                         @select="handleSelectMenuItem"
                         />
                     </div>
-                </div>
+                </template>
                 <p-button v-else-if="state.workspaceInfo?.state !== WORKSPACE_STATE.DISABLE"
                           style-type="tertiary"
                           :icon-right="!state.workspaceInfo?.is_dormant ? 'ic_arrow-right-up' : undefined"
@@ -241,7 +237,7 @@ const handleSelectMenuItem = (value: MenuItem) => {
                     {{ !state.workspaceInfo?.is_dormant? $t('IAM.BOOKMARK.GO_TO_WORKSPACE') : $t('IAM.BOOKMARK.GO_TO_SETTINGS') }}
                 </p-button>
             </template>
-        </p-heading>
+        </p-heading-layout>
         <router-view />
     </div>
 </template>
@@ -249,23 +245,16 @@ const handleSelectMenuItem = (value: MenuItem) => {
 <style lang="postcss" scoped>
 .bookmark-detail-container {
     .title {
-        .extra {
-            @apply flex;
-            gap: 1rem;
-            .create-button-wrapper {
-                @apply relative;
-                .create-context-menu {
-                    @apply absolute;
-                    min-width: unset;
-                    width: 9rem;
-                    top: 2rem;
-                    right: 0;
-                    z-index: 10;
-                }
+        .create-button-wrapper {
+            @apply relative;
+            .create-context-menu {
+                @apply absolute;
+                min-width: unset;
+                width: 9rem;
+                top: 2rem;
+                right: 0;
+                z-index: 10;
             }
-        }
-        .title-extra {
-            @apply flex items-center;
         }
         .state {
             @apply text-label-md border border-coral-300;

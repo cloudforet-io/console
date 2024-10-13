@@ -255,7 +255,8 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
 
 <template>
     <div class="user-management-tab-workspace">
-        <p-heading heading-type="sub"
+        <p-heading class="pt-8 px-4 pb-6"
+                   heading-type="sub"
                    :use-total-count="true"
                    :total-count="state.items.length"
                    :title="$t('IAM.USER.MAIN.ASSOCIATED_WORKSPACE')"

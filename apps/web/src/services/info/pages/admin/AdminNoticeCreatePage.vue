@@ -15,7 +15,8 @@ onBeforeMount(() => {
 
 <template>
     <div class="notice-create-page">
-        <p-heading :title="$t('INFO.NOTICE.FORM.CREATE_NOTICE')"
+        <p-heading class="mb-6"
+                   :title="$t('INFO.NOTICE.FORM.CREATE_NOTICE')"
                    show-back-button
                    @click-back-button="$router.go(-1)"
         />

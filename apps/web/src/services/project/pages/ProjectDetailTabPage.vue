@@ -263,7 +263,8 @@ onUnmounted(() => {
                        :active-tab.sync="singleItemTabState.webhookDetailActiveTab"
                 >
                     <template #details>
-                        <p-heading heading-type="sub"
+                        <p-heading class="pt-8 px-4 pb-4"
+                                   heading-type="sub"
                                    :title="$t('PROJECT.DETAIL.MEMBER.BASE_INFORMATION')"
                         />
                         <p-definition-table :fields="tableState.definitionFields"

@@ -9,7 +9,7 @@ import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PStatus, PToolboxTable, PHeading, PTooltip, PButton,
+    PStatus, PToolboxTable, PHeading, PTooltip, PButton, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
 import { useQueryTags } from '@/common/composables/query-tags';
@@ -104,23 +104,24 @@ watch(() => workspacePageStore.selectedWorkspaces, async () => {
 
 <template>
     <section class="workspace-user-management-tab-contents">
-        <p-heading :title="$t('IAM.WORKSPACES.DETAIL.USERS')"
-                   use-total-count
-                   heading-type="sub"
-                   :total-count="workspacePageState.usersTotalCount"
-        >
-            <template #extra>
-                <div class="heading-toolset">
-                    <p-button style-type="tertiary"
-                              :disabled="storeState.currentWorkspace.state === WORKSPACE_STATE.DISABLE || storeState.currentWorkspace.is_dormant"
-                              icon-left="ic_settings"
-                              @click="handleClickButton"
-                    >
-                        {{ $t('IAM.USER.NOTIFICATION.MANAGE') }}
-                    </p-button>
-                </div>
+        <p-heading-layout class="pt-8 px-4 pb-4">
+            <template #heading>
+                <p-heading :title="$t('IAM.WORKSPACES.DETAIL.USERS')"
+                           use-total-count
+                           heading-type="sub"
+                           :total-count="workspacePageState.usersTotalCount"
+                />
             </template>
-        </p-heading>
+            <template #extra>
+                <p-button style-type="tertiary"
+                          :disabled="storeState.currentWorkspace.state === WORKSPACE_STATE.DISABLE || storeState.currentWorkspace.is_dormant"
+                          icon-left="ic_settings"
+                          @click="handleClickButton"
+                >
+                    {{ $t('IAM.USER.NOTIFICATION.MANAGE') }}
+                </p-button>
+            </template>
+        </p-heading-layout>
         <p-toolbox-table
             class="workspace-user-management-table"
             search-type="query"
@@ -177,10 +178,6 @@ watch(() => workspacePageStore.selectedWorkspaces, async () => {
 
 <style lang="postcss" scoped>
 .workspace-user-management-tab-contents {
-    .heading-toolset {
-        @apply flex;
-        gap: 0.5rem;
-    }
     .workspace-user-management-table {
         @apply border-0;
     }

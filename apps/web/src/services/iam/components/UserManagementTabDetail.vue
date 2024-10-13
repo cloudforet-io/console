@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PButton, PDefinitionTable, PHeading, PI, PStatus,
+    PButton, PDefinitionTable, PHeading, PI, PStatus, PHeadingLayout,
 } from '@cloudforet/mirinae';
 import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
 import { iso8601Formatter } from '@cloudforet/utils';
@@ -159,9 +159,12 @@ const handleClickVerifyButton = async () => {
 
 <template>
     <div class="user-management-tab-detail">
-        <p-heading heading-type="sub"
-                   :title="$t('IAM.USER.MAIN.BASE_INFORMATION')"
-        >
+        <p-heading-layout class="pt-8 px-4 pb-6">
+            <template #heading>
+                <p-heading heading-type="sub"
+                           :title="$t('IAM.USER.MAIN.BASE_INFORMATION')"
+                />
+            </template>
             <template v-if="props.hasReadWriteAccess"
                       #extra
             >
@@ -203,7 +206,7 @@ const handleClickVerifyButton = async () => {
                     </p-button>
                 </div>
             </template>
-        </p-heading>
+        </p-heading-layout>
         <p-definition-table :fields="tableState.fields"
                             :data="tableState.refinedUserItems"
                             :loading="state.loading"

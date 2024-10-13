@@ -95,7 +95,8 @@ onUnmounted(() => {
 
 <template>
     <p-pane-layout class="service-account-connect-cluster">
-        <p-heading heading-type="sub"
+        <p-heading class="pt-8 px-4 pb-4"
+                   heading-type="sub"
                    :title="state.title"
         >
             <template #extra>

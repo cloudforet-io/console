@@ -1,6 +1,8 @@
 <template>
     <div class="notice-page">
-        <p-heading :title="$t('INFO.NOTICE.MAIN.NOTICE_TITLE')" />
+        <p-heading class="mb-6"
+                   :title="$t('INFO.NOTICE.MAIN.NOTICE_TITLE')"
+        />
         <notice-list />
     </div>
 </template>

@@ -106,7 +106,8 @@ watch(() => props.cloudServiceProjectId, (after, before) => {
 
 <template>
     <div>
-        <p-heading heading-type="sub"
+        <p-heading class="pt-8 px-4 pb-4"
+                   heading-type="sub"
                    :title="$t('INVENTORY.CLOUD_SERVICE.ADMIN.MEMBER')"
                    :total-count="state.totalCount"
         />
