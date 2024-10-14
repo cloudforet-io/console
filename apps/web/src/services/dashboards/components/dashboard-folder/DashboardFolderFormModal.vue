@@ -68,10 +68,11 @@ const state = reactive({
         return undefined;
     }),
     existingNameList: computed<string[]>(() => {
+        const _targetFolderItems = state.isPrivate ? dashboardPageControlGetters.privateFolderItems : dashboardPageControlGetters.publicFolderItems;
         if (dashboardPageControlState.folderFormModalType === 'UPDATE') {
-            return dashboardPageControlGetters.existingFolderNameList.filter((d) => d !== state.selectedFolder?.name);
+            return _targetFolderItems.filter((d) => d.folder_id !== state.selectedFolder?.folder_id).map((d) => d.name);
         }
-        return dashboardPageControlGetters.existingFolderNameList;
+        return _targetFolderItems.map((d) => d.name);
     }),
     headerTitle: computed(() => {
         if (dashboardPageControlState.folderFormModalType === 'UPDATE') return i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.EDIT_FOLDER_NAME');

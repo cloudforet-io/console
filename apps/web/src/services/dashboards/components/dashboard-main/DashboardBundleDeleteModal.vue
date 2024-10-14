@@ -18,6 +18,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
 
+import { getSelectedDataTableItems } from '@/services/dashboards/helpers/dashboard-tree-data-helper';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
 
@@ -50,31 +51,18 @@ const state = reactive({
     loading: false,
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
     modalTableItems: computed<DashboardDataTableItem[]>(() => {
-        // single folder case
+        let _selectedIdMap = dashboardPageControlState.selectedPublicIdMap;
+        // single case
         if (props.folderId) {
-            const _targetFolderItem = dashboardPageControlGetters.allFolderItems.find((f) => f.folder_id === props.folderId);
-            const _folderName = _targetFolderItem?.name || '';
-            const _folderItems: DashboardDataTableItem[] = [{
-                id: _targetFolderItem?.folder_id || '',
-                name: _folderName,
-                type: 'FOLDER',
-            }];
-            const _dashboardItems: DashboardDataTableItem[] = dashboardPageControlGetters.allDashboardItems
-                .filter((d) => d.folder_id === props.folderId)
-                .map((d) => ({
-                    id: d.dashboard_id,
-                    name: d.name,
-                    location: _folderName,
-                    type: 'DASHBOARD',
-                }));
-            return [..._folderItems, ..._dashboardItems];
+            const _childrenIdList = dashboardPageControlGetters.allDashboardItems.filter((d) => d.folder_id === props.folderId);
+            _selectedIdMap = {
+                [props.folderId]: true,
+                ..._childrenIdList.reduce((acc, d) => ({ ...acc, [d.dashboard_id]: true }), {}),
+            };
+        } else if (dashboardPageControlState.folderModalType === 'PRIVATE') { // bundle case
+            _selectedIdMap = dashboardPageControlState.selectedPrivateIdMap;
         }
-
-        // multiple folders case
-        if (dashboardPageControlState.folderModalType === 'PUBLIC') {
-            return dashboardPageControlGetters.publicModalTableItems;
-        }
-        return dashboardPageControlGetters.privateModalTableItems;
+        return getSelectedDataTableItems(dashboardPageControlGetters.allFolderItems, dashboardPageControlGetters.allDashboardItems, _selectedIdMap);
     }),
 });
 
