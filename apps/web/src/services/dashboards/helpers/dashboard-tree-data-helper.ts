@@ -71,57 +71,50 @@ export const getDashboardTreeData = (folderList: FolderModel[], dashboardList: D
     return rootNodes;
 };
 
-export const getSelectedTreeData = (dashboardTreeData: TreeNode<DashboardTreeDataType>[], selectedIdMap: Record<string, boolean>): TreeNode<DashboardTreeDataType>[] => {
-    const _selectedIdList = Object.keys(selectedIdMap).filter((key) => selectedIdMap[key]);
-    const _selectedNodeList: TreeNode<DashboardTreeDataType>[] = [];
-    _selectedIdList.forEach((id) => {
-        const _node = dashboardTreeData.find((node) => node.data.id === id);
-        if (!_node) return;
-        if (_node?.data.type === 'FOLDER') {
-            const _childrenDashboards = _node.children?.filter((child) => selectedIdMap[child.id]);
-            // get folder id only if all children are selected
-            if (_childrenDashboards?.length === _node.children?.length) {
-                _selectedNodeList.push(_node);
-            } else if (_childrenDashboards) {
-                _selectedNodeList.push(..._childrenDashboards);
-            }
-        } else {
-            _selectedNodeList.push(_node);
-        }
-    });
-    return _selectedNodeList;
-};
+export const getSelectedDataTableItems = (folderItems: FolderModel[], dashboardItems: DashboardModel[], selectedIdMap: Record<string, boolean>): DashboardDataTableItem[] => {
+    const _results: DashboardDataTableItem[] = [];
+    const _selectedIdList: string[] = Object.keys(selectedIdMap).filter((key) => selectedIdMap[key]);
+    const _selectedFolderIdList: string[] = _selectedIdList.filter((id) => id.includes('folder'));
+    const _selectedDashboardIdList: string[] = _selectedIdList.filter((id) => id.includes('dash'));
 
-export const convertTreeDataToDataTableItems = (treeData: TreeNode<DashboardTreeDataType>[], selectedTreeData: TreeNode<DashboardTreeDataType>[]): DashboardDataTableItem[] => {
-    const _tableItems: DashboardDataTableItem[] = [];
-    selectedTreeData.forEach((node) => {
-        if (node.data.type === 'FOLDER') {
-            _tableItems.push({
-                id: node.data.id,
-                name: node.data.name,
-                type: 'FOLDER',
-            });
-            node.children?.forEach((child) => {
-                _tableItems.push({
-                    id: child.data.id,
-                    name: child.data.name,
-                    location: node.data.name,
-                    type: 'DASHBOARD',
-                    isFolderSelected: true,
-                    folderId: node.data.id,
-                });
-            });
-        } else {
-            const _folderId = node.data?.folderId;
-            const _folderName = treeData.find((d) => d.id === _folderId)?.data?.name;
-            _tableItems.push({
-                id: node.data.id,
-                name: node.data.name,
-                location: _folderName,
+    // 1. Add selected folders and its children dashboards
+    _selectedFolderIdList.forEach((id) => {
+        const _targetFolder = folderItems.find((f) => f.folder_id === id);
+        const _childrenDashboards = dashboardItems.filter((d) => d.folder_id === id);
+        const _isAllChildrenSelected = _childrenDashboards.map((d) => d.dashboard_id).every((childId) => selectedIdMap[childId]);
+        if (!_targetFolder || !_isAllChildrenSelected) return;
+        _results.push({
+            id,
+            name: _targetFolder?.name,
+            type: 'FOLDER',
+        });
+        _childrenDashboards.forEach((child) => {
+            _results.push({
+                id: child.dashboard_id,
+                name: child.name,
+                location: _targetFolder.name,
                 type: 'DASHBOARD',
-                folderId: _folderId,
+                folderId: id,
+                isFolderSelected: true,
             });
-        }
+        });
     });
-    return _tableItems;
+
+    // 2. Add selected dashboards
+    _selectedDashboardIdList.forEach((id) => {
+        if (_results.find((r) => r.id === id)) return; // skip if already added
+        const _targetDashboard = dashboardItems.find((d) => d.dashboard_id === id);
+        const _parentFolder = folderItems.find((f) => f.folder_id === _targetDashboard?.folder_id);
+        if (!_targetDashboard) return;
+        _results.push({
+            id: _targetDashboard.dashboard_id,
+            name: _targetDashboard.name,
+            location: _parentFolder?.name,
+            type: 'DASHBOARD',
+            folderId: _parentFolder?.folder_id,
+            isFolderSelected: false,
+        });
+    });
+
+    return _results;
 };

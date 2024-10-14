@@ -18,26 +18,36 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import {
-    convertTreeDataToDataTableItems,
-    getDashboardTreeData, getSelectedTreeData,
+    getDashboardTreeData,
 } from '@/services/dashboards/helpers/dashboard-tree-data-helper';
-import type { DashboardTreeDataType, DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
+import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
 
 
 
-const _isControlButtonDisabled = (selectedPublicTreeData: TreeNode<DashboardTreeDataType>[]): boolean => {
-    if (selectedPublicTreeData.length === 0) return true;
+const _isPublicControlButtonDisabled = (folderItems: FolderModel[], dashboardItems: DashboardModel[], selectedIdMap: Record<string, boolean>): boolean => {
+    const _selectedIdList: string[] = Object.entries(selectedIdMap).filter(([, isSelected]) => isSelected).map(([id]) => id);
+    if (_selectedIdList.length === 0) return true;
     let result = false;
-    selectedPublicTreeData.forEach((node) => {
+    _selectedIdList.forEach((id) => {
         if (result) return;
-        if (node.data.type === 'FOLDER') {
-            node.children?.forEach((child) => {
-                if (child.data.shared && child.data.workspaceId === '*') result = true;
+        const _isFolder = id.includes('folder');
+        if (_isFolder) {
+            const _childrenDashboards = dashboardItems.filter((d) => d.folder_id === id);
+            _childrenDashboards?.forEach((child) => {
+                if (child?.shared && child?.workspace_id === '*') {
+                    result = true;
+                }
             });
-        } else if (node.data.shared && node.data.workspaceId === '*') result = true;
+        } else {
+            const _dashboard = dashboardItems.find((d) => d.dashboard_id === id);
+            if (_dashboard?.shared && _dashboard?.workspace_id === '*') {
+                result = true;
+            }
+        }
     });
     return result;
 };
+
 export const useDashboardPageControlStore = defineStore('page-dashboard-control', () => {
     const appContextStore = useAppContextStore();
     const dashboardStore = useDashboardStore();
@@ -72,11 +82,14 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
     });
     const getters = reactive({
         // admin
-        adminTreeControlButtonDisableMap: computed<Record<string, boolean>>(() => ({
-            clone: getters.selectedPublicTreeData.length === 0,
-            move: getters.selectedPublicTreeData.length === 0,
-            delete: getters.selectedPublicTreeData.length === 0,
-        })),
+        adminTreeControlButtonDisableMap: computed<Record<string, boolean>>(() => {
+            const _selectedPublicIdList: string[] = Object.entries(state.selectedPublicIdMap).filter(([, isSelected]) => isSelected).map(([id]) => id);
+            return {
+                clone: _selectedPublicIdList.length === 0,
+                move: _selectedPublicIdList.length === 0,
+                delete: _selectedPublicIdList.length === 0,
+            };
+        }),
         // public (only for dashboard page, so project dashboards are excluded)
         publicDashboardItems: computed<PublicDashboardModel[]>(() => {
             const _v2DashboardItems = dashboardState.publicDashboardItems.filter((d) => d.version !== '1.0');
@@ -88,24 +101,26 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
             return dashboardState.publicFolderItems.filter((d) => !(d.resource_group === 'DOMAIN' && d.project_id === '*'));
         }),
         publicDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getDashboardTreeData(getters.publicFolderItems, getters.publicDashboardItems, state.newIdList)),
-        selectedPublicTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getSelectedTreeData(getters.publicDashboardTreeData, state.selectedPublicIdMap)),
-        publicModalTableItems: computed<DashboardDataTableItem[]>(() => convertTreeDataToDataTableItems(getters.publicDashboardTreeData, getters.selectedPublicTreeData)),
-        publicTreeControlButtonDisableMap: computed<Record<string, boolean>>(() => ({
-            clone: getters.selectedPublicTreeData.length === 0,
-            move: _isControlButtonDisabled(getters.selectedPublicTreeData),
-            delete: _isControlButtonDisabled(getters.selectedPublicTreeData),
-        })),
+        publicTreeControlButtonDisableMap: computed<Record<string, boolean>>(() => {
+            const _selectedPublicIdList: string[] = Object.entries(state.selectedPublicIdMap).filter(([, isSelected]) => isSelected).map(([id]) => id);
+            return {
+                clone: _selectedPublicIdList.length === 0,
+                move: _isPublicControlButtonDisabled(getters.publicFolderItems, getters.publicDashboardItems, state.selectedPublicIdMap),
+                delete: _isPublicControlButtonDisabled(getters.publicFolderItems, getters.publicDashboardItems, state.selectedPublicIdMap),
+            };
+        }),
         // private
         privateDashboardItems: computed<PrivateDashboardModel[]>(() => dashboardState.privateDashboardItems.filter((d) => d.version !== '1.0')),
         privateFolderItems: computed<PrivateFolderModel[]>(() => dashboardState.privateFolderItems),
         privateDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getDashboardTreeData(getters.privateFolderItems, getters.privateDashboardItems, state.newIdList)),
-        selectedPrivateTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getSelectedTreeData(getters.privateDashboardTreeData, state.selectedPrivateIdMap)),
-        privateModalTableItems: computed<DashboardDataTableItem[]>(() => convertTreeDataToDataTableItems(getters.privateDashboardTreeData, getters.selectedPrivateTreeData)),
-        privateTreeControlButtonDisableMap: computed<Record<string, boolean>>(() => ({
-            clone: getters.selectedPrivateTreeData.length === 0,
-            move: getters.selectedPrivateTreeData.length === 0,
-            delete: getters.selectedPrivateTreeData.length === 0,
-        })),
+        privateTreeControlButtonDisableMap: computed<Record<string, boolean>>(() => {
+            const _selectedPrivateIdList: string[] = Object.entries(state.selectedPrivateIdMap).filter(([, isSelected]) => isSelected).map(([id]) => id);
+            return {
+                clone: _selectedPrivateIdList.length === 0,
+                move: _selectedPrivateIdList.length === 0,
+                delete: _selectedPrivateIdList.length === 0,
+            };
+        }),
         // deprecated (version 1.0)
         deprecatedDashboardItems: computed<Array<PublicDashboardModel|PrivateDashboardModel>>(() => {
             const _publicDeprecated = dashboardState.publicDashboardItems.filter((d) => d.version === '1.0');
@@ -115,11 +130,6 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
         // etc
         allDashboardItems: computed<DashboardModel[]>(() => [...getters.publicDashboardItems, ...getters.privateDashboardItems]),
         allFolderItems: computed<FolderModel[]>(() => [...getters.publicFolderItems, ...getters.privateFolderItems]),
-        existingFolderNameList: computed<string[]>(() => {
-            const _publicNames = dashboardState.publicFolderItems.map((d) => d.name);
-            const _privateNames = dashboardState.privateFolderItems.map((d) => d.name);
-            return [..._publicNames, ..._privateNames];
-        }),
         loading: computed<boolean>(() => dashboardState.loading),
     });
 
@@ -267,6 +277,14 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
         state.folderModalType = type;
         state.bundleDeleteModalVisible = true;
     };
+    const closeBundleCloneModal = () => {
+        state.bundleCloneModalVisible = false;
+        state.selectedFolderId = undefined;
+    };
+    const closeBundleDeleteModal = () => {
+        state.bundleDeleteModalVisible = false;
+        state.selectedFolderId = undefined;
+    };
     const actions = {
         reset,
         resetSelectedIdMap,
@@ -279,6 +297,8 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
         openBundleCloneModal,
         openBundleMoveModal,
         openBundleDeleteModal,
+        closeBundleCloneModal,
+        closeBundleDeleteModal,
     };
 
     return {
