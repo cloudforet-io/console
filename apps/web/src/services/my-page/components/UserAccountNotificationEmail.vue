@@ -77,9 +77,7 @@ watch(() => store.state.user.email, (value) => {
 </script>
 
 <template>
-    <user-account-module-container
-        class="notification-email-wrapper"
-    >
+    <user-account-module-container class="notification-email-wrapper">
         <template #headline>
             <div class="headline-wrapper">
                 <p class="form-title">
@@ -146,7 +144,6 @@ watch(() => store.state.user.email, (value) => {
 
 <style lang="postcss" scoped>
 .notification-email-wrapper {
-    margin-top: 1rem;
     .headline-wrapper {
         @apply flex items-center;
         margin-bottom: 1.625rem;
@@ -171,7 +168,7 @@ watch(() => store.state.user.email, (value) => {
         @apply text-paragraph-md;
     }
     .form {
-        @apply relative flex;
+        @apply flex;
         max-width: 33.625rem;
         margin-top: 1rem;
 
@@ -190,9 +187,6 @@ watch(() => store.state.user.email, (value) => {
                     &::placeholder {
                         @apply text-gray-300;
                     }
-                }
-                .invalid-feedback {
-                    position: absolute;
                 }
             }
         }

@@ -4,7 +4,7 @@ import { computed, reactive, watch } from 'vue';
 import { map } from 'lodash';
 
 import {
-    PButton, PFieldGroup, PSelectDropdown, PTextInput,
+    PButton, PFieldGroup, PSelectDropdown, PTextInput, PFieldTitle,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
@@ -97,61 +97,79 @@ watch(() => store.state.user.language, (language) => {
 <template>
     <user-account-module-container
         :title="$t('MY_PAGE.ACCOUNT.BASE_INFORMATION')"
-        class="base-information-wrapper"
     >
-        <p-field-group required
-                       :label="$t('COMMON.PROFILE.ID')"
-                       class="input-form"
-        >
-            <p-text-input v-model="state.userId"
-                          disabled
-                          class="text-input"
-            />
-        </p-field-group>
-        <p-field-group required
-                       :label="$t('COMMON.PROFILE.NAME')"
-                       class="input-form"
-        >
-            <p-text-input v-model="formState.userName"
-                          class="text-input"
-            />
-        </p-field-group>
-        <p-field-group v-if="state.userRole === 'DOMAIN_ADMIN'"
-                       required
-                       :label="$t('MY_PAGE.ACCOUNT.ADMIN_ROLE')"
-                       class="input-form"
-        >
-            <p-text-input :value="state.roleType"
-                          class="text-input"
-                          disabled
-            />
-        </p-field-group>
-        <p-field-group required
-                       :label="$t('COMMON.PROFILE.TIMEZONE')"
-                       class="input-form"
-                       :invalid="validationState.showValidation && !!validationState.timezoneInvalidText"
-                       :invalid-text="validationState.timezoneInvalidText"
-        >
-            <template #default="{invalid}">
-                <p-select-dropdown :menu="state.timezones"
-                                   :selected.sync="formState.timezone"
-                                   :invalid="invalid"
-                                   :placeholder="$t('COMMON.PROFILE.TIMEZONE')"
-                                   :page-size="10"
-                                   is-filterable
-                                   show-delete-all-button
+        <form class="base-information-wrapper">
+            <div class="input-form-wrapper">
+                <p-field-title class="field-title"
+                               :label="$t('COMMON.PROFILE.ID')"
+                               required
                 />
-            </template>
-        </p-field-group>
-        <p-field-group required
-                       :label="$t('COMMON.PROFILE.LANGUAGE')"
-                       class="input-form"
-        >
-            <p-select-dropdown :selected.sync="formState.language"
-                               :menu="state.languages"
-                               is-fixed-width
-            />
-        </p-field-group>
+                <p-field-group class="input-form">
+                    <p-text-input v-model="state.userId"
+                                  disabled
+                                  class="text-input"
+                    />
+                </p-field-group>
+            </div>
+            <div class="input-form-wrapper">
+                <p-field-title class="field-title"
+                               :label="$t('COMMON.PROFILE.NAME')"
+                               required
+                />
+                <p-field-group class="input-form">
+                    <p-text-input v-model="formState.userName"
+                                  class="text-input"
+                    />
+                </p-field-group>
+            </div>
+            <div v-if="state.userRole === 'DOMAIN_ADMIN'"
+                 class="input-form-wrapper"
+            >
+                <p-field-title class="field-title"
+                               :label="$t('MY_PAGE.ACCOUNT.ADMIN_ROLE')"
+                               required
+                />
+                <p-field-group class="input-form">
+                    <p-text-input :value="state.roleType"
+                                  class="text-input"
+                                  disabled
+                    />
+                </p-field-group>
+            </div>
+            <div class="input-form-wrapper">
+                <p-field-title class="field-title"
+                               :label="$t('COMMON.PROFILE.TIMEZONE')"
+                               required
+                />
+                <p-field-group class="input-form"
+                               :invalid="validationState.showValidation && !!validationState.timezoneInvalidText"
+                               :invalid-text="validationState.timezoneInvalidText"
+                >
+                    <template #default="{invalid}">
+                        <p-select-dropdown :menu="state.timezones"
+                                           :selected.sync="formState.timezone"
+                                           :invalid="invalid"
+                                           :placeholder="$t('COMMON.PROFILE.TIMEZONE')"
+                                           :page-size="10"
+                                           is-filterable
+                                           show-delete-all-button
+                        />
+                    </template>
+                </p-field-group>
+            </div>
+            <div class="input-form-wrapper">
+                <p-field-title class="field-title"
+                               :label="$t('COMMON.PROFILE.LANGUAGE')"
+                               required
+                />
+                <p-field-group class="input-form">
+                    <p-select-dropdown :selected.sync="formState.language"
+                                       :menu="state.languages"
+                                       is-fixed-width
+                    />
+                </p-field-group>
+            </div>
+        </form>
         <div class="save-button">
             <p-button style-type="primary"
                       @click="handleClickProfileConfirm"
@@ -164,36 +182,31 @@ watch(() => store.state.user.language, (language) => {
 
 <style lang="postcss" scoped>
 .base-information-wrapper {
-    /* custom design-system component - p-field-group */
-    :deep(.input-form.p-field-group) {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        max-width: 33.5rem;
-        .form-label {
-            margin-right: 1rem;
-        }
-        .invalid-feedback {
-            margin-left: 8.5rem;
+    max-width: 33.5rem;
+    .input-form-wrapper {
+        @apply flex flex-wrap;
+        .field-title {
+            min-width: 7.75rem;
+            flex-shrink: 1;
         }
     }
     .p-text-input,
     .p-select-dropdown {
-        width: 100%;
-        max-width: 25rem;
-        flex-shrink: 0;
-        flex-grow: 1;
+        width: 25rem;
     }
-    .save-button {
-        display: flex;
-        margin-top: 2rem;
+
+    @screen mobile {
+        .input-form-wrapper {
+            @apply flex-col;
+        }
+        .p-text-input,
+        .p-select-dropdown {
+            width: 100%;
+        }
     }
 }
-
-@screen mobile {
-    .p-text-input,
-    .p-select-dropdown {
-        max-width: unset;
-    }
+.save-button {
+    display: flex;
+    margin-top: 0.5rem;
 }
 </style>

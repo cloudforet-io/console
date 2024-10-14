@@ -3,8 +3,9 @@ import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { PButton, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
-
+import {
+    PButton, PFieldGroup, PTextInput, PFieldTitle,
+} from '@cloudforet/mirinae';
 
 import type { TokenIssueParameters } from '@/schema/identity/token/api-verbs/issue';
 import type { TokenIssueModel } from '@/schema/identity/token/model';
@@ -122,95 +123,105 @@ const updateUser = async (userParam: UpdateUserRequest) => {
 <template>
     <user-account-module-container
         :title="$t('COMMON.PROFILE.PASSWORD')"
-        class="change-password-wrapper"
     >
-        <form class="form">
-            <p-field-group
-                :label="$t('COMMON.PROFILE.CURRENT_PASSWORD')"
-                required
-                :invalid="validationState.isCurrentPasswordValid"
-                :invalid-text="validationState.currentPasswordInvalidText"
-                class="input-form"
-            >
-                <template #default="{invalid}">
-                    <p-text-input :value="currentPassword"
-                                  type="password"
-                                  class="text-input"
-                                  :invalid="invalid"
-                                  @update:value="setForm('currentPassword', $event)"
+        <div class="change-password-wrapper">
+            <form class="form">
+                <div class="input-form-wrapper">
+                    <p-field-title class="field-title"
+                                   :label="$t('COMMON.PROFILE.CURRENT_PASSWORD')"
+                                   required
                     />
-                </template>
-            </p-field-group>
-            <p-field-group
-                :label="$t('COMMON.PROFILE.NEW_PASSWORD')"
-                required
-                :invalid="invalidState.password"
-                :invalid-text="invalidTexts.password"
-                class="input-form"
-            >
-                <template #default="{invalid}">
-                    <p-text-input :value="password"
-                                  type="password"
-                                  class="text-input"
-                                  :invalid="invalid"
-                                  @update:value="setForm('password', $event)"
+                    <p-field-group :invalid="validationState.isCurrentPasswordValid"
+                                   :invalid-text="validationState.currentPasswordInvalidText"
+                                   class="input-form"
+                    >
+                        <template #default="{invalid}">
+                            <p-text-input :value="currentPassword"
+                                          type="password"
+                                          class="text-input"
+                                          :invalid="invalid"
+                                          @update:value="setForm('currentPassword', $event)"
+                            />
+                        </template>
+                    </p-field-group>
+                </div>
+                <div class="input-form-wrapper">
+                    <p-field-title class="field-title"
+                                   :label="$t('COMMON.PROFILE.NEW_PASSWORD')"
+                                   required
                     />
-                </template>
-            </p-field-group>
-            <p-field-group
-                :label="$t('COMMON.PROFILE.PASSWORD_CHECK')"
-                required
-                :invalid="invalidState.passwordCheck"
-                :invalid-text="invalidTexts.passwordCheck"
-                class="input-form"
-            >
-                <template #default="{invalid}">
-                    <p-text-input :value="passwordCheck"
-                                  type="password"
-                                  class="text-input"
-                                  :invalid="invalid"
-                                  @update:value="setForm('passwordCheck', $event)"
+                    <p-field-group :invalid="invalidState.password"
+                                   :invalid-text="invalidTexts.password"
+                                   class="input-form"
+                    >
+                        <template #default="{invalid}">
+                            <p-text-input :value="password"
+                                          type="password"
+                                          class="text-input"
+                                          :invalid="invalid"
+                                          @update:value="setForm('password', $event)"
+                            />
+                        </template>
+                    </p-field-group>
+                </div>
+                <div class="input-form-wrapper">
+                    <p-field-title class="field-title"
+                                   :label="$t('COMMON.PROFILE.CONFIRM_PASSWORD')"
+                                   required
                     />
-                </template>
-            </p-field-group>
-        </form>
-        <div class="save-button">
-            <p-button style-type="primary"
-                      :disabled="currentPassword === '' || password === '' || passwordCheck === ''"
-                      @click="handleClickPasswordConfirm"
-            >
-                {{ $t('MY_PAGE.ACCOUNT.SAVE_CHANGES') }}
-            </p-button>
+                    <p-field-group :invalid="invalidState.passwordCheck"
+                                   :invalid-text="invalidTexts.passwordCheck"
+                                   class="input-form"
+                    >
+                        <template #default="{invalid}">
+                            <p-text-input :value="passwordCheck"
+                                          type="password"
+                                          class="text-input"
+                                          :invalid="invalid"
+                                          @update:value="setForm('passwordCheck', $event)"
+                            />
+                        </template>
+                    </p-field-group>
+                </div>
+            </form>
+            <div class="save-button">
+                <p-button style-type="primary"
+                          :disabled="currentPassword === '' || password === '' || passwordCheck === ''"
+                          @click="handleClickPasswordConfirm"
+                >
+                    {{ $t('MY_PAGE.ACCOUNT.SAVE_CHANGES') }}
+                </p-button>
+            </div>
         </div>
     </user-account-module-container>
 </template>
 
 <style lang="postcss" scoped>
 .change-password-wrapper {
-    margin-top: 1rem;
-
-    /* custom design-system component - p-field-group */
-    :deep(.input-form.p-field-group) {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        max-width: 33.5rem;
-        .form-label {
-            margin-right: 0.625rem;
-        }
-        .invalid-feedback {
-            margin-left: 8.5rem;
+    max-width: 33.5rem;
+    .input-form-wrapper {
+        @apply flex flex-wrap justify-between;
+        .field-title {
+            min-width: 7.75rem;
+            flex-shrink: 1;
         }
     }
     .p-text-input {
-        width: 100%;
-        max-width: 25rem;
-        flex-shrink: 0;
-        flex-grow: 1;
+        width: 25rem;
     }
-    .save-button {
-        display: flex;
-        margin-top: 2rem;
+
+    @screen mobile {
+        .input-form-wrapper {
+            @apply flex-col;
+        }
+        .p-text-input {
+            width: 100%;
+        }
     }
+}
+
+.save-button {
+    display: flex;
+    margin-top: 0.5rem;
 }
 </style>
