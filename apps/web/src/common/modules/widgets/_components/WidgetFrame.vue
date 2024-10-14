@@ -367,9 +367,6 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
         &.selected {
             display: flex;
         }
-        .etc-button {
-            @apply bg-white;
-        }
     }
 }
 </style>
