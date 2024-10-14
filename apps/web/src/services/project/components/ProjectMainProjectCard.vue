@@ -324,7 +324,7 @@ const handleSelectItem = (selected: MenuItem) => {
 /* custom design-system component - p-select-dropdown */
 :deep(.p-select-dropdown) {
     .dropdown-button-component {
-        @apply bg-white rounded-full;
+        @apply rounded-full;
 
         &.opened {
             @apply rounded-full;
