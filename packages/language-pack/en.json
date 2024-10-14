@@ -1790,7 +1790,8 @@
 			}
 		},
 		"ANOMALY_DETECTION_CONFIGURATION": "Anomaly Detection Configuration",
-		"COST_ADVANCED_SETTINGS": "Advanced Settings"
+		"COST_ADVANCED_SETTINGS": "Advanced Settings",
+		"CURRENCY_CONVERTER": "Currency Converter"
 	},
 	"DASHBOARDS": {
 		"ALL_DASHBOARDS": {

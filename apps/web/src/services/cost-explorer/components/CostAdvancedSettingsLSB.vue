@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
@@ -11,14 +14,20 @@ import type { LSBItem } from '@/common/modules/navigations/lsb/type';
 
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
+const router = useRouter();
+
+const containerName = makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS._NAME);
+
 const state = reactive({
+    childrenRoute: computed(() => router.getRoutes().filter((r) => r.name?.includes(containerName) && (r.name !== containerName))),
     menuSet: computed<LSBItem[]>(() => [
-        {
+        ...state.childrenRoute.map((route) => ({
             type: MENU_ITEM_TYPE.ITEM,
-            label: i18n.t('COST_EXPLORER.ANOMALY_DETECTION_CONFIGURATION'),
-            to: { name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.ANOMALY_DETECTION_DOMAIN_CONFIGURATION._NAME) },
+            label: i18n.t(route.meta?.translationId),
+            to: { name: route.name },
+            highlightTag: MENU_INFO_MAP[route.meta?.menuId].highlightTag,
             hideFavorite: true,
-        },
+        })),
     ]),
 });
 </script>
