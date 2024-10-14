@@ -1293,6 +1293,7 @@
 		"PROFILE": {
 			"ALT_E_UPDATE": "개인 정보 수정 실패",
 			"ALT_S_UPDATE": "개인 정보 수정 완료",
+			"CONFIRM_PASSWORD": "비밀번호 확인",
 			"CURRENT_PASSWORD": "현재 비밀번호",
 			"EMAIL": "이메일",
 			"EMAIL_REQUIRED": "이메일을 입력해주세요.",
