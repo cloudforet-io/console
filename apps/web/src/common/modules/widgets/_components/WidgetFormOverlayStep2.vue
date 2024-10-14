@@ -27,8 +27,8 @@ import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-g
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { WidgetType } from '@/common/modules/widgets/types/widget-model';
 
-import DashboardToolsetDateDropdown from '@/services/dashboards/components/DashboardToolsetDateDropdown.vue';
-import DashboardVariablesV2 from '@/services/dashboards/components/DashboardVariablesV2.vue';
+import DashboardToolsetDateDropdown from '@/services/dashboards/components/dashboard-detail/DashboardToolsetDateDropdown.vue';
+import DashboardVariablesV2 from '@/services/dashboards/components/dashboard-detail/DashboardVariablesV2.vue';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import {
     useAllReferenceTypeInfoStore,

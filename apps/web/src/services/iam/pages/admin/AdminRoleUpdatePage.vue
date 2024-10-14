@@ -30,11 +30,7 @@ const state = reactive({
 
 const handleFormValidate = (isAllValid) => { state.isAllValid = isAllValid; };
 const handleUpdateForm = (data: RoleUpdateParameters) => {
-    // TODO: will be updated in the next step.
-    state.formData = {
-        ...data,
-        permissions: [],
-    };
+    state.formData = data;
 };
 const handleClickConfirm = async () => {
     state.loading = true;

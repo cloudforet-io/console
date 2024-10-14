@@ -12,6 +12,7 @@ interface UserWorkspaceStoreState {
     currentWorkspaceId?: string;
 }
 
+// NOTICE: If the user page is added, be sure to add it to the USER_PAGE_FIRST_PATH_LIST constant.
 export const useUserWorkspaceStore = defineStore('user-workspace-store', () => {
     const state = reactive<UserWorkspaceStoreState>({
         items: [],
@@ -48,8 +49,13 @@ export const useUserWorkspaceStore = defineStore('user-workspace-store', () => {
 
     const actions = {
         async load() {
-            const { results } = await SpaceConnector.clientV2.identity.userProfile.getWorkspaces<undefined, ListResponse<WorkspaceModel>>();
-            state.items = results?.filter((workspace) => workspace.state === 'ENABLED') || [];
+            try {
+                const { results } = await SpaceConnector.clientV2.identity.userProfile.getWorkspaces<undefined, ListResponse<WorkspaceModel>>();
+                state.items = results?.filter((workspace) => workspace.state === 'ENABLED') || [];
+            } catch (e) {
+                console.error(e);
+                actions.reset();
+            }
         },
         getIsAccessibleWorkspace(workspaceId: string) {
             if (!workspaceId) return false;

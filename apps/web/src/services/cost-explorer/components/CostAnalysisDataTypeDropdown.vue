@@ -65,6 +65,7 @@ const handleUpdateSelected = (selected: DisplayDataType) => {
                        :menu="state.headerMenuItems"
                        :selection-label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.DATA_TYPE')"
                        style-type="rounded"
+                       use-fixed-menu-style
                        @update:selected="handleUpdateSelected"
     />
 </template>

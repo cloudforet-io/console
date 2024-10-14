@@ -13,6 +13,7 @@ const AdminDomainSettingsBaseInformationPage = () => import('@/services/advanced
 const AdminDomainSettingsBrandAssetsPage = () => import('@/services/advanced/pages/admin/AdminDomainSettingsAppearancePage.vue');
 const AdminDomainSettingsAutoDormancyConfigurationPage = () => import('@/services/advanced/pages/admin/AdminDomainSettingsAutoDormancyConfigurationPage.vue');
 const WorkspacesPage = () => import('@/services/advanced/pages/admin/AdminWorkspacesPage.vue');
+const AdminWorkspaceGroupPage = () => import('@/services/advanced/pages/admin/AdminWorkspaceGroupPage.vue');
 const BookmarkContainer = () => import('@/services/advanced/components/BookmarkContainer.vue');
 const BookmarkPage = () => import('@/services/advanced/pages/admin/AdminBookmarkPage.vue');
 const BookmarkDetailContainer = () => import('@/services/advanced/components/BookmarkDetailContainer.vue');
@@ -38,6 +39,15 @@ const adminAdvancedRoutes: RouteConfig = {
                 translationId: MENU_INFO_MAP[MENU_ID.WORKSPACES].translationId,
             },
             component: WorkspacesPage,
+        },
+        {
+            path: 'workspace-group',
+            name: makeAdminRouteName(ADVANCED_ROUTE.WORKSPACE_GROUP._NAME),
+            meta: {
+                menuId: MENU_ID.WORKSPACE_GROUP,
+                translationId: MENU_INFO_MAP[MENU_ID.WORKSPACE_GROUP].translationId,
+            },
+            component: AdminWorkspaceGroupPage,
         },
         {
             path: 'bookmark',

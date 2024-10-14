@@ -9,8 +9,14 @@ import { debounce } from 'lodash';
 import {
     PTab, screens, PLazyImg, PI,
 } from '@cloudforet/mirinae';
+import type { ValueItem } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
+
+import { store } from '@/store';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+
+import type { PageAccessMap } from '@/lib/access-control/config';
+import { MENU_ID } from '@/lib/menu/config';
 
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { SEARCH_TAB } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
@@ -26,6 +32,7 @@ import TopBarSearchServiceTab
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
 import type { SearchTab } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
+
 
 interface Props {
     isFocused: boolean;
@@ -63,16 +70,28 @@ const getTabHeaderHeight = () => {
 const storeState = reactive({
     activeTab: computed(() => topBarSearchStore.state.activeTab),
     cloudServiceTypeMap: computed(() => allReferenceStore.getters.cloudServiceType),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
 });
 
 const state = reactive({
-    tabs: [
-        { label: 'Service', name: SEARCH_TAB.SERVICE },
-        { label: 'Service Account', name: SEARCH_TAB.SERVICE_ACCOUNT },
-        { label: 'Project', name: SEARCH_TAB.PROJECT },
-        { label: 'Dashboard', name: SEARCH_TAB.DASHBOARD },
-        { label: 'Cloud Service', name: SEARCH_TAB.CLOUD_SERVICE },
+    defaultServiceTabs: [
+        { label: 'Service Account', name: SEARCH_TAB.SERVICE_ACCOUNT, id: MENU_ID.SERVICE_ACCOUNT },
+        { label: 'Project', name: SEARCH_TAB.PROJECT, id: MENU_ID.PROJECT },
+        { label: 'Dashboard', name: SEARCH_TAB.DASHBOARD, id: MENU_ID.DASHBOARDS },
+        { label: 'Cloud Service', name: SEARCH_TAB.CLOUD_SERVICE, id: MENU_ID.CLOUD_SERVICE },
     ],
+    tabs: computed(() => {
+        const accessMenuList: ValueItem[] = [];
+        state.defaultServiceTabs.forEach((i) => {
+            if (storeState.pageAccessPermissionMap[i.id]) {
+                accessMenuList.push({ label: i.label, name: i.name });
+            }
+        });
+        return [
+            { label: 'Service', name: SEARCH_TAB.SERVICE },
+            ...accessMenuList,
+        ];
+    }),
     contentsHeight: 0,
     searchInputHeight: computed(() => (state.isTabletSize ? 60 : 0)),
     isTabletSize: computed(() => windowSize.width.value < screens.tablet.max),
@@ -132,7 +151,7 @@ const handleSelect = (item) => {
                :active-tab="storeState.activeTab"
                :tabs="state.tabs"
                :style="{ height: state.tabHeight ? state.tabHeight + 'px': undefined}"
-               @update:activeTab="handleUpdateActiveTab"
+               @update:active-tab="handleUpdateActiveTab"
         >
             <template #service>
                 <top-bar-search-service-tab

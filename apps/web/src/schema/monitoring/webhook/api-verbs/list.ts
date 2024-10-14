@@ -9,5 +9,5 @@ export interface WebhookListParameters {
     access_key?: string;
     workspace_id?: string;
     project_id?: string;
-    query: Query;
+    query?: Query;
 }

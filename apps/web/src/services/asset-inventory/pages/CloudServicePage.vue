@@ -12,7 +12,7 @@ import {
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import {
     PDataLoader, PDivider, PButton, PHeading, PEmpty,
 } from '@cloudforet/mirinae';
@@ -21,6 +21,7 @@ import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbo
 
 import { SpaceRouter } from '@/router';
 import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -29,8 +30,10 @@ import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-r
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 
+import type { PageAccessMap } from '@/lib/access-control/config';
+import { MENU_ID } from '@/lib/menu/config';
 import {
-    arrayToQueryString, objectToQueryString,
+    arrayToQueryString,
     primitiveToQueryString,
     queryStringToArray,
     queryStringToObject,
@@ -47,11 +50,12 @@ import CloudServiceListCard
 import CloudServiceToolbox from '@/services/asset-inventory/components/CloudServiceToolbox.vue';
 import { getCloudServiceAnalyzeQuery } from '@/services/asset-inventory/helpers/cloud-service-analyze-query-helper';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { useCloudServiceLSBStore } from '@/services/asset-inventory/stores/cloud-service-l-s-b-store';
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
 import type { CloudServiceAnalyzeResult } from '@/services/asset-inventory/types/cloud-service-card-type';
 import type {
-    CloudServiceCategory, CloudServicePageUrlQuery,
-    CloudServicePageUrlQueryValue,
+    CloudServiceCategory, CloudServiceMainPageUrlQuery,
+    CloudServiceMainPageUrlQueryValue,
 } from '@/services/asset-inventory/types/cloud-service-page-type';
 import type { EmptyData, Period } from '@/services/asset-inventory/types/type';
 
@@ -63,6 +67,7 @@ interface Response {
 const allReferenceStore = useAllReferenceStore();
 const cloudServicePageStore = useCloudServicePageStore();
 const cloudServicePageState = cloudServicePageStore.$state;
+const cloudServiceLSBStore = useCloudServiceLSBStore();
 
 const storeState = reactive({
     projects: computed(() => allReferenceStore.getters.project),
@@ -70,6 +75,7 @@ const storeState = reactive({
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceStore.getters.serviceAccount),
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     collectors: computed<CollectorReferenceMap>(() => allReferenceStore.getters.collector),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
 });
 const handlerState = reactive({
     keyItemSets: computed<KeyItemSet[]>(() => [{
@@ -108,11 +114,13 @@ const state = reactive({
     pageStart: 1,
     pageLimit: 24,
     // url query
-    urlQueryString: computed<CloudServicePageUrlQuery>(() => ({
+    urlQueryString: computed<CloudServiceMainPageUrlQuery>(() => ({
         provider: cloudServicePageState.selectedProvider === 'all' ? null : primitiveToQueryString(cloudServicePageState.selectedProvider),
         service: arrayToQueryString(cloudServicePageStore.selectedCategories),
         region: arrayToQueryString(cloudServicePageStore.selectedRegions),
-        period: objectToQueryString(cloudServicePageState.period),
+        project: arrayToQueryString(cloudServiceLSBStore.getters.selectedProjects),
+        service_account: arrayToQueryString(cloudServiceLSBStore.getters.selectedServiceAccounts),
+        // period: objectToQueryString(cloudServicePageState.period),
         filters: searchQueryHelper.setFilters(cloudServicePageState.searchFilters).rawQueryStrings,
     })),
     isNoServiceAccounts: computed(() => !Object.keys(storeState.serviceAccounts).length),
@@ -120,15 +128,15 @@ const state = reactive({
         let result = {} as EmptyData;
         if (!Object.keys(storeState.serviceAccounts).length) {
             result = {
-                to: { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME },
-                buttonText: i18n.t('INVENTORY.ADD_SERVICE_ACCOUNT'),
+                to: state.writableServiceAccount ? { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME } : {},
+                buttonText: state.writableServiceAccount ? i18n.t('INVENTORY.ADD_SERVICE_ACCOUNT') : undefined,
                 desc: i18n.t('INVENTORY.EMPTY_CLOUD_SERVICE'),
             };
         } else {
             if (!Object.keys(storeState.collectors).length) {
                 result = {
-                    to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME },
-                    buttonText: i18n.t('INVENTORY.CREATE_COLLECTOR'),
+                    to: state.writableCollector ? { name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME } : {},
+                    buttonText: state.writableCollector ? i18n.t('INVENTORY.CREATE_COLLECTOR') : undefined,
                     desc: i18n.t('INVENTORY.EMPTY_CLOUD_SERVICE_RESOURCE'),
                 };
             }
@@ -140,6 +148,8 @@ const state = reactive({
         }
         return result;
     }),
+    writableServiceAccount: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[MENU_ID.SERVICE_ACCOUNT].write),
+    writableCollector: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[MENU_ID.COLLECTOR].write),
 });
 
 /* api */
@@ -151,7 +161,7 @@ const listCloudServiceType = async () => {
 
         const { status, response } = await fetcher({
             query: getCloudServiceAnalyzeQuery(
-                cloudServicePageStore.allFilters,
+                [...cloudServicePageStore.allFilters, ...cloudServiceLSBStore.getters.allFilters],
                 { start: state.pageStart, limit: state.pageLimit },
                 cloudServicePageState.period,
             ),
@@ -190,14 +200,19 @@ let urlQueryStringWatcherStop;
 const init = async () => {
     /* init states from url query */
     const currentQuery = SpaceRouter.router.currentRoute.query;
-    const urlQueryValue: CloudServicePageUrlQueryValue = {
+    const urlQueryValue: CloudServiceMainPageUrlQueryValue = {
         provider: queryStringToString(currentQuery.provider),
+        project: queryStringToArray(currentQuery.project),
+        service_account: queryStringToArray(currentQuery.service_account),
         region: queryStringToArray(currentQuery.region),
         service: queryStringToArray<CloudServiceCategory>(currentQuery.service),
         period: queryStringToObject<Period>(currentQuery.period),
         filters: searchQueryHelper.setKeyItemSets(handlerState.keyItemSets).setFiltersAsRawQueryString(currentQuery.filters).filters,
     };
     cloudServicePageStore.setSelectedProvider(urlQueryValue.provider);
+    cloudServiceLSBStore.setSelectedProjectsToFilters(urlQueryValue.project);
+    cloudServiceLSBStore.setSelectedServiceAccountsToFilters(urlQueryValue.service_account);
+    cloudServicePageStore.setSelectedCategoriesToFilters(urlQueryValue.service);
     cloudServicePageStore.setSelectedRegionsToFilters(urlQueryValue.region);
     cloudServicePageStore.setSelectedCategoriesToFilters(urlQueryValue.service);
     cloudServicePageStore.$patch((_state) => {
@@ -307,7 +322,8 @@ onUnmounted(() => {
 
 /* custom design-system component - p-empty */
 :deep(.p-empty) {
-    @apply w-full h-full;
+    @apply w-full;
+    margin-top: 2.5rem;
 }
 
 @screen tablet {

@@ -3,10 +3,8 @@ import {
     computed, defineExpose, onMounted, reactive, watch,
 } from 'vue';
 
-import { isEqual } from 'lodash';
+import { isEqual, uniq } from 'lodash';
 
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/src/inputs/dropdown/select-dropdown/type';
 
@@ -39,6 +37,7 @@ import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-g
 import type { AdditionalLabel, DataTableAlertModalMode } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
     AdditionalLabels, DateFormat, DataTableAddOptions,
+    DataTableQueryFilter,
 } from '@/common/modules/widgets/types/widget-model';
 
 interface Props {
@@ -75,20 +74,7 @@ const state = reactive({
         ? props.item.options[DATA_SOURCE_DOMAIN.COST]?.data_key
         : props.item.options[DATA_SOURCE_DOMAIN.ASSET]?.metric_id,
     selectedGroupByItems: [] as { name: string; label: string; }[],
-    filter: {} as Record<string, string[]>,
-    consoleFilters: computed<ConsoleFilter[]>(() => {
-        const results: ConsoleFilter[] = [];
-        Object.entries(state.filter ?? {}).forEach(([category, filterItems]) => {
-            if (filterItems.length) {
-                results.push({
-                    k: category,
-                    v: filterItems,
-                    o: '=',
-                });
-            }
-        });
-        return results;
-    }),
+    filter: {} as Record<string, DataTableQueryFilter>,
     dataFieldName: '',
     dataUnit: '',
     selectableSourceItems: computed<SelectDropdownMenuItem[]>(() => {
@@ -156,10 +142,10 @@ const originDataState = reactive({
         name: group.key,
         label: group.name,
     }))),
-    filter: computed(() => {
-        const _filter = {} as Record<string, string[]>;
+    filter: computed<Record<string, DataTableQueryFilter>>(() => {
+        const _filter = {} as Record<string, DataTableQueryFilter>;
         ((props.item.options as DataTableAddOptions).filter ?? []).forEach((filter) => {
-            _filter[filter.k] = filter.v;
+            _filter[filter.k] = filter;
         });
         return _filter;
     }),
@@ -213,15 +199,17 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
     const metricLabelsInfo = storeState.metrics[state.metricId ?? '']?.data?.labels_info;
     const assetGroupBy = (metricLabelsInfo ?? []).filter((label) => state.selectedGroupByItems.map((group) => group.name).includes(label.key));
     const groupBy = state.sourceType === DATA_SOURCE_DOMAIN.COST ? costGroupBy : assetGroupBy;
-    const dataTableApiQueryHelper = new ApiQueryHelper();
-    dataTableApiQueryHelper.setFilters(state.consoleFilters);
+    const refinedFilter = Object.values(state.filter as Record<string, DataTableQueryFilter>).filter((filter) => filter?.v?.length).map((filter) => ({
+        ...filter,
+        v: uniq(filter.v),
+    }));
 
     const updateParams: DataTableUpdateParameters = {
         data_table_id: state.dataTableId,
         options: {
             [state.sourceType]: domainOptions,
             group_by: groupBy,
-            filter: dataTableApiQueryHelper.data.filter,
+            filter: refinedFilter,
             data_name: state.dataFieldName,
             data_unit: state.dataUnit,
             additional_labels: additionalLabelsRequest,

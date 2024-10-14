@@ -12,7 +12,6 @@ const stackedColumnChart: WidgetConfig = {
     },
     requiredFieldsSchema: {
         granularity: {},
-        dataField: {},
         xAxis: {
             options: {
                 dataTarget: 'labels_info',
@@ -20,15 +19,7 @@ const stackedColumnChart: WidgetConfig = {
                 max: 31,
             },
         },
-        stackBy: {
-            options: {
-                dataTarget: 'labels_info',
-                defaultMaxCount: 5,
-                max: 30,
-                defaultIndex: 0,
-                excludeDateField: true,
-            },
-        },
+        tableDataField: {},
     },
     optionalFieldsSchema: {
         legend: {

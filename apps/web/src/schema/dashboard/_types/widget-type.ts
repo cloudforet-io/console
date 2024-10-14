@@ -7,10 +7,18 @@ import type {
     GRANULARITY,
     WIDGET_SIZE,
 } from '@/schema/dashboard/_constants/widget-constant';
+import type { PrivateWidgetListParameters } from '@/schema/dashboard/private-widget/api-verbs/list';
+import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
+import type { PublicWidgetListParameters } from '@/schema/dashboard/public-widget/api-verbs/list';
+import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 
 import type { VariableModelType } from '@/lib/variable-models';
 import type { ManagedVariableModelKey } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
+
+
+export type WidgetModel = PublicWidgetModel | PrivateWidgetModel;
+export type WidgetListParams = PublicWidgetListParameters|PrivateWidgetListParameters;
 
 interface WidgetItemOptions {
     type: VariableModelType;
@@ -115,8 +123,6 @@ export interface WidgetOptions { // to be deprecated
     data_criteria?: 'history'|'realtime';
     filters?: WidgetFiltersMap;
 }
-
-export type NewWidgetFilters = Record<string, string[]>;
 
 
 export interface InheritOption {

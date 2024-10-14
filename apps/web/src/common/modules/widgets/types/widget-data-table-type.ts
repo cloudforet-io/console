@@ -1,4 +1,6 @@
-import type { EvaluateExpressionType } from '@/common/modules/widgets/types/widget-model';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+
+import type { EvaluateExpressionType, DataTableQueryFilter } from '@/common/modules/widgets/types/widget-model';
 
 type Handler = (item:any) => string;
 
@@ -45,3 +47,5 @@ export interface TransformDataTableInfo {
 export type DataTableAlertModalMode = 'DELETE'|'DELETE_UNABLED'|'RESET';
 
 export type JoinRestrictedMap = Record<string, boolean>; // { {id}: true }
+
+export type DataTableQueryFilterForDropdown = Omit<DataTableQueryFilter, 'v'> & { v: MenuItem[] };

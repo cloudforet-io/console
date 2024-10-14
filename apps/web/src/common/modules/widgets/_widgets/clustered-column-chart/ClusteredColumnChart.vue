@@ -15,10 +15,11 @@ import {
 } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import type { Query } from '@cloudforet/core-lib/space-connector/type';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
 import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
 import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
 
@@ -30,7 +31,6 @@ import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/u
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import {
-    getApiQueryDateRange,
     getReferenceLabel, getRefinedDynamicFieldData,
     getWidgetBasedOnDate,
     getWidgetDateFields,
@@ -38,15 +38,20 @@ import {
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
+import {
+    getWidgetLoadApiQuery,
+    getWidgetLoadApiQueryDateRange,
+} from '@/common/modules/widgets/_helpers/widget-load-helper';
+import type { DateFormatValue } from '@/common/modules/widgets/_widget-fields/date-format/type';
+import type { DisplaySeriesLabelValue } from '@/common/modules/widgets/_widget-fields/display-series-label/type';
+import type { LegendValue } from '@/common/modules/widgets/_widget-fields/legend/type';
+import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
+import type { TableDataFieldValue } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
+import type { XAxisValue } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
-import type {
-    XAxisValue, DateFormatValue, DisplaySeriesLabelValue, TableDataFieldValue,
-    NumberFormatValue,
-    LegendValue,
-} from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
@@ -70,7 +75,14 @@ const state = reactive({
     errorMessage: undefined as string|undefined,
     data: null as Data | null,
     chart: null as EChartsType | null,
-    xAxisData: [],
+    xAxisData: computed<string[]>(() => {
+        if (!state.data?.results?.length) return [];
+        if (isDateField(state.xAxisField)) {
+            const _isSeparatedDate = state.xAxisField !== DATE_FIELD.DATE;
+            return getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end, _isSeparatedDate);
+        }
+        return state.data.results.map((d) => d[state.xAxisField] as string) || [];
+    }),
     chartData: [],
     chartOptions: computed<BarSeriesOption>(() => ({
         color: MASSIVE_CHART_COLORS,
@@ -91,6 +103,7 @@ const state = reactive({
         },
         tooltip: {
             trigger: 'axis',
+            confine: true,
             formatter: (params) => {
                 const _params = params as any[];
                 let _axisValue = getReferenceLabel(props.allReferenceTypeInfo, state.xAxisField, _params[0].axisValue);
@@ -133,22 +146,26 @@ const state = reactive({
     xAxisField: computed<string>(() => (props.widgetOptions?.xAxis as XAxisValue)?.value),
     xAxisCount: computed<number>(() => (props.widgetOptions?.xAxis as XAxisValue)?.count),
     dataFieldInfo: computed<TableDataFieldValue>(() => props.widgetOptions?.tableDataField as TableDataFieldValue),
-    dataFieldType: computed<TableDataFieldValue['fieldType']>(() => state.dataFieldInfo?.fieldType),
-    dataField: computed<string|string[]|undefined>(() => state.dataFieldInfo?.value),
-    dataCriteria: computed<string|undefined>(() => state.dataFieldInfo?.criteria),
-    dynamicFieldValue: computed<string[]>(() => state.dataFieldInfo?.dynamicFieldValue || []),
+    dynamicFieldInfo: computed<TableDataFieldValue['dynamicFieldInfo']>(() => state.dataFieldInfo?.dynamicFieldInfo),
+    staticFieldInfo: computed<TableDataFieldValue['staticFieldInfo']>(() => state.dataFieldInfo?.staticFieldInfo),
+    dataField: computed<string|string[]|undefined>(() => {
+        if (state.dataFieldInfo?.fieldType === 'staticField') return state.staticFieldInfo?.fieldValue;
+        return state.dynamicFieldInfo?.fieldValue;
+    }),
+    dynamicFieldValue: computed<string[]>(() => state.dynamicFieldInfo?.fixedValue || []),
     dateRange: computed<DateRange>(() => {
         let _start = state.basedOnDate;
         let _end = state.basedOnDate;
         if (isDateField(state.xAxisField)) {
             [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.xAxisCount);
         } else if (isDateField(state.dataField)) {
-            if (state.dynamicFieldValue.length) {
-                const _sortedDateValue = [...state.dynamicFieldValue];
-                _sortedDateValue.sort();
-                _start = _sortedDateValue[0];
-                _end = _sortedDateValue[_sortedDateValue.length - 1];
+            let subtract = state.dynamicFieldInfo.count || 0;
+            if (state.dynamicFieldInfo?.valueType === 'fixed') {
+                if (state.granularity === GRANULARITY.YEARLY) subtract = 3;
+                if (state.granularity === GRANULARITY.MONTHLY) subtract = 12;
+                if (state.granularity === GRANULARITY.DAILY) subtract = 30;
             }
+            [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, subtract);
         }
         return { start: _start, end: _end };
     }),
@@ -169,55 +186,30 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
 });
 
 /* Api */
+const privateWidgetFetcher = getCancellableFetcher<PrivateWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.privateWidget.load);
+const publicWidgetFetcher = getCancellableFetcher<PublicWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.publicWidget.load);
 const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
     if (props.widgetState === 'INACTIVE') return undefined;
     try {
-        const _fields = {};
-        let _groupBy: string[] = [state.xAxisField];
-        let _field_group: string[] = [];
-        let _sort: Query['sort'] = [];
-        let _filter: Query['filter'] = [];
-        if (state.dataFieldType === 'staticField') {
-            state.dataField?.forEach((field) => {
-                _fields[field] = { key: field, operator: 'sum' };
-            });
-            _sort = _groupBy.includes('Date') ? [{ key: 'Date', desc: false }] : state.dataField.map((field) => ({ key: field, desc: true }));
-        } else {
-            _fields[state.dataCriteria] = { key: state.dataCriteria, operator: 'sum' };
-            _field_group = [state.dataField];
-            _groupBy = [..._groupBy, state.dataField];
-            _sort = _groupBy.includes('Date') && !_field_group.includes('Date') ? [{ key: 'Date', desc: false }] : [{ key: `_total_${state.dataCriteria}`, desc: true }];
-        }
-        if (isDateField(state.dataField) && state.dataFieldType === 'dynamicField' && state.dataFieldInfo?.dynamicFieldValue?.length) {
-            _filter = [{
-                k: state.dataField,
-                v: state.dataFieldInfo.dynamicFieldValue,
-                o: 'in',
-            }];
-        }
-
+        state.loading = true;
         const _isPrivate = props.widgetId.startsWith('private');
-        const _fetcher = _isPrivate
-            ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
-            : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>;
-        const _queryDateRange = getApiQueryDateRange(state.granularity, state.dateRange);
-        const res = await _fetcher({
+        const _fetcher = _isPrivate ? privateWidgetFetcher : publicWidgetFetcher;
+        const { status, response } = await _fetcher({
             widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
-                start: _queryDateRange.start,
-                end: _queryDateRange.end,
-                group_by: _groupBy,
-                fields: _fields,
-                field_group: _field_group,
-                sort: _sort,
                 page: { start: 1, limit: state.xAxisCount },
-                filter: _filter,
+                ...getWidgetLoadApiQueryDateRange(state.granularity, state.dateRange),
+                ...getWidgetLoadApiQuery(state.dataFieldInfo, state.xAxisField),
             },
             vars: props.dashboardVars,
         });
-        state.errorMessage = undefined;
-        return res;
+        if (status === 'succeed') {
+            state.errorMessage = undefined;
+            state.loading = false;
+            return response;
+        }
+        return undefined;
     } catch (e: any) {
         state.loading = false;
         state.errorMessage = e.message;
@@ -278,7 +270,7 @@ const getStaticFieldData = (rawData: StaticFieldData) => {
 };
 const getDynamicFieldData = (rawData: DynamicFieldData) => {
     // get refined data and series fields
-    const [_refinedResults, _seriesFields] = getRefinedDynamicFieldData(rawData, state.dataCriteria, state.dataField, state.dataFieldInfo.dynamicFieldValue);
+    const [_refinedResults, _seriesFields] = getRefinedDynamicFieldData(rawData, state.dynamicFieldInfo, state.xAxisField);
 
     // get chart data
     const _seriesData: any[] = [];
@@ -288,7 +280,7 @@ const getDynamicFieldData = (rawData: DynamicFieldData) => {
         const _data: number[] = [];
         state.xAxisData.forEach((d) => {
             const _result = _refinedResults.find((result) => result[state.xAxisField] === d);
-            const _value = _result?.[state.dataCriteria].find((v) => v[state.dataField] === field);
+            const _value = _result?.[state.dynamicFieldInfo?.criteria].find((v) => v[state.dataField] === field);
             _data.push(_value?.value || 0);
         });
         _seriesData.push({
@@ -303,7 +295,7 @@ const getDynamicFieldData = (rawData: DynamicFieldData) => {
                 fontSize: 10,
                 formatter: (p) => {
                     if (p.value < _threshold) return '';
-                    return getFormattedNumber(p.value, state.dataCriteria, state.numberFormat, _unit);
+                    return getFormattedNumber(p.value, state.dynamicFieldInfo?.criteria, state.numberFormat, _unit);
                 },
             },
             data: _data,
@@ -315,16 +307,8 @@ const getDynamicFieldData = (rawData: DynamicFieldData) => {
 const drawChart = (rawData: Data|null) => {
     if (isEmpty(rawData)) return;
 
-    // get xAxis data
-    if (isDateField(state.xAxisField)) {
-        const _isSeparatedDate = state.xAxisField !== DATE_FIELD.DATE;
-        state.xAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end, _isSeparatedDate);
-    } else {
-        state.xAxisData = rawData?.results?.map((d) => d[state.xAxisField] as string) || [];
-    }
-
     let _seriesData: any[] = [];
-    if (state.dataFieldType === 'staticField') {
+    if (state.dataFieldInfo.fieldType === 'staticField') {
         _seriesData = getStaticFieldData(rawData);
     } else {
         _seriesData = getDynamicFieldData(rawData);
@@ -333,12 +317,11 @@ const drawChart = (rawData: Data|null) => {
 };
 
 const loadWidget = async (): Promise<Data|APIErrorToast> => {
-    state.loading = true;
     const res = await fetchWidget();
+    if (!res) return state.data;
     if (typeof res === 'function') return res;
     state.data = res;
     drawChart(state.data);
-    state.loading = false;
     return state.data;
 };
 

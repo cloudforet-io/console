@@ -35,3 +35,24 @@ export const EVAL_EXPRESSION_TYPE = {
     LABEL: 'LABEL',
     DATA: 'DATA',
 } as const;
+
+export const DATA_TABLE_QUERY_OPERATOR = {
+    contain_in: {
+        key: 'contain_in',
+        label: 'contains',
+    },
+    not_contain_in: {
+        key: 'not_contain_in',
+        label: 'does not contain',
+    },
+    in: {
+        key: 'in',
+        label: 'equals',
+    },
+    not_in: {
+        key: 'not_in',
+        label: 'does not equal',
+    },
+} as const;
+
+export const KEYWORD_FILTER_DISABLED_KEYS = [GROUP_BY.PROJECT, GROUP_BY.WORKSPACE, GROUP_BY.SERVICE_ACCOUNT];

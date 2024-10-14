@@ -19,6 +19,9 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
+import type { PageAccessMap } from '@/lib/access-control/config';
+import { MENU_ID } from '@/lib/menu/config';
+
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
@@ -59,6 +62,8 @@ const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
     workspaceUserTotalCount: computed<number|undefined>(() => workspaceHomePageState.workspaceUserTotalCount),
     appsTotalCount: computed<number|undefined>(() => workspaceHomePageState.appsTotalCount),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    isRootRoleReadonly: computed<boolean>(() => store.getters['user/isRootRoleReadonly']),
 });
 const state = reactive({
     selectedWorkspace: computed<WorkspaceModel>(() => storeState.workspaceList.find((workspace) => workspace.workspace_id === storeState.currentWorkspace?.workspace_id) || {} as WorkspaceModel),
@@ -108,11 +113,13 @@ const routerToWorkspaceUser = (isOpenModal: boolean) => {
     router.push({ name: IAM_ROUTE.USER._NAME });
     if (isOpenModal) {
         userPageStore.$patch((_state) => {
-            _state.modal.type = USER_MODAL_TYPE.INVITE;
-            _state.modal.title = i18n.t('IAM.USER.MAIN.MODAL.INVITE_TITLE', { workspace_name: userWorkspaceStore.getters.currentWorkspace?.name }) as string;
-            _state.modal.themeColor = 'primary';
-            _state.modal.visible.add = true;
-            _state.modal = cloneDeep(_state.modal);
+            _state.state.modal.type = USER_MODAL_TYPE.INVITE;
+            _state.state.modal.title = i18n.t('IAM.USER.MAIN.MODAL.INVITE_TITLE', { workspace_name: userWorkspaceStore.getters.currentWorkspace?.name }) as string;
+            _state.state.modal.themeColor = 'primary';
+            _state.state.modal.visible = {
+                add: true,
+            };
+            _state.state.modal = cloneDeep(_state.state.modal);
         });
     }
 };
@@ -136,13 +143,13 @@ const routerToWorkspaceUser = (isOpenModal: boolean) => {
                                          class="favorite-button"
                                          scale="0.8"
                         />
-                        <p-icon-button v-if="storeState.isDomainAdmin"
+                        <p-icon-button v-if="storeState.isDomainAdmin && !storeState.isRootRoleReadonly"
                                        name="ic_settings"
                                        width="1.5rem"
                                        height="1.5rem"
                                        @click="handleActionButton('edit')"
                         />
-                        <p-icon-button v-if="storeState.isDomainAdmin"
+                        <p-icon-button v-if="storeState.isDomainAdmin && !storeState.isRootRoleReadonly"
                                        name="ic_delete"
                                        width="1.5rem"
                                        height="1.5rem"
@@ -190,14 +197,14 @@ const routerToWorkspaceUser = (isOpenModal: boolean) => {
             </div>
         </div>
         <div class="extra-wrapper">
-            <p-button v-if="props.accessUserMenu"
+            <p-button v-if="props.accessUserMenu && storeState.pageAccessPermissionMap[MENU_ID.USER].write"
                       style-type="tertiary"
                       icon-left="ic_service_user"
                       @click="handleActionButton('invite')"
             >
                 {{ $t('HOME.INFO_INVITE_USER') }}
             </p-button>
-            <p-button v-if="props.accessAppMenu"
+            <p-button v-if="props.accessAppMenu && storeState.pageAccessPermissionMap[MENU_ID.APP].write"
                       style-type="tertiary"
                       icon-left="ic_service_app"
                       @click="handleActionButton('create')"

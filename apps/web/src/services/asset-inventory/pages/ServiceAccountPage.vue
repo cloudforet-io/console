@@ -5,6 +5,8 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
+import { clone } from 'lodash';
+
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -38,9 +40,12 @@ import type { Currency } from '@/store/modules/display/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap, ProviderItem } from '@/store/reference/provider-reference-store';
 
+import type { PageAccessMap } from '@/lib/access-control/config';
 import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
+import type { MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import type { Reference } from '@/lib/reference/type';
 import { replaceUrlQuery } from '@/lib/router-query-string';
@@ -62,8 +67,9 @@ import { convertAgentModeOptions } from '@/services/asset-inventory/helpers/agen
 import { stateFormatter } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator';
 import type { QuerySearchTableLayout } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
-import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 const { width } = useWindowSize();
 
@@ -72,8 +78,8 @@ const route = useRoute();
 const { query } = router.currentRoute;
 const queryHelper = new QueryHelper().setFiltersAsRawQueryString(query.filters);
 
-const costReportPageStore = useCostReportPageStore();
-const constReportPageGetters = costReportPageStore.getters;
+const serviceAccountPageStore = useServiceAccountPageStore();
+const serviceAccountPageGetters = serviceAccountPageStore.getters;
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const serviceAccountSchemaState = serviceAccountSchemaStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
@@ -81,8 +87,21 @@ const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
 const { getProperRouteLocation } = useProperRouteLocation();
 
+const storeState = reactive({
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    currency: computed<Currency|undefined>(() => serviceAccountPageGetters.currency),
+});
 const state = reactive({
-    currency: computed<Currency|undefined>(() => constReportPageGetters.currency),
+    selectedMenuId: computed(() => {
+        const reversedMatched = clone(route.matched).reverse();
+        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
+        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
+            return '';
+        }
+        return targetMenuId;
+    }),
+    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     trustedAccounts: computed(() => allReferenceStore.getters.trustedAccount),
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
@@ -141,7 +160,6 @@ const tableState = reactive({
             { name: ACCOUNT_TYPE.TRUSTED, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.TRUSTED].label },
         ];
     }),
-    selectedAccountType: computed<AccountType>(() => serviceAccountSchemaState.selectedAccountType),
     tableTitle: computed(() => {
         let baseTitle:string;
         if (tableState.isTrustedAccount) baseTitle = 'Trusted Account';
@@ -151,7 +169,7 @@ const tableState = reactive({
         return `${state.selectedProviderName} ${baseTitle}`;
     }),
     searchFilters: computed<ConsoleFilter[]>(() => queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters),
-    isTrustedAccount: computed(() => tableState.selectedAccountType === ACCOUNT_TYPE.TRUSTED),
+    isTrustedAccount: computed(() => serviceAccountSchemaState.selectedAccountType === ACCOUNT_TYPE.TRUSTED),
     adminModeFilter: computed(() => (state.isAdminMode ? [{ k: 'resource_group', v: 'DOMAIN', o: '=' }] : [])),
     typeField: computed<ValueItem[]>(() => ([
         { label: i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALL') as string, name: 'ALL' },
@@ -259,7 +277,7 @@ const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = 
 const clickAddServiceAccount = () => {
     router.push(getProperRouteLocation({
         name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME,
-        params: { provider: state.selectedProvider, serviceAccountType: state.isAdminMode ? ACCOUNT_TYPE.TRUSTED : tableState.selectedAccountType },
+        params: { provider: state.selectedProvider, serviceAccountType: state.isAdminMode ? ACCOUNT_TYPE.TRUSTED : serviceAccountSchemaState.selectedAccountType },
         query: { nextPath: route.fullPath },
     }));
 };
@@ -322,14 +340,14 @@ watch(() => tableState.searchFilters, (searchFilters) => {
         replaceUrlQuery('filters', replaceQueryHelper.rawQueryStrings);
     }
 });
-watch([() => tableState.selectedAccountType, () => state.grantLoading], () => {
+watch([() => serviceAccountSchemaState.selectedAccountType, () => state.grantLoading], () => {
     if (state.currentGrantInfo.scope === 'USER') return;
     listServiceAccountData();
 }, { immediate: true });
 
 onMounted(async () => {
     if (tableState.isWorkspaceMember) return;
-    await costReportPageStore.fetchCostReportConfig();
+    await serviceAccountPageStore.fetchCostReportConfig();
 });
 
 (async () => {
@@ -348,14 +366,14 @@ onMounted(async () => {
         />
         <component :is="width > screens.tablet.max ? PTab : PPaneLayout"
                    :tabs="tableState.accountTypeList"
-                   :active-tab="tableState.selectedAccountType"
-                   @update:activeTab="handleSelectServiceAccountType"
+                   :active-tab="serviceAccountSchemaState.selectedAccountType"
+                   @update:active-tab="handleSelectServiceAccountType"
         >
             <div class="account-type-filter">
                 <span class="label">{{ $t('PAGE_SCHEMA.SERVICE_ACCOUNT_TYPE') }}</span>
                 <p-select-status v-for="(status, idx) in tableState.accountTypeList"
                                  :key="`${status.name}-${idx}`"
-                                 :selected="tableState.selectedAccountType"
+                                 :selected="serviceAccountSchemaState.selectedAccountType"
                                  :value="status.name"
                                  :multi-selectable="false"
                                  @change="handleSelectServiceAccountType"
@@ -375,7 +393,8 @@ onMounted(async () => {
                     />
                 </template>
                 <template #extra>
-                    <p-button style-type="primary"
+                    <p-button v-if="state.hasReadWriteAccess"
+                              style-type="primary"
                               icon-left="ic_plus_bold"
                               :disabled="tableState.isTrustedAccount && tableState.isWorkspaceMember"
                               @click="clickAddServiceAccount"
@@ -445,7 +464,7 @@ onMounted(async () => {
                           #col-cost_info-format="{value}"
                 >
                     <p>
-                        <span>{{ CURRENCY_SYMBOL[state.currency] }}</span>
+                        <span>{{ CURRENCY_SYMBOL[storeState.currency] }}</span>
                         {{ numberFormatter(value?.month) || 0 }}
                     </p>
                 </template>

@@ -2,7 +2,7 @@
     <p-pane-layout>
         <collector-detail-section-header :title="$t('INVENTORY.COLLECTOR.ADDITIONAL_OPTIONS')"
                                          :edit-mode="state.isEditMode"
-                                         :hide-edit-button="state.isCollectorOptionsSchemaEmpty || !collectorDetailPageStore.getters.isEditableCollector"
+                                         :hide-edit-button="!props.hasReadWriteAccess || state.isCollectorOptionsSchemaEmpty || !collectorDetailPageStore.getters.isEditableCollector"
                                          @click-edit="handleClickEdit"
         />
         <p-definition-table v-if="!state.isEditMode"
@@ -82,11 +82,12 @@ import CollectorOptionsForm from '@/services/asset-inventory/components/Collecto
 import { useCollectorDetailPageStore } from '@/services/asset-inventory/stores/collector-detail-page-store';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 
-
-
+const props = defineProps<{
+    hasReadWriteAccess?: boolean
+}>();
 
 const collectorFormStore = useCollectorFormStore();
-const collectorFormState = collectorFormStore.$state;
+const collectorFormState = collectorFormStore.state;
 const collectorDetailPageStore = useCollectorDetailPageStore();
 
 const state = reactive({
@@ -119,9 +120,9 @@ const state = reactive({
 });
 
 const fetchCollectorPluginUpdate = async (): Promise<CollectorModel> => {
-    if (!collectorFormStore.collectorId) throw new Error('collector_id is required');
+    if (!collectorFormState.collectorId) throw new Error('collector_id is required');
     const params: CollectorUpdatePluginParameters = {
-        collector_id: collectorFormStore.collectorId,
+        collector_id: collectorFormState.collectorId,
         options: collectorFormState.options,
     };
     return SpaceConnector.clientV2.inventory.collector.updatePlugin<CollectorUpdatePluginParameters, CollectorModel>(params);

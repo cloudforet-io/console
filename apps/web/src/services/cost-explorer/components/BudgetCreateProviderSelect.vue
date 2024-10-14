@@ -6,7 +6,7 @@ import {
 import { debounce } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import { PFieldGroup, PRadio, PSelectDropdown } from '@cloudforet/mirinae';
 import type {
     AutocompleteHandler,

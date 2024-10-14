@@ -40,6 +40,7 @@ import { useCollectorFormStore } from '@/services/asset-inventory/stores/collect
 
 const props = defineProps<{
     manageDisabled?: boolean;
+    hasReadWriteAccess?: boolean
 }>();
 const emit = defineEmits<{(e: 'update:totalCount', totalCount: number): void;
 }>();
@@ -47,7 +48,7 @@ const { getProperRouteLocation } = useProperRouteLocation();
 
 const allReferenceStore = useAllReferenceStore();
 const collectorFormStore = useCollectorFormStore();
-const collectorFormState = collectorFormStore.$state;
+const collectorFormState = collectorFormStore.state;
 
 const collectorDataModalStore = useCollectorDataModalStore();
 
@@ -162,10 +163,10 @@ const handleToolboxTableChange = async (options: ToolboxTableOptions) => {
     if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
     if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
 
-    if (collectorFormStore.collectorProvider) await getSecrets(collectorFormStore.collectorProvider, state.serviceAccountsFilter);
+    if (collectorFormState.collectorProvider) await getSecrets(collectorFormState.collectorProvider, state.serviceAccountsFilter);
 };
 const handleToolboxTableRefresh = async () => {
-    if (collectorFormStore.collectorProvider) await getSecrets(collectorFormStore.collectorProvider, state.serviceAccountsFilter);
+    if (collectorFormState.collectorProvider) await getSecrets(collectorFormState.collectorProvider, state.serviceAccountsFilter);
 };
 const handleClickCollect = async (secret: SecretModel) => {
     collectorDataModalStore.$patch((_state) => {
@@ -176,7 +177,7 @@ const handleClickCollect = async (secret: SecretModel) => {
     });
 };
 
-watch([() => collectorFormStore.collectorProvider, () => state.serviceAccountsFilter], async ([provider, serviceAccounts]) => {
+watch([() => collectorFormState.collectorProvider, () => state.serviceAccountsFilter], async ([provider, serviceAccounts]) => {
     if (!provider) return;
     await getSecrets(provider, serviceAccounts);
 }, { immediate: true });
@@ -231,7 +232,8 @@ watch([() => collectorFormStore.collectorProvider, () => state.serviceAccountsFi
                 </p-badge>
             </template>
             <template #col-collect-format="{item}">
-                <p-button size="sm"
+                <p-button v-if="props.hasReadWriteAccess"
+                          size="sm"
                           style-type="tertiary"
                           :disabled="props.manageDisabled"
                           class="service-account-collect-data-button"

@@ -25,7 +25,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { useRoleFormatter } from '@/services/iam/composables/refined-table-data';
 import {
-    ROLE_DELETE_TABLE_FIELDS,
+    ROLE_MODAL_TABLE_FIELDS,
     ROLE_UN_DELETABLE_TABLE_FIELDS,
 } from '@/services/iam/constants/role-constant';
 import { useRolePageStore } from '@/services/iam/store/role-page-store';
@@ -132,7 +132,7 @@ watch(() => state.proxyVisible, async (after) => {
             <p-data-table v-if="state.isDeletable"
                           class="role-data-table"
                           :items="rolePageStore.selectedRoles"
-                          :fields="ROLE_DELETE_TABLE_FIELDS"
+                          :fields="ROLE_MODAL_TABLE_FIELDS"
                           :loading="state.loading"
                           :table-custom-style="{ maxHeight: 'calc(100vh - 17.5rem)' }"
             >

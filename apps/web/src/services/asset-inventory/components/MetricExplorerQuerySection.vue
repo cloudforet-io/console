@@ -88,8 +88,8 @@ watch(() => route.params, async () => {
                            :class="{ 'open': state.filtersPopoverVisible }"
                            ignore-outside-click
                            trigger="click"
-                           relative-style
-                           position="bottom-start"
+                           boundary=".metric-explorer-query-section"
+                           width="100%"
                            class="filters-popover"
                 >
                     <p-button style-type="tertiary"
@@ -134,14 +134,18 @@ watch(() => route.params, async () => {
 
 <style lang="postcss" scoped>
 .metric-explorer-query-section {
+    position: relative;
     margin-top: 1.5rem;
+    z-index: 1;
     .filter-wrapper {
-        @apply relative flex items-center justify-between;
+        @apply relative flex justify-between;
+        align-items: flex-start;
         font-size: 0.875rem;
         .left-part {
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            flex-wrap: wrap;
         }
         .right-part {
             display: flex;
@@ -155,24 +159,6 @@ watch(() => route.params, async () => {
         .filters-button {
             .filters-badge {
                 margin-left: 0.25rem;
-            }
-        }
-
-        /* custom design-system component - p-popover */
-        :deep(.p-popover) {
-            &.open {
-                .p-button.filters-button {
-                    @apply bg-gray-200;
-                }
-            }
-            .popper {
-                width: 100%;
-                max-width: 100%;
-                left: 2rem;
-                transform: translate(0, 3rem) !important;
-                .arrow {
-                    left: 1.25rem !important;
-                }
             }
         }
     }

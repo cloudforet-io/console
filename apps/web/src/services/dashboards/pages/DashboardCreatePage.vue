@@ -25,10 +25,9 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PButton, PCenteredLayoutHeader,
+    PCenteredLayoutHeader,
 } from '@cloudforet/mirinae';
 
-import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -37,8 +36,8 @@ import ConfirmBackModal from '@/common/components/modals/ConfirmBackModal.vue';
 import { useGoBack } from '@/common/composables/go-back';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
-import DashboardCreateStep1 from '@/services/dashboards/components/DashboardCreateStep1.vue';
-import DashboardCreateStep2 from '@/services/dashboards/components/DashboardCreateStep2.vue';
+import DashboardCreateStep1 from '@/services/dashboards/components/dashboard-create/DashboardCreateStep1.vue';
+import DashboardCreateStep2 from '@/services/dashboards/components/dashboard-create/DashboardCreateStep2.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
 
@@ -64,34 +63,8 @@ const state = reactive({
             description: state.isAdminMode ? i18n.t('DASHBOARDS.CREATE.STEP2_DESC_FOR_ADMIN') : i18n.t('DASHBOARDS.CREATE.STEP2_DESC'),
         },
     ]),
-    isStep2Valid: false,
     closeConfirmModalVisible: false,
-    disableCreateButton: computed<boolean>(() => {
-        if (!dashboardCreatePageState.selectedDashboardId && !dashboardCreatePageState.selectedTemplateId) return true;
-        return !state.isStep2Valid;
-    }),
 });
-
-const goStep = (direction: 'prev'|'next') => {
-    if (direction === 'prev') {
-        dashboardCreatePageStore.reset();
-        dashboardCreatePageStore.setCurrentStep(dashboardCreatePageState.currentStep - 1);
-    } else {
-        dashboardCreatePageStore.setCurrentStep(dashboardCreatePageState.currentStep + 1);
-    }
-};
-
-const handleCreateDashboard = async () => {
-    const createdDashboardId = await dashboardCreatePageStore.createDashboard();
-    if (createdDashboardId) {
-        await SpaceRouter.router.push(getProperRouteLocation({
-            name: DASHBOARDS_ROUTE.DETAIL._NAME,
-            params: {
-                dashboardId: createdDashboardId,
-            },
-        })).catch(() => {});
-    }
-};
 
 /* Event */
 const handleClickClose = () => {
@@ -100,11 +73,14 @@ const handleClickClose = () => {
 const { setPathFrom, handleClickBackButton } = useGoBack(getProperRouteLocation({
     name: DASHBOARDS_ROUTE._NAME,
 }));
+const handleClickNext = () => {
+    dashboardCreatePageStore.setCreateType('BUNDLE');
+    dashboardCreatePageStore.setCurrentStep(2);
+};
 
 defineExpose({ setPathFrom });
 
 onUnmounted(() => {
-    dashboardCreatePageStore.setCurrentStep(1);
     dashboardCreatePageStore.reset();
 });
 </script>
@@ -121,27 +97,11 @@ onUnmounted(() => {
                                   show-close-button
                                   @close="handleClickClose"
         />
-        <dashboard-create-step1 v-if="dashboardCreatePageState.currentStep === 1" />
+        <dashboard-create-step1 v-if="dashboardCreatePageState.currentStep === 1"
+                                @click-next="handleClickNext"
+        />
         <template v-else-if="dashboardCreatePageState.currentStep === 2">
-            <dashboard-create-step2 :is-valid.sync="state.isStep2Valid" />
-            <div class="button-area">
-                <p-button style-type="transparent"
-                          size="lg"
-                          icon-left="ic_arrow-left"
-                          :disabled="dashboardCreatePageState.loading"
-                          @click="goStep('prev')"
-                >
-                    {{ $t('DASHBOARDS.CREATE.GO_BACK') }}
-                </p-button>
-                <p-button style-type="primary"
-                          size="lg"
-                          :disabled="state.disableCreateButton"
-                          :loading="dashboardCreatePageState.loading"
-                          @click="handleCreateDashboard"
-                >
-                    {{ $t('DASHBOARDS.CREATE.CREATE_NEW_DASHBOARD') }}
-                </p-button>
-            </div>
+            <dashboard-create-step2 />
         </template>
         <confirm-back-modal :visible.sync="state.closeConfirmModalVisible"
                             @confirm="handleClickBackButton"
@@ -151,19 +111,12 @@ onUnmounted(() => {
 
 <style lang="postcss" scoped>
 .dashboard-create-page {
+    margin: 0 auto;
     &.step-1 {
         width: 60rem;
     }
     &.step-2 {
         width: 45rem;
-    }
-    &.step-3 {
-        width: 100%;
-        height: 100%;
-        min-height: calc(100vh - 8rem);
-    }
-    .button-area {
-        @apply flex justify-end mt-8 gap-4;
     }
 }
 </style>

@@ -98,7 +98,7 @@ const state = reactive({
 /* event */
 const onClickAdd = () => {
     state.proxyConditions.push({
-        key: '',
+        key: 'title',
         value: '',
         operator: OPERATOR.contain,
     });

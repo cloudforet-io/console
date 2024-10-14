@@ -8,6 +8,7 @@ import dayjs from 'dayjs';
 import { throttle } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import {
     PI,
 } from '@cloudforet/mirinae';
@@ -31,15 +32,13 @@ import {
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
+import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/comparison/type';
+import type { IconValue } from '@/common/modules/widgets/_widget-fields/icon/type';
+import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
-import type {
-    IconValue,
-    ComparisonValue,
-    NumberFormatValue,
-} from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { gray } from '@/styles/colors';
 
@@ -156,14 +155,15 @@ const setValueTextFontSize = () => {
 };
 
 /* Api */
+const privateWidgetFetcher = getCancellableFetcher<PrivateWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.privateWidget.load);
+const publicWidgetFetcher = getCancellableFetcher<PublicWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.publicWidget.load);
 const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
     if (props.widgetState === 'INACTIVE') return undefined;
     try {
+        state.loading = true;
         const _isPrivate = props.widgetId.startsWith('private');
-        const _fetcher = _isPrivate
-            ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
-            : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>;
-        const res = await _fetcher({
+        const _fetcher = _isPrivate ? privateWidgetFetcher : publicWidgetFetcher;
+        const { status, response } = await _fetcher({
             widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
@@ -179,8 +179,12 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
             },
             vars: props.dashboardVars,
         });
-        state.errorMessage = undefined;
-        return res;
+        if (status === 'succeed') {
+            state.errorMessage = undefined;
+            state.loading = false;
+            return response;
+        }
+        return undefined;
     } catch (e: any) {
         state.loading = false;
         state.errorMessage = e.message;
@@ -190,11 +194,10 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
 };
 
 const loadWidget = async (): Promise<Data|APIErrorToast> => {
-    state.loading = true;
     const res = await fetchWidget();
+    if (!res) return state.data;
     if (typeof res === 'function') return res;
     state.data = res;
-    state.loading = false;
     return state.data;
 };
 

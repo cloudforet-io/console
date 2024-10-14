@@ -74,6 +74,37 @@ export interface Query {
     keyword?: string;
     minimal?: boolean;
     count_only?: boolean;
+    distinct?: string;
+}
+
+
+export interface AnalyzeField {
+    [key: string]: {
+        key: string;
+        operator: 'sum'|'average'|'count'|'max'|'min'|'push'|'add_to_set';
+    };
+}
+// unwind의 filter의 경우 TimeSeriesAnalyzeQuery에서의 겨웅에만 filter가 존재하며, RealTimeAnalyzeQuery에서는 filter가 존재하지 않습니다. (Granularity가 있으면 TimeSeriesAnalyzeQuery, Granularity가 없으면 RealTimeAnalyzeQuery)
+// In the case of TimeSeriesAnalyzeQuery, the filter exists only when filter exists, and in the case of RealTimeAnalyzeQuery, the filter does not exist.
+export interface AnalyzeQuery {
+    granularity?: 'YEARLY'|'MONTHLY'|'DAILY';
+    start?: string;
+    end?: string;
+    unwind?: {
+        path?: string;
+        filter?: Array<ApiFilter>;
+    };
+    group_by?: Array<string>;
+    field_group?: Array<string>;
+    filter?: Array<ApiFilter>;
+    filter_or?: Array<ApiFilter>;
+    page?: {
+        start?: number;
+        limit?: number;
+    };
+    sort?: Sort[];
+    fields?: AnalyzeField;
+    select?: any;
 }
 
 export interface MockConfig {

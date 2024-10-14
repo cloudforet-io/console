@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PButton, PCheckbox, PI, PRadio, PSelectDropdown, PTree, PBadge,
 } from '@cloudforet/mirinae';
@@ -14,6 +15,8 @@ import type { ProjectReferenceMap } from '@/store/reference/project-reference-st
 import type { ReferenceMap } from '@/store/reference/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { indigo, peacock } from '@/styles/colors';
 
 import type { ProjectTreeOptions } from '@/services/project/composables/use-project-tree';
 import { useProjectTree } from '@/services/project/composables/use-project-tree';
@@ -41,6 +44,8 @@ interface Props {
     position?: 'left' | 'right';
     selectionLabel?: string;
     hideCreateButton?: boolean;
+    workspaceId?: string;
+    isInitSelectedItem?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -56,6 +61,8 @@ const props = withDefaults(defineProps<Props>(), {
     position: 'left',
     selectionLabel: undefined,
     hideCreateButton: false,
+    workspaceId: undefined,
+    isInitSelectedItem: false,
 });
 
 const emit = defineEmits<{(e: 'select', value: ProjectTreeNodeData[]): void;
@@ -116,7 +123,13 @@ const getSearchPath = async (id: string|undefined, type?: ProjectTreeItemType): 
 const findNodes = async () => {
     if (!state.root) return;
 
-    const pathList: string[][] = await Promise.all(props.selectedProjectIds.map((d) => getSearchPath(d, props.projectGroupSelectable ? 'PROJECT_GROUP' : 'PROJECT')));
+    let selectedItemType = undefined as ProjectTreeItemType|undefined;
+    if (props.multiSelectable) {
+        selectedItemType = props.projectGroupSelectable ? 'PROJECT_GROUP' : 'PROJECT';
+    } else {
+        selectedItemType = props.selectedProjectIds[0]?.includes('pg') ? 'PROJECT_GROUP' : 'PROJECT';
+    }
+    const pathList: string[][] = await Promise.all(props.selectedProjectIds.map((d) => getSearchPath(d, selectedItemType)));
     const predicateList = pathList.map((paths) => paths.map((d) => ((data) => data.id === d)));
     await state.root.fetchAndFindNodes(predicateList);
 };
@@ -145,6 +158,8 @@ const dataSetter = (text: string, node: ProjectTreeNode) => {
     node.data.name = text;
 };
 const dataGetter = (node: ProjectTreeNode): string => node.data.name;
+
+const workspaceApiQuery = new ApiQueryHelper();
 const dataFetcher = async (node: ProjectTreeNode): Promise<ProjectTreeNodeData[]> => {
     try {
         const params: ProjectTreeOptions = {
@@ -153,6 +168,12 @@ const dataFetcher = async (node: ProjectTreeNode): Promise<ProjectTreeNodeData[]
             check_child: true,
         };
 
+        if (props.workspaceId) {
+            workspaceApiQuery.setFilters([
+                { k: 'workspace_id', v: props.workspaceId, o: '=' },
+            ]);
+            params.query = workspaceApiQuery.data;
+        }
         if (!props.projectSelectable) params.exclude_type = 'PROJECT';
 
         if (node.data?.id && node.data?.item_type) {
@@ -161,13 +182,10 @@ const dataFetcher = async (node: ProjectTreeNode): Promise<ProjectTreeNodeData[]
         }
 
         if (props.projectGroupSelectOptions?.type === 'PROJECT_GROUP' && (props.projectGroupSelectOptions?.currentProjectGroupId === node.data?.id)) {
-            params.query = {
-                filter: [{
-                    k: 'project_group_id',
-                    v: props.projectGroupSelectOptions.id,
-                    o: 'not',
-                }],
-            };
+            workspaceApiQuery.addFilter(
+                { k: 'project_group_id', v: props.projectGroupSelectOptions?.id ?? '', o: '!=' },
+            );
+            params.query = workspaceApiQuery.data;
         }
 
         return await projectTreeHelper.getProjectTree(params);
@@ -225,7 +243,10 @@ const refreshProjectTree = async () => {
 };
 
 const handleClickCreateButton = () => {
-    window.open(SpaceRouter.router.resolve({ name: PROJECT_ROUTE._NAME }).href);
+    window.open(SpaceRouter.router.resolve({
+        name: PROJECT_ROUTE._NAME,
+        ...(props.workspaceId ? { params: { workspaceId: props.workspaceId } } : {}),
+    }).href);
     state.visibleMenu = false;
     handleUpdateVisibleMenu(false);
 };
@@ -240,6 +261,10 @@ watch(() => props.selectedProjectIds, async (after, before) => {
             const deletedId = before.filter((d) => !after.includes(d))[0];
             const deletedIdx = state._selectedProjectIds.indexOf(deletedId);
             handleDeleteTag(deletedId, deletedIdx);
+            if (props.isInitSelectedItem) {
+                state._selectedProjectIds = [];
+                state.selectedProjectItems = [];
+            }
         }
     }
 });
@@ -321,7 +346,11 @@ watch(() => state._selectedProjectIds, (selectedProjectIds) => {
                                        class="mr-1"
                                        @change="handleChangeSelectState(node, path, ...arguments)"
                             />
-                            <p-i :name="node.data.item_type === 'PROJECT_GROUP' ? 'ic_folder-filled' : 'ic_document-filled'" />
+                            <p-i :name="node.data.item_type === 'PROJECT_GROUP' ? 'ic_folder-filled' : 'ic_document-filled'"
+                                 :color="node.data.item_type === 'PROJECT_GROUP' ? indigo[500] : peacock[600]"
+                                 width="1rem"
+                                 height="1rem"
+                            />
                             <p-badge v-if="props.projectGroupSelectOptions && node.data.id === props.projectGroupSelectOptions.currentProjectGroupId"
                                      badge-type="subtle"
                                      style-type="gray200"

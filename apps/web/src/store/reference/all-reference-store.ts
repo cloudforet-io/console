@@ -27,7 +27,10 @@ import { useProjectReferenceStore } from '@/store/reference/project-reference-st
 import { useProtocolReferenceStore } from '@/store/reference/protocol-reference-store';
 import { useProviderReferenceStore } from '@/store/reference/provider-reference-store';
 import { usePublicDashboardReferenceStore } from '@/store/reference/public-dashboard-reference-store';
+import type { PublicFolderReferenceMap } from '@/store/reference/public-folder-reference-store';
+import { usePublicFolderReferenceStore } from '@/store/reference/public-folder-reference-store';
 import { useRegionReferenceStore } from '@/store/reference/region-reference-store';
+import { useRoleReferenceStore } from '@/store/reference/role-reference-store';
 import { useSecretReferenceStore } from '@/store/reference/secret-reference-store';
 import { useServiceAccountReferenceStore } from '@/store/reference/service-account-reference-store';
 import { useTrustedAccountReferenceStore } from '@/store/reference/trusted-account-reference-store';
@@ -35,6 +38,8 @@ import type { ReferenceLoadOptions } from '@/store/reference/type';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 import { useWebhookReferenceStore } from '@/store/reference/webhook-reference-store';
+import type { WorkspaceGroupReferenceMap } from '@/store/reference/workspace-group-reference-store';
+import { useWorkspaceGroupReferenceStore } from '@/store/reference/workspace-group-reference-store';
 import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
 
@@ -50,6 +55,7 @@ type PiniaStoreReferenceType =
     |'protocol'
     |'provider'
     |'public_dashboard'
+    |'public_folder'
     |'region'
     |'secret'
     |'service_account'
@@ -59,7 +65,9 @@ type PiniaStoreReferenceType =
     |'workspace'
     |'escalation_policy'
     |'metric'
-    |'namespace';
+    |'namespace'
+    |'workspace_group'
+    |'role';
 
 export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const cloudServiceTypeReferenceStore = useCloudServiceTypeReferenceStore();
@@ -74,6 +82,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const workspaceReferenceStore = useWorkspaceReferenceStore();
     const userReferenceStore = useUserReferenceStore();
     const publicDashboardReferenceStore = usePublicDashboardReferenceStore();
+    const publicFolderReferenceStore = usePublicFolderReferenceStore();
     const serviceAccountReferenceStore = useServiceAccountReferenceStore();
     const webhookReferenceStore = useWebhookReferenceStore();
     const trustedAccountReferenceStore = useTrustedAccountReferenceStore();
@@ -82,6 +91,8 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const escalationPolicyReferenceStore = useEscalationPolicyReferenceStore();
     const namespaceReferenceStore = useNamespaceReferenceStore();
     const metricReferenceStore = useMetricReferenceStore();
+    const workspaceGroupReferenceStore = useWorkspaceGroupReferenceStore();
+    const roleReferenceStore = useRoleReferenceStore();
 
     const getters = reactive({
         // TODO: unify into one case (serviceAccount or service_account)
@@ -100,8 +111,12 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
         cloudServiceQuerySet: computed<CloudServiceQuerySetReferenceMap>(() => cloudServiceQuerySetReferenceStore.getters.cloudServiceQuerySetItems),
         cloud_service_query_set: computed<CloudServiceQuerySetReferenceMap>(() => cloudServiceQuerySetReferenceStore.getters.cloudServiceQuerySetItems),
         workspace: computed<WorkspaceReferenceMap>(() => workspaceReferenceStore.getters.workspaceItems),
+        workspace_group: computed<WorkspaceGroupReferenceMap>(() => workspaceGroupReferenceStore.getters.workspaceGroupItems),
+        workspaceGroup: computed<WorkspaceGroupReferenceMap>(() => workspaceGroupReferenceStore.getters.workspaceGroupItems),
         publicDashboard: computed(() => publicDashboardReferenceStore.getters.publicDashboardItems),
         public_dashboard: computed(() => publicDashboardReferenceStore.getters.publicDashboardItems),
+        publicFolder: computed<PublicFolderReferenceMap>(() => publicFolderReferenceStore.getters.publicFolderItems),
+        public_folder: computed<PublicFolderReferenceMap>(() => publicFolderReferenceStore.getters.publicFolderItems),
         serviceAccount: computed(() => serviceAccountReferenceStore.getters.serviceAccountItems),
         service_account: computed(() => serviceAccountReferenceStore.getters.serviceAccountItems),
         webhook: computed(() => webhookReferenceStore.getters.webhookItems),
@@ -113,6 +128,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
         escalation_policy: computed<EscalationPolicyReferenceMap>(() => escalationPolicyReferenceStore.getters.escalationPolicyItems),
         namespace: computed(() => namespaceReferenceStore.getters.namespaceItems),
         metric: computed(() => metricReferenceStore.getters.metricItems),
+        role: computed(() => roleReferenceStore.getters.roleItems),
     });
 
     const actions = {
@@ -134,10 +150,14 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
                 await providerReferenceStore.sync(data); break;
             case 'workspace':
                 await workspaceReferenceStore.sync(data); break;
+            case 'workspace_group':
+                await workspaceGroupReferenceStore.sync(data); break;
             case 'user':
                 await userReferenceStore.sync(data); break;
             case 'public_dashboard':
                 await publicDashboardReferenceStore.sync(data); break;
+            case 'public_folder':
+                await publicFolderReferenceStore.sync(data); break;
             case 'service_account':
                 await serviceAccountReferenceStore.sync(data); break;
             case 'webhook':
@@ -154,6 +174,8 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
                 await namespaceReferenceStore.sync(data); break;
             case 'metric':
                 await metricReferenceStore.sync(data); break;
+            case 'role':
+                await roleReferenceStore.sync(data); break;
             default: break;
             }
         },
@@ -177,10 +199,14 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
                 await protocolReferenceStore.load(options); break;
             case 'workspace':
                 await workspaceReferenceStore.load(options); break;
+            case 'workspace_group':
+                await workspaceGroupReferenceStore.load(options); break;
             case 'user':
                 await userReferenceStore.load(options); break;
             case 'public_dashboard':
                 await publicDashboardReferenceStore.load(options); break;
+            case 'public_folder':
+                await publicFolderReferenceStore.load(options); break;
             case 'provider':
                 await providerReferenceStore.load(options); break;
             case 'service_account':
@@ -199,6 +225,8 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
                 await namespaceReferenceStore.load(options); break;
             case 'metric':
                 await metricReferenceStore.load(options); break;
+            case 'role':
+                await roleReferenceStore.load(options); break;
             default: break;
             }
         },
@@ -213,8 +241,10 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
             protocolReferenceStore.flush();
             providerReferenceStore.flush();
             workspaceReferenceStore.flush();
+            workspaceGroupReferenceStore.flush();
             userReferenceStore.flush();
             publicDashboardReferenceStore.flush();
+            publicFolderReferenceStore.flush();
             serviceAccountReferenceStore.flush();
             webhookReferenceStore.flush();
             trustedAccountReferenceStore.flush();
@@ -223,6 +253,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
             escalationPolicyReferenceStore.flush();
             namespaceReferenceStore.flush();
             metricReferenceStore.flush();
+            roleReferenceStore.flush();
         },
     };
 

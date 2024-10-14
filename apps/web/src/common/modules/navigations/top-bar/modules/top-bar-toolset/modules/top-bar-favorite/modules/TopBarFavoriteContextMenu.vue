@@ -5,6 +5,8 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 import { useRouter } from 'vue-router/composables';
 
+import { isEmpty } from 'lodash';
+
 import {
     PButton, PDataLoader, PEmpty, PI, PIconButton,
 } from '@cloudforet/mirinae';
@@ -25,6 +27,7 @@ import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-r
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import { isUserAccessibleToMenu } from '@/lib/access-control';
+import type { PageAccessMap } from '@/lib/access-control/config';
 import {
     convertCloudServiceConfigToReferenceData,
     convertCostAnalysisConfigToReferenceData,
@@ -69,7 +72,7 @@ const emit = defineEmits<{(e: 'close'): void;
 
 const allReferenceStore = useAllReferenceStore();
 const dashboardStore = useDashboardStore();
-const dashboardGetters = dashboardStore.getters;
+const dashboardState = dashboardStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
@@ -86,11 +89,14 @@ const storeState = reactive({
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     costQuerySets: computed<CostQuerySetModel[]>(() => gnbStoreGetters.costQuerySets),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
 });
 const state = reactive({
     loading: true,
     showAll: false,
     showAllType: undefined as undefined|FavoriteType,
+    accessProject: computed<boolean>(() => !isEmpty(storeState.pageAccessPermissionMap[MENU_ID.PROJECT])),
+    accessCloudService: computed<boolean>(() => !isEmpty(storeState.pageAccessPermissionMap[MENU_ID.CLOUD_SERVICE])),
     items: computed<FavoriteMenuItem[]>(() => {
         const results: FavoriteMenuItem[] = [];
         if (state.favoriteMenuItems.length) {
@@ -197,7 +203,7 @@ const state = reactive({
         if (!isUserAccessibleToDashboards) return [];
         return convertDashboardConfigToReferenceData(
             favoriteGetters.dashboardItems ?? [],
-            [...dashboardGetters.workspaceItems, ...dashboardGetters.privateItems],
+            [...dashboardState.publicDashboardItems, ...dashboardState.privateDashboardItems],
         );
     }),
     favoriteCloudServiceItems: computed<FavoriteItem[]>(() => {
@@ -411,13 +417,15 @@ callApiWithGrantGuard();
                         >
                     </template>
                     <template #button>
-                        <p-button style-type="tertiary"
+                        <p-button v-if="state.accessProject"
+                                  style-type="tertiary"
                                   size="md"
                                   @click="handleClickMenuButton(FAVORITE_TYPE.PROJECT)"
                         >
                             {{ $t('COMMON.GNB.FAVORITES.GO_TO_PROJECT') }}
                         </p-button>
-                        <p-button style-type="tertiary"
+                        <p-button v-if="state.accessCloudService"
+                                  style-type="tertiary"
                                   size="md"
                                   @click="handleClickMenuButton(FAVORITE_TYPE.CLOUD_SERVICE)"
                         >

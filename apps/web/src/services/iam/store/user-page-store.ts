@@ -1,3 +1,5 @@
+import { computed, reactive } from 'vue';
+
 import { isEmpty } from 'lodash';
 import { defineStore } from 'pinia';
 
@@ -6,9 +8,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
-import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
-import type { RoleType } from '@/schema/identity/role/type';
 import type { UserGetParameters } from '@/schema/identity/user/api-verbs/get';
 import type { UserListParameters } from '@/schema/identity/user/api-verbs/list';
 import type { UserModel } from '@/schema/identity/user/model';
@@ -20,10 +21,10 @@ import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { UserListItemType } from '@/services/iam/types/user-type';
+import type { UserListItemType, ModalSettingState, ModalState } from '@/services/iam/types/user-type';
 
-export const useUserPageStore = defineStore('page-user', {
-    state: () => ({
+export const useUserPageStore = defineStore('page-user', () => {
+    const state = reactive({
         isAdminMode: false,
         loading: true,
         users: [] as UserListItemType[],
@@ -41,50 +42,47 @@ export const useUserPageStore = defineStore('page-user', {
             type: '',
             title: '',
             themeColor: 'primary',
-            visible: {
-                add: false,
-                form: false,
-                status: false,
-            },
-        },
-    }),
-    getters: {
-        timezone: () => store.state.user.timezone,
-        isWorkspaceOwner: () => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER,
-        selectedUsers: (state) => {
+            visible: undefined,
+        } as ModalState,
+    });
+    const getters = reactive({
+        timezone: computed(() => store.state.user.timezone),
+        isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+        selectedUsers: computed(():UserListItemType[] => {
             if (state.selectedIndices.length === 1 && !isEmpty(state.selectedUser)) return [state.selectedUser];
             const users: UserListItemType[] = [];
             state.selectedIndices.forEach((d:number) => {
                 users.push(state.users[d]);
             });
             return users ?? [];
-        },
-        roleMap: (state) => {
+        }),
+        selectedOnlyWorkspaceUsers: computed(():UserListItemType[] => state.users.filter((user) => !user.role_binding_info?.workspace_group_id)),
+        roleMap: computed(() => {
             const map: Record<string, RoleModel> = {};
             state.roles.forEach((role) => {
                 map[role.role_id] = role;
             });
             return map;
-        },
-    },
-    actions: {
+        }),
+    });
+    const actions = {
         // User
         async listUsers(params: UserListParameters) {
             try {
                 const res = await SpaceConnector.clientV2.identity.user.list<UserListParameters, ListResponse<UserModel>>(params);
-                this.users = res.results || [];
-                this.totalCount = res.total_count ?? 0;
-                this.selectedIndices = [];
+                state.users = res.results || [];
+                state.totalCount = res.total_count ?? 0;
+                state.selectedIndices = [];
             } catch (e) {
                 ErrorHandler.handleError(e);
-                this.users = [];
-                this.totalCount = 0;
+                state.users = [];
+                state.totalCount = 0;
                 throw e;
             }
         },
         async getUser(params: UserGetParameters) {
             try {
-                this.selectedUser = await SpaceConnector.clientV2.identity.user.get<UserGetParameters, UserModel>(params);
+                state.selectedUser = await SpaceConnector.clientV2.identity.user.get<UserGetParameters, UserModel>(params);
             } catch (e: any) {
                 ErrorHandler.handleRequestError(e, e.message);
                 throw e;
@@ -94,20 +92,20 @@ export const useUserPageStore = defineStore('page-user', {
         async listWorkspaceUsers(params: WorkspaceUserListParameters) {
             try {
                 const { results, total_count } = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>(params);
-                this.users = (results ?? [])?.map((item) => ({
+                state.users = (results ?? [])?.map((item) => ({
                     ...item,
-                    role_type: item.role_binding_info?.role_type,
+                    role_type: item.role_type,
                     role_binding: {
-                        type: item.role_binding_info?.role_type as RoleType,
-                        name: this.roles.find((role) => role.role_id === item.role_binding_info?.role_id)?.name ?? '',
+                        type: item.role_binding_info?.role_type ?? ROLE_TYPE.USER,
+                        name: state.roles?.find((role) => role.role_id === item.role_binding_info?.role_id)?.name ?? '',
                     },
                 }));
-                this.totalCount = total_count ?? 0;
-                this.selectedIndices = [];
+                state.totalCount = total_count ?? 0;
+                state.selectedIndices = [];
             } catch (e) {
                 ErrorHandler.handleError(e);
-                this.users = [];
-                this.totalCount = 0;
+                state.users = [];
+                state.totalCount = 0;
                 throw e;
             }
         },
@@ -116,10 +114,10 @@ export const useUserPageStore = defineStore('page-user', {
                 const res = await SpaceConnector.clientV2.identity.workspaceUser.get<WorkspaceUserGetParameters, WorkspaceUserModel>(params);
                 return {
                     ...res,
-                    role_type: res.role_binding_info?.role_type,
+                    role_type: res.role_type,
                     role_binding: {
-                        type: res.role_binding_info?.role_type as RoleType,
-                        name: this.roles.find((role) => role.role_id === res.role_binding_info?.role_id)?.name ?? '',
+                        type: res.role_binding_info?.role_type ?? ROLE_TYPE.USER,
+                        name: state.roles?.find((role) => role.role_id === res.role_binding_info?.role_id)?.name ?? '',
                     },
                 };
             } catch (e: any) {
@@ -137,29 +135,39 @@ export const useUserPageStore = defineStore('page-user', {
             }
         },
         setUserEmail(userId?: string, email?: string) {
-            const idx = this.users.findIndex((item) => item.user_id === userId);
-            this.users[idx].email = email;
-            if (this.selectedUser.user_id === userId) {
-                this.selectedUser.email = email;
+            const idx = state.users.findIndex((item) => item.user_id === userId);
+            state.users[idx].email = email;
+            if (state.selectedUser.user_id === userId) {
+                state.selectedUser.email = email;
             }
+        },
+        updateModalSettings({
+            type, title, themeColor, modalVisibleType,
+        }: ModalSettingState) {
+            state.modal = {
+                ...state.modal,
+                type,
+                title,
+                themeColor,
+                visible: modalVisibleType ?? undefined,
+            };
         },
         // Role
         async listRoles() {
             try {
-                const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
-                    query: {
-                        filter: [
-                            { k: 'state', v: ROLE_STATE.ENABLED, o: 'eq' },
-                        ],
-                    },
-                });
-                this.roles = results || [];
+                const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>();
+                state.roles = results || [];
                 return results;
             } catch (e) {
                 ErrorHandler.handleError(e);
-                this.roles = [];
+                state.roles = [];
                 throw e;
             }
         },
-    },
+    };
+    return {
+        state,
+        getters,
+        ...actions,
+    };
 });

@@ -1,3 +1,5 @@
+import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
+
 import type {
     DATA_TABLE_TYPE, DATA_SOURCE_DOMAIN, DATA_TABLE_OPERATOR, JOIN_TYPE,
     EVAL_EXPRESSION_TYPE,
@@ -13,7 +15,7 @@ export type DateFormat = 'SINGLE' | 'SEPARATE';
 export type TimeDiff = Record<TimeDiffItem, number>; // years|months|days
 export type LabelsInfo = Record<string, object>;
 export type DataInfo = Record<string, { unit?: string, timediff?: TimeDiff }>;
-export type DataTableOptions = DataTableAddOptions | DataTableTransformOptions;
+export type DataTableOptions = DataTableAddOptions & DataTableTransformOptions;
 export type JoinType = typeof JOIN_TYPE[keyof typeof JOIN_TYPE];
 export type WidgetState = 'CREATING' | 'INACTIVE' | 'ACTIVE';
 export type TimeDiffItem = 'years' | 'months';
@@ -27,9 +29,11 @@ export interface DataTableAddOptions {
     date_format?: DateFormat;
     additional_labels?: AdditionalLabels;
     timediff?: TimeDiff;
-    filter?: any[];
-    filter_or?: any[];
+    filter?: DataTableQueryFilter[];
+    filter_or?: DataTableQueryFilter[];
 }
+export type DataTableQueryFilter = ApiFilter;
+
 export interface AssetOptions {
     metric_id: string;
 }

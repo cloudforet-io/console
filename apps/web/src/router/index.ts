@@ -2,6 +2,8 @@ import Vue from 'vue';
 import type { RouteConfig } from 'vue-router';
 import VueRouter from 'vue-router';
 
+import { clone } from 'lodash';
+
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -23,6 +25,8 @@ import { useErrorStore } from '@/store/error/error-store';
 import { pinia } from '@/store/pinia';
 
 import { getRecentConfig } from '@/lib/helper/router-recent-helper';
+import type { MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
 import { GTag } from '@/lib/site-analytics/gtag';
 
 
@@ -120,9 +124,21 @@ export class SpaceRouter {
             const store = SpaceRouter.router.app?.$store;
             if (!store) return;
             const isAdminMode = appContextStore.getters.isAdminMode;
+            const pageAccessPermissionMap = SpaceRouter.router.app?.$store.getters['user/pageAccessPermissionMap'];
             const routeScope = getRouteScope(to);
 
             if (!isAdminMode && routeScope === 'WORKSPACE') {
+                const reversedMatched = clone(to.matched).reverse();
+                const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+                const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
+
+                if (pageAccessPermissionMap && !pageAccessPermissionMap[targetMenuId]) {
+                    SpaceRouter.router.push({ name: 'error', params: { statusCode: '403' } }).catch((e) => {
+                        console.error(e);
+                    });
+                    return;
+                }
+
                 const recent = getRecentConfig(to);
                 if (recent) {
                     SpaceConnector.clientV2.config.userConfig.set({

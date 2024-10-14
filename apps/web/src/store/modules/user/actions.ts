@@ -3,7 +3,7 @@ import type { Action } from 'vuex';
 import { jwtDecode } from 'jwt-decode';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import { isInstanceOfAPIError } from '@cloudforet/core-lib/space-connector/error';
 
 import type { RoleGetParameters } from '@/schema/identity/role/api-verbs/get';
@@ -123,14 +123,16 @@ export const grantRoleAndLoadReferenceData: Action<UserState, any> = async ({ co
             SpaceConnector.setToken(response.access_token);
             const currentRoleType = getRoleTypeFromToken(response.access_token);
 
+            const rootRoleInfo = await getGrantedRole(response.role_id, currentRoleType);
             const grantInfo = {
                 scope: grantRequest.scope,
                 workspaceId: grantRequest.workspace_id,
+                pageAccess: rootRoleInfo?.pageAccess || undefined,
             };
             commit('setCurrentGrantInfo', grantInfo);
 
-            const roleInfo = await getGrantedRole(response.role_id, currentRoleType, response.role_type);
-            commit('setCurrentRoleInfo', roleInfo);
+            const currentRoleInfo = await getGrantedRole(response.role_id, currentRoleType, response.role_type);
+            commit('setCurrentRoleInfo', currentRoleInfo);
 
             if (grantRequest.scope === 'DOMAIN') {
                 appContextStore.enterAdminMode();
@@ -141,7 +143,7 @@ export const grantRoleAndLoadReferenceData: Action<UserState, any> = async ({ co
             }
             if (grantRequest.scope === 'USER') userWorkspaceStore.setCurrentWorkspace();
 
-            if (roleInfo) {
+            if (currentRoleInfo) {
                 const allReferenceStore = useAllReferenceStore();
                 allReferenceStore.flush();
             }
@@ -190,7 +192,7 @@ export const grantRoleAndLoadReferenceData: Action<UserState, any> = async ({ co
 
 const getRoleTypeByManagedRoleId = (roleId: string): RoleType => MANAGED_ROLES[roleId];
 
-const getGrantedRole = async (roleId: string, currentRoleType: RoleType, baseRoleType: RoleType): Promise<RoleInfo|undefined> => {
+const getGrantedRole = async (roleId: string, currentRoleType: RoleType, baseRoleType?: RoleType): Promise<RoleInfo|undefined> => {
     // DOMAIN_ADMIN -> enter workspace case
     if (baseRoleType === ROLE_TYPE.DOMAIN_ADMIN && currentRoleType === ROLE_TYPE.WORKSPACE_OWNER) {
         return {

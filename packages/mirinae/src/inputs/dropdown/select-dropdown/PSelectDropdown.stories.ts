@@ -74,7 +74,8 @@ const Template: Story = {
                 :show-clear-selection="showClearSelection"
                 :menu-position="menuPosition"
                 :index-mode="indexMode"
-                :parent-id="parentId"
+                :menu-width="menuWidth"
+                :boundary="boundary"
                 :handler="handler"
                 :disable-handler="disableHandler"
                 :page-size="pageSize"
@@ -339,6 +340,30 @@ export const Placeholder: Story = {
     })],
 };
 
+export const MenuWidth: Story = {
+    render: () => ({
+        components: { PSelectDropdown },
+        template: `
+            <div class="h-full w-full overflow">
+                <p class="my-4">menu width: 'target-width' (default)</p>
+                <p-select-dropdown :menu="menuItems" menu-width="target-width"></p-select-dropdown>
+                <p class="my-4">menu width: 'auto'</p>
+                <p-select-dropdown :menu="menuItems" menu-width="auto"></p-select-dropdown>
+                <p class="my-4">menu width: '300px'</p>
+                <p-select-dropdown :menu="menuItems" menu-width="300px"></p-select-dropdown>
+            </div>
+        `,
+        setup() {
+            return {
+                menuItems,
+            };
+        },
+    }),
+    decorators: [() => ({
+        template: '<story style="height: 300px;" />',
+    })],
+};
+
 export const SelectionLabel: Story = {
     render: () => ({
         props: Object.keys(getSelectDropdownArgTypes()),
@@ -468,15 +493,18 @@ export const UseFixedMenuStyle: Story = {
     render: () => ({
         components: { PSelectDropdown, PToggleButton },
         template: `
-            <div class="bg-gray-100 p-8" style="height: 200px; overflow-y: auto; width: 90%;" id="select-dropdown-wrapper">
-                <div style="height: 500px;">
+            <div class="bg-gray-100 p-8" style="height: 200px; overflow-y: auto; width: 800px;" id="select-dropdown-wrapper">
+                <div class="border border-blue-500" style="height: 500px; width: 1000px;">
                     <p class="text-lg mb-5 leading-7" :class="useFixedMenuStyle ? 'text-gray-800' : 'text-gray-400'">
                         Use Fixed Menu Style: <strong> {{useFixedMenuStyle ? 'On' : 'Off' }}</strong> <p-toggle-button :value="useFixedMenuStyle" @change-toggle="onChange" /> <br/>
                         The menu's style position will be set 'fixed'.<br/>
                         Therefore, the menu is placed on front, except for all other fixed elements with high z-index.<br/>
-                        When you scroll parent elements, the menu will be automatically hidden.
+                        So, it can show upper even if the button is not visible by scrolling. <br/>
+                        To avoid this, you can set the boundary prop. <br/>
+                        <strong>boundary</strong> prop helps to hide the menu when the button is not visible anymore. <br/>
+                        
                     </p>
-                    <p-select-dropdown v-if="show" :menu="menuItems" :use-fixed-menu-style="useFixedMenuStyle" />
+                    <p-select-dropdown v-if="show" :menu="menuItems" :use-fixed-menu-style="useFixedMenuStyle" boundary=".select-dropdown-wrapper" />
                     <p class="text-lg mt-5 leading-7" :class="useFixedMenuStyle ? 'text-gray-800' : 'text-gray-400'">Multi Selectable</p>
                     <p-select-dropdown v-if="show" :menu="menuItems" :use-fixed-menu-style="useFixedMenuStyle" class="mt-5" multiSelectable parentId="select-dropdown-wrapper" />
                 </div>

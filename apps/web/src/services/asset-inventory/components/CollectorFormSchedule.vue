@@ -76,7 +76,7 @@ const props = defineProps<{
 }>();
 
 const collectorFormStore = useCollectorFormStore();
-const collectorFormState = collectorFormStore.$state;
+const collectorFormState = collectorFormStore.state;
 
 const hoursMatrix: number[] = range(24);
 const selectedUtcHoursSet = new Set<number>();
@@ -100,15 +100,15 @@ const state = reactive({
 
 const updateSelectedHours = () => {
     const hours: number[] = Array.from(selectedUtcHoursSet.values());
-    collectorFormStore.$patch({
-        scheduleHours: hours,
+    collectorFormStore.$patch((_state) => {
+        _state.state.scheduleHours = hours;
     });
 };
 const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
-    if (!collectorFormStore.collectorId) throw new Error('collector_id is not defined');
+    if (!collectorFormState.collectorId) throw new Error('collector_id is not defined');
     const hours = collectorFormState.originCollector?.schedule?.hours ?? [];
     const params: CollectorUpdateParameters = {
-        collector_id: collectorFormStore.collectorId,
+        collector_id: collectorFormState.collectorId,
         schedule: {
             hours,
             state: collectorFormState.schedulePower ? 'ENABLED' : 'DISABLED',
@@ -118,8 +118,8 @@ const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
 };
 
 const handleChangeToggle = async (value: boolean) => {
-    collectorFormStore.$patch({
-        schedulePower: value,
+    collectorFormStore.$patch((_state) => {
+        _state.state.schedulePower = value;
     });
     if (props.callApiOnPowerChange) {
         try {
@@ -145,26 +145,26 @@ const handleClickHour = (hour: number) => {
     }
     if (selectedUtcHoursSet.has(utcHour)) {
         selectedUtcHoursSet.delete(utcHour);
-        collectorFormStore.$patch({
-            isScheduleError: false,
+        collectorFormStore.$patch((_state) => {
+            _state.state.isScheduleError = false;
         });
     } else {
         if (selectedUtcHoursSet?.size >= 2) {
-            collectorFormStore.$patch({
-                isScheduleError: true,
+            collectorFormStore.$patch((_state) => {
+                _state.state.isScheduleError = true;
             });
             return;
         }
         selectedUtcHoursSet.add(utcHour);
-        collectorFormStore.$patch({
-            isScheduleError: false,
+        collectorFormStore.$patch((_state) => {
+            _state.state.isScheduleError = false;
         });
     }
 
     updateSelectedHours();
 };
 
-watch([() => collectorFormStore.collectorId, () => props.hoursReadonly], ([collectorId]) => {
+watch([() => collectorFormState.collectorId, () => props.hoursReadonly], ([collectorId]) => {
     if (props.resetOnCollectorIdChange && !collectorId) return;
     collectorFormStore.resetSchedule();
     selectedUtcHoursSet.clear();

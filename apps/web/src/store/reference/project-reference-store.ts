@@ -30,6 +30,7 @@ interface ProjectResourceItemData {
     };
     users: string[];
     projectType: ProjectType;
+    workspaceId: string;
 }
 export type ProjectReferenceItem = Required<Pick<ReferenceItem<ProjectResourceItemData>, 'key'|'label'|'name'|'data'>>;
 export type ProjectReferenceMap = ReferenceMap<ProjectReferenceItem>;
@@ -72,7 +73,7 @@ export const useProjectReferenceStore = defineStore('reference-project', () => {
 
         const params: ProjectListParameters = {
             query: {
-                only: ['project_id', 'name', 'project_group_id', 'users', 'project_type'],
+                only: ['project_id', 'name', 'project_group_id', 'users', 'project_type', 'workspace_id'],
             },
         };
         await allReferenceStore.load('project_group', { force: true });
@@ -95,6 +96,7 @@ export const useProjectReferenceStore = defineStore('reference-project', () => {
                     } : undefined,
                     users: projectInfo.users || [],
                     projectType: projectInfo.project_type,
+                    workspaceId: projectInfo.workspace_id,
                 },
             };
         });
@@ -119,6 +121,7 @@ export const useProjectReferenceStore = defineStore('reference-project', () => {
                     } : undefined,
                     users: project.users || [],
                     projectType: project.project_type,
+                    workspaceId: project.workspace_id,
                 },
             },
         };

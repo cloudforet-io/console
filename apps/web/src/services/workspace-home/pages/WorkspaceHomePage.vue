@@ -3,6 +3,8 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
+import { isEmpty } from 'lodash';
+
 import type { UserConfigModel } from '@/schema/config/user-config/model';
 import type { CostDataSourceModel } from '@/schema/cost-analysis/data-source/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
@@ -14,9 +16,11 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CollectorReferenceMap } from '@/store/reference/collector-reference-store';
 import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 
+import type { PageAccessMap } from '@/lib/access-control/config';
+import { MENU_ID } from '@/lib/menu/config';
+
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 
-import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import Bookmark from '@/services/workspace-home/components/Bookmark.vue';
 import Summaries from '@/services/workspace-home/components/Summaries.vue';
 import UserConfigs from '@/services/workspace-home/components/UserConfigs.vue';
@@ -32,21 +36,20 @@ const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 
 const storeState = reactive({
-    isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
     getCurrentRoleInfo: computed<RoleInfo>(() => store.getters['user/getCurrentRoleInfo']),
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceGetters.currentWorkspaceId),
     recentList: computed<UserConfigModel[]>(() => workspaceHomePageState.recentList),
     dataSource: computed<CostDataSourceModel[]>(() => workspaceHomePageState.dataSource),
     collectors: computed<CollectorReferenceMap>(() => allReferenceGetters.collector),
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceGetters.serviceAccount),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
 });
 const state = reactive({
     loading: false,
-    pageAccess: computed<string[]>(() => storeState.getCurrentRoleInfo.pageAccess),
     isWorkspaceOwner: computed<boolean>(() => storeState.getCurrentRoleInfo.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     isWorkspaceMember: computed<boolean>(() => storeState.getCurrentRoleInfo.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
-    accessUserMenu: computed<boolean>(() => state.pageAccess.find((access) => access === IAM_ROUTE.USER._NAME || access === '*') && state.isWorkspaceOwner),
-    accessAppMenu: computed<boolean>(() => state.pageAccess.find((access) => access === IAM_ROUTE.APP._NAME || access === '*') && state.isWorkspaceOwner),
+    accessUserMenu: computed<boolean>(() => !isEmpty(storeState.pageAccessPermissionMap[MENU_ID.USER]) && state.isWorkspaceOwner),
+    accessAppMenu: computed<boolean>(() => !isEmpty(storeState.pageAccessPermissionMap[MENU_ID.APP]) && state.isWorkspaceOwner),
     isNoServiceAccounts: computed(() => !Object.keys(storeState.serviceAccounts).length),
     isNoCollectors: computed<boolean>(() => !Object.keys(storeState.collectors).length),
 });
@@ -89,7 +92,7 @@ watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
                          is-centered
     >
         <div class="page-contents">
-            <workspace-info :access-user-menu="state.accessAppMenu"
+            <workspace-info :access-user-menu="state.accessUserMenu"
                             :access-app-menu="state.accessAppMenu"
             />
             <welcome

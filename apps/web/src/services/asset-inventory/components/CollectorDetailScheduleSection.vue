@@ -2,13 +2,13 @@
     <p-pane-layout>
         <collector-detail-section-header :title="$t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE')"
                                          :edit-mode="state.isEditMode"
-                                         :hide-edit-button="!collectorFormState.schedulePower || !state.isEditableCollector"
+                                         :hide-edit-button="!props.hasReadWriteAccess || !collectorFormState.schedulePower || !state.isEditableCollector"
                                          @click-edit="handleClickEdit"
         />
 
         <div class="schedule-wrapper">
             <collector-schedule-form :hours-readonly="!state.isEditMode"
-                                     :readonly="!state.isEditableCollector"
+                                     :readonly="!props.hasReadWriteAccess || !state.isEditableCollector"
                                      reset-on-collector-id-change
                                      call-api-on-power-change
             />
@@ -61,9 +61,12 @@ import {
     useCollectorFormStore,
 } from '@/services/asset-inventory/stores/collector-form-store';
 
+const props = defineProps<{
+    hasReadWriteAccess?: boolean
+}>();
 
 const collectorFormStore = useCollectorFormStore();
-const collectorFormState = collectorFormStore.$state;
+const collectorFormState = collectorFormStore.state;
 const collectorDetailPageStore = useCollectorDetailPageStore();
 const state = reactive({
     isEditMode: false,
@@ -72,9 +75,9 @@ const state = reactive({
 });
 
 const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
-    if (!collectorFormStore.collectorId) throw new Error('collector_id is required');
+    if (!collectorFormState.collectorId) throw new Error('collector_id is required');
     const params: CollectorUpdateParameters = {
-        collector_id: collectorFormStore.collectorId,
+        collector_id: collectorFormState.collectorId,
         schedule: {
             state: collectorFormState.schedulePower ? 'ENABLED' : 'DISABLED',
             hours: collectorFormState.scheduleHours,

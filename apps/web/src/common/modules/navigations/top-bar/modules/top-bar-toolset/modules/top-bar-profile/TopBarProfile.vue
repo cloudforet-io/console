@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { vOnClickOutside } from '@vueuse/components';
 import {
-    computed, reactive, ref,
+    computed, reactive, ref, watch,
 } from 'vue';
 import type { Location } from 'vue-router';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import ejs from 'ejs';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PI, PDivider, PButton, PCopyButton, PTooltip, PAvatar, PLazyImg,
 } from '@cloudforet/mirinae';
@@ -17,6 +18,7 @@ import UserImage from '@/assets/images/role/img_avatar_no-role.png';
 import SystemAdminImage from '@/assets/images/role/img_avatar_system-admin.png';
 import WorkspaceMemberImage from '@/assets/images/role/img_avatar_workspace-member.png';
 import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
+import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -24,6 +26,8 @@ import { i18n } from '@/translations';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDomainStore } from '@/store/domain/domain-store';
 import { languages } from '@/store/modules/user/config';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { RoleReferenceMap } from '@/store/reference/role-reference-store';
 
 import config from '@/lib/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -49,9 +53,12 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void; }>();
 
 const route = useRoute();
 const router = useRouter();
+const allReferenceStore = useAllReferenceStore();
 
 const state = reactive({
+    roles: computed<RoleReferenceMap>(() => allReferenceStore.getters.role),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    isUserMode: computed(() => appContextStore.getters.isUserMode),
     userIcon: computed<string>(() => {
         if (store.getters['user/isSystemAdmin']) return SystemAdminImage;
         if (store.getters['user/isDomainAdmin']) return DomainAdminImage;
@@ -68,6 +75,8 @@ const state = reactive({
         if (state.currentRoleType === ROLE_TYPE.WORKSPACE_MEMBER) return 'Workspace Member';
         return 'User';
     }),
+    userRoles: [] as RoleBindingModel[],
+    currentWorkspaceRole: computed<RoleBindingModel>(() => state.userRoles?.[0]),
     name: computed(() => store.state.user.name),
     email: computed(() => store.state.user.email),
     language: computed(() => store.getters['user/languageLabel']),
@@ -183,6 +192,30 @@ const handleClickSignOut = async () => {
     };
     await router.push(res);
 };
+const fetchUserRoles = async () => {
+    try {
+        const { results } = await SpaceConnector.clientV2.identity.roleBinding.list({
+            query: {
+                filter: [
+                    {
+                        k: 'user_id',
+                        o: 'eq',
+                        v: store.state.user.userId,
+                    },
+                ],
+            },
+        });
+        state.userRoles = results;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
+
+watch(() => props.visible, (value) => {
+    if (value && !state.isUserMode) {
+        fetchUserRoles();
+    }
+}, { immediate: true });
 </script>
 
 <template>
@@ -237,11 +270,17 @@ const handleClickSignOut = async () => {
                         </p-copy-button>
                     </span>
                 </div>
-                <div v-if="state.currentRoleType || state.baseRoleType === ROLE_TYPE.DOMAIN_ADMIN"
+                <div v-if="state.isAdminMode"
                      class="info-menu"
                 >
                     <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_ROLE_TYPE') }}</span>
                     <span class="value">{{ state.visibleRoleType }}</span>
+                </div>
+                <div v-else-if="state.currentWorkspaceRole?.role_id"
+                     class="info-menu"
+                >
+                    <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_ROLE') }}</span>
+                    <span class="value">{{ state.roles[state.currentWorkspaceRole?.role_id]?.label ?? 'User' }}</span>
                 </div>
                 <div v-on-click-outside="handleClickOutsideLanguageMenu"
                      class="info-menu language"

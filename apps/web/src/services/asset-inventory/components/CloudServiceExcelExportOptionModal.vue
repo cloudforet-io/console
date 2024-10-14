@@ -3,6 +3,7 @@ import {
     defineProps, defineEmits, reactive, computed,
 } from 'vue';
 
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
@@ -29,6 +30,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 import { getCloudServiceAnalyzeQuery } from '@/services/asset-inventory/helpers/cloud-service-analyze-query-helper';
+import { useCloudServiceLSBStore } from '@/services/asset-inventory/stores/cloud-service-l-s-b-store';
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
 import type { CloudServiceAnalyzeResult } from '@/services/asset-inventory/types/cloud-service-card-type';
 import type { Period } from '@/services/asset-inventory/types/type';
@@ -42,6 +44,7 @@ const emits = defineEmits<{(event: 'update:visible', value: boolean): void;
 }>();
 
 const cloudServicePageStore = useCloudServicePageStore();
+const cloudServiceLSBStore = useCloudServiceLSBStore();
 const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
 const appContextGetters = appContextStore.getters;
@@ -56,14 +59,15 @@ const state = reactive({
     downloadOptions: [DEFAULT_CONTENTS, DETAIL_CONTENTS] as string[],
     allOptionValue: false,
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
-    cloudServiceFilters: computed(() => cloudServicePageStore.allFilters.filter((f: any) => ![
-        'service_code',
-    ].includes(f.k)).map((f) => {
-        if (f.k === 'labels') {
-            return { ...f, k: 'ref_cloud_service_type.labels' };
-        }
-        return ({ ...f });
-    })),
+    cloudServiceFilters: computed<ConsoleFilter[]>(() => [...cloudServicePageStore.allFilters, ...cloudServiceLSBStore.getters.allFilters]
+        .filter((f: any) => ![
+            'service_code',
+        ].includes(f.k)).map((f) => {
+            if (f.k === 'labels') {
+                return { ...f, k: 'ref_cloud_service_type.labels' };
+            }
+            return ({ ...f });
+        })),
 });
 
 const getCloudServiceResourcesPayload = (): ExportOption => {

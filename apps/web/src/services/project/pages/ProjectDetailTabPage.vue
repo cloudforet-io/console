@@ -20,6 +20,7 @@ import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 
@@ -33,6 +34,7 @@ import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
 import { userStateFormatter } from '@/services/iam/composables/refined-table-data';
 import ProjectDetailTab from '@/services/project/components/ProjectDetailTab.vue';
+import ProjectDetailTabHeader from '@/services/project/components/ProjectDetailTabHeader.vue';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
 import type { WebhookType } from '@/services/project/types/project-alert-type';
@@ -50,12 +52,15 @@ const projectDetailPageStore = useProjectDetailPageStore();
 const projectDetailPageState = projectDetailPageStore.state;
 const projectDetailPageGetters = projectDetailPageStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
+const dashboardStore = useDashboardStore();
 
 const storeState = reactive({
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
     selectedWebhookItem: computed<WebhookModel|undefined>(() => projectDetailPageGetters.selectedWebhookItem),
     language: computed(() => store.state.user.language),
+    dashboardList: computed(() => dashboardStore.state.publicDashboardItems),
+    folderList: computed(() => dashboardStore.state.publicFolderItems),
 });
 const state = reactive({
     item: computed<ProjectModel|undefined>(() => projectDetailPageState.currentProject),
@@ -100,12 +105,8 @@ const state = reactive({
 const singleItemTabState = reactive({
     tabs: computed<TabItem[]>(() => [
         {
-            name: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
-            label: i18n.t('PROJECT.DETAIL.TAB_DASHBOARD'),
-        },
-        {
-            name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
-            label: i18n.t('PROJECT.DETAIL.TAB_PROJECT_MEMBER'),
+            name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
+            label: i18n.t('PROJECT.DETAIL.TAB_SUMMARY'),
         },
         {
             name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
@@ -115,12 +116,42 @@ const singleItemTabState = reactive({
             name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
             label: i18n.t('PROJECT.DETAIL.TAB_NOTIFICATIONS'),
         },
-        {
-            name: PROJECT_ROUTE.DETAIL.TAB.TAG._NAME,
-            label: i18n.t('PROJECT.DETAIL.TAB_TAG'),
-        },
+        ...(singleItemTabState.dashboardTabs.length
+            ? [
+                {
+                    name: 'divider',
+                    tabType: 'divider',
+                },
+                ...singleItemTabState.dashboardTabs,
+            ]
+            : []),
     ]),
-    activeTab: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
+    dashboardTabs: computed(() => {
+        const projectDashboardItems = storeState.dashboardList.filter((dashboard) => dashboard.project_id === '*' && dashboard.version !== '1.0');
+        const projectFolderItems = storeState.folderList.filter((folder) => folder.project_id === '*');
+
+        const folderTabs = projectFolderItems.map((folder) => ({
+            name: folder.folder_id,
+            label: folder.name,
+            tabType: 'folder',
+            icon: 'ic_folder',
+            subItems: projectDashboardItems.filter((dashboard) => dashboard.folder_id === folder.folder_id).map((dashboard) => ({
+                name: dashboard.dashboard_id,
+                label: dashboard.name,
+                icon: 'ic_service_dashboard',
+            })),
+        }));
+        const dashboardTabs = projectDashboardItems.filter((dashboard) => !dashboard.folder_id).map((dashboard) => ({
+            name: dashboard.dashboard_id,
+            label: dashboard.name,
+            icon: 'ic_service_dashboard',
+        }));
+        return [
+            ...folderTabs,
+            ...dashboardTabs,
+        ];
+    }),
+    activeTab: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
     webhookDetailTab: computed<TabItem[]>(() => {
         const defaultTab = [{
             name: 'details',
@@ -147,6 +178,10 @@ const tableState = reactive({
     ]),
 });
 
+const listProjectDashboard = async () => {
+    await dashboardStore.load();
+};
+
 /* Watchers */
 watch(() => storeState.selectedWebhookItem, () => {
     singleItemTabState.webhookDetailActiveTab = 'details';
@@ -159,9 +194,21 @@ watch(() => projectDetailPageState.projectId, async (projectId) => {
         ]);
     }
 });
-watch(() => route.name, () => {
-    const exactRoute = route.matched.find((d) => singleItemTabState.tabs.find((tab) => tab.name === d.name));
-    singleItemTabState.activeTab = exactRoute?.name || PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME;
+watch(() => route.name, (routeName) => {
+    const flattenTabs = singleItemTabState.tabs.reduce((acc, tab) => {
+        if (tab?.subItems) {
+            acc.push(...tab.subItems);
+        } else {
+            acc.push(tab);
+        }
+        return acc;
+    }, [] as TabItem[]);
+    const exactRoute = route.matched.find((d) => flattenTabs.find((tab) => tab.name === d.name));
+    if (routeName === PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME) {
+        singleItemTabState.activeTab = route.params.dashboardId;
+    } else {
+        singleItemTabState.activeTab = exactRoute?.name || PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME;
+    }
 }, { immediate: true });
 watch([
     () => props.id,
@@ -181,149 +228,159 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
 
 onMounted(async () => {
     state.webhookTypeList = await projectDetailPageStore.getListWebhookType();
+    await listProjectDashboard();
 });
 onUnmounted(() => {
     projectDetailPageStore.reset();
+    dashboardStore.reset();
 });
 </script>
 
 <template>
-    <p-data-loader class="project-detail-tab-page"
-                   :loading="projectDetailPageState.loading"
-                   :loader-backdrop-color="BACKGROUND_COLOR"
-    >
-        <div v-if="singleItemTabState.activeTab === PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME
-            && route.query?.tab === 'webhook'"
+    <div class="project-detail-tab-page">
+        <project-detail-tab-header :id="props.id" />
+        <p-data-loader class="detail-tab-content"
+                       :loading="projectDetailPageState.loading"
+                       :loader-backdrop-color="BACKGROUND_COLOR"
         >
-            <p-horizontal-layout class="page-inner"
-                                 :height="522"
+            <div v-if="singleItemTabState.activeTab === PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME
+                && route.query?.tab === 'webhook'"
             >
-                <template #container="{ height }">
-                    <project-detail-tab :style="{ height: `${height}px` }"
-                                        :item="state.item"
-                                        :tabs="singleItemTabState.tabs"
-                                        :active-tab.sync="singleItemTabState.activeTab"
-                    />
-                </template>
-            </p-horizontal-layout>
-            <p-tab v-if="storeState.selectedWebhookItem"
-                   :tabs="singleItemTabState.webhookDetailTab"
-                   :active-tab.sync="singleItemTabState.webhookDetailActiveTab"
-            >
-                <template #details>
-                    <p-heading heading-type="sub"
-                               :title="$t('PROJECT.DETAIL.MEMBER.BASE_INFORMATION')"
-                    />
-                    <p-definition-table :fields="tableState.definitionFields"
-                                        :data="storeState.selectedWebhookItem"
-                                        :skeleton-rows="4"
-                                        block
-                    >
-                        <template #data-state="{data}">
-                            <p-status
-                                class="capitalize"
-                                v-bind="userStateFormatter(data)"
-                            />
-                        </template>
-                        <template #data-plugin_info.plugin_id="{value}">
-                            <div class="col-type">
+                <p-horizontal-layout class="page-inner"
+                                     :height="522"
+                >
+                    <template #container="{ height }">
+                        <project-detail-tab :id="props.id"
+                                            :style="{ height: `${height}px` }"
+                                            :item="state.item"
+                                            :tabs="singleItemTabState.tabs"
+                                            :active-tab.sync="singleItemTabState.activeTab"
+                        />
+                    </template>
+                </p-horizontal-layout>
+                <p-tab v-if="storeState.selectedWebhookItem"
+                       :tabs="singleItemTabState.webhookDetailTab"
+                       :active-tab.sync="singleItemTabState.webhookDetailActiveTab"
+                >
+                    <template #details>
+                        <p-heading heading-type="sub"
+                                   :title="$t('PROJECT.DETAIL.MEMBER.BASE_INFORMATION')"
+                        />
+                        <p-definition-table :fields="tableState.definitionFields"
+                                            :data="storeState.selectedWebhookItem"
+                                            :skeleton-rows="4"
+                                            block
+                        >
+                            <template #data-state="{data}">
+                                <p-status
+                                    class="capitalize"
+                                    v-bind="userStateFormatter(data)"
+                                />
+                            </template>
+                            <template #data-plugin_info.plugin_id="{value}">
+                                <div class="col-type">
+                                    <p-lazy-img :src="state.selectedPlugin ? state.selectedPlugin?.tags?.icon : 'ic_webhook'"
+                                                error-icon="ic_webhook"
+                                                width="1rem"
+                                                height="1rem"
+                                                class="mr-2"
+                                    />
+                                    <span class="name">{{ state.selectedPlugin ? state.selectedPlugin?.name : value }}</span>
+                                </div>
+                            </template>
+                        </p-definition-table>
+                    </template>
+                    <template #help>
+                        <div class="help-tap">
+                            <div class="plugin-wrapper">
                                 <p-lazy-img :src="state.selectedPlugin ? state.selectedPlugin?.tags?.icon : 'ic_webhook'"
                                             error-icon="ic_webhook"
-                                            width="1rem"
-                                            height="1rem"
-                                            class="mr-2"
+                                            width="2rem"
+                                            height="2rem"
                                 />
-                                <span class="name">{{ state.selectedPlugin ? state.selectedPlugin?.name : value }}</span>
+                                <div class="plugin-info-wrapper">
+                                    <p class="plugin-info">
+                                        <span class="name">
+                                            {{ state.selectedPlugin ? state.selectedPlugin?.name : storeState.selectedWebhookItem?.plugin_info.plugin_id }}
+                                        </span>
+                                        <p-badge style-type="gray900"
+                                                 badge-type="solid-outline"
+                                        >
+                                            v {{ storeState.selectedWebhookItem?.plugin_info.version }}
+                                        </p-badge>
+                                    </p>
+                                    <p class="desc">
+                                        {{ state.selectedPlugin?.tags?.long_description || state.selectedPlugin?.tags.description }}
+                                    </p>
+                                </div>
                             </div>
-                        </template>
-                    </p-definition-table>
-                </template>
-                <template #help>
-                    <div class="help-tap">
-                        <div class="plugin-wrapper">
-                            <p-lazy-img :src="state.selectedPlugin ? state.selectedPlugin?.tags?.icon : 'ic_webhook'"
-                                        error-icon="ic_webhook"
-                                        width="2rem"
-                                        height="2rem"
-                            />
-                            <div class="plugin-info-wrapper">
-                                <p class="plugin-info">
-                                    <span class="name">
-                                        {{ state.selectedPlugin ? state.selectedPlugin?.name : storeState.selectedWebhookItem?.plugin_info.plugin_id }}
-                                    </span>
-                                    <p-badge style-type="gray900"
-                                             badge-type="solid-outline"
-                                    >
-                                        v {{ storeState.selectedWebhookItem?.plugin_info.version }}
-                                    </p-badge>
-                                </p>
-                                <p class="desc">
-                                    {{ state.selectedPlugin?.tags?.long_description || state.selectedPlugin?.tags.description }}
-                                </p>
+                            <div class="docs-wrapper">
+                                <p-markdown :markdown="state.selectedPlugin?.docs"
+                                            :language="storeState.language"
+                                            remove-spacing
+                                            class="markdown"
+                                />
                             </div>
                         </div>
-                        <div class="docs-wrapper">
-                            <p-markdown :markdown="state.selectedPlugin?.docs"
-                                        :language="storeState.language"
-                                        remove-spacing
-                                        class="markdown"
-                            />
-                        </div>
-                    </div>
-                </template>
-            </p-tab>
-        </div>
-        <div v-else>
-            <project-detail-tab :item="state.item"
-                                :tabs="singleItemTabState.tabs"
-                                :active-tab.sync="singleItemTabState.activeTab"
-            />
-        </div>
-    </p-data-loader>
+                    </template>
+                </p-tab>
+            </div>
+            <div v-else>
+                <project-detail-tab :id="props.id"
+                                    :item="state.item"
+                                    :tabs="singleItemTabState.tabs"
+                                    :active-tab.sync="singleItemTabState.activeTab"
+                />
+            </div>
+        </p-data-loader>
+    </div>
 </template>
 
 <style lang="postcss" scoped>
 .project-detail-tab-page {
     height: 100%;
-    margin-top: 1.5rem;
-    .page-inner {
-        height: 100%;
-        max-width: 85.5rem;
-    }
-    .help-tap {
-        padding-top: 2rem;
-        padding-right: 1rem;
-        padding-left: 1rem;
-        .plugin-wrapper {
-            @apply flex;
-            gap: 1rem;
-            .plugin-info-wrapper {
-                flex: 1;
-                .plugin-info {
-                    @apply flex items-center;
-                    gap: 0.125rem;
-                    .name {
-                        @apply text-label-xl font-bold;
+    .detail-tab-content {
+
+        margin-top: 1rem;
+        .page-inner {
+            height: 100%;
+            max-width: 85.5rem;
+        }
+        .help-tap {
+            padding-top: 2rem;
+            padding-right: 1rem;
+            padding-left: 1rem;
+            .plugin-wrapper {
+                @apply flex;
+                gap: 1rem;
+                .plugin-info-wrapper {
+                    flex: 1;
+                    .plugin-info {
+                        @apply flex items-center;
+                        gap: 0.125rem;
+                        .name {
+                            @apply text-label-xl font-bold;
+                        }
+                    }
+                    .desc {
+                        @apply text-label-sm text-gray-600;
                     }
                 }
-                .desc {
-                    @apply text-label-sm text-gray-600;
+            }
+            .docs-wrapper {
+                margin-top: 1.125rem;
+                .empty {
+                    @apply bg-violet-100;
+                    padding-top: 4.125rem;
+                    padding-bottom: 4.125rem;
+                    border-radius: 0.375rem;
                 }
             }
-        }
-        .docs-wrapper {
-            margin-top: 1.125rem;
-            .empty {
+            .markdown {
                 @apply bg-violet-100;
-                padding-top: 4.125rem;
-                padding-bottom: 4.125rem;
+                padding: 1rem;
                 border-radius: 0.375rem;
             }
-        }
-        .markdown {
-            @apply bg-violet-100;
-            padding: 1rem;
-            border-radius: 0.375rem;
         }
     }
 }

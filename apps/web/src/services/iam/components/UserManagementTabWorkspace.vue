@@ -9,6 +9,7 @@ import {
     PButton,
     PDataTable, PHeading, PLink, PSelectDropdown, PStatus, PTooltip,
 } from '@cloudforet/mirinae';
+import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import type {
     AutocompleteHandler,
     SelectDropdownMenuItem,
@@ -58,6 +59,7 @@ interface TableItem {
 }
 interface Props {
     activeTab: string;
+    hasReadWriteAccess?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -65,7 +67,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const userPageStore = useUserPageStore();
-const userPageState = userPageStore.$state;
+const userPageState = userPageStore.state;
 
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
@@ -76,17 +78,22 @@ const state = reactive({
     items: [] as TableItem[],
     sortBy: 'workspace_id',
     sortDesc: true,
-    selectedUser: computed(() => userPageStore.selectedUsers[0]),
+    selectedUser: computed(() => userPageStore.getters.selectedUsers[0]),
     selectedRemoveItem: '',
 });
 const tableState = reactive({
-    fields: computed(() => [
-        { name: 'workspace', label: i18n.t('IAM.USER.MAIN.WORKSPACE') as string },
-        { name: 'state', label: i18n.t('IAM.USER.MAIN.STATE') as string },
-        { name: 'role_binding', label: i18n.t('IAM.USER.MAIN.ROLE') as string, sortable: false },
-        { name: 'created_at', label: i18n.t('IAM.USER.MAIN.INVITED') as string, sortable: false },
-        { name: 'remove_button', label: ' ', sortable: false },
-    ]),
+    fields: computed<DataTableFieldType[]>(() => {
+        const defaultFields: DataTableFieldType[] = [
+            { name: 'workspace', label: i18n.t('IAM.USER.MAIN.WORKSPACE') as string },
+            { name: 'state', label: i18n.t('IAM.USER.MAIN.STATE') as string },
+            { name: 'role_binding', label: i18n.t('IAM.USER.MAIN.ROLE') as string, sortable: false },
+            { name: 'created_at', label: i18n.t('IAM.USER.MAIN.INVITED') as string, sortable: false },
+        ];
+        if (props.hasReadWriteAccess) {
+            defaultFields.push({ name: 'remove_button', label: ' ', sortable: false });
+        }
+        return defaultFields;
+    }),
 });
 const dropdownState = reactive({
     loading: false,
@@ -183,7 +190,13 @@ const dropdownMenuHandler: AutocompleteHandler = async (inputText: string) => {
     }
     try {
         const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
-            query: roleListApiQueryHelper.data,
+            query: {
+                ...roleListApiQueryHelper.data,
+                filter: [
+                    ...(roleListApiQueryHelper.data?.filter || []),
+                    { k: 'state', v: ROLE_STATE.ENABLED, o: 'eq' },
+                ],
+            },
         });
         dropdownState.menuItems = (results ?? []).map((role) => ({
             label: role.name,
@@ -278,6 +291,7 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
                     >
                     <p-select-dropdown is-filterable
                                        use-fixed-menu-style
+                                       :disabled="!props.hasReadWriteAccess"
                                        style-type="transparent"
                                        :visible-menu="dropdownState.visibleMenu"
                                        :loading="dropdownState.loading"

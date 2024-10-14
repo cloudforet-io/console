@@ -23,7 +23,7 @@ import type {
 type DataTableModel = PublicDataTableModel | PrivateDataTableModel;
 type WidgetModel = PublicWidgetModel | PrivateWidgetModel;
 
-const _listWidgetDataTables = async (widgetId?: string, costDataSource: CostDataSourceReferenceMap): Promise<[string, DataTableModel[]]|undefined> => {
+const _listWidgetDataTables = async (widgetId: string, costDataSource: CostDataSourceReferenceMap): Promise<[string, DataTableModel[]]|undefined> => {
     if (!widgetId) return undefined;
     const _isPrivate = widgetId.startsWith('private');
     const _fetcher = _isPrivate
@@ -37,7 +37,7 @@ const _listWidgetDataTables = async (widgetId?: string, costDataSource: CostData
         const _refinedResults = cloneDeep(results);
         results.forEach((r, idx) => {
             if (r.data_type === DATA_TABLE_TYPE.ADDED && r.source_type === 'COST') {
-                const _dataSourceId = r.options.COST?.data_source_id;
+                const _dataSourceId = r.options.COST?.data_source_id || '';
                 _refinedResults[idx].options.COST.plugin_id = costDataSource[_dataSourceId]?.data?.plugin_info?.plugin_id;
                 _refinedResults[idx].options.COST.data_source_id = undefined;
             }

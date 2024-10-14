@@ -24,15 +24,19 @@ import {
     getRefinedDateFormatByGranularity,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
+import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/comparison/type';
+import type { CustomTableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
+import type { DataFieldHeatmapColorValue } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
+import type { DateFormatValue } from '@/common/modules/widgets/_widget-fields/date-format/type';
+import type { MissingValueValue } from '@/common/modules/widgets/_widget-fields/missing-value/type';
+import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
+import type { TableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/table-column-width/type';
+import type { TableDataFieldValue } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
+import type { TextWrapValue } from '@/common/modules/widgets/_widget-fields/text-wrap/type';
+import type { TotalValue } from '@/common/modules/widgets/_widget-fields/total/type';
 import type { TableWidgetField } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { TableDataItem } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
-import type {
-    TableDataFieldValue, ComparisonValue, TotalValue,
-    DateFormatValue,
-    NumberFormatValue, DataFieldHeatmapColorValue, TableColumnWidthValue, CustomTableColumnWidthValue, TextWrapValue,
-    MissingValueValue,
-} from '@/common/modules/widgets/types/widget-field-value-type';
 import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
 
 import {
@@ -166,7 +170,7 @@ const getValue = (item: TableDataItem, field: TableWidgetField) => {
             const referenceValueKey = item[field.name];
             return storeState[referenceKey][referenceValueKey]?.label || storeState[referenceKey][referenceValueKey]?.name || referenceValueKey || '-';
         }
-        if (field.fieldInfo?.additionalType === 'dateFormat' && !!state.refinedDateFormat && item[field.name] !== 'Total') {
+        if (field.fieldInfo?.additionalType === 'dateFormat' && !!state.refinedDateFormat && item[props.fields[0].name] !== 'Total') {
             return getFormattedDate(item[field.name], state.refinedDateFormat);
         }
         return item[field.name] || '-';
@@ -226,7 +230,7 @@ const getValueTooltipText = (item: TableDataItem, field: TableWidgetField) => {
         let _unit;
         if (field.name === 'sub_total') {
             const filteredFieldWithUnit = (props.dataField as string[])?.filter((_field) => props.dataInfo?.[_field]?.unit);
-            _unit = filteredFieldWithUnit.map((_field) => (props.dataInfo ?? {})[_field]?.unit).join(', ');
+            _unit = filteredFieldWithUnit?.map((_field) => (props.dataInfo ?? {})[_field]?.unit).join(', ');
         } else _unit = props.dataInfo?.[field.name || '']?.unit;
         return `• Unit: ${_unit ?? '-'} \n• ${field.name}: ${numberFormatter(item[field.name])}`;
     }
@@ -265,6 +269,7 @@ const isSortable = (field: TableWidgetField) => {
 };
 
 const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
+    const BASE_OPACITY = 0.1;
     const _style: Record<string, string> = {};
     const heatmapSkipCondition = field.fieldInfo?.type === 'labelField'
         || (field?.fieldInfo?.additionalType && SKIP_HEATMAP_FIELD.includes(field?.fieldInfo?.additionalType));
@@ -283,7 +288,7 @@ const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
         _dataField = props.criteria as string;
     }
 
-    const opacity = 0.1 + (0.9 * ((_value - minValue) / absGapValue));
+    const opacity = absGapValue !== 0 ? (BASE_OPACITY + (0.9 * ((_value - minValue) / absGapValue))) : BASE_OPACITY;
     const _colorInfo = props.dataFieldHeatmapColorInfo?.[_dataField]?.value;
     if (_colorInfo && _colorInfo !== 'NONE') {
         const rgbaString = hexToRgba(HEATMAP_COLOR_HEX_MAP[_colorInfo], opacity);

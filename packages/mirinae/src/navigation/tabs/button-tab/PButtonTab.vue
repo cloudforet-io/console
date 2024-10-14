@@ -1,10 +1,13 @@
 <template>
     <div class="p-button-tab">
-        <transition name="fade" mode="out-in">
+        <transition name="fade"
+                    mode="out-in"
+        >
             <div class="button-group">
                 <button v-for="(tab, idx) in tabItems"
                         ref="buttonRefs"
                         :key="tab.name"
+                        class="tab-header-button"
                         :class="{ active: activeTab === tab.name}"
                         @click="handleClickTab(tab, idx)"
                         @keydown.left="handleKeydownLeft(idx)"
@@ -12,14 +15,21 @@
                 >
                     {{ tab.label }}
                 </button>
+                <slot name="additional-button" />
             </div>
         </transition>
         <div class="tab-pane">
             <slot />
             <keep-alive>
-                <slot v-if="keepAliveTabNames.includes(activeTab)" :name="activeTab" v-bind="currentTabItem" />
+                <slot v-if="keepAliveTabNames.includes(activeTab)"
+                      :name="activeTab"
+                      v-bind="currentTabItem"
+                />
             </keep-alive>
-            <slot v-if="nonKeepAliveTabNames.includes(activeTab)" :name="activeTab" v-bind="currentTabItem" />
+            <slot v-if="nonKeepAliveTabNames.includes(activeTab)"
+                  :name="activeTab"
+                  v-bind="currentTabItem"
+            />
         </div>
     </div>
 </template>
@@ -106,20 +116,19 @@ export default defineComponent({
 <style lang="postcss">
 .p-button-tab {
     .button-group {
-        display: flex;
-        flex-wrap: wrap;
+        @apply flex items-center gap-2 flex-wrap;
         min-height: 2.5rem;
-        margin: 0.75rem;
-        button {
+        margin: 1rem;
+
+        .tab-header-button {
             @apply bg-gray-100 text-gray-900 border rounded-2xl;
             border-width: 1px;
             border-color: rgba(theme('colors.gray.400'), 0.7);
             min-height: 2rem;
             font-size: 0.875rem;
-            line-height: 1.6;
+            line-height: 125%;
             padding-left: 1rem;
             padding-right: 1rem;
-            margin: 0.25rem;
             &:hover {
                 @apply bg-gray-200;
             }

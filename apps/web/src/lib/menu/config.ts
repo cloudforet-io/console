@@ -2,7 +2,7 @@
 import type { HighlightTagType } from '@/store/modules/display/type';
 
 export const MENU_ID = Object.freeze({
-    WORKSPACE_HOME: 'workspace-home',
+    WORKSPACE_HOME: 'workspace_home',
     DASHBOARDS: 'dashboards',
     PROJECT: 'project',
     ASSET_INVENTORY: 'asset_inventory',
@@ -36,6 +36,7 @@ export const MENU_ID = Object.freeze({
     AUTO_DORMANCY_CONFIGURATION: 'auto_dormancy_configuration',
     ANOMALY_DETECTION_DOMAIN_CONFIGURATION: 'anomaly_detection_domain_configuration',
     WORKSPACES: 'workspaces',
+    WORKSPACE_GROUP: 'workspace_group',
     BOOKMARK: 'bookmark',
     MY_PAGE: 'my_page',
     ACCOUNT_PROFILE: 'account_profile',

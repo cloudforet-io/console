@@ -2,7 +2,7 @@
     <p-pane-layout>
         <collector-detail-section-header :title="$t('INVENTORY.COLLECTOR.DETAIL.BASE_INFO')"
                                          :edit-mode="state.isEditMode"
-                                         :hide-edit-button="!collectorDetailPageStore.getters.isEditableCollector"
+                                         :hide-edit-button="!props.hasReadWriteAccess || !collectorDetailPageStore.getters.isEditableCollector"
                                          @click-edit="handleClickEdit"
         />
 
@@ -90,10 +90,11 @@ import { useCollectorJobStore } from '@/services/asset-inventory/stores/collecto
 
 const props = defineProps<{
     historyLink: Location
+    hasReadWriteAccess?: boolean
 }>();
 
 const collectorFormStore = useCollectorFormStore();
-const collectorFormState = collectorFormStore.$state;
+const collectorFormState = collectorFormStore.state;
 
 const collectorJobStore = useCollectorJobStore();
 const collectorJobState = collectorJobStore.$state;
@@ -130,18 +131,18 @@ const state = reactive({
 
 
 const fetchCollectorPluginUpdate = async (): Promise<CollectorModel> => {
-    if (!collectorFormStore.collectorId) throw new Error('collector_id is required');
+    if (!collectorFormState.collectorId) throw new Error('collector_id is required');
     const params: CollectorUpdatePluginParameters = {
-        collector_id: collectorFormStore.collectorId,
+        collector_id: collectorFormState.collectorId,
         version: collectorFormState.version,
         upgrade_mode: collectorFormState.autoUpgrade ? 'AUTO' : 'MANUAL',
     };
     return SpaceConnector.clientV2.inventory.collector.updatePlugin<CollectorUpdatePluginParameters, CollectorModel>(params);
 };
 const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
-    if (!collectorFormStore.collectorId) throw new Error('collector_id is required');
+    if (!collectorFormState.collectorId) throw new Error('collector_id is required');
     const params: CollectorUpdateParameters = {
-        collector_id: collectorFormStore.collectorId,
+        collector_id: collectorFormState.collectorId,
         tags: collectorFormState.tags,
     };
     return SpaceConnector.clientV2.inventory.collector.update<CollectorUpdateParameters, CollectorModel>(params);
@@ -199,7 +200,7 @@ const handleClickSave = async () => {
     }
 };
 
-watch(() => collectorFormStore.pluginId, async (pluginId) => {
+watch(() => collectorFormState.pluginId, async (pluginId) => {
     if (pluginId) await collectorFormStore.getVersions(pluginId);
 }, { immediate: true });
 

@@ -1,14 +1,16 @@
 import type { Tags } from '@/schema/_common/model';
 import type {
-    DashboardLayout, DashboardOptions, DashboardVariables, DashboardVariablesSchema,
+    DashboardOptions, DashboardVariables, DashboardVariablesSchema,
     DashboardVars,
 } from '@/schema/dashboard/_types/dashboard-type';
+
+import type { SharedDashboardLayout } from '@/services/dashboards/types/shared-dashboard-type';
 
 
 export interface PrivateDashboardCreateParameters {
     name: string;
     description?: string;
-    layouts?: DashboardLayout[];
+    layouts?: SharedDashboardLayout[];
     options?: DashboardOptions;
     vars?: DashboardVars;
     variables?: DashboardVariables;

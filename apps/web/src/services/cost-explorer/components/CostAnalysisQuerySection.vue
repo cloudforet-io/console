@@ -5,6 +5,9 @@ import {
 import {
     computed, reactive, ref, watch,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
+
+import { clone } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -16,9 +19,13 @@ import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/typ
 
 import { SpaceRouter } from '@/router';
 import type { CostQuerySetUpdateParameters } from '@/schema/cost-analysis/cost-query-set/api-verbs/update';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import type { PageAccessMap } from '@/lib/access-control/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import type { MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
@@ -35,11 +42,14 @@ import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-a
 import type { Granularity } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
 
+
 const CostAnalysisQueryFormModal = () => import('@/services/cost-explorer/components/CostAnalysisQueryFormModal.vue');
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
+
+const route = useRoute();
 
 const filtersPopperRef = ref<any|null>(null);
 const rightPartRef = ref<HTMLElement|null>(null);
@@ -49,8 +59,21 @@ const targetRef = ref<HTMLElement | null>(null);
 const { getProperRouteLocation } = useProperRouteLocation();
 const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
 
+const storeState = reactive({
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+});
 const state = reactive({
     queryFormModalVisible: false,
+    selectedMenuId: computed(() => {
+        const reversedMatched = clone(route.matched).reverse();
+        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
+        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
+            return '';
+        }
+        return targetMenuId;
+    }),
+    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
     saveDropdownMenuItems: computed<MenuItem[]>(() => ([
         {
             type: 'item',
@@ -77,7 +100,6 @@ const state = reactive({
 
 const {
     visibleMenu: visibleContextMenu,
-    contextMenuStyle,
     showContextMenu,
     hideContextMenu,
 } = useContextMenuController({
@@ -85,6 +107,7 @@ const {
     targetRef,
     contextMenuRef,
     menu: state.saveDropdownMenuItems,
+    position: 'right',
 });
 onClickOutside(rightPartRef, hideContextMenu);
 
@@ -149,8 +172,8 @@ watch(() => costAnalysisPageGetters.selectedQueryId, (updatedQueryId) => {
                            :class="{ 'open': state.filtersPopoverVisible }"
                            ignore-outside-click
                            trigger="click"
-                           relative-style
-                           position="bottom-start"
+                           boundary=".cost-analysis-query-section"
+                           width="100%"
                            class="filters-popover"
                 >
                     <p-button style-type="tertiary"
@@ -174,7 +197,8 @@ watch(() => costAnalysisPageGetters.selectedQueryId, (updatedQueryId) => {
                     </template>
                 </p-popover>
             </div>
-            <div ref="rightPartRef"
+            <div v-if="state.hasReadWriteAccess"
+                 ref="rightPartRef"
                  class="right-part"
             >
                 <template v-if="!state.isManagedQuerySet && !state.isDynamicQuerySet">
@@ -196,8 +220,8 @@ watch(() => costAnalysisPageGetters.selectedQueryId, (updatedQueryId) => {
                     />
                     <p-context-menu v-show="visibleContextMenu"
                                     ref="contextMenuRef"
+                                    :visible-menu="visibleContextMenu"
                                     :menu="state.saveDropdownMenuItems"
-                                    :style="contextMenuStyle"
                                     @select="handleClickSaveAsButton"
                     />
                 </template>
@@ -227,22 +251,26 @@ watch(() => costAnalysisPageGetters.selectedQueryId, (updatedQueryId) => {
 
 <style lang="postcss" scoped>
 .cost-analysis-query-section {
+    position: relative;
     margin-top: 1.5rem;
+    z-index: 1;
     .filter-wrapper {
-        @apply relative flex items-center justify-between;
+        @apply flex justify-between;
+        align-items: flex-start;
         font-size: 0.875rem;
         .left-part {
             display: flex;
             align-items: center;
+            flex-wrap: wrap;
             gap: 0.5rem;
             .granularity-dropdown {
                 min-width: unset;
             }
         }
         .right-part {
-            @apply relative;
             display: flex;
             align-items: flex-start;
+            padding-left: 0.5rem;
 
             .save-button {
                 border-top-right-radius: 0;
@@ -254,39 +282,14 @@ watch(() => costAnalysisPageGetters.selectedQueryId, (updatedQueryId) => {
                 border-left: 0;
             }
 
-            /* custom design-system component - p-context-menu */
-            :deep(.p-context-menu) {
-                @apply absolute;
-                top: 2.125rem;
+            .p-context-menu {
                 margin-top: -1px;
-                z-index: 100;
-                right: 0;
-                .p-context-menu-item {
-                    min-width: 10rem;
-                }
+                min-width: 10rem !important;
             }
         }
         .filters-button {
             .filters-badge {
                 margin-left: 0.25rem;
-            }
-        }
-
-        /* custom design-system component - p-popover */
-        :deep(.p-popover) {
-            &.open {
-                .p-button.filters-button {
-                    @apply bg-gray-200;
-                }
-            }
-            .popper {
-                width: 100%;
-                max-width: 100%;
-                left: 2rem;
-                transform: translate(0, 3rem) !important;
-                .arrow {
-                    left: 1.25rem !important;
-                }
             }
         }
     }

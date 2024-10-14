@@ -6,8 +6,9 @@ import {
 import { cloneDeep } from 'lodash';
 
 import {
-    PButtonModal, PDefinitionTable, PStatus,
+    PButtonModal, PDefinitionTable, PI, PStatus,
 } from '@cloudforet/mirinae';
+import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { AppModel } from '@/schema/identity/app/model';
@@ -15,8 +16,15 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { indigo, peacock } from '@/styles/colors';
 
 import { appStateFormatter } from '@/services/iam/composables/refined-table-data';
 import { APP_DROPDOWN_MODAL_TYPE } from '@/services/iam/constants/app-constant';
@@ -25,6 +33,8 @@ import { useAppPageStore } from '@/services/iam/store/app-page-store';
 const appContextStore = useAppContextStore();
 const appPageStore = useAppPageStore();
 const appPageState = appPageStore.$state;
+const allReferenceStore = useAllReferenceStore();
+const allReferenceGetters = allReferenceStore.getters;
 
 const emit = defineEmits<{(e: 'confirm', app?: AppModel): void;
 }>();
@@ -32,6 +42,8 @@ const emit = defineEmits<{(e: 'confirm', app?: AppModel): void;
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    projects: computed<ProjectReferenceMap>(() => allReferenceGetters.project),
+    projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceGetters.projectGroup),
 });
 const state = reactive({
     confirmButton: computed(() => {
@@ -49,16 +61,39 @@ const state = reactive({
         }
         return '';
     }),
+    selectedApp: computed(() => {
+        let projectLabel = '';
+        if (appPageStore.selectedApp.project_group_id) {
+            projectLabel = storeState.projectGroups[appPageStore.selectedApp.project_group_id].label;
+        } else if (appPageStore.selectedApp.project_id) {
+            projectLabel = storeState.projects[appPageStore.selectedApp.project_id].label;
+        }
+        return {
+            ...appPageStore.selectedApp,
+            project: appPageStore.selectedApp.project_group_id || appPageStore.selectedApp.project_id ? {
+                icon: appPageStore.selectedApp.project_group_id ? 'ic_folder-filled' : 'ic_document-filled',
+                color: appPageStore.selectedApp.project_id ? peacock[600] : indigo[500],
+                label: projectLabel,
+            } : undefined,
+        };
+    }),
 });
 
-const definitionFields = computed(() => [
-    { label: i18n.t('IAM.APP.MODAL.COL_NAME'), name: 'name' },
-    { label: i18n.t('IAM.APP.MODAL.COL_STATE'), name: 'state' },
-    { label: i18n.t('IAM.APP.MODAL.COL_APP_ID'), name: 'app_id' },
-    { label: i18n.t('IAM.APP.MODAL.COL_ROLE_ID'), name: 'role_id' },
-    { label: i18n.t('IAM.APP.MODAL.COL_LASTED_AT'), name: 'last_accessed_at' },
-    { label: i18n.t('IAM.APP.MODAL.COL_EXPIRED_AT'), name: 'expired_at' },
-]);
+const definitionFields = computed(() => {
+    const projectFields: DefinitionField[] = [];
+    if (appPageStore.selectedApp.project_group_id || appPageStore.selectedApp.project_id) {
+        projectFields.push({ label: i18n.t('IAM.APP.MODAL.COL_PROJECT'), name: 'project' });
+    }
+    return [
+        { label: i18n.t('IAM.APP.MODAL.COL_NAME'), name: 'name' },
+        { label: i18n.t('IAM.APP.MODAL.COL_STATE'), name: 'state' },
+        { label: i18n.t('IAM.APP.MODAL.COL_APP_ID'), name: 'app_id' },
+        ...projectFields,
+        { label: i18n.t('IAM.APP.MODAL.COL_ROLE_ID'), name: 'role_id' },
+        { label: i18n.t('IAM.APP.MODAL.COL_LASTED_AT'), name: 'last_accessed_at' },
+        { label: i18n.t('IAM.APP.MODAL.COL_EXPIRED_AT'), name: 'expired_at' },
+    ];
+});
 
 /* Component */
 const handleClose = () => {
@@ -77,8 +112,10 @@ const checkModalConfirm = async () => {
             await appPageStore.deleteApp({ app_id: appPageStore.selectedApp.app_id });
         } else if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.ENABLE) {
             await appPageStore.enableApp({ app_id: appPageStore.selectedApp.app_id });
+            showSuccessMessage(i18n.t('IAM.APP.ALT_S_ENABLED_APP'), '');
         } else if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.DISABLE) {
             await appPageStore.disableApp({ app_id: appPageStore.selectedApp.app_id });
+            showSuccessMessage(i18n.t('IAM.APP.ALT_S_DISABLED_APP'), '');
         } else if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.REGENERATE) {
             const res = await appPageStore.regenerateApp({ app_id: appPageStore.selectedApp.app_id });
             emit('confirm', res);
@@ -101,13 +138,14 @@ const checkModalConfirm = async () => {
                     :theme-color="appPageState.modal.themeColor"
                     :loading="appPageState.modal.loading"
                     modal-size="md"
+                    class="app-management-status-modal"
                     @confirm="checkModalConfirm"
                     @cancel="handleClose"
                     @close="handleClose"
     >
         <template #body>
             <p-definition-table :fields="definitionFields"
-                                :data="appPageStore.selectedApp"
+                                :data="state.selectedApp"
                                 :skeleton-rows="6"
                                 block
                                 disable-copy
@@ -116,6 +154,18 @@ const checkModalConfirm = async () => {
                     <p-status v-bind="appStateFormatter(data)"
                               class="capitalize"
                     />
+                </template>
+                <template #data-project="{value}">
+                    <div v-if="value"
+                         class="col-project"
+                    >
+                        <p-i :name="value.icon"
+                             :color="value.color"
+                             width="1rem"
+                             height="1rem"
+                        />
+                        <span>{{ value.label }}</span>
+                    </div>
                 </template>
                 <template #data-expired_at="{data}">
                     {{ iso8601Formatter(data, storeState.timezone) }}
@@ -130,3 +180,13 @@ const checkModalConfirm = async () => {
         </template>
     </p-button-modal>
 </template>
+
+
+<style lang="postcss" scoped>
+.app-management-status-modal {
+    .col-project {
+        @apply flex items-center;
+        gap: 0.5rem;
+    }
+}
+</style>

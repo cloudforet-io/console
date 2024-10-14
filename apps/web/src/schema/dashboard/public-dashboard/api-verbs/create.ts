@@ -1,15 +1,17 @@
 import type { Tags } from '@/schema/_common/model';
 import type { ResourceGroupType } from '@/schema/_common/type';
 import type {
-    DashboardOptions, DashboardVariables, DashboardVariablesSchema, DashboardLayout,
+    DashboardOptions, DashboardVariables, DashboardVariablesSchema,
     DashboardVars,
 } from '@/schema/dashboard/_types/dashboard-type';
+
+import type { SharedDashboardLayout } from '@/services/dashboards/types/shared-dashboard-type';
 
 
 export interface PublicDashboardCreateParameters {
     name: string;
     description?: string;
-    layouts?: DashboardLayout[];
+    layouts?: SharedDashboardLayout[];
     options?: DashboardOptions;
     vars?: DashboardVars;
     variables?: DashboardVariables;

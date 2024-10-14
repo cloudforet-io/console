@@ -18,12 +18,17 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
 import type { DataSourceItem } from '@/services/cost-explorer/types/data-sources-type';
 
-
 type DataType = {
     label: TranslateResult|string;
     name: string;
     disabled?: boolean;
 };
+
+interface Props {
+    hasReadWriteAccess?: boolean;
+}
+
+const props = defineProps<Props>();
 
 const dataSourcesPageStore = useDataSourcesPageStore();
 const dataSourcesPageGetters = dataSourcesPageStore.getters;
@@ -136,7 +141,7 @@ const handleConfirm = async () => {
             >
                 <p-toggle-button :value="state.dataTypeEnable[item.name]"
                                  class="toggle-button"
-                                 :disabled="item.disabled"
+                                 :disabled="!props.hasReadWriteAccess || item.disabled"
                                  @change-toggle="handleChangeToggle(item.name, $event)"
                 />
                 <span>

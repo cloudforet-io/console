@@ -44,9 +44,9 @@ const state = reactive({
                     filters: queryHelper.setFilters([{ k: 'webhook_id', v: props.value ?? '', o: '=' }]).rawQueryStrings,
                 },
             };
-        } if (state.userReference) {
+        } if (props.userReference) {
             return {
-                name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
+                name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
                 params: {
                     id: props.projectId ?? '',
                 },

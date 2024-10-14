@@ -5,12 +5,35 @@ import type {
 import type {
     InheritOptions, WidgetOptions, WidgetSize,
 } from '@/schema/dashboard/_types/widget-type';
+import type { PrivateDashboardChangeFolderParameters } from '@/schema/dashboard/private-dashboard/api-verbs/change-folder';
+import type { PrivateDashboardCreateParameters } from '@/schema/dashboard/private-dashboard/api-verbs/create';
+import type { PrivateDashboardDeleteParameters } from '@/schema/dashboard/private-dashboard/api-verbs/delete';
+import type { PrivateDashboardListParameters } from '@/schema/dashboard/private-dashboard/api-verbs/list';
+import type { PrivateDashboardUpdateParameters } from '@/schema/dashboard/private-dashboard/api-verbs/update';
+import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
+import type { PublicDashboardChangeFolderParameters } from '@/schema/dashboard/public-dashboard/api-verbs/change-folder';
+import type { PublicDashboardCreateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
+import type { PublicDashboardDeleteParameters } from '@/schema/dashboard/public-dashboard/api-verbs/delete';
+import type { PublicDashboardListParameters } from '@/schema/dashboard/public-dashboard/api-verbs/list';
+import type { PublicDashboardUpdateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/update';
+import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
 
 import type { VariableModelType } from '@/lib/variable-models';
 import type { Value } from '@/lib/variable-models/_base/types';
 
 
+
 export type DashboardType = typeof DASHBOARD_TYPE[keyof typeof DASHBOARD_TYPE];
+export type DashboardFolderType = 'PUBLIC'|'PRIVATE';
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+export type DashboardModel = PublicDashboardModel & PrivateDashboardModel;
+export type DashboardCreateParams = PublicDashboardCreateParameters | PrivateDashboardCreateParameters;
+export type DashboardChangeFolderParams = PublicDashboardChangeFolderParameters | PrivateDashboardChangeFolderParameters;
+export type DashboardListParams = PublicDashboardListParameters | PrivateDashboardListParameters;
+export type DashboardUpdateParams = PublicDashboardUpdateParameters | PrivateDashboardUpdateParameters;
+export type DashboardDeleteParams = PublicDashboardDeleteParameters | PrivateDashboardDeleteParameters;
 
 // dashboard variable schema types
 type VariableSelectionType = 'SINGLE' | 'MULTI';
@@ -97,13 +120,4 @@ export interface DashboardLayoutWidgetInfo {
     inherit_options?: InheritOptions; // inherit information for the widget option
     schema_properties?: string[]; // schema properties that are shown on widget form. updated when use add more options.
     fixed_options?: Record<string, any>; // fixed options for the widget
-}
-
-export interface DataSource {
-    // data_domain: string; // Cost/Asset/Security
-    // data_source_from?: string; // cost_analysis
-    // value: string[]; // Usage
-    // TODO: create ResrouceType
-    resource_type: any; // 'cost_analysis.Cost' || 'inventory.MetricData'
-    value: string;
 }

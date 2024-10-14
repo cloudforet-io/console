@@ -12,6 +12,7 @@ import { init } from 'echarts/core';
 import { isEmpty, throttle } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
@@ -27,12 +28,13 @@ import {
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
+import type { FormatRulesValue } from '@/common/modules/widgets/_widget-fields/format-rules/type';
+import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit,
     WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
-import type { FormatRulesValue, NumberFormatValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { gray } from '@/styles/colors';
 
@@ -80,12 +82,12 @@ const state = reactive({
                     distance: -55,
                     color: gray[700],
                     fontSize: 12,
-                    formatter: (val) => getFormattedNumber(val, state.dataField, state.numberFormatter, state.unit),
+                    formatter: (val) => getFormattedNumber(val, state.dataField, state.numberFormat, state.unit),
                 },
                 detail: {
                     offsetCenter: [0, 0],
                     fontSize: 32,
-                    formatter: (val) => getFormattedNumber(val, state.dataField, state.numberFormatter, state.unit),
+                    formatter: (val) => getFormattedNumber(val, state.dataField, state.numberFormat, state.unit),
                     color: gray[700],
                 },
                 data: [
@@ -127,7 +129,7 @@ const state = reactive({
         return { start: _start, end: _end };
     }),
     // optional fields
-    numberFormatter: computed(() => props.widgetOptions?.numberFormat as NumberFormatValue),
+    numberFormat: computed(() => props.widgetOptions?.numberFormat as NumberFormatValue),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange: computed(() => ({
@@ -138,14 +140,15 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
 });
 
 /* Api */
+const privateWidgetFetcher = getCancellableFetcher<PrivateWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.privateWidget.load);
+const publicWidgetFetcher = getCancellableFetcher<PublicWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.publicWidget.load);
 const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
     if (props.widgetState === 'INACTIVE') return undefined;
     try {
+        state.loading = true;
         const _isPrivate = props.widgetId.startsWith('private');
-        const _fetcher = _isPrivate
-            ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
-            : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>;
-        const res = await _fetcher({
+        const _fetcher = _isPrivate ? privateWidgetFetcher : publicWidgetFetcher;
+        const { status, response } = await _fetcher({
             widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
@@ -161,8 +164,12 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
             },
             vars: props.dashboardVars,
         });
-        state.errorMessage = undefined;
-        return res;
+        if (status === 'succeed') {
+            state.errorMessage = undefined;
+            state.loading = false;
+            return response;
+        }
+        return undefined;
     } catch (e: any) {
         state.loading = false;
         state.errorMessage = e.message;
@@ -177,12 +184,11 @@ const drawChart = (rawData: Data|null) => {
     state.chartData = rawData?.results?.[0]?.[state.dataField] || 0;
 };
 const loadWidget = async (): Promise<Data|APIErrorToast> => {
-    state.loading = true;
     const res = await fetchWidget();
+    if (!res) return state.data;
     if (typeof res === 'function') return res;
     state.data = res;
     drawChart(state.data);
-    state.loading = false;
     return state.data;
 };
 

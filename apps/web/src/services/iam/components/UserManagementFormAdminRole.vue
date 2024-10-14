@@ -46,7 +46,7 @@ const roleState = reactive({
     loading: true,
     visible: false,
     searchText: '',
-    data: computed<UserListItemType>(() => userPageStore.selectedUsers[0]),
+    data: computed<UserListItemType>(() => userPageStore.getters.selectedUsers[0]),
     menuItems: [] as AddModalMenuItem[],
     proxySelectedItems: useProxyValue('role', props, emit),
     selectedItems: computed(() => {
@@ -95,7 +95,13 @@ const fetchListRoles = async (inputText: string) => {
     }
     try {
         const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
-            query: roleListApiQueryHelper.data,
+            query: {
+                ...roleListApiQueryHelper.data,
+                filter: [
+                    ...(roleListApiQueryHelper.data?.filter || []),
+                    { k: 'state', v: ROLE_STATE.ENABLED, o: 'eq' },
+                ],
+            },
         });
         roleState.menuItems = (results ?? [])?.map((role) => ({
             label: role.name,

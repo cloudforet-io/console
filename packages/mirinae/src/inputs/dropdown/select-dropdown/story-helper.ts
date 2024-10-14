@@ -27,7 +27,8 @@ const extraArgs: Args = {
     visibleMenu: false,
     menuPosition: CONTEXT_MENU_POSITION.LEFT,
     indexMode: false,
-    parentId: undefined,
+    menuWidth: undefined,
+    boundary: undefined,
     disableHandler: false,
     pageSize: 10,
     resetSelectedOnUnmounted: true,
@@ -311,10 +312,25 @@ const extraArgTypes: ArgTypes = {
         },
         control: 'boolean',
     },
-    parentId: {
-        name: 'parentId',
+    menuWidth: {
+        name: 'menuWidth',
         type: { name: 'string' },
-        description: 'The property to automatically hide the context menu when scrolling, if the Select-Dropdown\'s parent component exists.',
+        description: 'The width of the menu. It can be css value or \'target-width\' which is same as dropdown button width. Default is \'auto\'.',
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'undefined',
+            },
+        },
+        control: 'text',
+    },
+    boundary: {
+        name: 'boundary',
+        type: { name: 'string' },
+        description: 'When the menu is opened, the menu is displayed within the boundary element. The boundary element is a CSS selector.',
         table: {
             type: {
                 summary: 'string',

@@ -13,8 +13,6 @@ import {
     cloneDeep, forEach, orderBy, range,
 } from 'lodash';
 
-import { QueryHelper } from '@cloudforet/core-lib/query';
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
@@ -28,6 +26,8 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
+import { arrayToQueryString } from '@/lib/router-query-string';
+
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -36,6 +36,10 @@ import {
 } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import type {
+    CloudServiceDetailPageUrlQuery,
+    CloudServiceMainPageUrlQuery,
+} from '@/services/asset-inventory/types/cloud-service-page-type';
 import ProjectSummaryAllSummaryWidgetRegionService
     from '@/services/project/components/ProjectSummaryAllSummaryWidgetRegionService.vue';
 import { SERVICE_CATEGORY } from '@/services/project/constants/project-summary-constant';
@@ -66,7 +70,6 @@ const allReferenceStore = useAllReferenceStore();
 
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
-const queryHelper = new QueryHelper();
 const userWorkspaceStore = useUserWorkspaceStore();
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
@@ -184,20 +187,15 @@ const drawChart = () => {
     state.chart = chart;
 };
 const getLocation = (type: ServiceCategory) => {
-    const query: Location['query'] = {};
+    const query: CloudServiceMainPageUrlQuery = {
+        project: arrayToQueryString([props.projectId]),
+    };
     if (type !== SERVICE_CATEGORY.ALL) {
         query.service = type;
     }
-
-    // set filters
-    queryHelper.setFilters([{ k: 'project_id', o: '=', v: props.projectId }]);
-
     const location: Location = {
         name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
-        query: {
-            filters: queryHelper.rawQueryStrings,
-            ...query,
-        },
+        query,
     };
     return location;
 };
@@ -330,14 +328,11 @@ const getSummaryInfo = async (type) => {
             workspace_id: storeState.currentWorkspaceId,
         });
         const summaryData: SummaryData[] = [];
+        const query: CloudServiceDetailPageUrlQuery = {
+            project: arrayToQueryString([props.projectId]),
+        };
 
-        const summaryQueryHelper = new QueryHelper();
         res.results.forEach((d) => {
-            const filters: ConsoleFilter[] = [];
-            filters.push({
-                k: 'project_id', o: '=', v: props.projectId,
-            });
-
             summaryData.push({
                 provider: d.provider,
                 label: storeState.providers[d.provider]?.label,
@@ -350,9 +345,7 @@ const getSummaryInfo = async (type) => {
                         group: d.cloud_service_group,
                         name: d.cloud_service_type,
                     },
-                    query: {
-                        filters: summaryQueryHelper.setFilters(filters).rawQueryStrings,
-                    },
+                    query,
                 },
                 color: storeState.providers[d.provider]?.color,
             });

@@ -41,7 +41,11 @@ const pieChart: WidgetConfig = {
             },
         },
         numberFormat: {},
-        displaySeriesLabel: {},
+        displaySeriesLabel: {
+            options: {
+                showFormatField: true,
+            },
+        },
         displayAnnotation: {},
     },
 };

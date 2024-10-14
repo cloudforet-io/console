@@ -137,7 +137,7 @@ import {
 
 
 const collectorFormStore = useCollectorFormStore();
-const collectorFormState = collectorFormStore.$state;
+const collectorFormState = collectorFormStore.state;
 const allReferenceStore = useAllReferenceStore();
 
 const emit = defineEmits<{(e:'selectRepository', repository: string):void}>();

@@ -7,6 +7,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { JsonSchema } from '@cloudforet/mirinae/types/inputs/forms/json-schema-form/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { CostReportConfigListParameters } from '@/schema/cost-analysis/cost-report-config/api-verbs/list';
+import type { CostReportConfigModel } from '@/schema/cost-analysis/cost-report-config/model';
 import type { IdentityJobListParameters } from '@/schema/identity/job/api-verbs/list';
 import type { IdentityJobModel } from '@/schema/identity/job/model';
 import type { IdentityJobStatus } from '@/schema/identity/job/type';
@@ -17,6 +19,7 @@ import type { TrustedAccountModel } from '@/schema/identity/trusted-account/mode
 import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import type { Currency } from '@/store/modules/display/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderItem } from '@/store/reference/provider-reference-store';
 
@@ -38,6 +41,7 @@ interface Getters {
     secondToLastJob: ComputedRef<Partial<IdentityJobModel>>;
     lastJobStatus: ComputedRef<IdentityJobStatus>;
     autoSyncDocsLink: ComputedRef<string>;
+    currency: ComputedRef<Currency|undefined>;
 }
 
 interface State {
@@ -45,6 +49,7 @@ interface State {
     serviceAccountType: AccountType;
     originServiceAccountItem: Partial<TrustedAccountModel & ServiceAccountModel>; // for detail page
     syncJobList: IdentityJobModel[];
+    costReportConfig: CostReportConfigModel|null|undefined,
 }
 
 interface FormState {
@@ -76,6 +81,7 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
         serviceAccountType: ACCOUNT_TYPE.GENERAL,
         originServiceAccountItem: {},
         syncJobList: [],
+        costReportConfig: null,
     });
 
     const formState = reactive<FormState>({
@@ -113,6 +119,7 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
             }
             return `https://cloudforet.io/${language}docs/guides/asset-inventory/service-account/`;
         }),
+        currency: computed(() => state.costReportConfig?.currency),
     });
     const actions = {
         initState: () => {
@@ -127,6 +134,7 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
             formState.skipProjectGroup = false;
             formState.scheduleHours = [];
             state.syncJobList = [];
+            state.costReportConfig = null;
         },
         initToOriginServiceAccountItem: () => {
             formState.isAutoSyncEnabled = state.originServiceAccountItem?.schedule?.state === 'ENABLED';
@@ -149,6 +157,16 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.syncJobList = [];
+            }
+        },
+        fetchCostReportConfig: async () => {
+            if (state.costReportConfig !== null) return;
+            try {
+                const { results } = await SpaceConnector.clientV2.costAnalysis.costReportConfig.list<CostReportConfigListParameters, ListResponse<CostReportConfigModel>>();
+                state.costReportConfig = results?.[0];
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.costReportConfig = undefined;
             }
         },
     };

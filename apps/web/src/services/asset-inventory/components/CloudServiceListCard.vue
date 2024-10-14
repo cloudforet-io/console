@@ -1,58 +1,6 @@
-<template>
-    <div class="cloud-service-type-item">
-        <router-link :to="getCloudServiceDetailLink(item)"
-                     class="item-wrapper"
-        >
-            <div class="card-title-wrapper">
-                <div class="provider-title-wrapper">
-                    <span class="provider">{{ (item.provider && providers[item.provider]) ? providers[item.provider].label : item.provider }}</span>
-                </div>
-                <div class="service-group-wrapper">
-                    <p-lazy-img width="1.25rem"
-                                height="1.25rem"
-                                :src="getImageUrl(item)"
-                                error-icon="ic_cloud-filled"
-                                :alt="item.cloud_service_group"
-                                class="icon"
-                    />
-                    <span class="service-group">{{ item.cloud_service_group }}</span>
-                </div>
-            </div>
-            <p-divider />
-            <div class="service-type-list">
-                <template
-                    v-for="(resource, idx) in slicedResources"
-                >
-                    <router-link
-                        :key="`${resource}-${idx}`"
-                        :to="getCloudServiceDetailLink(item, resource)"
-                        class="service-type-item"
-                        :style="{flexBasis: `${100 / slicedResources.length}%`}"
-                    >
-                        <p-tooltip ref="serviceTypeNameRef"
-                                   class="service-type-name"
-                                   :contents="getTextOverflowState(idx) ? resource.cloud_service_type || '' : ''"
-                        >
-                            {{ resource.cloud_service_type }}
-                        </p-tooltip>
-                        <span class="service-type-count">{{ resource.value }}</span>
-                    </router-link>
-                    <p-divider
-                        v-if="slicedResources.length > 1 && idx === 0"
-                        :key="idx"
-                        class="service-type-divider"
-                        :vertical="true"
-                    />
-                </template>
-            </div>
-        </router-link>
-    </div>
-</template>
-
-<script lang="ts">
-import type { PropType } from 'vue';
+<script setup lang="ts">
 import {
-    computed, defineComponent, reactive, ref, toRefs,
+    computed, reactive, ref,
 } from 'vue';
 import type { Location } from 'vue-router';
 
@@ -68,135 +16,172 @@ import type { CloudServiceTypeReferenceMap, CloudServiceTypeItem } from '@/store
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
-import { objectToQueryString } from '@/lib/router-query-string';
+import { arrayToQueryString, objectToQueryString } from '@/lib/router-query-string';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useTextOverflowState } from '@/common/composables/text-overflow-state';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { useCloudServiceLSBStore } from '@/services/asset-inventory/stores/cloud-service-l-s-b-store';
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
+import type { CloudServiceDetailPageUrlQuery } from '@/services/asset-inventory/types/cloud-service-page-type';
 import type { Period } from '@/services/asset-inventory/types/type';
 
 import type { CloudServiceAnalyzeResult, CloudServiceAnalyzeResultResource } from '../types/cloud-service-card-type';
 
 interface Props {
     item: CloudServiceAnalyzeResult;
-    searchFilters: ConsoleFilter[];
-    selectedRegions: string[];
+    searchFilters?: ConsoleFilter[];
+    selectedRegions?: string[];
     period?: Period;
 }
 
-export default defineComponent<Props>({
-    name: 'CloudServiceListCard',
-    components: {
-        PLazyImg,
-        PDivider,
-        PTooltip,
-    },
-    props: {
-        item: {
-            type: Object as PropType<CloudServiceAnalyzeResult>,
-            default: () => ({}),
-        },
-    },
-    setup(props: Props) {
-        const appContextStore = useAppContextStore();
-        const cloudServicePageStore = useCloudServicePageStore();
-        const cloudServicePageState = cloudServicePageStore.$state;
-        const allReferenceStore = useAllReferenceStore();
-
-        const { getProperRouteLocation } = useProperRouteLocation();
-
-        const state = reactive({
-            isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-            providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
-            cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),
-            cloudServiceTypeToItemMap: computed(() => {
-                const res: Record<string, CloudServiceTypeItem> = {};
-                Object.entries(state.cloudServiceTypes).forEach(([, item]) => {
-                    res[`${item.data.provider}:${item.data.group}:${item.name}`] = item;
-                });
-                return res;
-            }),
-            slicedResources: computed<CloudServiceAnalyzeResultResource[]>(() => {
-                const resources = props.item?.resources ?? [];
-                resources.sort((a, b) => a.cloud_service_type?.localeCompare(b.cloud_service_type ?? '') ?? 0);
-                return resources.slice(0, 2);
-            }),
-        });
-        const cloudServiceDetailQueryHelper = new QueryHelper();
-        const getCloudServiceDetailLink = (item: CloudServiceAnalyzeResult, resource?: CloudServiceAnalyzeResultResource): Location|undefined => {
-            const targetCloudServiceType = resource ?? item.resources?.[0];
-            if (!item.provider || !item.cloud_service_group || !targetCloudServiceType?.cloud_service_type) {
-                console.error(new Error(`Invalid cloud service item to generate link: ${item}`));
-                return undefined;
-            }
-
-            // extract product filter
-            let _searchFilters = cloneDeep(cloudServicePageState.searchFilters);
-            _searchFilters = _searchFilters.filter((d) => d.k !== 'ref_cloud_service_type.service_code');
-
-            cloudServiceDetailQueryHelper.setFilters(_searchFilters.filter((f: any) => f.k && ![
-                'cloud_service_type',
-                'cloud_service_group',
-                'service_code',
-            ].includes(f.k)));
-
-            if (cloudServicePageStore.selectedRegions.length) {
-                cloudServiceDetailQueryHelper.addFilter({ k: 'region_code', o: '=', v: cloudServicePageStore.selectedRegions });
-            }
-
-            const res: Location = getProperRouteLocation({
-                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                params: {
-                    provider: item.provider,
-                    group: item.cloud_service_group,
-                    name: targetCloudServiceType.cloud_service_type,
-                },
-                query: {
-                    filters: cloudServiceDetailQueryHelper.rawQueryStrings,
-                    period: objectToQueryString(cloudServicePageState.period),
-                },
-            });
-            return res;
-        };
-
-        const serviceTypeNameRef = ref<(HTMLElement|null)[]>([]);
-        const { getTextOverflowState } = useTextOverflowState({
-            targetRef: serviceTypeNameRef,
-            lineClamp: true,
-        });
-
-        const getImageUrl = (item: CloudServiceAnalyzeResult) => {
-            const cloudServiceType = item.resources?.[0]?.cloud_service_type;
-            const provider = item.provider;
-            const group = item.cloud_service_group;
-
-            if (cloudServiceType && provider && group) {
-                const key = `${provider}:${group}:${cloudServiceType}`;
-                const icon = state.cloudServiceTypeToItemMap[key]?.icon;
-                if (icon) return assetUrlConverter(icon);
-            }
-
-            if (provider) {
-                const icon = state.providers[provider]?.icon;
-                if (icon) return assetUrlConverter(icon);
-            }
-
-            return '';
-        };
-
-        return {
-            ...toRefs(state),
-            serviceTypeNameRef,
-            getTextOverflowState,
-            assetUrlConverter,
-            getCloudServiceDetailLink,
-            getImageUrl,
-        };
-    },
+const props = withDefaults(defineProps<Props>(), {
+    item: () => ({}),
+    searchFilters: () => ([]),
+    selectedRegions: () => ([]),
+    period: undefined,
 });
+
+const appContextStore = useAppContextStore();
+const cloudServicePageStore = useCloudServicePageStore();
+const cloudServicePageState = cloudServicePageStore.$state;
+const cloudServiceLSBStore = useCloudServiceLSBStore();
+
+const allReferenceStore = useAllReferenceStore();
+
+const { getProperRouteLocation } = useProperRouteLocation();
+
+const state = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
+    cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),
+    cloudServiceTypeToItemMap: computed(() => {
+        const res: Record<string, CloudServiceTypeItem> = {};
+        Object.entries(state.cloudServiceTypes).forEach(([, item]) => {
+            res[`${item.data.provider}:${item.data.group}:${item.name}`] = item;
+        });
+        return res;
+    }),
+    slicedResources: computed<CloudServiceAnalyzeResultResource[]>(() => {
+        const resources = props.item?.resources ?? [];
+        resources.sort((a, b) => a.cloud_service_type?.localeCompare(b.cloud_service_type ?? '') ?? 0);
+        return resources.slice(0, 2);
+    }),
+});
+const cloudServiceDetailQueryHelper = new QueryHelper();
+const getCloudServiceDetailLink = (item: CloudServiceAnalyzeResult, resource?: CloudServiceAnalyzeResultResource): Location|undefined => {
+    const targetCloudServiceType = resource ?? item.resources?.[0];
+    if (!item.provider || !item.cloud_service_group || !targetCloudServiceType?.cloud_service_type) {
+        console.error(new Error(`Invalid cloud service item to generate link: ${item}`));
+        return undefined;
+    }
+
+    // extract product filter
+    let _searchFilters = cloneDeep(cloudServicePageState.searchFilters);
+    _searchFilters = _searchFilters.filter((d) => d.k !== 'ref_cloud_service_type.service_code');
+
+    cloudServiceDetailQueryHelper.setFilters(_searchFilters.filter((f: any) => f.k && ![
+        'cloud_service_type',
+        'cloud_service_group',
+        'service_code',
+    ].includes(f.k)));
+
+    const query: CloudServiceDetailPageUrlQuery = {
+        project: arrayToQueryString(cloudServiceLSBStore.getters.selectedProjects),
+        service_account: arrayToQueryString(cloudServiceLSBStore.getters.selectedServiceAccounts),
+        filters: cloudServiceDetailQueryHelper.rawQueryStrings,
+        period: objectToQueryString(cloudServicePageState.period),
+    };
+    const res: Location = getProperRouteLocation({
+        name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+        params: {
+            provider: item.provider,
+            group: item.cloud_service_group,
+            name: targetCloudServiceType.cloud_service_type,
+        },
+        query,
+    });
+    return res;
+};
+
+const serviceTypeNameRef = ref<(HTMLElement|null)[]>([]);
+const { getTextOverflowState } = useTextOverflowState({
+    targetRef: serviceTypeNameRef,
+    lineClamp: true,
+});
+
+const getImageUrl = (item: CloudServiceAnalyzeResult) => {
+    const cloudServiceType = item.resources?.[0]?.cloud_service_type;
+    const provider = item.provider;
+    const group = item.cloud_service_group;
+
+    if (cloudServiceType && provider && group) {
+        const key = `${provider}:${group}:${cloudServiceType}`;
+        const icon = state.cloudServiceTypeToItemMap[key]?.icon;
+        if (icon) return assetUrlConverter(icon);
+    }
+
+    if (provider) {
+        const icon = state.providers[provider]?.icon;
+        if (icon) return assetUrlConverter(icon);
+    }
+
+    return '';
+};
+
 </script>
+
+<template>
+    <div class="cloud-service-type-item">
+        <router-link :to="getCloudServiceDetailLink(item)"
+                     class="item-wrapper"
+        >
+            <div class="card-title-wrapper">
+                <div class="provider-title-wrapper">
+                    <span class="provider">{{ (item.provider && state.providers[item.provider]) ? state.providers[item.provider].label : item.provider }}</span>
+                </div>
+                <div class="service-group-wrapper">
+                    <p-lazy-img width="1.25rem"
+                                height="1.25rem"
+                                :src="getImageUrl(item)"
+                                error-icon="ic_cloud-filled"
+                                :alt="item.cloud_service_group"
+                                class="icon"
+                    />
+                    <span class="service-group">{{ item.cloud_service_group }}</span>
+                </div>
+            </div>
+            <p-divider />
+            <div class="service-type-list">
+                <template
+                    v-for="(resource, idx) in state.slicedResources"
+                >
+                    <router-link
+                        :key="`${resource}-${idx}`"
+                        :to="getCloudServiceDetailLink(item, resource)"
+                        class="service-type-item"
+                        :style="{flexBasis: `${100 / state.slicedResources.length}%`}"
+                    >
+                        <p-tooltip ref="serviceTypeNameRef"
+                                   class="service-type-name"
+                                   :contents="getTextOverflowState(idx) ? resource.cloud_service_type || '' : ''"
+                        >
+                            {{ resource.cloud_service_type }}
+                        </p-tooltip>
+                        <span class="service-type-count">{{ resource.value }}</span>
+                    </router-link>
+                    <p-divider
+                        v-if="state.slicedResources.length > 1 && idx === 0"
+                        :key="idx"
+                        class="service-type-divider"
+                        :vertical="true"
+                    />
+                </template>
+            </div>
+        </router-link>
+    </div>
+</template>
 
 <style scoped lang="postcss">
 .cloud-service-type-item {

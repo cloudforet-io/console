@@ -49,7 +49,7 @@ const state = reactive({
     conditionsPolicy: 'ALL' as EventRuleConditionsPolicy,
     conditions: [
         {
-            key: '',
+            key: 'title',
             value: '',
             operator: 'contain',
         },
