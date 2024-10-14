@@ -96,7 +96,7 @@ import { focus as vFocus } from 'vue-focus';
 import PTag from '@/data-display/tags/PTag.vue';
 import PI from '@/foundation/icons/PI.vue';
 import { useContextMenuStyle, useProxyValue } from '@/hooks';
-import { useQuerySearch } from '@/hooks/query-search';
+import { useQuerySearch } from '@/hooks/use-query-search/use-query-search';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import type { FilterableQueryDropdownProps } from '@/inputs/dropdown/filterable-query-dropdown/type';
 import type { SelectDropdownMenuItem } from '@/inputs/dropdown/select-dropdown/type';

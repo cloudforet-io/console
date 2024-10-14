@@ -3,7 +3,7 @@ import { reactive, toRefs } from 'vue';
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
-import { useProxyValue } from '@/hooks/proxy-state';
+import { useProxyValue } from '@/hooks/use-proxy-state/use-proxy-state';
 import { getKeyItemSets, getValueHandlerMap, getValueItems } from '@/inputs/input/query-input/mock';
 import { getQueryInputArgs, getQueryInputArgTypes, getQueryInputParameters } from '@/inputs/input/query-input/story-helper';
 import { INPUT_SIZE } from '@/inputs/input/text-input/type';

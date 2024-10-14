@@ -16,14 +16,15 @@
 import { computed, defineComponent } from 'vue';
 
 import PStatus from '@/data-display/status/PStatus.vue';
+import type { AnimationType } from '@/foundation/icons/config';
 import { ANIMATION_TYPE } from '@/foundation/icons/config';
-import type { SelectProps } from '@/hooks/select';
-import { useSelect } from '@/hooks/select';
+import type { SelectProps } from '@/hooks/use-select/use-select';
+import { useSelect } from '@/hooks/use-select/use-select';
 
 interface Props extends SelectProps {
     icon?: string;
     iconColor?: string;
-    iconAnimation?: ANIMATION_TYPE;
+    iconAnimation?: AnimationType;
     disableCheckIcon?: boolean;
 }
 

@@ -102,7 +102,7 @@ import vClickOutside from 'v-click-outside';
 import { focus as vFocus } from 'vue-focus';
 
 import PI from '@/foundation/icons/PI.vue';
-import { useQuerySearch } from '@/hooks/query-search';
+import { useQuerySearch } from '@/hooks/use-query-search/use-query-search';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import type { KeyMenuItem, ValueMenuItem } from '@/inputs/search/query-search/type';
 import PSearch from '@/inputs/search/search/PSearch.vue';

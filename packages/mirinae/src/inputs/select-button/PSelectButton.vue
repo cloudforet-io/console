@@ -26,8 +26,8 @@ import { computed, defineComponent, reactive } from 'vue';
 
 
 import PI from '@/foundation/icons/PI.vue';
-import type { SelectProps } from '@/hooks/select';
-import { useSelect } from '@/hooks/select';
+import type { SelectProps } from '@/hooks/use-select/use-select';
+import { useSelect } from '@/hooks/use-select/use-select';
 import type {
     SelectButtonLayoutType,
     SelectButtonSize,

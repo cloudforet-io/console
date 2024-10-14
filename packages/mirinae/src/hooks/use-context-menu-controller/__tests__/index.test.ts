@@ -3,8 +3,8 @@ import { defineComponent, ref } from 'vue';
 
 import { describe, expect } from 'vitest';
 
-import type { UseContextMenuControllerOptions } from '@/hooks/context-menu-controller';
-import { useContextMenuController } from '@/hooks/context-menu-controller';
+import type { UseContextMenuControllerOptions } from '@/hooks/use-context-menu-controller/use-context-menu-controller';
+import { useContextMenuController } from '@/hooks/use-context-menu-controller/use-context-menu-controller';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import type { MenuItem } from '@/inputs/context-menu/type';
 

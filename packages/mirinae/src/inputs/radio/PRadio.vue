@@ -39,8 +39,8 @@ import {
 } from 'vue';
 
 import PI from '@/foundation/icons/PI.vue';
-import type { SelectProps } from '@/hooks/select';
-import { useSingleSelect } from '@/hooks/select';
+import type { SelectProps } from '@/hooks/use-select/use-select';
+import { useSingleSelect } from '@/hooks/use-select/use-select';
 
 interface Props extends SelectProps {
     invalid?: boolean;

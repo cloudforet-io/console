@@ -37,8 +37,8 @@ import {
 
 import PLazyImg from '@/feedbacks/loading/lazy-img/PLazyImg.vue';
 import PI from '@/foundation/icons/PI.vue';
-import type { SelectProps } from '@/hooks/select';
-import { useSelect } from '@/hooks/select';
+import type { SelectProps } from '@/hooks/use-select/use-select';
+import { useSelect } from '@/hooks/use-select/use-select';
 
 
 interface Props extends SelectProps {

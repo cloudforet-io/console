@@ -46,7 +46,7 @@ import {
 } from 'vue';
 
 
-import { useTab } from '@/hooks/tab';
+import { useTab } from '@/hooks/use-tab/use-tab';
 import {
     BALLOON_TAB_POSITION, BALLOON_TAB_SIZE, BALLOON_TAB_STYLE_TYPE,
 } from '@/navigation/tabs/ballon-tab/config';
