@@ -1293,6 +1293,7 @@
 		"PROFILE": {
 			"ALT_E_UPDATE": "Failed to Update Profile",
 			"ALT_S_UPDATE": "Profile successfully updated  ",
+			"CONFIRM_PASSWORD": "Confirm Password",
 			"CURRENT_PASSWORD": "Current Password",
 			"EMAIL": "E-mail",
 			"EMAIL_REQUIRED": "Please enter email",

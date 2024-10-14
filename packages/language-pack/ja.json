@@ -1293,6 +1293,7 @@
 		"PROFILE": {
 			"ALT_E_UPDATE": "個人情報編集に失敗",
 			"ALT_S_UPDATE": "個人情報編集完了",
+			"CONFIRM_PASSWORD": "パスワード確認",
 			"CURRENT_PASSWORD": "現在のパスワード",
 			"EMAIL": "メールアドレス",
 			"EMAIL_REQUIRED": "メールアドレスを入力してください",
