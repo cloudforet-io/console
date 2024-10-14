@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PI, PTextInput, PFieldGroup, PButton,
+    PI, PTextInput, PFieldGroup, PButton, PBadge,
 } from '@cloudforet/mirinae';
 
 import { store } from '@/store';
@@ -85,24 +85,20 @@ watch(() => store.state.user.email, (value) => {
                     {{ $t('IDENTITY.USER.NOTIFICATION_EMAIL.TITLE') }}
                 </p>
                 <div class="verify-status-wrapper">
-                    <div v-if="state.verified"
-                         class="verified"
+                    <p-badge v-if="state.verified"
+                             class="verified"
+                             style-type="green200"
+                             badge-type="subtle"
                     >
-                        <p-i name="ic_verified"
-                             height="1rem"
-                             width="1rem"
-                             class="verified-icon"
-                             color="#60B731"
-                        />
-                        <span>
-                            {{ $t('IDENTITY.USER.NOTIFICATION_EMAIL.VERIFIED') }}
-                        </span>
-                    </div>
-                    <span v-else
-                          class="not-verified"
+                        <span>{{ $t('IDENTITY.USER.NOTIFICATION_EMAIL.VERIFIED') }}</span>
+                    </p-badge>
+                    <p-badge v-else
+                             class="not-verified"
+                             style-type="yellow200"
+                             badge-type="subtle"
                     >
-                        {{ $t('IDENTITY.USER.NOTIFICATION_EMAIL.NOT_VERIFIED') }}
-                    </span>
+                        <span>{{ $t('IDENTITY.USER.NOTIFICATION_EMAIL.NOT_VERIFIED') }}</span>
+                    </p-badge>
                 </div>
             </div>
         </template>
@@ -172,15 +168,6 @@ watch(() => store.state.user.email, (value) => {
         }
         .verify-status-wrapper {
             margin-left: 0.5rem;
-            .verified {
-                @apply flex items-center text-label-md text-green-600;
-                gap: 0.25rem;
-            }
-            .not-verified {
-                @apply bg-yellow-200 text-label-sm;
-                padding: 0.15rem 0.5rem;
-                border-radius: 6.25rem;
-            }
         }
     }
     .help-text {
