@@ -5,13 +5,13 @@ import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-const
 export const DATA_TABLE_TYPE = {
     ADDED: 'ADDED',
     TRANSFORMED: 'TRANSFORMED',
-};
+} as const;
 
 export const DATA_SOURCE_DOMAIN = {
     COST: 'COST',
     ASSET: 'ASSET',
     SECURITY: 'SECURITY',
-};
+} as const;
 
 export const DATA_TABLE_OPERATOR = {
     CONCAT: 'CONCAT',
