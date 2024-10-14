@@ -104,6 +104,9 @@ export default defineComponent<Props>({
     }
     > h2 {
         @apply text-2xl;
+
+        /* NOTE: display: inline; is required */
+
         display: inline;
         word-break: break-word;
         line-height: 1.875rem;
