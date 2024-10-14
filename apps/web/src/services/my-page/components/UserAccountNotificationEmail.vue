@@ -3,7 +3,9 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { PI, PTextInput, PFieldGroup } from '@cloudforet/mirinae';
+import {
+    PI, PTextInput, PFieldGroup, PButton,
+} from '@cloudforet/mirinae';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -13,11 +15,10 @@ import { postUserProfileValidationEmail } from '@/lib/helper/verify-email-helper
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
-import VerifyButton from '@/common/modules/button/verify-button/VerifyButton.vue';
 import NotificationEmailModal from '@/common/modules/modals/notification-email-modal/NotificationEmailModal.vue';
+import { MODAL_TYPE } from '@/common/modules/modals/notification-email-modal/type';
 
 import UserAccountModuleContainer from '@/services/my-page/components/UserAccountModuleContainer.vue';
-
 
 const state = reactive({
     authType: computed(() => store.state.user.authType),
@@ -125,20 +126,38 @@ watch(() => store.state.user.email, (value) => {
                               @update:value="setForm('notificationEmail', $event)"
                 />
             </p-field-group>
-            <verify-button
-                :loading="state.loading"
-                :email="notificationEmail"
-                :verified="state.verified"
-                @click-button="handleClickVerifyButton"
-            >
-                <notification-email-modal
-                    :user-id="state.userId"
-                    :email="notificationEmail"
-                    :modal-type="state.modalType"
-                    :visible.sync="state.isModalVisible"
-                />
-            </verify-button>
+            <div class="verify-button">
+                <p-button v-if="state.verified"
+                          style-type="tertiary"
+                          :loading="state.loading"
+                          size="sm"
+                          @click.prevent="handleClickVerifyButton(MODAL_TYPE.SEND)"
+                >
+                    <p-i name="ic_edit"
+                         height="1rem"
+                         width="1rem"
+                         color="inherit"
+                         class="icon-edit"
+                    />
+                    {{ $t('IDENTITY.USER.NOTIFICATION_EMAIL.CHANGE') }}
+                </p-button>
+                <p-button v-else
+                          style-type="primary"
+                          :disabled="notificationEmail === '' || emailValidator(notificationEmail)"
+                          :loading="state.loading"
+                          size="sm"
+                          @click.prevent="handleClickVerifyButton(MODAL_TYPE.VERIFY)"
+                >
+                    {{ $t('IDENTITY.USER.NOTIFICATION_EMAIL.VERIFY') }}
+                </p-button>
+            </div>
         </form>
+        <notification-email-modal
+            :user-id="state.userId"
+            :email="notificationEmail"
+            :modal-type="state.modalType"
+            :visible.sync="state.isModalVisible"
+        />
     </user-account-module-container>
 </template>
 
@@ -168,7 +187,7 @@ watch(() => store.state.user.email, (value) => {
         @apply text-paragraph-md;
     }
     .form {
-        @apply flex;
+        @apply flex items-start;
         max-width: 33.625rem;
         margin-top: 1rem;
 
@@ -190,6 +209,11 @@ watch(() => store.state.user.email, (value) => {
                 }
             }
         }
+    }
+
+    .verify-button {
+        margin-top: 0.25rem;
+        margin-left: 0.5rem;
     }
 }
 </style>
