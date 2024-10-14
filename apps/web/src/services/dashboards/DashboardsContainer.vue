@@ -89,11 +89,11 @@ callApiWithGrantGuard();
         />
         <dashboard-bundle-clone-modal :visible="dashboardPageControlState.bundleCloneModalVisible"
                                       :folder-id="dashboardPageControlState.selectedFolderId"
-                                      @update:visible="dashboardPageControlStore.setBundleCloneModalVisible"
+                                      @update:visible="dashboardPageControlStore.closeBundleCloneModal"
         />
         <dashboard-bundle-delete-modal :visible="dashboardPageControlState.bundleDeleteModalVisible"
                                        :folder-id="dashboardPageControlState.selectedFolderId"
-                                       @update:visible="dashboardPageControlStore.setBundleDeleteModalVisible"
+                                       @update:visible="dashboardPageControlStore.closeBundleDeleteModal"
         />
         <dashboard-bundle-move-modal :visible="dashboardPageControlState.bundleMoveModalVisible"
                                      @update:visible="dashboardPageControlStore.setBundleMoveModalVisible"
