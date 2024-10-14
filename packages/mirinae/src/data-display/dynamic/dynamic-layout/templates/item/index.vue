@@ -1,6 +1,7 @@
 <template>
     <div>
         <p-heading v-if="layoutName"
+                   class="pt-8 px-4 pb-4"
                    heading-type="sub"
         >
             {{ layoutName }}

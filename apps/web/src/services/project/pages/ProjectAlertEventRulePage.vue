@@ -164,12 +164,12 @@ const handleClickFormCancel = () => {
 
 <template>
     <div class="project-alert-event-rule-page">
-        <p-heading show-back-button
-                   class="page-title"
+        <p-heading class="mb-6"
+                   show-back-button
+                   :title="$t('PROJECT.EVENT_RULE.EVENT_RULE')"
                    @click-back-button="$router.go(-1)"
         >
-            <template #title>
-                <span>{{ $t('PROJECT.EVENT_RULE.EVENT_RULE') }}</span>
+            <template #title-right-extra>
                 <info-message :message="$t('PROJECT.EVENT_RULE.TITLE_INFO_MESSAGE')" />
             </template>
         </p-heading>
@@ -287,12 +287,6 @@ const handleClickFormCancel = () => {
 
 <style lang="postcss" scoped>
 .project-alert-event-rule-page {
-    .page-title {
-        .info-message {
-            font-weight: normal;
-            margin-left: 1rem;
-        }
-    }
     .no-data-wrapper {
         @apply border border-gray-200 rounded-md;
         width: 100%;

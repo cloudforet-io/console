@@ -138,7 +138,7 @@ onMounted(() => {
 
 <template>
     <section class="workspace-group-tab-workspace">
-        <p-heading class="workspace-group-tab-workspace-header"
+        <p-heading class="pt-8 px-4 pb-4"
                    :title="$t('IAM.WORKSPACE_GROUP.TAB.WORKSPACE')"
                    use-total-count
                    :total-count="tableState.totalCount"

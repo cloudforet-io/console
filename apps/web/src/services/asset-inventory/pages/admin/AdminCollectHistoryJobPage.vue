@@ -58,7 +58,8 @@ onActivated(() => {
 
 <template>
     <div>
-        <p-heading :title="props.jobId"
+        <p-heading class="mb-6"
+                   :title="props.jobId"
                    show-back-button
                    @click-back-button="$router.go(-1)"
         />

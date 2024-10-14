@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PHeading, PSkeleton, PSelectDropdown, PI, PBadge,
+    PHeading, PSkeleton, PSelectDropdown, PI, PBadge, PHeadingLayout,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
@@ -100,36 +100,43 @@ const handleSelectItem = (item: MenuItem) => {
             />
             <span class="folder-name">{{ state.folderName }}</span>
         </div>
-        <p-heading :title="dashboardDetailState.name">
-            <p-skeleton v-if="!dashboardDetailState.name"
-                        width="20rem"
-                        height="1.5rem"
-            />
-            <template #title-right-extra>
-                <p-badge v-if="state.showBadge"
-                         badge-type="subtle"
-                         :style-type="state.badgeStyleType"
-                >
-                    <p-i v-if="dashboardDetailState.dashboardScope === 'PRIVATE'"
-                         name="ic_lock-filled"
-                         width="0.75rem"
-                         height="0.75rem"
-                         color="gray900"
-                         class="mr-1"
+        <p-heading-layout class="mb-6">
+            <template #heading>
+                <p-heading :title="dashboardDetailState.name">
+                    <p-skeleton v-if="!dashboardDetailState.name"
+                                width="20rem"
+                                height="1.5rem"
                     />
-                    {{ state.badgeText }}
-                </p-badge>
-                <p-select-dropdown class="dashboard-setting-dropdown"
-                                   style-type="tertiary-icon-button"
-                                   button-icon="ic_ellipsis-horizontal"
-                                   size="sm"
-                                   :menu="getControlMenuItems(props.dashboardId)"
-                                   :selected="[]"
-                                   use-fixed-menu-style
-                                   reset-selection-on-menu-close
-                                   @select="handleSelectItem"
-                />
-                <dashboard-labels-button :dashboard-id="props.dashboardId" />
+                    <template #title-right-extra>
+                        <p-badge v-if="state.showBadge"
+                                 badge-type="subtle"
+                                 :style-type="state.badgeStyleType"
+                                 class="mr-2"
+                        >
+                            <p-i v-if="dashboardDetailState.dashboardScope === 'PRIVATE'"
+                                 name="ic_lock-filled"
+                                 width="0.75rem"
+                                 height="0.75rem"
+                                 color="gray900"
+                                 class="mr-1"
+                            />
+                            {{ state.badgeText }}
+                        </p-badge>
+                        <p-select-dropdown class="dashboard-setting-dropdown"
+                                           style-type="tertiary-icon-button"
+                                           button-icon="ic_ellipsis-horizontal"
+                                           size="sm"
+                                           :menu="getControlMenuItems(props.dashboardId)"
+                                           :selected="[]"
+                                           use-fixed-menu-style
+                                           reset-selection-on-menu-close
+                                           @select="handleSelectItem"
+                        />
+                        <dashboard-labels-button class="label-button"
+                                                 :dashboard-id="props.dashboardId"
+                        />
+                    </template>
+                </p-heading>
             </template>
             <template v-if="!dashboardDetailGetters.isDeprecatedDashboard"
                       #extra
@@ -139,7 +146,7 @@ const handleSelectItem = (item: MenuItem) => {
                                            :name="dashboardDetailState.name"
                 />
             </template>
-        </p-heading>
+        </p-heading-layout>
         <p v-if="props.templateName"
            class="template-name"
         >
@@ -159,16 +166,13 @@ const handleSelectItem = (item: MenuItem) => {
             margin-left: 0.125rem;
         }
     }
-    .dashboard-setting-dropdown {
-        margin: 0 0.5rem;
-    }
-    .p-heading {
-        align-items: center;
-        margin-bottom: 0;
-    }
     .template-name {
         @apply text-paragraph-sm text-gray-500;
         margin-left: 2.5rem;
+    }
+    .label-button {
+        display: inline-flex;
+        margin-left: 0.5rem;
     }
 }
 .select-card-wrapper {
@@ -176,13 +180,6 @@ const handleSelectItem = (item: MenuItem) => {
     gap: 0.5rem;
     .p-select-card {
         @apply col-span-6;
-    }
-}
-
-/* custom design-system component - p-heading */
-:deep(.p-heading) {
-    .title {
-        font-size: 1.125rem;
     }
 }
 </style>

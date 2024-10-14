@@ -9,7 +9,7 @@ import { clone, cloneDeep } from 'lodash';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PButton, PHeading, PHorizontalLayout,
+    PButton, PHeading, PHorizontalLayout, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
 import { store } from '@/store';
@@ -157,10 +157,13 @@ onUnmounted(() => {
 
 <template>
     <section class="workspaces-page">
-        <p-heading :title="$t('IAM.WORKSPACES.WORKSPACES')"
-                   :total-count="workspacePageState.totalCount"
-                   use-total-count
-        >
+        <p-heading-layout class="mb-6">
+            <template #heading>
+                <p-heading :title="$t('IAM.WORKSPACES.WORKSPACES')"
+                           :total-count="workspacePageState.totalCount"
+                           use-total-count
+                />
+            </template>
             <template v-if="state.hasReadWriteAccess"
                       #extra
             >
@@ -171,7 +174,7 @@ onUnmounted(() => {
                     {{ $t('IAM.WORKSPACES.CREATE') }}
                 </p-button>
             </template>
-        </p-heading>
+        </p-heading-layout>
         <p-horizontal-layout class="workspace-toolbox-layout">
             <template #container="{ height }">
                 <workspace-management-table :table-height="height"

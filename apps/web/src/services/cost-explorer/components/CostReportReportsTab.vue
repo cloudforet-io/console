@@ -10,7 +10,7 @@ import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-ut
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PButton, PHeading, PI, PToolboxTable, PSelectDropdown, PBadge, PTextButton,
+    PButton, PHeading, PI, PToolboxTable, PSelectDropdown, PBadge, PTextButton, PHeadingLayout,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 import type { KeyItemSet } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
@@ -218,31 +218,32 @@ watch(() => costReportPageState.activeTab, (activeTab) => {
                          @refresh="handleChange()"
         >
             <template #toolbox-top>
-                <p-heading heading-type="sub"
-                           use-total-count
-                           :total-count="costReportPageState.reportListTotalCount"
-                           :title="$t('BILLING.COST_MANAGEMENT.COST_REPORT.REPORTS')"
-                >
-                    <template #title-right-extra>
-                        <div class="heading-right-part">
-                            <p-badge v-if="state.customPeriod"
-                                     badge-type="subtle"
-                                     style-type="gray200"
-                            >
-                                {{ getCustomPeriodText(state.customPeriod?.start, state.customPeriod?.end) }}
-                            </p-badge>
-                            <p-select-dropdown
-                                :menu="state.periodMenuItems"
-                                :selected="state.selectedPeriod"
-                                reset-selection-on-menu-close
-                                :selection-label="$t('BILLING.COST_MANAGEMENT.COST_REPORT.PERIOD')"
-                                style-type="rounded"
-                                class="period-select-dropdown"
-                                @select="handleSelectPeriodMenuItem"
-                            />
-                        </div>
+                <p-heading-layout class="pt-8 px-4 pb-4">
+                    <template #heading>
+                        <p-heading heading-type="sub"
+                                   use-total-count
+                                   :total-count="costReportPageState.reportListTotalCount"
+                                   :title="$t('BILLING.COST_MANAGEMENT.COST_REPORT.REPORTS')"
+                        />
                     </template>
-                </p-heading>
+                    <template #extra>
+                        <p-badge v-if="state.customPeriod"
+                                 badge-type="subtle"
+                                 style-type="gray200"
+                        >
+                            {{ getCustomPeriodText(state.customPeriod?.start, state.customPeriod?.end) }}
+                        </p-badge>
+                        <p-select-dropdown
+                            :menu="state.periodMenuItems"
+                            :selected="state.selectedPeriod"
+                            reset-selection-on-menu-close
+                            :selection-label="$t('BILLING.COST_MANAGEMENT.COST_REPORT.PERIOD')"
+                            style-type="rounded"
+                            class="period-select-dropdown"
+                            @select="handleSelectPeriodMenuItem"
+                        />
+                    </template>
+                </p-heading-layout>
             </template>
             <template #col-issue_date-format="{value}">
                 <div class="date-text">
@@ -307,21 +308,9 @@ watch(() => costReportPageState.activeTab, (activeTab) => {
 .cost-report-reports-tab {
     border: none;
 }
-.period-select-dropdown {
-    float: right;
-}
-.heading-right-part {
-    @apply flex-shrink-0 inline-flex items-center;
-    float: right;
-    gap: 0.5rem;
-    margin-left: auto;
-}
 
 /* custom design-system component - p-toolbox-table */
 :deep(.p-toolbox-table) {
-    .heading-sub {
-        margin-bottom: 0;
-    }
     .date-text {
         @apply text-paragraph-md;
         margin-top: 0.5rem;

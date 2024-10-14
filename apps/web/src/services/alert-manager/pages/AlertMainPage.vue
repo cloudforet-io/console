@@ -65,7 +65,9 @@ const onUpdateTable = (changed: Partial<AlertListTableFilters>) => {
 
 <template>
     <div class="alert-page">
-        <p-heading :title="$t('MONITORING.ALERT.ALERT_LIST.ALERT')" />
+        <p-heading class="mb-6"
+                   :title="$t('MONITORING.ALERT.ALERT_LIST.ALERT')"
+        />
         <div class="content-wrapper grid grid-cols-12 gap-4">
             <alert-main-data-table
                 :alert-state="state.alertState"

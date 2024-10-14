@@ -32,7 +32,7 @@ import { clone } from 'lodash';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PHeading, PSkeleton, PButton, PIconButton, PDoubleCheckModal, PLink,
+    PHeading, PSkeleton, PButton, PIconButton, PDoubleCheckModal, PLink, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
 import { SpaceRouter } from '@/router';
@@ -273,48 +273,50 @@ onUnmounted(() => {
                 </template>
             </scoped-notification>
         </portal>
-        <p-heading :title="state.collectorName"
-                   show-back-button
-                   @click-back-button="handleClickBackButton"
-        >
-            <p-skeleton v-if="state.loading"
-                        width="20rem"
-                        height="1.5rem"
-            />
-            <template v-if="state.collectorName && collectorDetailPageStore.getters.isEditableCollector"
-                      #title-right-extra
-            >
-                <span class="title-right-button-wrapper">
-                    <p-icon-button name="ic_edit-text"
-                                   width="1.5rem"
-                                   height="1.5rem"
-                                   @click="handleClickEditButton"
-                    />
-                    <p-icon-button name="ic_delete"
-                                   width="1.5rem"
-                                   height="1.5rem"
-                                   class="delete-button"
-                                   @click="handleClickDeleteButton"
-                    />
-                </span>
-            </template>
-            <template #extra>
-                <div v-if="collectorJobStore.AllJobsInfoLoaded"
-                     class="collector-button-box"
+        <p-heading-layout class="mb-6">
+            <template #heading>
+                <p-heading :title="state.collectorName"
+                           show-back-button
+                           @click-back-button="handleClickBackButton"
                 >
-                    <collect-data-button-group @collect="handleCollectData" />
-                    <router-link v-if="collectorJobStore.hasJobs"
-                                 :to="state.collectorHistoryLink"
+                    <p-skeleton v-if="state.loading"
+                                width="20rem"
+                                height="1.5rem"
+                    />
+                    <template v-if="state.collectorName && collectorDetailPageStore.getters.isEditableCollector"
+                              #title-right-extra
                     >
-                        <p-button style-type="tertiary"
-                                  icon-left="ic_history"
-                        >
-                            {{ $t('INVENTORY.COLLECTOR.DETAIL.COLLECTOR_HISTORY') }}
-                        </p-button>
-                    </router-link>
-                </div>
+                        <span class="title-right-button-wrapper">
+                            <p-icon-button name="ic_edit-text"
+                                           width="1.5rem"
+                                           height="1.5rem"
+                                           @click="handleClickEditButton"
+                            />
+                            <p-icon-button name="ic_delete"
+                                           width="1.5rem"
+                                           height="1.5rem"
+                                           class="delete-button"
+                                           @click="handleClickDeleteButton"
+                            />
+                        </span>
+                    </template>
+                </p-heading>
             </template>
-        </p-heading>
+            <template v-if="collectorJobStore.AllJobsInfoLoaded"
+                      #extra
+            >
+                <collect-data-button-group @collect="handleCollectData" />
+                <router-link v-if="collectorJobStore.hasJobs"
+                             :to="state.collectorHistoryLink"
+                >
+                    <p-button style-type="tertiary"
+                              icon-left="ic_history"
+                    >
+                        {{ $t('INVENTORY.COLLECTOR.DETAIL.COLLECTOR_HISTORY') }}
+                    </p-button>
+                </router-link>
+            </template>
+        </p-heading-layout>
 
         <collector-base-info-section class="section"
                                      :history-link="state.collectorHistoryLink"
@@ -357,12 +359,6 @@ onUnmounted(() => {
     align-items: center;
     justify-content: center;
     margin-left: 0.5rem;
-}
-.collector-button-box {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
 }
 </style>
 

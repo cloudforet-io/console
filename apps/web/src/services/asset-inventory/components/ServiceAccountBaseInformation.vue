@@ -114,7 +114,8 @@ const handleChangeForm = (form) => {
 
 <template>
     <p-pane-layout class="service-account-base-information">
-        <p-heading heading-type="sub"
+        <p-heading class="pt-8 px-4 pb-4"
+                   heading-type="sub"
                    :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.BASE_TITLE')"
         >
             <template #extra>

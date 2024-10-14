@@ -92,7 +92,8 @@ const handleClickSaveButton = async () => {
 
 <template>
     <p-pane-layout class="service-account-auto-sync">
-        <p-heading heading-type="sub"
+        <p-heading class="pt-8 px-4 pb-4"
+                   heading-type="sub"
                    :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.AUTO_SYNC_TITLE')"
         >
             <template #title-right-extra>

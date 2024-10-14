@@ -124,7 +124,7 @@ watch([() => storeState.activeTab, () => storeState.selectedItem], async () => {
                    use-total-count
                    :title="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.TAB_DETAILS_COLLECTION_JOB')"
                    :total-count="storeState.totalCount"
-                   class="title"
+                   class="pt-8 px-4 pb-4"
         />
         <p-toolbox-table :fields="tableState.fields"
                          :searchable="false"

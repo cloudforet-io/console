@@ -124,7 +124,6 @@ export const Slots: Story = {
                 <span class="border border-red">default slot with long long long long long long long long long long long long long long long long title</span>
                 <template #title-right-extra><span class="border border-secondary">title-right-extra slot</span></template>
                 <template #total-count><span class="border border-primary-1">total count slot</span></template>
-                <template #extra><span class="border border-peacock-600 inline-block">extra slot</span></template>
             </p-heading>
         </div>
         <!-- <div> -->

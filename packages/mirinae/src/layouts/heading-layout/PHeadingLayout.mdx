@@ -1,0 +1,42 @@
+{/* PHeadingLayout.mdx */}
+
+import { Canvas, Meta, Controls } from '@storybook/blocks';
+
+import * as PHeadingLayoutStories from './PHeadingLayout.stories';
+
+<Meta of={PHeadingLayoutStories} />
+
+
+# Heading Layout
+
+The `<Heading Layout>` component is designed for use with **the compound component pattern**, allowing developers to easily arrange the **[Heading](?path=/docs/data-display-heading--docs) component** alongside other elements, such as buttons or text.
+
+There are basic layout rules for how these elements should be positioned when used together. However, the `<Heading Layout>` component automatically applies these rules, ensuring consistent alignment and spacing.
+
+
+<br/>
+<br/>
+
+## Basic
+
+The `<Heading Layout>` component has two **slots**:
+1. **heading**: A slot for inserting the `<Heading>` component.
+2. **extra**: A slot for placing elements aligned to the right.
+
+The layout rules are as follows:
+1. The elements inside the **extra** slot are right-aligned with consistent spacing.
+2. The width of the **extra** slot remains fixed, even if the **heading** lengthens (`shrink: 0`).
+3. When the **heading** reaches 360px, the **extra** slot moves below the **heading**.
+
+<Canvas of={PHeadingLayoutStories.Basic} />
+
+<br/>
+<br/>
+
+
+## Playground
+<Canvas of={PHeadingLayoutStories.Playground} />
+<Controls of={PHeadingLayoutStories.Playground} />
+
+<br/>
+<br/>

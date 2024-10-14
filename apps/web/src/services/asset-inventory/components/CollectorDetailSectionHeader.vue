@@ -24,7 +24,8 @@ const handleClickEdit = () => {
 </script>
 
 <template>
-    <p-heading :title="props.title"
+    <p-heading class="pt-8 px-4 pb-4"
+               :title="props.title"
                heading-type="sub"
                :use-total-count="props.totalCount !== undefined"
                :total-count="props.totalCount"

@@ -246,7 +246,8 @@ watch(() => state.selectedStatus, (selectedStatus) => {
 
 <template>
     <div class="collector-history-page">
-        <p-heading :title="$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE')"
+        <p-heading class="mb-6"
+                   :title="$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE')"
                    show-back-button
                    @click-back-button="$router.go(-1)"
         />

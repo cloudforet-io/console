@@ -109,7 +109,8 @@ const alertTitleEditConfirm = async () => {
     <div v-if="!state.loading"
          class="alert-detail-note"
     >
-        <p-heading :title="alertPageState.alertData?.title"
+        <p-heading class="mb-6"
+                   :title="alertPageState.alertData?.title"
                    show-back-button
                    @click-back-button="router.go(-1)"
         >

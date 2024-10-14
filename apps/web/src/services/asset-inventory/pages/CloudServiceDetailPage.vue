@@ -12,7 +12,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { ApiFilterOperator } from '@cloudforet/core-lib/space-connector/type';
 import {
-    PHorizontalLayout, PDynamicLayout, PHeading, PButton, PTextButton, PI, PBadge,
+    PHorizontalLayout, PDynamicLayout, PHeading, PButton, PTextButton, PI, PBadge, PHeadingLayout,
 } from '@cloudforet/mirinae';
 import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
 import type {
@@ -522,42 +522,45 @@ const convertToQueryTag = (filter: Condition[]): ConsoleFilter[] => filter.map((
 
 <template>
     <div>
-        <p-heading v-if="props.isServerPage"
-                   :title="$t('INVENTORY.SERVER.MAIN.TITLE')"
-                   use-total-count
-                   use-selected-count
-                   :total-count="typeOptionState.totalCount"
-                   :selected-count="tableState.selectedItems.length"
-                   @click-back-button="$router.go(-1)"
-        >
-            <template #extra>
-                <cloud-service-metric-button go-to-metric-server-page />
+        <p-heading-layout class="mb-6">
+            <template #heading>
+                <p-heading v-if="props.isServerPage"
+                           :title="$t('INVENTORY.SERVER.MAIN.TITLE')"
+                           use-total-count
+                           use-selected-count
+                           :total-count="typeOptionState.totalCount"
+                           :selected-count="tableState.selectedItems.length"
+                           @click-back-button="$router.go(-1)"
+                />
+                <p-heading v-else-if="props.isSecurityPage"
+                           :title="props.provider ? `[${allReferenceGetters.provider[props.provider].label}] ${props.name}` : $t('INVENTORY.SECURITY.MAIN.TITLE')"
+                           use-total-count
+                           use-selected-count
+                           :total-count="typeOptionState.totalCount"
+                           :selected-count="tableState.selectedItems.length"
+                           @click-back-button="$router.go(-1)"
+                />
+                <p-heading v-else
+                           :title="props.name"
+                           show-back-button
+                           use-total-count
+                           use-selected-count
+                           :total-count="typeOptionState.totalCount"
+                           :selected-count="tableState.selectedItems.length"
+                           @click-back-button="$router.go(-1)"
+                />
             </template>
-        </p-heading>
-        <p-heading v-else-if="props.isSecurityPage"
-                   :title="props.provider ? `[${allReferenceGetters.provider[props.provider].label}] ${props.name}` : $t('INVENTORY.SECURITY.MAIN.TITLE')"
-                   use-total-count
-                   use-selected-count
-                   :total-count="typeOptionState.totalCount"
-                   :selected-count="tableState.selectedItems.length"
-                   @click-back-button="$router.go(-1)"
-        />
-        <p-heading v-else
-                   :title="props.name"
-                   show-back-button
-                   use-total-count
-                   use-selected-count
-                   :total-count="typeOptionState.totalCount"
-                   :selected-count="tableState.selectedItems.length"
-                   @click-back-button="$router.go(-1)"
-        >
             <template #extra>
-                <cloud-service-metric-button :provider="props.provider"
+                <cloud-service-metric-button v-if="props.isServerPage"
+                                             go-to-metric-server-page
+                />
+                <cloud-service-metric-button v-else-if="!props.isSecurityPage"
+                                             :provider="props.provider"
                                              :group="props.group"
                                              :name="props.name"
                 />
             </template>
-        </p-heading>
+        </p-heading-layout>
         <div v-if="!checkIsEmpty(overviewState.period)"
              class="filter-wrapper"
         >

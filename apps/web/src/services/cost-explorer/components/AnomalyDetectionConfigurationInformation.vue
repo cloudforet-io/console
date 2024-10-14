@@ -3,7 +3,7 @@ import { computed, reactive, watch } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import {
-    PHeading, PButton, PDefinitionTable, PLink, PLazyImg,
+    PHeading, PButton, PDefinitionTable, PLink, PLazyImg, PHeadingLayout,
 } from '@cloudforet/mirinae';
 import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
 import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
@@ -51,10 +51,12 @@ watch(() => route.params.configId, (configId) => {
 
 <template>
     <div class="anomaly-detection-configuration-information">
-        <p-heading :title="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.BASE_INFORMATION')"
-                   heading-type="sub"
-                   class="heading"
-        >
+        <p-heading-layout class="pt-8 px-4 pb-4">
+            <template #heading>
+                <p-heading :title="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.BASE_INFORMATION')"
+                           heading-type="sub"
+                />
+            </template>
             <template v-if="state.isDetailPage && !state.isEdit"
                       #extra
             >
@@ -65,7 +67,7 @@ watch(() => route.params.configId, (configId) => {
                     {{ $t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.EDIT') }}
                 </p-button>
             </template>
-        </p-heading>
+        </p-heading-layout>
         <anomaly-detection-configuration-information-form v-if="state.isEdit"
                                                           :is-edit.sync="state.isEdit"
                                                           :is-detail-page="state.isDetailPage"

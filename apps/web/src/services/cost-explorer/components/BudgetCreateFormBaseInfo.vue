@@ -87,7 +87,8 @@ watch([() => state.budgetInfo, () => state.isAllValid], ([budgetInfo, isAllValid
 
 <template>
     <p-pane-layout>
-        <p-heading heading-type="sub"
+        <p-heading class="pt-8 px-4 pb-4"
+                   heading-type="sub"
                    :title="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.BASE_INFORMATION')"
         />
         <div class="p-4">

@@ -1,6 +1,7 @@
 <template>
     <div class="p-dynamic-layout-table">
         <p-heading v-if="layoutName"
+                   class="pt-8 px-4 pb-4"
                    heading-type="sub"
                    use-total-count
                    :total-count="totalCount"
