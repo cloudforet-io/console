@@ -20,7 +20,7 @@ const handleModalType = (data: MultiFactorAuthModalDataType) => {
 </script>
 
 <template>
-    <div>
+    <div class="user-account-multi-factor-auth">
         <user-account-module-container
             class="multi-factor-authentication-wrapper"
         >
@@ -43,15 +43,17 @@ const handleModalType = (data: MultiFactorAuthModalDataType) => {
 </template>
 
 <style lang="postcss" scoped>
-.multi-factor-authentication-wrapper {
-    @apply flex flex-col;
+.user-account-multi-factor-auth {
     margin-top: 1rem;
-    gap: 1.5rem;
-    .headline-wrapper {
-        @apply flex items-center;
-        .form-title {
-            @apply text-display-md;
-            margin-bottom: 0;
+    .multi-factor-authentication-wrapper {
+        @apply flex flex-col;
+        gap: 1.5rem;
+        .headline-wrapper {
+            @apply flex items-center;
+            .form-title {
+                @apply text-display-md;
+                margin-bottom: 0;
+            }
         }
     }
 }

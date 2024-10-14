@@ -98,6 +98,7 @@ const state = reactive({
             }
         }
         .user-account-wrapper {
+            width: 100%;
             flex: 1;
         }
 
