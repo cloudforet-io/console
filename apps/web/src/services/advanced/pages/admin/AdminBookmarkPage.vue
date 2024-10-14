@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { vOnClickOutside } from '@vueuse/components';
 import {
-    computed, reactive,
+    computed, reactive, ref, toRef,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
@@ -8,6 +9,7 @@ import { at, clone } from 'lodash';
 
 import {
     PHeading, PButton, PContextMenu, PHeadingLayout,
+    useContextMenuStyle,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
 
@@ -66,6 +68,14 @@ const state = reactive({
     hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
 });
 
+const targetRef = ref(null);
+const contextMenuRef = ref(null);
+useContextMenuStyle({
+    visibleMenu: toRef(state, 'visibleMenu'),
+    targetRef,
+    menuRef: contextMenuRef,
+});
+
 const handleClickCreateButton = () => {
     state.visibleMenu = !state.visibleMenu;
 };
@@ -88,9 +98,7 @@ const handleClickDeleteButton = () => {
     <div class="admin-bookmark-page">
         <p-heading-layout class="mb-6">
             <template #heading>
-                <p-heading :title="$t('IAM.BOOKMARK.ALL_BOOKMARK')"
-                           class="title"
-                />
+                <p-heading :title="$t('IAM.BOOKMARK.ALL_BOOKMARK')" />
             </template>
             <template v-if="state.hasReadWriteAccess"
                       #extra
@@ -102,13 +110,19 @@ const handleClickDeleteButton = () => {
                 >
                     {{ $t('IAM.BOOKMARK.DELETE') }} {{ storeState.selectedIndices.length || ' ' }}
                 </p-button>
-                <div class="create-button-wrapper">
-                    <p-button icon-left="ic_plus"
+                <div v-on-click-outside="handleClickCreateButton"
+                     class="create-button-wrapper"
+                >
+                    <p-button ref="targetRef"
+                              icon-left="ic_plus"
+                              class="create-button"
                               @click="handleClickCreateButton"
                     >
                         {{ $t('IAM.BOOKMARK.ADD_GLOBAL_BOOKMARK') }}
                     </p-button>
                     <p-context-menu v-show="state.visibleMenu"
+                                    ref="contextMenuRef"
+                                    :visible-menu.sync="state.visibleMenu"
                                     class="create-context-menu"
                                     reset-selected-on-unmounted
                                     :selected="[]"
@@ -124,17 +138,12 @@ const handleClickDeleteButton = () => {
 
 <style lang="postcss" scoped>
 .admin-bookmark-page {
-    .title {
-        .create-button-wrapper {
+    .create-button-wrapper {
+        .create-button {
             @apply relative;
-            .create-context-menu {
-                @apply absolute;
-                min-width: unset;
-                width: 9rem;
-                top: 2rem;
-                right: 0;
-                z-index: 10;
-            }
+        }
+        .create-context-menu {
+            z-index: 1000;
         }
     }
 }
