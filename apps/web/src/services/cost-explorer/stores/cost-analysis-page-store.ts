@@ -17,7 +17,9 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
+import {
+    DEFAULT_UNIFIED_COST_CURRENCY, GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP, UNIFIED_COST_KEY,
+} from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { convertRelativePeriodToPeriod } from '@/services/cost-explorer/helpers/cost-explorer-period-helper';
 import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
 import type {
@@ -65,10 +67,12 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
         costQueryList: computed(() => costQuerySetState.costQuerySetList),
         selectedQuerySet: computed(() => costQuerySetGetters.selectedQuerySet),
         selectedDataSourceId: computed(() => costQuerySetState.selectedDataSourceId),
+        isUnifiedCost: computed(() => getters.selectedDataSourceId === UNIFIED_COST_KEY),
         managedCostQuerySetList: computed(() => costQuerySetGetters.managedCostQuerySets),
         currency: computed<Currency>(() => {
             if (costQuerySetState.selectedDataSourceId) {
                 const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId ?? ''];
+                if (costQuerySetState.selectedDataSourceId === UNIFIED_COST_KEY) return DEFAULT_UNIFIED_COST_CURRENCY;
                 return targetDataSource?.data?.plugin_info?.metadata?.currency ?? 'USD';
             }
             return 'USD';
