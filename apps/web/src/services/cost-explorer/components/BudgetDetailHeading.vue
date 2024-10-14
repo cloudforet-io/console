@@ -4,7 +4,9 @@ import { useRoute, useRouter } from 'vue-router/composables';
 
 import { clone } from 'lodash';
 
-import { PDivider, PHeading, PIconButton } from '@cloudforet/mirinae';
+import {
+    PDivider, PHeading, PIconButton, PHeadingLayout,
+} from '@cloudforet/mirinae';
 
 import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
@@ -85,22 +87,24 @@ const handleClickBackButton = () => {
 
 <template>
     <div class="budget-detail-heading">
-        <p-heading :show-back-button="!props.loading"
-                   :title="state.budgetData?.name"
-                   class="mb-2"
-                   @click-back-button="handleClickBackButton"
-        >
-            <template v-if="!props.loading"
-                      #title-right-extra
-            >
-                <div v-if="state.hasReadWriteAccess && (storeState.isAdminMode || (state.isProjectTarget && storeState.isWorkspaceOwner))"
-                     class="title-button-group"
+        <p-heading-layout class="mb-6">
+            <template #heading>
+                <p-heading :show-back-button="!props.loading"
+                           :title="state.budgetData?.name"
+                           @click-back-button="handleClickBackButton"
                 >
-                    <p-icon-button name="ic_delete"
-                                   @click="handleClickDelete"
-                    />
-                </div>
-                <div class="title-right-extra">
+                    <template v-if="!props.loading"
+                              #title-right-extra
+                    >
+                        <p-icon-button v-if="state.hasReadWriteAccess && (storeState.isAdminMode || (state.isProjectTarget && storeState.isWorkspaceOwner))"
+                                       name="ic_delete"
+                                       @click="handleClickDelete"
+                        />
+                    </template>
+                </p-heading>
+            </template>
+            <template #extra>
+                <div class="right-info-box">
                     <div class="right-item">
                         <span class="label">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.DATA_SOURCE') }}:</span>
                         <span>{{ state.dataSourceName }}</span>
@@ -114,7 +118,7 @@ const handleClickBackButton = () => {
                     </div>
                 </div>
             </template>
-        </p-heading>
+        </p-heading-layout>
         <budget-detail-delete-modal v-if="!props.loading"
                                     :visible="state.deleteModalVisible"
                                     @update="handleUpdateDelete"
@@ -125,22 +129,16 @@ const handleClickBackButton = () => {
 
 <style lang="postcss" scoped>
 .budget-detail-heading {
-    .title-button-group {
-        display: inline-flex;
-    }
-
-    .title-right-extra {
-        @apply inline-flex items-center justify-end;
-        flex-grow: 1;
-        float: right;
-        min-height: 2.5rem;
+    .right-info-box {
+        @apply flex items-center justify-end;
+        height: 2rem;
         .divider {
             height: 0.875rem;
             margin: 0 0.5rem;
         }
 
         .right-item {
-            @apply text-gray-800;
+            @apply inline-flex items-center text-gray-800;
             font-size: 0.875rem;
             .label {
                 font-weight: 700;

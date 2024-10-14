@@ -19,7 +19,8 @@ onBeforeMount(async () => {
 
 <template>
     <div class="notice-update-page">
-        <p-heading :title="$t('INFO.NOTICE.FORM.EDIT_TITLE')"
+        <p-heading class="mb-6"
+                   :title="$t('INFO.NOTICE.FORM.EDIT_TITLE')"
                    show-back-button
                    @click-back-button="$router.go(-1)"
         />

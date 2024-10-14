@@ -163,7 +163,8 @@ watch(() => state.id, () => {
 
 <template>
     <p-pane-layout class="cloud-service-history-detail-note">
-        <p-heading heading-type="sub"
+        <p-heading class="pt-8 px-4 pb-4"
+                   heading-type="sub"
                    use-total-count
                    :total-count="state.totalCount"
                    :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE')"

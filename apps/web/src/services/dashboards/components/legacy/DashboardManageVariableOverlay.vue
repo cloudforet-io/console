@@ -178,12 +178,14 @@ const {
     <overlay-page-layout :visible="visible"
                          class="dashboard-manage-variable-overlay"
     >
-        <p-heading :title="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.TITLE')"
+        <p-heading class="mb-6"
+                   :title="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.TITLE')"
                    show-back-button
                    @click-back-button="handleClickGoBackButton"
         />
         <div class="content-wrapper">
-            <p-heading heading-type="sub"
+            <p-heading class="pt-8 px-4 pb-4"
+                       heading-type="sub"
                        :use-total-count="contentType === 'LIST'"
                        :total-count="variableSchema?.order?.length || 0"
                        :title="titleSet[contentType]"

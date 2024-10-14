@@ -42,7 +42,9 @@ const listProjectAlertConfig = async () => {
 
 <template>
     <div class="alert-dashboard-page">
-        <p-heading :title="$t('MONITORING.ALERT.DASHBOARD.DASHBOARD')" />
+        <p-heading class="mb-6"
+                   :title="$t('MONITORING.ALERT.DASHBOARD.DASHBOARD')"
+        />
         <div class="widget-wrapper">
             <alert-dashboard-alert-state-widget
                 :activated-projects="state.activatedProjects"

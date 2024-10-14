@@ -235,7 +235,8 @@ const onChange = async (options: ToolboxOptions = {}) => {
 
 <template>
     <div class="escalation-policy-page">
-        <p-heading :title="state.pageTitle"
+        <p-heading class="mb-6"
+                   :title="state.pageTitle"
                    use-total-count
                    use-selected-count
                    :total-count="tableState.totalCount"

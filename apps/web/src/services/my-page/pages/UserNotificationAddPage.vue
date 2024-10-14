@@ -46,6 +46,7 @@ const state = reactive({
 
 <style lang="postcss" scoped>
 .page-title {
+    @apply mb-6;
     text-transform: capitalize;
 }
 </style>

@@ -5,7 +5,7 @@ import { useRoute } from 'vue-router/composables';
 import { clone } from 'lodash';
 
 import {
-    PHeading, PDivider, PButton,
+    PHeading, PDivider, PButton, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
 import { SpaceRouter } from '@/router';
@@ -46,7 +46,10 @@ const handleCreateBudgetSelect = () => {
 
 <template>
     <div class="budget-page">
-        <p-heading :title="$t('BILLING.COST_MANAGEMENT.MAIN.BUDGET')">
+        <p-heading-layout class="mb-6">
+            <template #heading>
+                <p-heading :title="$t('BILLING.COST_MANAGEMENT.MAIN.BUDGET')" />
+            </template>
             <template v-if="state.hasReadWriteAccess && storeState.isWorkspaceOwner"
                       #extra
             >
@@ -57,7 +60,7 @@ const handleCreateBudgetSelect = () => {
                     {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE') }}
                 </p-button>
             </template>
-        </p-heading>
+        </p-heading-layout>
         <p-divider />
         <budget-main-list />
     </div>

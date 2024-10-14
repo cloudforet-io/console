@@ -9,7 +9,8 @@ import AnomalyDetectionConfigurationRecipients
 
 <template>
     <div class="anomaly-detection-configuration-create-page">
-        <p-heading :title="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.CREATE_TITLE')"
+        <p-heading class="mb-6"
+                   :title="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.CREATE_TITLE')"
                    show-back-button
                    @click-back-button="$router.go(-1)"
         />

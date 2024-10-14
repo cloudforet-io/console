@@ -244,7 +244,8 @@ watch(() => state.trustedAccountId, async (ta) => {
 
 <template>
     <p-pane-layout class="service-account-attached-general-accounts">
-        <p-heading heading-type="sub"
+        <p-heading class="pt-8 px-4 pb-4"
+                   heading-type="sub"
                    :title="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ATTACHED_GENERAL_ACCOUNTS_TITLE')"
                    use-total-count
                    :total-count="state.totalCount"

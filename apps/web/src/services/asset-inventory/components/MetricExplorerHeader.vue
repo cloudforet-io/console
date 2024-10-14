@@ -8,7 +8,7 @@ import { clone } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    useContextMenuController, PHeading, PIconButton, PButton, PContextMenu, PI,
+    useContextMenuController, PHeading, PIconButton, PButton, PContextMenu, PI, PHeadingLayout,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
@@ -46,7 +46,6 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 
 const contextMenuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement | null>(null);
-const rightPartRef = ref<HTMLElement|null>(null);
 
 const { getProperRouteLocation } = useProperRouteLocation();
 
@@ -133,7 +132,7 @@ const {
     menu: state.saveDropdownMenuItems,
     position: 'right',
 });
-onClickOutside(rightPartRef, hideContextMenu);
+onClickOutside(targetRef, hideContextMenu);
 
 /* Util */
 const openNameFormModal = (modalType: string) => {
@@ -279,56 +278,52 @@ const handleOpenEditQuery = () => {
 </script>
 
 <template>
-    <p-heading :title="state.pageTitle">
-        <template v-if="!metricExplorerPageState.metricLoading"
-                  #title-left-extra
-        >
-            <p-i v-if="state.currentMetricExampleId"
-                 name="ic_example-filled"
-                 width="1.5rem"
-                 height="1.5rem"
-                 :color="gray[700]"
-            />
-            <p-i v-else
-                 :name="state.isManagedMetric ? 'ic_main-filled' : 'ic_sub'"
-                 width="1rem"
-                 height="1rem"
-                 :color="gray[500]"
-            />
-        </template>
-        <template v-if="!metricExplorerPageState.metricLoading"
-                  #title-right-extra
-        >
-            <div v-if="!state.isManagedMetric"
-                 class="title-right-extra icon-wrapper"
-            >
-                <p-icon-button v-if="state.hasReadWriteAccess"
-                               name="ic_edit-text"
-                               size="md"
-                               @click.stop="handleClickEditName"
-                />
-                <p-icon-button v-if="state.hasReadWriteAccess"
-                               name="ic_delete"
-                               size="md"
-                               style-type="negative-transparent"
-                               @click.stop="handleClickDeleteMetric"
-                />
-            </div>
-            <delete-modal :header-title="state.deleteModalTitle"
-                          :visible.sync="state.metricDeleteModalVisible"
-                          :contents="$t('INVENTORY.METRIC_EXPLORER.DELETE_MODAL_DESC')"
-                          @confirm="handleDeleteMetric"
-            />
-        </template>
-        <template v-if="!metricExplorerPageState.metricLoading"
-                  #extra
-        >
-            <div ref="rightPartRef"
-                 class="right-part"
+    <fragment>
+        <p-heading-layout class="mb-6">
+            <template #heading>
+                <p-heading :title="state.pageTitle">
+                    <template v-if="!metricExplorerPageState.metricLoading"
+                              #title-left-extra
+                    >
+                        <p-i v-if="state.currentMetricExampleId"
+                             name="ic_example-filled"
+                             width="1.5rem"
+                             height="1.5rem"
+                             :color="gray[700]"
+                        />
+                        <p-i v-else
+                             :name="state.isManagedMetric ? 'ic_main-filled' : 'ic_sub'"
+                             width="1rem"
+                             height="1rem"
+                             :color="gray[500]"
+                        />
+                    </template>
+                    <template v-if="!metricExplorerPageState.metricLoading"
+                              #title-right-extra
+                    >
+                        <div v-if="!state.isManagedMetric"
+                             class="title-right-extra icon-wrapper"
+                        >
+                            <p-icon-button v-if="state.hasReadWriteAccess"
+                                           name="ic_edit-text"
+                                           size="md"
+                                           @click.stop="handleClickEditName"
+                            />
+                            <p-icon-button v-if="state.hasReadWriteAccess"
+                                           name="ic_delete"
+                                           size="md"
+                                           style-type="negative-transparent"
+                                           @click.stop="handleClickDeleteMetric"
+                            />
+                        </div>
+                    </template>
+                </p-heading>
+            </template>
+            <template v-if="!metricExplorerPageState.metricLoading"
+                      #extra
             >
                 <!-- metric case -->
-                <p-button class="mr-2"
-                          style-type="tertiary"
+                <p-button style-type="tertiary"
                           :icon-left="state.editQueryButtonIcon"
                           @click="handleOpenEditQuery"
                 >
@@ -337,7 +332,6 @@ const handleOpenEditQuery = () => {
                 <template v-if="state.hasReadWriteAccess">
                     <template v-if="!state.currentMetricExampleId">
                         <p-button v-if="state.isDuplicateEnabled"
-                                  class="mr-2"
                                   style-type="tertiary"
                                   icon-left="ic_clone"
                                   :loading="state.loadingDuplicate"
@@ -353,7 +347,9 @@ const handleOpenEditQuery = () => {
                         </p-button>
                     </template>
                     <!-- example case -->
-                    <template v-else>
+                    <span v-else
+                          class="save-button-wrapper"
+                    >
                         <p-button class="save-button"
                                   style-type="tertiary"
                                   icon-left="ic_disk-filled"
@@ -372,19 +368,24 @@ const handleOpenEditQuery = () => {
                         />
                         <p-context-menu v-show="visibleContextMenu"
                                         ref="contextMenuRef"
-                                        :menu="state.saveDropdownMenuItems"
                                         :visible-menu="visibleContextMenu"
+                                        :menu="state.saveDropdownMenuItems"
                                         @select="handleSelectSaveAsExample"
                         />
-                    </template>
+                    </span>
                 </template>
-            </div>
-            <metric-explorer-name-form-modal :visible.sync="state.metricNameFormModalVisible"
-                                             :type="state.selectedNameFormModalType"
-            />
-            <metric-explorer-query-form-sidebar />
-        </template>
-    </p-heading>
+            </template>
+        </p-heading-layout>
+        <delete-modal :header-title="state.deleteModalTitle"
+                      :visible.sync="state.metricDeleteModalVisible"
+                      :contents="$t('INVENTORY.METRIC_EXPLORER.DELETE_MODAL_DESC')"
+                      @confirm="handleDeleteMetric"
+        />
+        <metric-explorer-name-form-modal :visible.sync="state.metricNameFormModalVisible"
+                                         :type="state.selectedNameFormModalType"
+        />
+        <metric-explorer-query-form-sidebar />
+    </fragment>
 </template>
 
 <style lang="postcss" scoped>
@@ -392,11 +393,11 @@ const handleOpenEditQuery = () => {
     @apply flex-shrink-0 inline-flex items-center;
     margin-bottom: -0.25rem;
 }
-.right-part {
+.save-button-wrapper {
     @apply relative;
     display: flex;
-    align-items: flex-start;
-
+    align-items: center;
+    gap: 0;
     .save-button {
         border-top-right-radius: 0;
         border-bottom-right-radius: 0;
@@ -406,8 +407,7 @@ const handleOpenEditQuery = () => {
         border-bottom-left-radius: 0;
         border-left: 0;
     }
-
-    .p-context-menu {
+    > .p-context-menu {
         margin-top: -1px;
         min-width: 10rem !important;
     }

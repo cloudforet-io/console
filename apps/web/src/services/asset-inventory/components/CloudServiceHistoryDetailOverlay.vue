@@ -1,12 +1,15 @@
 <template>
     <div class="cloud-service-history-detail-overlay">
         <p-pane-layout class="page-wrapper">
-            <p-heading :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.HISTORY_DETAIL')"
-                       show-back-button
-                       @click-back-button="$router.go(-1)"
-            >
-                <template #title-right-extra>
-                    <div class="title-right-extra">
+            <p-heading-layout class="px-6 pt-6">
+                <template #heading>
+                    <p-heading :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.HISTORY_DETAIL')"
+                               show-back-button
+                               @click-back-button="$router.go(-1)"
+                    />
+                </template>
+                <template #extra>
+                    <div class="flex items-center text-sm">
                         <template v-if="cloudServiceItem.name">
                             <span class="label-text">Name: </span>
                             {{ cloudServiceItem.name }}
@@ -22,7 +25,7 @@
                         </p-copy-button>
                     </div>
                 </template>
-            </p-heading>
+            </p-heading-layout>
             <div class="content-wrapper">
                 <div class="left-part">
                     <div class="title-wrapper">
@@ -104,7 +107,7 @@ import type { PropType } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PPaneLayout, PHeading, PTab, PCopyButton, PBadge, PDivider, PSpinner, PTooltip,
+    PPaneLayout, PHeading, PTab, PCopyButton, PBadge, PDivider, PSpinner, PTooltip, PHeadingLayout,
 } from '@cloudforet/mirinae';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 import { iso8601Formatter } from '@cloudforet/utils';
@@ -156,6 +159,7 @@ export default defineComponent<Props>({
         PDivider,
         PSpinner,
         PTooltip,
+        PHeadingLayout,
     },
     props: {
         loading: {
@@ -271,39 +275,25 @@ export default defineComponent<Props>({
         flex-grow: 1;
         max-width: 1920px;
 
-        /* custom design-system component - p-heading */
-        :deep(.p-heading) {
-            min-height: 3.5rem;
-            height: auto;
-            padding: 1.5rem 1.5rem 0 1.5rem;
-            margin: 0;
-            .title-right-extra {
-                display: flex;
-                flex-flow: wrap;
-                align-items: center;
-                float: right;
-                font-size: 0.875rem;
-                margin-left: auto;
-                .p-divider {
-                    margin: 0 0.75rem;
-                    height: 0.875rem;
-                }
-                .label-text {
-                    @apply text-gray-500;
-                    padding-right: 0.25rem;
-                }
-                .resource-id {
-                    @apply flex items-center;
-                    .copy-text {
-                        max-width: 16.25rem;
-                        .has-tooltip {
-                            @apply block truncate;
-                            max-width: 16.25rem;
-                        }
-                    }
+        .p-divider {
+            margin: 0 0.75rem;
+            height: 0.875rem;
+        }
+        .label-text {
+            @apply text-gray-500;
+            padding-right: 0.25rem;
+        }
+        .resource-id {
+            @apply flex items-center;
+            .copy-text {
+                max-width: 16.25rem;
+                .has-tooltip {
+                    @apply block truncate;
+                    max-width: 16.25rem;
                 }
             }
         }
+
         .content-wrapper {
             @apply flex;
             position: relative;

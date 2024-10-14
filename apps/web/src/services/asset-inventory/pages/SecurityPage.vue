@@ -103,7 +103,8 @@ onUnmounted(() => {
                                :name="state.pageParams?.name"
     />
     <div v-else>
-        <p-heading :title="$t('INVENTORY.SECURITY.MAIN.TITLE')"
+        <p-heading class="mb-6"
+                   :title="$t('INVENTORY.SECURITY.MAIN.TITLE')"
                    use-total-count
                    :total-count="0"
         />

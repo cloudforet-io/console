@@ -8,7 +8,7 @@ import dayjs from 'dayjs';
 import { clone } from 'lodash';
 
 import {
-    PButton, PHeading, PI, PLink, PStatus, PToolboxTable, PTooltip,
+    PButton, PHeading, PI, PLink, PStatus, PToolboxTable, PTooltip, PHeadingLayout,
 } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import { numberFormatter } from '@cloudforet/utils';
@@ -187,31 +187,32 @@ onMounted(async () => {
 
 <template>
     <section class="workspace-group-tab-workspace">
-        <p-heading class="workspace-group-tab-workspace-header"
-                   :title="$t('IAM.WORKSPACE_GROUP.TAB.WORKSPACE')"
-                   use-total-count
-                   :total-count="workspaceTabState.workspacesInSelectedGroupTotalCount"
-                   heading-type="sub"
-        >
+        <p-heading-layout class="pt-8 px-4 pb-4">
+            <template #heading>
+                <p-heading class="workspace-group-tab-workspace-header"
+                           :title="$t('IAM.WORKSPACE_GROUP.TAB.WORKSPACE')"
+                           use-total-count
+                           :total-count="workspaceTabState.workspacesInSelectedGroupTotalCount"
+                           heading-type="sub"
+                />
+            </template>
             <template v-if="state.hasReadWriteAccess"
                       #extra
             >
-                <div class="workspace-group-tab-workspace-button-wrapper">
-                    <p-button style-type="negative-primary"
-                              :disabled="!workspaceTabState.selectedWorkspaceIndices.length"
-                              @click="handleSelectedWorkspacesRemoveButtonClick"
-                    >
-                        {{ $t('IAM.WORKSPACE_GROUP.TAB.REMOVE') }}
-                    </p-button>
-                    <p-button style-type="secondary"
-                              icon-left="ic_plus_bold"
-                              @click="handleAddWorkspaceButtonClick"
-                    >
-                        {{ $t('IAM.WORKSPACE_GROUP.TAB.ADD_WORKSPACE') }}
-                    </p-button>
-                </div>
+                <p-button style-type="negative-primary"
+                          :disabled="!workspaceTabState.selectedWorkspaceIndices.length"
+                          @click="handleSelectedWorkspacesRemoveButtonClick"
+                >
+                    {{ $t('IAM.WORKSPACE_GROUP.TAB.REMOVE') }}
+                </p-button>
+                <p-button style-type="secondary"
+                          icon-left="ic_plus_bold"
+                          @click="handleAddWorkspaceButtonClick"
+                >
+                    {{ $t('IAM.WORKSPACE_GROUP.TAB.ADD_WORKSPACE') }}
+                </p-button>
             </template>
-        </p-heading>
+        </p-heading-layout>
         <p-toolbox-table class="workspace-group-tab-workspace-table"
                          :loading="workspaceTabState.loading"
                          :fields="tableState.fields"
@@ -322,11 +323,6 @@ onMounted(async () => {
 
 <style lang="postcss" scoped>
 .workspace-group-tab-workspace {
-    .workspace-group-tab-workspace-button-wrapper {
-        display: flex;
-        gap: 1rem;
-    }
-
     .workspace-group-tab-workspace-table {
         border: none;
 

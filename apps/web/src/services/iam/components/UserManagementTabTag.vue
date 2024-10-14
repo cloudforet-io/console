@@ -2,7 +2,9 @@
 import { computed, reactive, watch } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { PButton, PDataTable, PHeading } from '@cloudforet/mirinae';
+import {
+    PButton, PDataTable, PHeading, PHeadingLayout,
+} from '@cloudforet/mirinae';
 
 
 import type { Tags, TimeStamp } from '@/schema/_common/model';
@@ -99,11 +101,14 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
 
 <template>
     <div class="user-management-tab-tag">
-        <p-heading heading-type="sub"
-                   :use-total-count="true"
-                   :total-count="state.items.length"
-                   :title="$t('IAM.USER.MAIN.TAG')"
-        >
+        <p-heading-layout class="pt-8 px-4 pb-6">
+            <template #heading>
+                <p-heading heading-type="sub"
+                           :use-total-count="true"
+                           :total-count="state.items.length"
+                           :title="$t('IAM.USER.MAIN.TAG')"
+                />
+            </template>
             <template v-if="props.hasReadWriteAccess && userPageState.isAdminMode"
                       #extra
             >
@@ -114,7 +119,7 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
                     {{ $t('COMMON.TAGS.EDIT') }}
                 </p-button>
             </template>
-        </p-heading>
+        </p-heading-layout>
         <p-data-table :fields="tableState.fields"
                       :items="state.items"
                       col-copy

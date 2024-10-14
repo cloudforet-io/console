@@ -317,7 +317,6 @@ onUnmounted(() => {
 
 .page-title {
     @apply capitalize;
-    margin-bottom: 0;
 }
 
 /* custom design-system component - p-empty */

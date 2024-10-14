@@ -7,7 +7,7 @@ import { useRoute } from 'vue-router/composables';
 import { clone, cloneDeep } from 'lodash';
 
 import {
-    PHorizontalLayout, PHeading, PButton, PTab,
+    PHorizontalLayout, PHeading, PButton, PTab, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
@@ -80,11 +80,14 @@ onUnmounted(() => {
 
 <template>
     <section class="app-page">
-        <p-heading :title="$t('IAM.APP.TITLE')"
-                   use-selected-count
-                   use-total-count
-                   :total-count="appPageState.totalCount"
-        >
+        <p-heading-layout class="mb-6">
+            <template #heading>
+                <p-heading :title="$t('IAM.APP.TITLE')"
+                           use-selected-count
+                           use-total-count
+                           :total-count="appPageState.totalCount"
+                />
+            </template>
             <template #extra>
                 <p-button v-if="state.hasReadWriteAccess && storeState.roleType !== ROLE_TYPE.WORKSPACE_MEMBER"
                           style-type="primary"
@@ -94,7 +97,7 @@ onUnmounted(() => {
                     {{ $t('IAM.APP.CREATE') }}
                 </p-button>
             </template>
-        </p-heading>
+        </p-heading-layout>
         <p-horizontal-layout class="role-toolbox-layout">
             <template #container="{ height }">
                 <app-management-table :table-height="height"

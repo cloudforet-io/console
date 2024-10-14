@@ -163,7 +163,8 @@ watch(() => state.selectedRole.role_id, async (roleId) => {
         <div v-for="(item, idx) in detailMenuItems"
              :key="`detail-menu-item-${idx}`"
         >
-            <p-heading heading-type="sub"
+            <p-heading class="pt-8 px-4 pb-4"
+                       heading-type="sub"
                        :title="item.label"
             />
             <div class="detail-menu-content">

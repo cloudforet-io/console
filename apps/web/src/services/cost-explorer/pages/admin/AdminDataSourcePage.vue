@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PHeading, PHorizontalLayout, PLink, PI,
+    PHeading, PHorizontalLayout, PLink, PI, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
 import { store } from '@/store';
@@ -35,15 +35,17 @@ onUnmounted(() => {
 
 <template>
     <div class="admin-data-source-page">
-        <p-heading :title="$t('MENU.COST_EXPLORER_DATA_SOURCES')"
-                   use-total-count
-                   use-selected-count
-                   :total-count="storeState.totalCount"
-                   :selected-count="storeState.selectedIndices ? 1 : undefined"
-                   class="title"
-        >
+        <p-heading-layout class="mb-6">
+            <template #heading>
+                <p-heading :title="$t('MENU.COST_EXPLORER_DATA_SOURCES')"
+                           use-total-count
+                           use-selected-count
+                           :total-count="storeState.totalCount"
+                           :selected-count="storeState.selectedIndices ? 1 : undefined"
+                />
+            </template>
             <template #extra>
-                <span class="extra">
+                <span class="right-info-link">
                     <p-i name="ic_info-circle"
                          height="0.75rem"
                          width="0.75rem"
@@ -61,7 +63,7 @@ onUnmounted(() => {
                     />
                 </span>
             </template>
-        </p-heading>
+        </p-heading-layout>
         <div class="contents">
             <p-horizontal-layout class="data-source-table">
                 <template #container="{ height }">
@@ -80,12 +82,10 @@ onUnmounted(() => {
 
 <style lang="postcss" scoped>
 .admin-data-source-page {
-    .title {
-        @apply items-center;
-        .extra {
-            @apply flex items-center;
-            gap: 0.125rem;
-        }
+    .right-info-link {
+        @apply flex items-center;
+        gap: 0.125rem;
+        height: 2rem;
     }
 
     /* custom design-system component - p-link */

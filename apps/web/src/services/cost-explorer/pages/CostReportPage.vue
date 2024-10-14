@@ -82,7 +82,9 @@ onMounted(async () => {
 
 <template>
     <div class="cost-report-page">
-        <p-heading :title="$t('BILLING.COST_MANAGEMENT.COST_REPORT.COST_REPORT')" />
+        <p-heading class="mb-6"
+                   :title="$t('BILLING.COST_MANAGEMENT.COST_REPORT.COST_REPORT')"
+        />
         <p-tab :tabs="state.tabs"
                :active-tab.sync="state.activeTab"
         >

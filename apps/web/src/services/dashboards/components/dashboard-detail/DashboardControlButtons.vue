@@ -52,7 +52,8 @@ const handleClickWidgetReorder = () => {
 
 <style lang="postcss">
 .dashboard-control-buttons {
-    @apply flex justify-end;
+    @apply flex justify-end items-center;
     gap: 0.5rem;
+    height: 2rem;
 }
 </style>

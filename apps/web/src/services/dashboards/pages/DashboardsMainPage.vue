@@ -12,7 +12,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PHeading, PDivider, PButton, PToolbox, PEmpty, PDataLoader,
+    PHeading, PDivider, PButton, PToolbox, PEmpty, PDataLoader, PHeadingLayout,
 } from '@cloudforet/mirinae';
 import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
 import type { QueryTag } from '@cloudforet/mirinae/types/inputs/search/query-search-tags/type';
@@ -295,13 +295,15 @@ onUnmounted(() => {
 
 <template>
     <div class="dashboards-main-page">
-        <p-heading :title="$t('DASHBOARDS.ALL_DASHBOARDS.DASHBOARDS_TITLE')">
+        <p-heading-layout class="mb-6">
+            <template #heading>
+                <p-heading :title="$t('DASHBOARDS.ALL_DASHBOARDS.DASHBOARDS_TITLE')" />
+            </template>
             <template v-if="state.hasReadWriteAccess"
                       #extra
             >
                 <p-button icon-left="ic_plus_bold"
                           style-type="tertiary"
-                          class="mr-4"
                           @click="handleCreateFolder"
                 >
                     {{ $t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.NEW_FOLDER') }}
@@ -312,7 +314,7 @@ onUnmounted(() => {
                     {{ $t('DASHBOARDS.ALL_DASHBOARDS.NEW_DASHBOARD') }}
                 </p-button>
             </template>
-        </p-heading>
+        </p-heading-layout>
         <p-divider class="dashboard-divider" />
         <p-toolbox filters-visible
                    search-type="query"

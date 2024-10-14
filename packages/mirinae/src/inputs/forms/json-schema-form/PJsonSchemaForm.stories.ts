@@ -108,7 +108,7 @@ export const Basic: Story = {
         template: `
             <div class="flex gap-4">
             <div class="bg-blue-100 p-4">
-                <p-heading>Json Schema Form</p-heading>
+                <p-heading class="mb-6">Json Schema Form</p-heading>
                 <p-json-schema-form :schema="schema"
                                     :form-data.sync="formData"
                                     :language="$i18n.locale"
@@ -116,13 +116,13 @@ export const Basic: Story = {
                 />
             </div>
             <div class="bg-coral-100 p-4">
-                <p-heading>Schema</p-heading>
+                <p-heading class="mb-6">Schema</p-heading>
                 <p-text-editor :code="JSON.stringify(schema, null, 2)"
                                mode="readOnly"
                                folded
                                style="height: auto"
                 />
-                <p-heading>Form Data</p-heading>
+                <p-heading class="mb-6">Form Data</p-heading>
                 <p-text-editor :code="JSON.stringify(formData, null, 2)"
                                mode="readOnly"
                                style="height: auto"
@@ -244,12 +244,12 @@ export const ValidationMode: Story = {
                 <span class="font-lg font-bold mb-2">Validation Mode: </span>
                 <p-select-dropdown class="mb-4"
                                    :selected="validationMode" :menu="validationModes" />
-                <p-heading>Schema</p-heading>
+                <p-heading class="mb-6">Schema</p-heading>
                 <p-text-editor :code="JSON.stringify(schema, null, 2)"
                                mode="readOnly"
                                folded
                 />
-                <p-heading>Form Data</p-heading>
+                <p-heading class="mb-6">Form Data</p-heading>
                 <p-text-editor :code="JSON.stringify(formData, null, 2)"
                                mode="readOnly"
                                style="height: auto"
@@ -279,20 +279,20 @@ export const JsonInputMode: Story = {
         template: `
             <div class="grid gap-4 grid-cols-12">
             <div class="col-span-6 bg-blue-100 p-4">
-                <p-heading>Json Schema Form</p-heading>
+                <p-heading class="mb-6">Json Schema Form</p-heading>
                 <p-json-schema-form :schema="schema"
                                     :form-data.sync="formData"
                                     :language="$i18n.locale"
                 />
             </div>
             <div class="col-span-6 bg-coral-100 p-4">
-                <p-heading>Schema</p-heading>
+                <p-heading class="mb-6">Schema</p-heading>
                 <p-text-editor :code="JSON.stringify(schema, null, 2)"
                                mode="readOnly"
                                folded
                                style="height: auto"
                 />
-                <p-heading>Form Data</p-heading>
+                <p-heading class="mt-4 mb-6">Form Data</p-heading>
                 <p-text-editor :code="JSON.stringify(formData, null, 2)"
                                mode="readOnly"
                                style="height: auto"
@@ -320,7 +320,7 @@ export const UniformWidth: Story = {
         template: `
             <div class="flex gap-4">
             <div class="bg-blue-100 p-4">
-                <p-heading>Json Schema Form</p-heading>
+                <p-heading class="mb-6">Json Schema Form</p-heading>
                 <p-json-schema-form :schema="schema"
                                     :form-data.sync="formData"
                                     :language="$i18n.locale"

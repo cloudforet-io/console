@@ -8,7 +8,9 @@ import NotificationChannelList from '@/services/my-page/components/NotificationC
 
 <template>
     <section class="notification-wrapper">
-        <p-heading :title="$t('MY_PAGE.NOTIFICATION.NOTIFICATION')" />
+        <p-heading class="mb-6"
+                   :title="$t('MY_PAGE.NOTIFICATION.NOTIFICATION')"
+        />
         <p-pane-layout>
             <notification-channel-list />
         </p-pane-layout>

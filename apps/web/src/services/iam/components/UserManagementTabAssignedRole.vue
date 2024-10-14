@@ -102,7 +102,8 @@ watch(() => props.userId, () => {
 
 <template>
     <div>
-        <p-heading heading-type="sub"
+        <p-heading class="mt-8 mx-4 mb-6"
+                   heading-type="sub"
                    :title="state.title"
         />
         <p-data-table
