@@ -10,10 +10,13 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { CostQuerySetCreateParameters } from '@/schema/cost-analysis/cost-query-set/api-verbs/create';
 import type { CostQuerySetUpdateParameters } from '@/schema/cost-analysis/cost-query-set/api-verbs/update';
 import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import type { Currency } from '@/store/modules/display/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -36,7 +39,7 @@ interface GroupByItem {
 const getRefinedFilters = (consoleFilters?: ConsoleFilter[]): Record<string, string[]> => {
     if (!consoleFilters || isEmpty(consoleFilters)) return {};
     const result: Record<string, string[]> = {};
-    consoleFilters.forEach((d) => {
+    (consoleFilters ?? []).forEach((d) => {
         result[d.k as string] = d.v as string[];
     });
     return result;
@@ -48,6 +51,8 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
     const costQuerySetGetters = costQuerySetStore.getters;
     const costQuerySetState = costQuerySetStore.state;
     const appContextStore = useAppContextStore();
+    const userWorkspaceStore = useUserWorkspaceStore();
+    const workspaceStoreGetters = userWorkspaceStore.getters;
 
     const _state = reactive({
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -61,8 +66,12 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
         filters: {} as Record<string, string[]>,
         enabledFiltersProperties: undefined as string[]|undefined,
         displayDataType: 'cost' as DisplayDataType,
+        isAllWorkspaceSelected: false,
+        workspaceScope: undefined as string|undefined,
     });
     const getters = reactive({
+        workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
+        defaultWorkspaceScope: computed<string|undefined>(() => (workspaceStoreGetters.workspaceList[0]?.workspace_id)),
         selectedQueryId: computed(() => costQuerySetState.selectedQuerySetId),
         costQueryList: computed(() => costQuerySetState.costQuerySetList),
         selectedQuerySet: computed(() => costQuerySetGetters.selectedQuerySet),
@@ -137,6 +146,13 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
                     });
                 }
             });
+            if (_state.isAdminMode && !state.isAllWorkspaceSelected) {
+                results.push({
+                    k: GROUP_BY.WORKSPACE,
+                    v: [state.workspaceScope ?? ''],
+                    o: '=',
+                });
+            }
             return results;
         }),
         dataSourceImageUrl: computed<string>(() => {
@@ -186,6 +202,9 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
     const setDisplayDataType = (dataType: DisplayDataType) => {
         state.displayDataType = dataType;
     };
+    const setWorkspaceScope = (workspaceScope: string|undefined) => {
+        state.workspaceScope = workspaceScope;
+    };
 
     /* Actions */
     const reset = () => {
@@ -197,6 +216,8 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
         state.filters = {};
         state.enabledFiltersProperties = undefined;
         state.displayDataType = 'cost';
+        state.isAllWorkspaceSelected = false;
+        state.workspaceScope = getters.defaultWorkspaceScope ?? '';
     };
     const setQueryOptions = (options?: CostQuerySetModel['options']) => {
         reset();
@@ -206,6 +227,8 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
 
         state.groupBy = options.group_by ?? [];
         state.chartGroupBy = options.group_by?.[0];
+        state.isAllWorkspaceSelected = options.is_all_workspace_selected ?? false;
+        state.workspaceScope = options.workspace_scope ?? getters.defaultWorkspaceScope ?? '';
 
         if (options.relative_period) {
             state.relativePeriod = options.relative_period;
@@ -221,7 +244,7 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
 
         // check admin mode
         if (options.metadata?.filters_schema?.enabled_properties?.length) {
-            if (_state.isAdminMode) {
+            if (_state.isAdminMode && options.is_all_workspace_selected) {
                 state.enabledFiltersProperties = options.metadata.filters_schema.enabled_properties;
             } else {
                 state.enabledFiltersProperties = options.metadata.filters_schema.enabled_properties
@@ -239,6 +262,8 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
             group_by: state.groupBy,
             filters: getters.consoleFilters,
             display_data_type: state.displayDataType,
+            workspace_scope: state.workspaceScope,
+            is_all_workspace_selected: state.isAllWorkspaceSelected,
             metadata: { filters_schema: { enabled_properties: state.enabledFiltersProperties ?? [] } },
         };
         let createdData;
@@ -292,6 +317,7 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
         setPeriod,
         setRelativePeriod,
         setDisplayDataType,
+        setWorkspaceScope,
     };
 
     return {
