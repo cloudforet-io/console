@@ -6,23 +6,18 @@ import { defineStore } from 'pinia';
 
 import type { DashboardLayoutWidgetInfo } from '@/schema/dashboard/_types/dashboard-type';
 import type {
-    InheritOption, InheritOptions, WidgetConfig, WidgetOptions, WidgetOptionsSchemaProperty,
+    InheritOptions, WidgetConfig, WidgetOptions,
 } from '@/schema/dashboard/_types/widget-type';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import { useWidgetTitleInput } from '@/services/dashboards/composables/use-widget-title-input';
-import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
 import { getUpdatedWidgetInfo } from '@/services/dashboards/helpers/dashboard-widget-info-helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
 import type { MergedBaseWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/merge-base-widget-state';
 import { mergeBaseWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/merge-base-widget-state';
-import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-config-helper';
-import { getInitialWidgetInheritOptions } from '@/services/dashboards/widgets/_helpers/widget-inherit-options-helper';
-import { getRefinedWidgetOptions } from '@/services/dashboards/widgets/_helpers/widget-options-helper';
 import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_helpers/widget-options-schema-generator';
-import { getInitialSchemaProperties, getRefinedSchemaProperties } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 import type { UpdatableWidgetInfo } from '@/services/dashboards/widgets/_types/widget-type';
 
 
@@ -41,26 +36,10 @@ export interface PartialDashboardLayoutWidgetInfo extends DashboardLayoutWidgetI
 
 interface Getters {
     widgetConfig: ComputedRef<WidgetConfig|undefined>;
-    templateWidgetInfo: ComputedRef<DashboardLayoutWidgetInfo|undefined>;
-    mergedWidgetInfo: ComputedRef<PartialDashboardLayoutWidgetInfo|undefined>;
     updatedWidgetInfo: ComputedRef<UpdatableWidgetInfo|undefined>;
     title: ComputedRef<string>;
-    isTitleValid: ComputedRef<boolean|undefined>;
-    titleInvalidText: ComputedRef<string|undefined>;
-    isOptionsValid: ComputedRef<boolean>;
-    isAllValid: ComputedRef<boolean>;
-    isAllOptionsInitiated: ComputedRef<boolean>;
-    globalOptionInfo: ComputedRef<GlobalOptionInfo|undefined>;
 }
 
-interface GlobalOptionInfo {
-    optionKey: string;
-    variableKey: string;
-    name: string;
-    value?: any;
-    initiated?: boolean;
-    initiatedAndHasValue?: boolean;
-}
 export const useWidgetFormStore = defineStore('widget-form', () => {
     const appContextStore = useAppContextStore();
     const appContextGetters = appContextStore.getters;
@@ -68,7 +47,7 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
     const dashboardDetailState = dashboardDetailStore.state;
     const dashboardDetailGetters = dashboardDetailStore.getters;
     const {
-        title, resetTitle, updateTitle, isTitleValid, titleInvalidText,
+        title,
     } = useWidgetTitleInput();
 
     const initialState = {
@@ -79,9 +58,6 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
         inheritOptions: {} as InheritOptions,
         widgetOptions: {} as WidgetOptions,
         schemaProperties: [] as string[],
-        //
-        optionsValidMap: {} as Record<string, boolean>,
-        optionsInitMap: {} as Record<string, boolean>,
     };
 
     const state = reactive(initialState);
@@ -97,19 +73,12 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
         if (appContextGetters.isAdminMode) return 'DOMAIN';
 
         // update case
-        if (dashboardDetailState.dashboardInfo) {
-            return dashboardDetailState.dashboardInfo.resource_group;
+        if (dashboardDetailGetters.dashboardInfo) {
+            return dashboardDetailGetters.dashboardInfo.resource_group;
         }
 
         // create case
         return dashboardDetailState.dashboardScope;
-    });
-    const defaultTemplateWidgetInfo = computed(() => {
-        if (!state.templateWidgetId) return undefined;
-        const template = DASHBOARD_TEMPLATES[dashboardDetailState.templateId];
-        if (!template) return undefined;
-        const templateWidgetInfoList = flattenDeep(template.layouts.map((layout) => layout.widgets ?? []));
-        return templateWidgetInfoList.find((widget) => widget.template_widget_id === state.templateWidgetId);
     });
 
     const mergedWidgetState = computed<UnwrapRef<MergedBaseWidgetState>|undefined>(() => {
@@ -135,54 +104,6 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
 
     const getters: UnwrapRef<Getters> = reactive({
         widgetConfig: computed<WidgetConfig|undefined>(() => mergedWidgetState.value?.widgetConfig),
-        //
-        templateWidgetInfo: computed<DashboardLayoutWidgetInfo|undefined>(() => {
-            const _templateWidgetInfo = defaultTemplateWidgetInfo.value;
-            if (!_templateWidgetInfo || !state.widgetConfigId) return undefined;
-
-            const _variableSchema = dashboardDetailState.variablesSchema;
-            const _widgetConfig = getWidgetConfig(_templateWidgetInfo.widget_name);
-            const initialSchemaProperties = getInitialSchemaProperties(_widgetConfig, _variableSchema);
-            const _inheritOptions = getInitialWidgetInheritOptions(
-                _widgetConfig,
-                defaultTemplateWidgetInfo.value?.inherit_options,
-                _variableSchema,
-            );
-
-            return {
-                ..._templateWidgetInfo,
-                title: _templateWidgetInfo.title || getters.widgetConfig?.title,
-                widget_options: getRefinedWidgetOptions(
-                    _widgetConfig,
-                    _templateWidgetInfo.widget_options,
-                    _inheritOptions,
-                    dashboardDetailState.variables,
-                ),
-                inherit_options: _inheritOptions,
-                schema_properties: _templateWidgetInfo.schema_properties ? getRefinedSchemaProperties(
-                    _templateWidgetInfo.schema_properties ?? [],
-                    initialSchemaProperties,
-                    _templateWidgetInfo.widget_options,
-                    _templateWidgetInfo.inherit_options,
-                ) : initialSchemaProperties,
-                fixed_options: dashboardWidgetInfo.value?.fixed_options,
-            };
-        }),
-        mergedWidgetInfo: computed<PartialDashboardLayoutWidgetInfo|undefined>(() => {
-            if (!state.widgetConfigId) return undefined;
-
-            return {
-                ...(dashboardWidgetInfo.value ?? {}),
-                widget_key: state.widgetKey,
-                widget_name: state.widgetConfigId,
-                version: dashboardWidgetInfo.value?.version ?? '1',
-                title: mergedWidgetState.value?.title,
-                inherit_options: mergedWidgetState.value?.inheritOptions,
-                widget_options: mergedWidgetState.value?.options,
-                schema_properties: mergedWidgetState.value?.schemaProperties,
-                fixed_options: dashboardWidgetInfo.value?.fixed_options,
-            };
-        }),
         updatedWidgetInfo: computed<UpdatableWidgetInfo|undefined>(() => {
             if (!getters.widgetConfig || !state.widgetConfigId) {
                 return undefined;
@@ -195,164 +116,12 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
                 schema_properties: state.schemaProperties,
             });
         }),
-        //
         title,
-        isTitleValid,
-        titleInvalidText: titleInvalidText as ComputedRef<string|undefined>,
-        isOptionsValid: computed<boolean>(() => Object.values(state.optionsValidMap).every((valid) => valid)),
-        isAllValid: computed<boolean>(() => !!(getters.isOptionsValid && getters.isTitleValid)),
-        //
-        isAllOptionsInitiated: computed<boolean>(() => state.schemaProperties.every((name) => state.optionsInitMap[name])),
-        globalOptionInfo: computed<GlobalOptionInfo|undefined>(() => {
-            const properties = getters.widgetConfig?.options_schema?.properties;
-            if (!properties) return undefined;
-
-            const found = Object.entries(properties).find(([, property]) => (property as WidgetOptionsSchemaProperty).scope === 'GLOBAL');
-            if (!found) return undefined;
-
-            const [optionKey, schema] = found;
-            const name = schema.name as string;
-            const variableKey = schema.key as string;
-
-            // inherit case
-            const inheritOption: InheritOption|undefined = state.inheritOptions[optionKey];
-            if (inheritOption?.enabled) {
-                if (!inheritOption.variable_key) return undefined;
-                const value = dashboardDetailState.variables?.[inheritOption.variable_key];
-                return {
-                    optionKey,
-                    variableKey,
-                    name,
-                    value,
-                    initiated: state.optionsInitMap[optionKey],
-                    initiatedAndHasValue: state.optionsInitMap[optionKey] && (Array.isArray(value) ? value.length > 0 : !!value),
-                };
-            }
-            // normal case
-            const value = state.widgetOptions[optionKey];
-            return {
-                optionKey,
-                variableKey,
-                name,
-                value,
-                initiated: state.optionsInitMap[optionKey],
-                initiatedAndHasValue: state.optionsInitMap[optionKey] && (Array.isArray(value) ? value.length > 0 : !!value),
-            };
-        }),
     });
-
-    const initOptionsValidMap = () => {
-        const optionsValidMap = {};
-        state.schemaProperties.forEach((name) => {
-            optionsValidMap[name] = true;
-        });
-        state.optionsValidMap = optionsValidMap;
-    };
-    const initOptionsInitMap = (exceptGlobalOption ?: boolean) => {
-        const optionsInitMap = {};
-        state.schemaProperties.forEach((name) => {
-            optionsInitMap[name] = false;
-        });
-        const globalOptionKey = getters.globalOptionInfo?.optionKey;
-        if (exceptGlobalOption && globalOptionKey) {
-            optionsInitMap[globalOptionKey] = state.optionsInitMap[globalOptionKey];
-        }
-        state.optionsInitMap = optionsInitMap;
-    };
-
-    const actions = {
-        resetTitle,
-        updateTitle,
-        updateOptionsValidMap(optionsValidMap: Record<string, boolean>) {
-            state.optionsValidMap = optionsValidMap;
-        },
-        updateOptionValidState(optionKey: string, isValid: boolean) {
-            state.optionsValidMap = {
-                ...state.optionsValidMap,
-                [optionKey]: isValid,
-            };
-        },
-        updateOptionInitState(optionKey: string, isInit: boolean) {
-            state.optionsInitMap = {
-                ...state.optionsInitMap,
-                [optionKey]: isInit,
-            };
-        },
-        resetOptionsInitMap(exceptGlobalOption = false) {
-            initOptionsInitMap(exceptGlobalOption);
-        },
-        updateOptions(options: WidgetOptions) {
-            state.widgetOptions = options;
-        },
-        resetAll() {
-            Object.entries(initialState).forEach(([key, val]) => {
-                state[key] = val;
-            });
-            resetTitle();
-        },
-        initWidgetForm(widgetKey: string|undefined, widgetConfigId: string, templateWidgetId?: string) {
-            state.widgetKey = widgetKey;
-            state.widgetConfigId = widgetConfigId;
-            state.templateWidgetId = templateWidgetId;
-            const widgetInfo = getters.mergedWidgetInfo;
-
-            updateTitle(widgetInfo?.title ?? '');
-            state.widgetOptions = widgetInfo?.widget_options ?? {};
-            state.inheritOptions = widgetInfo?.inherit_options ?? {};
-            state.schemaProperties = widgetInfo?.schema_properties ?? [];
-
-            initOptionsValidMap();
-            initOptionsInitMap();
-        },
-        updateInheritOption(propertyName: string, enabled: boolean, variableKey?: string) {
-            const inheritOptions = { ...state.inheritOptions };
-            if (enabled) {
-                inheritOptions[propertyName] = {
-                    enabled: true,
-                    variable_key: variableKey ?? getters.widgetConfig?.options_schema?.properties?.[propertyName]?.key,
-                };
-            } else {
-                inheritOptions[propertyName] = {
-                    enabled: false,
-                };
-            }
-            state.inheritOptions = inheritOptions;
-        },
-        updateSchemaProperties(properties: string[]) {
-            state.schemaProperties = properties;
-
-            // update inherit options
-            const inheritOptions = { ...state.inheritOptions };
-            Object.keys(inheritOptions).forEach((name) => {
-                if (!properties.includes(name)) delete inheritOptions[name];
-            });
-            state.inheritOptions = inheritOptions;
-
-            // update widget options
-            // const widgetOptions = cloneDeep(state.widgetOptions);
-            // Object.keys(widgetOptions).forEach((name) => {
-            //     if (!properties.includes(name)) delete widgetOptions[name];
-            // });
-            // state.widgetOptions = widgetOptions;
-
-            initOptionsValidMap();
-            initOptionsInitMap();
-        },
-        returnToInitialSettings() {
-            updateTitle(getters.templateWidgetInfo?.title ?? '');
-            state.widgetOptions = getters.templateWidgetInfo?.widget_options ?? {};
-            state.schemaProperties = getters.templateWidgetInfo?.schema_properties ?? [];
-            state.inheritOptions = getters.templateWidgetInfo?.inherit_options ?? {};
-
-            initOptionsValidMap();
-            initOptionsInitMap();
-        },
-    };
 
     return {
         state,
         getters,
-        ...actions,
     };
 });
 
@@ -360,16 +129,6 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
 
 
 const getWidgetConfigByDashboardScope = (config: WidgetConfig, dashboardScope: DashboardScope): WidgetConfig => {
-    // if (dashboardScope === 'DOMAIN') {
-    //     const extraOptionsSchema = getWidgetOptionsSchema(['filters.workspace']);
-    //     return {
-    //         ...config,
-    //         options_schema: {
-    //             properties: { ...(config.options_schema?.properties ?? {}), ...extraOptionsSchema.properties },
-    //             order: ['filters.workspace', ...(config.options_schema?.order ?? [])],
-    //         },
-    //     };
-    // }
     if (dashboardScope === 'PROJECT') {
         const extraOptionsSchema = getWidgetOptionsSchema([['filters.project', { fixed: true, readonly: true }]]);
         return {
@@ -383,9 +142,6 @@ const getWidgetConfigByDashboardScope = (config: WidgetConfig, dashboardScope: D
     return config;
 };
 const getInheritOptionsByDashboardScope = (inheritOptions: InheritOptions, dashboardScope: DashboardScope): InheritOptions => {
-    // if (dashboardScope === 'DOMAIN') {
-    //     return { ...inheritOptions, 'filters.workspace': { enabled: true, variable_key: 'workspace' } };
-    // }
     if (dashboardScope === 'PROJECT') {
         return { ...inheritOptions, 'filters.project': { enabled: true, variable_key: 'project' } };
     }
