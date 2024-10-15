@@ -138,7 +138,7 @@ const cloneDashboard = async (): Promise<string|undefined> => {
         if (storeState.isAdminMode) {
             state.isPrivate = false;
             (_sharedDashboard as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.DOMAIN;
-        } else if (state.dashboardType !== 'PRIVATE') {
+        } else if (!state.isPrivate) {
             (_sharedDashboard as PublicDashboardCreateParameters).resource_group = state.targetDashboard?.resource_group || RESOURCE_GROUP.WORKSPACE;
         }
         const res = await dashboardStore.createDashboard(state.dashboardType, _sharedDashboard);
