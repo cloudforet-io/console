@@ -199,6 +199,7 @@ watch(() => costAnalysisPageState.granularity, () => {
                                                 :data="state.data"
                                                 :legend.sync="state.legend"
                                                 :accumulated="state.isAccumulated"
+                                                class="cost-analysis-stacked-column-chart"
             />
         </div>
     </div>
@@ -232,8 +233,13 @@ watch(() => costAnalysisPageState.granularity, () => {
         }
     }
     .bottom-part {
+        display: flex;
+        flex-direction: column;
         height: 25rem;
         margin-top: 1rem;
+        .cost-analysis-stacked-column-chart {
+            flex: 1;
+        }
         .bottom-right-part {
             text-align: right;
             display: flex;
