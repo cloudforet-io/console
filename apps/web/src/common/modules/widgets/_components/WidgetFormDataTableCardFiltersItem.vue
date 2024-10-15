@@ -50,14 +50,14 @@ const state = reactive({
             ];
         }
         return [
-            {
-                name: DATA_TABLE_QUERY_OPERATOR.contain_in.key,
-                label: DATA_TABLE_QUERY_OPERATOR.contain_in.label,
-            },
-            {
-                name: DATA_TABLE_QUERY_OPERATOR.not_contain_in.key,
-                label: DATA_TABLE_QUERY_OPERATOR.not_contain_in.label,
-            },
+            // {
+            //     name: DATA_TABLE_QUERY_OPERATOR.contain_in.key,
+            //     label: DATA_TABLE_QUERY_OPERATOR.contain_in.label,
+            // },
+            // {
+            //     name: DATA_TABLE_QUERY_OPERATOR.not_contain_in.key,
+            //     label: DATA_TABLE_QUERY_OPERATOR.not_contain_in.label,
+            // },
             {
                 name: DATA_TABLE_QUERY_OPERATOR.in.key,
                 label: DATA_TABLE_QUERY_OPERATOR.in.label,
