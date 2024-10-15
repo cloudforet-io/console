@@ -1,47 +1,183 @@
 <script lang="ts" setup>
 import {
-    computed, reactive,
+    computed, reactive, watch,
 } from 'vue';
 
 import {
-    PPaneLayout,
+    PFieldGroup, PCheckbox, PRadioGroup, PRadio, PBadge,
+    PPaneLayout, PTextInput, PSelectDropdown, PButton,
 } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
 
-import { useDomainStore } from '@/store/domain/domain-store';
-// import { usePreferencesStore } from '@/store/preferences/preferences-store';
+import { CURRENCY } from '@/store/modules/display/config';
+import type { Currency } from '@/store/modules/display/type';
+import { usePreferencesStore } from '@/store/preferences/preferences-store';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
+import ScopedNotification from '@/common/components/scoped-notification/ScopedNotification.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
-// const domainConfigStore = usePreferencesStore();
-// const domainConfigGetters = domainConfigStore.getters;
-const domainStore = useDomainStore();
+import type { UnifiedCostConfig } from '@/services/advanced/types/preferences-type';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const storeState = reactive({
-    domainId: computed<string>(() => domainStore.state.domainId),
-    domainName: computed<string>(() => domainStore.state.name),
-    domainConfig: computed(() => domainStore.state.config),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+const DEFAULT_AGGREGATION_DATE = 15;
+
+const domainConfigStore = usePreferencesStore();
+const domainConfigGetters = domainConfigStore.getters;
+
+const exchangeRateSourceOptions = ['Yahoo Finance!'];
+
+const state = reactive({
+    loading: false,
+    originUnifiedCostConfig: computed<UnifiedCostConfig|undefined>(() => domainConfigGetters?.unifiedCostConfig),
+    isSaveChangesButtonDisabled: computed<boolean>(() => {
+        if (formState.aggregationDate === '') {
+            return true;
+        }
+        const aggregationDate:number = (typeof formState.aggregationDate === 'string') ? parseInt(formState.aggregationDate) : formState.aggregationDate;
+
+        let isSameAggregationDate = aggregationDate === state.originUnifiedCostConfig?.aggregation_day;
+        if (aggregationDate < 1 || aggregationDate > 31) {
+            isSameAggregationDate = true;
+        }
+        return (formState.currency === state.originUnifiedCostConfig?.currency
+        && isSameAggregationDate
+        && formState.exchangeRateSource === state.originUnifiedCostConfig?.exchange_source
+        && formState.lastDayOfMonth === state.originUnifiedCostConfig?.is_last_day);
+    }),
+});
+
+const formState = reactive<{
+    currency: Currency;
+    aggregationDate: number|string;
+    exchangeRateSource: string;
+    lastDayOfMonth: boolean;
+}>({
+    currency: state.originUnifiedCostConfig?.currency ?? CURRENCY.KRW,
+    aggregationDate: state.originUnifiedCostConfig?.aggregation_day ?? DEFAULT_AGGREGATION_DATE,
+    exchangeRateSource: state.originUnifiedCostConfig?.exchange_source ?? 'Yahoo Finance!',
+    lastDayOfMonth: state.originUnifiedCostConfig?.is_last_day ?? false,
+});
+
+const handleSaveChanges = async () => {
+    try {
+        state.loading = true;
+        await domainConfigStore.updatePreferences({
+            ...domainConfigStore.state.domainConfig?.data,
+            unified_cost_config: {
+                ...state.originUnifiedCostConfig,
+                currency: formState.currency,
+                aggregation_day: parseInt(formState.aggregationDate),
+                exchange_source: formState.exchangeRateSource,
+                is_last_day: formState.lastDayOfMonth,
+            },
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        state.loading = false;
+    }
+};
+
+watch(() => state.originUnifiedCostConfig, (unifiedCostConfig) => {
+    formState.currency = unifiedCostConfig?.currency ?? CURRENCY.USD;
+    formState.aggregationDate = unifiedCostConfig?.aggregation_day ?? DEFAULT_AGGREGATION_DATE;
+    formState.exchangeRateSource = unifiedCostConfig?.exchange_source ?? 'Yahoo Finance!';
+    formState.lastDayOfMonth = unifiedCostConfig?.is_last_day ?? false;
 });
 
 </script>
 
 <template>
-    <p-pane-layout class="admin-domain-settings-anomaly-detection-configuration-page">
+    <p-pane-layout class="admin-domain-settings-currency-converter-page">
         <div class="content-wrapper">
-            currency converter
+            <scoped-notification type="info"
+                                 title-icon="ic_info-circle"
+                                 hide-header-close-button
+                                 no-title
+                                 title="Title"
+                                 layout="in-section"
+                                 class="mb-6"
+            >
+                {{ $t('COST_EXPLORER.CURRENCY_CONVERTER_PAGE.NOTIFICATION') }}
+            </scoped-notification>
+            <p-field-group :label="$t('COMMON.GNB.ACCOUNT.LABEL_CURRENCY')"
+                           required
+            >
+                <p-select-dropdown class="currency-dropdown"
+                                   :menu="Object.values(CURRENCY).map((currency) => ({ label: currency, name: currency }))"
+                                   :selected="formState.currency"
+                                   use-fixed-menu-style
+                                   @update:selected="formState.currency = $event"
+                >
+                    <template #dropdown-button="item">
+                        {{ item.label }}<p-badge v-if="item.label === CURRENCY.KRW"
+                                                 badge-type="subtle"
+                                                 style-type="indigo100"
+                        >
+                            Default
+                        </p-badge>
+                    </template>
+                </p-select-dropdown>
+            </p-field-group>
+            <p-field-group :label="$t('COST_EXPLORER.CURRENCY_CONVERTER_PAGE.AGGREGATION_DATE')"
+                           required
+            >
+                <div class="aggregation-field-wrapper">
+                    <p-text-input
+                        v-model="formState.aggregationDate"
+                        class="aggregation-field"
+                        type="number"
+                        min="1"
+                        max="31"
+                        :disabled="formState.lastDayOfMonth"
+                    />
+                    <p-checkbox
+                        v-model="formState.lastDayOfMonth"
+                        class="ml-2"
+                    >
+                        {{ $t('COST_EXPLORER.CURRENCY_CONVERTER_PAGE.LAST_DAY_OF_THE_MONTH') }}
+                    </p-checkbox>
+                </div>
+            </p-field-group>
+            <p-field-group :label="$t('COST_EXPLORER.CURRENCY_CONVERTER_PAGE.EXCHANGE_RATE_SOURCE')"
+                           required
+            >
+                <p-radio-group direction="vertical">
+                    <p-radio v-for="source in exchangeRateSourceOptions"
+                             :key="source"
+                             v-model="formState.exchangeRateSource"
+                             :label="source"
+                             :value="source"
+                    >
+                        {{ source }}
+                    </p-radio>
+                </p-radio-group>
+            </p-field-group>
+
+            <p-button :disabled="state.isSaveChangesButtonDisabled"
+                      class="mt-4"
+                      :loading="state.loading"
+                      @click="handleSaveChanges"
+            >
+                {{ $t('LADING.SAVE_CHANGES') }}
+            </p-button>
         </div>
     </p-pane-layout>
 </template>
 
 <style lang="postcss" scoped>
-.admin-domain-settings-anomaly-detection-configuration-page {
+.admin-domain-settings-currency-converter-page {
     .content-wrapper {
-        @apply flex flex-col;
-        gap: 1.5rem;
         padding: 1.5rem 1rem;
+
+        .currency-dropdown {
+            width: 9rem;
+        }
+    }
+
+    .aggregation-field-wrapper {
+        .aggregation-field {
+            width: 9rem;
+        }
     }
 }
 </style>
