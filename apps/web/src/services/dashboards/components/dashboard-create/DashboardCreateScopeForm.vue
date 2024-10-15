@@ -9,7 +9,6 @@ import {
 } from '@cloudforet/mirinae';
 import type { IconSet } from '@cloudforet/mirinae/src/data-display/board-item/type';
 
-import type { DashboardScope } from '@/schema/dashboard/_types/dashboard-type';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
@@ -23,7 +22,7 @@ import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashbo
 
 
 interface BoardSet {
-    value: DashboardScope | 'PRIVATE';
+    value: 'WORKSPACE' | 'PRIVATE';
     title: TranslateResult;
     leftIcon: string;
     description: TranslateResult;
@@ -61,7 +60,7 @@ const state = reactive({
 });
 
 /* Event */
-const handleSelectDashboardScope = (scopeType: DashboardScope) => {
+const handleSelectDashboardScope = (scopeType: 'WORKSPACE'|'PRIVATE') => {
     dashboardCreatePageStore.setDashboardScope(scopeType);
 };
 
