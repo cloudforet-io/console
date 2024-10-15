@@ -11,8 +11,6 @@ import type { DashboardTemplateModel } from '@/schema/repository/dashboard-templ
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
-
 
 
 export const useDashboardCreatePageStore = defineStore('page-dashboard-create', () => {
@@ -44,7 +42,7 @@ export const useDashboardCreatePageStore = defineStore('page-dashboard-create', 
     const setSelectedOotbIdMap = (templateIdMap: Record<string, boolean>) => { state.selectedOotbIdMap = templateIdMap; };
     const setSelectedExistingDashboardIdMap = (dashboardIdMap: Record<string, boolean>) => { state.selectedExistingDashboardIdMap = dashboardIdMap; };
     // const setTemplateName = (name: string) => { state.templateName = name; };
-    const setDashboardScope = (dashboardScope: DashboardScope) => { state.dashboardScope = dashboardScope; };
+    const setDashboardScope = (dashboardScope: 'WORKSPACE'|'PRIVATE') => { state.dashboardScope = dashboardScope; };
     const setDashboardCreated = (created: boolean) => { state.dashboardCreated = created; };
     const mutations = {
         setLoading,

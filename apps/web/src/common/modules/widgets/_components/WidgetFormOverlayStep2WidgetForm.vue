@@ -43,8 +43,8 @@ const props = defineProps<Props>();
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 const widgetGenerateGetters = widgetGenerateStore.getters;
-const dashboardDetailInfoStore = useDashboardDetailInfoStore();
-const dashboardDetailInfoState = dashboardDetailInfoStore.state;
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.state;
 const state = reactive({
     chartTypeMenuItems: computed<MenuItem[]>(() => Object.values(CONSOLE_WIDGET_CONFIG).map((d) => ({
         name: d.widgetName,
@@ -266,7 +266,7 @@ onMounted(() => {
                                :widget-field-schema="fieldSchema"
                                :data-table="widgetGenerateGetters.selectedDataTable"
                                :widget-id="widgetGenerateState.widgetId"
-                               :date-range="dashboardDetailInfoState.options.date_range"
+                               :date-range="dashboardDetailState.options.date_range"
                                :all-value-map="widgetGenerateState.widgetFormValueMap"
                                :value="widgetGenerateState.widgetFormValueMap[fieldName]"
                                :is-valid="widgetGenerateState.widgetValidMap[fieldName]"

@@ -25,10 +25,11 @@ type WidgetModel = PublicWidgetModel | PrivateWidgetModel;
 const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 const state = reactive({
     widgetList: computed<WidgetModel[]>(() => {
         const results: WidgetModel[] = [];
-        dashboardDetailState.dashboardLayouts.forEach((d) => {
+        dashboardDetailGetters.dashboardLayouts.forEach((d) => {
             const _widgetIdList = d.widgets;
             _widgetIdList?.forEach((widgetId) => {
                 const _widget = dashboardDetailState.dashboardWidgets.find((w) => w.widget_id === widgetId);
@@ -46,9 +47,9 @@ const handleChangeWidgetOrder = async () => {
     const _widgetIdList = state.widgetList.map((w) => w.widget_id);
     const _updatedLayouts = [{ widgets: _widgetIdList }];
     await dashboardStore.updateDashboard(dashboardDetailState.dashboardId as string, {
+        dashboard_id: dashboardDetailState.dashboardId || '',
         layouts: _updatedLayouts,
     });
-    dashboardDetailStore.setDashboardLayouts(_updatedLayouts);
 };
 const getWidgetDefaultName = (widgetType: string): string => {
     const _config = getWidgetConfig(widgetType);

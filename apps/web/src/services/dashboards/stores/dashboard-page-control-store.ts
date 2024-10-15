@@ -24,7 +24,7 @@ import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboar
 
 
 
-const _isPublicControlButtonDisabled = (folderItems: FolderModel[], dashboardItems: DashboardModel[], selectedIdMap: Record<string, boolean>): boolean => {
+const _isPublicControlButtonDisabled = (dashboardItems: DashboardModel[], selectedIdMap: Record<string, boolean>): boolean => {
     const _selectedIdList: string[] = Object.entries(selectedIdMap).filter(([, isSelected]) => isSelected).map(([id]) => id);
     if (_selectedIdList.length === 0) return true;
     let result = false;
@@ -105,8 +105,8 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
             const _selectedPublicIdList: string[] = Object.entries(state.selectedPublicIdMap).filter(([, isSelected]) => isSelected).map(([id]) => id);
             return {
                 clone: _selectedPublicIdList.length === 0,
-                move: _isPublicControlButtonDisabled(getters.publicFolderItems, getters.publicDashboardItems, state.selectedPublicIdMap),
-                delete: _isPublicControlButtonDisabled(getters.publicFolderItems, getters.publicDashboardItems, state.selectedPublicIdMap),
+                move: _isPublicControlButtonDisabled(getters.publicDashboardItems, state.selectedPublicIdMap),
+                delete: _isPublicControlButtonDisabled(getters.publicDashboardItems, state.selectedPublicIdMap),
             };
         }),
         // private
