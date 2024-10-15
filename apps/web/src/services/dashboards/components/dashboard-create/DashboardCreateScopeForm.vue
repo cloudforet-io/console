@@ -9,6 +9,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { IconSet } from '@cloudforet/mirinae/src/data-display/board-item/type';
 
+import type { DashboardScope } from '@/schema/dashboard/_types/dashboard-type';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
@@ -19,11 +20,10 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
-import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
 
 
 interface BoardSet {
-    value: DashboardScope;
+    value: DashboardScope | 'PRIVATE';
     title: TranslateResult;
     leftIcon: string;
     description: TranslateResult;

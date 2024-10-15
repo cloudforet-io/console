@@ -3,14 +3,12 @@ import {
     computed,
     onUnmounted, reactive, ref, watch,
 } from 'vue';
-import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
     PDivider, PI,
 } from '@cloudforet/mirinae';
 
 import { SpaceRouter } from '@/router';
-import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
@@ -30,7 +28,6 @@ import DashboardVariablesV2 from '@/services/dashboards/components/dashboard-det
 import DashboardWidgetContainerV2 from '@/services/dashboards/components/dashboard-detail/DashboardWidgetContainerV2.vue';
 import DashboardVariables from '@/services/dashboards/components/legacy/DashboardVariables.vue';
 import DashboardWidgetContainer from '@/services/dashboards/components/legacy/DashboardWidgetContainer.vue';
-import { DASHBOARD_SCOPE } from '@/services/dashboards/constants/dashboard-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
@@ -48,8 +45,6 @@ const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardDetailState = dashboardDetailStore.state;
 const widgetGenerateStore = useWidgetGenerateStore();
 const { breadcrumbs } = useBreadcrumbs();
-const router = useRouter();
-const route = useRoute();
 
 const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
@@ -57,27 +52,6 @@ const widgetContainerRef = ref<typeof DashboardWidgetContainer|null>(null);
 
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    dashboardScope: computed(() => dashboardDetailState.dashboardScope),
-    dashboardMiddleRouteLabel: computed(() => {
-        if (state.dashboardScope === DASHBOARD_SCOPE.WORKSPACE) return i18n.t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE');
-        if (state.dashboardScope === DASHBOARD_SCOPE.PROJECT) return i18n.t('DASHBOARDS.ALL_DASHBOARDS.SINGLE_PROJECT');
-        if (state.dashboardScope === DASHBOARD_SCOPE.PRIVATE) return i18n.t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE');
-        return '';
-    }),
-    dashboardCustomBreadcrumbs: computed(() => {
-        const _breadcrumbs = breadcrumbs.value;
-        const customMiddleRoute = router.match({
-            name: DASHBOARDS_ROUTE._NAME,
-            params: { workspaceId: route.params.workspaceId },
-            query: { scope: state.dashboardScope },
-        });
-        if (state.isAdminMode) return _breadcrumbs;
-        const dashboardMiddleRoute = {
-            name: state.dashboardMiddleRouteLabel,
-            to: { path: customMiddleRoute.fullPath },
-        };
-        return [_breadcrumbs[0], dashboardMiddleRoute, _breadcrumbs[1]];
-    }),
     favoriteOptions: computed<FavoriteOptions>(() => ({
         type: FAVORITE_TYPE.DASHBOARD,
         id: props.dashboardId,
@@ -119,7 +93,7 @@ watch(() => props.dashboardId, async (dashboardId, prevDashboardId) => {
     }
     await getDashboardData(dashboardId);
     // Set Dashboard Detail Custom breadcrumbs
-    gnbStore.setBreadcrumbs(state.dashboardCustomBreadcrumbs);
+    gnbStore.setBreadcrumbs(breadcrumbs.value);
 }, { immediate: true });
 
 watch(() => state.favoriteOptions, (favoriteOptions) => {
