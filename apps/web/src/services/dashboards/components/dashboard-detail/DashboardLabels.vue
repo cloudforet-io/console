@@ -2,7 +2,7 @@
 // CAUTION: this vOnClickOutside is using !! Please do not remove.
 import { vOnClickOutside } from '@vueuse/components';
 import {
-    computed, reactive,
+    reactive, watch,
 } from 'vue';
 
 import {
@@ -40,15 +40,10 @@ const {
 });
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 
 const state = reactive({
-    labelList: computed<Array<string>>({
-        get: () => dashboardDetailState.labels,
-        set(val: Array<string>) {
-            dashboardDetailStore.setLabels(val);
-        },
-    }),
+    labelList: [] as string[],
     inputMode: false,
     isInputFocused: false,
 });
@@ -65,15 +60,16 @@ const handlePushLabel = (e: KeyboardEvent) => {
     if (e.isComposing || !inputText.value || invalidState.inputText) return;
     state.labelList.push(inputText.value);
     setForm('inputText', '');
-    dashboardDetailStore.setLabels(state.labelList);
     emit('update-labels', state.labelList);
 };
 const handleDelete = (index: number) => {
     state.labelList.splice(index, 1);
-    dashboardDetailStore.setLabels(state.labelList);
     emit('update-labels', state.labelList);
 };
 
+watch(() => dashboardDetailGetters.dashboardLabels, (val) => {
+    state.labelList = val;
+}, { immediate: true });
 </script>
 
 <template>

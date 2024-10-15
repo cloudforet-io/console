@@ -14,7 +14,6 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useWidgetTitleInput } from '@/services/dashboards/composables/use-widget-title-input';
 import { getUpdatedWidgetInfo } from '@/services/dashboards/helpers/dashboard-widget-info-helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
 import type { MergedBaseWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/merge-base-widget-state';
 import { mergeBaseWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/merge-base-widget-state';
 import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_helpers/widget-options-schema-generator';
@@ -39,6 +38,13 @@ interface Getters {
     updatedWidgetInfo: ComputedRef<UpdatableWidgetInfo|undefined>;
     title: ComputedRef<string>;
 }
+const DASHBOARD_SCOPE = {
+    DOMAIN: 'DOMAIN',
+    WORKSPACE: 'WORKSPACE',
+    PROJECT: 'PROJECT',
+    PRIVATE: 'PRIVATE',
+} as const;
+type DashboardScope = keyof typeof DASHBOARD_SCOPE;
 
 export const useWidgetFormStore = defineStore('widget-form', () => {
     const appContextStore = useAppContextStore();
@@ -64,21 +70,14 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
 
     const dashboardWidgetInfo = computed<DashboardLayoutWidgetInfo|undefined>(() => {
         if (!state.widgetKey && !state.templateWidgetId) return undefined;
-        const _dashboardWidgetInfoList = flattenDeep(dashboardDetailState.dashboardWidgetInfoList ?? []);
+        const _dashboardWidgetInfoList: DashboardLayoutWidgetInfo[] = flattenDeep(dashboardDetailGetters.dashboardWidgetInfoList ?? []);
         const widgetInfoByWidgetKey = _dashboardWidgetInfoList.find((w) => w.widget_key === state.widgetKey);
         const widgetInfoByTemplateWidgetId = _dashboardWidgetInfoList.find((w) => w.template_widget_id === state.templateWidgetId);
         return state.widgetKey ? widgetInfoByWidgetKey : widgetInfoByTemplateWidgetId;
     });
     const dashboardScope = computed<DashboardScope>(() => {
         if (appContextGetters.isAdminMode) return 'DOMAIN';
-
-        // update case
-        if (dashboardDetailGetters.dashboardInfo) {
-            return dashboardDetailGetters.dashboardInfo.resource_group;
-        }
-
-        // create case
-        return dashboardDetailState.dashboardScope;
+        return dashboardDetailGetters.dashboardInfo.resource_group;
     });
 
     const mergedWidgetState = computed<UnwrapRef<MergedBaseWidgetState>|undefined>(() => {

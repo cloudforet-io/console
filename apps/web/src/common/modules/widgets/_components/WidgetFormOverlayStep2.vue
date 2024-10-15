@@ -111,10 +111,9 @@ const updateWidget = async () => {
         state: 'ACTIVE',
     });
     if (_isCreating) {
-        dashboardDetailStore.addWidgetToDashboardLayouts(widgetGenerateState.widgetId);
         await dashboardStore.updateDashboard(dashboardDetailState.dashboardId as string, {
-            dashboard_id: dashboardDetailState.dashboardId,
-            layouts: dashboardDetailState.dashboardLayouts,
+            dashboard_id: dashboardDetailState.dashboardId || '',
+            layouts: dashboardDetailGetters.dashboardLayouts,
         });
     }
 };

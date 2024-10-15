@@ -104,7 +104,7 @@ const { containerWidth } = useDashboardContainerWidth({ containerRef, observeRes
 const getRefinedWidgetInfoList = (): RefinedWidgetInfo[] => {
     const _refinedWidgets: RefinedWidgetInfo[] = [];
     const _widgetSizeList: WidgetSize[] = [];
-    dashboardDetailState.dashboardLayouts.forEach((d) => {
+    dashboardDetailGetters.dashboardLayouts.forEach((d) => {
         const _widgetIdList = d.widgets;
         _widgetIdList?.forEach((widgetId) => {
             const _widget = dashboardDetailState.dashboardWidgets.find((w) => w.widget_id === widgetId);
@@ -298,11 +298,10 @@ const handleCloneWidget = async (widget: RefinedWidgetInfo) => {
             widget_id: createdWidget.widget_id,
             state: 'ACTIVE',
         });
-        dashboardDetailStore.addWidgetToDashboardLayouts(completedWidget.widget_id);
         dashboardDetailStore.setDashboardWidgets([...dashboardDetailState.dashboardWidgets, completedWidget]);
         await dashboardUpdateFetcher({
             dashboard_id: dashboardDetailState.dashboardId,
-            layouts: dashboardDetailState.dashboardLayouts,
+            layouts: dashboardDetailGetters.dashboardLayouts,
         });
         showSuccessMessage(i18n.t('COMMON.WIDGETS.CLONE_SUCCESS_MSG'), '');
     } catch (e: any) {

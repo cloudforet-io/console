@@ -52,7 +52,7 @@ const state = reactive({
         return state.isSharedDashboard;
     }),
     badgeStyleType: computed<string>(() => {
-        if (dashboardDetailState.dashboardScope === 'PRIVATE') return 'gray150';
+        if (dashboardDetailGetters.isPrivate) return 'gray150';
         if (state.sharedScope === 'PROJECT') return 'primary3';
         return 'indigo100';
     }),
@@ -113,7 +113,7 @@ const handleSelectItem = (item: MenuItem) => {
                                  :style-type="state.badgeStyleType"
                                  class="mr-2"
                         >
-                            <p-i v-if="dashboardDetailState.dashboardScope === 'PRIVATE'"
+                            <p-i v-if="dashboardDetailGetters.isPrivate"
                                  name="ic_lock-filled"
                                  width="0.75rem"
                                  height="0.75rem"
