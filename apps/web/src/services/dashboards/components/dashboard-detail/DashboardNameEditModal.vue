@@ -14,7 +14,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 
 
@@ -31,7 +30,6 @@ const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
 }>();
 
 const dashboardStore = useDashboardStore();
-const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const {
@@ -81,10 +79,6 @@ const updateDashboard = async () => {
 const handleConfirm = async () => {
     state.loading = true;
     await updateDashboard();
-    // NOTE: for dashboard detail page
-    dashboardDetailStore.setName(_name.value);
-    dashboardDetailStore.setOriginDashboardName(_name.value);
-    //
     state.proxyVisible = false;
     state.loading = false;
 };

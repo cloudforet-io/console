@@ -22,6 +22,7 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashbo
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 
 
+
 interface Props {
     dashboardId: string;
     templateName?: string;
@@ -43,12 +44,11 @@ const { getControlMenuItems } = useDashboardControlMenuItems({
     dashboardList: computed(() => dashboardPageControlGetters.allDashboardItems),
 });
 const state = reactive({
-    loading: false,
-    isSharedDashboard: computed<boolean>(() => !!dashboardDetailState.dashboardInfo?.shared),
-    sharedScope: computed<DashboardScope|undefined>(() => dashboardDetailState.dashboardInfo?.scope),
+    isSharedDashboard: computed<boolean>(() => !!dashboardDetailGetters.dashboardInfo?.shared),
+    sharedScope: computed<DashboardScope|undefined>(() => dashboardDetailGetters.dashboardInfo?.scope),
     selectedSharedScope: 'WORKSPACE' as DashboardScope,
     showBadge: computed<boolean>(() => {
-        if (dashboardDetailState.dashboardInfo?.user_id) return true;
+        if (dashboardDetailGetters.dashboardInfo?.user_id) return true;
         return state.isSharedDashboard;
     }),
     badgeStyleType: computed<string>(() => {
@@ -60,7 +60,7 @@ const state = reactive({
         if (dashboardDetailState.dashboardId?.startsWith('private')) return i18n.t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE');
         if (state.isSharedDashboard) {
             if (storeState.isAdminMode) {
-                if (dashboardDetailState.dashboardInfo?.scope === 'PROJECT') {
+                if (dashboardDetailGetters.dashboardInfo?.scope === 'PROJECT') {
                     return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
                 }
                 return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_WORKSPACES');
@@ -102,8 +102,8 @@ const handleSelectItem = (item: MenuItem) => {
         </div>
         <p-heading-layout class="mb-6">
             <template #heading>
-                <p-heading :title="dashboardDetailState.name">
-                    <p-skeleton v-if="!dashboardDetailState.name"
+                <p-heading :title="dashboardDetailGetters.dashboardName">
+                    <p-skeleton v-if="!dashboardDetailGetters.dashboardName"
                                 width="20rem"
                                 height="1.5rem"
                     />
@@ -126,7 +126,7 @@ const handleSelectItem = (item: MenuItem) => {
                                            style-type="tertiary-icon-button"
                                            button-icon="ic_ellipsis-horizontal"
                                            size="sm"
-                                           :menu="getControlMenuItems(props.dashboardId)"
+                                           :menu="getControlMenuItems(props.dashboardId).value"
                                            :selected="[]"
                                            use-fixed-menu-style
                                            reset-selection-on-menu-close
@@ -143,7 +143,7 @@ const handleSelectItem = (item: MenuItem) => {
             >
                 <dashboard-control-buttons v-if="!dashboardDetailGetters.disableManageButtons"
                                            :dashboard-id="props.dashboardId"
-                                           :name="dashboardDetailState.name"
+                                           :name="dashboardDetailGetters.dashboardName"
                 />
             </template>
         </p-heading-layout>

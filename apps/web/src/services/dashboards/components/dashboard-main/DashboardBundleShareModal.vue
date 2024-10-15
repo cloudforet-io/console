@@ -26,7 +26,6 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
 
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
 
@@ -50,7 +49,6 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void,
 }>();
 const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
-const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const storeState = reactive({
@@ -206,12 +204,6 @@ const handleConfirm = async () => {
         await unshareDashboard();
     }
     await dashboardStore.load();
-
-    // for dashboard detail page
-    if (props.dashboardId) {
-        const _updatedDashboard = dashboardPageControlGetters.allDashboardItems.find((d) => d.dashboard_id === props.dashboardId);
-        dashboardDetailStore.setDashboardInfo(_updatedDashboard);
-    }
     dashboardPageControlStore.reset();
     state.proxyVisible = false;
 };

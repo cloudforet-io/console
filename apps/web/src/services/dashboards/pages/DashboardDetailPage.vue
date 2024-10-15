@@ -31,7 +31,6 @@ import DashboardWidgetContainerV2 from '@/services/dashboards/components/dashboa
 import DashboardVariables from '@/services/dashboards/components/legacy/DashboardVariables.vue';
 import DashboardWidgetContainer from '@/services/dashboards/components/legacy/DashboardWidgetContainer.vue';
 import { DASHBOARD_SCOPE } from '@/services/dashboards/constants/dashboard-constant';
-import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
@@ -58,7 +57,6 @@ const widgetContainerRef = ref<typeof DashboardWidgetContainer|null>(null);
 
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    templateName: computed(() => DASHBOARD_TEMPLATES[dashboardDetailState.templateId]?.name),
     dashboardScope: computed(() => dashboardDetailState.dashboardScope),
     dashboardMiddleRouteLabel: computed(() => {
         if (state.dashboardScope === DASHBOARD_SCOPE.WORKSPACE) return i18n.t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE');
@@ -98,7 +96,7 @@ const getDashboardData = async (dashboardId: string) => {
 
 /* Event */
 const handleRefresh = async () => {
-    if (dashboardDetailState.dashboardInfo?.version !== '1.0') await dashboardDetailStore.listDashboardWidgets();
+    if (dashboardDetailGetters.dashboardInfo?.version !== '1.0') await dashboardDetailStore.listDashboardWidgets();
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     if (widgetContainerRef.value) widgetContainerRef.value.refreshAllWidget();
@@ -106,8 +104,7 @@ const handleRefresh = async () => {
 const handleUpdateDashboardVariables = async (params) => {
     state.dashboardVariablesLoading = true;
     try {
-        const updatedDashboard = await dashboardStore.updateDashboard(props.dashboardId, params);
-        dashboardDetailStore.setDashboardInfo(updatedDashboard);
+        await dashboardStore.updateDashboard(props.dashboardId, params);
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {
@@ -157,9 +154,7 @@ onUnmounted(() => {
                     </p>
                 </div>
             </div>
-            <dashboard-detail-header :dashboard-id="props.dashboardId"
-                                     :template-name="state.templateName"
-            />
+            <dashboard-detail-header :dashboard-id="props.dashboardId" />
             <p-divider class="divider" />
         </div>
         <div class="filter-box">

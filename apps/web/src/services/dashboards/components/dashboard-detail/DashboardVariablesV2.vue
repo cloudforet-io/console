@@ -32,6 +32,7 @@ const emit = defineEmits<{(e: 'update', val: { vars?: DashboardVars }): void;
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 const appContextStore = useAppContextStore();
 
@@ -55,7 +56,7 @@ const state = reactive({
     modifiedVariablesSchemaProperties: computed<string[]>(() => {
         const results: string[] = [];
         Object.entries(state.variableProperties).forEach(([k]) => {
-            if (!isEqual(dashboardDetailState.dashboardInfo?.vars?.[k], dashboardDetailState.vars?.[k])) {
+            if (!isEqual(dashboardDetailGetters.dashboardInfo?.vars?.[k], dashboardDetailState.vars?.[k])) {
                 results.push(k);
             }
         });
@@ -70,7 +71,7 @@ const handleClickSaveButton = () => {
     dashboardDetailStore.setVars(dashboardDetailState.vars);
 };
 const handleResetVariables = () => {
-    const _originVars = props.originVars ?? dashboardDetailState.dashboardInfo?.vars ?? {};
+    const _originVars = props.originVars ?? dashboardDetailGetters.dashboardInfo?.vars ?? {};
     dashboardDetailStore.setVars(_originVars);
 };
 </script>
