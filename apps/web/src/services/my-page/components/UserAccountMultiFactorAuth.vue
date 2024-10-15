@@ -4,8 +4,8 @@ import {
 } from 'vue';
 
 import UserAccountModuleContainer from '@/services/my-page/components/UserAccountModuleContainer.vue';
+import UserAccountMultiFactorAuthFormModal from '@/services/my-page/components/UserAccountMultiFactorAuthFormModal.vue';
 import UserAccountMultiFactorAuthItems from '@/services/my-page/components/UserAccountMultiFactorAuthItems.vue';
-import UserAccountMultiFactorAuthModal from '@/services/my-page/components/UserAccountMultiFactorAuthModal.vue';
 import type { MultiFactorAuthModalDataType } from '@/services/my-page/types/multi-factor-auth-type';
 
 const modalState = reactive({
@@ -35,9 +35,9 @@ const handleModalType = (data: MultiFactorAuthModalDataType) => {
                                                   @handle-modal="handleModalType"
             />
         </user-account-module-container>
-        <user-account-multi-factor-auth-modal v-if="modalState.isModalVisible"
-                                              :data="modalState.modalData"
-                                              :visible.sync="modalState.isModalVisible"
+        <user-account-multi-factor-auth-form-modal v-if="modalState.isModalVisible"
+                                                   :data="modalState.modalData"
+                                                   :visible.sync="modalState.isModalVisible"
         />
     </div>
 </template>
@@ -60,12 +60,6 @@ const handleModalType = (data: MultiFactorAuthModalDataType) => {
 
 /* custom design-system component - p-field-group */
 :deep(.p-field-group) {
-    @apply relative;
     margin-bottom: 0;
-    .invalid-feedback {
-        @apply absolute;
-        bottom: -1.125rem;
-        left: 0;
-    }
 }
 </style>
