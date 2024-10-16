@@ -13,54 +13,44 @@ import { i18n as _i18n } from '@/translations';
 
 import { postValidationMfaCode } from '@/lib/helper/multi-factor-auth-helper';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
 
 import UserAccountMultiFactorAuthModalEmailInfo from '@/services/my-page/components/UserAccountMultiFactorAuthModalEmailInfo.vue';
 import UserAccountMultiFactorAuthModalFolding from '@/services/my-page/components/UserAccountMultiFactorAuthModalFolding.vue';
 import UserAccountMultiFactorAuthModalMSInfo
     from '@/services/my-page/components/UserAccountMultiFactorAuthModalMSInfo.vue';
+import { useMultiFactorAuthenticationStore } from '@/services/my-page/stores/multi-factor-authentication-store';
 import type {
-    MultiFactorAuthModalDataType,
-    MultiFactorAuthType,
     UserInfoType,
 } from '@/services/my-page/types/multi-factor-auth-type';
 import { MULTI_FACTOR_AUTH_TYPE } from '@/services/my-page/types/multi-factor-auth-type';
 
-interface Props {
-    data: MultiFactorAuthModalDataType
-    visible: boolean
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    data: undefined,
-    visible: false,
-});
+const multiFactorAuthenticationStore = useMultiFactorAuthenticationStore();
+const multiFactorAuthenticationState = multiFactorAuthenticationStore.state;
 
 const emit = defineEmits<{(e: 'refresh'): void }>();
 
 const storeState = reactive({
     userId: computed<string>(() => store.state.user.userId),
+    selectedType: computed<string>(() => multiFactorAuthenticationState.selectedType),
+    isReSyncModal: computed<boolean>(() => multiFactorAuthenticationState.modalType === 'RE_SYNC'),
+    isDisabledModal: computed<boolean>(() => multiFactorAuthenticationState.modalType === 'DISABLED'),
 });
 const state = reactive({
     loading: false,
-    mfaType: computed<MultiFactorAuthType>(() => props.data?.type),
-    isReSyncModal: computed<boolean>(() => props.data.isReSync || false),
-    isDisabledModal: computed<boolean>(() => !state.isReSyncModal && !props.data.state),
     userInfo: {} as UserInfoType,
     isCollapsed: true,
     isSentCode: false,
 });
 
 const modalState = reactive({
-    proxyVisible: useProxyValue('visible', props, emit),
     title: computed(() => {
-        if (state.isReSyncModal) {
+        if (storeState.isReSyncModal) {
             return _i18n.t('MY_PAGE.MFA.RESYNC_TITLE');
         }
-        if (state.isDisabledModal) {
+        if (storeState.isDisabledModal) {
             return _i18n.t('COMMON.MFA_MODAL.ALT.TITLE');
         }
-        const type = state.mfaType.toLowerCase()
+        const type = storeState.selectedType?.toLowerCase()
             .replace(/_/g, ' ')
             .replace(/\b\w/g, (char) => char.toUpperCase());
         return _i18n.t('COMMON.MFA_MODAL.TITLE', { type });
@@ -83,7 +73,7 @@ const handleChangeInput = (value: string) => {
     validationState.verificationCode = value;
 };
 const handleClickCancel = async () => {
-    modalState.proxyVisible = false;
+    multiFactorAuthenticationStore.setModalVisible(false);
     await resetFormData();
     if (storeState.userId === state.userInfo.user_id) {
         await store.dispatch('user/setUser', state.userInfo);
@@ -100,7 +90,7 @@ const handleClickVerifyButton = async () => {
         if (storeState.userId === state.userInfo.user_id) {
             await store.dispatch('user/setUser', state.userInfo);
         }
-        modalState.proxyVisible = false;
+        multiFactorAuthenticationStore.setModalVisible(false);
         resetFormData();
     } catch (e: any) {
         validationState.isValidationCodeValid = false;
@@ -119,20 +109,19 @@ watch(() => storeState.userId, (userId) => {
 </script>
 
 <template>
-    <p-button-modal
-        :visible="modalState.proxyVisible"
-        :header-title="modalState.title"
-        class="mfa-modal-wrapper"
-        size="sm"
-        :theme-color="state.isDisabledModal? 'alert' : 'primary'"
-        :disabled="validationState.verificationCode === '' || !state.isSentCode"
-        :loading="state.loading"
-        @confirm="handleClickVerifyButton"
-        @cancel="handleClickCancel"
-        @close="handleClickCancel"
+    <p-button-modal :visible="multiFactorAuthenticationState.modalVisible"
+                    :header-title="modalState.title"
+                    class="mfa-modal-wrapper"
+                    size="sm"
+                    :theme-color="storeState.isDisabledModal? 'alert' : 'primary'"
+                    :disabled="validationState.verificationCode === '' || !state.isSentCode"
+                    :loading="state.loading"
+                    @confirm="handleClickVerifyButton"
+                    @cancel="handleClickCancel"
+                    @close="handleClickCancel"
     >
         <template #body>
-            <p v-if="state.isReSyncModal"
+            <p v-if="storeState.isReSyncModal"
                class="re-sync-desc"
             >
                 {{ $t('MY_PAGE.MFA.RESYNC_DESC') }}
@@ -140,17 +129,16 @@ watch(() => storeState.userId, (userId) => {
             <div v-else
                  class="modal-content-wrapper"
             >
-                <span v-if="state.isDisabledModal"
+                <span v-if="storeState.isDisabledModal"
                       class="disable-modal-desc"
                 >
                     {{ $t('COMMON.MFA_MODAL.ALT.DESC') }}
                 </span>
-                <user-account-multi-factor-auth-modal-email-info v-if="state.mfaType === MULTI_FACTOR_AUTH_TYPE.EMAIL"
-                                                                 :mfa-type="props.data?.type"
-                                                                 :is-disabled-modal="state.isDisabledModal"
+                <user-account-multi-factor-auth-modal-email-info v-if="storeState.selectedType === MULTI_FACTOR_AUTH_TYPE.EMAIL"
+                                                                 :is-disabled-modal="storeState.isDisabledModal"
                                                                  :is-sent-code.sync="state.isSentCode"
                 />
-                <user-account-multi-factor-auth-modal-m-s-info v-else-if="state.mfaType === MULTI_FACTOR_AUTH_TYPE.MS && props.data.state" />
+                <user-account-multi-factor-auth-modal-m-s-info v-else-if="storeState.selectedType === MULTI_FACTOR_AUTH_TYPE.MS && !storeState.isDisabledModal" />
                 <div class="validation-code-form">
                     <p-field-group :label="$t('COMMON.MFA_MODAL.VERIFICATION_CODE')"
                                    :invalid="!validationState.isValidationCodeValid"
@@ -166,16 +154,16 @@ watch(() => storeState.userId, (userId) => {
                         />
                     </p-field-group>
                 </div>
-                <user-account-multi-factor-auth-modal-folding v-if="state.mfaType === MULTI_FACTOR_AUTH_TYPE.EMAIL"
-                                                              :is-disabled-modal="state.isDisabledModal"
+                <user-account-multi-factor-auth-modal-folding v-if="storeState.selectedType === MULTI_FACTOR_AUTH_TYPE.EMAIL"
+                                                              :is-disabled-modal="storeState.isDisabledModal"
                                                               :is-sent-code.sync="state.isSentCode"
                 />
             </div>
         </template>
-        <template v-if="!state.isReSyncModal"
+        <template v-if="!storeState.isReSyncModal"
                   #confirm-button
         >
-            <span v-if="state.isDisabledModal">
+            <span v-if="storeState.isDisabledModal">
                 {{ $t('COMMON.MFA_MODAL.ALT.DISABLED') }}
             </span>
         </template>

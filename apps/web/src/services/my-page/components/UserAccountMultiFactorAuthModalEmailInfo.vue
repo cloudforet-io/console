@@ -15,13 +15,11 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 interface Props {
-    mfaType?: string
     isDisabledModal?: boolean
     isSentCode?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    mfaType: '',
     isDisabledModal: false,
     isSentCode: false,
 });
@@ -33,8 +31,6 @@ const storeState = reactive({
 });
 const state = reactive({
     loading: false,
-    userEmail: computed<string>(() => store.state.user.email),
-    userId: computed<string>(() => store.state.user.userId),
     proxyIsSentCode: useProxyValue('isSentCode', props, emit),
     originEmail: storeState.email,
 });
@@ -94,6 +90,7 @@ const handleClickSendCodeButton = async () => {
                 />
             </p-field-group>
             <p-button style-type="secondary"
+                      class="send-code-button"
                       :loading="state.loading"
                       :disabled="email === '' || state.proxyIsSentCode"
                       @click="handleClickSendCodeButton"
@@ -135,10 +132,13 @@ const handleClickSendCodeButton = async () => {
 .email-info-wrapper {
     margin-bottom: 1.25rem;
     .email-form-wrapper {
-        @apply flex items-end;
+        @apply flex items-start;
         gap: 1rem;
         .input-form {
             flex: 1;
+        }
+        .send-code-button {
+            margin-top: 1.45rem;
         }
     }
     .email-view-wrapper {
