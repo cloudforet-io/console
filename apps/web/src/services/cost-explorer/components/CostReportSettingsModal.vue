@@ -6,7 +6,7 @@ import { map } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButtonModal, PFieldGroup, PSelectDropdown, PBadge, PTextInput, PCheckbox, PI,
+    PButtonModal, PFieldGroup, PSelectDropdown, PTextInput, PCheckbox, PI,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
@@ -14,8 +14,6 @@ import type { CostReportConfigUpdateParameters } from '@/schema/cost-analysis/co
 import type { CostReportConfigModel } from '@/schema/cost-analysis/cost-report-config/model';
 import { i18n } from '@/translations';
 
-import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
-import type { Currency } from '@/store/modules/display/type';
 import { languages } from '@/store/modules/user/config';
 import type { LanguageCode } from '@/store/modules/user/type';
 
@@ -42,13 +40,8 @@ const costReportPageStore = useCostReportPageStore();
 const costReportPageState = costReportPageStore.state;
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
-    selectedCurrency: undefined as undefined|Currency,
     selectedLanguage: undefined as undefined|LanguageCode,
     enableLastDay: false,
-    currencyMenuItems: computed<SelectDropdownMenuItem[]>(() => Object.values(CURRENCY).map((currency) => ({
-        name: currency,
-        label: `${CURRENCY_SYMBOL[currency]} ${currency}`,
-    }))),
     languageMenuItems: map(languages, (d, k) => ({
         type: 'item', label: d, name: k,
     })) as SelectDropdownMenuItem[],
@@ -104,7 +97,6 @@ const updateCostReportConfig = async () => {
     try {
         const updatedConfig = await SpaceConnector.clientV2.costAnalysis.costReportConfig.update<CostReportConfigUpdateParameters, CostReportConfigModel>({
             cost_report_config_id: costReportPageState.costReportConfig?.cost_report_config_id ?? '',
-            currency: state.selectedCurrency,
             issue_day: state.enableLastDay ? undefined : Number(issueDay.value),
             language: state.selectedLanguage,
             is_last_day: state.enableLastDay,
@@ -123,9 +115,6 @@ const handleChangeEnableLastDay = () => {
         setForm('issueDay', getLastDay());
     }
 };
-const handleSelectCurrency = (currency: Currency) => {
-    state.selectedCurrency = currency;
-};
 const handleConfirm = () => {
     updateCostReportConfig();
     state.proxyVisible = false;
@@ -134,7 +123,6 @@ const handleConfirm = () => {
 /* Watcher */
 watch(() => props.visible, (visible) => {
     if (visible && costReportPageState.costReportConfig) {
-        state.selectedCurrency = costReportPageState.costReportConfig?.currency;
         state.enableLastDay = costReportPageState.costReportConfig?.is_last_day;
         state.selectedLanguage = costReportPageState.costReportConfig?.language;
         if (!costReportPageState.costReportConfig?.is_last_day) {
@@ -163,30 +151,6 @@ watch(() => props.visible, (visible) => {
                                        :page-size="10"
                                        class="input-field"
                     />
-                </p-field-group>
-                <p-field-group :label="$t('BILLING.COST_MANAGEMENT.COST_REPORT.CURRENCY')"
-                               required
-                >
-                    <p-select-dropdown :menu="state.currencyMenuItems"
-                                       :selected="state.selectedCurrency"
-                                       :required="true"
-                                       class="input-field"
-                                       use-fixed-menu-style
-                                       @select="handleSelectCurrency"
-                    >
-                        <template #menu-item--format="{item}">
-                            <div class="menu-item">
-                                <span>{{ item?.label }}</span>
-                                <p-badge v-if="item.name === CURRENCY.KRW"
-                                         class="ml-1"
-                                         badge-type="subtle"
-                                         style-type="indigo100"
-                                >
-                                    Default
-                                </p-badge>
-                            </div>
-                        </template>
-                    </p-select-dropdown>
                 </p-field-group>
                 <p-field-group :label="$t('BILLING.COST_MANAGEMENT.COST_REPORT.ISSUE_DAY')"
                                :invalid="invalidState.issueDay"
