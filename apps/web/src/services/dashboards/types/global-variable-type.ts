@@ -8,9 +8,11 @@ interface DashboardGlobalVariableBase {
 
 interface ReferenceVariable extends DashboardGlobalVariableBase {
     type: 'reference';
-    reference?: 'cost'|'asset';
-    referenceKey: string;
-    dataKey: string;
+    reference: {
+        resourceType: string; // identity.User, inventory.Collector, etc..
+        dataSourceId?: string;
+        dataKey?: string;
+    }
     options: {
         selectionType: 'multi'|'single';
     }
