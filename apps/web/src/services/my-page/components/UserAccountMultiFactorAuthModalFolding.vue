@@ -30,8 +30,6 @@ const storeState = reactive({
 });
 const state = reactive({
     isCollapsed: true,
-    userId: computed<string>(() => store.state.user.userId),
-    userEmail: computed<string>(() => store.state.user.email),
     proxyIsSentCode: useProxyValue('is-sent-code', props, emit),
 });
 

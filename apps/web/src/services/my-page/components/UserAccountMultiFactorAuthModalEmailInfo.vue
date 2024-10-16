@@ -15,13 +15,11 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 interface Props {
-    mfaType?: string
     isDisabledModal?: boolean
     isSentCode?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    mfaType: '',
     isDisabledModal: false,
     isSentCode: false,
 });
@@ -33,8 +31,6 @@ const storeState = reactive({
 });
 const state = reactive({
     loading: false,
-    userEmail: computed<string>(() => store.state.user.email),
-    userId: computed<string>(() => store.state.user.userId),
     proxyIsSentCode: useProxyValue('isSentCode', props, emit),
     originEmail: storeState.email,
 });
