@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-import { keyBy, mapValues } from 'lodash';
+import { mapValues } from 'lodash';
 
 import {
     PI, PToggleButton, PBadge, PButton,
@@ -9,61 +9,63 @@ import {
 
 import { store } from '@/store';
 
-import type {
-    MultiFactorAuthType,
-    MultiFactorAuthModalDataType,
-} from '@/services/my-page/types/multi-factor-auth-type';
+// import { postEnableMfa } from '@/lib/helper/multi-factor-auth-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { useMultiFactorAuthenticationStore } from '@/services/my-page/stores/multi-factor-authentication-store';
 import {
-    MULTI_FACTOR_AUTH_ITEMS,
+    MULTI_FACTOR_AUTH_ITEMS, MULTI_FACTOR_AUTH_TYPE,
 } from '@/services/my-page/types/multi-factor-auth-type';
 
-interface Props {
-    modalVisible: boolean;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    modalVisible: false,
-});
-const emit = defineEmits<
-    {(e: 'handle-modal', data: MultiFactorAuthModalDataType): void}
->();
+const multiFactorAuthenticationStore = useMultiFactorAuthenticationStore();
+const multiFactorAuthenticationState = multiFactorAuthenticationStore.state;
 
 const storeState = reactive({
     mfa: computed(() => store.state.user.mfa || undefined),
+    selectedType: computed<string>(() => multiFactorAuthenticationState.selectedType),
 });
 const state = reactive({
-    enableMfa: mapValues(keyBy(MULTI_FACTOR_AUTH_ITEMS, 'type'), () => false) as Record<MultiFactorAuthType, boolean>,
+    enableMfa: mapValues(MULTI_FACTOR_AUTH_TYPE, () => false),
     isVerified: computed<boolean>(() => storeState.mfa?.state === 'ENABLED'),
     type: computed<string>(() => storeState.mfa?.mfa_type),
-    selectedType: '',
 });
 
-const handleChangeToggle = (type: MultiFactorAuthType, value: boolean) => {
-    state.selectedType = type;
+const handleChangeToggle = async (type: string, value: boolean) => {
+    multiFactorAuthenticationStore.setSelectedType(type);
+    multiFactorAuthenticationStore.setModalVisible(value);
     state.enableMfa[type] = value;
-    emit('handle-modal', {
-        type,
-        state: value,
-    });
+
+    if (storeState.selectedType !== MULTI_FACTOR_AUTH_TYPE.MS) return;
+
+    multiFactorAuthenticationStore.setModalLoading(true);
+    try {
+        // await postEnableMfa({
+        //     mfa_type: 'OTP',
+        //     options: {},
+        // }, false);
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        multiFactorAuthenticationStore.setModalLoading(false);
+    }
 };
-const handleClickReSyncButton = (type: MultiFactorAuthType) => {
-    emit('handle-modal', {
-        type,
-        isReSync: true,
-    });
+const handleClickReSyncButton = (type: string) => {
+    multiFactorAuthenticationStore.setSelectedType(type);
+    multiFactorAuthenticationStore.setModalType('RE_SYNC');
 };
 
 watch(() => storeState.mfa.mfa_type, (mfa_type) => {
     if (mfa_type) {
         state.enableMfa[mfa_type] = storeState.mfa.state === 'ENABLED';
     } else {
-        state.enableMfa = mapValues(keyBy(MULTI_FACTOR_AUTH_ITEMS, 'type'), () => false) as Record<MultiFactorAuthType, boolean>;
+        state.enableMfa = mapValues(MULTI_FACTOR_AUTH_TYPE, () => false);
     }
 }, { immediate: true });
-watch(() => props.modalVisible, (modalVisible) => {
+watch(() => multiFactorAuthenticationState.modalVisible, (modalVisible) => {
     if (!modalVisible) {
-        state.enableMfa[state.selectedType] = state.type === state.selectedType ? state.isVerified : false;
-        state.selectedType = '';
+        state.enableMfa[storeState.selectedType] = state.type === storeState.selectedType ? state.isVerified : false;
+        multiFactorAuthenticationStore.setSelectedType('');
     }
 }, { immediate: true });
 </script>
