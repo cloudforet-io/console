@@ -194,7 +194,9 @@ const handleUpdateIsAllWorkspaceSelected = (isAllWorkspaceSelected: boolean) => 
 };
 
 onMounted(async () => {
-    if (!costAnalysisPageState.workspaceScope) {
+    if (storeState.isAdminMode) {
+        costAnalysisPageStore.setWorkspaceScope('');
+    } else if (!costAnalysisPageState.workspaceScope) {
         costAnalysisPageStore.setWorkspaceScope(costAnalysisPageGetters.defaultWorkspaceScope);
     }
 });
@@ -202,7 +204,9 @@ onMounted(async () => {
 
 <template>
     <div class="cost-analysis-query-section">
-        <div class="scope-wrapper">
+        <div v-if="storeState.isAdminMode"
+             class="scope-wrapper"
+        >
             <p-field-title inline>
                 {{ $t('HOME.FORM_SCOPE') }}
             </p-field-title> <p-select-dropdown is-filterable
