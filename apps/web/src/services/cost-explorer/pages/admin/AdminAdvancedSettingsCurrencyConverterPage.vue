@@ -9,7 +9,7 @@ import {
 } from '@cloudforet/mirinae';
 
 
-import { CURRENCY } from '@/store/modules/display/config';
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 import type { Currency } from '@/store/modules/display/type';
 import { usePreferencesStore } from '@/store/preferences/preferences-store';
 
@@ -104,7 +104,7 @@ watch(() => state.originUnifiedCostConfig, (unifiedCostConfig) => {
                            required
             >
                 <p-select-dropdown class="currency-dropdown"
-                                   :menu="Object.values(CURRENCY).map((currency) => ({ label: currency, name: currency }))"
+                                   :menu="Object.values(CURRENCY).map((currency) => ({ label: `${CURRENCY_SYMBOL[currency]} ${currency}`, name: currency }))"
                                    :selected="formState.currency"
                                    use-fixed-menu-style
                                    @update:selected="formState.currency = $event"
@@ -116,6 +116,18 @@ watch(() => state.originUnifiedCostConfig, (unifiedCostConfig) => {
                         >
                             Default
                         </p-badge>
+                    </template>
+                    <template #menu-item--format="{item}">
+                        <div class="menu-item">
+                            <span>{{ item?.label }}</span>
+                            <p-badge v-if="item.name === CURRENCY.KRW"
+                                     class="ml-1"
+                                     badge-type="subtle"
+                                     style-type="indigo100"
+                            >
+                                Default
+                            </p-badge>
+                        </div>
                     </template>
                 </p-select-dropdown>
             </p-field-group>
