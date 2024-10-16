@@ -2,10 +2,10 @@
 import UserAccountModuleContainer from '@/services/my-page/components/UserAccountModuleContainer.vue';
 import UserAccountMultiFactorAuthFormModal from '@/services/my-page/components/UserAccountMultiFactorAuthFormModal.vue';
 import UserAccountMultiFactorAuthItems from '@/services/my-page/components/UserAccountMultiFactorAuthItems.vue';
-import { useMultiFactorAuthenticationStore } from '@/services/my-page/stores/multi-factor-authentication-store';
+import { useMultiFactorAuthStore } from '@/services/my-page/stores/multi-factor-auth-store';
 
-const multiFactorAuthenticationStore = useMultiFactorAuthenticationStore();
-const multiFactorAuthenticationState = multiFactorAuthenticationStore.state;
+const multiFactorAuthStore = useMultiFactorAuthStore();
+const multiFactorAuthState = multiFactorAuthStore.state;
 </script>
 
 <template>
@@ -20,7 +20,7 @@ const multiFactorAuthenticationState = multiFactorAuthenticationStore.state;
             </div>
         </template>
         <user-account-multi-factor-auth-items />
-        <user-account-multi-factor-auth-form-modal v-if="multiFactorAuthenticationState.modalVisible" />
+        <user-account-multi-factor-auth-form-modal v-if="multiFactorAuthState.modalVisible" />
     </user-account-module-container>
 </template>
 

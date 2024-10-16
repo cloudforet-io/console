@@ -4,14 +4,14 @@ import { defineStore } from 'pinia';
 
 
 type modelType = 'FORM'|'RE_SYNC'|'DISABLED';
-interface userAccountPageStoreState {
+interface multiFactorAuthState {
     selectedType: string,
     modalVisible: boolean,
     modalLoading: boolean,
     modalType: modelType,
 }
-export const useMultiFactorAuthenticationStore = defineStore('multi-factor-authentication-store', () => {
-    const state = reactive<userAccountPageStoreState>({
+export const useMultiFactorAuthStore = defineStore('multi-factor-auth-store', () => {
+    const state = reactive<multiFactorAuthState>({
         selectedType: '',
         modalVisible: false,
         modalLoading: false,
