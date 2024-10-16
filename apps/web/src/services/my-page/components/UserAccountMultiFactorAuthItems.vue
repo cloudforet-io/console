@@ -13,17 +13,17 @@ import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { useMultiFactorAuthenticationStore } from '@/services/my-page/stores/multi-factor-authentication-store';
+import { useMultiFactorAuthStore } from '@/services/my-page/stores/multi-factor-auth-store';
 import {
     MULTI_FACTOR_AUTH_ITEMS, MULTI_FACTOR_AUTH_TYPE,
 } from '@/services/my-page/types/multi-factor-auth-type';
 
-const multiFactorAuthenticationStore = useMultiFactorAuthenticationStore();
-const multiFactorAuthenticationState = multiFactorAuthenticationStore.state;
+const multiFactorAuthStore = useMultiFactorAuthStore();
+const multiFactorAuthState = multiFactorAuthStore.state;
 
 const storeState = reactive({
     mfa: computed(() => store.state.user.mfa || undefined),
-    selectedType: computed<string>(() => multiFactorAuthenticationState.selectedType),
+    selectedType: computed<string>(() => multiFactorAuthState.selectedType),
 });
 const state = reactive({
     enableMfa: mapValues(MULTI_FACTOR_AUTH_TYPE, () => false),
@@ -32,13 +32,14 @@ const state = reactive({
 });
 
 const handleChangeToggle = async (type: string, value: boolean) => {
-    multiFactorAuthenticationStore.setSelectedType(type);
-    multiFactorAuthenticationStore.setModalVisible(value);
+    multiFactorAuthStore.setSelectedType(type);
+    multiFactorAuthStore.setModalType(value ? 'FORM' : 'DISABLED');
+    multiFactorAuthStore.setModalVisible(true);
     state.enableMfa[type] = value;
 
     if (storeState.selectedType !== MULTI_FACTOR_AUTH_TYPE.MS) return;
 
-    multiFactorAuthenticationStore.setModalLoading(true);
+    multiFactorAuthStore.setModalLoading(true);
     try {
         // await postEnableMfa({
         //     mfa_type: 'OTP',
@@ -47,12 +48,13 @@ const handleChangeToggle = async (type: string, value: boolean) => {
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {
-        multiFactorAuthenticationStore.setModalLoading(false);
+        multiFactorAuthStore.setModalLoading(false);
     }
 };
 const handleClickReSyncButton = (type: string) => {
-    multiFactorAuthenticationStore.setSelectedType(type);
-    multiFactorAuthenticationStore.setModalType('RE_SYNC');
+    multiFactorAuthStore.setSelectedType(type);
+    multiFactorAuthStore.setModalVisible(true);
+    multiFactorAuthStore.setModalType('RE_SYNC');
 };
 
 watch(() => storeState.mfa.mfa_type, (mfa_type) => {
@@ -62,10 +64,10 @@ watch(() => storeState.mfa.mfa_type, (mfa_type) => {
         state.enableMfa = mapValues(MULTI_FACTOR_AUTH_TYPE, () => false);
     }
 }, { immediate: true });
-watch(() => multiFactorAuthenticationState.modalVisible, (modalVisible) => {
+watch(() => multiFactorAuthState.modalVisible, (modalVisible) => {
     if (!modalVisible) {
         state.enableMfa[storeState.selectedType] = state.type === storeState.selectedType ? state.isVerified : false;
-        multiFactorAuthenticationStore.setSelectedType('');
+        multiFactorAuthStore.setSelectedType('');
     }
 }, { immediate: true });
 </script>
@@ -75,7 +77,7 @@ watch(() => multiFactorAuthenticationState.modalVisible, (modalVisible) => {
         <div v-for="(item, idx) in MULTI_FACTOR_AUTH_ITEMS"
              :key="`${item.type} - ${idx}`"
              class="user-account-multi-factor-auth-item"
-             :class="{'disabled': state.type && item.type !== state.type}"
+             :class="{'disabled': state.isVerified && item.type !== state.type}"
         >
             <p-i class="icon"
                  :name="item.icon"
@@ -85,7 +87,7 @@ watch(() => multiFactorAuthenticationState.modalVisible, (modalVisible) => {
             <div class="title-wrapper">
                 <div class="toggle-wrapper">
                     <p-toggle-button :value="state.enableMfa[item.type]"
-                                     :disabled="state.type && item.type !== state.type"
+                                     :disabled="state.isVerified && item.type !== state.type"
                                      @change-toggle="handleChangeToggle(item.type, $event)"
                     />
                     <p class="title">
