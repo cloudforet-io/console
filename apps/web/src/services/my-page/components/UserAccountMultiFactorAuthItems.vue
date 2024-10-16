@@ -77,7 +77,7 @@ watch(() => multiFactorAuthState.modalVisible, (modalVisible) => {
         <div v-for="(item, idx) in MULTI_FACTOR_AUTH_ITEMS"
              :key="`${item.type} - ${idx}`"
              class="user-account-multi-factor-auth-item"
-             :class="{'disabled': state.type && item.type !== state.type}"
+             :class="{'disabled': state.isVerified && item.type !== state.type}"
         >
             <p-i class="icon"
                  :name="item.icon"
@@ -87,7 +87,7 @@ watch(() => multiFactorAuthState.modalVisible, (modalVisible) => {
             <div class="title-wrapper">
                 <div class="toggle-wrapper">
                     <p-toggle-button :value="state.enableMfa[item.type]"
-                                     :disabled="state.type && item.type !== state.type"
+                                     :disabled="state.isVerified && item.type !== state.type"
                                      @change-toggle="handleChangeToggle(item.type, $event)"
                     />
                     <p class="title">

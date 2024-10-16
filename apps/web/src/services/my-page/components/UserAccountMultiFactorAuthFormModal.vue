@@ -71,6 +71,8 @@ const resetFormData = () => {
 };
 const handleChangeInput = (value: string) => {
     validationState.verificationCode = value;
+    validationState.isValidationCodeValid = true;
+    validationState.validationCodeInvalidText = '';
 };
 const handleClickCancel = async () => {
     multiFactorAuthStore.setModalVisible(false);
@@ -91,6 +93,11 @@ const handleClickVerifyButton = async () => {
             await store.dispatch('user/setUser', state.userInfo);
         }
         resetFormData();
+        if (storeState.isReSyncModal) {
+            multiFactorAuthStore.setModalType('FORM');
+        } else {
+            multiFactorAuthStore.setModalVisible(false);
+        }
     } catch (e: any) {
         validationState.isValidationCodeValid = false;
         validationState.validationCodeInvalidText = _i18n.t('COMMON.MFA_MODAL.INVALID_CODE');
@@ -105,6 +112,11 @@ watch(() => storeState.userId, (userId) => {
         state.userInfo = store.state.user;
     }
 }, { immediate: true });
+watch(() => multiFactorAuthState.modalType, () => {
+    state.isSentCode = false;
+    validationState.isValidationCodeValid = true;
+    validationState.validationCodeInvalidText = '';
+});
 </script>
 
 <template>
@@ -120,21 +132,18 @@ watch(() => storeState.userId, (userId) => {
                     @close="handleClickCancel"
     >
         <template #body>
-            <p v-if="storeState.isReSyncModal"
-               class="re-sync-desc"
-            >
-                {{ $t('MY_PAGE.MFA.RESYNC_DESC') }}
-            </p>
-            <div v-else
-                 class="modal-content-wrapper"
-            >
+            <div class="modal-content-wrapper">
+                <p v-if="storeState.isReSyncModal"
+                   class="re-sync-desc"
+                >
+                    {{ $t('MY_PAGE.MFA.RESYNC_DESC') }}
+                </p>
                 <span v-if="storeState.isDisabledModal"
                       class="disable-modal-desc"
                 >
                     {{ $t('COMMON.MFA_MODAL.ALT.DESC') }}
                 </span>
                 <user-account-multi-factor-auth-modal-email-info v-if="storeState.selectedType === MULTI_FACTOR_AUTH_TYPE.EMAIL"
-                                                                 :is-disabled-modal="storeState.isDisabledModal"
                                                                  :is-sent-code.sync="state.isSentCode"
                 />
                 <user-account-multi-factor-auth-modal-m-s-info v-else-if="storeState.selectedType === MULTI_FACTOR_AUTH_TYPE.MS && !storeState.isDisabledModal" />
@@ -178,6 +187,7 @@ watch(() => storeState.userId, (userId) => {
     }
     .re-sync-desc {
         margin-top: 1rem;
+        margin-bottom: 1rem;
     }
     .validation-code-form {
         @apply flex items-end;
