@@ -13,6 +13,7 @@ import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mi
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import { VariableModelFactory } from '@/lib/variable-models';
@@ -43,6 +44,7 @@ const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetters = userWorkspaceStore.getters;
+const appContextStore = useAppContextStore();
 
 interface VariableOption {
     key: ManagedVariableModelKey;
@@ -69,6 +71,7 @@ const props = defineProps<{
 
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 const state = reactive({
     loading: true,
@@ -142,6 +145,10 @@ const initSelectedFilters = () => {
     const _filters = costAnalysisPageState.filters;
     const _selectedItemsMap = {};
     Object.keys(_filters ?? {}).forEach((groupBy) => {
+        if (storeState.isAdminMode && !costAnalysisPageState.isAllWorkspaceSelected && groupBy === GROUP_BY.WORKSPACE) {
+            _selectedItemsMap[groupBy] = [];
+            return;
+        }
         _selectedItemsMap[groupBy] = _filters?.[groupBy].map((d) => ({ name: d, label: d })) ?? [];
         if (costAnalysisPageState.enabledFiltersProperties?.indexOf(groupBy) === -1) {
             costAnalysisPageStore.setEnabledFiltersProperties([

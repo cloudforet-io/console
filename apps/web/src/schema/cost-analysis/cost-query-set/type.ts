@@ -12,6 +12,8 @@ export interface CostQuerySetOption {
     relative_period?: RelativePeriod;
     filters?: ConsoleFilter[];
     display_data_type?: DisplayDataType;
+    is_all_workspace_selected?: boolean;
+    workspace_scope?: string;
     metadata?: {
         filters_schema?: {
             enabled_properties?: string[];

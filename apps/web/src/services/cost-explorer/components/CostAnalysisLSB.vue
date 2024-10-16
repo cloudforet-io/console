@@ -3,14 +3,18 @@ import { computed, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PLazyImg, PSelectDropdown, PI,
+    PLazyImg, PSelectDropdown, PI, PIconButton,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import { usePreferencesStore } from '@/store/preferences/preferences-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
@@ -32,6 +36,10 @@ import {
 } from '@/styles/colors';
 
 
+import {
+    DEFAULT_UNIFIED_COST_CURRENCY,
+    UNIFIED_COST_KEY,
+} from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { MANAGED_COST_QUERY_SET_ID_LIST } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
@@ -45,6 +53,8 @@ const costQuerySetState = costQuerySetStore.state;
 const allReferenceStore = useAllReferenceStore();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
+const domainConfigStore = usePreferencesStore();
+const domainConfigGetters = domainConfigStore.getters;
 
 const router = useRouter();
 const route = useRoute();
@@ -58,6 +68,8 @@ const storeState = reactive({
     favoriteItems: computed(() => favoriteGetters.costAnalysisItems),
     plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
     dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
+    unifiedCostCurrency: computed(() => domainConfigGetters.unifiedCostConfig?.currency ?? DEFAULT_UNIFIED_COST_CURRENCY),
+    isAdminUser: computed(() => store.state.user.roleType === 'DOMAIN_ADMIN'),
 });
 const state = reactive({
     loading: true,
@@ -137,11 +149,13 @@ const state = reactive({
 const dataSourceState = reactive({
     items: computed<MenuItem[]>(() => {
         const dataSourceMap: CostDataSourceReferenceMap = storeState.dataSourceMap;
-        return Object.entries(dataSourceMap).map(([key, value]) => ({
-            name: key,
-            label: value.name,
-            imageUrl: storeState.plugins[value.data.plugin_info?.plugin_id]?.icon ? storeState.plugins[value.data.plugin_info?.plugin_id]?.icon : 'error',
-        }));
+        return [
+            { name: UNIFIED_COST_KEY, label: 'Unified Cost' },
+            ...Object.entries(dataSourceMap).map(([key, value]) => ({
+                name: key,
+                label: value.name,
+                imageUrl: storeState.plugins[value.data.plugin_info?.plugin_id]?.icon ? storeState.plugins[value.data.plugin_info?.plugin_id]?.icon : 'error',
+            }))];
     }),
     selected: computed(() => costQuerySetState.selectedDataSourceId ?? Object.keys(storeState.dataSourceMap)[0]),
 });
@@ -152,7 +166,7 @@ const filterStarredItems = (menuItems: LSBItem[] = []): LSBItem[] => menuItems.f
 const getCurrentCurrencySet = (dataSourceKey: string): string => {
     const defaultCurrencySet = `${CURRENCY_SYMBOL.USD}${CURRENCY.USD}`;
 
-    const currentCurrency: string = storeState.dataSourceMap[dataSourceKey]?.data.plugin_info?.metadata?.currency;
+    const currentCurrency: string = dataSourceKey !== UNIFIED_COST_KEY ? storeState.dataSourceMap[dataSourceKey]?.data.plugin_info?.metadata?.currency : storeState.unifiedCostCurrency;
     const currentSymbol: string = CURRENCY_SYMBOL[currentCurrency];
     const result = (currentCurrency && currentSymbol) && `${currentSymbol}${currentCurrency}`;
 
@@ -169,6 +183,13 @@ const handleSelectDataSource = (selected: string) => {
         },
     })).catch(() => {});
 };
+
+const handleRouteToUnifiedCostSettings = () => {
+    router.push({
+        name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.CURRENCY_CONVERTER._NAME),
+    }).catch(() => {});
+};
+
 </script>
 
 <template>
@@ -197,13 +218,23 @@ const handleSelectDataSource = (selected: string) => {
                     </div>
                 </template>
                 <template #menu-item--format="{item}">
-                    <div class="menu-item">
-                        <span>{{ item.label }}</span>
-                        <span class="selected-item-postfix">
-                            ({{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CURRENCY') }}: {{ getCurrentCurrencySet(item.name) }})
-                        </span>
-                        <beta-mark v-if="item.label === 'Kubernetes'"
-                                   class="beta"
+                    <div class="menu-item-wrapper">
+                        <div class="menu-item">
+                            <span>{{ item.label }}</span>
+                            <span class="selected-item-postfix">
+                                ({{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CURRENCY') }}: {{ getCurrentCurrencySet(item.name) }})
+                            </span>
+                            <beta-mark v-if="item.label === 'Kubernetes'"
+                                       class="beta"
+                            />
+                        </div>
+                        <p-icon-button v-if="item.name === UNIFIED_COST_KEY && storeState.isAdminUser"
+                                       class="menu-icon"
+                                       name="ic_settings"
+                                       size="sm"
+                                       style-type="tertiary"
+                                       shape="square"
+                                       @click.stop="handleRouteToUnifiedCostSettings"
                         />
                     </div>
                 </template>
@@ -248,6 +279,10 @@ const handleSelectDataSource = (selected: string) => {
     .select-options-dropdown {
         padding-right: 0.5rem;
         padding-left: 0.5rem;
+
+        .menu-item-wrapper {
+            @apply flex justify-between;
+        }
     }
     .selected-item-postfix {
         @apply text-gray-500;

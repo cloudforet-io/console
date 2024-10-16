@@ -17,6 +17,7 @@ import ScopedNotification from '@/common/components/scoped-notification/ScopedNo
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { UnifiedCostConfig } from '@/services/advanced/types/preferences-type';
+import { DEFAULT_UNIFIED_COST_CURRENCY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 
 const DEFAULT_AGGREGATION_DATE = 15;
 
@@ -51,7 +52,7 @@ const formState = reactive<{
     exchangeRateSource: string;
     lastDayOfMonth: boolean;
 }>({
-    currency: state.originUnifiedCostConfig?.currency ?? CURRENCY.KRW,
+    currency: state.originUnifiedCostConfig?.currency ?? DEFAULT_UNIFIED_COST_CURRENCY,
     aggregationDate: state.originUnifiedCostConfig?.aggregation_day ?? DEFAULT_AGGREGATION_DATE,
     exchangeRateSource: state.originUnifiedCostConfig?.exchange_source ?? 'Yahoo Finance!',
     lastDayOfMonth: state.originUnifiedCostConfig?.is_last_day ?? false,
@@ -78,7 +79,7 @@ const handleSaveChanges = async () => {
 };
 
 watch(() => state.originUnifiedCostConfig, (unifiedCostConfig) => {
-    formState.currency = unifiedCostConfig?.currency ?? CURRENCY.USD;
+    formState.currency = unifiedCostConfig?.currency ?? DEFAULT_UNIFIED_COST_CURRENCY;
     formState.aggregationDate = unifiedCostConfig?.aggregation_day ?? DEFAULT_AGGREGATION_DATE;
     formState.exchangeRateSource = unifiedCostConfig?.exchange_source ?? 'Yahoo Finance!';
     formState.lastDayOfMonth = unifiedCostConfig?.is_last_day ?? false;
@@ -109,7 +110,7 @@ watch(() => state.originUnifiedCostConfig, (unifiedCostConfig) => {
                                    @update:selected="formState.currency = $event"
                 >
                     <template #dropdown-button="item">
-                        {{ item.label }}<p-badge v-if="item.label === CURRENCY.KRW"
+                        {{ item.label }}<p-badge v-if="item.label === DEFAULT_UNIFIED_COST_CURRENCY"
                                                  badge-type="subtle"
                                                  style-type="indigo100"
                         >
