@@ -2033,6 +2033,7 @@
 			"EDIT_DASHBOARD_NAME": "Edit Dashboard Name",
 			"EDIT_LAYOUT": "Edit Layout",
 			"EXPORT": "Export",
+			"MORE": "More",
 			"MOVE": "Move",
 			"MOVE_DASHBOARDS": "Move Dashboard",
 			"NO_WIDGET_TEXT": "Add widgets with your data and design a custom dashboard tailored to your needs.",
@@ -2073,7 +2074,12 @@
 			"UNSHARE_FROM_ALL_PROJECTS": "Unshare from All Projects",
 			"UNSHARE_FROM_ALL_PROJECTS_DESC": "Are you sure you want to unshare this dashboard from all projects?",
 			"UNSHARE_FROM_ALL_WORKSPACES": "Unshare from All Workspaces",
-			"UNSHARE_FROM_ALL_WORKSPACES_DESC": "Are you sure you want to unshare this dashboard from all workspace?"
+			"UNSHARE_FROM_ALL_WORKSPACES_DESC": "Are you sure you want to unshare this dashboard from all workspace?",
+			"VARIABLES": {
+				"CREATE": "Create",
+				"DELETE_MODAL_TITLE": "Are you sure you want to delete variable?",
+				"IMPORT": "Import"
+			}
 		},
 		"FORM": {
 			"ALT_E_CLONE_DASHBOARD": "Failed to clone dashboard",

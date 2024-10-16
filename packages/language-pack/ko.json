@@ -2033,6 +2033,7 @@
 			"EDIT_DASHBOARD_NAME": "대시보드 이름 수정",
 			"EDIT_LAYOUT": "레이아웃 편집",
 			"EXPORT": "파일 저장",
+			"MORE": "추가",
 			"MOVE": "이동",
 			"MOVE_DASHBOARDS": "대시보드 이동",
 			"NO_WIDGET_TEXT": "데이터를 추가하고 필요에 맞게 커스텀 대시보드를 생하세요.",
@@ -2073,7 +2074,12 @@
 			"UNSHARE_FROM_ALL_PROJECTS": "전체 프로젝트에 공유 해제",
 			"UNSHARE_FROM_ALL_PROJECTS_DESC": "이 대시보드를 모든 프로젝트에서 공유 해제하시겠습니까?",
 			"UNSHARE_FROM_ALL_WORKSPACES": "전체 워크스페이스 공유 해제",
-			"UNSHARE_FROM_ALL_WORKSPACES_DESC": "이 대시보드를 모든 워크스페이스에서 공유 해제하시겠습니까?"
+			"UNSHARE_FROM_ALL_WORKSPACES_DESC": "이 대시보드를 모든 워크스페이스에서 공유 해제하시겠습니까?",
+			"VARIABLES": {
+				"CREATE": "생성 ",
+				"DELETE_MODAL_TITLE": "",
+				"IMPORT": ""
+			}
 		},
 		"FORM": {
 			"ALT_E_CLONE_DASHBOARD": "대시보드 복제 실패",

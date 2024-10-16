@@ -2033,6 +2033,7 @@
 			"EDIT_DASHBOARD_NAME": "ダッシュボード名の編集",
 			"EDIT_LAYOUT": "レイアウトを編集する",
 			"EXPORT": "エクスポート",
+			"MORE": "追加",
 			"MOVE": "移動",
 			"MOVE_DASHBOARDS": "ダッシュボードを移動",
 			"NO_WIDGET_TEXT": "データを追加して、ニーズに合わせたカスタムダッシュボードを設計してください。",
@@ -2073,7 +2074,12 @@
 			"UNSHARE_FROM_ALL_PROJECTS": "すべてのプロジェクトから共有解除",
 			"UNSHARE_FROM_ALL_PROJECTS_DESC": "このダッシュボードをすべてのプロジェクトで共有解除しますか？",
 			"UNSHARE_FROM_ALL_WORKSPACES": "すべてのワークスペースから共有解除",
-			"UNSHARE_FROM_ALL_WORKSPACES_DESC": "ワークスペース全体でこのダッシュボードの共有を解除してもよろしいですか？"
+			"UNSHARE_FROM_ALL_WORKSPACES_DESC": "ワークスペース全体でこのダッシュボードの共有を解除してもよろしいですか？",
+			"VARIABLES": {
+				"CREATE": "生成",
+				"DELETE_MODAL_TITLE": "",
+				"IMPORT": ""
+			}
 		},
 		"FORM": {
 			"ALT_E_CLONE_DASHBOARD": "ダッシュボードのクローンに失敗しました",
