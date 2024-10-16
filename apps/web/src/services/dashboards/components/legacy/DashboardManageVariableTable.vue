@@ -4,10 +4,10 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { cloneDeep, isEqual } from 'lodash';
+import { isEqual } from 'lodash';
 
 import {
-    PBadge, PDataTable, PSelectStatus, PToggleButton, PCollapsiblePanel, PIconButton,
+    PBadge, PDataTable, PToggleButton, PIconButton,
 } from '@cloudforet/mirinae';
 
 import type {
@@ -16,6 +16,7 @@ import type {
 import { i18n } from '@/translations';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+
 
 
 interface VariablesPropertiesForManage extends DashboardVariableSchemaProperty {
@@ -38,32 +39,16 @@ const dashboardDetailGetters = dashboardDetailStore.getters;
 
 const state = reactive({
     orderedVariables: [] as VariablesPropertiesForManage[],
-    filteredVariables: computed<VariablesPropertiesForManage[]>(() => {
-        if (state.selectedVariableType === 'ALL') {
-            return state.orderedVariables;
-        } if (state.selectedVariableType === 'MANAGED') {
-            return state.orderedVariables.filter((d) => d.variable_type === 'MANAGED');
-        }
-        return state.orderedVariables.filter((d) => d.variable_type !== 'MANAGED');
-    }),
-    variableFilterList: computed(() => [
-        { label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_ALL'), name: 'ALL' },
-        { label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_MANAGED'), name: 'MANAGED' },
-        { label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_CUSTOM'), name: 'CUSTOM' },
-    ]),
     selectedVariableType: 'ALL' as VariableType,
     variableFields: [
-        { name: 'name', label: 'Name', width: '220px' },
-        { name: 'selection_type', label: 'Selection Type' },
-        { name: 'variable_type', label: 'Variable Type' },
+        { name: 'name', label: 'Name' },
+        { name: 'type', label: 'Type' },
+        { name: 'reference', label: 'Reference' },
+        { name: 'management', label: 'Management' },
         { name: 'use', label: 'Use', width: '90px' },
-        { name: 'description', label: 'Description', width: '360px' },
-        { name: 'manageable', label: ' ', width: '144px' },
+        { name: 'created_by', label: 'Created By' },
+        { name: 'buttons', label: ' ', width: '144px' },
     ],
-    selectionType: computed(() => ({
-        SINGLE: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.SINGLE_SELECT'),
-        MULTI: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.MULTI_SELECT'),
-    })),
     variableType: computed<Partial<Record<VariableType, TranslateResult>>>(() => ({
         MANAGED: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_MANAGED'),
         CUSTOM: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_CUSTOM'),
@@ -71,28 +56,17 @@ const state = reactive({
 });
 
 /* EVENT */
-const handleSelectType = (selected: VariableType) => {
-    state.selectedVariableType = selected;
+const handleCloneVariable = (variableKey: string) => {
+    emit('clone', variableKey);
 };
-const handleCloneVariable = (propertyName: string) => {
-    emit('clone', propertyName);
+const handleEditVariable = (variableKey: string) => {
+    emit('edit', variableKey);
 };
-const handleEditVariable = (propertyName: string) => {
-    emit('edit', propertyName);
+const handleDeleteVariable = (variableKey: string) => {
+    emit('delete', variableKey);
 };
-const handleDeleteVariable = (propertyName: string) => {
-    emit('delete', propertyName);
-};
-const handleToggleUse = (propertyName: string, value: boolean) => {
-    // change use in state.orderedVariables
-    const selectedIndex = state.orderedVariables.findIndex((variable) => variable.propertyName === propertyName);
-    if (selectedIndex === -1) return;
-    state.orderedVariables[selectedIndex].use = !value;
-
-    // change use in store
-    const _variablesSchema = cloneDeep(dashboardDetailGetters.refinedVariablesSchema);
-    _variablesSchema.properties[propertyName].use = !value;
-    dashboardDetailStore.setVariablesSchema(_variablesSchema);
+const handleToggleUse = () => {
+    //
 };
 
 /* Helper */
@@ -117,25 +91,11 @@ watch(() => dashboardDetailState.variablesSchema.order, (after, before) => {
 
 <template>
     <div class="list-wrapper">
-        <div class="variable-select-filter">
-            <span class="filter-header">{{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_TITLE') }}</span>
-            <p-select-status v-for="(type, idx) in state.variableFilterList"
-                             :key="`variable-type-${idx}`"
-                             :selected="state.selectedVariableType"
-                             :value="type.name"
-                             @change="handleSelectType"
-            >
-                {{ type.label }}
-            </p-select-status>
-        </div>
         <p-data-table class="variable-table"
-                      :items="state.filteredVariables"
+                      :items="state.orderedVariables"
                       :fields="state.variableFields"
         >
-            <template #col-selection_type-format="{ value }">
-                <span>{{ state.selectionType[value] }}</span>
-            </template>
-            <template #col-variable_type-format="{ value }">
+            <template #col-management-format="{ value }">
                 <p-badge :style-type="variableTypeBadgeStyleFormatter(value)"
                          badge-type="solid-outline"
                 >
@@ -145,30 +105,22 @@ watch(() => dashboardDetailState.variablesSchema.order, (after, before) => {
             <template #col-use-format="{ value, item }">
                 <p-toggle-button :value="value"
                                  :disabled="item.disabled || item.required || item.fixed || item.readonly"
-                                 @change-toggle="handleToggleUse(item.propertyName, value)"
+                                 @change-toggle="handleToggleUse"
                 />
             </template>
-            <template #col-description-format="{ value }">
-                <p-collapsible-panel class="options-area"
-                                     is-collapsed
-                                     :line-clamp="1"
-                >
-                    {{ $t(value) }}
-                </p-collapsible-panel>
-            </template>
-            <template #col-manageable-format="{ item, value }">
+            <template #col-buttons-format="{ item, value }">
                 <div v-if="value"
                      class="button-wrapper"
                 >
                     <p-icon-button name="ic_clone"
-                                   @click="handleCloneVariable(item.percentage)"
+                                   @click="handleCloneVariable(item.key)"
                     />
                     <p-icon-button name="ic_edit"
-                                   @click="handleEditVariable(item.percentage)"
+                                   @click="handleEditVariable(item.key)"
                     />
                     <p-icon-button name="ic_delete"
                                    style-type="negative-transparent"
-                                   @click="handleDeleteVariable(item.percentage)"
+                                   @click="handleDeleteVariable(item.key)"
                     />
                 </div>
             </template>
@@ -178,18 +130,6 @@ watch(() => dashboardDetailState.variablesSchema.order, (after, before) => {
 
 <style lang="postcss" scoped>
 .list-wrapper {
-    .variable-select-filter {
-        @apply flex items-center;
-        height: 2.875rem;
-        gap: 1rem;
-        padding: 0.75rem 1rem;
-
-        .filter-header {
-            @apply text-gray-500;
-            font-size: 0.875rem;
-            line-height: 1.25;
-        }
-    }
     .variable-table {
         .options-area {
             padding: 0;

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, reactive } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { isEqual } from 'lodash';
 
@@ -10,10 +11,14 @@ import type { DashboardVariableSchemaProperty, DashboardVars } from '@/schema/da
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import DashboardVariableDropdown from '@/services/dashboards/components/dashboard-detail/DashboardVariableDropdown.vue';
+import DashboardVariablesMoreButton
+    from '@/services/dashboards/components/dashboard-detail/DashboardVariablesMoreButton.vue';
+import DashboardManageVariableOverlay from '@/services/dashboards/components/legacy/DashboardManageVariableOverlay.vue';
 import {
     MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP,
     MANAGED_DASHBOARD_VARIABLES_SCHEMA,
 } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
+import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/constants/manage-variable-overlay-constant';
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
@@ -30,6 +35,7 @@ const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update', val: { vars?: DashboardVars }): void;
 }>();
 
+const route = useRoute();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailGetters = dashboardDetailStore.getters;
@@ -40,6 +46,7 @@ const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 const state = reactive({
+    showOverlay: computed(() => route.hash === `#${MANAGE_VARIABLES_HASH_NAME}`),
     variableProperties: computed<Record<string, DashboardVariableSchemaProperty>>(() => {
         const _defaultDashboardVariables: Record<string, DashboardVariableSchemaProperty> = {};
         if (storeState.isAdminMode) {
@@ -117,6 +124,8 @@ const handleResetVariables = () => {
         >
             {{ $t('DASHBOARDS.CUSTOMIZE.SAVE') }}
         </p-text-button>
+        <dashboard-variables-more-button />
+        <dashboard-manage-variable-overlay :visible="state.showOverlay" />
     </div>
 </template>
 
