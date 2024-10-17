@@ -64,7 +64,7 @@ onBeforeMount(async () => {
 
 <style scoped lang="postcss">
 .gnb {
-    z-index: 50;
+    z-index: 1020;
     .g-n-b-item {
         @apply absolute flex border-gray-200;
     }

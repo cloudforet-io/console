@@ -332,7 +332,6 @@ onMounted(async () => {
 .cost-analysis-query-section {
     position: relative;
     margin-top: 1.5rem;
-    z-index: 1;
 
     .scope-wrapper {
         margin-bottom: 1rem;
