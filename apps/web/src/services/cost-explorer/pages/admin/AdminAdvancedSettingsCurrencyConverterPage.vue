@@ -3,6 +3,8 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
+import dayjs from 'dayjs';
+
 import {
     PFieldGroup, PCheckbox, PRadioGroup, PRadio, PBadge,
     PPaneLayout, PTextInput, PSelectDropdown, PButton,
@@ -78,6 +80,21 @@ const handleSaveChanges = async () => {
     }
 };
 
+const getLastDay = (): number => {
+    const today = dayjs.utc();
+    if (today.isSame(today.endOf('month'), 'day')) {
+        return today.add(1, 'month').endOf('month').date();
+    }
+    return today.endOf('month').date();
+};
+
+const handleUpdateLastDayOfMonth = (value:boolean) => {
+    formState.lastDayOfMonth = value;
+    if (value) {
+        formState.aggregationDate = getLastDay();
+    }
+};
+
 watch(() => state.originUnifiedCostConfig, (unifiedCostConfig) => {
     formState.currency = unifiedCostConfig?.currency ?? DEFAULT_UNIFIED_COST_CURRENCY;
     formState.aggregationDate = unifiedCostConfig?.aggregation_day ?? DEFAULT_AGGREGATION_DATE;
@@ -144,8 +161,9 @@ watch(() => state.originUnifiedCostConfig, (unifiedCostConfig) => {
                         :disabled="formState.lastDayOfMonth"
                     />
                     <p-checkbox
-                        v-model="formState.lastDayOfMonth"
+                        :selected="formState.lastDayOfMonth"
                         class="ml-2"
+                        @change="handleUpdateLastDayOfMonth"
                     >
                         {{ $t('COST_EXPLORER.CURRENCY_CONVERTER_PAGE.LAST_DAY_OF_THE_MONTH') }}
                     </p-checkbox>
