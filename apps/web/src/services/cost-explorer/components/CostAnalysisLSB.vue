@@ -150,7 +150,8 @@ const dataSourceState = reactive({
     items: computed<MenuItem[]>(() => {
         const dataSourceMap: CostDataSourceReferenceMap = storeState.dataSourceMap;
         return [
-            { name: UNIFIED_COST_KEY, label: 'Unified Cost' },
+            { name: UNIFIED_COST_KEY, label: 'Unified Cost', icon: 'ic_unified-cost' },
+            { type: 'divider' },
             ...Object.entries(dataSourceMap).map(([key, value]) => ({
                 name: key,
                 label: value.name,
@@ -211,6 +212,12 @@ const handleRouteToUnifiedCostSettings = () => {
                                     :src="item.imageUrl"
                                     width="1rem"
                                     height="1rem"
+                        />
+                        <p-i v-if="item && item.icon"
+                             width="1rem"
+                             height="1rem"
+                             class="selected-icon"
+                             name="ic_unified-cost"
                         />
                         <span class="selected-text">
                             {{ item?.label }}
