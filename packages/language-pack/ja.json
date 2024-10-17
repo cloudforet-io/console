@@ -1216,6 +1216,8 @@
 				"TITLE": "MFAを無効化にしますか？",
 				"VERIFIED": "認証済みです"
 			},
+			"ALT_S_DISABLED": "",
+			"ALT_S_ENABLED": "",
 			"ALT_S_SENT_EMAIL": "認証コードがメールで送信されました。",
 			"CHANGE": {
 				"CANCEL": "キャンセル",

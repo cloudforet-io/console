@@ -1216,6 +1216,8 @@
 				"TITLE": "Are you sure you want to disable MFA?",
 				"VERIFIED": "Verified"
 			},
+			"ALT_S_DISABLED": "MFA successfully disabled",
+			"ALT_S_ENABLED": "MFA successfully enabled",
 			"ALT_S_SENT_EMAIL": "A verification code has been sent to your email.",
 			"CHANGE": {
 				"CANCEL": "Cancel",
