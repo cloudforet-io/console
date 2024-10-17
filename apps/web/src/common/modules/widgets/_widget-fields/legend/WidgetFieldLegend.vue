@@ -78,11 +78,11 @@ onMounted(() => {
                        style-type="secondary"
                        class="position-wrapper"
         >
-            <p-select-dropdown class="w-full"
-                               use-fixed-menu-style
+            <p-select-dropdown use-fixed-menu-style
                                reset-selection-on-menu-close
                                :menu="state.positionMenuItems"
                                :selected="state.proxyValue?.position"
+                               block
                                @select="handleSelectPosition"
             />
         </p-field-group>

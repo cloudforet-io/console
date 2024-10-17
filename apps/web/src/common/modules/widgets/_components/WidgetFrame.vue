@@ -187,7 +187,6 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
             <p-select-dropdown v-if="!props.disableManageButtons"
                                style-type="tertiary-icon-button"
                                button-icon="ic_ellipsis-horizontal"
-                               class="etc-button"
                                :menu="state.etcMenuItems"
                                :selected="[]"
                                :visible-menu.sync="state.etcMenuVisible"

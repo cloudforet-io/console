@@ -55,6 +55,7 @@ onMounted(() => {
         >
             <p-select-dropdown :menu="state.granularityMenuItems"
                                :selected="state.proxyValue"
+                               block
                                @update:selected="handleUpdateSelect"
             />
         </p-field-group>

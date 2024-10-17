@@ -115,10 +115,10 @@ onMounted(() => {
                            class="pb-1"
             >
                 <p-select-dropdown :menu="labelsMenuItem"
-                                   class="w-full"
                                    :selected="state.proxyValue?.field"
                                    use-fixed-menu-style
                                    :invalid="state.proxyValue?.field === undefined"
+                                   block
                                    @update:selected="handleUpdateField"
                 />
             </p-field-group>

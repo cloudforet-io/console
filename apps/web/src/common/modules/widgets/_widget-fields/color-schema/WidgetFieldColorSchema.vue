@@ -81,11 +81,11 @@ const gradientGenerator = (color: string) => `linear-gradient(90deg, ${COLOR_SCH
                        required
         >
             <div class="contents">
-                <p-select-dropdown class="w-full"
-                                   :visible-menu.sync="state.visibleMenu"
+                <p-select-dropdown :visible-menu.sync="state.visibleMenu"
                                    use-fixed-menu-style
                                    :menu="state.colorSchemaList"
                                    :selected="state.selectedColor"
+                                   block
                 >
                     <template #dropdown-button>
                         <span class="color-circle"
