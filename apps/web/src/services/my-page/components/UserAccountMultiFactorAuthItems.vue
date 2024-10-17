@@ -1,17 +1,11 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-import { mapValues } from 'lodash';
-
 import {
     PI, PToggleButton, PBadge, PButton,
 } from '@cloudforet/mirinae';
 
 import { store } from '@/store';
-
-// import { postEnableMfa } from '@/lib/helper/multi-factor-auth-helper';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useMultiFactorAuthStore } from '@/services/my-page/stores/multi-factor-auth-store';
 import {
@@ -26,7 +20,7 @@ const storeState = reactive({
     selectedType: computed<string>(() => multiFactorAuthState.selectedType),
 });
 const state = reactive({
-    enableMfa: mapValues(MULTI_FACTOR_AUTH_TYPE, () => false),
+    enableMfa: {},
     isVerified: computed<boolean>(() => storeState.mfa?.state === 'ENABLED'),
     type: computed<string>(() => storeState.mfa?.mfa_type),
 });
@@ -36,20 +30,6 @@ const handleChangeToggle = async (type: string, value: boolean) => {
     multiFactorAuthStore.setModalType(value ? 'FORM' : 'DISABLED');
     multiFactorAuthStore.setModalVisible(true);
     state.enableMfa[type] = value;
-
-    if (storeState.selectedType !== MULTI_FACTOR_AUTH_TYPE.MS) return;
-
-    multiFactorAuthStore.setModalLoading(true);
-    try {
-        // await postEnableMfa({
-        //     mfa_type: 'OTP',
-        //     options: {},
-        // }, false);
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    } finally {
-        multiFactorAuthStore.setModalLoading(false);
-    }
 };
 const handleClickReSyncButton = (type: string) => {
     multiFactorAuthStore.setSelectedType(type);
@@ -61,7 +41,11 @@ watch(() => storeState.mfa.mfa_type, (mfa_type) => {
     if (mfa_type) {
         state.enableMfa[mfa_type] = storeState.mfa.state === 'ENABLED';
     } else {
-        state.enableMfa = mapValues(MULTI_FACTOR_AUTH_TYPE, () => false);
+        const result: Record<string, boolean> = {};
+        Object.values(MULTI_FACTOR_AUTH_TYPE).forEach((value) => {
+            result[value] = false;
+        });
+        state.enableMfa = result;
     }
 }, { immediate: true });
 watch(() => multiFactorAuthState.modalVisible, (modalVisible) => {

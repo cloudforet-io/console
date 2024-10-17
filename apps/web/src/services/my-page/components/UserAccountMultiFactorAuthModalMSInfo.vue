@@ -1,21 +1,70 @@
 <script setup lang="ts">
 import { useQRCode } from '@vueuse/integrations/useQRCode';
-import { reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
-    PTextInput, PIconButton,
+    PTextInput, PIconButton, PSpinner,
 } from '@cloudforet/mirinae';
 
-const qrcode = useQRCode('https://vueuse.org', {
-    margin: 0,
+import { postEnableMfa } from '@/lib/helper/multi-factor-auth-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { useMultiFactorAuthStore } from '@/services/my-page/stores/multi-factor-auth-store';
+
+const multiFactorAuthStore = useMultiFactorAuthStore();
+const multiFactorAuthState = multiFactorAuthStore.state;
+
+const storeState = reactive({
+    modalInitLoading: computed<boolean>(() => multiFactorAuthState.modalInitLoading),
 });
 
 const state = reactive({
     // TEMP DATA
-    passkey: '5PFZQPE3HQTY7D74',
+    passkey: '',
+    qrUri: '',
+    qrcode: '',
 });
 
-const handleClickRefreshButton = () => {};
+const initState = () => {
+    state.passkey = '';
+    state.qrUri = '';
+    state.qrcode = '';
+};
+const handleClickRefreshButton = () => {
+    initState();
+    initQrCodeInfo();
+};
+
+const initQrCodeInfo = async () => {
+    multiFactorAuthStore.setModalInitLoading(true);
+    try {
+        // TODO: check API
+        const userInfo = await postEnableMfa({
+            mfa_type: 'OTP',
+            options: {},
+        }, false);
+        console.log(userInfo?.mfa.options.otp_qrcode_uri);
+        // state.qrUrl = userInfo.mfa.options.otp_qrcode_uri
+        state.qrUri = 'otpauth://totp/issuer_name:name?secret=EOTXGURB7VQX6NTN5TVZXK5HBBIOAMGQ&issuer=issuer_name';
+        state.passkey = state.qrUri.match(/secret=([^&]*)/)?.[1] || '';
+        return;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        multiFactorAuthStore.setModalInitLoading(false);
+    }
+};
+
+watch(() => state.qrUri, (qrUri) => {
+    state.qrcode = useQRCode(qrUri, {
+        margin: 0,
+    });
+});
+
+(() => {
+    initQrCodeInfo();
+})();
 </script>
 
 <template>
@@ -33,7 +82,12 @@ const handleClickRefreshButton = () => {};
             <li>{{ $t('MY_PAGE.MFA.STEP1') }}</li>
             <li>{{ $t('MY_PAGE.MFA.STEP2') }}</li>
         </ol>
-        <img :src="qrcode"
+        <p-spinner v-if="storeState.modalInitLoading"
+                   size="md"
+                   class="loading qrcode"
+        />
+        <img v-else
+             :src="state.qrcode"
              alt="QR Code"
              class="qrcode"
         >
@@ -62,6 +116,9 @@ const handleClickRefreshButton = () => {};
 .user-account-multi-factor-auth-modal-ms-info {
     @apply flex flex-col text-paragraph-md;
     margin-bottom: 0.5rem;
+    .loading {
+        @apply flex items-center justify-center;
+    }
     .qrcode {
         width: 6.25rem;
         height: 6.25rem;

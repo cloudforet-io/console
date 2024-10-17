@@ -174,6 +174,9 @@ watch(() => multiFactorAuthState.modalType, () => {
             <span v-if="storeState.isDisabledModal">
                 {{ $t('COMMON.MFA_MODAL.ALT.DISABLED') }}
             </span>
+            <span v-else>
+                {{ $t('COMMON.MFA_MODAL.VERIFY') }}
+            </span>
         </template>
     </p-button-modal>
 </template>
