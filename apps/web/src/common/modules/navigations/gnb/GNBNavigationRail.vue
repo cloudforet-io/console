@@ -19,6 +19,7 @@ import type { DisplayMenu } from '@/store/modules/display/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
+import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';
@@ -53,6 +54,9 @@ const storeState = reactive({
     currentWorkspaceId: computed(() => userWorkspaceGetters.currentWorkspaceId),
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceGetters.costDataSource),
 });
+
+const noParentsMenuList:MenuId[] = [MENU_ID.DASHBOARDS, MENU_ID.WORKSPACE_HOME, MENU_ID.PROJECT];
+
 const state = reactive({
     isInit: false as boolean|undefined,
     isHovered: false,
@@ -74,7 +78,7 @@ const state = reactive({
                 {
                     ...menu,
                     name: menu.id,
-                    type: (menu.id === MENU_ID.DASHBOARDS) ? 'item' : 'header',
+                    type: (noParentsMenuList.includes(menu.id)) ? 'item' : 'header',
                 },
             ];
             if (menu.subMenuList) {
@@ -87,6 +91,8 @@ const state = reactive({
         const reversedMatched = clone(route.matched).reverse();
         const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
         const targetMenuId: string = closestRoute?.name || closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
+        console.log('all', closestRoute?.name, closestRoute?.meta?.menuId, MENU_ID.WORKSPACE_HOME);
+        console.log('targetMenuId', targetMenuId);
         if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
             return '';
         }
@@ -160,7 +166,7 @@ onMounted(async () => {
                              :to="(item.type === 'header' && item.subMenuList?.length > 0) ? '' : item.to"
                              class="service-menu"
                              :class="{
-                                 'is-selected': state.selectedMenuId.includes(item.id) && item.type !== 'header',
+                                 'is-selected': state.selectedMenuId.split('.').includes(item.id) && item.type !== 'header',
                                  'is-only-label': item.type === 'header' && item.subMenuList?.length > 0
                              }"
                 >
