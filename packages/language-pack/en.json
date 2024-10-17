@@ -2380,6 +2380,7 @@
 		"COST_SUMMARY_BY_PROJECT": "by Project",
 		"COST_SUMMARY_CURRENT_TOTAL_COST": "Current Month-to-Date Cost",
 		"COST_SUMMARY_DESC": "The cost above may differ from the costs in the report",
+		"COST_SUMMARY_GO_TO_COST_ANALYSIS": "Go to Cost Analysis",
 		"COST_SUMMARY_GO_TO_REPORT": "Go to Cost Report",
 		"COST_SUMMARY_LAST_MONT_TOTAL_COST": "Last Month Total Cost",
 		"COST_SUMMARY_RECENT": "Recent Cost Report for {date}",

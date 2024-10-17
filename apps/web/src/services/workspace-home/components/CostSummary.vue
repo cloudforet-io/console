@@ -235,13 +235,27 @@ watch(() => storeState.costReportConfig, async (costReportConfig) => {
                 </div>
                 <div v-if="!state.isWorkspaceMember && state.accessLink">
                     <p-divider class="divider" />
-                    <p-link highlight
-                            :to="getProperRouteLocation({ name: COST_EXPLORER_ROUTE.COST_REPORT._NAME })"
-                            action-icon="internal-link"
-                            class="link"
-                    >
-                        {{ $t('HOME.COST_SUMMARY_GO_TO_REPORT') }}
-                    </p-link>
+                    <div class="link-footer">
+                        <p-link highlight
+                                :to="getProperRouteLocation({ name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME })"
+                                action-icon="internal-link"
+                                class="link"
+                        >
+                            {{ $t('HOME.COST_SUMMARY_GO_TO_COST_ANALYSIS') }}
+                        </p-link>
+                        <div class="vertical-divider">
+                            <p-divider style="height: 14px;"
+                                       vertical
+                            />
+                        </div>
+                        <p-link highlight
+                                :to="getProperRouteLocation({ name: COST_EXPLORER_ROUTE.COST_REPORT._NAME })"
+                                action-icon="internal-link"
+                                class="link"
+                        >
+                            {{ $t('HOME.COST_SUMMARY_GO_TO_REPORT') }}
+                        </p-link>
+                    </div>
                 </div>
             </div>
             <empty-summary-data v-else
@@ -309,10 +323,17 @@ watch(() => storeState.costReportConfig, async (costReportConfig) => {
     .divider {
         @apply bg-gray-150;
     }
-    .link {
-        @apply flex items-center justify-center text-label-md;
-        padding-top: 0.625rem;
-        padding-bottom: 0.75rem;
+    .link-footer {
+        @apply flex justify-center items-center gap-4;
+
+        .vertical-divider {
+            @apply flex items-center h-full;
+        }
+        .link {
+            @apply inline-flex items-center justify-center text-label-md;
+            padding-top: 0.625rem;
+            padding-bottom: 0.75rem;
+        }
     }
 }
 </style>

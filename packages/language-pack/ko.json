@@ -2380,6 +2380,7 @@
 		"COST_SUMMARY_BY_PROJECT": "프로젝트별",
 		"COST_SUMMARY_CURRENT_TOTAL_COST": "당월 누적값",
 		"COST_SUMMARY_DESC": "위의 비용은 비용 리포트 발행 시점에 따라 최종 비용에 차이가 있을 수 있습니다.",
+		"COST_SUMMARY_GO_TO_COST_ANALYSIS": "コスト分析に移動",
 		"COST_SUMMARY_GO_TO_REPORT": "비용 리포트로 이동",
 		"COST_SUMMARY_LAST_MONT_TOTAL_COST": "전월 총 비용",
 		"COST_SUMMARY_RECENT": "최근 비용 리포트({date})",
