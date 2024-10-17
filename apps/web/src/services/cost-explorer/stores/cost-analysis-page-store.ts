@@ -14,8 +14,8 @@ import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useDomainStore } from '@/store/domain/domain-store';
 import type { Currency } from '@/store/modules/display/type';
-import { usePreferencesStore } from '@/store/preferences/preferences-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 
@@ -54,8 +54,8 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
     const appContextStore = useAppContextStore();
     const userWorkspaceStore = useUserWorkspaceStore();
     const workspaceStoreGetters = userWorkspaceStore.getters;
-    const domainConfigStore = usePreferencesStore();
-    const domainConfigGetters = domainConfigStore.getters;
+    const domainStore = useDomainStore();
+    const domainGetters = domainStore.getters;
 
     const _state = reactive({
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -84,7 +84,7 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
         currency: computed<Currency>(() => {
             if (costQuerySetState.selectedDataSourceId) {
                 const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId ?? ''];
-                if (costQuerySetState.selectedDataSourceId === UNIFIED_COST_KEY) return (domainConfigGetters.unifiedCostConfig?.currency ?? DEFAULT_UNIFIED_COST_CURRENCY);
+                if (costQuerySetState.selectedDataSourceId === UNIFIED_COST_KEY) return (domainGetters.domainUnifiedCostCurrency ?? DEFAULT_UNIFIED_COST_CURRENCY);
                 return targetDataSource?.data?.plugin_info?.metadata?.currency ?? 'USD';
             }
             return 'USD';

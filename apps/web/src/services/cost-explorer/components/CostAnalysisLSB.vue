@@ -13,8 +13,8 @@ import { i18n } from '@/translations';
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useDomainStore } from '@/store/domain/domain-store';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
-import { usePreferencesStore } from '@/store/preferences/preferences-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
@@ -53,8 +53,8 @@ const costQuerySetState = costQuerySetStore.state;
 const allReferenceStore = useAllReferenceStore();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
-const domainConfigStore = usePreferencesStore();
-const domainConfigGetters = domainConfigStore.getters;
+const domainStore = useDomainStore();
+const domainGetters = domainStore.getters;
 
 const router = useRouter();
 const route = useRoute();
@@ -68,7 +68,7 @@ const storeState = reactive({
     favoriteItems: computed(() => favoriteGetters.costAnalysisItems),
     plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
     dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
-    unifiedCostCurrency: computed(() => domainConfigGetters.unifiedCostConfig?.currency ?? DEFAULT_UNIFIED_COST_CURRENCY),
+    unifiedCostCurrency: computed(() => domainGetters.domainUnifiedCostCurrency ?? DEFAULT_UNIFIED_COST_CURRENCY),
     isAdminUser: computed(() => store.state.user.roleType === 'DOMAIN_ADMIN'),
 });
 const state = reactive({

@@ -52,7 +52,7 @@ const handleCloseClick = () => {
 
 <template>
     <div class="scoped-notification"
-         :class="{info: props.type==='info', waring: props.type ==='warning', danger: props.type ==='danger', 'in-section': props.layout === 'in-section'}"
+         :class="{info: props.type==='info', waring: props.type ==='warning', danger: props.type ==='danger', 'in-section': props.layout === 'in-section', 'items-center': props.noTitle}"
     >
         <p-i v-if="props.titleIcon"
              class="left-icon"
