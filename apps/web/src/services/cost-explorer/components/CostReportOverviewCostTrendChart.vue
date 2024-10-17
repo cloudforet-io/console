@@ -14,7 +14,7 @@ import {
 } from 'lodash';
 
 import {
-    PCollapsibleToggle, PDataTable, PSkeleton,
+    PCollapsibleToggle, PDataTable,
 } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 import { numberFormatter } from '@cloudforet/utils';
@@ -209,11 +209,7 @@ useResizeObserver(chartContext, throttle(() => {
 <template>
     <div class="cost-report-overview-cost-trend-chart">
         <div class="chart-wrapper">
-            <p-skeleton v-if="props.loading"
-                        height="100%"
-            />
-            <div v-show="!props.loading"
-                 ref="chartContext"
+            <div ref="chartContext"
                  class="chart"
             />
         </div>

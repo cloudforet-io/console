@@ -8,7 +8,7 @@ import { isEqual } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PSelectButton, PSelectDropdown, PSkeleton,
+    PDataLoader, PSelectButton, PSelectDropdown,
 } from '@cloudforet/mirinae';
 import type { SelectButtonType } from '@cloudforet/mirinae/types/inputs/buttons/select-button-group/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
@@ -29,6 +29,7 @@ import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/
 import CostReportOverviewCostTrendChart from '@/services/cost-explorer/components/CostReportOverviewCostTrendChart.vue';
 import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
+
 
 
 type CostReportDataAnalyzeResult = {
@@ -198,44 +199,37 @@ watch([
             </div>
         </template>
         <template #content>
-            <div class="summary-wrapper">
-                <div class="summary-item">
-                    <div class="summary-label">
-                        {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.TOTAL_COST_FOR_PREVIOUS_MONTH', { previous_month: state.period.end }) }}
+            <p-data-loader :loading="state.loading"
+                           :data="state.data"
+                           :min-loading-time="500"
+            >
+                <div class="summary-wrapper">
+                    <div class="summary-item">
+                        <div class="summary-label">
+                            {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.TOTAL_COST_FOR_PREVIOUS_MONTH', { previous_month: state.period.end }) }}
+                        </div>
+                        <div class="summary-value">
+                            <span class="currency-symbol">{{ CURRENCY_SYMBOL?.[costReportPageGetters.currency] }}</span>
+                            <span class="value">{{ currencyMoneyFormatter(state.previousTotalAmount, {currency: costReportPageGetters.currency, style: 'decimal'}) }}</span>
+                        </div>
                     </div>
-                    <p-skeleton v-if="state.loading"
-                                width="8rem"
-                                height="2rem"
-                    />
-                    <div v-else
-                         class="summary-value"
-                    >
-                        <span class="currency-symbol">{{ CURRENCY_SYMBOL?.[costReportPageGetters.currency] }}</span>
-                        <span class="value">{{ currencyMoneyFormatter(state.previousTotalAmount, {currency: costReportPageGetters.currency, style: 'decimal'}) }}</span>
-                    </div>
-                </div>
-                <div class="summary-item">
-                    <div class="summary-label">
-                        {{ state.selectedPeriodTranslation }}
-                    </div>
-                    <p-skeleton v-if="state.loading"
-                                width="8rem"
-                                height="2rem"
-                    />
-                    <div v-else
-                         class="summary-value"
-                    >
-                        <span class="currency-symbol">{{ CURRENCY_SYMBOL?.[costReportPageGetters.currency] }}</span>
-                        <span class="value">{{ currencyMoneyFormatter(state.last12MonthsAverage, {currency: costReportPageGetters.currency, style: 'decimal'}) }}</span>
+                    <div class="summary-item">
+                        <div class="summary-label">
+                            {{ state.selectedPeriodTranslation }}
+                        </div>
+                        <div class="summary-value">
+                            <span class="currency-symbol">{{ CURRENCY_SYMBOL?.[costReportPageGetters.currency] }}</span>
+                            <span class="value">{{ currencyMoneyFormatter(state.last12MonthsAverage, {currency: costReportPageGetters.currency, style: 'decimal'}) }}</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <cost-report-overview-cost-trend-chart
-                :group-by="state.selectedTarget"
-                :period="state.period"
-                :data="state.data"
-                :loading="state.loading"
-            />
+                <cost-report-overview-cost-trend-chart
+                    :group-by="state.selectedTarget"
+                    :period="state.period"
+                    :data="state.data"
+                    :loading="state.loading"
+                />
+            </p-data-loader>
         </template>
     </cost-report-overview-card-template>
 </template>
