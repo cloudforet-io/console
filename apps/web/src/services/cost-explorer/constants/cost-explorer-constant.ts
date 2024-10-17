@@ -53,4 +53,4 @@ export const FILTER = {
 } as const;
 
 export const DEFAULT_UNIFIED_COST_CURRENCY = CURRENCY.KRW;
-export const UNIFIED_COST_KEY = 'unifiedCost';
+export const UNIFIED_COST_KEY = 'unified-cost-data-source';

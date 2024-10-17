@@ -163,6 +163,8 @@ watch(() => props.visible, (visible) => {
                                       :disabled="state.enableLastDay"
                                       type="number"
                                       class="input-field"
+                                      min="1"
+                                      max="31"
                                       @update:value="setForm('issueDay', $event)"
                         />
                         <p-checkbox class="checkbox"
@@ -195,19 +197,11 @@ watch(() => props.visible, (visible) => {
     </p-button-modal>
 </template>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 .input-field {
     width: 10rem;
 }
 
-/* custom design-system component - p-text-input */
-:deep(.p-text-input) {
-    .input-container {
-        .tag-container {
-            width: 90%;
-        }
-    }
-}
 .checkbox {
     padding-left: 0.5rem;
 }

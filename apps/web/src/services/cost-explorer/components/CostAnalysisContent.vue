@@ -6,8 +6,6 @@ import { useRoute, useRouter } from 'vue-router/composables';
 
 import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
 
-import { usePreferencesStore } from '@/store/preferences/preferences-store';
-
 import {
     queryStringToArray,
     queryStringToObject,
@@ -32,7 +30,6 @@ const router = useRouter();
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
-const domainConfigStore = usePreferencesStore();
 
 /* util */
 const getQueryOptionsFromUrlQuery = (urlQuery: CostAnalysisPageUrlQuery): CostQuerySetModel['options'] => ({
@@ -58,9 +55,6 @@ watch(() => costAnalysisPageGetters.selectedQuerySet, async (selectedQuerySet) =
     }
 }, { immediate: true });
 
-(() => {
-    domainConfigStore.fetchPreferences();
-})();
 </script>
 
 <template>

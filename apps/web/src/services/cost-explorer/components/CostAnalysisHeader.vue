@@ -143,9 +143,15 @@ watch(() => state.favoriteOptions, async (favoriteOptions) => {
             <p-heading :title="state.title">
                 <template #title-left-extra>
                     <div class="title-left-extra">
-                        <p-lazy-img :src="state.dataSourceImage"
+                        <p-lazy-img v-if="state.dataSourceImage"
+                                    :src="state.dataSourceImage"
                                     width="2rem"
                                     height="2rem"
+                        />
+                        <p-i v-else
+                             name="ic_unified-cost"
+                             width="2rem"
+                             height="2rem"
                         />
                         <p-i v-if="state.managedCostQuerySetList.some((item) => item.name === (state.title || ''))"
                              name="ic_main-filled"
