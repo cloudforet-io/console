@@ -375,7 +375,7 @@ const handlePrint = () => {
                         highlight
                         use-anchor-scroll
                 >
-                    {{ $t('COMMON.COST_REPORT.TOTAL_AMOUNT_BY_PROVIDER') }}
+                    {{ $t('COMMON.COST_REPORT.DETAILS_BY_PROVIDER') }}
                 </p-link>
                 <p-link v-if="!config.get('COST_REPORT.EXCLUDE.CONTENTS.product')"
                         :to="{ ...router.currentRoute, hash: '#details-by-product' }"
