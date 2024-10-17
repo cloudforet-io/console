@@ -2380,7 +2380,7 @@
 		"COST_SUMMARY_BY_PROJECT": "プロジェクトごとに",
 		"COST_SUMMARY_CURRENT_TOTAL_COST": "現在の月初から今までの費用",
 		"COST_SUMMARY_DESC": "上記の費用は、報告書の費用と異なる場合があります",
-		"COST_SUMMARY_GO_TO_COST_ANALYSIS": "비용 분석으로 이동",
+		"COST_SUMMARY_GO_TO_COST_ANALYSIS": "コスト分析に移動",
 		"COST_SUMMARY_GO_TO_REPORT": "コストレポートに移動",
 		"COST_SUMMARY_LAST_MONT_TOTAL_COST": "先月の総費用",
 		"COST_SUMMARY_RECENT": "{date}の最近の費用レポート",
