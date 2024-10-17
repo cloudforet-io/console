@@ -42,6 +42,7 @@ interface SelectDropdownProps {
     buttonIcon?: string;
     isFixedWidth?: boolean;
     resetSelectionOnMenuClose?: boolean;
+    block?: boolean;
 
     /* context menu props */
     isFilterable?: boolean;
@@ -80,6 +81,7 @@ const props = withDefaults(defineProps<SelectDropdownProps>(), {
     showDeleteAllButton: false,
     buttonIcon: undefined,
     resetSelectionOnMenuClose: false,
+    block: false,
     /* context menu props */
     visibleMenu: undefined,
     menu: () => [],
@@ -318,6 +320,7 @@ defineExpose({ reloadMenu });
              [props.size]: true,
              'is-fixed-width': props.isFixedWidth,
              'is-filterable': props.isFilterable,
+             'block': props.block,
          }"
     >
         <dropdown-button ref="targetRef"
@@ -408,6 +411,9 @@ defineExpose({ reloadMenu });
     }
     &.icon-button, &.tertiary-icon-button {
         min-width: 0;
+    }
+    &.block {
+        width: 100%;
     }
     .dropdown-context-menu {
         @apply absolute;

@@ -83,11 +83,11 @@ watch(() => state.dataFieldList, (dataFieldList) => {
                                    style-type="secondary"
                                    required
                     >
-                        <p-select-dropdown class="w-full"
-                                           use-fixed-menu-style
+                        <p-select-dropdown use-fixed-menu-style
                                            reset-selection-on-menu-close
                                            :menu="state.menuItems"
                                            :selected="state.proxyValue?.[dataField]?.value"
+                                           block
                                            @select="handleSelectMenuItem(dataField, $event)"
                         >
                             <template #dropdown-button="item">
@@ -113,11 +113,11 @@ watch(() => state.dataFieldList, (dataFieldList) => {
             <template v-else>
                 <p-select-dropdown v-for="dataField in state.dataFieldList"
                                    :key="`number-format-data-field-${dataField}`"
-                                   class="w-full"
                                    use-fixed-menu-style
                                    reset-selection-on-menu-close
                                    :menu="state.menuItems"
                                    :selected="state.proxyValue?.[dataField]?.value"
+                                   block
                                    @select="handleSelectMenuItem(dataField, $event)"
                 >
                     <template #dropdown-button="item">

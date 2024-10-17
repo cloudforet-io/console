@@ -105,8 +105,8 @@ onUnmounted(() => {
                 />
             </template>
         </p-horizontal-layout>
-        <p-tab v-model="state.activeTab"
-               :tabs="tabs"
+        <p-tab :tabs="tabs"
+               :active-tab.sync="state.activeTab"
         >
             <template #rest>
                 <app-a-p-i-key-rest-endpoints-tab />

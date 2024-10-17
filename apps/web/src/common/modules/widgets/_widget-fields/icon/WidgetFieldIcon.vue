@@ -152,10 +152,10 @@ onMounted(() => {
         <div v-if="state.toggleValue"
              class="contents"
         >
-            <p-select-dropdown class="w-full"
-                               :visible-menu.sync="state.visibleMenu"
+            <p-select-dropdown :visible-menu.sync="state.visibleMenu"
                                use-fixed-menu-style
                                :menu="state.iconList"
+                               block
             >
                 <template #dropdown-button>
                     <div class="button-label">

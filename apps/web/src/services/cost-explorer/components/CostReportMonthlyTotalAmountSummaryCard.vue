@@ -15,7 +15,7 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PSelectButton, PDatePagination, PDataTable, PSkeleton, PTextButton, PI, PTooltip,
+    PSelectButton, PDatePagination, PDataTable, PTextButton, PI, PTooltip, PDataLoader,
 } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 import type { SelectButtonType } from '@cloudforet/mirinae/types/inputs/buttons/select-button-group/type';
@@ -52,6 +52,7 @@ import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-refe
 import {
     useAllReferenceTypeInfoStore,
 } from '@/services/dashboards/stores/all-reference-type-info-store';
+
 
 
 type CostReportDataAnalyzeResult = {
@@ -310,98 +311,92 @@ useResizeObserver(chartContext, throttle(() => {
             </div>
         </template>
         <template #content>
-            <div class="grid grid-cols-12 gap-4">
-                <div class="left-part">
-                    <p-date-pagination :date="state.currentDate"
-                                       :disable-next-button="state.currentDate?.isSame(dayjs.utc(costReportPageState.recentReportMonth), 'month')"
-                                       @update:date="handleChangeDate"
-                    />
-                    <div class="date-range-text">
-                        {{ state.currentDateRangeText }}
-                    </div>
-                    <div class="summary-wrapper">
-                        <div class="summary-label">
-                            {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.TOTAL_AMOUNT') }}
-                        </div>
-                        <p-skeleton v-if="state.loading"
-                                    width="8rem"
-                                    height="2rem"
+            <p-data-loader :loading="state.loading"
+                           :data="state.data"
+                           :min-loading-time="500"
+            >
+                <div class="grid grid-cols-12 gap-4">
+                    <div class="left-part">
+                        <p-date-pagination :date="state.currentDate"
+                                           :disable-next-button="state.currentDate?.isSame(dayjs.utc(costReportPageState.recentReportMonth), 'month')"
+                                           @update:date="handleChangeDate"
                         />
-                        <div v-else
-                             class="summary-value"
+                        <div class="date-range-text">
+                            {{ state.currentDateRangeText }}
+                        </div>
+                        <div class="summary-wrapper">
+                            <div class="summary-label">
+                                {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.TOTAL_AMOUNT') }}
+                            </div>
+                            <div class="summary-value">
+                                <span class="currency-symbol">{{ CURRENCY_SYMBOL?.[costReportPageGetters.currency] }}</span>
+                                <span class="value">{{ currencyMoneyFormatter(state.totalAmount, { currency: costReportPageGetters.currency, style: 'decimal' }) }}</span>
+                            </div>
+                        </div>
+                        <p-text-button v-if="!storeState.isAdminMode && state.currentReportId"
+                                       style-type="highlight"
+                                       class="report-link"
+                                       size="md"
+                                       @click="handleClickDetailsLink"
                         >
-                            <span class="currency-symbol">{{ CURRENCY_SYMBOL?.[costReportPageGetters.currency] }}</span>
-                            <span class="value">{{ currencyMoneyFormatter(state.totalAmount, { currency: costReportPageGetters.currency, style: 'decimal' }) }}</span>
+                            {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.SEE_DETAILS') }}
+                            <p-i name="ic_arrow-right-up"
+                                 class="link-mark"
+                                 height="0.875rem"
+                                 width="0.875rem"
+                                 color="inherit"
+                            />
+                        </p-text-button>
+                        <div class="chart-wrapper">
+                            <div ref="chartContext"
+                                 class="chart"
+                            />
                         </div>
                     </div>
-                    <p-text-button v-if="!storeState.isAdminMode && state.currentReportId"
-                                   style-type="highlight"
-                                   class="report-link"
-                                   size="md"
-                                   @click="handleClickDetailsLink"
-                    >
-                        {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.SEE_DETAILS') }}
-                        <p-i name="ic_arrow-right-up"
-                             class="link-mark"
-                             height="0.875rem"
-                             width="0.875rem"
-                             color="inherit"
-                        />
-                    </p-text-button>
-                    <div class="chart-wrapper">
-                        <p-skeleton v-show="state.loading"
-                                    height="100%"
-                                    width="100%"
-                                    class="chart-skeleton"
-                        />
-                        <div ref="chartContext"
-                             class="chart"
-                        />
+                    <div class="right-part">
+                        <p-data-table :fields="state.tableFields"
+                                      :items="state.data?.results ?? []"
+                                      :loading="state.loading"
+                                      table-style-type="simple"
+                                      class="summary-data-table"
+                        >
+                            <template #col-format="{field, value, rowIndex}">
+                                <span v-if="field.name === GROUP_BY.WORKSPACE_NAME">
+                                    <span class="toggle-button"
+                                          :style="{ 'background-color': getLegendColor(field.name, value, rowIndex) }"
+                                    />
+                                    <p-tooltip :contents="storeState.workspaces[value] ? storeState.workspaces[value].label : value"
+                                               position="bottom"
+                                    >
+                                        {{ storeState.workspaces[value] ? storeState.workspaces[value].label : value }}
+                                    </p-tooltip>
+                                </span>
+                                <span v-else-if="field.name === GROUP_BY.PROVIDER">
+                                    <span class="toggle-button"
+                                          :style="{ 'background-color': getLegendColor(field.name, value, rowIndex) }"
+                                    />
+                                    <p-tooltip :contents="storeState.providers[value] ? storeState.providers[value].name : value"
+                                               position="bottom"
+                                    >
+                                        {{ storeState.providers[value] ? storeState.providers[value].name : value }}
+                                    </p-tooltip>
+                                </span>
+                            </template>
+                            <template #col-value_sum-format="{ value }">
+                                <p-tooltip :contents="currencyMoneyFormatter(value, { currency: costReportPageGetters.currency }) ?? ''"
+                                           position="bottom"
+                                >
+                                    <span v-if="costReportPageGetters.currency"
+                                          class="amount-col"
+                                    >
+                                        {{ currencyMoneyFormatter(value, { currency: costReportPageGetters.currency }) }}
+                                    </span>
+                                </p-tooltip>
+                            </template>
+                        </p-data-table>
                     </div>
                 </div>
-                <div class="right-part">
-                    <p-data-table :fields="state.tableFields"
-                                  :items="state.data?.results ?? []"
-                                  :loading="state.loading"
-                                  table-style-type="simple"
-                                  class="summary-data-table"
-                    >
-                        <template #col-format="{field, value, rowIndex}">
-                            <span v-if="field.name === GROUP_BY.WORKSPACE_NAME">
-                                <span class="toggle-button"
-                                      :style="{ 'background-color': getLegendColor(field.name, value, rowIndex) }"
-                                />
-                                <p-tooltip :contents="storeState.workspaces[value] ? storeState.workspaces[value].label : value"
-                                           position="bottom"
-                                >
-                                    {{ storeState.workspaces[value] ? storeState.workspaces[value].label : value }}
-                                </p-tooltip>
-                            </span>
-                            <span v-else-if="field.name === GROUP_BY.PROVIDER">
-                                <span class="toggle-button"
-                                      :style="{ 'background-color': getLegendColor(field.name, value, rowIndex) }"
-                                />
-                                <p-tooltip :contents="storeState.providers[value] ? storeState.providers[value].name : value"
-                                           position="bottom"
-                                >
-                                    {{ storeState.providers[value] ? storeState.providers[value].name : value }}
-                                </p-tooltip>
-                            </span>
-                        </template>
-                        <template #col-value_sum-format="{ value }">
-                            <p-tooltip :contents="currencyMoneyFormatter(value, { currency: costReportPageGetters.currency }) ?? ''"
-                                       position="bottom"
-                            >
-                                <span v-if="costReportPageGetters.currency"
-                                      class="amount-col"
-                                >
-                                    {{ currencyMoneyFormatter(value, { currency: costReportPageGetters.currency }) }}
-                                </span>
-                            </p-tooltip>
-                        </template>
-                    </p-data-table>
-                </div>
-            </div>
+            </p-data-loader>
         </template>
     </cost-report-overview-card-template>
 </template>

@@ -221,7 +221,6 @@ const handleClickAddCondition = () => {
         margin-bottom: 1rem;
     }
     .join-type-dropdown {
-        @apply w-full;
         .selected-join-type-icon {
             min-width: 1rem;
         }

@@ -249,8 +249,6 @@ useResizeObserver(chartContext, throttle(() => {
 
 <style lang="postcss" scoped>
 .cost-analysis-stacked-column-chart {
-    height: 100%;
-
     /* custom design-system component - p-data-loader */
     :deep(.data-loader-container) {
         .no-data-wrapper {

@@ -178,6 +178,7 @@ watch(() => state.menuItems, (menuItems) => {
                                        :invalid="!state.isValid"
                                        :disabled="!!state.fixedValue"
                                        appearance-type="badge"
+                                       block
                                        @update:selected="handleUpdateSelect"
                     />
                 </p-field-group>
@@ -219,9 +220,6 @@ watch(() => state.menuItems, (menuItems) => {
 .field-form-wrapper {
     display: flex;
     gap: 0.5rem;
-    .p-select-dropdown {
-        width: 100%;
-    }
 
     /* custom design-system component - p-text-input */
     :deep(.p-text-input) {

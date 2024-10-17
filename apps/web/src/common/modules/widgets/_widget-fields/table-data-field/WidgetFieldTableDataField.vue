@@ -504,6 +504,7 @@ watch([ // Fetch Dynamic Field
                                  :value="selectItem.name"
                                  style-type="secondary"
                                  :selected="state.selectedFieldType"
+                                 block
                                  @change="handleChangeDataFieldType"
                 >
                     {{ selectItem.label }}
@@ -518,6 +519,7 @@ watch([ // Fetch Dynamic Field
                 <p-select-dropdown :menu="state.dataInfoMenuItems"
                                    :selected="state.selectedCriteria"
                                    appearance-type="badge"
+                                   block
                                    @update:selected="handleUpdateCriteria"
                 />
             </p-field-group>
@@ -534,6 +536,7 @@ watch([ // Fetch Dynamic Field
                                            :show-select-marker="state.multiSelectable"
                                            :invalid="state.dataFieldInvalid"
                                            appearance-type="badge"
+                                           block
                                            @update:selected="handleUpdateValue"
                         />
                         <template v-if="state.selectedFieldType === 'dynamicField'">
@@ -544,6 +547,7 @@ watch([ // Fetch Dynamic Field
                                              :value="selectItem.name"
                                              style-type="secondary"
                                              :selected="state.selectedValueType"
+                                             block
                                              @change="handleChangeValueType"
                             >
                                 {{ selectItem.label }}
@@ -567,6 +571,7 @@ watch([ // Fetch Dynamic Field
                                        appearance-type="badge"
                                        show-select-marker
                                        show-clear-selection
+                                       block
                                        @select="handleSelectDynamicFields"
                                        @clear-selection="handleClearDynamicFieldsSelection"
                     />
