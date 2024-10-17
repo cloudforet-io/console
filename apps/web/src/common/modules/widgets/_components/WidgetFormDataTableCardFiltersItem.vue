@@ -152,7 +152,6 @@ onClickOutside(operatorButtonRef, () => {
                       @update="handleUpdateKeywordSelected"
         />
         <p-select-dropdown v-else
-                           class="filters-dropdown"
                            is-filterable
                            :handler="props.handler"
                            :selected="state.proxySelectedFilter?.v"

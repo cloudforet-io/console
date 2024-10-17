@@ -62,6 +62,7 @@ onMounted(() => {
             <p-select-dropdown :menu="state.menuItems"
                                :selected="state.selectedMenuItem"
                                use-fixed-menu-style
+                               block
                                @update:selected="handleUpdateSelect"
             >
                 <template #menu-item--format="{item}">
