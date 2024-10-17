@@ -6,7 +6,7 @@ import {
     PTextInput, PIconButton, PSpinner,
 } from '@cloudforet/mirinae';
 
-import { postEnableMfa } from '@/lib/helper/multi-factor-auth-helper';
+// import { postEnableMfa } from '@/lib/helper/multi-factor-auth-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -40,15 +40,13 @@ const initQrCodeInfo = async () => {
     multiFactorAuthStore.setModalInitLoading(true);
     try {
         // TODO: check API
-        const userInfo = await postEnableMfa({
-            mfa_type: 'OTP',
-            options: {},
-        }, false);
-        console.log(userInfo?.mfa.options.otp_qrcode_uri);
+        // const userInfo = await postEnableMfa({
+        //     mfa_type: 'OTP',
+        //     options: {},
+        // }, false);
         // state.qrUrl = userInfo.mfa.options.otp_qrcode_uri
         state.qrUri = 'otpauth://totp/issuer_name:name?secret=EOTXGURB7VQX6NTN5TVZXK5HBBIOAMGQ&issuer=issuer_name';
         state.passkey = state.qrUri.match(/secret=([^&]*)/)?.[1] || '';
-        return;
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {

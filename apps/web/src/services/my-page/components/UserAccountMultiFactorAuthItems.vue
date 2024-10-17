@@ -20,7 +20,7 @@ const storeState = reactive({
     selectedType: computed<string>(() => multiFactorAuthState.selectedType),
 });
 const state = reactive({
-    enableMfa: {},
+    enableMfa: {} as Record<string, boolean>,
     isVerified: computed<boolean>(() => storeState.mfa?.state === 'ENABLED'),
     type: computed<string>(() => storeState.mfa?.mfa_type),
 });
