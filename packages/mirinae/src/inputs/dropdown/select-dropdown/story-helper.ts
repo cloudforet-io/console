@@ -34,6 +34,7 @@ const extraArgs: Args = {
     resetSelectedOnUnmounted: true,
     initSelectedWithHandler: true,
     hideHeaderWithoutItems: false,
+    block: false,
 };
 
 const extraArgTypes: ArgTypes = {
@@ -422,6 +423,21 @@ const extraArgTypes: ArgTypes = {
         name: 'hideHeaderWithoutItems',
         type: { name: 'boolean' },
         description: 'Whether to hide the header when there are no items that indicate the name of the header.',
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: 'boolean',
+    },
+    block: {
+        name: 'block',
+        type: { name: 'boolean' },
+        description: 'Whether to show value with full width or not.',
         table: {
             type: {
                 summary: 'boolean',
