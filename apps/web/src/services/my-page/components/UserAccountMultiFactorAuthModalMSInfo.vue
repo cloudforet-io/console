@@ -45,7 +45,7 @@ const initQrCodeInfo = async () => {
         //     options: {},
         // }, false);
         // state.qrUrl = userInfo.mfa.options.otp_qrcode_uri
-        state.qrUri = 'otpauth://totp/issuer_name:name?secret=EOTXGURB7VQX6NTN5TVZXK5HBBIOAMGQ&issuer=issuer_name';
+        state.qrUri = 'otpauth://totp/issuer_name:name?secret=1234456677&issuer=issuer_name';
         state.passkey = state.qrUri.match(/secret=([^&]*)/)?.[1] || '';
     } catch (e) {
         ErrorHandler.handleError(e);
