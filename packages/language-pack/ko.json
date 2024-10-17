@@ -1216,6 +1216,8 @@
 				"TITLE": "MFA를 비활성화 하시겠습니까?",
 				"VERIFIED": "인증됨"
 			},
+			"ALT_S_DISABLED": "",
+			"ALT_S_ENABLED": "",
 			"ALT_S_SENT_EMAIL": "인증 코드가 이메일로 전송되었습니다.",
 			"CHANGE": {
 				"CANCEL": "취소",

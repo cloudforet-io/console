@@ -1,3 +1,5 @@
+import type { TranslateResult } from 'vue-i18n';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { UserProfileConfirmMfaParameters } from '@/schema/identity/user-profile/api-verbs/confirm-mfa';
@@ -41,7 +43,15 @@ export const postUserProfileDisableMfa = async (): Promise<UserState|Error> => {
 
 export const postValidationMfaCode = async (body: UserProfileConfirmMfaParameters): Promise<void|Error> => {
     try {
-        return SpaceConnector.clientV2.identity.userProfile.confirmMfa<UserProfileConfirmMfaParameters>(body);
+        const userInfo = await SpaceConnector.clientV2.identity.userProfile.confirmMfa<UserProfileConfirmMfaParameters>(body);
+        let successMessage: TranslateResult;
+        if (userInfo.mfa.state === 'ENABLED') {
+            successMessage = i18n.t('COMMON.MFA_MODAL.ALT_S_ENABLED');
+        } else {
+            successMessage = i18n.t('COMMON.MFA_MODAL.ALT_S_DISABLED');
+        }
+        showSuccessMessage(successMessage, '');
+        return userInfo;
     } catch (e: any) {
         ErrorHandler.handleError(e);
         throw e;

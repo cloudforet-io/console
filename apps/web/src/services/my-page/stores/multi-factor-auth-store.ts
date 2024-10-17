@@ -7,14 +7,14 @@ type modelType = 'FORM'|'RE_SYNC'|'DISABLED';
 interface multiFactorAuthState {
     selectedType: string,
     modalVisible: boolean,
-    modalLoading: boolean,
+    modalInitLoading: boolean,
     modalType: modelType,
 }
 export const useMultiFactorAuthStore = defineStore('multi-factor-auth-store', () => {
     const state = reactive<multiFactorAuthState>({
         selectedType: '',
         modalVisible: false,
-        modalLoading: false,
+        modalInitLoading: false,
         modalType: 'FORM',
     });
 
@@ -25,8 +25,8 @@ export const useMultiFactorAuthStore = defineStore('multi-factor-auth-store', ()
         setModalVisible: (value: boolean) => {
             state.modalVisible = value;
         },
-        setModalLoading: (value: boolean) => {
-            state.modalLoading = value;
+        setModalInitLoading: (value: boolean) => {
+            state.modalInitLoading = value;
         },
         setModalType: (value: modelType) => {
             state.modalType = value;
