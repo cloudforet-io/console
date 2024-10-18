@@ -14,7 +14,7 @@ interface ReferenceVariable extends DashboardGlobalVariableBase {
         dataKey?: string;
     }
     options: {
-        selectionType: 'multi'|'single';
+        selectionType: 'multi';
     }
 }
 
