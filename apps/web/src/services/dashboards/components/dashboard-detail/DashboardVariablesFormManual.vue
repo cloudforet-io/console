@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, reactive, watch } from 'vue';
+import { computed, reactive } from 'vue';
 
 import {
     PFieldGroup, PTextInput, PSelectDropdown, PRadioGroup, PRadio, PButton, PIconButton, PDivider,
@@ -9,6 +9,8 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dr
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
+
+import type { DashboardGlobalVariableModel } from '@/services/dashboards/types/global-variable-type';
 
 
 
@@ -33,22 +35,69 @@ interface EnumValue {
 }
 interface Props {
     isValid: boolean;
+    data: Partial<DashboardGlobalVariableModel>;
 }
 const props = withDefaults(defineProps<Props>(), {
     isValid: false,
 });
 const emit = defineEmits<{(e: 'update:is-valid', isValid: boolean): void;
+    (e: 'update:data', data: Partial<DashboardGlobalVariableModel>): void;
 }>();
 
 const state = reactive({
-    proxyIsValid: useProxyValue('isValid', props, emit),
-    isAllValid: computed<boolean>(() => {
-        if (state.selectedValuesType === VALUES_TYPE.ANY_VALUE) {
-            if (state.selectedType === 'text') return true;
-            if (Number.isNaN(Number(state.min)) || Number.isNaN(Number(state.max))) return false;
-            return state.min !== undefined && state.max !== undefined;
-        }
-        return state.enumValues.every((d) => !!d.key && !!d.label);
+    proxyIsValid: useProxyValue<boolean>('isValid', props, emit),
+    proxyData: useProxyValue<Partial<DashboardGlobalVariableModel>>('data', props, emit),
+    isAllValid: computed<boolean>({
+        get: () => {
+            if (state.selectedValuesType === VALUES_TYPE.ANY_VALUE) {
+                if (state.selectedType === 'text') return true;
+                if (Number.isNaN(Number(state.min)) || Number.isNaN(Number(state.max))) return false;
+                return state.min !== undefined && state.max !== undefined;
+            }
+            return state.enumValues.every((d) => !!d.key && !!d.label);
+        },
+        set: (value: boolean) => {
+            state.proxyIsValid = value;
+        },
+    }),
+    manualGlobalVariableData: computed<Partial<DashboardGlobalVariableModel>>({
+        get() {
+            if (state.selectedValuesType === VALUES_TYPE.ANY_VALUE) {
+                if (state.selectedType === 'text') {
+                    return {
+                        method: 'manual',
+                        type: 'text',
+                        valueType: 'any',
+                        options: {
+                            defaultValue: state.defaultTextValue,
+                        },
+                    };
+                }
+                return {
+                    method: 'manual',
+                    type: 'number',
+                    valueType: 'any',
+                    options: {
+                        min: state.min,
+                        max: state.max,
+                        step: state.step,
+                        inputType: state.selectedNumberInputType,
+                    },
+                };
+            }
+            return {
+                method: 'manual',
+                type: state.selectedType,
+                valueType: 'enum',
+                values: state.enumValues,
+                options: {
+                    selectionType: state.selectedSelectionType,
+                },
+            };
+        },
+        set(value: Partial<DashboardGlobalVariableModel>) {
+            state.proxyData = value;
+        },
     }),
     typeMenuItems: computed<SelectDropdownMenuItem[]>(() => ([
         { name: 'text', label: i18n.t('DASHBOARDS.DETAIL.VARIABLES.TEXT') },
@@ -100,11 +149,6 @@ const handleUpdateEnumKey = (idx: number, value: string) => {
 const handleChangeNumberInputType = (type: NumberInputType) => {
     state.selectedNumberInputType = type;
 };
-
-/* Watcher */
-watch(() => state.isAllValid, (value) => {
-    state.proxyIsValid = value;
-}, { immediate: true });
 </script>
 
 <template>

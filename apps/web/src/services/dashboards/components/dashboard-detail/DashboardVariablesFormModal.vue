@@ -14,6 +14,7 @@ import DashboardVariablesFormDynamic
     from '@/services/dashboards/components/dashboard-detail/DashboardVariablesFormDynamic.vue';
 import DashboardVariablesFormManual
     from '@/services/dashboards/components/dashboard-detail/DashboardVariablesFormManual.vue';
+import type { DashboardGlobalVariableModel } from '@/services/dashboards/types/global-variable-type';
 
 
 
@@ -49,6 +50,27 @@ const state = reactive({
     selectedMethod: METHOD_TYPE.MANUAL_ENTRY as MethodType,
     isManualFormValid: false,
     isDynamicFormValid: false,
+    //
+    manualGlobalVariable: {} as Partial<DashboardGlobalVariableModel>,
+    dynamicGlobalVariable: {} as Partial<DashboardGlobalVariableModel>,
+    dashboardGlobalVariable: computed<DashboardGlobalVariableModel>(() => {
+        if (state.selectedMethod === METHOD_TYPE.MANUAL_ENTRY) {
+            return {
+                management: 'custom',
+                key: variableKey.value || '',
+                name: variableName.value || '',
+                method: 'manual',
+                ...state.manualGlobalVariable,
+            };
+        }
+        return {
+            management: 'custom',
+            key: variableKey.value || '',
+            name: variableName.value || '',
+            method: 'dynamic',
+            ...state.dynamicGlobalVariable,
+        };
+    }),
 });
 const {
     forms: { variableName, variableKey },
@@ -153,9 +175,11 @@ watch(() => state.proxyVisible, (visible) => {
             </p-field-group>
             <dashboard-variables-form-manual v-if="state.selectedMethod === METHOD_TYPE.MANUAL_ENTRY"
                                              :is-valid.sync="state.isManualFormValid"
+                                             :data.sync="state.manualGlobalVariable"
             />
             <dashboard-variables-form-dynamic v-else
                                               :is-valid.sync="state.isDynamicFormValid"
+                                              :data.sync="state.dynamicGlobalVariable"
             />
         </template>
     </p-button-modal>

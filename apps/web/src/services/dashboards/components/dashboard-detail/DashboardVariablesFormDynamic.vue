@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, watch,
+    computed, reactive,
 } from 'vue';
 
 import { sortBy } from 'lodash';
@@ -22,15 +22,19 @@ import type { ProviderReferenceMap } from '@/store/reference/provider-reference-
 import { useCostDataSourceFilterMenuItems } from '@/common/composables/data-source/use-cost-data-source-filter-menu-items';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import type { DashboardGlobalVariableModel } from '@/services/dashboards/types/global-variable-type';
+
 
 
 interface Props {
     isValid: boolean;
+    data: Partial<DashboardGlobalVariableModel>;
 }
 const props = withDefaults(defineProps<Props>(), {
     isValid: false,
 });
 const emit = defineEmits<{(e: 'update:is-valid', isValid: boolean): void;
+    (e: 'update:data', data: Partial<DashboardGlobalVariableModel>): void;
 }>();
 
 const appContextStore = useAppContextStore();
@@ -44,11 +48,35 @@ const storeState = reactive({
 });
 const state = reactive({
     proxyIsValid: useProxyValue<boolean>('isValid', props, emit),
-    isAllValid: computed<boolean>(() => {
-        if (state.selectedSourceFrom === 'asset' || state.selectedSourceFrom === 'cost') {
-            return !!state.selectedValuesFrom;
-        }
-        return false;
+    proxyData: useProxyValue<Partial<DashboardGlobalVariableModel>>('data', props, emit),
+    isAllValid: computed<boolean>({
+        get() {
+            if (state.selectedSourceFrom === 'asset' || state.selectedSourceFrom === 'cost') {
+                return !!state.selectedValuesFrom;
+            }
+            return false;
+        },
+        set(value: boolean) {
+            state.proxyIsValid = value;
+        },
+    }),
+    dynamicGlobalVariableData: computed<Partial<DashboardGlobalVariableModel>>({
+        get() {
+            return {
+                method: 'dynamic',
+                reference: {
+                    resourceType: state.selectedSourceFrom,
+                    dataSourceId: state.selectedCostDataSourceId || state.selectedMetricId,
+                    dataKey: state.selectedValuesFrom,
+                },
+                options: {
+                    selectionType: 'multi',
+                },
+            };
+        },
+        set(value: Partial<DashboardGlobalVariableModel>) {
+            state.proxyData = value;
+        },
     }),
     sourceFromMenuItems: computed<MenuItem[]>(() => {
         const _default = [
@@ -151,11 +179,8 @@ const handleChangeSourceFrom = (sourceFrom: string) => {
     state.selectedCategory = undefined;
     state.selectedNamespaceId = undefined;
     state.selectedMetricId = undefined;
+    state.selectedCostDataSourceId = undefined;
     state.selectedValuesFrom = undefined;
-};
-const handleChangeValuesFrom = (valuesFrom: string) => {
-    if (state.selectedValuesFrom === valuesFrom) return;
-    state.selectedValuesFrom = valuesFrom;
 };
 const handleSelectCategory = (item: MenuItem) => {
     if (state.selectedCategory === item.name) return;
@@ -178,12 +203,12 @@ const handleSelectMetric = (item: MenuItem) => {
 const handleSelectCostDataSource = (item: MenuItem) => {
     if (state.selectedCostDataSourceId === item.name) return;
     state.selectedCostDataSourceId = item.name;
+    state.selectedValuesFrom = undefined;
 };
-
-/* Watcher */
-watch(() => state.isAllValid, (value) => {
-    state.proxyIsValid = value;
-}, { immediate: true });
+const handleChangeValuesFrom = (valuesFrom: string) => {
+    if (state.selectedValuesFrom === valuesFrom) return;
+    state.selectedValuesFrom = valuesFrom;
+};
 </script>
 
 <template>
