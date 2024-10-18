@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ComponentPublicInstance } from 'vue';
 import {
-    reactive, ref, watch, computed, toRef, onBeforeUnmount, nextTick,
+    reactive, ref, watch, computed, onBeforeUnmount, nextTick,
 } from 'vue';
 
 import { debounce } from 'lodash';
@@ -46,7 +46,7 @@ const { containerWidth } = useDashboardContainerWidth({ containerRef, observeRes
 
 /* reform widget info list */
 const { reformedWidgetInfoList } = useReformedWidgetInfoList({
-    dashboardWidgetInfoList: toRef(dashboardDetailState, 'dashboardWidgetInfoList'),
+    dashboardWidgetInfoList: computed(() => dashboardDetailGetters.dashboardWidgetInfoList),
     containerWidth,
 });
 
