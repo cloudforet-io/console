@@ -105,6 +105,12 @@ const handleClose = () => {
             }
         }
 
+        >.close-button {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+        }
+
         .contents {
             @apply flex-1 overflow-y-auto flex;
         }
@@ -143,11 +149,6 @@ const handleClose = () => {
                 width: 100%;
             }
         }
-    }
-    .close-button {
-        position: fixed;
-        top: 1.5rem;
-        right: 1.5rem;
     }
 
     /* transition */
