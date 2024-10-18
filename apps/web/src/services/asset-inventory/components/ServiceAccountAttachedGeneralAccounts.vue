@@ -21,7 +21,7 @@ import {
     PTooltip,
     PStatus,
     PDivider,
-    PSelectStatus,
+    PSelectStatus, PHeadingLayout,
 } from '@cloudforet/mirinae';
 import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
@@ -244,28 +244,33 @@ watch(() => state.trustedAccountId, async (ta) => {
 
 <template>
     <p-pane-layout class="service-account-attached-general-accounts">
-        <p-heading class="pt-8 px-4 pb-4"
-                   heading-type="sub"
-                   :title="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ATTACHED_GENERAL_ACCOUNTS_TITLE')"
-                   use-total-count
-                   :total-count="state.totalCount"
-        >
+        <p-heading-layout>
+            <template #heading>
+                <p-heading class="pt-8 px-4 pb-4"
+                           heading-type="sub"
+                           :title="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ATTACHED_GENERAL_ACCOUNTS_TITLE')"
+                           use-total-count
+                           :total-count="state.totalCount"
+                />
+            </template>
             <template v-if="props.hasReadWriteAccess"
                       #extra
             >
-                <p-tooltip :contents="!state.isSyncEnabled ? $t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.DISABLED_SYNC_DESC') : ''"
-                           position="left"
-                >
-                    <p-button :disabled="!state.isSyncEnabled"
-                              style-type="secondary"
-                              :loading="state.isSyncing || state.syncReqLoading"
-                              @click="handleSync"
+                <div class="h-full pt-8 px-4 pb-4">
+                    <p-tooltip :contents="!state.isSyncEnabled ? $t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.DISABLED_SYNC_DESC') : ''"
+                               position="left"
                     >
-                        {{ (state.isSyncing || state.syncReqLoading) ? $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SYNCING') : $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SYNC_NOW') }}
-                    </p-button>
-                </p-tooltip>
+                        <p-button :disabled="!state.isSyncEnabled"
+                                  style-type="secondary"
+                                  :loading="state.isSyncing || state.syncReqLoading"
+                                  @click="handleSync"
+                        >
+                            {{ (state.isSyncing || state.syncReqLoading) ? $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SYNCING') : $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SYNC_NOW') }}
+                        </p-button>
+                    </p-tooltip>
+                </div>
             </template>
-        </p-heading>
+        </p-heading-layout>
         <div class="content-wrapper">
             <div class="content-header">
                 <div class="left-wrapper">

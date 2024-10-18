@@ -112,7 +112,7 @@ const state = reactive({
     deleteModalVisible: false,
     editModalVisible: false,
     isManagedTrustedAccount: computed(() => state.originServiceAccountItem.workspace_id === '*'),
-    isEditable: computed(() => state.hasReadWriteAccess && (!state.isManagedTrustedAccount || storeState.isAdminMode)),
+    isEditable: computed<boolean>(() => state.hasReadWriteAccess && (!state.isManagedTrustedAccount || storeState.isAdminMode)),
 });
 
 /* Api */

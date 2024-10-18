@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PPaneLayout, PHeading, PButton, PEmpty, PDataLoader, PButtonModal, PDoubleCheckModal, PI,
+    PPaneLayout, PHeading, PButton, PEmpty, PDataLoader, PButtonModal, PDoubleCheckModal, PI, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
 import type { AgentModel } from '@/schema/identity/agent/model';
@@ -95,35 +95,41 @@ onUnmounted(() => {
 
 <template>
     <p-pane-layout class="service-account-connect-cluster">
-        <p-heading class="pt-8 px-4 pb-4"
-                   heading-type="sub"
-                   :title="state.title"
-        >
+        <p-heading-layout>
+            <template #heading>
+                <p-heading class="pt-8 px-4 pb-4"
+                           heading-type="sub"
+                           :title="state.title"
+                />
+            </template>
             <template #extra>
-                <div v-if="storeState.isAgentCreated"
-                     class="button-wrapper"
-                >
-                    <p-button v-if="storeState.isClusterConnected"
-                              style-type="tertiary"
-                              @click="handleOpenClusterConnectionModal"
+                <div class="h-full pt-8 px-4 pb-4">
+                    <div v-if="storeState.isAgentCreated"
+                         class="button-wrapper"
                     >
-                        {{ state.isClusterActive ? $t('INVENTORY.SERVICE_ACCOUNT.AGENT.DEACTIVATE') : $t('INVENTORY.SERVICE_ACCOUNT.AGENT.ACTIVATE') }}
-                    </p-button>
-                    <p-button icon-left="ic_renew"
-                              style-type="tertiary"
-                              @click="handleOpenReconnectModal"
-                    >
-                        {{ $t('INVENTORY.SERVICE_ACCOUNT.AGENT.RECONNECT') }}
-                    </p-button>
-                    <p-button icon-left="ic_delete"
-                              style-type="tertiary"
-                              @click="handleOpenDeleteClusterModal"
-                    >
-                        {{ $t('INVENTORY.SERVICE_ACCOUNT.AGENT.DELETE') }}
-                    </p-button>
+                        <p-button v-if="storeState.isClusterConnected"
+                                  style-type="tertiary"
+                                  @click="handleOpenClusterConnectionModal"
+                        >
+                            {{ state.isClusterActive ? $t('INVENTORY.SERVICE_ACCOUNT.AGENT.DEACTIVATE') : $t('INVENTORY.SERVICE_ACCOUNT.AGENT.ACTIVATE') }}
+                        </p-button>
+                        <p-button icon-left="ic_renew"
+                                  style-type="tertiary"
+                                  @click="handleOpenReconnectModal"
+                        >
+                            {{ $t('INVENTORY.SERVICE_ACCOUNT.AGENT.RECONNECT') }}
+                        </p-button>
+                        <p-button icon-left="ic_delete"
+                                  style-type="tertiary"
+                                  @click="handleOpenDeleteClusterModal"
+                        >
+                            {{ $t('INVENTORY.SERVICE_ACCOUNT.AGENT.DELETE') }}
+                        </p-button>
+                    </div>
                 </div>
             </template>
-        </p-heading>
+        </p-heading-layout>
+
         <p-data-loader :loading="storeState.loading"
                        class="content-wrapper"
         >
