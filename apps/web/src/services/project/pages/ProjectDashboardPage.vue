@@ -4,7 +4,7 @@ import {
     reactive, ref, watch,
 } from 'vue';
 
-import { PHeading, PSkeleton } from '@cloudforet/mirinae';
+import { PSkeleton } from '@cloudforet/mirinae';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
@@ -83,23 +83,21 @@ onUnmounted(() => {
     <div class="project-dashboard-page">
         <div class="dashboard-wrapper">
             <div class="title-wrapper">
-                <p-heading :title="dashboardDetailState.name">
-                    <p-skeleton v-if="!dashboardDetailState.name"
-                                width="20rem"
-                                height="1.5rem"
-                    />
-                    <div v-else
-                         class="dashboard-title"
-                    >
-                        <p class="title">
-                            {{ dashboardDetailState.name }}
-                        </p>
-                        <span class="beta-mark">beta</span>
-                    </div>
-                    <template #title-right-extra>
-                        <dashboard-labels-button dashboard-id="props.dashboardId" />
-                    </template>
-                </p-heading>
+                <p-skeleton v-if="!dashboardDetailState.name"
+                            width="20rem"
+                            height="1.5rem"
+                />
+                <div v-else
+                     class="dashboard-title"
+                >
+                    <p class="title">
+                        {{ dashboardDetailState.name }}
+                    </p>
+                    <span class="beta-mark">beta</span>
+                </div>
+                <dashboard-labels-button class="ml-4"
+                                         dashboard-id="props.dashboardId"
+                />
             </div>
             <div class="contents-wrapper">
                 <div class="toolset">
@@ -127,8 +125,8 @@ onUnmounted(() => {
 .project-dashboard-page {
     .dashboard-wrapper {
         .title-wrapper {
-            @apply flex justify-between items-center;
-            padding: 1.5rem 1rem 0;
+            @apply flex items-center;
+            padding: 1.5rem 1rem;
             .dashboard-title {
                 @apply flex;
                 .title {

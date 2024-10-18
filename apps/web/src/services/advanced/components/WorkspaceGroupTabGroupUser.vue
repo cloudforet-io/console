@@ -8,7 +8,7 @@ import { clone } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PHeading, PButton, PToolboxTable, PStatus, PSelectDropdown, PTooltip,
+    PHeading, PButton, PToolboxTable, PStatus, PSelectDropdown, PTooltip, PHeadingLayout,
 } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
@@ -200,31 +200,32 @@ onUnmounted(() => {
 
 <template>
     <section class="workspace-group-tab-group-user">
-        <p-heading class="workspace-group-tab-group-user-header"
-                   :title="$t('IAM.WORKSPACE_GROUP.TAB.GROUP_USER')"
-                   use-total-count
-                   :total-count="userTabState.userInSelectedGroupTotalCount"
-                   heading-type="sub"
-        >
+        <p-heading-layout class="pt-8 px-4 pb-4">
+            <template #heading>
+                <p-heading class="workspace-group-tab-group-user-header"
+                           :title="$t('IAM.WORKSPACE_GROUP.TAB.GROUP_USER')"
+                           use-total-count
+                           :total-count="userTabState.userInSelectedGroupTotalCount"
+                           heading-type="sub"
+                />
+            </template>
             <template v-if="state.hasReadWriteAccess"
                       #extra
             >
-                <div class="workspace-group-tab-group-user-button-wrapper">
-                    <p-button style-type="negative-primary"
-                              :disabled="!userTabState.selectedUserIndices.length"
-                              @click="handleSelectedGroupUsersRemoveButtonClick"
-                    >
-                        {{ $t('IAM.WORKSPACE_GROUP.TAB.REMOVE') }}
-                    </p-button>
-                    <p-button style-type="secondary"
-                              icon-left="ic_plus_bold"
-                              @click="handleAddUsersButtonClick"
-                    >
-                        {{ $t('IAM.WORKSPACE_GROUP.TAB.ADD_USER') }}
-                    </p-button>
-                </div>
+                <p-button style-type="negative-primary"
+                          :disabled="!userTabState.selectedUserIndices.length"
+                          @click="handleSelectedGroupUsersRemoveButtonClick"
+                >
+                    {{ $t('IAM.WORKSPACE_GROUP.TAB.REMOVE') }}
+                </p-button>
+                <p-button style-type="secondary"
+                          icon-left="ic_plus_bold"
+                          @click="handleAddUsersButtonClick"
+                >
+                    {{ $t('IAM.WORKSPACE_GROUP.TAB.ADD_USER') }}
+                </p-button>
             </template>
-        </p-heading>
+        </p-heading-layout>
         <p-toolbox-table class="workspace-group-tab-group-user-table"
                          :loading="workspaceGroupPageState.loading"
                          :fields="tableState.fields"
@@ -305,11 +306,6 @@ onUnmounted(() => {
 
 <style lang="postcss" scoped>
 .workspace-group-tab-group-user {
-    .workspace-group-tab-group-user-button-wrapper {
-        display: flex;
-        gap: 1rem;
-    }
-
     .workspace-group-tab-group-user-table {
         border: none;
     }

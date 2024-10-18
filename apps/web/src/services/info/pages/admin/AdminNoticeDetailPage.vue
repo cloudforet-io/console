@@ -7,7 +7,7 @@ import { useRoute, useRouter } from 'vue-router/composables';
 import { clone } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { PButton, PHeading } from '@cloudforet/mirinae';
+import { PButton, PHeading, PHeadingLayout } from '@cloudforet/mirinae';
 
 
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
@@ -129,10 +129,13 @@ onBeforeMount(async () => {
 
 <template>
     <div>
-        <p-heading :title="noticeDetailState.post?.title"
-                   show-back-button
-                   @click-back-button="$router.go(-1)"
-        >
+        <p-heading-layout class="mb-6">
+            <template #heading>
+                <p-heading :title="noticeDetailState.post?.title"
+                           show-back-button
+                           @click-back-button="$router.go(-1)"
+                />
+            </template>
             <template v-if="state.hasReadWriteAccess"
                       #extra
             >
@@ -162,7 +165,7 @@ onBeforeMount(async () => {
                     </p-button>
                 </div>
             </template>
-        </p-heading>
+        </p-heading-layout>
         <notice-detail :post-id="props.postId" />
         <delete-modal :header-title="$t('INFO.NOTICE.FORM.DELETE_MODAL_TITLE')"
                       :visible.sync="state.deleteModalVisible"

@@ -1,7 +1,6 @@
 <template>
-    <fragment>
-        <span style-type="primary"
-              class="handbook-button"
+    <span class="handbook-button">
+        <span class="handbook-button-inner"
               @click="handleHandbookButton"
         >
             <p-i name="ic_question-mark-circle"
@@ -43,7 +42,7 @@
                 </div>
             </div>
         </portal>
-    </fragment>
+    </span>
 </template>
 
 <script lang="ts">
@@ -130,20 +129,22 @@ export default defineComponent({
 
 <style lang="postcss" scoped>
 .handbook-button {
-    @apply inline-flex items-center text-gray-700;
+    @apply inline-flex items-center;
+    z-index: 10;
     cursor: pointer;
     font-size: 0.75rem;
-    line-height: 1.2;
-    padding-top: 0.5rem;
-    z-index: 10;
-    &:hover {
-        @apply text-secondary;
-        .text {
-            text-decoration: underline;
+    .handbook-button-inner {
+        @apply text-gray-700;
+        line-height: 1.2;
+        &:hover {
+            @apply text-secondary;
+            .text {
+                text-decoration: underline;
+            }
         }
-    }
-    .text {
-        @apply ml-1 mr-0;
+        .text {
+            @apply ml-1 mr-0;
+        }
     }
 }
 .handbook-title {

@@ -137,11 +137,11 @@ onMounted(() => {
             <p-field-group :label="$t('COMMON.WIDGETS.DISPLAY_SERIES_LABEL.POSITION')"
                            style-type="secondary"
             >
-                <p-select-dropdown class="w-full"
-                                   use-fixed-menu-style
+                <p-select-dropdown use-fixed-menu-style
                                    reset-selection-on-menu-close
                                    :menu="state.menuItems"
                                    :selected="state.proxyValue?.position"
+                                   block
                                    @select="handleSelectMenuItem"
                 />
             </p-field-group>
@@ -161,11 +161,11 @@ onMounted(() => {
                            :label="$t('COMMON.WIDGETS.DISPLAY_SERIES_LABEL.FORMAT')"
                            style-type="secondary"
             >
-                <p-select-dropdown class="w-full"
-                                   use-fixed-menu-style
+                <p-select-dropdown use-fixed-menu-style
                                    reset-selection-on-menu-close
                                    :menu="state.formatMenuItems"
                                    :selected="state.proxyValue?.format"
+                                   block
                                    @select="handleSelectFormatMenuItem"
                 />
             </p-field-group>

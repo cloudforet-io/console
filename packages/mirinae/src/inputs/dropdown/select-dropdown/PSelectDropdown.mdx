@@ -32,6 +32,20 @@ import * as PSelectDropdownStories from './PSelectDropdown.stories';
 ## Placeholder
 <Canvas of={PSelectDropdownStories.Placeholder} />
 
+## Block
+<Canvas of={PSelectDropdownStories.Block} />
+
+## Menu Width
+The menuWidth prop for the select dropdown component accepts two types of values: target-width and standard CSS values. The default value is 'auto'.
+
+By default, the dropdown menu’s width is determined by the button’s width, serving as the minimum width (minWidth). However, when menuWidth is set to a standard CSS value, that value is applied to minWidth, width, and maxWidth, effectively fixing the menu width to that specified value.
+
+If the value is 'auto', the minWidth will still match the button’s width, while the width and maxWidth can adjust as necessary.
+
+When the menuWidth is set to 'target-width', the minWidth, width, and maxWidth will all be equal to the width of the dropdown button.
+
+<Canvas of={PSelectDropdownStories.MenuWidth} />
+
 ## Selection Label
 <Canvas of={PSelectDropdownStories.SelectionLabel} />
 

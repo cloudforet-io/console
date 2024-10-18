@@ -8,7 +8,7 @@ import type { TranslateResult } from 'vue-i18n';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PBadge, PCollapsibleList, PPaneLayout, PHeading, PEmpty,
+    PBadge, PCollapsibleList, PPaneLayout, PHeading, PEmpty, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -97,10 +97,13 @@ const listEscalationPolicy = async () => {
 <template>
     <p-pane-layout class="alert-detail-responder">
         <article class="responder-wrapper">
-            <p-heading heading-type="sub"
-                       :title="$t('MONITORING.ALERT.DETAIL.RESPONDER.NOTIFICATION')"
-                       class="panel-title"
-            >
+            <p-heading-layout class="pt-8 px-4 pb-4">
+                <template #heading>
+                    <p-heading heading-type="sub"
+                               :title="$t('MONITORING.ALERT.DETAIL.RESPONDER.NOTIFICATION')"
+                               class="panel-title"
+                    />
+                </template>
                 <template #extra>
                     <div class="w-full text-right">
                         <p-badge v-if="props.alertData.escalation_ttl === 0"
@@ -111,7 +114,7 @@ const listEscalationPolicy = async () => {
                         </p-badge>
                     </div>
                 </template>
-            </p-heading>
+            </p-heading-layout>
             <p-collapsible-list v-if="state.escalationRuleItems.length > 0"
                                 :items="state.escalationRuleItems"
                                 theme="card"

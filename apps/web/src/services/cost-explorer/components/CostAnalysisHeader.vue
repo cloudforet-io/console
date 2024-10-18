@@ -7,7 +7,7 @@ import { clone } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PIconButton, PHeading, PLazyImg, PDivider, PI,
+    PIconButton, PHeading, PLazyImg, PDivider, PI, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
 
@@ -139,50 +139,50 @@ watch(() => state.favoriteOptions, async (favoriteOptions) => {
 
 <template>
     <div class="cost-analysis-header">
-        <section class="title-section">
-            <p-heading :title="state.title">
-                <template #title-left-extra>
-                    <div class="title-left-extra">
-                        <p-lazy-img v-if="state.dataSourceImage"
-                                    :src="state.dataSourceImage"
-                                    width="2rem"
-                                    height="2rem"
-                        />
-                        <p-i v-else
-                             name="ic_unified-cost"
-                             width="2rem"
-                             height="2rem"
-                        />
-                        <p-i v-if="state.managedCostQuerySetList.some((item) => item.name === (state.title || ''))"
-                             name="ic_main-filled"
-                             width="1rem"
-                             height="1rem"
-                             :color="gray[500]"
-                        />
-                    </div>
-                </template>
-                <template #title-right-extra>
-                    <div v-if="costAnalysisPageGetters.selectedQueryId"
-                         class="title-right-extra icon-wrapper"
+        <p-heading-layout class="title-section">
+            <template #heading>
+                <p-heading :title="state.title">
+                    <template #title-left-extra>
+                        <div class="title-left-extra">
+                            <p-lazy-img v-if="state.dataSourceImage"
+                                        :src="state.dataSourceImage"
+                                        width="2rem"
+                                        height="2rem"
+                            />
+                            <p-i v-else
+                                 name="ic_unified-cost"
+                                 width="2rem"
+                                 height="2rem"
+                            />
+                            <p-i v-if="state.managedCostQuerySetList.some((item) => item.name === (state.title || ''))"
+                                 name="ic_main-filled"
+                                 width="1rem"
+                                 height="1rem"
+                                 :color="gray[500]"
+                            />
+                        </div>
+                    </template>
+                    <template v-if="costAnalysisPageGetters.selectedQueryId && state.isEditableQuerySet && !state.isManagedCostQuerySet"
+                              #title-right-extra
                     >
-                        <template v-if="state.isEditableQuerySet && !state.isManagedCostQuerySet">
-                            <p-icon-button name="ic_edit-text"
-                                           size="md"
-                                           @click.stop="handleClickEditQuery(costAnalysisPageGetters.selectedQueryId)"
-                            />
-                            <p-icon-button name="ic_delete"
-                                           size="md"
-                                           @click.stop="handleClickDeleteQuery(costAnalysisPageGetters.selectedQueryId)"
-                            />
-                        </template>
-                    </div>
-                    <div class="title-right-extra currency-wrapper">
-                        <span class="label">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CURRENCY') }}:</span>
-                        <span>{{ CURRENCY_SYMBOL[costAnalysisPageGetters.currency] }}{{ costAnalysisPageGetters.currency }}</span>
-                    </div>
-                </template>
-            </p-heading>
-        </section>
+                        <p-icon-button name="ic_edit-text"
+                                       size="md"
+                                       @click.stop="handleClickEditQuery(costAnalysisPageGetters.selectedQueryId)"
+                        />
+                        <p-icon-button name="ic_delete"
+                                       size="md"
+                                       @click.stop="handleClickDeleteQuery(costAnalysisPageGetters.selectedQueryId)"
+                        />
+                    </template>
+                </p-heading>
+            </template>
+            <template #extra>
+                <div class="currency-wrapper">
+                    <span class="label">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CURRENCY') }}:</span>
+                    <span>{{ CURRENCY_SYMBOL[costAnalysisPageGetters.currency] }}{{ costAnalysisPageGetters.currency }}</span>
+                </div>
+            </template>
+        </p-heading-layout>
         <p-divider class="heading-divider" />
         <cost-analysis-query-form-modal :visible.sync="state.queryFormModalVisible"
                                         :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.EDIT_COST_ANALYSIS')"
@@ -204,28 +204,22 @@ watch(() => state.favoriteOptions, async (favoriteOptions) => {
     }
     .title-section {
         @apply relative;
-        display: flex;
+        margin-bottom: 1.5rem;
     }
 
     .title-left-extra {
         @apply inline-flex items-center;
-        margin-bottom: -0.25rem;
-        margin-right: 0.5rem;
         gap: 0.5rem;
     }
 
-    .title-right-extra {
-        @apply flex-shrink-0 inline-flex items-center;
-        margin-bottom: -0.25rem;
-        &.currency-wrapper {
-            @apply justify-end text-gray-800;
-            font-size: 0.875rem;
-            float: right;
-            margin-left: auto;
-            .label {
-                font-weight: 700;
-                padding-right: 0.25rem;
-            }
+    .currency-wrapper {
+        @apply justify-end text-gray-800;
+        font-size: 0.875rem;
+        flex-shrink: 0;
+        line-height: 2rem;
+        .label {
+            font-weight: 700;
+            padding-right: 0.25rem;
         }
     }
 

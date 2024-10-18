@@ -11,7 +11,7 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PToolboxTable, PButton, PHeading, PBadge, PI, PLink,
+    PToolboxTable, PButton, PHeading, PBadge, PI, PLink, PHeadingLayout,
 } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
@@ -395,11 +395,14 @@ initPage();
             >
                 <template #toolbox-top>
                     <div class="panel-top-wrapper">
-                        <p-heading heading-type="sub"
-                                   use-total-count
-                                   :total-count="state.totalCount"
-                                   :title="$t('MONITORING.ALERT.ALERT_LIST.ALERT')"
-                        >
+                        <p-heading-layout class="pt-8 px-4 pb-4">
+                            <template #heading>
+                                <p-heading heading-type="sub"
+                                           use-total-count
+                                           :total-count="state.totalCount"
+                                           :title="$t('MONITORING.ALERT.ALERT_LIST.ALERT')"
+                                />
+                            </template>
                             <template v-if="state.hasReadWriteAccess"
                                       #extra
                             >
@@ -409,7 +412,7 @@ initPage();
                                     @refresh="getAlerts()"
                                 />
                             </template>
-                        </p-heading>
+                        </p-heading-layout>
                     </div>
                 </template>
                 <template v-if="state.hasReadWriteAccess"

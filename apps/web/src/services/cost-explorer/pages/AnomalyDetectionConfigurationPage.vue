@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router/composables';
 
-import { PHeading, PButton } from '@cloudforet/mirinae';
+import { PHeading, PButton, PHeadingLayout } from '@cloudforet/mirinae';
 
 import AnomalyDetectionConfigurationTable
     from '@/services/cost-explorer/components/AnomalyDetectionConfigurationTable.vue';
@@ -12,7 +12,10 @@ const router = useRouter();
 
 <template>
     <div class="anomaly-detection-configuration-page">
-        <p-heading :title="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.TITLE')">
+        <p-heading-layout class="mb-6">
+            <template #heading>
+                <p-heading :title="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.TITLE')" />
+            </template>
             <template #extra>
                 <p-button icon-left="ic_plus"
                           @click="router.push({ name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.CONFIGURATION.CREATE._NAME})"
@@ -20,7 +23,7 @@ const router = useRouter();
                     {{ $t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CREATE') }}
                 </p-button>
             </template>
-        </p-heading>
+        </p-heading-layout>
         <anomaly-detection-configuration-table />
     </div>
 </template>

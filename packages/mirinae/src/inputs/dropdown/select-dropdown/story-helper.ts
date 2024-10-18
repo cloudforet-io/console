@@ -27,12 +27,14 @@ const extraArgs: Args = {
     visibleMenu: false,
     menuPosition: CONTEXT_MENU_POSITION.LEFT,
     indexMode: false,
+    menuWidth: undefined,
     boundary: undefined,
     disableHandler: false,
     pageSize: 10,
     resetSelectedOnUnmounted: true,
     initSelectedWithHandler: true,
     hideHeaderWithoutItems: false,
+    block: false,
 };
 
 const extraArgTypes: ArgTypes = {
@@ -311,6 +313,21 @@ const extraArgTypes: ArgTypes = {
         },
         control: 'boolean',
     },
+    menuWidth: {
+        name: 'menuWidth',
+        type: { name: 'string' },
+        description: 'The width of the menu. It can be css value or \'target-width\' which is same as dropdown button width. Default is \'auto\'.',
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'undefined',
+            },
+        },
+        control: 'text',
+    },
     boundary: {
         name: 'boundary',
         type: { name: 'string' },
@@ -406,6 +423,21 @@ const extraArgTypes: ArgTypes = {
         name: 'hideHeaderWithoutItems',
         type: { name: 'boolean' },
         description: 'Whether to hide the header when there are no items that indicate the name of the header.',
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: 'boolean',
+    },
+    block: {
+        name: 'block',
+        type: { name: 'boolean' },
+        description: 'Whether to show value with full width or not.',
         table: {
             type: {
                 summary: 'boolean',

@@ -74,6 +74,7 @@ const Template: Story = {
                 :show-clear-selection="showClearSelection"
                 :menu-position="menuPosition"
                 :index-mode="indexMode"
+                :menu-width="menuWidth"
                 :boundary="boundary"
                 :handler="handler"
                 :disable-handler="disableHandler"
@@ -336,6 +337,55 @@ export const Placeholder: Story = {
     }),
     decorators: [() => ({
         template: '<story style="height: 400px" />',
+    })],
+};
+
+export const Block: Story = {
+    render: () => ({
+        props: Object.keys(getSelectDropdownArgTypes()),
+        components: { PSelectDropdown },
+        template: `
+            <div>
+                <p class="text-label-lg font-bold my-3">Default width</p>
+                <p-select-dropdown :menu="menuItems" />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Block width</p>
+                <p-select-dropdown :menu="menuItems" block />
+                <br/>
+            </div>
+        `,
+        setup() {
+            return {
+                menuItems,
+            };
+        },
+    }),
+    decorators: [() => ({
+        template: '<story style="height: 400px" />',
+    })],
+};
+
+export const MenuWidth: Story = {
+    render: () => ({
+        components: { PSelectDropdown },
+        template: `
+            <div class="h-full w-full overflow">
+                <p class="my-4">menu width: 'target-width' (default)</p>
+                <p-select-dropdown :menu="menuItems" menu-width="target-width"></p-select-dropdown>
+                <p class="my-4">menu width: 'auto'</p>
+                <p-select-dropdown :menu="menuItems" menu-width="auto"></p-select-dropdown>
+                <p class="my-4">menu width: '300px'</p>
+                <p-select-dropdown :menu="menuItems" menu-width="300px"></p-select-dropdown>
+            </div>
+        `,
+        setup() {
+            return {
+                menuItems,
+            };
+        },
+    }),
+    decorators: [() => ({
+        template: '<story style="height: 300px;" />',
     })],
 };
 

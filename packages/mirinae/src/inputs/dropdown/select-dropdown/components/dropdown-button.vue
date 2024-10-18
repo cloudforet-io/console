@@ -168,7 +168,7 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
                     <p-i name="ic_close"
                          width="1rem"
                          height="1rem"
-                         color="inherit"
+                         color="inherit transparent"
                     />
                 </span>
                 <span class="arrow-button"
@@ -344,7 +344,7 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
         }
     }
     &.tertiary-icon-button {
-        @apply border border-gray-300 rounded;
+        @apply border border-gray-300 rounded bg-white;
         &:not(.disabled, .readonly, .invalid):hover {
             @apply bg-gray-100;
         }

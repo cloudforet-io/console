@@ -1,6 +1,7 @@
 <template>
     <div class="job-task-error-list">
-        <p-heading heading-type="sub"
+        <p-heading class="pt-8 px-4 pb-4"
+                   heading-type="sub"
                    :use-total-count="true"
                    :total-count="errorItems.length"
                    :title="$t('MANAGEMENT.COLLECTOR_HISTORY.JOB.ERROR_LIST')"

@@ -4,7 +4,9 @@ import { computed, reactive } from 'vue';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
 
-import { PHeading, PSelectDropdown, PBadge } from '@cloudforet/mirinae';
+import {
+    PHeading, PSelectDropdown, PBadge, PHeadingLayout,
+} from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
 
 import { i18n } from '@/translations';
@@ -99,27 +101,28 @@ const handleSelectPeriod = (periodMenuName: string) => {
 
 <template>
     <div class="anomaly-detection-history-page">
-        <p-heading :title="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.HISTORY.TITLE')">
-            <template #extra>
-                <div class="extra-wrapper">
-                    <p-select-dropdown :menu="state.periodMenuItems"
-                                       :selection-label="$t('INVENTORY.ASSET_ANALYSIS.PERIOD.PERIOD')"
-                                       disable-proxy
-                                       reset-selection-on-menu-close
-                                       style-type="rounded"
-                                       :selected.sync="state.selectedPeriodItem"
-                                       @select="handleSelectPeriod"
-                    />
-                    <p-badge v-if="state.customPeriod?.start"
-                             class="custom-period"
-                             style-type="gray200"
-                             badge-type="subtle"
-                    >
-                        <span>{{ state.customPeriod?.start }} ~ {{ state.customPeriod?.end }}</span>
-                    </p-badge>
-                </div>
+        <p-heading-layout class="mb-6">
+            <template #heading>
+                <p-heading :title="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.HISTORY.TITLE')" />
             </template>
-        </p-heading>
+            <template #extra>
+                <p-select-dropdown :menu="state.periodMenuItems"
+                                   :selection-label="$t('INVENTORY.ASSET_ANALYSIS.PERIOD.PERIOD')"
+                                   disable-proxy
+                                   reset-selection-on-menu-close
+                                   style-type="rounded"
+                                   :selected.sync="state.selectedPeriodItem"
+                                   @select="handleSelectPeriod"
+                />
+                <p-badge v-if="state.customPeriod?.start"
+                         class="custom-period"
+                         style-type="gray200"
+                         badge-type="subtle"
+                >
+                    <span>{{ state.customPeriod?.start }} ~ {{ state.customPeriod?.end }}</span>
+                </p-badge>
+            </template>
+        </p-heading-layout>
         <anomaly-detection-history-table />
         <custom-date-modal :visible.sync="state.customPeriodModalVisible"
                            disable-future
@@ -133,12 +136,8 @@ const handleSelectPeriod = (periodMenuName: string) => {
 <style scoped lang="postcss">
 .anomaly-detection-history-page {
     @apply flex flex-col;
-    .extra-wrapper {
-        @apply flex items-center;
-        gap: 0.5rem;
-        .custom-period {
-            height: 1.25rem;
-        }
+    .custom-period {
+        height: 1.25rem;
     }
 }
 </style>

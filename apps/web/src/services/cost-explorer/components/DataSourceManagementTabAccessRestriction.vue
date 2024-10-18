@@ -131,7 +131,7 @@ const handleConfirm = async () => {
     <div class="data-source-management-tab-access-restriction">
         <p-heading heading-type="sub"
                    :title="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.TAB_RESTRICTION')"
-                   class="title"
+                   class="pt-8 px-4 pb-4"
         />
         <div class="contents-wrapper">
             <strong class="desc">{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.RESTRICTION_DESC') }}</strong>

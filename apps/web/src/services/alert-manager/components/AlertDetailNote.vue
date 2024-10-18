@@ -112,7 +112,8 @@ const handleDeleteNote = async () => {
 
 <template>
     <p-pane-layout class="alert-detail-note">
-        <p-heading heading-type="sub"
+        <p-heading class="pt-8 px-4 pb-4"
+                   heading-type="sub"
                    :title="$t('MONITORING.ALERT.DETAIL.NOTE.NOTE')"
         />
         <article class="note-wrapper">

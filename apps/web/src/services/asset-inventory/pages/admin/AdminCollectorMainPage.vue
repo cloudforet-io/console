@@ -9,7 +9,9 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-import { PButton, PHeading, PDataLoader } from '@cloudforet/mirinae';
+import {
+    PButton, PHeading, PDataLoader, PHeadingLayout,
+} from '@cloudforet/mirinae';
 
 import { SpaceRouter } from '@/router';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -111,12 +113,15 @@ onMounted(async () => {
 
 <template>
     <div class="collector-page">
-        <p-heading
-            use-total-count
-            use-selected-count
-            :title="$t('INVENTORY.COLLECTOR.MAIN.TITLE')"
-            :total-count="collectorPageState.totalCount"
-        >
+        <p-heading-layout class="mb-6">
+            <template #heading>
+                <p-heading
+                    use-total-count
+                    use-selected-count
+                    :title="$t('INVENTORY.COLLECTOR.MAIN.TITLE')"
+                    :total-count="collectorPageState.totalCount"
+                />
+            </template>
             <template #extra>
                 <router-link
                     :to="{ name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME) }"
@@ -129,7 +134,7 @@ onMounted(async () => {
                     </p-button>
                 </router-link>
             </template>
-        </p-heading>
+        </p-heading-layout>
         <p-data-loader
             :data="state.hasCollectorList"
             :loading="state.initLoading"

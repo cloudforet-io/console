@@ -31,7 +31,8 @@ const tabState = reactive({
            :active-tab.sync="tabState.activeTab"
     >
         <template #pushed-event>
-            <p-heading heading-type="sub"
+            <p-heading class="pt-8 px-4 pb-4"
+                       heading-type="sub"
                        :title="$t('MONITORING.ALERT.DETAIL.PUSHED_EVENT.PUSHED_EVENT')"
             />
             <alert-detail-tabs-pushed-event :id="props.id" />

@@ -5,7 +5,7 @@ import { useRoute, useRouter } from 'vue-router/composables';
 import { clone } from 'lodash';
 
 import {
-    PHorizontalLayout, PHeading, PButton,
+    PHorizontalLayout, PHeading, PButton, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
 import { store } from '@/store';
@@ -59,12 +59,15 @@ onUnmounted(() => {
 
 <template>
     <section class="role-page">
-        <p-heading :title="$t('IAM.ROLE.ROLE')"
-                   use-selected-count
-                   use-total-count
-                   :total-count="rolePageState.totalCount"
-                   :selected-count="rolePageState.selectedIndices.length"
-        >
+        <p-heading-layout class="mb-6">
+            <template #heading>
+                <p-heading :title="$t('IAM.ROLE.ROLE')"
+                           use-selected-count
+                           use-total-count
+                           :total-count="rolePageState.totalCount"
+                           :selected-count="rolePageState.selectedIndices.length"
+                />
+            </template>
             <template v-if="state.hasReadWriteAccess"
                       #extra
             >
@@ -75,7 +78,7 @@ onUnmounted(() => {
                     {{ $t('IAM.ROLE.CREATE') }}
                 </p-button>
             </template>
-        </p-heading>
+        </p-heading-layout>
         <p-horizontal-layout class="role-toolbox-layout">
             <template #container="{ height }">
                 <role-management-table :table-height="height"

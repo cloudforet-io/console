@@ -32,7 +32,7 @@ const tableState = reactive({
     <div class="data-source-management-tab-detail-base-information">
         <p-heading heading-type="sub"
                    :title="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.TAB_DETAIL_BASE_INFORMATION')"
-                   class="title"
+                   class="pt-8 px-4 pb-4"
         />
         <p-definition-table :fields="tableState.fields"
                             :data="storeState.selectedItem"

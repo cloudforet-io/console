@@ -42,6 +42,7 @@ interface SelectDropdownProps {
     buttonIcon?: string;
     isFixedWidth?: boolean;
     resetSelectionOnMenuClose?: boolean;
+    block?: boolean;
 
     /* context menu props */
     isFilterable?: boolean;
@@ -57,6 +58,7 @@ interface SelectDropdownProps {
     showClearSelection?: boolean;
     menuPosition?: ContextMenuPosition;
     indexMode?: boolean;
+    menuWidth?: 'target-width'|string;
     boundary?: string;
 
     /* others */
@@ -79,6 +81,7 @@ const props = withDefaults(defineProps<SelectDropdownProps>(), {
     showDeleteAllButton: false,
     buttonIcon: undefined,
     resetSelectionOnMenuClose: false,
+    block: false,
     /* context menu props */
     visibleMenu: undefined,
     menu: () => [],
@@ -86,6 +89,7 @@ const props = withDefaults(defineProps<SelectDropdownProps>(), {
     searchText: '',
     menuPosition: CONTEXT_MENU_POSITION.LEFT,
     indexMode: false,
+    menuWidth: 'auto',
     boundary: undefined,
     /* others */
     handler: undefined,
@@ -178,6 +182,7 @@ const {
     menu: toRef(props, 'menu'),
     pageSize: toRef(props, 'pageSize'),
     hideHeaderWithoutItems: toRef(props, 'hideHeaderWithoutItems'),
+    menuWidth: toRef(props, 'menuWidth'),
     boundary: toRef(props, 'boundary'),
     position: toRef(props, 'menuPosition'),
 });
@@ -315,6 +320,7 @@ defineExpose({ reloadMenu });
              [props.size]: true,
              'is-fixed-width': props.isFixedWidth,
              'is-filterable': props.isFilterable,
+             'block': props.block,
          }"
     >
         <dropdown-button ref="targetRef"
@@ -406,12 +412,13 @@ defineExpose({ reloadMenu });
     &.icon-button, &.tertiary-icon-button {
         min-width: 0;
     }
+    &.block {
+        width: 100%;
+    }
     .dropdown-context-menu {
         @apply absolute;
         margin-top: -1px;
         z-index: 1000;
-        min-width: 100%;
-        width: auto;
     }
 
     &.is-fixed-width {

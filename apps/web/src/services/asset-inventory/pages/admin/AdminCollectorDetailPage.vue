@@ -1,6 +1,7 @@
 <template>
     <div class="collector-detail-page">
-        <p-heading :title="state.collectorName"
+        <p-heading class="mb-6"
+                   :title="state.collectorName"
                    show-back-button
                    @click-back-button="handleClickBackButton"
         >

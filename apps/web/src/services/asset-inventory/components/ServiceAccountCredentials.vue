@@ -195,7 +195,8 @@ watch(() => state.attachedTrustedAccountId, (attachedTrustedAccountId) => {
 
 <template>
     <p-pane-layout class="service-account-credentials">
-        <p-heading heading-type="sub"
+        <p-heading class="pt-8 px-4 pb-4"
+                   heading-type="sub"
                    :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS')"
         >
             <template #extra>

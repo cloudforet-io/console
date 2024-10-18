@@ -13,6 +13,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PHeading, PDynamicLayout, PButton, PSelectStatus, PPaneLayout, screens, PTab, PLazyImg, PStatus, PTooltip, PI,
+    PHeadingLayout,
 } from '@cloudforet/mirinae';
 import type {
     DynamicLayoutEventListener,
@@ -359,7 +360,9 @@ onMounted(async () => {
 
 <template>
     <section class="service-account-page">
-        <p-heading :title="$t('PAGE_SCHEMA.SERVICE_ACCOUNT')" />
+        <p-heading class="mb-6"
+                   :title="$t('PAGE_SCHEMA.SERVICE_ACCOUNT')"
+        />
         <provider-list :provider-list="state.providerList"
                        :selected-provider.sync="state.selectedProvider"
                        class="service-account-provider-list"
@@ -381,16 +384,20 @@ onMounted(async () => {
                     {{ status.label }}
                 </p-select-status>
             </div>
-            <p-heading use-total-count
-                       class="service-account-table-heading"
-                       :title="tableState.tableTitle"
-                       :total-count="typeOptionState.totalCount"
-                       heading-type="sub"
-            >
-                <template #title-left-extra>
-                    <p-lazy-img class="provider"
-                                :src="state.providers[state.selectedProvider]?.icon || ''"
-                    />
+            <p-heading-layout class="pt-8 px-4 pb-4">
+                <template #heading>
+                    <p-heading use-total-count
+                               class="service-account-table-heading"
+                               :title="tableState.tableTitle"
+                               :total-count="typeOptionState.totalCount"
+                               heading-type="sub"
+                    >
+                        <template #title-left-extra>
+                            <p-lazy-img class="provider"
+                                        :src="state.providers[state.selectedProvider]?.icon || ''"
+                            />
+                        </template>
+                    </p-heading>
                 </template>
                 <template #extra>
                     <p-button v-if="state.hasReadWriteAccess"
@@ -402,7 +409,7 @@ onMounted(async () => {
                         {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.CREATE') }}
                     </p-button>
                 </template>
-            </p-heading>
+            </p-heading-layout>
             <p-dynamic-layout v-if="tableState.schema"
                               class="service-account-table"
                               type="query-search-table"
@@ -495,8 +502,6 @@ onMounted(async () => {
 <style lang="postcss" scoped>
 
 .service-account-table-heading {
-    margin-bottom: 0;
-
     .provider {
         margin-left: 0.5rem;
     }

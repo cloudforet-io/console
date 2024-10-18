@@ -6,7 +6,7 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PHeading, PButton, PToolboxTable, PStatus, PSelectDropdown, PTooltip,
+    PHeading, PButton, PToolboxTable, PStatus, PSelectDropdown, PTooltip, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -153,7 +153,7 @@ const handleChangeSort = (name:string, isDesc:boolean) => {
 
 const setRoleMap = async () => {
     const { results } = await SpaceConnector.clientV2.identity.role.listBasicRole<RoleListParameters, ListResponse<RoleModel>>();
-    tableState.roleMap = results.reduce((acc, role) => {
+    tableState.roleMap = results?.reduce((acc, role) => {
         acc[role.role_id] = role;
         return acc;
     }, {});
@@ -166,12 +166,14 @@ const setRoleMap = async () => {
 
 <template>
     <section class="workspace-group-tab-group-user">
-        <p-heading class="workspace-group-tab-group-user-header"
-                   :title="$t('IAM.WORKSPACE_GROUP.TAB.GROUP_USER')"
-                   use-total-count
-                   :total-count="landingPageStoreGetter.workspaceGroupUserTotalCount"
-                   heading-type="sub"
-        >
+        <p-heading-layout class="pt-8 px-4 pb-4">
+            <template #heading>
+                <p-heading :title="$t('IAM.WORKSPACE_GROUP.TAB.GROUP_USER')"
+                           use-total-count
+                           :total-count="landingPageStoreGetter.workspaceGroupUserTotalCount"
+                           heading-type="sub"
+                />
+            </template>
             <template #extra>
                 <div v-if="tableState.isUserOwnerRole"
                      class="workspace-group-tab-group-user-button-wrapper"
@@ -190,7 +192,7 @@ const setRoleMap = async () => {
                     </p-button>
                 </div>
             </template>
-        </p-heading>
+        </p-heading-layout>
         <p-toolbox-table class="workspace-group-tab-group-user-table"
                          style="height: calc(100vh - 25rem);"
                          :loading="userWorkspaceGroupStoreState.loading"

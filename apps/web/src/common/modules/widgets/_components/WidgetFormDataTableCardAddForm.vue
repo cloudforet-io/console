@@ -288,14 +288,14 @@ onMounted(async () => {
 <template>
     <div class="widget-form-data-table-card-add-form">
         <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.GROUP_BY')">
-            <p-select-dropdown class="group-by-select-dropdown"
-                               :menu="groupByState.items"
+            <p-select-dropdown :menu="groupByState.items"
                                :selected.sync="state.proxySelectedGroupByItems"
                                multi-selectable
                                appearance-type="badge"
                                :page-size="10"
                                show-select-marker
                                is-filterable
+                               block
             />
         </p-field-group>
         <widget-form-data-table-card-filters :key="props.filterFormKey"
@@ -432,9 +432,6 @@ onMounted(async () => {
         margin-top: 1rem;
     }
 
-    .group-by-select-dropdown {
-        @apply w-full;
-    }
     .data-text-input {
         @apply w-full;
     }

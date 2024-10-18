@@ -3,7 +3,7 @@ import { reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { PHeading, PButton } from '@cloudforet/mirinae';
+import { PHeading, PButton, PHeadingLayout } from '@cloudforet/mirinae';
 
 
 import type { RoleGetParameters } from '@/schema/identity/role/api-verbs/get';
@@ -14,7 +14,9 @@ import { i18n } from '@/translations';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import HandbookButton from '@/common/modules/portals/HandbookButton.vue';
 
+import RoleCreateEditHandbook from '@/services/iam/components/RoleCreateEditHandbook.vue';
 import RoleUpdateForm from '@/services/iam/components/RoleUpdateForm.vue';
 import { FORM_TYPE } from '@/services/iam/constants/role-constant';
 
@@ -64,10 +66,23 @@ const getRoleData = async () => {
 
 <template>
     <section class="role-edit-page">
-        <p-heading show-back-button
-                   :title="$t('IAM.ROLE.FORM.EDIT_TITLE')"
-                   @click-back-button="router.go(-1)"
-        />
+        <p-heading-layout class="mb-6">
+            <template #heading>
+                <p-heading show-back-button
+                           :title="$t('IAM.ROLE.FORM.EDIT_TITLE')"
+                           @click-back-button="router.go(-1)"
+                />
+            </template>
+            <template #extra>
+                <handbook-button type="iam/role/create-edit"
+                                 class="role-edit-handbook-button"
+                >
+                    <keep-alive>
+                        <role-create-edit-handbook />
+                    </keep-alive>
+                </handbook-button>
+            </template>
+        </p-heading-layout>
         <role-update-form :initial-role-data="state.initialRoleData"
                           :form-type="FORM_TYPE.UPDATE"
                           @update-validation="handleFormValidate"
@@ -95,6 +110,8 @@ const getRoleData = async () => {
 .role-edit-page {
     @apply mx-0;
     max-width: 100%;
-    margin-top: -1.875rem;
+    .role-edit-handbook-button {
+        height: 2rem;
+    }
 }
 </style>

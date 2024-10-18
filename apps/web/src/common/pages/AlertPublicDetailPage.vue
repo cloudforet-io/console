@@ -154,7 +154,8 @@ const handleRouteToSignInWithRedirectPath = () => {
 
 <template>
     <div class="alert-public-detail-page">
-        <p-heading :title="state.alertData?.title"
+        <p-heading class="mb-6"
+                   :title="state.alertData?.title"
                    @click-back-button="router.go(-1)"
         >
             <template #title-right-extra>
@@ -335,7 +336,6 @@ const handleRouteToSignInWithRedirectPath = () => {
         @apply text-gray-700;
         font-weight: 400;
         font-size: 1.5rem;
-        margin-left: 0.25rem;
     }
     .detail-contents-wrapper {
         @apply grid grid-cols-12 gap-4 w-full;
