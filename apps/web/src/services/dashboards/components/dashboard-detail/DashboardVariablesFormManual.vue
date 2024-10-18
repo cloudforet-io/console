@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
     PFieldGroup, PTextInput, PSelectDropdown, PRadioGroup, PRadio, PButton, PIconButton, PDivider,
@@ -47,57 +47,47 @@ const emit = defineEmits<{(e: 'update:is-valid', isValid: boolean): void;
 const state = reactive({
     proxyIsValid: useProxyValue<boolean>('isValid', props, emit),
     proxyData: useProxyValue<Partial<DashboardGlobalVariableModel>>('data', props, emit),
-    isAllValid: computed<boolean>({
-        get: () => {
-            if (state.selectedValuesType === VALUES_TYPE.ANY_VALUE) {
-                if (state.selectedType === 'text') return true;
-                if (Number.isNaN(Number(state.min)) || Number.isNaN(Number(state.max))) return false;
-                return state.min !== undefined && state.max !== undefined;
-            }
-            return state.enumValues.every((d) => !!d.key && !!d.label);
-        },
-        set: (value: boolean) => {
-            state.proxyIsValid = value;
-        },
+    isAllValid: computed<boolean>(() => {
+        if (state.selectedValuesType === VALUES_TYPE.ANY_VALUE) {
+            if (state.selectedType === 'text') return true;
+            if (Number.isNaN(Number(state.min)) || Number.isNaN(Number(state.max))) return false;
+            return state.min !== undefined && state.max !== undefined;
+        }
+        return state.enumValues.every((d) => !!d.key && !!d.label);
     }),
-    manualGlobalVariableData: computed<Partial<DashboardGlobalVariableModel>>({
-        get() {
-            if (state.selectedValuesType === VALUES_TYPE.ANY_VALUE) {
-                if (state.selectedType === 'text') {
-                    return {
-                        method: 'manual',
-                        type: 'text',
-                        valueType: 'any',
-                        options: {
-                            defaultValue: state.defaultTextValue,
-                        },
-                    };
-                }
+    manualGlobalVariableData: computed<Partial<DashboardGlobalVariableModel>>(() => {
+        if (state.selectedValuesType === VALUES_TYPE.ANY_VALUE) {
+            if (state.selectedType === 'text') {
                 return {
                     method: 'manual',
-                    type: 'number',
+                    type: 'text',
                     valueType: 'any',
                     options: {
-                        min: state.min,
-                        max: state.max,
-                        step: state.step,
-                        inputType: state.selectedNumberInputType,
+                        defaultValue: state.defaultTextValue,
                     },
                 };
             }
             return {
                 method: 'manual',
-                type: state.selectedType,
-                valueType: 'enum',
-                values: state.enumValues,
+                type: 'number',
+                valueType: 'any',
                 options: {
-                    selectionType: state.selectedSelectionType,
+                    min: state.min,
+                    max: state.max,
+                    step: state.step,
+                    inputType: state.selectedNumberInputType,
                 },
             };
-        },
-        set(value: Partial<DashboardGlobalVariableModel>) {
-            state.proxyData = value;
-        },
+        }
+        return {
+            method: 'manual',
+            type: state.selectedType,
+            valueType: 'enum',
+            values: state.enumValues,
+            options: {
+                selectionType: state.selectedSelectionType,
+            },
+        };
     }),
     typeMenuItems: computed<SelectDropdownMenuItem[]>(() => ([
         { name: 'text', label: i18n.t('DASHBOARDS.DETAIL.VARIABLES.TEXT') },
@@ -149,6 +139,14 @@ const handleUpdateEnumKey = (idx: number, value: string) => {
 const handleChangeNumberInputType = (type: NumberInputType) => {
     state.selectedNumberInputType = type;
 };
+
+/* Watcher */
+watch(() => state.manualGlobalVariableData, (data) => {
+    state.proxyData = data;
+}, { deep: true, immediate: true });
+watch(() => state.isAllValid, (isValid) => {
+    state.proxyIsValid = isValid;
+}, { immediate: true });
 </script>
 
 <template>

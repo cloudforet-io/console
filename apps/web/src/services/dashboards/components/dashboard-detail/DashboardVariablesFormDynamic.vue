@@ -1,12 +1,10 @@
 <script lang="ts" setup>
-import {
-    computed, reactive,
-} from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import { sortBy } from 'lodash';
 
 import {
-    PFieldGroup, PSelectDropdown, PContextMenu, PFieldTitle,
+    PContextMenu, PFieldGroup, PFieldTitle, PSelectDropdown,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
@@ -19,11 +17,12 @@ import type { MetricReferenceMap } from '@/store/reference/metric-reference-stor
 import type { NamespaceReferenceMap } from '@/store/reference/namespace-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
-import { useCostDataSourceFilterMenuItems } from '@/common/composables/data-source/use-cost-data-source-filter-menu-items';
+import {
+    useCostDataSourceFilterMenuItems,
+} from '@/common/composables/data-source/use-cost-data-source-filter-menu-items';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import type { DashboardGlobalVariableModel } from '@/services/dashboards/types/global-variable-type';
-
 
 
 interface Props {
@@ -49,42 +48,27 @@ const storeState = reactive({
 const state = reactive({
     proxyIsValid: useProxyValue<boolean>('isValid', props, emit),
     proxyData: useProxyValue<Partial<DashboardGlobalVariableModel>>('data', props, emit),
-    isAllValid: computed<boolean>({
-        get() {
-            if (state.selectedSourceFrom === 'asset' || state.selectedSourceFrom === 'cost') {
-                return !!state.selectedValuesFrom;
-            }
-            return false;
-        },
-        set(value: boolean) {
-            state.proxyIsValid = value;
-        },
+    isAllValid: computed<boolean>(() => {
+        if (state.selectedSourceFrom === 'asset' || state.selectedSourceFrom === 'cost') {
+            return !!state.selectedValuesFrom;
+        }
+        return false;
     }),
-    dynamicGlobalVariableData: computed<Partial<DashboardGlobalVariableModel>>({
-        get() {
-            return {
-                method: 'dynamic',
-                reference: {
-                    resourceType: state.selectedSourceFrom,
-                    dataSourceId: state.selectedCostDataSourceId || state.selectedMetricId,
-                    dataKey: state.selectedValuesFrom,
-                },
-                options: {
-                    selectionType: 'multi',
-                },
-            };
+    dynamicGlobalVariableData: computed<Partial<DashboardGlobalVariableModel>>(() => ({
+        method: 'dynamic',
+        reference: {
+            resourceType: state.selectedSourceFrom,
+            dataSourceId: state.selectedCostDataSourceId || state.selectedMetricId,
+            dataKey: state.selectedValuesFrom,
         },
-        set(value: Partial<DashboardGlobalVariableModel>) {
-            state.proxyData = value;
+        options: {
+            selectionType: 'multi',
         },
-    }),
-    sourceFromMenuItems: computed<MenuItem[]>(() => {
-        const _default = [
-            { name: 'asset', label: i18n.t('DASHBOARDS.DETAIL.VARIABLES.ASSET') },
-            { name: 'cost', label: i18n.t('DASHBOARDS.DETAIL.VARIABLES.COST') },
-        ];
-        return _default;
-    }),
+    })),
+    sourceFromMenuItems: computed<MenuItem[]>(() => [
+        { name: 'asset', label: i18n.t('DASHBOARDS.DETAIL.VARIABLES.ASSET') },
+        { name: 'cost', label: i18n.t('DASHBOARDS.DETAIL.VARIABLES.COST') },
+    ]),
     valuesFromMenuItems: computed<MenuItem[]>(() => {
         if (state.selectedSourceFrom === 'asset') {
             const _labelsInfo = storeState.metrics[state.selectedMetricId]?.data?.labels_info || [];
@@ -209,6 +193,14 @@ const handleChangeValuesFrom = (valuesFrom: string) => {
     if (state.selectedValuesFrom === valuesFrom) return;
     state.selectedValuesFrom = valuesFrom;
 };
+
+/* Watcher */
+watch(() => state.dynamicGlobalVariableData, (data) => {
+    state.proxyData = data;
+}, { deep: true, immediate: true });
+watch(() => state.isAllValid, (isValid) => {
+    state.proxyIsValid = isValid;
+}, { immediate: true });
 </script>
 
 <template>
