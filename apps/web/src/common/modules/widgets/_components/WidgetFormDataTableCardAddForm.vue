@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { isEmpty, range, sortBy } from 'lodash';
+import { range } from 'lodash';
 
 import {
     PFieldGroup, PDivider, PIconButton, PI, PButton, PSelectDropdown, PTextInput, PToggleButton, PFieldTitle,
@@ -20,17 +20,15 @@ import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-sou
 import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
 
 import getRandomId from '@/lib/random-id-generator';
-import CostTagKeyVariableModel
-    from '@/lib/variable-models/managed-model/custom-resource-model/cost-tag-key-variable-model';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useCostDataSourceFilterMenuItems } from '@/common/composables/data-source/use-cost-data-source-filter-menu-items';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import WidgetFormDataTableCardFilters from '@/common/modules/widgets/_components/WidgetFormDataTableCardFilters.vue';
 import { DATA_SOURCE_DOMAIN } from '@/common/modules/widgets/_constants/data-table-constant';
 import type { AdditionalLabel } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { DataTableQueryFilter } from '@/common/modules/widgets/types/widget-model';
 
-import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
+
 
 interface Props {
     filterFormKey: string;
@@ -72,6 +70,10 @@ const storeState = reactive({
     isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
     costDataSources: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
+});
+const { menuItems: costDataSourceMenuItems } = useCostDataSourceFilterMenuItems({
+    isAdminMode: computed(() => storeState.isAdminMode),
+    costDataSource: computed(() => storeState.costDataSources[props.sourceId]),
 });
 
 const state = reactive({
@@ -139,38 +141,10 @@ const groupByState = reactive({
     loading: false,
     items: computed(() => {
         if (props.sourceType === DATA_SOURCE_DOMAIN.COST) {
-            return [
-                ...costFilterState.managedGroupByItems,
-                ...costFilterState.additionalInfoGroupByItems,
-                ...costFilterState.tagsFilterItems,
-            ];
+            return costDataSourceMenuItems.value;
         }
         return [...assetFilterState.metricFilterItems];
     }),
-});
-const costFilterState = reactive({
-    managedGroupByItems: computed<MenuItem[]>(() => {
-        if (storeState.isAdminMode) return Object.values(GROUP_BY_ITEM_MAP);
-        return Object.values(GROUP_BY_ITEM_MAP).filter((item) => item.name !== 'workspace_id');
-    }),
-    additionalInfoGroupByItems: computed<MenuItem[]>(() => {
-        const dataSource = storeState.costDataSources[props.sourceId ?? ''];
-        const additionalInfo = dataSource?.data?.plugin_info?.metadata?.additional_info;
-        if (!dataSource) return [];
-        if (additionalInfo && !isEmpty(additionalInfo)) {
-            return sortBy(Object.entries(additionalInfo).map(([k]) => ({
-                name: `additional_info.${k}`,
-                label: k,
-                presetKeys: additionalInfo[k].enums,
-            })), 'label');
-        }
-        return dataSource ? sortBy((dataSource.data?.cost_additional_info_keys ?? [])
-            .map((key) => ({
-                name: `additional_info.${key}`,
-                label: key,
-            })), 'label') : [];
-    }),
-    tagsFilterItems: [] as MenuItem[],
 });
 
 const assetFilterState = reactive({
@@ -240,22 +214,6 @@ const getAdditionalLabelInvalidText = (labelKey: string, labelName: string): str
     }
     return '';
 };
-const setTagsResources = async (): Promise<void> => {
-    try {
-        groupByState.loading = true;
-        const options = {
-            cost_data_source: props.sourceId,
-        };
-        const costTagKeyVariableModel = new CostTagKeyVariableModel();
-        const response = await costTagKeyVariableModel.list({ options });
-        costFilterState.tagsFilterItems = response.results ? response.results.map((d) => ({ name: d.key, label: d.name })) : [];
-    } catch (e: any) {
-        ErrorHandler.handleError(e);
-        costFilterState.tagsFilterItems = [];
-    } finally {
-        groupByState.loading = false;
-    }
-};
 
 const resetAllFilter = () => {
     state.proxySelectedGroupByItems = [];
@@ -263,9 +221,6 @@ const resetAllFilter = () => {
 };
 
 watch([() => props.sourceId, () => props.sourceKey], async () => {
-    if (props.sourceType === DATA_SOURCE_DOMAIN.COST) {
-        await setTagsResources();
-    }
     resetAllFilter();
 });
 
@@ -276,13 +231,6 @@ watch([
     const additionalLabelInvalid = Object.values(additionalLabelInvalidMap).some((invalid) => invalid);
     validationState.proxyFormInvalid = dateFieldNameInvalid || additionalLabelInvalid;
 }, { immediate: true });
-
-onMounted(async () => {
-    if (props.sourceType === DATA_SOURCE_DOMAIN.COST) {
-        await setTagsResources();
-    }
-});
-
 </script>
 
 <template>
