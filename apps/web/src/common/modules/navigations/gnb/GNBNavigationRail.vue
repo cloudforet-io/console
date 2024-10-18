@@ -54,6 +54,9 @@ const storeState = reactive({
     currentWorkspaceId: computed(() => userWorkspaceGetters.currentWorkspaceId),
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceGetters.costDataSource),
 });
+
+const noParentsMenuList:MenuId[] = [MENU_ID.DASHBOARDS, MENU_ID.WORKSPACE_HOME, MENU_ID.PROJECT];
+
 const state = reactive({
     isInit: false as boolean|undefined,
     isHovered: false,
@@ -75,7 +78,7 @@ const state = reactive({
                 {
                     ...menu,
                     name: menu.id,
-                    type: 'header',
+                    type: (noParentsMenuList.includes(menu.id)) ? 'item' : 'header',
                 },
             ];
             if (menu.subMenuList) {
@@ -87,7 +90,9 @@ const state = reactive({
     selectedMenuId: computed(() => {
         const reversedMatched = clone(route.matched).reverse();
         const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
+        const targetMenuId: string = closestRoute?.name || closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
+        console.log('all', closestRoute?.name, closestRoute?.meta?.menuId, MENU_ID.WORKSPACE_HOME);
+        console.log('targetMenuId', targetMenuId);
         if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
             return '';
         }
@@ -161,7 +166,7 @@ onMounted(async () => {
                              :to="(item.type === 'header' && item.subMenuList?.length > 0) ? '' : item.to"
                              class="service-menu"
                              :class="{
-                                 'is-selected': state.selectedMenuId === item.id,
+                                 'is-selected': state.selectedMenuId.split('.').includes(item.id) && item.type !== 'header',
                                  'is-only-label': item.type === 'header' && item.subMenuList?.length > 0
                              }"
                 >

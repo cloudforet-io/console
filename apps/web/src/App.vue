@@ -215,7 +215,7 @@ watch(() => state.userId, (userId) => {
         position: fixed;
         width: 100%;
         height: $top-bar-height;
-        z-index: 100;
+        z-index: 1030;
         flex-shrink: 0;
         top: 0;
     }

@@ -120,6 +120,7 @@ const state = reactive({
             field_group: ['date'],
         };
     }),
+    analyzeFetcher: computed(() => (costAnalysisPageGetters.isUnifiedCost ? unifiedCostAnalyze : fetchCostAnalyze)),
 });
 const tableState = reactive({
     loading: true,
@@ -306,6 +307,7 @@ const getRefinedChartTableData = (results: CostAnalyzeRawData[] = [], granularit
 
 /* api */
 const fetchCostAnalyze = getCancellableFetcher<object, AnalyzeResponse<CostAnalyzeRawData>>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
+const unifiedCostAnalyze = getCancellableFetcher<object, AnalyzeResponse<CostAnalyzeRawData>>(SpaceConnector.clientV2.costAnalysis.unifiedCost.analyze);
 const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
 const listCostAnalysisTableData = async (): Promise<AnalyzeResponse<CostAnalyzeRawData>> => {
     try {
@@ -313,8 +315,8 @@ const listCostAnalysisTableData = async (): Promise<AnalyzeResponse<CostAnalyzeR
         analyzeApiQueryHelper
             .setFilters(costAnalysisPageGetters.consoleFilters)
             .setPage(getPageStart(tableState.thisPage, tableState.pageSize), tableState.pageSize);
-        const { status, response } = await fetchCostAnalyze({
-            data_source_id: costAnalysisPageGetters.selectedDataSourceId,
+        const { status, response } = await state.analyzeFetcher({
+            data_source_id: costAnalysisPageGetters.isUnifiedCost ? undefined : costAnalysisPageGetters.selectedDataSourceId,
             query: {
                 ...state.analyzeQuery,
                 ...analyzeApiQueryHelper.data,
@@ -333,8 +335,8 @@ const costAnalyzeExportQueryHelper = new QueryHelper();
 const listCostAnalysisExcelData = async (): Promise<CostAnalyzeRawData[]> => {
     try {
         costAnalyzeExportQueryHelper.setFilters(costAnalysisPageGetters.consoleFilters);
-        const { status, response } = await fetchCostAnalyze({
-            data_source_id: costAnalysisPageGetters.selectedDataSourceId,
+        const { status, response } = await state.analyzeFetcher({
+            data_source_id: costAnalysisPageGetters.isUnifiedCost ? undefined : costAnalysisPageGetters.selectedDataSourceId,
             query: {
                 ...state.analyzeQuery,
                 filter: costAnalyzeExportQueryHelper.apiQuery.filter,

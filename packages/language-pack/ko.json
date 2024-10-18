@@ -1790,7 +1790,14 @@
 			}
 		},
 		"ANOMALY_DETECTION_CONFIGURATION": "이상 비용 탐지 설정",
-		"COST_ADVANCED_SETTINGS": "고급 설정"
+		"COST_ADVANCED_SETTINGS": "고급 설정",
+		"CURRENCY_CONVERTER": "환율 설정",
+		"CURRENCY_CONVERTER_PAGE": {
+			"AGGREGATION_DATE": "집계 날짜",
+			"EXCHANGE_RATE_SOURCE": "환율 기준",
+			"LAST_DAY_OF_THE_MONTH": "매월 마지막일 ",
+			"NOTIFICATION": "집계가 완료되면, 날짜 변경은 다음 달부터 적용됩니다."
+		}
 	},
 	"DASHBOARDS": {
 		"ALL_DASHBOARDS": {
@@ -2373,6 +2380,7 @@
 		"COST_SUMMARY_BY_PROJECT": "프로젝트별",
 		"COST_SUMMARY_CURRENT_TOTAL_COST": "당월 누적값",
 		"COST_SUMMARY_DESC": "위의 비용은 비용 리포트 발행 시점에 따라 최종 비용에 차이가 있을 수 있습니다.",
+		"COST_SUMMARY_GO_TO_COST_ANALYSIS": "비용 분석으로 이동",
 		"COST_SUMMARY_GO_TO_REPORT": "비용 리포트로 이동",
 		"COST_SUMMARY_LAST_MONT_TOTAL_COST": "전월 총 비용",
 		"COST_SUMMARY_RECENT": "최근 비용 리포트({date})",
@@ -3498,7 +3506,7 @@
 				"SPECIFIC_SERVICE_ACCOUNT": "특정 서비스 어카운트",
 				"TAG": "태그",
 				"VERSION": "버전",
-				"VIEW_IN_ADMIN_MODE": "",
+				"VIEW_IN_ADMIN_MODE": "Admin 모드에서 확인",
 				"WORKSPACE": "워크스페이스"
 			},
 			"EDIT_ADDITIONAL_RULE": "추가 규칙 편집",
