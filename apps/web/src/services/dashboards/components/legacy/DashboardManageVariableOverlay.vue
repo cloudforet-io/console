@@ -15,10 +15,13 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useQueryTags } from '@/common/composables/query-tags';
 
+import DashboardVariablesFormModal
+    from '@/services/dashboards/components/dashboard-detail/DashboardVariablesFormModal.vue';
 import DashboardManageVariableTable
     from '@/services/dashboards/components/legacy/DashboardManageVariableTable.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+
 
 
 interface Props {
@@ -38,6 +41,8 @@ const state = reactive({
         const properties = state.variableSchema.properties;
         return state.variableSchema?.order?.map((d) => properties[d]?.name).filter((name) => name !== properties[state.selectedVariable]?.name) ?? [];
     }),
+    modalType: 'CREATE' as 'CREATE'|'UPDATE',
+    createModalVisible: false,
     deleteModalVisible: false,
     deleteModalLoading: false,
 });
@@ -55,8 +60,9 @@ const handleChangeToolbox = async (options: ToolboxOptions) => {
         // state.pageStart = options.pageStart;
     }
 };
-const handleClickAddButton = () => {
-    //
+const handleClickCreateButton = () => {
+    state.modalType = 'CREATE';
+    state.createModalVisible = true;
 };
 const handleClickImportButton = () => {
     //
@@ -100,7 +106,7 @@ const handleConfirmDelete = () => {
                     <p-button icon-left="ic_plus_bold"
                               style-type="primary"
                               class="mr-4"
-                              @click="handleClickAddButton"
+                              @click="handleClickCreateButton"
                     >
                         {{ $t('DASHBOARDS.DETAIL.VARIABLES.CREATE') }}
                     </p-button>
@@ -117,6 +123,9 @@ const handleConfirmDelete = () => {
                                              @clone="handleClickCloneButton"
             />
         </div>
+        <dashboard-variables-form-modal :modal-type="state.modalType"
+                                        :visible.sync="state.createModalVisible"
+        />
         <delete-modal :header-title="$t('DASHBOARDS.DETAIL.VARIABLES.DELETE_MODAL_TITLE')"
                       :visible.sync="state.deleteModalVisible"
                       :loading="state.deleteModalLoading"
