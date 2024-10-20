@@ -83,7 +83,7 @@ const handleClose = () => {
     left: 0;
     width: 0;
     height: 0;
-    z-index: 1001;
+    z-index: 1030;
 
     >.layout {
         @apply fixed flex flex-col;
