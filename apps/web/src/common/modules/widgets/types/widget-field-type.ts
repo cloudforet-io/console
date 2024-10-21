@@ -59,7 +59,8 @@ export type WidgetFieldName = 'dataField' | 'tableDataField' | 'xAxis' | 'yAxis'
     | 'granularity' | 'colorSchema' | 'pieChartType'
     | 'dateFormat' | 'numberFormat' | 'dataFieldHeatmapColor'
     | 'displayAnnotation' | 'displaySeriesLabel' | 'textWrap' | 'tableColumnWidth' | 'customTableColumnWidth'
-    | 'missingValue' | 'widgetHeight';
+    | 'missingValue' | 'widgetHeight'
+    | 'widgetHeader';
 
 export interface WidgetFieldComponentProps<FieldOptions, FieldValue = any> {
     dataTable?: PublicDataTableModel|PrivateDataTableModel;
