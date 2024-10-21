@@ -55,7 +55,7 @@ const handleCloseClick = () => {
          :class="{info: props.type==='info', waring: props.type ==='warning', danger: props.type ==='danger', 'in-section': props.layout === 'in-section', 'items-center': props.noTitle}"
     >
         <p-i v-if="props.titleIcon"
-             class="left-icon"
+             class="left-icon self-start"
              width="1.25rem"
              height="1.25rem"
              :color="iconColorMap[props.type]"

@@ -586,6 +586,7 @@
 				"ACCUMULATED": "누적 데이터",
 				"ADDITIONAL_INFO": "추가 정보",
 				"ADD_MORE": "추가",
+				"ALL_WORKSPACE_SELECTED_WARNING": "",
 				"ALT_EXCEL_DOWNLOAD_STACKED": "누적 데이터가 아닌 월별 데이터로 파일이 다운로드 됩니다.",
 				"ALT_E_ADD_GROUP_BY": "Group-by는 최대 3개까지만 선택이 가능합니다.",
 				"ALT_E_ADD_GROUP_BY_DESC": "이전 Group-by 선택을 최소 1개 해제한 후에 새로 선택해주세요.",
@@ -659,6 +660,7 @@
 					"THIS_MONTH": "이번 달",
 					"THIS_YEAR": "올해"
 				},
+				"POSSIBLE_PERFORMANCE_DELAY": "",
 				"PRIVATE": "비공개",
 				"PROJECT": "프로젝트",
 				"PROVIDERS_TITLE": "서비스 제공자",

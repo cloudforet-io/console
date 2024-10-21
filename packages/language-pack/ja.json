@@ -586,6 +586,7 @@
 				"ACCUMULATED": "累積データ",
 				"ADDITIONAL_INFO": "追加情報",
 				"ADD_MORE": "もっと見る",
+				"ALL_WORKSPACE_SELECTED_WARNING": "",
 				"ALT_EXCEL_DOWNLOAD_STACKED": "累積データではなく、月別データでファイルがダウンロードされます。",
 				"ALT_E_ADD_GROUP_BY": "最大で3つのグループ化オプションを選択できます。",
 				"ALT_E_ADD_GROUP_BY_DESC": "新しい選択を行う前に、以前のグループ化オプションを少なくとも1つ選択解除してください。",
@@ -659,6 +660,7 @@
 					"THIS_MONTH": "今月",
 					"THIS_YEAR": "本年"
 				},
+				"POSSIBLE_PERFORMANCE_DELAY": "",
 				"PRIVATE": "非公開",
 				"PROJECT": "プロジェクト",
 				"PROVIDERS_TITLE": "サービスプロバイダー",
