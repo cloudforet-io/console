@@ -1232,7 +1232,8 @@
 				"TITLE": "Enter New Email Address"
 			},
 			"EMAIL": "Email",
-			"INVALID_CODE": "Invalid code. Please check the email try again.",
+			"INVALID_CODE_EMAIL": "Invalid code. Please check the email try again.",
+			"INVALID_CODE_OTP": "Invalid code.",
 			"SEND_CODE": "Send Code",
 			"SEND_NEW_CODE": "Send new code",
 			"SENT_DESC": "A verification code has been sent to",

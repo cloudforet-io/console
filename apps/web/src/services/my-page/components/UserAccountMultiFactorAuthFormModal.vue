@@ -100,7 +100,9 @@ const handleClickVerifyButton = async () => {
         }
     } catch (e: any) {
         validationState.isValidationCodeValid = false;
-        validationState.validationCodeInvalidText = _i18n.t('COMMON.MFA_MODAL.INVALID_CODE');
+        validationState.validationCodeInvalidText = storeState.selectedType === MULTI_FACTOR_AUTH_TYPE.EMAIL
+            ? _i18n.t('COMMON.MFA_MODAL.INVALID_CODE_EMAIL')
+            : _i18n.t('COMMON.MFA_MODAL.INVALID_CODE_OTP');
     } finally {
         state.loading = false;
     }
