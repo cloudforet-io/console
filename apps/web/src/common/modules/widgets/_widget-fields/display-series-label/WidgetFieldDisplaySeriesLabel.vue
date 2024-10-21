@@ -18,6 +18,7 @@ import type {
 } from '@/common/modules/widgets/types/widget-field-type';
 
 
+
 const ROTATE_MIN = -90;
 const ROTATE_MAX = 90;
 const emit = defineEmits<WidgetFieldComponentEmit<DisplaySeriesLabelValue>>();
@@ -109,10 +110,7 @@ watch(() => state.isAllValid, (_isAllValid) => {
 }, { immediate: true });
 
 onMounted(() => {
-    if (!props.value) {
-        state.proxyValue = undefined;
-        return;
-    }
+    if (!props.value) return;
     const _format = props.value?.format || 'numeric';
     state.proxyValue = {
         toggleValue: props.value?.toggleValue ?? false,
