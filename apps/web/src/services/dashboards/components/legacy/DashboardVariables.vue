@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import type Vue from 'vue';
-import { computed, getCurrentInstance, reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { isEqual, xor } from 'lodash';
 
@@ -9,9 +8,6 @@ import { PI, PTextButton, PDivider } from '@cloudforet/mirinae';
 import type { DashboardVariables, DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
 
 import DashboardVariableDropdown from '@/services/dashboards/components/dashboard-detail/DashboardVariableDropdown.vue';
-import DashboardManageVariableOverlay
-    from '@/services/dashboards/components/legacy/DashboardManageVariableOverlay.vue';
-import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/constants/manage-variable-overlay-constant';
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
@@ -33,10 +29,7 @@ const dashboardDetailGetters = dashboardDetailStore.getters;
 
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 
-const vm = getCurrentInstance()?.proxy as Vue;
-
 const state = reactive({
-    showOverlay: computed(() => vm.$route.hash === `#${MANAGE_VARIABLES_HASH_NAME}`),
     variableProperties: computed(() => dashboardDetailGetters.refinedVariablesSchema.properties),
     order: computed(() => dashboardDetailGetters.refinedVariablesSchema.order),
     allReferenceTypeInfo: computed(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
@@ -114,7 +107,6 @@ const handleResetVariables = () => {
         >
             {{ $t('DASHBOARDS.CUSTOMIZE.SAVE') }}
         </p-text-button>
-        <dashboard-manage-variable-overlay :visible="state.showOverlay" />
     </div>
 </template>
 

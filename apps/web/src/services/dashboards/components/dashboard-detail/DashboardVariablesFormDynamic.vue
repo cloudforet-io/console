@@ -17,12 +17,20 @@ import type { MetricReferenceMap } from '@/store/reference/metric-reference-stor
 import type { NamespaceReferenceMap } from '@/store/reference/namespace-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
+import CostVariableModel from '@/lib/variable-models/managed-model/resource-model/cost-variable-model';
+import MetricDataVariableModel from '@/lib/variable-models/managed-model/resource-model/metric-data-variable-model';
+
 import {
     useCostDataSourceFilterMenuItems,
 } from '@/common/composables/data-source/use-cost-data-source-filter-menu-items';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import type { DashboardGlobalVariableModel } from '@/services/dashboards/types/global-variable-type';
+import {
+    MANAGED_DASHBOARD_GLOBAL_VARIABLES_SCHEMA,
+} from '@/services/dashboards/constants/managed-dashboard-global-variables';
+import type { DashboardGlobalVariableModel, ReferenceVariable } from '@/services/dashboards/types/global-variable-type';
+
+
 
 
 interface Props {
@@ -49,26 +57,47 @@ const state = reactive({
     proxyIsValid: useProxyValue<boolean>('isValid', props, emit),
     proxyData: useProxyValue<Partial<DashboardGlobalVariableModel>>('data', props, emit),
     isAllValid: computed<boolean>(() => {
-        if (state.selectedSourceFrom === 'asset' || state.selectedSourceFrom === 'cost') {
-            return !!state.selectedValuesFrom;
-        }
-        return false;
+        if (state.needToSelectValuesFrom) return !!state.selectedValuesFrom;
+        return true;
     }),
-    dynamicGlobalVariableData: computed<Partial<DashboardGlobalVariableModel>>(() => ({
-        method: 'dynamic',
-        reference: {
-            resourceType: state.selectedSourceFrom,
-            dataSourceId: state.selectedCostDataSourceId || state.selectedMetricId,
-            dataKey: state.selectedValuesFrom,
-        },
-        options: {
-            selectionType: 'multi',
-        },
-    })),
-    sourceFromMenuItems: computed<MenuItem[]>(() => [
-        { name: 'asset', label: i18n.t('DASHBOARDS.DETAIL.VARIABLES.ASSET') },
-        { name: 'cost', label: i18n.t('DASHBOARDS.DETAIL.VARIABLES.COST') },
-    ]),
+    needToSelectValuesFrom: computed<boolean>(() => state.selectedSourceFrom === 'asset' || state.selectedSourceFrom === 'cost'),
+    dynamicGlobalVariableData: computed<Partial<DashboardGlobalVariableModel>>(() => {
+        if (state.needToSelectValuesFrom) {
+            const _resourceType = state.selectedSourceFrom === 'asset' ? MetricDataVariableModel.meta.resourceType : CostVariableModel.meta.resourceType;
+            return {
+                method: 'dynamic',
+                reference: {
+                    resourceType: _resourceType,
+                    dataSourceId: state.selectedCostDataSourceId || state.selectedMetricId,
+                    dataKey: state.selectedValuesFrom,
+                },
+                options: {
+                    selectionType: 'multi',
+                },
+            };
+        }
+        const _targetGV: ReferenceVariable|undefined = MANAGED_DASHBOARD_GLOBAL_VARIABLES_SCHEMA[state.selectedSourceFrom];
+        return {
+            method: 'dynamic',
+            reference: {
+                resourceType: _targetGV?.reference.resourceType,
+            },
+            options: {
+                selectionType: 'multi',
+            },
+        };
+    }),
+    sourceFromMenuItems: computed<MenuItem[]>(() => {
+        const _managedGVMenuItems = Object.values(MANAGED_DASHBOARD_GLOBAL_VARIABLES_SCHEMA).map((d) => ({
+            name: d.key,
+            label: d.name,
+        }));
+        return [
+            { name: 'asset', label: i18n.t('DASHBOARDS.DETAIL.VARIABLES.ASSET') },
+            { name: 'cost', label: i18n.t('DASHBOARDS.DETAIL.VARIABLES.COST') },
+            ..._managedGVMenuItems,
+        ];
+    }),
     valuesFromMenuItems: computed<MenuItem[]>(() => {
         if (state.selectedSourceFrom === 'asset') {
             const _labelsInfo = storeState.metrics[state.selectedMetricId]?.data?.labels_info || [];
@@ -218,7 +247,9 @@ watch(() => state.isAllValid, (isValid) => {
             />
         </p-field-group>
         <!-- Select Source -->
-        <div class="data-source-wrapper">
+        <div v-if="state.needToSelectValuesFrom"
+             class="data-source-wrapper"
+        >
             <!-- Asset Data Source -->
             <template v-if="state.selectedSourceFrom === 'asset'">
                 <div class="data-source-select-col">
@@ -283,7 +314,8 @@ watch(() => state.isAllValid, (isValid) => {
             </div>
         </div>
         <!-- Values From -->
-        <p-field-group :label="$t('DASHBOARDS.DETAIL.VARIABLES.FETCH_LIST_OF_VALUES_FROM')"
+        <p-field-group v-if="state.needToSelectValuesFrom"
+                       :label="$t('DASHBOARDS.DETAIL.VARIABLES.FETCH_LIST_OF_VALUES_FROM')"
                        required
                        class="col-span-12"
         >
