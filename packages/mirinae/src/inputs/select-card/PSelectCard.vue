@@ -37,11 +37,16 @@ import {
 
 import PLazyImg from '@/feedbacks/loading/lazy-img/PLazyImg.vue';
 import PI from '@/foundation/icons/PI.vue';
-import type { SelectProps } from '@/hooks/use-select/use-select';
+import type { SelectionPredicate } from '@/hooks/use-select/use-select';
 import { useSelect } from '@/hooks/use-select/use-select';
 
 
-interface Props extends SelectProps {
+interface Props {
+    value?: any;
+    selected?: any | any[];
+    disabled?: boolean;
+    predicate?: SelectionPredicate;
+    multiSelectable?: boolean;
     block?: boolean;
     imageUrl?: string;
     icon?: string|boolean;

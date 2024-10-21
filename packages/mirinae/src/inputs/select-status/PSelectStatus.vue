@@ -18,10 +18,15 @@ import { computed, defineComponent } from 'vue';
 import PStatus from '@/data-display/status/PStatus.vue';
 import type { AnimationType } from '@/foundation/icons/config';
 import { ANIMATION_TYPE } from '@/foundation/icons/config';
-import type { SelectProps } from '@/hooks/use-select/use-select';
+import type { SelectionPredicate } from '@/hooks/use-select/use-select';
 import { useSelect } from '@/hooks/use-select/use-select';
 
-interface Props extends SelectProps {
+interface Props {
+    value?: any;
+    selected?: any | any[];
+    disabled?: boolean;
+    predicate?: SelectionPredicate;
+    multiSelectable?: boolean;
     icon?: string;
     iconColor?: string;
     iconAnimation?: AnimationType;

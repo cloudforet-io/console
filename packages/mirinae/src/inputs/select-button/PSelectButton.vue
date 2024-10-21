@@ -26,7 +26,7 @@ import { computed, defineComponent, reactive } from 'vue';
 
 
 import PI from '@/foundation/icons/PI.vue';
-import type { SelectProps } from '@/hooks/use-select/use-select';
+import type { SelectionPredicate } from '@/hooks/use-select/use-select';
 import { useSelect } from '@/hooks/use-select/use-select';
 import type {
     SelectButtonLayoutType,
@@ -42,7 +42,12 @@ import {
 import { gray, white } from '@/styles/colors.cjs';
 
 
-interface Props extends SelectProps {
+interface Props {
+    value?: any;
+    selected?: any | any[];
+    disabled?: boolean;
+    predicate?: SelectionPredicate;
+    multiSelectable?: boolean;
     layout?: SelectButtonLayoutType;
     styleType?: SelectButtonStyleType;
     size?: SelectButtonSize;

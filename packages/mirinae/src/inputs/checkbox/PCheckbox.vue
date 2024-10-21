@@ -33,10 +33,15 @@ import {
 } from 'vue';
 
 import PI from '@/foundation/icons/PI.vue';
-import type { SelectProps } from '@/hooks/use-select/use-select';
+import type { SelectionPredicate } from '@/hooks/use-select/use-select';
 import { useMultiSelect } from '@/hooks/use-select/use-select';
 
-interface CheckboxProps extends SelectProps {
+interface CheckboxProps {
+    value?: any;
+    selected?: any | any[];
+    disabled?: boolean;
+    predicate?: SelectionPredicate;
+    multiSelectable?: boolean;
     invalid?: boolean;
     indeterminate?: boolean;
 }

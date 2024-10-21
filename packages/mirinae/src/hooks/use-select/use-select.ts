@@ -5,21 +5,13 @@ import {
 
 import { pull, remove } from 'lodash';
 
-export interface SelectProps {
-    value?: any;
-    selected?: any | any[];
-    disabled?: boolean;
-    predicate?: Predicate;
-    multiSelectable?: boolean;
-}
-
-interface Predicate {
+export interface SelectionPredicate {
     (value: any, current: any): boolean;
 }
-interface SelectStateArgs {
+interface UseSelectOptions {
     value?: ComputedRef<any> | any;
     selected?: ComputedRef<any | any[]> | any | any[];
-    predicate?: ComputedRef<Predicate|undefined> | Predicate;
+    predicate?: ComputedRef<SelectionPredicate|undefined> | SelectionPredicate;
     disabled?: ComputedRef<boolean|undefined> | boolean;
     multiSelectable?: ComputedRef<boolean|undefined> | boolean;
 }
@@ -28,7 +20,7 @@ interface SelectState {
     isSelected: boolean;
 }
 
-const getSelectState = (state: UnwrapRef<SelectStateArgs>) => reactive({
+const getSelectState = (state: UnwrapRef<UseSelectOptions>) => reactive({
     isSelected: computed<boolean>(() => {
         if (Array.isArray(state.selected)) {
             if (state.predicate) {
@@ -41,7 +33,7 @@ const getSelectState = (state: UnwrapRef<SelectStateArgs>) => reactive({
         return state.selected === state.value;
     }),
 });
-const getSingleSelected = (state: UnwrapRef<SelectStateArgs>) => {
+const getSingleSelected = (state: UnwrapRef<UseSelectOptions>) => {
     if (state.disabled) return undefined;
 
     let result: any;
@@ -53,7 +45,7 @@ const getSingleSelected = (state: UnwrapRef<SelectStateArgs>) => {
 
     return result;
 };
-const getMultiSelected = (state: UnwrapRef<SelectStateArgs>, selectState: SelectState) => {
+const getMultiSelected = (state: UnwrapRef<UseSelectOptions>, selectState: SelectState) => {
     if (state.disabled) return undefined;
 
     let result: any;
@@ -78,7 +70,7 @@ const getMultiSelected = (state: UnwrapRef<SelectStateArgs>, selectState: Select
 
 export const useMultiSelect = ({
     value, selected, predicate, disabled,
-}: SelectStateArgs) => {
+}: UseSelectOptions) => {
     const state = reactive({
         value, selected, predicate, disabled,
     });
@@ -94,7 +86,7 @@ export const useMultiSelect = ({
 
 export const useSingleSelect = ({
     value, selected, predicate, disabled,
-}: SelectStateArgs) => {
+}: UseSelectOptions) => {
     const state = reactive({
         value, selected, predicate, disabled,
     });
@@ -110,7 +102,7 @@ export const useSingleSelect = ({
 
 export const useSelect = ({
     value, selected, predicate, disabled, multiSelectable,
-}: SelectStateArgs) => {
+}: UseSelectOptions) => {
     const state = reactive({
         value, selected, predicate, disabled, multiSelectable,
     });
