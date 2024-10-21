@@ -185,7 +185,7 @@ const migrateAllWidgets = (dashboardWidgets: Array<PublicWidgetModel|PrivateWidg
     _migratedWidgets.forEach((widget) => {
         const _widgetOptions: WidgetOptions = cloneDeep(widget.options);
         const _widgetHeaderOption = cloneDeep(widget.options.widgetHeader) as WidgetHeaderValue;
-        if (_widgetHeaderOption && !('toggleValue' in _widgetHeaderOption)) {
+        if (_widgetHeaderOption && (_widgetHeaderOption?.toggleValue === undefined)) {
             widget.options = {
                 ..._widgetOptions,
                 widgetHeader: {
