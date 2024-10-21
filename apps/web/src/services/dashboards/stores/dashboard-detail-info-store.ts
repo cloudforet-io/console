@@ -336,12 +336,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             const res = await fetcher<PublicWidgetListParameters|PrivateWidgetListParameters, ListResponse<WidgetModel>>({
                 dashboard_id: state.dashboardId,
             });
-            const [_isMigrated, widgets] = migrateLegacyWidgetOptions(res.results || []);
-            if (_isMigrated) {
-                state.dashboardWidgets = widgets;
-                return;
-            }
-            state.dashboardWidgets = res.results || [];
+            state.dashboardWidgets = migrateLegacyWidgetOptions(res.results || []);
+            return;
         } catch (e) {
             ErrorHandler.handleError(e);
         }

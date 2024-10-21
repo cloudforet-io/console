@@ -55,13 +55,6 @@ const state = reactive({
     timezoneMenuList: computed<SelectDropdownMenuItem[]>(() => map(timezoneList, (d) => ({
         type: 'item', label: d === 'UTC' ? `${d} (default)` : d, name: d,
     }))),
-    config: computed(() => ({
-        ...storeState.domainConfig,
-        settings: {
-            timezone: state.selectedTimezone,
-            language: state.selectedLanguage,
-        },
-    })),
     selectedMenuId: computed(() => {
         const reversedMatched = clone(route.matched).reverse();
         const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
@@ -80,9 +73,6 @@ const handleSaveChanges = async () => {
         await domainConfigStore.updatePreferences({
             timezone: state.selectedTimezone,
             language: state.selectedLanguage,
-        });
-        await store.commit('domain/setDomainConfigs', {
-            config: state.config,
         });
         showSuccessMessage(i18n.t('IAM.DOMAIN_SETTINGS.ALT_S_UPDATE_TIMEZONE_AND_LANGUAGE'), '');
     } catch (e) {

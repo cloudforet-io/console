@@ -3,7 +3,7 @@ import {
     onClickOutside, useElementSize,
 } from '@vueuse/core';
 import {
-    computed, reactive, ref, watch,
+    computed, onMounted, reactive, ref, watch,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
@@ -11,16 +11,17 @@ import { clone } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButton, PContextMenu, PIconButton, PPopover, PBadge,
-    useContextMenuController,
+    PButton, PContextMenu, PIconButton, PPopover, PBadge, PSelectDropdown, PFieldTitle,
+    useContextMenuController, PCheckbox,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
-
 
 import { SpaceRouter } from '@/router';
 import type { CostQuerySetUpdateParameters } from '@/schema/cost-analysis/cost-query-set/api-verbs/update';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -29,11 +30,14 @@ import { MENU_ID } from '@/lib/menu/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
+import { getWorkspaceInfo } from '@/services/advanced/composables/refined-table-data';
 import CostAnalysisDataTypeDropdown from '@/services/cost-explorer/components/CostAnalysisDataTypeDropdown.vue';
 import CostAnalysisFiltersPopper from '@/services/cost-explorer/components/CostAnalysisFiltersPopper.vue';
 import CostAnalysisGranularityPeriodDropdown
     from '@/services/cost-explorer/components/CostAnalysisGranularityPeriodDropdown.vue';
+import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import {
     DYNAMIC_COST_QUERY_SET_PARAMS,
 } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
@@ -43,11 +47,13 @@ import type { Granularity } from '@/services/cost-explorer/types/cost-explorer-q
 
 
 
+
 const CostAnalysisQueryFormModal = () => import('@/services/cost-explorer/components/CostAnalysisQueryFormModal.vue');
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
+const appContextStore = useAppContextStore();
 
 const route = useRoute();
 
@@ -61,6 +67,7 @@ const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
 
 const storeState = reactive({
     pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 const state = reactive({
     queryFormModalVisible: false,
@@ -96,6 +103,7 @@ const state = reactive({
         });
         return count;
     }),
+    workspaceScopeLoading: false,
 });
 
 const {
@@ -114,6 +122,8 @@ onClickOutside(rightPartRef, hideContextMenu);
 /* event */
 const handleSaveQuerySet = async () => {
     try {
+        const filters = costAnalysisPageState.isAllWorkspaceSelected ? costAnalysisPageGetters.consoleFilters : costAnalysisPageGetters.consoleFilters.filter((d) => d.k !== GROUP_BY.WORKSPACE);
+
         await SpaceConnector.clientV2.costAnalysis.costQuerySet.update<CostQuerySetUpdateParameters>({
             cost_query_set_id: costAnalysisPageGetters.selectedQueryId as string,
             options: {
@@ -121,8 +131,10 @@ const handleSaveQuerySet = async () => {
                 period: costAnalysisPageState.period,
                 relative_period: costAnalysisPageState.relativePeriod,
                 group_by: costAnalysisPageState.groupBy,
-                filters: costAnalysisPageGetters.consoleFilters,
+                filters,
                 display_data_type: costAnalysisPageState.displayDataType,
+                workspace_scope: costAnalysisPageState.workspaceScope,
+                is_all_workspace_selected: costAnalysisPageState.isAllWorkspaceSelected,
                 metadata: { filters_schema: { enabled_properties: costAnalysisPageState.enabledFiltersProperties ?? [] } },
             },
         });
@@ -152,16 +164,83 @@ const handleUpdateQuery = async (updatedQueryId: string) => {
 const handleClickFilter = () => {
     state.filtersPopoverVisible = !state.filtersPopoverVisible;
 };
-
+const handleUpdateWorkspaceScope = (selectedItems: string) => {
+    costAnalysisPageStore.setWorkspaceScope(selectedItems);
+};
 watch(() => costAnalysisPageGetters.selectedQueryId, (updatedQueryId) => {
     if (updatedQueryId !== '') {
         state.filtersPopoverVisible = false;
     }
 }, { immediate: true });
+
+const handleUpdateIsAllWorkspaceSelected = (isAllWorkspaceSelected: boolean) => {
+    costAnalysisPageState.isAllWorkspaceSelected = isAllWorkspaceSelected;
+    if (isAllWorkspaceSelected) {
+        costAnalysisPageStore.setWorkspaceScope('');
+        if (!costAnalysisPageState.enabledFiltersProperties?.includes(GROUP_BY.WORKSPACE)) {
+            costAnalysisPageState.enabledFiltersProperties = [
+                GROUP_BY.WORKSPACE,
+                ...(costAnalysisPageState.enabledFiltersProperties ?? []),
+            ];
+        }
+    } else {
+        costAnalysisPageStore.setWorkspaceScope(costAnalysisPageGetters.defaultWorkspaceScope);
+        costAnalysisPageState.enabledFiltersProperties = costAnalysisPageState.enabledFiltersProperties?.filter((property) => property !== GROUP_BY.WORKSPACE);
+    }
+    costAnalysisPageStore.setFilters({
+        ...costAnalysisPageState.filters,
+        workspace_id: [],
+    });
+};
+
+onMounted(async () => {
+    if (storeState.isAdminMode) {
+        costAnalysisPageStore.setWorkspaceScope('');
+    } else if (!costAnalysisPageState.workspaceScope) {
+        costAnalysisPageStore.setWorkspaceScope(costAnalysisPageGetters.defaultWorkspaceScope);
+    }
+});
 </script>
 
 <template>
     <div class="cost-analysis-query-section">
+        <div v-if="storeState.isAdminMode"
+             class="scope-wrapper"
+        >
+            <p-field-title inline>
+                {{ $t('HOME.FORM_SCOPE') }}
+            </p-field-title> <p-select-dropdown is-filterable
+                                                :menu="costAnalysisPageGetters.workspaceList.map((workspace) => ({
+                                                    label: workspace.name,
+                                                    name: workspace.workspace_id,
+                                                }))"
+                                                :selected="costAnalysisPageState.workspaceScope"
+                                                :disabled="costAnalysisPageState.isAllWorkspaceSelected"
+                                                :page-size="10"
+                                                show-select-marker
+                                                size="sm"
+                                                class="workspace-scope-dropdown"
+                                                @update:selected="handleUpdateWorkspaceScope"
+            >
+                <template #menu-item--format="{item}">
+                    <div class="menu-item-wrapper">
+                        <div class="label">
+                            <workspace-logo-icon :text="item?.label || ''"
+                                                 :theme="getWorkspaceInfo(item?.name || '', costAnalysisPageGetters.workspaceList)?.tags?.theme"
+                                                 size="xs"
+                            />
+                            <span class="label-text">{{ item.label }}</span>
+                        </div>
+                    </div>
+                </template>
+            </p-select-dropdown><p-checkbox
+                :selected="costAnalysisPageState.isAllWorkspaceSelected"
+                class="ml-2"
+                @change="handleUpdateIsAllWorkspaceSelected"
+            >
+                {{ $t('COMMON.NAVIGATIONS.TOP_BAR.ALL_WORKSPACE') }}
+            </p-checkbox>
+        </div>
         <div class="filter-wrapper"
              :style="{ 'margin-bottom': `${filtersPopperHeight ? filtersPopperHeight+40 + 16: 16}px` }"
         >
@@ -253,7 +332,36 @@ watch(() => costAnalysisPageGetters.selectedQueryId, (updatedQueryId) => {
 .cost-analysis-query-section {
     position: relative;
     margin-top: 1.5rem;
-    z-index: 1;
+
+    .scope-wrapper {
+        margin-bottom: 1rem;
+        .workspace-scope-dropdown {
+            width: 8.5rem;
+
+            /* custom design-system component - p-select-dropdown */
+            &:deep() {
+                .selected-item-text {
+                    @apply truncate;
+                    display: block;
+                    width: 6.5rem;
+                }
+            }
+        }
+
+        .menu-item-wrapper {
+            @apply flex justify-between;
+            max-width: 18rem;
+
+            .label {
+                @apply flex items-center gap-2;
+            }
+            .label-text {
+                @apply truncate;
+                max-width: 8.375rem;
+            }
+        }
+    }
+
     .filter-wrapper {
         @apply flex justify-between;
         align-items: flex-start;

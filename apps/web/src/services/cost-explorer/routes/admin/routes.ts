@@ -25,6 +25,7 @@ const AdminBudgetMainPage = () => import('@/services/cost-explorer/pages/admin/A
 const AdminBudgetCreatePage = () => import('@/services/cost-explorer/pages/admin/AdminBudgetCreatePage.vue');
 const AdminBudgetDetailPage = () => import('@/services/cost-explorer/pages/admin/AdminBudgetDetailPage.vue');
 const AdminDomainSettingsAnomalyDetectionConfigurationPage = () => import('@/services/cost-explorer/pages/admin/AdminAdvancedSettingsAnomalyDetectionConfigurationPage.vue');
+const AdminDomainSettingsCurrencyConverterPage = () => import('@/services/cost-explorer/pages/admin/AdminAdvancedSettingsCurrencyConverterPage.vue');
 
 const AdminCostAnalysisPage = () => import('@/services/cost-explorer/pages/admin/AdminCostAnalysisPage.vue');
 const CostReportPage = () => import('@/services/cost-explorer/pages/CostReportPage.vue');
@@ -96,7 +97,7 @@ const adminCostExplorerRoutes: RouteConfig = {
         {
             path: 'budget',
             meta: {
-                menuId: makeAdminRouteName(MENU_ID.BUDGET),
+                menuId: MENU_ID.BUDGET,
                 translationId: MENU_INFO_MAP[MENU_ID.BUDGET].translationId,
             },
             component: { template: '<router-view />' },
@@ -209,10 +210,16 @@ const adminCostExplorerRoutes: RouteConfig = {
             component: CostAdvancedSettingsContainer,
             children: [
                 {
-                    path: '/anomaly-detection-configuration',
+                    path: 'anomaly-detection-configuration',
                     name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.ANOMALY_DETECTION_DOMAIN_CONFIGURATION._NAME),
-                    meta: { lsbVisible: true, translationId: MENU_INFO_MAP[MENU_ID.ANOMALY_DETECTION_DOMAIN_CONFIGURATION].translationId },
+                    meta: { lsbVisible: true, translationId: MENU_INFO_MAP[MENU_ID.ANOMALY_DETECTION_DOMAIN_CONFIGURATION].translationId, menuId: MENU_ID.ANOMALY_DETECTION_DOMAIN_CONFIGURATION },
                     component: AdminDomainSettingsAnomalyDetectionConfigurationPage,
+                },
+                {
+                    path: 'currency-converter',
+                    name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.CURRENCY_CONVERTER._NAME),
+                    meta: { lsbVisible: true, translationId: MENU_INFO_MAP[MENU_ID.CURRENCY_CONVERTER].translationId, menuId: MENU_ID.CURRENCY_CONVERTER },
+                    component: AdminDomainSettingsCurrencyConverterPage,
                 },
             ],
         },

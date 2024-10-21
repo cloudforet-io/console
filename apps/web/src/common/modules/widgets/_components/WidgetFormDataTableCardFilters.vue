@@ -40,7 +40,6 @@ import WidgetFormDataTableCardFiltersItem
 import {
     DATA_SOURCE_DOMAIN,
     DATA_TABLE_QUERY_OPERATOR,
-    KEYWORD_FILTER_DISABLED_KEYS,
 } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { DataTableQueryFilterForDropdown } from '@/common/modules/widgets/types/widget-data-table-type';
@@ -61,7 +60,7 @@ const GROUP_BY_TO_VAR_MODELS: Record<string, VariableOption> = {
     [GROUP_BY.PRODUCT]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost, dataKey: 'product' },
     [GROUP_BY.PROVIDER]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.provider },
     [GROUP_BY.SERVICE_ACCOUNT]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.service_account },
-    [GROUP_BY.REGION]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.region },
+    [GROUP_BY.REGION]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost, dataKey: 'region' },
     [GROUP_BY.USAGE_TYPE]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost, dataKey: 'usage_type' },
 };
 
@@ -106,7 +105,7 @@ const state = reactive({
         }
         return handlerMaps;
     }),
-    primaryCostStatOptions: computed<Record<string, any>>(() => ({
+    primaryCostOptions: computed<Record<string, any>>(() => ({
         data_source_id: props.sourceId,
     })),
     selectedItemsMap: getInitialSelectedItemsMap() as Record<string, DataTableQueryFilterForDropdown>,
@@ -168,9 +167,11 @@ const handleAddFilter = () => {
 
 const handleSelectAddFilterMenuItem = (item: MenuItem, _: any, isSelected: boolean) => {
     if (isSelected) {
-        const defaultOperator = KEYWORD_FILTER_DISABLED_KEYS.includes(item.name)
-            ? DATA_TABLE_QUERY_OPERATOR.in.key
-            : DATA_TABLE_QUERY_OPERATOR.contain_in.key;
+        // NOTE: temporary disabled contain_in operator
+        // const defaultOperator = KEYWORD_FILTER_DISABLED_KEYS.includes(item.name)
+        //     ? DATA_TABLE_QUERY_OPERATOR.in.key
+        //     : DATA_TABLE_QUERY_OPERATOR.contain_in.key;
+        const defaultOperator = DATA_TABLE_QUERY_OPERATOR.in.key;
         state.selectedItems = [
             ...state.selectedItems,
             item,
@@ -222,6 +223,8 @@ const getCostMenuHandler = (
                 variableModel: new VariableModelFactory({ type: 'MANAGED', managedModelKey: _variableOption.key }),
                 dataKey: _variableOption.dataKey,
             };
+            if (_variableOption.key === MANAGED_VARIABLE_MODEL_KEY_MAP.cost) queryOptions = { ...queryOptions, ...state.primaryCostOptions };
+
             if (groupBy === MANAGED_VARIABLE_MODELS.workspace.meta.idKey) {
                 queryOptions.is_dormant = false;
             }
@@ -232,7 +235,7 @@ const getCostMenuHandler = (
                 variableModel: CostVariableModel,
                 dataKey: groupBy,
             };
-            queryOptions = { ...queryOptions, ...state.primaryCostStatOptions };
+            queryOptions = { ...queryOptions, ...state.primaryCostOptions };
         }
         const handler = getVariableModelMenuHandler([variableModelInfo], queryOptions);
 

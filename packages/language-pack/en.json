@@ -1790,7 +1790,14 @@
 			}
 		},
 		"ANOMALY_DETECTION_CONFIGURATION": "Anomaly Detection Configuration",
-		"COST_ADVANCED_SETTINGS": "Advanced Settings"
+		"COST_ADVANCED_SETTINGS": "Advanced Settings",
+		"CURRENCY_CONVERTER": "Currency Converter",
+		"CURRENCY_CONVERTER_PAGE": {
+			"AGGREGATION_DATE": "Aggregation Date",
+			"EXCHANGE_RATE_SOURCE": "Exchange Rate Source",
+			"LAST_DAY_OF_THE_MONTH": "Last day of the month",
+			"NOTIFICATION": "Once aggregated, date changes will take effect starting next month."
+		}
 	},
 	"DASHBOARDS": {
 		"ALL_DASHBOARDS": {
@@ -2427,6 +2434,7 @@
 		"COST_SUMMARY_BY_PROJECT": "by Project",
 		"COST_SUMMARY_CURRENT_TOTAL_COST": "Current Month-to-Date Cost",
 		"COST_SUMMARY_DESC": "The cost above may differ from the costs in the report",
+		"COST_SUMMARY_GO_TO_COST_ANALYSIS": "Go to Cost Analysis",
 		"COST_SUMMARY_GO_TO_REPORT": "Go to Cost Report",
 		"COST_SUMMARY_LAST_MONT_TOTAL_COST": "Last Month Total Cost",
 		"COST_SUMMARY_RECENT": "Recent Cost Report for {date}",

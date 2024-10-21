@@ -4,13 +4,14 @@ import { cloneDeep } from 'lodash';
 import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 
-import type { TableDataFieldValueNoVersion, TableDataFieldValueV1 } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
+import type { WidgetHeaderValue } from '@/common/modules/widgets/_widget-fields/header/type';
+import type {
+    TableDataFieldValueNoVersion,
+    TableDataFieldValueV1,
+} from '@/common/modules/widgets/_widget-fields/table-data-field/type';
 import { LATEST_TABLE_DATA_FIELD_VERSION } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
 import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-field-type';
-import type {
-    WidgetFieldValues,
-} from '@/common/modules/widgets/types/widget-field-value-type';
-
+import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
 type WidgetOptions = Record<WidgetFieldName, WidgetFieldValues>;
@@ -21,12 +22,10 @@ type WidgetOptions = Record<WidgetFieldName, WidgetFieldValues>;
  * Table Data Field No Version -> Table Data Field V1
  * Legend: value type is changed
  */
-const _migrateXYChart = (widget: PublicWidgetModel|PrivateWidgetModel, groupByField: string): [boolean, PublicWidgetModel|PrivateWidgetModel] => {
+const _migrateXYChart = (widget: PublicWidgetModel|PrivateWidgetModel, groupByField: string): PublicWidgetModel|PrivateWidgetModel => {
     let _options = cloneDeep(widget.options);
-    let _needMigration = false;
 
     const _dataFieldToTableDataFieldV1 = () => {
-        _needMigration = true;
         if (_options?.[groupByField]?.value) {
             _options = {
                 ..._options,
@@ -57,7 +56,6 @@ const _migrateXYChart = (widget: PublicWidgetModel|PrivateWidgetModel, groupByFi
         delete _options?.[groupByField];
     };
     const _tableDataFieldNoVersionToTableDataFieldV1 = () => {
-        _needMigration = true;
         _options = {
             ..._options,
             tableDataField: migrateTableDataField(_options.tableDataField),
@@ -80,13 +78,10 @@ const _migrateXYChart = (widget: PublicWidgetModel|PrivateWidgetModel, groupByFi
             },
         };
     }
-    return [
-        _needMigration,
-        {
-            ...widget,
-            options: _options,
-        },
-    ];
+    return {
+        ...widget,
+        options: _options,
+    };
 };
 
 /**
@@ -94,12 +89,10 @@ const _migrateXYChart = (widget: PublicWidgetModel|PrivateWidgetModel, groupByFi
  * Data Field -> Table Data Field V1
  * Table Data Field No Version -> Table Data Field V1
  */
-const _migrateClusteredColumnChart = (widget: PublicWidgetModel|PrivateWidgetModel): [boolean, PublicWidgetModel|PrivateWidgetModel] => {
+const _migrateClusteredColumnChart = (widget: PublicWidgetModel|PrivateWidgetModel): PublicWidgetModel|PrivateWidgetModel => {
     let _options: WidgetOptions = cloneDeep(widget.options);
-    let _needMigration = false;
 
     const _dataFieldToTableDataFieldV1 = () => {
-        _needMigration = true;
         _options = {
             ..._options,
             tableDataField: {
@@ -113,7 +106,6 @@ const _migrateClusteredColumnChart = (widget: PublicWidgetModel|PrivateWidgetMod
         delete _options?.dataField;
     };
     const _tableDataFieldNoVersionToTableDataFieldV1 = () => {
-        _needMigration = true;
         _options = {
             ..._options,
             tableDataField: migrateTableDataField(_options.tableDataField),
@@ -125,25 +117,20 @@ const _migrateClusteredColumnChart = (widget: PublicWidgetModel|PrivateWidgetMod
         && (!('version' in _options.tableDataField) || _options.tableDataField.version !== LATEST_TABLE_DATA_FIELD_VERSION)) {
         _tableDataFieldNoVersionToTableDataFieldV1();
     }
-    return [
-        _needMigration,
-        {
-            ...widget,
-            options: _options,
-        },
-    ];
+    return {
+        ...widget,
+        options: _options,
+    };
 };
 
 /**
  * Heatmap
  * Data Field & YAxis -> Table Data Field V1
  */
-const _migrateHeatmap = (widget: PublicWidgetModel|PrivateWidgetModel): [boolean, PublicWidgetModel|PrivateWidgetModel] => {
+const _migrateHeatmap = (widget: PublicWidgetModel|PrivateWidgetModel): PublicWidgetModel|PrivateWidgetModel => {
     let _options: WidgetOptions = cloneDeep(widget.options);
-    let _needMigration = false;
 
     const _dataFieldToTableDataFieldV1 = () => {
-        _needMigration = true;
         _options = {
             ..._options,
             tableDataField: {
@@ -164,72 +151,76 @@ const _migrateHeatmap = (widget: PublicWidgetModel|PrivateWidgetModel): [boolean
     if ('dataField' in _options) {
         _dataFieldToTableDataFieldV1();
     }
-    return [
-        _needMigration,
-        {
-            ...widget,
-            options: _options,
-        },
-    ];
+    return {
+        ...widget,
+        options: _options,
+    };
 };
 
 /**
  * Table
  * Table Data Field No Version -> Table Data Field V1
  */
-const migrateTable = (widget: PublicWidgetModel|PrivateWidgetModel): [boolean, PublicWidgetModel|PrivateWidgetModel] => {
+const migrateTable = (widget: PublicWidgetModel|PrivateWidgetModel): PublicWidgetModel|PrivateWidgetModel => {
     let _options: WidgetOptions = cloneDeep(widget.options);
-    let _needMigration = false;
     // Table Data Field version migration
     if (_options?.tableDataField
         && (!('version' in _options.tableDataField) || _options.tableDataField.version !== LATEST_TABLE_DATA_FIELD_VERSION)) {
-        _needMigration = true;
         _options = {
             ..._options,
             tableDataField: migrateTableDataField(_options.tableDataField),
         };
     }
-    return [
-        _needMigration,
-        {
-            ...widget,
-            options: _options,
-        },
-    ];
+    return {
+        ...widget,
+        options: _options,
+    };
+};
+
+/*
+* All Widgets
+*/
+const migrateAllWidgets = (dashboardWidgets: Array<PublicWidgetModel|PrivateWidgetModel>): Array<PublicWidgetModel|PrivateWidgetModel> => {
+    const _migratedWidgets: Array<PublicWidgetModel|PrivateWidgetModel> = cloneDeep(dashboardWidgets);
+    _migratedWidgets.forEach((widget) => {
+        const _widgetOptions: WidgetOptions = cloneDeep(widget.options);
+        const _widgetHeaderOption = cloneDeep(widget.options.widgetHeader) as WidgetHeaderValue;
+        if (_widgetHeaderOption && !_widgetHeaderOption?.toggleValue) {
+            widget.options = {
+                ..._widgetOptions,
+                widgetHeader: {
+                    ..._widgetHeaderOption,
+                    toggleValue: true,
+                },
+            };
+        }
+    });
+    return _migratedWidgets;
 };
 
 
-export const migrateLegacyWidgetOptions = (dashboardWidgets: Array<PublicWidgetModel|PrivateWidgetModel>): [boolean, Array<PublicWidgetModel|PrivateWidgetModel>] => {
-    let isMigrated = false;
-    const migratedWidgets = dashboardWidgets.map((widget) => {
+export const migrateLegacyWidgetOptions = (dashboardWidgets: Array<PublicWidgetModel|PrivateWidgetModel>): Array<PublicWidgetModel|PrivateWidgetModel> => {
+    // let isMigrated = false;
+    let migratedWidgets = dashboardWidgets.map((widget) => {
         if (widget.widget_type === 'lineChart' || widget.widget_type === 'stackedAreaChart') {
-            const [_needMigration, _widget] = _migrateXYChart(widget, 'lineBy');
-            isMigrated = isMigrated || _needMigration;
-            if (_needMigration) return _widget;
+            return _migrateXYChart(widget, 'lineBy');
         }
         if (widget.widget_type === 'stackedColumnChart' || widget.widget_type === 'stackedHorizontalBarChart') {
-            const [_needMigration, _widget] = _migrateXYChart(widget, 'stackBy');
-            isMigrated = isMigrated || _needMigration;
-            if (_needMigration) return _widget;
+            return _migrateXYChart(widget, 'stackBy');
         }
         if (widget.widget_type === 'clusteredColumnChart') {
-            const [_needMigration, _widget] = _migrateClusteredColumnChart(widget);
-            isMigrated = isMigrated || _needMigration;
-            if (_needMigration) return _widget;
+            return _migrateClusteredColumnChart(widget);
         }
         if (widget.widget_type === 'heatmap') {
-            const [_needMigration, _widget] = _migrateHeatmap(widget);
-            isMigrated = isMigrated || _needMigration;
-            if (_needMigration) return _widget;
+            return _migrateHeatmap(widget);
         }
         if (widget.widget_type === 'table') {
-            const [_needMigration, _widget] = migrateTable(widget);
-            isMigrated = isMigrated || _needMigration;
-            if (_needMigration) return _widget;
+            return migrateTable(widget);
         }
         return widget;
     });
-    return [isMigrated, migratedWidgets];
+    migratedWidgets = migrateAllWidgets(migratedWidgets);
+    return migratedWidgets;
 };
 
 /** Option Migration Helper */

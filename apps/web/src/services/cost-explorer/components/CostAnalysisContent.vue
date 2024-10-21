@@ -54,6 +54,7 @@ watch(() => costAnalysisPageGetters.selectedQuerySet, async (selectedQuerySet) =
         costAnalysisPageStore.setQueryOptions();
     }
 }, { immediate: true });
+
 </script>
 
 <template>

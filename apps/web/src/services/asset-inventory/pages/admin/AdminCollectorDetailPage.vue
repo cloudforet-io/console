@@ -1,30 +1,34 @@
 <template>
     <div class="collector-detail-page">
-        <p-heading class="mb-6"
-                   :title="state.collectorName"
-                   show-back-button
-                   @click-back-button="handleClickBackButton"
-        >
-            <p-skeleton v-if="state.loading"
-                        width="20rem"
-                        height="1.5rem"
-            />
-            <template v-if="state.hasReadWriteAccess && state.collectorName && collectorDetailPageStore.getters.isEditableCollector"
-                      #title-right-extra
-            >
-                <span class="title-right-button-wrapper">
-                    <p-icon-button name="ic_edit-text"
-                                   width="1.5rem"
-                                   height="1.5rem"
-                                   @click="handleClickEditButton"
+        <p-heading-layout>
+            <template #heading>
+                <p-heading class="mb-6"
+                           :title="state.collectorName"
+                           show-back-button
+                           @click-back-button="handleClickBackButton"
+                >
+                    <p-skeleton v-if="state.loading"
+                                width="20rem"
+                                height="1.5rem"
                     />
-                    <p-icon-button name="ic_delete"
-                                   width="1.5rem"
-                                   height="1.5rem"
-                                   class="delete-button"
-                                   @click="handleClickDeleteButton"
-                    />
-                </span>
+                    <template v-if="state.hasReadWriteAccess && state.collectorName && collectorDetailPageStore.getters.isEditableCollector"
+                              #title-right-extra
+                    >
+                        <span class="title-right-button-wrapper">
+                            <p-icon-button name="ic_edit-text"
+                                           width="1.5rem"
+                                           height="1.5rem"
+                                           @click="handleClickEditButton"
+                            />
+                            <p-icon-button name="ic_delete"
+                                           width="1.5rem"
+                                           height="1.5rem"
+                                           class="delete-button"
+                                           @click="handleClickDeleteButton"
+                            />
+                        </span>
+                    </template>
+                </p-heading>
             </template>
             <template #extra>
                 <div v-if="collectorJobStore.AllJobsInfoLoaded"
@@ -44,7 +48,7 @@
                     </router-link>
                 </div>
             </template>
-        </p-heading>
+        </p-heading-layout>
 
         <collector-base-info-section class="section"
                                      :history-link="state.collectorHistoryLink"
@@ -108,7 +112,7 @@ import { clone } from 'lodash';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PHeading, PSkeleton, PButton, PIconButton, PDoubleCheckModal,
+    PHeading, PSkeleton, PButton, PIconButton, PDoubleCheckModal, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
 import { SpaceRouter } from '@/router';
@@ -345,6 +349,7 @@ onUnmounted(() => {
     justify-content: flex-end;
     gap: 1rem;
     flex-wrap: wrap;
+    margin-bottom: 1.5rem;
 }
 </style>
 
