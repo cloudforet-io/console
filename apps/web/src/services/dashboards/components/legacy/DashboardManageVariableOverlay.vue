@@ -15,6 +15,8 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useQueryTags } from '@/common/composables/query-tags';
 
+import DashboardManageVariableImportModal
+    from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableImportModal.vue';
 import DashboardVariablesFormModal
     from '@/services/dashboards/components/dashboard-detail/DashboardVariablesFormModal.vue';
 import DashboardManageVariableTable
@@ -45,6 +47,7 @@ const state = reactive({
     createModalVisible: false,
     deleteModalVisible: false,
     deleteModalLoading: false,
+    importModalVisible: false,
 });
 
 /* Helper */
@@ -65,7 +68,7 @@ const handleClickCreateButton = () => {
     state.createModalVisible = true;
 };
 const handleClickImportButton = () => {
-    //
+    state.importModalVisible = true;
 };
 const handleClickDeleteButton = () => {
     //
@@ -131,6 +134,7 @@ const handleConfirmDelete = () => {
                       :loading="state.deleteModalLoading"
                       @confirm="handleConfirmDelete"
         />
+        <dashboard-manage-variable-import-modal :visible.sync="state.importModalVisible" />
     </p-overlay-layout>
 </template>
 
