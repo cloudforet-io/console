@@ -6,7 +6,7 @@ import {
 import type { TabItem } from '@/navigation/tabs/tab/type';
 
 
-interface TabStateArgs {
+export interface UseTabOptions {
     tabs: ComputedRef<Array<string|TabItem>> | Array<string|TabItem>;
     activeTab: ComputedRef<string> | string;
 }
@@ -18,7 +18,7 @@ interface TabState {
     currentTabItem?: TabItem;
 }
 
-export const useTab = ({ tabs, activeTab }: TabStateArgs) => {
+export const useTab = ({ tabs, activeTab }: UseTabOptions) => {
     const state = reactive({
         tabs,
         activeTab,
