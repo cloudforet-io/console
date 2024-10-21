@@ -15,6 +15,7 @@ import {
     PButtonModal, PI, PLink, PToolboxTable, PTextPagination, PCollapsibleToggle,
 } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
+import { numberFormatter } from '@cloudforet/utils';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 
@@ -303,6 +304,13 @@ const getRefinedChartTableData = (results: CostAnalyzeRawData[] = [], granularit
     });
     return refinedTableData;
 };
+const getTableValue = (value?: number, usageUnit?: string): string|undefined => {
+    if (value === undefined) return value;
+    if (costAnalysisPageState.displayDataType === 'usage') {
+        return usageUnitFormatter(value, { unit: usageUnit }, tableState.showFormattedData);
+    }
+    return numberFormatter(value, { notation: 'compact' });
+};
 
 
 /* api */
@@ -480,7 +488,7 @@ watch(
                     >
                         <span class="usage-wrapper">
                             <span :class="isIncreasedByHalfOrMore(item, field.name) ? 'cell-text raised' : undefined">
-                                {{ usageUnitFormatter(value, {unit: item.usage_unit}, tableState.showFormattedData) }}
+                                {{ getTableValue(value, item.usage_unit) }}
                             </span>
                             <p-i v-if="isIncreasedByHalfOrMore(item, field.name)"
                                  name="ic_arrow-up-bold-alt"
