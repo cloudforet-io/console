@@ -18,7 +18,7 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { loadAuth } from '@/services/auth/authenticator/loader';
-import CollapsibleContents from '@/services/auth/components/CollapsibleContents.vue';
+import CollapsibleContentsEmail from '@/services/auth/components/CollapsibleContentsEmail.vue';
 import { getDefaultRouteAfterSignIn } from '@/services/auth/helpers/default-route-helper';
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 
@@ -127,10 +127,14 @@ onMounted(() => {
                      height="2rem"
                      width="2rem"
                 />
-                <!-- TODO: "MS" is scheduled to be reflected-->
-                <span>
-                    EMAIL
-                </span>
+                <span>EMAIL</span>
+            </div>
+            <div class="headline-wrapper">
+                <p-i name="ic_notification-protocol_envelope"
+                     height="2rem"
+                     width="2rem"
+                />
+                <span>EMAIL</span>
             </div>
             <div class="email-info-wrapper">
                 <span class="email-info-desc">{{ $t('AUTH.MFA.EMAIL_INFO') }}</span>
@@ -186,7 +190,7 @@ onMounted(() => {
                                class="close-button"
                                @click="handleClickCollapsedButton(true)"
                 />
-                <collapsible-contents @click-resend="handleClickResend" />
+                <collapsible-contents-email @click-resend="handleClickResend" />
             </div>
         </div>
     </div>

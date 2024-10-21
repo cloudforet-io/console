@@ -74,9 +74,9 @@
                     >
                         {{ $t('AUTH.PASSWORD.RESET.EMAIL.DONE.COLLAPSED') }}
                     </p-collapsible-toggle>
-                    <collapsible-contents v-else
-                                          :loading="state.loading"
-                                          @click-resend="handleClickResend"
+                    <collapsible-contents-email v-else
+                                                :loading="state.loading"
+                                                @click-resend="handleClickResend"
                     />
                 </div>
             </div>
@@ -113,7 +113,7 @@ import { useDomainStore } from '@/store/domain/domain-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import CollapsibleContents from '@/services/auth/components/CollapsibleContents.vue';
+import CollapsibleContentsEmail from '@/services/auth/components/CollapsibleContentsEmail.vue';
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 
 
