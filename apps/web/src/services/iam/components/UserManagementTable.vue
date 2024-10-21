@@ -68,7 +68,7 @@ const state = reactive({
         ...user,
         type: user?.role_binding_info?.workspace_group_id ? 'Workspace Group' : 'Workspace',
         mfa_state: user?.mfa?.state === 'ENABLED' ? 'ON' : 'OFF',
-        last_accessed_count: calculateTime(user?.last_accessed_at, userPageGetters.timezone),
+        last_accessed_at: user?.last_accessed_at,
     }))),
 });
 const tableState = reactive({
@@ -94,7 +94,7 @@ const tableState = reactive({
             ...additionalFields,
             { name: 'tags', label: 'Tags', sortable: false },
             { name: 'auth_type', label: 'Auth Type' },
-            { name: 'last_accessed_count', label: 'Last Activity' },
+            { name: 'last_accessed_at', label: 'Last Activity' },
         ];
         return userPageGetters.isWorkspaceOwner && props.hasReadWriteAccess
             ? [
@@ -111,7 +111,7 @@ const tableState = reactive({
             state: makeEnumValueHandler(USER_STATE),
             email: makeDistinctValueHandler(resourceType, 'email'),
             auth_type: makeDistinctValueHandler(resourceType, 'auth_type'),
-            last_accessed_count: makeDistinctValueHandler(resourceType, 'last_accessed_count', 'datetime'),
+            last_accessed_at: makeDistinctValueHandler(resourceType, 'last_accessed_at', 'datetime'),
             tags: makeDistinctValueHandler(resourceType, 'tags'),
         };
     }),
@@ -347,18 +347,18 @@ const isWorkspaceGroupUser = (item: ExtendUserListItemType) => !!item?.role_bind
                           class="capitalize"
                 />
             </template>
-            <template #col-last_accessed_count-format="{ value }">
-                <span v-if="value === -1">
+            <template #col-last_accessed_at-format="{ value }">
+                <span v-if="calculateTime(value, userPageGetters.timezone) === -1">
                     -
                 </span>
-                <span v-else-if="value === 0">
+                <span v-else-if="calculateTime(value, userPageGetters.timezone) === 0">
                     {{ $t('IAM.USER.MAIN.TODAY') }}
                 </span>
-                <span v-else-if="value === 1">
+                <span v-else-if="calculateTime(value, userPageGetters.timezone) === 1">
                     {{ $t('IAM.USER.MAIN.YESTERDAY') }}
                 </span>
                 <span v-else>
-                    {{ value }} {{ $t('IAM.USER.MAIN.DAYS') }}
+                    {{ calculateTime(value, userPageGetters.timezone) }} {{ $t('IAM.USER.MAIN.DAYS') }}
                 </span>
             </template>
             <template #col-tags-format="{value}">

@@ -112,7 +112,7 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
             }
             const groupByItemValueList = Object.values(GROUP_BY_ITEM_MAP);
             const workspaceRemovedGroupByItems = groupByItemValueList.filter((d) => d.name !== GROUP_BY.WORKSPACE);
-            const adminManagedGroupByItems = state.isAllWorkspaceSelected ? workspaceRemovedGroupByItems : groupByItemValueList;
+            const adminManagedGroupByItems = state.isAllWorkspaceSelected ? groupByItemValueList : workspaceRemovedGroupByItems;
 
             const _managedGroupByItems = _state.isAdminMode ? adminManagedGroupByItems : workspaceRemovedGroupByItems;
             return [..._managedGroupByItems, ..._additionalInfoGroupBy];
