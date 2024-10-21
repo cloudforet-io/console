@@ -82,7 +82,6 @@ const handleClickCancel = async () => {
     }
 };
 
-/* API */
 const handleClickVerifyButton = async () => {
     state.loading = true;
     try {
@@ -108,7 +107,6 @@ const handleClickVerifyButton = async () => {
     }
 };
 
-/* Watcher */
 watch(() => storeState.userId, (userId) => {
     if (userId) {
         state.userInfo = store.state.user;
@@ -127,7 +125,7 @@ watch(() => multiFactorAuthState.modalType, () => {
                     class="mfa-modal-wrapper"
                     size="sm"
                     :theme-color="storeState.isDisabledModal? 'alert' : 'primary'"
-                    :disabled="validationState.verificationCode === '' || !state.isSentCode"
+                    :disabled="validationState.verificationCode === '' || (storeState.selectedType === MULTI_FACTOR_AUTH_TYPE.EMAIL && !state.isSentCode)"
                     :loading="state.loading"
                     @confirm="handleClickVerifyButton"
                     @cancel="handleClickCancel"
@@ -148,7 +146,11 @@ watch(() => multiFactorAuthState.modalType, () => {
                 <user-account-multi-factor-auth-modal-email-info v-if="storeState.selectedType === MULTI_FACTOR_AUTH_TYPE.EMAIL"
                                                                  :is-sent-code.sync="state.isSentCode"
                 />
-                <user-account-multi-factor-auth-modal-m-s-info v-else-if="storeState.selectedType === MULTI_FACTOR_AUTH_TYPE.MS && !storeState.isDisabledModal" />
+                <user-account-multi-factor-auth-modal-m-s-info v-else-if="storeState.selectedType === MULTI_FACTOR_AUTH_TYPE.OTP
+                                                                   && !storeState.isDisabledModal
+                                                                   && !storeState.isReSyncModal"
+                                                               :is-re-sync-modal="storeState.isReSyncModal"
+                />
                 <div class="validation-code-form">
                     <p-field-group :label="$t('COMMON.MFA_MODAL.VERIFICATION_CODE')"
                                    :invalid="!validationState.isValidationCodeValid"

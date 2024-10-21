@@ -6,10 +6,11 @@ import {
     PTextInput, PIconButton, PSpinner,
 } from '@cloudforet/mirinae';
 
-// import { postEnableMfa } from '@/lib/helper/multi-factor-auth-helper';
+import { postEnableMfa } from '@/lib/helper/multi-factor-auth-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { MULTI_FACTOR_AUTH_TYPE } from '@/services/my-page/constants/multi-factor-auth-constants';
 import { useMultiFactorAuthStore } from '@/services/my-page/stores/multi-factor-auth-store';
 
 const multiFactorAuthStore = useMultiFactorAuthStore();
@@ -20,7 +21,6 @@ const storeState = reactive({
 });
 
 const state = reactive({
-    // TEMP DATA
     passkey: '',
     qrUri: '',
     qrcode: '',
@@ -39,13 +39,12 @@ const handleClickRefreshButton = () => {
 const initQrCodeInfo = async () => {
     multiFactorAuthStore.setModalInitLoading(true);
     try {
-        // TODO: check API
-        // const userInfo = await postEnableMfa({
-        //     mfa_type: 'OTP',
-        //     options: {},
-        // }, false);
-        // state.qrUrl = userInfo.mfa.options.otp_qrcode_uri
-        state.qrUri = 'otpauth://totp/issuer_name:name?secret=1234456677&issuer=issuer_name';
+        const userInfo = await postEnableMfa({
+            mfa_type: MULTI_FACTOR_AUTH_TYPE.OTP,
+            options: {},
+        }, false);
+        if (!userInfo) return;
+        state.qrUri = userInfo?.mfa?.options.otp_qrcode_uri;
         state.passkey = state.qrUri.match(/secret=([^&]*)/)?.[1] || '';
     } catch (e) {
         ErrorHandler.handleError(e);
