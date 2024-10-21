@@ -1,6 +1,6 @@
 
 export interface WidgetHeaderValue {
-    toggleValue: boolean;
+    toggleValue?: boolean;
     title?: string;
     description?: string;
 }
