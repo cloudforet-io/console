@@ -179,13 +179,14 @@ const migrateTable = (widget: PublicWidgetModel|PrivateWidgetModel): PublicWidge
 
 /*
 * All Widgets
+* Widget Header: set toggleValue to true if widgetHeader exists but toggleValue is missing
 */
 const migrateAllWidgets = (dashboardWidgets: Array<PublicWidgetModel|PrivateWidgetModel>): Array<PublicWidgetModel|PrivateWidgetModel> => {
     const _migratedWidgets: Array<PublicWidgetModel|PrivateWidgetModel> = cloneDeep(dashboardWidgets);
     _migratedWidgets.forEach((widget) => {
         const _widgetOptions: WidgetOptions = cloneDeep(widget.options);
         const _widgetHeaderOption = cloneDeep(widget.options.widgetHeader) as WidgetHeaderValue;
-        if (_widgetHeaderOption && !_widgetHeaderOption?.toggleValue) {
+        if (_widgetHeaderOption && (_widgetHeaderOption?.toggleValue === undefined)) {
             widget.options = {
                 ..._widgetOptions,
                 widgetHeader: {

@@ -60,7 +60,7 @@ const state = reactive({
 const getValueSumKey = (dataType:string) => {
     switch (dataType) {
     case 'cost':
-        return 'cost';
+        return costAnalysisPageGetters.isUnifiedCost ? `cost.${costAnalysisPageGetters.currency}` : 'cost';
     case 'usage':
         return 'usage_quantity';
     default:

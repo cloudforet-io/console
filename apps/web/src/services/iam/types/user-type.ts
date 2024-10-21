@@ -21,7 +21,6 @@ export type UserListItemType = Partial<WorkspaceUserModel> & Partial<UserModel> 
 };
 
 export interface ExtendUserListItemType extends UserListItemType {
-    last_accessed_count: number
     mfa_state?: 'ON'|'OFF'
 }
 

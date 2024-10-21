@@ -110,7 +110,11 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
             } else {
                 _additionalInfoGroupBy = cloneDeep(getters.additionalInfoKeysItems);
             }
-            const _managedGroupByItems = _state.isAdminMode ? Object.values(GROUP_BY_ITEM_MAP) : Object.values(GROUP_BY_ITEM_MAP).filter((d) => d.name !== GROUP_BY.WORKSPACE);
+            const groupByItemValueList = Object.values(GROUP_BY_ITEM_MAP);
+            const workspaceRemovedGroupByItems = groupByItemValueList.filter((d) => d.name !== GROUP_BY.WORKSPACE);
+            const adminManagedGroupByItems = state.isAllWorkspaceSelected ? groupByItemValueList : workspaceRemovedGroupByItems;
+
+            const _managedGroupByItems = _state.isAdminMode ? adminManagedGroupByItems : workspaceRemovedGroupByItems;
             return [..._managedGroupByItems, ..._additionalInfoGroupBy];
         }),
         metadataAdditionalInfoItems: computed<GroupByItem[]>(() => {
