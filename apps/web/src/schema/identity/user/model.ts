@@ -1,7 +1,8 @@
 import type { Tags } from '@/schema/_common/model';
 import type { RoleType } from '@/schema/identity/role/type';
+import type { MultiFactorAuthType } from '@/schema/identity/user-profile/type';
 import type {
-    AuthType, UserState, UserMfaState, UserMfaType,
+    AuthType, UserState, UserMfaState,
 } from '@/schema/identity/user/type';
 
 export interface UserModel {
@@ -26,7 +27,7 @@ export interface UserModel {
 
 export interface UserMfa {
     state: UserMfaState,
-    mfa_type: UserMfaType,
+    mfa_type: MultiFactorAuthType,
     options: {
         email: string,
     }

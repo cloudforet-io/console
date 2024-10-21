@@ -8,6 +8,7 @@ import {
     PButtonModal, PFieldGroup, PTextInput,
 } from '@cloudforet/mirinae';
 
+import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
 import { store } from '@/store';
 import { i18n as _i18n } from '@/translations';
 
@@ -17,9 +18,7 @@ import UserAccountMultiFactorAuthModalEmailInfo from '@/services/my-page/compone
 import UserAccountMultiFactorAuthModalFolding from '@/services/my-page/components/UserAccountMultiFactorAuthModalFolding.vue';
 import UserAccountMultiFactorAuthModalMSInfo
     from '@/services/my-page/components/UserAccountMultiFactorAuthModalMSInfo.vue';
-import {
-    MULTI_FACTOR_AUTH_ITEMS, MULTI_FACTOR_AUTH_TYPE,
-} from '@/services/my-page/constants/multi-factor-auth-constants';
+import { MULTI_FACTOR_AUTH_ITEMS } from '@/services/my-page/constants/multi-factor-auth-constants';
 import { useMultiFactorAuthStore } from '@/services/my-page/stores/multi-factor-auth-store';
 import type {
     UserInfoType,
