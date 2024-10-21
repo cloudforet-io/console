@@ -1,8 +1,6 @@
 import { computed, reactive } from 'vue';
 
-import {
-    cloneDeep, isEmpty, isEqual,
-} from 'lodash';
+import { cloneDeep, isEmpty, isEqual } from 'lodash';
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -10,12 +8,16 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type {
+    DashboardLayout,
     DashboardLayoutWidgetInfo,
-    DashboardOptions, DashboardType,
-    DashboardVariables, DashboardVariableSchemaProperty,
+    DashboardModel,
+    DashboardOptions,
+    DashboardType,
+    DashboardVariables,
+    DashboardVariableSchemaProperty,
     DashboardVariablesSchema,
+    DashboardVars,
     TemplateType,
-    DashboardLayout, DashboardVars, DashboardModel,
 } from '@/schema/dashboard/_types/dashboard-type';
 import type { PrivateDashboardGetParameters } from '@/schema/dashboard/private-dashboard/api-verbs/get';
 import type { PrivateWidgetListParameters } from '@/schema/dashboard/private-widget/api-verbs/list';
@@ -37,7 +39,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { MANAGED_DASHBOARD_VARIABLES_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
 import { migrateLegacyWidgetOptions } from '@/services/dashboards/helpers/widget-migration-helper';
 import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
-
 
 
 interface WidgetValidMap {
@@ -393,12 +394,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             const res = await fetcher<PublicWidgetListParameters|PrivateWidgetListParameters, ListResponse<WidgetModel>>({
                 dashboard_id: state.dashboardId,
             });
-            const [_isMigrated, widgets] = await migrateLegacyWidgetOptions(res.results || []);
-            if (_isMigrated) {
-                state.dashboardWidgets = widgets;
-                return;
-            }
-            state.dashboardWidgets = res.results || [];
+            state.dashboardWidgets = migrateLegacyWidgetOptions(res.results || []);
+            return;
         } catch (e) {
             ErrorHandler.handleError(e);
         }
