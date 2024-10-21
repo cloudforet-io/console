@@ -15,6 +15,9 @@ import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 import type { Currency } from '@/store/modules/display/type';
 import { usePreferencesStore } from '@/store/preferences/preferences-store';
 
+import config from '@/lib/config';
+import { initDomain } from '@/lib/site-initializer/domain';
+
 import ScopedNotification from '@/common/components/scoped-notification/ScopedNotification.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -76,6 +79,7 @@ const handleSaveChanges = async () => {
                 is_last_day: formState.lastDayOfMonth,
             },
         });
+        await initDomain(config);
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {

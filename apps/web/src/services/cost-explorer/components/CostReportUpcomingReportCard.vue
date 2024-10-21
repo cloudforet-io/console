@@ -7,10 +7,12 @@ import dayjs from 'dayjs';
 import { PButton, PSkeleton, PDivider } from '@cloudforet/mirinae';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useDomainStore } from '@/store/domain/domain-store';
 import { languages } from '@/store/modules/user/config';
 
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
 import CostReportSettingsModal from '@/services/cost-explorer/components/CostReportSettingsModal.vue';
+import { DEFAULT_UNIFIED_COST_CURRENCY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 
 interface Props {
@@ -22,6 +24,8 @@ const props = defineProps<Props>();
 const costReportPageStore = useCostReportPageStore();
 const costReportPageGetters = costReportPageStore.getters;
 const costReportPageState = costReportPageStore.state;
+const domainStore = useDomainStore();
+const domainGetters = domainStore.getters;
 const appContextStore = useAppContextStore();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -54,6 +58,7 @@ const state = reactive({
         const endOfNextMonth = upcomingReportDate.endOf('month');
         return `${startOfNextMonth.format('YYYY-MM-DD')} ~ ${endOfNextMonth.format('YYYY-MM-DD')}`;
     }),
+    unifiedCostCurrency: computed(() => domainGetters.domainUnifiedCostCurrency ?? DEFAULT_UNIFIED_COST_CURRENCY),
 });
 
 /* Event */
@@ -106,7 +111,7 @@ const handleClickSettings = (): void => {
                         {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.CURRENCY') }}:
                     </span>
                     <span class="text">
-                        {{ costReportPageGetters.currency }}
+                        {{ state.unifiedCostCurrency }}
                     </span>
                 </div>
             </template>
