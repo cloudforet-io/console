@@ -57,7 +57,7 @@ const state = reactive({
 const tableState = reactive({
     refinedUserItems: computed<ExtendUserListItemType>(() => ({
         ...state.selectedUser,
-        last_accessed_count: calculateTime(state.selectedUser.last_accessed_at, state.selectedUser.timezone),
+        last_accessed_at: state.selectedUser.last_accessed_at,
     })),
     fields: computed<DefinitionField[]>(() => {
         const additionalFields: DefinitionField[] = [];
@@ -91,7 +91,7 @@ const tableState = reactive({
             { name: 'name', label: i18n.t('IAM.USER.MAIN.NAME') },
             { name: 'state', label: i18n.t('IAM.USER.MAIN.STATE'), disableCopy: true },
             ...additionalFields,
-            { name: 'last_accessed_count', label: i18n.t('IAM.USER.MAIN.LAST_ACTIVITY'), disableCopy: true },
+            { name: 'last_accessed_at', label: i18n.t('IAM.USER.MAIN.LAST_ACTIVITY'), disableCopy: true },
             { name: 'domain_id', label: i18n.t('IAM.USER.MAIN.DOMAIN_ID') },
             ...additionalRoleFields,
             { name: 'language', label: i18n.t('IAM.USER.MAIN.LANGUAGE'), disableCopy: true },
@@ -244,18 +244,18 @@ const handleClickVerifyButton = async () => {
                     </div>
                 </div>
             </template>
-            <template #data-last_accessed_count="{data}">
-                <span v-if="data === -1">
+            <template #data-last_accessed_at="{data}">
+                <span v-if="calculateTime(data, state.selectedUser.timezone) === -1">
                     -
                 </span>
-                <span v-else-if="data === 0">
+                <span v-else-if="calculateTime(data, state.selectedUser.timezone) === 0">
                     {{ $t('IAM.USER.MAIN.TODAY') }}
                 </span>
-                <span v-else-if="data === 1">
+                <span v-else-if="calculateTime(data, state.selectedUser.timezone) === 1">
                     {{ $t('IAM.USER.MAIN.YESTERDAY') }}
                 </span>
                 <span v-else>
-                    {{ data }} {{ $t('IAM.USER.MAIN.DAYS') }}
+                    {{ calculateTime(data, state.selectedUser.timezone) }} {{ $t('IAM.USER.MAIN.DAYS') }}
                 </span>
             </template>
             <template #data-created_at="{data}">
