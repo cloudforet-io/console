@@ -8,6 +8,7 @@ import { PButton, PSkeleton, PDivider } from '@cloudforet/mirinae';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDomainStore } from '@/store/domain/domain-store';
+import type { Currency } from '@/store/modules/display/type';
 import { languages } from '@/store/modules/user/config';
 
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
@@ -58,7 +59,7 @@ const state = reactive({
         const endOfNextMonth = upcomingReportDate.endOf('month');
         return `${startOfNextMonth.format('YYYY-MM-DD')} ~ ${endOfNextMonth.format('YYYY-MM-DD')}`;
     }),
-    unifiedCostCurrency: computed(() => domainGetters.domainUnifiedCostCurrency ?? DEFAULT_UNIFIED_COST_CURRENCY),
+    unifiedCostCurrency: computed<Currency>(() => domainGetters.domainUnifiedCostCurrency ?? DEFAULT_UNIFIED_COST_CURRENCY),
 });
 
 /* Event */
