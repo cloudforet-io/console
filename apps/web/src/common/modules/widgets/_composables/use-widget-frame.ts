@@ -32,6 +32,7 @@ import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constant
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 
+
 interface OverridableWidgetFrameState {
     dateRange?: DateRange | ComputedRef<DateRange>;
     errorMessage?: string | ComputedRef<string>;
@@ -138,7 +139,7 @@ export const useWidgetFrame = (
 ) => {
     const _state = reactive({
         widgetConfig: computed(() => getWidgetConfig(props.widgetName)),
-        showWidgetHeader: computed<boolean>(() => props.widgetOptions?.widgetHeader?.toggleValue),
+        showWidgetHeader: computed<boolean>(() => props.widgetOptions?.widgetHeader?.toggleValue || false),
         title: computed(() => {
             if (_state.showWidgetHeader) return props.widgetOptions?.widgetHeader?.title;
             return undefined;

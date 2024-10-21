@@ -55,12 +55,6 @@ watch(() => state.isWidgetTitleValid, (isValid) => {
 
 onMounted(() => {
     emit('update:is-valid', true);
-    if (!state.proxyValue) {
-        state.proxyValue = {
-            toggleValue: true,
-            title: props.widgetConfig?.meta?.title,
-        };
-    }
 });
 </script>
 <template>
