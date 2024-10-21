@@ -80,23 +80,5 @@ export const MANAGED_COST_QUERY_SET_LIST: Partial<CostQuerySetModel>[] = [
     ...DEFAULT_MANAGED_COST_QUERY_SET_LIST,
 ];
 export const ADMIN_MANAGED_COST_QUERY_SET_LIST: Partial<CostQuerySetModel>[] = [
-    {
-        cost_query_set_id: MANAGED_COST_QUERY_SET_IDS.MONTHLY_WORKSPACE,
-        name: MANAGED_COST_QUERY_SET_IDS.MONTHLY_WORKSPACE,
-        options: {
-            group_by: [GROUP_BY.WORKSPACE],
-            granularity: GRANULARITY.MONTHLY,
-            relative_period: {
-                unit: 'month',
-                value: 5,
-                include_today: true,
-            },
-            metadata: {
-                filters_schema: {
-                    enabled_properties: Object.keys(GROUP_BY_ITEM_MAP),
-                },
-            },
-        },
-    },
     ...DEFAULT_MANAGED_COST_QUERY_SET_LIST,
 ];
