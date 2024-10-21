@@ -91,8 +91,6 @@ const state = reactive({
         const reversedMatched = clone(route.matched).reverse();
         const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
         const targetMenuId: string = closestRoute?.name || closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
-        console.log('all', closestRoute?.name, closestRoute?.meta?.menuId, MENU_ID.WORKSPACE_HOME);
-        console.log('targetMenuId', targetMenuId);
         if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
             return '';
         }
