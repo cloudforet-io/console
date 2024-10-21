@@ -13,6 +13,7 @@ import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { UNIFIED_COST_KEY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { DYNAMIC_COST_QUERY_SET_PARAMS, MANAGED_COST_QUERY_SET_IDS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import CostExplorerHome from '@/services/cost-explorer/pages/CostExplorerHome.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
@@ -71,8 +72,8 @@ const adminCostExplorerRoutes: RouteConfig = {
                                 next({
                                     name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME),
                                     params: {
-                                        dataSourceId: results[0].data_source_id,
-                                        costQuerySetId: MANAGED_COST_QUERY_SET_IDS.MONTHLY_WORKSPACE,
+                                        dataSourceId: UNIFIED_COST_KEY,
+                                        costQuerySetId: MANAGED_COST_QUERY_SET_IDS.MONTHLY_PRODUCT,
                                     },
                                 });
                             }

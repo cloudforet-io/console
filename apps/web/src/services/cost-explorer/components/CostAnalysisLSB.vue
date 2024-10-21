@@ -158,7 +158,7 @@ const dataSourceState = reactive({
                 imageUrl: storeState.plugins[value.data.plugin_info?.plugin_id]?.icon ? storeState.plugins[value.data.plugin_info?.plugin_id]?.icon : 'error',
             }))];
     }),
-    selected: computed(() => costQuerySetState.selectedDataSourceId ?? Object.keys(storeState.dataSourceMap)[0]),
+    selected: computed(() => costQuerySetState.selectedDataSourceId ?? (storeState.isAdminMode ? UNIFIED_COST_KEY : Object.keys(storeState.dataSourceMap)[0])),
 });
 
 const filterStarredItems = (menuItems: LSBItem[] = []): LSBItem[] => menuItems.filter((menu) => (menu.id && state.favoriteItemMap[menu.favoriteOptions?.id || menu.id])
