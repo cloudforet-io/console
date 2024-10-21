@@ -54,3 +54,5 @@ export const FILTER = {
 
 export const DEFAULT_UNIFIED_COST_CURRENCY = CURRENCY.KRW;
 export const UNIFIED_COST_KEY = 'unified-cost-data-source';
+
+export const YAHOO_FINANCE_ID = 'Yahoo! Finance';

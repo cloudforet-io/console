@@ -19,14 +19,17 @@ import ScopedNotification from '@/common/components/scoped-notification/ScopedNo
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { UnifiedCostConfig } from '@/services/advanced/types/preferences-type';
-import { DEFAULT_UNIFIED_COST_CURRENCY } from '@/services/cost-explorer/constants/cost-explorer-constant';
+import {
+    DEFAULT_UNIFIED_COST_CURRENCY,
+    YAHOO_FINANCE_ID,
+} from '@/services/cost-explorer/constants/cost-explorer-constant';
 
 const DEFAULT_AGGREGATION_DATE = 15;
 
 const domainConfigStore = usePreferencesStore();
 const domainConfigGetters = domainConfigStore.getters;
 
-const exchangeRateSourceOptions = ['Yahoo Finance!'];
+const exchangeRateSourceOptions = [YAHOO_FINANCE_ID];
 
 const state = reactive({
     loading: false,
@@ -56,7 +59,7 @@ const formState = reactive<{
 }>({
     currency: state.originUnifiedCostConfig?.currency ?? DEFAULT_UNIFIED_COST_CURRENCY,
     aggregationDate: state.originUnifiedCostConfig?.aggregation_day ?? DEFAULT_AGGREGATION_DATE,
-    exchangeRateSource: state.originUnifiedCostConfig?.exchange_source ?? 'Yahoo Finance!',
+    exchangeRateSource: state.originUnifiedCostConfig?.exchange_source ?? YAHOO_FINANCE_ID,
     lastDayOfMonth: state.originUnifiedCostConfig?.is_last_day ?? false,
 });
 
@@ -98,7 +101,7 @@ const handleUpdateLastDayOfMonth = (value:boolean) => {
 watch(() => state.originUnifiedCostConfig, (unifiedCostConfig) => {
     formState.currency = unifiedCostConfig?.currency ?? DEFAULT_UNIFIED_COST_CURRENCY;
     formState.aggregationDate = unifiedCostConfig?.aggregation_day ?? DEFAULT_AGGREGATION_DATE;
-    formState.exchangeRateSource = unifiedCostConfig?.exchange_source ?? 'Yahoo Finance!';
+    formState.exchangeRateSource = unifiedCostConfig?.exchange_source ?? YAHOO_FINANCE_ID;
     formState.lastDayOfMonth = unifiedCostConfig?.is_last_day ?? false;
 });
 
