@@ -9,9 +9,7 @@ import { postUserProfileDisableMfa, postEnableMfa } from '@/lib/helper/multi-fac
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import {
-    MULTI_FACTOR_AUTH_TYPE,
-} from '@/services/my-page/types/multi-factor-auth-type';
+import { MULTI_FACTOR_AUTH_TYPE } from '@/services/my-page/constants/multi-factor-auth-constants';
 
 interface Props {
     isDisabledModal: boolean

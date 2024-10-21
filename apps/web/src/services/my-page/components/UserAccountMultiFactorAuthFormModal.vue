@@ -13,16 +13,17 @@ import { i18n as _i18n } from '@/translations';
 
 import { postValidationMfaCode } from '@/lib/helper/multi-factor-auth-helper';
 
-
 import UserAccountMultiFactorAuthModalEmailInfo from '@/services/my-page/components/UserAccountMultiFactorAuthModalEmailInfo.vue';
 import UserAccountMultiFactorAuthModalFolding from '@/services/my-page/components/UserAccountMultiFactorAuthModalFolding.vue';
 import UserAccountMultiFactorAuthModalMSInfo
     from '@/services/my-page/components/UserAccountMultiFactorAuthModalMSInfo.vue';
+import {
+    MULTI_FACTOR_AUTH_ITEMS, MULTI_FACTOR_AUTH_TYPE,
+} from '@/services/my-page/constants/multi-factor-auth-constants';
 import { useMultiFactorAuthStore } from '@/services/my-page/stores/multi-factor-auth-store';
 import type {
     UserInfoType,
 } from '@/services/my-page/types/multi-factor-auth-type';
-import { MULTI_FACTOR_AUTH_TYPE } from '@/services/my-page/types/multi-factor-auth-type';
 
 const multiFactorAuthStore = useMultiFactorAuthStore();
 const multiFactorAuthState = multiFactorAuthStore.state;
@@ -43,17 +44,16 @@ const state = reactive({
 });
 
 const modalState = reactive({
-    title: computed(() => {
+    title: computed<TranslateResult>(() => {
         if (storeState.isReSyncModal) {
             return _i18n.t('MY_PAGE.MFA.RESYNC_TITLE');
         }
         if (storeState.isDisabledModal) {
             return _i18n.t('COMMON.MFA_MODAL.ALT.TITLE');
         }
-        const type = storeState.selectedType?.toLowerCase()
-            .replace(/_/g, ' ')
-            .replace(/\b\w/g, (char) => char.toUpperCase());
-        return _i18n.t('COMMON.MFA_MODAL.TITLE', { type });
+        const selectedItem = MULTI_FACTOR_AUTH_ITEMS.find((i) => i.type === storeState.selectedType);
+        if (!selectedItem) return '';
+        return _i18n.t('COMMON.MFA_MODAL.TITLE', { type: selectedItem.title });
     }),
 });
 
