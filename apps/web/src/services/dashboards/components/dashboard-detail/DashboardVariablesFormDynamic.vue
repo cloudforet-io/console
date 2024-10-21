@@ -76,7 +76,7 @@ const state = reactive({
                 },
             };
         }
-        const _targetGV: ReferenceVariable|undefined = Object.values(MANAGED_DASHBOARD_GLOBAL_VARIABLES_SCHEMA).find((d) => d.key === state.selectedSourceFrom);
+        const _targetGV: ReferenceVariable|undefined = MANAGED_DASHBOARD_GLOBAL_VARIABLES_SCHEMA[state.selectedSourceFrom];
         return {
             method: 'dynamic',
             reference: {
