@@ -1,4 +1,4 @@
 export interface UserProfileEnableMfaParameters {
-    mfa_type: string;
+    mfa_type: 'EMAIL' | 'OTP';
     options: Record<string, any>;
 }

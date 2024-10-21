@@ -20,7 +20,9 @@ export const postEnableMfa = async (body: UserProfileEnableMfaParameters, setUse
         if (setUser) {
             await store.dispatch('user/setUser', response);
         }
-        showSuccessMessage(i18n.t('COMMON.MFA_MODAL.ALT_S_SENT_EMAIL'), '');
+        if (response.mfa.mfa_type === 'EMAIL') {
+            showSuccessMessage(i18n.t('COMMON.MFA_MODAL.ALT_S_SENT_EMAIL'), '');
+        }
         return response;
     } catch (e: any) {
         showErrorMessage(e.message, e);
@@ -32,7 +34,9 @@ export const postEnableMfa = async (body: UserProfileEnableMfaParameters, setUse
 export const postUserProfileDisableMfa = async (): Promise<UserState|Error> => {
     try {
         const response = await SpaceConnector.clientV2.identity.userProfile.disableMfa<undefined, UserState>();
-        showSuccessMessage(i18n.t('COMMON.MFA_MODAL.ALT_S_SENT_EMAIL'), '');
+        if (response.mfa.mfa_type === 'EMAIL') {
+            showSuccessMessage(i18n.t('COMMON.MFA_MODAL.ALT_S_SENT_EMAIL'), '');
+        }
         return response;
     } catch (e: any) {
         showErrorMessage(e.message, e);

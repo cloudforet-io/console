@@ -102,7 +102,7 @@ const handleClickConfirmButton = async () => {
         }
     } catch (e: any) {
         validationState.isVerificationCodeValid = true;
-        validationState.verificationCodeInvalidText = _i18n.t('COMMON.MFA_MODAL.INVALID_CODE');
+        validationState.verificationCodeInvalidText = _i18n.t('COMMON.MFA_MODAL.INVALID_CODE_EMAIL');
     } finally {
         state.confirmLoading = false;
     }

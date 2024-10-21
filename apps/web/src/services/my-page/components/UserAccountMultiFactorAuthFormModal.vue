@@ -13,16 +13,17 @@ import { i18n as _i18n } from '@/translations';
 
 import { postValidationMfaCode } from '@/lib/helper/multi-factor-auth-helper';
 
-
 import UserAccountMultiFactorAuthModalEmailInfo from '@/services/my-page/components/UserAccountMultiFactorAuthModalEmailInfo.vue';
 import UserAccountMultiFactorAuthModalFolding from '@/services/my-page/components/UserAccountMultiFactorAuthModalFolding.vue';
 import UserAccountMultiFactorAuthModalMSInfo
     from '@/services/my-page/components/UserAccountMultiFactorAuthModalMSInfo.vue';
+import {
+    MULTI_FACTOR_AUTH_ITEMS, MULTI_FACTOR_AUTH_TYPE,
+} from '@/services/my-page/constants/multi-factor-auth-constants';
 import { useMultiFactorAuthStore } from '@/services/my-page/stores/multi-factor-auth-store';
 import type {
     UserInfoType,
 } from '@/services/my-page/types/multi-factor-auth-type';
-import { MULTI_FACTOR_AUTH_TYPE } from '@/services/my-page/types/multi-factor-auth-type';
 
 const multiFactorAuthStore = useMultiFactorAuthStore();
 const multiFactorAuthState = multiFactorAuthStore.state;
@@ -43,17 +44,16 @@ const state = reactive({
 });
 
 const modalState = reactive({
-    title: computed(() => {
+    title: computed<TranslateResult>(() => {
         if (storeState.isReSyncModal) {
             return _i18n.t('MY_PAGE.MFA.RESYNC_TITLE');
         }
         if (storeState.isDisabledModal) {
             return _i18n.t('COMMON.MFA_MODAL.ALT.TITLE');
         }
-        const type = storeState.selectedType?.toLowerCase()
-            .replace(/_/g, ' ')
-            .replace(/\b\w/g, (char) => char.toUpperCase());
-        return _i18n.t('COMMON.MFA_MODAL.TITLE', { type });
+        const selectedItem = MULTI_FACTOR_AUTH_ITEMS.find((i) => i.type === storeState.selectedType);
+        if (!selectedItem) return '';
+        return _i18n.t('COMMON.MFA_MODAL.TITLE', { type: selectedItem.title });
     }),
 });
 
@@ -82,7 +82,6 @@ const handleClickCancel = async () => {
     }
 };
 
-/* API */
 const handleClickVerifyButton = async () => {
     state.loading = true;
     try {
@@ -100,13 +99,14 @@ const handleClickVerifyButton = async () => {
         }
     } catch (e: any) {
         validationState.isValidationCodeValid = false;
-        validationState.validationCodeInvalidText = _i18n.t('COMMON.MFA_MODAL.INVALID_CODE');
+        validationState.validationCodeInvalidText = storeState.selectedType === MULTI_FACTOR_AUTH_TYPE.EMAIL
+            ? _i18n.t('COMMON.MFA_MODAL.INVALID_CODE_EMAIL')
+            : _i18n.t('COMMON.MFA_MODAL.INVALID_CODE_OTP');
     } finally {
         state.loading = false;
     }
 };
 
-/* Watcher */
 watch(() => storeState.userId, (userId) => {
     if (userId) {
         state.userInfo = store.state.user;
@@ -125,7 +125,7 @@ watch(() => multiFactorAuthState.modalType, () => {
                     class="mfa-modal-wrapper"
                     size="sm"
                     :theme-color="storeState.isDisabledModal? 'alert' : 'primary'"
-                    :disabled="validationState.verificationCode === '' || !state.isSentCode"
+                    :disabled="validationState.verificationCode === '' || (storeState.selectedType === MULTI_FACTOR_AUTH_TYPE.EMAIL && !state.isSentCode)"
                     :loading="state.loading"
                     @confirm="handleClickVerifyButton"
                     @cancel="handleClickCancel"
@@ -146,7 +146,11 @@ watch(() => multiFactorAuthState.modalType, () => {
                 <user-account-multi-factor-auth-modal-email-info v-if="storeState.selectedType === MULTI_FACTOR_AUTH_TYPE.EMAIL"
                                                                  :is-sent-code.sync="state.isSentCode"
                 />
-                <user-account-multi-factor-auth-modal-m-s-info v-else-if="storeState.selectedType === MULTI_FACTOR_AUTH_TYPE.MS && !storeState.isDisabledModal" />
+                <user-account-multi-factor-auth-modal-m-s-info v-else-if="storeState.selectedType === MULTI_FACTOR_AUTH_TYPE.OTP
+                                                                   && !storeState.isDisabledModal
+                                                                   && !storeState.isReSyncModal"
+                                                               :is-re-sync-modal="storeState.isReSyncModal"
+                />
                 <div class="validation-code-form">
                     <p-field-group :label="$t('COMMON.MFA_MODAL.VERIFICATION_CODE')"
                                    :invalid="!validationState.isValidationCodeValid"

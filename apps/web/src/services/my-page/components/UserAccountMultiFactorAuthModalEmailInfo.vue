@@ -14,6 +14,7 @@ import { emailValidator } from '@/lib/helper/user-validation-helper';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { MULTI_FACTOR_AUTH_TYPE } from '@/services/my-page/constants/multi-factor-auth-constants';
 import { useMultiFactorAuthStore } from '@/services/my-page/stores/multi-factor-auth-store';
 
 interface Props {
@@ -57,7 +58,7 @@ const handleClickSendCodeButton = async () => {
     try {
         if (storeState.isFormModal) {
             await postEnableMfa({
-                mfa_type: 'EMAIL',
+                mfa_type: MULTI_FACTOR_AUTH_TYPE.EMAIL,
                 options: {
                     email: email.value,
                 },

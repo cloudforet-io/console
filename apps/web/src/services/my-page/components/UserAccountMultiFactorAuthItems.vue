@@ -7,10 +7,13 @@ import {
 
 import { store } from '@/store';
 
-import { useMultiFactorAuthStore } from '@/services/my-page/stores/multi-factor-auth-store';
+import { postUserProfileDisableMfa } from '@/lib/helper/multi-factor-auth-helper';
+
 import {
-    MULTI_FACTOR_AUTH_ITEMS, MULTI_FACTOR_AUTH_TYPE,
-} from '@/services/my-page/types/multi-factor-auth-type';
+    MULTI_FACTOR_AUTH_ITEMS,
+    MULTI_FACTOR_AUTH_TYPE,
+} from '@/services/my-page/constants/multi-factor-auth-constants';
+import { useMultiFactorAuthStore } from '@/services/my-page/stores/multi-factor-auth-store';
 
 const multiFactorAuthStore = useMultiFactorAuthStore();
 const multiFactorAuthState = multiFactorAuthStore.state;
@@ -30,11 +33,17 @@ const handleChangeToggle = async (type: string, value: boolean) => {
     multiFactorAuthStore.setModalType(value ? 'FORM' : 'DISABLED');
     multiFactorAuthStore.setModalVisible(true);
     state.enableMfa[type] = value;
+    if (!value && type === MULTI_FACTOR_AUTH_TYPE.OTP) {
+        await postUserProfileDisableMfa();
+    }
 };
-const handleClickReSyncButton = (type: string) => {
+const handleClickReSyncButton = async (type: string) => {
     multiFactorAuthStore.setSelectedType(type);
     multiFactorAuthStore.setModalVisible(true);
     multiFactorAuthStore.setModalType('RE_SYNC');
+    if (type === MULTI_FACTOR_AUTH_TYPE.OTP) {
+        await postUserProfileDisableMfa();
+    }
 };
 
 watch(() => storeState.mfa.mfa_type, (mfa_type) => {
