@@ -17,11 +17,11 @@ const labelRef = ref<HTMLElement|null>(null);
 const domainStore = useDomainStore();
 const state = reactive({
     integrationMenus: computed(() => domainStore.getters.domainExtraMenu?.contents ?? []),
-    tabs: computed(() => state.integrationMenus.map((menu) => ({
+    tabs: computed<TabItem[]>(() => state.integrationMenus.map((menu) => ({
         label: menu.title,
         name: menu.title,
         keepAlive: true,
-    })) as TabItem[]),
+    }))),
     activeTab: '',
 });
 
