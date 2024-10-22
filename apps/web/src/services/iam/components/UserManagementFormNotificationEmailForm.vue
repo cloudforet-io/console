@@ -19,13 +19,14 @@ import type { UserListItemType } from '@/services/iam/types/user-type';
 
 
 const userPageStore = useUserPageStore();
+const userPageState = userPageStore.state;
 
 const emit = defineEmits<{(e: 'change-input', formState): void,
     (e: 'change-verify', value: boolean): void,
 }>();
 
 const state = reactive({
-    data: computed<UserListItemType>(() => userPageStore.selectedUsers[0]),
+    data: computed<UserListItemType>(() => userPageState.selectedUser),
     loading: false,
     isEdit: false,
     isCollapsed: true,
@@ -77,7 +78,7 @@ const handleClickSend = async () => {
 };
 
 /* Watcher */
-watch(() => state.data.email_verified, (value) => {
+watch(() => state.data?.email_verified, (value) => {
     state.isValidEmail = value || false;
     if (email.value) {
         state.isEdit = !value;
