@@ -2023,6 +2023,7 @@
 			"1": "Share with Code",
 			"ADD_WIDGET": "Add Widget",
 			"ALL_PROJECTS": "All Projects",
+			"ALL_WORKSPACE": "All Workspace",
 			"ALL_WORKSPACES": "All Workspaces",
 			"ALT_E_MOVE_DASHBOARD": "Failed to move dashboard",
 			"ALT_S_MOVE_DASHBOARD": "Dashboard successfully moved",
@@ -2054,6 +2055,7 @@
 			"PDF_EXPORT": {
 				"APPLIED_FILTERS": "Applied Filters"
 			},
+			"PERFORMANCE_DELAY_WARNING": "Loading data from all workspaces at once may lead to slower performance due to the large volume of information being processed.",
 			"PERIOD": "Period",
 			"PERIOD_CUSTOM": "Custom",
 			"PERIOD_LAST_14_DAYS": "Last 14 days",
@@ -2062,7 +2064,9 @@
 			"PERIOD_LAST_7_DAYS": "Last 7 days",
 			"PERIOD_LAST_MONTH": "Last month",
 			"PERIOD_THIS_MONTH": "This month",
+			"POSSIBLE_PERFORMANCE_DELAY": "Possible Performance Delay",
 			"REFRESH": "Auto Refresh",
+			"SCOPE": "Scope",
 			"SELECT_MONTH": "Select Month",
 			"SET_HOME": "Set as Home Dashboard",
 			"SHARE": "Share",

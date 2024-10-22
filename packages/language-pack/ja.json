@@ -2023,6 +2023,7 @@
 			"1": "コードで共有",
 			"ADD_WIDGET": "ウィジェットを追加する",
 			"ALL_PROJECTS": "すべてのプロジェクト",
+			"ALL_WORKSPACE": "すべてのワークスペース",
 			"ALL_WORKSPACES": "すべてのワークスペース",
 			"ALT_E_MOVE_DASHBOARD": "ダッシュボードの移動に失敗しました。",
 			"ALT_S_MOVE_DASHBOARD": "ダッシュボードの移動に成功しました。",
@@ -2054,6 +2055,7 @@
 			"PDF_EXPORT": {
 				"APPLIED_FILTERS": "フィルタの適用"
 			},
+			"PERFORMANCE_DELAY_WARNING": "",
 			"PERIOD": "期間",
 			"PERIOD_CUSTOM": "カスタム",
 			"PERIOD_LAST_14_DAYS": "過去14日間",
@@ -2062,7 +2064,9 @@
 			"PERIOD_LAST_7_DAYS": "直近7日間",
 			"PERIOD_LAST_MONTH": "前月",
 			"PERIOD_THIS_MONTH": "今月",
+			"POSSIBLE_PERFORMANCE_DELAY": "",
 			"REFRESH": "自動更新",
+			"SCOPE": "スコープ",
 			"SELECT_MONTH": "月を選択",
 			"SET_HOME": "ホームダッシュボードとして設定",
 			"SHARE": "共有",
