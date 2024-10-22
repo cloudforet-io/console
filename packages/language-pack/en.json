@@ -42,7 +42,13 @@
 			"EXTENSION_REASON_2": "Check your spam.",
 			"EXTENSION_REASON_3": "to re-send the email.",
 			"EXTENSION_TITLE_1": "Didn't receive an email?",
-			"EXTENSION_TITLE_2": "Still having trouble?"
+			"EXTENSION_TITLE_2": "Still having trouble?",
+			"GOOGLE_GUIDE": "Google’s verification guide",
+			"OTP_EXTENSION_DESC_1": "If you are still experiencing problems with {guide}, follow Google’s verification guide. If the problem only exists across SpaceONE, {contact}. ",
+			"OTP_EXTENSION_REASON_1": "Make sure you have adequate internet connection when trying to send/receive codes.",
+			"OTP_EXTENSION_REASON_2": "Your time may not be correctly synced on your authenticator app. To set the correct time, go to your Google Authenticator app Settings > Time correction for codes > Sync now.",
+			"OTP_EXTENSION_TITLE_1": "Didn’t recieve a push notification in your Google Authenticator app?",
+			"OTP_EXTENSION_TITLE_2": "Still having problems?"
 		},
 		"MFA": {
 			"AUTHENTICATION_CODE": "Authentication code",
@@ -51,6 +57,7 @@
 			"EMAIL_INFO": "allows multi-factor authentication(MFA) for account logins. A MFA code has been sent to an email address:",
 			"ENTER_CODE": "Enter Code",
 			"GO_BACK": "Back to Sign in",
+			"OTP_INFO": "allows multi-factor authentication(MFA) for account logins. Enter the code that you see in the app.",
 			"PROBLEM_TITLE": "Having problems?",
 			"SUB_TITLE": "Your account required to verify with email MFA.",
 			"TITLE": "Multi-factor\nauthentication"

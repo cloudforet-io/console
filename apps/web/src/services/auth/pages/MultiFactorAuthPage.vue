@@ -7,8 +7,8 @@ import {
     PButton, PIconButton, PFieldGroup, PI, PTextInput, PTextButton,
 } from '@cloudforet/mirinae';
 
+import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
 import { store } from '@/store';
-// CAUTION: To prevent the issue of i18n imported in the template not being applied in the 'script setup' structure.
 import { i18n as _i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -19,24 +19,30 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { loadAuth } from '@/services/auth/authenticator/loader';
 import CollapsibleContentsEmail from '@/services/auth/components/CollapsibleContentsEmail.vue';
+import CollapsibleContentsOTP from '@/services/auth/components/CollapsibleContentsOTP.vue';
 import { getDefaultRouteAfterSignIn } from '@/services/auth/helpers/default-route-helper';
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 
+type TitleType = {
+    icon: string;
+    title: string;
+    desc: TranslateResult;
+};
 
 const route = useRoute();
 const router = useRouter();
 const userWorkspaceStore = useUserWorkspaceStore();
 
 const {
-    password, userId, mfaEmail, accessToken,
+    password, userId, mfaEmail, accessToken, mfaType,
 } = route.params;
 
 const state = reactive({
     loading: false,
-    isLocalLogin: computed(() => userId && !accessToken),
+    isLocalLogin: computed<boolean>(() => (userId && !accessToken) || false),
     confirmLoading: false,
     isCollapsed: true,
-    credentials: computed(() => {
+    credentials: computed<Record<string, any>>(() => {
         if (!accessToken) {
             return {
                 user_id: userId,
@@ -45,6 +51,20 @@ const state = reactive({
         }
         return {
             access_token: accessToken,
+        };
+    }),
+    titleInfo: computed<TitleType>(() => {
+        if (mfaType === MULTI_FACTOR_AUTH_TYPE.EMAIL) {
+            return {
+                icon: 'ic_notification-protocol_envelope',
+                title: 'EMAIL',
+                desc: _i18n.t('AUTH.MFA.EMAIL_INFO'),
+            };
+        }
+        return {
+            icon: 'ic_microsoft_auth',
+            title: 'Microsoft Authenticator App',
+            desc: _i18n.t('AUTH.MFA.OTP_INFO'),
         };
     }),
 });
@@ -123,22 +143,17 @@ onMounted(() => {
     <div class="multi-factor-authentication-page">
         <div class="form-wrapper">
             <div class="headline-wrapper">
-                <p-i name="ic_notification-protocol_envelope"
+                <p-i :name="state.titleInfo.icon"
                      height="2rem"
                      width="2rem"
                 />
-                <span>EMAIL</span>
-            </div>
-            <div class="headline-wrapper">
-                <p-i name="ic_notification-protocol_envelope"
-                     height="2rem"
-                     width="2rem"
-                />
-                <span>EMAIL</span>
+                <span>{{ state.titleInfo.title }}</span>
             </div>
             <div class="email-info-wrapper">
-                <span class="email-info-desc">{{ $t('AUTH.MFA.EMAIL_INFO') }}</span>
-                <span class="email-text">
+                <span class="email-info-desc">{{ state.titleInfo.desc }}</span>
+                <span v-if="mfaType === MULTI_FACTOR_AUTH_TYPE.EMAIL"
+                      class="email-text"
+                >
                     {{ mfaEmail }}
                 </span>
             </div>
@@ -190,7 +205,10 @@ onMounted(() => {
                                class="close-button"
                                @click="handleClickCollapsedButton(true)"
                 />
-                <collapsible-contents-email @click-resend="handleClickResend" />
+                <collapsible-contents-email v-if="mfaType === MULTI_FACTOR_AUTH_TYPE.EMAIL"
+                                            @click-resend="handleClickResend"
+                />
+                <collapsible-contents-o-t-p v-else />
             </div>
         </div>
     </div>
@@ -216,7 +234,6 @@ onMounted(() => {
         .email-info-wrapper {
             .email-info-desc {
                 @apply block text-label-md;
-                margin-bottom: 0.5rem;
             }
             .email-text {
                 @apply text-violet-600 font-medium;
