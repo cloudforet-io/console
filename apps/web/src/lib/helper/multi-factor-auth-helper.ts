@@ -4,6 +4,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { UserProfileConfirmMfaParameters } from '@/schema/identity/user-profile/api-verbs/confirm-mfa';
 import type { UserProfileEnableMfaParameters } from '@/schema/identity/user-profile/api-verbs/enable-mfa';
+import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
 import type { UserDisableMfaParameters } from '@/schema/identity/user/api-verbs/disable-mfa';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -20,7 +21,7 @@ export const postEnableMfa = async (body: UserProfileEnableMfaParameters, setUse
         if (setUser) {
             await store.dispatch('user/setUser', response);
         }
-        if (response.mfa.mfa_type === 'EMAIL') {
+        if (response.mfa.mfa_type === MULTI_FACTOR_AUTH_TYPE.EMAIL) {
             showSuccessMessage(i18n.t('COMMON.MFA_MODAL.ALT_S_SENT_EMAIL'), '');
         }
         return response;
@@ -34,7 +35,7 @@ export const postEnableMfa = async (body: UserProfileEnableMfaParameters, setUse
 export const postUserProfileDisableMfa = async (): Promise<UserState|Error> => {
     try {
         const response = await SpaceConnector.clientV2.identity.userProfile.disableMfa<undefined, UserState>();
-        if (response.mfa.mfa_type === 'EMAIL') {
+        if (response.mfa.mfa_type === MULTI_FACTOR_AUTH_TYPE.EMAIL) {
             showSuccessMessage(i18n.t('COMMON.MFA_MODAL.ALT_S_SENT_EMAIL'), '');
         }
         return response;

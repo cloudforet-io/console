@@ -6,11 +6,12 @@ import {
     PTextInput, PIconButton, PSpinner,
 } from '@cloudforet/mirinae';
 
+import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
+
 import { postEnableMfa } from '@/lib/helper/multi-factor-auth-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { MULTI_FACTOR_AUTH_TYPE } from '@/services/my-page/constants/multi-factor-auth-constants';
 import { useMultiFactorAuthStore } from '@/services/my-page/stores/multi-factor-auth-store';
 
 const multiFactorAuthStore = useMultiFactorAuthStore();

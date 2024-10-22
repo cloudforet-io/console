@@ -5,14 +5,12 @@ import {
     PI, PToggleButton, PBadge, PButton,
 } from '@cloudforet/mirinae';
 
+import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
 import { store } from '@/store';
 
 import { postUserProfileDisableMfa } from '@/lib/helper/multi-factor-auth-helper';
 
-import {
-    MULTI_FACTOR_AUTH_ITEMS,
-    MULTI_FACTOR_AUTH_TYPE,
-} from '@/services/my-page/constants/multi-factor-auth-constants';
+import { MULTI_FACTOR_AUTH_ITEMS } from '@/services/my-page/constants/multi-factor-auth-constants';
 import { useMultiFactorAuthStore } from '@/services/my-page/stores/multi-factor-auth-store';
 
 const multiFactorAuthStore = useMultiFactorAuthStore();

@@ -1,9 +1,5 @@
+import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
 import { i18n } from '@/translations';
-
-export const MULTI_FACTOR_AUTH_TYPE = {
-    OTP: 'OTP',
-    EMAIL: 'EMAIL',
-} as const;
 
 export const MULTI_FACTOR_AUTH_ITEMS = [
     {

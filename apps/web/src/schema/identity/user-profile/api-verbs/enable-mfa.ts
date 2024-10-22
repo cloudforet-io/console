@@ -1,4 +1,6 @@
+import type { MultiFactorAuthType } from '@/schema/identity/user-profile/type';
+
 export interface UserProfileEnableMfaParameters {
-    mfa_type: 'EMAIL' | 'OTP';
+    mfa_type: MultiFactorAuthType;
     options: Record<string, any>;
 }

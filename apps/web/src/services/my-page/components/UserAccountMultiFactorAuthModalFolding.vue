@@ -3,13 +3,12 @@ import { computed, reactive } from 'vue';
 
 import { PTextButton, PCollapsibleToggle } from '@cloudforet/mirinae';
 
+import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
 import { store } from '@/store';
 
 import { postUserProfileDisableMfa, postEnableMfa } from '@/lib/helper/multi-factor-auth-helper';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
-
-import { MULTI_FACTOR_AUTH_TYPE } from '@/services/my-page/constants/multi-factor-auth-constants';
 
 interface Props {
     isDisabledModal: boolean

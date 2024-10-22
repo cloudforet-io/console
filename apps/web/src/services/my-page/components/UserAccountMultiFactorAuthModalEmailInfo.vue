@@ -5,6 +5,7 @@ import {
     PI, PButton, PTextInput, PFieldGroup,
 } from '@cloudforet/mirinae';
 
+import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -14,7 +15,6 @@ import { emailValidator } from '@/lib/helper/user-validation-helper';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { MULTI_FACTOR_AUTH_TYPE } from '@/services/my-page/constants/multi-factor-auth-constants';
 import { useMultiFactorAuthStore } from '@/services/my-page/stores/multi-factor-auth-store';
 
 interface Props {
