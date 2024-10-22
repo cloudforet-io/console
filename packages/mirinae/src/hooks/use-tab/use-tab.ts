@@ -1,55 +1,57 @@
-import type { UnwrapRef, ComputedRef } from 'vue';
+import type { ComputedRef, Ref } from 'vue';
 import {
-    computed, reactive, toRefs,
+    computed, reactive,
 } from 'vue';
 
-import type { TabItem } from '@/navigation/tabs/tab/type';
+import type { TranslateResult } from 'vue-i18n';
 
+export type TabItem<T extends object> = {
+    name: string;
+    label?: TranslateResult; // includes string
+    keepAlive?: boolean;
+    subItems?: Array<string|TabItem<T>>;
+} & T;
 
-export interface UseTabOptions {
-    tabs: ComputedRef<Array<string|TabItem>> | Array<string|TabItem>;
-    activeTab: ComputedRef<string> | string;
+export interface UseTabOptions<T extends object = Record<string, never>> {
+    tabs: Ref<Array<string|TabItem<T>>> | Array<string|TabItem<T>>;
+    activeTab: Ref<string> | string;
+    defaultItem?: T;
 }
 
-interface TabState {
-    tabItems: TabItem[];
-    keepAliveTabNames: string[];
-    nonKeepAliveTabNames: string[];
-    currentTabItem?: TabItem;
+interface UseTabReturns<T extends object> {
+    tabItems: ComputedRef<TabItem<T>[]>;
+    keepAliveTabNames: ComputedRef<string[]>;
+    nonKeepAliveTabNames: ComputedRef<string[]>;
+    currentTabItem: ComputedRef<TabItem<T>|undefined>;
 }
-
-export const useTab = ({ tabs, activeTab }: UseTabOptions) => {
+const generateTabItem = <T extends object>(tab: string|TabItem<T>, defaultItem: T = {} as T): TabItem<T> => {
+    if (typeof tab === 'string') {
+        return {
+            ...defaultItem,
+            name: tab,
+            label: tab,
+        };
+    }
+    return {
+        ...defaultItem,
+        ...tab,
+        name: tab.name,
+        label: tab.label ?? tab.name,
+        keepAlive: !!tab.keepAlive,
+        subItems: tab.subItems?.map((subItem) => generateTabItem<T>(subItem, defaultItem)),
+    };
+};
+export const useTab = <T extends object = object>({ tabs, activeTab, defaultItem }: UseTabOptions<T>): UseTabReturns<T> => {
     const state = reactive({
         tabs,
         activeTab,
     });
-    const tabState: UnwrapRef<TabState> = reactive({
-        tabItems: computed<TabItem[]>(() => state.tabs.map((tab) => generateTabItem(tab))),
-        keepAliveTabNames: computed<string[]>(() => tabState.tabItems.filter((tabItem) => tabItem.keepAlive).map((tabItem) => tabItem.name)),
-        nonKeepAliveTabNames: computed<string[]>(() => tabState.tabItems.filter((tabItem) => !tabItem.keepAlive).map((tabItem) => tabItem.name)),
-        currentTabItem: computed<TabItem | undefined>(() => tabState.tabItems.find((tabItem) => tabItem.name === state.activeTab)),
-    });
-
-    const generateTabItem = (tab: string | TabItem): TabItem => {
-        if (typeof tab === 'string') {
-            return {
-                name: tab,
-                label: tab,
-                keepAlive: false,
-                tabType: 'tab',
-            };
-        }
-        return {
-            name: tab.name,
-            label: tab.label ?? tab.name,
-            keepAlive: !!tab.keepAlive,
-            tabType: tab.tabType ?? 'tab',
-            icon: tab.icon,
-            subItems: tab.subItems?.map((subItem) => generateTabItem(subItem)),
-        };
-    };
+    const tabItems = computed<TabItem<T>[]>(() => state.tabs.map((tab) => generateTabItem<T>(tab, defaultItem)));
 
     return {
-        ...toRefs(tabState),
+        tabItems,
+        keepAliveTabNames: computed<string[]>(() => tabItems.value.filter((tabItem) => tabItem.keepAlive).map((tabItem) => tabItem.name)),
+        nonKeepAliveTabNames: computed<string[]>(() => tabItems.value.filter((tabItem) => !tabItem.keepAlive).map((tabItem) => tabItem.name)),
+        currentTabItem: computed<TabItem<T> | undefined>(() => tabItems.value.find((tabItem) => tabItem.name === state.activeTab)),
     };
 };
