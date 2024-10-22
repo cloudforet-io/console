@@ -46,8 +46,8 @@
 			"GOOGLE_GUIDE": "Google’s verification guide",
 			"OTP_EXTENSION_DESC_1": "If you are still experiencing problems with {guide}, follow Google’s verification guide. If the problem only exists across SpaceONE, {contact}. ",
 			"OTP_EXTENSION_REASON_1": "Make sure you have adequate internet connection when trying to send/receive codes.",
-			"OTP_EXTENSION_REASON_2": "Your time may not be correctly synced on your authenticator app. To set the correct time, go to your Google Authenticator app Settings > Time correction for codes > Sync now.",
-			"OTP_EXTENSION_TITLE_1": "Didn’t recieve a push notification in your Google Authenticator app?",
+			"OTP_EXTENSION_REASON_2": "Your time may not be correctly synced on your authenticator app. To set the correct time, go to your Microsoft authenticator app Settings > Time correction for codes > Sync now.",
+			"OTP_EXTENSION_TITLE_1": "Didn’t recieve a push notification in your Microsoft authenticator app?",
 			"OTP_EXTENSION_TITLE_2": "Still having problems?"
 		},
 		"MFA": {
