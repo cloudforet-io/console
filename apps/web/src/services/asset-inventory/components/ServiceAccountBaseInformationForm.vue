@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-import { isEmpty } from 'lodash';
+import { isEmpty, isEqual } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -77,14 +77,15 @@ const state = reactive({
     formData: computed<BaseInformationForm>(() => ({
         accountName: serviceAccountName.value,
         customSchemaForm: state.customSchemaForm,
-        projectForm: state.projectForm,
+        ...(!state.isTrustedAccount && { projectForm: state.projectForm }),
         tags: state.tags,
     })),
+    isSameValueWithOrigin: computed(() => isEqual(state.formData, state.originForm)),
     isAllValid: computed(() => ((invalidState.serviceAccountName === false)
+        && !state.isSameValueWithOrigin
         && (state.isTrustedAccount ? true : (state.isProjectFormValid || state.originForm?.projectForm?.selectedProjectId))
         && state.isTagsValid
         && (isEmpty(props.schema) ? true : state.isCustomSchemaFormValid))),
-    isChanged: false,
 });
 
 /* Util */
@@ -110,23 +111,13 @@ const listServiceAccounts = async () => {
 /* Event */
 const handleUpdateTags = (tags: Tag) => {
     state.tags = tags;
-    if (props.mode !== 'UPDATE') return;
-    state.isChanged = true;
 };
 const handleAccountValidate = (isValid) => {
     state.isCustomSchemaFormValid = isValid;
-    if (props.mode !== 'UPDATE') return;
-    if (state.customSchemaForm?.account_id && state.originForm.customSchemaForm?.account_id !== state.customSchemaForm.account_id) {
-        state.isChanged = true;
-    }
 };
 
 const handleChangeProjectForm = (projectForm) => {
     state.projectForm = projectForm;
-    if (props.mode !== 'UPDATE') return;
-    if (state.originForm?.projectForm.selectedProjectId !== state.projectForm.selectedProjectId) {
-        state.isChanged = true;
-    }
 };
 
 const handleUpdateServiceAccountName = (value: string) => {
@@ -139,17 +130,11 @@ const handleUpdateServiceAccountName = (value: string) => {
 })();
 
 /* Watcher */
-watch([() => state.isAllValid, () => state.isChanged], ([isAllValid, isChanged]) => {
-    if (props.mode === 'UPDATE' && !isChanged) {
-        serviceAccountPageStore.$patch((_state) => {
-            _state.formState.isBaseInformationFormValid = false;
-        });
-        return;
-    }
+watch(() => state.isAllValid, (isAllValid) => {
     serviceAccountPageStore.$patch((_state) => {
         _state.formState.isBaseInformationFormValid = isAllValid;
     });
-});
+}, { immediate: true });
 watch(() => state.formData, (formData) => {
     serviceAccountPageStore.$patch((_state) => {
         _state.formState.baseInformation = formData;

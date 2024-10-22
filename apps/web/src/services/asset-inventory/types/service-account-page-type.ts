@@ -9,7 +9,7 @@ export interface BaseInformationForm {
     accountName: string;
     customSchemaForm: { [key: string]: any; };
     tags: Tag;
-    projectForm: ProjectForm;
+    projectForm?: ProjectForm;
 }
 export type ActiveDataType = 'input' | 'json';
 
