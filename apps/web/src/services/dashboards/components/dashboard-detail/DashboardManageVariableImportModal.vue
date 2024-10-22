@@ -148,10 +148,10 @@ const handleConfirmImportVariables = () => {
 };
 
 
-const isDuplicatedVariableName = (variable: DashboardGlobalVariableModel) => state.currentDashboardVariables.some((currentVariable) => currentVariable.name === variable.name
+const isDuplicatedVariableName = (variable: DashboardGlobalVariableModel): boolean => state.currentDashboardVariables.some((currentVariable) => currentVariable.name === variable.name
     || currentVariable.key === variable.key);
 
-const getIndeterminate = () => {
+const getIndeterminate = (): boolean => {
     const availableVariableCount = state.selectedDashboardVariables.filter((variable) => !isDuplicatedVariableName(variable)).length;
     return state.selectedVariables.length > 0 && state.selectedVariables.length < availableVariableCount;
 };
