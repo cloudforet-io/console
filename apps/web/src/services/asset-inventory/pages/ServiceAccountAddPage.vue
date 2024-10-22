@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router/composables';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButton, PLazyImg, PMarkdown, PHeading, PPaneLayout, PButtonModal, PLink,
+    PButton, PLazyImg, PMarkdown, PHeading, PPaneLayout, PButtonModal, PLink, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
 
@@ -238,38 +238,43 @@ const handleRouteToServiceAccountDetailPage = () => {
 
 <template>
     <div class="service-account-add-page">
-        <p-heading class="mb-6"
-                   show-back-button
-                   :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.TITLE', { type: state.titleAccountName })"
-                   @click-back-button="handleGoBack"
-        >
-            <template #title-left-extra>
-                <p-lazy-img class="icon"
-                            :src="state.providerIcon"
-                            :alt="provider"
-                            :loading="state.providerSchemaLoading"
-                            error-icon="ic_cloud-filled"
-                />
-            </template>
-            <template #extra>
-                <info-button v-if="state.description"
-                             :visible="!!state.description"
-                             class="info-button"
+        <p-heading-layout class="mb-6">
+            <template #heading>
+                <p-heading show-back-button
+                           :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.TITLE', { type: state.titleAccountName })"
+                           @click-back-button="handleGoBack"
                 >
-                    <template #contents>
-                        <p-markdown :markdown="state.description"
-                                    :data="state.description"
-                                    :language="$store.state.user.language"
-                                    class="!p-0"
+                    <template #title-left-extra>
+                        <p-lazy-img class="icon"
+                                    :src="state.providerIcon"
+                                    :alt="provider"
+                                    :loading="state.providerSchemaLoading"
+                                    error-icon="ic_cloud-filled"
                         />
                     </template>
-                </info-button>
+                </p-heading>
             </template>
-        </p-heading>
+            <template #extra>
+                <span class="account-info-button">
+                    <info-button v-if="state.description"
+                                 :visible="!!state.description"
+                    >
+                        <template #contents>
+                            <p-markdown :markdown="state.description"
+                                        :data="state.description"
+                                        :language="$store.state.user.language"
+                                        class="!p-0"
+                            />
+                        </template>
+                    </info-button>
+                </span>
+            </template>
+        </p-heading-layout>
 
         <div class="content-wrapper">
             <p-pane-layout class="form-wrapper">
-                <p-heading heading-type="sub"
+                <p-heading class="pt-8 px-4 pb-4"
+                           heading-type="sub"
                            :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.BASE_TITLE')"
                 />
                 <service-account-base-information-form :schema="state.baseInformationSchema"
@@ -281,7 +286,8 @@ const handleRouteToServiceAccountDetailPage = () => {
             <p-pane-layout v-if="state.enableCredentialInput"
                            class="form-wrapper"
             >
-                <p-heading heading-type="sub"
+                <p-heading class="pt-8 px-4 pb-4"
+                           heading-type="sub"
                            :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS')"
                 />
                 <service-account-credentials-form create-mode />
@@ -289,7 +295,8 @@ const handleRouteToServiceAccountDetailPage = () => {
             <p-pane-layout v-if="state.isTrustedAccount && serviceAccountPageStore.getters.isMainProvider"
                            class="form-wrapper"
             >
-                <p-heading heading-type="sub"
+                <p-heading class="pt-8 px-4 pb-4"
+                           heading-type="sub"
                            :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.AUTO_SYNC_TITLE')"
                 >
                     <template #title-right-extra>
@@ -361,9 +368,10 @@ const handleRouteToServiceAccountDetailPage = () => {
             }
         }
     }
-    .info-button {
-        flex-shrink: 0;
-        line-height: 2rem;
+    .account-info-button {
+        display: flex;
+        height: 2rem;
+        align-items: center;
     }
     .button-wrapper {
         display: flex;

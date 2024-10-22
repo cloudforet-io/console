@@ -594,6 +594,7 @@
 				"ACCUMULATED": "累積データ",
 				"ADDITIONAL_INFO": "追加情報",
 				"ADD_MORE": "もっと見る",
+				"ALL_WORKSPACE_SELECTED_WARNING": "すべてのワークスペースのデータを同時にロードすると、処理しなければならない情報の量が多くなり、応答時間が遅れる可能性があります。",
 				"ALT_EXCEL_DOWNLOAD_STACKED": "累積データではなく、月別データでファイルがダウンロードされます。",
 				"ALT_E_ADD_GROUP_BY": "最大で3つのグループ化オプションを選択できます。",
 				"ALT_E_ADD_GROUP_BY_DESC": "新しい選択を行う前に、以前のグループ化オプションを少なくとも1つ選択解除してください。",
@@ -667,6 +668,7 @@
 					"THIS_MONTH": "今月",
 					"THIS_YEAR": "本年"
 				},
+				"POSSIBLE_PERFORMANCE_DELAY": "応答時間が遅れる可能性があります。",
 				"PRIVATE": "非公開",
 				"PROJECT": "プロジェクト",
 				"PROVIDERS_TITLE": "サービスプロバイダー",
@@ -1802,7 +1804,14 @@
 			}
 		},
 		"ANOMALY_DETECTION_CONFIGURATION": "異常コスト検知設定",
-		"COST_ADVANCED_SETTINGS": "詳細設定"
+		"COST_ADVANCED_SETTINGS": "詳細設定",
+		"CURRENCY_CONVERTER": "為替レート設定",
+		"CURRENCY_CONVERTER_PAGE": {
+			"AGGREGATION_DATE": "集計日",
+			"EXCHANGE_RATE_SOURCE": "為替基準",
+			"LAST_DAY_OF_THE_MONTH": "月末",
+			"NOTIFICATION": "集計が完了すると、日付の変更は翌月から適用されます。"
+		}
 	},
 	"DASHBOARDS": {
 		"ALL_DASHBOARDS": {
@@ -2385,6 +2394,7 @@
 		"COST_SUMMARY_BY_PROJECT": "プロジェクトごとに",
 		"COST_SUMMARY_CURRENT_TOTAL_COST": "現在の月初から今までの費用",
 		"COST_SUMMARY_DESC": "上記の費用は、報告書の費用と異なる場合があります",
+		"COST_SUMMARY_GO_TO_COST_ANALYSIS": "コスト分析に移動",
 		"COST_SUMMARY_GO_TO_REPORT": "コストレポートに移動",
 		"COST_SUMMARY_LAST_MONT_TOTAL_COST": "先月の総費用",
 		"COST_SUMMARY_RECENT": "{date}の最近の費用レポート",
@@ -2942,16 +2952,16 @@
 				"ADD_USERS_TITLE": "\"{name}\"にユーザーを追加",
 				"ADD_WORKSPACES_TITLE": "\"{name}\" にワークスペースを追加",
 				"ADD_WORKSPACE_DESCRIPTION": "グループユーザーは、ワークスペースグループで割り当てられた役割で、含まれるすべてのワークスペースに追加されます。",
-				"ALT_E_REMOVE_USERS": "",
-				"ALT_E_REMOVE_WORKSPACES": "",
-				"ALT_E_REMOVE_WORKSPACE_GROUP": "",
+				"ALT_E_REMOVE_USERS": "ユーザーの削除に失敗しました",
+				"ALT_E_REMOVE_WORKSPACES": "ワークスペースの削除に失敗しました",
+				"ALT_E_REMOVE_WORKSPACE_GROUP": "ワークスペースグループの削除に失敗しました",
 				"ALT_S_ADD_USERS": "ユーザー追加完了",
 				"ALT_S_ADD_WORKSPACE": "ワークスペース追加完了",
 				"ALT_S_CREATE_WORKSPACE": "ワークスペースグループの作成が完了しました",
 				"ALT_S_EDIT_WORKSPACE": "ワークスペースグループが正常に更新されました",
-				"ALT_S_REMOVE_USERS": "",
-				"ALT_S_REMOVE_WORKSPACES": "",
-				"ALT_S_REMOVE_WORKSPACE_GROUP": "",
+				"ALT_S_REMOVE_USERS": "ユーザーの削除が完了しました",
+				"ALT_S_REMOVE_WORKSPACES": "ークスペースの削除が完了しました",
+				"ALT_S_REMOVE_WORKSPACE_GROUP": "ワークスペースグループの削除が完了しました",
 				"ASSOCIATED_WORKSPACES": "関連ワークスペース",
 				"CREATE_DROP_DOWN_PLACEHOLDER": "ワークスペースの選択",
 				"CREATE_GROUP_NAME": "名前",
@@ -3510,7 +3520,7 @@
 				"SPECIFIC_SERVICE_ACCOUNT": "特定のサービスアカウント",
 				"TAG": "タグ",
 				"VERSION": "バージョン",
-				"VIEW_IN_ADMIN_MODE": "",
+				"VIEW_IN_ADMIN_MODE": "管理者モードで確認",
 				"WORKSPACE": "ワークスペース"
 			},
 			"EDIT_ADDITIONAL_RULE": "追加ルールを編集",

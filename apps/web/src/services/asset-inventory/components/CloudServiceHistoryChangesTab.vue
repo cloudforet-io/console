@@ -1,6 +1,7 @@
 <template>
     <div class="cloud-service-history-changes-tab">
-        <p-heading heading-type="sub"
+        <p-heading class="pt-8 px-4 pb-4"
+                   heading-type="sub"
                    :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.CHANGES')"
                    use-total-count
                    :total-count="changesCount"

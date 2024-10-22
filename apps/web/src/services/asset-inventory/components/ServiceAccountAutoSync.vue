@@ -4,7 +4,7 @@ import { computed, reactive } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButton, PPaneLayout, PHeading, PLink,
+    PButton, PPaneLayout, PHeading, PLink, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
 
@@ -92,35 +92,42 @@ const handleClickSaveButton = async () => {
 
 <template>
     <p-pane-layout class="service-account-auto-sync">
-        <p-heading heading-type="sub"
-                   :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.AUTO_SYNC_TITLE')"
-        >
-            <template #title-right-extra>
-                <auto-sync-state v-if="state.mode==='READ'"
-                                 :state="serviceAccountPageStore.getters.isOriginAutoSyncEnabled ? 'ENABLED' : 'DISABLED'"
-                                 size="lg"
-                                 class="ml-2"
-                />
-                <p-link v-else
-                        :href="serviceAccountPageStore.getters.autoSyncDocsLink"
-                        new-tab
-                        highlight
-                        action-icon="external-link"
-                        class="ml-3"
+        <p-heading-layout>
+            <template #heading>
+                <p-heading class="pt-8 px-4 pb-4"
+                           heading-type="sub"
+                           :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.AUTO_SYNC_TITLE')"
                 >
-                    Docs
-                </p-link>
+                    <template #title-right-extra>
+                        <auto-sync-state v-if="state.mode==='READ'"
+                                         :state="serviceAccountPageStore.getters.isOriginAutoSyncEnabled ? 'ENABLED' : 'DISABLED'"
+                                         size="lg"
+                                         class="ml-2"
+                        />
+                        <p-link v-else
+                                :href="serviceAccountPageStore.getters.autoSyncDocsLink"
+                                new-tab
+                                highlight
+                                action-icon="external-link"
+                                class="ml-3"
+                        >
+                            Docs
+                        </p-link>
+                    </template>
+                </p-heading>
             </template>
             <template #extra>
-                <p-button v-if="state.mode === 'READ' && props.editable"
-                          icon-left="ic_edit"
-                          style-type="secondary"
-                          @click="handleClickEditButton"
-                >
-                    {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.EDIT') }}
-                </p-button>
+                <div class="h-full pt-8 px-4 pb-4">
+                    <p-button v-if="state.mode === 'READ' && props.editable"
+                              icon-left="ic_edit"
+                              style-type="secondary"
+                              @click="handleClickEditButton"
+                    >
+                        {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.EDIT') }}
+                    </p-button>
+                </div>
             </template>
-        </p-heading>
+        </p-heading-layout>
         <div class="content-wrapper"
              :class="{'ml-4': state.mode === 'READ'}"
         >

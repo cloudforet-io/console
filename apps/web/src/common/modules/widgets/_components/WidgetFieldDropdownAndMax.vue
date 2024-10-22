@@ -98,9 +98,9 @@ watch(() => props.menuItems, (menuItems) => {
                        class="w-full"
         >
             <p-select-dropdown :menu="props.menuItems"
-                               class="w-full"
                                :selected="state.proxyValue?.value"
                                use-fixed-menu-style
+                               block
                                @update:selected="handleUpdateSelect"
             />
         </p-field-group>

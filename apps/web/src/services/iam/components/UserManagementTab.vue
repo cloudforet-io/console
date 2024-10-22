@@ -65,7 +65,7 @@ const state = reactive({
         state.fieldByMode,
         { name: 'tags', label: 'Tags' },
         { name: 'auth_type', label: 'Auth Type', sortable: false },
-        { name: 'last_accessed_count', label: 'Last Activity', sortable: false },
+        { name: 'last_accessed_at', label: 'Last Activity', sortable: false },
         { name: 'timezone', label: 'Timezone', sortable: false },
     ])),
 });
@@ -92,7 +92,7 @@ const multiItemTabState = reactive({
     refinedUserItems: computed<ExtendUserListItemType[]>(() => userPageGetters.selectedUsers.map((user) => ({
         ...user,
         type: user?.role_binding_info?.workspace_group_id ? 'Workspace Group' : 'Workspace',
-        last_accessed_count: calculateTime(user?.last_accessed_at, userPageGetters.timezone),
+        last_accessed_at: user?.last_accessed_at,
     }))),
 });
 
@@ -229,18 +229,18 @@ watch(() => userPageState.selectedIndices[0], (index) => {
                                   class="capitalize"
                         />
                     </template>
-                    <template #col-last_accessed_count-format="{ value }">
-                        <span v-if="value === -1">
+                    <template #col-last_accessed_at-format="{ value }">
+                        <span v-if="calculateTime(value, userPageGetters.timezone) === -1">
                             -
                         </span>
-                        <span v-else-if="value === 0">
+                        <span v-else-if="calculateTime(value, userPageGetters.timezone) === 0">
                             {{ $t('IAM.USER.MAIN.TODAY') }}
                         </span>
-                        <span v-else-if="value === 1">
+                        <span v-else-if="calculateTime(value, userPageGetters.timezone) === 1">
                             {{ $t('IAM.USER.MAIN.YESTERDAY') }}
                         </span>
                         <span v-else>
-                            {{ value }} {{ $t('IAM.USER.MAIN.DAYS') }}
+                            {{ calculateTime(value, userPageGetters.timezone) }} {{ $t('IAM.USER.MAIN.DAYS') }}
                         </span>
                     </template>
                     <template #col-role_type-format="{value}">

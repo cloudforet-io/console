@@ -54,19 +54,18 @@ const handleClickActionButton = (type: string) => {
 
 <template>
     <div class="anomaly-detection-configuration-detail-page">
-        <p-heading title="detail page"
+        <p-heading class="mb-6"
+                   title="detail page"
                    show-back-button
                    @click-back-button="$router.go(-1)"
         >
             <template #title-right-extra>
-                <div class="toolbox-button-wrapper">
-                    <p-icon-button name="ic_edit-text"
-                                   @click="handleClickActionButton(MODAL_TYPE.EDIT)"
-                    />
-                    <p-icon-button name="ic_delete"
-                                   @click="handleClickActionButton(MODAL_TYPE.DELETE)"
-                    />
-                </div>
+                <p-icon-button name="ic_edit-text"
+                               @click="handleClickActionButton(MODAL_TYPE.EDIT)"
+                />
+                <p-icon-button name="ic_delete"
+                               @click="handleClickActionButton(MODAL_TYPE.DELETE)"
+                />
             </template>
         </p-heading>
         <anomaly-detection-configuration-trend class="form" />
@@ -101,9 +100,6 @@ const handleClickActionButton = (type: string) => {
 
 <style scoped lang="postcss">
 .anomaly-detection-configuration-detail-page {
-    .toolbox-button-wrapper {
-        @apply flex items-center;
-    }
     .form + .form {
         margin-top: 1rem;
     }

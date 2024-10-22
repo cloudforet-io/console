@@ -1,8 +1,16 @@
+import type { Currency } from '@/store/modules/display/type';
 
 export type DormancyConfig = {
     enabled: boolean;
     cost: number;
     send_email: boolean;
+};
+
+export type UnifiedCostConfig = {
+    aggregation_day?: number;
+    currency?: Currency;
+    is_last_day?: boolean;
+    exchange_source?: string;
 };
 
 export interface PreferencesData {
@@ -13,4 +21,5 @@ export interface PreferencesData {
     wordtype_logo_url?: string;
     symbol_favicon_url?: string;
     login_page_image_url?: string;
+    unified_cost_config?: UnifiedCostConfig;
 }

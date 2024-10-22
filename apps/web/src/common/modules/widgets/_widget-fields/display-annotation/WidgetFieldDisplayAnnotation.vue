@@ -13,6 +13,7 @@ import type { DisplayAnnotationValue } from '@/common/modules/widgets/_widget-fi
 import type { WidgetFieldComponentProps, WidgetFieldComponentEmit } from '@/common/modules/widgets/types/widget-field-type';
 
 
+
 const emit = defineEmits<WidgetFieldComponentEmit<DisplayAnnotationValue|undefined>>();
 const props = defineProps<WidgetFieldComponentProps<undefined, DisplayAnnotationValue>>();
 const state = reactive({
@@ -63,11 +64,9 @@ watch(() => isAllValid.value, (_isAllValid) => {
 
 onMounted(() => {
     emit('update:is-valid', true);
-    if (!props.value) {
-        state.proxyValue = false;
-        return;
+    if (props.value?.annotation) {
+        setForm('annotation', props.value.annotation);
     }
-    setForm('annotation', props.value.annotation);
 });
 </script>
 

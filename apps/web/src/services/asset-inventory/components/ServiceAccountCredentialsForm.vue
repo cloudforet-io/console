@@ -321,6 +321,7 @@ watch([() => storeState.secretSchema, () => state.isTrustedAccount], () => {
                         <p-select-dropdown :selected="formState.attachedTrustedAccountId"
                                            :menu="state.trustedAccountMenuItems"
                                            :disabled="!formState.attachTrustedAccount"
+                                           block
                                            @select="handleChangeAttachedTrustedAccountId"
                         />
                         <div v-if="formState.attachTrustedAccount && formState.attachedTrustedAccountId"
@@ -407,9 +408,6 @@ watch([() => storeState.secretSchema, () => state.isTrustedAccount], () => {
             padding: 0.5rem;
             margin-left: 1.5rem;
             margin-top: 0.25rem;
-            .p-select-dropdown {
-                width: 100%;
-            }
             .copy-text-wrapper {
                 display: flex;
                 align-items: center;

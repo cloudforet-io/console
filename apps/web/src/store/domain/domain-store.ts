@@ -12,6 +12,7 @@ import type {
 
 import type { ExtendedAuthType, ExtraMenuSet } from '@/store/domain/type';
 import { DOMAIN_CONFIG_TYPE } from '@/store/domain/type';
+import type { Currency } from '@/store/modules/display/type';
 
 import config from '@/lib/config';
 
@@ -78,6 +79,7 @@ export const useDomainStore = defineStore('domain-store', () => {
 
             return undefined;
         }),
+        domainUnifiedCostCurrency: computed<Currency|undefined>(() => state.config?.settings?.unified_cost_config?.currency),
     });
 
     /* Mutation */

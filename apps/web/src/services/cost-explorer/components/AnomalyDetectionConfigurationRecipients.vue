@@ -3,7 +3,7 @@ import { computed, reactive, watch } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import {
-    PHeading, PButton, PDefinitionTable, PBadge,
+    PHeading, PButton, PDefinitionTable, PBadge, PHeadingLayout,
 } from '@cloudforet/mirinae';
 import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
 
@@ -35,10 +35,12 @@ watch(() => route.params.configId, (configId) => {
 
 <template>
     <div class="anomaly-detection-configuration-recipients">
-        <p-heading :title="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.RECIPIENTS')"
-                   heading-type="sub"
-                   class="heading"
-        >
+        <p-heading-layout class="pt-8 px-4 pb-4">
+            <template #heading>
+                <p-heading :title="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.RECIPIENTS')"
+                           heading-type="sub"
+                />
+            </template>
             <template v-if="state.isDetailPage && !state.isEdit"
                       #extra
             >
@@ -49,7 +51,7 @@ watch(() => route.params.configId, (configId) => {
                     {{ $t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.EDIT') }}
                 </p-button>
             </template>
-        </p-heading>
+        </p-heading-layout>
         <anomaly-detection-configuration-recipients-form v-if="state.isEdit"
                                                          :is-edit.sync="state.isEdit"
                                                          :is-detail-page="state.isDetailPage"

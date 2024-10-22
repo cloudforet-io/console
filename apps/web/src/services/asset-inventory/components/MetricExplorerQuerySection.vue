@@ -141,6 +141,7 @@ watch(() => route.params, async () => {
         @apply relative flex justify-between;
         align-items: flex-start;
         font-size: 0.875rem;
+        gap: 0.5rem;
         .left-part {
             display: flex;
             align-items: center;
@@ -150,7 +151,10 @@ watch(() => route.params, async () => {
         .right-part {
             display: flex;
             align-items: center;
+            justify-content: flex-end;
             gap: 0.5rem;
+            flex-wrap: wrap;
+            flex-shrink: 0;
             .period-text {
                 @apply text-label-md text-gray-700;
                 font-weight: 400;

@@ -177,6 +177,7 @@ onMounted(() => {
                     >
                         <p-select-dropdown :menu="state.menuItems"
                                            :selected="state.proxyValue?.basisField"
+                                           block
                                            @update:selected="handleUpdateSelect($event, 'basisField')"
                         />
                     </p-field-group>
@@ -186,6 +187,7 @@ onMounted(() => {
                     >
                         <p-select-dropdown :menu="state.menuItems"
                                            :selected="state.proxyValue?.totalField"
+                                           block
                                            @update:selected="handleUpdateSelect($event, 'totalField')"
                         />
                     </p-field-group>
@@ -257,10 +259,6 @@ onMounted(() => {
 </template>
 
 <style lang="postcss" scoped>
-.p-select-dropdown {
-    width: 100%;
-}
-
 /* custom design-system component - p-field-group */
 :deep(.p-field-group) {
     .p-field-title {

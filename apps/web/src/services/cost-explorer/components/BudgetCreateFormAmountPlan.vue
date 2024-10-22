@@ -97,7 +97,8 @@ watch([() => state.amountPlanInfo, () => state.isAllValid], ([amountPlanInfo, is
 
 <template>
     <p-pane-layout class="budget-create-form-amount-plan">
-        <p-heading heading-type="sub"
+        <p-heading class="pt-8 px-4 pb-4"
+                   heading-type="sub"
                    :title="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.AMOUNT_PLANNING')"
         />
         <div class="p-4">

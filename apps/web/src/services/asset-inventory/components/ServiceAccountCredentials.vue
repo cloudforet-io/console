@@ -5,7 +5,7 @@ import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PPaneLayout, PHeading, PButton,
+    PPaneLayout, PHeading, PButton, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
 import type {
@@ -195,19 +195,25 @@ watch(() => state.attachedTrustedAccountId, (attachedTrustedAccountId) => {
 
 <template>
     <p-pane-layout class="service-account-credentials">
-        <p-heading heading-type="sub"
-                   :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS')"
-        >
-            <template #extra>
-                <p-button v-if="state.mode === 'READ' && props.editable && state.credentialData"
-                          icon-left="ic_edit"
-                          style-type="secondary"
-                          @click="handleClickEditButton"
-                >
-                    {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.EDIT') }}
-                </p-button>
+        <p-heading-layout>
+            <template #heading>
+                <p-heading class="pt-8 px-4 pb-4"
+                           heading-type="sub"
+                           :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS')"
+                />
             </template>
-        </p-heading>
+            <template #extra>
+                <div class="h-full pt-8 px-4 pb-4">
+                    <p-button v-if="state.mode === 'READ' && props.editable && state.credentialData"
+                              icon-left="ic_edit"
+                              style-type="secondary"
+                              @click="handleClickEditButton"
+                    >
+                        {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.EDIT') }}
+                    </p-button>
+                </div>
+            </template>
+        </p-heading-layout>
         <div class="content-wrapper">
             <service-account-credentials-detail v-show="state.mode === 'READ'"
                                                 :credential-data="state.credentialData"

@@ -102,7 +102,9 @@ const fetchRecentList = async () => {
 
 <template>
     <div class="metric-explorer-content">
-        <p-heading :title="$t('INVENTORY.METRIC_EXPLORER.METRIC_EXPLORER')" />
+        <p-heading class="mb-6"
+                   :title="$t('INVENTORY.METRIC_EXPLORER.METRIC_EXPLORER')"
+        />
         <p-pane-layout>
             <div class="contents">
                 <p class="title">

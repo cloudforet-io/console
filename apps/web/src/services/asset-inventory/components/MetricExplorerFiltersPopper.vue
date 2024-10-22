@@ -52,22 +52,25 @@ const state = reactive({
         label: d.name,
     }))),
     selectedItemsMap: {} as Record<string, SelectDropdownMenuItem[]>,
+    primaryMetricStatOptions: computed<Record<string, any>>(() => ({
+        metric_id: route.params.metricId,
+    })),
     handlerMap: computed(() => {
         const handlerMaps = {};
         metricExplorerPageGetters.refinedMetricLabelKeys.forEach((labelKey: MetricLabelKey) => {
-            handlerMaps[labelKey.key] = getMenuHandler(labelKey);
+            handlerMaps[labelKey.key] = getMenuHandler(labelKey, state.primaryMetricStatOptions);
         });
         return handlerMaps;
     }),
 });
 
 /* Util */
-const getMenuHandler = (labelKey: MetricLabelKey): AutocompleteHandler => {
+const getMenuHandler = (labelKey: MetricLabelKey, listQueryOptions: Record<string, any>): AutocompleteHandler => {
     try {
         let variableModelInfo: VariableModelMenuHandlerInfo;
-        const queryOptions: Record<string, any> = {};
+        let _queryOptions: Record<string, any> = {};
         if (labelKey.key === MANAGED_VARIABLE_MODELS.workspace.meta.idKey) {
-            queryOptions.is_dormant = false;
+            _queryOptions.is_dormant = false;
         }
         if (isEmpty(labelKey.reference)) {
             const MetricVariableModel = new VariableModelFactory(
@@ -78,6 +81,7 @@ const getMenuHandler = (labelKey: MetricLabelKey): AutocompleteHandler => {
                 variableModel: MetricVariableModel,
                 dataKey: labelKey.key,
             };
+            _queryOptions = { ..._queryOptions, ...listQueryOptions };
         } else {
             const _resourceType = labelKey.reference?.resource_type;
             const targetModelConfig = Object.values(MANAGED_VARIABLE_MODELS).find((d) => (d.meta?.resourceType === _resourceType));
@@ -90,7 +94,7 @@ const getMenuHandler = (labelKey: MetricLabelKey): AutocompleteHandler => {
             }
         }
         if (!variableModelInfo) return async () => ({ results: [] });
-        const handler = getVariableModelMenuHandler([variableModelInfo], queryOptions);
+        const handler = getVariableModelMenuHandler([variableModelInfo], _queryOptions);
         return async (...args) => {
             try {
                 state.loading = true;

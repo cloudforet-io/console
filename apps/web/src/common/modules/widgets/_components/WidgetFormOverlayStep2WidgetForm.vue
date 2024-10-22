@@ -189,6 +189,7 @@ onMounted(() => {
                 </template>
                 <p-select-dropdown :menu="state.selectableDataTableItems"
                                    :selected="state.selectedDataTableId"
+                                   block
                                    @select="handleSelectDataTable"
                 >
                     <template #dropdown-button="item">
@@ -208,6 +209,7 @@ onMounted(() => {
             >
                 <p-select-dropdown :menu="state.chartTypeMenuItems"
                                    :selected="widgetGenerateState.selectedWidgetName"
+                                   block
                                    @select="handleSelectWidgetName"
                 >
                     <template #dropdown-button>
@@ -371,9 +373,6 @@ onMounted(() => {
 
 /* custom design-system component - p-field-group */
 :deep(.p-field-group) {
-    .p-select-dropdown {
-        width: 100%;
-    }
     .p-text-input {
         width: 100%;
     }

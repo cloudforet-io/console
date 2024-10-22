@@ -3,7 +3,7 @@ import { reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { PHeading, PButton } from '@cloudforet/mirinae';
+import { PHeading, PButton, PHeadingLayout } from '@cloudforet/mirinae';
 
 
 import type { RoleCreateParameters } from '@/schema/identity/role/api-verbs/create';
@@ -13,7 +13,9 @@ import { i18n } from '@/translations';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import HandbookButton from '@/common/modules/portals/HandbookButton.vue';
 
+import RoleCreateEditHandbook from '@/services/iam/components/RoleCreateEditHandbook.vue';
 import RoleUpdateForm from '@/services/iam/components/RoleUpdateForm.vue';
 
 const router = useRouter();
@@ -43,11 +45,24 @@ const handleUpdateForm = (data: RoleCreateParameters) => {
 
 <template>
     <section class="role-create-page">
-        <p-heading
-            show-back-button
-            :title="$t('IAM.ROLE.FORM.CREATE_TITLE')"
-            @click-back-button="router.go(-1)"
-        />
+        <p-heading-layout class="mb-6">
+            <template #heading>
+                <p-heading show-back-button
+                           :title="$t('IAM.ROLE.FORM.CREATE_TITLE')"
+                           @click-back-button="router.go(-1)"
+                />
+            </template>
+            <template #extra>
+                <handbook-button type="iam/role/create-edit"
+                                 class="create-role-handbook-button"
+                >
+                    <keep-alive>
+                        <role-create-edit-handbook />
+                    </keep-alive>
+                </handbook-button>
+            </template>
+        </p-heading-layout>
+
         <role-update-form @update-validation="handleFormValidate"
                           @update-form-data="handleUpdateForm"
         />
@@ -73,6 +88,8 @@ const handleUpdateForm = (data: RoleCreateParameters) => {
 .role-create-page {
     @apply mx-0;
     max-width: 100%;
-    margin-top: -1.875rem;
+    .create-role-handbook-button {
+        height: 2rem;
+    }
 }
 </style>

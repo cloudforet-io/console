@@ -13,8 +13,8 @@ import {
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { UserConfigModel } from '@/schema/config/user-config/model';
 import type { CostReportConfigModel } from '@/schema/cost-analysis/cost-report-config/model';
-import type { CostReportDataAnalyzeParameters } from '@/schema/cost-analysis/cost-report-data/api-verbs/analyze';
 import type { CostDataSourceModel } from '@/schema/cost-analysis/data-source/model';
+import type { UnifiedCostAnalyzeParameters } from '@/schema/cost-analysis/unified-cost/api-verbs/analyze';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -36,7 +36,7 @@ import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdow
 import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import type { XYChartData } from '@/services/cost-explorer/types/cost-explorer-chart-type';
-import type { CostReportDataAnalyzeResult } from '@/services/cost-explorer/types/cost-report-data-type';
+import type { UnifiedCostAnalyzeResult } from '@/services/cost-explorer/types/unified-cost-type';
 import CostSummaryChart from '@/services/workspace-home/components/CostSummaryChart.vue';
 import EmptySummaryData from '@/services/workspace-home/components/EmptySummaryData.vue';
 import { costStateSummaryFormatter } from '@/services/workspace-home/composables/use-workspace-home';
@@ -120,8 +120,7 @@ const handleSelectedProject = async (selectedProject: string[]) => {
 const analyzeCostReportData = async () => {
     state.loading = true;
     try {
-        const { results } = await SpaceConnector.clientV2.costAnalysis.costReportData.analyze<CostReportDataAnalyzeParameters, AnalyzeResponse<CostReportDataAnalyzeResult>>({
-            cost_report_config_id: storeState.costReportConfig?.cost_report_config_id,
+        const { results } = await SpaceConnector.clientV2.costAnalysis.unifiedCost.analyze<UnifiedCostAnalyzeParameters, AnalyzeResponse<UnifiedCostAnalyzeResult>>({
             query: {
                 start: state.period.start,
                 end: state.period.end,
@@ -236,13 +235,27 @@ watch(() => storeState.costReportConfig, async (costReportConfig) => {
                 </div>
                 <div v-if="!state.isWorkspaceMember && state.accessLink">
                     <p-divider class="divider" />
-                    <p-link highlight
-                            :to="getProperRouteLocation({ name: COST_EXPLORER_ROUTE.COST_REPORT._NAME })"
-                            action-icon="internal-link"
-                            class="link"
-                    >
-                        {{ $t('HOME.COST_SUMMARY_GO_TO_REPORT') }}
-                    </p-link>
+                    <div class="link-footer">
+                        <p-link highlight
+                                :to="getProperRouteLocation({ name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME })"
+                                action-icon="internal-link"
+                                class="link"
+                        >
+                            {{ $t('HOME.COST_SUMMARY_GO_TO_COST_ANALYSIS') }}
+                        </p-link>
+                        <div class="vertical-divider">
+                            <p-divider style="height: 14px;"
+                                       vertical
+                            />
+                        </div>
+                        <p-link highlight
+                                :to="getProperRouteLocation({ name: COST_EXPLORER_ROUTE.COST_REPORT._NAME })"
+                                action-icon="internal-link"
+                                class="link"
+                        >
+                            {{ $t('HOME.COST_SUMMARY_GO_TO_REPORT') }}
+                        </p-link>
+                    </div>
                 </div>
             </div>
             <empty-summary-data v-else
@@ -310,10 +323,17 @@ watch(() => storeState.costReportConfig, async (costReportConfig) => {
     .divider {
         @apply bg-gray-150;
     }
-    .link {
-        @apply flex items-center justify-center text-label-md;
-        padding-top: 0.625rem;
-        padding-bottom: 0.75rem;
+    .link-footer {
+        @apply flex justify-center items-center gap-4;
+
+        .vertical-divider {
+            @apply flex items-center h-full;
+        }
+        .link {
+            @apply inline-flex items-center justify-center text-label-md;
+            padding-top: 0.625rem;
+            padding-bottom: 0.75rem;
+        }
     }
 }
 </style>

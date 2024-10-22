@@ -53,13 +53,14 @@ const state = reactive({
     showHideAll: computed(() => Object.values(state.legend).some((d) => d)),
     showAccumulatedToggle: computed(() => costAnalysisPageState.granularity === GRANULARITY.DAILY),
     isAccumulated: false,
+    analyzeFetcher: computed(() => (costAnalysisPageGetters.isUnifiedCost ? unifiedCostAnalyze : fetchCostAnalyze)),
 });
 
 /* Util */
 const getValueSumKey = (dataType:string) => {
     switch (dataType) {
     case 'cost':
-        return 'cost';
+        return costAnalysisPageGetters.isUnifiedCost ? `cost.${costAnalysisPageGetters.currency}` : 'cost';
     case 'usage':
         return 'usage_quantity';
     default:
@@ -69,14 +70,15 @@ const getValueSumKey = (dataType:string) => {
 
 /* Api */
 const fetchCostAnalyze = getCancellableFetcher<object, AnalyzeResponse<CostAnalyzeRawData>>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
+const unifiedCostAnalyze = getCancellableFetcher<object, AnalyzeResponse<CostAnalyzeRawData>>(SpaceConnector.clientV2.costAnalysis.unifiedCost.analyze);
 const analyzeApiQueryHelper = new ApiQueryHelper();
 const listCostAnalysisData = async (period:Period): Promise<AnalyzeResponse<CostAnalyzeRawData>|undefined> => {
     try {
         analyzeApiQueryHelper.setFilters(costAnalysisPageGetters.consoleFilters);
         let dateFormat = 'YYYY-MM';
         if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) dateFormat = 'YYYY';
-        const { status, response } = await fetchCostAnalyze({
-            data_source_id: costAnalysisPageGetters.selectedDataSourceId,
+        const { status, response } = await state.analyzeFetcher({
+            data_source_id: costAnalysisPageGetters.isUnifiedCost ? undefined : costAnalysisPageGetters.selectedDataSourceId,
             query: {
                 granularity: costAnalysisPageState.granularity,
                 group_by: costAnalysisPageState.chartGroupBy ? [costAnalysisPageState.chartGroupBy] : [],
@@ -199,6 +201,7 @@ watch(() => costAnalysisPageState.granularity, () => {
                                                 :data="state.data"
                                                 :legend.sync="state.legend"
                                                 :accumulated="state.isAccumulated"
+                                                class="cost-analysis-stacked-column-chart"
             />
         </div>
     </div>
@@ -232,8 +235,13 @@ watch(() => costAnalysisPageState.granularity, () => {
         }
     }
     .bottom-part {
+        display: flex;
+        flex-direction: column;
         height: 25rem;
         margin-top: 1rem;
+        .cost-analysis-stacked-column-chart {
+            flex: 1;
+        }
         .bottom-right-part {
             text-align: right;
             display: flex;

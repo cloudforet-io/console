@@ -4,7 +4,8 @@
                    :class="{ 'data-loader': schemaLoading }"
                    class="cloud-service-history-log-tab"
     >
-        <p-heading heading-type="sub"
+        <p-heading class="pt-8 px-4 pb-4"
+                   heading-type="sub"
                    :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG')"
                    use-total-count
                    :total-count="totalCount"

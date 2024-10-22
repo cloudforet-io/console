@@ -13,6 +13,7 @@ import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mi
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import { VariableModelFactory } from '@/lib/variable-models';
@@ -43,6 +44,7 @@ const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetters = userWorkspaceStore.getters;
+const appContextStore = useAppContextStore();
 
 interface VariableOption {
     key: ManagedVariableModelKey;
@@ -56,7 +58,7 @@ const GROUP_BY_TO_VAR_MODELS: Record<string, VariableOption> = {
     [GROUP_BY.PRODUCT]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost, dataKey: 'product' },
     [GROUP_BY.PROVIDER]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.provider },
     [GROUP_BY.SERVICE_ACCOUNT]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.service_account },
-    [GROUP_BY.REGION]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.region },
+    [GROUP_BY.REGION]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost, dataKey: 'region' },
     [GROUP_BY.USAGE_TYPE]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost, dataKey: 'usage_type' },
 };
 
@@ -69,6 +71,7 @@ const props = defineProps<{
 
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 const state = reactive({
     loading: true,
@@ -82,21 +85,21 @@ const state = reactive({
             return { name: d, label: d };
         });
     }),
-    primaryCostStatOptions: computed<Record<string, any>>(() => ({
+    primaryCostOptions: computed<Record<string, any>>(() => ({
         data_source_id: costAnalysisPageGetters.selectedDataSourceId,
     })),
     selectedItemsMap: {} as Record<string, SelectDropdownMenuItem[]>,
     handlerMap: computed(() => {
         const handlerMaps = {};
         state.enabledFilters.forEach((filter) => {
-            handlerMaps[filter.name] = getMenuHandler(filter.name, { presetKeys: filter?.presetKeys }, state.primaryCostStatOptions);
+            handlerMaps[filter.name] = getMenuHandler(filter.name, { presetKeys: filter?.presetKeys }, state.primaryCostOptions);
         });
         return handlerMaps;
     }),
 });
 
 /* Util */
-const getMenuHandler = (groupBy: string, modelOptions: Record<string, any>, listQueryOptions: Record<string, any>): AutocompleteHandler => {
+const getMenuHandler = (groupBy: string, modelOptions: Record<string, any>, primaryQueryOptions: Record<string, any>): AutocompleteHandler => {
     try {
         let variableModelInfo: VariableModelMenuHandlerInfo;
         const _variableOption = GROUP_BY_TO_VAR_MODELS[groupBy];
@@ -109,6 +112,7 @@ const getMenuHandler = (groupBy: string, modelOptions: Record<string, any>, list
                 variableModel: new VariableModelFactory({ type: 'MANAGED', managedModelKey: _variableOption.key }),
                 dataKey: _variableOption.dataKey,
             };
+            if (_variableOption.key === MANAGED_VARIABLE_MODEL_KEY_MAP.cost) _queryOptions = { ..._queryOptions, ...primaryQueryOptions };
         } else {
             const CostVariableModel = new VariableModelFactory({ type: 'MANAGED', managedModelKey: MANAGED_VARIABLE_MODEL_KEY_MAP.cost });
             CostVariableModel[groupBy] = CostVariableModel.generateProperty({ key: groupBy, presetValues: modelOptions?.presetKeys });
@@ -116,7 +120,7 @@ const getMenuHandler = (groupBy: string, modelOptions: Record<string, any>, list
                 variableModel: CostVariableModel,
                 dataKey: groupBy,
             };
-            _queryOptions = { ..._queryOptions, ...listQueryOptions };
+            _queryOptions = { ..._queryOptions, ...primaryQueryOptions };
         }
         const handler = getVariableModelMenuHandler([variableModelInfo], _queryOptions);
 
@@ -142,6 +146,10 @@ const initSelectedFilters = () => {
     const _filters = costAnalysisPageState.filters;
     const _selectedItemsMap = {};
     Object.keys(_filters ?? {}).forEach((groupBy) => {
+        if (storeState.isAdminMode && !costAnalysisPageState.isAllWorkspaceSelected && groupBy === GROUP_BY.WORKSPACE) {
+            _selectedItemsMap[groupBy] = [];
+            return;
+        }
         _selectedItemsMap[groupBy] = _filters?.[groupBy].map((d) => ({ name: d, label: d })) ?? [];
         if (costAnalysisPageState.enabledFiltersProperties?.indexOf(groupBy) === -1) {
             costAnalysisPageStore.setEnabledFiltersProperties([

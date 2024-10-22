@@ -81,7 +81,7 @@ const state = reactive({
         tags: state.tags,
     })),
     isAllValid: computed(() => ((invalidState.serviceAccountName === false)
-        && (state.isTrustedAccount ? true : state.isProjectFormValid)
+        && (state.isTrustedAccount ? true : (state.isProjectFormValid || state.originForm?.projectForm?.selectedProjectId))
         && state.isTagsValid
         && (isEmpty(props.schema) ? true : state.isCustomSchemaFormValid))),
     isChanged: false,
@@ -129,6 +129,10 @@ const handleChangeProjectForm = (projectForm) => {
     }
 };
 
+const handleUpdateServiceAccountName = (value: string) => {
+    setForm('serviceAccountName', value);
+};
+
 /* Init */
 (async () => {
     await listServiceAccounts();
@@ -170,7 +174,7 @@ watch(() => state.originForm, (originForm) => {
                               class="account-name-input block"
                               :invalid="invalid"
                               :placeholder="$t('IDENTITY.SERVICE_ACCOUNT.ADD.BASE_NAME_PLACEHOLDER')"
-                              @update:value="setForm('serviceAccountName', $event)"
+                              @update:value="handleUpdateServiceAccountName"
                 />
             </template>
         </p-field-group>

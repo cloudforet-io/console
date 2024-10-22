@@ -9,7 +9,7 @@ import { clone } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PLink, PButton, PIconButton, PHeading, PLazyImg,
+    PLink, PButton, PIconButton, PHeading, PLazyImg, PHeadingLayout,
 } from '@cloudforet/mirinae';
 import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 
@@ -112,7 +112,7 @@ const state = reactive({
     deleteModalVisible: false,
     editModalVisible: false,
     isManagedTrustedAccount: computed(() => state.originServiceAccountItem.workspace_id === '*'),
-    isEditable: computed(() => state.hasReadWriteAccess && (!state.isManagedTrustedAccount || storeState.isAdminMode)),
+    isEditable: computed<boolean>(() => state.hasReadWriteAccess && (!state.isManagedTrustedAccount || storeState.isAdminMode)),
 });
 
 /* Api */
@@ -183,30 +183,34 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
 
 <template>
     <div class="service-account-detail-page">
-        <p-heading :title="state.originServiceAccountItem.name"
-                   show-back-button
-                   class="page-title"
-                   @click-back-button="handleClickBackbutton"
-        >
-            <template #title-left-extra>
-                <p-lazy-img :src="state.providerIcon"
-                            :loading="state.loading"
-                            error-icon="ic_cloud-filled"
-                />
-            </template>
-            <template v-if="state.isEditable"
-                      #title-right-extra
-            >
-                <div class="title-right-wrapper">
-                    <p-icon-button name="ic_edit-text"
-                                   class="w-full delete-button"
-                                   @click="handleClickEditButton"
-                    />
-                    <p-icon-button name="ic_delete"
-                                   class="w-full delete-button"
-                                   @click="handleOpenDeleteModal"
-                    />
-                </div>
+        <p-heading-layout class="mb-6">
+            <template #heading>
+                <p-heading :title="state.originServiceAccountItem.name"
+                           show-back-button
+                           class="page-title"
+                           @click-back-button="handleClickBackbutton"
+                >
+                    <template #title-left-extra>
+                        <p-lazy-img :src="state.providerIcon"
+                                    :loading="state.loading"
+                                    error-icon="ic_cloud-filled"
+                        />
+                    </template>
+                    <template v-if="state.isEditable"
+                              #title-right-extra
+                    >
+                        <div class="title-right-wrapper">
+                            <p-icon-button name="ic_edit-text"
+                                           class="w-full delete-button"
+                                           @click="handleClickEditButton"
+                            />
+                            <p-icon-button name="ic_delete"
+                                           class="w-full delete-button"
+                                           @click="handleOpenDeleteModal"
+                            />
+                        </div>
+                    </template>
+                </p-heading>
             </template>
             <template v-if="state.isEditable && state.consoleLink"
                       #extra
@@ -221,7 +225,7 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
                     </p-link>
                 </p-button>
             </template>
-        </p-heading>
+        </p-heading-layout>
         <div class="content-wrapper">
             <service-account-base-information :service-account-loading="state.loading"
                                               :service-account-id="props.serviceAccountId"

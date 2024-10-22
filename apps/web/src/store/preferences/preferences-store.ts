@@ -14,7 +14,7 @@ import { DOMAIN_CONFIG_TYPE } from '@/store/domain/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { PreferencesData } from '@/services/advanced/types/preferences-type';
+import type { PreferencesData, UnifiedCostConfig } from '@/services/advanced/types/preferences-type';
 
 export const usePreferencesStore = defineStore('domain-config', () => {
     const state = reactive({
@@ -29,6 +29,7 @@ export const usePreferencesStore = defineStore('domain-config', () => {
         wordtypeLogoUrl: computed<string|undefined>(() => state.domainConfig?.data?.wordtype_logo_url),
         symbolFaviconUrl: computed<string|undefined>(() => state.domainConfig?.data?.symbol_favicon_url),
         loginPageImageUrl: computed<string|undefined>(() => state.domainConfig?.data?.login_page_image_url),
+        unifiedCostConfig: computed<UnifiedCostConfig|undefined>(() => state.domainConfig?.data?.unified_cost_config),
     });
 
     /* Actions */

@@ -2,7 +2,7 @@
 import { computed, reactive, watch } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { PHeading, PButton } from '@cloudforet/mirinae';
+import { PHeading, PButton, PHeadingLayout } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 
@@ -95,13 +95,15 @@ watch(() => route.query, (query) => {
 
 <template>
     <div>
-        <p-heading :title="$t('IAM.USER.TITLE')"
-                   use-selected-count
-                   use-total-count
-                   :total-count="userPageState.totalCount"
-                   :selected-count="userPageState.selectedIndices.length"
-                   class="user-management-header"
-        >
+        <p-heading-layout class="mb-6">
+            <template #heading>
+                <p-heading :title="$t('IAM.USER.TITLE')"
+                           use-selected-count
+                           use-total-count
+                           :total-count="userPageState.totalCount"
+                           :selected-count="userPageState.selectedIndices.length"
+                />
+            </template>
             <template v-if="props.hasReadWriteAccess"
                       #extra
             >
@@ -130,20 +132,18 @@ watch(() => route.query, (query) => {
                     </div>
                 </div>
             </template>
-        </p-heading>
+        </p-heading-layout>
     </div>
 </template>
 
 <style scoped lang="postcss">
-.user-management-header {
-    .toolbox-wrapper {
-        .toolbox {
-            @apply flex ;
-            gap: 1rem;
-        }
-        .button-label {
-            line-height: 1rem;
-        }
+.toolbox-wrapper {
+    .toolbox {
+        @apply flex ;
+        gap: 1rem;
+    }
+    .button-label {
+        line-height: 1rem;
     }
 }
 </style>

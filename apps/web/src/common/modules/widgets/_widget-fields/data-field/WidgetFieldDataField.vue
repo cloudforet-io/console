@@ -107,6 +107,7 @@ watch(() => state.menuItems, (menuItems) => {
                                :show-select-marker="state.multiselectable"
                                :invalid="!state.isValid"
                                appearance-type="badge"
+                               block
                                @update:selected="handleUpdateSelect"
             />
         </p-field-group>
@@ -114,10 +115,6 @@ watch(() => state.menuItems, (menuItems) => {
 </template>
 
 <style lang="postcss" scoped>
-.p-select-dropdown {
-    width: 100%;
-}
-
 /* custom design-system component - p-field-group */
 :deep(.p-field-group) {
     margin-bottom: 0;

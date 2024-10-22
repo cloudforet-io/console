@@ -4,7 +4,7 @@ import { computed, reactive } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButton, PPaneLayout, PHeading,
+    PButton, PPaneLayout, PHeading, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
 
@@ -114,19 +114,25 @@ const handleChangeForm = (form) => {
 
 <template>
     <p-pane-layout class="service-account-base-information">
-        <p-heading heading-type="sub"
-                   :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.BASE_TITLE')"
-        >
-            <template #extra>
-                <p-button v-if="state.mode === 'READ' && props.editable"
-                          icon-left="ic_edit"
-                          style-type="secondary"
-                          @click="handleClickEditButton"
-                >
-                    {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.EDIT') }}
-                </p-button>
+        <p-heading-layout>
+            <template #heading>
+                <p-heading class="pt-8 px-4 pb-4"
+                           heading-type="sub"
+                           :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.BASE_TITLE')"
+                />
             </template>
-        </p-heading>
+            <template #extra>
+                <div class="h-full pt-8 px-4 pb-4">
+                    <p-button v-if="state.mode === 'READ' && props.editable"
+                              icon-left="ic_edit"
+                              style-type="secondary"
+                              @click="handleClickEditButton"
+                    >
+                        {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.EDIT') }}
+                    </p-button>
+                </div>
+            </template>
+        </p-heading-layout>
         <div class="content-wrapper">
             <service-account-base-information-detail v-show="state.mode === 'READ'"
                                                      :loading="props.serviceAccountLoading || state.loading"

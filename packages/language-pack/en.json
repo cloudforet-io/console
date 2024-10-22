@@ -594,6 +594,7 @@
 				"ACCUMULATED": "Accumulated",
 				"ADDITIONAL_INFO": "Additional Info",
 				"ADD_MORE": "More",
+				"ALL_WORKSPACE_SELECTED_WARNING": "Loading data from all workspaces at once may lead to slower performance due to the large volume of information being processed.",
 				"ALT_EXCEL_DOWNLOAD_STACKED": "The file will be downloaded as monthly data rather than accumulated data.",
 				"ALT_E_ADD_GROUP_BY": "There can be a maximum of three group-by options.",
 				"ALT_E_ADD_GROUP_BY_DESC": "Please unselect at least 1 of your previous Group-by choices\nbefore making a new selection.",
@@ -667,6 +668,7 @@
 					"THIS_MONTH": "This Month",
 					"THIS_YEAR": "This Year"
 				},
+				"POSSIBLE_PERFORMANCE_DELAY": "Possible Performance Delay",
 				"PRIVATE": "Private",
 				"PROJECT": "Project",
 				"PROVIDERS_TITLE": "Service Providers",
@@ -1390,7 +1392,7 @@
 				"COLOR_CODED_TABLE_HEATMAP_DESC": "Heatmap color changes based on threshold values."
 			},
 			"ALL_SUMMARY": {
-				"ADD_SERVICE_ACCOUNTS": "Add Service Accounts",
+				"ADD_SERVICE_ACCOUNTS": "Add Service Account",
 				"ALL": "All",
 				"ANALYTICS": "Analytics",
 				"CLOUD_SERVICE": "Cloud Service",
@@ -1700,10 +1702,10 @@
 			"RUN_COLLECTOR_START_TIME": "Start Time",
 			"SAVE": "Save",
 			"SELECT_A_DATA_TABLE": "Select a data table and complete the widget settings.",
-			"SERVICE_ACCOUNTS": "Service Accounts",
+			"SERVICE_ACCOUNTS": "Service Account",
 			"SERVICE_ACCOUNTS_ACCOUNT": "Account",
 			"SERVICE_ACCOUNTS_ADD": "Add",
-			"SERVICE_ACCOUNTS_NO_ACCOUNT": "No Service Accounts",
+			"SERVICE_ACCOUNTS_NO_ACCOUNT": "No Service Account",
 			"SERVICE_ACCOUNTS_PROJECT": "Project",
 			"SERVICE_ACCOUNTS_PROVIDER": "Provider",
 			"SERVICE_ACCOUNT_TABLE": {
@@ -1713,7 +1715,7 @@
 				"PROVIDER": "Provider",
 				"SERVER": "Server",
 				"STORAGE": "Storage",
-				"TITLE": "Service Accounts"
+				"TITLE": "Service Account"
 			},
 			"SERVICE_SUMMARY_CLOUD_SERVICE": "Cloud Services",
 			"SERVICE_SUMMARY_PROJECT": "Project",
@@ -1802,7 +1804,14 @@
 			}
 		},
 		"ANOMALY_DETECTION_CONFIGURATION": "Anomaly Detection Configuration",
-		"COST_ADVANCED_SETTINGS": "Advanced Settings"
+		"COST_ADVANCED_SETTINGS": "Advanced Settings",
+		"CURRENCY_CONVERTER": "Currency Converter",
+		"CURRENCY_CONVERTER_PAGE": {
+			"AGGREGATION_DATE": "Aggregation Date",
+			"EXCHANGE_RATE_SOURCE": "Exchange Rate Source",
+			"LAST_DAY_OF_THE_MONTH": "Last day of the month",
+			"NOTIFICATION": "Once aggregated, date changes will take effect starting next month."
+		}
 	},
 	"DASHBOARDS": {
 		"ALL_DASHBOARDS": {
@@ -2385,6 +2394,7 @@
 		"COST_SUMMARY_BY_PROJECT": "by Project",
 		"COST_SUMMARY_CURRENT_TOTAL_COST": "Current Month-to-Date Cost",
 		"COST_SUMMARY_DESC": "The cost above may differ from the costs in the report",
+		"COST_SUMMARY_GO_TO_COST_ANALYSIS": "Go to Cost Analysis",
 		"COST_SUMMARY_GO_TO_REPORT": "Go to Cost Report",
 		"COST_SUMMARY_LAST_MONT_TOTAL_COST": "Last Month Total Cost",
 		"COST_SUMMARY_RECENT": "Recent Cost Report for {date}",
@@ -2403,8 +2413,8 @@
 		"INFO_INVITE_USER": "Invite User",
 		"INFO_USERS": "users",
 		"LEARN_MORE": "Learn more",
-		"NO_ACCOUNT": "No Service Accounts",
-		"NO_ACCOUNT_ADD_NEW": "Add Service Accounts",
+		"NO_ACCOUNT": "No Service Account",
+		"NO_ACCOUNT_ADD_NEW": "Add Service Account",
 		"NO_ACCOUNT_DESC": "No service account has been added in this workspace.",
 		"NO_COLLECTOR": "No collector has been set up yet",
 		"NO_COLLECTOR_CREATE_NEW": "Create New Collector",
@@ -3288,7 +3298,7 @@
 						"PREVIOUS": "Previous"
 					},
 					"HISTORY": "History",
-					"HISTORY_DETAIL": "History Detail",
+					"HISTORY_DETAIL": "History Details",
 					"LOG": "Log",
 					"LOG_TAB": {
 						"LAST_1_DAY": "Last 1 day",
@@ -4361,7 +4371,7 @@
 		"SERIAL_NUMBER": "Serial Number",
 		"SERVER_MODEL": "Server Model",
 		"SERVER_TYPE": "Server Type",
-		"SERVICE_ACCOUNT": "Service Accounts",
+		"SERVICE_ACCOUNT": "Service Account",
 		"SERVICE_ACCOUNT_TYPE": "Account Type",
 		"TAGS": "Tag",
 		"UPDATED_AT": "Updated",
@@ -4869,7 +4879,7 @@
 			"SEARCH_PROJECT_GROUP": "Project Group",
 			"SEARCH_RESULT_LABEL": "Search Result for",
 			"SERVER": "Server",
-			"SERVICE_ACCOUNTS": "Service Accounts",
+			"SERVICE_ACCOUNTS": "Service Account",
 			"SHOW_ALL": "Show all project",
 			"SHOW_ALL_TOOLTIP": "Show all projects of sub project groups",
 			"STORAGE": "Storage"

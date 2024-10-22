@@ -151,6 +151,11 @@ const fetchWidget = async (): Promise<WidgetLoadData|APIErrorToast|undefined> =>
 };
 
 /* Util */
+const loadMap = async () => {
+    const response = await axios.get('map/geo-data.json');
+    const geoJson = response.data;
+    registerMap('world', geoJson);
+};
 const drawChart = async (rawData: WidgetLoadData|null) => {
     if (!rawData) return;
     const _seriesData: any[] = [];
@@ -170,13 +175,11 @@ const drawChart = async (rawData: WidgetLoadData|null) => {
             },
         });
     });
-    const response = await axios.get('map/geo-data.json');
-    const geoJson = response.data;
-    registerMap('world', geoJson);
 
     state.chartData = _seriesData;
 };
 const loadWidget = async (): Promise<WidgetLoadData|APIErrorToast> => {
+    await loadMap();
     const res = await fetchWidget();
     if (!res) return state.data;
     if (typeof res === 'function') return res;

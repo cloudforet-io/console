@@ -70,9 +70,9 @@ watch(() => props.initialPermissions, (value) => {
 
 <template>
     <div class="role-update-page-policy">
-        <p-heading heading-type="sub"
+        <p-heading class="mt-8 mb-2"
+                   heading-type="sub"
                    :title="$t('IAM.ROLE.DETAIL.API_POLICY')"
-                   class="heading"
         />
         <p-radio-group>
             <p-radio v-for="(item, idx) in state.radioMenuList"
@@ -110,11 +110,6 @@ watch(() => props.initialPermissions, (value) => {
     @apply flex flex-col;
     margin: 0 1rem 2.5rem 1rem;
     gap: 0.5rem;
-    .heading {
-        margin-right: 0;
-        margin-bottom: 0.5rem;
-        margin-left: 0;
-    }
     .has-all-permissions {
         @apply flex items-center border border-gray-200 rounded-md;
         padding: 1rem;

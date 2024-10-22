@@ -48,7 +48,9 @@ const state = reactive({
 
 <template>
     <section class="user-account-page">
-        <p-heading :title="$t('MY_PAGE.ACCOUNT.ACCOUNT_N_PROFILE')" />
+        <p-heading class="mb-6"
+                   :title="$t('MY_PAGE.ACCOUNT.ACCOUNT_N_PROFILE')"
+        />
         <div class="contents-wrapper">
             <p-pane-layout class="role-card-content">
                 <div class="icon-wrapper">

@@ -14,11 +14,11 @@ import type { WidgetHeaderValue } from '@/common/modules/widgets/_widget-fields/
 import type { WidgetFieldComponentEmit, WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
 
 
+
 const emit = defineEmits<WidgetFieldComponentEmit<WidgetHeaderValue|undefined>>();
 const props = defineProps<WidgetFieldComponentProps<undefined, WidgetHeaderValue>>();
 const state = reactive({
     proxyValue: useProxyValue('value', props, emit),
-    isHeaderCollapsed: false,
     isWidgetTitleValid: computed<boolean>(() => {
         if (!state.proxyValue?.toggleValue) return true;
         return !!state.proxyValue?.title?.trim();
@@ -32,10 +32,6 @@ const state = reactive({
 });
 
 /* Event */
-const handleClickCollapsibleTitle = () => {
-    if (!state.proxyValue?.toggleValue) return;
-    state.isHeaderCollapsed = !state.isHeaderCollapsed;
-};
 const handleToggleWidgetHeader = () => {
     const _toggleValue = !state.proxyValue?.toggleValue;
     emit('update:value', {
@@ -43,12 +39,11 @@ const handleToggleWidgetHeader = () => {
         title: _toggleValue ? props.widgetConfig?.meta?.title : undefined,
         description: undefined,
     });
-    state.isHeaderCollapsed = !_toggleValue;
 };
 const handleUpdateValue = (key: string, value: string) => {
     state.proxyValue = {
         ...state.proxyValue,
-        [key]: value.trim(),
+        [key]: value?.trim() || '',
     };
     emit('update:value', state.proxyValue);
 };
@@ -60,21 +55,14 @@ watch(() => state.isWidgetTitleValid, (isValid) => {
 
 onMounted(() => {
     emit('update:is-valid', true);
-    if (!state.proxyValue) {
-        state.proxyValue = {
-            toggleValue: true,
-            title: props.widgetConfig?.meta?.title,
-        };
-    }
 });
 </script>
 <template>
     <div class="form-group-wrapper"
-         :class="{ 'collapsed': state.isHeaderCollapsed }"
+         :class="{ 'collapsed': !state.proxyValue?.toggleValue }"
     >
         <div class="title-wrapper flex justify-between align-middle"
-             :class="{ 'disabled': !props.value?.toggleValue }"
-             @click="handleClickCollapsibleTitle"
+             :class="{ 'disabled': !state.proxyValue?.toggleValue }"
         >
             <div class="left-part">
                 <p-i name="ic_chevron-down"
@@ -91,7 +79,7 @@ onMounted(() => {
                 />
             </div>
         </div>
-        <div class="form-wrapper widget-header-field">
+        <div class="form-wrapper">
             <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.TITLE')"
                            :invalid-text="state.titleInvalidText"
                            :invalid="!state.isWidgetTitleValid"

@@ -340,6 +340,31 @@ export const Placeholder: Story = {
     })],
 };
 
+export const Block: Story = {
+    render: () => ({
+        props: Object.keys(getSelectDropdownArgTypes()),
+        components: { PSelectDropdown },
+        template: `
+            <div>
+                <p class="text-label-lg font-bold my-3">Default width</p>
+                <p-select-dropdown :menu="menuItems" />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Block width</p>
+                <p-select-dropdown :menu="menuItems" block />
+                <br/>
+            </div>
+        `,
+        setup() {
+            return {
+                menuItems,
+            };
+        },
+    }),
+    decorators: [() => ({
+        template: '<story style="height: 400px" />',
+    })],
+};
+
 export const MenuWidth: Story = {
     render: () => ({
         components: { PSelectDropdown },
