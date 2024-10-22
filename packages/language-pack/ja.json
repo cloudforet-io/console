@@ -1876,6 +1876,7 @@
 			"WORKSPACE": "ワークスペース"
 		},
 		"CREATE": {
+			"ADMIN_DASHBOARD": "",
 			"ALT_E_CREATE_DASHBOARD": "{count}個のダッシュボード作成失敗。",
 			"ALT_S_CREATE_DASHBOARD": "ダッシュボードの作成に成功しました。",
 			"BLANK": "空のダッシュボード",
@@ -1886,6 +1887,10 @@
 			"CREATE_NEW_DASHBOARD": "新規ダッシュボード作成",
 			"CURRENT_WORKSPACE": "現在のワークスペース",
 			"DASHBOARD_SCOPE": "ダッシュボードの範囲",
+			"DASHBOARD_TEMPLATE": "",
+			"DASHBOARD_TEMPLATE_DESC": "",
+			"DASHBOARD_TYPE": "",
+			"DASHBOARD_TYPE_DESC": "",
 			"EXISTING_DASHBOARDS": "既存のダッシュボードから選択",
 			"GO_BACK": "戻る",
 			"LABEL": "ラベル",
@@ -1925,7 +1930,8 @@
 			"VALIDATION_TEMPLATE": "テンプレートを選択してください",
 			"VIEW": "ビュー",
 			"VIEW_THIS_DASHBOARD": "このダッシュボードを表示",
-			"WORKSPACE": "ワークスペース"
+			"WORKSPACE": "ワークスペース",
+			"WORKSPACE_DASHBOARD": "ワークスペースダッシュボード"
 		},
 		"CUSTOMIZE": {
 			"ADD_LABEL": "[+] ボタンをクリックして、ラベルを追加してください",

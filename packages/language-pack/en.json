@@ -1876,6 +1876,7 @@
 			"WORKSPACE": "Workspace"
 		},
 		"CREATE": {
+			"ADMIN_DASHBOARD": "Admin Dashboard",
 			"ALT_E_CREATE_DASHBOARD": "Failed to create {count} dashboard",
 			"ALT_S_CREATE_DASHBOARD": "Dashboards successfully created",
 			"BLANK": "Blank",
@@ -1886,6 +1887,10 @@
 			"CREATE_NEW_DASHBOARD": "Create New Dashboard",
 			"CURRENT_WORKSPACE": "Current Workspace",
 			"DASHBOARD_SCOPE": "Dashboard Scope",
+			"DASHBOARD_TEMPLATE": "Dashboard Template",
+			"DASHBOARD_TEMPLATE_DESC": "Get started quickly with Templates or existing dashboards.",
+			"DASHBOARD_TYPE": "Dashboard Type",
+			"DASHBOARD_TYPE_DESC": "Admin and workspace dashboards differ in terms of accessible data sources and the content they target.",
 			"EXISTING_DASHBOARDS": "Existing Dashboards",
 			"GO_BACK": "Go back",
 			"LABEL": "Label",
@@ -1925,7 +1930,8 @@
 			"VALIDATION_TEMPLATE": "Please Select Template.",
 			"VIEW": "View",
 			"VIEW_THIS_DASHBOARD": "View this dashboard",
-			"WORKSPACE": "Workspace"
+			"WORKSPACE": "Workspace",
+			"WORKSPACE_DASHBOARD": "Workspace Dashboard"
 		},
 		"CUSTOMIZE": {
 			"ADD_LABEL": "Click + button to add dashboard's label.",
