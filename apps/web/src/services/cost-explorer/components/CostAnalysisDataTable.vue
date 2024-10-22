@@ -50,7 +50,7 @@ import {
 } from '@/services/cost-explorer/helpers/cost-analysis-data-table-helper';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
 import type {
-    Granularity, Period,
+    Granularity, Period, DisplayDataType,
 } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
 
@@ -304,12 +304,15 @@ const getRefinedChartTableData = (results: CostAnalyzeRawData[] = [], granularit
     });
     return refinedTableData;
 };
-const getTableValue = (value?: number, usageUnit?: string): string|undefined => {
+const getTableValue = (displayDataType: DisplayDataType, showFormattedData: boolean, value?: number, usageUnit?: string): string|undefined => {
     if (value === undefined) return value;
-    if (costAnalysisPageState.displayDataType === 'usage') {
-        return usageUnitFormatter(value, { unit: usageUnit }, tableState.showFormattedData);
+    if (displayDataType === 'usage') {
+        return usageUnitFormatter(value, { unit: usageUnit }, showFormattedData);
     }
-    return numberFormatter(value, { notation: 'compact' });
+    if (showFormattedData) {
+        return numberFormatter(value, { notation: 'compact' });
+    }
+    return numberFormatter(value, { minimumFractionDigits: 2 });
 };
 
 
@@ -488,7 +491,7 @@ watch(
                     >
                         <span class="usage-wrapper">
                             <span :class="isIncreasedByHalfOrMore(item, field.name) ? 'cell-text raised' : undefined">
-                                {{ getTableValue(value, item.usage_unit) }}
+                                {{ getTableValue(costAnalysisPageState.displayDataType, tableState.showFormattedData, value, item.usage_unit) }}
                             </span>
                             <p-i v-if="isIncreasedByHalfOrMore(item, field.name)"
                                  name="ic_arrow-up-bold-alt"
