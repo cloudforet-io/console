@@ -42,7 +42,13 @@
 			"EXTENSION_REASON_2": "스팸 메일을 확인해주세요. ",
 			"EXTENSION_REASON_3": "을 클릭하여, 이메일을 재전송을 시도하세요. ",
 			"EXTENSION_TITLE_1": "이메일을 받지 못하셨나요?",
-			"EXTENSION_TITLE_2": "아직도 이메일을 받지 못하셨나요? "
+			"EXTENSION_TITLE_2": "아직도 이메일을 받지 못하셨나요? ",
+			"GOOGLE_GUIDE": "",
+			"OTP_EXTENSION_DESC_1": "",
+			"OTP_EXTENSION_REASON_1": "",
+			"OTP_EXTENSION_REASON_2": "",
+			"OTP_EXTENSION_TITLE_1": "",
+			"OTP_EXTENSION_TITLE_2": ""
 		},
 		"MFA": {
 			"AUTHENTICATION_CODE": "인증 코드",
@@ -51,6 +57,7 @@
 			"EMAIL_INFO": "",
 			"ENTER_CODE": "코드 입력",
 			"GO_BACK": "로그인 하러 가기",
+			"OTP_INFO": "",
 			"PROBLEM_TITLE": "",
 			"SUB_TITLE": "멀티 팩터 인증을 사용하여 계정 확인이 필요합니다.",
 			"TITLE": "멀티 팩터\n인증"
