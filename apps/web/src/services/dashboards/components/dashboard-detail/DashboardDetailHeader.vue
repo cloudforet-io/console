@@ -4,6 +4,7 @@ import { computed, reactive } from 'vue';
 import {
     PHeading, PSkeleton, PSelectDropdown, PI, PBadge, PHeadingLayout,
 } from '@cloudforet/mirinae';
+import type { BadgeStyleType, BadgeType } from '@cloudforet/mirinae/src/data-display/badge/type';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import type { DashboardScope } from '@/schema/dashboard/_types/dashboard-type';
@@ -49,11 +50,15 @@ const state = reactive({
     selectedSharedScope: 'WORKSPACE' as DashboardScope,
     showBadge: computed<boolean>(() => {
         if (dashboardDetailGetters.dashboardInfo?.user_id) return true;
+        // TODO: is admin type dashboard, return true
         return state.isSharedDashboard;
     }),
-    badgeStyleType: computed<string>(() => {
+    // TODO: is admin type dashboard, return 'solid-outline'
+    badgeType: computed<BadgeType>(() => 'subtle'),
+    badgeStyleType: computed<BadgeStyleType>(() => {
         if (dashboardDetailGetters.isPrivate) return 'gray150';
         if (state.sharedScope === 'PROJECT') return 'primary3';
+        // TODO: is admin type dashboard, return 'indigo500'
         return 'indigo100';
     }),
     badgeText: computed(() => {
@@ -109,7 +114,7 @@ const handleSelectItem = (item: MenuItem) => {
                     />
                     <template #title-right-extra>
                         <p-badge v-if="state.showBadge"
-                                 badge-type="subtle"
+                                 :badge-type="state.badgeType"
                                  :style-type="state.badgeStyleType"
                                  class="mr-2"
                         >
