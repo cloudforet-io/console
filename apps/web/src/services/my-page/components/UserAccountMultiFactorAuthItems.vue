@@ -27,10 +27,10 @@ const state = reactive({
 });
 
 const handleChangeToggle = async (type: string, value: boolean) => {
+    state.enableMfa[type] = value;
     multiFactorAuthStore.setSelectedType(type);
     multiFactorAuthStore.setModalType(value ? 'FORM' : 'DISABLED');
     multiFactorAuthStore.setModalVisible(true);
-    state.enableMfa[type] = value;
     if (!value && type === MULTI_FACTOR_AUTH_TYPE.OTP) {
         await postUserProfileDisableMfa();
     }
@@ -44,16 +44,16 @@ const handleClickReSyncButton = async (type: string) => {
     }
 };
 
-watch(() => storeState.mfa.mfa_type, (mfa_type) => {
-    if (mfa_type) {
-        state.enableMfa[mfa_type] = storeState.mfa.state === 'ENABLED';
-    } else {
-        const result: Record<string, boolean> = {};
-        Object.values(MULTI_FACTOR_AUTH_TYPE).forEach((value) => {
+watch(() => storeState.mfa, (mfa) => {
+    const result: Record<string, boolean> = {};
+    Object.values(MULTI_FACTOR_AUTH_TYPE).forEach((value) => {
+        if (mfa.mfa_type === value) {
+            result[value] = mfa.state === 'ENABLED';
+        } else {
             result[value] = false;
-        });
-        state.enableMfa = result;
-    }
+        }
+    });
+    state.enableMfa = result;
 }, { immediate: true });
 watch(() => multiFactorAuthState.modalVisible, (modalVisible) => {
     if (!modalVisible) {
@@ -79,7 +79,7 @@ watch(() => multiFactorAuthState.modalVisible, (modalVisible) => {
                 <div class="toggle-wrapper">
                     <p-toggle-button :value="state.enableMfa[item.type]"
                                      :disabled="state.isVerified && item.type !== state.type"
-                                     @change-toggle="handleChangeToggle(item.type, $event)"
+                                     @update:value="handleChangeToggle(item.type, $event)"
                     />
                     <p class="title">
                         {{ item.title }}
