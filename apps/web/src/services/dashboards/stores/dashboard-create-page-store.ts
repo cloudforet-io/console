@@ -5,7 +5,7 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { DashboardType } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardType, AdminDashboardType } from '@/schema/dashboard/_types/dashboard-type';
 import type { DashboardTemplateListParameters } from '@/schema/repository/dashboard-template/api-verbs/list';
 import type { DashboardTemplateModel } from '@/schema/repository/dashboard-template/model';
 
@@ -25,6 +25,8 @@ export const useDashboardCreatePageStore = defineStore('page-dashboard-create', 
         // bundle case
         selectedOotbIdMap: {} as Record<string, boolean>,
         selectedExistingDashboardIdMap: {} as Record<string, boolean>,
+        // only for admin
+        adminDashboardType: 'WORKSPACE' as AdminDashboardType,
     });
     const getters = reactive({
         dashboardType: computed<DashboardType>(() => (state.dashboardScope === 'PRIVATE' ? 'PRIVATE' : 'PUBLIC')),
@@ -44,6 +46,7 @@ export const useDashboardCreatePageStore = defineStore('page-dashboard-create', 
     // const setTemplateName = (name: string) => { state.templateName = name; };
     const setDashboardScope = (dashboardScope: 'WORKSPACE'|'PRIVATE') => { state.dashboardScope = dashboardScope; };
     const setDashboardCreated = (created: boolean) => { state.dashboardCreated = created; };
+    const setAdminDashboardType = (type: AdminDashboardType) => { state.adminDashboardType = type; };
     const mutations = {
         setLoading,
         setCurrentStep,
@@ -52,17 +55,19 @@ export const useDashboardCreatePageStore = defineStore('page-dashboard-create', 
         setSelectedExistingDashboardIdMap,
         setDashboardScope,
         setDashboardCreated,
+        setAdminDashboardType,
     };
 
     /* Actions */
     const reset = () => {
-        setLoading(false);
-        setCurrentStep(1);
-        setCreateType('SINGLE');
-        setDashboardScope('WORKSPACE');
-        setSelectedOotbIdMap({});
-        setSelectedExistingDashboardIdMap({});
-        setDashboardCreated(false);
+        state.loading = false;
+        state.currentStep = 1;
+        state.createType = 'SINGLE';
+        state.dashboardScope = 'WORKSPACE';
+        state.selectedOotbIdMap = {};
+        state.selectedExistingDashboardIdMap = {};
+        state.dashboardCreated = false;
+        state.adminDashboardType = 'WORKSPACE';
     };
     const listDashboardTemplates = async () => {
         try {
