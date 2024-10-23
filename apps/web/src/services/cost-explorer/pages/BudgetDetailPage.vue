@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 import type { Location } from 'vue-router';
 
-import { PLink } from '@cloudforet/mirinae';
+import { PLink, PScopedNotification } from '@cloudforet/mirinae';
 import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 
 import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
@@ -11,7 +11,6 @@ import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
-import ScopedNotification from '@/common/components/scoped-notification/ScopedNotification.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import BudgetDetailHeading from '@/services/cost-explorer/components/BudgetDetailHeading.vue';
@@ -64,11 +63,10 @@ const state = reactive({
 <template>
     <div>
         <portal to="page-top-notification">
-            <scoped-notification v-if="state.isWorkspaceTarget"
-                                 :title="i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.PAGE_NOTIFICATION')"
-                                 title-icon="ic_info-circle"
-                                 type="info"
-                                 hide-header-close-button
+            <p-scoped-notification v-if="state.isWorkspaceTarget"
+                                   type="information"
+                                   :title="i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.PAGE_NOTIFICATION')"
+                                   icon="ic_info-circle"
             >
                 <template v-if="store.getters['user/isDomainAdmin']"
                           #right
@@ -82,7 +80,7 @@ const state = reactive({
                         {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.VIEW_IN_ADMIN_MODE') }}
                     </p-link>
                 </template>
-            </scoped-notification>
+            </p-scoped-notification>
         </portal>
         <budget-detail-heading :loading="state.loading" />
         <section class="content">

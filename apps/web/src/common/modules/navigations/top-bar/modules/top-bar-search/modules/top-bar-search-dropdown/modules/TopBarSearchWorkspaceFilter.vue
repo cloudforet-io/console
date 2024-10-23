@@ -8,7 +8,7 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PCheckboxGroup, PCheckbox, PTooltip, PToggleButton, PTextButton, PContextMenu, PIconButton,
+    PCheckboxGroup, PCheckbox, PTooltip, PToggleButton, PTextButton, PContextMenu, PIconButton, PScopedNotification,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
 
@@ -18,7 +18,6 @@ import type { ResourceModel } from '@/schema/search/resource/model';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
-import ScopedNotification from '@/common/components/scoped-notification/ScopedNotification.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 import {
@@ -218,19 +217,14 @@ watch(() => state.searchText, (val) => {
                     </span>
                 </template>
             </p-context-menu>
-            <div v-if="storeState.selectedWorkspaces.length >= STAGED_WORKSPACE_LIMIT"
-                 class="limit-description-card"
+            <p-scoped-notification v-if="storeState.selectedWorkspaces.length >= STAGED_WORKSPACE_LIMIT"
+                                   type="warning"
+                                   :title="$t('COMMON.NAVIGATIONS.TOP_BAR.WORKSPACE_FILTER_WARNING_TITLE')"
+                                   icon="ic_warning-filled"
+                                   layout="in-section"
             >
-                <scoped-notification type="warning"
-                                     :title="$t('COMMON.NAVIGATIONS.TOP_BAR.WORKSPACE_FILTER_WARNING_TITLE')"
-                                     title-icon="ic_warning-filled"
-                                     :visible="true"
-                                     layout="in-section"
-                                     hide-header-close-button
-                >
-                    <span class="text">{{ $t('COMMON.NAVIGATIONS.TOP_BAR.WORKSPACE_FILTER_WARNING_DESC') }}</span>
-                </scoped-notification>
-            </div>
+                {{ $t('COMMON.NAVIGATIONS.TOP_BAR.WORKSPACE_FILTER_WARNING_DESC') }}
+            </p-scoped-notification>
         </div>
     </div>
 </template>
@@ -307,14 +301,6 @@ watch(() => state.searchText, (val) => {
                     @apply truncate;
                     width: 10.5rem;
                 }
-            }
-        }
-
-        .limit-description-card {
-            width: 100%;
-
-            .text {
-                @apply text-paragraph-md;
             }
         }
     }

@@ -4,7 +4,7 @@ import { computed, reactive, watch } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButtonModal, PFieldGroup, PSelectDropdown, PIconButton, PAvatar, PTextInput,
+    PButtonModal, PFieldGroup, PSelectDropdown, PIconButton, PAvatar, PTextInput, PScopedNotification,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
@@ -20,7 +20,6 @@ import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-import ScopedNotification from '@/common/components/scoped-notification/ScopedNotification.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useSelectDropDownList } from '@/services/advanced/composables/use-select-drop-down-list';
@@ -167,15 +166,12 @@ watch(() => workspaceGroupPageState.modal.visible, async (visible) => {
     >
         <template #body>
             <div class="form-wrapper">
-                <scoped-notification type="info"
-                                     title-icon="ic_info-circle"
-                                     hide-header-close-button
-                                     no-title
-                                     title="Title"
-                                     layout="in-section"
+                <p-scoped-notification type="information"
+                                       icon="ic_info-circle"
+                                       layout="in-section"
                 >
                     {{ $t('IAM.WORKSPACE_GROUP.MODAL.ADD_USERS_DESCRIPTION') }}
-                </scoped-notification>
+                </p-scoped-notification>
                 <p-field-group required
                                :label="$t('IAM.WORKSPACE_GROUP.MODAL.USER_SELECT_DROP_DOWN_TITLE')"
                                class="mt-4"

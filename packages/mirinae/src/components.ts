@@ -43,6 +43,7 @@ export { default as PIconModal } from './feedbacks/modals/icon-modal/PIconModal.
 export { default as PDoubleCheckModal } from './feedbacks/modals/advanced/double-check-modal/PDoubleCheckModal.vue';
 export { default as PTableCheckModal } from './feedbacks/modals/advanced/table-check-modal/PTableCheckModal.vue';
 export { default as PNotificationBar } from './feedbacks/notification-bar/PNotificationBar.vue';
+export { default as PScopedNotification } from './feedbacks/scoped-notification/PScopedNotification.vue';
 
 
 /* Foundation */

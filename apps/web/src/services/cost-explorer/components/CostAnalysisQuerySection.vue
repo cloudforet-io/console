@@ -12,7 +12,7 @@ import { clone } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PContextMenu, PIconButton, PPopover, PBadge, PSelectDropdown, PFieldTitle,
-    useContextMenuController, PCheckbox, PButtonModal,
+    useContextMenuController, PCheckbox, PButtonModal, PScopedNotification,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
@@ -28,7 +28,6 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
-import ScopedNotification from '@/common/components/scoped-notification/ScopedNotification.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
@@ -347,16 +346,12 @@ onMounted(async () => {
             @confirm="handleConfirmIsAllWorkspaceSelected"
         >
             <template #body>
-                <div>
-                    <scoped-notification type="warning"
-                                         title-icon="ic_warning-filled"
-                                         no-title
-                                         layout="in-section"
-                                         hide-header-close-button
-                    >
-                        {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALL_WORKSPACE_SELECTED_WARNING') }}
-                    </scoped-notification>
-                </div>
+                <p-scoped-notification type="warning"
+                                       icon="ic_warning-filled"
+                                       layout="in-section"
+                >
+                    {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALL_WORKSPACE_SELECTED_WARNING') }}
+                </p-scoped-notification>
             </template>
         </p-button-modal>
     </div>
