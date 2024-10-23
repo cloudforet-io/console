@@ -32,7 +32,7 @@ import { clone } from 'lodash';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PHeading, PSkeleton, PButton, PIconButton, PDoubleCheckModal, PLink, PHeadingLayout,
+    PHeading, PSkeleton, PButton, PIconButton, PDoubleCheckModal, PLink, PHeadingLayout, PScopedNotification,
 } from '@cloudforet/mirinae';
 
 import { SpaceRouter } from '@/router';
@@ -49,7 +49,6 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
-import ScopedNotification from '@/common/components/scoped-notification/ScopedNotification.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGoBack } from '@/common/composables/go-back';
 
@@ -255,11 +254,10 @@ onUnmounted(() => {
 <template>
     <div class="collector-detail-page">
         <portal to="page-top-notification">
-            <scoped-notification v-if="state.isNotiVisible"
-                                 :title="i18n.t('INVENTORY.COLLECTOR.DETAIL.PAGE_NOTIFICATION')"
-                                 title-icon="ic_info-circle"
-                                 type="info"
-                                 hide-header-close-button
+            <p-scoped-notification v-if="state.isNotiVisible"
+                                   type="information"
+                                   :title="$t('INVENTORY.COLLECTOR.DETAIL.PAGE_NOTIFICATION')"
+                                   icon="ic_info-circle"
             >
                 <template #right>
                     <p-link v-if="state.isDomainAdmin"
@@ -271,7 +269,7 @@ onUnmounted(() => {
                             new-tab
                     />
                 </template>
-            </scoped-notification>
+            </p-scoped-notification>
         </portal>
         <p-heading-layout class="mb-6">
             <template #heading>
