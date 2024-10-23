@@ -5,6 +5,7 @@ import {
     PButtonModal, PFieldGroup, PTextInput, PRadioGroup, PRadio,
 } from '@cloudforet/mirinae';
 
+import type { DashboardGlobalVariableModel } from '@/schema/dashboard/_types/dashboard-global-variable-type';
 import { i18n } from '@/translations';
 
 import { useFormValidator } from '@/common/composables/form-validator';
@@ -14,7 +15,6 @@ import DashboardVariablesFormDynamic
     from '@/services/dashboards/components/dashboard-detail/DashboardVariablesFormDynamic.vue';
 import DashboardVariablesFormManual
     from '@/services/dashboards/components/dashboard-detail/DashboardVariablesFormManual.vue';
-import type { DashboardGlobalVariableModel } from '@/services/dashboards/types/global-variable-type';
 
 
 
