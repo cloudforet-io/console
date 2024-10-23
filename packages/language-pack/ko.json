@@ -1876,6 +1876,7 @@
 			"WORKSPACE": "워크스페이스"
 		},
 		"CREATE": {
+			"ADMIN_DASHBOARD": "",
 			"ALT_E_CREATE_DASHBOARD": "{count}개 대시보드 생성 실패 ",
 			"ALT_S_CREATE_DASHBOARD": "대시보드 생성 완료",
 			"BLANK": "빈 대시보드",
@@ -1886,6 +1887,10 @@
 			"CREATE_NEW_DASHBOARD": "대시보드 생성",
 			"CURRENT_WORKSPACE": "현재 워크스페이스",
 			"DASHBOARD_SCOPE": "대시보드 범위",
+			"DASHBOARD_TEMPLATE": "",
+			"DASHBOARD_TEMPLATE_DESC": "",
+			"DASHBOARD_TYPE": "",
+			"DASHBOARD_TYPE_DESC": "",
 			"EXISTING_DASHBOARDS": "저장된 대시보드 중 선택",
 			"GO_BACK": "뒤로가기",
 			"LABEL": "레이블",
@@ -1925,7 +1930,8 @@
 			"VALIDATION_TEMPLATE": "템플릿을 선택하세요.",
 			"VIEW": "보기",
 			"VIEW_THIS_DASHBOARD": "선택한 대시보드 보기",
-			"WORKSPACE": "워크스페이스"
+			"WORKSPACE": "워크스페이스",
+			"WORKSPACE_DASHBOARD": "워크스페이스 대시보드"
 		},
 		"CUSTOMIZE": {
 			"ADD_LABEL": "+ 버튼을 클릭하여 레이블을 추가할 수 있습니다.",
@@ -2017,6 +2023,7 @@
 			"1": "코드로 공유",
 			"ADD_WIDGET": "위젯 추가",
 			"ALL_PROJECTS": "모든 프로젝트",
+			"ALL_WORKSPACE": "전체 워크스페이스",
 			"ALL_WORKSPACES": "전체 워크스페이스",
 			"ALT_E_MOVE_DASHBOARD": "대시보드 이동 실패",
 			"ALT_S_MOVE_DASHBOARD": "대시보드 이동 완료",
@@ -2048,6 +2055,7 @@
 			"PDF_EXPORT": {
 				"APPLIED_FILTERS": "적용된 필터"
 			},
+			"PERFORMANCE_DELAY_WARNING": "",
 			"PERIOD": "기간",
 			"PERIOD_CUSTOM": "기간 선택",
 			"PERIOD_LAST_14_DAYS": "최근 2주일",
@@ -2056,7 +2064,9 @@
 			"PERIOD_LAST_7_DAYS": "최근 1주일",
 			"PERIOD_LAST_MONTH": "지난달",
 			"PERIOD_THIS_MONTH": "이번 달",
+			"POSSIBLE_PERFORMANCE_DELAY": "",
 			"REFRESH": "자동 새로고침",
+			"SCOPE": "범위",
 			"SELECT_MONTH": "월 선택",
 			"SET_HOME": "홈 대시보드로 설정",
 			"SHARE": "공유",

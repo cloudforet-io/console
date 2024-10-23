@@ -89,6 +89,8 @@ export interface DateRange {
     end?: string;
 }
 
+export type AdminDashboardType = 'WORKSPACE'|'ADMIN';
+
 // dashboard template types
 export interface DashboardTemplate {
     name: string;

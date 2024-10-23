@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router/composables';
 import { flatMapDeep, uniq } from 'lodash';
 
 import {
-    PEmpty, PSearch, PFieldTitle, PButton,
+    PEmpty, PSearch, PFieldTitle, PButton, PDivider, PSelectCard,
 } from '@cloudforet/mirinae';
 import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
 import type { BoardSet } from '@cloudforet/mirinae/types/data-display/board/type';
@@ -36,6 +36,7 @@ import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboar
 const emit = defineEmits<{(e: 'click-next'): void }>();
 const router = useRouter();
 const { getProperRouteLocation } = useProperRouteLocation();
+
 const appContextStore = useAppContextStore();
 const dashboardCreatePageStore = useDashboardCreatePageStore();
 const dashboardCreatePageState = dashboardCreatePageStore.state;
@@ -132,6 +133,33 @@ onMounted(() => {
 
 <template>
     <div class="dashboard-create-step-1">
+        <div v-if="storeState.isAdminMode"
+             class="dashboard-type-wrapper"
+        >
+            <p-field-title size="lg"
+                           :label="$t('DASHBOARDS.CREATE.DASHBOARD_TYPE')"
+                           :description="$t('DASHBOARDS.CREATE.DASHBOARD_TYPE_DESC')"
+            />
+            <div class="dashboard-type-select-card-wrapper">
+                <p-select-card class="col-span-6"
+                               :label="i18n.t('DASHBOARDS.CREATE.WORKSPACE_DASHBOARD')"
+                               icon="ic_service_workspaces"
+                               :selected="dashboardCreatePageState.adminDashboardType === 'WORKSPACE'"
+                               @click="dashboardCreatePageStore.setAdminDashboardType('WORKSPACE')"
+                />
+                <p-select-card class="col-span-6"
+                               :label="i18n.t('DASHBOARDS.CREATE.ADMIN_DASHBOARD')"
+                               icon="ic_admin-icon"
+                               :selected="dashboardCreatePageState.adminDashboardType === 'ADMIN'"
+                               @click="dashboardCreatePageStore.setAdminDashboardType('ADMIN')"
+                />
+            </div>
+            <p-divider class="divider" />
+            <p-field-title size="lg"
+                           :label="$t('DASHBOARDS.CREATE.DASHBOARD_TEMPLATE')"
+                           :description="$t('DASHBOARDS.CREATE.DASHBOARD_TEMPLATE_DESC')"
+            />
+        </div>
         <div class="contents-container">
             <dashboard-create-step1-search-filter :labels="state.allExistingLabels"
                                                   @select-label="handleSelectLabels"
@@ -190,6 +218,16 @@ onMounted(() => {
     @apply flex flex-col h-full;
     width: 100%;
     overflow: visible;
+    .dashboard-type-wrapper {
+        .dashboard-type-select-card-wrapper {
+            @apply grid grid-cols-12;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+        .divider {
+            margin: 2rem 0;
+        }
+    }
     .contents-container {
         @apply flex gap-4;
         margin-top: 1.5rem;
