@@ -167,6 +167,7 @@ watch(() => multiFactorAuthState.modalType, () => {
                 </div>
                 <user-account-multi-factor-auth-modal-folding v-if="storeState.selectedType === MULTI_FACTOR_AUTH_TYPE.EMAIL"
                                                               :is-disabled-modal="storeState.isDisabledModal"
+                                                              :is-re-sync-modal="storeState.isReSyncModal"
                                                               :is-sent-code.sync="state.isSentCode"
                 />
             </div>
