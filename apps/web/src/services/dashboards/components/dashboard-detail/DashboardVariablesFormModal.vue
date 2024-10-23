@@ -5,7 +5,7 @@ import {
     PButtonModal, PFieldGroup, PTextInput, PRadioGroup, PRadio,
 } from '@cloudforet/mirinae';
 
-import type { DashboardGlobalVariableModel } from '@/schema/dashboard/_types/dashboard-global-variable-type';
+import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
 import { i18n } from '@/translations';
 
 import { useFormValidator } from '@/common/composables/form-validator';
@@ -51,9 +51,9 @@ const state = reactive({
     isManualFormValid: false,
     isDynamicFormValid: false,
     //
-    manualGlobalVariable: {} as Partial<DashboardGlobalVariableModel>,
-    dynamicGlobalVariable: {} as Partial<DashboardGlobalVariableModel>,
-    dashboardGlobalVariable: computed<DashboardGlobalVariableModel>(() => {
+    manualGlobalVariable: {} as Partial<DashboardGlobalVariable>,
+    dynamicGlobalVariable: {} as Partial<DashboardGlobalVariable>,
+    dashboardGlobalVariable: computed<DashboardGlobalVariable>(() => {
         if (state.selectedMethod === METHOD_TYPE.MANUAL_ENTRY) {
             return {
                 management: 'custom',

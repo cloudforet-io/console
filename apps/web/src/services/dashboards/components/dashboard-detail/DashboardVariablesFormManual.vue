@@ -6,7 +6,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
-import type { DashboardGlobalVariableModel } from '@/schema/dashboard/_types/dashboard-global-variable-type';
+import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -35,18 +35,18 @@ interface EnumValue {
 }
 interface Props {
     isValid: boolean;
-    data: Partial<DashboardGlobalVariableModel>;
+    data: Partial<DashboardGlobalVariable>;
 }
 const props = withDefaults(defineProps<Props>(), {
     isValid: false,
 });
 const emit = defineEmits<{(e: 'update:is-valid', isValid: boolean): void;
-    (e: 'update:data', data: Partial<DashboardGlobalVariableModel>): void;
+    (e: 'update:data', data: Partial<DashboardGlobalVariable>): void;
 }>();
 
 const state = reactive({
     proxyIsValid: useProxyValue<boolean>('isValid', props, emit),
-    proxyData: useProxyValue<Partial<DashboardGlobalVariableModel>>('data', props, emit),
+    proxyData: useProxyValue<Partial<DashboardGlobalVariable>>('data', props, emit),
     isAllValid: computed<boolean>(() => {
         if (state.selectedValuesType === VALUES_TYPE.ANY_VALUE) {
             if (state.selectedType === 'text') return true;
@@ -55,7 +55,7 @@ const state = reactive({
         }
         return state.enumValues.every((d) => !!d.key && !!d.label);
     }),
-    manualGlobalVariableData: computed<Partial<DashboardGlobalVariableModel>>(() => {
+    manualGlobalVariableData: computed<Partial<DashboardGlobalVariable>>(() => {
         if (state.selectedValuesType === VALUES_TYPE.ANY_VALUE) {
             if (state.selectedType === 'text') {
                 return {

@@ -8,7 +8,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
-import type { DashboardGlobalVariableModel, ReferenceVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
+import type { DashboardGlobalVariable, ReferenceVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -35,13 +35,13 @@ import {
 
 interface Props {
     isValid: boolean;
-    data: Partial<DashboardGlobalVariableModel>;
+    data: Partial<DashboardGlobalVariable>;
 }
 const props = withDefaults(defineProps<Props>(), {
     isValid: false,
 });
 const emit = defineEmits<{(e: 'update:is-valid', isValid: boolean): void;
-    (e: 'update:data', data: Partial<DashboardGlobalVariableModel>): void;
+    (e: 'update:data', data: Partial<DashboardGlobalVariable>): void;
 }>();
 
 const appContextStore = useAppContextStore();
@@ -55,13 +55,13 @@ const storeState = reactive({
 });
 const state = reactive({
     proxyIsValid: useProxyValue<boolean>('isValid', props, emit),
-    proxyData: useProxyValue<Partial<DashboardGlobalVariableModel>>('data', props, emit),
+    proxyData: useProxyValue<Partial<DashboardGlobalVariable>>('data', props, emit),
     isAllValid: computed<boolean>(() => {
         if (state.needToSelectValuesFrom) return !!state.selectedValuesFrom;
         return true;
     }),
     needToSelectValuesFrom: computed<boolean>(() => state.selectedSourceFrom === 'asset' || state.selectedSourceFrom === 'cost'),
-    dynamicGlobalVariableData: computed<Partial<DashboardGlobalVariableModel>>(() => {
+    dynamicGlobalVariableData: computed<Partial<DashboardGlobalVariable>>(() => {
         if (state.needToSelectValuesFrom) {
             const _resourceType = state.selectedSourceFrom === 'asset' ? MetricDataVariableModel.meta.resourceType : CostVariableModel.meta.resourceType;
             return {

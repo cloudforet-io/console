@@ -64,7 +64,7 @@ interface NumberEnumVariable extends DashboardGlobalVariableBase {
 }
 
 // Model
-export type DashboardGlobalVariableModel =
+export type DashboardGlobalVariable =
     | ReferenceVariable
     | TextAnyVariable
     | NumberAnyVariable
