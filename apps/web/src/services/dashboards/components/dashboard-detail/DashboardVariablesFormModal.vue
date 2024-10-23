@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
 
+import { cloneDeep, isEmpty } from 'lodash';
+
 import {
     PButtonModal, PFieldGroup, PTextInput, PRadioGroup, PRadio,
 } from '@cloudforet/mirinae';
@@ -8,6 +10,9 @@ import {
 import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
 import { i18n } from '@/translations';
 
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -15,6 +20,7 @@ import DashboardVariablesFormDynamic
     from '@/services/dashboards/components/dashboard-detail/DashboardVariablesFormDynamic.vue';
 import DashboardVariablesFormManual
     from '@/services/dashboards/components/dashboard-detail/DashboardVariablesFormManual.vue';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
 
@@ -26,13 +32,19 @@ type MethodType = typeof METHOD_TYPE[keyof typeof METHOD_TYPE];
 interface Props {
     visible: boolean;
     modalType: 'CREATE'|'UPDATE';
+    variableKey?: string;
 }
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
+    variableKey: undefined,
 });
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 }>();
 
+const dashboardStore = useDashboardStore();
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     loading: false,
@@ -45,8 +57,20 @@ const state = reactive({
         if (state.selectedMethod === METHOD_TYPE.MANUAL_ENTRY) return state.isManualFormValid;
         return state.isDynamicFormValid;
     }),
-    existingVariableNameList: computed<string[]>(() => ([])),
-    existingVariableKeyList: computed<string[]>(() => ([])),
+    targetVariable: computed<DashboardGlobalVariable|undefined>(() => {
+        if (props.modalType === 'CREATE' || !props.variableKey) return undefined;
+        return dashboardDetailGetters.dashboardVarsSchema[props.variableKey];
+    }),
+    existingVariableNameList: computed<string[]>(() => {
+        const _nameList: string[] = Object.values(dashboardDetailGetters.dashboardVarsSchema).map((d) => d.name);
+        if (props.modalType === 'CREATE' || !state.targetVariable) return _nameList;
+        return _nameList.filter((d) => d !== state.targetVariable?.name);
+    }),
+    existingVariableKeyList: computed<string[]>(() => {
+        const _keyList: string[] = Object.values(dashboardDetailGetters.dashboardVarsSchema).map((d) => d.key);
+        if (props.modalType === 'CREATE' || !state.targetVariable) return _keyList;
+        return _keyList.filter((d) => d !== state.targetVariable?.key);
+    }),
     selectedMethod: METHOD_TYPE.MANUAL_ENTRY as MethodType,
     isManualFormValid: false,
     isDynamicFormValid: false,
@@ -97,8 +121,81 @@ const {
     },
 });
 
+/* Util */
+const initSelectedVariable = (variable: DashboardGlobalVariable) => {
+    setForm('variableName', variable.name);
+    setForm('variableKey', variable.key);
+    if (variable.method === METHOD_TYPE.MANUAL_ENTRY) {
+        state.selectedMethod = METHOD_TYPE.MANUAL_ENTRY;
+        state.manualGlobalVariable = variable;
+    } else {
+        state.selectedMethod = METHOD_TYPE.DYNAMIC_LIST_FROM_SOURCE;
+        state.dynamicGlobalVariable = variable;
+    }
+};
+const resetState = () => {
+    initForm();
+    state.selectedMethod = METHOD_TYPE.MANUAL_ENTRY;
+    state.manualGlobalVariable = {};
+    state.dynamicGlobalVariable = {};
+    state.isManualFormValid = false;
+    state.isDynamicFormValid = false;
+};
+
+/* Api */
+const createDashboardVarsSchema = async (dashboardId: string) => {
+    try {
+        state.loading = true;
+        await dashboardStore.updateDashboard(dashboardId, {
+            dashboard_id: dashboardId,
+            vars_schema: {
+                ...dashboardDetailGetters.dashboardVarsSchema,
+                [state.dashboardGlobalVariable.key]: {
+                    ...state.dashboardGlobalVariable,
+                    use: true,
+                },
+            },
+        });
+    } catch (e) {
+        // TODO: update lang code!
+        ErrorHandler.handleRequestError(e, i18n.t(''));
+    } finally {
+        state.loading = false;
+    }
+};
+const updateDashboardVarsSchema = async (dashboardId: string) => {
+    try {
+        state.loading = true;
+        const _originalKey = state.targetVariable?.key;
+        const _use = state.targetVariable?.use || false;
+        if (!_originalKey) return;
+        const _newVarsSchema = cloneDeep(dashboardDetailGetters.dashboardVarsSchema);
+        delete _newVarsSchema[_originalKey];
+        _newVarsSchema[state.dashboardGlobalVariable.key] = {
+            ...state.dashboardGlobalVariable,
+            use: _use,
+        };
+        await dashboardStore.updateDashboard(dashboardId, {
+            dashboard_id: dashboardId,
+            vars_schema: _newVarsSchema,
+        });
+    } catch (e) {
+        // TODO: update lang code!
+        ErrorHandler.handleRequestError(e, i18n.t(''));
+    } finally {
+        state.loading = false;
+    }
+};
+
 /* Event */
-const handleConfirm = () => {
+const handleConfirm = async () => {
+    if (!dashboardDetailState.dashboardId) return;
+    if (props.modalType === 'CREATE') {
+        await createDashboardVarsSchema(dashboardDetailState.dashboardId);
+    } else {
+        await updateDashboardVarsSchema(dashboardDetailState.dashboardId);
+    }
+    state.proxyVisible = false;
 };
 const handleClickClose = () => {
     state.proxyVisible = false;
@@ -109,7 +206,15 @@ const handleChangeMethod = (method: MethodType) => {
 
 /* Watcher */
 watch(() => state.proxyVisible, (visible) => {
-    if (visible) initForm();
+    if (visible) {
+        if (props.modalType === 'UPDATE' && props.variableKey) {
+            const _targetVariable = dashboardDetailGetters.dashboardVarsSchema[props.variableKey];
+            if (isEmpty(_targetVariable)) return;
+            initSelectedVariable(_targetVariable);
+        }
+    } else {
+        resetState();
+    }
 });
 </script>
 
