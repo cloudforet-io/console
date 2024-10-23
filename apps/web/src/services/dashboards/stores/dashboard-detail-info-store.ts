@@ -7,6 +7,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
 import type {
     DashboardLayout,
     DashboardLayoutWidgetInfo,
@@ -117,6 +118,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         dashboardName: computed<string>(() => getters.dashboardInfo?.name || ''),
         dashboardLabels: computed<string[]>(() => getters.dashboardInfo?.labels || []),
         dashboardLayouts: computed<DashboardLayout[]>(() => getters.dashboardInfo?.layouts || []),
+        dashboardVarsSchema: computed<Record<string, DashboardGlobalVariable>>(() => getters.dashboardInfo?.vars_schema || {}),
         isPrivate: computed<boolean>(() => !!state.dashboardId?.startsWith('private')),
         //
         isAllVariablesInitialized: computed(() => Object.values(state.variablesInitMap).every((d) => d === true)),
