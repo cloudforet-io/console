@@ -14,6 +14,7 @@ import { i18n } from '@/translations';
 import {
     MANAGED_DASHBOARD_GLOBAL_VARIABLES_SCHEMA,
 } from '@/services/dashboards/constants/managed-dashboard-global-variables';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
 
@@ -33,6 +34,9 @@ interface EmitFn {
 }
 type VariableType = 'managed'|'custom';
 const emit = defineEmits<EmitFn>();
+
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailGetters = dashboardDetailStore.getters;
 const state = reactive({
     globalVariablesTableItems: computed<GlobalVariableTableItem[]>(() => {
         const _managedItems: GlobalVariableTableItem[] = [];
@@ -47,7 +51,12 @@ const state = reactive({
                 reference: i18n.t('DASHBOARDS.DETAIL.VARIABLES.COMMON'),
             });
         });
-        const _customItems = [];
+        const _customItems = Object.values(dashboardDetailGetters.dashboardVarsSchema).map((d) => ({
+            ...d,
+            type: d?.type || '-',
+            created_by: 'System',
+            reference: d?.reference?.resourceType || '-',
+        }));
         return [
             ..._managedItems,
             ..._customItems,
