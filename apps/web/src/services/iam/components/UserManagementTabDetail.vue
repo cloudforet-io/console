@@ -223,7 +223,7 @@ const handleClickVerifyButton = async () => {
             <template #data-mfa="{data}">
                 <p>
                     <span>{{ data?.state === 'ENABLED' ? 'On' : 'Off' }}</span>
-                    <span> - {{ data?.mfa_type === MULTI_FACTOR_AUTH_TYPE.EMAIL ? `Email (${data.options.email})` : 'Microsoft Authenticator App' }}</span>
+                    <span v-if="data?.state === 'ENABLED'"> - {{ data?.mfa_type === MULTI_FACTOR_AUTH_TYPE.EMAIL ? `Email (${data.options.email})` : 'Microsoft Authenticator App' }}</span>
                 </p>
             </template>
             <template #data-role_id="{value, data}">

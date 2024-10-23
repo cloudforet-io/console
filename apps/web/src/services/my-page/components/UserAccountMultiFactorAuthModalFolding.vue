@@ -12,11 +12,13 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 interface Props {
     isDisabledModal: boolean
+    isReSyncModal: boolean
     isSentCode: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
     isDisabledModal: false,
+    isReSyncModal: false,
     isSentCode: false,
 });
 
@@ -31,7 +33,7 @@ const state = reactive({
 });
 
 const handleClickSendEmailButton = async () => {
-    if (props.isDisabledModal) {
+    if (props.isDisabledModal || props.isReSyncModal) {
         await postUserProfileDisableMfa();
     } else {
         await postEnableMfa({
@@ -58,7 +60,7 @@ const handleClickSendEmailButton = async () => {
             {{ $t('COMMON.MFA_MODAL.COLLAPSE_DESC') }}
             <p-text-button class="send-code-button"
                            style-type="highlight"
-                           :disabled="props.isDisabledModal ? !storeState.email : !props.isSentCode"
+                           :disabled="(props.isDisabledModal || props.isReSyncModal) ? !storeState.email : !props.isSentCode"
                            @click.prevent="handleClickSendEmailButton"
             >
                 <span class="emphasis">{{ $t('COMMON.MFA_MODAL.SEND_NEW_CODE') }}</span>
