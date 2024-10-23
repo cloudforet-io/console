@@ -1,11 +1,11 @@
+import type { ReferenceVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
+
 import ProjectVariableModel from '@/lib/variable-models/managed-model/resource-model/project-variable-model';
 import RegionVariableModel from '@/lib/variable-models/managed-model/resource-model/region-variable-model';
 import ServiceAccountVariableModel
     from '@/lib/variable-models/managed-model/resource-model/service-account-variable-model';
 import UserVariableModel from '@/lib/variable-models/managed-model/resource-model/user-variable-model';
 import WorkspaceVariableModel from '@/lib/variable-models/managed-model/resource-model/workspace-variable-model';
-
-import type { ReferenceVariable } from '@/services/dashboards/types/global-variable-type';
 
 
 

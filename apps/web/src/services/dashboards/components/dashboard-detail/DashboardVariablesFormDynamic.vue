@@ -8,6 +8,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
+import type { DashboardGlobalVariableModel, ReferenceVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -28,7 +29,6 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import {
     MANAGED_DASHBOARD_GLOBAL_VARIABLES_SCHEMA,
 } from '@/services/dashboards/constants/managed-dashboard-global-variables';
-import type { DashboardGlobalVariableModel, ReferenceVariable } from '@/services/dashboards/types/global-variable-type';
 
 
 

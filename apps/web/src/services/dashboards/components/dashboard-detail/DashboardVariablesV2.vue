@@ -10,10 +10,10 @@ import type { DashboardVariableSchemaProperty, DashboardVars } from '@/schema/da
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
+import DashboardManageVariableOverlay from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableOverlay.vue';
 import DashboardVariableDropdown from '@/services/dashboards/components/dashboard-detail/DashboardVariableDropdown.vue';
 import DashboardVariablesMoreButton
     from '@/services/dashboards/components/dashboard-detail/DashboardVariablesMoreButton.vue';
-import DashboardManageVariableOverlay from '@/services/dashboards/components/legacy/DashboardManageVariableOverlay.vue';
 import {
     MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP,
     MANAGED_DASHBOARD_VARIABLES_SCHEMA,

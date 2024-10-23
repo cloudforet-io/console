@@ -17,10 +17,10 @@ import { useQueryTags } from '@/common/composables/query-tags';
 
 import DashboardManageVariableImportModal
     from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableImportModal.vue';
+import DashboardManageVariableTable
+    from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableTable.vue';
 import DashboardVariablesFormModal
     from '@/services/dashboards/components/dashboard-detail/DashboardVariablesFormModal.vue';
-import DashboardManageVariableTable
-    from '@/services/dashboards/components/legacy/DashboardManageVariableTable.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 

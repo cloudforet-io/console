@@ -6,11 +6,11 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
+import type { DashboardGlobalVariableModel } from '@/schema/dashboard/_types/dashboard-global-variable-type';
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import type { DashboardGlobalVariableModel } from '@/services/dashboards/types/global-variable-type';
 
 
 
