@@ -287,7 +287,7 @@ const handleCloneWidget = async (widget: RefinedWidgetInfo) => {
             options: {
                 ...widget.options,
                 widgetHeader: {
-                    ...(widget.options.widgetHeader as WidgetHeaderValue ?? {}),
+                    ...(widget.options?.widgetHeader as WidgetHeaderValue ?? {}),
                     title: widget.options?.widgetHeader?.title ? `Clone - ${widget.options.widgetHeader.title}` : undefined,
                 },
             },
