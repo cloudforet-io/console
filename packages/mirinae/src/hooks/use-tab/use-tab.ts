@@ -1,29 +1,9 @@
-import type { ComputedRef, Ref } from 'vue';
 import {
     computed, reactive,
 } from 'vue';
 
-import type { TranslateResult } from 'vue-i18n';
+import type { TabItem, UseTabOptions, UseTabReturns } from './type';
 
-export type TabItem<T extends object> = {
-    name: string;
-    label?: TranslateResult; // includes string
-    keepAlive?: boolean;
-    subItems?: Array<string|TabItem<T>>;
-} & T;
-
-export interface UseTabOptions<T extends object = Record<string, never>> {
-    tabs: Ref<Array<string|TabItem<T>>> | Array<string|TabItem<T>>;
-    activeTab: Ref<string> | string;
-    defaultItem?: T;
-}
-
-interface UseTabReturns<T extends object> {
-    tabItems: ComputedRef<TabItem<T>[]>;
-    keepAliveTabNames: ComputedRef<string[]>;
-    nonKeepAliveTabNames: ComputedRef<string[]>;
-    currentTabItem: ComputedRef<TabItem<T>|undefined>;
-}
 const generateTabItem = <T extends object>(tab: string|TabItem<T>, defaultItem: T = {} as T): TabItem<T> => {
     if (typeof tab === 'string') {
         return {

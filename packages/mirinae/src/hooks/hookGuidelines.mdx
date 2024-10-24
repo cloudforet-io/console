@@ -1,0 +1,25 @@
+{/* hookGuidelines.mdx */}
+
+import { Meta } from '@storybook/blocks';
+
+<Meta title="Hooks/Guidelines" />
+
+# Hook Guidelines
+
+This document outlines the guidelines for creating and using hooks within the design system, as well as for external usage, ensuring consistency and clarity across all hooks.
+<br/>
+
+## 1. Hook Argument - Options
+
+- **Single Argument**: Every hook accepts a single argument, which is always an object. This object is referred to as the "Hook Options."
+- **Naming Convention**: The interface for these options follows the naming rule `HookNameOptions`, where `HookName` is the name of the specific hook.
+  - **Example**: `UseTabOptions`
+<br/>
+
+## 2. Hook Returns
+
+- **Return Format**: Hooks always return a single object, called the "Hook Returns."
+- **Naming Convention**: The interface for the return object follows the naming rule `HookNameReturns`, where `HookName` is the name of the specific hook.
+  - **Example**: `UseTabReturns`
+<br/>
+

@@ -1,22 +1,3 @@
-{/* useTab.mdx */}
-
-import {Canvas, Meta } from '@storybook/blocks';
-
-import * as useTabStories from './use-tab.stories';
-
-<Meta of={useTabStories}/>
-
-
-# useTab
-
-The `useTab` hook manages tab-related state and behavior, supporting dynamic and complex tab structures. It offers several computed values to assist in tab management and allows for the use of a default item structure.
-
-<br/>
-<br/>
-
-## Type Declarations
-
-```typescript
 import type { ComputedRef, Ref } from 'vue';
 
 import type { TranslateResult } from 'vue-i18n';
@@ -53,27 +34,3 @@ export interface UseTabReturns<T extends object> {
     /* currentTabItem: Represents the currently active tab item based on the `activeTab` input. If no matching tab is found, it returns `undefined`. */
     currentTabItem: ComputedRef<TabItem<T>|undefined>;
 }
-```
-
-## Demo
-<br/>
-
-### With String Tabs
-<Canvas of={useTabStories.WithStringTabs}/>
-<br/>
-
-### With Object Tabs
-<Canvas of={useTabStories.WithObjectTabs}/>
-<br/>
-
-### With Sub Items
-<Canvas of={useTabStories.WithSubItems}/>
-<br/>
-
-### With Keep Alive
-<Canvas of={useTabStories.WithKeepAlive}/>
-<br/>
-
-### With Default Item
-<Canvas of={useTabStories.WithDefaultItem}/>
-<br/>
