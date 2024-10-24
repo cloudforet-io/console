@@ -19,7 +19,7 @@ export interface ReferenceVariable extends DashboardGlobalVariableBase {
 }
 
 // 'text' type / 'any' valueType
-interface TextAnyVariable extends DashboardGlobalVariableBase {
+export interface TextAnyVariable extends DashboardGlobalVariableBase {
     method: 'manual';
     type: 'text';
     valueType: 'any';
@@ -29,7 +29,7 @@ interface TextAnyVariable extends DashboardGlobalVariableBase {
 }
 
 // 'number' type / 'any' valueType
-interface NumberAnyVariable extends DashboardGlobalVariableBase {
+export interface NumberAnyVariable extends DashboardGlobalVariableBase {
     method: 'manual';
     type: 'number';
     valueType: 'any';
@@ -42,7 +42,7 @@ interface NumberAnyVariable extends DashboardGlobalVariableBase {
 }
 
 // 'text' type / 'enum' valueType
-interface TextEnumVariable extends DashboardGlobalVariableBase {
+export interface TextEnumVariable extends DashboardGlobalVariableBase {
     method: 'manual';
     type: 'text';
     valueType: 'enum';
@@ -53,7 +53,7 @@ interface TextEnumVariable extends DashboardGlobalVariableBase {
 }
 
 // 'number' type / 'enum' valueType
-interface NumberEnumVariable extends DashboardGlobalVariableBase {
+export interface NumberEnumVariable extends DashboardGlobalVariableBase {
     method: 'manual';
     type: 'number';
     valueType: 'enum';
@@ -64,6 +64,7 @@ interface NumberEnumVariable extends DashboardGlobalVariableBase {
 }
 
 // Model
+export type ManualVariable = TextAnyVariable|NumberAnyVariable|TextEnumVariable|NumberEnumVariable;
 export type DashboardGlobalVariable =
     | ReferenceVariable
     | TextAnyVariable
