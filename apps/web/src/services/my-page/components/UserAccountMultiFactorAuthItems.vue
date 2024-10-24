@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, reactive, watch,
+} from 'vue';
+
+import { constant, mapValues } from 'lodash';
 
 import {
     PI, PToggleButton, PBadge, PButton,
@@ -21,7 +25,7 @@ const storeState = reactive({
     selectedType: computed<string>(() => multiFactorAuthState.selectedType),
 });
 const state = reactive({
-    enableMfa: {} as Record<string, boolean>,
+    enableMfa: mapValues(MULTI_FACTOR_AUTH_TYPE, constant(false)) as Record<string, boolean>,
     isVerified: computed<boolean>(() => storeState.mfa?.state === 'ENABLED'),
     type: computed<string>(() => storeState.mfa?.mfa_type),
 });
@@ -45,15 +49,9 @@ const handleClickReSyncButton = async (type: string) => {
 };
 
 watch(() => storeState.mfa, (mfa) => {
-    const result: Record<string, boolean> = {};
-    Object.values(MULTI_FACTOR_AUTH_TYPE).forEach((value) => {
-        if (mfa.mfa_type === value) {
-            result[value] = mfa.state === 'ENABLED';
-        } else {
-            result[value] = false;
-        }
-    });
-    state.enableMfa = result;
+    if (mfa.mfa_type) {
+        state.enableMfa[mfa.mfa_type] = storeState.mfa.state === 'ENABLED';
+    }
 }, { immediate: true });
 watch(() => multiFactorAuthState.modalVisible, (modalVisible) => {
     if (!modalVisible) {

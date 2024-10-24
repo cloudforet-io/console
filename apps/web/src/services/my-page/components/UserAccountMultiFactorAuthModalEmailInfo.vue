@@ -75,7 +75,9 @@ const handleClickSendCodeButton = async () => {
 </script>
 
 <template>
-    <div class="email-info-wrapper">
+    <div class="email-info-wrapper"
+         :class="{'form-modal': storeState.isFormModal}"
+    >
         <div v-if="storeState.isFormModal"
              class="email-form-wrapper"
         >
@@ -136,6 +138,9 @@ const handleClickSendCodeButton = async () => {
 <style scoped lang="postcss">
 .email-info-wrapper {
     margin-bottom: 1.25rem;
+    &.form-modal {
+        margin-top: 1.625rem;
+    }
     .email-form-wrapper {
         @apply flex items-start;
         gap: 1rem;

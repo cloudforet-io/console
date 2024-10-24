@@ -68,11 +68,16 @@ watch(() => state.qrUri, (qrUri) => {
 <template>
     <div class="user-account-multi-factor-auth-modal-ms-info">
         <p class="set-up-title">
-            <i18n path="MY_PAGE.MFA.STEP_DESC">
+            <i18n path="MY_PAGE.MFA.STEP_DESC"
+                  tag="p"
+            >
                 <template #type>
-                    <router-link to="https://www.microsoft.com/en-us/security/mobile-authenticator-app">
-                        <u>Microsoft Authenticator App</u>
-                    </router-link>
+                    <a href="https://www.microsoft.com/en-us/security/mobile-authenticator-app"
+                       target="_blank"
+                       class="auth-link"
+                    >
+                        Microsoft Authenticator App
+                    </a>
                 </template>
             </i18n>
         </p>
@@ -113,7 +118,11 @@ watch(() => state.qrUri, (qrUri) => {
 <style scoped lang="postcss">
 .user-account-multi-factor-auth-modal-ms-info {
     @apply flex flex-col text-paragraph-md;
+    margin-top: 1.625rem;
     margin-bottom: 0.5rem;
+    .auth-link {
+        @apply underline;
+    }
     .loading {
         @apply flex items-center justify-center;
     }

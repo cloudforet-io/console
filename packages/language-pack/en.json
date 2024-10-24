@@ -1220,6 +1220,7 @@
 		"MFA_MODAL": {
 			"ALT": {
 				"DESC": "To turn off, you need to verifiy with your email.",
+				"DESC_MS": "To turn off, you need to verifiy with the microsoft authenticator code.",
 				"DISABLED": "Disable",
 				"EMAIL_INFO": "Send verification code to the email",
 				"TITLE": "Are you sure you want to disable MFA?",
