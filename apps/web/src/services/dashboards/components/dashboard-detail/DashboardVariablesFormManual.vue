@@ -6,7 +6,9 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
-import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
+import type {
+    DashboardGlobalVariable, ManualVariable,
+} from '@/schema/dashboard/_types/dashboard-global-variable-type';
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -33,12 +35,16 @@ interface EnumValue {
     key: string;
     label: string;
 }
+
+type ManualVariableData = Omit<ManualVariable, 'management'|'key'|'name'|'method'>;
 interface Props {
     isValid: boolean;
-    data: Partial<DashboardGlobalVariable>;
+    originalData?: DashboardGlobalVariable;
+    data: ManualVariableData;
 }
 const props = withDefaults(defineProps<Props>(), {
     isValid: false,
+    originalData: undefined,
 });
 const emit = defineEmits<{(e: 'update:is-valid', isValid: boolean): void;
     (e: 'update:data', data: Partial<DashboardGlobalVariable>): void;
@@ -46,7 +52,6 @@ const emit = defineEmits<{(e: 'update:is-valid', isValid: boolean): void;
 
 const state = reactive({
     proxyIsValid: useProxyValue<boolean>('isValid', props, emit),
-    proxyData: useProxyValue<Partial<DashboardGlobalVariable>>('data', props, emit),
     isAllValid: computed<boolean>(() => {
         if (state.selectedValuesType === VALUES_TYPE.ANY_VALUE) {
             if (state.selectedType === 'text') return true;
@@ -104,6 +109,29 @@ const state = reactive({
     selectedNumberInputType: NUMBER_INPUT_TYPE.NUMBER_INPUT as NumberInputType,
 });
 
+/* Util */
+const initExistingVariable = (originalData: DashboardGlobalVariable) => {
+    if (originalData.method !== 'manual') return;
+    state.selectedType = originalData.type;
+    state.selectedValuesType = originalData.valueType;
+    if (originalData.type === 'text') {
+        if (originalData.valueType === 'any') {
+            state.defaultTextValue = originalData.options?.defaultValue;
+        } else {
+            state.enumValues = originalData.values;
+            state.selectedSelectionType = originalData.options.selectionType;
+        }
+    } else if (originalData.valueType === 'any') {
+        state.min = originalData.options.min;
+        state.max = originalData.options.max;
+        state.step = originalData.options.step;
+        state.selectedNumberInputType = originalData.options.inputType;
+    } else {
+        state.enumValues = originalData.values;
+        state.selectedSelectionType = originalData.options.selectionType;
+    }
+};
+
 /* Event */
 const handleChangeType = (type: 'text'|'number') => {
     if (state.selectedType === type) return;
@@ -114,6 +142,7 @@ const handleChangeType = (type: 'text'|'number') => {
     state.enumValues = [{ key: '', label: '' }];
 };
 const handleChangeValuesType = (type: ValuesType) => {
+    if (state.selectedValuesType === type) return;
     state.selectedValuesType = type;
     if (type === VALUES_TYPE.LIST_OF_VALUES) {
         state.enumValues = [{ key: '', label: '' }];
@@ -142,10 +171,13 @@ const handleChangeNumberInputType = (type: NumberInputType) => {
 
 /* Watcher */
 watch(() => state.manualGlobalVariableData, (data) => {
-    state.proxyData = data;
+    emit('update:data', data);
 }, { deep: true, immediate: true });
 watch(() => state.isAllValid, (isValid) => {
     state.proxyIsValid = isValid;
+}, { immediate: true });
+watch(() => props.originalData, (originalData) => {
+    if (originalData) initExistingVariable(originalData);
 }, { immediate: true });
 </script>
 

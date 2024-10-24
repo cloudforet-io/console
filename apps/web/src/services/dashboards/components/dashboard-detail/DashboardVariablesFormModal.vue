@@ -7,7 +7,7 @@ import {
     PButtonModal, PFieldGroup, PTextInput, PRadioGroup, PRadio,
 } from '@cloudforet/mirinae';
 
-import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
+import type { DashboardGlobalVariable, ManualVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
 import { i18n } from '@/translations';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
@@ -24,6 +24,8 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashbo
 
 
 
+type ManualVariableData = Omit<ManualVariable, 'management'|'key'|'name'|'method'>;
+type DynamicVariableData = Omit<DashboardGlobalVariable, 'management'|'key'|'name'|'method'>;
 const METHOD_TYPE = {
     MANUAL_ENTRY: 'manual',
     DYNAMIC_LIST_FROM_SOURCE: 'dynamic',
@@ -75,8 +77,8 @@ const state = reactive({
     isManualFormValid: false,
     isDynamicFormValid: false,
     //
-    manualGlobalVariable: {} as Partial<DashboardGlobalVariable>,
-    dynamicGlobalVariable: {} as Partial<DashboardGlobalVariable>,
+    manualGlobalVariable: {} as ManualVariableData,
+    dynamicGlobalVariable: {} as DynamicVariableData,
     dashboardGlobalVariable: computed<DashboardGlobalVariable>(() => {
         if (state.selectedMethod === METHOD_TYPE.MANUAL_ENTRY) {
             return {
@@ -145,7 +147,6 @@ const resetState = () => {
 /* Api */
 const createDashboardVarsSchema = async (dashboardId: string) => {
     try {
-        state.loading = true;
         await dashboardStore.updateDashboard(dashboardId, {
             dashboard_id: dashboardId,
             vars_schema: {
@@ -159,13 +160,10 @@ const createDashboardVarsSchema = async (dashboardId: string) => {
     } catch (e) {
         // TODO: update lang code!
         ErrorHandler.handleRequestError(e, i18n.t(''));
-    } finally {
-        state.loading = false;
     }
 };
 const updateDashboardVarsSchema = async (dashboardId: string) => {
     try {
-        state.loading = true;
         const _originalKey = state.targetVariable?.key;
         const _use = state.targetVariable?.use || false;
         if (!_originalKey) return;
@@ -182,20 +180,20 @@ const updateDashboardVarsSchema = async (dashboardId: string) => {
     } catch (e) {
         // TODO: update lang code!
         ErrorHandler.handleRequestError(e, i18n.t(''));
-    } finally {
-        state.loading = false;
     }
 };
 
 /* Event */
 const handleConfirm = async () => {
     if (!dashboardDetailState.dashboardId) return;
+    state.loading = true;
     if (props.modalType === 'CREATE') {
         await createDashboardVarsSchema(dashboardDetailState.dashboardId);
     } else {
         await updateDashboardVarsSchema(dashboardDetailState.dashboardId);
     }
     state.proxyVisible = false;
+    state.loading = false;
 };
 const handleClickClose = () => {
     state.proxyVisible = false;
@@ -278,13 +276,15 @@ watch(() => state.proxyVisible, (visible) => {
                     </p-radio>
                 </p-radio-group>
             </p-field-group>
-            <dashboard-variables-form-manual v-if="state.selectedMethod === METHOD_TYPE.MANUAL_ENTRY"
+            <dashboard-variables-form-manual v-show="state.selectedMethod === METHOD_TYPE.MANUAL_ENTRY"
                                              :is-valid.sync="state.isManualFormValid"
                                              :data.sync="state.manualGlobalVariable"
+                                             :original-data="state.targetVariable"
             />
-            <dashboard-variables-form-dynamic v-else
+            <dashboard-variables-form-dynamic v-show="state.selectedMethod === METHOD_TYPE.DYNAMIC_LIST_FROM_SOURCE"
                                               :is-valid.sync="state.isDynamicFormValid"
                                               :data.sync="state.dynamicGlobalVariable"
+                                              :original-data="state.targetVariable"
             />
         </template>
     </p-button-modal>

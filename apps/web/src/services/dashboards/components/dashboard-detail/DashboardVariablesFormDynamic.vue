@@ -33,15 +33,18 @@ import {
 
 
 
+type DynamicVariableData = Omit<DashboardGlobalVariable, 'management'|'key'|'name'|'method'>;
 interface Props {
     isValid: boolean;
-    data: Partial<DashboardGlobalVariable>;
+    originalData?: DashboardGlobalVariable;
+    data: DynamicVariableData;
 }
 const props = withDefaults(defineProps<Props>(), {
     isValid: false,
+    originalData: undefined,
 });
 const emit = defineEmits<{(e: 'update:is-valid', isValid: boolean): void;
-    (e: 'update:data', data: Partial<DashboardGlobalVariable>): void;
+    (e: 'update:data', data: DynamicVariableData): void;
 }>();
 
 const appContextStore = useAppContextStore();
@@ -55,13 +58,12 @@ const storeState = reactive({
 });
 const state = reactive({
     proxyIsValid: useProxyValue<boolean>('isValid', props, emit),
-    proxyData: useProxyValue<Partial<DashboardGlobalVariable>>('data', props, emit),
     isAllValid: computed<boolean>(() => {
         if (state.needToSelectValuesFrom) return !!state.selectedValuesFrom;
         return true;
     }),
     needToSelectValuesFrom: computed<boolean>(() => state.selectedSourceFrom === 'asset' || state.selectedSourceFrom === 'cost'),
-    dynamicGlobalVariableData: computed<Partial<DashboardGlobalVariable>>(() => {
+    dynamicGlobalVariableData: computed<DynamicVariableData>(() => {
         if (state.needToSelectValuesFrom) {
             const _resourceType = state.selectedSourceFrom === 'asset' ? MetricDataVariableModel.meta.resourceType : CostVariableModel.meta.resourceType;
             return {
@@ -138,6 +140,7 @@ const state = reactive({
     }),
     categorySearchText: '',
     selectedCategory: undefined as undefined|string,
+    selectedCategoryMenuItem: computed<MenuItem[]>(() => state.categoryMenuItems.filter((d) => d.name === state.selectedCategory)),
     // namespace
     namespaceMenuItems: computed<MenuItem[]>(() => {
         if (!state.selectedCategory) return [];
@@ -153,6 +156,7 @@ const state = reactive({
     }),
     namespaceSearchText: '',
     selectedNamespaceId: undefined as undefined|string,
+    selectedNamespaceMenuItem: computed<MenuItem[]>(() => state.namespaceMenuItems.filter((d) => d.name === state.selectedNamespaceId)),
     // metric
     metricMenuItems: computed<MenuItem[]>(() => {
         if (!state.selectedNamespaceId) return [];
@@ -167,6 +171,7 @@ const state = reactive({
     }),
     metricSearchText: '',
     selectedMetricId: undefined as undefined|string,
+    selectedMetricMenuItem: computed<MenuItem[]>(() => state.metricMenuItems.filter((d) => d.name === state.selectedMetricId)),
     /* Cost */
     costDataSourceMenuItems: computed<MenuItem[]>(() => {
         const _filteredCostDataSources = Object.values(storeState.costDataSources)
@@ -179,11 +184,30 @@ const state = reactive({
     }),
     costDataSourceSearchText: '',
     selectedCostDataSourceId: undefined as string|undefined,
+    selectedCostDataSourceMenuItem: computed<MenuItem[]>(() => state.costDataSourceMenuItems.filter((d) => d.name === state.selectedCostDataSourceId)),
 });
 const { menuItems: costDataSourceFilterMenuItems } = useCostDataSourceFilterMenuItems({
     isAdminMode: computed(() => storeState.isAdminMode),
     costDataSource: computed(() => storeState.costDataSources[state.selectedCostDataSourceId]),
 });
+
+/* Util */
+const initExistingVariable = (originalData: DashboardGlobalVariable) => {
+    if (originalData.method === 'dynamic') {
+        const _reference = originalData.reference;
+        if (_reference.resourceType === MetricDataVariableModel.meta.resourceType) {
+            state.selectedSourceFrom = 'asset';
+            state.selectedMetricId = _reference.dataSourceId || '';
+            const _targetMetric = storeState.metrics[state.selectedMetricId];
+            state.selectedNamespaceId = _targetMetric?.data.namespace_id || '';
+            state.selectedCategory = storeState.namespaces[state.selectedNamespaceId]?.data.group;
+        } else if (_reference.resourceType === CostVariableModel.meta.resourceType) {
+            state.selectedSourceFrom = 'cost';
+            state.selectedCostDataSourceId = _reference.dataSourceId;
+        }
+        state.selectedValuesFrom = _reference.dataKey;
+    }
+};
 
 /* Event */
 const handleChangeSourceFrom = (sourceFrom: string) => {
@@ -225,10 +249,13 @@ const handleChangeValuesFrom = (valuesFrom: string) => {
 
 /* Watcher */
 watch(() => state.dynamicGlobalVariableData, (data) => {
-    state.proxyData = data;
+    emit('update:data', data);
 }, { deep: true, immediate: true });
 watch(() => state.isAllValid, (isValid) => {
     state.proxyIsValid = isValid;
+}, { immediate: true });
+watch(() => props.originalData, (originalData) => {
+    if (originalData) initExistingVariable(originalData);
 }, { immediate: true });
 </script>
 
@@ -260,6 +287,7 @@ watch(() => state.isAllValid, (isValid) => {
                     <p-context-menu :menu="state.categoryMenuItems"
                                     :search-text.sync="state.categorySearchText"
                                     searchable
+                                    :selected="state.selectedCategoryMenuItem"
                                     @select="handleSelectCategory"
                     >
                         <template #item--format="{ item }">
@@ -283,6 +311,7 @@ watch(() => state.isAllValid, (isValid) => {
                     <p-context-menu :menu="state.namespaceMenuItems"
                                     :search-text.sync="state.namespaceSearchText"
                                     searchable
+                                    :selected="state.selectedNamespaceMenuItem"
                                     @select="handleSelectNamespace"
                     />
                 </div>
@@ -294,6 +323,7 @@ watch(() => state.isAllValid, (isValid) => {
                     <p-context-menu :menu="state.metricMenuItems"
                                     :search-text.sync="state.metricSearchText"
                                     searchable
+                                    :selected="state.selectedMetricMenuItem"
                                     @select="handleSelectMetric"
                     />
                 </div>
@@ -308,6 +338,7 @@ watch(() => state.isAllValid, (isValid) => {
                 />
                 <p-context-menu :menu="state.costDataSourceMenuItems"
                                 :search-text.sync="state.costDataSourceSearchText"
+                                :selected="state.selectedCostDataSourceMenuItem"
                                 searchable
                                 @select="handleSelectCostDataSource"
                 />
