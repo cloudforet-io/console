@@ -7,6 +7,7 @@ import type {
     DashboardVariablesSchema,
     DashboardVars,
     DashboardScope,
+    DashboardGlobalVariablesSchema,
 } from '@/schema/dashboard/_types/dashboard-type';
 
 
@@ -17,6 +18,7 @@ export interface PublicDashboardModel {
     version: string;
     layouts: DashboardLayout[];
     vars?: DashboardVars;
+    vars_schema?: DashboardGlobalVariablesSchema;
     options: DashboardOptions;
     variables_schema?: DashboardVariablesSchema; // will be deprecated
     variables?: DashboardVariables; // will be deprecated

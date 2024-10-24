@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import {
-    computed, reactive,
+    reactive,
 } from 'vue';
-
 
 import {
     POverlayLayout, PToolbox, PButton,
@@ -32,25 +31,17 @@ interface Props {
 const props = defineProps<Props>();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
-const dashboardDetailGetters = dashboardDetailStore.getters;
 
 const { getProperRouteLocation } = useProperRouteLocation();
 const queryTagsHelper = useQueryTags({});
 const state = reactive({
-    variableSchema: computed(() => dashboardDetailGetters.refinedVariablesSchema),
-    selectedVariable: '' as string,
-    variableNames: computed<string[]>(() => {
-        const properties = state.variableSchema.properties;
-        return state.variableSchema?.order?.map((d) => properties[d]?.name).filter((name) => name !== properties[state.selectedVariable]?.name) ?? [];
-    }),
+    selectedVariableKey: undefined as string|undefined,
     modalType: 'CREATE' as 'CREATE'|'UPDATE',
-    createModalVisible: false,
+    formModalVisible: false,
     deleteModalVisible: false,
     deleteModalLoading: false,
     importModalVisible: false,
 });
-
-/* Helper */
 
 /* Event */
 const handleChangeToolbox = async (options: ToolboxOptions) => {
@@ -65,7 +56,7 @@ const handleChangeToolbox = async (options: ToolboxOptions) => {
 };
 const handleClickCreateButton = () => {
     state.modalType = 'CREATE';
-    state.createModalVisible = true;
+    state.formModalVisible = true;
 };
 const handleClickImportButton = () => {
     state.importModalVisible = true;
@@ -74,10 +65,12 @@ const handleClickDeleteButton = () => {
     //
 };
 const handleClickEditButton = (variableKey: string) => {
-    state.selectedVariable = variableKey;
+    state.modalType = 'UPDATE';
+    state.selectedVariableKey = variableKey;
+    state.formModalVisible = true;
 };
 const handleClickCloneButton = (variableKey: string) => {
-    state.selectedVariable = variableKey;
+    state.selectedVariableKey = variableKey;
 };
 const handleCloseOverlay = () => {
     SpaceRouter.router.replace(getProperRouteLocation({
@@ -127,7 +120,8 @@ const handleConfirmDelete = () => {
             />
         </div>
         <dashboard-variables-form-modal :modal-type="state.modalType"
-                                        :visible.sync="state.createModalVisible"
+                                        :variable-key="state.selectedVariableKey"
+                                        :visible.sync="state.formModalVisible"
         />
         <delete-modal :header-title="$t('DASHBOARDS.DETAIL.VARIABLES.DELETE_MODAL_TITLE')"
                       :visible.sync="state.deleteModalVisible"
