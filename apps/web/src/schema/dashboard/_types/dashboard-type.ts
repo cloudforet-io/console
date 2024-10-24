@@ -2,6 +2,7 @@ import type {
     REFRESH_INTERVAL_OPTIONS_MAP,
     DASHBOARD_TYPE,
 } from '@/schema/dashboard/_constants/dashboard-constant';
+import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
 import type {
     InheritOptions, WidgetOptions, WidgetSize,
 } from '@/schema/dashboard/_types/widget-type';
@@ -65,6 +66,10 @@ export interface DashboardVariablesSchema {
     properties: DashboardVariableSchemaProperties;
     order: string[];
     fixed_options?: Record<string, any>;
+}
+
+export interface DashboardGlobalVariablesSchema {
+    properties: Record<string, DashboardGlobalVariable>;
 }
 
 // dashboard variables types

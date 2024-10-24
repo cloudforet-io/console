@@ -1,8 +1,8 @@
 import type { Tags } from '@/schema/_common/model';
-import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
 import type {
     DashboardOptions, DashboardVariables, DashboardVariablesSchema, DashboardLayout,
     DashboardVars,
+    DashboardGlobalVariablesSchema,
 } from '@/schema/dashboard/_types/dashboard-type';
 
 
@@ -11,7 +11,7 @@ export interface PrivateDashboardUpdateParameters {
     name?: string;
     layouts?: DashboardLayout[];
     vars?: DashboardVars;
-    vars_schema?: Record<string, DashboardGlobalVariable>;
+    vars_schema?: DashboardGlobalVariablesSchema;
     variables?: DashboardVariables;
     options?: DashboardOptions;
     variables_schema?: DashboardVariablesSchema;

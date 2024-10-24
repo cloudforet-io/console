@@ -51,7 +51,7 @@ const state = reactive({
                 reference: i18n.t('DASHBOARDS.DETAIL.VARIABLES.COMMON'),
             });
         });
-        const _customItems = Object.values(dashboardDetailGetters.dashboardVarsSchema).map((d) => ({
+        const _customItems = Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties).map((d) => ({
             ...d,
             type: d?.type || '-',
             created_by: 'System',

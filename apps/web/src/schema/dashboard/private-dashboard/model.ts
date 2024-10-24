@@ -1,11 +1,11 @@
 import type { Tags } from '@/schema/_common/model';
-import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
 import type {
     DashboardLayout,
     DashboardOptions,
     DashboardVariables,
     DashboardVariablesSchema,
     DashboardVars,
+    DashboardGlobalVariablesSchema,
 } from '@/schema/dashboard/_types/dashboard-type';
 
 
@@ -16,7 +16,7 @@ export interface PrivateDashboardModel {
     version: string;
     layouts: DashboardLayout[];
     vars?: DashboardVars;
-    vars_schema?: Record<string, DashboardGlobalVariable>;
+    vars_schema?: DashboardGlobalVariablesSchema;
     options: DashboardOptions;
     variables_schema?: DashboardVariablesSchema; // will be deprecated
     variables?: DashboardVariables; // will be deprecated

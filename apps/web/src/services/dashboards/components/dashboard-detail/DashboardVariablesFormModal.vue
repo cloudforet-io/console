@@ -63,15 +63,15 @@ const state = reactive({
     }),
     targetVariable: computed<DashboardGlobalVariable|undefined>(() => {
         if (props.modalType === 'CREATE' || !props.variableKey) return undefined;
-        return dashboardDetailGetters.dashboardVarsSchema[props.variableKey];
+        return dashboardDetailGetters.dashboardVarsSchemaProperties[props.variableKey];
     }),
     existingVariableNameList: computed<string[]>(() => {
-        const _nameList: string[] = Object.values(dashboardDetailGetters.dashboardVarsSchema).map((d) => d.name);
+        const _nameList: string[] = Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties).map((d) => d.name);
         if (props.modalType === 'CREATE' || !state.targetVariable) return _nameList;
         return _nameList.filter((d) => d !== state.targetVariable?.name);
     }),
     existingVariableKeyList: computed<string[]>(() => {
-        const _keyList: string[] = Object.values(dashboardDetailGetters.dashboardVarsSchema).map((d) => d.key);
+        const _keyList: string[] = Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties).map((d) => d.key);
         if (props.modalType === 'CREATE' || !state.targetVariable) return _keyList;
         return _keyList.filter((d) => d !== state.targetVariable?.key);
     }),
@@ -152,10 +152,12 @@ const createDashboardVarsSchema = async (dashboardId: string) => {
         await dashboardStore.updateDashboard(dashboardId, {
             dashboard_id: dashboardId,
             vars_schema: {
-                ...dashboardDetailGetters.dashboardVarsSchema,
-                [state.dashboardGlobalVariable.key]: {
-                    ...state.dashboardGlobalVariable,
-                    use: true,
+                properties: {
+                    ...dashboardDetailGetters.dashboardVarsSchemaProperties,
+                    [state.dashboardGlobalVariable.key]: {
+                        ...state.dashboardGlobalVariable,
+                        use: true,
+                    },
                 },
             },
         });
@@ -169,15 +171,17 @@ const updateDashboardVarsSchema = async (dashboardId: string) => {
         const _originalKey = state.targetVariable?.key;
         const _use = state.targetVariable?.use || false;
         if (!_originalKey) return;
-        const _newVarsSchema = cloneDeep(dashboardDetailGetters.dashboardVarsSchema);
-        delete _newVarsSchema[_originalKey];
-        _newVarsSchema[state.dashboardGlobalVariable.key] = {
+        const _newVarsSchemaProperties = cloneDeep(dashboardDetailGetters.dashboardVarsSchemaProperties);
+        delete _newVarsSchemaProperties[_originalKey];
+        _newVarsSchemaProperties[state.dashboardGlobalVariable.key] = {
             ...state.dashboardGlobalVariable,
             use: _use,
         };
         await dashboardStore.updateDashboard(dashboardId, {
             dashboard_id: dashboardId,
-            vars_schema: _newVarsSchema,
+            vars_schema: {
+                properties: _newVarsSchemaProperties,
+            },
         });
         showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_S_UPDATE_DASHBOARD_VARS_SCHEMA'), '');
     } catch (e) {
@@ -208,9 +212,9 @@ const handleChangeMethod = (method: MethodType) => {
 watch(() => state.proxyVisible, (visible) => {
     if (visible) {
         if (props.modalType === 'UPDATE' && props.variableKey) {
-            const _targetVariable = dashboardDetailGetters.dashboardVarsSchema[props.variableKey];
-            if (isEmpty(_targetVariable)) return;
-            initSelectedVariable(_targetVariable);
+            const _targetProperty = dashboardDetailGetters.dashboardVarsSchemaProperties[props.variableKey];
+            if (isEmpty(_targetProperty)) return;
+            initSelectedVariable(_targetProperty);
         }
     } else {
         resetState();
