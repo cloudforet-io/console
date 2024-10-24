@@ -37,6 +37,7 @@ type VariableType = 'managed'|'custom';
 const emit = defineEmits<EmitFn>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailGetters = dashboardDetailStore.getters;
 const state = reactive({
     globalVariablesTableItems: computed<GlobalVariableTableItem[]>(() => {
@@ -103,6 +104,7 @@ const variableTypeBadgeStyleFormatter = (type: VariableType) => {
         <p-data-table class="variable-table"
                       :items="state.globalVariablesTableItems"
                       :fields="state.variableFields"
+                      :loading="dashboardDetailState.loadingDashboard"
         >
             <template #col-type-format="{ value }">
                 {{ value || '-' }}
