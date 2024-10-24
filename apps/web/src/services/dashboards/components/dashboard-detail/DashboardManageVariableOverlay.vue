@@ -3,14 +3,22 @@ import {
     reactive,
 } from 'vue';
 
+import { cloneDeep } from 'lodash';
+
 import {
     POverlayLayout, PToolbox, PButton,
 } from '@cloudforet/mirinae';
 import type { ToolboxOptions } from '@cloudforet/mirinae/src/navigation/toolbox/type';
 
 import { SpaceRouter } from '@/router';
+import { i18n } from '@/translations';
+
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useQueryTags } from '@/common/composables/query-tags';
 
@@ -29,8 +37,10 @@ interface Props {
     visible: boolean;
 }
 const props = defineProps<Props>();
+const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 
 const { getProperRouteLocation } = useProperRouteLocation();
 const queryTagsHelper = useQueryTags({});
@@ -42,6 +52,23 @@ const state = reactive({
     deleteModalLoading: false,
     importModalVisible: false,
 });
+
+/* Api */
+const deleteDashboardVarsSchema = async (dashboardId: string, variableKey: string) => {
+    try {
+        const _varsSchemaProperties = cloneDeep(dashboardDetailGetters.dashboardVarsSchemaProperties);
+        delete _varsSchemaProperties[variableKey];
+        await dashboardStore.updateDashboard(dashboardId, {
+            dashboard_id: dashboardId,
+            vars_schema: {
+                properties: _varsSchemaProperties,
+            },
+        });
+        showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_S_DELETE_DASHBOARD_VARS_SCHEMA'), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_E_DELETE_DASHBOARD_VARS_SCHEMA'));
+    }
+};
 
 /* Event */
 const handleChangeToolbox = async (options: ToolboxOptions) => {
@@ -61,8 +88,9 @@ const handleClickCreateButton = () => {
 const handleClickImportButton = () => {
     state.importModalVisible = true;
 };
-const handleClickDeleteButton = () => {
-    //
+const handleClickDeleteButton = (variableKey: string) => {
+    state.selectedVariableKey = variableKey;
+    state.deleteModalVisible = true;
 };
 const handleClickEditButton = (variableKey: string) => {
     state.modalType = 'UPDATE';
@@ -79,7 +107,9 @@ const handleCloseOverlay = () => {
     }));
 };
 const handleConfirmDelete = () => {
-    //
+    if (!dashboardDetailState.dashboardId || !state.selectedVariableKey) return;
+    deleteDashboardVarsSchema(dashboardDetailState.dashboardId, state.selectedVariableKey);
+    state.deleteModalVisible = false;
 };
 </script>
 
