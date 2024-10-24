@@ -9,6 +9,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 
+import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
 import { i18n } from '@/translations';
 
 import {
@@ -21,11 +22,11 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashbo
 interface GlobalVariableTableItem {
     key: string;
     name: string;
-    type: string;
     management: VariableType;
-    use: boolean;
-    created_by: string;
-    reference: string|TranslateResult;
+    type?: string;
+    use?: boolean;
+    created_by?: string;
+    reference?: string|TranslateResult;
 }
 interface EmitFn {
     (e: 'delete', value: string): void;
@@ -44,18 +45,17 @@ const state = reactive({
             _managedItems.push({
                 key: d.key,
                 name: d.name,
-                type: '-',
                 management: 'managed',
-                use: true, // TODO: get use
+                use: dashboardDetailGetters.dashboardVarsSchemaProperties[d.key]?.use || false,
                 created_by: 'System',
                 reference: i18n.t('DASHBOARDS.DETAIL.VARIABLES.COMMON'),
             });
         });
-        const _customItems = Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties).map((d) => ({
+        const varsSchemaProperties: DashboardGlobalVariable[] = Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties);
+        const _customItems: GlobalVariableTableItem[] = varsSchemaProperties.map((d) => ({
             ...d,
-            type: d?.type || '-',
-            created_by: 'System',
-            reference: d?.reference?.resourceType || '-',
+            type: d.method === 'manual' ? d.type : undefined,
+            reference: d.method === 'dynamic' ? d?.reference?.resourceType : undefined,
         }));
         return [
             ..._managedItems,
@@ -104,6 +104,12 @@ const variableTypeBadgeStyleFormatter = (type: VariableType) => {
                       :items="state.globalVariablesTableItems"
                       :fields="state.variableFields"
         >
+            <template #col-type-format="{ value }">
+                {{ value || '-' }}
+            </template>
+            <template #col-reference-format="{ value }">
+                {{ value || '-' }}
+            </template>
             <template #col-management-format="{ value }">
                 <p-badge :style-type="variableTypeBadgeStyleFormatter(value)"
                          badge-type="solid-outline"
