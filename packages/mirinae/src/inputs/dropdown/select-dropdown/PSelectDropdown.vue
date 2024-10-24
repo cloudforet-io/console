@@ -7,7 +7,7 @@ import { onClickOutside, useFocus } from '@vueuse/core';
 import { debounce, reduce } from 'lodash';
 
 import { useContextMenuController, useProxyValue } from '@/hooks';
-import { useIgnoreWindowArrowKeydownEvents } from '@/hooks/ignore-window-arrow-keydown-events';
+import { useIgnoreWindowArrowKeydownEvents } from '@/hooks/use-ignore-window-arrow-keydown-events/use-ignore-window-arrow-keydown-events';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import type { ContextMenuType } from '@/inputs/context-menu/type';
 import DropdownButton from '@/inputs/dropdown/select-dropdown/components/dropdown-button.vue';

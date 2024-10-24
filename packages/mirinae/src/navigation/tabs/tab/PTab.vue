@@ -7,7 +7,7 @@ import { onClickOutside, useResizeObserver } from '@vueuse/core';
 import { throttle } from 'lodash';
 
 import PI from '@/foundation/icons/PI.vue';
-import { useTab } from '@/hooks/tab';
+import { useTab } from '@/hooks/use-tab/use-tab';
 import PTextButton from '@/inputs/buttons/text-button/PTextButton.vue';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import type { MenuItem } from '@/inputs/context-menu/type';

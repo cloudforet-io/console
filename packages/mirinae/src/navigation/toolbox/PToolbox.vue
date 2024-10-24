@@ -107,7 +107,7 @@ import {
 
 import { groupBy } from 'lodash';
 
-import { useProxyValue } from '@/hooks/proxy-state';
+import { useProxyValue } from '@/hooks/use-proxy-state/use-proxy-state';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import type { MenuItem } from '@/inputs/context-menu/type';
 import PSelectDropdown from '@/inputs/dropdown/select-dropdown/PSelectDropdown.vue';

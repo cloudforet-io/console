@@ -17,9 +17,9 @@
                                :key="index"
                                :deletable="!disabled"
                                :selected="index === deleteTargetIdx"
-                               :invalid="isSelectedItemInvalid(tag, index)"
+                               :invalid="isSelectedItemInvalid(tag, Number(index))"
                                class="tag"
-                               @delete="handleDeleteTag(tag, index)"
+                               @delete="handleDeleteTag(tag, Number(index))"
                         >
                             {{ tag.label || tag.name }}
                         </p-tag>
@@ -129,9 +129,9 @@ import type { TranslateResult } from 'vue-i18n';
 import PBadge from '@/data-display/badge/PBadge.vue';
 import PTag from '@/data-display/tags/PTag.vue';
 import PI from '@/foundation/icons/PI.vue';
-import { useIgnoreWindowArrowKeydownEvents } from '@/hooks';
-import { useContextMenuController } from '@/hooks/context-menu-controller';
-import { useProxyValue } from '@/hooks/proxy-state';
+import { useContextMenuController } from '@/hooks/use-context-menu-controller/use-context-menu-controller';
+import { useIgnoreWindowArrowKeydownEvents } from '@/hooks/use-ignore-window-arrow-keydown-events/use-ignore-window-arrow-keydown-events';
+import { useProxyValue } from '@/hooks/use-proxy-state/use-proxy-state';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import type { MenuItem } from '@/inputs/context-menu/type';

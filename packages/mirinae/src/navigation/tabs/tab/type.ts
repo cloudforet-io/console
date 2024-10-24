@@ -1,4 +1,4 @@
-import type { TranslateResult } from 'vue-i18n';
+import type { TabItem as BaseTabItem } from '@/hooks/use-tab/use-tab';
 
 
 export const TAB_MENU_TYPE = {
@@ -10,11 +10,7 @@ export const TAB_MENU_TYPE = {
 export type TabMenuType = typeof TAB_MENU_TYPE[keyof typeof TAB_MENU_TYPE];
 
 
-export interface TabItem {
-    name: string;
+export type TabItem = BaseTabItem<{
     tabType?: TabMenuType;
-    label?: string | TranslateResult;
-    keepAlive?: boolean;
-    subItems?: TabItem[];
     icon?: string;
-}
+}>;

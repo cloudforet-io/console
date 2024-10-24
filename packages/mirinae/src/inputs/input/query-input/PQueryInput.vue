@@ -102,7 +102,7 @@ import { isEqual } from 'lodash';
 
 import PI from '@/foundation/icons/PI.vue';
 import { useContextMenuStyle, useProxyValue } from '@/hooks';
-import { useQuerySearch } from '@/hooks/query-search';
+import { useQuerySearch } from '@/hooks/use-query-search/use-query-search';
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import type { SelectDropdownAppearanceType } from '@/inputs/dropdown/select-dropdown/type';

@@ -5,7 +5,7 @@ import type { ComponentProps } from 'vue-component-type-helpers';
 
 import { getUserFields, getUsers } from '@/data-display/tables/data-table/mock';
 import { getToolboxTableArgs, getToolboxTableArgTypes, getToolboxTableParameters } from '@/data-display/tables/toolbox-table/story-helper';
-import { useProxyValue } from '@/hooks/proxy-state';
+import { useProxyValue } from '@/hooks/use-proxy-state/use-proxy-state';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import PSelectStatus from '@/inputs/select-status/PSelectStatus.vue';
 

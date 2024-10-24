@@ -39,10 +39,15 @@ import {
 } from 'vue';
 
 import PI from '@/foundation/icons/PI.vue';
-import type { SelectProps } from '@/hooks/select';
-import { useSingleSelect } from '@/hooks/select';
+import type { SelectionPredicate } from '@/hooks/use-select/use-select';
+import { useSingleSelect } from '@/hooks/use-select/use-select';
 
-interface Props extends SelectProps {
+interface Props {
+    value?: any;
+    selected?: any | any[];
+    disabled?: boolean;
+    predicate?: SelectionPredicate;
+    multiSelectable?: boolean;
     invalid?: boolean;
     readonly?: boolean;
 }
