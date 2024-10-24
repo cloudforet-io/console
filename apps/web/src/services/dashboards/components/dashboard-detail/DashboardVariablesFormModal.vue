@@ -12,6 +12,8 @@ import { i18n } from '@/translations';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -157,9 +159,9 @@ const createDashboardVarsSchema = async (dashboardId: string) => {
                 },
             },
         });
+        showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_S_CREATE_DASHBOARD_VARS_SCHEMA'), '');
     } catch (e) {
-        // TODO: update lang code!
-        ErrorHandler.handleRequestError(e, i18n.t(''));
+        ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_E_CREATE_DASHBOARD_VARS_SCHEMA'));
     }
 };
 const updateDashboardVarsSchema = async (dashboardId: string) => {
@@ -177,9 +179,9 @@ const updateDashboardVarsSchema = async (dashboardId: string) => {
             dashboard_id: dashboardId,
             vars_schema: _newVarsSchema,
         });
+        showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_S_UPDATE_DASHBOARD_VARS_SCHEMA'), '');
     } catch (e) {
-        // TODO: update lang code!
-        ErrorHandler.handleRequestError(e, i18n.t(''));
+        ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_E_UPDATE_DASHBOARD_VARS_SCHEMA'));
     }
 };
 
