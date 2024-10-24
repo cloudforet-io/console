@@ -6,10 +6,10 @@ import type { ComponentProps } from 'vue-component-type-helpers';
 import PI from '@/foundation/icons/PI.vue';
 import PTextarea from '@/inputs/textarea/PTextarea.vue';
 
-import type { UseTabOptions } from './use-tab';
+import type { UseTabOptions } from './type';
 import { useTab } from './use-tab';
 
-type UseTabPropsAndCustomArgs = ComponentProps<UseTabOptions>;
+type UseTabPropsAndCustomArgs = ComponentProps<UseTabOptions<Record<string, never>>>;
 
 const meta: Meta<UseTabPropsAndCustomArgs> = {
     title: 'Hooks/useTab',
