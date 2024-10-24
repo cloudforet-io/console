@@ -218,15 +218,17 @@ watch(() => props.postId, (postId) => {
                                     {{ $t('INFO.NOTICE.DETAIL.SHOW_ALL_WORKSPACES') }}
                                 </p-text-button>
                                 <template #content>
-                                    <div v-for="(item,idx) in state.scopedWorkspaceList"
-                                         :key="idx"
-                                         class="workspace-wrapper"
-                                    >
-                                        <workspace-logo-icon :text="item?.name || ''"
-                                                             :theme="item?.tags?.theme"
-                                                             size="xxs"
-                                        />
-                                        <span>{{ item?.name }}</span>
+                                    <div class="workspace-list">
+                                        <div v-for="(item,idx) in state.scopedWorkspaceList"
+                                             :key="idx"
+                                             class="workspace-list-item"
+                                        >
+                                            <workspace-logo-icon :text="item?.name || ''"
+                                                                 :theme="item?.tags?.theme"
+                                                                 size="xxs"
+                                            />
+                                            <span>{{ item?.name }}</span>
+                                        </div>
                                     </div>
                                 </template>
                             </p-popover>
@@ -300,6 +302,13 @@ watch(() => props.postId, (postId) => {
                 .popper-content-wrapper {
                     @apply flex-col;
                     gap: 0.5rem;
+                }
+            }
+
+            .workspace-list {
+                @apply flex flex-col gap-2;
+                .workspace-list-item {
+                    @apply flex items-center pl-1 pr-4 gap-1;
                 }
             }
         }
