@@ -9,8 +9,10 @@ import {
     POverlayLayout, PToolbox, PButton,
 } from '@cloudforet/mirinae';
 import type { ToolboxOptions } from '@cloudforet/mirinae/src/navigation/toolbox/type';
+import { getClonedName } from '@cloudforet/utils';
 
 import { SpaceRouter } from '@/router';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
@@ -69,6 +71,31 @@ const deleteDashboardVarsSchema = async (dashboardId: string, variableKey: strin
         ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_E_DELETE_DASHBOARD_VARS_SCHEMA'));
     }
 };
+const cloneDashboardVarsSchema = async (dashboardId: string, variableKey: string) => {
+    try {
+        const _clonedProperty = cloneDeep(dashboardDetailGetters.dashboardVarsSchemaProperties[variableKey]);
+        const _varsNameList: string[] = Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties).map((d) => d.name);
+        const _varsKeyList: string[] = Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties).map((d) => d.key);
+        _clonedProperty.key = getClonedName(_varsKeyList, _clonedProperty.key, 'clone_');
+        _clonedProperty.name = getClonedName(_varsNameList, _clonedProperty.name);
+        await dashboardStore.updateDashboard(dashboardId, {
+            dashboard_id: dashboardId,
+            vars_schema: {
+                properties: {
+                    ...dashboardDetailGetters.dashboardVarsSchemaProperties,
+                    [_clonedProperty.key]: {
+                        ..._clonedProperty,
+                        use: false,
+                        created_by: store.state.user.userId,
+                    },
+                },
+            },
+        });
+        showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_S_CLONE_DASHBOARD_VARS_SCHEMA'), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_E_CLONE_DASHBOARD_VARS_SCHEMA'));
+    }
+};
 
 /* Event */
 const handleChangeToolbox = async (options: ToolboxOptions) => {
@@ -98,7 +125,8 @@ const handleClickEditButton = (variableKey: string) => {
     state.formModalVisible = true;
 };
 const handleClickCloneButton = (variableKey: string) => {
-    state.selectedVariableKey = variableKey;
+    if (!dashboardDetailState.dashboardId) return;
+    cloneDashboardVarsSchema(dashboardDetailState.dashboardId, variableKey);
 };
 const handleCloseOverlay = () => {
     SpaceRouter.router.replace(getProperRouteLocation({
