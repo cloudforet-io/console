@@ -57,7 +57,7 @@ const state = reactive({
         if (mfaType === MULTI_FACTOR_AUTH_TYPE.EMAIL) {
             return {
                 icon: 'ic_notification-protocol_envelope',
-                title: 'EMAIL',
+                title: 'Email',
                 desc: _i18n.t('AUTH.MFA.EMAIL_INFO'),
             };
         }
@@ -236,7 +236,8 @@ onMounted(() => {
                 @apply block text-label-md;
             }
             .email-text {
-                @apply text-violet-600 font-medium;
+                @apply block text-violet-600 font-medium;
+                padding-top: 0.25rem;
             }
         }
         .input-form {

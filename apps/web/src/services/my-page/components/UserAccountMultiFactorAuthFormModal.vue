@@ -119,70 +119,72 @@ watch(() => multiFactorAuthState.modalType, () => {
 </script>
 
 <template>
-    <p-button-modal :visible="multiFactorAuthState.modalVisible"
-                    :header-title="modalState.title"
-                    class="mfa-modal-wrapper"
-                    size="sm"
-                    :theme-color="storeState.isDisabledModal? 'alert' : 'primary'"
-                    :disabled="validationState.verificationCode === '' || (storeState.selectedType === MULTI_FACTOR_AUTH_TYPE.EMAIL && !state.isSentCode)"
-                    :loading="state.loading"
-                    @confirm="handleClickVerifyButton"
-                    @cancel="handleClickCancel"
-                    @close="handleClickCancel"
-    >
-        <template #body>
-            <div class="modal-content-wrapper">
-                <p v-if="storeState.isReSyncModal"
-                   class="re-sync-desc"
-                >
-                    {{ $t('MY_PAGE.MFA.RESYNC_DESC') }}
-                </p>
-                <span v-if="storeState.isDisabledModal"
-                      class="disable-modal-desc"
-                >
-                    {{ $t('COMMON.MFA_MODAL.ALT.DESC') }}
-                </span>
-                <user-account-multi-factor-auth-modal-email-info v-if="storeState.selectedType === MULTI_FACTOR_AUTH_TYPE.EMAIL"
-                                                                 :is-sent-code.sync="state.isSentCode"
-                />
-                <user-account-multi-factor-auth-modal-m-s-info v-else-if="storeState.selectedType === MULTI_FACTOR_AUTH_TYPE.OTP
-                                                                   && !storeState.isDisabledModal
-                                                                   && !storeState.isReSyncModal"
-                                                               :is-re-sync-modal="storeState.isReSyncModal"
-                />
-                <div class="validation-code-form">
-                    <p-field-group :label="$t('COMMON.MFA_MODAL.VERIFICATION_CODE')"
-                                   :invalid="!validationState.isValidationCodeValid"
-                                   :invalid-text="validationState.validationCodeInvalidText"
-                                   required
-                                   class="form"
-                    >
-                        <p-text-input :value="validationState.verificationCode"
-                                      :invalid="!validationState.isValidationCodeValid"
-                                      class="text-input"
-                                      block
-                                      @update:value="handleChangeInput"
-                        />
-                    </p-field-group>
-                </div>
-                <user-account-multi-factor-auth-modal-folding v-if="storeState.selectedType === MULTI_FACTOR_AUTH_TYPE.EMAIL"
-                                                              :is-disabled-modal="storeState.isDisabledModal"
-                                                              :is-re-sync-modal="storeState.isReSyncModal"
-                                                              :is-sent-code.sync="state.isSentCode"
-                />
-            </div>
-        </template>
-        <template v-if="!storeState.isReSyncModal"
-                  #confirm-button
+    <div>
+        <p-button-modal :visible="multiFactorAuthState.modalVisible"
+                        :header-title="modalState.title"
+                        class="mfa-modal-wrapper"
+                        size="sm"
+                        :theme-color="storeState.isDisabledModal? 'alert' : 'primary'"
+                        :disabled="validationState.verificationCode === '' || (storeState.selectedType === MULTI_FACTOR_AUTH_TYPE.EMAIL && !state.isSentCode)"
+                        :loading="state.loading"
+                        @confirm="handleClickVerifyButton"
+                        @cancel="handleClickCancel"
+                        @close="handleClickCancel"
         >
-            <span v-if="storeState.isDisabledModal">
-                {{ $t('COMMON.MFA_MODAL.ALT.DISABLED') }}
-            </span>
-            <span v-else>
-                {{ $t('COMMON.MFA_MODAL.VERIFY') }}
-            </span>
-        </template>
-    </p-button-modal>
+            <template #body>
+                <div class="modal-content-wrapper">
+                    <p v-if="storeState.isReSyncModal"
+                       class="re-sync-desc"
+                    >
+                        {{ $t('MY_PAGE.MFA.RESYNC_DESC') }}
+                    </p>
+                    <span v-if="storeState.isDisabledModal"
+                          class="disable-modal-desc"
+                    >
+                        {{ storeState.selectedType === MULTI_FACTOR_AUTH_TYPE.EMAIL ? $t('COMMON.MFA_MODAL.ALT.DESC') : $t('COMMON.MFA_MODAL.ALT.DESC_MS') }}
+                    </span>
+                    <user-account-multi-factor-auth-modal-email-info v-if="storeState.selectedType === MULTI_FACTOR_AUTH_TYPE.EMAIL"
+                                                                     :is-sent-code.sync="state.isSentCode"
+                    />
+                    <user-account-multi-factor-auth-modal-m-s-info v-else-if="storeState.selectedType === MULTI_FACTOR_AUTH_TYPE.OTP
+                                                                       && !storeState.isDisabledModal
+                                                                       && !storeState.isReSyncModal"
+                                                                   :is-re-sync-modal="storeState.isReSyncModal"
+                    />
+                    <div class="validation-code-form">
+                        <p-field-group :label="$t('COMMON.MFA_MODAL.VERIFICATION_CODE')"
+                                       :invalid="!validationState.isValidationCodeValid"
+                                       :invalid-text="validationState.validationCodeInvalidText"
+                                       required
+                                       class="form"
+                        >
+                            <p-text-input :value="validationState.verificationCode"
+                                          :invalid="!validationState.isValidationCodeValid"
+                                          class="text-input"
+                                          block
+                                          @update:value="handleChangeInput"
+                            />
+                        </p-field-group>
+                    </div>
+                    <user-account-multi-factor-auth-modal-folding v-if="storeState.selectedType === MULTI_FACTOR_AUTH_TYPE.EMAIL"
+                                                                  :is-disabled-modal="storeState.isDisabledModal"
+                                                                  :is-re-sync-modal="storeState.isReSyncModal"
+                                                                  :is-sent-code.sync="state.isSentCode"
+                    />
+                </div>
+            </template>
+            <template v-if="!storeState.isReSyncModal"
+                      #confirm-button
+            >
+                <span v-if="storeState.isDisabledModal">
+                    {{ $t('COMMON.MFA_MODAL.ALT.DISABLED') }}
+                </span>
+                <span v-else>
+                    {{ $t('COMMON.MFA_MODAL.VERIFY') }}
+                </span>
+            </template>
+        </p-button-modal>
+    </div>
 </template>
 
 <style lang="postcss" scoped>
@@ -218,6 +220,13 @@ watch(() => multiFactorAuthState.modalType, () => {
     .change-confirm-button {
         @apply flex items-center;
         gap: 0.25rem;
+    }
+}
+
+/* custom design-system component - p-button-modal */
+:deep(.p-button-modal) {
+    .modal-content .header .modal-header {
+        min-height: initial;
     }
 }
 </style>

@@ -118,6 +118,7 @@ watch(() => state.qrUri, (qrUri) => {
 <style scoped lang="postcss">
 .user-account-multi-factor-auth-modal-ms-info {
     @apply flex flex-col text-paragraph-md;
+    margin-top: 1.625rem;
     margin-bottom: 0.5rem;
     .auth-link {
         @apply underline;
