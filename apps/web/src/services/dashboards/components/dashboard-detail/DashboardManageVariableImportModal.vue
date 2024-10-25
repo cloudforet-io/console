@@ -55,6 +55,7 @@ const state = reactive({
         if (!selectedDashboard) return [];
         return getRefinedGlobalVariables(selectedDashboard?.vars_schema);
     }),
+    searchedDashboardVariables: computed<DashboardGlobalVariable[]>(() => state.selectedDashboardVariables.filter((variable) => variable.name.toLowerCase().includes(state.keyword.toLowerCase()))),
     selectedVariableKeys: [] as string[],
     isAllSelected: computed<boolean>(() => {
         if (state.selectedVariableKeys.length === 0) return false;
@@ -191,7 +192,7 @@ watch(() => state.selectedDashboardVariables, (selectedDashboardVariables) => {
                             >
                                 {{ $t('DASHBOARDS.DETAIL.VARIABLES.DUPLICATED_NAME_WARNING') }}
                             </p-scoped-notification>
-                            <div v-for="(variable) in state.selectedDashboardVariables"
+                            <div v-for="(variable) in state.searchedDashboardVariables"
                                  :key="variable.key"
                                  class="variable"
                             >
