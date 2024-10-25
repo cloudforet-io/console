@@ -77,9 +77,9 @@ const state = reactive({
                 reference: i18n.t('DASHBOARDS.DETAIL.VARIABLES.COMMON'),
             });
         });
-
         const varsSchemaProperties: DashboardGlobalVariable[] = Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties);
-        const _customItems: GlobalVariableTableItem[] = varsSchemaProperties.map((d) => ({
+        const _customProperties = varsSchemaProperties.filter((d) => d.management !== 'managed');
+        const _customItems: GlobalVariableTableItem[] = _customProperties.map((d) => ({
             ...d,
             type: d.method === 'manual' ? d.type : undefined,
             reference: d.method === 'dynamic' ? d?.reference?.resourceType : undefined,
@@ -234,6 +234,7 @@ const handleConfirmDelete = () => {
                              :total-count="state.searchedGlobalVariablesTableItems.length"
                              searchable
                              :search-text.sync="state.searchText"
+                             :refreshable="false"
             >
                 <template #toolbox-left>
                     <p-button icon-left="ic_plus_bold"
