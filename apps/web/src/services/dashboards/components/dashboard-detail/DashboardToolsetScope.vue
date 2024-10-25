@@ -3,7 +3,7 @@ import { reactive } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PSelectDropdown, PCheckbox, PButtonModal, PStatus,
+    PSelectDropdown, PCheckbox, PButtonModal, PStatus, PScopedNotification,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
@@ -11,7 +11,6 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
-import ScopedNotification from '@/common/components/scoped-notification/ScopedNotification.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
@@ -122,14 +121,11 @@ const handleConfirmPerformanceDelay = () => {
                         @confirm="handleConfirmPerformanceDelay"
         >
             <template #body>
-                <scoped-notification title-icon="ic_warning-filled"
-                                     type="warning"
-                                     :visible="true"
-                                     no-title
-                                     hide-header-close-button
+                <p-scoped-notification type="warning"
+                                       icon="ic_warning-filled"
                 >
                     {{ $t('DASHBOARDS.DETAIL.PERFORMANCE_DELAY_WARNING') }}
-                </scoped-notification>
+                </p-scoped-notification>
             </template>
         </p-button-modal>
     </div>
