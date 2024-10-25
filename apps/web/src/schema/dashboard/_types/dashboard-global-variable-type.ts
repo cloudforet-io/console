@@ -4,6 +4,8 @@ interface DashboardGlobalVariableBase {
     key: string; // new_variable
     name: string; // New Variable
     method: 'manual'|'dynamic';
+    created_by?: string;
+    use?: boolean;
 }
 
 export interface ReferenceVariable extends DashboardGlobalVariableBase {
