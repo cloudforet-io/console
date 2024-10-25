@@ -1,17 +1,19 @@
 <script setup lang="ts">
 import {
-    reactive,
+    reactive, computed,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
-import { cloneDeep } from 'lodash';
+import { cloneDeep, orderBy } from 'lodash';
 
 import {
-    POverlayLayout, PToolbox, PButton,
+    POverlayLayout, PToolbox, PButton, PDataTable, PBadge, PIconButton, PToggleButton,
 } from '@cloudforet/mirinae';
-import type { ToolboxOptions } from '@cloudforet/mirinae/src/navigation/toolbox/type';
+import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 import { getClonedName } from '@cloudforet/utils';
 
 import { SpaceRouter } from '@/router';
+import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -22,19 +24,29 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
-import { useQueryTags } from '@/common/composables/query-tags';
 
 import DashboardManageVariableImportModal
     from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableImportModal.vue';
-import DashboardManageVariableTable
-    from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableTable.vue';
 import DashboardVariablesFormModal
     from '@/services/dashboards/components/dashboard-detail/DashboardVariablesFormModal.vue';
+import {
+    MANAGED_DASHBOARD_GLOBAL_VARIABLES_SCHEMA,
+} from '@/services/dashboards/constants/managed-dashboard-global-variables';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
 
+type ManagementType = 'managed'|'custom';
+interface GlobalVariableTableItem {
+    key: string;
+    name: string;
+    management: ManagementType;
+    type?: string;
+    use?: boolean;
+    created_by?: string;
+    reference?: string|TranslateResult;
+}
 interface Props {
     visible: boolean;
 }
@@ -45,7 +57,6 @@ const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailGetters = dashboardDetailStore.getters;
 
 const { getProperRouteLocation } = useProperRouteLocation();
-const queryTagsHelper = useQueryTags({});
 const state = reactive({
     selectedVariableKey: undefined as string|undefined,
     modalType: 'CREATE' as 'CREATE'|'UPDATE',
@@ -53,7 +64,53 @@ const state = reactive({
     deleteModalVisible: false,
     deleteModalLoading: false,
     importModalVisible: false,
+    thisPage: 1,
+    searchText: '',
+    totalCount: computed<number>(() => Object.keys(dashboardDetailGetters.dashboardVarsSchemaProperties).length),
+    globalVariablesTableItems: computed<GlobalVariableTableItem[]>(() => {
+        const _managedItems: GlobalVariableTableItem[] = [];
+        Object.values(MANAGED_DASHBOARD_GLOBAL_VARIABLES_SCHEMA).forEach((d) => {
+            _managedItems.push({
+                key: d.key,
+                name: d.name,
+                management: 'managed',
+                use: dashboardDetailGetters.dashboardVarsSchemaProperties[d.key]?.use || false,
+                created_by: 'System',
+                reference: i18n.t('DASHBOARDS.DETAIL.VARIABLES.COMMON'),
+            });
+        });
+        const varsSchemaProperties: DashboardGlobalVariable[] = Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties);
+        const _customItems: GlobalVariableTableItem[] = varsSchemaProperties.map((d) => ({
+            ...d,
+            type: d.method === 'manual' ? d.type : undefined,
+            reference: d.method === 'dynamic' ? d?.reference?.resourceType : undefined,
+        }));
+        const _orderedCustomItems = orderBy(_customItems, ['name'], ['asc']);
+        return [
+            ..._managedItems,
+            ..._orderedCustomItems,
+        ];
+    }),
+    variableFields: [
+        { name: 'name', label: 'Name' },
+        { name: 'type', label: 'Type' },
+        { name: 'reference', label: 'Reference' },
+        { name: 'management', label: 'Management' },
+        { name: 'use', label: 'Use', width: '90px' },
+        { name: 'created_by', label: 'Created By' },
+        { name: 'buttons', label: ' ', width: '144px' },
+    ] as DataTableField[],
+    variableType: computed<Partial<Record<ManagementType, TranslateResult>>>(() => ({
+        managed: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_MANAGED'),
+        custom: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_CUSTOM'),
+    })),
 });
+
+/* Util */
+const variableTypeBadgeStyleFormatter = (type: 'managed'|'custom') => {
+    if (type === 'managed') return 'gray500';
+    return 'primary';
+};
 
 /* Api */
 const deleteDashboardVarsSchema = async (dashboardId: string, variableKey: string) => {
@@ -96,18 +153,27 @@ const cloneDashboardVarsSchema = async (dashboardId: string, variableKey: string
         ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_E_CLONE_DASHBOARD_VARS_SCHEMA'));
     }
 };
-
-/* Event */
-const handleChangeToolbox = async (options: ToolboxOptions) => {
-    if (options.queryTags !== undefined) queryTagsHelper.setQueryTags(options.queryTags);
-    if (options.pageLimit !== undefined) {
-        // state.pageLimit = options.pageLimit;
-        // state.pageStart = 1;
-    }
-    if (options.pageStart !== undefined) {
-        // state.pageStart = options.pageStart;
+const updateUseDashboardVarsSchema = async (dashboardId: string, variableKey: string, use: boolean) => {
+    try {
+        await dashboardStore.updateDashboard(dashboardId, {
+            dashboard_id: dashboardId,
+            vars_schema: {
+                properties: {
+                    ...dashboardDetailGetters.dashboardVarsSchemaProperties,
+                    [variableKey]: {
+                        ...dashboardDetailGetters.dashboardVarsSchemaProperties[variableKey],
+                        use,
+                    },
+                },
+            },
+        });
+        showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_S_UPDATE_DASHBOARD_VARS_SCHEMA'), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_E_UPDATE_DASHBOARD_VARS_SCHEMA'));
     }
 };
+
+/* Event */
 const handleClickCreateButton = () => {
     state.modalType = 'CREATE';
     state.formModalVisible = true;
@@ -127,6 +193,10 @@ const handleClickEditButton = (variableKey: string) => {
 const handleClickCloneButton = (variableKey: string) => {
     if (!dashboardDetailState.dashboardId) return;
     cloneDashboardVarsSchema(dashboardDetailState.dashboardId, variableKey);
+};
+const handleToggleUse = (variableKey: string, val: boolean) => {
+    if (!dashboardDetailState.dashboardId) return;
+    updateUseDashboardVarsSchema(dashboardDetailState.dashboardId, variableKey, val);
 };
 const handleCloseOverlay = () => {
     SpaceRouter.router.replace(getProperRouteLocation({
@@ -151,10 +221,12 @@ const handleConfirmDelete = () => {
     >
         <div class="content-wrapper">
             <p-toolbox searchable
-                       :page-size-options="[15, 30, 45]"
-                       :page-size="15"
-                       :this-page="1"
-                       @change="handleChangeToolbox"
+                       :page-size-options="[5, 30, 45]"
+                       :page-size="5"
+                       :refreshable="false"
+                       :this-page.sync="state.thisPage"
+                       :total-count="state.totalCount"
+                       :search-text.sync="state.searchText"
             >
                 <template #left-area>
                     <p-button icon-left="ic_plus_bold"
@@ -172,10 +244,50 @@ const handleConfirmDelete = () => {
                     </p-button>
                 </template>
             </p-toolbox>
-            <dashboard-manage-variable-table @delete="handleClickDeleteButton"
-                                             @edit="handleClickEditButton"
-                                             @clone="handleClickCloneButton"
-            />
+            <p-data-table class="variable-table"
+                          :items="state.globalVariablesTableItems"
+                          :fields="state.variableFields"
+                          :loading="dashboardDetailState.loadingDashboard"
+            >
+                <template #col-type-format="{ value }">
+                    {{ value || '-' }}
+                </template>
+                <template #col-reference-format="{ value }">
+                    {{ value || '-' }}
+                </template>
+                <template #col-management-format="{ value }">
+                    <p-badge :style-type="variableTypeBadgeStyleFormatter(value)"
+                             badge-type="solid-outline"
+                    >
+                        {{ state.variableType[value] }}
+                    </p-badge>
+                </template>
+                <template #col-use-format="{ value, item }">
+                    <p-toggle-button :value="value"
+                                     :disabled="item.disabled || item.required || item.fixed || item.readonly"
+                                     @change-toggle="handleToggleUse(item.key, $event)"
+                    />
+                </template>
+                <template #col-buttons-format="{ item }">
+                    <div class="button-wrapper">
+                        <p-icon-button name="ic_clone"
+                                       size="sm"
+                                       @click="handleClickCloneButton(item.key)"
+                        />
+                        <p-icon-button v-if="item.management === 'custom'"
+                                       name="ic_edit"
+                                       size="sm"
+                                       @click="handleClickEditButton(item.key)"
+                        />
+                        <p-icon-button v-if="item.management === 'custom'"
+                                       name="ic_delete"
+                                       size="sm"
+                                       style-type="negative-transparent"
+                                       @click="handleClickDeleteButton(item.key)"
+                        />
+                    </div>
+                </template>
+            </p-data-table>
         </div>
         <dashboard-variables-form-modal :modal-type="state.modalType"
                                         :variable-key="state.selectedVariableKey"
