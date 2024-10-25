@@ -12,7 +12,7 @@ import { clone } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PContextMenu, PIconButton, PPopover, PBadge, PSelectDropdown, PFieldTitle,
-    useContextMenuController, PCheckbox,
+    useContextMenuController, PCheckbox, PButtonModal, PScopedNotification,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
@@ -104,6 +104,7 @@ const state = reactive({
         return count;
     }),
     workspaceScopeLoading: false,
+    visibleNotiModal: false,
 });
 
 const {
@@ -174,23 +175,34 @@ watch(() => costAnalysisPageGetters.selectedQueryId, (updatedQueryId) => {
 }, { immediate: true });
 
 const handleUpdateIsAllWorkspaceSelected = (isAllWorkspaceSelected: boolean) => {
-    costAnalysisPageState.isAllWorkspaceSelected = isAllWorkspaceSelected;
     if (isAllWorkspaceSelected) {
-        costAnalysisPageStore.setWorkspaceScope('');
-        if (!costAnalysisPageState.enabledFiltersProperties?.includes(GROUP_BY.WORKSPACE)) {
-            costAnalysisPageState.enabledFiltersProperties = [
-                GROUP_BY.WORKSPACE,
-                ...(costAnalysisPageState.enabledFiltersProperties ?? []),
-            ];
-        }
+        state.visibleNotiModal = true;
     } else {
+        costAnalysisPageState.isAllWorkspaceSelected = false;
         costAnalysisPageStore.setWorkspaceScope(costAnalysisPageGetters.defaultWorkspaceScope);
         costAnalysisPageState.enabledFiltersProperties = costAnalysisPageState.enabledFiltersProperties?.filter((property) => property !== GROUP_BY.WORKSPACE);
+
+        costAnalysisPageStore.setFilters({
+            ...costAnalysisPageState.filters,
+            workspace_id: [],
+        });
+    }
+};
+
+const handleConfirmIsAllWorkspaceSelected = () => {
+    costAnalysisPageState.isAllWorkspaceSelected = true;
+    costAnalysisPageStore.setWorkspaceScope('');
+    if (!costAnalysisPageState.enabledFiltersProperties?.includes(GROUP_BY.WORKSPACE)) {
+        costAnalysisPageState.enabledFiltersProperties = [
+            GROUP_BY.WORKSPACE,
+            ...(costAnalysisPageState.enabledFiltersProperties ?? []),
+        ];
     }
     costAnalysisPageStore.setFilters({
         ...costAnalysisPageState.filters,
         workspace_id: [],
     });
+    state.visibleNotiModal = false;
 };
 
 onMounted(async () => {
@@ -325,6 +337,23 @@ onMounted(async () => {
                                         :selected-query-set-id="costAnalysisPageGetters.selectedQueryId"
                                         @update-query="handleUpdateQuery"
         />
+        <p-button-modal
+            :visible="state.visibleNotiModal"
+            :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.POSSIBLE_PERFORMANCE_DELAY')"
+            size="sm"
+            @close="state.visibleNotiModal = false"
+            @cancel="state.visibleNotiModal = false"
+            @confirm="handleConfirmIsAllWorkspaceSelected"
+        >
+            <template #body>
+                <p-scoped-notification type="warning"
+                                       icon="ic_warning-filled"
+                                       layout="in-section"
+                >
+                    {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALL_WORKSPACE_SELECTED_WARNING') }}
+                </p-scoped-notification>
+            </template>
+        </p-button-modal>
     </div>
 </template>
 

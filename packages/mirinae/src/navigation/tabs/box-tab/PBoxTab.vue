@@ -35,7 +35,7 @@
 import { computed, defineComponent } from 'vue';
 
 import PI from '@/foundation/icons/PI.vue';
-import { useTab } from '@/hooks/tab';
+import { useTab } from '@/hooks/use-tab/use-tab';
 import { BOX_TAB_STYLE_TYPE } from '@/navigation/tabs/box-tab/config';
 import type { TabItem } from '@/navigation/tabs/tab/type';
 

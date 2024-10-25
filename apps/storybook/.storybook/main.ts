@@ -33,6 +33,14 @@ const config: StorybookConfig = {
       <link rel='shortcut icon' type='image/x-icon' href="<%= BASE_URL %>favicon.ico">
       <link rel='manifest' type='image/x-icon' href="<%= BASE_URL %>manifest.json">
       <link rel="apple-touch-icon" href="<%= BASE_URL %>images/icons/icon-192x192.png">
+      <style>
+        blockquote {
+            background-color: #D9E8F2;
+            border-radius: 4px;
+            padding-top: 8px !important;
+            padding-bottom: 8px !important;
+        }  
+      </style>
       `
   },
   previewBody: (body) => {

@@ -7,9 +7,8 @@ import dayjs from 'dayjs';
 
 import {
     PFieldGroup, PCheckbox, PRadioGroup, PRadio, PBadge,
-    PPaneLayout, PTextInput, PSelectDropdown, PButton,
+    PPaneLayout, PTextInput, PSelectDropdown, PButton, PScopedNotification,
 } from '@cloudforet/mirinae';
-
 
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 import type { Currency } from '@/store/modules/display/type';
@@ -18,7 +17,6 @@ import { usePreferencesStore } from '@/store/preferences/preferences-store';
 import config from '@/lib/config';
 import { initDomain } from '@/lib/site-initializer/domain';
 
-import ScopedNotification from '@/common/components/scoped-notification/ScopedNotification.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { UnifiedCostConfig } from '@/services/advanced/types/preferences-type';
@@ -114,16 +112,13 @@ watch(() => state.originUnifiedCostConfig, (unifiedCostConfig) => {
 <template>
     <p-pane-layout class="admin-domain-settings-currency-converter-page">
         <div class="content-wrapper">
-            <scoped-notification type="info"
-                                 title-icon="ic_info-circle"
-                                 hide-header-close-button
-                                 no-title
-                                 title="Title"
-                                 layout="in-section"
-                                 class="mb-6"
+            <p-scoped-notification type="information"
+                                   icon="ic_info-circle"
+                                   layout="in-section"
+                                   class="mb-6"
             >
                 {{ $t('COST_EXPLORER.CURRENCY_CONVERTER_PAGE.NOTIFICATION') }}
-            </scoped-notification>
+            </p-scoped-notification>
             <p-field-group :label="$t('COMMON.GNB.ACCOUNT.LABEL_CURRENCY')"
                            required
             >

@@ -586,6 +586,7 @@
 				"ACCUMULATED": "Accumulated",
 				"ADDITIONAL_INFO": "Additional Info",
 				"ADD_MORE": "More",
+				"ALL_WORKSPACE_SELECTED_WARNING": "Loading data from all workspaces at once may lead to slower performance due to the large volume of information being processed.",
 				"ALT_EXCEL_DOWNLOAD_STACKED": "The file will be downloaded as monthly data rather than accumulated data.",
 				"ALT_E_ADD_GROUP_BY": "There can be a maximum of three group-by options.",
 				"ALT_E_ADD_GROUP_BY_DESC": "Please unselect at least 1 of your previous Group-by choices\nbefore making a new selection.",
@@ -659,6 +660,7 @@
 					"THIS_MONTH": "This Month",
 					"THIS_YEAR": "This Year"
 				},
+				"POSSIBLE_PERFORMANCE_DELAY": "Possible Performance Delay",
 				"PRIVATE": "Private",
 				"PROJECT": "Project",
 				"PROVIDERS_TITLE": "Service Providers",

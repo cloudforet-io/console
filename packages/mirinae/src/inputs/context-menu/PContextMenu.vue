@@ -6,8 +6,8 @@ import {
 import { reduce } from 'lodash';
 
 import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
-import { useListFocus } from '@/hooks/list-focus';
-import { useProxyValue } from '@/hooks/proxy-state';
+import { useListFocus } from '@/hooks/use-list-focus/use-list-focus';
+import { useProxyValue } from '@/hooks/use-proxy-state/use-proxy-state';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import PTextButton from '@/inputs/buttons/text-button/PTextButton.vue';
 import PContextMenuItem from '@/inputs/context-menu/context-menu-item/PContextMenuItem.vue';

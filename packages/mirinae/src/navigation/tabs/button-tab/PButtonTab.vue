@@ -40,7 +40,7 @@ import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
 
-import { useTab } from '@/hooks/tab';
+import { useTab } from '@/hooks/use-tab/use-tab';
 import type { TabItem } from '@/navigation/tabs/tab/type';
 
 

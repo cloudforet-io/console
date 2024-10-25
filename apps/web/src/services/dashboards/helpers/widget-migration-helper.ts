@@ -184,8 +184,8 @@ const migrateTable = (widget: PublicWidgetModel|PrivateWidgetModel): PublicWidge
 const migrateAllWidgets = (dashboardWidgets: Array<PublicWidgetModel|PrivateWidgetModel>): Array<PublicWidgetModel|PrivateWidgetModel> => {
     const _migratedWidgets: Array<PublicWidgetModel|PrivateWidgetModel> = cloneDeep(dashboardWidgets);
     _migratedWidgets.forEach((widget) => {
-        const _widgetOptions: WidgetOptions = cloneDeep(widget.options);
-        const _widgetHeaderOption = cloneDeep(widget.options.widgetHeader) as WidgetHeaderValue;
+        const _widgetOptions: WidgetOptions = cloneDeep(widget?.options);
+        const _widgetHeaderOption = cloneDeep(widget?.options?.widgetHeader) as WidgetHeaderValue;
         if (_widgetHeaderOption && (_widgetHeaderOption?.toggleValue === undefined)) {
             widget.options = {
                 ..._widgetOptions,
