@@ -7,20 +7,32 @@ import {
 import { useRouter } from 'vue-router/composables';
 
 import {
-    debounce,
+    cloneDeep, debounce,
 } from 'lodash';
 
 import { PButton, PContextMenu, useContextMenuController } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
+import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
+import { i18n } from '@/translations';
+
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/constants/manage-variable-overlay-constant';
+import { getRefinedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variable-helper';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
 
+interface VariableMenuItem extends MenuItem {
+    use?: boolean;
+}
 interface Props {
     isManageable?: boolean;
     disabled?: boolean;
@@ -28,6 +40,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
+const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailGetters = dashboardDetailStore.getters;
@@ -39,9 +52,16 @@ const state = reactive({
     targetRef: null as HTMLElement | null,
     contextMenuRef: null as any | null,
     searchText: '',
-    variableSchema: computed(() => ({})),
-    variableList: computed<MenuItem[]>(() => []),
-    selected: computed<MenuItem[]>(() => []),
+    varsSchemaProperties: computed(() => ({})),
+    variableList: computed<VariableMenuItem[]>(() => {
+        const _refinedProperties = getRefinedGlobalVariables(dashboardDetailGetters.dashboardVarsSchema);
+        return _refinedProperties.map((property) => ({
+            name: property.key,
+            label: property.name,
+            use: property.use,
+        }));
+    }),
+    selected: computed<VariableMenuItem[]>(() => state.variableList.filter((item) => item.use)),
 });
 
 const {
@@ -66,7 +86,29 @@ const {
 const containerRef = ref<HTMLElement|null>(null);
 onClickOutside(containerRef, hideContextMenu);
 
-// event
+/* Api */
+const toggleUseDashboardVarsSchema = debounce(async (dashboardId: string, variableKey: string) => {
+    try {
+        const _dashboardVarsSchemaProperties: Record<string, DashboardGlobalVariable> = cloneDeep(dashboardDetailGetters.dashboardVarsSchemaProperties);
+        await dashboardStore.updateDashboard(dashboardId, {
+            dashboard_id: dashboardId,
+            vars_schema: {
+                properties: {
+                    ..._dashboardVarsSchemaProperties,
+                    [variableKey]: {
+                        ..._dashboardVarsSchemaProperties[variableKey],
+                        use: !_dashboardVarsSchemaProperties[variableKey].use,
+                    },
+                },
+            },
+        });
+        showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_S_UPDATE_DASHBOARD_VARS_SCHEMA'), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_E_UPDATE_DASHBOARD_VARS_SCHEMA'));
+    }
+}, 300);
+
+/* Event */
 const handleOpenOverlay = () => {
     hideContextMenu();
     router.push(getProperRouteLocation({
@@ -79,22 +121,12 @@ const handleClickButton = () => {
     if (visibleMenu.value) hideContextMenu();
     else focusOnContextMenu();
 };
-
-const handleSelectVariable = (item: MenuItem) => { // idx, isSelected
-    if (!item.name) console.error(new Error(`item.name is undefined: ${item.name}`));
-    else {
-        // TODO: update use
-    }
+const handleSelectVariable = async (item: VariableMenuItem) => { // idx, isSelected
+    if (!dashboardDetailState.dashboardId || !item.name) return;
+    await toggleUseDashboardVarsSchema(dashboardDetailState.dashboardId, item.name);
     hideContextMenu();
     state.searchText = '';
 };
-
-const handleClearSelection = () => {
-    // TODO: update use
-    hideContextMenu();
-    state.searchText = '';
-};
-
 const handleUpdateSearchText = debounce((text: string) => {
     state.searchText = text;
     reloadMenu();
@@ -133,11 +165,9 @@ const {
                         :selected="state.selected"
                         multi-selectable
                         show-select-marker
-                        show-clear-selection
                         @click-show-more="showMoreMenu"
                         @keyup:down:end="focusOnContextMenu()"
                         @select="handleSelectVariable"
-                        @clear-selection="handleClearSelection"
                         @update:search-text="handleUpdateSearchText"
         >
             <template v-if="!dashboardDetailGetters.isDeprecatedDashboard"
