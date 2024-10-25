@@ -71,7 +71,7 @@
     "uuid": "^8.3.2",
     "v-click-outside": "^3.0.1",
     "v-tooltip": "^2.0.3",
-    "vue": "2.7.16",
+    "vue": "3.0.0",
     "vue-focus": "^2.1.0",
     "vue-fragment": "^1.5.1",
     "vue-gtag": "^1.16.1",
