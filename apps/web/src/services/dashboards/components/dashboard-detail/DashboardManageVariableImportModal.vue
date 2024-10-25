@@ -1,165 +1,123 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
+import { cloneDeep } from 'lodash';
+
 import {
-    PButtonModal, PSearch, PCheckbox, PButton, PI, PIconButton,
+    PButton, PButtonModal, PCheckbox, PSearch, PScopedNotification,
 } from '@cloudforet/mirinae';
 
+import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
 import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
 import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
+import { store } from '@/store';
+import { i18n } from '@/translations';
 
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import LSBCollapsibleMenuItem from '@/common/modules/navigations/lsb/modules/LSBCollapsibleMenuItem.vue';
 
 import DashboardManageVariableImportModalTree
     from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableImportModalTree.vue';
+import { getRefinedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variable-helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
-import type { DashboardGlobalVariableModel } from '@/services/dashboards/types/global-variable-type';
 
-const MOCK_CURRNET_DASHBOARD_VARIABLES: DashboardGlobalVariableModel[] = [
-    {
-        management: 'managed',
-        key: 'mock_key1',
-        name: 'Variable 1',
-        method: 'manual',
-        type: 'text',
-        valueType: 'any',
-        options: {
-        },
-    },
-    {
-        management: 'managed',
-        key: 'mock_key2',
-        name: 'Variable 2',
-        method: 'manual',
-        type: 'text',
-        valueType: 'any',
-        options: {
-        },
-    },
-];
 
-const MOCK_SELECTED_DASHBOARD_VARIABLES: DashboardGlobalVariableModel[] = [
-    {
-        management: 'managed',
-        key: 'mock_key1',
-        name: 'Variable 1',
-        method: 'manual',
-        type: 'text',
-        valueType: 'any',
-        options: {
-        },
-    },
-    {
-        management: 'managed',
-        key: 'mock_key2',
-        name: 'Variable 2',
-        method: 'manual',
-        type: 'text',
-        valueType: 'any',
-        options: {
-        },
-    },
-    {
-        management: 'managed',
-        key: 'mock_key3',
-        name: 'Variable 3',
-        method: 'manual',
-        type: 'text',
-        valueType: 'any',
-        options: {
-        },
-    },
-    {
-        management: 'managed',
-        key: 'mock_key4',
-        name: 'Variable 4',
-        method: 'manual',
-        type: 'text',
-        valueType: 'any',
-        options: {
-        },
-    },
-    {
-        management: 'managed',
-        key: 'mock_key5',
-        name: 'Variable 5',
-        method: 'manual',
-        type: 'text',
-        valueType: 'any',
-        options: {
-        },
-    },
-];
 
 interface Props {
     visible: boolean;
 }
+const dashboardStore = useDashboardStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlGetters = dashboardPageControlStore.getters;
-const dashboardDetailInfoStore = useDashboardDetailInfoStore();
-const dashboardDetailInfoState = dashboardDetailInfoStore.state;
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;}>();
 
 const state = reactive({
-    proxyVisible: useProxyValue('visible', props, emit),
-    currentDashboardId: computed(() => dashboardDetailInfoState.dashboardId),
-    currentDashboardVariables: computed<DashboardGlobalVariableModel[]>(() => {
-        // const currentVariables = Object.values(dashboardDetailInfoState.variablesSchema.properties) as DashboardGlobalVariableModel[];
-        const currentVariables = MOCK_CURRNET_DASHBOARD_VARIABLES as DashboardGlobalVariableModel[];
-        return currentVariables;
-    }),
+    proxyVisible: useProxyValue<boolean>('visible', props, emit),
+    currentDashboardId: computed<string>(() => dashboardDetailState.dashboardId || ''),
+    currentDashboardVariables: computed<DashboardGlobalVariable[]>(() => Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties)),
     keyword: '',
     selectedDashboardId: '' as string|undefined,
     publicDashboardItems: computed<PublicDashboardModel[]>(() => dashboardPageControlGetters.publicDashboardItems.filter((item) => item.dashboard_id !== state.currentDashboardId)),
     privateDashboardItems: computed<PrivateDashboardModel[]>(() => dashboardPageControlGetters.privateDashboardItems.filter((item) => item.dashboard_id !== state.currentDashboardId)),
     allDashboardItems: computed<PrivateDashboardModel[]>(() => [...state.publicDashboardItems, ...state.privateDashboardItems]),
-    selectedDashboardVariables: computed<DashboardGlobalVariableModel[]>(() => {
-        const _mock = MOCK_SELECTED_DASHBOARD_VARIABLES;
-        // const selectedDashboard = state.allDashboardItems.find((item) => item.dashboard_id === state.selectedDashboardId);
-        // if (!selectedDashboard) return [];
-        // return Object.values(selectedDashboard.variables_schema?.properties as Record<string, DashboardGlobalVariableModel> ?? {});
-        return _mock;
+    selectedDashboardVariables: computed<DashboardGlobalVariable[]>(() => {
+        const selectedDashboard = state.allDashboardItems.find((item) => item.dashboard_id === state.selectedDashboardId);
+        if (!selectedDashboard) return [];
+        return getRefinedGlobalVariables(selectedDashboard?.vars_schema);
     }),
-    selectedVariables: [] as string[],
-    isAllSelected: computed(() => state.selectedVariables.length === state.selectedDashboardVariables.filter((variable) => !isDuplicatedVariableName(variable)).length),
+    searchedDashboardVariables: computed<DashboardGlobalVariable[]>(() => state.selectedDashboardVariables.filter((variable) => variable.name.toLowerCase().includes(state.keyword.toLowerCase()))),
+    selectedVariableKeys: [] as string[],
+    isAllSelected: computed<boolean>(() => {
+        if (state.selectedVariableKeys.length === 0) return false;
+        return state.selectedVariableKeys.length === state.selectedDashboardVariables.filter((variable) => !isDuplicatedVariableName(variable)).length;
+    }),
     notiBannerVisible: true,
 });
 
 
-const handleChangeSelectedVariables = (selected: string[]) => {
-    state.selectedVariables = selected;
+/* Api */
+const updateUseDashboardVarsSchema = async (dashboardId: string) => {
+    try {
+        const _dashboardVarsSchemaProperties = cloneDeep(dashboardDetailGetters.dashboardVarsSchemaProperties);
+        state.selectedDashboardVariables
+            .filter((variable) => state.selectedVariableKeys.includes(variable.key))
+            .forEach((variable) => {
+                _dashboardVarsSchemaProperties[variable.key] = {
+                    ...variable,
+                    use: false,
+                    created_by: store.state.user.userId,
+                };
+            });
+        await dashboardStore.updateDashboard(dashboardId, {
+            dashboard_id: dashboardId,
+            vars_schema: {
+                properties: _dashboardVarsSchemaProperties,
+            },
+        });
+        showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_S_UPDATE_DASHBOARD_VARS_SCHEMA'), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_E_UPDATE_DASHBOARD_VARS_SCHEMA'));
+    }
+};
+
+
+/* Event */
+const handleChangeSelectedVariableKeys = (selected: string[]) => {
+    state.selectedVariableKeys = selected;
 };
 const handleChangeAllSelectedVariables = (selected: boolean) => {
-    state.selectedVariables = selected ? state.selectedDashboardVariables.filter((variable) => !isDuplicatedVariableName(variable)).map((variable) => variable.key) : [];
+    state.selectedVariableKeys = selected ? state.selectedDashboardVariables.filter((variable) => !isDuplicatedVariableName(variable)).map((variable) => variable.key) : [];
 };
 const handleClickClearAll = () => {
-    state.selectedVariables = [];
+    state.selectedVariableKeys = [];
 };
-
-const handleCloseScopeNotificationBanner = () => {
-    state.notiBannerVisible = false;
-};
-
-const handleConfirmImportVariables = () => {
-    // TODO: Implement import variables
+const handleConfirmImportVariables = async () => {
+    await updateUseDashboardVarsSchema(state.currentDashboardId);
+    state.proxyVisible = false;
 };
 
 
-const isDuplicatedVariableName = (variable: DashboardGlobalVariableModel): boolean => state.currentDashboardVariables.some((currentVariable) => currentVariable.name === variable.name
+const isDuplicatedVariableName = (variable: DashboardGlobalVariable): boolean => state.currentDashboardVariables.some((currentVariable) => currentVariable.name === variable.name
     || currentVariable.key === variable.key);
 
 const getIndeterminate = (): boolean => {
     const availableVariableCount = state.selectedDashboardVariables.filter((variable) => !isDuplicatedVariableName(variable)).length;
-    return state.selectedVariables.length > 0 && state.selectedVariables.length < availableVariableCount;
+    return state.selectedVariableKeys.length > 0 && state.selectedVariableKeys.length < availableVariableCount;
 };
 
 watch(() => state.selectedDashboardVariables, (selectedDashboardVariables) => {
     state.notiBannerVisible = selectedDashboardVariables.some((variable) => isDuplicatedVariableName(variable));
-});
-
+}, { immediate: true });
 </script>
 
 <template>
@@ -225,28 +183,23 @@ watch(() => state.selectedDashboardVariables, (selectedDashboardVariables) => {
                             </p-button>
                         </div>
                         <div class="variable-list">
-                            <div v-if="state.notiBannerVisible"
-                                 class="variable-scoped-notification-banner"
+                            <p-scoped-notification v-if="state.notiBannerVisible"
+                                                   type="warning"
+                                                   icon="ic_warning-filled"
+                                                   layout="in-section"
+                                                   :visible.sync="state.notiBannerVisible"
+                                                   show-close-button
                             >
-                                <p-i name="ic_warning-filled"
-                                     width="1.25rem"
-                                     height="1.25rem"
-                                />
-                                <span class="description">{{ $t('DASHBOARDS.DETAIL.VARIABLES.DUPLICATED_NAME_WARNING') }}</span>
-                                <p-icon-button name="ic_close"
-                                               width="1.5rem"
-                                               height="1.5rem"
-                                               @click="handleCloseScopeNotificationBanner"
-                                />
-                            </div>
-                            <div v-for="(variable) in state.selectedDashboardVariables"
+                                {{ $t('DASHBOARDS.DETAIL.VARIABLES.DUPLICATED_NAME_WARNING') }}
+                            </p-scoped-notification>
+                            <div v-for="(variable) in state.searchedDashboardVariables"
                                  :key="variable.key"
                                  class="variable"
                             >
-                                <p-checkbox :selected="state.selectedVariables"
+                                <p-checkbox :selected="state.selectedVariableKeys"
                                             :value="variable.key"
                                             :disabled="isDuplicatedVariableName(variable)"
-                                            @change="handleChangeSelectedVariables"
+                                            @change="handleChangeSelectedVariableKeys"
                                 >
                                     <span class="variable-text">{{ variable.name }}</span>
                                 </p-checkbox>
@@ -292,15 +245,6 @@ watch(() => state.selectedDashboardVariables, (selectedDashboardVariables) => {
                 .variable-list {
                     height: calc(100% - 2.5rem);
                     overflow: auto;
-
-                    .variable-scoped-notification-banner {
-                        @apply bg-yellow-100 flex gap-1;
-                        padding: 0.5rem 1rem;
-
-                        .description {
-                            @apply flex-1 text-paragraph-md text-gray-900;
-                        }
-                    }
 
                     .variable {
                         @apply flex items-center;

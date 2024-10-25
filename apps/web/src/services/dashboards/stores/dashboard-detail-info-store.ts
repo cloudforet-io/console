@@ -118,6 +118,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         dashboardName: computed<string>(() => getters.dashboardInfo?.name || ''),
         dashboardLabels: computed<string[]>(() => getters.dashboardInfo?.labels || []),
         dashboardLayouts: computed<DashboardLayout[]>(() => getters.dashboardInfo?.layouts || []),
+        dashboardVarsSchema: computed<DashboardVariablesSchema>(() => getters.dashboardInfo?.vars_schema || {}),
         dashboardVarsSchemaProperties: computed<Record<string, DashboardGlobalVariable>>(() => getters.dashboardInfo?.vars_schema?.properties || {}),
         isPrivate: computed<boolean>(() => !!state.dashboardId?.startsWith('private')),
         //
