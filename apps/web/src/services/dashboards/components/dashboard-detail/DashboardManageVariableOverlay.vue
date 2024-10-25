@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import {
-    reactive, computed,
-} from 'vue';
+import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { cloneDeep, orderBy } from 'lodash';
 
 import {
-    POverlayLayout, PToolbox, PButton, PDataTable, PBadge, PIconButton, PToggleButton,
+    PBadge, PButton, PDataTable, PIconButton, POverlayLayout, PToggleButton, PToolbox,
 } from '@cloudforet/mirinae';
 import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 import { getClonedName } from '@cloudforet/utils';
@@ -65,8 +63,8 @@ const state = reactive({
     deleteModalLoading: false,
     importModalVisible: false,
     thisPage: 1,
+    pageSize: 15,
     searchText: '',
-    totalCount: computed<number>(() => Object.keys(dashboardDetailGetters.dashboardVarsSchemaProperties).length),
     globalVariablesTableItems: computed<GlobalVariableTableItem[]>(() => {
         const _managedItems: GlobalVariableTableItem[] = [];
         Object.values(MANAGED_DASHBOARD_GLOBAL_VARIABLES_SCHEMA).forEach((d) => {
@@ -79,6 +77,7 @@ const state = reactive({
                 reference: i18n.t('DASHBOARDS.DETAIL.VARIABLES.COMMON'),
             });
         });
+
         const varsSchemaProperties: DashboardGlobalVariable[] = Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties);
         const _customItems: GlobalVariableTableItem[] = varsSchemaProperties.map((d) => ({
             ...d,
@@ -86,10 +85,11 @@ const state = reactive({
             reference: d.method === 'dynamic' ? d?.reference?.resourceType : undefined,
         }));
         const _orderedCustomItems = orderBy(_customItems, ['name'], ['asc']);
-        return [
-            ..._managedItems,
-            ..._orderedCustomItems,
-        ];
+        return [..._managedItems, ..._orderedCustomItems];
+    }),
+    searchedGlobalVariablesTableItems: computed<GlobalVariableTableItem[]>(() => {
+        if (!state.searchText.length) return state.globalVariablesTableItems;
+        return state.globalVariablesTableItems.filter((d) => d.name.toLowerCase().includes(state.searchText.toLowerCase()));
     }),
     variableFields: [
         { name: 'name', label: 'Name' },
@@ -110,6 +110,11 @@ const state = reactive({
 const variableTypeBadgeStyleFormatter = (type: 'managed'|'custom') => {
     if (type === 'managed') return 'gray500';
     return 'primary';
+};
+const getSlicedVariableItems = (items: GlobalVariableTableItem[], thisPage: number, pageSize: number): GlobalVariableTableItem[] => {
+    const _startIndex = (thisPage - 1) * pageSize;
+    const _endIndex = thisPage * pageSize;
+    return items.slice(_startIndex, _endIndex);
 };
 
 /* Api */
@@ -221,11 +226,11 @@ const handleConfirmDelete = () => {
     >
         <div class="content-wrapper">
             <p-toolbox searchable
-                       :page-size-options="[5, 30, 45]"
-                       :page-size="5"
+                       :page-size-options="[15, 30, 45]"
+                       :page-size.sync="state.pageSize"
                        :refreshable="false"
                        :this-page.sync="state.thisPage"
-                       :total-count="state.totalCount"
+                       :total-count="state.searchedGlobalVariablesTableItems.length"
                        :search-text.sync="state.searchText"
             >
                 <template #left-area>
@@ -245,7 +250,7 @@ const handleConfirmDelete = () => {
                 </template>
             </p-toolbox>
             <p-data-table class="variable-table"
-                          :items="state.globalVariablesTableItems"
+                          :items="getSlicedVariableItems(state.searchedGlobalVariablesTableItems, state.thisPage, state.pageSize)"
                           :fields="state.variableFields"
                           :loading="dashboardDetailState.loadingDashboard"
             >
