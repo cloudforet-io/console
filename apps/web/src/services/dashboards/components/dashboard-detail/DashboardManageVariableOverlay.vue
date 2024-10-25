@@ -5,7 +5,7 @@ import type { TranslateResult } from 'vue-i18n';
 import { cloneDeep, orderBy } from 'lodash';
 
 import {
-    PBadge, PButton, PDataTable, PIconButton, POverlayLayout, PToggleButton, PToolbox,
+    PBadge, PButton, PIconButton, POverlayLayout, PToggleButton, PToolboxTable,
 } from '@cloudforet/mirinae';
 import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 import { getClonedName } from '@cloudforet/utils';
@@ -225,15 +225,17 @@ const handleConfirmDelete = () => {
                       @close="handleCloseOverlay"
     >
         <div class="content-wrapper">
-            <p-toolbox searchable
-                       :page-size-options="[15, 30, 45]"
-                       :page-size.sync="state.pageSize"
-                       :refreshable="false"
-                       :this-page.sync="state.thisPage"
-                       :total-count="state.searchedGlobalVariablesTableItems.length"
-                       :search-text.sync="state.searchText"
+            <p-toolbox-table :fields="state.variableFields"
+                             :loading="dashboardDetailState.loadingDashboard"
+                             :items="getSlicedVariableItems(state.searchedGlobalVariablesTableItems, state.thisPage, state.pageSize)"
+                             :page-size-options="[15, 30, 45]"
+                             :page-size.sync="state.pageSize"
+                             :this-page.sync="state.thisPage"
+                             :total-count="state.searchedGlobalVariablesTableItems.length"
+                             searchable
+                             :search-text.sync="state.searchText"
             >
-                <template #left-area>
+                <template #toolbox-left>
                     <p-button icon-left="ic_plus_bold"
                               style-type="primary"
                               class="mr-4"
@@ -248,12 +250,6 @@ const handleConfirmDelete = () => {
                         {{ $t('DASHBOARDS.DETAIL.VARIABLES.IMPORT') }}
                     </p-button>
                 </template>
-            </p-toolbox>
-            <p-data-table class="variable-table"
-                          :items="getSlicedVariableItems(state.searchedGlobalVariablesTableItems, state.thisPage, state.pageSize)"
-                          :fields="state.variableFields"
-                          :loading="dashboardDetailState.loadingDashboard"
-            >
                 <template #col-type-format="{ value }">
                     {{ value || '-' }}
                 </template>
@@ -292,7 +288,7 @@ const handleConfirmDelete = () => {
                         />
                     </div>
                 </template>
-            </p-data-table>
+            </p-toolbox-table>
         </div>
         <dashboard-variables-form-modal :modal-type="state.modalType"
                                         :variable-key="state.selectedVariableKey"
