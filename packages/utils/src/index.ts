@@ -216,8 +216,8 @@ export const getContrastingColor = (hexColor?: string): string => {
 };
 
 
-export const getClonedName = (existingNames: string[], name: string): string => {
+export const getClonedName = (existingNames: string[], name: string, cloneKey = 'Clone - '): string => {
     if (!existingNames.includes(name)) return name;
-    const _newName = `Clone - ${name}`;
+    const _newName = `${cloneKey}${name}`;
     return existingNames.find((n) => n === _newName) ? getClonedName(existingNames, _newName) : _newName;
 };

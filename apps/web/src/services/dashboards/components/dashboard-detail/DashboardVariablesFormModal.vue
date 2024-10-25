@@ -8,6 +8,7 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { DashboardGlobalVariable, ManualVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
@@ -121,6 +122,8 @@ const {
         if (state.loading) return '';
         if (!value) return i18n.t('DASHBOARDS.DETAIL.VARIABLES.KEY_REQUIRED');
         if (state.existingVariableKeyList.find((d) => d === value)) return i18n.t('DASHBOARDS.DETAIL.VARIABLES.KEY_DUPLICATED');
+        const _snakeCaseRegex = RegExp(/^[a-z]+(_[a-z]+)*$/);
+        if (!_snakeCaseRegex.test(value)) return i18n.t('DASHBOARDS.DETAIL.VARIABLES.KEY_INVALID');
         return '';
     },
 });
@@ -157,6 +160,7 @@ const createDashboardVarsSchema = async (dashboardId: string) => {
                     [state.dashboardGlobalVariable.key]: {
                         ...state.dashboardGlobalVariable,
                         use: true,
+                        created_by: store.state.user.userId,
                     },
                 },
             },
