@@ -11,7 +11,6 @@ import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables
 import { getClonedName } from '@cloudforet/utils';
 
 import { SpaceRouter } from '@/router';
-import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -27,9 +26,7 @@ import DashboardManageVariableImportModal
     from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableImportModal.vue';
 import DashboardVariablesFormModal
     from '@/services/dashboards/components/dashboard-detail/DashboardVariablesFormModal.vue';
-import {
-    MANAGED_DASHBOARD_GLOBAL_VARIABLES_SCHEMA,
-} from '@/services/dashboards/constants/managed-dashboard-global-variables';
+import { getRefinedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variable-helper';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
@@ -66,26 +63,22 @@ const state = reactive({
     pageSize: 15,
     searchText: '',
     globalVariablesTableItems: computed<GlobalVariableTableItem[]>(() => {
-        const _managedItems: GlobalVariableTableItem[] = [];
-        Object.values(MANAGED_DASHBOARD_GLOBAL_VARIABLES_SCHEMA).forEach((d) => {
-            _managedItems.push({
-                key: d.key,
-                name: d.name,
-                management: 'managed',
-                use: dashboardDetailGetters.dashboardVarsSchemaProperties[d.key]?.use || false,
-                created_by: 'System',
-                reference: i18n.t('DASHBOARDS.DETAIL.VARIABLES.COMMON'),
-            });
-        });
-        const varsSchemaProperties: DashboardGlobalVariable[] = Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties);
-        const _customProperties = varsSchemaProperties.filter((d) => d.management !== 'managed');
+        const refinedGlobalVariables = getRefinedGlobalVariables(dashboardDetailGetters?.dashboardInfo?.vars_schema);
+        const _managedProperties = refinedGlobalVariables.filter((d) => d.management === 'managed');
+        const _managedItems: GlobalVariableTableItem[] = _managedProperties.map((d) => ({
+            ...d,
+            created_by: 'System',
+            reference: i18n.t('DASHBOARDS.DETAIL.VARIABLES.COMMON'),
+        }));
+        const _orderedManagedItems = orderBy(_managedItems, ['name'], ['asc']);
+        const _customProperties = refinedGlobalVariables.filter((d) => d.management !== 'managed');
         const _customItems: GlobalVariableTableItem[] = _customProperties.map((d) => ({
             ...d,
             type: d.method === 'manual' ? d.type : undefined,
             reference: d.method === 'dynamic' ? d?.reference?.resourceType : undefined,
         }));
         const _orderedCustomItems = orderBy(_customItems, ['name'], ['asc']);
-        return [..._managedItems, ..._orderedCustomItems];
+        return [..._orderedManagedItems, ..._orderedCustomItems];
     }),
     searchedGlobalVariablesTableItems: computed<GlobalVariableTableItem[]>(() => {
         if (!state.searchText.length) return state.globalVariablesTableItems;
