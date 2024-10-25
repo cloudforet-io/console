@@ -12,6 +12,12 @@ import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables
 import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
 import { i18n } from '@/translations';
 
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import {
     MANAGED_DASHBOARD_GLOBAL_VARIABLES_SCHEMA,
 } from '@/services/dashboards/constants/managed-dashboard-global-variables';
@@ -36,6 +42,7 @@ interface EmitFn {
 type VariableType = 'managed'|'custom';
 const emit = defineEmits<EmitFn>();
 
+const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailGetters = dashboardDetailStore.getters;
@@ -78,6 +85,28 @@ const state = reactive({
     })),
 });
 
+
+/* Api */
+const updateDashboardVarsSchema = async (dashboardId: string, variableKey: string, use: boolean) => {
+    try {
+        await dashboardStore.updateDashboard(dashboardId, {
+            dashboard_id: dashboardId,
+            vars_schema: {
+                properties: {
+                    ...dashboardDetailGetters.dashboardVarsSchemaProperties,
+                    [variableKey]: {
+                        ...dashboardDetailGetters.dashboardVarsSchemaProperties[variableKey],
+                        use,
+                    },
+                },
+            },
+        });
+        showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_S_UPDATE_DASHBOARD_VARS_SCHEMA'), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_E_UPDATE_DASHBOARD_VARS_SCHEMA'));
+    }
+};
+
 /* EVENT */
 const handleCloneVariable = (variableKey: string) => {
     emit('clone', variableKey);
@@ -88,8 +117,9 @@ const handleEditVariable = (variableKey: string) => {
 const handleDeleteVariable = (variableKey: string) => {
     emit('delete', variableKey);
 };
-const handleToggleUse = () => {
-    //
+const handleToggleUse = (variableKey: string, val: boolean) => {
+    if (!dashboardDetailState.dashboardId) return;
+    updateDashboardVarsSchema(dashboardDetailState.dashboardId, variableKey, val);
 };
 
 /* Helper */
@@ -122,7 +152,7 @@ const variableTypeBadgeStyleFormatter = (type: VariableType) => {
             <template #col-use-format="{ value, item }">
                 <p-toggle-button :value="value"
                                  :disabled="item.disabled || item.required || item.fixed || item.readonly"
-                                 @change-toggle="handleToggleUse"
+                                 @change-toggle="handleToggleUse(item.key, $event)"
                 />
             </template>
             <template #col-buttons-format="{ item }">
