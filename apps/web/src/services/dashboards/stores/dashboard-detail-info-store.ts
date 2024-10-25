@@ -173,7 +173,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         }),
         // only for 1.0 legacy dashboard
         dashboardWidgetInfoList: computed<DashboardLayoutWidgetInfo[]>(() => {
-            const _dashboardWidget: DashboardLayoutWidgetInfo[] = getters.dashboardInfo?.layouts[0].widgets || [];
+            const _dashboardWidget: DashboardLayoutWidgetInfo[] = getters.dashboardInfo?.layouts?.[0].widgets || [];
             return _dashboardWidget.map((info) => ({
                 ...info,
                 widget_key: info.widget_key ?? getRandomId(),

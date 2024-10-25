@@ -11,7 +11,6 @@ import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables
 import { getClonedName } from '@cloudforet/utils';
 
 import { SpaceRouter } from '@/router';
-import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -27,9 +26,7 @@ import DashboardManageVariableImportModal
     from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableImportModal.vue';
 import DashboardVariablesFormModal
     from '@/services/dashboards/components/dashboard-detail/DashboardVariablesFormModal.vue';
-import {
-    MANAGED_DASHBOARD_GLOBAL_VARIABLES_SCHEMA,
-} from '@/services/dashboards/constants/managed-dashboard-global-variables';
+import { getRefinedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variable-helper';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
@@ -66,26 +63,22 @@ const state = reactive({
     pageSize: 15,
     searchText: '',
     globalVariablesTableItems: computed<GlobalVariableTableItem[]>(() => {
-        const _managedItems: GlobalVariableTableItem[] = [];
-        Object.values(MANAGED_DASHBOARD_GLOBAL_VARIABLES_SCHEMA).forEach((d) => {
-            _managedItems.push({
-                key: d.key,
-                name: d.name,
-                management: 'managed',
-                use: dashboardDetailGetters.dashboardVarsSchemaProperties[d.key]?.use || false,
-                created_by: 'System',
-                reference: i18n.t('DASHBOARDS.DETAIL.VARIABLES.COMMON'),
-            });
-        });
-        const varsSchemaProperties: DashboardGlobalVariable[] = Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties);
-        const _customProperties = varsSchemaProperties.filter((d) => d.management !== 'managed');
+        const refinedGlobalVariables = getRefinedGlobalVariables(dashboardDetailGetters?.dashboardInfo?.vars_schema);
+        const _managedProperties = refinedGlobalVariables.filter((d) => d.management === 'managed');
+        const _managedItems: GlobalVariableTableItem[] = _managedProperties.map((d) => ({
+            ...d,
+            created_by: 'System',
+            reference: i18n.t('DASHBOARDS.DETAIL.VARIABLES.COMMON'),
+        }));
+        const _orderedManagedItems = orderBy(_managedItems, ['name'], ['asc']);
+        const _customProperties = refinedGlobalVariables.filter((d) => d.management !== 'managed');
         const _customItems: GlobalVariableTableItem[] = _customProperties.map((d) => ({
             ...d,
             type: d.method === 'manual' ? d.type : undefined,
             reference: d.method === 'dynamic' ? d?.reference?.resourceType : undefined,
         }));
         const _orderedCustomItems = orderBy(_customItems, ['name'], ['asc']);
-        return [..._managedItems, ..._orderedCustomItems];
+        return [..._orderedManagedItems, ..._orderedCustomItems];
     }),
     searchedGlobalVariablesTableItems: computed<GlobalVariableTableItem[]>(() => {
         if (!state.searchText.length) return state.globalVariablesTableItems;
@@ -224,73 +217,72 @@ const handleConfirmDelete = () => {
                       class="dashboard-manage-variable-overlay"
                       @close="handleCloseOverlay"
     >
-        <div class="content-wrapper">
-            <p-toolbox-table :fields="state.variableFields"
-                             :loading="dashboardDetailState.loadingDashboard"
-                             :items="getSlicedVariableItems(state.searchedGlobalVariablesTableItems, state.thisPage, state.pageSize)"
-                             :page-size-options="[15, 30, 45]"
-                             :page-size.sync="state.pageSize"
-                             :this-page.sync="state.thisPage"
-                             :total-count="state.searchedGlobalVariablesTableItems.length"
-                             searchable
-                             :search-text.sync="state.searchText"
-                             :refreshable="false"
-            >
-                <template #toolbox-left>
-                    <p-button icon-left="ic_plus_bold"
-                              style-type="primary"
-                              class="mr-4"
-                              @click="handleClickCreateButton"
-                    >
-                        {{ $t('DASHBOARDS.DETAIL.VARIABLES.CREATE') }}
-                    </p-button>
-                    <p-button icon-left="ic_collect"
-                              style-type="substitutive"
-                              @click="handleClickImportButton"
-                    >
-                        {{ $t('DASHBOARDS.DETAIL.VARIABLES.IMPORT') }}
-                    </p-button>
-                </template>
-                <template #col-type-format="{ value }">
-                    {{ value || '-' }}
-                </template>
-                <template #col-reference-format="{ value }">
-                    {{ value || '-' }}
-                </template>
-                <template #col-management-format="{ value }">
-                    <p-badge :style-type="variableTypeBadgeStyleFormatter(value)"
-                             badge-type="solid-outline"
-                    >
-                        {{ state.variableType[value] }}
-                    </p-badge>
-                </template>
-                <template #col-use-format="{ value, item }">
-                    <p-toggle-button :value="value"
-                                     :disabled="item.disabled || item.required || item.fixed || item.readonly"
-                                     @change-toggle="handleToggleUse(item.key, $event)"
+        <p-toolbox-table :fields="state.variableFields"
+                         :loading="dashboardDetailState.loadingDashboard"
+                         :items="getSlicedVariableItems(state.searchedGlobalVariablesTableItems, state.thisPage, state.pageSize)"
+                         :page-size-options="[15, 30, 45]"
+                         :page-size.sync="state.pageSize"
+                         :this-page.sync="state.thisPage"
+                         :total-count="state.searchedGlobalVariablesTableItems.length"
+                         searchable
+                         :search-text.sync="state.searchText"
+                         :refreshable="false"
+                         class="content-wrapper"
+        >
+            <template #toolbox-left>
+                <p-button icon-left="ic_plus_bold"
+                          style-type="primary"
+                          class="mr-4"
+                          @click="handleClickCreateButton"
+                >
+                    {{ $t('DASHBOARDS.DETAIL.VARIABLES.CREATE') }}
+                </p-button>
+                <p-button icon-left="ic_collect"
+                          style-type="substitutive"
+                          @click="handleClickImportButton"
+                >
+                    {{ $t('DASHBOARDS.DETAIL.VARIABLES.IMPORT') }}
+                </p-button>
+            </template>
+            <template #col-type-format="{ value }">
+                {{ value || '-' }}
+            </template>
+            <template #col-reference-format="{ value }">
+                {{ value || '-' }}
+            </template>
+            <template #col-management-format="{ value }">
+                <p-badge :style-type="variableTypeBadgeStyleFormatter(value)"
+                         badge-type="solid-outline"
+                >
+                    {{ state.variableType[value] }}
+                </p-badge>
+            </template>
+            <template #col-use-format="{ value, item }">
+                <p-toggle-button :value="value"
+                                 :disabled="item.disabled || item.required || item.fixed || item.readonly"
+                                 @change-toggle="handleToggleUse(item.key, $event)"
+                />
+            </template>
+            <template #col-buttons-format="{ item }">
+                <div class="button-wrapper">
+                    <p-icon-button name="ic_clone"
+                                   size="sm"
+                                   @click="handleClickCloneButton(item.key)"
                     />
-                </template>
-                <template #col-buttons-format="{ item }">
-                    <div class="button-wrapper">
-                        <p-icon-button name="ic_clone"
-                                       size="sm"
-                                       @click="handleClickCloneButton(item.key)"
-                        />
-                        <p-icon-button v-if="item.management === 'custom'"
-                                       name="ic_edit"
-                                       size="sm"
-                                       @click="handleClickEditButton(item.key)"
-                        />
-                        <p-icon-button v-if="item.management === 'custom'"
-                                       name="ic_delete"
-                                       size="sm"
-                                       style-type="negative-transparent"
-                                       @click="handleClickDeleteButton(item.key)"
-                        />
-                    </div>
-                </template>
-            </p-toolbox-table>
-        </div>
+                    <p-icon-button v-if="item.management === 'custom'"
+                                   name="ic_edit"
+                                   size="sm"
+                                   @click="handleClickEditButton(item.key)"
+                    />
+                    <p-icon-button v-if="item.management === 'custom'"
+                                   name="ic_delete"
+                                   size="sm"
+                                   style-type="negative-transparent"
+                                   @click="handleClickDeleteButton(item.key)"
+                    />
+                </div>
+            </template>
+        </p-toolbox-table>
         <dashboard-variables-form-modal :modal-type="state.modalType"
                                         :variable-key="state.selectedVariableKey"
                                         :visible.sync="state.formModalVisible"
@@ -310,7 +302,7 @@ const handleConfirmDelete = () => {
         @apply bg-white border border-gray-200 rounded-md;
         width: 100%;
         height: fit-content;
-        padding: 1.5rem;
+        padding-bottom: 1.5rem;
         margin: 0 1.5rem;
     }
 }

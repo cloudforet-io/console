@@ -8,7 +8,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
-import type { DashboardGlobalVariable, ReferenceVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
+import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -78,11 +78,10 @@ const state = reactive({
                 },
             };
         }
-        const _targetGV: ReferenceVariable|undefined = MANAGED_DASHBOARD_GLOBAL_VARIABLES_SCHEMA[state.selectedSourceFrom];
         return {
             method: 'dynamic',
             reference: {
-                resourceType: _targetGV?.reference.resourceType,
+                resourceType: state.selectedSourceFrom,
             },
             options: {
                 selectionType: 'multi',
@@ -91,7 +90,7 @@ const state = reactive({
     }),
     sourceFromMenuItems: computed<MenuItem[]>(() => {
         const _managedGVMenuItems = Object.values(MANAGED_DASHBOARD_GLOBAL_VARIABLES_SCHEMA).map((d) => ({
-            name: d.key,
+            name: d.reference.resourceType,
             label: d.name,
         }));
         return [
@@ -193,19 +192,21 @@ const { menuItems: costDataSourceFilterMenuItems } = useCostDataSourceFilterMenu
 
 /* Util */
 const initExistingVariable = (originalData: DashboardGlobalVariable) => {
-    if (originalData.method === 'dynamic') {
-        const _reference = originalData.reference;
-        if (_reference.resourceType === MetricDataVariableModel.meta.resourceType) {
-            state.selectedSourceFrom = 'asset';
-            state.selectedMetricId = _reference.dataSourceId || '';
-            const _targetMetric = storeState.metrics[state.selectedMetricId];
-            state.selectedNamespaceId = _targetMetric?.data.namespace_id || '';
-            state.selectedCategory = storeState.namespaces[state.selectedNamespaceId]?.data.group;
-        } else if (_reference.resourceType === CostVariableModel.meta.resourceType) {
-            state.selectedSourceFrom = 'cost';
-            state.selectedCostDataSourceId = _reference.dataSourceId;
-        }
+    if (originalData.method !== 'dynamic') return;
+    const _reference = originalData.reference;
+    if (_reference.resourceType === MetricDataVariableModel.meta.resourceType) {
+        state.selectedSourceFrom = 'asset';
+        state.selectedMetricId = _reference.dataSourceId || '';
+        const _targetMetric = storeState.metrics[state.selectedMetricId];
+        state.selectedNamespaceId = _targetMetric?.data.namespace_id || '';
+        state.selectedCategory = storeState.namespaces[state.selectedNamespaceId]?.data.group;
         state.selectedValuesFrom = _reference.dataKey;
+    } else if (_reference.resourceType === CostVariableModel.meta.resourceType) {
+        state.selectedSourceFrom = 'cost';
+        state.selectedCostDataSourceId = _reference.dataSourceId;
+        state.selectedValuesFrom = _reference.dataKey;
+    } else {
+        state.selectedSourceFrom = _reference.resourceType;
     }
 };
 
