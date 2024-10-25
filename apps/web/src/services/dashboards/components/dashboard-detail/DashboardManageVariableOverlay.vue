@@ -224,73 +224,72 @@ const handleConfirmDelete = () => {
                       class="dashboard-manage-variable-overlay"
                       @close="handleCloseOverlay"
     >
-        <div class="content-wrapper">
-            <p-toolbox-table :fields="state.variableFields"
-                             :loading="dashboardDetailState.loadingDashboard"
-                             :items="getSlicedVariableItems(state.searchedGlobalVariablesTableItems, state.thisPage, state.pageSize)"
-                             :page-size-options="[15, 30, 45]"
-                             :page-size.sync="state.pageSize"
-                             :this-page.sync="state.thisPage"
-                             :total-count="state.searchedGlobalVariablesTableItems.length"
-                             searchable
-                             :search-text.sync="state.searchText"
-                             :refreshable="false"
-            >
-                <template #toolbox-left>
-                    <p-button icon-left="ic_plus_bold"
-                              style-type="primary"
-                              class="mr-4"
-                              @click="handleClickCreateButton"
-                    >
-                        {{ $t('DASHBOARDS.DETAIL.VARIABLES.CREATE') }}
-                    </p-button>
-                    <p-button icon-left="ic_collect"
-                              style-type="substitutive"
-                              @click="handleClickImportButton"
-                    >
-                        {{ $t('DASHBOARDS.DETAIL.VARIABLES.IMPORT') }}
-                    </p-button>
-                </template>
-                <template #col-type-format="{ value }">
-                    {{ value || '-' }}
-                </template>
-                <template #col-reference-format="{ value }">
-                    {{ value || '-' }}
-                </template>
-                <template #col-management-format="{ value }">
-                    <p-badge :style-type="variableTypeBadgeStyleFormatter(value)"
-                             badge-type="solid-outline"
-                    >
-                        {{ state.variableType[value] }}
-                    </p-badge>
-                </template>
-                <template #col-use-format="{ value, item }">
-                    <p-toggle-button :value="value"
-                                     :disabled="item.disabled || item.required || item.fixed || item.readonly"
-                                     @change-toggle="handleToggleUse(item.key, $event)"
+        <p-toolbox-table :fields="state.variableFields"
+                         :loading="dashboardDetailState.loadingDashboard"
+                         :items="getSlicedVariableItems(state.searchedGlobalVariablesTableItems, state.thisPage, state.pageSize)"
+                         :page-size-options="[15, 30, 45]"
+                         :page-size.sync="state.pageSize"
+                         :this-page.sync="state.thisPage"
+                         :total-count="state.searchedGlobalVariablesTableItems.length"
+                         searchable
+                         :search-text.sync="state.searchText"
+                         :refreshable="false"
+                         class="content-wrapper"
+        >
+            <template #toolbox-left>
+                <p-button icon-left="ic_plus_bold"
+                          style-type="primary"
+                          class="mr-4"
+                          @click="handleClickCreateButton"
+                >
+                    {{ $t('DASHBOARDS.DETAIL.VARIABLES.CREATE') }}
+                </p-button>
+                <p-button icon-left="ic_collect"
+                          style-type="substitutive"
+                          @click="handleClickImportButton"
+                >
+                    {{ $t('DASHBOARDS.DETAIL.VARIABLES.IMPORT') }}
+                </p-button>
+            </template>
+            <template #col-type-format="{ value }">
+                {{ value || '-' }}
+            </template>
+            <template #col-reference-format="{ value }">
+                {{ value || '-' }}
+            </template>
+            <template #col-management-format="{ value }">
+                <p-badge :style-type="variableTypeBadgeStyleFormatter(value)"
+                         badge-type="solid-outline"
+                >
+                    {{ state.variableType[value] }}
+                </p-badge>
+            </template>
+            <template #col-use-format="{ value, item }">
+                <p-toggle-button :value="value"
+                                 :disabled="item.disabled || item.required || item.fixed || item.readonly"
+                                 @change-toggle="handleToggleUse(item.key, $event)"
+                />
+            </template>
+            <template #col-buttons-format="{ item }">
+                <div class="button-wrapper">
+                    <p-icon-button name="ic_clone"
+                                   size="sm"
+                                   @click="handleClickCloneButton(item.key)"
                     />
-                </template>
-                <template #col-buttons-format="{ item }">
-                    <div class="button-wrapper">
-                        <p-icon-button name="ic_clone"
-                                       size="sm"
-                                       @click="handleClickCloneButton(item.key)"
-                        />
-                        <p-icon-button v-if="item.management === 'custom'"
-                                       name="ic_edit"
-                                       size="sm"
-                                       @click="handleClickEditButton(item.key)"
-                        />
-                        <p-icon-button v-if="item.management === 'custom'"
-                                       name="ic_delete"
-                                       size="sm"
-                                       style-type="negative-transparent"
-                                       @click="handleClickDeleteButton(item.key)"
-                        />
-                    </div>
-                </template>
-            </p-toolbox-table>
-        </div>
+                    <p-icon-button v-if="item.management === 'custom'"
+                                   name="ic_edit"
+                                   size="sm"
+                                   @click="handleClickEditButton(item.key)"
+                    />
+                    <p-icon-button v-if="item.management === 'custom'"
+                                   name="ic_delete"
+                                   size="sm"
+                                   style-type="negative-transparent"
+                                   @click="handleClickDeleteButton(item.key)"
+                    />
+                </div>
+            </template>
+        </p-toolbox-table>
         <dashboard-variables-form-modal :modal-type="state.modalType"
                                         :variable-key="state.selectedVariableKey"
                                         :visible.sync="state.formModalVisible"
@@ -310,7 +309,7 @@ const handleConfirmDelete = () => {
         @apply bg-white border border-gray-200 rounded-md;
         width: 100%;
         height: fit-content;
-        padding: 1.5rem;
+        padding-bottom: 1.5rem;
         margin: 0 1.5rem;
     }
 }
