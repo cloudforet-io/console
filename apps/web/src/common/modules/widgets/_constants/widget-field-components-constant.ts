@@ -5,6 +5,7 @@ import categoryBy from '@/common/modules/widgets/_widget-fields/category-by/Widg
 import colorSchema from '@/common/modules/widgets/_widget-fields/color-schema/WidgetFieldColorSchema.vue';
 import comparison from '@/common/modules/widgets/_widget-fields/comparison/WidgetFieldComparison.vue';
 import customTableColumnWidth from '@/common/modules/widgets/_widget-fields/custom-table-column-width/WidgetFieldCustomTableColumnWidth.vue';
+import dateAggregationOptions from '@/common/modules/widgets/_widget-fields/data-aggregation-options/WidgetFieldDateAggregationOptions.vue';
 import dataFieldHeatmapColor from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/WidgetFieldDataFieldHeatmapColor.vue';
 import dataField from '@/common/modules/widgets/_widget-fields/data-field/WidgetFieldDataField.vue';
 import dateFormat from '@/common/modules/widgets/_widget-fields/date-format/WidgetFieldDateFormat.vue';
@@ -37,6 +38,7 @@ import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-fiel
 
 export const WIDGET_FIELD_COMPONENTS: Record<Partial<WidgetFieldName>, Component> = {
     dateRange,
+    dateAggregationOptions,
     dataField,
     tableDataField,
     xAxis,

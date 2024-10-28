@@ -7,6 +7,7 @@ import type { CategoryByOptions } from '@/common/modules/widgets/_widget-fields/
 import type { ColorSchemaOptions } from '@/common/modules/widgets/_widget-fields/color-schema/type';
 import type { ComparisonOptions } from '@/common/modules/widgets/_widget-fields/comparison/type';
 import type { CustomTableColumnWidthOptions } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
+import type { DateAggregationOptionsOptions } from '@/common/modules/widgets/_widget-fields/data-aggregation-options/type';
 import type { DataFieldHeatmapColorOptions } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
 import type { DataFieldOptions } from '@/common/modules/widgets/_widget-fields/data-field/type';
 import type { DateFormatOptions } from '@/common/modules/widgets/_widget-fields/date-format/type';
@@ -44,7 +45,8 @@ export type WidgetFieldOptions = DataFieldOptions | TableDataFieldOptions | XAxi
     | MinOptions | MaxOptions | LegendOptions | IconOptions | SubTotalOptions | TotalOptions
     | ComparisonOptions | ProgressBarOptions | ColorSchemaOptions | PieChartTypeOptions | DateFormatOptions
     | NumberFormatOptions | DataFieldHeatmapColorOptions | TextWrapOptions | TableColumnWidthOptions | CustomTableColumnWidthOptions
-    | MissingValueOptions | WidgetHeightOptions | DisplaySeriesLabelOptions | DateRangeOptions;
+    | MissingValueOptions | WidgetHeightOptions | DisplaySeriesLabelOptions | DateRangeOptions
+    | DateAggregationOptionsOptions;
 
 export interface WidgetFieldSchema<FieldOption=WidgetFieldOptions> {
     options?: Partial<FieldOption>;
@@ -57,7 +59,7 @@ export type WidgetFieldName = 'dataField' | 'tableDataField' | 'xAxis' | 'yAxis'
     | 'subTotal' | 'total'
     | 'progressBar'
     | 'formatRules' | 'advancedFormatRules'
-    | 'granularity' | 'dateRange' | 'colorSchema' | 'pieChartType'
+    | 'granularity' | 'dateRange' | 'dateAggregationOptions' | 'colorSchema' | 'pieChartType'
     | 'dateFormat' | 'numberFormat' | 'dataFieldHeatmapColor'
     | 'displayAnnotation' | 'displaySeriesLabel' | 'textWrap' | 'tableColumnWidth' | 'customTableColumnWidth'
     | 'missingValue' | 'widgetHeight'
