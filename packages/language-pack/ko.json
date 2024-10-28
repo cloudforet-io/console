@@ -1554,6 +1554,11 @@
 				"GUIDE_LINK_TEXT": "Widget 생성 방법 가이드",
 				"TRANSFORM": "데이터 병합/변환"
 			},
+			"DATE_AGGREGATION_OPTIONS": {
+				"AGGREGATED": "기간 합산",
+				"DATE_AGGREGATION_OPTIONS": "",
+				"LATEST": "최신 데이터"
+			},
 			"DEFAULT_WIDTH": "기본 너비",
 			"DELETE": "삭제",
 			"DISPLAY_ANNOTATION": {

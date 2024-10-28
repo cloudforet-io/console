@@ -1554,6 +1554,11 @@
 				"GUIDE_LINK_TEXT": "ウィジェットの作成方法",
 				"TRANSFORM": "データを変換"
 			},
+			"DATE_AGGREGATION_OPTIONS": {
+				"AGGREGATED": "",
+				"DATE_AGGREGATION_OPTIONS": "",
+				"LATEST": ""
+			},
 			"DEFAULT_WIDTH": "デフォルト幅",
 			"DELETE": "削除",
 			"DISPLAY_ANNOTATION": {

@@ -1554,6 +1554,11 @@
 				"GUIDE_LINK_TEXT": "How to create a widget?",
 				"TRANSFORM": "Transform Data"
 			},
+			"DATE_AGGREGATION_OPTIONS": {
+				"AGGREGATED": "Aggregated",
+				"DATE_AGGREGATION_OPTIONS": "Date Aggregation Options",
+				"LATEST": "Latest"
+			},
 			"DEFAULT_WIDTH": "Default Width",
 			"DELETE": "Delete",
 			"DISPLAY_ANNOTATION": {
