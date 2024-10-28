@@ -2368,6 +2368,7 @@
 					"TOTAL": "총합(Total)",
 					"TOTAL_FIELD": "총합 필드",
 					"UPDATE_PREVIEW": "미리보기 업데이트",
+					"USE_BASE_DATE": "",
 					"VALIDATION_MODAL": {
 						"DESC": "이 차트를 올바르게 표시하려면, 데이터에 최소 {number}개의 그룹별 통계(Group by) 선택 또는 레이블 필드 추가가 필요합니다.",
 						"EDIT_DATA": "데이터 편집으로 이동",
