@@ -7,7 +7,7 @@ export interface DateRangeOptions {
     //
 }
 
-export type DateRangeValue = InheritDateRangeValue | DisnheritDateRangeValue;
+export type DateRangeValue = InheritDateRangeValue | DisinheritDateRangeValue;
 
 interface BaseDateRangeValue {
     inherit: boolean;
@@ -27,7 +27,7 @@ interface InheritDateRangeValue extends BaseDateRangeValue {
     }
 }
 
-interface DisnheritDateRangeValue extends BaseDateRangeValue {
+interface DisinheritDateRangeValue extends BaseDateRangeValue {
     inherit: false;
     options: {
         value: DateRangeValueType;

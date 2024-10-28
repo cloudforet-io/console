@@ -44,7 +44,7 @@ const state = reactive({
     granularity: computed<string>(() => (props.allValueMap?.granularity as string|undefined) || 'MONTHLY'),
     baseDateRange: computed(() => props.dateRange),
     proxyValue: useProxyValue<DateRangeValue>('value', props, emit),
-    valueMenuItems: computed(() => {
+    valueMenuItems: computed<MenuItem[]>(() => {
         if (state.granularity === 'MONTHLY') return MONTHLY_ENABLED_VALUES.map((value) => ({ label: DATE_RANGE_MONTHLY_VALUE_MAP[value] || getCommonDateRangeValueLabel(value), name: value }));
         if (state.granularity === 'DAILY') return DAILY_ENABLED_VALUES.map((value) => ({ label: DATE_RANGE_DAILY_VALUE_MAP[value] || getCommonDateRangeValueLabel(value), name: value }));
         if (state.granularity === 'YEARLY') return YEARLY_ENABLED_VALUES.map((value) => ({ label: DATE_RANGE_YEARLY_VALUE_MAP[value] || getCommonDateRangeValueLabel(value), name: value }));
@@ -68,22 +68,18 @@ const state = reactive({
             if (relativeDateRangeValue === 'auto') {
                 _start = baseDate.subtract(11, 'month').startOf('month').format('YYYY-MM-DD');
                 _end = baseDate.endOf('month').format('YYYY-MM-DD');
-            }
-            if (relativeDateRangeValue === 'thisMonth') {
+            } else if (relativeDateRangeValue === 'thisMonth') {
                 _start = baseDate.startOf('month').format('YYYY-MM-DD');
                 _end = baseDate.endOf('month').format('YYYY-MM-DD');
-            }
-            if (relativeDateRangeValue === 'lastMonth') {
+            } else if (relativeDateRangeValue === 'lastMonth') {
                 const lastMonthDate = baseDate.subtract(1, 'month');
                 _start = lastMonthDate.startOf('month').format('YYYY-MM-DD');
                 _end = lastMonthDate.endOf('month').format('YYYY-MM-DD');
-            }
-            if (relativeDateRangeValue === 'lastTwoMonths') {
+            } else if (relativeDateRangeValue === 'lastTwoMonths') {
                 const lastMonthDate = baseDate.subtract(2, 'month');
                 _start = lastMonthDate.startOf('month').format('YYYY-MM-DD');
                 _end = lastMonthDate.endOf('month').format('YYYY-MM-DD');
-            }
-            if (relativeDateRangeValue === 'thisQuarter') {
+            } else if (relativeDateRangeValue === 'thisQuarter') {
                 if (thisMonth >= 1 && thisMonth <= 3) {
                     _start = `${thisYear}-01-01`;
                     _end = `${thisYear}-03-31`;
@@ -97,8 +93,7 @@ const state = reactive({
                     _start = `${thisYear}-10-01`;
                     _end = `${thisYear}-12-31`;
                 }
-            }
-            if (relativeDateRangeValue === 'lastQuarter') {
+            } else if (relativeDateRangeValue === 'lastQuarter') {
                 if (thisMonth >= 1 && thisMonth <= 3) {
                     _start = `${thisYear}-10-01`;
                     _end = `${thisYear}-12-31`;
@@ -118,40 +113,31 @@ const state = reactive({
             if (relativeDateRangeValue === 'auto') {
                 _start = baseDate.subtract(29, 'day').format('YYYY-MM-DD');
                 _end = baseDate.format('YYYY-MM-DD');
-            }
-            if (relativeDateRangeValue === 'today') {
+            } else if (relativeDateRangeValue === 'today') {
                 _start = baseDate.format('YYYY-MM-DD');
                 _end = baseDate.format('YYYY-MM-DD');
-            }
-            if (relativeDateRangeValue === 'yesterday') {
+            } else if (relativeDateRangeValue === 'yesterday') {
                 _start = baseDate.subtract(1, 'day').format('YYYY-MM-DD');
                 _end = baseDate.subtract(1, 'day').format('YYYY-MM-DD');
-            }
-            if (relativeDateRangeValue === 'lastTwoDays') {
+            } else if (relativeDateRangeValue === 'lastTwoDays') {
                 _start = baseDate.subtract(2, 'day').format('YYYY-MM-DD');
                 _end = baseDate.subtract(2, 'day').format('YYYY-MM-DD');
-            }
-            if (relativeDateRangeValue === 'lastSevenDays') {
+            } else if (relativeDateRangeValue === 'lastSevenDays') {
                 _start = baseDate.subtract(7, 'day').format('YYYY-MM-DD');
                 _end = baseDate.subtract(7, 'day').format('YYYY-MM-DD');
-            }
-            if (relativeDateRangeValue === 'lastFourteenDays') {
+            } else if (relativeDateRangeValue === 'lastFourteenDays') {
                 _start = baseDate.subtract(14, 'day').format('YYYY-MM-DD');
                 _end = baseDate.subtract(14, 'day').format('YYYY-MM-DD');
-            }
-            if (relativeDateRangeValue === 'lastThirtyDays') {
+            } else if (relativeDateRangeValue === 'lastThirtyDays') {
                 _start = baseDate.subtract(30, 'day').format('YYYY-MM-DD');
                 _end = baseDate.subtract(30, 'day').format('YYYY-MM-DD');
-            }
-            if (relativeDateRangeValue === 'thisWeek') {
+            } else if (relativeDateRangeValue === 'thisWeek') {
                 _start = baseDate.startOf('week').format('YYYY-MM-DD');
                 _end = baseDate.endOf('week').format('YYYY-MM-DD');
-            }
-            if (relativeDateRangeValue === 'thisWeekToDate') {
+            } else if (relativeDateRangeValue === 'thisWeekToDate') {
                 _start = baseDate.startOf('week').format('YYYY-MM-DD');
                 _end = baseDate.format('YYYY-MM-DD');
-            }
-            if (relativeDateRangeValue === 'lastWeek') {
+            } else if (relativeDateRangeValue === 'lastWeek') {
                 _start = baseDate.subtract(1, 'week').startOf('week').format('YYYY-MM-DD');
                 _end = baseDate.subtract(1, 'week').endOf('week').format('YYYY-MM-DD');
             }
@@ -160,16 +146,13 @@ const state = reactive({
             if (relativeDateRangeValue === 'auto') {
                 _start = baseDate.subtract(2, 'year').startOf('year').format('YYYY-MM-DD');
                 _end = baseDate.endOf('year').format('YYYY-MM-DD');
-            }
-            if (relativeDateRangeValue === 'thisYear') {
+            } else if (relativeDateRangeValue === 'thisYear') {
                 _start = baseDate.startOf('year').format('YYYY-MM-DD');
                 _end = baseDate.endOf('year').format('YYYY-MM-DD');
-            }
-            if (relativeDateRangeValue === 'lastYear') {
+            } else if (relativeDateRangeValue === 'lastYear') {
                 _start = baseDate.subtract(1, 'year').startOf('year').format('YYYY-MM-DD');
                 _end = baseDate.subtract(1, 'year').endOf('year').format('YYYY-MM-DD');
-            }
-            if (relativeDateRangeValue === 'lastTwoYears') {
+            } else if (relativeDateRangeValue === 'lastTwoYears') {
                 _start = baseDate.subtract(2, 'year').startOf('year').format('YYYY-MM-DD');
                 _end = baseDate.subtract(2, 'year').endOf('year').format('YYYY-MM-DD');
             }
@@ -189,7 +172,7 @@ const state = reactive({
         const currentYear = dayjs().year();
         return Array.from({ length: 3 }, (_, i) => ({ name: currentYear - i, label: (currentYear - i).toString() }));
     }),
-    disinheritYearlyCustomMenuItems: computed(() => {
+    disinheritYearlyCustomMenuItems: computed<MenuItem[]>(() => {
         const currentYear = dayjs().year();
         return Array.from({ length: 10 }, (_, i) => ({ name: currentYear - i, label: (currentYear - i).toString() }));
     }),
