@@ -87,7 +87,6 @@ const handleClickCancel = async () => {
         await store.dispatch('user/setUser', state.userInfo);
     }
     if (storeState.isSwitchModal && state.otherType) {
-        console.log(storeState.selectedType, state.otherType);
         multiFactorAuthStore.setEnableMfaMap({
             [storeState.selectedType]: true,
             [state.otherType]: false,
