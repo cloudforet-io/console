@@ -29,7 +29,8 @@ export interface UserMfa {
     state: UserMfaState,
     mfa_type: MultiFactorAuthType,
     options: {
-        email: string,
+        email?: string,
+        user_secret_id?: string,
     }
 }
 

@@ -8,6 +8,7 @@ import {
 } from '@cloudforet/mirinae';
 
 import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
+import type { UserMfa } from '@/schema/identity/user/model';
 import { store } from '@/store';
 
 import { postUserProfileDisableMfa } from '@/lib/helper/multi-factor-auth-helper';
@@ -19,13 +20,13 @@ const multiFactorAuthStore = useMultiFactorAuthStore();
 const multiFactorAuthState = multiFactorAuthStore.state;
 
 const storeState = reactive({
-    mfa: computed(() => store.state.user.mfa || undefined),
+    mfa: computed<UserMfa|undefined>(() => store.state.user.mfa || undefined),
     selectedType: computed<string>(() => multiFactorAuthState.selectedType),
     enableMfaMap: computed<Record<string, boolean>>(() => multiFactorAuthState.enableMfaMap),
 });
 const state = reactive({
     isVerified: computed<boolean>(() => storeState.mfa?.state === 'ENABLED'),
-    type: computed<string>(() => storeState.mfa?.mfa_type),
+    type: computed<string|undefined>(() => storeState.mfa?.mfa_type || undefined),
 });
 
 const handleChangeToggle = async (type: string, value: boolean) => {

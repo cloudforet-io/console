@@ -9,6 +9,7 @@ import {
 } from '@cloudforet/mirinae';
 
 import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
+import type { UserMfa } from '@/schema/identity/user/model';
 import { store } from '@/store';
 import { i18n as _i18n } from '@/translations';
 
@@ -31,7 +32,7 @@ const emit = defineEmits<{(e: 'refresh'): void }>();
 
 const storeState = reactive({
     userId: computed<string>(() => store.state.user.userId),
-    mfa: computed(() => store.state.user.mfa || undefined),
+    mfa: computed<UserMfa|undefined>(() => store.state.user.mfa || undefined),
     selectedType: computed<string>(() => multiFactorAuthState.selectedType),
     isReSyncModal: computed<boolean>(() => multiFactorAuthState.modalType === 'RE_SYNC'),
     isDisabledModal: computed<boolean>(() => multiFactorAuthState.modalType === 'DISABLED'),
@@ -43,7 +44,7 @@ const state = reactive({
     isCollapsed: true,
     isSentCode: false,
     isVerified: computed<boolean>(() => storeState.mfa?.state === 'ENABLED'),
-    type: computed<string>(() => storeState.mfa?.mfa_type),
+    type: computed<string|undefined>(() => storeState.mfa?.mfa_type || undefined),
     otherType: computed<string|undefined>(() => Object.keys(MULTI_FACTOR_AUTH_TYPE).find((key) => key !== storeState.selectedType)),
 });
 
