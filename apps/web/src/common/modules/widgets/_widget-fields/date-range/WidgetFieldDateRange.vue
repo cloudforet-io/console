@@ -51,7 +51,7 @@ const state = reactive({
         return [];
     }),
     datePreview: computed<{start: string; end: string;}>(() => {
-        const isInherit = !!state.proxyValue.inherit;
+        const isInherit = !!state.proxyValue?.inherit;
         const _granularity = state.granularity;
         const relativeDateRangeValue = state.proxyValue?.options?.value;
 
@@ -229,7 +229,7 @@ const handleSelectDateRangeValue = (selected: DateRangeValueType) => {
             _end = isInherit ? dayjs.utc().day() : dayjs.utc().endOf('day').format('YYYY-MM-DD');
         }
         state.proxyValue = {
-            inherit: state.proxyValue.inherit,
+            inherit: state.proxyValue?.inherit,
             options: {
                 value: selected,
                 start: _start,
@@ -238,7 +238,7 @@ const handleSelectDateRangeValue = (selected: DateRangeValueType) => {
         };
     } else {
         state.proxyValue = {
-            inherit: state.proxyValue.inherit,
+            inherit: state.proxyValue?.inherit,
             options: {
                 value: selected,
             },
@@ -255,7 +255,7 @@ const handleUpdateInherit = (value: boolean) => {
 };
 
 const handleSelectCustomValue = (type: 'start'|'end', selected: number) => {
-    const isInherit = !!state.proxyValue.inherit;
+    const isInherit = !!state.proxyValue?.inherit;
 
     if (isInherit) {
         state.proxyValue = {
@@ -370,7 +370,7 @@ onMounted(() => {
                         >
                             <template #dropdown-left-area>
                                 <p-i class="inherit-icon"
-                                     :name="state.proxyValue.inherit ? 'ic_link' : 'ic_unlink'"
+                                     :name="state.proxyValue?.inherit ? 'ic_link' : 'ic_unlink'"
                                      width="1rem"
                                      height="1rem"
                                 />
@@ -389,7 +389,7 @@ onMounted(() => {
                          class="custom-range-selector"
                     >
                         <!--Inherit CASE-->
-                        <template v-if="state.proxyValue.inherit">
+                        <template v-if="state.proxyValue?.inherit">
                             <p-field-group class="selector-field-group"
                                            required
                             >
