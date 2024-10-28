@@ -4286,6 +4286,8 @@
 		"MFA": {
 			"BTN_CHANGE": "변경",
 			"BTN_SEND_MAIL": "인증 코드 전송",
+			"CHANGE_DESC": "이미 멀티 팩터 인증(MFA)이 활성화되어 있습니다. 새로운 인증으로 전환하려면 먼저 현재 MFA로 인증해 주세요.",
+			"CHANGE_TITLE": "멀티 팩터 인증(MFA)을 변경하시겠습니까?",
 			"EMAIL_DESC": "이메일로 인증 코드를 받으세요.",
 			"ENABLE_MFA": "멀티 팩터 인증(MFA) 활성화",
 			"MS_DESC": "Microsoft Authenticator 앱으로 인증 코드를 받으세요.",
