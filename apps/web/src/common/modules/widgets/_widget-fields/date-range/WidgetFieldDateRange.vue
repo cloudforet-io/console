@@ -111,7 +111,8 @@ const state = reactive({
         }
         if (_granularity === 'DAILY') {
             if (relativeDateRangeValue === 'auto') {
-                _start = baseDate.subtract(29, 'day').format('YYYY-MM-DD');
+                const baseMonthDayCount = baseDate.daysInMonth();
+                _start = baseDate.subtract(baseMonthDayCount - 1, 'day').format('YYYY-MM-DD');
                 _end = baseDate.format('YYYY-MM-DD');
             } else if (relativeDateRangeValue === 'today') {
                 _start = baseDate.format('YYYY-MM-DD');
