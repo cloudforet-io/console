@@ -80,30 +80,34 @@ watch(() => multiFactorAuthState.modalVisible, (modalVisible) => {
              :key="`${item.type} - ${idx}`"
              class="user-account-multi-factor-auth-item"
         >
-            <p-i class="icon"
-                 :name="item.icon"
-                 height="2rem"
-                 width="2rem"
-            />
-            <div class="title-wrapper">
-                <div class="toggle-wrapper">
-                    <p-toggle-button :value="storeState.enableMfaMap[item.type]"
-                                     @change-toggle="handleChangeToggle(item.type, $event)"
-                    />
-                    <p class="title">
-                        {{ item.title }}
+            <div class="user-account-multi-factor-auth-item-inner">
+                <p-i class="icon"
+                     :name="item.icon"
+                     height="2rem"
+                     width="2rem"
+                />
+                <div class="title-wrapper">
+                    <div class="toggle-wrapper">
+                        <div class="toggle-inner">
+                            <p-toggle-button :value="storeState.enableMfaMap[item.type]"
+                                             @change-toggle="handleChangeToggle(item.type, $event)"
+                            />
+                            <p class="title">
+                                {{ item.title }}
+                            </p>
+                        </div>
+                        <p-badge v-if="state.type === item.type && state.isVerified"
+                                 style-type="green200"
+                                 badge-type="subtle"
+                                 class="badge"
+                        >
+                            {{ $t('MY_PAGE.MFA.SYNC') }}
+                        </p-badge>
+                    </div>
+                    <p class="desc">
+                        {{ item.desc }}
                     </p>
-                    <p-badge v-if="state.type === item.type && state.isVerified"
-                             style-type="green200"
-                             badge-type="subtle"
-                             class="badge"
-                    >
-                        {{ $t('MY_PAGE.MFA.SYNC') }}
-                    </p-badge>
                 </div>
-                <p class="desc">
-                    {{ item.desc }}
-                </p>
             </div>
             <p-button v-if="state.type === item.type && state.isVerified"
                       class="re-sync-button"
@@ -122,27 +126,43 @@ watch(() => multiFactorAuthState.modalVisible, (modalVisible) => {
     @apply flex flex-col;
     gap: 1rem;
     .user-account-multi-factor-auth-item {
-        @apply flex items-center border border-gray-200;
+        @apply flex items-center justify-between border border-gray-200 flex-wrap;
         padding: 1rem;
         border-radius: 0.375rem;
         gap: 1rem;
-        .title-wrapper {
-            @apply flex flex-col;
-            gap: 0.5rem;
-            .toggle-wrapper {
-                @apply flex items-center;
+        .user-account-multi-factor-auth-item-inner {
+            @apply flex items-center;
+            gap: 1rem;
+            .title-wrapper {
+                @apply flex flex-col items-start;
                 gap: 0.5rem;
-                .title {
-                    @apply text-label-lg font-bold;
-                    margin-left: 0.5rem;
+                .toggle-wrapper, .toggle-inner {
+                    @apply flex items-center;
+                    gap: 0.5rem;
+                    .title {
+                        @apply text-label-lg font-bold;
+                        margin-left: 0.5rem;
+                    }
+                }
+                .desc {
+                    @apply text-label-md text-gray-600;
                 }
             }
-            .desc {
-                @apply text-label-md text-gray-600;
+            .re-sync-button {
+                margin-left: auto;
             }
-        }
-        .re-sync-button {
-            margin-left: auto;
+
+            @screen mobile {
+                .title-wrapper {
+                    flex: 1;
+                    .toggle-wrapper {
+                        @apply flex-col items-start;
+                    }
+                }
+                .re-sync-button {
+                    margin-left: initial;
+                }
+            }
         }
     }
 }

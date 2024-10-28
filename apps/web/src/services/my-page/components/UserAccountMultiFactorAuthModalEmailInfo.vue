@@ -157,6 +157,11 @@ const handleClickSendCodeButton = async () => {
         gap: 0.375rem;
         .contents-wrapper {
             @apply flex justify-between items-center;
+
+            @screen mobile {
+                @apply flex-col items-start;
+                gap: 0.5rem;
+            }
             .email-info {
                 @apply flex flex-col;
             }

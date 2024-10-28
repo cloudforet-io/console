@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import { useWindowSize } from '@vueuse/core';
 import { useQRCode } from '@vueuse/integrations/useQRCode';
 import { computed, reactive, watch } from 'vue';
 
 import {
-    PTextInput, PIconButton, PSpinner,
+    PTextInput, PIconButton, PSpinner, screens, PTextarea,
 } from '@cloudforet/mirinae';
 
 import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
@@ -17,6 +18,8 @@ import { useMultiFactorAuthStore } from '@/services/my-page/stores/multi-factor-
 const multiFactorAuthStore = useMultiFactorAuthStore();
 const multiFactorAuthState = multiFactorAuthStore.state;
 
+const { width } = useWindowSize();
+
 const storeState = reactive({
     modalInitLoading: computed<boolean>(() => multiFactorAuthState.modalInitLoading),
 });
@@ -25,6 +28,7 @@ const state = reactive({
     passkey: '',
     qrUri: '',
     qrcode: '',
+    isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
 });
 
 const initState = () => {
@@ -95,10 +99,17 @@ watch(() => state.qrUri, (qrUri) => {
              class="qrcode"
         >
         <div class="passkey-wrapper">
-            <p-text-input :value="state.passkey"
+            <p-text-input v-if="!state.isMobileSize"
+                          :value="state.passkey"
                           class="passkey"
                           disabled
                           block
+            />
+            <p-textarea v-else
+                        :value="state.passkey"
+                        class="passkey"
+                        disabled
+                        block
             />
             <p-icon-button name="ic_refresh"
                            class="refresh-btn"
@@ -119,7 +130,7 @@ watch(() => state.qrUri, (qrUri) => {
 .user-account-multi-factor-auth-modal-ms-info {
     @apply flex flex-col text-paragraph-md;
     margin-top: 1.625rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 1rem;
     .auth-link {
         @apply underline;
     }
@@ -134,6 +145,10 @@ watch(() => state.qrUri, (qrUri) => {
     .set-up-desc {
         list-style: decimal;
         padding-left: 1rem;
+
+        @screen mobile {
+            margin-left: 0.25rem;
+        }
     }
     .passkey-wrapper {
         @apply flex;
@@ -145,6 +160,12 @@ watch(() => state.qrUri, (qrUri) => {
             .input-container.disabled {
                 background-color: white;
             }
+        }
+
+        /* custom design-system component - p-textarea */
+        :deep(.p-textarea) {
+            @apply bg-white text-gray-900 resize-none;
+            min-height: 2rem;
         }
         .refresh-btn {
             border-radius: 0.25rem;
