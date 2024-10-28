@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { onUnmounted } from 'vue';
+
 import UserAccountModuleContainer from '@/services/my-page/components/UserAccountModuleContainer.vue';
 import UserAccountMultiFactorAuthFormModal from '@/services/my-page/components/UserAccountMultiFactorAuthFormModal.vue';
 import UserAccountMultiFactorAuthItems from '@/services/my-page/components/UserAccountMultiFactorAuthItems.vue';
@@ -6,6 +8,10 @@ import { useMultiFactorAuthStore } from '@/services/my-page/stores/multi-factor-
 
 const multiFactorAuthStore = useMultiFactorAuthStore();
 const multiFactorAuthState = multiFactorAuthStore.state;
+
+onUnmounted(() => {
+    multiFactorAuthStore.initState();
+});
 </script>
 
 <template>

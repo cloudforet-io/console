@@ -4286,6 +4286,8 @@
 		"MFA": {
 			"BTN_CHANGE": "変更",
 			"BTN_SEND_MAIL": "認証コード送信",
+			"CHANGE_DESC": "既にマルチファクタ認証(MFA)が有効です。本当に無効にして新しい認証に切り替えますか？まず、現在のMFAで認証してください。",
+			"CHANGE_TITLE": "マルチファクタ認証(MFA)を変更しますか？",
 			"EMAIL_DESC": "メールでコードを受け取る",
 			"ENABLE_MFA": "マルチファクタ認証(MFA)有効化",
 			"MS_DESC": "Microsoft Authenticatorアプリでコードを受け取る",

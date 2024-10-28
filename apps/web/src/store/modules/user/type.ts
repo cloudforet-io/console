@@ -1,5 +1,6 @@
 import type { RoleType } from '@/schema/identity/role/type';
 import type { GrantScope } from '@/schema/identity/token/type';
+import type { UserMfa } from '@/schema/identity/user/model';
 import type { AuthType, UserType } from '@/schema/identity/user/type';
 
 import type { PageAccessType } from '@/lib/access-control/config';
@@ -34,7 +35,7 @@ export interface UserState {
     requiredActions?: string[];
     emailVerified?: boolean;
     isSignInLoading?: boolean;
-    mfa?: any
+    mfa?: UserMfa
 }
 
 export interface SignInRequest {

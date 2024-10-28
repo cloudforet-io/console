@@ -9,6 +9,7 @@ import {
 } from '@cloudforet/mirinae';
 
 import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
+import type { UserMfa } from '@/schema/identity/user/model';
 import { store } from '@/store';
 import { i18n as _i18n } from '@/translations';
 
@@ -31,15 +32,20 @@ const emit = defineEmits<{(e: 'refresh'): void }>();
 
 const storeState = reactive({
     userId: computed<string>(() => store.state.user.userId),
+    mfa: computed<UserMfa|undefined>(() => store.state.user.mfa || undefined),
     selectedType: computed<string>(() => multiFactorAuthState.selectedType),
     isReSyncModal: computed<boolean>(() => multiFactorAuthState.modalType === 'RE_SYNC'),
     isDisabledModal: computed<boolean>(() => multiFactorAuthState.modalType === 'DISABLED'),
+    isSwitchModal: computed<boolean>(() => multiFactorAuthState.modalType === 'SWITCH'),
 });
 const state = reactive({
     loading: false,
     userInfo: {} as UserInfoType,
     isCollapsed: true,
     isSentCode: false,
+    isVerified: computed<boolean>(() => storeState.mfa?.state === 'ENABLED'),
+    type: computed<string|undefined>(() => storeState.mfa?.mfa_type || undefined),
+    otherType: computed<string|undefined>(() => Object.keys(MULTI_FACTOR_AUTH_TYPE).find((key) => key !== storeState.selectedType)),
 });
 
 const modalState = reactive({
@@ -49,6 +55,9 @@ const modalState = reactive({
         }
         if (storeState.isDisabledModal) {
             return _i18n.t('COMMON.MFA_MODAL.ALT.TITLE');
+        }
+        if (storeState.isSwitchModal) {
+            return _i18n.t('MY_PAGE.MFA.CHANGE_TITLE');
         }
         const selectedItem = MULTI_FACTOR_AUTH_ITEMS.find((i) => i.type === storeState.selectedType);
         if (!selectedItem) return '';
@@ -74,11 +83,17 @@ const handleChangeInput = (value: string) => {
     validationState.validationCodeInvalidText = '';
 };
 const handleClickCancel = async () => {
-    multiFactorAuthStore.setModalVisible(false);
     await resetFormData();
     if (storeState.userId === state.userInfo.user_id) {
         await store.dispatch('user/setUser', state.userInfo);
     }
+    if (storeState.isSwitchModal && state.otherType) {
+        multiFactorAuthStore.setEnableMfaMap({
+            [storeState.selectedType]: true,
+            [state.otherType]: false,
+        });
+    }
+    multiFactorAuthStore.setModalVisible(false);
 };
 
 const handleClickVerifyButton = async () => {
@@ -91,7 +106,14 @@ const handleClickVerifyButton = async () => {
             await store.dispatch('user/setUser', state.userInfo);
         }
         resetFormData();
-        if (storeState.isReSyncModal) {
+        if (storeState.isReSyncModal || storeState.isSwitchModal) {
+            if (storeState.isSwitchModal && state.otherType) {
+                multiFactorAuthStore.setEnableMfaMap({
+                    [storeState.selectedType]: false,
+                    [state.otherType]: true,
+                });
+                multiFactorAuthStore.setSelectedType(state.otherType);
+            }
             multiFactorAuthStore.setModalType('FORM');
         } else {
             multiFactorAuthStore.setModalVisible(false);
@@ -124,7 +146,7 @@ watch(() => multiFactorAuthState.modalType, () => {
                         :header-title="modalState.title"
                         class="mfa-modal-wrapper"
                         size="sm"
-                        :theme-color="storeState.isDisabledModal? 'alert' : 'primary'"
+                        :theme-color="storeState.isDisabledModal || storeState.isSwitchModal? 'alert' : 'primary'"
                         :disabled="validationState.verificationCode === '' || (storeState.selectedType === MULTI_FACTOR_AUTH_TYPE.EMAIL && !state.isSentCode)"
                         :loading="state.loading"
                         @confirm="handleClickVerifyButton"
@@ -143,11 +165,17 @@ watch(() => multiFactorAuthState.modalType, () => {
                     >
                         {{ storeState.selectedType === MULTI_FACTOR_AUTH_TYPE.EMAIL ? $t('COMMON.MFA_MODAL.ALT.DESC') : $t('COMMON.MFA_MODAL.ALT.DESC_MS') }}
                     </span>
+                    <span v-if="storeState.isSwitchModal"
+                          class="disable-modal-desc"
+                    >
+                        {{ $t('MY_PAGE.MFA.CHANGE_DESC') }}
+                    </span>
                     <user-account-multi-factor-auth-modal-email-info v-if="storeState.selectedType === MULTI_FACTOR_AUTH_TYPE.EMAIL"
                                                                      :is-sent-code.sync="state.isSentCode"
                     />
                     <user-account-multi-factor-auth-modal-m-s-info v-else-if="storeState.selectedType === MULTI_FACTOR_AUTH_TYPE.OTP
                                                                        && !storeState.isDisabledModal
+                                                                       && !storeState.isSwitchModal
                                                                        && !storeState.isReSyncModal"
                                                                    :is-re-sync-modal="storeState.isReSyncModal"
                     />
@@ -167,7 +195,7 @@ watch(() => multiFactorAuthState.modalType, () => {
                         </p-field-group>
                     </div>
                     <user-account-multi-factor-auth-modal-folding v-if="storeState.selectedType === MULTI_FACTOR_AUTH_TYPE.EMAIL"
-                                                                  :is-disabled-modal="storeState.isDisabledModal"
+                                                                  :is-disabled-modal="storeState.isDisabledModal || storeState.isSwitchModal"
                                                                   :is-re-sync-modal="storeState.isReSyncModal"
                                                                   :is-sent-code.sync="state.isSentCode"
                     />
@@ -176,7 +204,7 @@ watch(() => multiFactorAuthState.modalType, () => {
             <template v-if="!storeState.isReSyncModal"
                       #confirm-button
             >
-                <span v-if="storeState.isDisabledModal">
+                <span v-if="storeState.isDisabledModal || storeState.isSwitchModal">
                     {{ $t('COMMON.MFA_MODAL.ALT.DISABLED') }}
                 </span>
                 <span v-else>

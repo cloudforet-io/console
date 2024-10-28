@@ -1,10 +1,14 @@
 import { reactive } from 'vue';
 
+import { constant, mapValues } from 'lodash';
 import { defineStore } from 'pinia';
 
+import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
 
-type modelType = 'FORM'|'RE_SYNC'|'DISABLED';
+
+type modelType = 'FORM'|'RE_SYNC'|'DISABLED'|'SWITCH';
 interface multiFactorAuthState {
+    enableMfaMap: Record<string, boolean>,
     selectedType: string,
     modalVisible: boolean,
     modalInitLoading: boolean,
@@ -12,6 +16,7 @@ interface multiFactorAuthState {
 }
 export const useMultiFactorAuthStore = defineStore('multi-factor-auth-store', () => {
     const state = reactive<multiFactorAuthState>({
+        enableMfaMap: mapValues(MULTI_FACTOR_AUTH_TYPE, constant(false)),
         selectedType: '',
         modalVisible: false,
         modalInitLoading: false,
@@ -19,6 +24,12 @@ export const useMultiFactorAuthStore = defineStore('multi-factor-auth-store', ()
     });
 
     const mutations = {
+        setEnableMfaMap: (map: Record<string, boolean>) => {
+            state.enableMfaMap = map;
+        },
+        setEnableMfaMapType: (type: string, value: boolean) => {
+            state.enableMfaMap[type] = value;
+        },
         setSelectedType: (type: string) => {
             state.selectedType = type;
         },
@@ -33,8 +44,19 @@ export const useMultiFactorAuthStore = defineStore('multi-factor-auth-store', ()
         },
     };
 
+    const actions = {
+        initState: () => {
+            state.enableMfaMap = mapValues(MULTI_FACTOR_AUTH_TYPE, constant(false));
+            state.selectedType = '';
+            state.modalVisible = false;
+            state.modalInitLoading = false;
+            state.modalType = 'FORM';
+        },
+    };
+
     return {
         state,
         ...mutations,
+        ...actions,
     };
 });
