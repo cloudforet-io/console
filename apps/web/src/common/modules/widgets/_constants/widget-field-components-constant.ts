@@ -8,6 +8,7 @@ import customTableColumnWidth from '@/common/modules/widgets/_widget-fields/cust
 import dataFieldHeatmapColor from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/WidgetFieldDataFieldHeatmapColor.vue';
 import dataField from '@/common/modules/widgets/_widget-fields/data-field/WidgetFieldDataField.vue';
 import dateFormat from '@/common/modules/widgets/_widget-fields/date-format/WidgetFieldDateFormat.vue';
+import dateRange from '@/common/modules/widgets/_widget-fields/date-range/WidgetFieldDateRange.vue';
 import displayAnnotation from '@/common/modules/widgets/_widget-fields/display-annotation/WidgetFieldDisplayAnnotation.vue';
 import displaySeriesLabel from '@/common/modules/widgets/_widget-fields/display-series-label/WidgetFieldDisplaySeriesLabel.vue';
 import formatRules from '@/common/modules/widgets/_widget-fields/format-rules/WidgetFieldFormatRules.vue';
@@ -35,6 +36,7 @@ import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-fiel
 
 
 export const WIDGET_FIELD_COMPONENTS: Record<Partial<WidgetFieldName>, Component> = {
+    dateRange,
     dataField,
     tableDataField,
     xAxis,

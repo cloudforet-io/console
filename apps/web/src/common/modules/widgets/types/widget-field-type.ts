@@ -10,6 +10,7 @@ import type { CustomTableColumnWidthOptions } from '@/common/modules/widgets/_wi
 import type { DataFieldHeatmapColorOptions } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
 import type { DataFieldOptions } from '@/common/modules/widgets/_widget-fields/data-field/type';
 import type { DateFormatOptions } from '@/common/modules/widgets/_widget-fields/date-format/type';
+import type { DateRangeOptions } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { DisplaySeriesLabelOptions } from '@/common/modules/widgets/_widget-fields/display-series-label/type';
 import type { FormatRulesOptions } from '@/common/modules/widgets/_widget-fields/format-rules/type';
 import type { GroupByOptions } from '@/common/modules/widgets/_widget-fields/group-by/type';
@@ -43,7 +44,7 @@ export type WidgetFieldOptions = DataFieldOptions | TableDataFieldOptions | XAxi
     | MinOptions | MaxOptions | LegendOptions | IconOptions | SubTotalOptions | TotalOptions
     | ComparisonOptions | ProgressBarOptions | ColorSchemaOptions | PieChartTypeOptions | DateFormatOptions
     | NumberFormatOptions | DataFieldHeatmapColorOptions | TextWrapOptions | TableColumnWidthOptions | CustomTableColumnWidthOptions
-    | MissingValueOptions | WidgetHeightOptions | DisplaySeriesLabelOptions;
+    | MissingValueOptions | WidgetHeightOptions | DisplaySeriesLabelOptions | DateRangeOptions;
 
 export interface WidgetFieldSchema<FieldOption=WidgetFieldOptions> {
     options?: Partial<FieldOption>;
@@ -56,7 +57,7 @@ export type WidgetFieldName = 'dataField' | 'tableDataField' | 'xAxis' | 'yAxis'
     | 'subTotal' | 'total'
     | 'progressBar'
     | 'formatRules' | 'advancedFormatRules'
-    | 'granularity' | 'colorSchema' | 'pieChartType'
+    | 'granularity' | 'dateRange' | 'colorSchema' | 'pieChartType'
     | 'dateFormat' | 'numberFormat' | 'dataFieldHeatmapColor'
     | 'displayAnnotation' | 'displaySeriesLabel' | 'textWrap' | 'tableColumnWidth' | 'customTableColumnWidth'
     | 'missingValue' | 'widgetHeight'

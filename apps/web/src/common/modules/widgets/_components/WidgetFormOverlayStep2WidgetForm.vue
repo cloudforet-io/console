@@ -28,10 +28,12 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashbo
 
 
 const FORM_TITLE_MAP = {
+    DATE_CONFIG: 'DATE_CONFIG',
     WIDGET_HEADER: 'WIDGET_HEADER',
     REQUIRED_FIELDS: 'REQUIRED_FIELDS',
     OPTIONAL_FIELDS: 'OPTIONAL_FIELDS',
 };
+const DATE_CONFIG_FIELD_KEYS = ['granularity', 'dateRange'];
 
 interface Props {
     widgetValidationInvalid?: boolean;
@@ -56,10 +58,12 @@ const state = reactive({
     defaultValidationConfig: computed(() => state.widgetConfig.meta?.defaultValidationConfig),
     widgetDefaultValidationModalVisible: false,
     formErrorModalValue: undefined as number|undefined,
-    widgetRequiredFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.requiredFieldsSchema)),
+    widgetDateConfigSchemaMap: computed(() => Object.entries(state.widgetConfig.requiredFieldsSchema).filter(([key]) => DATE_CONFIG_FIELD_KEYS.includes(key))),
+    widgetRequiredFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.requiredFieldsSchema).filter(([key]) => !DATE_CONFIG_FIELD_KEYS.includes(key))),
     widgetOptionalFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.optionalFieldsSchema)),
     // display
     collapsedTitleMap: {
+        [FORM_TITLE_MAP.DATE_CONFIG]: false,
         [FORM_TITLE_MAP.WIDGET_HEADER]: false,
         [FORM_TITLE_MAP.REQUIRED_FIELDS]: false,
         [FORM_TITLE_MAP.OPTIONAL_FIELDS]: false,
@@ -231,6 +235,40 @@ onMounted(() => {
                              @update:value="handleUpdateFieldValue('widgetHeader', $event)"
                              @update:is-valid="handleUpdateFieldValidation('widgetHeader', $event)"
         />
+        <!-- Date Config -->
+        <div class="form-group-wrapper"
+             :class="{ 'collapsed': state.collapsedTitleMap[FORM_TITLE_MAP.DATE_CONFIG] }"
+        >
+            <div class="title-wrapper"
+                 @click="handleClickCollapsibleTitle(FORM_TITLE_MAP.DATE_CONFIG)"
+            >
+                <p-i name="ic_chevron-down"
+                     width="1.25rem"
+                     height="1.25rem"
+                     color="inherit transparent"
+                     class="arrow-button"
+                />
+                <span>{{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.DATE_CONFIG') }}</span>
+            </div>
+            <div class="form-wrapper">
+                <template v-for="[fieldName, fieldSchema] in state.widgetDateConfigSchemaMap">
+                    <component :is="getWidgetFieldComponent(fieldName)"
+                               :key="`${fieldName}-${widgetGenerateState.selectedWidgetName}`"
+                               :widget-field-schema="fieldSchema"
+                               :data-table="widgetGenerateGetters.selectedDataTable"
+                               :widget-id="widgetGenerateState.widgetId"
+                               :date-range="dashboardDetailState.options.date_range"
+                               :all-value-map="widgetGenerateState.widgetFormValueMap"
+                               :value="widgetGenerateState.widgetFormValueMap[fieldName]"
+                               :is-valid="widgetGenerateState.widgetValidMap[fieldName]"
+                               :widget-config="state.widgetConfig"
+                               @update:value="handleUpdateFieldValue(fieldName, $event)"
+                               @update:is-valid="handleUpdateFieldValidation(fieldName, $event)"
+                               @show-error-modal="handleShowErrorModal"
+                    />
+                </template>
+            </div>
+        </div>
         <!-- required fields -->
         <div class="form-group-wrapper"
              :class="{ 'collapsed': state.collapsedTitleMap[FORM_TITLE_MAP.REQUIRED_FIELDS] }"
@@ -250,6 +288,7 @@ onMounted(() => {
                     {{ props.widgetValidationInvalidText }}
                 </p>
             </div>
+
             <div class="title-wrapper"
                  @click="handleClickCollapsibleTitle(FORM_TITLE_MAP.REQUIRED_FIELDS)"
             >
