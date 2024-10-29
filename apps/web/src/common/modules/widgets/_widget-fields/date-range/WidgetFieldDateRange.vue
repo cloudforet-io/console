@@ -11,7 +11,7 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
-import { useWdigetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
+import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import {
     DATE_RANGE_DAILY_VALUE_MAP,
     DATE_RANGE_DAILY_VALUES, DATE_RANGE_MONTHLY_VALUE_MAP,
@@ -76,7 +76,7 @@ const state = reactive({
     }),
 });
 
-const { dateRange } = useWdigetDateRange({
+const { dateRange } = useWidgetDateRange({
     dateRangeFieldValue: computed(() => state.proxyValue),
     baseOnDate: computed(() => (state.proxyValue?.inherit ? state.baseDateRange?.end : undefined)),
     granularity: computed(() => state.granularity),
