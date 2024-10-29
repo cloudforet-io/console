@@ -115,12 +115,14 @@ export const getPreviousDateRange = (granularity: string, dateRange: DateRange):
         DAILY: 'day',
         MONTHLY: 'month',
         YEARLY: 'year',
-    };
+    } as const;
     const unit = unitMap[granularity];
-    const duration = end.diff(start, unit);
 
-    const previousStart = start.subtract(duration, unit);
-    const previousEnd = end.subtract(duration, unit);
+    const START_DIFF = 1;
+    const endDiff = end.diff(start, unit);
+
+    const previousStart = start.subtract(endDiff + START_DIFF, unit);
+    const previousEnd = end.subtract(endDiff + START_DIFF, unit);
 
     return {
         start: previousStart.format(format),
