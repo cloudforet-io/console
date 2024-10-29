@@ -12,6 +12,7 @@ const treemap: WidgetConfig = {
     },
     requiredFieldsSchema: {
         granularity: {},
+        dateRange: {},
         dataField: {},
         categoryBy: {
             options: {

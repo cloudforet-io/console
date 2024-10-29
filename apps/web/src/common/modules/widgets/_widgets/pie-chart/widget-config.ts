@@ -12,6 +12,7 @@ const pieChart: WidgetConfig = {
     },
     requiredFieldsSchema: {
         granularity: {},
+        dateRange: {},
         dataField: {},
         groupBy: {
             options: {

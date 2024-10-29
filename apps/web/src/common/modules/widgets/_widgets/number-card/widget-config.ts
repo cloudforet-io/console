@@ -9,6 +9,7 @@ const numberCard: WidgetConfig = {
     },
     requiredFieldsSchema: {
         granularity: {},
+        dateRange: {},
         dataField: {},
     },
     optionalFieldsSchema: {
