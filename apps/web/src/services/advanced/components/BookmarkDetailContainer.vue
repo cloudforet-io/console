@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { vOnClickOutside } from '@vueuse/components';
 import {
     computed, reactive,
 } from 'vue';
@@ -92,6 +93,9 @@ const state = reactive({
     hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
 });
 
+const hideMenu = () => {
+    state.visibleMenu = false;
+};
 const handleClickCreateButton = () => {
     if (!state.folder) {
         state.visibleMenu = !state.visibleMenu;
@@ -213,7 +217,9 @@ const handleSelectMenuItem = (value: MenuItem) => {
                     >
                         {{ $t('IAM.BOOKMARK.DELETE') }} {{ storeState.selectedIndices.length || ' ' }}
                     </p-button>
-                    <div class="create-button-wrapper">
+                    <div v-on-click-outside="hideMenu"
+                         class="create-button-wrapper"
+                    >
                         <p-button icon-left="ic_plus"
                                   @click="handleClickCreateButton"
                         >
@@ -245,22 +251,28 @@ const handleSelectMenuItem = (value: MenuItem) => {
 <style lang="postcss" scoped>
 .bookmark-detail-container {
     .title {
-        .create-button-wrapper {
-            @apply relative;
-            .create-context-menu {
-                @apply absolute;
-                min-width: unset;
-                width: 9rem;
-                top: 2rem;
-                right: 0;
-                z-index: 10;
-            }
+        .workspace-logo {
+            @apply inline-flex;
         }
         .state {
             @apply text-label-md border border-coral-300;
             padding-right: 0.5rem;
             padding-left: 0.5rem;
             border-radius: 6.25rem;
+        }
+        .title-right-extra-wrapper {
+            @apply inline-flex;
+        }
+    }
+    .create-button-wrapper {
+        @apply relative;
+        .create-context-menu {
+            @apply absolute;
+            min-width: unset;
+            width: 9rem;
+            top: 2rem;
+            right: 0;
+            z-index: 10;
         }
     }
 }
