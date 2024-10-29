@@ -24,10 +24,13 @@ const props = withDefaults(defineProps<Props>(), {
 
 <style lang="postcss" scoped>
 .user-account-module-container {
-    padding: 1.5rem 1rem;
+    padding: 1.5rem 1rem 2rem;
     .form-title {
         @apply text-display-md;
         margin-bottom: 2rem;
+    }
+    & + .user-account-module-container {
+        margin-top: 1rem;
     }
 }
 </style>

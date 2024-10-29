@@ -48,12 +48,13 @@ const onErrorSignIn = (e, token) => {
     state.token = token;
     if (e.message.includes('MFA')) {
         const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g;
-        const userEmail = e.message.match(emailRegex);
+        const mfaTypeRegex = /mfa_type\s*=\s*(\w+)/;
         router.push({
             name: AUTH_ROUTE.SIGN_IN.MULTI_FACTOR_AUTH._NAME,
             params: {
                 accessToken: state.token,
-                mfaEmail: userEmail[0],
+                mfaEmail: e.message.match(emailRegex)[0],
+                mfaType: e.message.match(mfaTypeRegex)[1],
                 userId: state.userId?.trim() as string,
             },
         });

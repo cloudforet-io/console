@@ -10,6 +10,7 @@ import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/table
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -220,7 +221,10 @@ const handleClickVerifyButton = async () => {
                 />
             </template>
             <template #data-mfa="{data}">
-                {{ data?.state === 'ENABLED' ? 'On' : 'Off' }}
+                <p>
+                    <span>{{ data?.state === 'ENABLED' ? 'On' : 'Off' }}</span>
+                    <span v-if="data?.state === 'ENABLED'"> - {{ data?.mfa_type === MULTI_FACTOR_AUTH_TYPE.EMAIL ? `Email (${data.options.email})` : 'Microsoft Authenticator App' }}</span>
+                </p>
             </template>
             <template #data-role_id="{value, data}">
                 <span class="role-wrapper">

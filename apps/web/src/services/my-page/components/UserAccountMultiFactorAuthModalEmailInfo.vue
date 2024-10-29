@@ -2,9 +2,10 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PI, PTooltip, PDivider, PButton, PTextInput, PFieldGroup,
+    PI, PButton, PTextInput, PFieldGroup,
 } from '@cloudforet/mirinae';
 
+import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -14,30 +15,29 @@ import { emailValidator } from '@/lib/helper/user-validation-helper';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import type { UserListItemType } from '@/services/iam/types/user-type';
+import { useMultiFactorAuthStore } from '@/services/my-page/stores/multi-factor-auth-store';
 
 interface Props {
-    email?: string
-    type?: string
-    mfaType?: string
     isSentCode?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    email: '',
-    type: '',
-    mfaType: '',
     isSentCode: false,
 });
 
+const multiFactorAuthStore = useMultiFactorAuthStore();
+const multiFactorAuthState = multiFactorAuthStore.state;
+
 const emit = defineEmits<{(e: 'update:is-sent-code'): void }>();
 
+const storeState = reactive({
+    email: computed<string>(() => store.state.user.mfa?.options?.email || undefined),
+    isFormModal: computed(() => multiFactorAuthState.modalType === 'FORM'),
+});
 const state = reactive({
     loading: false,
-    data: {} as UserListItemType,
-    userId: computed(() => store.state.user.userId),
     proxyIsSentCode: useProxyValue('isSentCode', props, emit),
-    originEmail: props.email,
+    originEmail: storeState.email,
 });
 
 const {
@@ -56,19 +56,16 @@ const {
 const handleClickSendCodeButton = async () => {
     state.loading = true;
     try {
-        if (props.type === 'new') {
-            state.data = await postEnableMfa({
-                mfa_type: props.mfaType,
+        if (storeState.isFormModal) {
+            await postEnableMfa({
+                mfa_type: MULTI_FACTOR_AUTH_TYPE.EMAIL,
                 options: {
                     email: email.value,
                 },
-            }, false) as UserListItemType;
-            await store.dispatch('user/setUser', {
-                email: state.data.email,
-            });
+            }, false);
+            await store.dispatch('user/setUser', { mfa: { options: { email: email.value } } });
         } else {
-            const response = await postUserProfileDisableMfa();
-            await store.dispatch('user/setUser', response);
+            await postUserProfileDisableMfa();
         }
         state.proxyIsSentCode = true;
     } finally {
@@ -78,8 +75,10 @@ const handleClickSendCodeButton = async () => {
 </script>
 
 <template>
-    <div class="email-info-wrapper">
-        <div v-if="props.type === 'new'"
+    <div class="email-info-wrapper"
+         :class="{'form-modal': storeState.isFormModal}"
+    >
+        <div v-if="storeState.isFormModal"
              class="email-form-wrapper"
         >
             <p-field-group
@@ -92,11 +91,13 @@ const handleClickSendCodeButton = async () => {
                 <p-text-input :value="email"
                               :invalid="invalidState.email"
                               is-focused
+                              :disabled="state.loading || state.proxyIsSentCode"
                               block
                               @update:value="setForm('email', $event)"
                 />
             </p-field-group>
             <p-button style-type="secondary"
+                      class="send-code-button"
                       :loading="state.loading"
                       :disabled="email === '' || state.proxyIsSentCode"
                       @click="handleClickSendCodeButton"
@@ -107,28 +108,9 @@ const handleClickSendCodeButton = async () => {
         <div v-else
              class="email-view-wrapper"
         >
-            <div v-if="props.type === 'change'"
-                 class="change-info-wrapper"
-            >
-                <div class="change-info">
-                    <p>{{ $t('COMMON.MFA_MODAL.CHANGE.DESC') }}</p>
-                    <p-tooltip
-                        :contents="$t('COMMON.MFA_MODAL.CHANGE.TOOLTIP')"
-                        position="bottom"
-                    >
-                        <p-i name="ic_info-circle"
-                             class="icon-info"
-                             height="1rem"
-                             width="1rem"
-                             color="inherit"
-                        />
-                    </p-tooltip>
-                </div>
-                <p-divider />
-            </div>
             <div class="contents-wrapper">
                 <div class="email-info">
-                    <p>{{ props.type === 'verify' ? $t('COMMON.MFA_MODAL.SENT_DESC') : $t('COMMON.MFA_MODAL.ALT.EMAIL_INFO') }}</p>
+                    <p>{{ $t('COMMON.MFA_MODAL.ALT.EMAIL_INFO') }}</p>
                     <div class="email-wrapper">
                         <p-i name="ic_envelope-filled"
                              height="0.875rem"
@@ -137,12 +119,11 @@ const handleClickSendCodeButton = async () => {
                              class="icon-envelope"
                         />
                         <p class="email-text">
-                            {{ props.email || state.originEmail }}
+                            {{ storeState.email || state.originEmail }}
                         </p>
                     </div>
                 </div>
-                <p-button v-if="props.type !== 'verify'"
-                          style-type="secondary"
+                <p-button style-type="secondary"
                           :loading="state.loading"
                           :disabled="state.proxyIsSentCode"
                           @click="handleClickSendCodeButton"
@@ -156,31 +137,31 @@ const handleClickSendCodeButton = async () => {
 
 <style scoped lang="postcss">
 .email-info-wrapper {
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
+    &.form-modal {
+        margin-top: 1.625rem;
+    }
     .email-form-wrapper {
-        @apply flex items-end;
+        @apply flex items-start;
         gap: 1rem;
         .input-form {
             flex: 1;
+        }
+        .send-code-button {
+            margin-top: 1.45rem;
         }
     }
     .email-view-wrapper {
         @apply flex flex-col bg-gray-100 rounded text-label-md text-gray-700;
         padding: 0.5rem;
         gap: 0.375rem;
-        .change-info-wrapper {
-            @apply flex flex-col;
-            gap: 0.375rem;
-            .change-info {
-                @apply flex;
-                gap: 0.25rem;
-                .icon-info {
-                    @apply text-gray-900;
-                }
-            }
-        }
         .contents-wrapper {
             @apply flex justify-between items-center;
+
+            @screen mobile {
+                @apply flex-col items-start;
+                gap: 0.5rem;
+            }
             .email-info {
                 @apply flex flex-col;
             }

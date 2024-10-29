@@ -16,7 +16,7 @@ import type { RoleBindingUpdateRoleParameters } from '@/schema/identity/role-bin
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { UserUpdateParameters } from '@/schema/identity/user/api-verbs/update';
-import type { UserModel } from '@/schema/identity/user/model';
+import type { UserMfa, UserModel } from '@/schema/identity/user/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -60,7 +60,7 @@ const state = reactive({
     mfaLoading: false,
     data: computed<UserListItemType>(() => userPageStore.getters.selectedUsers[0]),
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
-    mfa: computed(() => store.state.user.mfa),
+    mfa: computed<UserMfa>(() => store.state.user.mfa),
     loginUserId: computed(() => store.state.user.userId),
     isChangedMfaToggle: false,
     isChangedRoleToggle: false,

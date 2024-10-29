@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { vOnClickOutside } from '@vueuse/components';
 import {
-    computed, reactive, ref, toRef,
+    computed, reactive,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
@@ -9,7 +9,6 @@ import { at, clone } from 'lodash';
 
 import {
     PHeading, PButton, PContextMenu, PHeadingLayout,
-    useContextMenuStyle,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
 
@@ -68,14 +67,9 @@ const state = reactive({
     hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
 });
 
-const targetRef = ref(null);
-const contextMenuRef = ref(null);
-useContextMenuStyle({
-    visibleMenu: toRef(state, 'visibleMenu'),
-    targetRef,
-    menuRef: contextMenuRef,
-});
-
+const hideMenu = () => {
+    state.visibleMenu = false;
+};
 const handleClickCreateButton = () => {
     state.visibleMenu = !state.visibleMenu;
 };
@@ -110,19 +104,16 @@ const handleClickDeleteButton = () => {
                 >
                     {{ $t('IAM.BOOKMARK.DELETE') }} {{ storeState.selectedIndices.length || ' ' }}
                 </p-button>
-                <div v-on-click-outside="handleClickCreateButton"
+                <div v-on-click-outside="hideMenu"
                      class="create-button-wrapper"
                 >
-                    <p-button ref="targetRef"
-                              icon-left="ic_plus"
+                    <p-button icon-left="ic_plus"
                               class="create-button"
                               @click="handleClickCreateButton"
                     >
                         {{ $t('IAM.BOOKMARK.ADD_GLOBAL_BOOKMARK') }}
                     </p-button>
                     <p-context-menu v-show="state.visibleMenu"
-                                    ref="contextMenuRef"
-                                    :visible-menu.sync="state.visibleMenu"
                                     class="create-context-menu"
                                     reset-selected-on-unmounted
                                     :selected="[]"
@@ -139,11 +130,14 @@ const handleClickDeleteButton = () => {
 <style lang="postcss" scoped>
 .admin-bookmark-page {
     .create-button-wrapper {
-        .create-button {
-            @apply relative;
-        }
+        @apply relative;
         .create-context-menu {
-            z-index: 1000;
+            @apply absolute;
+            min-width: unset;
+            width: 9rem;
+            top: 2rem;
+            right: 0;
+            z-index: 10;
         }
     }
 }

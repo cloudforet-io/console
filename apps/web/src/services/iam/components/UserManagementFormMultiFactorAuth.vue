@@ -1,14 +1,17 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import { computed, reactive } from 'vue';
 
 import {
     PI, PTooltip, PFieldTitle, PToggleButton,
 } from '@cloudforet/mirinae';
 
+import type { MultiFactorAuthType } from '@/schema/identity/user-profile/type';
+import type { UserMfa } from '@/schema/identity/user/model';
+
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { MULTI_FACTOR_AUTH_ITEMS } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
-import type { UserListItemType } from '@/services/iam/types/user-type';
 
 interface Props {
     isChangedToggle?: boolean
@@ -20,22 +23,20 @@ const props = withDefaults(defineProps<Props>(), {
 
 const userPageStore = useUserPageStore();
 
-const emit = defineEmits<{(e: 'update:is-changed-toggle', type: string): void }>();
+const emit = defineEmits<{(e: 'update:is-changed-toggle'): void }>();
 
+const storeState = reactive({
+    mfaData: computed<UserMfa|undefined>(() => userPageStore.getters.selectedUsers[0]?.mfa),
+});
 const state = reactive({
-    data: computed<UserListItemType>(() => userPageStore.getters.selectedUsers[0]),
-    isToggleActive: false,
     proxyIsChangedToggle: useProxyValue('isChangedToggle', props, emit),
+    mfaType: computed<MultiFactorAuthType|undefined>(() => storeState.mfaData?.mfa_type),
+    isEnabled: computed<boolean>(() => storeState.mfaData?.state === 'ENABLED'),
 });
 
-const handleUpdateToggle = async () => {
-    state.isToggleActive = false;
-    state.proxyIsChangedToggle = true;
+const handleUpdateToggle = async (value: boolean) => {
+    state.proxyIsChangedToggle = !value;
 };
-
-watch(() => state.data.mfa?.state, (value) => {
-    state.isToggleActive = value === 'ENABLED';
-}, { immediate: true });
 </script>
 
 <template>
@@ -55,27 +56,44 @@ watch(() => state.data.mfa?.state, (value) => {
                 />
             </p-tooltip>
         </div>
-        <p-toggle-button
-            :value="state.isToggleActive"
-            :disabled="!state.isToggleActive"
-            class="toggle-button"
-            @change-toggle="handleUpdateToggle"
-        />
+        <div class="toggles-wrapper">
+            <div v-for="(item) in MULTI_FACTOR_AUTH_ITEMS"
+                 :key="`mfa-toggle-item-${item.type}`"
+                 class="toggle"
+            >
+                <p-toggle-button
+                    :value="state.mfaType === item.type"
+                    :disabled="!(state.mfaType === item.type && state.isEnabled) || state.mfaType !== item.type"
+                    class="toggle-button"
+                    @change-toggle="handleUpdateToggle"
+                />
+                <span>{{ item.title }}</span>
+            </div>
+        </div>
     </div>
 </template>
 
 <style scoped lang="postcss">
 .multi-factor-auth-wrapper {
-    @apply flex items-center justify-between bg-white rounded-lg;
+    @apply flex flex-col bg-white rounded-lg;
     padding: 0.75rem;
+    gap: 0.75rem;
     .title-wrapper {
         @apply flex items-center;
         gap: 0.25rem;
     }
-    .mfa-tooltip {
-        margin-top: -0.25rem;
-        .icon-info {
-            @apply text-gray-500;
+    .toggles-wrapper {
+        @apply flex flex-col;
+        gap: 0.75rem;
+        .toggle {
+            @apply flex text-label-md font-bold;
+            gap: 0.5rem;
+            .mfa-tooltip {
+                margin-top: -0.25rem;
+                .icon-info {
+                    @apply text-gray-500;
+                }
+            }
         }
     }
 }
