@@ -2339,6 +2339,8 @@
 					"DATE_FORMAT": "日付フォーマット",
 					"DATE_FORMAT_AUTO_DISPLAY": "グラニュラリティ別自動表示",
 					"DATE_RANGE": "",
+					"DATE_RANGE_INVALID_LIMIT_TEXT": "",
+					"DATE_RANGE_INVALID_RANGE_TEXT": "",
 					"DESCRIPTION": "説明",
 					"DYNAMIC_FIELD": "ダイナミックフィールド",
 					"EDIT_DATA": "データを編集",

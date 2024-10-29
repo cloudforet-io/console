@@ -10,6 +10,8 @@ import {
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
+import { i18n } from '@/translations';
+
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import {
@@ -68,7 +70,7 @@ const state = reactive({
     isValid: computed<boolean>(() => {
         const _value = state.proxyValue?.options?.value;
         if (!_value) return false;
-        if (checkInvalidCustomValue()) return false;
+        if (checkInvalidCustomValue().invalid) return false;
         if (state.granularity === 'MONTHLY' && !MONTHLY_ENABLED_VALUES.includes(_value)) return false;
         if (state.granularity === 'DAILY' && !DAILY_ENABLED_VALUES.includes(_value)) return false;
         if (state.granularity === 'YEARLY' && !YEARLY_ENABLED_VALUES.includes(_value)) return false;
@@ -86,25 +88,25 @@ const { dateRange } = useWidgetDateRange({
 const checkInvalidCustomValue = () => {
     const _value = state.proxyValue?.options?.value;
     if (_value === 'custom') {
-        if (!state.proxyValue.options.start || !state.proxyValue.options.end) return true;
+        if (!state.proxyValue.options.start || !state.proxyValue.options.end) return { invalid: true, text: '' };
         if (state.proxyValue?.inherit) {
             const inheritCustomStartValue = state.proxyValue?.options?.start || 0;
             const inheritCustomEndValue = state.proxyValue?.options?.end || 0;
-            if (inheritCustomStartValue > inheritCustomEndValue) return true;
+            if (inheritCustomStartValue > inheritCustomEndValue) return { invalid: true, text: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.DATE_RANGE_INVALID_RANGE_TEXT') };
             const gap = inheritCustomEndValue - inheritCustomStartValue;
-            if (state.granularity === 'YEARLY' && gap >= 3) return true;
-            if (state.granularity === 'MONTHLY' && gap >= 12) return true;
-            if (state.granularity === 'DAILY' && gap >= 31) return true;
+            if (state.granularity === 'YEARLY' && gap >= 3) return { invalid: true, text: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.DATE_RANGE_INVALID_LIMIT_TEXT') };
+            if (state.granularity === 'MONTHLY' && gap >= 12) return { invalid: true, text: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.DATE_RANGE_INVALID_LIMIT_TEXT') };
+            if (state.granularity === 'DAILY' && gap >= 31) return { invalid: true, text: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.DATE_RANGE_INVALID_LIMIT_TEXT') };
         } else {
             const _startDate = dayjs.utc(state.proxyValue?.options?.start);
             const _endDate = dayjs.utc(state.proxyValue?.options.end);
-            if (state.granularity === 'YEARLY' && _endDate.diff(_startDate, 'year') >= 3) return true;
-            if (state.granularity === 'MONTHLY' && _endDate.diff(_startDate, 'month') >= 12) return true;
-            if (state.granularity === 'DAILY' && _endDate.diff(_startDate, 'day') >= 31) return true;
-            if (_startDate.isAfter(_endDate)) return true;
+            if (state.granularity === 'YEARLY' && _endDate.diff(_startDate, 'year') >= 3) return { invalid: true, text: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.DATE_RANGE_INVALID_LIMIT_TEXT') };
+            if (state.granularity === 'MONTHLY' && _endDate.diff(_startDate, 'month') >= 12) return { invalid: true, text: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.DATE_RANGE_INVALID_LIMIT_TEXT') };
+            if (state.granularity === 'DAILY' && _endDate.diff(_startDate, 'day') >= 31) return { invalid: true, text: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.DATE_RANGE_INVALID_LIMIT_TEXT') };
+            if (_startDate.isAfter(_endDate)) return { invalid: true, text: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.DATE_RANGE_INVALID_RANGE_TEXT') };
         }
     }
-    return false;
+    return { invalid: false, text: '' };
 };
 
 /* Event */
@@ -282,50 +284,9 @@ onMounted(() => {
                         <div v-if="state.proxyValue?.options?.value === 'custom'"
                              class="custom-range-selector"
                         >
-                            <!--Inherit CASE-->
-                            <template v-if="state.proxyValue?.inherit">
-                                <p-field-group class="selector-field-group"
-                                               required
-                                >
-                                    <template #label>
-                                        <span class="field-label">
-                                            {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.START') }}
-                                            <span class="granularity-unit">
-                                                ({{ GRANULARITY_UNIT_MAP[state.granularity] }})
-                                            </span>
-                                        </span>
-                                    </template>
-                                    <p-select-dropdown :menu="state.inheritCustomMenuItems"
-                                                       :selected="state.proxyValue?.options?.start"
-                                                       block
-                                                       :invalid="checkInvalidCustomValue()"
-                                                       @select="handleSelectCustomValue('start', $event)"
-                                    />
-                                </p-field-group>
-                                <p-field-group class="selector-field-group"
-                                               required
-                                >
-                                    <template #label>
-                                        <span class="field-label">
-                                            {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.END') }}
-                                            <span class="granularity-unit">
-                                                ({{ GRANULARITY_UNIT_MAP[state.granularity] }})
-                                            </span>
-                                        </span>
-                                    </template>
-                                    <p-select-dropdown :menu="state.inheritCustomMenuItems"
-                                                       :selected="state.proxyValue?.options?.end"
-                                                       block
-                                                       :invalid="checkInvalidCustomValue()"
-                                                       @select="handleSelectCustomValue('end', $event)"
-                                    />
-                                </p-field-group>
-                            </template>
-                            <!--Disinherit CASE-->
-                            <template v-else>
-                                <div v-if="state.granularity === 'YEARLY'"
-                                     class="disinherit-custom-yearly-selector"
-                                >
+                            <div class="select-wrapper">
+                                <!--Inherit CASE-->
+                                <template v-if="state.proxyValue?.inherit">
                                     <p-field-group class="selector-field-group"
                                                    required
                                     >
@@ -337,10 +298,10 @@ onMounted(() => {
                                                 </span>
                                             </span>
                                         </template>
-                                        <p-select-dropdown :menu="state.disinheritYearlyCustomMenuItems"
-                                                           :selected="dayjs.utc(state.proxyValue?.options?.start).year()"
+                                        <p-select-dropdown :menu="state.inheritCustomMenuItems"
+                                                           :selected="state.proxyValue?.options?.start"
                                                            block
-                                                           :invalid="checkInvalidCustomValue()"
+                                                           :invalid="checkInvalidCustomValue().invalid"
                                                            @select="handleSelectCustomValue('start', $event)"
                                         />
                                     </p-field-group>
@@ -355,64 +316,112 @@ onMounted(() => {
                                                 </span>
                                             </span>
                                         </template>
-                                        <p-select-dropdown :menu="state.disinheritYearlyCustomMenuItems"
-                                                           :selected="dayjs.utc(state.proxyValue?.options?.end).year()"
+                                        <p-select-dropdown :menu="state.inheritCustomMenuItems"
+                                                           :selected="state.proxyValue?.options?.end"
                                                            block
-                                                           :invalid="checkInvalidCustomValue()"
+                                                           :invalid="checkInvalidCustomValue().invalid"
                                                            @select="handleSelectCustomValue('end', $event)"
                                         />
                                     </p-field-group>
-                                </div>
-                                <div v-else-if="state.granularity === 'MONTHLY'"
-                                     class="disinherit-custom-monthly-selector"
-                                >
-                                    <p-field-group class="selector-field-group"
-                                                   required
+                                </template>
+                                <!--Disinherit CASE-->
+                                <template v-else>
+                                    <div v-if="state.granularity === 'YEARLY'"
+                                         class="disinherit-custom-yearly-selector"
                                     >
-                                        <template #label>
-                                            <span class="field-label">
-                                                {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.START') }}
-                                            </span>
-                                        </template>
-                                        <p-datetime-picker class="picker"
-                                                           select-mode="single"
-                                                           data-type="yearToMonth"
-                                                           :selected-dates="[dayjs.utc(state.proxyValue?.options?.start).format('YYYY-MM')]"
-                                                           :invalid="checkInvalidCustomValue()"
-                                                           @update:selected-dates="handleUpdateDisinheritMonthlyCustomSelectedDates('start', $event)"
-                                        />
-                                    </p-field-group>
-                                    <p-field-group class="selector-field-group"
-                                                   required
+                                        <p-field-group class="selector-field-group"
+                                                       required
+                                        >
+                                            <template #label>
+                                                <span class="field-label">
+                                                    {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.START') }}
+                                                    <span class="granularity-unit">
+                                                        ({{ GRANULARITY_UNIT_MAP[state.granularity] }})
+                                                    </span>
+                                                </span>
+                                            </template>
+                                            <p-select-dropdown :menu="state.disinheritYearlyCustomMenuItems"
+                                                               :selected="dayjs.utc(state.proxyValue?.options?.start).year()"
+                                                               block
+                                                               :invalid="checkInvalidCustomValue().invalid"
+                                                               @select="handleSelectCustomValue('start', $event)"
+                                            />
+                                        </p-field-group>
+                                        <p-field-group class="selector-field-group"
+                                                       required
+                                        >
+                                            <template #label>
+                                                <span class="field-label">
+                                                    {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.END') }}
+                                                    <span class="granularity-unit">
+                                                        ({{ GRANULARITY_UNIT_MAP[state.granularity] }})
+                                                    </span>
+                                                </span>
+                                            </template>
+                                            <p-select-dropdown :menu="state.disinheritYearlyCustomMenuItems"
+                                                               :selected="dayjs.utc(state.proxyValue?.options?.end).year()"
+                                                               block
+                                                               :invalid="checkInvalidCustomValue().invalid"
+                                                               @select="handleSelectCustomValue('end', $event)"
+                                            />
+                                        </p-field-group>
+                                    </div>
+                                    <div v-else-if="state.granularity === 'MONTHLY'"
+                                         class="disinherit-custom-monthly-selector"
                                     >
-                                        <template #label>
-                                            <span class="field-label">
-                                                {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.END') }}
-                                            </span>
-                                        </template>
+                                        <p-field-group class="selector-field-group"
+                                                       required
+                                        >
+                                            <template #label>
+                                                <span class="field-label">
+                                                    {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.START') }}
+                                                </span>
+                                            </template>
+                                            <p-datetime-picker class="picker"
+                                                               select-mode="single"
+                                                               data-type="yearToMonth"
+                                                               :selected-dates="[dayjs.utc(state.proxyValue?.options?.start).format('YYYY-MM')]"
+                                                               :invalid="checkInvalidCustomValue().invalid"
+                                                               @update:selected-dates="handleUpdateDisinheritMonthlyCustomSelectedDates('start', $event)"
+                                            />
+                                        </p-field-group>
+                                        <p-field-group class="selector-field-group"
+                                                       required
+                                        >
+                                            <template #label>
+                                                <span class="field-label">
+                                                    {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.END') }}
+                                                </span>
+                                            </template>
+                                            <p-datetime-picker class="picker"
+                                                               select-mode="single"
+                                                               data-type="yearToMonth"
+                                                               :selected-dates="[dayjs.utc(state.proxyValue?.options?.end).format('YYYY-MM')]"
+                                                               :invalid="checkInvalidCustomValue().invalid"
+                                                               @update:selected-dates="handleUpdateDisinheritMonthlyCustomSelectedDates('end', $event)"
+                                            />
+                                        </p-field-group>
+                                    </div>
+                                    <div v-else
+                                         class="disinherit-custom-daily-selector"
+                                    >
                                         <p-datetime-picker class="picker"
-                                                           select-mode="single"
-                                                           data-type="yearToMonth"
-                                                           :selected-dates="[dayjs.utc(state.proxyValue?.options?.end).format('YYYY-MM')]"
-                                                           :invalid="checkInvalidCustomValue()"
-                                                           @update:selected-dates="handleUpdateDisinheritMonthlyCustomSelectedDates('end', $event)"
+                                                           select-mode="range"
+                                                           :selected-dates="[
+                                                               dayjs.utc(state.proxyValue?.options?.start).format('YYYY-MM-DD'),
+                                                               dayjs.utc(state.proxyValue?.options?.end).format('YYYY-MM-DD')
+                                                           ]"
+                                                           :invalid="checkInvalidCustomValue().invalid"
+                                                           @update:selected-dates="handleUpdateDisinheritDailyCustomSelectedDates"
                                         />
-                                    </p-field-group>
-                                </div>
-                                <div v-else
-                                     class="disinherit-custom-daily-selector"
-                                >
-                                    <p-datetime-picker class="picker"
-                                                       select-mode="range"
-                                                       :selected-dates="[
-                                                           dayjs.utc(state.proxyValue?.options?.start).format('YYYY-MM-DD'),
-                                                           dayjs.utc(state.proxyValue?.options?.end).format('YYYY-MM-DD')
-                                                       ]"
-                                                       :invalid="checkInvalidCustomValue()"
-                                                       @update:selected-dates="handleUpdateDisinheritDailyCustomSelectedDates"
-                                    />
-                                </div>
-                            </template>
+                                    </div>
+                                </template>
+                            </div>
+                            <p v-if="checkInvalidCustomValue().invalid"
+                               class="invalid-text"
+                            >
+                                {{ checkInvalidCustomValue().text }}
+                            </p>
                         </div>
                         <div v-else
                              class="date-preview"
@@ -455,13 +464,15 @@ onMounted(() => {
                     padding: 0.375rem 0.75rem;
                 }
                 .custom-range-selector {
-                    @apply flex gap-2;
-                    .selector-field-group {
-                        width: calc(50% - 0.25rem);
-                        .field-label {
-                            @apply text-label-sm text-gray-900 font-bold;
-                            .granularity-unit {
-                                @apply text-gray-500 font-normal;
+                    .select-wrapper {
+                        @apply flex gap-2;
+                        .selector-field-group {
+                            width: calc(50% - 0.25rem);
+                            .field-label {
+                                @apply text-label-sm text-gray-900 font-bold;
+                                .granularity-unit {
+                                    @apply text-gray-500 font-normal;
+                                }
                             }
                         }
                     }
@@ -473,6 +484,10 @@ onMounted(() => {
                     }
                     .disinherit-custom-daily-selector {
                         @apply w-full;
+                    }
+                    .invalid-text {
+                        @apply text-label-md text-red-500;
+                        margin-top: 0.25rem;
                     }
                 }
             }
