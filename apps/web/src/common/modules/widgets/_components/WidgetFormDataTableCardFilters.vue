@@ -108,6 +108,9 @@ const state = reactive({
     primaryCostOptions: computed<Record<string, any>>(() => ({
         data_source_id: props.sourceId,
     })),
+    primaryMetricStatOptions: computed<Record<string, any>>(() => ({
+        metric_id: props.sourceId,
+    })),
     selectedItemsMap: getInitialSelectedItemsMap() as Record<string, DataTableQueryFilterForDropdown>,
 });
 const assetFilterState = reactive({
@@ -260,6 +263,7 @@ const getCostMenuHandler = (
 const getAssetMenuHandler = (labelKey: MetricLabelKey): AutocompleteHandler => {
     try {
         let variableModelInfo: VariableModelMenuHandlerInfo;
+        let queryOptions: Record<string, any> = {};
         if (isEmpty(labelKey.reference)) {
             const MetricVariableModel = new VariableModelFactory(
                 { type: 'MANAGED', managedModelKey: MANAGED_VARIABLE_MODEL_KEY_MAP.metric_data },
@@ -269,6 +273,7 @@ const getAssetMenuHandler = (labelKey: MetricLabelKey): AutocompleteHandler => {
                 variableModel: MetricVariableModel,
                 dataKey: labelKey.key,
             };
+            queryOptions = { ...queryOptions, ...state.primaryMetricStatOptions };
         } else {
             const _resourceType = labelKey.reference?.resource_type;
             const targetModelConfig = Object.values(MANAGED_VARIABLE_MODELS).find((d) => (d.meta?.resourceType === _resourceType));
@@ -282,7 +287,7 @@ const getAssetMenuHandler = (labelKey: MetricLabelKey): AutocompleteHandler => {
         }
         if (!variableModelInfo) return async () => ({ results: [] });
 
-        const queryOptions: Record<string, any> = {};
+
         if (labelKey.key === MANAGED_VARIABLE_MODELS.workspace.meta.idKey) {
             queryOptions.is_dormant = false;
         }
