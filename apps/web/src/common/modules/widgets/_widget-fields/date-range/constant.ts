@@ -2,7 +2,6 @@
 export const DATE_RANGE_MONTHLY_VALUE_MAP = {
     thisMonth: 'This Month',
     lastMonth: 'Last Month',
-    lastTwoMonths: 'Last 2 Months',
     thisQuarter: 'This Quarter',
     lastQuarter: 'Last Quarter',
 } as const;
@@ -26,7 +25,6 @@ export const DATE_RANGE_DAILY_VALUES = Object.keys(DATE_RANGE_DAILY_VALUE_MAP);
 export const DATE_RANGE_YEARLY_VALUE_MAP = {
     thisYear: 'This Year',
     lastYear: 'Last Year',
-    lastTwoYears: 'Last 2 Years',
 } as const;
 
 export const DATE_RANGE_YEARLY_VALUES = Object.keys(DATE_RANGE_YEARLY_VALUE_MAP);
