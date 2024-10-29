@@ -42,15 +42,23 @@
 			"EXTENSION_REASON_2": "Check your spam.",
 			"EXTENSION_REASON_3": "to re-send the email.",
 			"EXTENSION_TITLE_1": "Didn't receive an email?",
-			"EXTENSION_TITLE_2": "Still having trouble?"
+			"EXTENSION_TITLE_2": "Still having trouble?",
+			"GOOGLE_GUIDE": "Microsoft verification guide",
+			"OTP_EXTENSION_DESC_1": "If you are still experiencing problems with {guide}, follow Microsoft verification guide. If the problem only exists across SpaceONE, {contact}. ",
+			"OTP_EXTENSION_REASON_1": "Make sure you have adequate internet connection when trying to send/receive codes.",
+			"OTP_EXTENSION_REASON_2": "Your authenticator app may not be syncing the time correctly. Please ensure your device is up to date and that the date and time settings are accurate.",
+			"OTP_EXTENSION_TITLE_1": "Didn’t recieve a push notification in your Microsoft authenticator app?",
+			"OTP_EXTENSION_TITLE_2": "Still having problems?"
 		},
 		"MFA": {
 			"AUTHENTICATION_CODE": "Authentication code",
 			"AUTHENTICATION_CODE_LOWER": "authentication code",
 			"CONFIRM": "Confirm",
-			"EMAIL_INFO": "An {code} has been sent to an email at:",
+			"EMAIL_INFO": "Allows multi-factor authentication(MFA) for account logins. A MFA code has been sent to an email address:",
 			"ENTER_CODE": "Enter Code",
 			"GO_BACK": "Back to Sign in",
+			"OTP_INFO": "Allows multi-factor authentication(MFA) for account logins. Enter the code that you see in the app.",
+			"PROBLEM_TITLE": "Having problems?",
 			"SUB_TITLE": "Your account required to verify with email MFA.",
 			"TITLE": "Multi-factor\nauthentication"
 		},
@@ -1212,11 +1220,14 @@
 		"MFA_MODAL": {
 			"ALT": {
 				"DESC": "To turn off, you need to verifiy with your email.",
+				"DESC_MS": "To turn off, you need to verifiy with the microsoft authenticator code.",
 				"DISABLED": "Disable",
 				"EMAIL_INFO": "Send verification code to the email",
 				"TITLE": "Are you sure you want to disable MFA?",
 				"VERIFIED": "Verified"
 			},
+			"ALT_S_DISABLED": "MFA successfully disabled",
+			"ALT_S_ENABLED": "MFA successfully enabled",
 			"ALT_S_SENT_EMAIL": "A verification code has been sent to your email.",
 			"CHANGE": {
 				"CANCEL": "Cancel",
@@ -1231,12 +1242,12 @@
 				"TITLE": "Enter New Email Address"
 			},
 			"EMAIL": "Email",
-			"INVALID_CODE": "Invalid code. Please check the email try again.",
+			"INVALID_CODE_EMAIL": "Invalid code. Please check the email try again.",
+			"INVALID_CODE_OTP": "Invalid code.",
 			"SEND_CODE": "Send Code",
 			"SEND_NEW_CODE": "Send new code",
 			"SENT_DESC": "A verification code has been sent to",
 			"SUCCESS": "A verification code has been sent to your notification email.",
-			"TITLE": "Verify your Email Address",
 			"VERIFICATION_CODE": "Verification Code",
 			"VERIFY": "Verify"
 		},
@@ -1294,6 +1305,7 @@
 		"PROFILE": {
 			"ALT_E_UPDATE": "Failed to Update Profile",
 			"ALT_S_UPDATE": "Profile successfully updated  ",
+			"CONFIRM_PASSWORD": "Confirm Password",
 			"CURRENT_PASSWORD": "Current Password",
 			"EMAIL": "E-mail",
 			"EMAIL_REQUIRED": "Please enter email",
@@ -4264,6 +4276,7 @@
 	"MY_PAGE": {
 		"ACCOUNT": {
 			"ACCOUNT_N_PROFILE": "Account & Profile",
+			"ADMIN_ROLE": "Admin Role",
 			"BASE_INFORMATION": "Base Information",
 			"SAVE_CHANGES": "Save Changes",
 			"TIMEZONE_INVALID": "The time zone is set incorrectly."
@@ -4272,9 +4285,23 @@
 		"MFA": {
 			"BTN_CHANGE": "Change",
 			"BTN_SEND_MAIL": "Send Verification Code",
+			"CHANGE_DESC": "An MFA method is already active. Are you sure you want to disable it and switch to a new one? Please authenticate the current MFA first.",
+			"CHANGE_TITLE": "Are you sure you want to change MFA?",
+			"EMAIL_DESC": "Receive a code by Email",
 			"ENABLE_MFA": "Enable MFA",
+			"MODAL_EMAIL_TITLE": "Set up Email",
+			"MODAL_MS_TITLE": "Set up Microsoft Authenticator App",
+			"MS_DESC": "Receive a code with the Microsoft Authenticator app",
+			"RESYNC": "Re-Sync",
+			"RESYNC_DESC": "To re-sync, your existing authentication records will be deleted.",
+			"RESYNC_TITLE": "Are you sure you want to resync this multi-factor authentication?",
 			"STATE_NOT_VERIFIED": "Not Verified",
 			"STATE_VERIFIED": "Verified",
+			"STEP1": "Download the Microsoft Authenticator app to your phone.",
+			"STEP2": "Scan this QR code or Enter the secret key with the Microsoft Authenticator app.",
+			"STEP3": "Enter the code below that the Microsoft Authenticator app generated.",
+			"STEP_DESC": "To set up two-step verification using {type}",
+			"SYNC": "In-Sync",
 			"TITLE": "Multi-factor Authentication",
 			"TYPE": "MFA Type"
 		},
