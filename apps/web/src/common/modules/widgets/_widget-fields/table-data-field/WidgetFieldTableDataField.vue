@@ -145,7 +145,7 @@ const state = reactive({
     dynamicFields: undefined as undefined | string[],
     dynamicFieldMenuItems: computed<MenuItem[]>(() => {
         if (state.proxyValue?.fieldType === 'staticField') return [];
-        if (state.proxyValue?.dynamicFieldInfo?.fieldValue === 'Date') return [];
+        if (isDateField(state.proxyValue?.dynamicFieldInfo?.fieldValue)) return [];
         return state.dynamicFields?.map((d) => {
             const fieldName = state.proxyValue.dynamicFieldInfo?.fieldValue;
             const label = getReferenceLabel(storeState.allReferenceTypeInfo, fieldName, d);
