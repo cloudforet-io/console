@@ -98,26 +98,14 @@ const state = reactive({
         return _fixedAmount;
     }),
     comparisonText: computed(() => {
+        const _previousDateRange = getPreviousDateRange(state.granularity, dateRange.value);
         const _comparison = state.currentValue - state.previousValue;
         if (!_comparison) return i18n.t('COMMON.WIDGETS.NUMBER_CARD.NO_CHANGE');
 
-        let _text;
         if (_comparison < 0) {
-            if (state.granularity === 'YEARLY') {
-                _text = i18n.t('COMMON.WIDGETS.NUMBER_CARD.LESS_THAN_PREVIOUS_YEAR');
-            } else if (state.granularity === 'MONTHLY') {
-                _text = i18n.t('COMMON.WIDGETS.NUMBER_CARD.LESS_THAN_PREVIOUS_MONTH');
-            } else {
-                _text = i18n.t('COMMON.WIDGETS.NUMBER_CARD.LESS_THAN_PREVIOUS_DAY');
-            }
-        } else if (state.granularity === 'YEARLY') {
-            _text = i18n.t('COMMON.WIDGETS.NUMBER_CARD.MORE_THAN_PREVIOUS_YEAR');
-        } else if (state.granularity === 'MONTHLY') {
-            _text = i18n.t('COMMON.WIDGETS.NUMBER_CARD.MORE_THAN_PREVIOUS_MONTH');
-        } else {
-            _text = i18n.t('COMMON.WIDGETS.NUMBER_CARD.MORE_THAN_PREVIOUS_DAY');
+            return `less than '${_previousDateRange.start} ~ ${_previousDateRange.end}'`;
         }
-        return _text;
+        return `more than '${_previousDateRange.start} ~ ${_previousDateRange.end}'`;
     }),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
