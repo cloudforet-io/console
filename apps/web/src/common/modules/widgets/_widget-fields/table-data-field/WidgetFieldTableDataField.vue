@@ -187,6 +187,7 @@ const handleChangeDataFieldType = (value: string) => {
             },
             staticFieldInfo: undefined,
         };
+        state.selectedValueType = DEFAULT_VALUE_TYPE;
         state.selectedItem = state.menuItems[0]?.name;
         state.selectedCriteria = state.dataInfoMenuItems[0]?.name;
     }
