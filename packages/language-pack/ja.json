@@ -2304,6 +2304,7 @@
 					"TOTAL": "合計",
 					"TOTAL_FIELD": "総合フィールド",
 					"UPDATE_PREVIEW": "プレビューを更新する",
+					"USE_BASE_DATE": "",
 					"VALIDATION_MODAL": {
 						"DESC": "このグラフを適切に表示するには、少なくとも {number} つのグループ選択または追加ラベルが必要です。",
 						"EDIT_DATA": "データを編集する",

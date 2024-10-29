@@ -2304,6 +2304,7 @@
 					"TOTAL": "Total",
 					"TOTAL_FIELD": "Total Field",
 					"UPDATE_PREVIEW": "Update Preview",
+					"USE_BASE_DATE": "Use Dashboard Base Date",
 					"VALIDATION_MODAL": {
 						"DESC": "To illustrate this chart properly, the data requires at least {number} group-by selection or additional labels.",
 						"EDIT_DATA": "Go to Edit Data",
