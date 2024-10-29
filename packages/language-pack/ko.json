@@ -1248,7 +1248,6 @@
 			"SEND_NEW_CODE": "인증 코드 재전송",
 			"SENT_DESC": "인증코드가 입력한 이메일로 발송 되었습니다: ",
 			"SUCCESS": "인증 코드가 알림 이메일로 전송되었습니다.",
-			"TITLE": "",
 			"VERIFICATION_CODE": "인증 코드",
 			"VERIFY": "인증"
 		},
@@ -4290,6 +4289,8 @@
 			"CHANGE_TITLE": "멀티 팩터 인증(MFA)을 변경하시겠습니까?",
 			"EMAIL_DESC": "이메일로 인증 코드를 받으세요.",
 			"ENABLE_MFA": "멀티 팩터 인증(MFA) 활성화",
+			"MODAL_EMAIL_TITLE": "이메일 설정",
+			"MODAL_MS_TITLE": "Microsoft Authenticator 앱 설정",
 			"MS_DESC": "Microsoft Authenticator 앱으로 인증 코드를 받으세요.",
 			"RESYNC": "동기화",
 			"RESYNC_DESC": "동기화할 경우 기존 인증 기록은 삭제됩니다.",

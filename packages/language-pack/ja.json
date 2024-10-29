@@ -1248,7 +1248,6 @@
 			"SEND_NEW_CODE": "再送信",
 			"SENT_DESC": "認証コードが入力したメールアドレスに送信されました:",
 			"SUCCESS": "確認コードが通知メールに送信されました。",
-			"TITLE": "",
 			"VERIFICATION_CODE": "認証コード",
 			"VERIFY": "認証"
 		},
@@ -4290,6 +4289,8 @@
 			"CHANGE_TITLE": "マルチファクタ認証(MFA)を変更しますか？",
 			"EMAIL_DESC": "メールでコードを受け取る",
 			"ENABLE_MFA": "マルチファクタ認証(MFA)有効化",
+			"MODAL_EMAIL_TITLE": "メール設定",
+			"MODAL_MS_TITLE": "Microsoft Authenticator アプリを設定する",
 			"MS_DESC": "Microsoft Authenticatorアプリでコードを受け取る",
 			"RESYNC": "再同期",
 			"RESYNC_DESC": "再同期すると、既存の認証記録が削除されます。",
