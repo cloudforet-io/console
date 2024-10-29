@@ -80,7 +80,7 @@ export const useWidgetDateRange = (options: UseWidgetDateRangeOptions): UseWidge
             } else if (relativeDateRangeValue === 'lastTwoMonths') {
                 const lastMonthDate = baseDate.subtract(2, 'month');
                 _start = lastMonthDate.startOf('month').format('YYYY-MM-DD');
-                _end = lastMonthDate.endOf('month').format('YYYY-MM-DD');
+                _end = baseDate.subtract(1, 'month').format('YYYY-MM-DD');
             } else if (relativeDateRangeValue === 'thisQuarter') {
                 if (thisMonth >= 1 && thisMonth <= 3) {
                     _start = `${thisYear}-01-01`;
@@ -127,16 +127,16 @@ export const useWidgetDateRange = (options: UseWidgetDateRangeOptions): UseWidge
                 _end = baseDate.subtract(1, 'day').format('YYYY-MM-DD');
             } else if (relativeDateRangeValue === 'lastTwoDays') {
                 _start = baseDate.subtract(2, 'day').format('YYYY-MM-DD');
-                _end = baseDate.subtract(2, 'day').format('YYYY-MM-DD');
+                _end = baseDate.subtract(1, 'day').format('YYYY-MM-DD');
             } else if (relativeDateRangeValue === 'lastSevenDays') {
                 _start = baseDate.subtract(7, 'day').format('YYYY-MM-DD');
-                _end = baseDate.subtract(7, 'day').format('YYYY-MM-DD');
+                _end = baseDate.subtract(1, 'day').format('YYYY-MM-DD');
             } else if (relativeDateRangeValue === 'lastFourteenDays') {
                 _start = baseDate.subtract(14, 'day').format('YYYY-MM-DD');
-                _end = baseDate.subtract(14, 'day').format('YYYY-MM-DD');
+                _end = baseDate.subtract(1, 'day').format('YYYY-MM-DD');
             } else if (relativeDateRangeValue === 'lastThirtyDays') {
                 _start = baseDate.subtract(30, 'day').format('YYYY-MM-DD');
-                _end = baseDate.subtract(30, 'day').format('YYYY-MM-DD');
+                _end = baseDate.subtract(1, 'day').format('YYYY-MM-DD');
             } else if (relativeDateRangeValue === 'thisWeek') {
                 _start = baseDate.startOf('week').format('YYYY-MM-DD');
                 _end = baseDate.endOf('week').format('YYYY-MM-DD');
@@ -160,7 +160,7 @@ export const useWidgetDateRange = (options: UseWidgetDateRangeOptions): UseWidge
                 _end = baseDate.subtract(1, 'year').endOf('year').format('YYYY-MM-DD');
             } else if (relativeDateRangeValue === 'lastTwoYears') {
                 _start = baseDate.subtract(2, 'year').startOf('year').format('YYYY-MM-DD');
-                _end = baseDate.subtract(2, 'year').endOf('year').format('YYYY-MM-DD');
+                _end = baseDate.subtract(1, 'year').endOf('year').format('YYYY-MM-DD');
             }
         }
 
