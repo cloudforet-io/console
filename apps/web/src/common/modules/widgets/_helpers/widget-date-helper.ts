@@ -173,9 +173,9 @@ export const getRefinedDynamicFieldData = (rawData: DynamicFieldData, dynamicFie
             if (isDateField(dataField)) {
                 _refinedData = orderBy(result[criteria], dataField, 'desc') ?? [];
             } else {
-                const _orderedData = orderBy(result[criteria], 'value', 'desc') ?? [];
-                _refinedData = _orderedData.slice(0, valueCount);
+                _refinedData = orderBy(result[criteria], 'value', 'desc') ?? [];
             }
+            _refinedData = _refinedData.slice(0, valueCount);
             _refinedData.forEach((v) => {
                 _seriesFieldsSet.add(v[dataField]);
             });
