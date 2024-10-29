@@ -56,6 +56,12 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         translationId: 'MENU.ASSET_INVENTORY_SECURITY',
         icon: 'ic_service_security',
     },
+    [MENU_ID.METRIC_EXPLORER]: {
+        menuId: MENU_ID.METRIC_EXPLORER,
+        routeName: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER._NAME,
+        translationId: 'MENU.ASSET_INVENTORY_METRIC_EXPLORER',
+        icon: 'ic_service_metric-explorer',
+    },
     [MENU_ID.COLLECTOR]: {
         menuId: MENU_ID.COLLECTOR,
         routeName: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME,
@@ -116,7 +122,6 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.ANOMALY_DETECTION_DOMAIN_CONFIGURATION,
         routeName: COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.ANOMALY_DETECTION_DOMAIN_CONFIGURATION._NAME,
         translationId: 'COST_EXPLORER.ANOMALY_DETECTION_CONFIGURATION',
-        highlightTag: 'new',
     },
     [MENU_ID.CURRENCY_CONVERTER]: {
         menuId: MENU_ID.CURRENCY_CONVERTER,
@@ -199,7 +204,6 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.AUTO_DORMANCY_CONFIGURATION,
         routeName: ADVANCED_ROUTE.AUTO_DORMANCY_CONFIGURATION._NAME,
         translationId: 'IAM.AUTO_DORMANCY_CONFIGURATION',
-        highlightTag: 'new',
         icon: 'ic_service_dormancy-configuration',
     },
     [MENU_ID.WORKSPACES]: {
@@ -251,12 +255,5 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         routeName: INFO_ROUTE.NOTICE._NAME,
         translationId: 'MENU.INFO_NOTICE',
         icon: 'ic_gnb_bell',
-    },
-    [MENU_ID.METRIC_EXPLORER]: {
-        menuId: MENU_ID.METRIC_EXPLORER,
-        routeName: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER._NAME,
-        translationId: 'MENU.ASSET_INVENTORY_METRIC_EXPLORER',
-        highlightTag: 'new',
-        icon: 'ic_service_metric-explorer',
     },
 });
