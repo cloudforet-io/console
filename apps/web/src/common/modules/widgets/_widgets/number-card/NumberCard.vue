@@ -220,7 +220,7 @@ const loadWidget = async (): Promise<Data|APIErrorToast> => {
     return state.data;
 };
 
-watch(() => props.widgetOptions?.comparison, async (comparison) => {
+watch([() => props.widgetOptions?.comparison, () => dateRange.value], async ([comparison]) => {
     if (comparison) {
         state.previousData = await fetchPreviousData();
     } else {
