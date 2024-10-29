@@ -25,7 +25,7 @@ import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-wi
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import {
-    getPreviousDateRange, getWidgetBasedOnDate,
+    getPreviousDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/comparison/type';
@@ -65,7 +65,6 @@ const state = reactive({
         return getFormattedNumber(state.currentValue, state.dataField, _numberFormatMap, state.unit);
     }),
     granularity: computed<string>(() => props.widgetOptions?.granularity as string),
-    basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
     dataField: computed<string|undefined>(() => props.widgetOptions?.dataField as string),
     // optional fields
     iconName: computed<string|undefined>(() => (props.widgetOptions?.icon as IconValue)?.icon?.name),
@@ -188,7 +187,6 @@ const fetchPreviousData = async (): Promise<Data|undefined> => {
         const _isPrivate = props.widgetId.startsWith('private');
         const _fetcher = _isPrivate ? privatePreviousFetcher : publicPreviousFetcher;
         const _previousDateRange = getPreviousDateRange(state.granularity, dateRange.value);
-        console.log(dateRange.value, _previousDateRange);
         const { status, response } = await _fetcher({
             widget_id: props.widgetId,
             query: {

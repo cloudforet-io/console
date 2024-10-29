@@ -25,8 +25,7 @@ import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import {
-    getWidgetBasedOnDate, getWidgetDateFields,
-    getWidgetDateRange,
+    getWidgetDateFields, getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
@@ -114,13 +113,12 @@ const state = reactive({
         return state.dynamicFieldInfo?.fieldValue;
     }),
     dynamicFieldValue: computed<string[]>(() => state.dynamicFieldInfo?.fixedValue || []),
-    basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
     formatRulesValue: computed<AdvancedFormatRulesValue>(() => props.widgetOptions?.advancedFormatRules as AdvancedFormatRulesValue),
     widgetDateRange: computed<DateRange>(() => {
-        let _start = state.basedOnDate;
-        let _end = state.basedOnDate;
+        let _start = dateRange.value.start;
+        let _end = dateRange.value.end;
         if (isDateField(state.xAxisField)) {
-            [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.xAxisCount);
+            [_start, _end] = getWidgetDateRange(state.granularity, _end, state.xAxisCount);
         } else if (isDateField(state.dataField)) {
             let subtract = state.dynamicFieldInfo.count;
             if (state.dynamicFieldInfo?.valueType === 'fixed') {
@@ -128,7 +126,7 @@ const state = reactive({
                 if (state.granularity === GRANULARITY.MONTHLY) subtract = 12;
                 if (state.granularity === GRANULARITY.DAILY) subtract = 30;
             }
-            [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, subtract);
+            [_start, _end] = getWidgetDateRange(state.granularity, _end, subtract);
         }
         return { start: _start, end: _end };
     }),
@@ -210,8 +208,8 @@ const targetValue = (xField?: string, yField?: string, format?: 'table'|'tooltip
 };
 const getColor = (val: string|number): string => {
     let _formatRules = cloneDeep(state.formatRulesValue);
-    let _color = state.formatRulesValue.baseColor || gray[200];
-    _formatRules = _formatRules.value.sort((a, b) => (a?.threshold || 0) - (b?.threshold || 0));
+    let _color = state.formatRulesValue?.baseColor || gray[200];
+    _formatRules = _formatRules?.value?.sort((a, b) => (a?.threshold || 0) - (b?.threshold || 0)) || [];
     _formatRules?.forEach((d) => {
         if (val >= (d.threshold || 0)) {
             _color = d.color;
@@ -222,11 +220,11 @@ const getColor = (val: string|number): string => {
 
 /* Watcher */
 watch(() => state.formatRulesValue, async () => {
-    state.legendList = state.formatRulesValue.value.map((d) => ({
+    state.legendList = state.formatRulesValue?.value?.map((d) => ({
         name: d.text,
         color: d.color,
         disabled: false,
-    }));
+    })) || [];
 }, { immediate: true });
 
 /* Lifecycle */

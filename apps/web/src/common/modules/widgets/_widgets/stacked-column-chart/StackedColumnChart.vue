@@ -33,7 +33,6 @@ import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant'
 import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import {
     getReferenceLabel, getRefinedDynamicFieldData,
-    getWidgetBasedOnDate,
     getWidgetDateFields,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
@@ -140,7 +139,6 @@ const state = reactive({
     })),
     // required fields
     granularity: computed<string>(() => props.widgetOptions?.granularity as string),
-    basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
     xAxisField: computed<string>(() => (props.widgetOptions?.xAxis as XAxisValue)?.value),
     xAxisCount: computed<number>(() => (props.widgetOptions?.xAxis as XAxisValue)?.count),
     dataFieldInfo: computed<TableDataFieldValue>(() => props.widgetOptions?.tableDataField as TableDataFieldValue),
@@ -152,18 +150,18 @@ const state = reactive({
     }),
     dynamicFieldValue: computed<string[]>(() => state.dynamicFieldInfo?.fixedValue || []),
     widgetDateRange: computed<DateRange>(() => {
-        let _start = state.basedOnDate;
-        let _end = state.basedOnDate;
+        let _start = dateRange.value.start;
+        let _end = dateRange.value.end;
         if (isDateField(state.xAxisField)) {
-            [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.xAxisCount);
+            [_start, _end] = getWidgetDateRange(state.granularity, _end, state.xAxisCount);
         } else if (isDateField(state.dataField)) {
-            let subtract = state.dynamicFieldInfo.count;
+            let subtract = state.dynamicFieldInfo?.count || 0;
             if (state.dynamicFieldInfo?.valueType === 'fixed') {
                 if (state.granularity === GRANULARITY.YEARLY) subtract = 3;
                 if (state.granularity === GRANULARITY.MONTHLY) subtract = 12;
                 if (state.granularity === GRANULARITY.DAILY) subtract = 30;
             }
-            [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, subtract);
+            [_start, _end] = getWidgetDateRange(state.granularity, _end, subtract);
         }
         return { start: _start, end: _end };
     }),
