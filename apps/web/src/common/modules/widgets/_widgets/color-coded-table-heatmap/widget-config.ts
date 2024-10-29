@@ -13,6 +13,7 @@ const colorCodedTableHeatmap: WidgetConfig = {
     },
     requiredFieldsSchema: {
         granularity: {},
+        dateRange: {},
         xAxis: {
             options: {
                 dataTarget: 'labels_info',

@@ -13,6 +13,7 @@ const colorCodedHeatmap: WidgetConfig = {
     },
     requiredFieldsSchema: {
         granularity: {},
+        dateRange: {},
         dataField: {},
         groupBy: {
             options: {

@@ -10,7 +10,9 @@ import { init } from 'echarts/core';
 import type {
     EChartsType,
 } from 'echarts/core';
-import { isEmpty, orderBy, throttle } from 'lodash';
+import {
+    cloneDeep, isEmpty, orderBy, throttle,
+} from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
@@ -23,21 +25,21 @@ import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widge
 import type { APIErrorToast } from '@/common/composables/error/errorHandler';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
+import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import {
     getReferenceLabel,
-    getWidgetBasedOnDate,
-    getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { CategoryByValue } from '@/common/modules/widgets/_widget-fields/category-by/type';
 import type { DateFormatValue } from '@/common/modules/widgets/_widget-fields/date-format/type';
+import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { DisplaySeriesLabelValue } from '@/common/modules/widgets/_widget-fields/display-series-label/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
-import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
@@ -45,12 +47,17 @@ import type {
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
 
+
 type Data = ListResponse<{
     [key: string]: string|number;
 }>;
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
-
+const { dateRange } = useWidgetDateRange({
+    dateRangeFieldValue: computed(() => (props.widgetOptions?.dateRange as DateRangeValue)),
+    baseOnDate: computed(() => props.dashboardOptions?.date_range?.end),
+    granularity: computed<string>(() => props.widgetOptions?.granularity as string),
+});
 const chartContext = ref<HTMLElement|null>(null);
 const state = reactive({
     loading: false,
@@ -100,15 +107,9 @@ const state = reactive({
     })),
     // required fields
     granularity: computed<string>(() => props.widgetOptions?.granularity as string),
-    basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
     dataField: computed<string|undefined>(() => props.widgetOptions?.dataField as string),
     categoryByField: computed<string|undefined>(() => (props.widgetOptions?.categoryBy as CategoryByValue)?.value as string),
     categoryByCount: computed<number>(() => (props.widgetOptions?.categoryBy as CategoryByValue)?.count as number),
-    dateRange: computed<DateRange>(() => {
-        const _dateRangeCount = Object.values(DATE_FIELD).includes(state.categoryByField) ? state.categoryByCount : 1;
-        const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, _dateRangeCount);
-        return { start: _start, end: _end };
-    }),
     // optional fields
     dateFormat: computed<string|undefined>(() => {
         const _dateFormat = (props.widgetOptions?.dateFormat as DateFormatValue)?.value || 'MMM DD, YYYY';
@@ -118,7 +119,7 @@ const state = reactive({
     displaySeriesLabel: computed(() => (props.widgetOptions?.displaySeriesLabel as DisplaySeriesLabelValue)),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
-    dateRange: computed(() => state.dateRange),
+    dateRange,
     errorMessage: computed(() => state.errorMessage),
     widgetLoading: computed(() => state.loading),
     noData: computed(() => (state.data ? !state.data.results?.length : false)),
@@ -137,8 +138,8 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
             widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
-                start: state.dateRange.start,
-                end: state.dateRange.end,
+                start: dateRange.value.start,
+                end: dateRange.value.end,
                 group_by: [state.categoryByField],
                 fields: {
                     [state.dataField]: {
@@ -164,14 +165,21 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
 };
 const drawChart = (rawData: Data|null) => {
     if (isEmpty(rawData)) return;
-    const _orderedData = orderBy(rawData.results, [state.dataField], ['desc']);
-    const _slicedData = _orderedData.slice(0, state.categoryByCount);
-    const _etcValue = _orderedData.slice(state.categoryByCount).reduce((acc, v) => acc + v[state.dataField], 0);
-    const _etcData = _etcValue ? {
-        [state.categoryByField]: 'etc',
-        [state.dataField]: _etcValue,
-    } : {};
-    const _refinedData = isEmpty(_etcData) ? _slicedData : [..._slicedData, _etcData];
+
+    let _refinedData = cloneDeep(rawData.results || []);
+    if (isDateField(state.categoryByField)) {
+        _refinedData = orderBy(_refinedData, state.categoryByField, 'desc');
+        _refinedData = _refinedData?.slice(0, state.categoryByCount);
+    } else {
+        _refinedData = orderBy(_refinedData, state.dataField, 'desc');
+        const _slicedData = _refinedData.slice(0, state.categoryByCount);
+        const _etcValue = _refinedData.slice(state.categoryByCount).reduce((acc, v) => acc + v[state.dataField], 0);
+        const _etcData = _etcValue ? {
+            [state.categoryByField]: 'etc',
+            [state.dataField]: _etcValue,
+        } : {};
+        _refinedData = isEmpty(_etcData) ? _slicedData : [..._slicedData, _etcData];
+    }
 
     // get chart data
     state.chartData = _refinedData?.map((v) => {

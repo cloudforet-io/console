@@ -26,13 +26,13 @@ import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widge
 import type { APIErrorToast } from '@/common/composables/error/errorHandler';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
+import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import {
     getReferenceLabel, getRefinedDynamicFieldData,
-    getWidgetBasedOnDate,
     getWidgetDateFields,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
@@ -43,6 +43,7 @@ import {
     getWidgetLoadApiQueryDateRange,
 } from '@/common/modules/widgets/_helpers/widget-load-helper';
 import type { DateFormatValue } from '@/common/modules/widgets/_widget-fields/date-format/type';
+import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { DisplaySeriesLabelValue } from '@/common/modules/widgets/_widget-fields/display-series-label/type';
 import type { LegendValue } from '@/common/modules/widgets/_widget-fields/legend/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
@@ -54,6 +55,7 @@ import type {
 } from '@/common/modules/widgets/types/widget-display-type';
 
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
+
 
 
 type StaticFieldData = ListResponse<{
@@ -69,6 +71,11 @@ type Data = StaticFieldData|DynamicFieldData;
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
+const { dateRange } = useWidgetDateRange({
+    dateRangeFieldValue: computed(() => (props.widgetOptions?.dateRange as DateRangeValue)),
+    baseOnDate: computed(() => props.dashboardOptions?.date_range?.end),
+    granularity: computed<string>(() => props.widgetOptions?.granularity as string),
+});
 const chartContext = ref<HTMLElement|null>(null);
 const state = reactive({
     loading: false,
@@ -79,9 +86,9 @@ const state = reactive({
         if (!state.data?.results?.length) return [];
         if (isDateField(state.xAxisField)) {
             const _isSeparatedDate = state.xAxisField !== DATE_FIELD.DATE;
-            return getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end, _isSeparatedDate);
+            return getWidgetDateFields(state.granularity, state.widgetDateRange.start, state.widgetDateRange.end, _isSeparatedDate);
         }
-        return state.data.results.map((d) => d[state.xAxisField] as string) || [];
+        return state.data?.results?.map((d) => d[state.xAxisField] as string) || [];
     }),
     chartData: [],
     chartOptions: computed<BarSeriesOption>(() => ({
@@ -142,7 +149,7 @@ const state = reactive({
     })),
     // required fields
     granularity: computed<string>(() => props.widgetOptions?.granularity as string),
-    basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
+    dateRangeField: computed<DateRangeValue|undefined>(() => props.widgetOptions?.dateRange as DateRangeValue),
     xAxisField: computed<string>(() => (props.widgetOptions?.xAxis as XAxisValue)?.value),
     xAxisCount: computed<number>(() => (props.widgetOptions?.xAxis as XAxisValue)?.count),
     dataFieldInfo: computed<TableDataFieldValue>(() => props.widgetOptions?.tableDataField as TableDataFieldValue),
@@ -153,19 +160,19 @@ const state = reactive({
         return state.dynamicFieldInfo?.fieldValue;
     }),
     dynamicFieldValue: computed<string[]>(() => state.dynamicFieldInfo?.fixedValue || []),
-    dateRange: computed<DateRange>(() => {
-        let _start = state.basedOnDate;
-        let _end = state.basedOnDate;
+    widgetDateRange: computed<DateRange>(() => {
+        let _start = dateRange.value.start;
+        let _end = dateRange.value.end;
         if (isDateField(state.xAxisField)) {
-            [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.xAxisCount);
+            [_start, _end] = getWidgetDateRange(state.granularity, _end, state.xAxisCount);
         } else if (isDateField(state.dataField)) {
-            let subtract = state.dynamicFieldInfo.count || 0;
+            let subtract = state.dynamicFieldInfo?.count || 0;
             if (state.dynamicFieldInfo?.valueType === 'fixed') {
                 if (state.granularity === GRANULARITY.YEARLY) subtract = 3;
                 if (state.granularity === GRANULARITY.MONTHLY) subtract = 12;
                 if (state.granularity === GRANULARITY.DAILY) subtract = 30;
             }
-            [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, subtract);
+            [_start, _end] = getWidgetDateRange(state.granularity, _end, subtract);
         }
         return { start: _start, end: _end };
     }),
@@ -179,7 +186,7 @@ const state = reactive({
     displaySeriesLabel: computed(() => (props.widgetOptions?.displaySeriesLabel as DisplaySeriesLabelValue)),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
-    dateRange: computed(() => state.dateRange),
+    dateRange,
     errorMessage: computed(() => state.errorMessage),
     widgetLoading: computed(() => state.loading),
     noData: computed(() => (state.data ? !state.data.results?.length : false)),
@@ -198,8 +205,8 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
             widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
-                page: { start: 1, limit: state.xAxisCount },
-                ...getWidgetLoadApiQueryDateRange(state.granularity, state.dateRange),
+                ...(!isDateField(state.xAxisField) && { page: { start: 1, limit: state.xAxisCount } }),
+                ...getWidgetLoadApiQueryDateRange(state.granularity, dateRange.value),
                 ...getWidgetLoadApiQuery(state.dataFieldInfo, state.xAxisField),
             },
             vars: props.dashboardVars,
@@ -229,16 +236,20 @@ const getThreshold = (rawData: Data): number => {
 const getStaticFieldData = (rawData: StaticFieldData) => {
     const _threshold = getThreshold(rawData);
     // sort and slice Data, etc
-    const _sortedData = sortBy(rawData?.results, (v) => state.dataField.reduce((acc, field) => acc + (v[field] as number), 0)).reverse();
-    const _slicedData = _sortedData.slice(0, state.xAxisCount);
-    const _etcData = _sortedData.slice(state.xAxisCount).reduce((acc, v) => {
-        state.dataField.forEach((field) => {
-            acc[field] = (acc[field] as number) + (v[field] as number);
-        });
-        return acc;
-    }, Object.fromEntries(state.dataField.map((field) => [field, 0])));
-    if (Object.values(_etcData).some((v) => v > 0)) {
-        _slicedData.push({ [state.xAxisField]: 'etc', ..._etcData });
+
+    let _refinedData = rawData?.results || [];
+    if (!isDateField(state.xAxisField)) {
+        const _sortedData = sortBy(rawData?.results, (v) => state.dataField.reduce((acc, field) => acc + (v[field] as number), 0)).reverse();
+        _refinedData = _sortedData.slice(0, state.xAxisCount);
+        const _etcData = _sortedData.slice(state.xAxisCount).reduce((acc, v) => {
+            state.dataField.forEach((field) => {
+                acc[field] = (acc[field] as number) + (v[field] as number);
+            });
+            return acc;
+        }, Object.fromEntries(state.dataField.map((field) => [field, 0])));
+        if (Object.values(_etcData).some((v) => v > 0)) {
+            _refinedData.push({ [state.xAxisField]: 'etc', ..._etcData });
+        }
     }
 
     // get chart data
@@ -261,7 +272,7 @@ const getStaticFieldData = (rawData: StaticFieldData) => {
                 },
             },
             data: state.xAxisData.map((d) => {
-                const _data = _slicedData.find((v) => v[state.xAxisField] === d);
+                const _data = _refinedData.find((v) => v[state.xAxisField] === d);
                 return _data ? _data[field] : undefined;
             }),
         });
