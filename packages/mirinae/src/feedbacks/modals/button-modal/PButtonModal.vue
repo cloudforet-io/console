@@ -30,7 +30,7 @@
                                          class="header-img"
                                          color="inherit transparent"
                                     />
-                                    {{ headerTitle }}
+                                    <span class="header-title">{{ headerTitle }}</span>
                                 </span>
                             </slot>
                             <p-icon-button v-if="!hideHeaderCloseButton"
@@ -307,6 +307,12 @@ export default defineComponent<ButtonModalProps>({
                     text-indent: 2rem;
                     .modal-alert {
                         @apply text-red-400;
+                    }
+
+                    @screen mobile {
+                        .header-title {
+                            text-indent: 2rem;
+                        }
                     }
                 }
             }
