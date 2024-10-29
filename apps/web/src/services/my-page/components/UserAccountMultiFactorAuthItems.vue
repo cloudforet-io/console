@@ -62,8 +62,8 @@ const handleClickReSyncButton = async (type: string) => {
 };
 
 watch(() => storeState.mfa, (mfa) => {
-    if (mfa.mfa_type) {
-        multiFactorAuthStore.setEnableMfaMapType(mfa.mfa_type, storeState.mfa.state === 'ENABLED');
+    if (mfa?.mfa_type) {
+        multiFactorAuthStore.setEnableMfaMapType(mfa.mfa_type, storeState.mfa?.state === 'ENABLED');
     }
 }, { immediate: true });
 watch(() => multiFactorAuthState.modalVisible, (modalVisible) => {
@@ -105,7 +105,8 @@ watch(() => multiFactorAuthState.modalVisible, (modalVisible) => {
                         </p-badge>
                     </div>
                     <p class="desc">
-                        {{ item.desc }}
+                        <span v-if="item.type === MULTI_FACTOR_AUTH_TYPE.OTP">{{ $t('MY_PAGE.MFA.MS_DESC') }}</span>
+                        <span v-else>{{ $t('MY_PAGE.MFA.EMAIL_DESC') }}</span>
                     </p>
                 </div>
             </div>
