@@ -20,7 +20,7 @@ import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widge
 import type { APIErrorToast } from '@/common/composables/error/errorHandler';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
-import { useWdigetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
+import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD, REFERENCE_FIELD_MAP } from '@/common/modules/widgets/_constants/widget-constant';
@@ -59,7 +59,7 @@ type Data = ListResponse<TableDataItem>;
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
-const { dateRange } = useWdigetDateRange({
+const { dateRange } = useWidgetDateRange({
     dateRangeFieldValue: computed(() => (props.widgetOptions?.dateRange as DateRangeValue)),
     baseOnDate: computed(() => props.dashboardOptions?.date_range?.end),
     granularity: computed<string>(() => props.widgetOptions?.granularity as string),
