@@ -23,7 +23,6 @@ import LSBCollapsibleMenuItem from '@/common/modules/navigations/lsb/modules/LSB
 
 import DashboardManageVariableImportModalTree
     from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableImportModalTree.vue';
-import { getRefinedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variable-helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 
@@ -53,7 +52,7 @@ const state = reactive({
     selectedDashboardVariables: computed<DashboardGlobalVariable[]>(() => {
         const selectedDashboard = state.allDashboardItems.find((item) => item.dashboard_id === state.selectedDashboardId);
         if (!selectedDashboard) return [];
-        return getRefinedGlobalVariables(selectedDashboard?.vars_schema);
+        return Object.values(selectedDashboard?.vars_schema?.properties || {});
     }),
     searchedDashboardVariables: computed<DashboardGlobalVariable[]>(() => state.selectedDashboardVariables.filter((variable) => variable.name.toLowerCase().includes(state.keyword.toLowerCase()))),
     selectedVariableKeys: [] as string[],

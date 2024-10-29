@@ -1,6 +1,5 @@
 // Base Model
 interface DashboardGlobalVariableBase {
-    management: 'custom'|'managed';
     key: string; // new_variable
     name: string; // New Variable
     method: 'manual'|'dynamic';

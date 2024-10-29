@@ -26,9 +26,7 @@ import {
 } from '@/common/composables/data-source/use-cost-data-source-filter-menu-items';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import {
-    MANAGED_DASHBOARD_GLOBAL_VARIABLES_SCHEMA,
-} from '@/services/dashboards/constants/managed-dashboard-global-variables';
+import { DASHBOARD_GLOBAL_VARIABLES_PRESET_LIST } from '@/services/dashboards/constants/dashboard-global-variable-preset';
 
 
 
@@ -88,17 +86,11 @@ const state = reactive({
             },
         };
     }),
-    sourceFromMenuItems: computed<MenuItem[]>(() => {
-        const _managedGVMenuItems = Object.values(MANAGED_DASHBOARD_GLOBAL_VARIABLES_SCHEMA).map((d) => ({
-            name: d.reference.resourceType,
-            label: d.name,
-        }));
-        return [
-            { name: 'asset', label: i18n.t('DASHBOARDS.DETAIL.VARIABLES.ASSET') },
-            { name: 'cost', label: i18n.t('DASHBOARDS.DETAIL.VARIABLES.COST') },
-            ..._managedGVMenuItems,
-        ];
-    }),
+    sourceFromMenuItems: computed<MenuItem[]>(() => [
+        { name: 'asset', label: i18n.t('DASHBOARDS.DETAIL.VARIABLES.ASSET') },
+        { name: 'cost', label: i18n.t('DASHBOARDS.DETAIL.VARIABLES.COST') },
+        ...DASHBOARD_GLOBAL_VARIABLES_PRESET_LIST,
+    ]),
     valuesFromMenuItems: computed<MenuItem[]>(() => {
         if (state.selectedSourceFrom === 'asset') {
             const _labelsInfo = storeState.metrics[state.selectedMetricId]?.data?.labels_info || [];
