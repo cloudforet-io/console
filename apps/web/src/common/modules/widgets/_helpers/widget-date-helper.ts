@@ -110,7 +110,6 @@ export const getPreviousDateRange = (granularity: string, dateRange: DateRange):
 
     const start = dayjs.utc(dateRange.start, format);
     const end = dayjs.utc(dateRange.end, format);
-    const duration = end.diff(start);
 
     const unitMap = {
         DAILY: 'day',
@@ -118,6 +117,7 @@ export const getPreviousDateRange = (granularity: string, dateRange: DateRange):
         YEARLY: 'year',
     };
     const unit = unitMap[granularity];
+    const duration = end.diff(start, unit);
 
     const previousStart = start.subtract(duration, unit);
     const previousEnd = end.subtract(duration, unit);
