@@ -118,11 +118,12 @@ export const getPreviousDateRange = (granularity: string, dateRange: DateRange):
     } as const;
     const unit = unitMap[granularity];
 
-    const START_DIFF = 1;
     const endDiff = end.diff(start, unit);
+    const duration = endDiff + 1;
+    const dayCountOfPreviewDate = end.subtract(1, 'month').endOf('month').date();
 
-    const previousStart = start.subtract(endDiff + START_DIFF, unit);
-    const previousEnd = end.subtract(endDiff + START_DIFF, unit);
+    const previousStart = start.subtract(duration > dayCountOfPreviewDate ? dayCountOfPreviewDate : duration, unit);
+    const previousEnd = end.subtract(duration, unit);
 
     return {
         start: previousStart.format(format),
