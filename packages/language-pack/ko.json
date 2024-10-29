@@ -2275,6 +2275,8 @@
 					"DATE_FORMAT": "날짜 형식",
 					"DATE_FORMAT_AUTO_DISPLAY": "세부기준(Granuarity)별 자동 표시",
 					"DATE_RANGE": "",
+					"DATE_RANGE_INVALID_LIMIT_TEXT": "",
+					"DATE_RANGE_INVALID_RANGE_TEXT": "",
 					"DESCRIPTION": "설명",
 					"DYNAMIC_FIELD": "변동 데이터 필드",
 					"EDIT_DATA": "데이터 수정",
