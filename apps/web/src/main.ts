@@ -21,13 +21,15 @@ import App from './App.vue';
 
 import '@/styles/style.pcss';
 // eslint-disable-next-line
-import '@cloudforet/mirinae/css/light-style.css';
+import "@cloudforet/mirinae/css/light-style.css";
 import '@cloudforet/mirinae/dist/style.css';
-
 
 /** ********** SET VUE PLUGINS ************** */
 Vue.use(Fragment.Plugin);
-Vue.use(VTooltip, { defaultClass: 'p-tooltip', defaultBoundariesElement: document.body });
+Vue.use(VTooltip, {
+    defaultClass: 'p-tooltip',
+    defaultBoundariesElement: document.body,
+});
 Vue.use(PortalVue);
 Vue.use(PiniaVuePlugin);
 

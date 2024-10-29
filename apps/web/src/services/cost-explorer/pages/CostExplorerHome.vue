@@ -32,7 +32,6 @@ const SERVICE_CONTENTS = {
         },
     ],
 };
-
 </script>
 
 <template>
@@ -52,18 +51,20 @@ const SERVICE_CONTENTS = {
                     {{ SERVICE_CONTENTS.topic.button_text }}
                 </p-button>
                 <br>
-                <p-link text="More information"
-                        :action-icon="ACTION_ICON.EXTERNAL_LINK"
-                        :href="SERVICE_CONTENTS.topic.link"
-                        highlight
+                <p-link
+                    text="More information"
+                    :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                    :href="SERVICE_CONTENTS.topic.link"
+                    highlight
                 >
                     {{ SERVICE_CONTENTS.topic.link_text }}
                 </p-link>
             </div>
             <div class="image-wrapper">
-                <img class="image"
-                     src="@/assets/images/landing/img_landing_cost-explorer_hero.png"
-                     :alt="SERVICE_CONTENTS.topic.description"
+                <img
+                    class="image"
+                    src="@/assets/images/landing/img_landing_cost-explorer_hero.png"
+                    :alt="SERVICE_CONTENTS.topic.description"
                 >
             </div>
         </div>
@@ -74,16 +75,18 @@ const SERVICE_CONTENTS = {
                     <p class="description">
                         {{ SERVICE_CONTENTS.sub_menu[0].description }}
                     </p>
-                    <p-link :text="SERVICE_CONTENTS.sub_menu[0].link_text"
-                            :action-icon="ACTION_ICON.EXTERNAL_LINK"
-                            highlight
-                            :href="SERVICE_CONTENTS.sub_menu[0].link"
+                    <p-link
+                        :text="SERVICE_CONTENTS.sub_menu[0].link_text"
+                        :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                        highlight
+                        :href="SERVICE_CONTENTS.sub_menu[0].link"
                     />
                 </div>
                 <div class="image-wrapper">
-                    <img src="@/assets/images/landing/img_landing_cost-explorer_cost-analysis.png"
-                         :alt="SERVICE_CONTENTS.sub_menu[0].description"
-                         class="image"
+                    <img
+                        src="@/assets/images/landing/img_landing_cost-explorer_cost-analysis.png"
+                        :alt="SERVICE_CONTENTS.sub_menu[0].description"
+                        class="image"
                     >
                 </div>
             </div>
@@ -93,16 +96,18 @@ const SERVICE_CONTENTS = {
                     <p class="description">
                         {{ SERVICE_CONTENTS.sub_menu[1].description }}
                     </p>
-                    <p-link :text="SERVICE_CONTENTS.sub_menu[1].link_text"
-                            :action-icon="ACTION_ICON.EXTERNAL_LINK"
-                            highlight
-                            :href="SERVICE_CONTENTS.sub_menu[1].link"
+                    <p-link
+                        :text="SERVICE_CONTENTS.sub_menu[1].link_text"
+                        :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                        highlight
+                        :href="SERVICE_CONTENTS.sub_menu[1].link"
                     />
                 </div>
                 <div class="image-wrapper">
-                    <img src="@/assets/images/landing/img_landing_cost-explorer_budget.png"
-                         :alt="SERVICE_CONTENTS.sub_menu[1].description"
-                         class="image"
+                    <img
+                        src="@/assets/images/landing/img_landing_cost-explorer_budget.png"
+                        :alt="SERVICE_CONTENTS.sub_menu[1].description"
+                        class="image"
                     >
                 </div>
             </div>

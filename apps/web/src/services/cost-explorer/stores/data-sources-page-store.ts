@@ -48,7 +48,7 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
         dataSourceList: [] as DataSourceItem[],
         dataSourceListTotalCount: 0,
         dataSourceListSearchFilters: [] as ConsoleFilter[],
-        selectedDataSourceIndices: undefined as number|undefined,
+        selectedDataSourceIndices: undefined as number | undefined,
         selectedDataSourceItem: {} as DataSourceItem,
 
         jobList: [] as CostJobModel[],
@@ -64,7 +64,7 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
 
         modal: {
             visible: false,
-            type: undefined as CostLinkedAccountModalType|undefined,
+            type: undefined as CostLinkedAccountModalType | undefined,
         },
     });
 
@@ -79,24 +79,40 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
             return {
                 ...i,
                 icon: assetUrlConverter(icon),
-                created_at: dayjs.utc(i.created_at).tz(_getters.timezone).format('YYYY-MM-DD HH:mm:ss'),
+                created_at: dayjs
+                    .utc(i.created_at)
+                    .tz(_getters.timezone)
+                    .format('YYYY-MM-DD HH:mm:ss'),
             };
         })),
-        jobList: computed<CostJobItem[]>(() => (state.jobList.map((i) => ({
+        jobList: computed<CostJobItem[]>(() => state.jobList.map((i) => ({
             ...i,
             total_tasks: i.total_tasks || 0,
-            finished_at: dayjs.utc(i.finished_at).tz(_getters.timezone).format('YYYY-MM-DD HH:mm:ss'),
-            created_at: dayjs.utc(i.created_at).tz(_getters.timezone).format('YYYY-MM-DD HH:mm:ss'),
-            duration: durationFormatter(i.created_at, i.finished_at, _getters.timezone) || '--',
-        })))),
-        linkedAccounts: computed<CostDataSourceAccountModel[]>(() => (state.linkedAccounts.map((i) => ({
+            finished_at: dayjs
+                .utc(i.finished_at)
+                .tz(_getters.timezone)
+                .format('YYYY-MM-DD HH:mm:ss'),
+            created_at: dayjs
+                .utc(i.created_at)
+                .tz(_getters.timezone)
+                .format('YYYY-MM-DD HH:mm:ss'),
+            duration:
+          durationFormatter(i.created_at, i.finished_at, _getters.timezone)
+          || '--',
+        }))),
+        linkedAccounts: computed<CostDataSourceAccountModel[]>(() => state.linkedAccounts.map((i) => ({
             ...i,
-            updated_at: dayjs.utc(i.updated_at).tz(_getters.timezone).format('YYYY-MM-DD HH:mm:ss'),
-        })))),
+            updated_at: dayjs
+                .utc(i.updated_at)
+                .tz(_getters.timezone)
+                .format('YYYY-MM-DD HH:mm:ss'),
+        }))),
         selectedDataSourceItem: computed<DataSourceItem>(() => {
             if (state.selectedDataSourceIndices === undefined) return {} as DataSourceItem;
             if (!state.selectedDataSourceItem) return {} as DataSourceItem;
-            const pluginItem = _getters.plugin[state.selectedDataSourceItem.plugin_info?.plugin_id || ''];
+            const pluginItem = _getters.plugin[
+                state.selectedDataSourceItem.plugin_info?.plugin_id || ''
+            ];
             return {
                 ...state.selectedDataSourceItem,
                 icon: assetUrlConverter(pluginItem?.icon),
@@ -168,17 +184,24 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
 
             state.modal = {
                 visible: false,
-                type: undefined as CostLinkedAccountModalType|undefined,
+                type: undefined as CostLinkedAccountModalType | undefined,
             };
         },
         fetchDataSourceList: async (params?: CostDataSourceListParameters) => {
             try {
-                const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.dataSource.list<CostDataSourceListParameters, ListResponse<CostDataSourceModel>>(params);
+                const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.dataSource.list<
+            CostDataSourceListParameters,
+            ListResponse<CostDataSourceModel>
+          >(params);
                 const analyzeDataList = await actions.fetchLinkedAccountAnalyze();
                 state.dataSourceList = (results || []).map((item) => {
-                    const matchingItem = analyzeDataList?.find((entry) => entry.data_source_id === item.data_source_id);
+                    const matchingItem = analyzeDataList?.find(
+                        (entry) => entry.data_source_id === item.data_source_id,
+                    );
                     if (matchingItem) {
-                        const linkedCount = matchingItem.workspaceList?.filter((id) => id !== null).length;
+                        const linkedCount = matchingItem.workspaceList?.filter(
+                            (id) => id !== null,
+                        ).length;
                         return {
                             ...item,
                             linked_count: linkedCount,
@@ -195,7 +218,10 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
         },
         fetchDataSourceItem: async (params?: CostDataSourceListParameters) => {
             try {
-                state.selectedDataSourceItem = await SpaceConnector.clientV2.costAnalysis.dataSource.get<CostDataSourceGetParameters, CostDataSourceModel>(params);
+                state.selectedDataSourceItem = await SpaceConnector.clientV2.costAnalysis.dataSource.get<
+            CostDataSourceGetParameters,
+            CostDataSourceModel
+          >(params);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.selectedDataSourceItem = {} as DataSourceItem;
@@ -203,7 +229,12 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
         },
         fetchJobList: async (params: CostJobListParameters) => {
             try {
-                const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.job.list<CostJobListParameters, ListResponse<CostJobModel>>(params);
+                const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.job.list<
+            CostJobListParameters,
+            ListResponse<CostJobModel>
+          >(params);
+
+                console.log('joblist', results);
                 state.jobList = results || [];
                 state.jobListTotalCount = total_count || 0;
             } catch (e) {
@@ -214,9 +245,10 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
         },
         fetchLinkedAccount: async (params: CostJobListParameters) => {
             try {
-                const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.dataSourceAccount.list<CostDataSourceAccountListParameters, ListResponse<CostDataSourceAccountModel>>(
-                    params,
-                );
+                const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.dataSourceAccount.list<
+            CostDataSourceAccountListParameters,
+            ListResponse<CostDataSourceAccountModel>
+          >(params);
                 state.linkedAccounts = results || [];
                 state.linkedAccountsTotalCount = total_count || 0;
             } catch (e) {
@@ -225,17 +257,22 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
                 state.linkedAccountsTotalCount = 0;
             }
         },
-        updateLinkedAccount: async (params: CostDataSourceAccountUpdateParameters) => {
+        updateLinkedAccount: async (
+            params: CostDataSourceAccountUpdateParameters,
+        ) => {
             try {
-                await SpaceConnector.clientV2.costAnalysis.dataSourceAccount.update<CostDataSourceAccountUpdateParameters, CostDataSourceAccountModel>(
-                    params,
-                );
+                await SpaceConnector.clientV2.costAnalysis.dataSourceAccount.update<
+          CostDataSourceAccountUpdateParameters,
+          CostDataSourceAccountModel
+        >(params);
             } catch (e: any) {
                 ErrorHandler.handleRequestError(e, e.message);
                 throw e;
             }
         },
-        resetLinkedAccount: async (params: CostDataSourceAccountResetParameters) => {
+        resetLinkedAccount: async (
+            params: CostDataSourceAccountResetParameters,
+        ) => {
             try {
                 await SpaceConnector.clientV2.costAnalysis.dataSourceAccount.reset<CostDataSourceAccountResetParameters>(
                     params,
@@ -245,19 +282,24 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
                 throw e;
             }
         },
-        fetchLinkedAccountAnalyze: async (): Promise<CostDataSourceAnalyzeModel | undefined> => {
+        fetchLinkedAccountAnalyze: async (): Promise<
+      CostDataSourceAnalyzeModel | undefined
+    > => {
             try {
-                const { results } = await SpaceConnector.clientV2.costAnalysis.dataSourceAccount.analyze<DataSourceAccountAnalyzeParameters, AnalyzeResponse<CostDataSourceAnalyzeModel>>({
-                    query: {
-                        group_by: ['data_source_id'],
-                        fields: {
-                            workspaceList: {
-                                key: 'workspace_id',
-                                operator: 'push',
-                            },
-                        },
-                    },
-                });
+                const { results } = await SpaceConnector.clientV2.costAnalysis.dataSourceAccount.analyze<
+            DataSourceAccountAnalyzeParameters,
+            AnalyzeResponse<CostDataSourceAnalyzeModel>
+          >({
+              query: {
+                  group_by: ['data_source_id'],
+                  fields: {
+                      workspaceList: {
+                          key: 'workspace_id',
+                          operator: 'push',
+                      },
+                  },
+              },
+          });
                 return results;
             } catch (e) {
                 ErrorHandler.handleError(e);

@@ -1,31 +1,42 @@
 <script setup lang="ts">
 import {
-    computed, reactive, watch,
+    computed, reactive, watch, watchEffect,
 } from 'vue';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PButton, PButtonModal,
-    PToolboxTable, PHeading, PI, PTextEditor,
+    PButton,
+    PButtonModal,
+    PToolboxTable,
+    PHeading,
+    PI,
+    PTextEditor,
 } from '@cloudforet/mirinae';
 import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
 
-
 import type { CostJobStatus } from '@/schema/cost-analysis/job/type';
 import { i18n } from '@/translations';
 
-import { gray, green, red } from '@/styles/colors';
+import {
+    gray, green, red, blue,
+} from '@/styles/colors';
 
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
-import type { DataSourceItem, CostJobItem, CostJobStatusInfo } from '@/services/cost-explorer/types/data-sources-type';
+import type {
+    DataSourceItem,
+    CostJobItem,
+    CostJobStatusInfo,
+} from '@/services/cost-explorer/types/data-sources-type';
 
 const dataSourcesPageStore = useDataSourcesPageStore();
 const dataSourcesPageState = dataSourcesPageStore.state;
 const dataSourcesPageGetters = dataSourcesPageStore.getters;
 
 const storeState = reactive({
-    selectedItem: computed<DataSourceItem>(() => dataSourcesPageGetters.selectedDataSourceItem),
+    selectedItem: computed<DataSourceItem>(
+        () => dataSourcesPageGetters.selectedDataSourceItem,
+    ),
     jobList: computed<CostJobItem[]>(() => dataSourcesPageGetters.jobList),
     totalCount: computed<number>(() => dataSourcesPageState.jobListTotalCount),
     activeTab: computed<string>(() => dataSourcesPageState.activeTab),
@@ -34,7 +45,7 @@ const state = reactive({
     loading: false,
     modalVisible: false,
     selectedJobId: '',
-    selectedJobItem: computed<CostJobItem|undefined>(() => storeState.jobList.find((item) => item.job_id === state.selectedJobId)),
+    selectedJobItem: computed<CostJobItem | undefined>(() => storeState.jobList.find((item) => item.job_id === state.selectedJobId)),
 });
 const tableState = reactive({
     pageStart: 0,
@@ -79,6 +90,13 @@ const getStatusInfo = (value: CostJobStatus): CostJobStatusInfo => {
             color: red[400],
         };
         break;
+    case 'IN_PROGRESS':
+        info = {
+            icon: 'ic_peacock-gradient-circle',
+            color: blue[400],
+            text: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.IN_PROGRESS'),
+        };
+        break;
     default:
         break;
     }
@@ -98,10 +116,11 @@ const handleChangeToolbox = async (options: ToolboxOptions) => {
 const fetchJobList = async () => {
     state.loading = true;
     try {
-        jobListApiQueryHelper.setPage(tableState.pageStart, tableState.pageLimit)
-            .setFilters([
-                { k: 'status', v: 'IN_PROGRESS', o: '!=' },
-            ]);
+        jobListApiQueryHelper.setPage(tableState.pageStart, tableState.pageLimit);
+        //   .setFilters([
+        //     { k: "status", v: "TIMEOUT", o: "!=" },
+        //     { k: "status", v: "CANCELED", o: "!=" },
+        //   ]);
         await dataSourcesPageStore.fetchJobList({
             data_source_id: storeState.selectedItem?.data_source_id || '',
             query: jobListApiQueryHelper.data,
@@ -111,43 +130,57 @@ const fetchJobList = async () => {
     }
 };
 
-watch([() => storeState.activeTab, () => storeState.selectedItem], async () => {
-    tableState.pageStart = 0;
-    tableState.pageLimit = 15;
-    await fetchJobList();
-}, { immediate: true });
+watch(
+    [() => storeState.activeTab, () => storeState.selectedItem],
+    async () => {
+        tableState.pageStart = 0;
+        tableState.pageLimit = 15;
+        await fetchJobList();
+    },
+    { immediate: true },
+);
+
+watchEffect(() => {
+    console.log('sdfasdfasd', dataSourcesPageGetters);
+});
 </script>
 
 <template>
     <div class="data-source-management-tab-detail-base-information">
-        <p-heading heading-type="sub"
-                   use-total-count
-                   :title="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.TAB_DETAILS_COLLECTION_JOB')"
-                   :total-count="storeState.totalCount"
-                   class="pt-8 px-4 pb-4"
+        <p-heading
+            heading-type="sub"
+            use-total-count
+            :title="
+                $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.TAB_DETAILS_COLLECTION_JOB')
+            "
+            :total-count="storeState.totalCount"
+            class="pt-8 px-4 pb-4"
         />
-        <p-toolbox-table :fields="tableState.fields"
-                         :searchable="false"
-                         :items="storeState.jobList"
-                         :loading="state.loading"
-                         class="data-source-definition-table"
-                         :total-count="storeState.totalCount"
-                         @refresh="fetchJobList()"
-                         @change="handleChangeToolbox"
+        <p-toolbox-table
+            :fields="tableState.fields"
+            :searchable="false"
+            :items="storeState.jobList"
+            :loading="state.loading"
+            class="data-source-definition-table"
+            :total-count="storeState.totalCount"
+            @refresh="fetchJobList()"
+            @change="handleChangeToolbox"
         >
-            <template #col-status-format="{value, item}">
-                <p-i :name="getStatusInfo(value).icon"
-                     :color="getStatusInfo(value).color"
-                     width="1rem"
-                     height="1rem"
-                     class="icon-info"
+            <template #col-status-format="{ value, item }">
+                <p-i
+                    :name="getStatusInfo(value).icon"
+                    :color="getStatusInfo(value).color"
+                    width="1rem"
+                    height="1rem"
+                    class="icon-info"
                 />
-                <p-button v-if="value === 'FAILURE'"
-                          size="sm"
-                          style-type="tertiary"
-                          @click="handleClickErrorDetail(item.job_id)"
+                <p-button
+                    v-if="value === 'FAILURE'"
+                    size="sm"
+                    style-type="tertiary"
+                    @click="handleClickErrorDetail(item.job_id)"
                 >
-                    {{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ERROR_FOUND') }}
+                    {{ $t("BILLING.COST_MANAGEMENT.DATA_SOURCES.ERROR_FOUND") }}
                 </p-button>
                 <span v-else>
                     {{ getStatusInfo(value).text }}
@@ -155,7 +188,9 @@ watch([() => storeState.activeTab, () => storeState.selectedItem], async () => {
             </template>
         </p-toolbox-table>
         <p-button-modal
-            :header-title="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ERROR_FOUND_TITLE')"
+            :header-title="
+                $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ERROR_FOUND_TITLE')
+            "
             centered
             size="md"
             fade
@@ -167,18 +202,21 @@ watch([() => storeState.activeTab, () => storeState.selectedItem], async () => {
             <template #body>
                 <div class="content">
                     <p class="error-info">
-                        {{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ERROR_FOUND_CODE') }}:
+                        {{ $t("BILLING.COST_MANAGEMENT.DATA_SOURCES.ERROR_FOUND_CODE") }}:
                         <span class="error-code">
                             {{ state.selectedJobItem.error_code }}
                         </span>
                     </p>
-                    <p-text-editor read-only
-                                   :code="state.selectedJobItem.error_message"
+                    <p-text-editor
+                        read-only
+                        :code="state.selectedJobItem.error_message"
                     />
                 </div>
             </template>
             <template #confirm-button>
-                <span>{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ERROR_FOUND_OK') }}</span>
+                <span>{{
+                    $t("BILLING.COST_MANAGEMENT.DATA_SOURCES.ERROR_FOUND_OK")
+                }}</span>
             </template>
         </p-button-modal>
     </div>
@@ -240,4 +278,3 @@ watch([() => storeState.activeTab, () => storeState.selectedItem], async () => {
     }
 }
 </style>
-
