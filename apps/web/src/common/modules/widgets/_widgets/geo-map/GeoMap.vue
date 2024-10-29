@@ -54,6 +54,7 @@ const storeState = reactive({
     regions: computed<RegionReferenceMap>(() => allReferenceStore.getters.region),
 });
 const state = reactive({
+    mapLoaded: false,
     loading: false,
     errorMessage: undefined as string|undefined,
     data: null as WidgetLoadData | null,
@@ -151,6 +152,7 @@ const loadMap = async () => {
     const response = await axios.get('map/geo-data.json');
     const geoJson = response.data;
     registerMap('world', geoJson);
+    state.mapLoaded = true;
 };
 const drawChart = async (rawData: WidgetLoadData|null) => {
     if (!rawData) return;
@@ -185,8 +187,8 @@ const loadWidget = async (): Promise<WidgetLoadData|APIErrorToast> => {
 };
 
 /* Watcher */
-watch([() => state.chartData, () => chartContext.value], ([, chartCtx]) => {
-    if (chartCtx) {
+watch([() => state.chartData, () => chartContext.value, () => state.mapLoaded], ([, chartCtx, mapLoaded]) => {
+    if (chartCtx && mapLoaded) {
         state.chart = init(chartContext.value);
         state.chart.setOption(state.chartOptions, true);
     }
