@@ -26,6 +26,7 @@ const props = withDefaults(defineProps<{
     defaultIndex?: number;
     excludeDateField?: boolean;
     value?: {value?: string; count?: number};
+    commonInvalidState?: boolean;
 }>(), {
     defaultCount: 1,
     max: undefined,
@@ -99,6 +100,7 @@ watch(() => props.menuItems, (menuItems) => {
         >
             <p-select-dropdown :menu="props.menuItems"
                                :selected="state.proxyValue?.value"
+                               :invalid="props.commonInvalidState"
                                use-fixed-menu-style
                                block
                                @update:selected="handleUpdateSelect"
