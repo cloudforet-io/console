@@ -76,7 +76,7 @@ const state = reactive({
                     lineStyle: {
                         width: 30,
                         color: [
-                            [1, state.formatRulesBaseColor],
+                            [1, gray[200]],
                         ],
                     },
                 },
