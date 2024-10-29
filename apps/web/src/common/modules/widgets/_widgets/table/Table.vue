@@ -25,8 +25,8 @@ import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD, REFERENCE_FIELD_MAP } from '@/common/modules/widgets/_constants/widget-constant';
 import {
+    getPreviousDateRange,
     getWidgetDateFields,
-    getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { getWidgetDataTable } from '@/common/modules/widgets/_helpers/widget-helper';
@@ -100,10 +100,7 @@ const state = reactive({
     tableDataDynamicCount: computed<number>(() => state.tableDataFieldInfo?.dynamicFieldInfo?.count),
 
     groupByField: computed<string[]|undefined>(() => ((props.widgetOptions?.groupBy as GroupByValue)?.value as string[]) ?? []),
-    comparisonDateRange: computed<DateRange>(() => {
-        const [_start] = getWidgetDateRange(state.granularity, state.basedOnDate, 2);
-        return { start: _start, end: _start };
-    }),
+    comparisonDateRange: computed<DateRange>(() => getPreviousDateRange(state.granularity, dateRange.value)),
     // data for optional fields
     isComparisonEnabled: computed<boolean>(() => !isDateField(state.tableDataField) && !state.groupByField?.some((groupBy) => Object.values(DATE_FIELD).includes(groupBy))),
     comparisonInfo: computed<ComparisonValue|undefined>(() => props.widgetOptions?.comparison?.[0] as ComparisonValue),
