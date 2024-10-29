@@ -104,6 +104,30 @@ export const getWidgetDateRange = (granularity: string, basedOnDate: string, sub
     return [refinedDateRange.start || '', refinedDateRange.end];
 };
 
+export const getPreviousDateRange = (granularity: string, dateRange: DateRange): DateRange => {
+    if (!granularity) return dateRange;
+    const format = getDateFormat(granularity);
+
+    const start = dayjs.utc(dateRange.start, format);
+    const end = dayjs.utc(dateRange.end, format);
+    const duration = end.diff(start);
+
+    const unitMap = {
+        DAILY: 'day',
+        MONTHLY: 'month',
+        YEARLY: 'year',
+    };
+    const unit = unitMap[granularity];
+
+    const previousStart = start.subtract(duration, unit);
+    const previousEnd = end.subtract(duration, unit);
+
+    return {
+        start: previousStart.format(format),
+        end: previousEnd.format(format),
+    };
+};
+
 export const getReferenceLabel = (allReferenceTypeInfo: AllReferenceTypeInfo, field?: string, val?: string) => {
     if (!val) return '';
     if (field === 'Workspace' || field === 'workspace_id') {
