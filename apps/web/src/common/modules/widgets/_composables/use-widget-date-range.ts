@@ -26,7 +26,7 @@ interface UseWidgetDateRangeReturnType {
     dateRange: ComputedRef<DateRange>;
 }
 
-export const useWdigetDateRange = (options: UseWidgetDateRangeOptions): UseWidgetDateRangeReturnType => {
+export const useWidgetDateRange = (options: UseWidgetDateRangeOptions): UseWidgetDateRangeReturnType => {
     const {
         baseOnDate: _baseOnDate,
         granularity: _granularity,
