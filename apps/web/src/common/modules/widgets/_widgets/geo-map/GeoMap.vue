@@ -25,14 +25,12 @@ import type { RegionReferenceMap } from '@/store/reference/region-reference-stor
 import type { APIErrorToast } from '@/common/composables/error/errorHandler';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
+import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
-import {
-    getWidgetBasedOnDate,
-    getWidgetDateRange,
-} from '@/common/modules/widgets/_helpers/widget-date-helper';
+import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { LegendValue } from '@/common/modules/widgets/_widget-fields/legend/type';
-import type { DateRange, WidgetLoadData } from '@/common/modules/widgets/types/widget-data-type';
+import type { WidgetLoadData } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit,
     WidgetExpose,
@@ -45,6 +43,11 @@ const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 const REGION_FIELD = 'Region';
 
+const { dateRange } = useWidgetDateRange({
+    dateRangeFieldValue: computed(() => (props.widgetOptions?.dateRange as DateRangeValue)),
+    baseOnDate: computed(() => props.dashboardOptions?.date_range?.end),
+    granularity: computed<string>(() => props.widgetOptions?.granularity as string),
+});
 const chartContext = ref<HTMLElement|null>(null);
 const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
@@ -94,19 +97,12 @@ const state = reactive({
     })),
     // required fields
     granularity: computed<string>(() => props.widgetOptions?.granularity as string),
-    basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
     dataField: computed<string[]>(() => props.widgetOptions?.dataField as string[] || []),
-    dateRange: computed<DateRange>(() => {
-        const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, 1);
-        return { start: _start, end: _end };
-    }),
     // optional fields
     showLegends: computed<boolean>(() => (props.widgetOptions?.legend as LegendValue)?.toggleValue),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
-    dateRange: computed(() => ({
-        end: state.dateRange.end,
-    })),
+    dateRange,
     errorMessage: computed(() => state.errorMessage),
     widgetLoading: computed(() => state.loading),
 });
@@ -124,8 +120,8 @@ const fetchWidget = async (): Promise<WidgetLoadData|APIErrorToast|undefined> =>
             widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
-                start: state.dateRange.start,
-                end: state.dateRange.end,
+                start: dateRange.value.start,
+                end: dateRange.value.end,
                 group_by: [REGION_FIELD],
                 fields: {
                     [state.dataField]: {

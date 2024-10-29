@@ -12,6 +12,7 @@ const stackedHorizontalBarChart: WidgetConfig = {
     },
     requiredFieldsSchema: {
         granularity: {},
+        dateRange: {},
         yAxis: {
             options: {
                 dataTarget: 'labels_info',
