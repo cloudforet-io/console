@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { vOnClickOutside } from '@vueuse/components';
 import {
-    computed, reactive,
+    computed, onUnmounted, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
@@ -155,6 +155,14 @@ const handleSelectMenuItem = (value: MenuItem) => {
     }
     state.visibleMenu = false;
 };
+
+watch(() => route.path, () => {
+    bookmarkStore.resetState();
+});
+
+onUnmounted(() => {
+    bookmarkStore.resetState();
+});
 </script>
 
 <template>
@@ -178,6 +186,7 @@ const handleSelectMenuItem = (value: MenuItem) => {
                                                  :text="state.workspaceInfo?.name || ''"
                                                  :theme="state.workspaceInfo?.tags?.theme"
                                                  size="sm"
+                                                 class="workspace-logo"
                             />
                         </template>
                         <template v-else>
@@ -194,14 +203,16 @@ const handleSelectMenuItem = (value: MenuItem) => {
                                   class="capitalize state"
                         />
                         <template v-if="state.folder && state.group === 'global'">
-                            <p-icon-button name="ic_edit-text"
-                                           style-type="transparent"
-                                           @click="handleClickEditFolderButton"
-                            />
-                            <p-icon-button name="ic_delete"
-                                           style-type="transparent"
-                                           @click="handleClickDeleteFolderButton"
-                            />
+                            <div class="title-right-extra-wrapper">
+                                <p-icon-button name="ic_edit-text"
+                                               style-type="transparent"
+                                               @click="handleClickEditFolderButton"
+                                />
+                                <p-icon-button name="ic_delete"
+                                               style-type="transparent"
+                                               @click="handleClickDeleteFolderButton"
+                                />
+                            </div>
                         </template>
                     </template>
                 </p-heading>
