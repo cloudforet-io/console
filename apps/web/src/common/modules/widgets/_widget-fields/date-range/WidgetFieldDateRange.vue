@@ -11,6 +11,7 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
+import { useWdigetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import {
     DATE_RANGE_DAILY_VALUE_MAP,
     DATE_RANGE_DAILY_VALUES, DATE_RANGE_MONTHLY_VALUE_MAP,
@@ -50,119 +51,6 @@ const state = reactive({
         if (state.granularity === 'YEARLY') return YEARLY_ENABLED_VALUES.map((value) => ({ label: DATE_RANGE_YEARLY_VALUE_MAP[value] || getCommonDateRangeValueLabel(value), name: value }));
         return [];
     }),
-    datePreview: computed<{start: string; end: string;}>(() => {
-        const isInherit = !!state.proxyValue?.inherit;
-        const _granularity = state.granularity;
-        const relativeDateRangeValue = state.proxyValue?.options?.value;
-
-        const baseEndDate = isInherit ? state.baseDateRange?.end : undefined;
-        const thisYear = dayjs.utc(baseEndDate).year();
-        const thisMonth = dayjs.utc(baseEndDate).month() + 1;
-        const baseDate = baseEndDate ? dayjs.utc(baseEndDate).endOf('month') : dayjs.utc(baseEndDate);
-
-        // Results
-        let _start = '';
-        let _end = '';
-
-        if (_granularity === 'MONTHLY') {
-            if (relativeDateRangeValue === 'auto') {
-                _start = baseDate.subtract(11, 'month').startOf('month').format('YYYY-MM-DD');
-                _end = baseDate.endOf('month').format('YYYY-MM-DD');
-            } else if (relativeDateRangeValue === 'thisMonth') {
-                _start = baseDate.startOf('month').format('YYYY-MM-DD');
-                _end = baseDate.endOf('month').format('YYYY-MM-DD');
-            } else if (relativeDateRangeValue === 'lastMonth') {
-                const lastMonthDate = baseDate.subtract(1, 'month');
-                _start = lastMonthDate.startOf('month').format('YYYY-MM-DD');
-                _end = lastMonthDate.endOf('month').format('YYYY-MM-DD');
-            } else if (relativeDateRangeValue === 'lastTwoMonths') {
-                const lastMonthDate = baseDate.subtract(2, 'month');
-                _start = lastMonthDate.startOf('month').format('YYYY-MM-DD');
-                _end = lastMonthDate.endOf('month').format('YYYY-MM-DD');
-            } else if (relativeDateRangeValue === 'thisQuarter') {
-                if (thisMonth >= 1 && thisMonth <= 3) {
-                    _start = `${thisYear}-01-01`;
-                    _end = `${thisYear}-03-31`;
-                } else if (thisMonth >= 4 && thisMonth <= 6) {
-                    _start = `${thisYear}-04-01`;
-                    _end = `${thisYear}-06-30`;
-                } else if (thisMonth >= 7 && thisMonth <= 9) {
-                    _start = `${thisYear}-07-01`;
-                    _end = `${thisYear}-09-30`;
-                } else if (thisMonth >= 10 && thisMonth <= 12) {
-                    _start = `${thisYear}-10-01`;
-                    _end = `${thisYear}-12-31`;
-                }
-            } else if (relativeDateRangeValue === 'lastQuarter') {
-                if (thisMonth >= 1 && thisMonth <= 3) {
-                    _start = `${thisYear}-10-01`;
-                    _end = `${thisYear}-12-31`;
-                } else if (thisMonth >= 4 && thisMonth <= 6) {
-                    _start = `${thisYear}-01-01`;
-                    _end = `${thisYear}-03-31`;
-                } else if (thisMonth >= 7 && thisMonth <= 9) {
-                    _start = `${thisYear}-04-01`;
-                    _end = `${thisYear}-06-30`;
-                } else if (thisMonth >= 10 && thisMonth <= 12) {
-                    _start = `${thisYear}-07-01`;
-                    _end = `${thisYear}-09-30`;
-                }
-            }
-        }
-        if (_granularity === 'DAILY') {
-            if (relativeDateRangeValue === 'auto') {
-                const baseMonthDayCount = baseDate.daysInMonth();
-                _start = baseDate.subtract(baseMonthDayCount - 1, 'day').format('YYYY-MM-DD');
-                _end = baseDate.format('YYYY-MM-DD');
-            } else if (relativeDateRangeValue === 'today') {
-                _start = baseDate.format('YYYY-MM-DD');
-                _end = baseDate.format('YYYY-MM-DD');
-            } else if (relativeDateRangeValue === 'yesterday') {
-                _start = baseDate.subtract(1, 'day').format('YYYY-MM-DD');
-                _end = baseDate.subtract(1, 'day').format('YYYY-MM-DD');
-            } else if (relativeDateRangeValue === 'lastTwoDays') {
-                _start = baseDate.subtract(2, 'day').format('YYYY-MM-DD');
-                _end = baseDate.subtract(2, 'day').format('YYYY-MM-DD');
-            } else if (relativeDateRangeValue === 'lastSevenDays') {
-                _start = baseDate.subtract(7, 'day').format('YYYY-MM-DD');
-                _end = baseDate.subtract(7, 'day').format('YYYY-MM-DD');
-            } else if (relativeDateRangeValue === 'lastFourteenDays') {
-                _start = baseDate.subtract(14, 'day').format('YYYY-MM-DD');
-                _end = baseDate.subtract(14, 'day').format('YYYY-MM-DD');
-            } else if (relativeDateRangeValue === 'lastThirtyDays') {
-                _start = baseDate.subtract(30, 'day').format('YYYY-MM-DD');
-                _end = baseDate.subtract(30, 'day').format('YYYY-MM-DD');
-            } else if (relativeDateRangeValue === 'thisWeek') {
-                _start = baseDate.startOf('week').format('YYYY-MM-DD');
-                _end = baseDate.endOf('week').format('YYYY-MM-DD');
-            } else if (relativeDateRangeValue === 'thisWeekToDate') {
-                _start = baseDate.startOf('week').format('YYYY-MM-DD');
-                _end = baseDate.format('YYYY-MM-DD');
-            } else if (relativeDateRangeValue === 'lastWeek') {
-                _start = baseDate.subtract(1, 'week').startOf('week').format('YYYY-MM-DD');
-                _end = baseDate.subtract(1, 'week').endOf('week').format('YYYY-MM-DD');
-            }
-        }
-        if (_granularity === 'YEARLY') {
-            if (relativeDateRangeValue === 'auto') {
-                _start = baseDate.subtract(2, 'year').startOf('year').format('YYYY-MM-DD');
-                _end = baseDate.endOf('year').format('YYYY-MM-DD');
-            } else if (relativeDateRangeValue === 'thisYear') {
-                _start = baseDate.startOf('year').format('YYYY-MM-DD');
-                _end = baseDate.endOf('year').format('YYYY-MM-DD');
-            } else if (relativeDateRangeValue === 'lastYear') {
-                _start = baseDate.subtract(1, 'year').startOf('year').format('YYYY-MM-DD');
-                _end = baseDate.subtract(1, 'year').endOf('year').format('YYYY-MM-DD');
-            } else if (relativeDateRangeValue === 'lastTwoYears') {
-                _start = baseDate.subtract(2, 'year').startOf('year').format('YYYY-MM-DD');
-                _end = baseDate.subtract(2, 'year').endOf('year').format('YYYY-MM-DD');
-            }
-        }
-        return {
-            start: _start,
-            end: _end,
-        };
-    }),
     inheritCustomMenuItems: computed<MenuItem[]>(() => {
         if (state.granularity === 'MONTHLY') {
             return Array.from({ length: 12 }, (_, i) => ({ name: (i + 1), label: (i + 1).toString() }));
@@ -188,6 +76,13 @@ const state = reactive({
     }),
 });
 
+const { dateRange } = useWdigetDateRange({
+    dateRangeFieldValue: computed(() => state.proxyValue),
+    baseOnDate: computed(() => (state.proxyValue?.inherit ? state.baseDateRange?.end : undefined)),
+    granularity: computed(() => state.granularity),
+    usePreviewFormat: true,
+});
+
 const checkInvalidCustomValue = () => {
     const _value = state.proxyValue?.options?.value;
     if (_value === 'custom') {
@@ -199,13 +94,13 @@ const checkInvalidCustomValue = () => {
             const gap = inheritCustomEndValue - inheritCustomStartValue;
             if (state.granularity === 'YEARLY' && gap >= 3) return true;
             if (state.granularity === 'MONTHLY' && gap >= 12) return true;
-            if (state.granularity === 'DAILY' && gap >= 30) return true;
+            if (state.granularity === 'DAILY' && gap >= 31) return true;
         } else {
             const _startDate = dayjs.utc(state.proxyValue?.options?.start);
             const _endDate = dayjs.utc(state.proxyValue?.options.end);
             if (state.granularity === 'YEARLY' && _endDate.diff(_startDate, 'year') >= 3) return true;
             if (state.granularity === 'MONTHLY' && _endDate.diff(_startDate, 'month') >= 12) return true;
-            if (state.granularity === 'DAILY' && _endDate.diff(_startDate, 'day') >= 30) return true;
+            if (state.granularity === 'DAILY' && _endDate.diff(_startDate, 'day') >= 31) return true;
             if (_startDate.isAfter(_endDate)) return true;
         }
     }
@@ -361,7 +256,13 @@ onMounted(() => {
                        required
         >
             <div class="form-wrapper">
-                <div class="header">
+                <div class="inherit-toggle">
+                    <span>{{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.USE_BASE_DATE') }}</span>
+                    <p-toggle-button :value="state.proxyValue?.inherit"
+                                     @update:value="handleUpdateInherit"
+                    />
+                </div>
+                <div class="range-contents">
                     <div class="value-selector">
                         <p-select-dropdown style-type="transparent"
                                            :menu="state.valueMenuItems"
@@ -377,61 +278,12 @@ onMounted(() => {
                             </template>
                         </p-select-dropdown>
                     </div>
-                    <div class="inherit-toggle">
-                        <span>{{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.INHERIT') }}</span>
-                        <p-toggle-button :value="state.proxyValue?.inherit"
-                                         @update:value="handleUpdateInherit"
-                        />
-                    </div>
-                </div>
-                <div class="body">
-                    <div v-if="state.proxyValue?.options?.value === 'custom'"
-                         class="custom-range-selector"
-                    >
-                        <!--Inherit CASE-->
-                        <template v-if="state.proxyValue?.inherit">
-                            <p-field-group class="selector-field-group"
-                                           required
-                            >
-                                <template #label>
-                                    <span class="field-label">
-                                        {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.START') }}
-                                        <span class="granularity-unit">
-                                            ({{ GRANULARITY_UNIT_MAP[state.granularity] }})
-                                        </span>
-                                    </span>
-                                </template>
-                                <p-select-dropdown :menu="state.inheritCustomMenuItems"
-                                                   :selected="state.proxyValue?.options?.start"
-                                                   block
-                                                   :invalid="checkInvalidCustomValue()"
-                                                   @select="handleSelectCustomValue('start', $event)"
-                                />
-                            </p-field-group>
-                            <p-field-group class="selector-field-group"
-                                           required
-                            >
-                                <template #label>
-                                    <span class="field-label">
-                                        {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.END') }}
-                                        <span class="granularity-unit">
-                                            ({{ GRANULARITY_UNIT_MAP[state.granularity] }})
-                                        </span>
-                                    </span>
-                                </template>
-                                <p-select-dropdown :menu="state.inheritCustomMenuItems"
-                                                   :selected="state.proxyValue?.options?.end"
-                                                   block
-                                                   :invalid="checkInvalidCustomValue()"
-                                                   @select="handleSelectCustomValue('end', $event)"
-                                />
-                            </p-field-group>
-                        </template>
-                        <!--Disinherit CASE-->
-                        <template v-else>
-                            <div v-if="state.granularity === 'YEARLY'"
-                                 class="disinherit-custom-yearly-selector"
-                            >
+                    <div class="value-detail">
+                        <div v-if="state.proxyValue?.options?.value === 'custom'"
+                             class="custom-range-selector"
+                        >
+                            <!--Inherit CASE-->
+                            <template v-if="state.proxyValue?.inherit">
                                 <p-field-group class="selector-field-group"
                                                required
                                 >
@@ -443,8 +295,8 @@ onMounted(() => {
                                             </span>
                                         </span>
                                     </template>
-                                    <p-select-dropdown :menu="state.disinheritYearlyCustomMenuItems"
-                                                       :selected="dayjs.utc(state.proxyValue?.options?.start).year()"
+                                    <p-select-dropdown :menu="state.inheritCustomMenuItems"
+                                                       :selected="state.proxyValue?.options?.start"
                                                        block
                                                        :invalid="checkInvalidCustomValue()"
                                                        @select="handleSelectCustomValue('start', $event)"
@@ -461,66 +313,112 @@ onMounted(() => {
                                             </span>
                                         </span>
                                     </template>
-                                    <p-select-dropdown :menu="state.disinheritYearlyCustomMenuItems"
-                                                       :selected="dayjs.utc(state.proxyValue?.options?.end).year()"
+                                    <p-select-dropdown :menu="state.inheritCustomMenuItems"
+                                                       :selected="state.proxyValue?.options?.end"
                                                        block
                                                        :invalid="checkInvalidCustomValue()"
                                                        @select="handleSelectCustomValue('end', $event)"
                                     />
                                 </p-field-group>
-                            </div>
-                            <div v-else-if="state.granularity === 'MONTHLY'"
-                                 class="disinherit-custom-monthly-selector"
-                            >
-                                <p-field-group class="selector-field-group"
-                                               required
+                            </template>
+                            <!--Disinherit CASE-->
+                            <template v-else>
+                                <div v-if="state.granularity === 'YEARLY'"
+                                     class="disinherit-custom-yearly-selector"
                                 >
-                                    <template #label>
-                                        <span class="field-label">
-                                            {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.START') }}
-                                        </span>
-                                    </template>
-                                    <p-datetime-picker class="picker"
-                                                       select-mode="single"
-                                                       data-type="yearToMonth"
-                                                       :selected-dates="[dayjs.utc(state.proxyValue?.options?.start).format('YYYY-MM')]"
-                                                       :invalid="checkInvalidCustomValue()"
-                                                       @update:selected-dates="handleUpdateDisinheritMonthlyCustomSelectedDates('start', $event)"
-                                    />
-                                </p-field-group>
-                                <p-field-group class="selector-field-group"
-                                               required
+                                    <p-field-group class="selector-field-group"
+                                                   required
+                                    >
+                                        <template #label>
+                                            <span class="field-label">
+                                                {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.START') }}
+                                                <span class="granularity-unit">
+                                                    ({{ GRANULARITY_UNIT_MAP[state.granularity] }})
+                                                </span>
+                                            </span>
+                                        </template>
+                                        <p-select-dropdown :menu="state.disinheritYearlyCustomMenuItems"
+                                                           :selected="dayjs.utc(state.proxyValue?.options?.start).year()"
+                                                           block
+                                                           :invalid="checkInvalidCustomValue()"
+                                                           @select="handleSelectCustomValue('start', $event)"
+                                        />
+                                    </p-field-group>
+                                    <p-field-group class="selector-field-group"
+                                                   required
+                                    >
+                                        <template #label>
+                                            <span class="field-label">
+                                                {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.END') }}
+                                                <span class="granularity-unit">
+                                                    ({{ GRANULARITY_UNIT_MAP[state.granularity] }})
+                                                </span>
+                                            </span>
+                                        </template>
+                                        <p-select-dropdown :menu="state.disinheritYearlyCustomMenuItems"
+                                                           :selected="dayjs.utc(state.proxyValue?.options?.end).year()"
+                                                           block
+                                                           :invalid="checkInvalidCustomValue()"
+                                                           @select="handleSelectCustomValue('end', $event)"
+                                        />
+                                    </p-field-group>
+                                </div>
+                                <div v-else-if="state.granularity === 'MONTHLY'"
+                                     class="disinherit-custom-monthly-selector"
                                 >
-                                    <template #label>
-                                        <span class="field-label">
-                                            {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.END') }}
-                                        </span>
-                                    </template>
+                                    <p-field-group class="selector-field-group"
+                                                   required
+                                    >
+                                        <template #label>
+                                            <span class="field-label">
+                                                {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.START') }}
+                                            </span>
+                                        </template>
+                                        <p-datetime-picker class="picker"
+                                                           select-mode="single"
+                                                           data-type="yearToMonth"
+                                                           :selected-dates="[dayjs.utc(state.proxyValue?.options?.start).format('YYYY-MM')]"
+                                                           :invalid="checkInvalidCustomValue()"
+                                                           @update:selected-dates="handleUpdateDisinheritMonthlyCustomSelectedDates('start', $event)"
+                                        />
+                                    </p-field-group>
+                                    <p-field-group class="selector-field-group"
+                                                   required
+                                    >
+                                        <template #label>
+                                            <span class="field-label">
+                                                {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.END') }}
+                                            </span>
+                                        </template>
+                                        <p-datetime-picker class="picker"
+                                                           select-mode="single"
+                                                           data-type="yearToMonth"
+                                                           :selected-dates="[dayjs.utc(state.proxyValue?.options?.end).format('YYYY-MM')]"
+                                                           :invalid="checkInvalidCustomValue()"
+                                                           @update:selected-dates="handleUpdateDisinheritMonthlyCustomSelectedDates('end', $event)"
+                                        />
+                                    </p-field-group>
+                                </div>
+                                <div v-else
+                                     class="disinherit-custom-daily-selector"
+                                >
                                     <p-datetime-picker class="picker"
-                                                       select-mode="single"
-                                                       data-type="yearToMonth"
-                                                       :selected-dates="[dayjs.utc(state.proxyValue?.options?.end).format('YYYY-MM')]"
+                                                       select-mode="range"
+                                                       :selected-dates="[
+                                                           dayjs.utc(state.proxyValue?.options?.start).format('YYYY-MM-DD'),
+                                                           dayjs.utc(state.proxyValue?.options?.end).format('YYYY-MM-DD')
+                                                       ]"
                                                        :invalid="checkInvalidCustomValue()"
-                                                       @update:selected-dates="handleUpdateDisinheritMonthlyCustomSelectedDates('end', $event)"
+                                                       @update:selected-dates="handleUpdateDisinheritDailyCustomSelectedDates"
                                     />
-                                </p-field-group>
-                            </div>
-                            <div v-else
-                                 class="disinherit-custom-daily-selector"
-                            >
-                                <p-datetime-picker class="picker"
-                                                   select-mode="range"
-                                                   :selected-dates="[dayjs.utc(state.proxyValue?.options?.start).format('YYYY-MM-DD'), dayjs.utc(state.proxyValue?.options?.end).format('YYYY-MM-DD')]"
-                                                   :invalid="checkInvalidCustomValue()"
-                                                   @update:selected-dates="handleUpdateDisinheritDailyCustomSelectedDates"
-                                />
-                            </div>
-                        </template>
-                    </div>
-                    <div v-else
-                         class="date-preview"
-                    >
-                        {{ `${state.datePreview.start} ~ ${state.datePreview.end}` }}
+                                </div>
+                            </template>
+                        </div>
+                        <div v-else
+                             class="date-preview"
+                        >
+                            {{ `${dateRange.start} ~ ${dateRange.end}` }}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -532,45 +430,50 @@ onMounted(() => {
 .widget-field-date-range {
     .form-wrapper {
         @apply border border-gray-150 rounded-lg w-full;
-        padding: 0.5rem 0.75rem 0.75rem 0.75rem;
 
-        .header {
-            @apply flex items-center justify-between;
+        .inherit-toggle {
+            @apply flex items-center justify-between text-label-md text-gray-900 border-b border-gray-150;
+
+            gap: 0.375rem;
+            padding: 0.75rem;
+        }
+        .range-contents {
+            padding: 0.25rem 0.75rem 0.75rem;
             .value-selector {
+                @apply w-full;
+                height: 2rem;
+                margin-bottom: 0.125rem;
                 .inherit-icon {
                     min-width: 1rem;
                 }
             }
-            .inherit-toggle {
-                @apply inline-flex items-center text-label-sm text-gray-600 rounded-md bg-gray-100;
-                gap: 0.375rem;
-                padding: 0.25rem 0.375rem 0.25rem 0.5rem;
-            }
-        }
-        .body {
-            .date-preview {
-                @apply bg-gray-100 rounded-lg text-label-md text-gray-900;
-                padding: 0.375rem 0.75rem;
-            }
-            .custom-range-selector {
-                @apply flex gap-2;
-                .selector-field-group {
-                    width: calc(50% - 0.25rem);
-                    .field-label {
-                        @apply text-label-sm text-gray-900 font-bold;
-                        .granularity-unit {
-                            @apply text-gray-500 font-normal;
+            .value-detail {
+                @apply w-full;
+                .date-preview {
+                    @apply bg-gray-100 rounded-lg text-label-md text-gray-900;
+                    height: 2rem;
+                    padding: 0.375rem 0.75rem;
+                }
+                .custom-range-selector {
+                    @apply flex gap-2;
+                    .selector-field-group {
+                        width: calc(50% - 0.25rem);
+                        .field-label {
+                            @apply text-label-sm text-gray-900 font-bold;
+                            .granularity-unit {
+                                @apply text-gray-500 font-normal;
+                            }
                         }
                     }
-                }
-                .disinherit-custom-yearly-selector {
-                    @apply flex gap-2 w-full;
-                }
-                .disinherit-custom-monthly-selector {
-                    @apply flex gap-2 w-full;
-                }
-                .disinherit-custom-daily-selector {
-                    @apply w-full;
+                    .disinherit-custom-yearly-selector {
+                        @apply flex gap-2 w-full;
+                    }
+                    .disinherit-custom-monthly-selector {
+                        @apply flex gap-2 w-full;
+                    }
+                    .disinherit-custom-daily-selector {
+                        @apply w-full;
+                    }
                 }
             }
         }
