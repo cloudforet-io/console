@@ -1,6 +1,7 @@
 <script lang="ts" setup>
+import type { Ref } from 'vue';
 import {
-    computed, reactive, watch,
+    computed, reactive, toRef, watch,
 } from 'vue';
 
 import {
@@ -13,15 +14,20 @@ import { i18n } from '@/translations';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { useGranularityMenuItem } from '@/common/modules/widgets/_composables/use-granularity-menu-items';
 import {
+    useWidgetOptionsComplexValidation,
+} from '@/common/modules/widgets/_composables/use-widget-options-complex-validation';
+import {
     getDefaultMenuItemIndex,
     getInitialSelectedMenuItem,
 } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { GroupByValue, GroupByOptions } from '@/common/modules/widgets/_widget-fields/group-by/type';
+import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 import type {
     WidgetFieldComponentProps,
     WidgetFieldComponentEmit,
 } from '@/common/modules/widgets/types/widget-field-type';
+import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
 const DEFAULT_COUNT = 5;
@@ -32,6 +38,14 @@ const props = withDefaults(defineProps<WidgetFieldComponentProps<GroupByOptions,
 const { labelsMenuItem } = useGranularityMenuItem(props, 'groupBy');
 
 const emit = defineEmits<WidgetFieldComponentEmit<GroupByValue>>();
+
+const {
+    invalid: widgetOptionsInvalid,
+} = useWidgetOptionsComplexValidation({
+    optionValueMap: toRef(props, 'allValueMap') as Record<string, WidgetFieldValues|undefined>,
+    widgetConfig: toRef(props, 'widgetConfig') as Ref<WidgetConfig>,
+});
+
 const state = reactive({
     isInitiated: false,
     proxyValue: useProxyValue('value', props, emit),
@@ -175,7 +189,7 @@ watch(() => state.menuItems, (menuItems) => {
                                        :selected="state.selectedItem"
                                        :multi-selectable="state.multiselectable"
                                        :show-select-marker="state.multiselectable"
-                                       :invalid="!state.isValid"
+                                       :invalid="!state.isValid || widgetOptionsInvalid"
                                        :disabled="!!state.fixedValue"
                                        appearance-type="badge"
                                        block
