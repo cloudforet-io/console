@@ -32,7 +32,7 @@ import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/u
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import {
-    getReferenceLabel, getRefinedDynamicFieldData,
+    getReferenceLabel, getRefinedDynamicFieldData, getWidgetBasedOnDate,
     getWidgetDateFields,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
@@ -149,7 +149,7 @@ const state = reactive({
     })),
     // required fields
     granularity: computed<string>(() => props.widgetOptions?.granularity as string),
-    basedOnDate: computed(() => props.dashboardOptions?.date_range?.end),
+    basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
     dateRangeField: computed<DateRangeValue|undefined>(() => props.widgetOptions?.dateRange as DateRangeValue),
     xAxisField: computed<string>(() => (props.widgetOptions?.xAxis as XAxisValue)?.value),
     xAxisCount: computed<number>(() => (props.widgetOptions?.xAxis as XAxisValue)?.count),
@@ -167,7 +167,7 @@ const state = reactive({
         if (isDateField(state.xAxisField)) {
             [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.xAxisCount);
         } else if (isDateField(state.dataField)) {
-            let subtract = state.dynamicFieldInfo.count || 0;
+            let subtract = state.dynamicFieldInfo?.count || 0;
             if (state.dynamicFieldInfo?.valueType === 'fixed') {
                 if (state.granularity === GRANULARITY.YEARLY) subtract = 3;
                 if (state.granularity === GRANULARITY.MONTHLY) subtract = 12;

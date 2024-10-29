@@ -21,16 +21,15 @@ import type { APIErrorToast } from '@/common/composables/error/errorHandler';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetCustomLagend from '@/common/modules/widgets/_components/WidgetCustomLagend.vue';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
+import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import {
     getReferenceLabel,
-    getWidgetBasedOnDate,
-    getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import type { AdvancedFormatRulesValue } from '@/common/modules/widgets/_widget-fields/advanced-format-rules/type';
+import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { GroupByValue } from '@/common/modules/widgets/_widget-fields/group-by/type';
-import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/common/modules/widgets/types/widget-display-type';
 import type { WidgetLegend } from '@/common/modules/widgets/types/widget-legend-typs';
 
@@ -43,6 +42,12 @@ const BOX_MIN_WIDTH = 112;
 const MAX_COUNT = 80;
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
+
+const { dateRange } = useWidgetDateRange({
+    dateRangeFieldValue: computed(() => (props.widgetOptions?.dateRange as DateRangeValue)),
+    baseOnDate: computed(() => props.dashboardOptions?.date_range?.end),
+    granularity: computed<string>(() => props.widgetOptions?.granularity as string),
+});
 const state = reactive({
     loading: false,
     errorMessage: undefined as string|undefined,
@@ -73,17 +78,12 @@ const state = reactive({
     // required fields
     granularity: computed<string>(() => props.widgetOptions?.granularity as string),
     dataField: computed<string|undefined>(() => props.widgetOptions?.dataField as string),
-    basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
     groupByField: computed<string|undefined>(() => (props.widgetOptions?.groupBy as GroupByValue)?.value as string),
     formatRulesValue: computed<AdvancedFormatRulesValue>(() => props.widgetOptions?.advancedFormatRules as AdvancedFormatRulesValue),
     formatRulesField: computed<string|undefined>(() => state.formatRulesValue?.field),
-    dateRange: computed<DateRange>(() => {
-        const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, 1);
-        return { start: _start, end: _end };
-    }),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
-    dateRange: computed(() => state.dateRange),
+    dateRange,
     errorMessage: computed(() => state.errorMessage),
     widgetLoading: computed(() => state.loading),
     noData: computed(() => (state.data ? !state.data.results?.length : false)),
@@ -102,8 +102,8 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
             widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
-                start: state.dateRange.start,
-                end: state.dateRange.end,
+                start: dateRange.value.start,
+                end: dateRange.value.end,
                 group_by: [state.groupByField, state.formatRulesField],
                 fields: {
                     [state.dataField]: {
