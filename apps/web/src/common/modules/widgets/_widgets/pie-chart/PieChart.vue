@@ -12,7 +12,9 @@ import type {
     EChartsType,
 } from 'echarts/core';
 import type { LegendOption, EChartsOption } from 'echarts/types/dist/shared';
-import { isEmpty, orderBy, throttle } from 'lodash';
+import {
+    cloneDeep, isEmpty, orderBy, throttle,
+} from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
@@ -25,22 +27,22 @@ import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widge
 import type { APIErrorToast } from '@/common/composables/error/errorHandler';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
+import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import {
     getReferenceLabel,
-    getWidgetBasedOnDate,
-    getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { DateFormatValue } from '@/common/modules/widgets/_widget-fields/date-format/type';
+import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { DisplaySeriesLabelValue } from '@/common/modules/widgets/_widget-fields/display-series-label/type';
 import type { GroupByValue } from '@/common/modules/widgets/_widget-fields/group-by/type';
 import type { LegendValue } from '@/common/modules/widgets/_widget-fields/legend/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
-import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
@@ -48,11 +50,17 @@ import type {
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
 
+
 type Data = ListResponse<{
     [key: string]: string|number;
 }>;
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
+const { dateRange } = useWidgetDateRange({
+    dateRangeFieldValue: computed(() => (props.widgetOptions?.dateRange as DateRangeValue)),
+    baseOnDate: computed(() => props.dashboardOptions?.date_range?.end),
+    granularity: computed<string>(() => props.widgetOptions?.granularity as string),
+});
 const chartContext = ref<HTMLElement|null>(null);
 const state = reactive({
     loading: true,
@@ -150,16 +158,10 @@ const state = reactive({
     })),
     // required fields
     granularity: computed<string>(() => props.widgetOptions?.granularity as string),
-    basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
     dataField: computed<string|undefined>(() => props.widgetOptions?.dataField as string),
     groupByField: computed<string|undefined>(() => (props.widgetOptions?.groupBy as GroupByValue)?.value as string),
     groupByCount: computed<number>(() => (props.widgetOptions?.groupBy as GroupByValue)?.count as number),
     chartType: computed<string>(() => props.widgetOptions?.pieChartType as string),
-    dateRange: computed<DateRange>(() => {
-        const _dateRangeCount = Object.values(DATE_FIELD).includes(state.groupByField) ? state.groupByCount : 1;
-        const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, _dateRangeCount);
-        return { start: _start, end: _end };
-    }),
     // optional fields
     showLegends: computed<boolean>(() => (props.widgetOptions?.legend as LegendValue)?.toggleValue),
     legendPosition: computed<string|undefined>(() => (props.widgetOptions?.legend as LegendValue)?.position),
@@ -172,7 +174,7 @@ const state = reactive({
     seriesFormat: computed<string>(() => state.displaySeriesLabel?.format || 'numeric'),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
-    dateRange: computed(() => state.dateRange),
+    dateRange,
     errorMessage: computed(() => state.errorMessage),
     widgetLoading: computed(() => state.loading),
 });
@@ -190,8 +192,8 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
             widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
-                start: state.dateRange.start,
-                end: state.dateRange.end,
+                start: dateRange.value.start,
+                end: dateRange.value.end,
                 group_by: [state.groupByField],
                 fields: {
                     [state.dataField]: {
@@ -218,15 +220,20 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
 const drawChart = (rawData: Data|null) => {
     if (isEmpty(rawData)) return;
     // get chart data
-    const _orderedData = orderBy(rawData.results || [], state.dataField, 'desc');
-    const _slicedData = _orderedData?.slice(0, state.groupByCount);
-    const _etcData = _orderedData?.slice(state.groupByCount).reduce((acc, cur) => {
-        acc[state.groupByField] = 'etc';
-        acc[state.dataField] = (acc[state.dataField] || 0) + cur[state.dataField];
-        return acc;
-    }, {} as Record<string, string|number>);
-    let _refinedData = isEmpty(_etcData) ? _slicedData : [..._slicedData, _etcData];
-    _refinedData = orderBy(_refinedData, state.dataField, 'desc');
+    let _refinedData = cloneDeep(rawData.results || []);
+    if (isDateField(state.groupByField)) {
+        _refinedData = orderBy(_refinedData, state.groupByField, 'desc');
+        _refinedData = _refinedData?.slice(0, state.groupByCount);
+    } else {
+        _refinedData = orderBy(_refinedData, state.dataField, 'desc');
+        const _slicedData = _refinedData?.slice(0, state.groupByCount);
+        const _etcData = _refinedData?.slice(state.groupByCount).reduce((acc, cur) => {
+            acc[state.groupByField] = 'etc';
+            acc[state.dataField] = (acc[state.dataField] || 0) + cur[state.dataField];
+            return acc;
+        }, {} as Record<string, string|number>);
+        _refinedData = isEmpty(_etcData) ? _slicedData : [..._slicedData, _etcData];
+    }
     state.chartData = _refinedData?.map((v) => ({
         name: v[state.groupByField],
         value: v[state.dataField],

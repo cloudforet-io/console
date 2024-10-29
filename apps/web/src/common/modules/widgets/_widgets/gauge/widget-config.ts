@@ -12,6 +12,7 @@ const gauge: WidgetConfig = {
     },
     requiredFieldsSchema: {
         granularity: {},
+        dateRange: {},
         dataField: {},
         min: {
             options: {

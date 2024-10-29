@@ -1,6 +1,7 @@
 <script lang="ts" setup>
+import type { Ref } from 'vue';
 import {
-    computed, reactive, watch,
+    computed, reactive, toRef, watch,
 } from 'vue';
 
 import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
@@ -26,6 +27,9 @@ import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { useGranularityMenuItem } from '@/common/modules/widgets/_composables/use-granularity-menu-items';
+import {
+    useWidgetOptionsComplexValidation,
+} from '@/common/modules/widgets/_composables/use-widget-options-complex-validation';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import {
     getReferenceLabel,
@@ -42,8 +46,10 @@ import type {
 import {
     LATEST_TABLE_DATA_FIELD_VERSION,
 } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
+import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 import type { TableDataItem, DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetFieldComponentEmit, WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
+import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import {
@@ -67,6 +73,13 @@ const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 
 const storeState = reactive({
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
+});
+
+const {
+    invalid: widgetOptionsInvalid,
+} = useWidgetOptionsComplexValidation({
+    optionValueMap: toRef(props, 'allValueMap') as Record<string, WidgetFieldValues|undefined>,
+    widgetConfig: toRef(props, 'widgetConfig') as Ref<WidgetConfig>,
 });
 
 const state = reactive({
@@ -145,6 +158,7 @@ const state = reactive({
     dynamicFields: undefined as undefined | string[],
     dynamicFieldMenuItems: computed<MenuItem[]>(() => {
         if (state.proxyValue?.fieldType === 'staticField') return [];
+        if (isDateField(state.proxyValue?.dynamicFieldInfo?.fieldValue)) return [];
         return state.dynamicFields?.map((d) => {
             const fieldName = state.proxyValue.dynamicFieldInfo?.fieldValue;
             const label = getReferenceLabel(storeState.allReferenceTypeInfo, fieldName, d);
@@ -186,6 +200,7 @@ const handleChangeDataFieldType = (value: string) => {
             },
             staticFieldInfo: undefined,
         };
+        state.selectedValueType = DEFAULT_VALUE_TYPE;
         state.selectedItem = state.menuItems[0]?.name;
         state.selectedCriteria = state.dataInfoMenuItems[0]?.name;
     }
@@ -534,7 +549,7 @@ watch([ // Fetch Dynamic Field
                                            :selected="state.selectedItem"
                                            :multi-selectable="state.multiSelectable"
                                            :show-select-marker="state.multiSelectable"
-                                           :invalid="state.dataFieldInvalid"
+                                           :invalid="state.dataFieldInvalid || widgetOptionsInvalid"
                                            appearance-type="badge"
                                            block
                                            @update:selected="handleUpdateValue"

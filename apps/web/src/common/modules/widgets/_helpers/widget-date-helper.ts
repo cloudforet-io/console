@@ -104,6 +104,33 @@ export const getWidgetDateRange = (granularity: string, basedOnDate: string, sub
     return [refinedDateRange.start || '', refinedDateRange.end];
 };
 
+export const getPreviousDateRange = (granularity: string, dateRange: DateRange): DateRange => {
+    if (!granularity) return dateRange;
+    const format = getDateFormat(granularity);
+
+    const start = dayjs.utc(dateRange.start, format);
+    const end = dayjs.utc(dateRange.end, format);
+
+    const unitMap = {
+        DAILY: 'day',
+        MONTHLY: 'month',
+        YEARLY: 'year',
+    } as const;
+    const unit = unitMap[granularity];
+
+    const endDiff = end.diff(start, unit);
+    const duration = endDiff + 1;
+    const dayCountOfPreviewDate = end.subtract(1, 'month').endOf('month').date();
+
+    const previousStart = start.subtract(duration > dayCountOfPreviewDate ? dayCountOfPreviewDate : duration, unit);
+    const previousEnd = end.subtract(duration, unit);
+
+    return {
+        start: previousStart.format(format),
+        end: previousEnd.format(format),
+    };
+};
+
 export const getReferenceLabel = (allReferenceTypeInfo: AllReferenceTypeInfo, field?: string, val?: string) => {
     if (!val) return '';
     if (field === 'Workspace' || field === 'workspace_id') {
@@ -173,9 +200,9 @@ export const getRefinedDynamicFieldData = (rawData: DynamicFieldData, dynamicFie
             if (isDateField(dataField)) {
                 _refinedData = orderBy(result[criteria], dataField, 'desc') ?? [];
             } else {
-                const _orderedData = orderBy(result[criteria], 'value', 'desc') ?? [];
-                _refinedData = _orderedData.slice(0, valueCount);
+                _refinedData = orderBy(result[criteria], 'value', 'desc') ?? [];
             }
+            _refinedData = _refinedData.slice(0, valueCount);
             _refinedData.forEach((v) => {
                 _seriesFieldsSet.add(v[dataField]);
             });
@@ -197,7 +224,7 @@ export const getRefinedDynamicFieldData = (rawData: DynamicFieldData, dynamicFie
         });
 
 
-        if (_etcExists) _seriesFields.push('etc');
+        if (!isDateField(dataField) && _etcExists) _seriesFields.push('etc');
     }
 
     return [_refinedResults, _seriesFields];
@@ -217,6 +244,7 @@ export const getRefinedHeatmapDynamicFieldData = (rawData: DynamicFieldData, dyn
     } else {
         const _subTotalResults: Record<string, number> = {};
         rawData.results.forEach((result) => {
+            if (!Array.isArray(result[criteria])) return;
             result[criteria]?.forEach((d) => {
                 if (d[dataField] in _subTotalResults) {
                     _subTotalResults[d[dataField]] += d.value;

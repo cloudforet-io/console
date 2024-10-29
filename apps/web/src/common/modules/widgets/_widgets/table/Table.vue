@@ -3,7 +3,6 @@ import {
     defineExpose, reactive, computed, watch, onMounted,
 } from 'vue';
 
-import dayjs from 'dayjs';
 import { flatMap, map, uniq } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -13,7 +12,6 @@ import type { Query } from '@cloudforet/core-lib/space-connector/type';
 import { PPagination } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
@@ -22,12 +20,13 @@ import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widge
 import type { APIErrorToast } from '@/common/composables/error/errorHandler';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
+import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD, REFERENCE_FIELD_MAP } from '@/common/modules/widgets/_constants/widget-constant';
 import {
-    getWidgetBasedOnDate, getWidgetDateFields,
-    getWidgetDateRange,
+    getPreviousDateRange,
+    getWidgetDateFields,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { getWidgetDataTable } from '@/common/modules/widgets/_helpers/widget-helper';
@@ -35,6 +34,7 @@ import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/co
 import type { CustomTableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
 import type { DataFieldHeatmapColorValue } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
 import type { DateFormatValue } from '@/common/modules/widgets/_widget-fields/date-format/type';
+import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { GroupByValue } from '@/common/modules/widgets/_widget-fields/group-by/type';
 import type { MissingValueValue } from '@/common/modules/widgets/_widget-fields/missing-value/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
@@ -59,6 +59,12 @@ type Data = ListResponse<TableDataItem>;
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
+const { dateRange } = useWidgetDateRange({
+    dateRangeFieldValue: computed(() => (props.widgetOptions?.dateRange as DateRangeValue)),
+    baseOnDate: computed(() => props.dashboardOptions?.date_range?.end),
+    granularity: computed<string>(() => props.widgetOptions?.granularity as string),
+});
+
 const state = reactive({
     loading: false,
     isPrivateWidget: computed(() => props.widgetId.startsWith('private')),
@@ -80,7 +86,8 @@ const state = reactive({
     noneTimeSeriesDynamicFieldSlicedData: null as Data | null,
     // data fetch options
     granularity: computed<string>(() => props.widgetOptions?.granularity as string),
-    basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
+    basedOnDate: computed(() => props.dashboardOptions?.date_range?.end),
+    dateRangeField: computed<DateRangeValue|undefined>(() => props.widgetOptions?.dateRange as DateRangeValue),
     tableDataFieldInfo: computed<TableDataFieldValue>(() => props.widgetOptions?.tableDataField as TableDataFieldValue),
     tableDataFieldType: computed<TableDataFieldValue['fieldType']>(() => state.tableDataFieldInfo?.fieldType),
     tableDataField: computed<string|string[]|undefined>(() => {
@@ -93,25 +100,7 @@ const state = reactive({
     tableDataDynamicCount: computed<number>(() => state.tableDataFieldInfo?.dynamicFieldInfo?.count),
 
     groupByField: computed<string[]|undefined>(() => ((props.widgetOptions?.groupBy as GroupByValue)?.value as string[]) ?? []),
-    dateRange: computed<DateRange>(() => {
-        let subtract = 1;
-        if (isDateField(state.tableDataField) || state.groupByField?.some((groupBy) => Object.values(DATE_FIELD).includes(groupBy))) {
-            if (state.granularity === GRANULARITY.YEARLY) subtract = 3;
-            if (state.granularity === GRANULARITY.MONTHLY) subtract = 12;
-            if (state.granularity === GRANULARITY.DAILY) {
-                // if basedOnDate is end of month, need to assign date count of that month
-                const endOfMonth = dayjs.utc(state.basedOnDate).endOf('month').date();
-                if (dayjs.utc(state.basedOnDate).date() === endOfMonth) subtract = endOfMonth;
-                else subtract = 30;
-            }
-        }
-        const [start, end] = getWidgetDateRange(state.granularity, state.basedOnDate, subtract);
-        return { start, end };
-    }),
-    comparisonDateRange: computed<DateRange>(() => {
-        const [_start] = getWidgetDateRange(state.granularity, state.basedOnDate, 2);
-        return { start: _start, end: _start };
-    }),
+    comparisonDateRange: computed<DateRange>(() => getPreviousDateRange(state.granularity, dateRange.value)),
     // data for optional fields
     isComparisonEnabled: computed<boolean>(() => !isDateField(state.tableDataField) && !state.groupByField?.some((groupBy) => Object.values(DATE_FIELD).includes(groupBy))),
     comparisonInfo: computed<ComparisonValue|undefined>(() => props.widgetOptions?.comparison?.[0] as ComparisonValue),
@@ -155,7 +144,7 @@ const state = reactive({
                 }
             });
         } else if (isDateField(state.tableDataField)) { // 2-2-1. Dynamic Fields - Date Field Case
-            const autoGeneratedFieldNames = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
+            const autoGeneratedFieldNames = getWidgetDateFields(state.granularity, dateRange.value.start, dateRange.value.end);
             const _fieldNames = state.tableDataDynamicValueType === 'fixed'
                 ? (state.tableDataDynamicFixedValue ?? [])
                 : autoGeneratedFieldNames.slice(-state.tableDataDynamicCount);
@@ -225,7 +214,7 @@ const state = reactive({
 });
 
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
-    dateRange: computed(() => state.dateRange),
+    dateRange,
     errorMessage: computed(() => state.errorMessage),
     widgetLoading: computed(() => state.loading),
     noData: computed(() => (state.data ? !state.data.results?.length : false)),
@@ -333,8 +322,8 @@ const fetchWidget = async (
             widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
-                start: isComparison ? state.comparisonDateRange.start : state.dateRange.start,
-                end: isComparison ? state.comparisonDateRange.end : state.dateRange.end,
+                start: isComparison ? state.comparisonDateRange.start : dateRange.value.start,
+                end: isComparison ? state.comparisonDateRange.end : dateRange.value.end,
                 group_by: _groupBy,
                 field_group: _field_group,
                 fields: _fields,

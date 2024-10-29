@@ -20,12 +20,12 @@ import type { APIErrorToast } from '@/common/composables/error/errorHandler';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetCustomLagend from '@/common/modules/widgets/_components/WidgetCustomLagend.vue';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
+import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import {
-    getWidgetBasedOnDate, getWidgetDateFields,
-    getWidgetDateRange,
+    getWidgetDateFields, getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
@@ -34,6 +34,7 @@ import {
     getWidgetLoadApiQueryDateRange,
 } from '@/common/modules/widgets/_helpers/widget-load-helper';
 import type { AdvancedFormatRulesValue } from '@/common/modules/widgets/_widget-fields/advanced-format-rules/type';
+import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type { TableDataFieldValue } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
 import type { XAxisValue } from '@/common/modules/widgets/_widget-fields/x-axis/type';
@@ -42,6 +43,7 @@ import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/common/modules/wid
 import type { WidgetLegend } from '@/common/modules/widgets/types/widget-legend-typs';
 
 import { gray } from '@/styles/colors';
+
 
 
 type Data = ListResponse<{
@@ -54,6 +56,12 @@ const Y_AXIS_FIELD_WIDTH = 120;
 const BOX_MIN_WIDTH = 64;
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
+
+const { dateRange } = useWidgetDateRange({
+    dateRangeFieldValue: computed(() => (props.widgetOptions?.dateRange as DateRangeValue)),
+    baseOnDate: computed(() => props.dashboardOptions?.date_range?.end),
+    granularity: computed<string>(() => props.widgetOptions?.granularity as string),
+});
 const state = reactive({
     loading: false,
     errorMessage: undefined as string|undefined,
@@ -65,7 +73,7 @@ const state = reactive({
     xAxisData: computed<string[]>(() => {
         if (isDateField(state.xAxisField)) {
             const _isSeparatedDate = state.xAxisField !== DATE_FIELD.DATE;
-            return getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end, _isSeparatedDate);
+            return getWidgetDateFields(state.granularity, state.widgetDateRange.start, state.widgetDateRange.end, _isSeparatedDate);
         }
         return state.data?.results?.map((d) => d[state.xAxisField] as string) || [];
     }),
@@ -76,7 +84,7 @@ const state = reactive({
         // auto
         if (isDateField(state.dataField)) {
             const _isSeparatedDate = state.dataField !== DATE_FIELD.DATE;
-            return getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end, _isSeparatedDate);
+            return getWidgetDateFields(state.granularity, state.widgetDateRange.start, state.widgetDateRange.end, _isSeparatedDate);
         }
         const _subTotalResults: Record<string, number> = {};
         const _criteria = state.dynamicFieldInfo?.criteria;
@@ -105,13 +113,12 @@ const state = reactive({
         return state.dynamicFieldInfo?.fieldValue;
     }),
     dynamicFieldValue: computed<string[]>(() => state.dynamicFieldInfo?.fixedValue || []),
-    basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
     formatRulesValue: computed<AdvancedFormatRulesValue>(() => props.widgetOptions?.advancedFormatRules as AdvancedFormatRulesValue),
-    dateRange: computed<DateRange>(() => {
-        let _start = state.basedOnDate;
-        let _end = state.basedOnDate;
+    widgetDateRange: computed<DateRange>(() => {
+        let _start = dateRange.value.start;
+        let _end = dateRange.value.end;
         if (isDateField(state.xAxisField)) {
-            [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.xAxisCount);
+            [_start, _end] = getWidgetDateRange(state.granularity, _end, state.xAxisCount);
         } else if (isDateField(state.dataField)) {
             let subtract = state.dynamicFieldInfo.count;
             if (state.dynamicFieldInfo?.valueType === 'fixed') {
@@ -119,7 +126,7 @@ const state = reactive({
                 if (state.granularity === GRANULARITY.MONTHLY) subtract = 12;
                 if (state.granularity === GRANULARITY.DAILY) subtract = 30;
             }
-            [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, subtract);
+            [_start, _end] = getWidgetDateRange(state.granularity, _end, subtract);
         }
         return { start: _start, end: _end };
     }),
@@ -127,10 +134,10 @@ const state = reactive({
     numberFormat: computed(() => props.widgetOptions?.numberFormat as NumberFormatValue),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
-    dateRange: computed(() => state.dateRange),
+    dateRange,
     errorMessage: computed(() => state.errorMessage),
     widgetLoading: computed(() => state.loading),
-    noData: computed(() => (state.data ? !state.data.results?.length : false)),
+    noData: computed(() => (state.data ? !state.data?.results?.length : false)),
 });
 
 /* Api */
@@ -146,8 +153,8 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
             widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
-                page: { start: 1, limit: state.xAxisCount },
-                ...getWidgetLoadApiQueryDateRange(state.granularity, state.dateRange),
+                ...(!isDateField(state.xAxisField) && { page: { start: 1, limit: state.xAxisCount } }),
+                ...getWidgetLoadApiQueryDateRange(state.granularity, dateRange.value),
                 ...getWidgetLoadApiQuery(state.dataFieldInfo, state.xAxisField),
             },
             vars: props.dashboardVars,
@@ -201,8 +208,8 @@ const targetValue = (xField?: string, yField?: string, format?: 'table'|'tooltip
 };
 const getColor = (val: string|number): string => {
     let _formatRules = cloneDeep(state.formatRulesValue);
-    let _color = state.formatRulesValue.baseColor || gray[200];
-    _formatRules = _formatRules.value.sort((a, b) => (a?.threshold || 0) - (b?.threshold || 0));
+    let _color = state.formatRulesValue?.baseColor || gray[200];
+    _formatRules = _formatRules?.value?.sort((a, b) => (a?.threshold || 0) - (b?.threshold || 0)) || [];
     _formatRules?.forEach((d) => {
         if (val >= (d.threshold || 0)) {
             _color = d.color;
@@ -213,11 +220,11 @@ const getColor = (val: string|number): string => {
 
 /* Watcher */
 watch(() => state.formatRulesValue, async () => {
-    state.legendList = state.formatRulesValue.value.map((d) => ({
+    state.legendList = state.formatRulesValue?.value?.map((d) => ({
         name: d.text,
         color: d.color,
         disabled: false,
-    }));
+    })) || [];
 }, { immediate: true });
 
 /* Lifecycle */

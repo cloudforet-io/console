@@ -21,16 +21,13 @@ import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widge
 import type { APIErrorToast } from '@/common/composables/error/errorHandler';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
+import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
-import {
-    getWidgetBasedOnDate,
-    getWidgetDateRange,
-} from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
+import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { FormatRulesValue } from '@/common/modules/widgets/_widget-fields/format-rules/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
-import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit,
     WidgetExpose,
@@ -46,6 +43,11 @@ const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
 const chartContext = ref<HTMLElement|null>(null);
+const { dateRange } = useWidgetDateRange({
+    dateRangeFieldValue: computed(() => (props.widgetOptions?.dateRange as DateRangeValue)),
+    baseOnDate: computed(() => props.dashboardOptions?.date_range?.end),
+    granularity: computed<string>(() => props.widgetOptions?.granularity as string),
+});
 const state = reactive({
     loading: false,
     errorMessage: undefined as string|undefined,
@@ -74,7 +76,7 @@ const state = reactive({
                     lineStyle: {
                         width: 30,
                         color: [
-                            [1, state.formatRulesBaseColor],
+                            [1, gray[200]],
                         ],
                     },
                 },
@@ -104,7 +106,6 @@ const state = reactive({
     })),
     // required fields
     granularity: computed<string>(() => props.widgetOptions?.granularity as string),
-    basedOnDate: computed<string>(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
     dataField: computed<string|undefined>(() => props.widgetOptions?.dataField as string),
     min: computed<number>(() => props.widgetOptions?.min as number),
     max: computed<number>(() => props.widgetOptions?.max as number),
@@ -124,17 +125,11 @@ const state = reactive({
         const _formatRules = props.widgetOptions?.formatRules as FormatRulesValue[];
         return _formatRules?.filter((d) => d.threshold === 0)?.[0]?.color || gray[200];
     }),
-    dateRange: computed<DateRange>(() => {
-        const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, 2);
-        return { start: _start, end: _end };
-    }),
     // optional fields
     numberFormat: computed(() => props.widgetOptions?.numberFormat as NumberFormatValue),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
-    dateRange: computed(() => ({
-        end: state.dateRange.end,
-    })),
+    dateRange,
     errorMessage: computed(() => state.errorMessage),
     widgetLoading: computed(() => state.loading),
 });
@@ -152,8 +147,8 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
             widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
-                start: state.dateRange.start,
-                end: state.dateRange.end,
+                start: dateRange.value.start,
+                end: dateRange.value.end,
                 group_by: [],
                 fields: {
                     [state.dataField]: {

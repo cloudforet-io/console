@@ -12,6 +12,7 @@ const table: WidgetConfig = {
     },
     requiredFieldsSchema: {
         granularity: {},
+        dateRange: {},
         tableDataField: {},
         groupBy: {
             options: {
