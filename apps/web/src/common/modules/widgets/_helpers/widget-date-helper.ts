@@ -223,7 +223,7 @@ export const getRefinedDynamicFieldData = (rawData: DynamicFieldData, dynamicFie
         });
 
 
-        if (_etcExists) _seriesFields.push('etc');
+        if (!isDateField(dataField) && _etcExists) _seriesFields.push('etc');
     }
 
     return [_refinedResults, _seriesFields];
@@ -243,6 +243,7 @@ export const getRefinedHeatmapDynamicFieldData = (rawData: DynamicFieldData, dyn
     } else {
         const _subTotalResults: Record<string, number> = {};
         rawData.results.forEach((result) => {
+            if (!Array.isArray(result[criteria])) return;
             result[criteria]?.forEach((d) => {
                 if (d[dataField] in _subTotalResults) {
                     _subTotalResults[d[dataField]] += d.value;
