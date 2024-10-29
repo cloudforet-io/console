@@ -194,6 +194,7 @@ export const useWidgetDateRange = (options: UseWidgetDateRangeOptions): UseWidge
 
         const baseYear = dayjs.utc(basedOnDate).year();
         const baseMonth = dayjs.utc(basedOnDate).month() + 1;
+        const endDateOfBaseMonth = dayjs.utc(basedOnDate).endOf('month').date();
 
         // Results
         let _start = '';
@@ -206,8 +207,9 @@ export const useWidgetDateRange = (options: UseWidgetDateRangeOptions): UseWidge
             _start = `${baseYear}-${start}`;
             _end = `${baseYear}-${end}`;
         } else {
+            const _endDate = end > endDateOfBaseMonth ? endDateOfBaseMonth : end;
             _start = `${baseYear}-${baseMonth}-${start}`;
-            _end = `${baseYear}-${baseMonth}-${end}`;
+            _end = `${baseYear}-${baseMonth}-${_endDate}`;
         }
 
         return {
