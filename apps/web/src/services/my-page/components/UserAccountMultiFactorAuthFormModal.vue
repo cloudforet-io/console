@@ -19,7 +19,6 @@ import UserAccountMultiFactorAuthModalEmailInfo from '@/services/my-page/compone
 import UserAccountMultiFactorAuthModalFolding from '@/services/my-page/components/UserAccountMultiFactorAuthModalFolding.vue';
 import UserAccountMultiFactorAuthModalMSInfo
     from '@/services/my-page/components/UserAccountMultiFactorAuthModalMSInfo.vue';
-import { MULTI_FACTOR_AUTH_ITEMS } from '@/services/my-page/constants/multi-factor-auth-constants';
 import { useMultiFactorAuthStore } from '@/services/my-page/stores/multi-factor-auth-store';
 import type {
     UserInfoType,
@@ -59,9 +58,10 @@ const modalState = reactive({
         if (storeState.isSwitchModal) {
             return _i18n.t('MY_PAGE.MFA.CHANGE_TITLE');
         }
-        const selectedItem = MULTI_FACTOR_AUTH_ITEMS.find((i) => i.type === storeState.selectedType);
-        if (!selectedItem) return '';
-        return _i18n.t('COMMON.MFA_MODAL.TITLE', { type: selectedItem.title });
+        if (storeState.selectedType === MULTI_FACTOR_AUTH_TYPE.EMAIL) {
+            return _i18n.t('MY_PAGE.MFA.MODAL_EMAIL_TITLE');
+        }
+        return _i18n.t('MY_PAGE.MFA.MODAL_MS_TITLE');
     }),
 });
 
