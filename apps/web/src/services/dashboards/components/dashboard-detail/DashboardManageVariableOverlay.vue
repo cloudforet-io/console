@@ -5,12 +5,13 @@ import type { TranslateResult } from 'vue-i18n';
 import { cloneDeep, orderBy } from 'lodash';
 
 import {
-    PBadge, PButton, PIconButton, POverlayLayout, PToggleButton, PToolboxTable,
+    PButton, PIconButton, POverlayLayout, PToggleButton, PToolboxTable,
 } from '@cloudforet/mirinae';
 import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 import { getClonedName } from '@cloudforet/utils';
 
 import { SpaceRouter } from '@/router';
+import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -26,17 +27,13 @@ import DashboardManageVariableImportModal
     from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableImportModal.vue';
 import DashboardVariablesFormModal
     from '@/services/dashboards/components/dashboard-detail/DashboardVariablesFormModal.vue';
-import { getRefinedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variable-helper';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
-
-type ManagementType = 'managed'|'custom';
 interface GlobalVariableTableItem {
     key: string;
     name: string;
-    management: ManagementType;
     type?: string;
     use?: boolean;
     created_by?: string;
@@ -63,22 +60,13 @@ const state = reactive({
     pageSize: 15,
     searchText: '',
     globalVariablesTableItems: computed<GlobalVariableTableItem[]>(() => {
-        const refinedGlobalVariables = getRefinedGlobalVariables(dashboardDetailGetters?.dashboardInfo?.vars_schema);
-        const _managedProperties = refinedGlobalVariables.filter((d) => d.management === 'managed');
-        const _managedItems: GlobalVariableTableItem[] = _managedProperties.map((d) => ({
-            ...d,
-            created_by: 'System',
-            reference: i18n.t('DASHBOARDS.DETAIL.VARIABLES.COMMON'),
-        }));
-        const _orderedManagedItems = orderBy(_managedItems, ['name'], ['asc']);
-        const _customProperties = refinedGlobalVariables.filter((d) => d.management !== 'managed');
-        const _customItems: GlobalVariableTableItem[] = _customProperties.map((d) => ({
+        const _properties: DashboardGlobalVariable[] = Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties);
+        const _tableItems: GlobalVariableTableItem[] = _properties.map((d) => ({
             ...d,
             type: d.method === 'manual' ? d.type : undefined,
             reference: d.method === 'dynamic' ? d?.reference?.resourceType : undefined,
         }));
-        const _orderedCustomItems = orderBy(_customItems, ['name'], ['asc']);
-        return [..._orderedManagedItems, ..._orderedCustomItems];
+        return orderBy(_tableItems, ['name'], ['asc']);
     }),
     searchedGlobalVariablesTableItems: computed<GlobalVariableTableItem[]>(() => {
         if (!state.searchText.length) return state.globalVariablesTableItems;
@@ -86,24 +74,16 @@ const state = reactive({
     }),
     variableFields: [
         { name: 'name', label: 'Name' },
+        { name: 'key', label: 'Key' },
         { name: 'type', label: 'Type' },
         { name: 'reference', label: 'Reference' },
-        { name: 'management', label: 'Management' },
         { name: 'use', label: 'Use', width: '90px' },
         { name: 'created_by', label: 'Created By' },
         { name: 'buttons', label: ' ', width: '144px' },
     ] as DataTableField[],
-    variableType: computed<Partial<Record<ManagementType, TranslateResult>>>(() => ({
-        managed: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_MANAGED'),
-        custom: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_CUSTOM'),
-    })),
 });
 
 /* Util */
-const variableTypeBadgeStyleFormatter = (type: 'managed'|'custom') => {
-    if (type === 'managed') return 'gray500';
-    return 'primary';
-};
 const getSlicedVariableItems = (items: GlobalVariableTableItem[], thisPage: number, pageSize: number): GlobalVariableTableItem[] => {
     const _startIndex = (thisPage - 1) * pageSize;
     const _endIndex = thisPage * pageSize;
@@ -250,13 +230,6 @@ const handleConfirmDelete = () => {
             <template #col-reference-format="{ value }">
                 {{ value || '-' }}
             </template>
-            <template #col-management-format="{ value }">
-                <p-badge :style-type="variableTypeBadgeStyleFormatter(value)"
-                         badge-type="solid-outline"
-                >
-                    {{ state.variableType[value] }}
-                </p-badge>
-            </template>
             <template #col-use-format="{ value, item }">
                 <p-toggle-button :value="value"
                                  :disabled="item.disabled || item.required || item.fixed || item.readonly"
@@ -269,13 +242,11 @@ const handleConfirmDelete = () => {
                                    size="sm"
                                    @click="handleClickCloneButton(item.key)"
                     />
-                    <p-icon-button v-if="item.management === 'custom'"
-                                   name="ic_edit"
+                    <p-icon-button name="ic_edit"
                                    size="sm"
                                    @click="handleClickEditButton(item.key)"
                     />
-                    <p-icon-button v-if="item.management === 'custom'"
-                                   name="ic_delete"
+                    <p-icon-button name="ic_delete"
                                    size="sm"
                                    style-type="negative-transparent"
                                    @click="handleClickDeleteButton(item.key)"
