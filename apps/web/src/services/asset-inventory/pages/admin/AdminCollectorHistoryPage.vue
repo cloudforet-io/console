@@ -25,7 +25,6 @@ import { SpaceRouter } from '@/router';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { JobListParameters } from '@/schema/inventory/job/api-verbs/list';
 import type { JobModel } from '@/schema/inventory/job/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { ROOT_ROUTE } from '@/router/constant';
@@ -34,6 +33,7 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CollectorReferenceMap } from '@/store/reference/collector-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
@@ -56,6 +56,7 @@ import { JOB_SELECTED_STATUS } from '@/services/asset-inventory/types/collector-
 const COLLECTOR_DETAIL_ROUTE = ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME;
 const WORKSPACE_HOME_ROUTE = ROOT_ROUTE.WORKSPACE._NAME;
 const allReferenceStore = useAllReferenceStore();
+const userStore = useUserStore();
 
 const fields: DataTableField[] = [
     { label: 'Job ID', name: 'job_id' },
@@ -93,7 +94,7 @@ const handlers = reactive({
     },
 });
 const storeState = reactive({
-    timezone: computed(() => store.state.user.timezone),
+    timezone: computed(() => userStore.state.timezone || 'UTC'),
     collectors: computed<CollectorReferenceMap>(() => allReferenceStore.getters.collector),
     plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
     workspaces: computed(() => allReferenceStore.getters.workspace),
@@ -105,7 +106,8 @@ const state = reactive({
     pageSize: 30,
     thisPage: 1,
     totalCount: 0,
-    isDomainOwner: computed(() => store.state.user.userType === 'DOMAIN_OWNER'),
+    // TODO: UserType should be updated
+    isDomainOwner: computed(() => (userStore.state.userType as string) === 'DOMAIN_OWNER'),
     selectedStatus: 'ALL',
     items: [] as any[],
     sortBy: 'created_at',

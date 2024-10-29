@@ -14,9 +14,10 @@ import { iso8601Formatter } from '@cloudforet/utils';
 
 import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleState } from '@/schema/identity/role/type';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
+
+import { useUserStore } from '@/store/user/user-store';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
@@ -47,6 +48,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const rolePageStore = useRolePageStore();
 const rolePageState = rolePageStore.$state;
+const userStore = useUserStore();
 const { getProperRouteLocation } = useProperRouteLocation();
 
 const router = useRouter();
@@ -59,7 +61,7 @@ const { queryTags } = queryTagHelper;
 let roleListApiQuery = roleListApiQueryHelper.data;
 
 const storeState = reactive({
-    timezone: computed(() => store.state.user.timezone ?? 'UTC'),
+    timezone: computed(() => userStore.state.timezone || 'UTC'),
 });
 const state = reactive({
     fields: computed<DataTableFieldType[]>(() => {

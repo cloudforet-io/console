@@ -104,9 +104,9 @@
 
 <script lang="ts">
 import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
+import { useRouter } from 'vue-router/composables';
 
 import dayjs from 'dayjs';
 import {
@@ -122,7 +122,8 @@ import {
 import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 
 import { MONITORING_TYPE } from '@/schema/monitoring/data-source/constant';
-import { store } from '@/store';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -179,10 +180,11 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as Vue;
+        const router = useRouter();
+        const userStore = useUserStore();
         const state = reactive({
             showLoader: computed(() => props.loading || state.metricsLoading),
-            timezone: computed(() => store.state.user.timezone),
+            timezone: computed<string>(() => userStore.state.timezone || 'UTC'),
             dataTools: [],
             selectedToolId: '',
             tools: computed<DataToolType[]>(() => state.dataTools.map((d) => ({
@@ -211,7 +213,7 @@ export default {
             resources = resources.map((resource, idx) => ({
                 ...resource,
                 color: COLORS[idx],
-                link: vm.$router.resolve(referenceRouter(resource.id, { resource_type: 'inventory.Server' })).href,
+                link: router.resolve(referenceRouter(resource.id, { resource_type: 'inventory.Server' })).href,
             }));
             state.availableResources = sortBy(resources, (m) => m.name);
         };

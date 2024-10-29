@@ -14,16 +14,18 @@ import type { UserListParameters } from '@/schema/identity/user/api-verbs/list';
 import type { UserModel } from '@/schema/identity/user/model';
 import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
 import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
-// eslint-disable-next-line import/no-cycle
-import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type {
     ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
+// eslint-disable-next-line import/no-cycle
+import { useUserStore } from '@/store/user/user-store';
 
+// eslint-disable-next-line import/no-cycle
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
+// eslint-disable-next-line import/no-cycle
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
@@ -68,10 +70,10 @@ export const useUserReferenceStore = defineStore('reference-user', () => {
     const state = reactive({
         items: null as UserReferenceMap | null,
     });
-
+    const userStore = useUserStore();
     const getters = reactive({
         userItems: asyncComputed<UserReferenceMap>(async () => {
-            if (store.getters['user/getCurrentGrantInfo'].scope === 'USER') return {};
+            if (userStore.getters.getCurrentGrantInfo?.scope === 'USER') return {};
             if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),

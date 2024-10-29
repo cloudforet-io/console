@@ -26,12 +26,12 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service/api-verbs/get';
 import type { CloudServiceListParameters } from '@/schema/inventory/cloud-service/api-verbs/list';
 import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
 import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper';
@@ -75,6 +75,7 @@ const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const appContextStore = useAppContextStore();
 const appContextGetters = appContextStore.getters;
+const userStore = useUserStore();
 
 const router = useRouter();
 
@@ -82,9 +83,9 @@ const state = reactive({
     data: undefined as any,
     loading: true,
     totalCount: 0,
-    timezone: computed(() => store.state.user.timezone),
+    timezone: computed(() => userStore.state.timezone),
     selectIndex: [] as number[],
-    language: computed(() => store.state.user.language),
+    language: computed(() => userStore.state.language),
 
     // button tab
     tabs: computed<TabItem[]>(() => {

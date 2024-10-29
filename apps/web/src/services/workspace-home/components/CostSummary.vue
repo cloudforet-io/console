@@ -16,14 +16,14 @@ import type { CostReportConfigModel } from '@/schema/cost-analysis/cost-report-c
 import type { CostDataSourceModel } from '@/schema/cost-analysis/data-source/model';
 import type { UnifiedCostAnalyzeParameters } from '@/schema/cost-analysis/unified-cost/api-verbs/analyze';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 import type { Currency } from '@/store/modules/display/type';
-import type { RoleInfo } from '@/store/modules/user/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
+import type { RoleInfo } from '@/store/user/type';
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
@@ -49,6 +49,7 @@ const workspaceHomePageStore = useWorkspaceHomePageStore();
 const workspaceHomePageState = workspaceHomePageStore.state;
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
+const userStore = useUserStore();
 
 const { width } = useWindowSize();
 
@@ -56,16 +57,16 @@ const storeState = reactive({
     costReportConfig: computed<CostReportConfigModel|null|undefined>(() => workspaceHomePageState.costReportConfig),
     recentList: computed<UserConfigModel[]>(() => workspaceHomePageState.recentList),
     dataSource: computed<CostDataSourceModel[]>(() => workspaceHomePageState.dataSource),
-    getCurrentRoleInfo: computed<RoleInfo>(() => store.getters['user/getCurrentRoleInfo']),
+    getCurrentRoleInfo: computed<RoleInfo|undefined>(() => userStore.getters.getCurrentRoleInfo),
     projects: computed<ProjectReferenceMap>(() => allReferenceGetters.project),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     loading: true,
     accessLink: computed<boolean>(() => !isEmpty(storeState.pageAccessPermissionMap[MENU_ID.COST_REPORT])),
     isDesktopSize: computed(() => width.value > screens.laptop.max),
     currency: computed<Currency|undefined>(() => storeState.costReportConfig?.currency || CURRENCY.USD),
-    isWorkspaceMember: computed(() => storeState.getCurrentRoleInfo.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
+    isWorkspaceMember: computed(() => storeState.getCurrentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
     chartData: undefined as XYChartData[]|undefined,
     emptyData: computed<EmptyData>(() => {
         let result = {} as EmptyData;

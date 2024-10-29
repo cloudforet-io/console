@@ -4,11 +4,13 @@ import type { UserModel } from '@/schema/identity/user/model';
 
 import { useDomainStore } from '@/store/domain/domain-store';
 import { pinia } from '@/store/pinia';
+import { useUserStore } from '@/store/user/user-store';
 
 
-export const initUserAndAuth = async (store, config): Promise<string | undefined> => {
+export const initUserAndAuth = async (config): Promise<string | undefined> => {
     const domainStore = useDomainStore(pinia);
-    let userId = store.state.user.userId;
+    const userStore = useUserStore(pinia);
+    let userId = userStore.state.userId;
 
     const domainSettings = domainStore.state.config?.settings;
     const isTokenAlive = SpaceConnector.isTokenAlive;
@@ -19,7 +21,7 @@ export const initUserAndAuth = async (store, config): Promise<string | undefined
     if (userId && isTokenAlive) {
         try {
             const response = await SpaceConnector.clientV2.identity.userProfile.get<undefined, UserModel>();
-            store.commit('user/setUser', {
+            userStore.setUserState({
                 userId: response.user_id,
                 roleType: response.role_type,
                 authType: response.auth_type,
@@ -37,12 +39,12 @@ export const initUserAndAuth = async (store, config): Promise<string | undefined
             console.error(e);
         }
     } else {
-        store.commit('user/setUser', {
+        userStore.setUserState({
             language: domainSettings?.language,
         });
     }
 
     SpaceConnector.flushToken();
-    store.dispatch('user/setIsSessionExpired', true);
+    userStore.setIsSessionExpired(true);
     return undefined;
 };

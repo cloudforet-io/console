@@ -10,8 +10,9 @@ import {
 
 import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
 import type { UserMfa } from '@/schema/identity/user/model';
-import { store } from '@/store';
 import { i18n as _i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import { postValidationMfaCode } from '@/lib/helper/multi-factor-auth-helper';
 
@@ -26,12 +27,13 @@ import type {
 
 const multiFactorAuthStore = useMultiFactorAuthStore();
 const multiFactorAuthState = multiFactorAuthStore.state;
+const userStore = useUserStore();
 
 const emit = defineEmits<{(e: 'refresh'): void }>();
 
 const storeState = reactive({
-    userId: computed<string>(() => store.state.user.userId),
-    mfa: computed<UserMfa|undefined>(() => store.state.user.mfa || undefined),
+    userId: computed<string>(() => userStore.state.userId ?? ''),
+    mfa: computed<UserMfa|undefined>(() => userStore.state.mfa || undefined),
     selectedType: computed<string>(() => multiFactorAuthState.selectedType),
     isReSyncModal: computed<boolean>(() => multiFactorAuthState.modalType === 'RE_SYNC'),
     isDisabledModal: computed<boolean>(() => multiFactorAuthState.modalType === 'DISABLED'),
@@ -85,7 +87,7 @@ const handleChangeInput = (value: string) => {
 const handleClickCancel = async () => {
     await resetFormData();
     if (storeState.userId === state.userInfo.user_id) {
-        await store.dispatch('user/setUser', state.userInfo);
+        await userStore.setUser(state.userInfo);
     }
     if (storeState.isSwitchModal && state.otherType) {
         multiFactorAuthStore.setEnableMfaMap({
@@ -103,7 +105,7 @@ const handleClickVerifyButton = async () => {
             verify_code: validationState.verificationCode,
         }) as UserInfoType;
         if (storeState.userId === state.userInfo.user_id) {
-            await store.dispatch('user/setUser', state.userInfo);
+            await userStore.setUser(state.userInfo);
         }
         resetFormData();
         if (storeState.isReSyncModal || storeState.isSwitchModal) {
@@ -130,7 +132,7 @@ const handleClickVerifyButton = async () => {
 
 watch(() => storeState.userId, (userId) => {
     if (userId) {
-        state.userInfo = store.state.user;
+        state.userInfo = userStore.state;
     }
 }, { immediate: true });
 watch(() => multiFactorAuthState.modalType, () => {

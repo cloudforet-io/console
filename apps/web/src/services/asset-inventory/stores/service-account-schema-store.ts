@@ -15,13 +15,13 @@ import type { SchemaListParameters } from '@/schema/identity/schema/api-verbs/li
 import type { SchemaModel } from '@/schema/identity/schema/model';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { AccountType } from '@/schema/identity/service-account/type';
-import { store } from '@/store';
 
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import type { UserState } from '@/store/modules/user/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderItem, ProviderReferenceMap } from '@/store/reference/provider-reference-store';
+import type { UserState } from '@/store/user/type';
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -46,9 +46,10 @@ interface Getters {
 export const useServiceAccountSchemaStore = defineStore('service-account-schema', () => {
     const allReferenceStore = useAllReferenceStore();
     const appContextStore = useAppContextStore();
+    const userStore = useUserStore();
     const _providerSchemaMap = ref<Record<string, SchemaModel[]>>({});
     const _providerItemMap = computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider);
-    const _userConfigMap = computed<UserState>(() => store.state.user);
+    const _userConfigMap = computed<UserState>(() => userStore.state);
     const _isAdminMode = computed(() => appContextStore.getters.isAdminMode);
 
     const state = reactive({

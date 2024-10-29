@@ -13,10 +13,10 @@ import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { ESCALATION_POLICY_FINISH_CONDITION } from '@/schema/monitoring/escalation-policy/constant';
 import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
 import type { EscalationPolicyFinishCondition } from '@/schema/monitoring/escalation-policy/type';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -45,6 +45,8 @@ const { getProperRouteLocation } = useProperRouteLocation();
 const allReferenceStore = useAllReferenceStore();
 const escalationPolicyFormStore = useEscalationPolicyFormStore();
 const escalationPolicyFormState = escalationPolicyFormStore.$state;
+const userStore = useUserStore();
+
 const state = reactive({
     projects: computed(() => allReferenceStore.getters.project),
     //
@@ -53,7 +55,7 @@ const state = reactive({
         PROJECT: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'),
     })),
     resourceGroups: computed<{label: TranslateResult; value: EscalationPolicyModel['resource_group']}[]>(() => {
-        const currentRoleType = store.getters['user/getCurrentRoleInfo'].roleType;
+        const currentRoleType = userStore.getters.getCurrentRoleInfo?.roleType;
         const resGroup: {label: TranslateResult; value: EscalationPolicyModel['resource_group']}[] = [
             { label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'), value: 'PROJECT' },
         ];

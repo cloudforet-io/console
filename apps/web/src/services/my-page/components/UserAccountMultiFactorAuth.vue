@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onUnmounted } from 'vue';
 
+import { useUserStore } from '@/store/user/user-store';
 import UserAccountModuleContainer from '@/services/my-page/components/UserAccountModuleContainer.vue';
 import UserAccountMultiFactorAuthFormModal from '@/services/my-page/components/UserAccountMultiFactorAuthFormModal.vue';
 import UserAccountMultiFactorAuthItems from '@/services/my-page/components/UserAccountMultiFactorAuthItems.vue';

@@ -8,15 +8,17 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RegionListParameters } from '@/schema/inventory/region/api-verbs/list';
 import type { RegionModel } from '@/schema/inventory/region/model';
-// eslint-disable-next-line import/no-cycle
-import { store } from '@/store';
 
 import type {
     ReferenceItem, ReferenceLoadOptions, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
+// eslint-disable-next-line import/no-cycle
+import { useUserStore } from '@/store/user/user-store';
 
+// eslint-disable-next-line import/no-cycle
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
+// eslint-disable-next-line import/no-cycle
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
@@ -40,10 +42,10 @@ export const useRegionReferenceStore = defineStore('reference-region', () => {
     const state = reactive({
         items: null as RegionReferenceMap | null,
     });
-
+    const userStore = useUserStore();
     const getters = reactive({
         regionItems: asyncComputed<RegionReferenceMap>(async () => {
-            if (store.getters['user/getCurrentGrantInfo'].scope === 'USER') return {};
+            if (userStore.getters.getCurrentGrantInfo?.scope === 'USER') return {};
             if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),

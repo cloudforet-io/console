@@ -1,6 +1,7 @@
 import type { RouteConfig } from 'vue-router';
 
-import { store } from '@/store';
+import { pinia } from '@/store/pinia';
+import { useUserStore } from '@/store/user/user-store';
 
 import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
@@ -13,6 +14,7 @@ const IamContainer = () => import('@/services/iam/IamContainer.vue');
 const UserMainPage = () => import('@/services/iam/pages/UserMainPage.vue');
 const AppMainPage = () => import('@/services/iam/pages/AppMainPage.vue');
 
+const userStore = useUserStore(pinia);
 const iamRoutes: RouteConfig = {
     path: 'iam',
     name: IAM_ROUTE._NAME,
@@ -20,7 +22,8 @@ const iamRoutes: RouteConfig = {
         menuId: MENU_ID.IAM,
         translationId: MENU_INFO_MAP[MENU_ID.IAM].translationId,
     },
-    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
+    // TODO: Check PagePermissionType of pageAccessPermissionMap
+    redirect: (to) => getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap as unknown as Record<string, boolean>),
     component: IamContainer,
     children: [
         {

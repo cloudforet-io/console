@@ -5,11 +5,10 @@ import {
 
 import { includes } from 'lodash';
 
-import { store } from '@/store';
-
 import { ROOT_ROUTE } from '@/router/constant';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import type { MenuId } from '@/lib/menu/config';
 
@@ -20,11 +19,12 @@ import TopBarToolset from '@/common/modules/navigations/top-bar/modules/top-bar-
 const ALLOWED_MENUS_FOR_ALL_USERS = ['notifications', 'support', 'profile'];
 
 const appContextStore = useAppContextStore();
+const userStore = useUserStore();
 
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     openedMenu: '',
-    hasPermission: computed((() => store.getters['user/hasPermission'])),
+    hasPermission: computed((() => userStore.getters.hasPermission)),
     logoLink: computed(() => {
         if (state.isAdminMode) return { name: ROOT_ROUTE.ADMIN._NAME };
         return null;

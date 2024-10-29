@@ -7,10 +7,10 @@ import { clone } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PIconButton, PHeading } from '@cloudforet/mirinae';
 
-
 import type { AlertDeleteParameters } from '@/schema/monitoring/alert/api-verbs/delete';
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -39,12 +39,13 @@ const props = defineProps({
 });
 const alertPageStore = useAlertPageStore();
 const alertPageState = alertPageStore.state;
+const userStore = useUserStore();
 
 const router = useRouter();
 const route = useRoute();
 
 const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     loading: true,

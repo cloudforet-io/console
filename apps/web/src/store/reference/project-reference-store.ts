@@ -9,8 +9,6 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';
 import type { ProjectModel } from '@/schema/identity/project/model';
 import type { ProjectType } from '@/schema/identity/project/type';
-// eslint-disable-next-line import/no-cycle
-import { store } from '@/store';
 
 // eslint-disable-next-line import/no-cycle
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -18,7 +16,10 @@ import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-r
 import type {
     ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
+// eslint-disable-next-line import/no-cycle
+import { useUserStore } from '@/store/user/user-store';
 
+// eslint-disable-next-line import/no-cycle
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 
@@ -47,10 +48,10 @@ export const useProjectReferenceStore = defineStore('reference-project', () => {
     const _getters = reactive({
         projectGroup: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     });
-
+    const userStore = useUserStore();
     const getters = reactive({
         projectItems: asyncComputed<ProjectReferenceMap>(async () => {
-            if (store.getters['user/getCurrentGrantInfo'].scope === 'USER') return {};
+            if (userStore.getters.getCurrentGrantInfo?.scope === 'USER') return {};
             if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),

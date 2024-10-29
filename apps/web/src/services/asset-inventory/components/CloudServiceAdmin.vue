@@ -8,13 +8,12 @@ import {
     PHeading, PToolboxTable,
 } from '@cloudforet/mirinae';
 
-
 import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
 import type { ProjectModel } from '@/schema/identity/project/model';
-import { store } from '@/store';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
@@ -37,6 +36,7 @@ const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
 });
+const userStore = useUserStore();
 const state = reactive({
     fields: [
         { label: 'User ID', name: 'user_id' },
@@ -59,7 +59,7 @@ const state = reactive({
     searchText: '',
     pageLimit: 15,
     pageStart: 1,
-    timezone: computed(() => store.state.user.timezone ?? 'UTC'),
+    timezone: computed(() => userStore.state.timezone ?? 'UTC'),
 });
 
 const getProjectUserData = async () => {

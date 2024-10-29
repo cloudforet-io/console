@@ -15,7 +15,9 @@ import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-us
 import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
-import { store } from '@/store';
+
+import { pinia } from '@/store/pinia';
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -40,7 +42,7 @@ interface WorkspacePageState {
     usersSearchfilters: ConsoleFilter[],
     roles: RoleModel[],
 }
-
+const userStore = useUserStore(pinia);
 export const useWorkspacePageStore = defineStore('page-workspace', {
     state: (): WorkspacePageState => ({
         loading: false,
@@ -64,7 +66,7 @@ export const useWorkspacePageStore = defineStore('page-workspace', {
         roles: [],
     }),
     getters: {
-        timezone: () => store.state.user.timezone,
+        timezone: () => userStore.state.timezone || 'UTC',
         selectedWorkspaces: (state) => state.selectedIndices.reduce((refined: WorkspaceModel[], idx: number) : WorkspaceModel[] => {
             refined.push(state.workspaces[idx]);
             return refined;

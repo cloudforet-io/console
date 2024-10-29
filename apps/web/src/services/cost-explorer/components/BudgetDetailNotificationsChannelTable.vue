@@ -6,11 +6,11 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PBadge, PDataTable } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProtocolReferenceMap } from '@/store/reference/protocol-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -18,6 +18,7 @@ import { utcToTimezoneFormatter } from '@/services/iam/helpers/user-notification
 import type { NotiChannelItem } from '@/services/my-page/types/notification-channel-item-type';
 
 const allReferenceStore = useAllReferenceStore();
+const userStore = useUserStore();
 
 const getBadgeColor = (level: string) => {
     switch (level) {
@@ -53,7 +54,7 @@ const state = reactive({
         { name: 'schedule', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.FIELD.SCHEDULE') },
     ]),
     items: [] as NotiChannelItem[],
-    timezone: computed(() => store.state.user.timezone),
+    timezone: computed(() => userStore.state.timezone || 'UTC'),
     protocols: computed<ProtocolReferenceMap>(() => allReferenceStore.getters.protocol),
 });
 

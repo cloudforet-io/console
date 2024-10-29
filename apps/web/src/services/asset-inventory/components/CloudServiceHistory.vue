@@ -96,15 +96,14 @@
 
 import { useInfiniteScroll } from '@vueuse/core';
 import {
-    computed, getCurrentInstance, onMounted, reactive, toRefs, watch,
+    computed, onMounted, reactive, toRefs, watch,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
+import { useRoute } from 'vue-router/composables';
 
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import localeData from 'dayjs/plugin/localeData';
 
-import type { KeyItem, ValueHandler } from '@cloudforet/core-lib/component-util/query-search/type';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -112,6 +111,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PHeading, PToolbox, PDataLoader, PBadge, PSpinner,
 } from '@cloudforet/mirinae';
+import type { KeyItem, ValueHandler } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
 
 import { SpaceRouter } from '@/router';
@@ -120,7 +120,8 @@ import type { ChangeHistoryListParameters } from '@/schema/inventory/change-hist
 import type { ChangeHistoryModel } from '@/schema/inventory/change-history/model';
 import type { NoteListParameters } from '@/schema/inventory/note/api-verbs/list';
 import type { NoteModel } from '@/schema/inventory/note/model';
-import { store } from '@/store';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import VerticalTimeline from '@/common/components/vertical-timeline/VerticalTimeline.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -136,7 +137,7 @@ import type {
 } from '@/services/asset-inventory/types/cloud-service-detail-page-type';
 
 
-const makeCustomValueHandler = (distinctKey: string, cloudServiceId: string): ValueHandler => async (inputText: string) => {
+const makeCustomValueHandler = (distinctKey: string, cloudServiceId: string): ValueHandler => async (inputText) => {
     try {
         const { results } = await SpaceConnector.client.addOns.autocomplete.distinct({
             resource_type: 'inventory.ChangeHistory',
@@ -190,18 +191,19 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as Vue;
+        const route = useRoute();
+        const userStore = useUserStore();
         const state = reactive({
             loading: true,
             timelineWrapperRef: null as null | HTMLElement,
-            timezone: computed(() => store.state.user.timezone),
+            timezone: computed(() => userStore.state.timezone),
             selectedYear: dayjs.utc().format('YYYY'),
             selectedMonth: 'all',
             items: [] as CloudServiceHistoryItem[],
             noteItemMap: {} as { [key: string]: NoteModel[] },
             selectedHistoryItem: undefined as undefined | CloudServiceHistoryItem,
             selectedKeyName: undefined as undefined | string,
-            showDetailOverlay: computed(() => vm.$route.hash === `#${HISTORY_OVERLAY_HASH_NAME}`),
+            showDetailOverlay: computed(() => route.hash === `#${HISTORY_OVERLAY_HASH_NAME}`),
             totalCount: 0,
             pageStart: 1,
             searchText: '',

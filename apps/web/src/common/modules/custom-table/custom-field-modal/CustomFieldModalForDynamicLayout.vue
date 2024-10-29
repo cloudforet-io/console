@@ -9,12 +9,11 @@ import {
 } from '@cloudforet/mirinae';
 import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
 
-
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import type { UserState } from '@/store/modules/user/type';
+import type { UserState } from '@/store/user/type';
+import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -75,9 +74,10 @@ const emit = defineEmits<{(e: 'complete'): void;
 
 const appContextStore = useAppContextStore();
 const appContextGetters = appContextStore.getters;
+const userStore = useUserStore();
 
 let schema: any = {};
-const _userConfigMap = computed<UserState>(() => store.state.user);
+const _userConfigMap = computed<UserState>(() => userStore.state);
 
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),

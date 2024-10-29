@@ -25,7 +25,7 @@ import { useRouter } from 'vue-router/composables';
 
 import { PI, PButton } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -36,8 +36,10 @@ const router = useRouter();
 
 const emit = defineEmits(['sign-in', 'go-to-admin-sign-in']);
 
+const userStore = useUserStore();
+
 const state = reactive({
-    userId: computed(() => store.state.user.userId),
+    userId: computed(() => userStore.state.userId),
     token: '',
 });
 

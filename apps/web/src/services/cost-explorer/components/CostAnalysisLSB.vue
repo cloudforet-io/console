@@ -7,7 +7,6 @@ import {
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
@@ -18,6 +17,7 @@ import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { getCompoundKeyWithManagedCostQuerySetFavoriteKey } from '@/lib/helper/config-data-helper';
 
@@ -62,6 +62,7 @@ const route = useRoute();
 const { getProperRouteLocation } = useProperRouteLocation();
 
 const appContextStore = useAppContextStore();
+const userStore = useUserStore();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -69,7 +70,7 @@ const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
     dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     unifiedCostCurrency: computed(() => domainGetters.domainUnifiedCostCurrency ?? DEFAULT_UNIFIED_COST_CURRENCY),
-    isAdminUser: computed(() => store.state.user.roleType === 'DOMAIN_ADMIN'),
+    isAdminUser: computed(() => userStore.state.roleType === 'DOMAIN_ADMIN'),
 });
 const state = reactive({
     loading: true,

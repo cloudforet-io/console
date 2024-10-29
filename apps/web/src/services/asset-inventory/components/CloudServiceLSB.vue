@@ -10,13 +10,13 @@ import {
     PRadioGroup, PRadio, PLazyImg,
 } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
@@ -55,12 +55,13 @@ const cloudServiceDetailPageState = cloudServiceDetailPageStore.$state;
 const allReferenceStore = useAllReferenceStore();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
+const userStore = useUserStore();
 
 const route = useRoute();
 const router = useRouter();
 
 const storeState = reactive({
-    currentGrantInfo: computed(() => store.getters['user/getCurrentGrantInfo']),
+    currentGrantInfo: computed(() => userStore.getters.getCurrentGrantInfo),
     favoriteItems: computed(() => favoriteGetters.cloudServiceItems),
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
 });
@@ -208,7 +209,7 @@ const handleSelectProvider = (selected: string) => {
 };
 
 /* Watchers */
-watch([() => state.detailPageParams, () => storeState.currentGrantInfo.scope], async ([params, scope]) => {
+watch([() => state.detailPageParams, () => storeState.currentGrantInfo?.scope], async ([params, scope]) => {
     if (scope === 'USER') return;
     if (!params) return;
     await initCloudServiceDetailLSB(params);

@@ -23,8 +23,9 @@ import { CONTEXT_MENU_TYPE } from '@cloudforet/mirinae/src/inputs/context-menu/t
 import type { ValueItem } from '@cloudforet/mirinae/src/inputs/search/query-search/type';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
@@ -62,9 +63,10 @@ const moreContextMenuRef = ref<any|null>(null);
 const { width: containerWidth } = useElementSize(componentRef);
 const { top: moreButtonTop, height: moreButtonHeight } = useElementBounding(moreButtonRef);
 
+const userStore = useUserStore();
 const storeState = reactive({
-    isWorkspaceMember: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
-    language: computed<string>(() => store.state.user.language),
+    isWorkspaceMember: computed(() => userStore.getters.getCurrentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
+    language: computed<string>(() => userStore.state.language ?? ''),
 
     selectedBookmark: computed<BookmarkItem|undefined>(() => bookmarkState.selectedBookmark),
     selectedBookmarks: computed<BookmarkItem[]>(() => bookmarkState.selectedBookmarks),

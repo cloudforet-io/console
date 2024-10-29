@@ -5,7 +5,6 @@ import { useRoute, useRouter } from 'vue-router/composables';
 
 import { isEmpty, get, cloneDeep } from 'lodash';
 
-import type { ToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter, ConsoleFilterValue } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -23,6 +22,7 @@ import type {
     DynamicLayout,
     DynamicLayoutOptions,
 } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
 
 import { QueryType } from '@/schema/_common/api-verbs/export';
 import type { ExportParameter } from '@/schema/_common/api-verbs/export';
@@ -30,12 +30,12 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service/api-verbs/get';
 import type { CloudServiceListParameters } from '@/schema/inventory/cloud-service/api-verbs/list';
 import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
-import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
 import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper';
@@ -92,6 +92,7 @@ const assetInventorySettingsStore = useAssetInventorySettingsStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const appContextStore = useAppContextStore();
 const appContextGetters = appContextStore.getters;
+const userStore = useUserStore();
 assetInventorySettingsStore.initState();
 
 const route = useRoute();
@@ -123,7 +124,7 @@ const state = reactive({
 const typeOptionState = reactive({
     loading: true,
     totalCount: 0,
-    timezone: computed(() => store.state.user.timezone || 'UTC'),
+    timezone: computed(() => userStore.state.timezone || 'UTC'),
     selectIndex: [] as number[],
 });
 
@@ -161,7 +162,7 @@ const tableState = reactive({
         if (!tableState.schema) return [];
         return tableState.schema.options.fields ?? [];
     }),
-    hasAdminOrWorkspaceOwnerRole: computed(() => store.getters['user/hasAdminOrWorkspaceOwnerRole']),
+    hasAdminOrWorkspaceOwnerRole: computed(() => userStore.getters.hasAdminOrWorkspaceOwnerRole),
     defaultSearchQuery: [],
 });
 

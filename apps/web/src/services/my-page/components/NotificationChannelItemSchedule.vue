@@ -11,8 +11,9 @@ import {
 
 import type { ProjectChannelSetScheduleParameters } from '@/schema/notification/project-channel/api-verbs/set-schedule';
 import type { UserChannelSetScheduleParameters } from '@/schema/notification/user-channel/api-verbs/set-schedule';
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -36,14 +37,14 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{(event: 'change'): void;
     (event: 'edit'): void;
 }>();
+const userStore = useUserStore();
 
-const timezoneForFormatter = computed(() => store.state.user.timezone).value;
 const state = reactive({
     scheduleModeForEdit: props.channelData.is_scheduled,
     scheduleForEdit: props.channelData.schedule,
     isScheduleValid: false,
-    displayStartHour: computed(() => utcToTimezoneFormatter((props.channelData.schedule?.start_hour || 0), timezoneForFormatter)),
-    displayEndHour: computed(() => utcToTimezoneFormatter((props.channelData.schedule?.end_hour || 0), timezoneForFormatter)),
+    displayStartHour: computed(() => utcToTimezoneFormatter((props.channelData.schedule?.start_hour || 0), userStore.state.timezone)),
+    displayEndHour: computed(() => utcToTimezoneFormatter((props.channelData.schedule?.end_hour || 0), userStore.state.timezone)),
 });
 const {
     state: notificationItemState,

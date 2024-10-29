@@ -12,12 +12,11 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
-import { store } from '@/store';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import type { MenuId } from '@/lib/menu/config';
@@ -49,15 +48,16 @@ const recentStore = useRecentStore();
 const recentState = recentStore.state;
 const landingPageStore = useLandingPageStore();
 const landingPageStoreGetters = landingPageStore.getters;
+const userStore = useUserStore();
 
 const router = useRouter();
 const route = useRoute();
 const { width } = useWindowSize();
 
 const storeState = reactive({
-    userId: computed<string>(() => store.state.user.userId),
+    userId: computed<string>(() => userStore.state.userId ?? ''),
     loading: computed<boolean>(() => landingPageStoreGetters.loading),
-    isDomainAdmin: computed<boolean>(() => store.getters['user/isDomainAdmin']),
+    isDomainAdmin: computed<boolean>(() => userStore.getters.isDomainAdmin),
     workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
     favoriteList: computed<FavoriteItem[]>(() => sortBy(favoriteGetters.workspaceItems, 'label')),
     recentWorkspace: computed<RecentConfig[]>(() => recentState.recentMenuList.map((i) => ({
@@ -65,7 +65,7 @@ const storeState = reactive({
         workspaceId: i.data.workspace_id,
         itemId: i.data.id,
     }))),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     searchText: '',

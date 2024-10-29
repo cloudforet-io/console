@@ -14,8 +14,9 @@ import type { NoteCreateParameters } from '@/schema/monitoring/note/api-verbs/cr
 import type { NoteDeleteParameters } from '@/schema/monitoring/note/api-verbs/delete';
 import type { NoteListParameters } from '@/schema/monitoring/note/api-verbs/list';
 import type { NoteModel } from '@/schema/monitoring/note/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -25,10 +26,12 @@ const props = defineProps<{
     manageDisabled?: boolean;
 }>();
 
+const userStore = useUserStore();
+
 const state = reactive({
     noteInput: '',
     noteList: [] as NoteModel[],
-    timezone: computed<string>(() => store.state.user.timezone),
+    timezone: computed<string>(() => userStore.state.timezone ?? 'UTC'),
     menuItems: [
         {
             label: 'Delete', name: 'delete',

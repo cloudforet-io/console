@@ -16,10 +16,11 @@ import type {
     ValueItem,
 } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import type { MenuId } from '@/lib/menu/config';
@@ -41,6 +42,7 @@ const bookmarkStore = useBookmarkStore();
 const bookmarkPageStore = useBookmarkPageStore();
 const bookmarkPageState = bookmarkPageStore.state;
 const bookmarkPageGetters = bookmarkPageStore.getters;
+const userStore = useUserStore();
 
 const route = useRoute();
 const router = useRouter();
@@ -55,7 +57,7 @@ const storeState = reactive({
     loading: computed<boolean>(() => bookmarkPageState.loading),
     selectedType: computed<string>(() => bookmarkPageState.selectedType),
     searchFilter: computed<ConsoleFilter[]>(() => bookmarkPageState.searchFilter),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     group: computed<string>(() => route.params.group),

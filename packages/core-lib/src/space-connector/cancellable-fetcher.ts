@@ -1,5 +1,7 @@
-import type { AxiosRequestConfig, CancelTokenSource } from 'axios';
+import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
+
+import type { MockRequestConfig } from '@/space-connector';
 
 
 interface CancelledResponse {
@@ -13,17 +15,17 @@ interface SucceedResponse<T> {
 type CancellableFetcherResponse<T> = CancelledResponse|SucceedResponse<T>;
 
 interface Fetcher<Param, Res> {
-    (params: Param, config?: AxiosRequestConfig): Promise<Res>
+    (params: Param, config?: MockRequestConfig): Promise<Res>
 }
 
 export interface CancellableFetcher<Param, Res> {
-    (params: Param, config?: AxiosRequestConfig): Promise<CancellableFetcherResponse<Res>>
+    (params: Param, config?: MockRequestConfig): Promise<CancellableFetcherResponse<Res>>
 }
 
 export function getCancellableFetcher<Param extends Record<string, any> = Record<string, any>, Res = any>(fetcher: Fetcher<Param, Res>): CancellableFetcher<Param, Res> {
     let cancelTokenSource: CancelTokenSource|undefined;
 
-    return async (params: Param, config?: AxiosRequestConfig) => {
+    return async (params: Param, config?: MockRequestConfig) => {
         try {
             if (cancelTokenSource) {
                 cancelTokenSource.cancel('[getCancellableFetcher] Next request has been called.');

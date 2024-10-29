@@ -17,7 +17,8 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
-import { store } from '@/store';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -41,6 +42,7 @@ const emit = defineEmits<{(e: 'update:role', formState): void,
     (e: 'update:is-changed-toggle', type: string): void,
 }>();
 const userPageStore = useUserPageStore();
+const userStore = useUserStore();
 
 const roleState = reactive({
     loading: true,
@@ -143,7 +145,7 @@ watch(() => roleState.proxySelectedItems, (role) => {
                                    :search-text="roleState.searchText"
                                    :selected="roleState.selectedItems"
                                    :handler="roleMenuHandler"
-                                   :disabled="roleState.data.user_id === store.state.user.userId"
+                                   :disabled="roleState.data.user_id === userStore.state.userId"
                                    is-filterable
                                    show-delete-all-button
                                    class="role-select-dropdown"

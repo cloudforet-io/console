@@ -14,8 +14,9 @@ import type { RoleDisableParameters } from '@/schema/identity/role/api-verbs/dis
 import type { RoleEnableParameters } from '@/schema/identity/role/api-verbs/enable';
 import { ROLE_STATE } from '@/schema/identity/role/constant';
 import type { RoleState } from '@/schema/identity/role/type';
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -42,13 +43,14 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const rolePageStore = useRolePageStore();
+const userStore = useUserStore();
 
 const emit = defineEmits<{(e: ':update:visible'): void,
     (e: 'refresh'): void,
 }>();
 
 const storeState = reactive({
-    timezone: computed(() => store.state.user.timezone ?? 'UTC'),
+    timezone: computed(() => userStore.state.timezone || 'UTC'),
 });
 const state = reactive({
     loading: false,

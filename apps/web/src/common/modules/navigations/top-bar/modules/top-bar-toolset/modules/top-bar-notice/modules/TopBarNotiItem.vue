@@ -10,7 +10,7 @@ import {
     PI, PIconButton,
 } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
+import { useUserStore } from '@/store/user/user-store';
 
 import {
     NOTIFICATION_TYPE_ICONS,
@@ -39,8 +39,10 @@ const emit = defineEmits<{(event: 'select'): void;
     (event: 'delete'): void;
 }>();
 
+const userStore = useUserStore();
+
 const state = reactive({
-    timezone: computed<string>(() => store.state.user.timezone),
+    timezone: computed<string>(() => userStore.state.timezone || 'UTC'),
     occurred: computed<string>(() => {
         if (!props.createdAt) return '';
         return dayjs.tz(dayjs.utc(props.createdAt), state.timezone).format('YYYY-MM-DD HH:mm');

@@ -6,8 +6,9 @@ import { clone } from 'lodash';
 
 import { PTab } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import type { MenuId } from '@/lib/menu/config';
@@ -27,12 +28,13 @@ import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-so
 
 const dataSourcesPageStore = useDataSourcesPageStore();
 const dataSourcesPageState = dataSourcesPageStore.state;
+const userStore = useUserStore();
 
 const route = useRoute();
 
 const storeState = reactive({
     activeTab: computed<string>(() => dataSourcesPageState.activeTab),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     selectedMenuId: computed(() => {

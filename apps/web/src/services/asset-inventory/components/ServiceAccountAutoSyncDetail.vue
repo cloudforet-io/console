@@ -6,8 +6,9 @@ import { range } from 'lodash';
 
 import { PFieldGroup, PFieldTitle } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import ServiceAccountAutoSyncMappingMethod
     from '@/services/asset-inventory/components/ServiceAccountAutoSyncMappingMethod.vue';
@@ -15,10 +16,11 @@ import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/se
 
 const serviceAccountPageStore = useServiceAccountPageStore();
 const serviceAccountPageFormState = serviceAccountPageStore.formState;
+const userStore = useUserStore();
 const hoursMatrix: number[] = range(24);
 
 const state = reactive({
-    timezone: computed<string>(() => store.state.user.timezone),
+    timezone: computed<string>(() => userStore.state.timezone || 'UTC'),
     scheduleHelpText: computed(() => i18n.t('INVENTORY.SERVICE_ACCOUNT.CREATE.TIMEZONE', { timezone: state.timezone })),
     timezoneAppliedHours: computed<number[]>(() => {
         if (state.timezone === 'UTC') return serviceAccountPageFormState.scheduleHours;

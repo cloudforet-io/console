@@ -6,20 +6,22 @@ import type { UserProfileConfirmMfaParameters } from '@/schema/identity/user-pro
 import type { UserProfileEnableMfaParameters } from '@/schema/identity/user-profile/api-verbs/enable-mfa';
 import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
 import type { UserDisableMfaParameters } from '@/schema/identity/user/api-verbs/disable-mfa';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { UserState } from '@/store/modules/user/type';
+import { pinia } from '@/store/pinia';
+import type { UserState } from '@/store/user/type';
+import { useUserStore } from '@/store/user/user-store';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export const postEnableMfa = async (body: UserProfileEnableMfaParameters, setUser?: boolean): Promise<void|Error> => {
+    const userStore = useUserStore(pinia);
     try {
         const response = await SpaceConnector.clientV2.identity.userProfile.enableMfa<UserProfileEnableMfaParameters>(body);
         if (setUser) {
-            await store.dispatch('user/setUser', response);
+            await userStore.setUser(response);
         }
         if (response.mfa.mfa_type === MULTI_FACTOR_AUTH_TYPE.EMAIL) {
             showSuccessMessage(i18n.t('COMMON.MFA_MODAL.ALT_S_SENT_EMAIL'), '');

@@ -9,8 +9,9 @@ import {
 import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 
 import type { AgentModel } from '@/schema/identity/agent/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import config from '@/lib/config';
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
@@ -40,6 +41,8 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update:visible'): void;
     (e: 'close'): void;
 }>();
+
+const userStore = useUserStore();
 const serviceAccountAgentStore = useServiceAccountAgentStore();
 
 const storeState = reactive({
@@ -298,7 +301,7 @@ watch(() => props.visible, (visible) => {
                             <p>
                                 {{ $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.CONFLICT_INFO') }}
                             </p>
-                            <p-link :href="`https://cloudforet.io/${store.state.user.language}/docs/guides/account-hierarchy/kubernetes`"
+                            <p-link :href="`https://cloudforet.io/${userStore.state.language || 'en'}/docs/guides/account-hierarchy/kubernetes`"
                                     highlight
                                     :action-icon="ACTION_ICON.EXTERNAL_LINK"
                             >

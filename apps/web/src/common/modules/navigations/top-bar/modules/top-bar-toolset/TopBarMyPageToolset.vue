@@ -19,15 +19,16 @@ import {
 
 import { PTooltip } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
+import { useUserStore } from '@/store/user/user-store';
 
 import TopBarAdminToggleButton
     from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-admin-toggle-button/TopBarAdminToggleButton.vue';
 import TopBarProfile from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-profile/TopBarProfile.vue';
 
+const userStore = useUserStore();
 const state = reactive({
-    isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
-    timezone: computed(() => store.state.user.timezone),
+    isDomainAdmin: computed(() => userStore.getters.isDomainAdmin),
+    timezone: computed(() => userStore.state.timezone || 'UTC'),
     profileMenuVisible: false,
 });
 

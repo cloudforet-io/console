@@ -8,12 +8,12 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { PublicDashboardListParameters } from '@/schema/dashboard/public-dashboard/api-verbs/list';
 import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
-// eslint-disable-next-line import/no-cycle
-import { store } from '@/store';
 
 import type {
     ReferenceItem, ReferenceLoadOptions, ReferenceMap,
 } from '@/store/reference/type';
+// eslint-disable-next-line import/no-cycle
+import { useUserStore } from '@/store/user/user-store';
 
 
 interface PublicDashboardResourceItemData {
@@ -34,9 +34,10 @@ export const usePublicDashboardReferenceStore = defineStore('reference-dashboard
         items: null as PublicDashboardReferenceMap | null,
     });
 
+    const userStore = useUserStore();
     const getters = reactive({
         publicDashboardItems: asyncComputed<PublicDashboardReferenceMap>(async () => {
-            if (store.getters['user/getCurrentGrantInfo'].scope === 'USER') return {};
+            if (userStore.getters.getCurrentGrantInfo?.scope === 'USER') return {};
             if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),

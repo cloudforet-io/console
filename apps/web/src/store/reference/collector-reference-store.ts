@@ -8,16 +8,18 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CollectorListParameters } from '@/schema/inventory/collector/api-verbs/list';
 import type { CollectorModel } from '@/schema/inventory/collector/model';
-// eslint-disable-next-line import/no-cycle
-import { store } from '@/store';
 
 import type {
     ReferenceItem, ReferenceLoadOptions, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
+// eslint-disable-next-line import/no-cycle
+import { useUserStore } from '@/store/user/user-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
+// eslint-disable-next-line import/no-cycle
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
+// eslint-disable-next-line import/no-cycle
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export type CollectorItem = Required<Pick<ReferenceItem<CollectorModel>, 'key'|'label'|'name'|'icon'>>;
@@ -31,9 +33,10 @@ export const useCollectorReferenceStore = defineStore('reference-collector', () 
         items: null as CollectorReferenceMap | null,
     });
 
+    const userStore = useUserStore();
     const getters = reactive({
         collectorItems: asyncComputed<CollectorReferenceMap>(async () => {
-            if (store.getters['user/getCurrentGrantInfo'].scope === 'USER') return {};
+            if (userStore.getters.getCurrentGrantInfo?.scope === 'USER') return {};
             if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),

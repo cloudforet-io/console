@@ -11,12 +11,12 @@ import { iso8601Formatter } from '@cloudforet/utils';
 import type { AlertModel } from '@/schema/monitoring/alert/model';
 import type { EscalationPolicyGetParameters } from '@/schema/monitoring/escalation-policy/api-verbs/get';
 import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
@@ -38,6 +38,7 @@ const props = defineProps<{
 const allReferenceStore = useAllReferenceStore();
 const alertPageStore = useAlertPageStore();
 const alertPageState = alertPageStore.state;
+const userStore = useUserStore();
 const { getProperRouteLocation } = useProperRouteLocation();
 
 
@@ -68,7 +69,7 @@ const state = reactive({
     webhooks: computed<WebhookReferenceMap>(() => allReferenceStore.getters.webhook),
     data: computed<Partial<AlertModel>>(() => alertPageState.alertData ?? {}),
     escalationPolicyName: '',
-    timezone: computed(() => store.state.user.timezone),
+    timezone: computed(() => userStore.state.timezone),
 });
 
 const getEscalationPolicy = async () => {

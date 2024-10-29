@@ -10,13 +10,13 @@ import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { DashboardType } from '@/schema/dashboard/_types/dashboard-type';
 import type { PrivateDashboardCreateParameters } from '@/schema/dashboard/private-dashboard/api-verbs/create';
 import type { PublicDashboardCreateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -42,6 +42,7 @@ const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
 
 const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
+const userStore = useUserStore();
 const allReferenceStore = useAllReferenceStore();
 const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
@@ -101,7 +102,7 @@ const cloneDashboard = async (): Promise<string|undefined> => {
             layouts: _sharedLayouts,
             options: dashboardDetailState.options || {},
             labels: dashboardDetailState.labels || [],
-            tags: { created_by: store.state.user.userId },
+            tags: { created_by: userStore.state.userId },
         };
         if (storeState.isAdminMode) {
             state.isPrivate = false;

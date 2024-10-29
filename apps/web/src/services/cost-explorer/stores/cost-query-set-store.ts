@@ -7,9 +7,9 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
-import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -18,6 +18,7 @@ import { ADMIN_MANAGED_COST_QUERY_SET_LIST, MANAGED_COST_QUERY_SET_LIST } from '
 
 export const useCostQuerySetStore = defineStore('cost-query-set', () => {
     const appContextStore = useAppContextStore();
+    const userStore = useUserStore();
 
     const _state = reactive({
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -62,7 +63,7 @@ export const useCostQuerySetStore = defineStore('cost-query-set', () => {
         }
 
         const apiQueryHelper = new ApiQueryHelper();
-        apiQueryHelper.setFilters([{ k: 'user_id', v: store.state.user.userId, o: '=' }]);
+        apiQueryHelper.setFilters([{ k: 'user_id', v: userStore.state.userId ?? '', o: '=' }]);
         if (_state.isAdminMode) {
             apiQueryHelper.addFilter({ k: 'workspace_id', v: null, o: '=' });
         } else {

@@ -8,13 +8,14 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { TrustedAccountListParameters } from '@/schema/identity/trusted-account/api-verbs/list';
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
-// eslint-disable-next-line import/no-cycle
-import { store } from '@/store';
 
 import type {
     ReferenceItem, ReferenceLoadOptions, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
+// eslint-disable-next-line import/no-cycle
+import { useUserStore } from '@/store/user/user-store';
 
+// eslint-disable-next-line import/no-cycle
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
@@ -28,10 +29,10 @@ export const useTrustedAccountReferenceStore = defineStore('reference-trusted-ac
     const state = reactive({
         items: null as TrustedAccountReferenceMap | null,
     });
-
+    const userStore = useUserStore();
     const getters = reactive({
         trustedAccountItems: asyncComputed<TrustedAccountReferenceMap>(async () => {
-            if (store.getters['user/getCurrentGrantInfo'].scope === 'USER') return {};
+            if (userStore.getters.getCurrentGrantInfo?.scope === 'USER') return {};
             if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),

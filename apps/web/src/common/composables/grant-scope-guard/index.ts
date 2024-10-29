@@ -1,9 +1,9 @@
 import { computed, reactive, watch } from 'vue';
 
 import type { GrantScope } from '@/schema/identity/token/type';
-import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -12,9 +12,10 @@ interface GrantScopeGuardReturnType {
 }
 export const useGrantScopeGuard = (requiredScopes: GrantScope[], apiFunction: () => Promise<void>): GrantScopeGuardReturnType => {
     const appContextStore = useAppContextStore();
+    const userStore = useUserStore();
 
     const state = reactive({
-        currentGrantInfo: computed(() => store.getters['user/getCurrentGrantInfo'] || { scope: 'USER' }),
+        currentGrantInfo: computed(() => userStore.getters.getCurrentGrantInfo || { scope: 'USER' }),
         isLoading: computed(() => appContextStore.getters.globalGrantLoading),
         isValidScope: computed(() => requiredScopes.includes(state.currentGrantInfo.scope)),
     });

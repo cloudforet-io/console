@@ -9,10 +9,8 @@ import { clone } from 'lodash';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PHorizontalLayout } from '@cloudforet/mirinae';
 
-
-import { store } from '@/store';
-
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import type { MenuId } from '@/lib/menu/config';
@@ -36,14 +34,15 @@ import { useUserPageStore } from '@/services/iam/store/user-page-store';
 const appContextStore = useAppContextStore();
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
+const userStore = useUserStore();
 
 const route = useRoute();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     globalGrantLoading: computed(() => appContextStore.getters.globalGrantLoading),
-    grantInfo: computed(() => store.getters['user/getCurrentGrantInfo']),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    grantInfo: computed(() => userStore.getters.getCurrentGrantInfo),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     selectedMenuId: computed(() => {
@@ -68,9 +67,9 @@ const refreshUserList = async () => {
         .setPageStart(userPageState.pageStart).setPageLimit(userPageState.pageLimit)
         .setFilters(userPageState.searchFilters);
     try {
-        if (storeState.isAdminMode && storeState.grantInfo.scope === 'DOMAIN') {
+        if (storeState.isAdminMode && storeState.grantInfo?.scope === 'DOMAIN') {
             await userPageStore.listUsers({ query: userListApiQueryHelper.data });
-        } else if (storeState.grantInfo.scope === 'WORKSPACE') {
+        } else if (storeState.grantInfo?.scope === 'WORKSPACE') {
             await userPageStore.listWorkspaceUsers({ query: userListApiQueryHelper.data });
         }
     } finally {

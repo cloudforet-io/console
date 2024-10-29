@@ -15,7 +15,7 @@ const API_REFLECTION_URL_V2 = '/console-api/api/reflection';
 
 const CHECK_TOKEN_TIME = 1000 * 30;
 
-interface MockRequestConfig extends CustomAxiosRequestConfig {
+export interface MockRequestConfig extends CustomAxiosRequestConfig {
     mockMode?: boolean;
     mockPath?: string;
 }

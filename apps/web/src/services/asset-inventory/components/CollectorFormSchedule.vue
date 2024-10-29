@@ -57,8 +57,9 @@ import {
 
 import type { CollectorUpdateParameters } from '@/schema/inventory/collector/api-verbs/update';
 import type { CollectorModel } from '@/schema/inventory/collector/model';
-import { store } from '@/store';
 import { i18n as i18nTranslator } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -77,11 +78,12 @@ const props = defineProps<{
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
+const userStore = useUserStore();
 
 const hoursMatrix: number[] = range(24);
 const selectedUtcHoursSet = new Set<number>();
 const state = reactive({
-    timezone: computed<string>(() => store.state.user.timezone),
+    timezone: computed<string>(() => userStore.state.timezone ?? 'UTC'),
     isAllHoursSelected: computed<boolean>(() => collectorFormState.scheduleHours.length === size(hoursMatrix)),
     timezoneAppliedHours: computed<number[]>(() => {
         if (state.timezone === 'UTC') return collectorFormState.scheduleHours;

@@ -11,7 +11,6 @@ import {
     PNoticeAlert, PToastAlert, PIconModal, PSidebar, PDataLoader,
 } from '@cloudforet/mirinae';
 
-
 import { store } from '@/store';
 
 import { EXTERNAL_PAGE_ROUTE } from '@/router/constant';
@@ -21,6 +20,7 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useErrorStore } from '@/store/error/error-store';
 import { useGlobalUIStore } from '@/store/global-ui/global-ui-store';
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
+import { useUserStore } from '@/store/user/user-store';
 
 import config from '@/lib/config';
 import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
@@ -48,9 +48,9 @@ const state = reactive({
     isMyPage: computed(() => route.path.startsWith('/my-page')),
     isExpired: computed(() => !state.isRoutingToSignIn && errorStore.state.visibleSessionExpiredError && state.routeScope !== 'EXCLUDE_AUTH'),
     isRoutingToSignIn: false,
-    isEmailVerified: computed(() => store.state.user.emailVerified),
-    userId: computed<string>(() => store.state.user.userId),
-    email: computed<string>(() => store.state.user.email),
+    isEmailVerified: computed(() => userStore.state.emailVerified),
+    userId: computed<string>(() => userStore.state.userId ?? ''),
+    email: computed<string>(() => userStore.state.email ?? ''),
     notificationEmailModalVisible: false,
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
     globalGrantLoading: computed(() => appContextStore.getters.globalGrantLoading),
@@ -60,6 +60,7 @@ const appContextStore = useAppContextStore();
 const errorStore = useErrorStore();
 const globalUIStore = useGlobalUIStore();
 const globalUIGetters = globalUIStore.getters;
+const userStore = useUserStore();
 
 const topNotiRef = ref(null);
 useResizeObserver(topNotiRef, (entries) => {
@@ -73,7 +74,7 @@ const goToSignIn = async () => {
         name: AUTH_ROUTE.SIGN_OUT._NAME,
         query: { previousPath: route.fullPath },
     };
-    store.commit('user/setCurrentGrantInfo', undefined);
+    userStore.setCurrentGrantInfo(undefined);
     errorStore.setVisibleSessionExpiredError(false);
 
     await router.push(res);

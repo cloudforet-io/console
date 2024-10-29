@@ -27,12 +27,12 @@ import type { PublicDashboardCreateParameters } from '@/schema/dashboard/public-
 import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
 import type { PublicFolderCreateParameters } from '@/schema/dashboard/public-folder/api-verbs/create';
 import type { PublicFolderModel } from '@/schema/dashboard/public-folder/model';
-import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
@@ -63,6 +63,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
     const favoriteStore = useFavoriteStore();
     const favoriteGetters = favoriteStore.getters;
     const allReferenceStore = useAllReferenceStore();
+    const userStore = useUserStore();
 
     const _state = reactive({
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -267,7 +268,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
             layouts: _createdLayouts,
             options: _dashboard.options || {},
             labels: _dashboard.labels || [],
-            tags: { created_by: store.state.user.userId },
+            tags: { created_by: userStore.state.userId },
             folder_id: folderId,
         };
         if (_state.isAdminMode) {
@@ -286,7 +287,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
             const _existingFolderNameList = isPrivate ? state.privateFolderItems.map((d) => d.name) : state.publicFolderItems.map((d) => d.name);
             const params: FolderCreateParams = {
                 name: getClonedName(_existingFolderNameList, name),
-                tags: { created_by: store.state.user.userId },
+                tags: { created_by: userStore.state.userId },
             };
             if (!isPrivate) {
                 (params as PublicFolderCreateParameters).resource_group = _state.isAdminMode ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE;

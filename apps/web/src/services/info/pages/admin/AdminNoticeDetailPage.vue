@@ -9,12 +9,12 @@ import { clone } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButton, PHeading, PHeadingLayout } from '@cloudforet/mirinae';
 
-
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { PostSendParameters } from '@/schema/board/post/api-verbs/send';
 import type { PostModel } from '@/schema/board/post/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import {
@@ -43,16 +43,17 @@ const props = defineProps<{
 const { getProperRouteLocation } = useProperRouteLocation();
 const noticeDetailStore = useNoticeDetailStore();
 const noticeDetailState = noticeDetailStore.state;
+const userStore = useUserStore();
 
 const router = useRouter();
 const route = useRoute();
 
 const storeState = reactive({
     post: computed<undefined|PostModel>(() => noticeDetailState.post),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
-    hasPermissionToEditOrDelete: computed<boolean>(() => store.getters['user/isDomainAdmin']),
+    hasPermissionToEditOrDelete: computed<boolean>(() => userStore.getters.isDomainAdmin),
     deleteModalVisible: false,
     sendLoading: false,
     selectedMenuId: computed(() => {

@@ -2,7 +2,8 @@ import type { RouteConfig } from 'vue-router';
 
 import { upperCase } from 'lodash';
 
-import { store } from '@/store';
+import { pinia } from '@/store/pinia';
+import { useUserStore } from '@/store/user/user-store';
 
 import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
@@ -37,6 +38,7 @@ const CollectorHistoryPage = () => import('@/services/asset-inventory/pages/Coll
 const CollectJobPage = () => import('@/services/asset-inventory/pages/CollectHistoryJobPage.vue');
 const CollectorDetailPage = () => import('@/services/asset-inventory/pages/CollectorDetailPage.vue');
 
+const userStore = useUserStore(pinia);
 const assetInventoryRoute: RouteConfig = {
     path: 'asset-inventory',
     name: ASSET_INVENTORY_ROUTE._NAME,
@@ -44,7 +46,8 @@ const assetInventoryRoute: RouteConfig = {
         menuId: MENU_ID.ASSET_INVENTORY,
         translationId: MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY].translationId,
     },
-    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
+    // TODO: Check PagePermissionType of pageAccessPermissionMap
+    redirect: (to) => getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap as unknown as Record<string, boolean>),
     component: AssetInventoryContainer,
     children: [
         {

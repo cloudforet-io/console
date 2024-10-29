@@ -27,8 +27,9 @@ import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
 import type { WorkspaceModel, WorkspaceState } from '@/schema/identity/workspace/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -68,9 +69,10 @@ const props = withDefaults(defineProps<Props>(), {
 
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
+const userStore = useUserStore();
 
 const storeState = reactive({
-    timezone: computed(() => store.state.user.timezone ?? 'UTC'),
+    timezone: computed(() => userStore.state.timezone ?? 'UTC'),
 });
 const state = reactive({
     loading: false,

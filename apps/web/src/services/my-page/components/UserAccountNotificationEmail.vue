@@ -7,8 +7,9 @@ import {
     PI, PTextInput, PFieldGroup, PButton, PBadge,
 } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import { emailValidator } from '@/lib/helper/user-validation-helper';
 import { postUserProfileValidationEmail } from '@/lib/helper/verify-email-helper';
@@ -20,10 +21,11 @@ import { MODAL_TYPE } from '@/common/modules/modals/notification-email-modal/typ
 
 import UserAccountModuleContainer from '@/services/my-page/components/UserAccountModuleContainer.vue';
 
+const userStore = useUserStore();
 const state = reactive({
-    authType: computed(() => store.state.user.authType),
-    verified: computed(() => store.state.user.emailVerified),
-    userId: computed(() => store.state.user.userId),
+    authType: computed(() => userStore.state.authType),
+    verified: computed(() => userStore.state.emailVerified),
+    userId: computed(() => userStore.state.userId),
     loading: false,
     isModalVisible: false,
     modalType: '',
@@ -53,7 +55,7 @@ const handleClickVerifyButton = async (type: string) => {
         await postUserProfileValidationEmail({
             email: notificationEmail.value,
         });
-        await store.dispatch('user/setUser', { email: notificationEmail });
+        await userStore.setUser({ email: notificationEmail.value });
     } catch (e: any) {
         ErrorHandler.handleError(e);
     } finally {
@@ -64,7 +66,7 @@ const handleClickVerifyButton = async (type: string) => {
 };
 
 /* Watcher */
-watch(() => store.state.user.email, (value) => {
+watch(() => userStore.state.email, (value) => {
     let result = value;
     if (value === '') {
         if (state.authType === 'LOCAL') {

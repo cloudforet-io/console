@@ -14,13 +14,13 @@ import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
 import type { Currency } from '@/store/modules/display/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 
@@ -41,11 +41,12 @@ const workspaceGroupPageState = workspaceGroupPageStore.state;
 const workspaceTabState = workspaceGroupPageStore.workspaceTabState;
 const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
 const allReferenceStore = useAllReferenceStore();
+const userStore = useUserStore();
 
 const route = useRoute();
 
 const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 
 interface WorkspaceTableItem extends WorkspaceModel {
@@ -62,7 +63,7 @@ const state = reactive({
     currency: computed<Currency|undefined>(() => workspaceGroupPageGetters.currency),
 });
 const tableState = reactive({
-    timezone: computed(() => store.state.user.timezone),
+    timezone: computed(() => userStore.state.timezone || 'UTC'),
     workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
     tableItems: computed<WorkspaceTableItem[]>(() => workspaceTabState.workspacesInSelectedGroup?.map((workspace) => ({
         ...workspace,

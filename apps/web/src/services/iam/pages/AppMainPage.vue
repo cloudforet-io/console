@@ -11,8 +11,9 @@ import {
 } from '@cloudforet/mirinae';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import type { MenuId } from '@/lib/menu/config';
@@ -28,12 +29,13 @@ import { useAppPageStore } from '@/services/iam/store/app-page-store';
 
 const appPageStore = useAppPageStore();
 const appPageState = appPageStore.$state;
+const userStore = useUserStore();
 
 const route = useRoute();
 
 const storeState = reactive({
-    roleType: computed(() => store.state.user.roleType),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    roleType: computed(() => userStore.state.roleType),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 
 const tabs = [{
@@ -45,7 +47,7 @@ const tabs = [{
 }];
 const state = reactive({
     activeTab: 'rest',
-    userId: computed(() => store.state.user.userId),
+    userId: computed(() => userStore.state.userId ?? ''),
     selectedMenuId: computed(() => {
         const reversedMatched = clone(route.matched).reverse();
         const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);

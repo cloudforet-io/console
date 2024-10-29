@@ -152,11 +152,10 @@ import {
     PLazyImg, PSkeleton, PI, PDataLoader, PEmpty,
 } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
-
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { arrayToQueryString } from '@/lib/router-query-string';
@@ -167,7 +166,6 @@ import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import type { CloudServiceDetailPageUrlQuery } from '@/services/asset-inventory/types/cloud-service-page-type';
-
 
 interface CloudServiceData {
     cloud_service_group: string;
@@ -216,6 +214,7 @@ export default {
     },
     setup(props) {
         const userWorkspaceStore = useUserWorkspaceStore();
+        const userStore = useUserStore();
         const allReferenceStore = useAllReferenceStore();
         const queryHelper = new QueryHelper();
         const state = reactive({
@@ -234,7 +233,7 @@ export default {
             state.loading = true;
             try {
                 const params: Record<string, string> = {
-                    timezone: store.state.user.timezone,
+                    timezone: userStore.state.timezone ?? 'UTC',
                 };
                 if (props.projectId) params.project_id = props.projectId;
                 const { results } = await SpaceConnector.client.statistics.topic.dailyUpdateCloudService({

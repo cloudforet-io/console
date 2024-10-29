@@ -24,12 +24,12 @@ import { SpaceRouter } from '@/router';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { JobListParameters } from '@/schema/inventory/job/api-verbs/list';
 import type { JobModel } from '@/schema/inventory/job/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CollectorReferenceMap } from '@/store/reference/collector-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
@@ -49,6 +49,7 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-c
 import { JOB_SELECTED_STATUS } from '@/services/asset-inventory/types/collector-history-page-type';
 
 const allReferenceStore = useAllReferenceStore();
+const userStore = useUserStore();
 const fields: DataTableField[] = [
     { label: 'Job ID', name: 'job_id' },
     { label: 'Collector', name: 'collector_info.label', sortable: false },
@@ -84,7 +85,7 @@ const handlers = reactive({
     },
 });
 const storeState = reactive({
-    timezone: computed(() => store.state.user.timezone),
+    timezone: computed<string>(() => userStore.state.timezone || 'UTC'),
     collectors: computed<CollectorReferenceMap>(() => allReferenceStore.getters.collector),
     plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
 });
@@ -95,7 +96,8 @@ const state = reactive({
     pageSize: 30,
     thisPage: 1,
     totalCount: 0,
-    isDomainOwner: computed(() => store.state.user.userType === 'DOMAIN_OWNER'),
+    // TODO: UserType must be changed.
+    isDomainOwner: computed(() => (userStore.state.userType as string) === 'DOMAIN_OWNER'),
     selectedStatus: 'ALL',
     items: [] as any[],
     sortBy: 'created_at',

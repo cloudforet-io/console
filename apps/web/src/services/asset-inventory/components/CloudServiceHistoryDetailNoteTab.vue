@@ -18,10 +18,10 @@ import type { NoteCreateParameters } from '@/schema/inventory/note/api-verbs/cre
 import type { NoteDeleteParameters } from '@/schema/inventory/note/api-verbs/delete';
 import type { NoteListParameters } from '@/schema/inventory/note/api-verbs/list';
 import type { NoteModel } from '@/schema/inventory/note/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
+import { useUserStore } from '@/store/user/user-store';
+
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
@@ -45,16 +45,15 @@ const emit = defineEmits<{(e: 'refresh-note-count'): void}>();
 
 const route = useRoute();
 
-const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
-});
+const userStore = useUserStore();
+
 const state = reactive({
     id: '',
     noteInput: '',
     noteList: [] as NoteModel[],
     loading: true,
-    timezone: computed(() => store.state.user.timezone),
-    userId: computed(() => store.state.user.userId),
+    timezone: computed(() => userStore.state.timezone || 'UTC'),
+    userId: computed(() => userStore.state.userId),
     menuItems: computed(() => [
         {
             label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE_TAB.DELETE'), name: 'delete',
@@ -71,7 +70,7 @@ const state = reactive({
         }
         return targetMenuId;
     }),
-    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
+    hasReadWriteAccess: computed<boolean|undefined>(() => userStore.getters.pageAccessPermissionMap[state.selectedMenuId]?.write),
 });
 
 const handleChangeNoteInput = (e) => {

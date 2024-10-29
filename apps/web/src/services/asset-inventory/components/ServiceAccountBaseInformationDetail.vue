@@ -6,9 +6,9 @@ import dayjs from 'dayjs';
 import { PDynamicLayout, PStatus } from '@cloudforet/mirinae';
 
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
-import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 
@@ -25,9 +25,10 @@ const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const serviceAccountPageStore = useServiceAccountPageStore();
 const serviceAccountPageState = serviceAccountPageStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
+const userStore = useUserStore();
 
 const state = reactive({
-    timezone: computed<string>(() => store.state.user.timezone),
+    timezone: computed<string>(() => userStore.state.timezone || 'UTC'),
     detailSchema: {} as ItemLayout,
     fieldHandler: [],
     isTrustedAccount: computed(() => serviceAccountPageState.serviceAccountType === ACCOUNT_TYPE.TRUSTED),

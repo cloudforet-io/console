@@ -9,7 +9,8 @@ import {
 
 import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
 import type { UserMfa } from '@/schema/identity/user/model';
-import { store } from '@/store';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import { postUserProfileDisableMfa } from '@/lib/helper/multi-factor-auth-helper';
 
@@ -18,9 +19,10 @@ import { useMultiFactorAuthStore } from '@/services/my-page/stores/multi-factor-
 
 const multiFactorAuthStore = useMultiFactorAuthStore();
 const multiFactorAuthState = multiFactorAuthStore.state;
+const userStore = useUserStore();
 
 const storeState = reactive({
-    mfa: computed<UserMfa|undefined>(() => store.state.user.mfa || undefined),
+    mfa: computed<UserMfa|undefined>(() => userStore.state.mfa || undefined),
     selectedType: computed<string>(() => multiFactorAuthState.selectedType),
     enableMfaMap: computed<Record<string, boolean>>(() => multiFactorAuthState.enableMfaMap),
 });

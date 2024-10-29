@@ -22,11 +22,11 @@ import type { ProtocolListParameters } from '@/schema/notification/protocol/api-
 import type { ProtocolModel } from '@/schema/notification/protocol/model';
 import type { UserChannelListParameters } from '@/schema/notification/user-channel/api-verbs/list';
 import type { UserChannelModel } from '@/schema/notification/user-channel/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
@@ -55,10 +55,13 @@ const props = withDefaults(defineProps<{
     manageDisabled: false,
 });
 const route = useRoute();
+
+const userStore = useUserStore();
+
 const state = reactive({
     loading: true,
     channelLoading: true,
-    userId: computed<string>(() => (route.params.userId ? decodeURIComponent(route.params.userId) : store.state.user.userId)),
+    userId: computed<string>(() => (route.params.userId ? decodeURIComponent(route.params.userId) : userStore.state.userId ?? '')),
     channelList: [] as NotiChannelItem[],
     protocolResp: [] as ProtocolModel[],
     defaultProtocolResp: computed<ProtocolModel[]>(() => state.protocolResp.filter((d) => d.protocol_type !== 'INTERNAL')),

@@ -8,7 +8,7 @@ import {
     PTooltip,
 } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
+import { useUserStore } from '@/store/user/user-store';
 
 import TopBarAdminToggleButton
     from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-admin-toggle-button/TopBarAdminToggleButton.vue';
@@ -20,8 +20,10 @@ import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 
 const route = useRoute();
 
+const userStore = useUserStore();
+
 const storeState = reactive({
-    isDomainAdmin: computed<boolean>(() => store.getters['user/isDomainAdmin']),
+    isDomainAdmin: computed<boolean>(() => userStore.getters.isDomainAdmin),
 });
 
 const state = reactive({

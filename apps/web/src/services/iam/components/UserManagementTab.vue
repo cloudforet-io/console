@@ -20,8 +20,9 @@ import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -49,9 +50,10 @@ const props = defineProps<Props>();
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
 const userPageGetters = userPageStore.getters;
+const userStore = useUserStore();
 
 const storeState = reactive({
-    loginUserId: computed(() => store.state.user.userId),
+    loginUserId: computed(() => userStore.state.userId ?? ''),
 });
 const state = reactive({
     fieldByMode: computed(() => (userPageState.isAdminMode

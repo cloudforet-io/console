@@ -11,10 +11,10 @@ import type { IconSet } from '@cloudforet/mirinae/src/data-display/board-item/ty
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
@@ -34,8 +34,9 @@ const dashboardCreatePageStore = useDashboardCreatePageStore();
 const dashboardCreatePageState = dashboardCreatePageStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceState = userWorkspaceStore.$state;
+const userStore = useUserStore();
 const storeState = reactive({
-    isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+    isWorkspaceOwner: computed(() => userStore.getters.getCurrentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     selectedWorkspace: computed<WorkspaceModel|undefined>(() => userWorkspaceState.getters.currentWorkspace),
 });
 const state = reactive({

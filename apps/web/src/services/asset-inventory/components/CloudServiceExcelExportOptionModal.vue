@@ -15,12 +15,12 @@ import type { DynamicLayout } from '@cloudforet/mirinae/types/data-display/dynam
 import { QueryType } from '@/schema/_common/api-verbs/export';
 import type { ExportOption, ExportParameter } from '@/schema/_common/api-verbs/export';
 import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
 import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper';
@@ -48,6 +48,7 @@ const cloudServiceLSBStore = useCloudServiceLSBStore();
 const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
 const appContextGetters = appContextStore.getters;
+const userStore = useUserStore();
 
 const DEFAULT_CONTENTS = 'Default Contents';
 
@@ -58,7 +59,7 @@ const state = reactive({
     downloadLoading: false,
     downloadOptions: [DEFAULT_CONTENTS, DETAIL_CONTENTS] as string[],
     allOptionValue: false,
-    timezone: computed(() => store.state.user.timezone ?? 'UTC'),
+    timezone: computed(() => userStore.state.timezone || 'UTC'),
     cloudServiceFilters: computed<ConsoleFilter[]>(() => [...cloudServicePageStore.allFilters, ...cloudServiceLSBStore.getters.allFilters]
         .filter((f: any) => ![
             'service_code',

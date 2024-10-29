@@ -2,8 +2,8 @@ import { defineStore } from 'pinia';
 
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 
-import { store } from '@/store';
-
+import { pinia } from '@/store/pinia';
+import { useUserStore } from '@/store/user/user-store';
 import { initServiceSettingsStore } from '@/store/util';
 
 interface CostExplorerSettingsStore {
@@ -14,6 +14,7 @@ export interface RelocateDashboardStatus {
     hideModal?: boolean;
 }
 
+const userStore = useUserStore(pinia);
 export const useCostExplorerSettingsStore = defineStore('cost-explorer-settings', {
     state: (): CostExplorerSettingsStore => ({
         relocateDashboardStatus: {},
@@ -25,7 +26,7 @@ export const useCostExplorerSettingsStore = defineStore('cost-explorer-settings'
         setRelocateDashboardState(state: CostExplorerSettingsStore['relocateDashboardStatus']) {
             this.relocateDashboardStatus = state;
 
-            const userId = store.state.user.userId;
+            const userId = userStore.state.userId ?? '';
             const settings = LocalStorageAccessor.getItem(userId) ?? {};
             settings.costExplorer = {
                 relocateDashboardStatus: this.relocateDashboardStatus,

@@ -6,16 +6,18 @@ import dayjs from 'dayjs';
 import { PDataLoader, PDefinitionTable, PStatus } from '@cloudforet/mirinae';
 import type { StatusProps } from '@cloudforet/mirinae/types/data-display/status/type';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import { useServiceAccountAgentStore } from '@/services/asset-inventory/stores/service-account-agent-store';
 
 const serviceAccountAgentStore = useServiceAccountAgentStore();
+const userStore = useUserStore();
 
 const storeState = reactive({
     agentInfo: computed(() => serviceAccountAgentStore.state.agentInfo),
-    timezone: computed<string>(() => store.state.user.timezone),
+    timezone: computed<string>(() => userStore.state.timezone || 'UTC'),
 });
 
 const state = reactive({

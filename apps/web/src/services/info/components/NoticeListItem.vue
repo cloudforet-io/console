@@ -10,11 +10,11 @@ import { PI, PSkeleton, PBadge } from '@cloudforet/mirinae';
 
 import type { PostModel } from '@/schema/board/post/model';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import NewMark from '@/common/components/marks/NewMark.vue';
 import TextHighlighting from '@/common/components/text/text-highlighting/TextHighlighting.vue';
@@ -39,14 +39,15 @@ const props = withDefaults(defineProps<{
     loading: true,
 });
 
+const userStore = useUserStore();
 const storeState = reactive({
     isAdminMode: computed(() => appContextGetters.isAdminMode),
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
 });
 const state = reactive({
-    hasDomainRoleUser: computed<boolean>(() => store.getters['user/isDomainAdmin']),
+    hasDomainRoleUser: computed<boolean>(() => userStore.getters.isDomainAdmin),
     postDirectionLabel: computed<TranslateResult>(() => ((props.postDirection === 'prev') ? i18n.t('INFO.NOTICE.MAIN.PREV') : i18n.t('INFO.NOTICE.MAIN.NEXT'))),
-    timezone: computed<string>(() => store.state.user.timezone || 'UTC'),
+    timezone: computed<string>(() => userStore.state.timezone || 'UTC'),
     date: computed<string>(() => dateFormatter(props.post?.created_at)),
     isPinned: computed<boolean>(() => !!props.post?.options?.is_pinned),
     postDirectionIcon: computed<string>(() => ((props.postDirection === 'prev') ? 'ic_arrow-down' : 'ic_arrow-up')),

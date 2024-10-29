@@ -7,21 +7,23 @@ import {
     PLink, PDivider, PCard, PButton, PI, screens,
 } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 
 const router = useRouter();
+const userStore = useUserStore();
 
 const { width } = useWindowSize();
 
 const storeState = reactive({
-    language: computed(() => store.state.user.language),
-    isDomainAdmin: computed<boolean>(() => store.getters['user/isDomainAdmin']),
+    language: computed(() => userStore.state.language || 'en'),
+    isDomainAdmin: computed<boolean>(() => userStore.getters.isDomainAdmin),
 });
 const state = reactive({
     isTabletSize: computed(() => width.value < screens.tablet.max),

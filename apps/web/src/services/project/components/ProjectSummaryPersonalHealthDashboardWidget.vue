@@ -15,7 +15,6 @@ import {
 import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 import { numberFormatter } from '@cloudforet/utils';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -23,6 +22,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { RegionReferenceMap } from '@/store/reference/region-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -50,6 +50,7 @@ const props = withDefaults(defineProps<Props>(), {
     projectId: undefined,
 });
 const allReferenceStore = useAllReferenceStore();
+const userStore = useUserStore();
 const { getProperRouteLocation } = useProperRouteLocation();
 const getEventsApiQuery = new ApiQueryHelper();
 const queryHelper = new QueryHelper();
@@ -60,7 +61,7 @@ const storeState = reactive({
 const state = reactive({
     loading: false,
     regions: computed<RegionReferenceMap>(() => allReferenceStore.getters.region),
-    timezone: computed(() => store.state.user.timezone),
+    timezone: computed<string>(() => userStore.state.timezone || 'UTC'),
     cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     pageStart: 1,

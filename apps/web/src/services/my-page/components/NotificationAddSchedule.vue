@@ -9,8 +9,9 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { ChannelSchedule, ChannelScheduleDayOfWeek } from '@/schema/notification/type';
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import InfoMessage from '@/common/components/guidance/InfoMessage.vue';
 import { useFormValidator } from '@/common/composables/form-validator';
@@ -37,7 +38,9 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{(event: 'change', payload: NotificationAddFormSchedulePayload): void;
 }>();
 
-const timezone = computed<string>(() => store.state.user.timezone);
+const userStore = useUserStore();
+
+const timezone = computed<string>(() => userStore.state.timezone ?? 'UTC');
 
 /* constants */
 const WEEK_DAYS = [

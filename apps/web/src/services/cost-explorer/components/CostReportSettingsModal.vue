@@ -14,8 +14,7 @@ import type { CostReportConfigUpdateParameters } from '@/schema/cost-analysis/co
 import type { CostReportConfigModel } from '@/schema/cost-analysis/cost-report-config/model';
 import { i18n } from '@/translations';
 
-import { languages } from '@/store/modules/user/config';
-import type { LanguageCode } from '@/store/modules/user/type';
+import type { LanguageCode } from '@/store/user/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -23,6 +22,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { languages } from '@/services/advanced/constants/domain-settings-constaint';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 
 

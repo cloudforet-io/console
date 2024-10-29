@@ -10,8 +10,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CostDataSourceListParameters } from '@/schema/cost-analysis/data-source/api-verbs/list';
 import type { CostDataSourceModel } from '@/schema/cost-analysis/data-source/model';
-// eslint-disable-next-line import/no-cycle
-import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type {
@@ -20,9 +18,13 @@ import type {
     ReferenceLoadOptions,
     ReferenceTypeInfo,
 } from '@/store/reference/type';
+// eslint-disable-next-line import/no-cycle
+import { useUserStore } from '@/store/user/user-store';
 
+// eslint-disable-next-line import/no-cycle
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
+// eslint-disable-next-line import/no-cycle
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
@@ -35,6 +37,8 @@ let lastLoadedTime = 0;
 
 export const useCostDataSourceReferenceStore = defineStore('reference-cost-data-source', () => {
     const appContextStore = useAppContextStore();
+    const userStore = useUserStore();
+
     const _state = reactive({
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     });
@@ -44,7 +48,7 @@ export const useCostDataSourceReferenceStore = defineStore('reference-cost-data-
 
     const getters = reactive({
         costDataSourceItems: asyncComputed<CostDataSourceReferenceMap>(async () => {
-            if (store.getters['user/getCurrentGrantInfo'].scope === 'USER') return {};
+            if (userStore.getters.getCurrentGrantInfo?.scope === 'USER') return {};
             if (state.items === null) await actions.load();
             return state.items ?? {};
         }, {}, { lazy: true }),

@@ -1,5 +1,8 @@
 import { store } from '@/store';
 
+import { pinia } from '@/store/pinia';
+import { useUserStore } from '@/store/user/user-store';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { Authenticator } from '@/services/auth/authenticator';
@@ -14,8 +17,9 @@ class SamlAuth extends Authenticator {
     }
 
     static async onSuccess(refreshToken:string) {
+        const userStore = useUserStore(pinia);
         try {
-            store.dispatch('user/startSignIn');
+            userStore.startSignIn();
             const credentials = {
                 refreshToken,
             };
@@ -25,7 +29,7 @@ class SamlAuth extends Authenticator {
             await store.dispatch('display/showSignInErrorMessage');
             throw e;
         } finally {
-            store.dispatch('user/finishSignIn');
+            userStore.finishSignIn();
         }
     }
 }

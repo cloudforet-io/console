@@ -1,16 +1,19 @@
 import type { AuthType } from '@/schema/identity/user/type';
-import { store } from '@/store';
+
+import { pinia } from '@/store/pinia';
+import { useUserStore } from '@/store/user/user-store';
 
 import { Authenticator } from '@/services/auth/authenticator';
 
 class SpaceAuth extends Authenticator {
     // eslint-disable-next-line class-methods-use-this
     static async signIn(credentials, authType: AuthType, verifyCode?: string): Promise<void> {
+        const userStore = useUserStore(pinia);
         try {
-            store.dispatch('user/startSignIn');
+            userStore.startSignIn();
             await super.signIn(credentials, authType, verifyCode);
         } finally {
-            store.dispatch('user/finishSignIn');
+            userStore.finishSignIn();
         }
     }
 

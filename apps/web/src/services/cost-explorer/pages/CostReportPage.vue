@@ -11,10 +11,10 @@ import {
 } from '@cloudforet/mirinae';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import type { Currency } from '@/store/modules/display/type';
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import type { MenuId } from '@/lib/menu/config';
@@ -30,14 +30,14 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 
 
-
+const userStore = useUserStore();
 const costReportPageStore = useCostReportPageStore();
 const costReportPageState = costReportPageStore.state;
 
 const route = useRoute();
 
 const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     loading: true,

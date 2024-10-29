@@ -59,6 +59,8 @@ import {
 
 import { store } from '@/store';
 
+import { useUserStore } from '@/store/user/user-store';
+
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 export default defineComponent({
@@ -81,9 +83,10 @@ export default defineComponent({
         },
     },
     setup(props, { emit }: SetupContext) {
+        const userStore = useUserStore();
         const state = reactive({
             proxyActiveTab: useProxyValue('activeTab', props, emit),
-            userId: computed<string>(() => store.state.user.userId),
+            userId: computed<string>(() => userStore.state.userId ?? ''),
             noMore: false,
         });
 

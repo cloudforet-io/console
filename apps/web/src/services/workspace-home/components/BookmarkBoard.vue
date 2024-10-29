@@ -12,8 +12,9 @@ import { CONTEXT_MENU_TYPE } from '@cloudforet/mirinae/src/inputs/context-menu/t
 
 import type { UserConfigModel } from '@/schema/config/user-config/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
@@ -46,9 +47,10 @@ const bookmarkState = bookmarkStore.state;
 const workspaceHomePageStore = useWorkspaceHomePageStore();
 const workspaceHomePageState = workspaceHomePageStore.state;
 const workspaceHomePageGetters = workspaceHomePageStore.getters;
+const userStore = useUserStore();
 
 const storeState = reactive({
-    isWorkspaceMember: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
+    isWorkspaceMember: computed(() => userStore.getters.getCurrentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
 
     selectedBookmarks: computed<BookmarkItem[]>(() => bookmarkState.selectedBookmarks),
     bookmarkType: computed<BookmarkType|undefined>(() => bookmarkState.bookmarkType),

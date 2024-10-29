@@ -6,6 +6,7 @@ import {
     isInstanceOfBadRequestError,
 } from '@cloudforet/core-lib/space-connector/error';
 
+// eslint-disable-next-line import/no-cycle
 import { SpaceRouter } from '@/router';
 
 import { getRouteScope } from '@/router/helpers/route-helper';

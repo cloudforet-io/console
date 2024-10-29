@@ -4,7 +4,7 @@ import { computed, reactive } from 'vue';
 
 import { screens } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
+import { useUserStore } from '@/store/user/user-store';
 
 import DomainLandingNotification from '@/services/landing/components/DomainLandingNotification.vue';
 import DomainLandingRecommendation from '@/services/landing/components/DomainLandingRecommendation.vue';
@@ -12,9 +12,10 @@ import DomainLandingStartBanner from '@/services/landing/components/DomainLandin
 import DomainLandingTitle from '@/services/landing/components/DomainLandingTitle.vue';
 
 const { width } = useWindowSize();
+const userStore = useUserStore();
 
 const storeState = reactive({
-    isDomainAdmin: computed<boolean>(() => store.getters['user/isDomainAdmin']),
+    isDomainAdmin: computed<boolean>(() => userStore.getters.isDomainAdmin),
 });
 const state = reactive({
     isTabletSize: computed<boolean>(() => width.value < screens.tablet.max),

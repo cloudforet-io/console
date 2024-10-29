@@ -33,12 +33,12 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
 import { SERVICE_ACCOUNT_STATE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -67,6 +67,7 @@ const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
+const userStore = useUserStore();
 
 const emit = defineEmits<{(e: 'update:attached-general-accounts', attachedGeneralAccounts: ServiceAccountModel[]): void;
 }>();
@@ -87,7 +88,7 @@ const state = reactive({
         } return serviceAccountPageStore.getters.isOriginAutoSyncEnabled;
     }),
     trustedAccountId: computed(() => serviceAccountPageStore.state.originServiceAccountItem.trusted_account_id),
-    timezone: computed(() => store.state.user.timezone),
+    timezone: computed(() => userStore.state.timezone),
     lastSuccessSynced: computed(() => serviceAccountPageStore.getters.lastSuccessSynced),
     errorModalVisible: false,
     isSyncing: computed(() => ['IN_PROGRESS', 'PENDING'].includes(serviceAccountPageStore.getters.lastJob?.status)),

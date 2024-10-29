@@ -7,8 +7,9 @@ import {
     PFieldGroup, PTextInput, PTooltip, PI, PButton, PBadge,
 } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import { emailValidator } from '@/lib/helper/user-validation-helper';
 
@@ -20,6 +21,7 @@ import type { UserListItemType } from '@/services/iam/types/user-type';
 
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
+const userStore = useUserStore();
 
 const emit = defineEmits<{(e: 'change-input', formState): void,
     (e: 'change-verify', value: boolean): void,
@@ -32,7 +34,7 @@ const state = reactive({
     isCollapsed: true,
     isFocused: false,
     isValidEmail: false,
-    loginUserId: computed(() => store.state.user.userId),
+    loginUserId: computed(() => userStore.state.userId ?? ''),
 });
 const {
     forms,

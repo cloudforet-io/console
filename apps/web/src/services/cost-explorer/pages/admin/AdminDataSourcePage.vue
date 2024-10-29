@@ -7,7 +7,7 @@ import {
     PHeading, PHorizontalLayout, PLink, PI, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { gray } from '@/styles/colors';
 
@@ -15,11 +15,12 @@ import DataSourceManagementTable from '@/services/cost-explorer/components/DataS
 import DataSourceManagementTabs from '@/services/cost-explorer/components/DataSourceManagementTabs.vue';
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
 
+const userStore = useUserStore();
 const dataSourcesPageStore = useDataSourcesPageStore();
 const dataSourcesPageState = dataSourcesPageStore.state;
 
 const storeState = reactive({
-    language: computed<string>(() => store.state.user.language),
+    language: computed<string>(() => userStore.state.language || 'en'),
     totalCount: computed<number>(() => dataSourcesPageState.dataSourceListTotalCount),
     selectedIndices: computed<number|undefined>(() => dataSourcesPageState.selectedDataSourceIndices),
 });

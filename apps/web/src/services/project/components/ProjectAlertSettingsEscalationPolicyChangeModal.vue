@@ -21,10 +21,10 @@ import type {
 import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
 import type { ProjectAlertConfigUpdateParameters } from '@/schema/monitoring/project-alert-config/api-verbs/update';
 import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -65,13 +65,15 @@ type FormMode = typeof FORM_MODE[keyof typeof FORM_MODE];
 const escalationPolicyFormStore = useEscalationPolicyFormStore();
 const escalationPolicyFormState = escalationPolicyFormStore.$state;
 const allReferenceStore = useAllReferenceStore();
+const userStore = useUserStore();
+
 const tableState = reactive({
     loading: true,
     items: [] as TableItem[],
     selectIndex: [] as number[],
 });
 const state = reactive({
-    timezone: computed<string>(() => store.state.user.timezone),
+    timezone: computed<string>(() => userStore.state.timezone || 'UTC'),
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
     tabs: computed<TabItem[]>(() => ([
         {

@@ -8,12 +8,12 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { PublicFolderListParameters } from '@/schema/dashboard/public-folder/api-verbs/list';
 import type { PublicFolderModel } from '@/schema/dashboard/public-folder/model';
-// eslint-disable-next-line import/no-cycle
-import { store } from '@/store';
 
 import type {
     ReferenceItem, ReferenceLoadOptions, ReferenceMap,
 } from '@/store/reference/type';
+// eslint-disable-next-line import/no-cycle
+import { useUserStore } from '@/store/user/user-store';
 
 
 interface PublicFolderResourceItemData {
@@ -32,10 +32,10 @@ export const usePublicFolderReferenceStore = defineStore('reference-folder', () 
     const state = reactive({
         items: null as PublicFolderReferenceMap | null,
     });
-
+    const userStore = useUserStore();
     const getters = reactive({
         publicFolderItems: asyncComputed<PublicFolderReferenceMap>(async () => {
-            if (store.getters['user/getCurrentGrantInfo'].scope === 'USER') return {};
+            if (userStore.getters.getCurrentGrantInfo?.scope === 'USER') return {};
             if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),

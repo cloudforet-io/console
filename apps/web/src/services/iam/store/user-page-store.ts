@@ -17,13 +17,16 @@ import type { FindWorkspaceUserParameters } from '@/schema/identity/workspace-us
 import type { WorkspaceUserGetParameters } from '@/schema/identity/workspace-user/api-verbs/get';
 import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
 import type { WorkspaceUserModel, SummaryWorkspaceUserModel } from '@/schema/identity/workspace-user/model';
-import { store } from '@/store';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { UserListItemType, ModalSettingState, ModalState } from '@/services/iam/types/user-type';
 
 export const useUserPageStore = defineStore('page-user', () => {
+    const userStore = useUserStore();
+
     const state = reactive({
         isAdminMode: false,
         loading: true,
@@ -46,8 +49,8 @@ export const useUserPageStore = defineStore('page-user', () => {
         } as ModalState,
     });
     const getters = reactive({
-        timezone: computed(() => store.state.user.timezone),
-        isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+        timezone: computed(() => userStore.state.timezone || 'UTC'),
+        isWorkspaceOwner: computed(() => userStore.getters.getCurrentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
         selectedUsers: computed(():UserListItemType[] => {
             if (state.selectedIndices.length === 1 && !isEmpty(state.selectedUser)) return [state.selectedUser];
             const users: UserListItemType[] = [];

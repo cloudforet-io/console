@@ -3,11 +3,11 @@ import { computed, reactive } from 'vue';
 
 import { PTooltip } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDomainStore } from '@/store/domain/domain-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import TopBarAdminToggleButton from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-admin-toggle-button/TopBarAdminToggleButton.vue';
 import TopBarFavorite
@@ -31,8 +31,10 @@ const emit = defineEmits<{(event: 'hide-menu'): void;
 
 const appContextStore = useAppContextStore();
 const domainStore = useDomainStore();
+const userStore = useUserStore();
+
 const state = reactive({
-    isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
+    isDomainAdmin: computed(() => userStore.getters.isDomainAdmin),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     isGrantLoading: computed(() => appContextStore.getters.globalGrantLoading),
     tooltipTexts: computed<Record<string, string>>(() => ({

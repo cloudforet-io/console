@@ -9,12 +9,11 @@ import {
 
 import type { TokenIssueParameters } from '@/schema/identity/token/api-verbs/issue';
 import type { TokenIssueModel } from '@/schema/identity/token/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useDomainStore } from '@/store/domain/domain-store';
-import type { UpdateUserRequest } from '@/store/modules/user/type';
-
+import type { UpdateUserRequest } from '@/store/user/type';
+import { useUserStore } from '@/store/user/user-store';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import {
@@ -31,8 +30,10 @@ import UserAccountModuleContainer
 
 
 const domainStore = useDomainStore();
+const userStore = useUserStore();
+
 const state = reactive({
-    userId: computed(() => store.state.user.userId),
+    userId: computed(() => userStore.state.userId),
     isCheckedToken: false,
 });
 const {
@@ -108,7 +109,7 @@ const updateUser = async (userParam: UpdateUserRequest) => {
     try {
         await checkCurrentPassword();
         if (!state.isCheckedToken) return;
-        await store.dispatch('user/setUser', userParam);
+        await userStore.setUser(userParam);
         showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '');
     } catch (e: any) {
         if (e.code === 'ERROR_PASSWORD_NOT_CHANGED') {

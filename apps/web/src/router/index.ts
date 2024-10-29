@@ -7,6 +7,7 @@ import { clone } from 'lodash';
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { TokenGrantParameters } from '@/schema/identity/token/api-verbs/grant';
 import type { GrantScope } from '@/schema/identity/token/type';
 
 import { ERROR_ROUTE, ROUTE_SCOPE } from '@/router/constant';
@@ -23,6 +24,8 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useErrorStore } from '@/store/error/error-store';
 import { pinia } from '@/store/pinia';
+// eslint-disable-next-line import/no-cycle
+import { useUserStore } from '@/store/user/user-store';
 
 import { getRecentConfig } from '@/lib/helper/router-recent-helper';
 import type { MenuId } from '@/lib/menu/config';
@@ -33,14 +36,15 @@ import { GTag } from '@/lib/site-analytics/gtag';
 const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
 const grantAndLoadByCurrentScope = async (scope: GrantScope, workspaceId?: string): Promise<{ failStatus: boolean }> => {
     const refreshToken = SpaceConnector.getRefreshToken();
-    const grantRequest = {
+    const grantRequest: Omit<TokenGrantParameters, 'grant_type'> = {
         scope,
         token: refreshToken,
         workspace_id: workspaceId,
     };
 
     const errorStore = useErrorStore(pinia);
-    await SpaceRouter.router.app?.$store.dispatch('user/grantRoleAndLoadReferenceData', grantRequest);
+    const userStore = useUserStore(pinia);
+    await userStore.grantRoleAndLoadReferenceData(grantRequest);
     const grantAccessFailStatus = errorStore.state.grantAccessFailStatus;
     return {
         failStatus: !!grantAccessFailStatus,

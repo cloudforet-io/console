@@ -11,11 +11,11 @@ import type { CostQuerySetListParameters } from '@/schema/cost-analysis/cost-que
 import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
 import type { MetricExampleListParameters } from '@/schema/inventory/metric-example/api-verbs/list';
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
-import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
@@ -35,9 +35,10 @@ interface GnbStoreState {
 export const useGnbStore = defineStore('gnb', () => {
     const allReferenceStore = useAllReferenceStore();
     const userWorkspaceStore = useUserWorkspaceStore();
+    const userStore = useUserStore();
 
     const _getters = reactive({
-        userId: computed(() => store.state.user.userId),
+        userId: computed(() => userStore.state.userId ?? ''),
         costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
         currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId as string),
     });
@@ -144,7 +145,7 @@ export const useGnbStore = defineStore('gnb', () => {
                             data_source_id: dataSourceId,
                             query: {
                                 filter: [
-                                    { k: 'user_id', v: store.state.user.userId, o: 'eq' },
+                                    { k: 'user_id', v: userStore.state.userId ?? '', o: 'eq' },
                                     { k: 'workspace_id', v: _getters.currentWorkspaceId, o: 'eq' },
                                 ],
                                 only: ['cost_query_set_id', 'data_source_id', 'name'],

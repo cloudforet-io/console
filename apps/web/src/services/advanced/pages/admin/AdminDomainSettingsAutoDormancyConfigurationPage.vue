@@ -18,13 +18,13 @@ import type { DomainConfigUpdateParameters } from '@/schema/config/domain-config
 import type { DomainConfigModel } from '@/schema/config/domain-config/model';
 import type { CostReportConfigListParameters } from '@/schema/cost-analysis/cost-report-config/api-verbs/list';
 import type { CostReportConfigModel } from '@/schema/cost-analysis/cost-report-config/model';
-import { store } from '@/store';
 import { i18n as _i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
 import type { Currency } from '@/store/modules/display/type';
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -41,9 +41,10 @@ const DORMANCY_CONFIG_NAME = 'identity:dormancy:workspace';
 
 const router = useRouter();
 const route = useRoute();
+const userStore = useUserStore();
 
 const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     currency: undefined as Currency|undefined,

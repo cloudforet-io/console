@@ -41,9 +41,6 @@ const route = useRoute();
 
 const emit = defineEmits<{(e: 'update:currentStep', step: number): void; }>();
 
-// const storeState = reactive({
-//     language: computed(() => store.state.user.language),
-// });
 const state = reactive({
     pageLoading: true,
     loading: false,

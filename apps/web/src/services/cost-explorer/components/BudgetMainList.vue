@@ -20,9 +20,9 @@ import type {
     BudgetUsageAnalyzeParameters,
     BudgetUsageAnalyzeResult,
 } from '@/schema/cost-analysis/budget-usage/api-verbs/analyze';
-import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
@@ -41,7 +41,10 @@ import type { Period } from '@/services/cost-explorer/types/cost-explorer-query-
 const currentRoute = SpaceRouter.router.currentRoute;
 const queryHelper = new QueryHelper();
 const budgetUsageApiQueryHelper = new ApiQueryHelper();
+
 const appContextStore = useAppContextStore();
+const userStore = useUserStore();
+
 const storeState = reactive({
     isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
 });
@@ -59,7 +62,7 @@ const state = reactive({
         key: 'budget_usage',
         desc: true,
     }] as Query['sort'],
-    timezone: computed(() => store.state.user.timezone ?? 'UTC'),
+    timezone: computed(() => userStore.state.timezone || 'UTC'),
 });
 
 const fetchBudgetUsages = async (): Promise<AnalyzeResponse<BudgetUsageAnalyzeResult>> => {

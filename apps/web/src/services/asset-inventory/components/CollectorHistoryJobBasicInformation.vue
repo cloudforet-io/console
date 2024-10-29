@@ -53,11 +53,11 @@ import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { JobModel } from '@/schema/inventory/job/model';
-import { store } from '@/store';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CollectorReferenceMap } from '@/store/reference/collector-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
@@ -69,6 +69,7 @@ interface Props {
 }
 
 const allReferenceStore = useAllReferenceStore();
+const userStore = useUserStore();
 
 const props = withDefaults(defineProps<Props>(), {
     job: undefined,
@@ -79,7 +80,7 @@ const { getProperRouteLocation } = useProperRouteLocation();
 const storeState = reactive({
     collectors: computed<CollectorReferenceMap>(() => allReferenceStore.getters.collector),
     plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
-    timezone: computed(() => store.state.user.timezone),
+    timezone: computed(() => userStore.state.timezone),
 });
 const state = reactive({
     collector: computed(() => {

@@ -19,11 +19,11 @@ import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
 import type { PostModel } from '@/schema/board/post/model';
 import type { FileModel } from '@/schema/file-manager/model';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
-import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useNoticeStore } from '@/store/notice';
+import { useUserStore } from '@/store/user/user-store';
 
 import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -39,6 +39,7 @@ const props = defineProps<{
     postId?: string;
 }>();
 
+const userStore = useUserStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
 const noticeDetailStore = useNoticeDetailStore();
@@ -52,7 +53,7 @@ const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
 });
 const state = reactive({
-    timezone: computed(() => store.state.user.timezone),
+    timezone: computed(() => userStore.state.timezone || 'UTC'),
     loading: false,
     noticePostData: computed<PostModel|undefined>(() => noticeDetailState.post),
     prevNoticePost: undefined as PostModel | undefined,
@@ -71,7 +72,7 @@ const state = reactive({
             params: { postId: state.nextNoticePost.post_id },
         };
     }),
-    hasDomainRoleUser: computed<boolean>(() => store.getters['user/isDomainAdmin']),
+    hasDomainRoleUser: computed<boolean>(() => userStore.getters.isDomainAdmin),
     isAllWorkspace: computed<boolean>(() => (!state.noticePostData?.workspaces || state.noticePostData?.workspaces?.includes('*')) ?? true),
     scopedWorkspaceList: computed<WorkspaceModel[]|undefined>(() => {
         if (state.isAllWorkspace) return undefined;

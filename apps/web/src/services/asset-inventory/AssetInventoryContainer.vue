@@ -6,7 +6,7 @@ import { useRoute } from 'vue-router/composables';
 
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 
-import { store } from '@/store';
+import { useUserStore } from '@/store/user/user-store';
 
 import CenteredPageLayout from '@/common/modules/page-layouts/CenteredPageLayout.vue';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
@@ -22,11 +22,12 @@ const cloudServicePageStore = useCloudServicePageStore();
 const cloudServiceLSBStore = useCloudServiceLSBStore();
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
 const assetInventorySettings = useAssetInventorySettingsStore();
+const userStore = useUserStore();
 
 const route = useRoute();
 
 const storeState = reactive({
-    userId: computed<string>(() => store.state.user.userId),
+    userId: computed<string>(() => userStore.state.userId ?? ''),
 });
 const state = reactive({
     lsbVisible: computed<boolean>(() => route.meta?.lsbVisible),

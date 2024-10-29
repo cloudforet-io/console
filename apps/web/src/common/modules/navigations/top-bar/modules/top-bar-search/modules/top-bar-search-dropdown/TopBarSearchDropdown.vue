@@ -11,9 +11,8 @@ import {
 } from '@cloudforet/mirinae';
 import type { ValueItem } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
 
-import { store } from '@/store';
-
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import { MENU_ID } from '@/lib/menu/config';
@@ -54,6 +53,8 @@ const BOTTOM_MARGIN = 5.5 * 16;
 
 const topBarSearchStore = useTopBarSearchStore();
 const recentStore = useRecentStore();
+const userStore = useUserStore();
+
 const windowSize = useWindowSize();
 
 const dropdownRef = ref<null | HTMLElement>(null);
@@ -70,7 +71,7 @@ const getTabHeaderHeight = () => {
 const storeState = reactive({
     activeTab: computed(() => topBarSearchStore.state.activeTab),
     cloudServiceTypeMap: computed(() => allReferenceStore.getters.cloudServiceType),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 
 const state = reactive({

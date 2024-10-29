@@ -11,13 +11,13 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import { MENU_ID } from '@/lib/menu/config';
@@ -53,17 +53,18 @@ const appPageStore = useAppPageStore();
 const appContextStore = useAppContextStore();
 const workspaceHomePageStore = useWorkspaceHomePageStore();
 const workspaceHomePageState = workspaceHomePageStore.state;
+const userStore = useUserStore();
 
 const router = useRouter();
 
 const storeState = reactive({
-    isDomainAdmin: computed<boolean>(() => store.getters['user/isDomainAdmin']),
+    isDomainAdmin: computed<boolean>(() => userStore.getters.isDomainAdmin),
     currentWorkspace: computed<WorkspaceModel|undefined>(() => userWorkspaceGetters.currentWorkspace),
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
     workspaceUserTotalCount: computed<number|undefined>(() => workspaceHomePageState.workspaceUserTotalCount),
     appsTotalCount: computed<number|undefined>(() => workspaceHomePageState.appsTotalCount),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
-    isRootRoleReadonly: computed<boolean>(() => store.getters['user/isRootRoleReadonly']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
+    isRootRoleReadonly: computed<boolean>(() => userStore.getters.isRootRoleReadonly),
 });
 const state = reactive({
     selectedWorkspace: computed<WorkspaceModel>(() => storeState.workspaceList.find((workspace) => workspace.workspace_id === storeState.currentWorkspace?.workspace_id) || {} as WorkspaceModel),

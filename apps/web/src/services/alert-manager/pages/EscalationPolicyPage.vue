@@ -30,10 +30,10 @@ import {
     ESCALATION_POLICY_RESOURCE_GROUP,
 } from '@/schema/monitoring/escalation-policy/constant';
 import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -65,9 +65,10 @@ const route = useRoute();
 const { query } = router.currentRoute;
 
 const allReferenceStore = useAllReferenceStore();
+const userStore = useUserStore();
 
 const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 
 /* Search Tag */
@@ -109,7 +110,7 @@ const tableState = reactive({
     tags: computed(() => queryTagsHelper.queryTags.value),
 });
 const state = reactive({
-    timezone: computed(() => store.state.user.timezone),
+    timezone: computed(() => userStore.state.timezone),
     pageTitle: computed(() => i18n.t('MONITORING.ALERT.ESCALATION_POLICY.ESCALATION_POLICY')),
     actionItems: computed(() => ([
         {

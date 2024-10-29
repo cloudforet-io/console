@@ -10,9 +10,9 @@ import type { UserConfigDeleteParameters } from '@/schema/config/user-config/api
 import type { UserConfigListParameters } from '@/schema/config/user-config/api-verbs/list';
 import type { UserConfigSetParameters } from '@/schema/config/user-config/api-verbs/set';
 import type { UserConfigModel } from '@/schema/config/user-config/model';
-import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import type { ReferenceData, ConfigData } from '@/lib/helper/config-data-helper';
 
@@ -29,9 +29,10 @@ interface FavoriteState {
 
 export const useFavoriteStore = defineStore('favorite', () => {
     const userWorkspaceStore = useUserWorkspaceStore();
+    const userStore = useUserStore();
 
     const _getters = reactive({
-        userId: computed(() => store.state.user.userId),
+        userId: computed(() => userStore.state.userId ?? ''),
         currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
     });
 

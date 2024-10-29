@@ -8,13 +8,14 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { EscalationPolicyListParameters } from '@/schema/monitoring/escalation-policy/api-verbs/list';
 import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
-// eslint-disable-next-line import/no-cycle
-import { store } from '@/store';
 
 import type {
     ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
+// eslint-disable-next-line import/no-cycle
+import { useUserStore } from '@/store/user/user-store';
 
+// eslint-disable-next-line import/no-cycle
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
@@ -29,9 +30,10 @@ export const useEscalationPolicyReferenceStore = defineStore('reference-escalati
         items: null as EscalationPolicyReferenceMap | null,
     });
 
+    const userStore = useUserStore();
     const getters = reactive({
         escalationPolicyItems: asyncComputed<EscalationPolicyReferenceMap>(async () => {
-            if (store.getters['user/getCurrentGrantInfo'].scope !== 'WORKSPACE') return {};
+            if (userStore.getters.getCurrentGrantInfo?.scope !== 'WORKSPACE') return {};
             if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),

@@ -27,6 +27,7 @@ import { store } from '@/store';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useDomainStore } from '@/store/domain/domain-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { getLastAccessedWorkspaceId } from '@/lib/site-initializer/last-accessed-workspace';
 
@@ -50,12 +51,13 @@ const props = withDefaults(defineProps<Props>(), {
 const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const domainStore = useDomainStore();
+const userStore = useUserStore();
 
 const route = useRoute();
 const router = useRouter();
 
 const state = reactive({
-    beforeUser: store.state.user.userId,
+    beforeUser: userStore.state.userId,
     component: computed(() => {
         let component;
         const auth = domainStore.state.extendedAuthType;

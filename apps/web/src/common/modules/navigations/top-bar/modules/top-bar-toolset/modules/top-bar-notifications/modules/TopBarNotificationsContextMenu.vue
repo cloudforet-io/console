@@ -26,6 +26,8 @@ import type { NotificationModel } from '@/schema/notification/notification/model
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useUserStore } from '@/store/user/user-store';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -60,9 +62,11 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
 }>();
 const { i18nDayjs } = useI18nDayjs();
+const userStore = useUserStore();
+
 const state = reactive({
     loading: true,
-    timezone: computed(() => store.state.user.timezone),
+    timezone: computed(() => userStore.state.timezone || 'UTC'),
     notificationItemsRef: null as HTMLElement|null,
     items: [] as NotificationItem[],
     proxyCount: useProxyValue('count', props, emit),
@@ -134,7 +138,7 @@ const initApiHelper = (apiHelper: ApiQueryHelper) => {
         .setFilters([
             { k: 'created_at', v: dayjs().subtract(7, 'day').format('YYYY-MM-DD HH:mm:ss'), o: '>=t' },
             { k: 'created_at', v: dayjs().format('YYYY-MM-DD HH:mm:ss'), o: '<t' },
-            { k: 'user_id', v: store.state.user.userId, o: '=' },
+            { k: 'user_id', v: userStore.state.userId ?? '', o: '=' },
         ]);
 };
 const notificationApiHelper = new ApiQueryHelper();

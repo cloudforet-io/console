@@ -11,9 +11,9 @@ import {
 import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
-import { store } from '@/store';
 
 import type { ReferenceItem } from '@/store/reference/type';
+import { useUserStore } from '@/store/user/user-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -45,8 +45,10 @@ const props = withDefaults(defineProps<{
     userReference: () => ({}),
 });
 
+const userStore = useUserStore();
+
 const state = reactive({
-    timezone: computed(() => store.state.user.timezone),
+    timezone: computed(() => userStore.state.timezone),
     alertStateI18n: useAlertStateI18n(),
 });
 const { getProperRouteLocation } = useProperRouteLocation();

@@ -4,7 +4,7 @@ import { computed, reactive } from 'vue';
 import { PTextButton, PCollapsibleToggle } from '@cloudforet/mirinae';
 
 import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
-import { store } from '@/store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { postUserProfileDisableMfa, postEnableMfa } from '@/lib/helper/multi-factor-auth-helper';
 
@@ -24,8 +24,9 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{(e: 'update:is-sent-code'): void }>();
 
+const userStore = useUserStore();
 const storeState = reactive({
-    email: computed<string>(() => store.state.user.mfa?.options?.email || undefined),
+    email: computed<string>(() => userStore.state.mfa?.options?.email || undefined),
 });
 const state = reactive({
     isCollapsed: true,

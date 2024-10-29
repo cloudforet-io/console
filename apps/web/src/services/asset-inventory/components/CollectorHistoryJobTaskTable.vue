@@ -5,19 +5,18 @@ import {
 
 
 import { makeEnumValueHandler, makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import type { KeyItemSet } from '@cloudforet/core-lib/component-util/query-search/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PLink, PSelectButtonGroup, PStatus, PToolboxTable,
 } from '@cloudforet/mirinae';
 import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
+import type { KeyItemSet } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
 import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { JobTaskListParameters } from '@/schema/inventory/job-task/api-verbs/list';
 import type { JobTaskModel } from '@/schema/inventory/job-task/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { ROOT_ROUTE } from '@/router/constant';
@@ -25,6 +24,7 @@ import { ROOT_ROUTE } from '@/router/constant';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -84,10 +84,11 @@ const storeState = reactive({
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     workspaces: computed(() => allReferenceStore.getters.workspace),
 });
+const userStore = useUserStore();
 
 const state = reactive({
     loading: false,
-    timezone: computed(() => store.state.user.timezone),
+    timezone: computed(() => userStore.state.timezone || 'UTC'),
     items: [] as ({duration: string} & JobTaskModel)[],
     selectedStatus: 'ALL',
     //

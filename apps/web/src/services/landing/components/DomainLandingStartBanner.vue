@@ -7,9 +7,9 @@ import { clone } from 'lodash';
 
 import { PButton, screens, PTextButton } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
-
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import type { MenuId } from '@/lib/menu/config';
@@ -22,11 +22,12 @@ import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 
 const router = useRouter();
 const route = useRoute();
+const userStore = useUserStore();
 
 const { width } = useWindowSize();
 
 const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     isTabletSize: computed(() => width.value < screens.tablet.max),

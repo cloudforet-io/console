@@ -13,6 +13,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import type { SuggestionMenu } from '@/lib/helper/menu-suggestion-helper';
@@ -48,6 +49,8 @@ const props = withDefaults(defineProps<Props>(), {
 const userWorkspaceStore = useUserWorkspaceStore();
 const topBarSearchStore = useTopBarSearchStore();
 const recentStore = useRecentStore();
+const userStore = useUserStore();
+
 const router = useRouter();
 const emit = defineEmits<{(event: 'move-focus-end'): void;
     (event: 'update:contents-size', value: number): void;
@@ -61,7 +64,7 @@ const storeState = reactive({
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
     inputText: computed(() => topBarSearchStore.getters.inputText),
     trimmedInputText: computed(() => topBarSearchStore.getters.trimmedInputText),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 
 const state = reactive({

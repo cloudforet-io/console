@@ -12,13 +12,13 @@ import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/table
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { AppModel } from '@/schema/identity/app/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -35,12 +35,13 @@ const appPageStore = useAppPageStore();
 const appPageState = appPageStore.$state;
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
+const userStore = useUserStore();
 
 const emit = defineEmits<{(e: 'confirm', app?: AppModel): void;
 }>();
 
 const storeState = reactive({
-    timezone: computed(() => store.state.user.timezone ?? 'UTC'),
+    timezone: computed(() => userStore.state.timezone || 'UTC'),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     projects: computed<ProjectReferenceMap>(() => allReferenceGetters.project),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceGetters.projectGroup),

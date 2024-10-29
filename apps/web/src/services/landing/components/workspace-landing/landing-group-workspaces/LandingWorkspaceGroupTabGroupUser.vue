@@ -15,10 +15,10 @@ import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { BasicRoleModel, RoleModel } from '@/schema/identity/role/model';
 import type { WorkspaceGroupUserUpdateRoleParameters } from '@/schema/identity/workspace-group-user/api-verbs/update-role';
 import type { WorkspaceGroupModel, WorkspaceUser } from '@/schema/identity/workspace-group/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceGroupStore } from '@/store/app-context/workspace/user-workspace-group-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -39,6 +39,7 @@ const landingPageStore = useLandingPageStore();
 const landingPageStoreState = landingPageStore.state;
 const landingPageStoreGetter = landingPageStore.getters;
 const landingPageStoreGroupUserState = landingPageStore.groupUserTableState;
+const userStore = useUserStore();
 
 const state = reactive({
     addUserModalVisible: false,
@@ -55,9 +56,9 @@ const tableState = reactive({
         { name: 'role', label: 'Role' },
         { name: 'remove_button', label: ' ', sortable: false },
     ],
-    loginUserId: computed(() => store.state.user.userId),
+    loginUserId: computed(() => userStore.state.userId ?? ''),
     loginUserRoleType: computed(() => landingPageStoreGetter.workspaceGroupUsers.find((user) => user.user_id === tableState.loginUserId).role_type),
-    isUserOwnerRole: computed(() => store.state.user.roleType === ROLE_TYPE.DOMAIN_ADMIN || tableState.loginUserRoleType === ROLE_TYPE.WORKSPACE_OWNER),
+    isUserOwnerRole: computed(() => userStore.state.roleType === ROLE_TYPE.DOMAIN_ADMIN || tableState.loginUserRoleType === ROLE_TYPE.WORKSPACE_OWNER),
     roleMap: {} as Record<string, BasicRoleModel>,
 });
 

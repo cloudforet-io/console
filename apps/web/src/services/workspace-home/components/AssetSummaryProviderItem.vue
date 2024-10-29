@@ -7,7 +7,7 @@ import { isEmpty } from 'lodash';
 import { PLazyImg, PTextButton } from '@cloudforet/mirinae';
 import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
-import { store } from '@/store';
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
@@ -32,8 +32,10 @@ const props = withDefaults(defineProps<Props>(), {
 
 const router = useRouter();
 
+const userStore = useUserStore();
+
 const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     accessLink: computed<boolean>(() => !isEmpty(storeState.pageAccessPermissionMap[MENU_ID.METRIC_EXPLORER])),

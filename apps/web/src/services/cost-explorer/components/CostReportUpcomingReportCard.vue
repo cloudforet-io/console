@@ -9,8 +9,8 @@ import { PButton, PSkeleton, PDivider } from '@cloudforet/mirinae';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDomainStore } from '@/store/domain/domain-store';
 import type { Currency } from '@/store/modules/display/type';
-import { languages } from '@/store/modules/user/config';
 
+import { languages } from '@/services/advanced/constants/domain-settings-constaint';
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
 import CostReportSettingsModal from '@/services/cost-explorer/components/CostReportSettingsModal.vue';
 import { DEFAULT_UNIFIED_COST_CURRENCY } from '@/services/cost-explorer/constants/cost-explorer-constant';

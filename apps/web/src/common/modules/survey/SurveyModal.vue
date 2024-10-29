@@ -65,7 +65,8 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { UserConfigCreateParameters } from '@/schema/config/user-config/api-verbs/create';
 import type { UserConfigListParameters } from '@/schema/config/user-config/api-verbs/list';
 import type { UserConfigModel } from '@/schema/config/user-config/model';
-import { store } from '@/store';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -82,11 +83,12 @@ export default {
     props: {
     },
     setup() {
+        const userStore = useUserStore();
         const state = reactive({
             visible: false,
-            isSessionExpired: computed(() => store.state.user.isSessionExpired),
-            userId: computed(() => store.state.user.userId),
-            isDomainOwner: computed(() => store.getters['user/isDomainAdmin']),
+            isSessionExpired: computed(() => userStore.state.isSessionExpired),
+            userId: computed(() => userStore.state.userId),
+            isDomainOwner: computed(() => userStore.getters.isDomainAdmin),
             answerItems1: computed(() => [
                 {
                     name: 1,

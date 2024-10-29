@@ -18,10 +18,10 @@ import type { DynamicLayout } from '@cloudforet/mirinae/types/data-display/dynam
 
 import { QueryType } from '@/schema/_common/api-verbs/export';
 import type { ExportOption, ExportParameter } from '@/schema/_common/api-verbs/export';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
 import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper';
@@ -55,6 +55,7 @@ const cloudServiceDetailPageStoreState = cloudServiceDetailPageStore.$state;
 const cloudServiceLSBStore = useCloudServiceLSBStore();
 const appContextStore = useAppContextStore();
 const appContextGetters = appContextStore.getters;
+const userStore = useUserStore();
 
 const MAIN_TABLE = 'Main Table';
 
@@ -68,7 +69,7 @@ const state = reactive({
     ]),
     selectedSubDataIds: [MAIN_TABLE] as string[],
     selectedSubDataSchemas: computed<CloudServiceDetailSchema[]>(() => state.detailSchemaList.filter((schema:CloudServiceDetailSchema) => state.selectedSubDataIds.includes(schema.name))),
-    timezone: computed(() => store.state.user.timezone ?? 'UTC'),
+    timezone: computed(() => userStore.state.timezone ?? 'UTC'),
     detailSchemaList: [] as CloudServiceDetailSchema[],
 });
 
