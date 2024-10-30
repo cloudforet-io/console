@@ -6,7 +6,7 @@ import {
 import dayjs from 'dayjs';
 
 import {
-    PFieldGroup, PToggleButton, PSelectDropdown, PI, PDatetimePicker,
+    PFieldGroup, PToggleButton, PSelectDropdown, PI, PDatetimePicker, PTooltip,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
@@ -279,6 +279,15 @@ onMounted(() => {
                                 />
                             </template>
                         </p-select-dropdown>
+
+                        <p-tooltip v-if="state.proxyValue?.inherit"
+                                   :contents="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.DATE_RANGE_INFO_TEXT')"
+                        >
+                            <p-i name="ic_info-circle"
+                                 width="1rem"
+                                 height="1rem"
+                            />
+                        </p-tooltip>
                     </div>
                     <div class="value-detail">
                         <div v-if="state.proxyValue?.options?.value === 'custom'"
@@ -438,7 +447,7 @@ onMounted(() => {
 <style scoped lang="postcss">
 .widget-field-date-range {
     .form-wrapper {
-        @apply border border-gray-150 rounded-lg w-full;
+        @apply border-2 border-gray-150 rounded-lg w-full;
 
         .inherit-toggle {
             @apply flex items-center justify-between text-label-md text-gray-900 border-b border-gray-150;
@@ -449,7 +458,7 @@ onMounted(() => {
         .range-contents {
             padding: 0.25rem 0.75rem 0.75rem;
             .value-selector {
-                @apply w-full;
+                @apply w-full flex items-center justify-between;
                 height: 2rem;
                 margin-bottom: 0.125rem;
                 .inherit-icon {
