@@ -7,6 +7,10 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { durationFormatter } from '@cloudforet/utils';
 
+
+
+
+
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { DataSourceAccountAnalyzeParameters } from '@/schema/cost-analysis/data-source-account/api-verbs/analyze';
@@ -35,6 +39,10 @@ import type {
     CostLinkedAccountModalType,
     DataSourceItem,
 } from '@/services/cost-explorer/types/data-sources-type';
+
+
+
+
 
 export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
     const allReferenceStore = useAllReferenceStore();
@@ -234,7 +242,6 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
             ListResponse<CostJobModel>
           >(params);
 
-                console.log('joblist', results);
                 state.jobList = results || [];
                 state.jobListTotalCount = total_count || 0;
             } catch (e) {

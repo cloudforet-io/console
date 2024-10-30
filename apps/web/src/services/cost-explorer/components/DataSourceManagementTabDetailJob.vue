@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import {
-    computed, reactive, watch, watchEffect,
-} from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
@@ -136,10 +134,6 @@ watch(
     },
     { immediate: true },
 );
-
-watchEffect(() => {
-    console.log('sdfasdfasd', dataSourcesPageGetters);
-});
 </script>
 
 <template>
@@ -147,9 +141,7 @@ watchEffect(() => {
         <p-heading
             heading-type="sub"
             use-total-count
-            :title="
-                $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.TAB_DETAILS_COLLECTION_JOB')
-            "
+            :title="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.TAB_DETAILS_COLLECTION_JOB')"
             :total-count="storeState.totalCount"
             class="pt-8 px-4 pb-4"
         />
@@ -185,9 +177,7 @@ watchEffect(() => {
             </template>
         </p-toolbox-table>
         <p-button-modal
-            :header-title="
-                $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ERROR_FOUND_TITLE')
-            "
+            :header-title="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ERROR_FOUND_TITLE')"
             centered
             size="md"
             fade
@@ -204,16 +194,13 @@ watchEffect(() => {
                             {{ state.selectedJobItem.error_code }}
                         </span>
                     </p>
-                    <p-text-editor
-                        read-only
-                        :code="state.selectedJobItem.error_message"
+                    <p-text-editor read-only
+                                   :code="state.selectedJobItem.error_message"
                     />
                 </div>
             </template>
             <template #confirm-button>
-                <span>{{
-                    $t("BILLING.COST_MANAGEMENT.DATA_SOURCES.ERROR_FOUND_OK")
-                }}</span>
+                <span>{{ $t("BILLING.COST_MANAGEMENT.DATA_SOURCES.ERROR_FOUND_OK") }}</span>
             </template>
         </p-button-modal>
     </div>
