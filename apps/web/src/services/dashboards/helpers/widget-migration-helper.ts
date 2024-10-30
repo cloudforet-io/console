@@ -205,7 +205,7 @@ const migrateAllWidgets = (dashboardWidgets: Array<PublicWidgetModel|PrivateWidg
         * */
         const _widgetDateRangeOption = cloneDeep(widget?.options?.dateRange) as DateRangeValue;
         if (_widgetDateRangeOption === undefined) {
-            const granularity = widget.options.granularity as string;
+            const granularity = widget.options?.granularity as string;
             const granularityDefaults: Record<string, DateRangeValue['options']['value']> = {
                 DAILY: 'today',
                 MONTHLY: 'thisMonth',

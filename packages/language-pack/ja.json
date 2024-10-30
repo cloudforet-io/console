@@ -1555,9 +1555,9 @@
 				"TRANSFORM": "データを変換"
 			},
 			"DATE_AGGREGATION_OPTIONS": {
-				"AGGREGATED": "",
-				"DATE_AGGREGATION_OPTIONS": "",
-				"LATEST": ""
+				"AGGREGATED": "集計",
+				"DATE_AGGREGATION_OPTIONS": "日付集計オプション",
+				"LATEST": "最新データ"
 			},
 			"DEFAULT_WIDTH": "デフォルト幅",
 			"DELETE": "削除",
@@ -1890,7 +1890,7 @@
 			"UNSHARE": "共有を解除",
 			"UNSHARE_DASHBOARD": "ダッシュボードの共有を解除",
 			"UNSHARE_DASHBOARD_FROM_ALL_PROJECTS": "ダッシュボードを全プロジェクトから解除",
-			"UNSHARE_DASHBOARD_FROM_ALL_WORKSPACES": "",
+			"UNSHARE_DASHBOARD_FROM_ALL_WORKSPACES": "すべてのワークスペースからダッシュボードの共有を解除",
 			"VIEW_ALL": "すべてのダッシュボードを表示",
 			"WORKSPACE": "ワークスペース"
 		},
@@ -2094,7 +2094,7 @@
 			"SHARED_TO_WORKSPACES": "ワークスペースに共有",
 			"SHARE_DASHBOARD": "ダッシュボードを共有",
 			"SHARE_ENTIRE_FOLDER": "上位フォルダーを共有する",
-			"SHARE_ENTIRE_FOLDER_DESC_1": "",
+			"SHARE_ENTIRE_FOLDER_DESC_1": "このダッシュボードを共有すると、親フォルダーおよびその中のすべてのダッシュボードも共有されます。",
 			"SHARE_ENTIRE_FOLDER_DESC_2": "フォルダー内のダッシュボードは個別に共有することはできません。フォルダー全体を共有しますか？",
 			"SHARE_ENTIRE_FOLDER_TO_ALL_PROJECTS": "上位フォルダーを全プロジェクトに共有する",
 			"SHARE_TO_ALL_PROJECTS": "すべてのプロジェクトに共有",
@@ -2347,12 +2347,13 @@
 					"COLOR_SCHEMA": "色彩スキーマ",
 					"DATA_FIELD": "データフィールド",
 					"DATA_TABLE": "データテーブル",
-					"DATE_CONFIG": "",
+					"DATE_CONFIG": "日付設定",
 					"DATE_FORMAT": "日付フォーマット",
 					"DATE_FORMAT_AUTO_DISPLAY": "グラニュラリティ別自動表示",
-					"DATE_RANGE": "",
-					"DATE_RANGE_INVALID_LIMIT_TEXT": "",
-					"DATE_RANGE_INVALID_RANGE_TEXT": "",
+					"DATE_RANGE": "日付範囲",
+					"DATE_RANGE_INFO_TEXT": "許可される日付範囲: 日次 – 最大1ヶ月、\n月次 – 最大12ヶ月、\n年次 – 最大3年",
+					"DATE_RANGE_INVALID_LIMIT_TEXT": "日付範囲が制限を超えています。許可されている値については、情報ツールチップを参照してください。",
+					"DATE_RANGE_INVALID_RANGE_TEXT": "開始日は終了日より前である必要があります。",
 					"DESCRIPTION": "説明",
 					"DYNAMIC_FIELD": "ダイナミックフィールド",
 					"EDIT_DATA": "データを編集",
@@ -2382,7 +2383,7 @@
 					"TOTAL": "合計",
 					"TOTAL_FIELD": "総合フィールド",
 					"UPDATE_PREVIEW": "プレビューを更新する",
-					"USE_BASE_DATE": "",
+					"USE_BASE_DATE": "ダッシュボード基準日を使用",
 					"VALIDATION_MODAL": {
 						"DESC": "このグラフを適切に表示するには、少なくとも {number} つのグループ選択または追加ラベルが必要です。",
 						"EDIT_DATA": "データを編集する",

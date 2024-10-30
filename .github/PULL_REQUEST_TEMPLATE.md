@@ -1,11 +1,10 @@
 ### To Reviewers
-- [ ] Skip (`style`, `chore`, `ci`, minor refactoring, etc.)
-- [ ] Need discussion
-- [ ] Not that difficult
-- [ ] Approved feature branch merge to master
+- [ ] Self-reviewed (coding conventions, bug-free, functionality verified, tests checked, documentation updated)
+- [ ] Minor change, review optional (`style`, `chore`, `ci`, straightforward changes, etc.)
+- [ ] Previously reviewed in feature branch, no further review needed
+- [ ] Need review or discussion
+
+### Description (optional)
 
 
-### Description
-
-
-### Things to Talk About
+### Things to Talk About (optional)

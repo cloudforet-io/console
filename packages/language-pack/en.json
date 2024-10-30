@@ -2351,6 +2351,7 @@
 					"DATE_FORMAT": "Date Format",
 					"DATE_FORMAT_AUTO_DISPLAY": "Auto display by granularity",
 					"DATE_RANGE": "Date Range",
+					"DATE_RANGE_INFO_TEXT": "Allowed date ranges: Daily – max 1 month, \nMonthly – max 12 months, Yearly – max 3 \nyears.",
 					"DATE_RANGE_INVALID_LIMIT_TEXT": "Date range exceeds limit. See information tooltip for allowed values.",
 					"DATE_RANGE_INVALID_RANGE_TEXT": "The start date must be earlier than the end date.",
 					"DESCRIPTION": "Description",
