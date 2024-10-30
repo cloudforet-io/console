@@ -4,7 +4,7 @@ import { computed, reactive, watch } from 'vue';
 import { sortBy } from 'lodash';
 
 import {
-    PContextMenu, PFieldGroup, PFieldTitle, PSelectDropdown,
+    PContextMenu, PDivider, PFieldGroup, PFieldTitle, PRadio, PRadioGroup, PSelectDropdown,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
@@ -31,6 +31,11 @@ import { DASHBOARD_GLOBAL_VARIABLES_PRESET_LIST } from '@/services/dashboards/co
 
 
 
+const SELECTION_TYPE = {
+    MULTI_SELECT: 'multi',
+    SINGLE_SELECT: 'single',
+} as const;
+type SelectionType = typeof SELECTION_TYPE[keyof typeof SELECTION_TYPE];
 type DynamicVariableData = Omit<DashboardGlobalVariable, 'management'|'key'|'name'|'method'>;
 interface Props {
     isValid: boolean;
@@ -72,7 +77,7 @@ const state = reactive({
                     dataKey: state.selectedValuesFrom,
                 },
                 options: {
-                    selectionType: 'multi',
+                    selectionType: state.selectedSelectionType,
                 },
             };
         }
@@ -82,7 +87,7 @@ const state = reactive({
                 resourceType: state.selectedSourceFrom,
             },
             options: {
-                selectionType: 'multi',
+                selectionType: state.selectedSelectionType,
             },
         };
     }),
@@ -100,6 +105,7 @@ const state = reactive({
     }),
     selectedSourceFrom: 'asset' as string|undefined,
     selectedValuesFrom: undefined as string|undefined,
+    selectedSelectionType: 'single' as SelectionType,
     /* Asset */
     // category
     categoryMenuItems: computed<MenuItem[]>(() => {
@@ -200,6 +206,7 @@ const initExistingVariable = (originalData: DashboardGlobalVariable) => {
     } else {
         state.selectedSourceFrom = _reference.resourceType;
     }
+    state.selectedSelectionType = originalData.options.selectionType;
 };
 
 /* Event */
@@ -238,6 +245,9 @@ const handleSelectCostDataSource = (item: MenuItem) => {
 const handleChangeValuesFrom = (valuesFrom: string) => {
     if (state.selectedValuesFrom === valuesFrom) return;
     state.selectedValuesFrom = valuesFrom;
+};
+const handleChangeSelectionType = (type: SelectionType) => {
+    state.selectedSelectionType = type;
 };
 
 /* Watcher */
@@ -350,6 +360,26 @@ watch(() => props.originalData, (originalData) => {
                                @select="handleChangeValuesFrom"
             />
         </p-field-group>
+        <!-- Selection Type -->
+        <p-divider class="divider" />
+        <p-field-group :label="$t('DASHBOARDS.DETAIL.VARIABLES.SELECTION_TYPE')"
+                       required
+        >
+            <p-radio-group>
+                <p-radio :value="SELECTION_TYPE.MULTI_SELECT"
+                         :selected="state.selectedSelectionType"
+                         @change="handleChangeSelectionType"
+                >
+                    {{ $t('DASHBOARDS.DETAIL.VARIABLES.MULTI_SELECT') }}
+                </p-radio>
+                <p-radio :value="SELECTION_TYPE.SINGLE_SELECT"
+                         :selected="state.selectedSelectionType"
+                         @change="handleChangeSelectionType"
+                >
+                    {{ $t('DASHBOARDS.DETAIL.VARIABLES.SINGLE_SELECT') }}
+                </p-radio>
+            </p-radio-group>
+        </p-field-group>
     </div>
 </template>
 
@@ -357,6 +387,10 @@ watch(() => props.originalData, (originalData) => {
 .dashboard-variables-dynamic {
     @apply bg-gray-100 rounded-md;
     padding: 0.75rem 1rem;
+
+    .divider {
+        margin: 0.75rem 0;
+    }
 }
 .data-source-wrapper {
     @apply bg-white rounded-md border border-gray-200 grid grid-cols-12;

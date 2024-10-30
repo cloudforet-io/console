@@ -34,6 +34,7 @@ import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import getRandomId from '@/lib/random-id-generator';
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
+import WorkspaceVariableModel from '@/lib/variable-models/managed-model/resource-model/workspace-variable-model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -170,6 +171,9 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
                 const idKey = MANAGED_VARIABLE_MODELS[k]?.meta.idKey;
                 if (idKey) _vars[idKey] = v;
             });
+            if (!storeState.isAdminMode) {
+                delete _vars[WorkspaceVariableModel.meta.idKey];
+            }
             return _vars;
         }),
         // only for 1.0 legacy dashboard
