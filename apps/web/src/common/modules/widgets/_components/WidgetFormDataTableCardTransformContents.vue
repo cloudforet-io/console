@@ -73,8 +73,12 @@ const state = reactive({
         const dataTableIdChanged = state.dataTableInfo.dataTableId !== originState.dataTableInfo.dataTableId;
         const joinTypeChanged = joinState.joinType !== originState.joinType;
         const conditionsChanged = !isEqual(queryState.conditions.map((cond) => ({ value: cond.value })).filter((cond) => !!cond.value.trim().length), originState.conditions);
-        const expressionsChanged = !isEqual(evalState.expressions.map((expression) => ({ name: expression.name, field_type: expression.fieldType, expression: expression.expression }))
-            .filter((expression) => !!expression.name && !!expression.expression), originState.expressions);
+        const expressionsChanged = !isEqual(evalState.expressions.map((expression) => ({
+            name: expression.name,
+            field_type: expression.fieldType,
+            expression: expression.expression,
+            condition: expression?.condition,
+        })).filter((expression) => !!expression.name && !!expression.expression), originState.expressions);
         if (state.operator === 'CONCAT') return dataTablesChanged;
         if (state.operator === 'JOIN') return dataTablesChanged || joinTypeChanged;
         if (state.operator === 'QUERY') return dataTableIdChanged || conditionsChanged;
@@ -177,8 +181,11 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
     const evalOptions: EvalOptions = {
         data_table_id: state.dataTableInfo.dataTableId,
         expressions: evalState.expressions.map((expressionInfo) => ({
-            name: expressionInfo.name, field_type: expressionInfo.fieldType, expression: expressionInfo.expression,
-        })).filter((expresionInfo) => !!expresionInfo.name && !!expresionInfo.expression),
+            name: expressionInfo.name,
+            field_type: expressionInfo.fieldType,
+            expression: expressionInfo.expression,
+            ...(expressionInfo.condition && { condition: expressionInfo.condition }) || {},
+        })).filter((expressionInfo) => !!expressionInfo.name && !!expressionInfo.expression),
     };
     const options = () => {
         switch (state.operator) {
