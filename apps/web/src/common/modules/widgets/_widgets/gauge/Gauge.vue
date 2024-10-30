@@ -9,7 +9,7 @@ import type {
     EChartsType,
 } from 'echarts/core';
 import { init } from 'echarts/core';
-import { isEmpty, throttle } from 'lodash';
+import { isEmpty, orderBy, throttle } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
@@ -113,9 +113,10 @@ const state = reactive({
     gaugeColor: computed<string>(() => {
         let _formatRules = props.widgetOptions?.formatRules as FormatRulesValue[];
         let _color = gray[200];
-        _formatRules = _formatRules?.sort((a, b) => (a?.threshold || 0) - (b?.threshold || 0));
+        const _percentage = (state.chartData / state.max) * 100;
+        _formatRules = orderBy(_formatRules, ['threshold'], ['asc']);
         _formatRules?.forEach((d) => {
-            if (state.chartData >= (d.threshold || 0)) {
+            if (_percentage >= (d.threshold || 0)) {
                 _color = d.color;
             }
         });

@@ -178,7 +178,6 @@ watch(() => widgetGenerateState.widget?.size, (widgetSize) => {
     }
 }, { immediate: true });
 watch(() => state.mounted, async (mounted) => {
-    console.log(widgetGenerateState.widget?.state);
     if (mounted) {
         if (widgetGenerateState.widget?.state === 'CREATING') {
             await updateWidget();
