@@ -278,6 +278,29 @@ export const useDashboardStore = defineStore('dashboard', () => {
         const createdDashboard = await createDashboard(_dashboardType, _createdDashboardParams);
         return createdDashboard;
     };
+    const addWidgetToDashboard = async (dashboardId: string, widgetId: string) => {
+        const _allDashboardItems = [...state.privateDashboardItems, ...state.publicDashboardItems];
+        const _dashboard = _allDashboardItems.find((item) => item.dashboard_id === dashboardId);
+        const _layouts = cloneDeep(_dashboard?.layouts || []);
+        if (_layouts.length) {
+            const _targetLayout = _layouts[0];
+            if (_targetLayout.widgets) {
+                _targetLayout.widgets.push(widgetId);
+            } else {
+                _targetLayout.widgets = [widgetId];
+            }
+            _layouts[0] = _targetLayout;
+        } else {
+            _layouts.push({
+                widgets: [widgetId],
+            });
+        }
+
+        await updateDashboard(dashboardId, {
+            dashboard_id: dashboardId,
+            layouts: _layouts,
+        });
+    };
 
     // folder
     const createFolder = async (name: string, isPrivate: boolean): Promise<string|undefined> => {
@@ -307,6 +330,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
         reset,
         createFolder,
         cloneDashboard,
+        addWidgetToDashboard,
     };
 
     return {
