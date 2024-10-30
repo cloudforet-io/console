@@ -10,14 +10,11 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PDataLoader, PEmpty, PButton } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
-import type { PrivateDashboardUpdateParameters } from '@/schema/dashboard/private-dashboard/api-verbs/update';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PrivateWidgetCreateParameters } from '@/schema/dashboard/private-widget/api-verbs/create';
 import type { PrivateWidgetDeleteParameters } from '@/schema/dashboard/private-widget/api-verbs/delete';
 import type { PrivateWidgetUpdateParameters } from '@/schema/dashboard/private-widget/api-verbs/update';
 import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
-import type { PublicDashboardUpdateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/update';
 import type { DataTableListParameters } from '@/schema/dashboard/public-data-table/api-verbs/list';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import type { PublicWidgetCreateParameters } from '@/schema/dashboard/public-widget/api-verbs/create';
@@ -27,6 +24,7 @@ import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
@@ -66,6 +64,7 @@ type RefinedWidgetInfo = WidgetModel & {
     component: AsyncComponent|null;
 };
 
+const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardDetailState = dashboardDetailStore.state;
@@ -272,9 +271,6 @@ const handleCloneWidget = async (widget: RefinedWidgetInfo) => {
     const widgetUpdateFetcher = isPrivate
         ? SpaceConnector.clientV2.dashboard.privateWidget.update<PrivateWidgetUpdateParameters, PrivateWidgetModel>
         : SpaceConnector.clientV2.dashboard.publicWidget.update<PublicWidgetUpdateParameters, PublicWidgetModel>;
-    const dashboardUpdateFetcher = isPrivate
-        ? SpaceConnector.clientV2.dashboard.privateDashboard.update<PrivateDashboardUpdateParameters, DashboardModel>
-        : SpaceConnector.clientV2.dashboard.publicDashboard.update<PublicDashboardUpdateParameters, DashboardModel>;
 
     const dataTableList = await listWidgetDataTables(widget.widget_id);
     const dataTableIndex = dataTableList.findIndex((d) => d.data_table_id === widget.data_table_id);
@@ -299,10 +295,7 @@ const handleCloneWidget = async (widget: RefinedWidgetInfo) => {
             state: 'ACTIVE',
         });
         dashboardDetailStore.setDashboardWidgets([...dashboardDetailState.dashboardWidgets, completedWidget]);
-        await dashboardUpdateFetcher({
-            dashboard_id: dashboardDetailState.dashboardId,
-            layouts: dashboardDetailGetters.dashboardLayouts,
-        });
+        await dashboardStore.addWidgetToDashboard(dashboardDetailState.dashboardId, createdWidget.widget_id);
         showSuccessMessage(i18n.t('COMMON.WIDGETS.CLONE_SUCCESS_MSG'), '');
     } catch (e: any) {
         showErrorMessage(e.message, e);

@@ -111,10 +111,7 @@ const updateWidget = async () => {
         state: 'ACTIVE',
     });
     if (_isCreating) {
-        await dashboardStore.updateDashboard(dashboardDetailState.dashboardId as string, {
-            dashboard_id: dashboardDetailState.dashboardId || '',
-            layouts: dashboardDetailGetters.dashboardLayouts,
-        });
+        await dashboardStore.addWidgetToDashboard(dashboardDetailState.dashboardId || '', widgetGenerateState.widgetId);
     }
 };
 
@@ -181,6 +178,7 @@ watch(() => widgetGenerateState.widget?.size, (widgetSize) => {
     }
 }, { immediate: true });
 watch(() => state.mounted, async (mounted) => {
+    console.log(widgetGenerateState.widget?.state);
     if (mounted) {
         if (widgetGenerateState.widget?.state === 'CREATING') {
             await updateWidget();
