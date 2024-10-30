@@ -29,6 +29,7 @@ import type {
     CostJobStatusInfo,
 } from '@/services/cost-explorer/types/data-sources-type';
 
+
 const dataSourcesPageStore = useDataSourcesPageStore();
 const dataSourcesPageState = dataSourcesPageStore.state;
 const dataSourcesPageGetters = dataSourcesPageStore.getters;
@@ -117,10 +118,6 @@ const fetchJobList = async () => {
     state.loading = true;
     try {
         jobListApiQueryHelper.setPage(tableState.pageStart, tableState.pageLimit);
-        //   .setFilters([
-        //     { k: "status", v: "TIMEOUT", o: "!=" },
-        //     { k: "status", v: "CANCELED", o: "!=" },
-        //   ]);
         await dataSourcesPageStore.fetchJobList({
             data_source_id: storeState.selectedItem?.data_source_id || '',
             query: jobListApiQueryHelper.data,
