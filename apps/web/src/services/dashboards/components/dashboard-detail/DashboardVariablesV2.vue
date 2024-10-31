@@ -11,7 +11,7 @@ import type { DashboardVariableSchemaProperty, DashboardVars } from '@/schema/da
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import DashboardManageVariableOverlay from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableOverlay.vue';
-import DashboardVariableDropdown from '@/services/dashboards/components/dashboard-detail/DashboardVariableDropdown.vue';
+// import DashboardVariableDropdown from '@/services/dashboards/components/dashboard-detail/DashboardVariableDropdown.vue';
 import DashboardVariablesMoreButton
     from '@/services/dashboards/components/dashboard-detail/DashboardVariablesMoreButton.vue';
 import {
@@ -85,22 +85,22 @@ const handleResetVariables = () => {
 
 <template>
     <div :class="{'dashboard-variables-select-dropdown': true, 'detail-page': !props.widgetMode}">
-        <template v-for="([propertyName, property], idx) in Object.entries(state.variableProperties)">
-            <div :key="`${propertyName}-${idx}`"
-                 class="variable-selector-box"
-            >
-                <dashboard-variable-dropdown :property-name="propertyName"
-                                             :property-label="property.name"
-                                             :property="property"
-                                             :reference-map="state.allReferenceTypeInfo[propertyName]?.referenceMap"
-                                             :disabled="props.loading"
-                                             :dashboard-variables="dashboardDetailState.vars"
-                />
-                <span class="circle-mark"
-                      :class="{'changed': state.modifiedVariablesSchemaProperties.includes(propertyName)}"
-                />
-            </div>
-        </template>
+        <!--        <template v-for="([propertyName, property], idx) in Object.entries(state.variableProperties)">-->
+        <!--            <div :key="`${propertyName}-${idx}`"-->
+        <!--                 class="variable-selector-box"-->
+        <!--            >-->
+        <!--                <dashboard-variable-dropdown :property-name="propertyName"-->
+        <!--                                             :property-label="property.name"-->
+        <!--                                             :property="property"-->
+        <!--                                             :reference-map="state.allReferenceTypeInfo[propertyName]?.referenceMap"-->
+        <!--                                             :disabled="props.loading"-->
+        <!--                                             :dashboard-variables="dashboardDetailState.vars"-->
+        <!--                />-->
+        <!--                <span class="circle-mark"-->
+        <!--                      :class="{'changed': state.modifiedVariablesSchemaProperties.includes(propertyName)}"-->
+        <!--                />-->
+        <!--            </div>-->
+        <!--        </template>-->
         <p-text-button style-type="highlight"
                        class="reset-button"
                        :disabled="props.loading || state.notChanged"
