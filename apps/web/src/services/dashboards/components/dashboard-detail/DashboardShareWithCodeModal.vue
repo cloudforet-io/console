@@ -101,6 +101,8 @@ watch(() => props.visible, async (visible) => {
             layouts: _sharedLayouts,
             options: state.targetDashboard.options || {},
             labels: state.targetDashboard.labels || [],
+            vars: state.targetDashboard.vars,
+            vars_schema: state.targetDashboard.vars_schema,
         };
         state.loading = false;
     }

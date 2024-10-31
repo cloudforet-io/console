@@ -130,6 +130,8 @@ const cloneDashboard = async (): Promise<string|undefined> => {
             options: state.targetDashboard.options || {},
             labels: state.targetDashboard.labels || [],
             tags: { created_by: store.state.user.userId },
+            vars: state.targetDashboard.vars,
+            vars_schema: state.targetDashboard.vars_schema,
         };
         if (storeState.isAdminMode) {
             state.isPrivate = false;
