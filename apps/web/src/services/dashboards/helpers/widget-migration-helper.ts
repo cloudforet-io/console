@@ -4,7 +4,6 @@ import { cloneDeep } from 'lodash';
 import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 
-import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { WidgetHeaderValue } from '@/common/modules/widgets/_widget-fields/header/type';
 import type {
     TableDataFieldValueNoVersion,
@@ -194,33 +193,6 @@ const migrateAllWidgets = (dashboardWidgets: Array<PublicWidgetModel|PrivateWidg
                 widgetHeader: {
                     ..._widgetHeaderOption,
                     toggleValue: true,
-                },
-            };
-        }
-        // Date Range
-        /* History
-        * Migration note: For existing non-table widgets, apply the current year/month/day date range
-        * instead of the 'auto' policy. This migration only affects legacy widgets, as newer non-table
-        * widgets are already configured with specific date ranges based on granularity (e.g., 'DAILY' -> 'today').
-        * */
-        const _widgetDateRangeOption = cloneDeep(widget?.options?.dateRange) as DateRangeValue;
-        if (_widgetDateRangeOption === undefined) {
-            const granularity = widget.options?.granularity as string;
-            const granularityDefaults: Record<string, DateRangeValue['options']['value']> = {
-                DAILY: 'today',
-                MONTHLY: 'thisMonth',
-                YEARLY: 'thisYear',
-            };
-
-            const defaultDateRangePresetKey = granularityDefaults[granularity] || 'auto';
-
-            widget.options = {
-                ..._widgetOptions,
-                dateRange: {
-                    inherit: true,
-                    options: {
-                        value: widget.widget_type === 'table' ? 'auto' : defaultDateRangePresetKey,
-                    },
                 },
             };
         }
