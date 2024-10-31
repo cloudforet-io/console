@@ -4,7 +4,6 @@ import {
     reactive, ref, watch, computed, onBeforeUnmount,
 } from 'vue';
 
-import dayjs from 'dayjs';
 import { cloneDeep, debounce, flattenDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -95,7 +94,6 @@ const state = reactive({
     overlayType: 'EDIT' as 'EDIT' | 'EXPAND',
     showExpandOverlay: false,
     remountWidgetId: undefined as string|undefined,
-    showDateRangeNotification: false,
 });
 const widgetDeleteState = reactive({
     visibleModal: false,
@@ -378,10 +376,6 @@ watch(() => dashboardDetailState.dashboardWidgets, (dashboardWidgets) => {
         });
     }
 }, { immediate: true });
-watch(() => dashboardDetailState.dashboardInfo?.created_at, () => {
-    // NOTE: Dashboards created before 2024-11-01, will display a date range scoped notification.
-    state.showDateRangeNotification = dayjs.utc(dashboardDetailState.dashboardInfo?.created_at).isSameOrBefore(dayjs.utc('2024-11-01'));
-}, { immediate: true });
 let widgetObserverMap: Record<string, IntersectionObserver> = {};
 const stopWidgetRefWatch = watch([widgetRef, () => state.isAllWidgetsMounted], ([widgetRefs, allMounted]) => {
     if (widgetObserverMap) {
@@ -415,13 +409,14 @@ defineExpose({
     <div ref="containerRef"
          class="dashboard-widget-container"
     >
-        <p-scoped-notification v-if="state.showDateRangeNotification"
+        <p-scoped-notification v-if="dashboardDetailState.showDateRangeNotification"
                                type="information"
                                icon="ic_info-circle"
                                show-close-button
                                :title="$t('DASHBOARDS.DETAIL.DATE_RANGE_NOTIFICATION_TITLE')"
                                class="w-full"
-                               :visible.sync="state.showDateRangeNotification"
+                               :visible="dashboardDetailState.showDateRangeNotification"
+                               @update:visible="dashboardDetailState.showDateRangeNotification = $event"
         >
             <div>
                 <p>{{ $t('DASHBOARDS.DETAIL.DATE_RANGE_NOTIFICATION_DESC1') }}</p>
