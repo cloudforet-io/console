@@ -60,9 +60,9 @@ import { BUTTON_SIZE, BUTTON_STYLE } from '@/inputs/buttons/button/type';
 
 
 const ICON_SIZE: Record<ButtonSize, string> = {
-    sm: '0.75rem',
-    md: '1rem',
-    lg: '1.25rem',
+    sm: '1rem',
+    md: '1.25rem',
+    lg: '1.5rem',
 };
 const LOADING_SIZE: Record<ButtonSize, string> = {
     sm: SPINNER_SIZE.xs,
