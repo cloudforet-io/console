@@ -112,6 +112,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         labels: [] as string[],
         dashboardType: 'PUBLIC' as DashboardType,
         dashboardScope: 'WORKSPACE' as DashboardScope,
+        showDateRangeNotification: true,
         // template info
         templateId: 'blank', // "templateId" exists in new dashboard, but not in existing dashboard.
         templateType: 'MANAGED' as TemplateType,
@@ -212,6 +213,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const setShareWithCodeModalVisible = (visible: boolean) => { state.shareWithCodeModalVisible = visible; };
     const setDashboardShareModalVisible = (visible: boolean) => { state.dashboardShareModalVisible = visible; };
     const setDashboardShareModalType = (type: 'SHARE' | 'UNSHARE') => { state.dashboardShareModalType = type; };
+    const setShowDateRangeNotification = (visible: boolean) => { state.showDateRangeNotification = visible; };
     /* Actions */
     const reset = () => {
         // set default value of all state
@@ -235,6 +237,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         //
         setIsNameValid(undefined);
         state.widgetValidMap = {};
+        state.showDateRangeNotification = true;
     };
     const setOriginDashboardName = (name: string) => {
         if (state.dashboardInfo) state.dashboardInfo.name = name;
@@ -442,6 +445,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setShareWithCodeModalVisible,
         setDashboardShareModalVisible,
         setDashboardShareModalType,
+        setShowDateRangeNotification,
     };
     const actions = {
         reset,

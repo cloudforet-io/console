@@ -7,7 +7,9 @@ import {
 import { cloneDeep, debounce, flattenDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { PDataLoader, PEmpty, PButton } from '@cloudforet/mirinae';
+import {
+    PDataLoader, PEmpty, PButton, PScopedNotification,
+} from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
@@ -407,6 +409,20 @@ defineExpose({
     <div ref="containerRef"
          class="dashboard-widget-container"
     >
+        <p-scoped-notification v-if="dashboardDetailState.showDateRangeNotification"
+                               type="information"
+                               icon="ic_info-circle"
+                               show-close-button
+                               :title="$t('DASHBOARDS.DETAIL.DATE_RANGE_NOTIFICATION_TITLE')"
+                               class="w-full"
+                               :visible="dashboardDetailState.showDateRangeNotification"
+                               @update:visible="dashboardDetailState.showDateRangeNotification = $event"
+        >
+            <div>
+                <p>{{ $t('DASHBOARDS.DETAIL.DATE_RANGE_NOTIFICATION_DESC1') }}</p>
+                <p>{{ $t('DASHBOARDS.DETAIL.DATE_RANGE_NOTIFICATION_DESC2') }} <b>({{ $t('DASHBOARDS.DETAIL.DATE_RANGE_NOTIFICATION_DESC3') }})</b></p>
+            </div>
+        </p-scoped-notification>
         <p-data-loader :loading="dashboardDetailState.loadingDashboard"
                        :data="state.refinedWidgetInfoList"
                        loader-backdrop-color="gray.100"
