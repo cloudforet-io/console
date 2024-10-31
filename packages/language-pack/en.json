@@ -3230,12 +3230,15 @@
 		"NOTICE": {
 			"ALL_WORKSPACE": "All Workspaces",
 			"DETAIL": {
+				"ALL_SENDING_EMAIL_MODAL_CONTENT": "Are you sure you want to send an email to all the members of the workspace?",
+				"ALL_SENDING_EMAIL_MODAL_TITLE": "Send email to all members in all workspaces.",
 				"ALT_E_SEND_EMAIL": "Fail to sent email",
 				"ALT_S_SENDING": "Sending email",
 				"ALT_S_SEND_EMAIL": "Successfully sent email",
 				"BACK_TO_LIST": "Back to List",
 				"DETAIL_TITLE": "Notice Detail",
-				"SHOW_ALL_WORKSPACES": "Show All Workspaces"
+				"SHOW_ALL_WORKSPACES": "Show All Workspaces",
+				"SPECIFIC_SENDING_EMAIL_MODAL_TITLE": "Send email to all members in workspaces below"
 			},
 			"DOMAIN_NOTICE": "Internal Notice",
 			"FORM": {

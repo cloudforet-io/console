@@ -3230,12 +3230,15 @@
 		"NOTICE": {
 			"ALL_WORKSPACE": "すべてのワークスペース",
 			"DETAIL": {
+				"ALL_SENDING_EMAIL_MODAL_CONTENT": "すべてのワークスペースのユーザーにメールを送信しますか？",
+				"ALL_SENDING_EMAIL_MODAL_TITLE": "すべてのワークスペースのすべてのユーザーにメールを送信",
 				"ALT_E_SEND_EMAIL": "電子メール送信に失敗しました",
 				"ALT_S_SENDING": "メール送信中",
 				"ALT_S_SEND_EMAIL": "メール送信完了",
 				"BACK_TO_LIST": "一覧に戻る",
 				"DETAIL_TITLE": "お知らせ詳細",
-				"SHOW_ALL_WORKSPACES": "すべてのワークスペースを表示"
+				"SHOW_ALL_WORKSPACES": "すべてのワークスペースを表示",
+				"SPECIFIC_SENDING_EMAIL_MODAL_TITLE": "以下のワークスペースに含まれるユーザーにメールを送信します。"
 			},
 			"DOMAIN_NOTICE": "内部通知",
 			"FORM": {
