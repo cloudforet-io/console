@@ -3,8 +3,9 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PIconButton, PI, PFieldGroup, PSelectButton, PTextInput, PButton, PTextarea, PButtonModal,
+    PIconButton, PI, PFieldGroup, PSelectButton, PTextInput, PButton, PTextarea, PButtonModal, PToggleButton, PLink,
 } from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import { i18n } from '@/translations';
@@ -16,6 +17,8 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { EVAL_EXPRESSION_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import type { EvalExpressions } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { EvaluateExpressionType } from '@/common/modules/widgets/types/widget-model';
+
+
 
 interface Props {
     expressions: (EvalExpressions[]|string[]);
@@ -104,6 +107,16 @@ const handleClickAddLabel = () => {
         },
     ];
 };
+const handleToggleCondition = (key: string) => {
+    const targetExpression = state.proxyExpressions.find((d) => d.key === key);
+    if (!targetExpression) return;
+    if ('condition' in targetExpression) {
+        delete targetExpression.condition;
+    } else {
+        targetExpression.condition = '';
+    }
+    state.proxyExpressions = [...state.proxyExpressions];
+};
 </script>
 
 <template>
@@ -162,13 +175,55 @@ const handleClickAddLabel = () => {
                                       block
                         />
                     </p-field-group>
-                    <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.FIELD_FORMULA')"
+                    <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.FIELD_EXPRESSION')"
                                    required
                                    style-type="secondary"
                     >
-                        <p-textarea v-model="expression.expression"
-                                    :placeholder="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.FORMULA_PLACEHOLDER')"
-                        />
+                        <div class="field-expression-wrapper">
+                            <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.CONDITION')"
+                                           style-type="secondary"
+                                           required
+                                           class="expression-form"
+                            >
+                                <template #label-extra>
+                                    <div class="condition-form-extra justify-between inline-flex">
+                                        <p-link href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.query.html"
+                                                :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                                                highlight
+                                                class="external-link"
+                                        >
+                                            Pandas Query
+                                        </p-link>
+                                        <p-toggle-button :value="'condition' in expression"
+                                                         class="condition-toggle-button"
+                                                         @change-toggle="handleToggleCondition(expression.key)"
+                                        />
+                                    </div>
+                                </template>
+                                <p-textarea v-if="'condition' in expression"
+                                            v-model="expression.condition"
+                                            :placeholder="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.CONDITION_PLACEHOLDER')"
+                                />
+                            </p-field-group>
+                            <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.FORMULA')"
+                                           style-type="secondary"
+                                           required
+                                           class="expression-form"
+                            >
+                                <template #label-extra>
+                                    <p-link href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.eval.html"
+                                            :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                                            highlight
+                                            class="external-link"
+                                    >
+                                        Pandas Eval
+                                    </p-link>
+                                </template>
+                                <p-textarea v-model="expression.expression"
+                                            :placeholder="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.FORMULA_PLACEHOLDER')"
+                                />
+                            </p-field-group>
+                        </div>
                     </p-field-group>
                 </div>
             </div>
@@ -251,6 +306,22 @@ const handleClickAddLabel = () => {
 
         .form-body {
             padding: 0.5rem 0.5rem 0;
+            .field-expression-wrapper {
+                @apply bg-gray-100 rounded;
+                padding: 0.5rem;
+                .expression-form {
+                    @apply bg-white rounded;
+                    position: relative;
+                    padding: 0.5rem;
+                    .external-link {
+                        font-weight: normal;
+                    }
+                    .condition-toggle-button {
+                        right: 0.5rem;
+                        position: absolute;
+                    }
+                }
+            }
         }
     }
     .add-field-button {
