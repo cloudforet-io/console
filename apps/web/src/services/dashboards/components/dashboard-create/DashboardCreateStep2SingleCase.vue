@@ -26,6 +26,10 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import DashboardCreateScopeForm from '@/services/dashboards/components/dashboard-create/DashboardCreateScopeForm.vue';
+import {
+    DASHBOARD_VARS_SCHEMA_PRESET,
+    DOMAIN_DASHBOARD_VARS_SCHEMA_PRESET,
+} from '@/services/dashboards/constants/dashboard-vars-schema-preset';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
@@ -105,6 +109,7 @@ const createSingleDashboard = async () => {
         labels: state.labels.map((item) => item.name),
         tags: { created_by: store.state.user.userId },
         folder_id: state.selectedFolderId,
+        vars_schema: storeState.isAdminMode ? DOMAIN_DASHBOARD_VARS_SCHEMA_PRESET : DASHBOARD_VARS_SCHEMA_PRESET,
     };
     try {
         if (storeState.isAdminMode) {

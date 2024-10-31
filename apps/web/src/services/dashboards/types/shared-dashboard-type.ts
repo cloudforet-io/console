@@ -21,7 +21,7 @@ export type SharedDashboardLayout = {
     widgets: SharedWidgetInfo[];
 };
 export type SharedDashboardInfo =
-    Pick<DashboardModel, 'name' | 'options' | 'labels'> & {
+    Pick<DashboardModel, 'name' | 'options' | 'labels' | 'vars' | 'vars_schema'> & {
     layouts: Array<{
         name?: string;
         widgets: SharedWidgetInfo[];
