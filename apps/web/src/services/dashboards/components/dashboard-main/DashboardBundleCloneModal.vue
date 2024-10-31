@@ -256,7 +256,6 @@ const handleCloneConfirm = async () => {
     // 1. Use Existing Folder Structure
     if (!state.changeFolderStructure) {
         await Promise.allSettled(state.modalTableItems.map(async (item) => {
-            // 1. Use Existing Folder Structure
             const _isPrivate = storeState.isWorkspaceMember ? true : state.privateMap[item.id];
             if (item.type === 'FOLDER') {
                 const createdFolderId = await dashboardStore.createFolder(item.name, _isPrivate);
@@ -268,6 +267,8 @@ const handleCloneConfirm = async () => {
                 });
             } else if (!item.folderId) {
                 _createDashboardPromises.push(cloneDashboard(item.id, _isPrivate));
+            } else {
+                _createDashboardPromises.push(cloneDashboard(item.id, _isPrivate, item.folderId));
             }
         }));
     } else { // 2. Change Folder Structure
