@@ -188,7 +188,6 @@ const handleChangeStartOption = (selected: string) => {
             }
 
             .label-item {
-                margin-bottom: 0.5rem;
                 .content-menu-item {
                     @apply inline-flex text-label-md;
                     margin-left: 0.25rem;
