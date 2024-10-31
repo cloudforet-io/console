@@ -107,11 +107,7 @@ const listDashboardWidgets = async (dashboardId: string): Promise<WidgetModel[]>
         const res = await fetcher<PublicWidgetListParameters|PrivateWidgetListParameters, ListResponse<WidgetModel>>({
             dashboard_id: dashboardId,
         });
-        const [_isMigrated, widgets] = migrateLegacyWidgetOptions(res.results || []);
-        if (_isMigrated) {
-            return widgets;
-        }
-        return res.results || [];
+        return migrateLegacyWidgetOptions(res.results || []);
     } catch (e) {
         ErrorHandler.handleError(e);
         return [];
