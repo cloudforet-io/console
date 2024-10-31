@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { PRadio, PCheckbox } from '@cloudforet/mirinae';
+import { PRadio, PCheckbox, PRadioGroup } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 
@@ -55,15 +55,16 @@ const onChangeTopic = (topics: string[]) => {
 
 <template>
     <div>
-        <p-radio v-for="(item, i) in state.topicModeList"
-                 :key="i"
-                 :selected="state.isTopicModeSelected"
-                 :value="item.value"
-                 class="mr-4"
-                 @change="onChangeTopicMode"
-        >
-            <span class="radio-label">{{ item.label }}</span>
-        </p-radio>
+        <p-radio-group>
+            <p-radio v-for="(item, i) in state.topicModeList"
+                     :key="i"
+                     :selected="state.isTopicModeSelected"
+                     :value="item.value"
+                     @change="onChangeTopicMode"
+            >
+                <span class="radio-label">{{ item.label }}</span>
+            </p-radio>
+        </p-radio-group>
         <article v-if="state.isTopicModeSelected"
                  class="topic-wrapper"
         >
