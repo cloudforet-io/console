@@ -921,6 +921,7 @@
 				"ERROR_FOUND_OK": "はい",
 				"ERROR_FOUND_TITLE": "エラーの詳細",
 				"GUIDE": "データソース登録方法を調べる",
+				"IN_PROGRESS": "進行中",
 				"LINKED": "リンク済み",
 				"MODAL_CONTENT": "このデータタイプを許可すると、ユーザーモードですべてのワークスペースにアクセスできるようになります。",
 				"MODAL_TITLE": "アクセス許可",
