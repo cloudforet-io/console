@@ -2063,6 +2063,10 @@
 			"CUSTOMIZE": "カスタマイズ",
 			"CUSTOM_DATE_MODAL_MONTH": "月",
 			"CUSTOM_DATE_MODAL_TITLE": "適用するカスタム範囲",
+			"DATE_RANGE_NOTIFICATION_DESC1": "ウィジェットに「日付範囲」フィールドが追加されたことにより、このフィールドが更新されていないウィジェットはデフォルト値に従うように設定されます。",
+			"DATE_RANGE_NOTIFICATION_DESC2": "デフォルト値は粒度によって異なります。",
+			"DATE_RANGE_NOTIFICATION_DESC3": "日別: 今月 / 月別: 今年 / 年別: 過去3年間",
+			"DATE_RANGE_NOTIFICATION_TITLE": "各ウィジェットごとに「日付範囲」オプションを追加",
 			"DEFAULT": "既定値",
 			"DELETE": "削除",
 			"DONE_EDITING": "編集完了",
@@ -3310,12 +3314,15 @@
 		"NOTICE": {
 			"ALL_WORKSPACE": "すべてのワークスペース",
 			"DETAIL": {
+				"ALL_SENDING_EMAIL_MODAL_CONTENT": "すべてのワークスペースのユーザーにメールを送信しますか？",
+				"ALL_SENDING_EMAIL_MODAL_TITLE": "すべてのワークスペースのすべてのユーザーにメールを送信",
 				"ALT_E_SEND_EMAIL": "電子メール送信に失敗しました",
 				"ALT_S_SENDING": "メール送信中",
 				"ALT_S_SEND_EMAIL": "メール送信完了",
 				"BACK_TO_LIST": "一覧に戻る",
 				"DETAIL_TITLE": "お知らせ詳細",
-				"SHOW_ALL_WORKSPACES": "すべてのワークスペースを表示"
+				"SHOW_ALL_WORKSPACES": "すべてのワークスペースを表示",
+				"SPECIFIC_SENDING_EMAIL_MODAL_TITLE": "以下のワークスペースに含まれるユーザーにメールを送信します。"
 			},
 			"DOMAIN_NOTICE": "内部通知",
 			"FORM": {

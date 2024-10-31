@@ -7,14 +7,19 @@ import { useRoute, useRouter } from 'vue-router/composables';
 import { clone } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { PButton, PHeading, PHeadingLayout } from '@cloudforet/mirinae';
-
+import {
+    PButton, PButtonModal, PHeading, PHeadingLayout, PDataTable, PStatus,
+} from '@cloudforet/mirinae';
+import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { PostSendParameters } from '@/schema/board/post/api-verbs/send';
 import type { PostModel } from '@/schema/board/post/model';
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import {
@@ -29,7 +34,10 @@ import { MENU_ID } from '@/lib/menu/config';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
+import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
+import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import NoticeDetail from '@/services/info/components/NoticeDetail.vue';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
@@ -43,6 +51,8 @@ const props = defineProps<{
 const { getProperRouteLocation } = useProperRouteLocation();
 const noticeDetailStore = useNoticeDetailStore();
 const noticeDetailState = noticeDetailStore.state;
+const userWorkspaceStore = useUserWorkspaceStore();
+const userWorkspaceGetters = userWorkspaceStore.getters;
 
 const router = useRouter();
 const route = useRoute();
@@ -50,10 +60,13 @@ const route = useRoute();
 const storeState = reactive({
     post: computed<undefined|PostModel>(() => noticeDetailState.post),
     pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
 });
 const state = reactive({
     hasPermissionToEditOrDelete: computed<boolean>(() => store.getters['user/isDomainAdmin']),
     deleteModalVisible: false,
+    allSendingEmailModalVisible: false,
+    specificSendingEmailModalVisible: false,
     sendLoading: false,
     selectedMenuId: computed(() => {
         const reversedMatched = clone(route.matched).reverse();
@@ -65,7 +78,17 @@ const state = reactive({
         return targetMenuId;
     }),
     hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
+    isAllWorkspace: computed<boolean>(() => (!storeState.post?.workspaces || storeState.post?.workspaces?.includes('*')) ?? true),
+    scopedWorkspaceList: computed<WorkspaceModel[]|undefined>(() => {
+        if (state.isAllWorkspace) return undefined;
+        return storeState.workspaceList.filter((workspace) => storeState.post?.workspaces.includes(workspace.workspace_id));
+    }),
 });
+
+const tableField:DataTableField = [
+    { name: 'name', label: 'Workspace' },
+    { name: 'state', label: 'State' },
+];
 
 const handleClickEditButton = () => {
     if (!props.postId) {
@@ -94,6 +117,14 @@ const handleDeleteNoticeConfirm = async () => {
         state.deleteModalVisible = false;
     }
 };
+
+const handleOpenEmailSendingModal = () => {
+    if (state.isAllWorkspace) {
+        state.allSendingEmailModalVisible = true;
+        return;
+    }
+    state.specificSendingEmailModalVisible = true;
+};
 const handleClickSendEmail = async () => {
     state.sendLoading = true;
     const loadingMessageId = showLoadingMessage(i18n.t('INFO.NOTICE.DETAIL.ALT_S_SENDING'), '');
@@ -117,6 +148,8 @@ const handleClickSendEmail = async () => {
         hideLoadingMessage(loadingMessageId);
         showErrorMessage(i18n.t('INFO.NOTICE.DETAIL.ALT_E_SEND_EMAIL'), e);
     } finally {
+        state.allSendingEmailModalVisible = false;
+        state.specificSendingEmailModalVisible = false;
         state.sendLoading = false;
     }
 };
@@ -153,7 +186,7 @@ onBeforeMount(async () => {
                               style-type="tertiary"
                               icon-left="ic_paper-airplane"
                               :loading="state.sendLoading"
-                              @click="handleClickSendEmail"
+                              @click="handleOpenEmailSendingModal"
                     >
                         {{ $t('INFO.NOTICE.FORM.SEND_EMAIL_MODAL_TITLE') }}
                     </p-button>
@@ -172,11 +205,58 @@ onBeforeMount(async () => {
                       :contents="$t('INFO.NOTICE.FORM.DELETE_MODAL_CONTENTS')"
                       @confirm="handleDeleteNoticeConfirm"
         />
+        <p-button-modal :visible.sync="state.allSendingEmailModalVisible"
+                        :header-title="$t('INFO.NOTICE.DETAIL.ALL_SENDING_EMAIL_MODAL_TITLE')"
+                        size="sm"
+                        @close="state.allSendingEmailModalVisible = false"
+                        @cancel="state.allSendingEmailModalVisible = false"
+                        @confirm="handleClickSendEmail"
+        >
+            <template #body>
+                <div class="pt-4">
+                    {{ $t('INFO.NOTICE.DETAIL.ALL_SENDING_EMAIL_MODAL_CONTENT') }}
+                </div>
+            </template>
+        </p-button-modal>
+        <p-button-modal :visible.sync="state.specificSendingEmailModalVisible"
+                        :header-title="$t('INFO.NOTICE.DETAIL.SPECIFIC_SENDING_EMAIL_MODAL_TITLE')"
+                        @close="state.specificSendingEmailModalVisible = false"
+                        @cancel="state.specificSendingEmailModalVisible = false"
+                        @confirm="handleClickSendEmail"
+        >
+            <template #body>
+                <div class="pt-2">
+                    <p-data-table :fields="tableField"
+                                  :items="state.scopedWorkspaceList"
+                    >
+                        <template #col-name-format="{value, item}">
+                            <div class="workspace-wrapper">
+                                <workspace-logo-icon :text="value || ''"
+                                                     :theme="item?.tags?.theme"
+                                                     size="xs"
+                                />
+                                <span>{{ item?.name }}</span>
+                            </div>
+                        </template>
+                        <template #col-state-format="{item, value}">
+                            <p-status v-bind="workspaceStateFormatter(item.is_dormant ? WORKSPACE_STATE.DORMANT : value)"
+                                      class="capitalize"
+                            />
+                        </template>
+                    </p-data-table>
+                </div>
+            </template>
+        </p-button-modal>
     </div>
 </template>
 
 <style scoped lang="postcss">
 .button-group {
     @apply flex gap-2;
+}
+
+.workspace-wrapper {
+    @apply flex items-center;
+    gap: 0.25rem;
 }
 </style>

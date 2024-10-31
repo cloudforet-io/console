@@ -102,10 +102,15 @@ const state = reactive({
         const _comparison = state.currentValue - state.previousValue;
         if (!_comparison) return i18n.t('COMMON.WIDGETS.NUMBER_CARD.NO_CHANGE');
 
-        if (_comparison < 0) {
-            return `less than '${_previousDateRange.start} ~ ${_previousDateRange.end}'`;
+        let _dateText = `${_previousDateRange.start} ~ ${_previousDateRange.end}`;
+        if (_previousDateRange.start === _previousDateRange.end) {
+            _dateText = _previousDateRange.start;
         }
-        return `more than '${_previousDateRange.start} ~ ${_previousDateRange.end}'`;
+
+        if (_comparison < 0) {
+            return `less than '${_dateText}'`;
+        }
+        return `more than '${_dateText}'`;
     }),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {

@@ -106,6 +106,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             order: [],
         } as DashboardVariablesSchema,
         variablesInitMap: {} as Record<string, boolean>,
+        showDateRangeNotification: true,
         // widget info states
         loadingWidgets: false,
         dashboardWidgets: [] as Array<PublicWidgetModel|PrivateWidgetModel>,
@@ -195,7 +196,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const setDashboardWidgets = (dashboardWidgets: Array<PublicWidgetModel|PrivateWidgetModel>) => { state.dashboardWidgets = dashboardWidgets; };
     const setLoadingWidgets = (loading: boolean) => { state.loadingWidgets = loading; };
     const setProjectId = (projectId?: string) => { state.projectId = projectId; };
-
+    const setShowDateRangeNotification = (visible: boolean) => { state.showDateRangeNotification = visible; };
     /* Actions */
     const reset = () => {
         // set default value of all state
@@ -208,6 +209,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setVariablesInitMap({});
         setVars({});
         setLoadingWidgets(false);
+        state.showDateRangeNotification = true;
     };
     const _setDashboardInfoStoreStateV2 = (dashboardInfo?: DashboardModel) => {
         if (!dashboardInfo || isEmpty(dashboardInfo)) {
@@ -359,6 +361,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setDashboardWidgets,
         setLoadingWidgets,
         setProjectId,
+        setShowDateRangeNotification,
     };
     const actions = {
         reset,

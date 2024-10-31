@@ -112,7 +112,7 @@ onMounted(() => {
     height: calc(100vh - $(top-bar-height));
     top: $top-bar-height;
     left: 0;
-    z-index: 99;
+    z-index: 1030;
     background-color: $bg-color;
 
     .page-wrapper {

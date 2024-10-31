@@ -122,8 +122,8 @@ const handleSelectDateRangeValue = (selected: DateRangeValueType) => {
             _start = isInherit ? dayjs.utc().month() + 1 : dayjs.utc().startOf('month').format('YYYY-MM-DD');
             _end = isInherit ? dayjs.utc().month() + 1 : dayjs.utc().endOf('month').format('YYYY-MM-DD');
         } else if (state.granularity === 'DAILY') {
-            _start = isInherit ? dayjs.utc().day() : dayjs.utc().startOf('day').format('YYYY-MM-DD');
-            _end = isInherit ? dayjs.utc().day() : dayjs.utc().endOf('day').format('YYYY-MM-DD');
+            _start = isInherit ? dayjs.utc().date() : dayjs.utc().startOf('day').format('YYYY-MM-DD');
+            _end = isInherit ? dayjs.utc().date() : dayjs.utc().endOf('day').format('YYYY-MM-DD');
         }
         state.proxyValue = {
             inherit: state.proxyValue?.inherit,
