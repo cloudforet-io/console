@@ -4,7 +4,6 @@ import { cloneDeep } from 'lodash';
 import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 
-import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { WidgetHeaderValue } from '@/common/modules/widgets/_widget-fields/header/type';
 import type {
     TableDataFieldValueNoVersion,
@@ -194,19 +193,6 @@ const migrateAllWidgets = (dashboardWidgets: Array<PublicWidgetModel|PrivateWidg
                 widgetHeader: {
                     ..._widgetHeaderOption,
                     toggleValue: true,
-                },
-            };
-        }
-        // Date Range
-        const _widgetDateRangeOption = cloneDeep(widget?.options?.dateRange) as DateRangeValue;
-        if (_widgetDateRangeOption === undefined) {
-            widget.options = {
-                ..._widgetOptions,
-                dateRange: {
-                    inherit: true,
-                    options: {
-                        value: 'auto',
-                    },
                 },
             };
         }
