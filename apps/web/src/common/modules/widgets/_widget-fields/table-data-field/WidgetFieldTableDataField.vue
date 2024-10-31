@@ -4,8 +4,6 @@ import {
     computed, reactive, toRef, watch,
 } from 'vue';
 
-import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
-import dayjs from 'dayjs';
 import {
     flatMap, isEqual, map, orderBy, uniq,
 } from 'lodash';
@@ -17,27 +15,24 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
 import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
 import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
 import { i18n } from '@/translations';
-
 
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { useGranularityMenuItem } from '@/common/modules/widgets/_composables/use-granularity-menu-items';
+import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import {
     useWidgetOptionsComplexValidation,
 } from '@/common/modules/widgets/_composables/use-widget-options-complex-validation';
-import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import {
     getReferenceLabel,
-    getWidgetBasedOnDate,
-    getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { getInitialSelectedMenuItem, isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
+import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { GroupByValue } from '@/common/modules/widgets/_widget-fields/group-by/type';
 import type {
     TableDataFieldOptions,
@@ -47,7 +42,7 @@ import {
     LATEST_TABLE_DATA_FIELD_VERSION,
 } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
-import type { TableDataItem, DateRange } from '@/common/modules/widgets/types/widget-data-type';
+import type { TableDataItem } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetFieldComponentEmit, WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 
@@ -55,6 +50,7 @@ import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-refe
 import {
     useAllReferenceTypeInfoStore,
 } from '@/services/dashboards/stores/all-reference-type-info-store';
+
 
 
 type Data = ListResponse<TableDataItem>;
@@ -80,6 +76,11 @@ const {
 } = useWidgetOptionsComplexValidation({
     optionValueMap: toRef(props, 'allValueMap') as Record<string, WidgetFieldValues|undefined>,
     widgetConfig: toRef(props, 'widgetConfig') as Ref<WidgetConfig>,
+});
+const { dateRange } = useWidgetDateRange({
+    dateRangeFieldValue: computed(() => (props.allValueMap?.dateRange as DateRangeValue)),
+    baseOnDate: computed(() => props.dateRange?.end),
+    granularity: computed<string>(() => props.allValueMap?.granularity as string),
 });
 
 const state = reactive({
@@ -129,21 +130,6 @@ const state = reactive({
         return !state.selectedItem;
     }),
     // Dynamic Field Fetching
-    basedOnDate: computed(() => getWidgetBasedOnDate(props.allValueMap?.granularity as string, props.dateRange?.end)),
-    dateRange: computed<DateRange>(() => {
-        const _granularity = props.allValueMap?.granularity as string;
-        const _groupBy = (props.allValueMap?.groupBy as GroupByValue)?.value as string[];
-        const _basedOnDate = getWidgetBasedOnDate(_granularity, props.dateRange?.end);
-        let subtract = 1;
-        const _field = state.selectedFieldType === 'staticField' ? state.proxyValue?.staticFieldInfo?.fieldValue : state.proxyValue?.dynamicFieldInfo?.fieldValue;
-        if (isDateField(_field) || _groupBy?.some((groupBy) => Object.values(DATE_FIELD).includes(groupBy))) {
-            if (_granularity === GRANULARITY.YEARLY) subtract = 3;
-            if (_granularity === GRANULARITY.MONTHLY) subtract = 12;
-            if (_granularity === GRANULARITY.DAILY) subtract = 30;
-        }
-        const [start, end] = getWidgetDateRange(_granularity, _basedOnDate, subtract);
-        return { start, end };
-    }),
     valueTypeItems: computed<MenuItem[]>(() => [
         {
             name: 'auto',
@@ -419,7 +405,7 @@ const fetchAndExtractDynamicField = async () => {
                 fields: {
                     [_criteria]: { key: _criteria, operator: 'sum' },
                 },
-                ...state.dateRange,
+                ...dateRange.value,
             },
         });
         const values = flatMap(res.results ?? [], (item) => map(item[_criteria], _field));
@@ -431,42 +417,42 @@ const fetchAndExtractDynamicField = async () => {
         state.loading = false;
     }
 };
-const generateDateFields = (granularity: string, dateRange: DateRange) => {
-    if (!granularity) {
-        state.dynamicFields = [];
-        return;
-    }
-    const dateFields: string[] = [];
-
-    let timeUnit: TimeUnit = 'day';
-    if (granularity === GRANULARITY.MONTHLY) timeUnit = 'month';
-    else if (granularity === GRANULARITY.YEARLY) timeUnit = 'year';
-
-    let labelDateFormat = 'YYYY-MM-DD';
-    if (timeUnit === 'month') labelDateFormat = 'YYYY-MM';
-    else if (timeUnit === 'year') labelDateFormat = 'YYYY';
-
-    let start = dayjs.utc(dateRange.start);
-    let end = dayjs.utc(dateRange.end);
-
-    if (granularity === GRANULARITY.DAILY) {
-        if (!props.dateRange?.start && !props.dateRange?.end) {
-            end = dayjs.utc().startOf('day');
-            start = end.subtract(30, 'day');
-        } else {
-            start = dayjs.utc(props.dateRange.start).startOf('month');
-            end = start.endOf('month');
-        }
-    }
-
-    let now = start;
-    while (now.isSameOrBefore(end, timeUnit)) {
-        dateFields.push(now.format(labelDateFormat));
-        now = now.add(1, timeUnit);
-    }
-
-    state.dynamicFields = dateFields;
-};
+// const generateDateFields = (granularity: string, dateRange: DateRange) => {
+//     if (!granularity) {
+//         state.dynamicFields = [];
+//         return;
+//     }
+//     const dateFields: string[] = [];
+//
+//     let timeUnit: TimeUnit = 'day';
+//     if (granularity === GRANULARITY.MONTHLY) timeUnit = 'month';
+//     else if (granularity === GRANULARITY.YEARLY) timeUnit = 'year';
+//
+//     let labelDateFormat = 'YYYY-MM-DD';
+//     if (timeUnit === 'month') labelDateFormat = 'YYYY-MM';
+//     else if (timeUnit === 'year') labelDateFormat = 'YYYY';
+//
+//     let start = dayjs.utc(dateRange.start);
+//     let end = dayjs.utc(dateRange.end);
+//
+//     if (granularity === GRANULARITY.DAILY) {
+//         if (!props.dateRange?.start && !props.dateRange?.end) {
+//             end = dayjs.utc().startOf('day');
+//             start = end.subtract(30, 'day');
+//         } else {
+//             start = dayjs.utc(props.dateRange.start).startOf('month');
+//             end = start.endOf('month');
+//         }
+//     }
+//
+//     let now = start;
+//     while (now.isSameOrBefore(end, timeUnit)) {
+//         dateFields.push(now.format(labelDateFormat));
+//         now = now.add(1, timeUnit);
+//     }
+//
+//     state.dynamicFields = dateFields;
+// };
 watch([ // Fetch Dynamic Field
     () => state.proxyValue?.fieldType,
     () => state.proxyValue?.dynamicFieldInfo?.fieldValue,
@@ -476,7 +462,7 @@ watch([ // Fetch Dynamic Field
     () => props.allValueMap?.granularity,
     () => props.allValueMap?.xAxis?.value,
     () => props.allValueMap?.yAxis?.value,
-    () => props.dateRange,
+    () => dateRange.value,
 ], async (
     [_fieldType, _value, _valueType, _criteria, _groupBy, _granularity, _xAxis, _yAxis, _dateRange],
     [, _prevValue, _prevValueType, _prevCriteria, _prevGroupBy, _prevGranularity, _prevXAxis, _prevYAxis, _prevDateRange],
@@ -500,7 +486,7 @@ watch([ // Fetch Dynamic Field
         };
     }
     if (_value === 'Date') {
-        generateDateFields(_granularity as string, state.dateRange);
+        // generateDateFields(_granularity as string, state.dateRange);
     } else {
         await fetchAndExtractDynamicField();
     }
