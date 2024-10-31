@@ -5,7 +5,7 @@ import type { TranslateResult } from 'vue-i18n';
 import { range } from 'lodash';
 
 import {
-    PRadio, PSelectButton, PSelectDropdown,
+    PRadio, PSelectButton, PSelectDropdown, PRadioGroup,
 } from '@cloudforet/mirinae';
 
 import type { ChannelSchedule, ChannelScheduleDayOfWeek } from '@/schema/notification/type';
@@ -139,17 +139,18 @@ onMounted(() => {
 
 <template>
     <div>
-        <p-radio v-for="(item, i) in state.scheduleMode"
-                 :key="i"
-                 :selected="item.value"
-                 :value="state.proxyIsScheduled"
-                 class="mr-4"
-                 @click="handleScheduleMode(item.value)"
-        >
-            <span class="radio-label"
-                  @click="handleScheduleMode(item.value)"
-            >{{ item.label }}</span>
-        </p-radio>
+        <p-radio-group>
+            <p-radio v-for="(item, i) in state.scheduleMode"
+                     :key="i"
+                     :selected="item.value"
+                     :value="state.proxyIsScheduled"
+                     @click="handleScheduleMode(item.value)"
+            >
+                <span class="radio-label"
+                      @click="handleScheduleMode(item.value)"
+                >{{ item.label }}</span>
+            </p-radio>
+        </p-radio-group>
         <article v-if="state.proxyIsScheduled"
                  class="schedule-wrapper"
         >
