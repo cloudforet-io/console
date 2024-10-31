@@ -214,10 +214,6 @@ watch(() => props.menuItems, (menuItems) => {
         .menu-dropdown {
             min-width: 9.5rem;
         }
-        .accessible-item {
-            @apply inline-flex;
-            gap: 0.25rem;
-        }
         .invalid {
             @apply text-label-sm text-alert;
         }

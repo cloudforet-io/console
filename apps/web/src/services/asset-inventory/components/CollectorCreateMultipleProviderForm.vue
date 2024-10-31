@@ -100,10 +100,6 @@ watch(() => state.isProviderValid, (isValid) => {
         width: 100%;
     }
 
-    .provider-item {
-        margin-bottom: 0.25rem;
-    }
-
     .dropdown-container {
         width: 100%;
         display: none;
