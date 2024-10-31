@@ -11,6 +11,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
+import NewMark from '@/common/components/marks/NewMark.vue';
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { WIDGET_COMPONENT_ICON_MAP } from '@/common/modules/widgets/_constants/widget-components-constant';
 import { CONSOLE_WIDGET_CONFIG } from '@/common/modules/widgets/_constants/widget-config-list-constant';
@@ -249,6 +250,7 @@ onMounted(() => {
                      class="arrow-button"
                 />
                 <span>{{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.DATE_CONFIG') }}</span>
+                <new-mark class="new-mark" />
             </div>
             <div class="form-wrapper">
                 <template v-for="[fieldName, fieldSchema] in state.widgetDateConfigSchemaMap">
