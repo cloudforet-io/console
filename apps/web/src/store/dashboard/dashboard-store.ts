@@ -269,6 +269,8 @@ export const useDashboardStore = defineStore('dashboard', () => {
             labels: _dashboard.labels || [],
             tags: { created_by: store.state.user.userId },
             folder_id: folderId,
+            vars: _dashboard.vars,
+            vars_schema: _dashboard.vars_schema,
         };
         if (_state.isAdminMode) {
             (_createdDashboardParams as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.DOMAIN;

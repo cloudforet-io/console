@@ -71,6 +71,7 @@ const state = reactive({
     }),
     showSaveButton: computed<boolean>(() => !props.disableSaveButton && state.modifiedVariablesSchemaProperties.length > 0),
     notChanged: computed(() => state.modifiedVariablesSchemaProperties.length === 0),
+    isSharedDashboard: computed<boolean>(() => !!dashboardDetailGetters.dashboardInfo?.shared && !storeState.isAdminMode),
 });
 
 const handleClickSaveButton = () => {
@@ -124,7 +125,7 @@ const handleResetVariables = () => {
         >
             {{ $t('DASHBOARDS.CUSTOMIZE.SAVE') }}
         </p-text-button>
-        <dashboard-variables-more-button />
+        <dashboard-variables-more-button v-if="!state.isSharedDashboard" />
         <dashboard-manage-variable-overlay :visible="state.showOverlay" />
     </div>
 </template>

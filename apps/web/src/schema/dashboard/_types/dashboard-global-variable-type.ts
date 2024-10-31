@@ -9,6 +9,7 @@ interface DashboardGlobalVariableBase {
 
 export interface ReferenceVariable extends DashboardGlobalVariableBase {
     method: 'dynamic';
+    type: 'reference';
     reference: {
         resourceType: string; // identity.User, inventory.Collector, etc..
         dataSourceId?: string;
