@@ -12,13 +12,17 @@ import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/table
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
 
 
+
 import type { CostJobStatus } from '@/schema/cost-analysis/job/type';
 import { i18n } from '@/translations';
 
-import { gray, green, red } from '@/styles/colors';
+import {
+    blue, gray, green, red,
+} from '@/styles/colors';
 
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
 import type { DataSourceItem, CostJobItem, CostJobStatusInfo } from '@/services/cost-explorer/types/data-sources-type';
+
 
 const dataSourcesPageStore = useDataSourcesPageStore();
 const dataSourcesPageState = dataSourcesPageStore.state;
@@ -79,6 +83,13 @@ const getStatusInfo = (value: CostJobStatus): CostJobStatusInfo => {
             color: red[400],
         };
         break;
+    case 'IN_PROGRESS':
+        info = {
+            icon: 'ic_peacock-gradient-circle',
+            color: blue[400],
+            text: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.IN_PROGRESS'),
+        };
+        break;
     default:
         break;
     }
@@ -98,10 +109,7 @@ const handleChangeToolbox = async (options: ToolboxOptions) => {
 const fetchJobList = async () => {
     state.loading = true;
     try {
-        jobListApiQueryHelper.setPage(tableState.pageStart, tableState.pageLimit)
-            .setFilters([
-                { k: 'status', v: 'IN_PROGRESS', o: '!=' },
-            ]);
+        jobListApiQueryHelper.setPage(tableState.pageStart, tableState.pageLimit);
         await dataSourcesPageStore.fetchJobList({
             data_source_id: storeState.selectedItem?.data_source_id || '',
             query: jobListApiQueryHelper.data,
