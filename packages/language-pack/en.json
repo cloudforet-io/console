@@ -921,6 +921,7 @@
 				"ERROR_FOUND_OK": "OK",
 				"ERROR_FOUND_TITLE": "Error Details",
 				"GUIDE": "How to register data sources",
+				"IN_PROGRESS": "In-Progress",
 				"LINKED": "Linked",
 				"MODAL_CONTENT": "By allowing this data type, it will be accessible to all workspaces in user mode.",
 				"MODAL_TITLE": "Allow Access",
