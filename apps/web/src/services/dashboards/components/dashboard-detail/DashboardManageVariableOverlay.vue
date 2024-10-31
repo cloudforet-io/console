@@ -27,6 +27,7 @@ import DashboardManageVariableImportModal
     from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableImportModal.vue';
 import DashboardVariablesFormModal
     from '@/services/dashboards/components/dashboard-detail/DashboardVariablesFormModal.vue';
+import { DOMAIN_DASHBOARD_VARS_SCHEMA_PRESET } from '@/services/dashboards/constants/dashboard-vars-schema-preset';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
@@ -88,6 +89,10 @@ const getSlicedVariableItems = (items: GlobalVariableTableItem[], thisPage: numb
     const _startIndex = (thisPage - 1) * pageSize;
     const _endIndex = thisPage * pageSize;
     return items.slice(_startIndex, _endIndex);
+};
+const isPresetVarsSchemaProperty = (key: string): boolean => {
+    const _presetKeys: string[] = Object.keys(DOMAIN_DASHBOARD_VARS_SCHEMA_PRESET.properties);
+    return _presetKeys.includes(key);
 };
 
 /* Api */
@@ -236,20 +241,25 @@ const handleConfirmDelete = () => {
                                  @change-toggle="handleToggleUse(item.key, $event)"
                 />
             </template>
+            <template #col-created_by-format="{ value }">
+                {{ value || 'System' }}
+            </template>
             <template #col-buttons-format="{ item }">
                 <div class="button-wrapper">
+                    <template v-if="!isPresetVarsSchemaProperty(item.key)">
+                        <p-icon-button name="ic_edit"
+                                       size="sm"
+                                       @click="handleClickEditButton(item.key)"
+                        />
+                        <p-icon-button name="ic_delete"
+                                       size="sm"
+                                       style-type="negative-transparent"
+                                       @click="handleClickDeleteButton(item.key)"
+                        />
+                    </template>
                     <p-icon-button name="ic_clone"
                                    size="sm"
                                    @click="handleClickCloneButton(item.key)"
-                    />
-                    <p-icon-button name="ic_edit"
-                                   size="sm"
-                                   @click="handleClickEditButton(item.key)"
-                    />
-                    <p-icon-button name="ic_delete"
-                                   size="sm"
-                                   style-type="negative-transparent"
-                                   @click="handleClickDeleteButton(item.key)"
                     />
                 </div>
             </template>
