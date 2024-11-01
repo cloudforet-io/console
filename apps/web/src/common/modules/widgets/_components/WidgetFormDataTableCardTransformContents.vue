@@ -78,6 +78,7 @@ const state = reactive({
             field_type: expression.fieldType,
             expression: expression.expression,
             condition: expression?.condition,
+            else: expression?.else,
         })).filter((expression) => !!expression.name && !!expression.expression), originState.expressions);
         if (state.operator === 'CONCAT') return dataTablesChanged;
         if (state.operator === 'JOIN') return dataTablesChanged || joinTypeChanged;
@@ -185,6 +186,7 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
             field_type: expressionInfo.fieldType,
             expression: expressionInfo.expression,
             ...(expressionInfo.condition && { condition: expressionInfo.condition }) || {},
+            ...(expressionInfo.else && { else: expressionInfo.else }) || {},
         })).filter((expressionInfo) => !!expressionInfo.name && !!expressionInfo.expression),
     };
     const options = () => {
@@ -280,7 +282,10 @@ const setInitialDataTableForm = () => {
     joinState.joinType = originState.joinType;
     queryState.conditions = originState.conditions.length ? originState.conditions.map((cond) => ({ ...cond, key: getRandomId() })) : [{ key: getRandomId(), value: '' }];
     evalState.expressions = originState.expressions.length ? originState.expressions.map((expression) => ({
-        ...expression, isCollapsed: false, fieldType: expression.field_type, key: getRandomId(),
+        ...expression,
+        isCollapsed: false,
+        fieldType: expression.field_type,
+        key: getRandomId(),
     })) : [{
         key: getRandomId(), name: '', fieldType: EVAL_EXPRESSION_TYPE.DATA, expression: '', isCollapsed: false,
     }];

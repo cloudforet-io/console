@@ -112,8 +112,10 @@ const handleToggleCondition = (key: string) => {
     if (!targetExpression) return;
     if ('condition' in targetExpression) {
         delete targetExpression.condition;
+        delete targetExpression.else;
     } else {
         targetExpression.condition = '';
+        targetExpression.else = '';
     }
     state.proxyExpressions = [...state.proxyExpressions];
 };
@@ -220,6 +222,25 @@ const handleToggleCondition = (key: string) => {
                                     </p-link>
                                 </template>
                                 <p-textarea v-model="expression.expression"
+                                            :placeholder="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.FORMULA_PLACEHOLDER')"
+                                />
+                            </p-field-group>
+                            <p-field-group v-if="'condition' in expression"
+                                           :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.ELSE')"
+                                           style-type="secondary"
+                                           required
+                                           class="expression-form"
+                            >
+                                <template #label-extra>
+                                    <p-link href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.eval.html"
+                                            :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                                            highlight
+                                            class="external-link"
+                                    >
+                                        Pandas Eval
+                                    </p-link>
+                                </template>
+                                <p-textarea v-model="expression.else"
                                             :placeholder="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.FORMULA_PLACEHOLDER')"
                                 />
                             </p-field-group>
