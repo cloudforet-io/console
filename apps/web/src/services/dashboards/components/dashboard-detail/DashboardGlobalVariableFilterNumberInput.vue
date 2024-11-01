@@ -27,10 +27,6 @@ const props = defineProps<Props>();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 
-const storeState = reactive({
-    vars: computed<DashboardVars>(() => dashboardDetailState.vars),
-});
-
 const targetRef = ref<HTMLElement|null>(null);
 const menuRef = ref<HTMLElement|null>(null);
 
@@ -61,7 +57,6 @@ const handleUpdateKeyword = (value: string) => {
 };
 
 const handleSelectValue = (selected: InputItem[]) => {
-    console.debug(selected);
     if (state.invalid || !selected.length) return;
     state.value = selected[0].name;
     changeVariables(parseFloat(selected[0].name));
@@ -136,7 +131,7 @@ const isValidNumber = (value: string, min: number, max: number, step?: string): 
 
 const changeVariables = (changedSelected?: number) => {
     const _key = state.variable.key;
-    const vars = cloneDeep(storeState.vars);
+    const vars = cloneDeep(dashboardDetailState.vars) as DashboardVars;
     if (changedSelected) {
         vars[_key] = changedSelected;
     } else {
@@ -149,7 +144,7 @@ onClickOutside(targetRef, () => { state.editMode = false; });
 
 onMounted(() => {
     const _variable = props.variable as NumberAnyVariable;
-    state.value = (storeState.vars[_variable.key] as number) || _variable.options.min;
+    state.value = (dashboardDetailState.vars[_variable.key] as number) || _variable.options.min;
     changeVariables(state.value);
 
     state.keyword = _variable.options.min;
