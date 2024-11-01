@@ -2174,7 +2174,8 @@
 				"TYPE": "Type",
 				"UPDATE_WARNING": "When a variable is modified, the value of that variable set in the dashboard will be reset.",
 				"VALUES": "Values"
-			}
+			},
+			"VIEW_GLOBAL_VARIABLE": "View Global Variables"
 		},
 		"FORM": {
 			"ALT_E_CLONE_DASHBOARD": "Failed to clone dashboard",
