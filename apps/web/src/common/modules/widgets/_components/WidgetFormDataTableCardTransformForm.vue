@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PI, PFieldGroup, PSelectDropdown, PTextInput, PButton, PIconButton,
+    PI, PFieldGroup, PSelectDropdown, PTextInput, PButton, PIconButton, PFieldTitle,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/src/inputs/dropdown/select-dropdown/type';
 
@@ -13,6 +13,8 @@ import WidgetFormDataTableCardTransformDataTableDropdown
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformDataTableDropdown.vue';
 import WidgetFormDataTableCardTransformFormEvaluate
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformFormEvaluate.vue';
+import WidgetFormDataTableGlobalVariableViewButton
+    from '@/common/modules/widgets/_components/WidgetFormDataTableGlobalVariableViewButton.vue';
 import { DATA_TABLE_OPERATOR, JOIN_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import type { QueryCondition, TransformDataTableInfo, EvalExpressions } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
@@ -170,10 +172,22 @@ const handleClickAddCondition = () => {
                     </template>
                 </p-select-dropdown>
             </p-field-group>
-            <p-field-group v-if="props.operator === DATA_TABLE_OPERATOR.QUERY"
-                           :label="'Condition'"
-                           required
+            <div v-if="props.operator === DATA_TABLE_OPERATOR.QUERY"
+                 class="query-wrapper"
             >
+                <div class="query-type-conditions-title-wrapper">
+                    <p-field-title class="field-title"
+                                   size="md"
+                                   color="dark"
+                    >
+                        <div class="field-title-wrapper">
+                            <span>{{ $t('Condition') }}</span>
+                            <div class="left-area">
+                                <widget-form-data-table-global-variable-view-button />
+                            </div>
+                        </div>
+                    </p-field-title>
+                </div>
                 <div class="query-type-conditions-wrapper">
                     <div v-for="(conditionInfo, idx) in queryState.proxyConditions"
                          :key="conditionInfo.key"
@@ -197,7 +211,7 @@ const handleClickAddCondition = () => {
                         Add Condition
                     </p-button>
                 </div>
-            </p-field-group>
+            </div>
             <widget-form-data-table-card-transform-form-evaluate v-if="props.operator === DATA_TABLE_OPERATOR.EVAL"
                                                                  :expressions.sync="evalState.proxyExpressions"
                                                                  :is-legacy-data-table="props.isLegacyDataTable"
@@ -216,6 +230,36 @@ const handleClickAddCondition = () => {
             padding: 0.25rem 0.5rem;
             margin-bottom: 0.5rem;
         }
+        .query-wrapper {
+            .query-type-conditions-title-wrapper {
+                /* custom design-system component - p-field-title */
+                :deep(.p-field-title) {
+                    .title {
+                        @apply flex;
+                        width: 100%;
+                    }
+                }
+                .field-title {
+                    @apply w-full;
+                    .field-title-wrapper {
+                        @apply flex w-full items-center;
+                        .left-area {
+                            @apply flex flex-1 items-center justify-end;
+                            width: 100%;
+                        }
+                    }
+                }
+            }
+            .query-type-conditions-wrapper {
+                @apply bg-gray-100 rounded-lg;
+                padding: 0.5rem;
+                margin-top: 0.25rem;
+                .conditions-wrapper {
+                    @apply flex gap-1 items-center;
+                    margin-bottom: 0.5rem;
+                }
+            }
+        }
     }
     .data-table-dropdown-wrapper {
         margin-bottom: 1rem;
@@ -225,15 +269,7 @@ const handleClickAddCondition = () => {
             min-width: 1rem;
         }
     }
-    .query-type-conditions-wrapper {
-        @apply bg-gray-100 rounded-lg;
-        padding: 0.5rem;
-        margin-top: 0.25rem;
-        .conditions-wrapper {
-            @apply flex gap-1 items-center;
-            margin-bottom: 0.5rem;
-        }
-    }
+
     .eval-type-functions-wrapper {
         @apply bg-gray-100 rounded-lg;
         padding: 0.5rem;

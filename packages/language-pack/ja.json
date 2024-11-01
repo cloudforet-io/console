@@ -2174,7 +2174,8 @@
 				"TYPE": "",
 				"UPDATE_WARNING": "",
 				"VALUES": ""
-			}
+			},
+			"VIEW_GLOBAL_VARIABLE": ""
 		},
 		"FORM": {
 			"ALT_E_CLONE_DASHBOARD": "ダッシュボードのクローンに失敗しました",
