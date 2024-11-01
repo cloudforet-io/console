@@ -36,6 +36,7 @@ interface Props {
     sourceType?: string;
     sourceId: string;
     sourceKey: string;
+    sourceItems: SelectDropdownMenuItem[];
     selectedGroupByItems: any[];
     filter: Record<string, DataTableQueryFilter>;
     dataFieldName: string;
@@ -201,6 +202,14 @@ const handleClickTimeDiff = (timeDiff: string) => {
 
 const handleClickTimeDiffDate = (timeDiffDate: string) => {
     advancedOptionsState.proxySelectedTimeDiffDate = timeDiffDate;
+
+    const defaultFieldName = props.sourceItems.find((source) => source.name === props.sourceKey)?.label || '';
+    const timediffOptions = {
+        none: '',
+        months: 'month',
+        years: 'year',
+    };
+    state.proxyDataFieldName = `${defaultFieldName} (- ${timeDiffDate} ${timediffOptions[advancedOptionsState.proxySelectedTimeDiff]})`;
 };
 
 /* Utils */
