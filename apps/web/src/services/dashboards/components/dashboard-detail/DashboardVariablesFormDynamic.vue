@@ -26,7 +26,10 @@ import {
 } from '@/common/composables/data-source/use-cost-data-source-filter-menu-items';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { DASHBOARD_GLOBAL_VARIABLES_PRESET_LIST } from '@/services/dashboards/constants/dashboard-global-variable-preset';
+import {
+    DASHBOARD_GLOBAL_VARIABLES_PRESET_LIST,
+    DOMAIN_DASHBOARD_GLOBAL_VARIABLES_PRESET_LIST,
+} from '@/services/dashboards/constants/dashboard-global-variable-preset';
 
 
 
@@ -94,7 +97,7 @@ const state = reactive({
     sourceFromMenuItems: computed<MenuItem[]>(() => [
         { name: 'asset', label: i18n.t('DASHBOARDS.DETAIL.VARIABLES.ASSET') },
         { name: 'cost', label: i18n.t('DASHBOARDS.DETAIL.VARIABLES.COST') },
-        ...DASHBOARD_GLOBAL_VARIABLES_PRESET_LIST,
+        ...(storeState.isAdminMode ? DOMAIN_DASHBOARD_GLOBAL_VARIABLES_PRESET_LIST : DASHBOARD_GLOBAL_VARIABLES_PRESET_LIST),
     ]),
     valuesFromMenuItems: computed<MenuItem[]>(() => {
         if (state.selectedSourceFrom === 'asset') {
