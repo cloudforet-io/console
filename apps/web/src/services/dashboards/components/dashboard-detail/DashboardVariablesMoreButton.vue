@@ -91,8 +91,10 @@ const toggleUseDashboardVarsSchema = debounce(async (dashboardId: string, variab
         const _dashboardVarsSchemaProperties: Record<string, DashboardGlobalVariable> = cloneDeep(dashboardDetailGetters.dashboardVarsSchemaProperties);
         const _use = !_dashboardVarsSchemaProperties[variableKey].use;
         const _vars = cloneDeep(dashboardDetailGetters.dashboardInfo?.vars || {});
+        const _tempVars = cloneDeep(dashboardDetailState.vars);
         if (!_use) {
             delete _vars[variableKey];
+            delete _tempVars[variableKey];
         }
         await dashboardStore.updateDashboard(dashboardId, {
             dashboard_id: dashboardId,
@@ -107,6 +109,7 @@ const toggleUseDashboardVarsSchema = debounce(async (dashboardId: string, variab
             },
             vars: _vars,
         });
+        dashboardDetailStore.setVars(_tempVars);
         showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_S_UPDATE_DASHBOARD_VARS_SCHEMA'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_E_UPDATE_DASHBOARD_VARS_SCHEMA'));
