@@ -172,7 +172,7 @@ watch(() => storeState.vars, async () => {
                            use-fixed-menu-style
                            selection-highlight
                            :selection-label="state.variable.name"
-                           :show-delete-all-button="false"
+                           show-delete-all-button
                            :page-size="10"
                            @update:selected="handleSelectOption"
         >
