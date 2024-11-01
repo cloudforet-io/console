@@ -19,7 +19,12 @@ import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import { VariableModelFactory } from '@/lib/variable-models';
-import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
+import type {
+    ManagedVariableModelKey,
+} from '@/lib/variable-models/managed-model-config/base-managed-model-config';
+import {
+    MANAGED_VARIABLE_MODELS,
+} from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 import type { VariableModelMenuHandlerInfo } from '@/lib/variable-models/variable-model-menu-handler';
 import {
     getVariableModelMenuHandler,
@@ -56,7 +61,7 @@ const state = reactive({
         const listQueryOptions: Record<string, any> = {};
         const targetModelConfig = Object.values(MANAGED_VARIABLE_MODELS).find((d) => (d.meta?.resourceType === state.variable.reference.resourceType));
 
-        const _variableModelKey = targetModelConfig?.meta.key;
+        const _variableModelKey = targetModelConfig?.meta.key as ManagedVariableModelKey;
         const _dataKey: string|undefined = state.variable.reference.dataKey;
 
         const isWorkspaceDropdown = _variableModelKey === MANAGED_VARIABLE_MODELS.workspace.meta.key;
@@ -65,14 +70,14 @@ const state = reactive({
         if (state.variable.reference.resourceType === MANAGED_VARIABLE_MODELS.cost.meta.resourceType) listQueryOptions.data_source_id = state.variable.reference.dataSourceId;
         if (state.variable.reference.resourceType === MANAGED_VARIABLE_MODELS.metric_data.meta.resourceType) listQueryOptions.metric_id = state.variable.reference.dataSourceId;
 
-
+        const variableModel = new VariableModelFactory({ type: 'MANAGED', managedModelKey: _variableModelKey });
         const variableModelInfo = {
-            variableModel: new VariableModelFactory({ type: 'MANAGED', managedModelKey: _variableModelKey }),
+            variableModel,
             dataKey: _dataKey,
         } as VariableModelMenuHandlerInfo;
 
-        if (_dataKey && !variableModelInfo.variableModel[_dataKey]) {
-            variableModelInfo.variableModel[_dataKey] = variableModelInfo.variableModel.generateProperty({ key: _dataKey });
+        if (_dataKey && !variableModel[_dataKey]) {
+            variableModelInfo.variableModel[_dataKey] = variableModel.generateProperty({ key: _dataKey });
         }
 
         return getVariableModelMenuHandler([variableModelInfo], listQueryOptions);
@@ -167,7 +172,7 @@ watch(() => storeState.vars, async () => {
                            use-fixed-menu-style
                            selection-highlight
                            :selection-label="state.variable.name"
-                           :show-delete-all-button="false"
+                           show-delete-all-button
                            :page-size="10"
                            @update:selected="handleSelectOption"
         >

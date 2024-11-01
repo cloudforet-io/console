@@ -182,7 +182,9 @@ const updateDashboardVarsSchema = async (dashboardId: string) => {
             created_by: state.targetVariable?.created_by,
         };
         const _vars = cloneDeep(dashboardDetailGetters.dashboardInfo?.vars || {});
+        const _tempVars = cloneDeep(dashboardDetailState.vars);
         delete _vars[_originalKey];
+        delete _tempVars[_originalKey];
         await dashboardStore.updateDashboard(dashboardId, {
             dashboard_id: dashboardId,
             vars_schema: {
@@ -190,6 +192,7 @@ const updateDashboardVarsSchema = async (dashboardId: string) => {
             },
             vars: _vars,
         });
+        dashboardDetailStore.setVars(_tempVars);
         showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_S_UPDATE_DASHBOARD_VARS_SCHEMA'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_E_UPDATE_DASHBOARD_VARS_SCHEMA'));
