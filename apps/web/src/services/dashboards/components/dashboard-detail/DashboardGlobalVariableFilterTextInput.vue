@@ -115,6 +115,7 @@ watch(() => state.value, (_value) => {
 
     /* custom design-system component - p-text-input */
     :deep(.p-text-input) {
+        width: 8rem;
         max-height: 2rem;
         > .input-container {
             @apply rounded-none border-t border-b border-l-0 border-r-0 border-gray-200;

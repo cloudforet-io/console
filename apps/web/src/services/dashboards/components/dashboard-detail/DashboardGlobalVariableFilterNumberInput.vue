@@ -240,6 +240,7 @@ watch(() => state.value, (_value) => {
 
         /* custom design-system component - p-text-input */
         :deep(.p-text-input) {
+            width: 8rem;
 
             input {
                 -moz-appearance: textfield;
