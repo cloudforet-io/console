@@ -20,6 +20,7 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 
 import { VariableModelFactory } from '@/lib/variable-models';
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
+import type { VariableModelMenuHandlerInfo } from '@/lib/variable-models/variable-model-menu-handler';
 import {
     getVariableModelMenuHandler,
 } from '@/lib/variable-models/variable-model-menu-handler';
@@ -55,12 +56,10 @@ const state = reactive({
         const listQueryOptions: Record<string, any> = {};
         const targetModelConfig = Object.values(MANAGED_VARIABLE_MODELS).find((d) => (d.meta?.resourceType === state.variable.reference.resourceType));
 
-        const option = {
-            type: 'MANAGED',
-            key: targetModelConfig?.meta.key,
-            dataKey: state.variable.reference.dataKey,
-        };
-        const isWorkspaceDropdown = option.key === MANAGED_VARIABLE_MODELS.workspace.meta.key;
+        const _variableModelKey = targetModelConfig?.meta.key;
+        const _dataKey: string|undefined = state.variable.reference.dataKey;
+
+        const isWorkspaceDropdown = _variableModelKey === MANAGED_VARIABLE_MODELS.workspace.meta.key;
         if (isWorkspaceDropdown) listQueryOptions.is_dormant = false;
 
         if (state.variable.reference.resourceType === MANAGED_VARIABLE_MODELS.cost.meta.resourceType) listQueryOptions.data_source_id = state.variable.reference.dataSourceId;
@@ -68,17 +67,17 @@ const state = reactive({
 
 
         const variableModelInfo = {
-            variableModel: new VariableModelFactory({ type: option.type, managedModelKey: option.key }),
-            dataKey: option.dataKey,
-        };
+            variableModel: new VariableModelFactory({ type: 'MANAGED', managedModelKey: _variableModelKey }),
+            dataKey: _dataKey,
+        } as VariableModelMenuHandlerInfo;
 
-        if (option.dataKey) {
-            variableModelInfo.variableModel[option.dataKey] = variableModelInfo.variableModel.generateProperty({ key: option.dataKey });
+        if (_dataKey) {
+            variableModelInfo.variableModel[_dataKey] = variableModelInfo.variableModel.generateProperty({ key: _dataKey });
         }
 
         return getVariableModelMenuHandler([variableModelInfo], listQueryOptions);
     }),
-    selected: [],
+    selected: [] as MenuItem[],
 });
 
 // event

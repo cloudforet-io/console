@@ -21,6 +21,7 @@ import {
     MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP,
     MANAGED_DASHBOARD_VARIABLES_SCHEMA,
 } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
+import { DOMAIN_DASHBOARD_VARS_SCHEMA_PRESET } from '@/services/dashboards/constants/dashboard-vars-schema-preset';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/constants/manage-variable-overlay-constant';
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
@@ -63,8 +64,14 @@ const state = reactive({
         return _defaultDashboardVariables;
     }),
     newGlobalVariables: computed<DashboardGlobalVariable[]>(() => {
-        const properties = dashboardDetailGetters.dashboardVarsSchemaProperties;
-        return orderBy(Object.values(properties), ['name'], ['asc']);
+        const properties = dashboardDetailGetters.dashboardVarsSchemaProperties as Record<string, DashboardGlobalVariable>;
+        const _presetKeys: string[] = Object.keys(DOMAIN_DASHBOARD_VARS_SCHEMA_PRESET.properties);
+        const _presetItems = Object.values(properties).filter((d) => _presetKeys.includes(d.key));
+        const _customItems = Object.values(properties).filter((d) => !_presetKeys.includes(d.key));
+        return [
+            ...orderBy(_presetItems, 'name', 'asc'),
+            ...orderBy(_customItems, 'name', 'asc'),
+        ];
     }),
     allReferenceTypeInfo: computed(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     modifiedVariablesSchemaProperties: computed<string[]>(() => {
