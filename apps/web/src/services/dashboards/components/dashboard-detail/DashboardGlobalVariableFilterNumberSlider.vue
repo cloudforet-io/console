@@ -77,7 +77,7 @@ onMounted(() => {
                       :value="state.value"
                       :min="state.min"
                       :max="state.max"
-                      :step="state.step ?? parseFloat(state.step)"
+                      :step="state.step !== undefined ? parseFloat(state.step) : undefined"
                       :show-value="false"
                       @update:value="handleUpdateSliderValue"
             />
