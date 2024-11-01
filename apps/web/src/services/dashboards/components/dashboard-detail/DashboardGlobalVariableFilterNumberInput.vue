@@ -134,7 +134,7 @@ const isValidNumber = (value: string, min: number, max: number, step?: string): 
     return true;
 };
 
-const changeVariables = (changedSelected?: string) => {
+const changeVariables = (changedSelected?: number) => {
     const _key = state.variable.key;
     const vars = cloneDeep(storeState.vars);
     if (changedSelected) {
