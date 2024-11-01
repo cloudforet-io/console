@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-import { cloneDeep } from 'lodash';
+import { cloneDeep, orderBy } from 'lodash';
 
 import {
     PButton, PButtonModal, PCheckbox, PSearch, PScopedNotification,
@@ -23,6 +23,7 @@ import LSBCollapsibleMenuItem from '@/common/modules/navigations/lsb/modules/LSB
 
 import DashboardManageVariableImportModalTree
     from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableImportModalTree.vue';
+import { DOMAIN_DASHBOARD_VARS_SCHEMA_PRESET } from '@/services/dashboards/constants/dashboard-vars-schema-preset';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 
@@ -52,9 +53,15 @@ const state = reactive({
     selectedDashboardVariables: computed<DashboardGlobalVariable[]>(() => {
         const selectedDashboard = state.allDashboardItems.find((item) => item.dashboard_id === state.selectedDashboardId);
         if (!selectedDashboard) return [];
-        return Object.values(selectedDashboard?.vars_schema?.properties || {});
+        const _varsSchemaProperties: DashboardGlobalVariable[] = Object.values(selectedDashboard?.vars_schema?.properties || {});
+        const _preset = _varsSchemaProperties.filter((d) => isPresetVarsSchemaProperty(d.key));
+        const _custom = _varsSchemaProperties.filter((d) => !isPresetVarsSchemaProperty(d.key));
+        return [
+            ...orderBy(_preset, 'name', 'asc'),
+            ...orderBy(_custom, 'name', 'asc'),
+        ];
     }),
-    searchedDashboardVariables: computed<DashboardGlobalVariable[]>(() => state.selectedDashboardVariables.filter((variable) => variable.name.toLowerCase().includes(state.keyword.toLowerCase()))),
+    searchedDashboardVariables: computed<DashboardGlobalVariable[]>(() => state.selectedDashboardVariables.filter((variable) => variable?.name?.toLowerCase()?.includes(state.keyword.toLowerCase()))),
     selectedVariableKeys: [] as string[],
     isAllSelected: computed<boolean>(() => {
         if (state.selectedVariableKeys.length === 0) return false;
@@ -113,9 +120,16 @@ const getIndeterminate = (): boolean => {
     const availableVariableCount = state.selectedDashboardVariables.filter((variable) => !isDuplicatedVariableName(variable)).length;
     return state.selectedVariableKeys.length > 0 && state.selectedVariableKeys.length < availableVariableCount;
 };
+const isPresetVarsSchemaProperty = (key: string): boolean => {
+    const _presetKeys: string[] = Object.keys(DOMAIN_DASHBOARD_VARS_SCHEMA_PRESET.properties);
+    return _presetKeys.includes(key);
+};
 
 watch(() => state.selectedDashboardVariables, (selectedDashboardVariables) => {
     state.notiBannerVisible = selectedDashboardVariables.some((variable) => isDuplicatedVariableName(variable));
+}, { immediate: true });
+watch(() => state.selectedDashboardId, () => {
+    state.selectedVariableKeys = [];
 }, { immediate: true });
 </script>
 
@@ -123,6 +137,7 @@ watch(() => state.selectedDashboardVariables, (selectedDashboardVariables) => {
     <p-button-modal class="dashboard-manage-variable-import-modal"
                     :header-title="$t('DASHBOARDS.DETAIL.VARIABLES.IMPORT_MODAL_HEADER')"
                     :visible.sync="state.proxyVisible"
+                    :disabled="!state.selectedVariableKeys.length"
                     @confirm="handleConfirmImportVariables"
     >
         <template #body>

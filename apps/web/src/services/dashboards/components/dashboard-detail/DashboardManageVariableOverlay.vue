@@ -67,7 +67,12 @@ const state = reactive({
             type: d.method === 'manual' ? d.type : undefined,
             reference: d.method === 'dynamic' ? d?.reference?.resourceType : undefined,
         }));
-        return orderBy(_tableItems, ['name'], ['asc']);
+        const _presetItems = _tableItems.filter((d) => isPresetVarsSchemaProperty(d.key));
+        const _customItems = _tableItems.filter((d) => !isPresetVarsSchemaProperty(d.key));
+        return [
+            ...orderBy(_presetItems, 'name', 'asc'),
+            ...orderBy(_customItems, 'name', 'asc'),
+        ];
     }),
     searchedGlobalVariablesTableItems: computed<GlobalVariableTableItem[]>(() => {
         if (!state.searchText.length) return state.globalVariablesTableItems;

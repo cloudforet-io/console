@@ -2145,6 +2145,7 @@
 				"EDIT_VARIABLE": "Edit Variable",
 				"FETCH_LIST_OF_VALUES_FROM": "Fetch List of Values from",
 				"IMPORT": "Import",
+				"IMPORT_MODAL_HEADER": "Import Variables from other dashboards",
 				"INPUT_TYPE": "Input Type",
 				"KEY": "Key",
 				"KEY_DUPLICATED": "Key is duplicated.",

@@ -9,10 +9,6 @@ import WorkspaceVariableModel from '@/lib/variable-models/managed-model/resource
 
 export const DASHBOARD_GLOBAL_VARIABLES_PRESET_LIST = [
     {
-        name: WorkspaceVariableModel.meta.resourceType,
-        label: WorkspaceVariableModel.meta.name,
-    },
-    {
         name: ProjectVariableModel.meta.resourceType,
         label: ProjectVariableModel.meta.name,
     },
@@ -29,3 +25,11 @@ export const DASHBOARD_GLOBAL_VARIABLES_PRESET_LIST = [
         label: UserVariableModel.meta.name,
     },
 ] as const;
+
+export const DOMAIN_DASHBOARD_GLOBAL_VARIABLES_PRESET_LIST = [
+    {
+        name: WorkspaceVariableModel.meta.resourceType,
+        label: WorkspaceVariableModel.meta.name,
+    },
+    ...DASHBOARD_GLOBAL_VARIABLES_PRESET_LIST,
+];
