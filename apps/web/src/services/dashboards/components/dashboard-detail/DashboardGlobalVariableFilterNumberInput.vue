@@ -237,7 +237,6 @@ watch(() => state.value, (_value) => {
         height: 3rem;
         padding: 0.5rem 0.75rem;
 
-
         /* custom design-system component - p-text-input */
         :deep(.p-text-input) {
             width: 8rem;
