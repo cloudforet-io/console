@@ -1527,6 +1527,7 @@
 						"DELETE_MODAL_DESC": "이 필드를 삭제하시겠습니까?",
 						"DELETE_MODAL_TITLE": "{field_name} 삭제",
 						"DELETE_SUCCESS_TOOLTIP": "{field_name} 삭제 완료",
+						"ELSE": "",
 						"FIELD_EXPRESSION": "",
 						"FIELD_FORMULA": "필드 수식",
 						"FIELD_NAME": "필드명",
@@ -2171,6 +2172,7 @@
 				"STEP": "",
 				"TEXT": "",
 				"TYPE": "",
+				"UPDATE_WARNING": "",
 				"VALUES": ""
 			}
 		},
