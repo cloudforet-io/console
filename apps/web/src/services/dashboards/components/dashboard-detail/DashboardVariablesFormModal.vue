@@ -240,7 +240,8 @@ watch(() => state.proxyVisible, (visible) => {
                     @close="handleClickClose"
     >
         <template #body>
-            <p-scoped-notification type="warning"
+            <p-scoped-notification v-if="props.modalType === 'UPDATE'"
+                                   type="warning"
                                    icon="ic_warning-filled"
                                    layout="in-section"
                                    class="mb-4"
