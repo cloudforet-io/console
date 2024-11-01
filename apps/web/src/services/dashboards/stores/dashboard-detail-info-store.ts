@@ -111,6 +111,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         } as DashboardGlobalVariablesSchema,
         variablesInitMap: {} as Record<string, boolean>,
         showDateRangeNotification: true,
+        // only for admin
+        selectedWorkspaceId: undefined as string | undefined,
         // widget info states
         loadingWidgets: false,
         dashboardWidgets: [] as Array<PublicWidgetModel|PrivateWidgetModel>,
@@ -176,7 +178,13 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
                 const idKey = MANAGED_VARIABLE_MODELS[k]?.meta.idKey;
                 if (idKey) _vars[idKey] = v;
             });
-            if (!storeState.isAdminMode) {
+            if (storeState.isAdminMode) {
+                if (state.selectedWorkspaceId && state.selectedWorkspaceId !== 'all') {
+                    _vars[WorkspaceVariableModel.meta.idKey] = [state.selectedWorkspaceId];
+                } else {
+                    delete _vars[WorkspaceVariableModel.meta.idKey];
+                }
+            } else {
                 delete _vars[WorkspaceVariableModel.meta.idKey];
             }
             return _vars;
@@ -201,6 +209,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const setLoadingWidgets = (loading: boolean) => { state.loadingWidgets = loading; };
     const setProjectId = (projectId?: string) => { state.projectId = projectId; };
     const setShowDateRangeNotification = (visible: boolean) => { state.showDateRangeNotification = visible; };
+    const setSelectedWorkspaceId = (workspaceId?: string) => { state.selectedWorkspaceId = workspaceId; };
     /* Actions */
     const reset = () => {
         // set default value of all state
@@ -214,6 +223,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setVars({});
         setLoadingWidgets(false);
         state.showDateRangeNotification = true;
+        state.selectedWorkspaceId = undefined;
     };
     const _setDashboardInfoStoreStateV2 = (dashboardInfo?: DashboardModel) => {
         if (!dashboardInfo || isEmpty(dashboardInfo)) {
@@ -366,6 +376,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setLoadingWidgets,
         setProjectId,
         setShowDateRangeNotification,
+        setSelectedWorkspaceId,
     };
     const actions = {
         reset,

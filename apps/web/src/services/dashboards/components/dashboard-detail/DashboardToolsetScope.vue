@@ -1,5 +1,7 @@
 <script lang="ts" setup="">
-import { reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
+
+import { isEqual } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -11,17 +13,26 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
 
+const allReferenceStore = useAllReferenceStore();
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.state;
+const storeState = reactive({
+    workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
+});
 const state = reactive({
     selectedWorkspaceItems: [] as SelectDropdownMenuItem[],
-    selectAllWorkspace: false as boolean,
     performanceDelayModalVisible: false as boolean,
 });
 
@@ -55,23 +66,38 @@ const workspaceHandler: AutocompleteHandler = async (keyword: string, pageStart 
         };
     }
 };
+const initSelectedWorkspace = () => {
+    const _defaultWorkspace = Object.values(storeState.workspaces)[0];
+    dashboardDetailStore.setSelectedWorkspaceId(_defaultWorkspace?.key);
+    state.selectedWorkspaceItems = [{
+        name: _defaultWorkspace?.key,
+        label: _defaultWorkspace?.label,
+    }];
+};
 
 /* Event */
 const handleSelectWorkspace = (selected: SelectDropdownMenuItem[]) => {
+    if (isEqual(state.selectedWorkspaceItems, selected)) return;
+    dashboardDetailStore.setSelectedWorkspaceId(selected[0]?.name);
     state.selectedWorkspaceItems = selected;
 };
 const handleToggleAllWorkspace = (value: boolean) => {
     if (value) {
         state.performanceDelayModalVisible = true;
     } else {
-        state.selectAllWorkspace = value;
+        initSelectedWorkspace();
     }
 };
 const handleConfirmPerformanceDelay = () => {
     state.selectedWorkspaceItems = [];
-    state.selectAllWorkspace = true;
     state.performanceDelayModalVisible = false;
+    dashboardDetailStore.setSelectedWorkspaceId('all');
 };
+
+/* Watcher */
+watch(() => storeState.workspaces, (workspaces) => {
+    if (workspaces) initSelectedWorkspace();
+}, { immediate: true });
 </script>
 
 <template>
@@ -87,7 +113,7 @@ const handleConfirmPerformanceDelay = () => {
                                menu-position="left"
                                show-select-marker
                                use-fixed-menu-style
-                               :disabled="state.selectAllWorkspace"
+                               :disabled="dashboardDetailState.selectedWorkspaceId === 'all'"
                                :page-size="10"
                                @update:selected="handleSelectWorkspace"
             >
@@ -109,7 +135,7 @@ const handleConfirmPerformanceDelay = () => {
             </p-select-dropdown>
         </div>
         <div class="checkbox-wrapper">
-            <p-checkbox :selected="state.selectAllWorkspace"
+            <p-checkbox :selected="dashboardDetailState.selectedWorkspaceId === 'all'"
                         class="ml-1"
                         @change="handleToggleAllWorkspace"
             />

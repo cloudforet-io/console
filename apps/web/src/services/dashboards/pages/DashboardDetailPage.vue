@@ -24,7 +24,7 @@ import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-g
 import DashboardDetailHeader from '@/services/dashboards/components/dashboard-detail/DashboardDetailHeader.vue';
 import DashboardRefreshDropdown from '@/services/dashboards/components/dashboard-detail/DashboardRefreshDropdown.vue';
 import DashboardToolsetDateDropdown from '@/services/dashboards/components/dashboard-detail/DashboardToolsetDateDropdown.vue';
-// import DashboardToolsetScope from '@/services/dashboards/components/dashboard-detail/DashboardToolsetScope.vue';
+import DashboardToolsetScope from '@/services/dashboards/components/dashboard-detail/DashboardToolsetScope.vue';
 import DashboardVariablesV2 from '@/services/dashboards/components/dashboard-detail/DashboardVariablesV2.vue';
 import DashboardWidgetContainerV2 from '@/services/dashboards/components/dashboard-detail/DashboardWidgetContainerV2.vue';
 import DashboardVariables from '@/services/dashboards/components/legacy/DashboardVariables.vue';
@@ -135,7 +135,7 @@ onUnmounted(() => {
         <div class="filter-box">
             <div class="left-part">
                 <dashboard-toolset-date-dropdown :date-range="dashboardDetailState.options.date_range" />
-                <!--                <dashboard-toolset-scope />-->
+                <dashboard-toolset-scope v-if="state.isAdminMode" />
             </div>
             <div class="right-part">
                 <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
