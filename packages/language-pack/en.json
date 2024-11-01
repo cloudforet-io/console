@@ -2366,6 +2366,7 @@
 					"DATE_RANGE_INFO_TEXT": "Allowed date ranges: Daily – max 1 month, \nMonthly – max 12 months, Yearly – max 3 \nyears.",
 					"DATE_RANGE_INVALID_LIMIT_TEXT": "Date range exceeds limit. See information tooltip for allowed values.",
 					"DATE_RANGE_INVALID_RANGE_TEXT": "The start date must be earlier than the end date.",
+					"DEPRECATED_OPTION": "Deprecated Option",
 					"DESCRIPTION": "Description",
 					"DYNAMIC_FIELD": "Dynamic Field",
 					"EDIT_DATA": "Edit Data",

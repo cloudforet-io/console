@@ -2366,6 +2366,7 @@
 					"DATE_RANGE_INFO_TEXT": "許可される日付範囲: 日次 – 最大1ヶ月、\n月次 – 最大12ヶ月、\n年次 – 最大3年",
 					"DATE_RANGE_INVALID_LIMIT_TEXT": "日付範囲が制限を超えています。許可されている値については、情報ツールチップを参照してください。",
 					"DATE_RANGE_INVALID_RANGE_TEXT": "開始日は終了日より前である必要があります。",
+					"DEPRECATED_OPTION": "",
 					"DESCRIPTION": "説明",
 					"DYNAMIC_FIELD": "ダイナミックフィールド",
 					"EDIT_DATA": "データを編集",
