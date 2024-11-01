@@ -41,7 +41,7 @@ const getJinjaTemplateGlobalVariableValue = (value: string) => `{{ global.${valu
                   style-type="secondary"
                   size="sm"
         >
-            {{ $t('View Global Variables') }}
+            {{ $t('DASHBOARDS.DETAIL.VIEW_GLOBAL_VARIABLE') }}
         </p-button>
         <template #content>
             <div class="preview-global-variable">

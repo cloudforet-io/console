@@ -3,7 +3,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PIconButton, PI, PFieldGroup, PSelectButton, PTextInput, PButton, PTextarea, PButtonModal, PToggleButton, PLink,
+    PIconButton, PI, PFieldGroup, PSelectButton, PTextInput, PButton, PTextarea, PButtonModal, PToggleButton, PLink, PFieldTitle,
 } from '@cloudforet/mirinae';
 import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
@@ -14,6 +14,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import getRandomId from '@/lib/random-id-generator';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
+import WidgetFormDataTableGlobalVariableViewButton
+    from '@/common/modules/widgets/_components/WidgetFormDataTableGlobalVariableViewButton.vue';
 import { EVAL_EXPRESSION_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import type { EvalExpressions } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { EvaluateExpressionType } from '@/common/modules/widgets/types/widget-model';
@@ -41,6 +43,7 @@ const state = reactive({
             label: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.TYPE_DATA_FIELD'),
         },
     ]),
+    globalVariablePopperVisible: false,
 });
 
 const modalState = reactive({
@@ -177,10 +180,20 @@ const handleToggleCondition = (key: string) => {
                                       block
                         />
                     </p-field-group>
-                    <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.FIELD_EXPRESSION')"
-                                   required
-                                   style-type="secondary"
-                    >
+                    <div>
+                        <div class="field-expression-title-wrapper">
+                            <p-field-title class="field-title"
+                                           size="sm"
+                                           color="gray"
+                            >
+                                <div class="field-title-wrapper">
+                                    <span>{{ $t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.FIELD_EXPRESSION') }}</span>
+                                    <div class="left-area">
+                                        <widget-form-data-table-global-variable-view-button />
+                                    </div>
+                                </div>
+                            </p-field-title>
+                        </div>
                         <div class="field-expression-wrapper">
                             <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.CONDITION')"
                                            style-type="secondary"
@@ -245,7 +258,7 @@ const handleToggleCondition = (key: string) => {
                                 />
                             </p-field-group>
                         </div>
-                    </p-field-group>
+                    </div>
                 </div>
             </div>
         </template>
@@ -327,6 +340,27 @@ const handleToggleCondition = (key: string) => {
 
         .form-body {
             padding: 0.5rem 0.5rem 0;
+
+            .field-expression-title-wrapper {
+                /* custom design-system component - p-field-title */
+                :deep(.p-field-title) {
+                    .title {
+                        @apply flex;
+                        width: 100%;
+                    }
+                }
+                .field-title {
+                    @apply w-full;
+                    .field-title-wrapper {
+                        @apply flex w-full items-center;
+                        .left-area {
+                            @apply flex flex-1 items-center justify-end;
+                            width: 100%;
+                        }
+                    }
+                }
+            }
+
             .field-expression-wrapper {
                 @apply bg-gray-100 rounded;
                 padding: 0.5rem;
