@@ -105,11 +105,14 @@ const deleteDashboardVarsSchema = async (dashboardId: string, variableKey: strin
     try {
         const _varsSchemaProperties = cloneDeep(dashboardDetailGetters.dashboardVarsSchemaProperties);
         delete _varsSchemaProperties[variableKey];
+        const _vars = cloneDeep(dashboardDetailGetters.dashboardInfo?.vars || {});
+        delete _vars[variableKey];
         await dashboardStore.updateDashboard(dashboardId, {
             dashboard_id: dashboardId,
             vars_schema: {
                 properties: _varsSchemaProperties,
             },
+            vars: _vars,
         });
         showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_S_DELETE_DASHBOARD_VARS_SCHEMA'), '');
     } catch (e) {
