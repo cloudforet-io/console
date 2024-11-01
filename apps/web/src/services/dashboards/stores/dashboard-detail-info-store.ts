@@ -17,6 +17,7 @@ import type {
     DashboardVariableSchemaProperty,
     DashboardVariablesSchema,
     DashboardVars,
+    DashboardGlobalVariablesSchema,
 } from '@/schema/dashboard/_types/dashboard-type';
 import type { PrivateDashboardGetParameters } from '@/schema/dashboard/private-dashboard/api-verbs/get';
 import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
@@ -99,12 +100,15 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         dashboardId: '' as string | undefined,
         projectId: undefined as string | undefined,
         options: DASHBOARD_DEFAULT.options as DashboardOptions,
-        vars: {} as Record<string, string[]>,
+        vars: {} as DashboardVars,
         variables: {} as DashboardVariables,
         variablesSchema: {
             properties: {},
             order: [],
         } as DashboardVariablesSchema,
+        varsSchema: {
+            properties: {},
+        } as DashboardGlobalVariablesSchema,
         variablesInitMap: {} as Record<string, boolean>,
         showDateRangeNotification: true,
         // widget info states
@@ -163,7 +167,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         }),
         refinedVars: computed<DashboardVars>(() => {
             const isProjectSharedDashboard = !!state.projectId;
-            const _vars: Record<string, string[]> = {};
+            const _vars: DashboardVars = {};
             const originVars = state.vars;
             if (isProjectSharedDashboard && !!state.projectId) {
                 originVars.project = [state.projectId];
@@ -189,7 +193,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
 
     /* Mutations */
     const setOptions = (options: DashboardOptions) => { state.options = options; };
-    const setVars = (vars: Record<string, string[]>) => { state.vars = vars; };
+    const setVars = (vars: DashboardVars) => { state.vars = vars; };
     const setVariablesSchema = (variablesSchema: DashboardVariablesSchema) => { state.variablesSchema = variablesSchema; };
     const setVariables = (variables: DashboardVariables) => { state.variables = variables; };
     const setVariablesInitMap = (variablesInitMap: Record<string, boolean>) => { state.variablesInitMap = variablesInitMap; };

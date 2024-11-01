@@ -1,8 +1,11 @@
 // Base Model
+import type { GLOBAL_VARIABLE_FILTER_TYPE_MAP } from '@/services/dashboards/constants/dashboard-global-variable';
+
 interface DashboardGlobalVariableBase {
     key: string; // new_variable
     name: string; // New Variable
     method: 'manual'|'dynamic';
+    type: 'reference' | 'number' | 'text';
     created_by?: string;
     use?: boolean;
 }
@@ -75,3 +78,5 @@ export type DashboardGlobalVariable =
     | NumberEnumVariable;
 
 
+
+export type GlobalVariableFilterType = keyof typeof GLOBAL_VARIABLE_FILTER_TYPE_MAP;

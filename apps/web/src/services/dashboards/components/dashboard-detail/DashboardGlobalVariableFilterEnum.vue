@@ -1,0 +1,137 @@
+<script setup lang="ts">
+
+
+import { computed, reactive, watch } from 'vue';
+
+import { cloneDeep, flattenDeep } from 'lodash';
+
+import { PSelectDropdown } from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+
+import type {
+    DashboardGlobalVariable,
+    NumberEnumVariable,
+    TextEnumVariable,
+} from '@/schema/dashboard/_types/dashboard-global-variable-type';
+import type { DashboardVars } from '@/schema/dashboard/_types/dashboard-type';
+
+import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+
+
+interface Props {
+    variable: DashboardGlobalVariable;
+}
+
+
+const props = defineProps<Props>();
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.state;
+
+const storeState = reactive({
+    vars: computed<DashboardVars>(() => dashboardDetailState.vars),
+});
+
+const state = reactive({
+    variable: computed(() => {
+        const enumVariable = props.variable as TextEnumVariable|NumberEnumVariable;
+        return enumVariable;
+    }),
+    multiSelectable: computed(() => state.variable.options.selectionType === 'multi'),
+    menuItems: computed(() => state.variable.values.map((value) => ({ label: value.label, name: value.key }))),
+    selected: [],
+});
+
+
+const handleSelectOption = () => {
+    changeVariables(state.selected);
+};
+
+const changeVariables = (changedSelected: MenuItem[]) => {
+    const _key = state.variable.key;
+    const vars = cloneDeep(storeState.vars);
+    const reconvertedSelected = changedSelected.map((d) => d.name) as string[];
+    if (reconvertedSelected.length === 0) {
+        delete vars[_key];
+    } else if (state.multiSelectable) {
+        vars[_key] = reconvertedSelected[0];
+    } else {
+        vars[_key] = reconvertedSelected;
+    }
+    dashboardDetailStore.setVars(vars);
+};
+
+const initVariableAndSelected = async () => {
+    const found = state.menuItems[0];
+    if (found) {
+        state.selected = [found];
+        changeVariables([found]);
+    }
+};
+
+const initSelected = async (value: any) => {
+    // Selected options data from backend can be undefined or string not string[]. Convert them to Array.
+    const selectedValues = flattenDeep([value ?? []]);
+    const selectedItems = state.menuItems.filter((item) => selectedValues.includes(item.name));
+    if (selectedItems.length) {
+        state.selected = selectedItems;
+    } else {
+        await initVariableAndSelected();
+    }
+};
+
+watch(() => storeState.vars, async () => {
+    dashboardDetailStore.setVariablesInitMap({
+        ...dashboardDetailState.variablesInitMap,
+        [state.variable.key]: false,
+    });
+
+    const value = storeState.vars[state.variable.key];
+    if (value) {
+        await initSelected(value);
+    } else {
+        state.selected = [];
+    }
+
+    dashboardDetailStore.setVariablesInitMap({
+        ...dashboardDetailState.variablesInitMap,
+        [state.variable.key]: true,
+    });
+}, { immediate: true });
+
+
+
+</script>
+
+<template>
+    <div class="dashboard-global-variable-filter-enum">
+        <p-select-dropdown is-filterable
+                           :menu="state.menuItems"
+                           :selected.sync="state.selected"
+                           :multi-selectable="state.multiSelectable"
+                           style-type="rounded"
+                           appearance-type="badge"
+                           show-select-marker
+                           use-fixed-menu-style
+                           selection-highlight
+                           :selection-label="state.variable.name"
+                           :show-delete-all-button="false"
+                           :page-size="10"
+                           @update:selected="handleSelectOption"
+        />
+    </div>
+</template>
+
+<style scoped lang="postcss">
+.dashboard-global-variable-filter-enum {
+    /* custom design-system component - p-context-menu */
+    :deep(.options-menu) {
+        z-index: 10;
+        margin-top: -1px;
+        .label-wrapper {
+            min-width: 7rem;
+            width: max-content;
+            max-width: 22.5rem;
+        }
+    }
+}
+</style>

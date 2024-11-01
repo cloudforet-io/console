@@ -184,10 +184,9 @@ const getSortIcon = (field: PreviewTableField) => {
 // };
 
 watch(() => storeState.selectedDataTableId, async (dataTableId) => {
-    if (dataTableId) {
-        state.thisPage = 1;
-        state.sortBy = [];
-    }
+    if (!dataTableId) return;
+    state.thisPage = 1;
+    state.sortBy = [];
     widgetGenerateStore.setDataTableUpdating(true);
     await widgetGenerateStore.loadDataTable({});
 }, { immediate: true });

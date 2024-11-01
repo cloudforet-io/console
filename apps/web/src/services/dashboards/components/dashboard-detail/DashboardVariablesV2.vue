@@ -2,14 +2,17 @@
 import { computed, reactive } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { isEqual } from 'lodash';
+import { isEqual, orderBy } from 'lodash';
 
 import { PI, PTextButton, PDivider } from '@cloudforet/mirinae';
 
+import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
 import type { DashboardVariableSchemaProperty, DashboardVars } from '@/schema/dashboard/_types/dashboard-type';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
+import DashboardGlobalVariableFilter
+    from '@/services/dashboards/components/dashboard-detail/DashboardGlobalVariableFilter.vue';
 import DashboardManageVariableOverlay from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableOverlay.vue';
 // import DashboardVariableDropdown from '@/services/dashboards/components/dashboard-detail/DashboardVariableDropdown.vue';
 import DashboardVariablesMoreButton
@@ -18,6 +21,7 @@ import {
     MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP,
     MANAGED_DASHBOARD_VARIABLES_SCHEMA,
 } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
+import { DOMAIN_DASHBOARD_VARS_SCHEMA_PRESET } from '@/services/dashboards/constants/dashboard-vars-schema-preset';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/constants/manage-variable-overlay-constant';
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
@@ -59,12 +63,22 @@ const state = reactive({
         _defaultDashboardVariables.region = MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties[MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.region.key];
         return _defaultDashboardVariables;
     }),
+    newGlobalVariables: computed<DashboardGlobalVariable[]>(() => {
+        const properties = dashboardDetailGetters.dashboardVarsSchemaProperties as Record<string, DashboardGlobalVariable>;
+        const _presetKeys: string[] = Object.keys(DOMAIN_DASHBOARD_VARS_SCHEMA_PRESET.properties);
+        const _presetItems = Object.values(properties).filter((d) => _presetKeys.includes(d.key));
+        const _customItems = Object.values(properties).filter((d) => !_presetKeys.includes(d.key));
+        return [
+            ...orderBy(_presetItems, 'name', 'asc'),
+            ...orderBy(_customItems, 'name', 'asc'),
+        ];
+    }),
     allReferenceTypeInfo: computed(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     modifiedVariablesSchemaProperties: computed<string[]>(() => {
         const results: string[] = [];
-        Object.entries(state.variableProperties).forEach(([k]) => {
-            if (!isEqual(dashboardDetailGetters.dashboardInfo?.vars?.[k], dashboardDetailState.vars?.[k])) {
-                results.push(k);
+        state.newGlobalVariables.forEach((_var) => {
+            if (!isEqual(dashboardDetailGetters.dashboardInfo?.vars?.[_var.key], dashboardDetailState.vars?.[_var.key])) {
+                results.push(_var.key);
             }
         });
         return results;
@@ -86,22 +100,16 @@ const handleResetVariables = () => {
 
 <template>
     <div :class="{'dashboard-variables-select-dropdown': true, 'detail-page': !props.widgetMode}">
-        <!--        <template v-for="([propertyName, property], idx) in Object.entries(state.variableProperties)">-->
-        <!--            <div :key="`${propertyName}-${idx}`"-->
-        <!--                 class="variable-selector-box"-->
-        <!--            >-->
-        <!--                <dashboard-variable-dropdown :property-name="propertyName"-->
-        <!--                                             :property-label="property.name"-->
-        <!--                                             :property="property"-->
-        <!--                                             :reference-map="state.allReferenceTypeInfo[propertyName]?.referenceMap"-->
-        <!--                                             :disabled="props.loading"-->
-        <!--                                             :dashboard-variables="dashboardDetailState.vars"-->
-        <!--                />-->
-        <!--                <span class="circle-mark"-->
-        <!--                      :class="{'changed': state.modifiedVariablesSchemaProperties.includes(propertyName)}"-->
-        <!--                />-->
-        <!--            </div>-->
-        <!--        </template>-->
+        <template v-for="(property, idx) in state.newGlobalVariables">
+            <div :key="`${property.name}-${idx}`"
+                 class="variable-selector-box"
+            >
+                <dashboard-global-variable-filter :variable="property" />
+                <span class="circle-mark"
+                      :class="{'changed': state.modifiedVariablesSchemaProperties.includes(property.key)}"
+                />
+            </div>
+        </template>
         <p-text-button style-type="highlight"
                        class="reset-button"
                        :disabled="props.loading || state.notChanged"
