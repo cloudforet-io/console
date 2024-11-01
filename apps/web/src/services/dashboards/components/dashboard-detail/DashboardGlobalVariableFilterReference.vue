@@ -1,6 +1,4 @@
 <script setup lang="ts">
-
-
 import { computed, reactive, watch } from 'vue';
 
 import { cloneDeep, flattenDeep } from 'lodash';
@@ -29,6 +27,8 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 
 import { getWorkspaceInfo } from '@/services/advanced/composables/refined-table-data';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+
+
 
 interface Props {
     variable: DashboardGlobalVariable;
@@ -70,10 +70,6 @@ const state = reactive({
             variableModel: new VariableModelFactory({ type: 'MANAGED', managedModelKey: _variableModelKey }),
             dataKey: _dataKey,
         } as VariableModelMenuHandlerInfo;
-
-        if (_dataKey) {
-            variableModelInfo.variableModel[_dataKey] = variableModelInfo.variableModel.generateProperty({ key: _dataKey });
-        }
 
         return getVariableModelMenuHandler([variableModelInfo], listQueryOptions);
     }),
