@@ -71,7 +71,7 @@ const state = reactive({
             dataKey: _dataKey,
         } as VariableModelMenuHandlerInfo;
 
-        if (_dataKey) {
+        if (_dataKey && !variableModelInfo.variableModel[_dataKey]) {
             variableModelInfo.variableModel[_dataKey] = variableModelInfo.variableModel.generateProperty({ key: _dataKey });
         }
 
