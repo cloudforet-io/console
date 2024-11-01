@@ -13,7 +13,7 @@ import type {
     DashboardGlobalVariable,
     ReferenceVariable,
 } from '@/schema/dashboard/_types/dashboard-global-variable-type';
-import type { DashboardVars } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardGlobalVariablesSchema, DashboardVars } from '@/schema/dashboard/_types/dashboard-type';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -49,6 +49,7 @@ const dashboardDetailState = dashboardDetailStore.state;
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
     vars: computed<DashboardVars>(() => dashboardDetailState.vars),
+    varsSchema: computed<DashboardGlobalVariablesSchema>(() => dashboardDetailState.varsSchema),
 });
 
 const state = reactive({
@@ -138,7 +139,7 @@ const initSelected = async (value: any) => {
     }
 };
 
-watch(() => storeState.vars, async () => {
+watch([() => storeState.vars, () => storeState.varsSchema], async () => {
     dashboardDetailStore.setVariablesInitMap({
         ...dashboardDetailState.variablesInitMap,
         [state.variable.key]: false,

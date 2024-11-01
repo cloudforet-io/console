@@ -53,9 +53,9 @@ const changeVariables = (changedSelected: MenuItem[]) => {
     if (reconvertedSelected.length === 0) {
         delete vars[_key];
     } else if (state.multiSelectable) {
-        vars[_key] = reconvertedSelected[0];
-    } else {
         vars[_key] = reconvertedSelected;
+    } else {
+        vars[_key] = reconvertedSelected[0];
     }
     dashboardDetailStore.setVars(vars);
 };
