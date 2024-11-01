@@ -34,7 +34,6 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import getRandomId from '@/lib/random-id-generator';
-import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 import WorkspaceVariableModel from '@/lib/variable-models/managed-model/resource-model/workspace-variable-model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -169,15 +168,10 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         }),
         refinedVars: computed<DashboardVars>(() => {
             const isProjectSharedDashboard = !!state.projectId;
-            const _vars: DashboardVars = {};
-            const originVars = state.vars;
+            const _vars: DashboardVars = cloneDeep(state.vars);
             if (isProjectSharedDashboard && !!state.projectId) {
-                originVars.project = [state.projectId];
+                _vars.project = [state.projectId];
             }
-            Object.entries(originVars).forEach(([k, v]) => {
-                const idKey = MANAGED_VARIABLE_MODELS[k]?.meta.idKey;
-                if (idKey) _vars[idKey] = v;
-            });
             if (storeState.isAdminMode) {
                 if (state.selectedWorkspaceId && state.selectedWorkspaceId !== 'all') {
                     _vars[WorkspaceVariableModel.meta.idKey] = [state.selectedWorkspaceId];
