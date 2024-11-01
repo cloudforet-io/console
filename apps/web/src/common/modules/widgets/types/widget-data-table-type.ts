@@ -38,6 +38,7 @@ export interface EvalExpressions {
     fieldType: EvaluateExpressionType;
     expression: string;
     condition?: string;
+    else?: string;
 }
 
 export interface TransformDataTableInfo {
