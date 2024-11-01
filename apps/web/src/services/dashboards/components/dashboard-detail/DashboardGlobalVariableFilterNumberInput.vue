@@ -58,8 +58,8 @@ const handleUpdateKeyword = (value: string) => {
 
 const handleSelectValue = (selected: InputItem[]) => {
     if (state.invalid || !selected.length) return;
-    state.value = selected[0].name;
-    changeVariables(parseFloat(selected[0].name));
+    state.value = selected[0]?.name;
+    changeVariables(parseFloat(selected[0]?.name));
     state.editMode = false;
 };
 const handleClickMinusButton = () => {

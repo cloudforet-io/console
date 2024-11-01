@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { cloneDeep, orderBy } from 'lodash';
+import { cloneDeep } from 'lodash';
 
 import {
     PButton, PIconButton, POverlayLayout, PToggleButton, PToolboxTable,
@@ -28,6 +28,7 @@ import DashboardManageVariableImportModal
 import DashboardVariablesFormModal
     from '@/services/dashboards/components/dashboard-detail/DashboardVariablesFormModal.vue';
 import { DOMAIN_DASHBOARD_VARS_SCHEMA_PRESET } from '@/services/dashboards/constants/dashboard-vars-schema-preset';
+import { getOrderedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variables-helper';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
@@ -62,17 +63,12 @@ const state = reactive({
     searchText: '',
     globalVariablesTableItems: computed<GlobalVariableTableItem[]>(() => {
         const _properties: DashboardGlobalVariable[] = Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties);
-        const _tableItems: GlobalVariableTableItem[] = _properties.map((d) => ({
+        const _orderedProperties = getOrderedGlobalVariables(_properties);
+        return _orderedProperties.map((d) => ({
             ...d,
             type: d.method === 'manual' ? d.type : undefined,
             reference: d.method === 'dynamic' ? d?.reference?.resourceType : undefined,
         }));
-        const _presetItems = _tableItems.filter((d) => isPresetVarsSchemaProperty(d.key));
-        const _customItems = _tableItems.filter((d) => !isPresetVarsSchemaProperty(d.key));
-        return [
-            ...orderBy(_presetItems, 'name', 'asc'),
-            ...orderBy(_customItems, 'name', 'asc'),
-        ];
     }),
     searchedGlobalVariablesTableItems: computed<GlobalVariableTableItem[]>(() => {
         if (!state.searchText.length) return state.globalVariablesTableItems;

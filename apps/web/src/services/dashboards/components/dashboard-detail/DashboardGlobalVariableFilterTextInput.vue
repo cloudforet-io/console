@@ -42,8 +42,8 @@ const handleDeleteTextValue = () => {
     changeVariables();
 };
 const handleSelectValue = (selected: InputItem[]) => {
-    state.value = selected[0].name;
-    changeVariables(selected[0].name);
+    state.value = selected[0]?.name;
+    changeVariables(selected[0]?.name);
 };
 
 
