@@ -89,6 +89,11 @@ onClickOutside(containerRef, hideContextMenu);
 const toggleUseDashboardVarsSchema = debounce(async (dashboardId: string, variableKey: string) => {
     try {
         const _dashboardVarsSchemaProperties: Record<string, DashboardGlobalVariable> = cloneDeep(dashboardDetailGetters.dashboardVarsSchemaProperties);
+        const _use = !_dashboardVarsSchemaProperties[variableKey].use;
+        const _vars = cloneDeep(dashboardDetailGetters.dashboardInfo?.vars || {});
+        if (!_use) {
+            delete _vars[variableKey];
+        }
         await dashboardStore.updateDashboard(dashboardId, {
             dashboard_id: dashboardId,
             vars_schema: {
@@ -100,6 +105,7 @@ const toggleUseDashboardVarsSchema = debounce(async (dashboardId: string, variab
                     },
                 },
             },
+            vars: _vars,
         });
         showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_S_UPDATE_DASHBOARD_VARS_SCHEMA'), '');
     } catch (e) {

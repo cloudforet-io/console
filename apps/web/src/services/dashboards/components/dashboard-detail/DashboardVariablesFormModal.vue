@@ -173,13 +173,13 @@ const createDashboardVarsSchema = async (dashboardId: string) => {
 const updateDashboardVarsSchema = async (dashboardId: string) => {
     try {
         const _originalKey = state.targetVariable?.key;
-        const _use = state.targetVariable?.use || false;
         if (!_originalKey) return;
         const _newVarsSchemaProperties = cloneDeep(dashboardDetailGetters.dashboardVarsSchemaProperties);
         delete _newVarsSchemaProperties[_originalKey];
         _newVarsSchemaProperties[state.dashboardGlobalVariable.key] = {
             ...state.dashboardGlobalVariable,
-            use: _use,
+            use: state.targetVariable?.use || false,
+            created_by: state.targetVariable?.created_by,
         };
         const _vars = cloneDeep(dashboardDetailGetters.dashboardInfo?.vars || {});
         delete _vars[_originalKey];

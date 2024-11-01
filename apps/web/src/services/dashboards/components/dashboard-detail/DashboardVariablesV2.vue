@@ -65,9 +65,10 @@ const state = reactive({
     }),
     newGlobalVariables: computed<DashboardGlobalVariable[]>(() => {
         const properties = dashboardDetailGetters.dashboardVarsSchemaProperties as Record<string, DashboardGlobalVariable>;
+        const _usedProperties: DashboardGlobalVariable[] = Object.values(properties).filter((d) => d.use);
         const _presetKeys: string[] = Object.keys(DOMAIN_DASHBOARD_VARS_SCHEMA_PRESET.properties);
-        const _presetItems = Object.values(properties).filter((d) => _presetKeys.includes(d.key));
-        const _customItems = Object.values(properties).filter((d) => !_presetKeys.includes(d.key));
+        const _presetItems = _usedProperties.filter((d) => _presetKeys.includes(d.key));
+        const _customItems = _usedProperties.filter((d) => !_presetKeys.includes(d.key));
         return [
             ...orderBy(_presetItems, 'name', 'asc'),
             ...orderBy(_customItems, 'name', 'asc'),
