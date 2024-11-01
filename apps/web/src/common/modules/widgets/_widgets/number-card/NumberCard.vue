@@ -4,7 +4,7 @@ import {
     computed, defineExpose, reactive, ref, watch,
 } from 'vue';
 
-import { throttle } from 'lodash';
+import { debounce, throttle } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
@@ -121,7 +121,7 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
 });
 
 /* Util */
-const setValueTextFontSize = () => {
+const setValueTextFontSize = debounce(() => {
     if (!valueTextRef.value || !topPartRef.value) return;
     let _fontSize = 56;
     let _maxWidth = useElementSize(topPartRef).width.value;
@@ -132,7 +132,7 @@ const setValueTextFontSize = () => {
         valueTextRef.value.style.fontSize = `${_fontSize}px`;
         _valueTextWidth = useElementSize(valueTextRef).width.value;
     }
-};
+}, 300);
 
 /* Api */
 const privateWidgetFetcher = getCancellableFetcher<PrivateWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.privateWidget.load);
@@ -233,7 +233,8 @@ defineExpose<WidgetExpose<Data>>({
     <widget-frame v-bind="widgetFrameProps"
                   v-on="widgetFrameEventHandlers"
     >
-        <div class="content-wrapper">
+        <!-- NOTE: Apply styles directly due to intermittent scoped style issues -->
+        <div class="content-wrapper flex flex-col justify-center h-full">
             <div ref="topPartRef"
                  class="top-part"
             >
@@ -272,8 +273,6 @@ defineExpose<WidgetExpose<Data>>({
 
 <style lang="postcss" scoped>
 .content-wrapper {
-    @apply flex flex-col justify-center;
-    height: 100%;
     .top-part {
         display: flex;
         align-items: center;
