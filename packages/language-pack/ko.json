@@ -2366,6 +2366,7 @@
 					"DATE_RANGE_INFO_TEXT": "허용되는 날짜 범위: 일일 – 최대 1개월, \n월별 – 최대 12개월,\n연간 – 최대 3년",
 					"DATE_RANGE_INVALID_LIMIT_TEXT": "날짜 범위가 제한을 초과했습니다. 허용되는 값의 정보는 툴팁을 참조하세요.",
 					"DATE_RANGE_INVALID_RANGE_TEXT": "시작 날짜는 종료 날짜보다 이전이어야 합니다.",
+					"DEPRECATED_OPTION": "",
 					"DESCRIPTION": "설명",
 					"DYNAMIC_FIELD": "변동 데이터 필드",
 					"EDIT_DATA": "데이터 수정",
