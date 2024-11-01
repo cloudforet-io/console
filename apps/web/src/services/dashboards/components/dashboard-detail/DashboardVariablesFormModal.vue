@@ -4,7 +4,7 @@ import { computed, reactive, watch } from 'vue';
 import { cloneDeep, isEmpty } from 'lodash';
 
 import {
-    PButtonModal, PFieldGroup, PTextInput, PRadioGroup, PRadio,
+    PButtonModal, PFieldGroup, PTextInput, PRadioGroup, PRadio, PScopedNotification,
 } from '@cloudforet/mirinae';
 
 import type { DashboardGlobalVariable, ManualVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
@@ -181,11 +181,14 @@ const updateDashboardVarsSchema = async (dashboardId: string) => {
             ...state.dashboardGlobalVariable,
             use: _use,
         };
+        const _vars = cloneDeep(dashboardDetailGetters.dashboardInfo?.vars || {});
+        delete _vars[_originalKey];
         await dashboardStore.updateDashboard(dashboardId, {
             dashboard_id: dashboardId,
             vars_schema: {
                 properties: _newVarsSchemaProperties,
             },
+            vars: _vars,
         });
         showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_S_UPDATE_DASHBOARD_VARS_SCHEMA'), '');
     } catch (e) {
@@ -237,6 +240,13 @@ watch(() => state.proxyVisible, (visible) => {
                     @close="handleClickClose"
     >
         <template #body>
+            <p-scoped-notification type="warning"
+                                   icon="ic_warning-filled"
+                                   layout="in-section"
+                                   class="mb-4"
+            >
+                {{ $t('DASHBOARDS.DETAIL.VARIABLES.UPDATE_WARNING') }}
+            </p-scoped-notification>
             <div class="grid grid-cols-12 gap-4">
                 <p-field-group :label="$t('DASHBOARDS.DETAIL.VARIABLES.NAME')"
                                :invalid="invalidState.variableName"
