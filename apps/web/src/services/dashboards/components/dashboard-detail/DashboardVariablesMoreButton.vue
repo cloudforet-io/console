@@ -175,7 +175,7 @@ const {
                         :selected="state.selected"
                         multi-selectable
                         show-select-marker
-                        @click-show-more="showMoreMenu"
+                        @click-show-more="showMoreMenu()"
                         @keyup:down:end="focusOnContextMenu()"
                         @select="handleSelectVariable"
                         @update:search-text="handleUpdateSearchText"
