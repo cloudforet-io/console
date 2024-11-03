@@ -2,13 +2,12 @@
 
 import { computed, reactive } from 'vue';
 
-import { orderBy } from 'lodash';
 
 import { PButton, PPopover, PCopyButton } from '@cloudforet/mirinae';
 
 import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
 
-import { DOMAIN_DASHBOARD_VARS_SCHEMA_PRESET } from '@/services/dashboards/constants/dashboard-vars-schema-preset';
+import { getOrderedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variables-helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
@@ -17,14 +16,8 @@ const dashboardDetailGetters = dashboardDetailStore.getters;
 const state = reactive({
     popperVisible: false,
     variableItems: computed<DashboardGlobalVariable[]>(() => {
-        const properties = dashboardDetailGetters.dashboardVarsSchemaProperties as Record<string, DashboardGlobalVariable>;
-        const _presetKeys: string[] = Object.keys(DOMAIN_DASHBOARD_VARS_SCHEMA_PRESET.properties);
-        const _presetItems = Object.values(properties).filter((d) => _presetKeys.includes(d.key));
-        const _customItems = Object.values(properties).filter((d) => !_presetKeys.includes(d.key));
-        return [
-            ...orderBy(_presetItems, 'name', 'asc'),
-            ...orderBy(_customItems, 'name', 'asc'),
-        ];
+        const _refinedProperties: DashboardGlobalVariable[] = Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties);
+        return getOrderedGlobalVariables(_refinedProperties);
     }),
 });
 
