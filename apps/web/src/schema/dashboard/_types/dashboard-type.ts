@@ -109,7 +109,7 @@ export interface DashboardTemplate {
     template_type: TemplateType;
 }
 
-export type DashboardVars = Record<string, string[]|string|number>;
+export type DashboardVars = Record<string, string[]|number[]|string|number>;
 
 export interface DashboardLayout {
     name?: string;
