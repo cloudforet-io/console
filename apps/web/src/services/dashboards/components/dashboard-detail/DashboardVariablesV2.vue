@@ -14,7 +14,6 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import DashboardGlobalVariableFilter
     from '@/services/dashboards/components/dashboard-detail/DashboardGlobalVariableFilter.vue';
 import DashboardManageVariableOverlay from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableOverlay.vue';
-// import DashboardVariableDropdown from '@/services/dashboards/components/dashboard-detail/DashboardVariableDropdown.vue';
 import DashboardVariablesMoreButton
     from '@/services/dashboards/components/dashboard-detail/DashboardVariablesMoreButton.vue';
 import {
