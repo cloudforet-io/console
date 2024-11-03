@@ -1,13 +1,19 @@
 <script setup lang="ts">
 
 import { onClickOutside } from '@vueuse/core/index';
-import { computed, reactive, ref } from 'vue';
+import {
+    computed, onMounted, reactive, ref,
+} from 'vue';
+
+import { orderBy } from 'lodash';
 
 import {
     PSelectDropdown, PContextMenu, PIconButton, PI, PTextInput,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 import type { AutocompleteHandler } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+
+import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import {
@@ -17,6 +23,9 @@ import {
 import type { DataTableQueryFilterForDropdown } from '@/common/modules/widgets/types/widget-data-table-type';
 
 import { blue, gray } from '@/styles/colors';
+
+import { DOMAIN_DASHBOARD_VARS_SCHEMA_PRESET } from '@/services/dashboards/constants/dashboard-vars-schema-preset';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
 interface Props {
@@ -34,52 +43,95 @@ const emit = defineEmits<{(e: 'delete'): void;
 }>();
 const operatorButtonRef = ref<HTMLElement | null>(null);
 
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailGetters = dashboardDetailStore.getters;
+
 const state = reactive({
     visibleMenu: false,
     operatorMenu: computed<MenuItem[]>(() => {
         if (KEYWORD_FILTER_DISABLED_KEYS.includes(props.filterItem?.name)) {
             return [
                 {
-                    name: DATA_TABLE_QUERY_OPERATOR.in.key,
+                    name: DATA_TABLE_QUERY_OPERATOR.in.operator,
                     label: DATA_TABLE_QUERY_OPERATOR.in.label,
+                    key: DATA_TABLE_QUERY_OPERATOR.in.key,
                 },
                 {
-                    name: DATA_TABLE_QUERY_OPERATOR.not_in.key,
+                    name: DATA_TABLE_QUERY_OPERATOR.not_in.operator,
                     label: DATA_TABLE_QUERY_OPERATOR.not_in.label,
+                    key: DATA_TABLE_QUERY_OPERATOR.not_in.key,
+                },
+                {
+                    name: DATA_TABLE_QUERY_OPERATOR.use_global_variable.operator,
+                    label: DATA_TABLE_QUERY_OPERATOR.use_global_variable.label,
+                    key: DATA_TABLE_QUERY_OPERATOR.use_global_variable.key,
                 },
             ];
         }
         return [
             // {
-            //     name: DATA_TABLE_QUERY_OPERATOR.contain_in.key,
+            //     name: DATA_TABLE_QUERY_OPERATOR.contain_in.operator,
             //     label: DATA_TABLE_QUERY_OPERATOR.contain_in.label,
+            //     key: DATA_TABLE_QUERY_OPERATOR.contain_in.key,
             // },
             // {
-            //     name: DATA_TABLE_QUERY_OPERATOR.not_contain_in.key,
+            //     name: DATA_TABLE_QUERY_OPERATOR.not_contain_in.operator,
             //     label: DATA_TABLE_QUERY_OPERATOR.not_contain_in.label,
+            //     key: DATA_TABLE_QUERY_OPERATOR.not_contain_in.key,
             // },
             {
-                name: DATA_TABLE_QUERY_OPERATOR.in.key,
+                name: DATA_TABLE_QUERY_OPERATOR.in.operator,
                 label: DATA_TABLE_QUERY_OPERATOR.in.label,
+                key: DATA_TABLE_QUERY_OPERATOR.in.key,
             },
             {
-                name: DATA_TABLE_QUERY_OPERATOR.not_in.key,
+                name: DATA_TABLE_QUERY_OPERATOR.not_in.operator,
                 label: DATA_TABLE_QUERY_OPERATOR.not_in.label,
+                key: DATA_TABLE_QUERY_OPERATOR.not_in.key,
+            },
+            {
+                name: DATA_TABLE_QUERY_OPERATOR.use_global_variable.operator,
+                label: DATA_TABLE_QUERY_OPERATOR.use_global_variable.label,
+                key: DATA_TABLE_QUERY_OPERATOR.use_global_variable.key,
             },
         ];
     }),
+    selectedOperator: [] as MenuItem[],
     proxySelectedFilter: useProxyValue<DataTableQueryFilterForDropdown>('selectedFilter', props, emit),
+    globalVariableItems: computed<MenuItem[]>(() => {
+        const properties = dashboardDetailGetters.dashboardVarsSchemaProperties as Record<string, DashboardGlobalVariable>;
+        const _presetKeys: string[] = Object.keys(DOMAIN_DASHBOARD_VARS_SCHEMA_PRESET.properties);
+        const _presetItems = Object.values(properties).filter((d) => _presetKeys.includes(d.key));
+        const _customItems = Object.values(properties).filter((d) => !_presetKeys.includes(d.key));
+        return [
+            ...orderBy(_presetItems, 'name', 'asc'),
+            ...orderBy(_customItems, 'name', 'asc'),
+        ].map((variable) => ({
+            name: `{{ global.${variable.key} }}`,
+            label: variable.name,
+        }));
+    }),
+    selectedFilterValue: computed<MenuItem[]>(() => {
+        if (state.selectedOperator[0]?.key === DATA_TABLE_QUERY_OPERATOR.use_global_variable.key) {
+            const selected = state.globalVariableItems.find((item) => item.name === state.proxySelectedFilter?.v);
+            return selected ? [selected] : [];
+        }
+        return state.proxySelectedFilter?.v;
+    }),
 });
 
 const handleClickDropdown = () => {
     state.visibleMenu = !state.visibleMenu;
 };
 const handleSelectOperator = (operator: MenuItem) => {
-    if (!operator?.name) return;
+    if (operator?.name === undefined) return;
+    state.selectedOperator = [operator];
+
+    const defaultFilterValue = operator?.key === DATA_TABLE_QUERY_OPERATOR.use_global_variable.key ? undefined : [];
     state.proxySelectedFilter = {
         ...state.proxySelectedFilter,
         o: operator.name,
-        v: [],
+        v: defaultFilterValue,
     };
     state.visibleMenu = false;
 };
@@ -88,11 +140,18 @@ const handleDeleteFilter = () => {
     emit('delete');
 };
 
-const handleUpdateFilterDropdown = (selected: MenuItem[]) => {
-    state.proxySelectedFilter = {
-        ...state.proxySelectedFilter,
-        v: selected,
-    };
+const handleUpdateFilterDropdown = (selected: string|MenuItem[], isGlobalVariable?: boolean) => {
+    if (isGlobalVariable) {
+        state.proxySelectedFilter = {
+            ...state.proxySelectedFilter,
+            v: selected[0]?.name,
+        };
+    } else {
+        state.proxySelectedFilter = {
+            ...state.proxySelectedFilter,
+            v: selected,
+        };
+    }
 };
 
 const handleUpdateKeywordSelected = (selected: MenuItem[]) => {
@@ -104,6 +163,13 @@ const handleUpdateKeywordSelected = (selected: MenuItem[]) => {
 
 onClickOutside(operatorButtonRef, () => {
     state.visibleMenu = false;
+});
+
+onMounted(() => {
+    const operator = state.operatorMenu.find((item) => item.name === state.proxySelectedFilter.o);
+    if (operator) {
+        state.selectedOperator = [operator];
+    }
 });
 
 </script>
@@ -119,7 +185,7 @@ onClickOutside(operatorButtonRef, () => {
                     <div class="operator-button"
                          @click="handleClickDropdown"
                     >
-                        <span class="selected">{{ DATA_TABLE_QUERY_OPERATOR[state.proxySelectedFilter.o]?.label }}</span>
+                        <span class="selected">{{ state.selectedOperator[0]?.label }}</span>
                         <p-i :name="state.visibleMenu ? 'ic_chevron-up' : 'ic_chevron-down'"
                              width="1.5rem"
                              height="1.5rem"
@@ -131,7 +197,7 @@ onClickOutside(operatorButtonRef, () => {
                                     :visible.sync="state.visibleMenu"
                                     searchable
                                     :menu="state.operatorMenu"
-                                    :selected="[{ name: state.proxySelectedFilter?.o }]"
+                                    :selected="state.selectedOperator"
                                     @select="handleSelectOperator"
                     />
                 </div>
@@ -142,14 +208,26 @@ onClickOutside(operatorButtonRef, () => {
                            @click="handleDeleteFilter"
             />
         </div>
-        <p-text-input v-if="state.proxySelectedFilter.o === DATA_TABLE_QUERY_OPERATOR.contain_in.key
-                          || state.proxySelectedFilter.o === DATA_TABLE_QUERY_OPERATOR.not_contain_in.key"
+        <p-text-input v-if="state.selectedOperator[0]?.key === DATA_TABLE_QUERY_OPERATOR.contain_in.key
+                          || state.selectedOperator[0]?.key === DATA_TABLE_QUERY_OPERATOR.not_contain_in.key"
                       :selected="state.proxySelectedFilter?.v"
                       multi-input
                       block
                       appearance-type="stack"
                       placeholder="Enter Value"
                       @update="handleUpdateKeywordSelected"
+        />
+        <p-select-dropdown v-else-if="state.selectedOperator[0]?.key === DATA_TABLE_QUERY_OPERATOR.use_global_variable.key"
+                           is-filterable
+                           :menu="state.globalVariableItems"
+                           :selected="state.selectedFilterValue"
+                           :loading="props.loading"
+                           appearance-type="stack"
+                           show-select-marker
+                           :init-selected-with-handler="props.initSelectedWithHandler"
+                           :show-delete-all-button="false"
+                           :page-size="10"
+                           @update:selected="handleUpdateFilterDropdown($event, true)"
         />
         <p-select-dropdown v-else
                            is-filterable

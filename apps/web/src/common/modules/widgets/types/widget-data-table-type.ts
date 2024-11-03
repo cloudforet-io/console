@@ -50,4 +50,4 @@ export type DataTableAlertModalMode = 'DELETE'|'DELETE_UNABLED'|'RESET';
 
 export type JoinRestrictedMap = Record<string, boolean>; // { {id}: true }
 
-export type DataTableQueryFilterForDropdown = Omit<DataTableQueryFilter, 'v'> & { v: MenuItem[] };
+export type DataTableQueryFilterForDropdown = Omit<DataTableQueryFilter, 'v'> & { v: MenuItem[]|string };
