@@ -5,7 +5,7 @@ import type { TranslateResult } from 'vue-i18n';
 import { cloneDeep } from 'lodash';
 
 import {
-    PButton, PIconButton, POverlayLayout, PToggleButton, PToolboxTable,
+    PButton, PIconButton, POverlayLayout, PToggleButton, PToolboxTable, PScopedNotification,
 } from '@cloudforet/mirinae';
 import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 import { getClonedName } from '@cloudforet/utils';
@@ -31,6 +31,7 @@ import { DOMAIN_DASHBOARD_VARS_SCHEMA_PRESET } from '@/services/dashboards/const
 import { getOrderedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variables-helper';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+
 
 
 interface GlobalVariableTableItem {
@@ -83,6 +84,10 @@ const state = reactive({
         { name: 'created_by', label: 'Created By' },
         { name: 'buttons', label: ' ', width: '144px' },
     ] as DataTableField[],
+    showDeleteWarning: computed<boolean>(() => {
+        const _varsKeys = Object.keys(dashboardDetailGetters.dashboardInfo?.vars || {});
+        return _varsKeys.includes(state.selectedVariableKey);
+    }),
 });
 
 /* Util */
@@ -285,7 +290,18 @@ const handleConfirmDelete = () => {
                       :visible.sync="state.deleteModalVisible"
                       :loading="state.deleteModalLoading"
                       @confirm="handleConfirmDelete"
-        />
+        >
+            <template #delete-modal-body>
+                <p-scoped-notification v-if="state.showDeleteWarning"
+                                       type="warning"
+                                       icon="ic_warning-filled"
+                                       layout="in-section"
+                                       class="mt-4"
+                >
+                    {{ $t('DASHBOARDS.DETAIL.VARIABLES.DELETE_WARNING') }}
+                </p-scoped-notification>
+            </template>
+        </delete-modal>
         <dashboard-manage-variable-import-modal :visible.sync="state.importModalVisible" />
     </p-overlay-layout>
 </template>

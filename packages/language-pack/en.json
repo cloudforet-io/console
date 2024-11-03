@@ -2141,6 +2141,7 @@
 				"DATA_SOURCE": "Data Source",
 				"DEFAULT_VALUE": "Default Value",
 				"DELETE_MODAL_TITLE": "Are you sure you want to delete variable?",
+				"DELETE_WARNING": "When a variable is deleted, the value of that variable set in the dashboard will be reset.",
 				"DUPLICATED_NAME_WARNING": "Variables with the same name as those in the current dashboard cannot be imported. Please update the variable names (in the current dashboard) before proceeding.",
 				"DYNAMIC_LIST_FROM_SOURCE": "Dynamic List from Source",
 				"EDIT_VARIABLE": "Edit Variable",
