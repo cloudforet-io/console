@@ -3,7 +3,7 @@
 
 import { computed, reactive, watch } from 'vue';
 
-import { cloneDeep, flattenDeep } from 'lodash';
+import { cloneDeep, flattenDeep, isEqual } from 'lodash';
 
 import { PSelectDropdown } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
@@ -39,6 +39,7 @@ const state = reactive({
     multiSelectable: computed(() => state.variable.options.selectionType === 'multi'),
     menuItems: computed(() => state.variable.values.map((value) => ({ label: value.label, name: value.key }))),
     selected: [],
+    isNumber: computed<boolean>(() => state.variable.type === 'number'),
 });
 
 
@@ -49,13 +50,16 @@ const handleSelectOption = () => {
 const changeVariables = (changedSelected: MenuItem[]) => {
     const _key = state.variable.key;
     const vars = cloneDeep(storeState.vars);
-    const reconvertedSelected = changedSelected.map((d) => d.name) as string[];
-    if (reconvertedSelected.length === 0) {
+    const selectedValues: string[] = changedSelected.map((d) => d.name) as string[];
+    if (selectedValues.length === 0) {
         delete vars[_key];
-    } else if (state.multiSelectable) {
-        vars[_key] = reconvertedSelected;
     } else {
-        vars[_key] = reconvertedSelected[0];
+        const _refinedValues: string[]|number[] = state.isNumber ? selectedValues.map((d) => parseFloat(d)) : selectedValues;
+        const _vars = state.multiSelectable ? _refinedValues : _refinedValues[0];
+        if (isEqual(dashboardDetailState.vars[_key], _vars)) {
+            return;
+        }
+        vars[_key] = _vars;
     }
     dashboardDetailStore.setVars(vars);
 };
@@ -71,7 +75,8 @@ const initVariableAndSelected = async () => {
 const initSelected = async (value: any) => {
     // Selected options data from backend can be undefined or string not string[]. Convert them to Array.
     const selectedValues = flattenDeep([value ?? []]);
-    const selectedItems = state.menuItems.filter((item) => selectedValues.includes(item.name));
+    const _refinedValue = selectedValues.map((d) => d.toString());
+    const selectedItems = state.menuItems.filter((item) => _refinedValue.includes(item.name));
     if (selectedItems.length) {
         state.selected = selectedItems;
     } else {
@@ -114,7 +119,7 @@ watch(() => storeState.vars, async () => {
                            use-fixed-menu-style
                            selection-highlight
                            :selection-label="state.variable.name"
-                           :show-delete-all-button="false"
+                           show-delete-all-button
                            :page-size="10"
                            @update:selected="handleSelectOption"
         />
