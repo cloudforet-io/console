@@ -105,6 +105,7 @@ onUnmounted(() => {
                     <dashboard-toolset-date-dropdown :date-range="dashboardDetailState.options.date_range" />
                     <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
                                                 :loading="dashboardDetailState.loadingWidgets"
+                                                disable-interval
                                                 @refresh="handleRefresh"
                     />
                 </div>

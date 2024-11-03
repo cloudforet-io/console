@@ -54,6 +54,7 @@ const { dateRange } = useWidgetDateRange({
 });
 const state = reactive({
     loading: false,
+    previousLoading: false,
     errorMessage: undefined as string|undefined,
     data: null as Data | null,
     previousData: null as Data | null,
@@ -177,6 +178,7 @@ const publicPreviousFetcher = getCancellableFetcher<PublicWidgetLoadParameters, 
 const fetchPreviousData = async (): Promise<Data|undefined> => {
     if (props.widgetState === 'INACTIVE') return undefined;
     try {
+        state.previousLoading = true;
         const _isPrivate = props.widgetId.startsWith('private');
         const _fetcher = _isPrivate ? privatePreviousFetcher : publicPreviousFetcher;
         const _previousDateRange = getPreviousDateRange(state.granularity, dateRange.value);
@@ -202,6 +204,8 @@ const fetchPreviousData = async (): Promise<Data|undefined> => {
     } catch (e: any) {
         ErrorHandler.handleError(e);
         return undefined;
+    } finally {
+        state.previousLoading = false;
     }
 };
 
@@ -253,7 +257,7 @@ defineExpose<WidgetExpose<Data>>({
                       style="font-size: 56px;"
                 >{{ state.valueText }}</span>
             </div>
-            <div v-if="props.widgetOptions?.comparison"
+            <div v-if="props.widgetOptions?.comparison && !state.previousLoading"
                  class="comparison-wrapper"
             >
                 <p-i v-if="state.currentValue !== state.previousValue"
