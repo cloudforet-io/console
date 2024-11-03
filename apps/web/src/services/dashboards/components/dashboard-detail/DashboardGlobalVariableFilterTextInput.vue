@@ -1,10 +1,10 @@
 <script setup lang="ts">
 
 import {
-    computed, reactive, watch,
+    computed, onMounted, reactive,
 } from 'vue';
 
-import { cloneDeep, isEqual } from 'lodash';
+import { cloneDeep } from 'lodash';
 
 import { PTag, PTextInput } from '@cloudforet/mirinae';
 import type { InputItem } from '@cloudforet/mirinae/src/inputs/input/text-input/type';
@@ -39,10 +39,12 @@ const handleDeleteTextValue = () => {
     state.value = undefined;
     state.keyword = '';
     changeVariables();
+    state.editMode = true;
 };
 const handleSelectValue = (selected: InputItem[]) => {
     state.value = selected[0]?.name;
     changeVariables(selected[0]?.name);
+    state.editMode = false;
 };
 
 
@@ -57,19 +59,11 @@ const changeVariables = (changedSelected?: string) => {
     dashboardDetailStore.setVars(vars);
 };
 
-watch(() => dashboardDetailState.vars, (vars, prevVars) => {
-    if (isEqual(vars[state.variable.key], prevVars?.[state.variable.key])) return;
-
+onMounted(() => {
     const _variable = props.variable as TextAnyVariable;
     state.value = (dashboardDetailState.vars[_variable.key] as string) || _variable.options?.defaultValue;
     changeVariables(state.value);
-}, { immediate: true });
-
-
-watch(() => state.value, (_value) => {
-    state.editMode = !_value;
 });
-
 
 </script>
 
