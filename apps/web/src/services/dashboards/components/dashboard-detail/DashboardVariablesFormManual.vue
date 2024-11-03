@@ -58,7 +58,8 @@ const state = reactive({
             if (Number.isNaN(Number(state.min)) || Number.isNaN(Number(state.max))) return false;
             return state.min !== undefined && state.max !== undefined;
         }
-        return state.enumValues.every((d) => !!d.key && !!d.label);
+        const keys = state.enumValues.map((d) => d.key);
+        return new Set(keys).size === keys.length && state.enumValues.every((d) => !!d.key && !!d.label);
     }),
     manualGlobalVariableData: computed<Partial<DashboardGlobalVariable>>(() => {
         if (state.selectedValuesType === VALUES_TYPE.ANY_VALUE) {
@@ -295,6 +296,7 @@ watch(() => props.originalData, (originalData) => {
                         <p-text-input :value="enumValue.key"
                                       placeholder="Key"
                                       block
+                                      :invalid="state.enumValues.some((d, idx) => d.key === enumValue.key && idx !== enumIdx)"
                                       :type="state.selectedType"
                                       @update:value="handleUpdateEnumKey(enumIdx, $event)"
                         />
