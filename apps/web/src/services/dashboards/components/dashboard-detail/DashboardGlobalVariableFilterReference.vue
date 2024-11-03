@@ -3,7 +3,7 @@
 
 import { computed, reactive, watch } from 'vue';
 
-import { cloneDeep, flattenDeep } from 'lodash';
+import { cloneDeep, flattenDeep, isEqual } from 'lodash';
 
 import { PSelectDropdown } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
@@ -139,7 +139,8 @@ const initSelected = async (value: any) => {
     }
 };
 
-watch([() => storeState.vars, () => storeState.varsSchema], async () => {
+watch([() => storeState.vars, () => storeState.varsSchema], async ([vars, varsSchema], [prevVars, prevVarsSchema]) => {
+    if (isEqual(prevVars, vars) && isEqual(prevVarsSchema, varsSchema)) return;
     dashboardDetailStore.setVariablesInitMap({
         ...dashboardDetailState.variablesInitMap,
         [state.variable.key]: false,
