@@ -2150,7 +2150,7 @@
 				"INPUT_TYPE": "",
 				"KEY": "키 ",
 				"KEY_DUPLICATED": "중복된 키입니다.",
-				"KEY_INVALID": "",
+				"KEY_INVALID": "잘못된 키 형식입니다 (모든 문자를 소문자로 입력하고, 단어 사이에 _을 넣어주세요)",
 				"KEY_REQUIRED": "키를 입력하세요.",
 				"LIST_OF_VALUES": "",
 				"MANUAL_ENTRY": "직접 입력",

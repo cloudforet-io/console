@@ -2150,7 +2150,7 @@
 				"INPUT_TYPE": "",
 				"KEY": "キー",
 				"KEY_DUPLICATED": "",
-				"KEY_INVALID": "",
+				"KEY_INVALID": "無効なキー形式です。 (すべての文字を小文字で入力し、単語の間には _を入れてください)",
 				"KEY_REQUIRED": "",
 				"LIST_OF_VALUES": "",
 				"MANUAL_ENTRY": "手動入力",

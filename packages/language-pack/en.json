@@ -2150,7 +2150,7 @@
 				"INPUT_TYPE": "Input Type",
 				"KEY": "Key",
 				"KEY_DUPLICATED": "Key is duplicated.",
-				"KEY_INVALID": "Invalid Key format",
+				"KEY_INVALID": "Invalid Key format (Use lowercase letters and an _ between words)",
 				"KEY_REQUIRED": "Please enter key.",
 				"LIST_OF_VALUES": "List of values",
 				"MANUAL_ENTRY": "Manual Entry",
