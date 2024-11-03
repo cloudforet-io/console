@@ -342,6 +342,8 @@ const handleToggleCondition = (key: string) => {
             padding: 0.5rem 0.5rem 0;
 
             .field-expression-title-wrapper {
+                margin-bottom: 0.25rem;
+
                 /* custom design-system component - p-field-title */
                 :deep(.p-field-title) {
                     .title {

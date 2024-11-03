@@ -139,8 +139,12 @@ const initSelected = async (value: any) => {
     }
 };
 
-watch([() => storeState.vars, () => storeState.varsSchema], async ([vars, varsSchema], [prevVars, prevVarsSchema]) => {
-    if (isEqual(vars[state.variable.key], prevVars?.[state.variable.key]) && isEqual(varsSchema.properties[state.variable.key], prevVarsSchema?.properties[state.variable.key])) return;
+watch(() => storeState.vars, async (vars, prevVars) => {
+    if (isEqual(vars[state.variable.key], prevVars?.[state.variable.key])) return;
+    dashboardDetailStore.setVariablesInitMap({
+        ...dashboardDetailState.variablesInitMap,
+        [state.variable.key]: false,
+    });
 
     const value = storeState.vars[state.variable.key];
     if (value) {
