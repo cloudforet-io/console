@@ -261,7 +261,7 @@ const getStaticFieldData = (rawData: StaticFieldData): any[] => {
             areaStyle: state.isAreaChart ? {} : undefined,
             data: state.xAxisData.map((d) => {
                 const _data = rawData.results?.find((v) => v[state.xAxisField] === d);
-                return _data ? _data[field] : _defaultValue;
+                return _data?.[field] || _defaultValue;
             }),
             label: {
                 show: !!state.displaySeriesLabel?.toggleValue,

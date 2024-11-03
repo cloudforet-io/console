@@ -77,9 +77,9 @@ const state = reactive({
                 type: 'number',
                 valueType: 'any',
                 options: {
-                    min: state.min,
-                    max: state.max,
-                    step: state.step,
+                    min: parseFloat(state.min),
+                    max: parseFloat(state.max),
+                    step: parseFloat(state.step),
                     inputType: state.selectedNumberInputType,
                 },
             };
