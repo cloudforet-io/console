@@ -91,7 +91,6 @@ const changeVariables = (changedSelected: MenuItem[]) => {
         variables[props.propertyName] = reconvertedSelected;
     }
     dashboardDetailStore.setVariables(variables);
-    dashboardDetailStore.setVars(variables);
 };
 
 const loadOptionItems = async (selectedValues?: string[]): Promise<MenuItem[]> => {
@@ -161,7 +160,6 @@ watch([() => props.property, () => props.dashboardVariables], async ([property])
                            show-select-marker
                            use-fixed-menu-style
                            selection-highlight
-                           :init-selected-with-handler="props.visible"
                            :selection-label="props.propertyLabel"
                            :show-delete-all-button="false"
                            :page-size="10"

@@ -7,7 +7,7 @@ import { PI, PTextButton, PDivider } from '@cloudforet/mirinae';
 
 import type { DashboardVariables, DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
 
-import DashboardVariableDropdown from '@/services/dashboards/components/dashboard-detail/DashboardVariableDropdown.vue';
+import DashboardVariableDropdown from '@/services/dashboards/components/legacy/DashboardVariableDropdown.vue';
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
