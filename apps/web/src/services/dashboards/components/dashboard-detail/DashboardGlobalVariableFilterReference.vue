@@ -141,10 +141,6 @@ const initSelected = async (value: any) => {
 
 watch(() => storeState.vars, async (vars, prevVars) => {
     if (isEqual(vars[state.variable.key], prevVars?.[state.variable.key])) return;
-    dashboardDetailStore.setVariablesInitMap({
-        ...dashboardDetailState.variablesInitMap,
-        [state.variable.key]: false,
-    });
 
     const value = storeState.vars[state.variable.key];
     if (value) {
