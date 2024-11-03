@@ -13,7 +13,6 @@ import type {
     NumberEnumVariable,
     TextEnumVariable,
 } from '@/schema/dashboard/_types/dashboard-global-variable-type';
-import type { DashboardVars } from '@/schema/dashboard/_types/dashboard-type';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
@@ -26,10 +25,6 @@ interface Props {
 const props = defineProps<Props>();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
-
-const storeState = reactive({
-    vars: computed<DashboardVars>(() => dashboardDetailState.vars),
-});
 
 const state = reactive({
     variable: computed(() => {
@@ -49,7 +44,7 @@ const handleSelectOption = () => {
 
 const changeVariables = (changedSelected: MenuItem[]) => {
     const _key = state.variable.key;
-    const vars = cloneDeep(storeState.vars);
+    const vars = cloneDeep(dashboardDetailState.vars);
     const selectedValues: string[] = changedSelected.map((d) => d.name) as string[];
     if (selectedValues.length === 0) {
         delete vars[_key];
@@ -84,8 +79,8 @@ const initSelected = async (value: any) => {
     }
 };
 
-watch(() => storeState.vars, async () => {
-    const value = storeState.vars[state.variable.key];
+watch(() => dashboardDetailState.vars, async () => {
+    const value = dashboardDetailState.vars[state.variable.key];
     if (value) {
         await initSelected(value);
     } else {

@@ -1,13 +1,12 @@
 <script setup lang="ts">
 
-import { onClickOutside } from '@vueuse/core';
 import {
-    computed, onMounted, reactive, ref, watch,
+    computed, reactive, watch,
 } from 'vue';
 
-import { cloneDeep } from 'lodash';
+import { cloneDeep, isEqual } from 'lodash';
 
-import { PIconButton, PTextInput } from '@cloudforet/mirinae';
+import { PIconButton, PTextInput, PPopover } from '@cloudforet/mirinae';
 import type { InputItem } from '@cloudforet/mirinae/src/inputs/input/text-input/type';
 
 import type {
@@ -27,9 +26,6 @@ const props = defineProps<Props>();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 
-const targetRef = ref<HTMLElement|null>(null);
-const menuRef = ref<HTMLElement|null>(null);
-
 const state = reactive({
     variable: computed(() => {
         const anyNumberVariable = props.variable as NumberAnyVariable;
@@ -44,14 +40,6 @@ const state = reactive({
     keyword: undefined as number|undefined,
 });
 
-const handleClickFilter = () => {
-    if (state.editMode) {
-        state.editMode = false;
-    } else {
-        state.keyword = `${state.value}`;
-        state.editMode = true;
-    }
-};
 const handleUpdateKeyword = (value: string) => {
     changeNumberKeyword(value);
 };
@@ -140,64 +128,64 @@ const changeVariables = (changedSelected?: number) => {
     dashboardDetailStore.setVars(vars);
 };
 
-onClickOutside(targetRef, () => { state.editMode = false; });
+watch(() => dashboardDetailState.vars, (vars, prevVars) => {
+    if (isEqual(vars[state.variable.key], prevVars?.[state.variable.key])) return;
 
-onMounted(() => {
     const _variable = props.variable as NumberAnyVariable;
     state.value = (dashboardDetailState.vars[_variable.key] as number) || _variable.options.min;
     changeVariables(state.value);
 
-    state.keyword = _variable.options.min;
-});
+    state.keyword = (dashboardDetailState.vars[_variable.key] as number) || _variable.options.min;
+}, { immediate: true });
 
-watch(() => state.value, (_value) => {
-    state.editMode = !_value;
-});
 
 
 </script>
 
 <template>
-    <div ref="targetRef"
-         class="dashboard-global-variable-filter-number-input"
-    >
-        <div :class="{
-                 'filter-button': true,
-                 'selected': !!state.value,
-             }"
-             @click="handleClickFilter"
+    <div class="dashboard-global-variable-filter-number-input">
+        <p-popover :is-visible.sync="state.editMode"
+                   hide-arrow
+                   hide-close-button
+                   position="bottom-start"
         >
-            <span class="selection-label">{{ state.variable.name }}</span>
-            <span v-if="state.value"
-                  class="selection-value"
-            >{{ state.value }}</span>
-        </div>
-        <div v-if="state.editMode"
-             ref="menuRef"
-             class="number-input-menu"
-        >
-            <p-icon-button name="ic_minus"
-                           width="2rem"
-                           height="2rem"
-                           :disabled="parseFloat(state.keyword) <= state.min"
-                           @click="handleClickMinusButton"
-            />
-            <p-text-input type="number"
-                          :invalid="state.invalid"
-                          :value="state.keyword"
-                          :min="state.variable.options.min"
-                          :max="state.variable.options.max"
-                          @update:value="handleUpdateKeyword"
-                          @update:selected="handleSelectValue"
-                          @delete-all-tags="handleDeleteKeyword"
-            />
-            <p-icon-button name="ic_plus"
-                           width="2rem"
-                           height="2rem"
-                           :disabled="parseFloat(state.keyword) >= state.max"
-                           @click="handleClickPlusButton"
-            />
-        </div>
+            <div :class="{
+                'filter-button': true,
+                'selected': !!state.value,
+            }"
+            >
+                <span class="selection-label">{{ state.variable.name }}</span>
+                <span v-if="state.value"
+                      class="selection-value"
+                >{{ state.value }}</span>
+            </div>
+
+            <template #content>
+                <div class="number-input-menu">
+                    <p-icon-button name="ic_minus"
+                                   width="2rem"
+                                   height="2rem"
+                                   :disabled="parseFloat(state.keyword) <= state.min"
+                                   @click="handleClickMinusButton"
+                    />
+                    <p-text-input type="number"
+                                  :invalid="state.invalid"
+                                  :value="state.keyword"
+                                  :min="state.variable.options.min"
+                                  :max="state.variable.options.max"
+                                  @update:value="handleUpdateKeyword"
+                                  @update:selected="handleSelectValue"
+                                  @delete-all-tags="handleDeleteKeyword"
+                    />
+                    <p-icon-button name="ic_plus"
+                                   width="2rem"
+                                   height="2rem"
+                                   :disabled="parseFloat(state.keyword) >= state.max"
+                                   @click="handleClickPlusButton"
+                    />
+                </div>
+            </template>
+        </p-popover>
     </div>
 </template>
 
@@ -225,12 +213,7 @@ watch(() => state.value, (_value) => {
     }
 
     .number-input-menu {
-        @apply border border-gray-300 rounded-md flex items-center gap-1 absolute bg-white;
-        top: 2rem;
-        left: 0;
-        z-index: 1050;
-        height: 3rem;
-        padding: 0.5rem 0.75rem;
+        @apply flex items-center gap-1 bg-white;
 
         /* custom design-system component - p-text-input */
         :deep(.p-text-input) {

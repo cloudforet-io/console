@@ -1,16 +1,18 @@
 <script setup lang="ts">
 
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 
-import { cloneDeep } from 'lodash';
+import { cloneDeep, isEqual } from 'lodash';
 
 import { PTag, PTextInput } from '@cloudforet/mirinae';
 import type { InputItem } from '@cloudforet/mirinae/src/inputs/input/text-input/type';
 
-import type { DashboardGlobalVariable, TextAnyVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
-import type { DashboardVars } from '@/schema/dashboard/_types/dashboard-type';
+import type {
+    DashboardGlobalVariable,
+    TextAnyVariable,
+} from '@/schema/dashboard/_types/dashboard-global-variable-type';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
@@ -22,10 +24,6 @@ interface Props {
 const props = defineProps<Props>();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
-
-const storeState = reactive({
-    vars: computed<DashboardVars>(() => dashboardDetailState.vars),
-});
 
 const state = reactive({
     variable: computed(() => {
@@ -39,6 +37,7 @@ const state = reactive({
 
 const handleDeleteTextValue = () => {
     state.value = undefined;
+    state.keyword = '';
     changeVariables();
 };
 const handleSelectValue = (selected: InputItem[]) => {
@@ -49,7 +48,7 @@ const handleSelectValue = (selected: InputItem[]) => {
 
 const changeVariables = (changedSelected?: string) => {
     const _key = state.variable.key;
-    const vars = cloneDeep(storeState.vars);
+    const vars = cloneDeep(dashboardDetailState.vars);
     if (changedSelected) {
         vars[_key] = changedSelected;
     } else {
@@ -58,11 +57,14 @@ const changeVariables = (changedSelected?: string) => {
     dashboardDetailStore.setVars(vars);
 };
 
-onMounted(() => {
+watch(() => dashboardDetailState.vars, (vars, prevVars) => {
+    if (isEqual(vars[state.variable.key], prevVars?.[state.variable.key])) return;
+
     const _variable = props.variable as TextAnyVariable;
-    state.value = (storeState.vars[_variable.key] as string) || _variable.options?.defaultValue;
+    state.value = (dashboardDetailState.vars[_variable.key] as string) || _variable.options?.defaultValue;
     changeVariables(state.value);
-});
+}, { immediate: true });
+
 
 watch(() => state.value, (_value) => {
     state.editMode = !_value;

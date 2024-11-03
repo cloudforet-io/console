@@ -13,7 +13,6 @@ import type {
     DashboardGlobalVariable,
     ReferenceVariable,
 } from '@/schema/dashboard/_types/dashboard-global-variable-type';
-import type { DashboardGlobalVariablesSchema, DashboardVars } from '@/schema/dashboard/_types/dashboard-type';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -48,8 +47,6 @@ const dashboardDetailState = dashboardDetailStore.state;
 
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
-    vars: computed<DashboardVars>(() => dashboardDetailState.vars),
-    varsSchema: computed<DashboardGlobalVariablesSchema>(() => dashboardDetailState.varsSchema),
 });
 
 const state = reactive({
@@ -94,7 +91,7 @@ const handleSelectOption = () => {
 // helper
 const changeVariables = (changedSelected: MenuItem[]) => {
     const _key = state.variable.key;
-    const vars = cloneDeep(storeState.vars);
+    const vars = cloneDeep(dashboardDetailState.vars);
     const reconvertedSelected = changedSelected.map((d) => d.name) as string[];
     if (reconvertedSelected.length === 0) {
         delete vars[_key];
@@ -139,10 +136,10 @@ const initSelected = async (value: any) => {
     }
 };
 
-watch(() => storeState.vars, async (vars, prevVars) => {
+watch(() => dashboardDetailState.vars, async (vars, prevVars) => {
     if (isEqual(vars[state.variable.key], prevVars?.[state.variable.key])) return;
 
-    const value = storeState.vars[state.variable.key];
+    const value = dashboardDetailState.vars[state.variable.key];
     if (value) {
         await initSelected(value);
     } else {
