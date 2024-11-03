@@ -79,6 +79,7 @@ const getJinjaTemplateGlobalVariableValue = (value: string) => `{{ global.${valu
         .name-section {
             @apply bg-gray-100;
             .variable-name-item {
+                height: 1.875rem;
                 padding: 0.375rem 1rem;
                 .variable-name {
                     @apply text-label-md font-normal text-gray-900;
@@ -89,6 +90,9 @@ const getJinjaTemplateGlobalVariableValue = (value: string) => `{{ global.${valu
             @apply border-t border-r border-b border-gray-100 ;
             .variable-key-item {
                 @apply font-normal text-gray-900;
+                display: flex;
+                align-items: center;
+                height: 1.875rem;
                 padding: 0.375rem 1rem;
             }
         }
