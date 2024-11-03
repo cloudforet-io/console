@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    reactive,
+    reactive, watch,
 } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -22,6 +22,8 @@ import ProjectSummaryBillingWidget from '@/services/project/components/ProjectSu
 import ProjectSummaryPersonalHealthDashboardWidget from '@/services/project/components/ProjectSummaryPersonalHealthDashboardWidget.vue';
 import ProjectSummaryServiceAccountsWidget from '@/services/project/components/ProjectSummaryServiceAccountsWidget.vue';
 import ProjectSummaryTrustedAdvisorWidget from '@/services/project/components/ProjectSummaryTrustedAdvisorWidget.vue';
+
+
 
 interface Props {
     id: string;
@@ -48,11 +50,9 @@ const getProjectAlertConfig = async () => {
     }
 };
 
-(async () => {
-    await Promise.allSettled([
-        getProjectAlertConfig(),
-    ]);
-})();
+watch(() => props.id, () => {
+    getProjectAlertConfig();
+}, { immediate: true });
 </script>
 
 <template>
@@ -84,12 +84,14 @@ const getProjectAlertConfig = async () => {
             />
         </div>
         <project-summary-all-summary-widget
+            :key="`project-summary-all-summary-widget-${props.id}`"
             class="col-span-12"
             :project-id="props.id"
         />
         <div class="col-span-12 lg:col-span-9 grid grid-cols-12 left-part">
             <project-summary-alert-widget
                 v-if="state.hasAlertConfig"
+                :key="`project-summary-alert-widget-${props.id}`"
                 class="col-span-12"
                 :project-id="props.id"
             />
@@ -98,27 +100,33 @@ const getProjectAlertConfig = async () => {
             <!--                :project-id="props.id"-->
             <!--            />-->
             <project-summary-billing-widget
+                :key="`project-summary-billing-widget-${props.id}`"
                 class="col-span-12"
                 :project-id="props.id"
             />
             <project-summary-personal-health-dashboard-widget
+                :key="`project-summary-personal-health-dashboard-widget-${props.id}`"
                 class="col-span-12"
                 :project-id="props.id"
             />
             <project-summary-service-accounts-widget
+                :key="`project-summary-service-accounts-widget-${props.id}`"
                 class="col-span-12 service-accounts-table"
                 :project-id="props.id"
             />
         </div>
         <div class="col-span-12 lg:col-span-3 grid grid-cols-12 right-part">
-            <daily-updates class="col-span-12 daily-updates"
+            <daily-updates :key="`daily-updates-${props.id}`"
+                           class="col-span-12 daily-updates"
                            :project-id="props.id"
             />
-            <cloud-services class="col-span-12 cloud-services"
+            <cloud-services :key="`cloud-services-${props.id}`"
+                            class="col-span-12 cloud-services"
                             :more-info="true"
                             :project-id="props.id"
             />
             <project-summary-trusted-advisor-widget
+                :key="`project-summary-trusted-advisor-widget-${props.id}`"
                 class="col-span-12 trusted-advisor"
                 :project-id="props.id"
             />
