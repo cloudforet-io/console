@@ -132,7 +132,7 @@ const getRefinedWidgetInfoList = (): RefinedWidgetInfo[] => {
     return _refinedWidgets;
 };
 const getWidgetLoading = () => {
-    if (!dashboardDetailGetters.isAllVariablesInitialized) return true;
+    // if (!dashboardDetailGetters.isAllVariablesInitialized) return true;
     if (!state.isAllWidgetsMounted) return true;
     // if (!state.intersectedWidgetMap[widgetId]) return true;
     return false;
