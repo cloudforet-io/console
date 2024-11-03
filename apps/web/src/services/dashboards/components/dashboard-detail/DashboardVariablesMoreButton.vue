@@ -7,7 +7,7 @@ import {
 import { useRouter } from 'vue-router/composables';
 
 import {
-    cloneDeep, debounce,
+    cloneDeep, debounce, orderBy,
 } from 'lodash';
 
 import { PButton, PContextMenu, useContextMenuController } from '@cloudforet/mirinae';
@@ -23,6 +23,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
+import { DOMAIN_DASHBOARD_VARS_SCHEMA_PRESET } from '@/services/dashboards/constants/dashboard-vars-schema-preset';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/constants/manage-variable-overlay-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
@@ -53,8 +54,15 @@ const state = reactive({
     searchText: '',
     varsSchemaProperties: computed(() => ({})),
     variableList: computed<VariableMenuItem[]>(() => {
-        const _refinedProperties: DashboardGlobalVariable[] = Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties);
-        return _refinedProperties.map((property) => ({
+        const properties = dashboardDetailGetters.dashboardVarsSchemaProperties as Record<string, DashboardGlobalVariable>;
+        const _presetKeys: string[] = Object.keys(DOMAIN_DASHBOARD_VARS_SCHEMA_PRESET.properties);
+        const _presetItems = Object.values(properties).filter((d) => _presetKeys.includes(d.key));
+        const _customItems = Object.values(properties).filter((d) => !_presetKeys.includes(d.key));
+
+        return [
+            ...orderBy(_presetItems, 'name', 'asc'),
+            ...orderBy(_customItems, 'name', 'asc'),
+        ].map((property) => ({
             name: property.key,
             label: property.name,
             use: property.use,
