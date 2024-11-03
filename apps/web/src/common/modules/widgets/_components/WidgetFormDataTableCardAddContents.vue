@@ -330,21 +330,6 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
     advancedOptionsState.selectedTimeDiff = 'none';
 });
 
-// Set 'dataFieldName' by 'selectedTimeDiff' and 'selectedTimeDiffDate'
-watch([() => advancedOptionsState.selectedTimeDiff, () => advancedOptionsState.selectedTimeDiffDate], ([timediff, date]) => {
-    const defaultFieldName = state.selectableSourceItems.find((source) => source.name === state.selectedSourceEndItem)?.label;
-    const timediffOptions = {
-        none: '',
-        months: 'month',
-        years: 'year',
-    };
-    if (timediff === 'none') {
-        state.dataFieldName = defaultFieldName;
-    } else if (date) {
-        state.dataFieldName = `${defaultFieldName} (- ${date} ${timediffOptions[timediff]})`;
-    }
-});
-
 // Validation
 watch(() => validationState.dataTableApplyInvalid, (invalid) => {
     const _allDataTableInvalidMap = {
@@ -382,6 +367,7 @@ defineExpose({
                                               :source-id="state.sourceType === DATA_SOURCE_DOMAIN.COST ? state.dataSourceId : state.selectedSourceEndItem"
                                               :source-key="state.selectedSourceEndItem"
                                               :source-type="state.sourceType"
+                                              :source-items="state.selectableSourceItems"
                                               :selected-group-by-items.sync="state.selectedGroupByItems"
                                               :filter.sync="state.filter"
                                               :data-field-name.sync="state.dataFieldName"
