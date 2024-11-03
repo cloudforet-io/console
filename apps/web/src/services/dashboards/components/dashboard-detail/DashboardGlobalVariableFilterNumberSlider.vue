@@ -1,10 +1,10 @@
 <script setup lang="ts">
 
 import {
-    computed, onMounted, reactive,
+    computed, reactive, watch,
 } from 'vue';
 
-import { cloneDeep, debounce } from 'lodash';
+import { cloneDeep, debounce, isEqual } from 'lodash';
 
 import { PTag, PSlider } from '@cloudforet/mirinae';
 
@@ -57,11 +57,15 @@ const changeVariables = (changedSelected?: number) => {
     dashboardDetailStore.setVars(vars);
 };
 
-onMounted(() => {
+watch(() => storeState.vars, (vars, prevVars) => {
+    if (isEqual(vars[state.variable.key], prevVars?.[state.variable.key])) return;
+
     const _variable = props.variable as NumberAnyVariable;
     state.value = (dashboardDetailState.vars[_variable.key] as number) || _variable.options.min;
     changeVariables(state.value);
-});
+
+    state.keyword = (dashboardDetailState.vars[_variable.key] as number) || _variable.options.min;
+}, { immediate: true });
 
 </script>
 
