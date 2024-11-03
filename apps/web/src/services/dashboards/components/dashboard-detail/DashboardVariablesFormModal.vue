@@ -79,6 +79,11 @@ const state = reactive({
     selectedMethod: METHOD_TYPE.MANUAL_ENTRY as MethodType,
     isManualFormValid: false,
     isDynamicFormValid: false,
+    showUpdateWarning: computed<boolean>(() => {
+        if (props.modalType === 'CREATE') return false;
+        const _varsKeys = Object.keys(dashboardDetailGetters.dashboardInfo?.vars || {});
+        return _varsKeys.includes(props.variableKey || '');
+    }),
     //
     manualGlobalVariable: {} as ManualVariableData,
     dynamicGlobalVariable: {} as DynamicVariableData,
@@ -243,7 +248,7 @@ watch(() => state.proxyVisible, (visible) => {
                     @close="handleClickClose"
     >
         <template #body>
-            <p-scoped-notification v-if="props.modalType === 'UPDATE'"
+            <p-scoped-notification v-if="state.showUpdateWarning"
                                    type="warning"
                                    icon="ic_warning-filled"
                                    layout="in-section"
