@@ -141,17 +141,10 @@ const handleDeleteFilter = () => {
 };
 
 const handleUpdateFilterDropdown = (selected: string|MenuItem[], isGlobalVariable?: boolean) => {
-    if (isGlobalVariable) {
-        state.proxySelectedFilter = {
-            ...state.proxySelectedFilter,
-            v: selected[0]?.name,
-        };
-    } else {
-        state.proxySelectedFilter = {
-            ...state.proxySelectedFilter,
-            v: selected,
-        };
-    }
+    state.proxySelectedFilter = {
+        ...state.proxySelectedFilter,
+        v: isGlobalVariable ? selected[0]?.name : selected,
+    };
 };
 
 const handleUpdateKeywordSelected = (selected: MenuItem[]) => {

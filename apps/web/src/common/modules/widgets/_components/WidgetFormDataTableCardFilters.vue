@@ -151,6 +151,7 @@ onClickOutside(containerRef, hideContextMenu);
 const handleUpdateFilter = (filterKey: string, filter: DataTableQueryFilterForDropdown) => {
     state.selectedItemsMap[filterKey] = { ...filter };
 
+    // NOTE: For Use Global Variables CASE, since it is a single select, the value is a string.
     const filterValue = isArray(filter.v) ? filter.v.map((d) => d.name) : filter.v;
 
     state.proxyFilter = {
