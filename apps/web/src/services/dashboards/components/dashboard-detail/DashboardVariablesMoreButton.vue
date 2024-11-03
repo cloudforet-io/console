@@ -24,6 +24,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/constants/manage-variable-overlay-constant';
+import { getOrderedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variables-helper';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
@@ -54,7 +55,8 @@ const state = reactive({
     varsSchemaProperties: computed(() => ({})),
     variableList: computed<VariableMenuItem[]>(() => {
         const _refinedProperties: DashboardGlobalVariable[] = Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties);
-        return _refinedProperties.map((property) => ({
+        const _orderedVariables = getOrderedGlobalVariables(_refinedProperties);
+        return _orderedVariables.map((property) => ({
             name: property.key,
             label: property.name,
             use: property.use,
