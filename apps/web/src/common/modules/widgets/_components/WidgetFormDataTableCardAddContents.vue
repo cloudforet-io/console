@@ -3,7 +3,7 @@ import {
     computed, defineExpose, onMounted, reactive, watch,
 } from 'vue';
 
-import { isEqual, uniq } from 'lodash';
+import { isArray, isEqual, uniq } from 'lodash';
 
 import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/src/inputs/dropdown/select-dropdown/type';
@@ -199,10 +199,23 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
     const metricLabelsInfo = storeState.metrics[state.metricId ?? '']?.data?.labels_info;
     const assetGroupBy = (metricLabelsInfo ?? []).filter((label) => state.selectedGroupByItems.map((group) => group.name).includes(label.key));
     const groupBy = state.sourceType === DATA_SOURCE_DOMAIN.COST ? costGroupBy : assetGroupBy;
-    const refinedFilter = Object.values(state.filter as Record<string, DataTableQueryFilter>).filter((filter) => filter?.v?.length).map((filter) => ({
-        ...filter,
-        v: uniq(filter.v),
-    }));
+    const refinedFilter = Object.values(state.filter as Record<string, DataTableQueryFilter>)
+        .filter((filter) => {
+            if (isArray(filter.v)) return filter?.v?.length;
+            return !!filter?.v;
+        })
+        .map((filter) => {
+            if (isArray(filter.v)) {
+                return {
+                    ...filter,
+                    v: uniq(filter.v),
+                };
+            }
+            return {
+                ...filter,
+                v: filter.v,
+            };
+        });
 
     const updateParams: DataTableUpdateParameters = {
         data_table_id: state.dataTableId,
