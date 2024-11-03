@@ -108,7 +108,7 @@ const state = reactive({
                         _seriesName = dayjs.utc(_seriesName).format(state.dateFormat);
                     }
                     if (state.unit) _seriesName = `${_seriesName} (${state.unit})`;
-                    let _name = params.name;
+                    let _name = getReferenceLabel(props.allReferenceTypeInfo, state.xAxisField, params.name);
                     if (state.xAxisField === DATE_FIELD.DATE) {
                         _name = dayjs.utc(params.name).format(state.dateFormat);
                     }
