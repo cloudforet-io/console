@@ -12,7 +12,6 @@ import type {
     DashboardGlobalVariable,
     NumberAnyVariable,
 } from '@/schema/dashboard/_types/dashboard-global-variable-type';
-import type { DashboardVars } from '@/schema/dashboard/_types/dashboard-type';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
@@ -24,10 +23,6 @@ interface Props {
 const props = defineProps<Props>();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
-
-const storeState = reactive({
-    vars: computed<DashboardVars>(() => dashboardDetailState.vars),
-});
 
 const state = reactive({
     variable: computed(() => {
@@ -48,7 +43,7 @@ const handleUpdateSliderValue = debounce((value: string) => {
 
 const changeVariables = (changedSelected?: number) => {
     const _key = state.variable.key;
-    const vars = cloneDeep(storeState.vars);
+    const vars = cloneDeep(dashboardDetailState.vars);
     if (changedSelected) {
         vars[_key] = changedSelected;
     } else {
@@ -57,7 +52,7 @@ const changeVariables = (changedSelected?: number) => {
     dashboardDetailStore.setVars(vars);
 };
 
-watch(() => storeState.vars, (vars, prevVars) => {
+watch(() => dashboardDetailState.vars, (vars, prevVars) => {
     if (isEqual(vars[state.variable.key], prevVars?.[state.variable.key])) return;
 
     const _variable = props.variable as NumberAnyVariable;

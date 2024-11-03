@@ -26,10 +26,6 @@ const props = defineProps<Props>();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 
-const storeState = reactive({
-    vars: computed<DashboardVars>(() => dashboardDetailState.vars),
-});
-
 const state = reactive({
     variable: computed(() => {
         const anyNumberVariable = props.variable as NumberAnyVariable;
@@ -132,7 +128,7 @@ const changeVariables = (changedSelected?: number) => {
     dashboardDetailStore.setVars(vars);
 };
 
-watch(() => storeState.vars, (vars, prevVars) => {
+watch(() => dashboardDetailState.vars, (vars, prevVars) => {
     if (isEqual(vars[state.variable.key], prevVars?.[state.variable.key])) return;
 
     const _variable = props.variable as NumberAnyVariable;
