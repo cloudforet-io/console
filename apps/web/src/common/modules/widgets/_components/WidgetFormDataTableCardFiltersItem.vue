@@ -5,8 +5,6 @@ import {
     computed, onMounted, reactive, ref,
 } from 'vue';
 
-import { orderBy } from 'lodash';
-
 import {
     PSelectDropdown, PContextMenu, PIconButton, PI, PTextInput,
 } from '@cloudforet/mirinae';
@@ -24,7 +22,7 @@ import type { DataTableQueryFilterForDropdown } from '@/common/modules/widgets/t
 
 import { blue, gray } from '@/styles/colors';
 
-import { DOMAIN_DASHBOARD_VARS_SCHEMA_PRESET } from '@/services/dashboards/constants/dashboard-vars-schema-preset';
+import { getOrderedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variables-helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
@@ -99,14 +97,9 @@ const state = reactive({
     selectedOperator: [] as MenuItem[],
     proxySelectedFilter: useProxyValue<DataTableQueryFilterForDropdown>('selectedFilter', props, emit),
     globalVariableItems: computed<MenuItem[]>(() => {
-        const properties = dashboardDetailGetters.dashboardVarsSchemaProperties as Record<string, DashboardGlobalVariable>;
-        const _presetKeys: string[] = Object.keys(DOMAIN_DASHBOARD_VARS_SCHEMA_PRESET.properties);
-        const _presetItems = Object.values(properties).filter((d) => _presetKeys.includes(d.key));
-        const _customItems = Object.values(properties).filter((d) => !_presetKeys.includes(d.key));
-        return [
-            ...orderBy(_presetItems, 'name', 'asc'),
-            ...orderBy(_customItems, 'name', 'asc'),
-        ].map((variable) => ({
+        const _refinedProperties: DashboardGlobalVariable[] = Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties);
+        const _orderedVariables = getOrderedGlobalVariables(_refinedProperties);
+        return _orderedVariables.map((variable) => ({
             name: `{{ global.${variable.key} }}`,
             label: variable.name,
         }));
