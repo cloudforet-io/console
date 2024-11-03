@@ -75,8 +75,8 @@ const initVariableAndSelected = async () => {
 const initSelected = async (value: any) => {
     // Selected options data from backend can be undefined or string not string[]. Convert them to Array.
     const selectedValues = flattenDeep([value ?? []]);
-    const refinedValue = selectedValues.map((d) => d.toString());
-    const selectedItems = state.menuItems.filter((item) => refinedValue.includes(item.name));
+    const refinedValues = selectedValues.map((d) => d.toString());
+    const selectedItems = state.menuItems.filter((item) => refinedValues.includes(item.name));
     if (selectedItems.length) {
         state.selected = selectedItems;
     } else {
