@@ -110,6 +110,7 @@ const deleteDashboardVarsSchema = async (dashboardId: string, variableKey: strin
         const _tempVars = cloneDeep(dashboardDetailState.vars);
         delete _vars[variableKey];
         delete _tempVars[variableKey];
+        dashboardDetailStore.setVars(_tempVars);
         await dashboardStore.updateDashboard(dashboardId, {
             dashboard_id: dashboardId,
             vars_schema: {
@@ -117,7 +118,6 @@ const deleteDashboardVarsSchema = async (dashboardId: string, variableKey: strin
             },
             vars: _vars,
         });
-        dashboardDetailStore.setVars(_tempVars);
         showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_S_DELETE_DASHBOARD_VARS_SCHEMA'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_E_DELETE_DASHBOARD_VARS_SCHEMA'));
