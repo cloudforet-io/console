@@ -2172,6 +2172,7 @@
 				"SLIDER": "",
 				"SOURCE_FROM": "",
 				"STEP": "",
+				"STEP_TOOLTIP": "最大値の約数のみ入力可能です",
 				"TEXT": "",
 				"TYPE": "",
 				"UPDATE_WARNING": "",

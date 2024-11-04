@@ -2172,6 +2172,7 @@
 				"SLIDER": "",
 				"SOURCE_FROM": "",
 				"STEP": "",
+				"STEP_TOOLTIP": "최대값의 약수만 입력 가능합니다",
 				"TEXT": "",
 				"TYPE": "",
 				"UPDATE_WARNING": "",
