@@ -28,7 +28,6 @@ import { gray } from '@/styles/colors';
 
 import {
     DASHBOARD_VARS_SCHEMA_PRESET,
-    DOMAIN_DASHBOARD_VARS_SCHEMA_PRESET,
 } from '@/services/dashboards/constants/dashboard-vars-schema-preset';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
@@ -99,7 +98,7 @@ const createBundleOotb = async () => {
             layouts: _dashboard.layouts,
             options: _dashboard.options,
             tags: { created_by: store.state.user.userId },
-            vars_schema: storeState.isAdminMode ? DOMAIN_DASHBOARD_VARS_SCHEMA_PRESET : DASHBOARD_VARS_SCHEMA_PRESET,
+            vars_schema: DASHBOARD_VARS_SCHEMA_PRESET,
         };
         if (storeState.isAdminMode) {
             (_dashboardParams as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.DOMAIN;

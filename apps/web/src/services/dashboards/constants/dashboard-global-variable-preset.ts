@@ -3,7 +3,6 @@ import RegionVariableModel from '@/lib/variable-models/managed-model/resource-mo
 import ServiceAccountVariableModel
     from '@/lib/variable-models/managed-model/resource-model/service-account-variable-model';
 import UserVariableModel from '@/lib/variable-models/managed-model/resource-model/user-variable-model';
-import WorkspaceVariableModel from '@/lib/variable-models/managed-model/resource-model/workspace-variable-model';
 
 
 
@@ -25,11 +24,3 @@ export const DASHBOARD_GLOBAL_VARIABLES_PRESET_LIST = [
         label: UserVariableModel.meta.name,
     },
 ] as const;
-
-export const DOMAIN_DASHBOARD_GLOBAL_VARIABLES_PRESET_LIST = [
-    {
-        name: WorkspaceVariableModel.meta.resourceType,
-        label: WorkspaceVariableModel.meta.name,
-    },
-    ...DASHBOARD_GLOBAL_VARIABLES_PRESET_LIST,
-];
