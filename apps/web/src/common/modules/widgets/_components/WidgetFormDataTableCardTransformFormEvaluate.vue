@@ -25,6 +25,8 @@ interface Props {
     isLegacyDataTable?: boolean;
 }
 
+const CONDITION_PLACEHOLDER = '{{ Product }} == \'A\' & {{ Provider }} == \'B\'';
+const FORMULA_PLACEHOLDER = '{{ Product }}';
 const props = defineProps<Props>();
 
 const emit = defineEmits<{ e: 'update:expressions'; value: EvalExpressions[]}>();
@@ -224,7 +226,7 @@ const handleToggleCondition = (key: string) => {
                                     </div>
                                 </template>
                                 <p-textarea :value.sync="expression.condition"
-                                            :placeholder="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.CONDITION_PLACEHOLDER')"
+                                            :placeholder="CONDITION_PLACEHOLDER"
                                             @update:value="handleChangeFieldValue(expression.key, 'condition', $event)"
                                 />
                             </p-field-group>
@@ -243,7 +245,7 @@ const handleToggleCondition = (key: string) => {
                                     </p-link>
                                 </template>
                                 <p-textarea v-model="expression.expression"
-                                            :placeholder="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.FORMULA_PLACEHOLDER')"
+                                            :placeholder="FORMULA_PLACEHOLDER"
                                 />
                             </p-field-group>
                             <p-field-group v-if="'condition' in expression"
@@ -262,7 +264,7 @@ const handleToggleCondition = (key: string) => {
                                     </p-link>
                                 </template>
                                 <p-textarea :value="expression.else"
-                                            :placeholder="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.FORMULA_PLACEHOLDER')"
+                                            placeholder="'-'"
                                             @update:value="handleChangeFieldValue(expression.key, 'else', $event)"
                                 />
                             </p-field-group>

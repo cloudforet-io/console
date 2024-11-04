@@ -26,6 +26,7 @@ import { yellow } from '@/styles/colors';
 
 
 
+const CONDITION_PLACEHOLDER = '{{ Product }} == \'A\' & {{ Provider }} == \'B\'';
 interface Props {
     dataTableId: string;
     operator: DataTableOperator;
@@ -200,6 +201,7 @@ const handleClickAddCondition = () => {
                         <p-text-input class="label-input"
                                       block
                                       :value="conditionInfo.value"
+                                      :placeholder="CONDITION_PLACEHOLDER"
                                       @update:value="handleChangeCondition(conditionInfo.key, $event,)"
                         />
                         <p-icon-button name="ic_delete"
