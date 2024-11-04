@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import { computed, reactive } from 'vue';
 
 import {
@@ -18,7 +17,6 @@ import WidgetFormDataTableGlobalVariableViewButton
     from '@/common/modules/widgets/_components/WidgetFormDataTableGlobalVariableViewButton.vue';
 import { EVAL_EXPRESSION_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import type { EvalExpressions } from '@/common/modules/widgets/types/widget-data-table-type';
-import type { EvaluateExpressionType } from '@/common/modules/widgets/types/widget-model';
 
 
 
@@ -87,12 +85,12 @@ const handleCancelModal = () => {
     modalState.currentSelectionKey = undefined;
     modalState.currentSelectionName = undefined;
 };
-const handleChangeFieldType = (key: string, selected: EvaluateExpressionType) => {
+const handleChangeFieldValue = (key: string, fieldName: string, value) => {
     state.proxyExpressions = state.proxyExpressions.map((expression) => {
         if (expression.key === key) {
             return {
                 ...expression,
-                fieldType: selected,
+                [fieldName]: value,
             };
         }
         return expression;
@@ -166,7 +164,7 @@ const handleToggleCondition = (key: string) => {
                                              :value="selectItem.name"
                                              style-type="secondary"
                                              :selected="expression.fieldType"
-                                             @change="handleChangeFieldType(expression.key, $event)"
+                                             @change="handleChangeFieldValue(expression.key, 'fieldType', $event)"
                             >
                                 {{ selectItem.label }}
                             </p-select-button>
@@ -225,8 +223,9 @@ const handleToggleCondition = (key: string) => {
                                         </p-link>
                                     </div>
                                 </template>
-                                <p-textarea v-model="expression.condition"
+                                <p-textarea :value.sync="expression.condition"
                                             :placeholder="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.CONDITION_PLACEHOLDER')"
+                                            @update:value="handleChangeFieldValue(expression.key, 'condition', $event)"
                                 />
                             </p-field-group>
                             <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.FORMULA')"
@@ -262,8 +261,9 @@ const handleToggleCondition = (key: string) => {
                                         Pandas Eval
                                     </p-link>
                                 </template>
-                                <p-textarea v-model="expression.else"
+                                <p-textarea :value="expression.else"
                                             :placeholder="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.FORMULA_PLACEHOLDER')"
+                                            @update:value="handleChangeFieldValue(expression.key, 'else', $event)"
                                 />
                             </p-field-group>
                         </div>

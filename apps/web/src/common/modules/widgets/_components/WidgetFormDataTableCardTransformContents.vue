@@ -77,8 +77,8 @@ const state = reactive({
             name: expression.name,
             field_type: expression.fieldType,
             expression: expression.expression,
-            condition: expression?.condition,
-            else: expression?.else,
+            ...(expression?.condition ? { condition: expression?.condition } : {}),
+            ...(expression?.else ? { else: expression?.else } : {}),
         })).filter((expression) => !!expression.name && !!expression.expression), originState.expressions);
         if (state.operator === 'CONCAT') return dataTablesChanged;
         if (state.operator === 'JOIN') return dataTablesChanged || joinTypeChanged;
