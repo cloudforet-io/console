@@ -6,7 +6,7 @@ import {
 
 import { cloneDeep, isEqual } from 'lodash';
 
-import { PTag, PTextInput } from '@cloudforet/mirinae';
+import { PButton, PTag, PTextInput } from '@cloudforet/mirinae';
 import type { InputItem } from '@cloudforet/mirinae/src/inputs/input/text-input/type';
 
 import type {
@@ -48,6 +48,13 @@ const handleSelectValue = (selected: InputItem[]) => {
     state.editMode = false;
 };
 
+const handleClickDoneButton = () => {
+    if (state.keyword) {
+        state.value = state.keyword;
+        changeVariables(state.keyword);
+        state.editMode = false;
+    }
+};
 
 const changeVariables = (changedSelected?: string) => {
     const _key = state.variable.key;
@@ -89,6 +96,13 @@ watch(() => dashboardDetailGetters.dashboardVarsSchemaProperties, (varsSchema, p
                           :value.sync="state.keyword"
                           @update:selected="handleSelectValue"
             />
+            <p-button v-if="!state.value"
+                      size="sm"
+                      style-type="highlight"
+                      @click="handleClickDoneButton"
+            >
+                {{ $t('COMMON.WIDGETS.APPLY') }}
+            </p-button>
         </div>
     </div>
 </template>
