@@ -45,23 +45,3 @@ export const DASHBOARD_VARS_SCHEMA_PRESET: DashboardGlobalVariablesSchema = {
         },
     },
 } as const;
-
-
-export const DOMAIN_DASHBOARD_VARS_SCHEMA_PRESET: DashboardGlobalVariablesSchema = {
-    properties: {
-        workspace_id: {
-            key: 'workspace_id',
-            name: 'Workspace',
-            method: 'dynamic',
-            type: 'reference',
-            use: true,
-            reference: {
-                resourceType: 'identity.Workspace',
-            },
-            options: {
-                selectionType: 'multi',
-            },
-        },
-        ...DASHBOARD_VARS_SCHEMA_PRESET.properties,
-    },
-};

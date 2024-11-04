@@ -27,7 +27,9 @@ import DashboardManageVariableImportModal
     from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableImportModal.vue';
 import DashboardVariablesFormModal
     from '@/services/dashboards/components/dashboard-detail/DashboardVariablesFormModal.vue';
-import { DOMAIN_DASHBOARD_VARS_SCHEMA_PRESET } from '@/services/dashboards/constants/dashboard-vars-schema-preset';
+import {
+    DASHBOARD_VARS_SCHEMA_PRESET,
+} from '@/services/dashboards/constants/dashboard-vars-schema-preset';
 import { getOrderedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variables-helper';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
@@ -97,7 +99,7 @@ const getSlicedVariableItems = (items: GlobalVariableTableItem[], thisPage: numb
     return items.slice(_startIndex, _endIndex);
 };
 const isPresetVarsSchemaProperty = (key: string): boolean => {
-    const _presetKeys: string[] = Object.keys(DOMAIN_DASHBOARD_VARS_SCHEMA_PRESET.properties);
+    const _presetKeys: string[] = Object.keys(DASHBOARD_VARS_SCHEMA_PRESET.properties);
     return _presetKeys.includes(key);
 };
 
