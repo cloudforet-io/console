@@ -63,8 +63,8 @@ const state = reactive({
         return state.isDynamicFormValid;
     }),
     targetVariable: computed<DashboardGlobalVariable|undefined>(() => {
-        if (props.modalType === 'CREATE' || !props.variableKey) return undefined;
-        return dashboardDetailGetters.dashboardVarsSchemaProperties[props.variableKey];
+        if (props.modalType === 'CREATE' || !props.variableKey || !props.visible) return undefined;
+        return cloneDeep(dashboardDetailGetters.dashboardVarsSchemaProperties[props.variableKey]);
     }),
     existingVariableNameList: computed<string[]>(() => {
         const _nameList: string[] = Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties).map((d) => d.name);
@@ -227,7 +227,7 @@ const handleChangeMethod = (method: MethodType) => {
 watch(() => state.proxyVisible, (visible) => {
     if (visible) {
         if (props.modalType === 'UPDATE' && props.variableKey) {
-            const _targetProperty = dashboardDetailGetters.dashboardVarsSchemaProperties[props.variableKey];
+            const _targetProperty = cloneDeep(dashboardDetailGetters.dashboardVarsSchemaProperties[props.variableKey]);
             if (isEmpty(_targetProperty)) return;
             initSelectedVariable(_targetProperty);
         }
