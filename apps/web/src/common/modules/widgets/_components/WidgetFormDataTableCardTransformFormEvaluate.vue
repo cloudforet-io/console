@@ -195,7 +195,21 @@ const handleToggleCondition = (key: string) => {
                             </p-field-title>
                         </div>
                         <div class="field-expression-wrapper">
-                            <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.CONDITION')"
+                            <p-field-title size="sm"
+                                           color="gray"
+                                           required
+                                           class="use-condition-title"
+                                           :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.USE_CONDITION')"
+                            >
+                                <template #right>
+                                    <p-toggle-button :value="'condition' in expression"
+                                                     class="condition-toggle-button"
+                                                     @change-toggle="handleToggleCondition(expression.key)"
+                                    />
+                                </template>
+                            </p-field-title>
+                            <p-field-group v-if="'condition' in expression"
+                                           :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.CONDITION')"
                                            style-type="secondary"
                                            required
                                            class="expression-form"
@@ -209,14 +223,9 @@ const handleToggleCondition = (key: string) => {
                                         >
                                             Pandas Query
                                         </p-link>
-                                        <p-toggle-button :value="'condition' in expression"
-                                                         class="condition-toggle-button"
-                                                         @change-toggle="handleToggleCondition(expression.key)"
-                                        />
                                     </div>
                                 </template>
-                                <p-textarea v-if="'condition' in expression"
-                                            v-model="expression.condition"
+                                <p-textarea v-model="expression.condition"
                                             :placeholder="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.CONDITION_PLACEHOLDER')"
                                 />
                             </p-field-group>
@@ -365,6 +374,7 @@ const handleToggleCondition = (key: string) => {
 
             .field-expression-wrapper {
                 @apply bg-gray-100 rounded;
+                position: relative;
                 padding: 0.5rem;
                 .expression-form {
                     @apply bg-white rounded;
@@ -373,10 +383,13 @@ const handleToggleCondition = (key: string) => {
                     .external-link {
                         font-weight: normal;
                     }
-                    .condition-toggle-button {
-                        right: 0.5rem;
-                        position: absolute;
-                    }
+                }
+                .use-condition-title {
+                    margin-bottom: 0.5rem;
+                }
+                .condition-toggle-button {
+                    right: 0.5rem;
+                    position: absolute;
                 }
             }
         }
