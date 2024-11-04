@@ -14,7 +14,7 @@ import { i18n } from '@/translations';
 
 import CostAnalysisPeriodSelectDropdown
     from '@/services/cost-explorer/components/CostAnalysisPeriodSelectDropdown.vue';
-import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
+import { GRANULARITY, UNIFIED_COST_KEY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import {
     DYNAMIC_COST_QUERY_SET_PARAMS,
 } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
@@ -27,7 +27,8 @@ const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
 
 const state = reactive({
-    granularityItems: computed<MenuItem[]>(() => ([
+    isUnifiedCost: computed(() => costAnalysisPageGetters.selectedDataSourceId === UNIFIED_COST_KEY),
+    granularityItems: computed<MenuItem[]>(() => (([
         {
             type: 'item',
             name: GRANULARITY.DAILY,
@@ -43,7 +44,7 @@ const state = reactive({
             name: GRANULARITY.YEARLY,
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.YEARLY'),
         },
-    ])),
+    ] as MenuItem[]).filter((item) => !(state.isUnifiedCost && item.name === GRANULARITY.DAILY)))),
     showPeriodBadge: computed<boolean>(() => costAnalysisPageGetters.selectedQueryId === DYNAMIC_COST_QUERY_SET_PARAMS || !costAnalysisPageState.relativePeriod),
     periodBadgeText: computed<string>(() => {
         if (!costAnalysisPageState.period) return '';
