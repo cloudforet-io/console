@@ -14,8 +14,8 @@ export type IconButtonShape = typeof ICON_BUTTON_SHAPE[keyof typeof ICON_BUTTON_
 
 export const ICON_BUTTON_SIZE = {
     sm: '1rem',
-    md: '1.5rem',
-    lg: '2rem',
+    md: '1.25rem',
+    lg: '1.5rem',
 } as const;
 export type IconButtonSize = typeof ICON_BUTTON_SIZE[keyof typeof ICON_BUTTON_SIZE];
 

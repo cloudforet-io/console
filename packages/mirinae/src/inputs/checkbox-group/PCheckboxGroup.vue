@@ -25,11 +25,12 @@ const props = withDefaults(defineProps<CheckboxGroupProps>(), {
     &.horizontal {
         .p-checkbox {
             @apply inline-block;
-            margin-right: 1rem;
+            margin-right: 0.5rem;
         }
     }
     &.vertical {
-        @apply flex flex-col row-gap-2;
+        @apply flex flex-col;
+        gap: 0.5rem;
     }
 }
 </style>
