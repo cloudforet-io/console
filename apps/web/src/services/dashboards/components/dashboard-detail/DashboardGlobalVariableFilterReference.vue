@@ -44,6 +44,7 @@ const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetters = userWorkspaceStore.getters;
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
@@ -136,10 +137,11 @@ const initSelected = async (value: any) => {
     }
 };
 
-watch(() => dashboardDetailState.vars, async (vars, prevVars) => {
-    if (isEqual(vars[state.variable.key], prevVars?.[state.variable.key])) return;
+watch(() => dashboardDetailGetters.dashboardVarsSchemaProperties, async (varsSchema, prevVarsSchema) => {
+    const _variable = props.variable as ReferenceVariable;
+    if (isEqual(varsSchema[_variable.key], prevVarsSchema?.[varsSchema[_variable.key]])) return;
 
-    const value = dashboardDetailState.vars[state.variable.key];
+    const value = dashboardDetailGetters.dashboardInfo.vars[_variable.key];
     if (value) {
         await initSelected(value);
     } else {

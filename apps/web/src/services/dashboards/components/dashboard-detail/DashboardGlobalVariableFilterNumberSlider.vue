@@ -23,6 +23,7 @@ interface Props {
 const props = defineProps<Props>();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 
 const state = reactive({
     variable: computed(() => {
@@ -52,14 +53,14 @@ const changeVariables = (changedSelected?: number) => {
     dashboardDetailStore.setVars(vars);
 };
 
-watch(() => dashboardDetailState.vars, (vars, prevVars) => {
-    if (isEqual(vars[state.variable.key], prevVars?.[state.variable.key])) return;
-
+watch(() => dashboardDetailGetters.dashboardVarsSchemaProperties, (varsSchema, prevVarsSchema) => {
     const _variable = props.variable as NumberAnyVariable;
-    state.value = (dashboardDetailState.vars[_variable.key] as number) || _variable.options.min;
+    if (isEqual(varsSchema[_variable.key], prevVarsSchema?.[varsSchema[_variable.key]])) return;
+
+    state.value = (dashboardDetailGetters.dashboardInfo.vars[_variable.key] as number) || _variable.options.min;
     changeVariables(state.value);
 
-    state.keyword = (dashboardDetailState.vars[_variable.key] as number) || _variable.options.min;
+    state.keyword = (dashboardDetailGetters.dashboardInfo.vars[_variable.key] as number) || _variable.options.min;
 }, { immediate: true });
 
 </script>

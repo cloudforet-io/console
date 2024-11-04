@@ -24,6 +24,7 @@ interface Props {
 const props = defineProps<Props>();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 
 const state = reactive({
     variable: computed(() => {
@@ -39,10 +40,12 @@ const handleDeleteTextValue = () => {
     state.value = undefined;
     state.keyword = '';
     changeVariables();
+    state.editMode = true;
 };
 const handleSelectValue = (selected: InputItem[]) => {
     state.value = selected[0]?.name;
     changeVariables(selected[0]?.name);
+    state.editMode = false;
 };
 
 
@@ -57,19 +60,13 @@ const changeVariables = (changedSelected?: string) => {
     dashboardDetailStore.setVars(vars);
 };
 
-watch(() => dashboardDetailState.vars, (vars, prevVars) => {
-    if (isEqual(vars[state.variable.key], prevVars?.[state.variable.key])) return;
-
+// set default value
+watch(() => dashboardDetailGetters.dashboardVarsSchemaProperties, (varsSchema, prevVarsSchema) => {
     const _variable = props.variable as TextAnyVariable;
-    state.value = (dashboardDetailState.vars[_variable.key] as string) || _variable.options?.defaultValue;
+    if (isEqual(varsSchema[_variable.key], prevVarsSchema?.[_variable.key])) return;
+    state.value = (dashboardDetailGetters.dashboardInfo.vars[_variable.key] as string) || _variable.options?.defaultValue;
     changeVariables(state.value);
 }, { immediate: true });
-
-
-watch(() => state.value, (_value) => {
-    state.editMode = !_value;
-});
-
 
 </script>
 

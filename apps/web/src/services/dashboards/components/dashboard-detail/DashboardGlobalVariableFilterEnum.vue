@@ -25,6 +25,8 @@ interface Props {
 const props = defineProps<Props>();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
+
 
 const state = reactive({
     variable: computed(() => {
@@ -79,8 +81,11 @@ const initSelected = async (value: any) => {
     }
 };
 
-watch(() => dashboardDetailState.vars, async () => {
-    const value = dashboardDetailState.vars[state.variable.key];
+watch(() => dashboardDetailGetters.dashboardVarsSchemaProperties, async (varsSchema, prevVarsSchema) => {
+    const _variable = props.variable as TextEnumVariable|NumberEnumVariable;
+    if (isEqual(varsSchema[_variable.key], prevVarsSchema?.[varsSchema[_variable.key]])) return;
+
+    const value = dashboardDetailGetters.dashboardInfo.vars[_variable.key];
     if (value) {
         await initSelected(value);
     } else {
