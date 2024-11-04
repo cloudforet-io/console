@@ -1536,7 +1536,8 @@
 						"FORMULA_PLACEHOLDER": "{pandas}形式で数式を入力してください。",
 						"TITLE_PLACEHOLDER": "フィールド名を入力",
 						"TYPE_DATA_FIELD": "データフィールド",
-						"TYPE_LABEL_FIELD": "ラベルフィールド"
+						"TYPE_LABEL_FIELD": "ラベルフィールド",
+						"USE_CONDITION": ""
 					},
 					"EVAL_DESC": "データフィールドに関数や計算を適用します。",
 					"FIELD_NAME_DATE_INVALID_TEXT": "Date/Year/Month/Day はフィールド名として使用できません。",

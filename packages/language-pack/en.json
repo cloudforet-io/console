@@ -1536,7 +1536,8 @@
 						"FORMULA_PLACEHOLDER": "Enter your formula in a pandas format.",
 						"TITLE_PLACEHOLDER": "Enter Field Name",
 						"TYPE_DATA_FIELD": "Data Field",
-						"TYPE_LABEL_FIELD": "Label Field"
+						"TYPE_LABEL_FIELD": "Label Field",
+						"USE_CONDITION": "Use Condition"
 					},
 					"EVAL_DESC": "Apply Functions or calculations to data fields. ",
 					"FIELD_NAME_DATE_INVALID_TEXT": "Date/Year/Month/Day cannot be used as field names.",
