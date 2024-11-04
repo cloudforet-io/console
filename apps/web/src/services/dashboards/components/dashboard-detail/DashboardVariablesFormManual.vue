@@ -2,7 +2,8 @@
 import { computed, reactive, watch } from 'vue';
 
 import {
-    PFieldGroup, PTextInput, PSelectDropdown, PRadioGroup, PRadio, PButton, PIconButton, PDivider,
+    PFieldGroup, PTextInput, PSelectDropdown, PRadioGroup, PRadio, PButton, PIconButton, PDivider, PCheckbox,
+    PTooltip, PI,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
@@ -56,6 +57,7 @@ const state = reactive({
         if (state.selectedValuesType === VALUES_TYPE.ANY_VALUE) {
             if (state.selectedType === 'text') return true;
             if (Number.isNaN(Number(state.min)) || Number.isNaN(Number(state.max))) return false;
+            if (state.isStepValid === false) return false;
             return state.min !== undefined && state.max !== undefined;
         }
         const keys = state.enumValues.map((d) => d.key);
@@ -92,6 +94,7 @@ const state = reactive({
             values: state.enumValues,
             options: {
                 selectionType: state.selectedSelectionType,
+                ...(state.selectedType === 'number' ? { displayKey: state.displayKeyWithLabel } : {}),
             },
         };
     }),
@@ -103,11 +106,16 @@ const state = reactive({
     selectedValuesType: VALUES_TYPE.ANY_VALUE as ValuesType,
     defaultTextValue: undefined as string|undefined,
     enumValues: [] as EnumValue[],
+    displayKeyWithLabel: false,
     selectedSelectionType: 'multi' as SelectionType,
     min: undefined as number|undefined,
     max: undefined as number|undefined,
     step: undefined as number|undefined,
     selectedNumberInputType: NUMBER_INPUT_TYPE.NUMBER_INPUT as NumberInputType,
+    isStepValid: computed<boolean>(() => {
+        if (state.max === undefined || state.min === undefined || state.step === undefined) return true;
+        return state.max % state.step === 0;
+    }),
 });
 
 /* Util */
@@ -130,6 +138,7 @@ const initExistingVariable = (originalData: DashboardGlobalVariable) => {
     } else {
         state.enumValues = originalData.values;
         state.selectedSelectionType = originalData.options.selectionType;
+        state.displayKeyWithLabel = originalData.options.displayKey;
     }
 };
 
@@ -141,10 +150,12 @@ const handleChangeType = (type: 'text'|'number') => {
     state.min = undefined;
     state.max = undefined;
     state.enumValues = [{ key: '', label: '' }];
+    state.displayKeyWithLabel = false;
 };
 const handleChangeValuesType = (type: ValuesType) => {
     if (state.selectedValuesType === type) return;
     state.selectedValuesType = type;
+    state.displayKeyWithLabel = false;
     if (type === VALUES_TYPE.LIST_OF_VALUES) {
         state.enumValues = [{ key: '', label: '' }];
     } else {
@@ -168,6 +179,9 @@ const handleUpdateEnumKey = (idx: number, value: string) => {
 };
 const handleChangeNumberInputType = (type: NumberInputType) => {
     state.selectedNumberInputType = type;
+};
+const handleUpdateDisplayKey = (value: boolean[]) => {
+    state.displayKeyWithLabel = value[0];
 };
 
 /* Watcher */
@@ -231,32 +245,47 @@ watch(() => props.originalData, (originalData) => {
                 <div v-else
                      class="grid grid-cols-12 gap-2"
                 >
-                    <p-field-group :label="$t('DASHBOARDS.DETAIL.VARIABLES.MIN')"
-                                   required
-                                   class="col-span-5"
-                    >
-                        <p-text-input :value.sync="state.min"
-                                      type="number"
-                                      block
-                        />
-                    </p-field-group>
-                    <p-field-group :label="$t('DASHBOARDS.DETAIL.VARIABLES.MAX')"
-                                   required
-                                   class="col-span-5"
-                    >
-                        <p-text-input :value.sync="state.max"
-                                      type="number"
-                                      block
-                        />
-                    </p-field-group>
+                    <div class="col-span-9 grid grid-cols-12 gap-2">
+                        <p-field-group :label="$t('DASHBOARDS.DETAIL.VARIABLES.MIN')"
+                                       required
+                                       class="col-span-6"
+                        >
+                            <p-text-input :value.sync="state.min"
+                                          type="number"
+                                          block
+                            />
+                        </p-field-group>
+                        <p-field-group :label="$t('DASHBOARDS.DETAIL.VARIABLES.MAX')"
+                                       required
+                                       class="col-span-6"
+                        >
+                            <p-text-input :value.sync="state.max"
+                                          type="number"
+                                          block
+                            />
+                        </p-field-group>
+                    </div>
                     <p-field-group :label="$t('DASHBOARDS.DETAIL.VARIABLES.STEP')"
-                                   class="col-span-2"
+                                   class="col-span-3"
                     >
                         <p-text-input :value.sync="state.step"
                                       block
                                       type="number"
                                       class="step-input"
+                                      :invalid="!state.isStepValid"
                         />
+                        <template #label-extra>
+                            <p-tooltip position="bottom"
+                                       :contents="$t('DASHBOARDS.DETAIL.VARIABLES.STEP_TOOLTIP')"
+                            >
+                                <p-i name="ic_info-circle"
+                                     height="0.75rem"
+                                     width="0.75rem"
+                                     color="inherit"
+                                     class="ml-2"
+                                />
+                            </p-tooltip>
+                        </template>
                     </p-field-group>
                     <!-- Input Type -->
                     <p-field-group :label="$t('DASHBOARDS.DETAIL.VARIABLES.INPUT_TYPE')"
@@ -316,6 +345,14 @@ watch(() => props.originalData, (originalData) => {
                 >
                     {{ $t('DASHBOARDS.DETAIL.VARIABLES.ADD_VALUE') }}
                 </p-button>
+                <p-checkbox v-if="state.selectedType === 'number'"
+                            :selected="state.displayKeyWithLabel"
+                            :value="true"
+                            class="pt-3 block"
+                            @change="handleUpdateDisplayKey"
+                >
+                    {{ $t('DASHBOARDS.DETAIL.VARIABLES.DISPLAY_KEY_WITH_LABEL') }}
+                </p-checkbox>
                 <!-- Selection Type -->
                 <p-divider class="divider" />
                 <p-field-group :label="$t('DASHBOARDS.DETAIL.VARIABLES.SELECTION_TYPE')"
