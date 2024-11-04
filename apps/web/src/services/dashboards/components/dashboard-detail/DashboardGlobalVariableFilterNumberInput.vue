@@ -3,10 +3,13 @@
 import {
     computed, reactive, watch,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import { cloneDeep, isEqual } from 'lodash';
 
-import { PIconButton, PTextInput, PPopover } from '@cloudforet/mirinae';
+import {
+    PIconButton, PTextInput, PPopover, PButton, PI,
+} from '@cloudforet/mirinae';
 import type { InputItem } from '@cloudforet/mirinae/src/inputs/input/text-input/type';
 
 import type {
@@ -14,6 +17,7 @@ import type {
     NumberAnyVariable,
 } from '@/schema/dashboard/_types/dashboard-global-variable-type';
 import type { DashboardVars } from '@/schema/dashboard/_types/dashboard-type';
+import { i18n } from '@/translations';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
@@ -36,6 +40,7 @@ const state = reactive({
     min: computed<number>(() => parseFloat(state.variable.options.min)),
     max: computed<number>(() => parseFloat(state.variable.options.max)),
     invalid: false,
+    invalidText: '',
     value: undefined as number|undefined,
     editMode: false,
     keyword: undefined as number|undefined,
@@ -51,6 +56,12 @@ const handleSelectValue = (selected: InputItem[]) => {
     changeVariables(parseFloat(selected[0]?.name));
     state.editMode = false;
 };
+const handleClickDoneButton = () => {
+    if (!state.keyword) return;
+    state.value = state.keyword;
+    changeVariables(parseFloat(state.keyword));
+    state.editMode = false;
+};
 const handleClickMinusButton = () => {
     let _numericValue = parseFloat(state.keyword);
     const _min = state.min;
@@ -59,7 +70,7 @@ const handleClickMinusButton = () => {
     if (_numericValue < _min) {
         _numericValue = _min;
     } else if (state.step) {
-        if (isValidNumber(state.keyword, state.min, state.max, state.step)) {
+        if (isValidNumberInfo(state.keyword, state.min, state.max, state.step).valid) {
             _numericValue = Math.max(_numericValue - numericStep, _min);
         } else {
             _numericValue = _min + Math.floor((_numericValue - _min) / numericStep) * numericStep;
@@ -85,7 +96,7 @@ const handleClickPlusButton = () => {
     if (_numericValue < _min) {
         _numericValue = _min;
     } else if (state.step) {
-        if (isValidNumber(state.keyword, state.min, state.max, state.step)) {
+        if (isValidNumberInfo(state.keyword, state.min, state.max, state.step).valid) {
             _numericValue = Math.min(_numericValue + numericStep, _max);
         } else {
             _numericValue = _min + Math.ceil((_numericValue - _min) / numericStep) * numericStep;
@@ -99,23 +110,28 @@ const handleClickPlusButton = () => {
 };
 
 const changeNumberKeyword = (value: string) => {
-    state.invalid = !isValidNumber(value, state.min, state.max, state.step);
+    state.invalid = !isValidNumberInfo(value, state.min, state.max, state.step).valid;
+    if (state.invalid) {
+        state.invalidText = isValidNumberInfo(value, state.min, state.max, state.step).invalidText;
+    }
     state.keyword = value;
 };
 
-const isValidNumber = (value: string, min: number, max: number, step?: string): boolean => {
+const isValidNumberInfo = (value: string, min: number, max: number, step?: string): { valid: boolean, invalidText?: string|TranslateResult } => {
     const numericValue = parseFloat(value);
 
     if (Number.isNaN(numericValue) || numericValue < min || numericValue > max) {
-        return false;
+        return { valid: false, invalidText: i18n.t('DASHBOARDS.DETAIL.VARIABLES.NUMBER_INPUT_OUT_OF_RANGE_VALUE', { min: state.min, max: state.max }) };
     }
 
     if (step) {
         const numericStep = parseFloat(step);
-        return numericValue === max || (numericValue - min) % numericStep === 0;
+        if (numericValue !== max && (numericValue - min) % numericStep !== 0) {
+            return { valid: false, invalidText: i18n.t('DASHBOARDS.DETAIL.VARIABLES.NUMBER_INPUT_INVALID_STEP_VALUE') };
+        }
     }
 
-    return true;
+    return { valid: true };
 };
 
 const changeVariables = (changedSelected?: number) => {
@@ -162,28 +178,59 @@ watch(() => dashboardDetailGetters.dashboardVarsSchemaProperties, (varsSchema, p
             </div>
 
             <template #content>
-                <div class="number-input-menu">
-                    <p-icon-button name="ic_minus"
-                                   width="2rem"
-                                   height="2rem"
-                                   :disabled="parseFloat(state.keyword) <= state.min"
-                                   @click="handleClickMinusButton"
-                    />
-                    <p-text-input type="number"
-                                  :invalid="state.invalid"
-                                  :value="state.keyword"
-                                  :min="state.variable.options.min"
-                                  :max="state.variable.options.max"
-                                  @update:value="handleUpdateKeyword"
-                                  @update:selected="handleSelectValue"
-                                  @delete-all-tags="handleDeleteKeyword"
-                    />
-                    <p-icon-button name="ic_plus"
-                                   width="2rem"
-                                   height="2rem"
-                                   :disabled="parseFloat(state.keyword) >= state.max"
-                                   @click="handleClickPlusButton"
-                    />
+                <div class="content-wrapper">
+                    <div class="number-input-menu">
+                        <p-icon-button name="ic_minus"
+                                       width="2rem"
+                                       height="2rem"
+                                       :disabled="parseFloat(state.keyword) <= state.min"
+                                       @click="handleClickMinusButton"
+                        />
+                        <p-text-input type="number"
+                                      :invalid="state.invalid"
+                                      :value="state.keyword"
+                                      :min="state.variable.options.min"
+                                      :max="state.variable.options.max"
+                                      @update:value="handleUpdateKeyword"
+                                      @update:selected="handleSelectValue"
+                                      @delete-all-tags="handleDeleteKeyword"
+                        />
+                        <p-icon-button name="ic_plus"
+                                       width="2rem"
+                                       height="2rem"
+                                       :disabled="parseFloat(state.keyword) >= state.max"
+                                       @click="handleClickPlusButton"
+                        />
+                        <p-button size="sm"
+                                  style-type="highlight"
+                                  :disabled="state.invalid"
+                                  @click="handleClickDoneButton"
+                        >
+                            {{ $t('COMMON.WIDGETS.APPLY') }}
+                        </p-button>
+                    </div>
+                    <div class="info-wrapper">
+                        <div v-if="!state.invalid"
+                             class="info"
+                        >
+                            <p-i class="info-icon"
+                                 name="ic_info-circle"
+                                 width="1rem"
+                                 height="1rem"
+                            />
+                            <p>
+                                {{ $t('DASHBOARDS.DETAIL.VARIABLES.NUMBER_INPUT_STEP_INFO', { step: state.step }) }}
+                            </p>
+                        </div>
+                        <div v-else
+                             class="invalid-text"
+                        >
+                            <p class="text">
+                                {{ state.invalidText }}
+                            </p>
+                        </div>
+                    </div>
+                    <div />
                 </div>
             </template>
         </p-popover>
@@ -213,22 +260,41 @@ watch(() => dashboardDetailGetters.dashboardVarsSchemaProperties, (varsSchema, p
         }
     }
 
-    .number-input-menu {
-        @apply flex items-center gap-1 bg-white;
+    .content-wrapper {
+        .number-input-menu {
+            @apply flex items-center gap-1 bg-white;
 
-        /* custom design-system component - p-text-input */
-        :deep(.p-text-input) {
-            width: 8rem;
+            margin-bottom: 0.25rem;
 
-            input {
-                -moz-appearance: textfield;
-                -webkit-appearance: none;
-                appearance: none;
+            /* custom design-system component - p-text-input */
+            :deep(.p-text-input) {
+                width: 8rem;
+
+                input {
+                    -moz-appearance: textfield;
+                    -webkit-appearance: none;
+                    appearance: none;
+                }
+                input::-webkit-inner-spin-button,
+                .no-spinner::-webkit-outer-spin-button {
+                    -webkit-appearance: none;
+                    margin: 0;
+                }
             }
-            input::-webkit-inner-spin-button,
-            .no-spinner::-webkit-outer-spin-button {
-                -webkit-appearance: none;
-                margin: 0;
+        }
+        .info-wrapper {
+            .info {
+                @apply flex items-center text-gray-600 text-paragraph-md;
+                .info-icon {
+                    margin-right: 0.125rem;
+                }
+            }
+            .invalid-text {
+                @apply text-label-sm text-red-500;
+                padding-left: 2.25rem;
+                .text {
+                    width: 8rem;
+                }
             }
         }
     }

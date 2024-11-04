@@ -81,7 +81,9 @@ watch(() => dashboardDetailGetters.dashboardVarsSchemaProperties, (varsSchema, p
                       :show-value="false"
                       @update:value="handleUpdateSliderValue"
             />
-            <p-tag :deletable="false">
+            <p-tag selected
+                   :deletable="false"
+            >
                 {{ state.value }}
             </p-tag>
         </div>
