@@ -89,10 +89,8 @@ const state = reactive({
     mountedWidgetMap: {} as Record<string, boolean>,
     intersectedWidgetMap: {} as Record<string, boolean>,
     isAllWidgetsMounted: computed<boolean>(() => Object.values(state.mountedWidgetMap).every((d) => d)),
-    refinedWidgetInfoList: computed<RefinedWidgetInfo[]>(() => {
-        if (!dashboardDetailState.dashboardWidgets.length) return [];
-        return getRefinedWidgetInfoList();
-    }),
+    refinedWidgetInfoList: computed<RefinedWidgetInfo[]>(() => getRefinedWidgetInfoList(dashboardDetailState.dashboardWidgets)),
+    widgetLoading: true,
     overlayType: 'EDIT' as 'EDIT' | 'EXPAND',
     showExpandOverlay: false,
     remountWidgetId: undefined as string|undefined,
@@ -105,13 +103,17 @@ const widgetDeleteState = reactive({
 
 /* Util */
 const { containerWidth } = useDashboardContainerWidth({ containerRef, observeResize: true });
-const getRefinedWidgetInfoList = (): RefinedWidgetInfo[] => {
+const getRefinedWidgetInfoList = (dashboardWidgets: Array<PublicWidgetModel|PrivateWidgetModel>): RefinedWidgetInfo[] => {
+    if (!dashboardWidgets.length) {
+        state.widgetLoading = false;
+        return [];
+    }
     const _refinedWidgets: RefinedWidgetInfo[] = [];
     const _widgetSizeList: WidgetSize[] = [];
     dashboardDetailGetters.dashboardLayouts.forEach((d) => {
         const _widgetIdList = d.widgets;
         _widgetIdList?.forEach((widgetId) => {
-            const _widget = dashboardDetailState.dashboardWidgets.find((w) => w.widget_id === widgetId);
+            const _widget = dashboardWidgets.find((w) => w.widget_id === widgetId);
             if (!_widget) return;
             const _config = getWidgetConfig(_widget.widget_type);
             if (!_config) return;
@@ -132,6 +134,8 @@ const getRefinedWidgetInfoList = (): RefinedWidgetInfo[] => {
     _refinedWidgets.forEach((widget, idx) => {
         widget.width = _widths[idx];
     });
+
+    state.widgetLoading = false;
     return _refinedWidgets;
 };
 const getWidgetLoading = () => {
@@ -354,7 +358,10 @@ const handleChangeDoNotShowDateRangeWarning = (value: boolean) => {
 
 /* Watcher */
 watch(() => dashboardDetailState.dashboardId, (dashboardId) => {
-    if (dashboardId) dashboardDetailStore.listDashboardWidgets();
+    if (dashboardId) {
+        state.widgetLoading = true;
+        dashboardDetailStore.listDashboardWidgets();
+    }
 }, { immediate: true });
 watch(() => widgetGenerateState.showOverlay, async (showOverlay) => {
     if (!showOverlay && widgetGenerateState.overlayType !== 'EXPAND') {
@@ -430,9 +437,10 @@ defineExpose({
                 </p-checkbox>
             </template>
         </p-scoped-notification>
-        <p-data-loader :loading="dashboardDetailState.loadingDashboard"
+        <p-data-loader :loading="dashboardDetailState.loadingDashboard || state.widgetLoading"
                        :data="state.refinedWidgetInfoList"
                        loader-backdrop-color="gray.100"
+                       disable-empty-case
         >
             <div class="widgets-wrapper">
                 <template v-for="(widget) in state.refinedWidgetInfoList">
@@ -464,27 +472,27 @@ defineExpose({
                     />
                 </template>
             </div>
-            <template #no-data>
-                <div class="no-data-wrapper">
-                    <p-empty show-image
-                             image-size="sm"
-                             class="empty-wrapper"
-                             :show-button="!dashboardDetailGetters.disableManageButtons"
-                    >
-                        {{ $t('DASHBOARDS.DETAIL.NO_WIDGET_TEXT') }}
-                        <template #button>
-                            <p-button style-type="substitutive"
-                                      icon-left="ic_plus_bold"
-                                      class="add-widget-button"
-                                      @click="handleClickAddWidget"
-                            >
-                                {{ $t('DASHBOARDS.DETAIL.ADD_WIDGET') }}
-                            </p-button>
-                        </template>
-                    </p-empty>
-                </div>
-            </template>
         </p-data-loader>
+        <div v-if="!dashboardDetailState.loadingDashboard && !state.refinedWidgetInfoList?.length"
+             class="no-data-wrapper"
+        >
+            <p-empty show-image
+                     image-size="sm"
+                     class="empty-wrapper"
+                     :show-button="!dashboardDetailGetters.disableManageButtons"
+            >
+                {{ $t('DASHBOARDS.DETAIL.NO_WIDGET_TEXT') }}
+                <template #button>
+                    <p-button style-type="substitutive"
+                              icon-left="ic_plus_bold"
+                              class="add-widget-button"
+                              @click="handleClickAddWidget"
+                    >
+                        {{ $t('DASHBOARDS.DETAIL.ADD_WIDGET') }}
+                    </p-button>
+                </template>
+            </p-empty>
+        </div>
         <delete-modal :visible="widgetDeleteState.visibleModal"
                       :header-title="$t('DASHBOARDS.WIDGET.DELETE_TITLE')"
                       :contents="$t('DASHBOARDS.WIDGET.DELETE_CONTENTS')"
@@ -506,6 +514,7 @@ defineExpose({
     flex-wrap: wrap;
     gap: 0.5rem;
     .no-data-wrapper {
+        width: 100%;
         padding-top: 3.5rem;
     }
     .widgets-wrapper {
