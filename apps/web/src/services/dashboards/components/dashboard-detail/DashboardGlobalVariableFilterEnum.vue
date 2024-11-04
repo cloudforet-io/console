@@ -7,6 +7,7 @@ import { cloneDeep, flattenDeep, isEqual } from 'lodash';
 
 import { PSelectDropdown } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import type {
     DashboardGlobalVariable,
@@ -29,13 +30,15 @@ const dashboardDetailGetters = dashboardDetailStore.getters;
 
 
 const state = reactive({
-    variable: computed(() => {
-        const enumVariable = props.variable as TextEnumVariable|NumberEnumVariable;
-        return enumVariable;
+    variable: computed(() => props.variable as TextEnumVariable | NumberEnumVariable),
+    multiSelectable: computed<boolean>(() => state.variable.options.selectionType === 'multi'),
+    menuItems: computed<SelectDropdownMenuItem[]>(() => {
+        if (state.variable.type === 'number' && state.variable.options.displayKey) {
+            return state.variable.values.map((value) => ({ label: `${value.label} (${value.key})`, name: value.key }));
+        }
+        return state.variable.values.map((value) => ({ label: value.label, name: value.key }));
     }),
-    multiSelectable: computed(() => state.variable.options.selectionType === 'multi'),
-    menuItems: computed(() => state.variable.values.map((value) => ({ label: value.label, name: value.key }))),
-    selected: [],
+    selected: [] as SelectDropdownMenuItem[],
     isNumber: computed<boolean>(() => state.variable.type === 'number'),
 });
 
