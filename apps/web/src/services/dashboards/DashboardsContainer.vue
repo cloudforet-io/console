@@ -22,12 +22,15 @@ import DashboardBundleShareModal from '@/services/dashboards/components/dashboar
 import DashboardDeleteModal from '@/services/dashboards/components/DashboardDeleteModal.vue';
 import DashboardsLSB from '@/services/dashboards/DashboardsLSB.vue';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
+import { useDashboardSettingsStore } from '@/services/dashboards/stores/dashboard-settings-store';
 
 
 
 const dashboardStore = useDashboardStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
+const dashboardSettings = useDashboardSettingsStore();
+dashboardSettings.initState();
 const loadDashboard = async () => {
     await dashboardStore.load();
 };
