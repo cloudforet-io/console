@@ -177,7 +177,6 @@ const handleClickNameConfirm = async () => {
         /* custom design-system component - p-text-input */
         :deep(.p-text-input) {
             @apply w-full font-normal;
-            height: 1.5rem;
             .tag-container {
                 padding: 0;
             }

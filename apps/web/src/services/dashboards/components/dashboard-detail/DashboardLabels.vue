@@ -177,11 +177,8 @@ const handleDelete = (index: number) => {
 
 /* custom design-system component - p-text-input */
 :deep(.p-text-input) {
-    height: 1.5rem;
     .input-container {
         max-width: 10.25rem;
-        min-height: 1.5rem;
-        height: 1.5rem;
     }
     + .invalid-feedback {
         @apply absolute;
