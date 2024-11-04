@@ -57,6 +57,7 @@ const state = reactive({
         if (state.selectedValuesType === VALUES_TYPE.ANY_VALUE) {
             if (state.selectedType === 'text') return true;
             if (Number.isNaN(Number(state.min)) || Number.isNaN(Number(state.max))) return false;
+            if (state.isStepValid === false) return false;
             return state.min !== undefined && state.max !== undefined;
         }
         const keys = state.enumValues.map((d) => d.key);
