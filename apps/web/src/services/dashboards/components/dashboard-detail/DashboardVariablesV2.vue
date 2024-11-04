@@ -94,7 +94,9 @@ const handleResetVariables = () => {
 </script>
 
 <template>
-    <div :class="{'dashboard-variables-select-dropdown': true, 'detail-page': !props.widgetMode}">
+    <div v-if="!dashboardDetailState.loadingDashboard"
+         :class="{'dashboard-variables-select-dropdown': true, 'detail-page': !props.widgetMode}"
+    >
         <template v-for="(property, idx) in state.newGlobalVariables">
             <div :key="`${property.name}-${idx}`"
                  class="variable-selector-box"
