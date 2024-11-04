@@ -2,9 +2,10 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PI, PFieldGroup, PSelectDropdown, PTextInput, PButton, PIconButton, PFieldTitle,
+    PI, PFieldGroup, PSelectDropdown, PTextInput, PButton, PIconButton, PFieldTitle, PLink,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/src/inputs/dropdown/select-dropdown/type';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 
 import getRandomId from '@/lib/random-id-generator';
 
@@ -22,6 +23,8 @@ import type {
 } from '@/common/modules/widgets/types/widget-model';
 
 import { yellow } from '@/styles/colors';
+
+
 
 interface Props {
     dataTableId: string;
@@ -172,6 +175,7 @@ const handleClickAddCondition = () => {
                     </template>
                 </p-select-dropdown>
             </p-field-group>
+            <!-- Query -->
             <div v-if="props.operator === DATA_TABLE_OPERATOR.QUERY"
                  class="query-wrapper"
             >
@@ -204,12 +208,22 @@ const handleClickAddCondition = () => {
                                        @click="handleRemoveCondition(conditionInfo.key)"
                         />
                     </div>
-                    <p-button style-type="tertiary"
-                              icon-left="ic_plus_bold"
-                              @click="handleClickAddCondition"
-                    >
-                        Add Condition
-                    </p-button>
+                    <div class="add-condition-wrapper">
+                        <p-button style-type="tertiary"
+                                  icon-left="ic_plus_bold"
+                                  @click="handleClickAddCondition"
+                        >
+                            Add Condition
+                        </p-button>
+                        <p-link href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.query.html"
+                                :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                                highlight
+                                size="sm"
+                                class="external-link"
+                        >
+                            Pandas Query
+                        </p-link>
+                    </div>
                 </div>
             </div>
             <widget-form-data-table-card-transform-form-evaluate v-if="props.operator === DATA_TABLE_OPERATOR.EVAL"
@@ -257,6 +271,11 @@ const handleClickAddCondition = () => {
                 .conditions-wrapper {
                     @apply flex gap-1 items-center;
                     margin-bottom: 0.5rem;
+                }
+                .add-condition-wrapper {
+                    @apply flex;
+                    align-items: center;
+                    justify-content: space-between;
                 }
             }
         }
