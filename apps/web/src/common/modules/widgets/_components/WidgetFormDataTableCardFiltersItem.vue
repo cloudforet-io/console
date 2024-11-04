@@ -209,7 +209,6 @@ onMounted(() => {
                            :selected="state.selectedFilterValue"
                            :loading="props.loading"
                            appearance-type="stack"
-                           show-select-marker
                            :init-selected-with-handler="props.initSelectedWithHandler"
                            :show-delete-all-button="false"
                            :page-size="10"
