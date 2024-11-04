@@ -8,7 +8,7 @@ import { cloneDeep, debounce, flattenDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PDataLoader, PEmpty, PButton, PScopedNotification,
+    PDataLoader, PEmpty, PButton, PScopedNotification, PCheckbox,
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -54,6 +54,7 @@ import {
     useAllReferenceTypeInfoStore,
 } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+import { useDashboardSettingsStore } from '@/services/dashboards/stores/dashboard-settings-store';
 import type { SharedDataTableInfo } from '@/services/dashboards/types/shared-dashboard-type';
 
 
@@ -74,6 +75,8 @@ const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 const allReferenceStore = useAllReferenceStore();
+const dashboardSettings = useDashboardSettingsStore();
+const dashboardSettingsState = dashboardSettings.state;
 
 /* State */
 const containerRef = ref<HTMLElement|null>(null);
@@ -344,6 +347,9 @@ const handleClickAddWidget = () => {
     widgetGenerateStore.setOverlayType('ADD');
     widgetGenerateStore.setShowOverlay(true);
 };
+const handleChangeDoNotShowDateRangeWarning = (value: boolean) => {
+    dashboardSettings.updateDoNotShowDateRangeWarning(value);
+};
 
 
 /* Watcher */
@@ -401,7 +407,7 @@ defineExpose({
     <div ref="containerRef"
          class="dashboard-widget-container"
     >
-        <p-scoped-notification v-if="dashboardDetailState.showDateRangeNotification"
+        <p-scoped-notification v-if="!dashboardSettingsState.doNotShowDateRangeWarning && dashboardDetailState.showDateRangeNotification"
                                type="information"
                                icon="ic_info-circle"
                                show-close-button
@@ -414,6 +420,15 @@ defineExpose({
                 <p>{{ $t('DASHBOARDS.DETAIL.DATE_RANGE_NOTIFICATION_DESC1') }}</p>
                 <p>{{ $t('DASHBOARDS.DETAIL.DATE_RANGE_NOTIFICATION_DESC2') }} <b>({{ $t('DASHBOARDS.DETAIL.DATE_RANGE_NOTIFICATION_DESC3') }})</b></p>
             </div>
+            <template #right>
+                <p-checkbox :selected="dashboardSettingsState.doNotShowDateRangeWarning"
+                            :value="true"
+                            class="pt-2"
+                            @change="handleChangeDoNotShowDateRangeWarning"
+                >
+                    {{ $t('DASHBOARDS.DETAIL.DO_NOT_SHOW_AGAIN') }}
+                </p-checkbox>
+            </template>
         </p-scoped-notification>
         <p-data-loader :loading="dashboardDetailState.loadingDashboard"
                        :data="state.refinedWidgetInfoList"

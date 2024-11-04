@@ -2071,6 +2071,7 @@
 			"DEFAULT": "既定値",
 			"DELETE": "削除",
 			"DONE_EDITING": "編集完了",
+			"DO_NOT_SHOW_AGAIN": "再表示しない",
 			"DUPLICATE": "複製",
 			"EDIT_DASHBOARD_NAME": "ダッシュボード名の編集",
 			"EDIT_LAYOUT": "レイアウトを編集する",
