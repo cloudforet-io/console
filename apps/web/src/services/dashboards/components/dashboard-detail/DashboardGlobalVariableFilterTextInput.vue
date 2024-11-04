@@ -1,10 +1,10 @@
 <script setup lang="ts">
 
 import {
-    computed, onMounted, reactive,
+    computed, reactive, watch,
 } from 'vue';
 
-import { cloneDeep } from 'lodash';
+import { cloneDeep, isEqual } from 'lodash';
 
 import { PTag, PTextInput } from '@cloudforet/mirinae';
 import type { InputItem } from '@cloudforet/mirinae/src/inputs/input/text-input/type';
@@ -24,6 +24,7 @@ interface Props {
 const props = defineProps<Props>();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 
 const state = reactive({
     variable: computed(() => {
@@ -59,11 +60,13 @@ const changeVariables = (changedSelected?: string) => {
     dashboardDetailStore.setVars(vars);
 };
 
-onMounted(() => {
+// set default value
+watch(() => dashboardDetailGetters.dashboardVarsSchemaProperties, (varsSchema, prevVarsSchema) => {
     const _variable = props.variable as TextAnyVariable;
-    state.value = (dashboardDetailState.vars[_variable.key] as string) || _variable.options?.defaultValue;
+    if (isEqual(varsSchema[_variable.key], prevVarsSchema?.[_variable.key])) return;
+    state.value = (dashboardDetailGetters.dashboardInfo.vars[_variable.key] as string) || _variable.options?.defaultValue;
     changeVariables(state.value);
-});
+}, { immediate: true });
 
 </script>
 
