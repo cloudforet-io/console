@@ -68,6 +68,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         dataTableCreateLoading: false,
         joinRestrictedMap: {} as JoinRestrictedMap, // Flag for handling Join type EXCEPTION RESTRICTION cases. (duplicated data field). Example - { '{dataTalbeId}': true, }
         allDataTableInvalidMap: {} as Record<string, boolean>, // Flag for handling all data table invalid cases. Example - { '{dataTalbeId}': true, }
+        dataTableLoadFailed: false,
     });
 
     const getters = reactive({
@@ -126,6 +127,9 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const setAllDataTableInvalidMap = (value: Record<string, boolean>) => {
         state.allDataTableInvalidMap = value;
     };
+    const setDataTableLoadFailed = (status: boolean) => {
+        state.dataTableLoadFailed = status;
+    };
 
     const mutations = {
         setWidgetId,
@@ -143,6 +147,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         setJoinRestrictedMap,
         setAllDataTableInvalidMap,
         setDataTableCreateLoading,
+        setDataTableLoadFailed,
     };
     const actions = {
         listDataTable: async () => {
@@ -233,6 +238,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 options: {
                     [operatorType]: options[operatorType],
                 },
+                state: 'AVAILABLE',
             } as Partial<DataTableModel>;
             state.dataTables.push(unsavedTransformData);
         },
@@ -353,7 +359,9 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                     vars: dashboardDetailGetters.dashboardInfo?.vars || {},
                 });
                 state.previewData = { results: results ?? [], total_count: total_count ?? 0 };
+                setDataTableLoadFailed(false);
             } catch (e) {
+                setDataTableLoadFailed(true);
                 ErrorHandler.handleError(e);
             } finally {
                 state.dataTableUpdating = false;
