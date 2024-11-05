@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import { computed, reactive } from 'vue';
 
 import {
@@ -19,6 +18,9 @@ import type { DataTableDataType } from '@/common/modules/widgets/types/widget-mo
 
 import { gray, violet } from '@/styles/colors';
 
+import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+
+
 
 interface Props {
     dataTableId: string;
@@ -30,6 +32,7 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:dataTableName', value: string): void;}>();
 
+const dashboardDetailGetters = useDashboardDetailInfoStore().getters;
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 
@@ -77,6 +80,7 @@ const handleClickNameConfirm = async () => {
     await widgetGenerateStore.updateDataTable({
         data_table_id: props.dataTableId,
         name: editedDataTableName,
+        vars: dashboardDetailGetters.dashboardInfo?.vars || {},
     }, { unsaved: state.isUnsavedTransformed, preventReferenceUpdating: true });
     showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.DATA_TABLE_NAME_SUCCESS'), '');
     dataTableNameState.editMode = false;

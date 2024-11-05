@@ -47,6 +47,7 @@ const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceStore = useAllReferenceStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 
 const storeState = reactive({
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
@@ -233,6 +234,7 @@ const handleConfirmDataSource = async () => {
             options: {
                 ...state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST ? costOptions : assetOptions,
             },
+            vars: dashboardDetailGetters.dashboardInfo?.vars || {},
         });
         if (!widgetGenerateState.selectedDataTableId && result) {
             widgetGenerateStore.setSelectedDataTableId(result?.data_table_id);

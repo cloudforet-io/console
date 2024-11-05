@@ -40,6 +40,10 @@ import type {
     DataTableQueryFilter,
 } from '@/common/modules/widgets/types/widget-model';
 
+import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+
+
+
 interface Props {
     selected: boolean;
     item: PublicDataTableModel|PrivateDataTableModel;
@@ -51,6 +55,7 @@ const props = defineProps<Props>();
 
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
+const dashboardDetailGetters = useDashboardDetailInfoStore().getters;
 const allReferenceStore = useAllReferenceStore();
 
 const storeState = reactive({
@@ -231,6 +236,7 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
                 ? { [advancedOptionsState.selectedTimeDiff]: -Number(advancedOptionsState.selectedTimeDiffDate) }
                 : undefined,
         },
+        vars: dashboardDetailGetters.dashboardInfo?.vars || {},
     };
     const result = await widgetGenerateStore.updateDataTable(updateParams);
 

@@ -32,6 +32,8 @@ import type {
     EvaluateExpression,
 } from '@/common/modules/widgets/types/widget-model';
 
+import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+
 
 
 
@@ -45,6 +47,7 @@ const props = defineProps<Props>();
 
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
+const dashboardDetailGetters = useDashboardDetailInfoStore().getters;
 
 const storeState = reactive({
     dataTables: computed(() => widgetGenerateState.dataTables),
@@ -208,6 +211,7 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
             name: state.dataTableName,
             operator: state.operator,
             options: { [state.operator]: options() },
+            vars: dashboardDetailGetters.dashboardInfo?.vars || {},
         };
         const dataTable = await widgetGenerateStore.createTransformDataTable(createParams, state.dataTableId);
         if (dataTable) {
@@ -226,6 +230,7 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
         data_table_id: state.dataTableId,
         name: state.dataTableName,
         options: { [state.operator]: options() },
+        vars: dashboardDetailGetters.dashboardInfo?.vars || {},
     };
     const result = await widgetGenerateStore.updateDataTable(updateParams);
     if (!result) setFailStatus(true);
