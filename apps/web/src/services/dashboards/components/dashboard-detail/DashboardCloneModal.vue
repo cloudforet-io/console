@@ -202,6 +202,7 @@ watch(() => props.visible, (visible) => {
                            class="mt-6"
             >
                 <p-toggle-button :value="state.isPrivate"
+                                 :disabled="state.loading"
                                  @change-toggle="handleChangePrivate"
                 />
             </p-field-group>
