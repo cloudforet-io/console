@@ -6,7 +6,7 @@ import type {
     DataTableDataType,
     DataTableOperator,
     DataTableOptions,
-    DataTableSourceType, LabelsInfo,
+    DataTableSourceType, DataTableState, LabelsInfo,
 } from '@/common/modules/widgets/types/widget-model';
 
 
@@ -28,4 +28,6 @@ export interface PublicDataTableModel {
     domain_id: string;
     created_at: string;
     updated_at: string;
+    state: DataTableState;
+    error_message?: string;
 }
