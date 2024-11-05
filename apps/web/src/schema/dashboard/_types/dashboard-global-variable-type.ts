@@ -65,7 +65,6 @@ export interface NumberEnumVariable extends DashboardGlobalVariableBase {
     values: Array<{label: string; key: number;}>;
     options: {
         selectionType: 'multi'|'single';
-        displayKey?: boolean;
     }
 }
 

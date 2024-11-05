@@ -2,8 +2,7 @@
 import { computed, reactive, watch } from 'vue';
 
 import {
-    PFieldGroup, PTextInput, PSelectDropdown, PRadioGroup, PRadio, PButton, PIconButton, PDivider, PCheckbox,
-    PTooltip, PI,
+    PFieldGroup, PTextInput, PSelectDropdown, PRadioGroup, PRadio, PButton, PIconButton, PDivider, PTooltip, PI,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
@@ -61,7 +60,7 @@ const state = reactive({
             return state.min !== undefined && state.max !== undefined;
         }
         const keys = state.enumValues.map((d) => d.key);
-        return new Set(keys).size === keys.length && state.enumValues.every((d) => !!d.key && !!d.label);
+        return new Set(keys).size === keys.length && state.enumValues.every((d) => !!d.key);
     }),
     manualGlobalVariableData: computed<Partial<DashboardGlobalVariable>>(() => {
         if (state.selectedValuesType === VALUES_TYPE.ANY_VALUE) {
@@ -94,7 +93,6 @@ const state = reactive({
             values: state.enumValues,
             options: {
                 selectionType: state.selectedSelectionType,
-                ...(state.selectedType === 'number' ? { displayKey: state.displayKeyWithLabel } : {}),
             },
         };
     }),
@@ -106,7 +104,6 @@ const state = reactive({
     selectedValuesType: VALUES_TYPE.ANY_VALUE as ValuesType,
     defaultTextValue: undefined as string|undefined,
     enumValues: [] as EnumValue[],
-    displayKeyWithLabel: false,
     selectedSelectionType: 'multi' as SelectionType,
     min: undefined as number|undefined,
     max: undefined as number|undefined,
@@ -138,7 +135,6 @@ const initExistingVariable = (originalData: DashboardGlobalVariable) => {
     } else {
         state.enumValues = originalData.values;
         state.selectedSelectionType = originalData.options.selectionType;
-        state.displayKeyWithLabel = originalData.options.displayKey;
     }
 };
 
@@ -150,12 +146,10 @@ const handleChangeType = (type: 'text'|'number') => {
     state.min = undefined;
     state.max = undefined;
     state.enumValues = [{ key: '', label: '' }];
-    state.displayKeyWithLabel = false;
 };
 const handleChangeValuesType = (type: ValuesType) => {
     if (state.selectedValuesType === type) return;
     state.selectedValuesType = type;
-    state.displayKeyWithLabel = false;
     if (type === VALUES_TYPE.LIST_OF_VALUES) {
         state.enumValues = [{ key: '', label: '' }];
     } else {
@@ -171,18 +165,19 @@ const handleDeleteEnumValue = (idx: number) => {
 const handleAddValue = () => {
     state.enumValues.push({ key: '', label: '' });
 };
-const handleUpdateEnumLabel = (idx: number, value: string) => {
-    state.enumValues[idx].label = value;
-};
+// const handleUpdateEnumLabel = (idx: number, value: string) => {
+//     state.enumValues[idx].label = value;
+// };
 const handleUpdateEnumKey = (idx: number, value: string) => {
     state.enumValues[idx].key = value;
+    state.enumValues[idx].label = value;
 };
 const handleChangeNumberInputType = (type: NumberInputType) => {
     state.selectedNumberInputType = type;
 };
-const handleUpdateDisplayKey = (value: boolean[]) => {
-    state.displayKeyWithLabel = value[0];
-};
+// const handleUpdateDisplayKey = (value: boolean[]) => {
+//     state.displayKeyWithLabel = value[0];
+// };
 
 /* Watcher */
 watch(() => state.manualGlobalVariableData, (data) => {
@@ -316,12 +311,12 @@ watch(() => props.originalData, (originalData) => {
                          :key="`enum-value-${enumIdx}`"
                          class="list-of-values-row"
                     >
-                        <p-text-input :value="enumValue.label"
-                                      placeholder="Label"
-                                      block
-                                      @update:value="handleUpdateEnumLabel(enumIdx, $event)"
-                        />
-                        <span>:</span>
+                        <!--                        <p-text-input :value="enumValue.label"-->
+                        <!--                                      placeholder="Label"-->
+                        <!--                                      block-->
+                        <!--                                      @update:value="handleUpdateEnumLabel(enumIdx, $event)"-->
+                        <!--                        />-->
+                        <!--                        <span>:</span>-->
                         <p-text-input :value="enumValue.key"
                                       placeholder="Key"
                                       block
@@ -345,14 +340,14 @@ watch(() => props.originalData, (originalData) => {
                 >
                     {{ $t('DASHBOARDS.DETAIL.VARIABLES.ADD_VALUE') }}
                 </p-button>
-                <p-checkbox v-if="state.selectedType === 'number'"
-                            :selected="state.displayKeyWithLabel"
-                            :value="true"
-                            class="pt-3 block"
-                            @change="handleUpdateDisplayKey"
-                >
-                    {{ $t('DASHBOARDS.DETAIL.VARIABLES.DISPLAY_KEY_WITH_LABEL') }}
-                </p-checkbox>
+                <!--                <p-checkbox v-if="state.selectedType === 'number'"-->
+                <!--                            :selected="state.displayKeyWithLabel"-->
+                <!--                            :value="true"-->
+                <!--                            class="pt-3 block"-->
+                <!--                            @change="handleUpdateDisplayKey"-->
+                <!--                >-->
+                <!--                    {{ $t('DASHBOARDS.DETAIL.VARIABLES.DISPLAY_KEY_WITH_LABEL') }}-->
+                <!--                </p-checkbox>-->
                 <!-- Selection Type -->
                 <p-divider class="divider" />
                 <p-field-group :label="$t('DASHBOARDS.DETAIL.VARIABLES.SELECTION_TYPE')"

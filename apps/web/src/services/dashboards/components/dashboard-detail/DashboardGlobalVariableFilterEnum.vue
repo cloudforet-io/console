@@ -32,12 +32,7 @@ const dashboardDetailGetters = dashboardDetailStore.getters;
 const state = reactive({
     variable: computed(() => props.variable as TextEnumVariable | NumberEnumVariable),
     multiSelectable: computed<boolean>(() => state.variable.options.selectionType === 'multi'),
-    menuItems: computed<SelectDropdownMenuItem[]>(() => {
-        if (state.variable.type === 'number' && state.variable.options.displayKey) {
-            return state.variable.values.map((value) => ({ label: `${value.label} (${value.key})`, name: value.key }));
-        }
-        return state.variable.values.map((value) => ({ label: value.label, name: value.key }));
-    }),
+    menuItems: computed<SelectDropdownMenuItem[]>(() => state.variable.values.map((value) => ({ label: value.label, name: value.key }))),
     selected: [] as SelectDropdownMenuItem[],
     isNumber: computed<boolean>(() => state.variable.type === 'number'),
 });
