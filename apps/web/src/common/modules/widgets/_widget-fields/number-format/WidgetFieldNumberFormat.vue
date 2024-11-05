@@ -4,9 +4,8 @@ import {
 } from 'vue';
 
 import {
-    PButtonModal, PFieldGroup, PSelectDropdown, PTextInput, PButton, PLink,
+    PButtonModal, PFieldGroup, PSelectDropdown, PTextInput, PButton,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 import { customNumberFormatter } from '@cloudforet/utils';
 
@@ -216,12 +215,13 @@ watch(() => state.customModalVisible, (modalVisible) => {
                         <p class="sample-text">
                             {{ $t('COMMON.WIDGETS.NUMBER_FORMAT.SAMPLE') }}: {{ getFormattedNumber(state.customNumberFormat) }}
                         </p>
-                        <p-link :href="state.numberFormatHelpLink"
-                                :action-icon="ACTION_ICON.EXTERNAL_LINK"
-                                highlight
-                        >
-                            {{ $t('COMMON.WIDGETS.NUMBER_FORMAT.HELP') }}
-                        </p-link>
+                        <!--                        TODO: To be activated after guide completion-->
+                        <!--                        <p-link :href="state.numberFormatHelpLink"-->
+                        <!--                                :action-icon="ACTION_ICON.EXTERNAL_LINK"-->
+                        <!--                                highlight-->
+                        <!--                        >-->
+                        <!--                            {{ $t('COMMON.WIDGETS.NUMBER_FORMAT.HELP') }}-->
+                        <!--                        </p-link>-->
                     </div>
                 </div>
                 <div class="bottom-part">
