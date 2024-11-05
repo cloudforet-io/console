@@ -24,7 +24,7 @@ const props = withDefaults(defineProps<Props>(), {
     visible: false,
     dashboardId: undefined,
 });
-const emit = defineEmits<{(e: 'update:visible'): void,
+const emit = defineEmits<{(e: 'update:visible', value: boolean): void,
 }>();
 
 const { getProperRouteLocation } = useProperRouteLocation();

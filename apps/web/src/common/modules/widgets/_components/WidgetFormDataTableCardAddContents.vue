@@ -3,7 +3,7 @@ import {
     computed, defineExpose, onMounted, reactive, watch,
 } from 'vue';
 
-import { isEqual, uniq } from 'lodash';
+import { isArray, isEqual, uniq } from 'lodash';
 
 import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/src/inputs/dropdown/select-dropdown/type';
@@ -119,6 +119,7 @@ const state = reactive({
             || additionalLabelChanged || seperateDateChanged || timeDiffChanged || timeDiffDateChanged;
     }),
     failStatus: false,
+    isUnavailable: computed<boolean>(() => props.item.state === 'UNAVAILABLE'),
 });
 
 const dataTableNameState = reactive({
@@ -199,10 +200,23 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
     const metricLabelsInfo = storeState.metrics[state.metricId ?? '']?.data?.labels_info;
     const assetGroupBy = (metricLabelsInfo ?? []).filter((label) => state.selectedGroupByItems.map((group) => group.name).includes(label.key));
     const groupBy = state.sourceType === DATA_SOURCE_DOMAIN.COST ? costGroupBy : assetGroupBy;
-    const refinedFilter = Object.values(state.filter as Record<string, DataTableQueryFilter>).filter((filter) => filter?.v?.length).map((filter) => ({
-        ...filter,
-        v: uniq(filter.v),
-    }));
+    const refinedFilter = Object.values(state.filter as Record<string, DataTableQueryFilter>)
+        .filter((filter) => {
+            if (isArray(filter.v)) return filter?.v?.length;
+            return !!filter?.v;
+        })
+        .map((filter) => {
+            if (isArray(filter.v)) {
+                return {
+                    ...filter,
+                    v: uniq(filter.v),
+                };
+            }
+            return {
+                ...filter,
+                v: filter.v,
+            };
+        });
 
     const updateParams: DataTableUpdateParameters = {
         data_table_id: state.dataTableId,
@@ -330,21 +344,6 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
     advancedOptionsState.selectedTimeDiff = 'none';
 });
 
-// Set 'dataFieldName' by 'selectedTimeDiff' and 'selectedTimeDiffDate'
-watch([() => advancedOptionsState.selectedTimeDiff, () => advancedOptionsState.selectedTimeDiffDate], ([timediff, date]) => {
-    const defaultFieldName = state.selectableSourceItems.find((source) => source.name === state.selectedSourceEndItem)?.label;
-    const timediffOptions = {
-        none: '',
-        months: 'month',
-        years: 'year',
-    };
-    if (timediff === 'none') {
-        state.dataFieldName = defaultFieldName;
-    } else if (date) {
-        state.dataFieldName = `${defaultFieldName} (- ${date} ${timediffOptions[timediff]})`;
-    }
-});
-
 // Validation
 watch(() => validationState.dataTableApplyInvalid, (invalid) => {
     const _allDataTableInvalidMap = {
@@ -362,7 +361,7 @@ defineExpose({
 
 <template>
     <div class="widget-form-data-table-card-add-contents"
-         :class="{ 'selected': props.selected, 'failed': state.failStatus }"
+         :class="{ 'selected': props.selected, 'failed': state.failStatus, 'unavailable': state.isUnavailable }"
     >
         <div class="card-header">
             <widget-form-data-table-card-header-title :data-table-id="state.dataTableId"
@@ -382,6 +381,7 @@ defineExpose({
                                               :source-id="state.sourceType === DATA_SOURCE_DOMAIN.COST ? state.dataSourceId : state.selectedSourceEndItem"
                                               :source-key="state.selectedSourceEndItem"
                                               :source-type="state.sourceType"
+                                              :source-items="state.selectableSourceItems"
                                               :selected-group-by-items.sync="state.selectedGroupByItems"
                                               :filter.sync="state.filter"
                                               :data-field-name.sync="state.dataFieldName"
@@ -432,6 +432,10 @@ defineExpose({
     &.failed {
         @apply border-red-400;
         box-shadow: 0 0 0 0.1875rem rgba(255, 193, 193, 1);
+    }
+
+    &.unavailable {
+        @apply border-dashed;
     }
 
     .card-header {

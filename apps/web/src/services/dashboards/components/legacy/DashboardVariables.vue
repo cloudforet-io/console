@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import type Vue from 'vue';
-import { computed, getCurrentInstance, reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { isEqual, xor } from 'lodash';
 
@@ -8,11 +7,7 @@ import { PI, PTextButton, PDivider } from '@cloudforet/mirinae';
 
 import type { DashboardVariables, DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
 
-import DashboardVariableDropdown from '@/services/dashboards/components/dashboard-detail/DashboardVariableDropdown.vue';
-import DashboardManageVariableOverlay
-    from '@/services/dashboards/components/legacy/DashboardManageVariableOverlay.vue';
-import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/constants/manage-variable-overlay-constant';
-import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
+import DashboardVariableDropdown from '@/services/dashboards/components/legacy/DashboardVariableDropdown.vue';
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
@@ -34,21 +29,18 @@ const dashboardDetailGetters = dashboardDetailStore.getters;
 
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 
-const vm = getCurrentInstance()?.proxy as Vue;
-
 const state = reactive({
-    showOverlay: computed(() => vm.$route.hash === `#${MANAGE_VARIABLES_HASH_NAME}`),
     variableProperties: computed(() => dashboardDetailGetters.refinedVariablesSchema.properties),
     order: computed(() => dashboardDetailGetters.refinedVariablesSchema.order),
     allReferenceTypeInfo: computed(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     modifiedVariablesSchemaProperties: computed<string[]>(() => {
         if (props.disableSaveButton) return [];
         const results: string[] = [];
-        const prevUsedProperties = Object.entries(dashboardDetailState.dashboardInfo?.variables_schema.properties ?? {}).filter(([, v]) => v.use);
+        const prevUsedProperties = Object.entries(dashboardDetailGetters.dashboardInfo?.variables_schema.properties ?? {}).filter(([, v]) => v.use);
         const currUsedProperties = Object.entries(dashboardDetailGetters.refinedVariablesSchema.properties).filter(([, v]) => v.use);
         // check variables changed
         currUsedProperties.forEach(([k]) => {
-            if (!isEqual(dashboardDetailState.dashboardInfo?.variables?.[k], dashboardDetailState.variables?.[k])) {
+            if (!isEqual(dashboardDetailGetters.dashboardInfo?.variables?.[k], dashboardDetailState.variables?.[k])) {
                 results.push(k);
             }
         });
@@ -66,8 +58,8 @@ const handleClickSaveButton = () => {
     });
 };
 const handleResetVariables = () => {
-    const _originVariables = props.originVariables ?? dashboardDetailState.dashboardInfo?.variables ?? DASHBOARD_TEMPLATES[dashboardDetailState.templateId].variables;
-    const _originVariablesSchema = props.originVariablesSchema ?? dashboardDetailState.dashboardInfo?.variables_schema ?? DASHBOARD_TEMPLATES[dashboardDetailState.templateId].variables_schema;
+    const _originVariables = props.originVariables ?? dashboardDetailGetters.dashboardInfo?.variables;
+    const _originVariablesSchema = props.originVariablesSchema ?? dashboardDetailGetters.dashboardInfo?.variables_schema;
     dashboardDetailStore.resetVariables(_originVariables, _originVariablesSchema);
 };
 
@@ -115,7 +107,6 @@ const handleResetVariables = () => {
         >
             {{ $t('DASHBOARDS.CUSTOMIZE.SAVE') }}
         </p-text-button>
-        <dashboard-manage-variable-overlay :visible="state.showOverlay" />
     </div>
 </template>
 

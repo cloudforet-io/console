@@ -10,7 +10,7 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PSelectDropdown, PFieldGroup, PSelectButton, PDivider, PTextInput,
+    PSelectDropdown, PFieldGroup, PSelectButton, PDivider, PTextInput, PScopedNotification,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
@@ -144,6 +144,7 @@ const state = reactive({
     dynamicFields: undefined as undefined | string[],
     dynamicFieldMenuItems: computed<MenuItem[]>(() => {
         if (state.proxyValue?.fieldType === 'staticField') return [];
+        // if (isDateField(state.proxyValue?.dynamicFieldInfo?.fieldValue)) return [{ label: '2024-10', name: '2024-10' }, { label: '2024-09', name: '2024-09' }];
         if (isDateField(state.proxyValue?.dynamicFieldInfo?.fieldValue)) return [];
         return state.dynamicFields?.map((d) => {
             const fieldName = state.proxyValue.dynamicFieldInfo?.fieldValue;
@@ -154,7 +155,12 @@ const state = reactive({
             };
         }) ?? [];
     }),
-    selectedDynamicFieldMenuItems: computed(() => state.dynamicFieldMenuItems.filter((d) => state.proxyValue.dynamicFieldInfo?.fixedValue?.includes(d.name))),
+    selectedDynamicFieldMenuItems: computed<MenuItem[]>(() => {
+        if (isDateField(state.proxyValue.dynamicFieldInfo?.fieldValue) && state.proxyValue.dynamicFieldInfo?.valueType === 'fixed' && state.proxyValue.dynamicFieldInfo?.fixedValue?.length) {
+            return (state.proxyValue.dynamicFieldInfo?.fixedValue ?? []).map((value) => ({ label: value, name: value }));
+        }
+        return state.dynamicFieldMenuItems.filter((d) => state.proxyValue.dynamicFieldInfo?.fixedValue?.includes(d.name));
+    }),
     loading: false,
 });
 
@@ -561,12 +567,20 @@ watch([ // Fetch Dynamic Field
                            required
             >
                 <div class="dynamic-field-value-contents-wrapper">
+                    <p-scoped-notification v-if="state.selectedValueType === 'fixed' && isDateField(state.selectedItem)"
+                                           class="deprecated-option-noti"
+                                           type="warning"
+                                           :title="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.DEPRECATED_OPTION')"
+                                           icon="ic_warning-filled"
+                                           layout="in-section"
+                    />
                     <p-select-dropdown v-if="state.selectedValueType === 'fixed'"
                                        class="dynamic-field-select-dropdown"
                                        :menu="state.dynamicFieldMenuItems"
                                        :selected="state.selectedDynamicFieldMenuItems"
                                        :loading="state.loading"
                                        :invalid="!state.proxyValue?.dynamicFieldInfo?.fixedValue?.length"
+                                       :disabled="state.selectedValueType === 'fixed' && isDateField(state.selectedItem)"
                                        use-fixed-menu-style
                                        multi-selectable
                                        appearance-type="badge"
@@ -614,6 +628,10 @@ watch([ // Fetch Dynamic Field
 }
 .dynamic-field-value-contents-wrapper {
     margin-top: 0.5rem;
+
+    .deprecated-option-noti {
+        margin-bottom: 0.5rem;
+    }
 
     .dynamic-field-auto-count {
         height: 2rem;

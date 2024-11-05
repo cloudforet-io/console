@@ -31,14 +31,17 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 
 
+
 type FolderModel = PublicFolderModel | PrivateFolderModel;
 type FolderCreateParams = PublicFolderCreateParameters | PrivateFolderCreateParameters;
 type FolderUpdateParams = PublicFolderUpdateParameters | PrivateFolderUpdateParameters;
 interface Props {
     visible: boolean;
+    folderId?: string;
 }
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
+    folderId: undefined,
 });
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 }>();
@@ -57,18 +60,19 @@ const state = reactive({
     isPrivate: false,
     selectedFolder: computed<FolderModel|undefined>(() => {
         if (dashboardPageControlState.folderFormModalType === 'UPDATE') {
-            if (dashboardPageControlState.selectedFolderId?.startsWith('private')) {
-                return dashboardPageControlGetters.privateFolderItems.find((d) => d.folder_id === dashboardPageControlState.selectedFolderId);
+            if (props.folderId?.startsWith('private')) {
+                return dashboardPageControlGetters.privateFolderItems.find((d) => d.folder_id === props.folderId);
             }
-            return dashboardPageControlGetters.publicFolderItems.find((d) => d.folder_id === dashboardPageControlState.selectedFolderId);
+            return dashboardPageControlGetters.publicFolderItems.find((d) => d.folder_id === props.folderId);
         }
         return undefined;
     }),
     existingNameList: computed<string[]>(() => {
+        const _targetFolderItems = state.isPrivate ? dashboardPageControlGetters.privateFolderItems : dashboardPageControlGetters.publicFolderItems;
         if (dashboardPageControlState.folderFormModalType === 'UPDATE') {
-            return dashboardPageControlGetters.existingDashboardNameList.filter((d) => d !== state.selectedFolder?.name);
+            return _targetFolderItems.filter((d) => d.folder_id !== state.selectedFolder?.folder_id).map((d) => d.name);
         }
-        return dashboardPageControlGetters.existingDashboardNameList;
+        return _targetFolderItems.map((d) => d.name);
     }),
     headerTitle: computed(() => {
         if (dashboardPageControlState.folderFormModalType === 'UPDATE') return i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.EDIT_FOLDER_NAME');
@@ -118,7 +122,7 @@ const createFolder = async () => {
 };
 const updateFolderName = async () => {
     try {
-        const _isPrivate = dashboardPageControlState.selectedFolderId?.startsWith('private');
+        const _isPrivate = props.folderId?.startsWith('private');
         const fetcher = _isPrivate ? SpaceConnector.clientV2.dashboard.privateFolder.update : SpaceConnector.clientV2.dashboard.publicFolder.update;
         const params: FolderUpdateParams = {
             folder_id: state.selectedFolder?.folder_id as string,

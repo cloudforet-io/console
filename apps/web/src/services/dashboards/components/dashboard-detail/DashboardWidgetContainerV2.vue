@@ -8,18 +8,15 @@ import { cloneDeep, debounce, flattenDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PDataLoader, PEmpty, PButton, PScopedNotification,
+    PDataLoader, PEmpty, PButton, PScopedNotification, PCheckbox,
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
-import type { PrivateDashboardUpdateParameters } from '@/schema/dashboard/private-dashboard/api-verbs/update';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PrivateWidgetCreateParameters } from '@/schema/dashboard/private-widget/api-verbs/create';
 import type { PrivateWidgetDeleteParameters } from '@/schema/dashboard/private-widget/api-verbs/delete';
 import type { PrivateWidgetUpdateParameters } from '@/schema/dashboard/private-widget/api-verbs/update';
 import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
-import type { PublicDashboardUpdateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/update';
 import type { DataTableListParameters } from '@/schema/dashboard/public-data-table/api-verbs/list';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import type { PublicWidgetCreateParameters } from '@/schema/dashboard/public-widget/api-verbs/create';
@@ -29,6 +26,7 @@ import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
@@ -56,6 +54,7 @@ import {
     useAllReferenceTypeInfoStore,
 } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+import { useDashboardSettingsStore } from '@/services/dashboards/stores/dashboard-settings-store';
 import type { SharedDataTableInfo } from '@/services/dashboards/types/shared-dashboard-type';
 
 
@@ -68,6 +67,7 @@ type RefinedWidgetInfo = WidgetModel & {
     component: AsyncComponent|null;
 };
 
+const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardDetailState = dashboardDetailStore.state;
@@ -75,6 +75,8 @@ const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 const allReferenceStore = useAllReferenceStore();
+const dashboardSettings = useDashboardSettingsStore();
+const dashboardSettingsState = dashboardSettings.state;
 
 /* State */
 const containerRef = ref<HTMLElement|null>(null);
@@ -87,10 +89,8 @@ const state = reactive({
     mountedWidgetMap: {} as Record<string, boolean>,
     intersectedWidgetMap: {} as Record<string, boolean>,
     isAllWidgetsMounted: computed<boolean>(() => Object.values(state.mountedWidgetMap).every((d) => d)),
-    refinedWidgetInfoList: computed<RefinedWidgetInfo[]>(() => {
-        if (!dashboardDetailState.dashboardWidgets.length) return [];
-        return getRefinedWidgetInfoList();
-    }),
+    refinedWidgetInfoList: computed<RefinedWidgetInfo[]>(() => getRefinedWidgetInfoList(dashboardDetailState.dashboardWidgets)),
+    widgetLoading: true,
     overlayType: 'EDIT' as 'EDIT' | 'EXPAND',
     showExpandOverlay: false,
     remountWidgetId: undefined as string|undefined,
@@ -103,13 +103,17 @@ const widgetDeleteState = reactive({
 
 /* Util */
 const { containerWidth } = useDashboardContainerWidth({ containerRef, observeResize: true });
-const getRefinedWidgetInfoList = (): RefinedWidgetInfo[] => {
+const getRefinedWidgetInfoList = (dashboardWidgets: Array<PublicWidgetModel|PrivateWidgetModel>): RefinedWidgetInfo[] => {
+    if (!dashboardWidgets.length) {
+        state.widgetLoading = false;
+        return [];
+    }
     const _refinedWidgets: RefinedWidgetInfo[] = [];
     const _widgetSizeList: WidgetSize[] = [];
-    dashboardDetailState.dashboardLayouts.forEach((d) => {
+    dashboardDetailGetters.dashboardLayouts.forEach((d) => {
         const _widgetIdList = d.widgets;
         _widgetIdList?.forEach((widgetId) => {
-            const _widget = dashboardDetailState.dashboardWidgets.find((w) => w.widget_id === widgetId);
+            const _widget = dashboardWidgets.find((w) => w.widget_id === widgetId);
             if (!_widget) return;
             const _config = getWidgetConfig(_widget.widget_type);
             if (!_config) return;
@@ -130,10 +134,12 @@ const getRefinedWidgetInfoList = (): RefinedWidgetInfo[] => {
     _refinedWidgets.forEach((widget, idx) => {
         widget.width = _widths[idx];
     });
+
+    state.widgetLoading = false;
     return _refinedWidgets;
 };
 const getWidgetLoading = () => {
-    if (!dashboardDetailGetters.isAllVariablesInitialized) return true;
+    // if (!dashboardDetailGetters.isAllVariablesInitialized) return true;
     if (!state.isAllWidgetsMounted) return true;
     // if (!state.intersectedWidgetMap[widgetId]) return true;
     return false;
@@ -274,9 +280,6 @@ const handleCloneWidget = async (widget: RefinedWidgetInfo) => {
     const widgetUpdateFetcher = isPrivate
         ? SpaceConnector.clientV2.dashboard.privateWidget.update<PrivateWidgetUpdateParameters, PrivateWidgetModel>
         : SpaceConnector.clientV2.dashboard.publicWidget.update<PublicWidgetUpdateParameters, PublicWidgetModel>;
-    const dashboardUpdateFetcher = isPrivate
-        ? SpaceConnector.clientV2.dashboard.privateDashboard.update<PrivateDashboardUpdateParameters, DashboardModel>
-        : SpaceConnector.clientV2.dashboard.publicDashboard.update<PublicDashboardUpdateParameters, DashboardModel>;
 
     const dataTableList = await listWidgetDataTables(widget.widget_id);
     const dataTableIndex = dataTableList.findIndex((d) => d.data_table_id === widget.data_table_id);
@@ -300,12 +303,8 @@ const handleCloneWidget = async (widget: RefinedWidgetInfo) => {
             widget_id: createdWidget.widget_id,
             state: 'ACTIVE',
         });
-        dashboardDetailStore.addWidgetToDashboardLayouts(completedWidget.widget_id);
         dashboardDetailStore.setDashboardWidgets([...dashboardDetailState.dashboardWidgets, completedWidget]);
-        await dashboardUpdateFetcher({
-            dashboard_id: dashboardDetailState.dashboardId,
-            layouts: dashboardDetailState.dashboardLayouts,
-        });
+        await dashboardStore.addWidgetToDashboard(dashboardDetailState.dashboardId, createdWidget.widget_id);
         showSuccessMessage(i18n.t('COMMON.WIDGETS.CLONE_SUCCESS_MSG'), '');
     } catch (e: any) {
         showErrorMessage(e.message, e);
@@ -352,11 +351,17 @@ const handleClickAddWidget = () => {
     widgetGenerateStore.setOverlayType('ADD');
     widgetGenerateStore.setShowOverlay(true);
 };
+const handleChangeDoNotShowDateRangeWarning = (value: boolean) => {
+    dashboardSettings.updateDoNotShowDateRangeWarning(value);
+};
 
 
 /* Watcher */
 watch(() => dashboardDetailState.dashboardId, (dashboardId) => {
-    if (dashboardId) dashboardDetailStore.listDashboardWidgets();
+    if (dashboardId) {
+        state.widgetLoading = true;
+        dashboardDetailStore.listDashboardWidgets();
+    }
 }, { immediate: true });
 watch(() => widgetGenerateState.showOverlay, async (showOverlay) => {
     if (!showOverlay && widgetGenerateState.overlayType !== 'EXPAND') {
@@ -409,7 +414,7 @@ defineExpose({
     <div ref="containerRef"
          class="dashboard-widget-container"
     >
-        <p-scoped-notification v-if="dashboardDetailState.showDateRangeNotification"
+        <p-scoped-notification v-if="!dashboardSettingsState.doNotShowDateRangeWarning && dashboardDetailState.showDateRangeNotification"
                                type="information"
                                icon="ic_info-circle"
                                show-close-button
@@ -422,10 +427,20 @@ defineExpose({
                 <p>{{ $t('DASHBOARDS.DETAIL.DATE_RANGE_NOTIFICATION_DESC1') }}</p>
                 <p>{{ $t('DASHBOARDS.DETAIL.DATE_RANGE_NOTIFICATION_DESC2') }} <b>({{ $t('DASHBOARDS.DETAIL.DATE_RANGE_NOTIFICATION_DESC3') }})</b></p>
             </div>
+            <template #right>
+                <p-checkbox :selected="dashboardSettingsState.doNotShowDateRangeWarning"
+                            :value="true"
+                            class="pt-2"
+                            @change="handleChangeDoNotShowDateRangeWarning"
+                >
+                    {{ $t('DASHBOARDS.DETAIL.DO_NOT_SHOW_AGAIN') }}
+                </p-checkbox>
+            </template>
         </p-scoped-notification>
-        <p-data-loader :loading="dashboardDetailState.loadingDashboard"
+        <p-data-loader :loading="dashboardDetailState.loadingDashboard || state.widgetLoading"
                        :data="state.refinedWidgetInfoList"
                        loader-backdrop-color="gray.100"
+                       disable-empty-case
         >
             <div class="widgets-wrapper">
                 <template v-for="(widget) in state.refinedWidgetInfoList">
@@ -457,27 +472,27 @@ defineExpose({
                     />
                 </template>
             </div>
-            <template #no-data>
-                <div class="no-data-wrapper">
-                    <p-empty show-image
-                             image-size="sm"
-                             class="empty-wrapper"
-                             :show-button="!dashboardDetailGetters.disableManageButtons"
-                    >
-                        {{ $t('DASHBOARDS.DETAIL.NO_WIDGET_TEXT') }}
-                        <template #button>
-                            <p-button style-type="substitutive"
-                                      icon-left="ic_plus_bold"
-                                      class="add-widget-button"
-                                      @click="handleClickAddWidget"
-                            >
-                                {{ $t('DASHBOARDS.DETAIL.ADD_WIDGET') }}
-                            </p-button>
-                        </template>
-                    </p-empty>
-                </div>
-            </template>
         </p-data-loader>
+        <div v-if="!dashboardDetailState.loadingDashboard && !state.refinedWidgetInfoList?.length"
+             class="no-data-wrapper"
+        >
+            <p-empty show-image
+                     image-size="sm"
+                     class="empty-wrapper"
+                     :show-button="!dashboardDetailGetters.disableManageButtons"
+            >
+                {{ $t('DASHBOARDS.DETAIL.NO_WIDGET_TEXT') }}
+                <template #button>
+                    <p-button style-type="substitutive"
+                              icon-left="ic_plus_bold"
+                              class="add-widget-button"
+                              @click="handleClickAddWidget"
+                    >
+                        {{ $t('DASHBOARDS.DETAIL.ADD_WIDGET') }}
+                    </p-button>
+                </template>
+            </p-empty>
+        </div>
         <delete-modal :visible="widgetDeleteState.visibleModal"
                       :header-title="$t('DASHBOARDS.WIDGET.DELETE_TITLE')"
                       :contents="$t('DASHBOARDS.WIDGET.DELETE_CONTENTS')"
@@ -499,6 +514,7 @@ defineExpose({
     flex-wrap: wrap;
     gap: 0.5rem;
     .no-data-wrapper {
+        width: 100%;
         padding-top: 3.5rem;
     }
     .widgets-wrapper {

@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PI, PCheckbox, PIconButton, PButton,
+    PI, PCheckbox, PButton, PIconButton,
 } from '@cloudforet/mirinae';
 import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
 
@@ -10,6 +10,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import DashboardFolderTreeItem from '@/services/dashboards/components/dashboard-folder/DashboardFolderTreeItem.vue';
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
+
 
 
 interface ControlButton {

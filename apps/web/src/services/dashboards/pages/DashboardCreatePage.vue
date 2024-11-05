@@ -50,17 +50,19 @@ const appContextStore = useAppContextStore();
 const dashboardCreatePageStore = useDashboardCreatePageStore();
 const dashboardCreatePageState = dashboardCreatePageStore.state;
 const { getProperRouteLocation } = useProperRouteLocation();
-const state = reactive({
+const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+});
+const state = reactive({
     loading: false,
     steps: computed<Step[]>(() => [
         {
             step: 1,
-            description: i18n.t('DASHBOARDS.CREATE.STEP1_DESC'),
+            description: storeState.isAdminMode ? '' : i18n.t('DASHBOARDS.CREATE.STEP1_DESC'),
         },
         {
             step: 2,
-            description: state.isAdminMode ? i18n.t('DASHBOARDS.CREATE.STEP2_DESC_FOR_ADMIN') : i18n.t('DASHBOARDS.CREATE.STEP2_DESC'),
+            description: storeState.isAdminMode ? i18n.t('DASHBOARDS.CREATE.STEP2_DESC_FOR_ADMIN') : i18n.t('DASHBOARDS.CREATE.STEP2_DESC'),
         },
     ]),
     closeConfirmModalVisible: false,

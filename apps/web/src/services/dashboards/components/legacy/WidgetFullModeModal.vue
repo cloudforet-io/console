@@ -66,7 +66,7 @@ const state = reactive({
     hasNonInheritedWidgetOptions: false,
     originWidgetInfo: computed<DashboardLayoutWidgetInfo|undefined>(() => {
         if (!props.widgetKey) return undefined;
-        return dashboardDetailState.dashboardWidgetInfoList.find((widgetInfo) => widgetInfo.widget_key === props.widgetKey);
+        return dashboardDetailGetters.dashboardWidgetInfoList.find((widgetInfo) => widgetInfo.widget_key === props.widgetKey);
     }),
     hideDateDropdown: computed<boolean>(() => widgetFormGetters.widgetConfig?.options?.data_criteria === 'realtime'),
 });
@@ -155,7 +155,6 @@ onBeforeUnmount(() => {
                                :schema-properties="widgetFormGetters.updatedWidgetInfo?.schema_properties ?? state.originWidgetInfo.schema_properties"
                                size="full"
                                :theme="props.theme"
-                               :error-mode="dashboardDetailState.widgetValidMap[props.widgetKey] === false"
                                :all-reference-type-info="state.allReferenceTypeInfo"
                                :dashboard-options="dashboardDetailState.options"
                                :dashboard-variables-schema="dashboardDetailGetters.refinedVariablesSchema"

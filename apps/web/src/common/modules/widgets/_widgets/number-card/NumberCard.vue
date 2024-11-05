@@ -4,7 +4,7 @@ import {
     computed, defineExpose, reactive, ref, watch,
 } from 'vue';
 
-import { throttle } from 'lodash';
+import { debounce, throttle } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
@@ -54,6 +54,7 @@ const { dateRange } = useWidgetDateRange({
 });
 const state = reactive({
     loading: false,
+    previousLoading: false,
     errorMessage: undefined as string|undefined,
     data: null as Data | null,
     previousData: null as Data | null,
@@ -121,7 +122,7 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
 });
 
 /* Util */
-const setValueTextFontSize = () => {
+const setValueTextFontSize = debounce(() => {
     if (!valueTextRef.value || !topPartRef.value) return;
     let _fontSize = 56;
     let _maxWidth = useElementSize(topPartRef).width.value;
@@ -132,7 +133,7 @@ const setValueTextFontSize = () => {
         valueTextRef.value.style.fontSize = `${_fontSize}px`;
         _valueTextWidth = useElementSize(valueTextRef).width.value;
     }
-};
+}, 300);
 
 /* Api */
 const privateWidgetFetcher = getCancellableFetcher<PrivateWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.privateWidget.load);
@@ -177,6 +178,7 @@ const publicPreviousFetcher = getCancellableFetcher<PublicWidgetLoadParameters, 
 const fetchPreviousData = async (): Promise<Data|undefined> => {
     if (props.widgetState === 'INACTIVE') return undefined;
     try {
+        state.previousLoading = true;
         const _isPrivate = props.widgetId.startsWith('private');
         const _fetcher = _isPrivate ? privatePreviousFetcher : publicPreviousFetcher;
         const _previousDateRange = getPreviousDateRange(state.granularity, dateRange.value);
@@ -202,6 +204,8 @@ const fetchPreviousData = async (): Promise<Data|undefined> => {
     } catch (e: any) {
         ErrorHandler.handleError(e);
         return undefined;
+    } finally {
+        state.previousLoading = false;
     }
 };
 
@@ -233,7 +237,8 @@ defineExpose<WidgetExpose<Data>>({
     <widget-frame v-bind="widgetFrameProps"
                   v-on="widgetFrameEventHandlers"
     >
-        <div class="content-wrapper">
+        <!-- NOTE: Apply styles directly due to intermittent scoped style issues -->
+        <div class="content-wrapper flex flex-col justify-center h-full">
             <div ref="topPartRef"
                  class="top-part"
             >
@@ -252,7 +257,7 @@ defineExpose<WidgetExpose<Data>>({
                       style="font-size: 56px;"
                 >{{ state.valueText }}</span>
             </div>
-            <div v-if="props.widgetOptions?.comparison"
+            <div v-if="props.widgetOptions?.comparison && !state.previousLoading"
                  class="comparison-wrapper"
             >
                 <p-i v-if="state.currentValue !== state.previousValue"
@@ -272,8 +277,6 @@ defineExpose<WidgetExpose<Data>>({
 
 <style lang="postcss" scoped>
 .content-wrapper {
-    @apply flex flex-col justify-center;
-    height: 100%;
     .top-part {
         display: flex;
         align-items: center;

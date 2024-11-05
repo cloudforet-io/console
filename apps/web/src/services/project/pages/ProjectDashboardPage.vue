@@ -20,6 +20,8 @@ import DashboardWidgetContainerV2
 import type DashboardWidgetContainer from '@/services/dashboards/components/legacy/DashboardWidgetContainer.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
+
+
 interface Props {
     id: string;
     dashboardId: string;
@@ -43,8 +45,7 @@ const handleUpdateDashboardVariables = async (params) => {
     if (!props.dashboardId) return;
     state.dashboardVariablesLoading = true;
     try {
-        const updatedDashboard = await dashboardStore.updateDashboard(props.dashboardId, params);
-        dashboardDetailStore.setDashboardInfo(updatedDashboard);
+        await dashboardStore.updateDashboard(props.dashboardId, params);
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {
@@ -83,7 +84,7 @@ onUnmounted(() => {
     <div class="project-dashboard-page">
         <div class="dashboard-wrapper">
             <div class="title-wrapper">
-                <p-skeleton v-if="!dashboardDetailState.name"
+                <p-skeleton v-if="!dashboardDetailGetters.dashboardName"
                             width="20rem"
                             height="1.5rem"
                 />
@@ -91,7 +92,7 @@ onUnmounted(() => {
                      class="dashboard-title"
                 >
                     <p class="title">
-                        {{ dashboardDetailState.name }}
+                        {{ dashboardDetailGetters.dashboardName }}
                     </p>
                     <span class="beta-mark">beta</span>
                 </div>
@@ -104,6 +105,7 @@ onUnmounted(() => {
                     <dashboard-toolset-date-dropdown :date-range="dashboardDetailState.options.date_range" />
                     <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
                                                 :loading="dashboardDetailState.loadingWidgets"
+                                                disable-interval
                                                 @refresh="handleRefresh"
                     />
                 </div>

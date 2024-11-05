@@ -37,6 +37,8 @@ export interface EvalExpressions {
     name: string;
     fieldType: EvaluateExpressionType;
     expression: string;
+    condition?: string;
+    else?: string;
 }
 
 export interface TransformDataTableInfo {
@@ -48,4 +50,4 @@ export type DataTableAlertModalMode = 'DELETE'|'DELETE_UNABLED'|'RESET';
 
 export type JoinRestrictedMap = Record<string, boolean>; // { {id}: true }
 
-export type DataTableQueryFilterForDropdown = Omit<DataTableQueryFilter, 'v'> & { v: MenuItem[] };
+export type DataTableQueryFilterForDropdown = Omit<DataTableQueryFilter, 'v'> & { v: MenuItem[]|string };

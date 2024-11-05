@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, reactive, watch } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PDataTable, PI } from '@cloudforet/mirinae';
@@ -18,11 +18,16 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
 
+import { getSelectedDataTableItems } from '@/services/dashboards/helpers/dashboard-tree-data-helper';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
 
 
 
+/* Cases
+* Single Case: If props.folderId exists, delete single folder
+* Multiple Case: Otherwise, delete multiple folders (get selected data from dashboardPageControlGetters)
+*/
 const DELETE_TABLE_FIELDS = [
     { name: 'name', label: 'Name' },
     { name: 'location', label: 'Location' },
@@ -30,9 +35,11 @@ const DELETE_TABLE_FIELDS = [
 type FolderDeleteParams = PublicFolderDeleteParameters | PrivateFolderDeleteParameters;
 interface Props {
     visible?: boolean;
+    folderId?: string;
 }
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
+    folderId: undefined,
 });
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void,
 }>();
@@ -44,10 +51,18 @@ const state = reactive({
     loading: false,
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
     modalTableItems: computed<DashboardDataTableItem[]>(() => {
-        if (dashboardPageControlState.folderModalType === 'PUBLIC') {
-            return dashboardPageControlGetters.publicModalTableItems;
+        let _selectedIdMap = dashboardPageControlState.selectedPublicIdMap;
+        // single case
+        if (props.folderId) {
+            const _childrenIdList = dashboardPageControlGetters.allDashboardItems.filter((d) => d.folder_id === props.folderId);
+            _selectedIdMap = {
+                [props.folderId]: true,
+                ..._childrenIdList.reduce((acc, d) => ({ ...acc, [d.dashboard_id]: true }), {}),
+            };
+        } else if (dashboardPageControlState.folderModalType === 'PRIVATE') { // bundle case
+            _selectedIdMap = dashboardPageControlState.selectedPrivateIdMap;
         }
-        return dashboardPageControlGetters.privateModalTableItems;
+        return getSelectedDataTableItems(dashboardPageControlGetters.allFolderItems, dashboardPageControlGetters.allDashboardItems, _selectedIdMap);
     }),
 });
 
@@ -91,15 +106,10 @@ const handleDeleteConfirm = async () => {
         ErrorHandler.handleRequestError(new Error('Delete failed'), i18n.t('DASHBOARDS.ALL_DASHBOARDS.ALT_E_DELETE_DASHBOARD'));
     }
     await dashboardStore.load();
+    dashboardPageControlStore.reset();
     state.loading = false;
-    dashboardPageControlStore.setSelectedIdMap({}, dashboardPageControlState.folderModalType);
     state.proxyVisible = false;
 };
-
-/* Watcher */
-watch(() => state.proxyVisible, (visible) => {
-    if (!visible) dashboardPageControlStore.reset();
-});
 </script>
 
 <template>

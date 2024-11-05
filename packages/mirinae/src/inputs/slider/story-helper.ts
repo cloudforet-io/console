@@ -53,6 +53,34 @@ export const getSliderArgTypes = (): ArgTypes => ({
         },
         control: 'number',
     },
+    step: {
+        name: 'step',
+        description: 'TDefines the incremental steps between values on the slider.',
+        table: {
+            type: {
+                summary: 'number',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: '1',
+            },
+        },
+        control: 'number',
+    },
+    showValue: {
+        name: 'showValue',
+        description: 'Displays the minimum and maximum values below the slider.',
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: '"true"',
+            },
+        },
+        control: 'boolean',
+    },
     showInput: {
         name: 'showInput',
         description: 'Whether to show input box or not.',

@@ -75,6 +75,50 @@ export const Basic: Story = {
     }),
 };
 
+export const Step: Story = {
+    render: (args, { argTypes }) => ({
+        props: Object.keys(argTypes),
+        components: { PSlider },
+        template: `
+            <div class="h-full w-full overflow p-8">
+                <p-slider :value.sync="val" :step="10" :min="100" :max="200" />
+            </div>
+        `,
+        setup() {
+            const state = reactive({
+                val: 120,
+            });
+            return {
+                ...toRefs(state),
+            };
+        },
+    }),
+};
+
+
+export const ShowValue: Story = {
+    render: (args, { argTypes }) => ({
+        props: Object.keys(argTypes),
+        components: { PSlider },
+        template: `
+            <div class="h-full w-full overflow p-8">
+                <p-slider class="mb-10" :value.sync="val" />
+
+                <p-slider :value.sync="val_sub" :show-value="false" />
+            </div>
+        `,
+        setup() {
+            const state = reactive({
+                val: 50,
+                val_sub: 50,
+            });
+            return {
+                ...toRefs(state),
+            };
+        },
+    }),
+};
+
 export const ShowInput: Story = {
     render: (args, { argTypes }) => ({
         props: Object.keys(argTypes),

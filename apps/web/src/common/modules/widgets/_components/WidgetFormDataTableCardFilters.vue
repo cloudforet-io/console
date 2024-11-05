@@ -5,6 +5,7 @@ import {
 } from 'vue';
 
 import {
+    isArray,
     isEmpty, unset,
 } from 'lodash';
 
@@ -150,11 +151,14 @@ onClickOutside(containerRef, hideContextMenu);
 const handleUpdateFilter = (filterKey: string, filter: DataTableQueryFilterForDropdown) => {
     state.selectedItemsMap[filterKey] = { ...filter };
 
+    // NOTE: For Use Global Variables CASE, since it is a single select, the value is a string.
+    const filterValue = isArray(filter.v) ? filter.v.map((d) => d.name) : filter.v;
+
     state.proxyFilter = {
         ...state.proxyFilter,
         [filterKey]: {
             ...filter,
-            v: filter.v.map((d) => d.name),
+            v: filterValue,
         },
     };
 };
@@ -323,9 +327,10 @@ onMounted(() => {
             ...state.selectedItems,
             { name: filter.k, label: selectedFilteritem?.label, presetKeys: selectedFilteritem?.presetKeys },
         ];
+
         state.selectedItemsMap[filter.k] = {
             ...filter,
-            v: filter.v.map((d) => ({ name: d, label: d })),
+            v: isArray(filter.v) ? filter.v.map((d) => ({ name: d, label: d })) : filter.v,
         };
     });
 });

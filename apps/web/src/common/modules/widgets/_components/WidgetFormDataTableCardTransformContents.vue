@@ -73,8 +73,13 @@ const state = reactive({
         const dataTableIdChanged = state.dataTableInfo.dataTableId !== originState.dataTableInfo.dataTableId;
         const joinTypeChanged = joinState.joinType !== originState.joinType;
         const conditionsChanged = !isEqual(queryState.conditions.map((cond) => ({ value: cond.value })).filter((cond) => !!cond.value.trim().length), originState.conditions);
-        const expressionsChanged = !isEqual(evalState.expressions.map((expression) => ({ name: expression.name, field_type: expression.fieldType, expression: expression.expression }))
-            .filter((expression) => !!expression.name && !!expression.expression), originState.expressions);
+        const expressionsChanged = !isEqual(evalState.expressions.map((expression) => ({
+            name: expression.name,
+            field_type: expression.fieldType,
+            expression: expression.expression,
+            ...(expression?.condition ? { condition: expression?.condition } : {}),
+            ...(expression?.else ? { else: expression?.else } : {}),
+        })).filter((expression) => !!expression.name && !!expression.expression), originState.expressions);
         if (state.operator === 'CONCAT') return dataTablesChanged;
         if (state.operator === 'JOIN') return dataTablesChanged || joinTypeChanged;
         if (state.operator === 'QUERY') return dataTableIdChanged || conditionsChanged;
@@ -96,6 +101,7 @@ const state = reactive({
         if (isLegacyEval) return true;
         return false;
     }),
+    isUnavailable: computed<boolean>(() => props.item.state === 'UNAVAILABLE'),
 });
 
 const modalState = reactive({
@@ -177,8 +183,12 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
     const evalOptions: EvalOptions = {
         data_table_id: state.dataTableInfo.dataTableId,
         expressions: evalState.expressions.map((expressionInfo) => ({
-            name: expressionInfo.name, field_type: expressionInfo.fieldType, expression: expressionInfo.expression,
-        })).filter((expresionInfo) => !!expresionInfo.name && !!expresionInfo.expression),
+            name: expressionInfo.name,
+            field_type: expressionInfo.fieldType,
+            expression: expressionInfo.expression,
+            ...(expressionInfo.condition && { condition: expressionInfo.condition }) || {},
+            ...(expressionInfo.else && { else: expressionInfo.else }) || {},
+        })).filter((expressionInfo) => !!expressionInfo.name && !!expressionInfo.expression),
     };
     const options = () => {
         switch (state.operator) {
@@ -273,7 +283,10 @@ const setInitialDataTableForm = () => {
     joinState.joinType = originState.joinType;
     queryState.conditions = originState.conditions.length ? originState.conditions.map((cond) => ({ ...cond, key: getRandomId() })) : [{ key: getRandomId(), value: '' }];
     evalState.expressions = originState.expressions.length ? originState.expressions.map((expression) => ({
-        ...expression, isCollapsed: false, fieldType: expression.field_type, key: getRandomId(),
+        ...expression,
+        isCollapsed: false,
+        fieldType: expression.field_type,
+        key: getRandomId(),
     })) : [{
         key: getRandomId(), name: '', fieldType: EVAL_EXPRESSION_TYPE.DATA, expression: '', isCollapsed: false,
     }];
@@ -301,7 +314,7 @@ defineExpose({
 
 <template>
     <div class="widget-form-data-table-card-transform-contents"
-         :class="{ 'selected': props.selected, 'failed': state.failStatus }"
+         :class="{ 'selected': props.selected, 'failed': state.failStatus, 'unavailable': state.isUnavailable }"
     >
         <div class="card-header">
             <widget-form-data-table-card-header-title :data-table-id="state.dataTableId"
@@ -360,6 +373,10 @@ defineExpose({
     &.failed {
         @apply border-red-400;
         box-shadow: 0 0 0 0.1875rem rgba(255, 193, 193, 1);
+    }
+
+    &.unavailable {
+        @apply border-dashed;
     }
 
     .card-header {

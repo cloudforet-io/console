@@ -19,11 +19,10 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
-import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
 
 
 interface BoardSet {
-    value: DashboardScope;
+    value: 'WORKSPACE' | 'PRIVATE';
     title: TranslateResult;
     leftIcon: string;
     description: TranslateResult;
@@ -61,7 +60,7 @@ const state = reactive({
 });
 
 /* Event */
-const handleSelectDashboardScope = (scopeType: DashboardScope) => {
+const handleSelectDashboardScope = (scopeType: 'WORKSPACE'|'PRIVATE') => {
     dashboardCreatePageStore.setDashboardScope(scopeType);
 };
 

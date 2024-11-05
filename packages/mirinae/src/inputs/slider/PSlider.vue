@@ -9,13 +9,17 @@ const sliderRef = ref<HTMLElement|null>(null);
 interface SliderProps {
     min?: number;
     max?: number;
+    step?: number;
     value: number|string;
     showInput?: boolean;
+    showValue?: boolean;
 }
 const props = withDefaults(defineProps<SliderProps>(), {
     min: 0,
     max: 100,
     value: 50,
+    step: 1,
+    showValue: true,
 });
 const emit = defineEmits<{(event: 'update:value', value: boolean): void;
 }>();
@@ -42,12 +46,17 @@ watch([() => state.proxyValue, () => sliderRef.value], ([val, _sliderRef]) => {
             <input ref="sliderRef"
                    v-model="state.proxyValue"
                    type="range"
+                   :step="props.step"
                    :min="props.min"
                    :max="props.max"
                    class="custom-slider"
             >
-            <span class="bottom-text min">{{ props.min }}</span>
-            <span class="bottom-text max">{{ props.max }}</span>
+            <span v-if="showValue"
+                  class="bottom-text min"
+            >{{ props.min }}</span>
+            <span v-if="showValue"
+                  class="bottom-text max"
+            >{{ props.max }}</span>
         </div>
         <p-text-input v-if="props.showInput"
                       v-model="state.proxyValue"
