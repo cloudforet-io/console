@@ -361,6 +361,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 state.previewData = { results: results ?? [], total_count: total_count ?? 0 };
                 setDataTableLoadFailed(false);
             } catch (e) {
+                state.previewData = { results: [], total_count: 0 };
                 setDataTableLoadFailed(true);
                 ErrorHandler.handleError(e);
             } finally {

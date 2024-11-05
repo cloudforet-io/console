@@ -2315,6 +2315,9 @@
 			"DAILY_UPDATES": {
 				"DESC": "Displays the list of cloud resources created or deleted today. "
 			},
+			"DATA_TABLE_LOAD_INVALID_GLOBAL_VARIABLE_DESC": "Please check your variable and try again.",
+			"DATA_TABLE_LOAD_INVALID_GLOBAL_VARIALBE_TITLE": "Unable to retrieve the Global Variable value.",
+			"DATA_TABLE_LOAD_LOADING": "Processing large amounts of data can take a while.",
 			"DATE_PAST_7_DAYS": "Past 7 days",
 			"DATE_TODAY": "Today",
 			"DELETE_CONTENTS": "Are you sure you want to delete the widget?",
@@ -4447,6 +4450,7 @@
 		},
 		"SPACEONE_USER": "SpaceONE User "
 	},
+	"No Data": "",
 	"PAGE_SCHEMA": {
 		"ACCOUNT": "Account ID",
 		"BASE_INFO": "Base Information",
