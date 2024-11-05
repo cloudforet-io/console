@@ -117,9 +117,6 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
                 </p-tooltip>
             </h3>
             <div class="title-bottom-text-wrapper">
-                <span class="date-text">
-                    {{ props.periodText }}
-                </span>
                 <span v-if="props.annotation"
                       class="annotation-text"
                 >
@@ -131,6 +128,9 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
              class="action-button-wrapper"
              :class="{ 'selected': state.etcMenuVisible || state.popperVisible }"
         >
+            <span class="period-text">
+                {{ props.periodText }}
+            </span>
             <p-tooltip :contents="$t('COMMON.WIDGETS.EXPAND')"
                        position="top"
             >
@@ -307,6 +307,13 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
 
             @apply text-label-sm text-gray-500;
         }
+    }
+    .period-text {
+        display: flex;
+        align-items: center;
+        padding-right: 0.5rem;
+
+        @apply text-label-sm text-gray-500;
     }
     .metadata-content {
         @apply text-label-md;
