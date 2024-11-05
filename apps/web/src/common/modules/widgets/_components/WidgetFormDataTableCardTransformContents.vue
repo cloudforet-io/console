@@ -376,7 +376,8 @@ defineExpose({
     }
 
     &.unavailable {
-        @apply border-dashed;
+        @apply border-dashed border-red-400;
+        box-shadow: 0 0 0 0.1875rem rgba(255, 193, 193, 1);
     }
 
     .card-header {
