@@ -5,6 +5,8 @@ import {
     computed, onMounted, reactive, ref,
 } from 'vue';
 
+import { isArray } from 'lodash';
+
 import {
     PSelectDropdown, PContextMenu, PIconButton, PI, PTextInput,
 } from '@cloudforet/mirinae';
@@ -18,6 +20,7 @@ import {
     DATA_TABLE_QUERY_OPERATOR,
     KEYWORD_FILTER_DISABLED_KEYS,
 } from '@/common/modules/widgets/_constants/data-table-constant';
+import { isGlobalVariableFormat } from '@/common/modules/widgets/_helpers/global-variable-helper';
 import type { DataTableQueryFilterForDropdown } from '@/common/modules/widgets/types/widget-data-table-type';
 
 import { blue, gray } from '@/styles/colors';
@@ -120,10 +123,11 @@ const handleSelectOperator = (operator: MenuItem) => {
     if (operator?.name === undefined) return;
     state.selectedOperator = [operator];
 
-    const defaultFilterValue = operator?.key === DATA_TABLE_QUERY_OPERATOR.use_global_variable.key ? undefined : [];
+    const defaultFilterValue = operator?.name === DATA_TABLE_QUERY_OPERATOR.use_global_variable.operator ? undefined : [];
+    const _operator = operator?.name === DATA_TABLE_QUERY_OPERATOR.use_global_variable.operator ? 'in' : operator.name;
     state.proxySelectedFilter = {
         ...state.proxySelectedFilter,
-        o: operator.name,
+        o: _operator,
         v: defaultFilterValue,
     };
     state.visibleMenu = false;
@@ -152,9 +156,14 @@ onClickOutside(operatorButtonRef, () => {
 });
 
 onMounted(() => {
-    const operator = state.operatorMenu.find((item) => item.name === state.proxySelectedFilter.o);
-    if (operator) {
-        state.selectedOperator = [operator];
+    const operator = state.operatorMenu.find((item) => props.selectedFilter?.v && !isGlobalVariableFormat(props.selectedFilter?.v) && item.name === props.selectedFilter.o);
+    const isUseGlobalVariable = props.selectedFilter?.v
+        && !isArray(props.selectedFilter?.v) // useGlobalVariableOperator's value is string like '{{ global.variable }}'
+        && isGlobalVariableFormat(props.selectedFilter?.v) // useGlobalVariableOperator's value need to be formatted like '{{ global.variable }}'
+        && props.selectedFilter.o === 'in'; // useGlobalVariableOperator's operator is 'in'
+    const useGlobalVariableOperator = state.operatorMenu.find((item) => item.key === DATA_TABLE_QUERY_OPERATOR.use_global_variable.key);
+    if (useGlobalVariableOperator || operator) {
+        state.selectedOperator = isUseGlobalVariable ? [useGlobalVariableOperator] : [operator];
     }
 });
 
@@ -214,7 +223,8 @@ onMounted(() => {
                            :page-size="10"
                            @update:selected="handleUpdateFilterDropdown($event, true)"
         />
-        <p-select-dropdown v-else
+        <p-select-dropdown v-else-if="state.selectedOperator[0]?.key === DATA_TABLE_QUERY_OPERATOR.in.key
+                               || state.selectedOperator[0]?.key === DATA_TABLE_QUERY_OPERATOR.not_in.key"
                            is-filterable
                            :handler="props.handler"
                            :selected="state.proxySelectedFilter?.v"
