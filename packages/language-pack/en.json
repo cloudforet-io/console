@@ -2170,6 +2170,7 @@
 				"NUMBER": "Number",
 				"NUMBER_INPUT": "Number Input",
 				"NUMBER_INPUT_INCONSISTENT_STEP_VALUE": "",
+				"NUMBER_INPUT_INVALID_STEP_VALUE": "The input value must match the step",
 				"NUMBER_INPUT_OUT_OF_RANGE_VALUE": "Enter a valid number (minof {min} max of {max})",
 				"NUMBER_INPUT_STEP_INFO": "The allowable input step is {step}",
 				"SELECTION_TYPE": "Selection Type",
