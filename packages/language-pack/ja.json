@@ -2315,6 +2315,9 @@
 			"DAILY_UPDATES": {
 				"DESC": "当日の作成または削除されたクラウドリソースの一覧が表示されます。"
 			},
+			"DATA_TABLE_LOAD_INVALID_GLOBAL_VARIABLE_DESC": "",
+			"DATA_TABLE_LOAD_INVALID_GLOBAL_VARIALBE_TITLE": "",
+			"DATA_TABLE_LOAD_LOADING": "",
 			"DATE_PAST_7_DAYS": "過去7日間",
 			"DATE_TODAY": "今日",
 			"DELETE_CONTENTS": "このウィジェットを削除しますか？",
@@ -4447,6 +4450,7 @@
 		},
 		"SPACEONE_USER": "SpaceONEユーザー"
 	},
+	"No Data": "",
 	"PAGE_SCHEMA": {
 		"ACCOUNT": "アカウントID",
 		"BASE_INFO": "基本情報",

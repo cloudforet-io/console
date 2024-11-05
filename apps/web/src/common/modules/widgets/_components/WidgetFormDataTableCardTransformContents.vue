@@ -101,6 +101,7 @@ const state = reactive({
         if (isLegacyEval) return true;
         return false;
     }),
+    isUnavailable: computed<boolean>(() => props.item.state === 'UNAVAILABLE'),
 });
 
 const modalState = reactive({
@@ -313,7 +314,7 @@ defineExpose({
 
 <template>
     <div class="widget-form-data-table-card-transform-contents"
-         :class="{ 'selected': props.selected, 'failed': state.failStatus }"
+         :class="{ 'selected': props.selected, 'failed': state.failStatus, 'unavailable': state.isUnavailable }"
     >
         <div class="card-header">
             <widget-form-data-table-card-header-title :data-table-id="state.dataTableId"
@@ -372,6 +373,10 @@ defineExpose({
     &.failed {
         @apply border-red-400;
         box-shadow: 0 0 0 0.1875rem rgba(255, 193, 193, 1);
+    }
+
+    &.unavailable {
+        @apply border-dashed;
     }
 
     .card-header {
