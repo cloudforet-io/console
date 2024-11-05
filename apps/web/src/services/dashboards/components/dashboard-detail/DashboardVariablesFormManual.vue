@@ -56,7 +56,7 @@ const state = reactive({
     isAllValid: computed<boolean>(() => {
         if (state.selectedValuesType === VALUES_TYPE.ANY_VALUE) {
             if (state.selectedType === 'text') return true;
-            if (Number.isNaN(Number(state.min)) || Number.isNaN(Number(state.max))) return false;
+            if (Number.isNaN(parseFloat(state.min)) || Number.isNaN(parseFloat(state.max))) return false;
             if (state.isStepValid === false) return false;
             return state.min !== undefined && state.max !== undefined;
         }
@@ -113,7 +113,7 @@ const state = reactive({
     step: undefined as number|undefined,
     selectedNumberInputType: NUMBER_INPUT_TYPE.NUMBER_INPUT as NumberInputType,
     isStepValid: computed<boolean>(() => {
-        if (state.max === undefined || state.min === undefined || state.step === undefined) return true;
+        if (state.max === undefined || state.min === undefined || (!state.step && state.step !== 0)) return true;
         return state.max % state.step === 0;
     }),
 });
