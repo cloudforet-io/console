@@ -45,7 +45,7 @@ const handleUpdateSliderValue = debounce((value: string) => {
 const changeVariables = (changedSelected?: number) => {
     const _key = state.variable.key;
     const vars = cloneDeep(dashboardDetailState.vars);
-    if (changedSelected) {
+    if (changedSelected !== undefined) {
         vars[_key] = changedSelected;
     } else {
         delete vars[_key];
@@ -69,7 +69,7 @@ watch(() => dashboardDetailGetters.dashboardVarsSchemaProperties, (varsSchema, p
     <div class="dashboard-global-variable-filter-number-slider">
         <div :class="{
             'filter-button': true,
-            'selected': !!state.value,
+            'selected': state.value !== undefined,
         }"
         >
             <span class="selection-label">{{ state.variable.name }}</span>
