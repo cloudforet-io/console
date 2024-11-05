@@ -24,17 +24,18 @@ const route = useRoute();
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
 });
-const state = reactive({
-    isDomainLandingPage: computed<boolean>(() => storeState.workspaceList.length === 0),
-});
 
 watch(() => storeState.workspaceList, () => {
-    if (route.params.force === 'true') return;
-    if (state.isDomainLandingPage) {
-        router.push({ name: LANDING_ROUTE.DOMAIN._NAME }).catch(() => {});
-    } else {
-        router.push({ name: LANDING_ROUTE.WORKSPACE._NAME }).catch(() => {});
-    }
+    const { force } = route.params;
+    const isLanding = route.name === LANDING_ROUTE.DOMAIN._NAME;
+
+    if (force === 'true') return;
+
+    const targetRoute = storeState.workspaceList.length === 0 || isLanding
+        ? LANDING_ROUTE.DOMAIN._NAME
+        : LANDING_ROUTE.WORKSPACE._NAME;
+
+    router.push({ name: targetRoute }).catch(() => {});
 }, { immediate: true });
 
 onUnmounted(() => {
