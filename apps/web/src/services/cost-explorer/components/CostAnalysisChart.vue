@@ -27,7 +27,7 @@ import {
 } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
 import type { CostAnalyzeRawData } from '@/services/cost-explorer/types/cost-analyze-type';
-import type { XYChartData } from '@/services/cost-explorer/types/cost-explorer-chart-type';
+import type { CostXYChartData } from '@/services/cost-explorer/types/cost-explorer-chart-type';
 import type {
     Period,
 } from '@/services/cost-explorer/types/cost-explorer-query-type';
@@ -41,7 +41,7 @@ const state = reactive({
     loading: true,
     legend: {} as Record<string, boolean>,
     data: {} as AnalyzeResponse<CostAnalyzeRawData>,
-    chartData: [] as XYChartData[],
+    chartData: [] as CostXYChartData[],
     chart: null as XYChart | null,
     groupByMenuItems: computed<SelectDropdownMenuItem[]>(() => costAnalysisPageState.groupBy.map((d) => {
         if (GROUP_BY_ITEM_MAP[d]) return GROUP_BY_ITEM_MAP[d];
