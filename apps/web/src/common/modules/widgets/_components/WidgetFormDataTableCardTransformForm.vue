@@ -26,7 +26,7 @@ import { yellow } from '@/styles/colors';
 
 
 
-const CONDITION_PLACEHOLDER = '{{ Product }} == \'A\' & {{ Provider }} == \'B\'';
+const CONDITION_PLACEHOLDER = '{{ Product }} == \'A\'';
 interface Props {
     dataTableId: string;
     operator: DataTableOperator;
