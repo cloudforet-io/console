@@ -59,7 +59,7 @@ export const DATA_TABLE_QUERY_OPERATOR = {
     },
     use_global_variable: {
         key: 'use_global_variable',
-        operator: 'contain_in', // temporary solution
+        operator: 'use_global_variable',
         label: 'use global variable',
     },
 } as const;

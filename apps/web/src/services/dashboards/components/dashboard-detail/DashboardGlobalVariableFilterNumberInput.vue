@@ -137,7 +137,7 @@ const isValidNumberInfo = (value: string, min: number, max: number, step?: strin
 const changeVariables = (changedSelected?: number) => {
     const _key = state.variable.key;
     const vars = cloneDeep(dashboardDetailState.vars) as DashboardVars;
-    if (changedSelected) {
+    if (changedSelected !== undefined) {
         vars[_key] = changedSelected;
     } else {
         delete vars[_key];
@@ -168,11 +168,11 @@ watch(() => dashboardDetailGetters.dashboardVarsSchemaProperties, (varsSchema, p
         >
             <div :class="{
                 'filter-button': true,
-                'selected': !!state.value,
+                'selected': state.value !== undefined,
             }"
             >
                 <span class="selection-label">{{ state.variable.name }}</span>
-                <span v-if="state.value"
+                <span v-if="state.value !== undefined"
                       class="selection-value"
                 >{{ state.value }}</span>
             </div>

@@ -7,6 +7,8 @@ import type {
 
 export type WidgetType = string; // TODO: make this widget type enum
 
+export type DataTableState = 'AVAILABLE' | 'UNAVAILABLE';
+
 export type DataTableSourceType = typeof DATA_SOURCE_DOMAIN[keyof typeof DATA_SOURCE_DOMAIN];
 export type DataTableOperator = typeof DATA_TABLE_OPERATOR[keyof typeof DATA_TABLE_OPERATOR];
 export type DataTableDataType = keyof typeof DATA_TABLE_TYPE;

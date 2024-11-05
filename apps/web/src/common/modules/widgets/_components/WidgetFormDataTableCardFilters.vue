@@ -327,9 +327,10 @@ onMounted(() => {
             ...state.selectedItems,
             { name: filter.k, label: selectedFilteritem?.label, presetKeys: selectedFilteritem?.presetKeys },
         ];
+
         state.selectedItemsMap[filter.k] = {
             ...filter,
-            v: filter.v.map((d) => ({ name: d, label: d })),
+            v: isArray(filter.v) ? filter.v.map((d) => ({ name: d, label: d })) : filter.v,
         };
     });
 });

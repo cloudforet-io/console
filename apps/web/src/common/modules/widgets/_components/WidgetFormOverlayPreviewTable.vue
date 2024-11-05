@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import {
-    computed, reactive, watch,
+    computed, onUnmounted, reactive, watch,
 } from 'vue';
 
 import bytes from 'bytes';
@@ -196,6 +196,10 @@ watch(() => storeState.dataTableUpdating, () => {
         state.thisPage = 1;
         state.sortBy = [];
     }
+});
+
+onUnmounted(() => {
+    widgetGenerateStore.setDataTableLoadFailed(false);
 });
 
 </script>
