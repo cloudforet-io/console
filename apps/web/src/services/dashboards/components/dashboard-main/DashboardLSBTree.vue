@@ -4,11 +4,14 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { PI, PTreeView } from '@cloudforet/mirinae';
+import { PI, PTreeView, PSelectDropdown } from '@cloudforet/mirinae';
 import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
 import type { TreeDisplayMap } from '@cloudforet/mirinae/types/data-display/tree/tree-view/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
@@ -18,6 +21,7 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { gray } from '@/styles/colors';
 
+import { useDashboardControlMenuItems } from '@/services/dashboards/composables/use-dashboard-control-menu-items';
 import { getDashboardTreeData } from '@/services/dashboards/helpers/dashboard-tree-data-helper';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
@@ -35,13 +39,19 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const route = useRoute();
 const router = useRouter();
-
 const { getProperRouteLocation } = useProperRouteLocation();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const appContextStore = useAppContextStore();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+});
+const { getControlMenuItems } = useDashboardControlMenuItems({
+    isAdminMode: computed(() => storeState.isAdminMode),
+    isWorkspaceOwner: computed(() => storeState.isWorkspaceOwner),
+    dashboardList: computed(() => dashboardPageControlGetters.allDashboardItems),
+    folderList: computed(() => dashboardPageControlGetters.allFolderItems),
 });
 const state = reactive({
     currentParentPathIds: [] as string[],
@@ -87,6 +97,14 @@ const handleClickTreeItem = (node: TreeNode<DashboardTreeDataType>) => {
         },
     }));
 };
+const handleSelectControlButton = (id: string, item: MenuItem) => {
+    if (item.name === 'edit') dashboardPageControlStore.openEditNameModal(id);
+    if (item.name === 'clone') dashboardPageControlStore.openCloneModal(id);
+    if (item.name === 'move') dashboardPageControlStore.openMoveModal(id);
+    if (item.name === 'share') dashboardPageControlStore.openShareModal(id);
+    if (item.name === 'shareWithCode') dashboardPageControlStore.openShareWithCodeModal(id);
+    if (item.name === 'delete') dashboardPageControlStore.openDeleteModal(id);
+};
 
 /* Watcher */
 watch(() => route.params, ({ dashboardId }) => {
@@ -120,12 +138,23 @@ onMounted(() => {
                         />
                         <span class="text">{{ node.data.name }}</span>
                     </div>
-                    <favorite-button v-if="node.data.type === 'DASHBOARD'"
-                                     :item-id="node.id"
-                                     :favorite-type="FAVORITE_TYPE.DASHBOARD"
-                                     scale="0.8"
-                                     class="favorite-button"
-                    />
+                    <div class="hover-contents-wrapper">
+                        <p-select-dropdown style-type="tertiary-icon-button"
+                                           button-icon="ic_ellipsis-horizontal"
+                                           :menu="getControlMenuItems(node.data.id)"
+                                           :selected="[]"
+                                           size="sm"
+                                           menu-position="left"
+                                           reset-selection-on-menu-close
+                                           @select="handleSelectControlButton(node.data.id, $event)"
+                        />
+                        <favorite-button v-if="node.data.type === 'DASHBOARD'"
+                                         :item-id="node.id"
+                                         :favorite-type="FAVORITE_TYPE.DASHBOARD"
+                                         scale="0.8"
+                                         class="favorite-button"
+                        />
+                    </div>
                 </div>
             </template>
         </p-tree-view>
@@ -153,19 +182,21 @@ onMounted(() => {
             }
         }
 
-        .favorite-button {
+        .hover-contents-wrapper {
             display: none;
             min-width: 1.5rem;
             height: 1rem;
+            align-items: center;
+            gap: 0.25rem;
             padding-left: 0.5rem;
         }
 
         &:hover {
             .contents-wrapper {
-                width: calc(100% - 1.5rem);
+                width: calc(100% - 3rem);
             }
-            .favorite-button {
-                display: block;
+            .hover-contents-wrapper {
+                display: flex;
             }
         }
     }

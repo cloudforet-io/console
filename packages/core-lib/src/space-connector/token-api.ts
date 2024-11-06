@@ -15,7 +15,7 @@ const REFRESH_TOKEN_KEY = 'spaceConnector/refreshToken';
 const REFRESH_URL = '/identity/token/grant';
 const IS_REFRESHING_KEY = 'spaceConnector/isRefreshing';
 
-const VERBOSE = false;
+const VERBOSE = true;
 
 export default class TokenAPI {
     private static instance: TokenAPI;
@@ -63,12 +63,16 @@ export default class TokenAPI {
     }
 
     setToken(accessToken: string, refreshToken?: string): void {
-        this.accessToken = accessToken;
-        if (refreshToken) {
-            this.refreshToken = refreshToken;
-            LocalStorageAccessor.setItem(REFRESH_TOKEN_KEY, refreshToken);
+        try {
+            this.accessToken = accessToken;
+            if (refreshToken) {
+                this.refreshToken = refreshToken;
+                LocalStorageAccessor.setItem(REFRESH_TOKEN_KEY, refreshToken);
+            }
+            TokenAPI.unsetRefreshingState();
+        } catch (e) {
+            console.error(e);
         }
-        TokenAPI.unsetRefreshingState();
     }
 
     getRefreshToken(): string|undefined|null {
@@ -101,6 +105,9 @@ export default class TokenAPI {
                 let scope = 'USER';
                 let workspaceId: string|undefined;
                 if (this.accessToken) {
+                    if (VERBOSE) {
+                        console.debug('TokenAPI.refreshAccessToken: has access token: ', jwtDecode(this.accessToken));
+                    }
                     const { rol, wid } = jwtDecode<JwtPayload&{rol: string, wid: string}>(this.accessToken);
                     if (rol === 'SYSTEM_ADMIN') scope = 'SYSTEM';
                     if (rol === 'DOMAIN_ADMIN') scope = 'DOMAIN';
@@ -111,12 +118,10 @@ export default class TokenAPI {
                 const response: AxiosPostResponse = await this.refreshInstance.post(REFRESH_URL, {
                     grant_type: 'REFRESH_TOKEN', token: this.refreshToken, scope, workspaceId,
                 });
-                this.setToken(response.data.access_token);
                 if (VERBOSE) {
-                    const decoded = jwtDecode<JwtPayload&{ttl: number}>(response.data.refresh_token);
-                    console.debug('TokenAPI.refreshAccessToken: success');
-                    console.debug(`TokenAPI.refreshAccessToken: new refresh token ttl: ${decoded.ttl}`);
+                    console.debug('TokenAPI.refreshAccessToken: response: ', response);
                 }
+                this.setToken(response.data.access_token);
                 return true;
             } catch (e) {
                 if (VERBOSE) {
@@ -147,13 +152,16 @@ export default class TokenAPI {
         if (VERBOSE) {
             console.debug(`TokenAPI.checkToken: tokenExpirationTime - currentTime: ${tokenExpirationTime - currentTime}`);
         }
-        return (tokenExpirationTime - currentTime) > 600; // initial difference between token expiration time and current time is 600 seconds
+        return (tokenExpirationTime - currentTime) > 10; // initial difference between token expiration time and current time is 10 seconds
     }
 
     static getTokenExpirationTime(token?: string): number {
         if (token) {
             try {
                 const decodedToken = jwtDecode<JwtPayload>(token);
+                if (VERBOSE) {
+                    console.debug(`TokenAPI.getTokenExpirationTime: decodedToken.exp: ${decodedToken.exp}`);
+                }
                 return decodedToken.exp ?? -1;
             } catch (e) {
                 console.error(`Decode token error: ${e}`);

@@ -20,14 +20,12 @@ const REFRESH_INTERVAL_OPTIONS = Object.keys(REFRESH_INTERVAL_OPTIONS_MAP);
 
 interface Props {
     dashboardId?: string;
-    readOnly?: boolean;
-    refreshDisabled?: boolean;
+    disableInterval?: boolean;
     loading?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
     dashboardId: '',
-    readOnly: false,
-    refreshDisabled: false,
+    disableInterval: false,
     loading: false,
 });
 const emit = defineEmits<{(e: 'refresh'): void;
@@ -89,14 +87,13 @@ const handleSelectRefreshIntervalOption = (option) => {
         ...dashboardDetailState.options,
         refresh_interval_option: option,
     });
-    if (props.refreshDisabled) return;
     clearRefreshInterval();
     executeRefreshInterval();
 
     if (!dashboardDetailGetters.disableManageButtons) {
         dashboardStore.updateDashboard(dashboardDetailState.dashboardId, {
             options: {
-                ...dashboardDetailState.dashboardInfo?.options || {},
+                ...dashboardDetailGetters.dashboardInfo?.options || {},
                 refresh_interval_option: option,
             },
         });
@@ -104,7 +101,7 @@ const handleSelectRefreshIntervalOption = (option) => {
 };
 
 watch([() => props.dashboardId, () => props.loading], ([dashboardId, loading], prev) => {
-    if (!dashboardId || props.refreshDisabled) {
+    if (!dashboardId) {
         clearRefreshInterval();
         return;
     }
@@ -113,7 +110,6 @@ watch([() => props.dashboardId, () => props.loading], ([dashboardId, loading], p
         clearRefreshInterval();
     }
     if (!loading) {
-        if (props.refreshDisabled) return;
         executeRefreshInterval();
     }
 });
@@ -123,7 +119,9 @@ const documentVisibility = useDocumentVisibility();
 watch(documentVisibility, (visibility) => {
     if (visibility === 'hidden') {
         clearRefreshInterval();
-    } else if (!props.refreshDisabled) executeRefreshInterval();
+    } else {
+        executeRefreshInterval();
+    }
 }, { immediate: true });
 
 onUnmounted(() => {
@@ -142,14 +140,15 @@ const handleRefresh = () => {
                        style-type="tertiary"
                        size="sm"
                        shape="square"
-                       :disabled="props.refreshDisabled || props.loading"
+                       :disabled="props.loading"
                        :animation="props.loading ? 'reserve-spin' : undefined"
                        @click="handleRefresh"
         />
-        <p-select-dropdown class="currency-select-dropdown"
+        <p-select-dropdown class="interval-select-dropdown"
                            size="sm"
                            :menu="state.intervalOptionItems"
                            :selected="dashboardDetailState.options.refresh_interval_option"
+                           :disabled="props.disableInterval"
                            :read-only="props.loading"
                            :class="{ loading: props.loading }"
                            menu-position="right"
@@ -172,12 +171,12 @@ const handleRefresh = () => {
         }
     }
 
-    .currency-select-dropdown {
+    .interval-select-dropdown {
         min-width: unset;
     }
 
     /* custom design-system component - p-select-dropdown */
-    :deep(.currency-select-dropdown) {
+    :deep(.interval-select-dropdown) {
         .dropdown-button {
             height: 1.5rem;
             border-top-left-radius: 0;

@@ -641,6 +641,10 @@ export default defineComponent<TextInputProps>({
     }
     &.sm {
         @mixin size 1.5rem, 0.75rem, 1.5rem;
+        .input-container > .tag-container {
+            padding-top: 0.219rem;
+            padding-bottom: 0.219rem;
+        }
     }
     &.md {
         @mixin size 2rem, 0.875rem, 2rem;

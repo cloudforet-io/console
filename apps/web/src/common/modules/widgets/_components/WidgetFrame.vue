@@ -117,9 +117,6 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
                 </p-tooltip>
             </h3>
             <div class="title-bottom-text-wrapper">
-                <span class="date-text">
-                    {{ props.periodText }}
-                </span>
                 <span v-if="props.annotation"
                       class="annotation-text"
                 >
@@ -247,6 +244,9 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
             </div>
             <slot v-else />
         </div>
+        <span class="period-text">
+            {{ props.periodText }}
+        </span>
         <div v-if="state.showWidthToggleButton"
              class="widget-toggle-button-wrapper"
         >
@@ -283,6 +283,9 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
         .action-button-wrapper {
             display: flex;
         }
+        .period-text {
+            display: block;
+        }
     }
 
     .widget-header {
@@ -307,6 +310,13 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
 
             @apply text-label-sm text-gray-500;
         }
+    }
+    .period-text {
+        @apply text-label-sm text-gray-500;
+        position: absolute;
+        right: 0.5rem;
+        bottom: 0.25rem;
+        display: none;
     }
     .metadata-content {
         @apply text-label-md;

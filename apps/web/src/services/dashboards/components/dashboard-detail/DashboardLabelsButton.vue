@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core';
-import { computed, reactive, ref } from 'vue';
+import { reactive, ref } from 'vue';
 
 import { PButton, PBadge, PPopover } from '@cloudforet/mirinae';
 
@@ -11,6 +11,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import DashboardLabels from '@/services/dashboards/components/dashboard-detail/DashboardLabels.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
+
+
 interface Props {
     dashboardId: string;
 }
@@ -19,12 +21,7 @@ const props = defineProps<Props>();
 const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailGetters = dashboardDetailStore.getters;
-const dashboardDetailState = dashboardDetailStore.state;
 const labelPopoverRef = ref<HTMLElement|null>(null);
-
-const storeState = reactive({
-    labelList: computed(() => dashboardDetailState.labels),
-});
 
 const state = reactive({
     visible: false,
@@ -33,6 +30,7 @@ const state = reactive({
 const handleUpdateLabels = async (labels: string[]) => {
     try {
         await dashboardStore.updateDashboard(props.dashboardId, {
+            dashboard_id: props.dashboardId,
             labels,
         });
     } catch (e) {
@@ -57,11 +55,11 @@ onClickOutside(labelPopoverRef, () => { state.visible = false; });
             >
                 <div class="button-contents-wrapper">
                     <span class="button-text">{{ $t('Label') }}</span>
-                    <p-badge v-if="storeState.labelList.length > 0"
+                    <p-badge v-if="dashboardDetailGetters.dashboardLabels.length > 0"
                              style-type="gray200"
                              badge-type="subtle"
                     >
-                        +{{ storeState.labelList.length }}
+                        +{{ dashboardDetailGetters.dashboardLabels.length }}
                     </p-badge>
                 </div>
             </p-button>

@@ -37,11 +37,14 @@ import type {
     DataTableTransformOptions,
 } from '@/common/modules/widgets/types/widget-model';
 
+import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+
 
 type DataTableModel = PublicDataTableModel|PrivateDataTableModel;
 type WidgetModel = PublicWidgetModel|PrivateWidgetModel;
 type WidgetUpdateParameters = PublicWidgetUpdateParameters|PrivateWidgetUpdateParameters;
 export const useWidgetGenerateStore = defineStore('widget-generate', () => {
+    const dashboardDetailGetters = useDashboardDetailInfoStore().getters;
     const state = reactive({
         // display
         showOverlay: false,
@@ -65,6 +68,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         dataTableCreateLoading: false,
         joinRestrictedMap: {} as JoinRestrictedMap, // Flag for handling Join type EXCEPTION RESTRICTION cases. (duplicated data field). Example - { '{dataTalbeId}': true, }
         allDataTableInvalidMap: {} as Record<string, boolean>, // Flag for handling all data table invalid cases. Example - { '{dataTalbeId}': true, }
+        dataTableLoadFailed: false,
     });
 
     const getters = reactive({
@@ -123,6 +127,9 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const setAllDataTableInvalidMap = (value: Record<string, boolean>) => {
         state.allDataTableInvalidMap = value;
     };
+    const setDataTableLoadFailed = (status: boolean) => {
+        state.dataTableLoadFailed = status;
+    };
 
     const mutations = {
         setWidgetId,
@@ -140,6 +147,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         setJoinRestrictedMap,
         setAllDataTableInvalidMap,
         setDataTableCreateLoading,
+        setDataTableLoadFailed,
     };
     const actions = {
         listDataTable: async () => {
@@ -161,6 +169,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         createAddDataTable: async (addParams: Partial<DataTableAddParameters>):Promise<DataTableModel|undefined> => {
             const parameters = {
                 widget_id: state.widgetId,
+                vars: dashboardDetailGetters.dashboardInfo?.vars || {},
                 ...addParams,
             } as DataTableAddParameters;
             const isPrivate = state.widgetId.startsWith('private');
@@ -181,6 +190,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         createTransformDataTable: async (transformParams: Partial<DataTableTransformParameters>, unsavedId: string): Promise<DataTableModel|undefined> => {
             const parameters = {
                 widget_id: state.widgetId,
+                vars: dashboardDetailGetters.dashboardInfo?.vars || {},
                 ...transformParams,
             } as DataTableTransformParameters;
             const isPrivate = state.widgetId.startsWith('private');
@@ -228,6 +238,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 options: {
                     [operatorType]: options[operatorType],
                 },
+                state: 'AVAILABLE',
             } as Partial<DataTableModel>;
             state.dataTables.push(unsavedTransformData);
         },
@@ -246,7 +257,10 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                         ...updateParams,
                     };
                 } else {
-                    result = await fetcher(updateParams);
+                    result = await fetcher({
+                        ...updateParams,
+                        vars: dashboardDetailGetters.dashboardInfo?.vars || {},
+                    });
                     if (state.widget?.state === 'ACTIVE') {
                         await actions.updateWidget({ state: 'INACTIVE' });
                     }
@@ -342,9 +356,13 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                     ...loadParams,
                     sort: _sort,
                     data_table_id: loadParams.data_table_id || state.selectedDataTableId as string, // for fetching without data_table_id
+                    vars: dashboardDetailGetters.dashboardInfo?.vars || {},
                 });
                 state.previewData = { results: results ?? [], total_count: total_count ?? 0 };
+                setDataTableLoadFailed(false);
             } catch (e) {
+                state.previewData = { results: [], total_count: 0 };
+                setDataTableLoadFailed(true);
                 ErrorHandler.handleError(e);
             } finally {
                 state.dataTableUpdating = false;

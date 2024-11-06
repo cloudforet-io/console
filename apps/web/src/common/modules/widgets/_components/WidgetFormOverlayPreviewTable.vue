@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import {
-    computed, reactive, watch,
+    computed, onUnmounted, reactive, watch,
 } from 'vue';
 
 import bytes from 'bytes';
@@ -48,6 +48,7 @@ const storeState = reactive({
     loading: computed(() => widgetGenerateState.dataTableLoadLoading),
     dataTableUpdating: computed(() => widgetGenerateState.dataTableUpdating),
     selectedGranularity: computed(() => widgetGenerateState.selectedPreviewGranularity),
+    dataTableLoadFailed: computed(() => widgetGenerateState.dataTableLoadFailed),
     // reference
     project: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     workspace: computed(() => allReferenceStore.getters.workspace),
@@ -60,19 +61,39 @@ const state = reactive({
     labelFields: computed<string[]>(() => (storeState.loading ? [] : sortWidgetTableFields(Object.keys(storeState.selectedDataTable?.labels_info ?? {})))),
     dataFields: computed<string[]>(() => (storeState.loading ? [] : sortWidgetTableFields(Object.keys(storeState.selectedDataTable?.data_info ?? {})))),
     dataInfo: computed<DataInfo|undefined>(() => storeState.selectedDataTable?.data_info),
-    fields: computed<PreviewTableField[]>(() => [
-        ...state.labelFields.map((key) => ({ type: 'LABEL', name: key, sortKey: key })).filter((field) => {
-            const _granularity = storeState.selectedGranularity;
-            if (state.labelFields.some((d) => d === 'Year' || d === 'Month' || d === 'Date')) {
-                if (_granularity === GRANULARITY.DAILY && (field.name === 'Year' || field.name === 'Month')) return false;
-                if (_granularity === GRANULARITY.MONTHLY && (field.name === 'Year' || field.name === 'Day')) return false;
-                if (_granularity === GRANULARITY.YEARLY && (field.name === 'Month' || field.name === 'Day')) return false;
-            }
-            return true;
-        }),
-        { type: 'DIVIDER', name: '' },
-        ...state.dataFields.map((key) => ({ type: 'DATA', name: key })),
-    ]),
+    fields: computed<PreviewTableField[]>(() => {
+        if (!storeState.selectedDataTableId || !storeState.previewData?.results?.length) {
+            return [{
+                type: 'DIVIDER',
+                name: '',
+            }];
+        }
+
+        return [
+            ...state.labelFields.map((key) => ({
+                type: 'LABEL',
+                name: key,
+                sortKey: key,
+            }))
+                .filter((field) => {
+                    const _granularity = storeState.selectedGranularity;
+                    if (state.labelFields.some((d) => d === 'Year' || d === 'Month' || d === 'Date')) {
+                        if (_granularity === GRANULARITY.DAILY && (field.name === 'Year' || field.name === 'Month')) return false;
+                        if (_granularity === GRANULARITY.MONTHLY && (field.name === 'Year' || field.name === 'Day')) return false;
+                        if (_granularity === GRANULARITY.YEARLY && (field.name === 'Month' || field.name === 'Day')) return false;
+                    }
+                    return true;
+                }),
+            {
+                type: 'DIVIDER',
+                name: '',
+            },
+            ...state.dataFields.map((key) => ({
+                type: 'DATA',
+                name: key,
+            })),
+        ];
+    }),
     isSeparatedDataTable: computed(() => !Object.keys(storeState.selectedDataTable?.labels_info ?? {}).includes('Date')),
     sortBy: [] as { key: string; desc: boolean }[],
     granularityItems: computed<MenuItem[]>(() => ([
@@ -96,14 +117,24 @@ const state = reactive({
         padding: '0',
         width: '1px',
         'min-width': '1px',
-        backgroundColor: storeState.selectedDataTableId && !storeState.loading ? gray[900] : white,
+        backgroundColor: storeState.selectedDataTableId && storeState.previewData?.results?.length && !storeState.loading ? gray[900] : white,
     })),
     thisPage: 1,
 });
 
 const emptyState = reactive({
-    title: computed(() => i18n.t('COMMON.WIDGETS.PREVIEW_TABLE_EMPTY_TITLE')),
-    description: computed(() => i18n.t('COMMON.WIDGETS.PREVIEW_TABLE_EMPTY_DESC')),
+    isUnavailableDataTable: computed(() => storeState.selectedDataTable?.state === 'UNAVAILABLE'),
+    title: computed(() => {
+        if (!storeState.selectedDataTableId) return i18n.t('COMMON.WIDGETS.PREVIEW_TABLE_EMPTY_TITLE');
+        if (storeState.dataTableLoadFailed && emptyState.isUnavailableDataTable) return i18n.t('DASHBOARDS.WIDGET.DATA_TABLE_LOAD_INVALID_GLOBAL_VARIALBE_TITLE');
+        return '';
+    }),
+    description: computed(() => {
+        if (!storeState.selectedDataTableId) return i18n.t('COMMON.WIDGETS.PREVIEW_TABLE_EMPTY_DESC');
+        if (storeState.dataTableLoadFailed && emptyState.isUnavailableDataTable) return i18n.t('DASHBOARDS.WIDGET.DATA_TABLE_LOAD_INVALID_GLOBAL_VARIABLE_DESC');
+        if (!storeState.previewData?.results?.length) return i18n.t('DASHBOARDS.WIDGET.NO_DATA');
+        return '';
+    }),
 });
 /* Events */
 const handleSelectGranularity = async (granularity: Granularity) => {
@@ -184,10 +215,9 @@ const getSortIcon = (field: PreviewTableField) => {
 // };
 
 watch(() => storeState.selectedDataTableId, async (dataTableId) => {
-    if (dataTableId) {
-        state.thisPage = 1;
-        state.sortBy = [];
-    }
+    if (!dataTableId) return;
+    state.thisPage = 1;
+    state.sortBy = [];
     widgetGenerateStore.setDataTableUpdating(true);
     await widgetGenerateStore.loadDataTable({});
 }, { immediate: true });
@@ -197,6 +227,10 @@ watch(() => storeState.dataTableUpdating, () => {
         state.thisPage = 1;
         state.sortBy = [];
     }
+});
+
+onUnmounted(() => {
+    widgetGenerateStore.setDataTableLoadFailed(false);
 });
 
 </script>
@@ -269,12 +303,12 @@ watch(() => storeState.dataTableUpdating, () => {
                         <div class="preview-loader-contents">
                             <p-spinner size="xl" />
                             <span>
-                                Processing large amounts of data can take a while.
+                                {{ $t('DASHBOARDS.WIDGET.DATA_TABLE_LOAD_LOADING') }}
                             </span>
                         </div>
                     </p-empty>
                 </tr>
-                <template v-else-if="storeState.selectedDataTableId">
+                <template v-else-if="storeState.selectedDataTableId && storeState.previewData?.results?.length">
                     <tr v-for="(item, rowIdx) in storeState.previewData.results"
                         :key="`tr-preview-${rowIdx}`"
                         :data-index="rowIdx"
@@ -296,11 +330,11 @@ watch(() => storeState.dataTableUpdating, () => {
                     class="no-data-wrapper"
                 >
                     <p-empty class="preview-empty-contents">
-                        <template #image>
-                            <img src="@/assets/images/img_jellyocto-with-a-telescope.png"
-                                 alt="image-preview-data-empty"
-                            >
-                        </template>
+                        <!--                        <template #image>-->
+                        <!--                            <img src="@/assets/images/img_jellyocto-with-a-telescope.png"-->
+                        <!--                                 alt="image-preview-data-empty"-->
+                        <!--                            >-->
+                        <!--                        </template>-->
                         <template #default>
                             <p class="title">
                                 {{ emptyState.title }}
@@ -395,6 +429,7 @@ watch(() => storeState.dataTableUpdating, () => {
             .preview-empty-contents {
                 @apply text-paragraph-md;
                 padding: 2rem 0;
+                width: 100%;
                 .title {
                     @apply font-bold text-violet-300;
                 }

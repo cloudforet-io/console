@@ -1,10 +1,10 @@
 <script setup lang="ts">
-
 import { computed, reactive } from 'vue';
 
 import {
-    PIconButton, PI, PFieldGroup, PSelectButton, PTextInput, PButton, PTextarea, PButtonModal,
+    PIconButton, PI, PFieldGroup, PSelectButton, PTextInput, PButton, PTextarea, PButtonModal, PToggleButton, PLink, PFieldTitle,
 } from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import { i18n } from '@/translations';
@@ -13,15 +13,20 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import getRandomId from '@/lib/random-id-generator';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
+import WidgetFormDataTableGlobalVariableViewButton
+    from '@/common/modules/widgets/_components/WidgetFormDataTableGlobalVariableViewButton.vue';
 import { EVAL_EXPRESSION_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import type { EvalExpressions } from '@/common/modules/widgets/types/widget-data-table-type';
-import type { EvaluateExpressionType } from '@/common/modules/widgets/types/widget-model';
+
+
 
 interface Props {
     expressions: (EvalExpressions[]|string[]);
     isLegacyDataTable?: boolean;
 }
 
+const CONDITION_PLACEHOLDER = '{{ Product }} == \'A\' & {{ Provider }} == \'B\'';
+const FORMULA_PLACEHOLDER = '{{ Product }}';
 const props = defineProps<Props>();
 
 const emit = defineEmits<{ e: 'update:expressions'; value: EvalExpressions[]}>();
@@ -38,6 +43,7 @@ const state = reactive({
             label: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.TYPE_DATA_FIELD'),
         },
     ]),
+    globalVariablePopperVisible: false,
 });
 
 const modalState = reactive({
@@ -81,12 +87,12 @@ const handleCancelModal = () => {
     modalState.currentSelectionKey = undefined;
     modalState.currentSelectionName = undefined;
 };
-const handleChangeFieldType = (key: string, selected: EvaluateExpressionType) => {
+const handleChangeFieldValue = (key: string, fieldName: string, value) => {
     state.proxyExpressions = state.proxyExpressions.map((expression) => {
         if (expression.key === key) {
             return {
                 ...expression,
-                fieldType: selected,
+                [fieldName]: value,
             };
         }
         return expression;
@@ -103,6 +109,18 @@ const handleClickAddLabel = () => {
             isCollapsed: false,
         },
     ];
+};
+const handleToggleCondition = (key: string) => {
+    const targetExpression = state.proxyExpressions.find((d) => d.key === key);
+    if (!targetExpression) return;
+    if ('condition' in targetExpression) {
+        delete targetExpression.condition;
+        delete targetExpression.else;
+    } else {
+        targetExpression.condition = '';
+        targetExpression.else = '';
+    }
+    state.proxyExpressions = [...state.proxyExpressions];
 };
 </script>
 
@@ -148,7 +166,7 @@ const handleClickAddLabel = () => {
                                              :value="selectItem.name"
                                              style-type="secondary"
                                              :selected="expression.fieldType"
-                                             @change="handleChangeFieldType(expression.key, $event)"
+                                             @change="handleChangeFieldValue(expression.key, 'fieldType', $event)"
                             >
                                 {{ selectItem.label }}
                             </p-select-button>
@@ -162,14 +180,96 @@ const handleClickAddLabel = () => {
                                       block
                         />
                     </p-field-group>
-                    <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.FIELD_FORMULA')"
-                                   required
-                                   style-type="secondary"
-                    >
-                        <p-textarea v-model="expression.expression"
-                                    :placeholder="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.FORMULA_PLACEHOLDER')"
-                        />
-                    </p-field-group>
+                    <div>
+                        <div class="field-expression-title-wrapper">
+                            <p-field-title class="field-title"
+                                           size="sm"
+                                           color="gray"
+                            >
+                                <div class="field-title-wrapper">
+                                    <span>{{ $t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.FIELD_EXPRESSION') }}</span>
+                                    <div class="left-area">
+                                        <widget-form-data-table-global-variable-view-button />
+                                    </div>
+                                </div>
+                            </p-field-title>
+                        </div>
+                        <div class="field-expression-wrapper">
+                            <p-field-title size="sm"
+                                           color="gray"
+                                           required
+                                           class="use-condition-title"
+                                           :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.USE_CONDITION')"
+                            >
+                                <template #right>
+                                    <p-toggle-button :value="'condition' in expression"
+                                                     class="condition-toggle-button"
+                                                     @change-toggle="handleToggleCondition(expression.key)"
+                                    />
+                                </template>
+                            </p-field-title>
+                            <p-field-group v-if="'condition' in expression"
+                                           :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.CONDITION')"
+                                           style-type="secondary"
+                                           required
+                                           class="expression-form"
+                            >
+                                <template #label-extra>
+                                    <div class="condition-form-extra justify-between inline-flex">
+                                        <p-link href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.query.html"
+                                                :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                                                highlight
+                                                class="external-link"
+                                        >
+                                            Pandas Query
+                                        </p-link>
+                                    </div>
+                                </template>
+                                <p-textarea :value.sync="expression.condition"
+                                            :placeholder="CONDITION_PLACEHOLDER"
+                                            @update:value="handleChangeFieldValue(expression.key, 'condition', $event)"
+                                />
+                            </p-field-group>
+                            <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.FORMULA')"
+                                           style-type="secondary"
+                                           required
+                                           class="expression-form"
+                            >
+                                <template #label-extra>
+                                    <p-link href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.eval.html"
+                                            :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                                            highlight
+                                            class="external-link"
+                                    >
+                                        Pandas Eval
+                                    </p-link>
+                                </template>
+                                <p-textarea v-model="expression.expression"
+                                            :placeholder="FORMULA_PLACEHOLDER"
+                                />
+                            </p-field-group>
+                            <p-field-group v-if="'condition' in expression"
+                                           :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.ELSE')"
+                                           style-type="secondary"
+                                           required
+                                           class="expression-form"
+                            >
+                                <template #label-extra>
+                                    <p-link href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.eval.html"
+                                            :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                                            highlight
+                                            class="external-link"
+                                    >
+                                        Pandas Eval
+                                    </p-link>
+                                </template>
+                                <p-textarea :value="expression.else"
+                                            placeholder="'-'"
+                                            @update:value="handleChangeFieldValue(expression.key, 'else', $event)"
+                                />
+                            </p-field-group>
+                        </div>
+                    </div>
                 </div>
             </div>
         </template>
@@ -251,6 +351,49 @@ const handleClickAddLabel = () => {
 
         .form-body {
             padding: 0.5rem 0.5rem 0;
+
+            .field-expression-title-wrapper {
+                margin-bottom: 0.25rem;
+
+                /* custom design-system component - p-field-title */
+                :deep(.p-field-title) {
+                    .title {
+                        @apply flex;
+                        width: 100%;
+                    }
+                }
+                .field-title {
+                    @apply w-full;
+                    .field-title-wrapper {
+                        @apply flex w-full items-center;
+                        .left-area {
+                            @apply flex flex-1 items-center justify-end;
+                            width: 100%;
+                        }
+                    }
+                }
+            }
+
+            .field-expression-wrapper {
+                @apply bg-gray-100 rounded;
+                position: relative;
+                padding: 0.5rem;
+                .expression-form {
+                    @apply bg-white rounded;
+                    position: relative;
+                    padding: 0.5rem;
+                    .external-link {
+                        font-weight: normal;
+                    }
+                }
+                .use-condition-title {
+                    margin-bottom: 0.5rem;
+                }
+                .condition-toggle-button {
+                    right: 0.5rem;
+                    position: absolute;
+                }
+            }
         }
     }
     .add-field-button {

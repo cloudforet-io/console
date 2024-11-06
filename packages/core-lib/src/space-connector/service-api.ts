@@ -27,25 +27,20 @@ export default class ServiceAPI {
         this.setAxiosInterceptors();
     }
 
-    private handleResponseError = async (error: AxiosError): Promise<void> => {
-        switch (error.response?.status) {
-        case 400: {
+    private handleResponseError = (error: AxiosError): void => {
+        const status = error.response?.status;
+        if (status === 400) {
             throw new BadRequestError(error);
-        }
-        case 401: {
-            const res = await this.tokenApi.refreshAccessToken();
-            if (!res) throw new AuthenticationError(error);
-            else break;
-        }
-        case 403: {
+        } else if (status === 401) {
+            this.tokenApi.refreshAccessToken().then((res) => {
+                if (!res) throw new AuthenticationError(error);
+            });
+        } else if (status === 403) {
             throw new AuthorizationError(error);
-        }
-        case 404: {
+        } else if (status === 404) {
             throw new NotFoundError(error);
-        }
-        default: {
+        } else {
             throw new APIError(error);
-        }
         }
     };
 

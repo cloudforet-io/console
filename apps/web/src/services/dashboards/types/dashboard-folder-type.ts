@@ -18,7 +18,8 @@ export interface DashboardTreeDataType extends TreeData {
 export interface DashboardDataTableItem {
     id: string;
     name: string;
-    location?: string;
+    location?: string; // folder name
+    folderId?: string; // folder id
     type: 'DASHBOARD' | 'FOLDER';
     isFolderSelected?: boolean;
 }

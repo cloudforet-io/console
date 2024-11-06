@@ -146,7 +146,6 @@ watch(() => state.originParentGroupId, (_id?: string) => {
                 />
                 <p-radio :value="false"
                          :selected="state.selectProjectGroup"
-                         class="mt-2"
                          @change="state.selectProjectGroup = $event"
                 >
                     {{ props.isProject ? $t('PROJECT.LANDING.MODAL_MOVE_PROJECT_GROUP.NO_PROJECT_GROUP')
@@ -159,7 +158,6 @@ watch(() => state.originParentGroupId, (_id?: string) => {
 
 <style lang="postcss" scoped>
 .project-select-dropdown {
-    padding-bottom: 0.5rem;
     padding-left: 1.25rem;
 }
 </style>

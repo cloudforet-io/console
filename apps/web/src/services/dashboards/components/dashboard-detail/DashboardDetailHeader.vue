@@ -4,6 +4,7 @@ import { computed, reactive } from 'vue';
 import {
     PHeading, PSkeleton, PSelectDropdown, PI, PBadge, PHeadingLayout,
 } from '@cloudforet/mirinae';
+import type { BadgeStyleType, BadgeType } from '@cloudforet/mirinae/src/data-display/badge/type';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import type { DashboardScope } from '@/schema/dashboard/_types/dashboard-type';
@@ -17,8 +18,10 @@ import { gray } from '@/styles/colors';
 
 import DashboardControlButtons from '@/services/dashboards/components/dashboard-detail/DashboardControlButtons.vue';
 import DashboardLabelsButton from '@/services/dashboards/components/dashboard-detail/DashboardLabelsButton.vue';
+import { useDashboardControlMenuItems } from '@/services/dashboards/composables/use-dashboard-control-menu-items';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
+
 
 
 interface Props {
@@ -26,7 +29,6 @@ interface Props {
     templateName?: string;
 }
 const props = defineProps<Props>();
-
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailGetters = dashboardDetailStore.getters;
@@ -37,25 +39,33 @@ const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
 });
+const { getControlMenuItems } = useDashboardControlMenuItems({
+    isAdminMode: computed(() => storeState.isAdminMode),
+    isWorkspaceOwner: computed(() => storeState.isWorkspaceOwner),
+    dashboardList: computed(() => dashboardPageControlGetters.allDashboardItems),
+});
 const state = reactive({
-    loading: false,
-    isSharedDashboard: computed<boolean>(() => !!dashboardDetailState.dashboardInfo?.shared),
-    sharedScope: computed<DashboardScope|undefined>(() => dashboardDetailState.dashboardInfo?.scope),
+    isSharedDashboard: computed<boolean>(() => !!dashboardDetailGetters.dashboardInfo?.shared),
+    sharedScope: computed<DashboardScope|undefined>(() => dashboardDetailGetters.dashboardInfo?.scope),
     selectedSharedScope: 'WORKSPACE' as DashboardScope,
     showBadge: computed<boolean>(() => {
-        if (dashboardDetailState.dashboardInfo?.user_id) return true;
+        if (dashboardDetailGetters.dashboardInfo?.user_id) return true;
+        // TODO: is admin type dashboard, return true
         return state.isSharedDashboard;
     }),
-    badgeStyleType: computed<string>(() => {
-        if (dashboardDetailState.dashboardScope === 'PRIVATE') return 'gray150';
+    // TODO: is admin type dashboard, return 'solid-outline'
+    badgeType: computed<BadgeType>(() => 'subtle'),
+    badgeStyleType: computed<BadgeStyleType>(() => {
+        if (dashboardDetailGetters.isPrivate) return 'gray150';
         if (state.sharedScope === 'PROJECT') return 'primary3';
+        // TODO: is admin type dashboard, return 'indigo500'
         return 'indigo100';
     }),
     badgeText: computed(() => {
         if (dashboardDetailState.dashboardId?.startsWith('private')) return i18n.t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE');
         if (state.isSharedDashboard) {
             if (storeState.isAdminMode) {
-                if (dashboardDetailState.dashboardInfo?.scope === 'PROJECT') {
+                if (dashboardDetailGetters.dashboardInfo?.scope === 'PROJECT') {
                     return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
                 }
                 return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_WORKSPACES');
@@ -65,83 +75,6 @@ const state = reactive({
         }
         return '';
     }),
-    menuItems: computed<MenuItem[]>(() => {
-        if (dashboardDetailGetters.isDeprecatedDashboard) {
-            return [
-                {
-                    type: 'item',
-                    name: 'edit',
-                    label: i18n.t('DASHBOARDS.DETAIL.EDIT_DASHBOARD_NAME'),
-                    icon: 'ic_edit-text',
-                },
-                {
-                    type: 'item',
-                    name: 'delete',
-                    label: i18n.t('DASHBOARDS.DETAIL.DELETE'),
-                    icon: 'ic_delete',
-                },
-            ];
-        }
-        if (dashboardDetailGetters.disableManageButtons) {
-            return [{
-                type: 'item',
-                name: 'duplicate',
-                label: i18n.t('DASHBOARDS.DETAIL.CLONE'),
-                icon: 'ic_clone',
-            }];
-        }
-        let _shareMenuItems: MenuItem[] = [];
-        if (storeState.isAdminMode) {
-            _shareMenuItems = [{
-                type: 'item',
-                name: state.isSharedDashboard ? 'unshare' : 'share',
-                label: state.isSharedDashboard ? i18n.t('DASHBOARDS.DETAIL.UNSHARE_DASHBOARD') : i18n.t('DASHBOARDS.DETAIL.SHARE_DASHBOARD'),
-                icon: 'ic_share',
-            }];
-        } else if (dashboardDetailState.dashboardScope !== 'PRIVATE') {
-            _shareMenuItems = [{
-                type: 'item',
-                name: 'share',
-                label: state.isSharedDashboard ? i18n.t('DASHBOARDS.DETAIL.UNSHARE_FROM_ALL_PROJECTS') : i18n.t('DASHBOARDS.DETAIL.SHARE_TO_ALL_PROJECTS'),
-                icon: 'ic_share',
-            }];
-        }
-        return [
-            {
-                type: 'item',
-                name: 'edit',
-                label: i18n.t('DASHBOARDS.DETAIL.EDIT_DASHBOARD_NAME'),
-                icon: 'ic_edit-text',
-            },
-            {
-                type: 'item',
-                name: 'duplicate',
-                label: i18n.t('DASHBOARDS.DETAIL.CLONE'),
-                icon: 'ic_clone',
-            },
-            {
-                type: 'item',
-                name: 'move',
-                label: i18n.t('DASHBOARDS.DETAIL.MOVE'),
-                icon: 'ic_move',
-            },
-            { type: 'divider', name: 'divider' },
-            {
-                type: 'item',
-                name: 'shareWithCode',
-                label: i18n.t('DASHBOARDS.DETAIL.SHARE_WITH_CODE'),
-                icon: 'ic_share-code',
-            },
-            ..._shareMenuItems,
-            { type: 'divider', name: 'divider' },
-            {
-                type: 'item',
-                name: 'delete',
-                label: i18n.t('DASHBOARDS.DETAIL.DELETE'),
-                icon: 'ic_delete',
-            },
-        ];
-    }),
     folderName: computed<string|undefined>(() => {
         const _folderId = dashboardPageControlGetters.allDashboardItems.find((d) => d.dashboard_id === props.dashboardId)?.folder_id;
         const folder = dashboardPageControlGetters.allFolderItems.find((d) => d.folder_id === _folderId);
@@ -150,20 +83,13 @@ const state = reactive({
 });
 
 /* Event */
-const handleSelectItem = (selected: MenuItem) => {
-    if (selected.name === 'edit') dashboardDetailStore.setDashboardNameEditModalVisible(true);
-    if (selected.name === 'duplicate') dashboardDetailStore.setDashboardCloneModalVisible(true);
-    if (selected.name === 'shareWithCode') dashboardDetailStore.setShareWithCodeModalVisible(true);
-    if (selected.name === 'delete') dashboardDetailStore.setDashboardDeleteModalVisible(true);
-    if (selected.name === 'share') {
-        dashboardDetailStore.setDashboardShareModalType('SHARE');
-        dashboardDetailStore.setDashboardShareModalVisible(true);
-    }
-    if (selected.name === 'unshare') {
-        dashboardDetailStore.setDashboardShareModalType('UNSHARE');
-        dashboardDetailStore.setDashboardShareModalVisible(true);
-    }
-    if (selected.name === 'move') dashboardDetailStore.setFolderMoveModalVisible(true);
+const handleSelectItem = (item: MenuItem) => {
+    if (item.name === 'edit') dashboardPageControlStore.openEditNameModal(props.dashboardId);
+    if (item.name === 'clone') dashboardPageControlStore.openCloneModal(props.dashboardId);
+    if (item.name === 'move') dashboardPageControlStore.openMoveModal(props.dashboardId);
+    if (item.name === 'share') dashboardPageControlStore.openShareModal(props.dashboardId);
+    if (item.name === 'shareWithCode') dashboardPageControlStore.openShareWithCodeModal(props.dashboardId);
+    if (item.name === 'delete') dashboardPageControlStore.openDeleteModal(props.dashboardId);
 };
 </script>
 
@@ -181,17 +107,18 @@ const handleSelectItem = (selected: MenuItem) => {
         </div>
         <p-heading-layout class="mb-6">
             <template #heading>
-                <p-heading :title="dashboardDetailState.name">
-                    <p-skeleton v-if="!dashboardDetailState.name"
+                <p-heading :title="dashboardDetailGetters.dashboardName">
+                    <p-skeleton v-if="!dashboardDetailGetters.dashboardName"
                                 width="20rem"
                                 height="1.5rem"
                     />
                     <template #title-right-extra>
                         <p-badge v-if="state.showBadge"
-                                 badge-type="subtle"
+                                 :badge-type="state.badgeType"
                                  :style-type="state.badgeStyleType"
+                                 class="mr-2"
                         >
-                            <p-i v-if="dashboardDetailState.dashboardScope === 'PRIVATE'"
+                            <p-i v-if="dashboardDetailGetters.isPrivate"
                                  name="ic_lock-filled"
                                  width="0.75rem"
                                  height="0.75rem"
@@ -204,7 +131,7 @@ const handleSelectItem = (selected: MenuItem) => {
                                            style-type="tertiary-icon-button"
                                            button-icon="ic_ellipsis-horizontal"
                                            size="sm"
-                                           :menu="state.menuItems"
+                                           :menu="getControlMenuItems(props.dashboardId).value"
                                            :selected="[]"
                                            use-fixed-menu-style
                                            reset-selection-on-menu-close
@@ -221,7 +148,7 @@ const handleSelectItem = (selected: MenuItem) => {
             >
                 <dashboard-control-buttons v-if="!dashboardDetailGetters.disableManageButtons"
                                            :dashboard-id="props.dashboardId"
-                                           :name="dashboardDetailState.name"
+                                           :name="dashboardDetailGetters.dashboardName"
                 />
             </template>
         </p-heading-layout>

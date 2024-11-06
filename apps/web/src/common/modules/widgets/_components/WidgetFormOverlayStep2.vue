@@ -88,7 +88,7 @@ const state = reactive({
     //
     varsSnapshot: {} as DashboardVars,
     dashboardOptionsSnapshot: {} as DashboardOptions,
-    isSharedDashboard: computed<boolean>(() => !!dashboardDetailState.dashboardInfo?.shared && !storeState.isAdminMode),
+    isSharedDashboard: computed<boolean>(() => !!dashboardDetailGetters.dashboardInfo?.shared && !storeState.isAdminMode),
 });
 
 const {
@@ -111,11 +111,7 @@ const updateWidget = async () => {
         state: 'ACTIVE',
     });
     if (_isCreating) {
-        dashboardDetailStore.addWidgetToDashboardLayouts(widgetGenerateState.widgetId);
-        await dashboardStore.updateDashboard(dashboardDetailState.dashboardId as string, {
-            dashboard_id: dashboardDetailState.dashboardId,
-            layouts: dashboardDetailState.dashboardLayouts,
-        });
+        await dashboardStore.addWidgetToDashboard(dashboardDetailState.dashboardId || '', widgetGenerateState.widgetId);
     }
 };
 

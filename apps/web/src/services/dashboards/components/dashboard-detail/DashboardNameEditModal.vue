@@ -5,6 +5,7 @@ import {
 
 import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
+import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
@@ -13,7 +14,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 
 
 interface Props {
@@ -29,8 +30,8 @@ const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
 }>();
 
 const dashboardStore = useDashboardStore();
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
+const dashboardPageControlStore = useDashboardPageControlStore();
+const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const {
     forms: {
         _name,
@@ -43,7 +44,8 @@ const {
     _name: '',
 }, {
     _name(value: string) {
-        if (value === dashboardDetailState.name) return '';
+        if (state.loading) return '';
+        if (value === state.originName) return '';
         if (value.length > 100) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_LENGTH');
         if (!value.trim().length) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_INPUT');
         if (state.dashboardNameList.find((d) => d === value)) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_UNIQUE');
@@ -53,7 +55,14 @@ const {
 const state = reactive({
     loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
-    dashboardNameList: computed<string[]>(() => dashboardStore.getDashboardNameList(dashboardDetailState.dashboardType)),
+    originName: computed<string>(() => {
+        const _dashboard = dashboardPageControlGetters.allDashboardItems.find((item: DashboardModel) => item.dashboard_id === props.dashboardId);
+        return _dashboard?.name || '';
+    }),
+    dashboardNameList: computed<string[]>(() => {
+        if (props.dashboardId.startsWith('private')) return dashboardPageControlGetters.privateDashboardItems.map((d) => d.name);
+        return dashboardPageControlGetters.publicDashboardItems.map((d) => d.name);
+    }),
 });
 
 const updateDashboard = async () => {
@@ -70,8 +79,6 @@ const updateDashboard = async () => {
 const handleConfirm = async () => {
     state.loading = true;
     await updateDashboard();
-    dashboardDetailStore.setName(_name.value);
-    dashboardDetailStore.setOriginDashboardName(_name.value);
     state.proxyVisible = false;
     state.loading = false;
 };
@@ -81,7 +88,7 @@ const handleUpdateVisible = (visible) => {
 };
 
 watch(() => props.visible, (visible) => {
-    if (visible) setForm('_name', dashboardDetailState.name);
+    if (visible) setForm('_name', state.originName);
 }, { immediate: true });
 </script>
 
@@ -97,7 +104,7 @@ watch(() => props.visible, (visible) => {
         <template #body>
             <p-field-group :label="$t('DASHBOARDS.FORM.LABEL_DASHBOARD_NAME')"
                            :invalid="!state.loading && invalidState._name"
-                           :invalid-text="!state.loading && invalidTexts._name"
+                           :invalid-text="state.loading ? '' : invalidTexts._name"
                            required
             >
                 <template #default="{invalid}">

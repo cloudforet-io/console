@@ -2,6 +2,7 @@ import type {
     REFRESH_INTERVAL_OPTIONS_MAP,
     DASHBOARD_TYPE,
 } from '@/schema/dashboard/_constants/dashboard-constant';
+import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
 import type {
     InheritOptions, WidgetOptions, WidgetSize,
 } from '@/schema/dashboard/_types/widget-type';
@@ -67,6 +68,10 @@ export interface DashboardVariablesSchema {
     fixed_options?: Record<string, any>;
 }
 
+export interface DashboardGlobalVariablesSchema {
+    properties: Record<string, DashboardGlobalVariable>;
+}
+
 // dashboard variables types
 export type DashboardVariables = SingleSelectDashboardVariables | MultiSelectDashboardVariables;
 interface SingleSelectDashboardVariables {
@@ -89,6 +94,8 @@ export interface DateRange {
     end?: string;
 }
 
+export type AdminDashboardType = 'WORKSPACE'|'ADMIN';
+
 // dashboard template types
 export interface DashboardTemplate {
     name: string;
@@ -102,7 +109,7 @@ export interface DashboardTemplate {
     template_type: TemplateType;
 }
 
-export type DashboardVars = Record<string, string[]>;
+export type DashboardVars = Record<string, string[]|number[]|string|number>;
 
 export interface DashboardLayout {
     name?: string;

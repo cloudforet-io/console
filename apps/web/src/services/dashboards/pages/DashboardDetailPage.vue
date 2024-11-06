@@ -3,14 +3,12 @@ import {
     computed,
     onUnmounted, reactive, ref, watch,
 } from 'vue';
-import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
     PDivider, PI,
 } from '@cloudforet/mirinae';
 
 import { SpaceRouter } from '@/router';
-import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
@@ -23,25 +21,17 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 
-import DashboardCloneModal from '@/services/dashboards/components/dashboard-detail/DashboardCloneModal.vue';
 import DashboardDetailHeader from '@/services/dashboards/components/dashboard-detail/DashboardDetailHeader.vue';
-import DashboardFolderSingleMoveModal
-    from '@/services/dashboards/components/dashboard-detail/DashboardFolderSingleMoveModal.vue';
-import DashboardNameEditModal from '@/services/dashboards/components/dashboard-detail/DashboardNameEditModal.vue';
 import DashboardRefreshDropdown from '@/services/dashboards/components/dashboard-detail/DashboardRefreshDropdown.vue';
-import DashboardShareModal from '@/services/dashboards/components/dashboard-detail/DashboardShareModal.vue';
-import DashboardShareWithCodeModal
-    from '@/services/dashboards/components/dashboard-detail/DashboardShareWithCodeModal.vue';
 import DashboardToolsetDateDropdown from '@/services/dashboards/components/dashboard-detail/DashboardToolsetDateDropdown.vue';
+import DashboardToolsetScope from '@/services/dashboards/components/dashboard-detail/DashboardToolsetScope.vue';
 import DashboardVariablesV2 from '@/services/dashboards/components/dashboard-detail/DashboardVariablesV2.vue';
 import DashboardWidgetContainerV2 from '@/services/dashboards/components/dashboard-detail/DashboardWidgetContainerV2.vue';
-import DashboardDeleteModal from '@/services/dashboards/components/DashboardDeleteModal.vue';
 import DashboardVariables from '@/services/dashboards/components/legacy/DashboardVariables.vue';
 import DashboardWidgetContainer from '@/services/dashboards/components/legacy/DashboardWidgetContainer.vue';
-import { DASHBOARD_SCOPE } from '@/services/dashboards/constants/dashboard-constant';
-import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+
 
 
 interface Props {
@@ -56,8 +46,6 @@ const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardDetailState = dashboardDetailStore.state;
 const widgetGenerateStore = useWidgetGenerateStore();
 const { breadcrumbs } = useBreadcrumbs();
-const router = useRouter();
-const route = useRoute();
 
 const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
@@ -65,28 +53,6 @@ const widgetContainerRef = ref<typeof DashboardWidgetContainer|null>(null);
 
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    templateName: computed(() => DASHBOARD_TEMPLATES[dashboardDetailState.templateId]?.name),
-    dashboardScope: computed(() => dashboardDetailState.dashboardScope),
-    dashboardMiddleRouteLabel: computed(() => {
-        if (state.dashboardScope === DASHBOARD_SCOPE.WORKSPACE) return i18n.t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE');
-        if (state.dashboardScope === DASHBOARD_SCOPE.PROJECT) return i18n.t('DASHBOARDS.ALL_DASHBOARDS.SINGLE_PROJECT');
-        if (state.dashboardScope === DASHBOARD_SCOPE.PRIVATE) return i18n.t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE');
-        return '';
-    }),
-    dashboardCustomBreadcrumbs: computed(() => {
-        const _breadcrumbs = breadcrumbs.value;
-        const customMiddleRoute = router.match({
-            name: DASHBOARDS_ROUTE._NAME,
-            params: { workspaceId: route.params.workspaceId },
-            query: { scope: state.dashboardScope },
-        });
-        if (state.isAdminMode) return _breadcrumbs;
-        const dashboardMiddleRoute = {
-            name: state.dashboardMiddleRouteLabel,
-            to: { path: customMiddleRoute.fullPath },
-        };
-        return [_breadcrumbs[0], dashboardMiddleRoute, _breadcrumbs[1]];
-    }),
     favoriteOptions: computed<FavoriteOptions>(() => ({
         type: FAVORITE_TYPE.DASHBOARD,
         id: props.dashboardId,
@@ -105,7 +71,7 @@ const getDashboardData = async (dashboardId: string) => {
 
 /* Event */
 const handleRefresh = async () => {
-    if (dashboardDetailState.dashboardInfo?.version !== '1.0') await dashboardDetailStore.listDashboardWidgets();
+    if (dashboardDetailGetters.dashboardInfo?.version !== '1.0') await dashboardDetailStore.listDashboardWidgets();
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     if (widgetContainerRef.value) widgetContainerRef.value.refreshAllWidget();
@@ -113,8 +79,7 @@ const handleRefresh = async () => {
 const handleUpdateDashboardVariables = async (params) => {
     state.dashboardVariablesLoading = true;
     try {
-        const updatedDashboard = await dashboardStore.updateDashboard(props.dashboardId, params);
-        dashboardDetailStore.setDashboardInfo(updatedDashboard);
+        await dashboardStore.updateDashboard(props.dashboardId, params);
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {
@@ -129,7 +94,7 @@ watch(() => props.dashboardId, async (dashboardId, prevDashboardId) => {
     }
     await getDashboardData(dashboardId);
     // Set Dashboard Detail Custom breadcrumbs
-    gnbStore.setBreadcrumbs(state.dashboardCustomBreadcrumbs);
+    gnbStore.setBreadcrumbs(breadcrumbs.value);
 }, { immediate: true });
 
 watch(() => state.favoriteOptions, (favoriteOptions) => {
@@ -164,17 +129,20 @@ onUnmounted(() => {
                     </p>
                 </div>
             </div>
-            <dashboard-detail-header :dashboard-id="props.dashboardId"
-                                     :template-name="state.templateName"
-            />
+            <dashboard-detail-header :dashboard-id="props.dashboardId" />
             <p-divider class="divider" />
         </div>
         <div class="filter-box">
-            <dashboard-toolset-date-dropdown :date-range="dashboardDetailState.options.date_range" />
-            <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
-                                        :loading="dashboardDetailState.loadingWidgets"
-                                        @refresh="handleRefresh"
-            />
+            <div class="left-part">
+                <dashboard-toolset-date-dropdown :date-range="dashboardDetailState.options.date_range" />
+                <dashboard-toolset-scope v-if="state.isAdminMode" />
+            </div>
+            <div class="right-part">
+                <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
+                                            :loading="dashboardDetailState.loadingWidgets"
+                                            @refresh="handleRefresh"
+                />
+            </div>
         </div>
         <div class="dashboard-selectors">
             <dashboard-variables v-if="dashboardDetailGetters.isDeprecatedDashboard"
@@ -195,23 +163,6 @@ onUnmounted(() => {
         />
         <dashboard-widget-container-v2 v-else
                                        ref="widgetContainerRef"
-        />
-        <!-- Modals -->
-        <dashboard-name-edit-modal :visible.sync="dashboardDetailState.dashboardNameEditModalVisible"
-                                   :dashboard-id="props.dashboardId"
-        />
-        <dashboard-clone-modal :visible.sync="dashboardDetailState.dashboardCloneModalVisible" />
-        <dashboard-folder-single-move-modal :dashboard-id="props.dashboardId"
-                                            :visible.sync="dashboardDetailState.folderMoveModalVisible"
-        />
-        <dashboard-share-with-code-modal :visible.sync="dashboardDetailState.shareWithCodeModalVisible"
-                                         :dashboard-id="props.dashboardId"
-        />
-        <dashboard-share-modal :visible.sync="dashboardDetailState.dashboardShareModalVisible"
-                               :dashboard-id="props.dashboardId"
-        />
-        <dashboard-delete-modal :visible.sync="dashboardDetailState.dashboardDeleteModalVisible"
-                                :dashboard-id="props.dashboardId"
         />
     </div>
 </template>
@@ -250,6 +201,19 @@ onUnmounted(() => {
     }
     .filter-box {
         @apply flex justify-between items-start mb-4;
+        flex-wrap: wrap;
+        row-gap: 0.25rem;
+        .left-part {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            column-gap: 1rem;
+        }
+        .right-part {
+            display: flex;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
     }
     .dashboard-selectors {
         padding-bottom: 1.25rem;

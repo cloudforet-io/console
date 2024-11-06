@@ -224,18 +224,11 @@ watch(() => state.selectedRepository, (repository) => {
         @apply flex flex-col;
         gap: 0.75rem;
         margin-bottom: 1.625rem;
-
-        .provider-item {
-            margin-bottom: 0.5rem;
-        }
     }
 
     .repository {
         @apply flex flex-col;
         gap: 0.75rem;
-        .repository-item {
-            margin-bottom: 0.5rem;
-        }
     }
     .radio-container {
         height: calc(100vh - 17rem);

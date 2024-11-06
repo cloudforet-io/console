@@ -1,5 +1,6 @@
 import type { Tags } from '@/schema/_common/model';
 import type {
+    DashboardGlobalVariablesSchema,
     DashboardOptions, DashboardVariables, DashboardVariablesSchema,
     DashboardVars,
 } from '@/schema/dashboard/_types/dashboard-type';
@@ -13,6 +14,7 @@ export interface PrivateDashboardCreateParameters {
     layouts?: SharedDashboardLayout[];
     options?: DashboardOptions;
     vars?: DashboardVars;
+    vars_schema?: DashboardGlobalVariablesSchema;
     variables?: DashboardVariables;
     variables_schema?: DashboardVariablesSchema;
     labels?: string[];

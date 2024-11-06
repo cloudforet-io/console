@@ -28,6 +28,7 @@ interface Props {
 }
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
+    dashboardId: '',
 });
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 }>();
@@ -91,6 +92,7 @@ const handleFormConfirm = async () => {
 watch(() => state.proxyVisible, (visible) => {
     if (!visible) {
         state.selectedFolderId = '';
+        dashboardPageControlStore.reset();
     } else {
         const _folderId = dashboardPageControlGetters.allDashboardItems.find((d) => d.dashboard_id === props.dashboardId)?.folder_id;
         if (_folderId) state.selectedFolderId = _folderId;
