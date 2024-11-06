@@ -472,7 +472,7 @@ defineExpose({
                 </template>
             </div>
         </p-data-loader>
-        <div v-if="!dashboardDetailState.loadingDashboard && !state.refinedWidgetInfoList?.length"
+        <div v-if="!(dashboardDetailState.loadingDashboard || state.widgetLoading) && !state.refinedWidgetInfoList?.length"
              class="no-data-wrapper"
         >
             <p-empty show-image
