@@ -123,14 +123,15 @@ const state = reactive({
 });
 
 const emptyState = reactive({
+    isUnavailableDataTable: computed(() => storeState.selectedDataTable?.state === 'UNAVAILABLE'),
     title: computed(() => {
         if (!storeState.selectedDataTableId) return i18n.t('COMMON.WIDGETS.PREVIEW_TABLE_EMPTY_TITLE');
-        if (storeState.dataTableLoadFailed) return i18n.t('DASHBOARDS.WIDGET.DATA_TABLE_LOAD_INVALID_GLOBAL_VARIALBE_TITLE');
+        if (storeState.dataTableLoadFailed && emptyState.isUnavailableDataTable) return i18n.t('DASHBOARDS.WIDGET.DATA_TABLE_LOAD_INVALID_GLOBAL_VARIALBE_TITLE');
         return '';
     }),
     description: computed(() => {
         if (!storeState.selectedDataTableId) return i18n.t('COMMON.WIDGETS.PREVIEW_TABLE_EMPTY_DESC');
-        if (storeState.dataTableLoadFailed) return i18n.t('DASHBOARDS.WIDGET.DATA_TABLE_LOAD_INVALID_GLOBAL_VARIABLE_DESC');
+        if (storeState.dataTableLoadFailed && emptyState.isUnavailableDataTable) return i18n.t('DASHBOARDS.WIDGET.DATA_TABLE_LOAD_INVALID_GLOBAL_VARIABLE_DESC');
         if (!storeState.previewData?.results?.length) return i18n.t('DASHBOARDS.WIDGET.NO_DATA');
         return '';
     }),
