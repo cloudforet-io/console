@@ -147,7 +147,7 @@ export default class TokenAPI {
         if (VERBOSE) {
             console.debug(`TokenAPI.checkToken: tokenExpirationTime - currentTime: ${tokenExpirationTime - currentTime}`);
         }
-        return (tokenExpirationTime - currentTime) > 600; // initial difference between token expiration time and current time is 600 seconds
+        return (tokenExpirationTime - currentTime) > 10; // initial difference between token expiration time and current time is 10 seconds
     }
 
     static getTokenExpirationTime(token?: string): number {
