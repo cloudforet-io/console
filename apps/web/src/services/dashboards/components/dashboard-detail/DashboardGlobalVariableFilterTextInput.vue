@@ -71,7 +71,7 @@ const changeVariables = (changedSelected?: string) => {
 watch(() => dashboardDetailGetters.dashboardVarsSchemaProperties, (varsSchema, prevVarsSchema) => {
     const _variable = props.variable as TextAnyVariable;
     if (isEqual(varsSchema[_variable.key], prevVarsSchema?.[_variable.key])) return;
-    state.value = (dashboardDetailGetters.dashboardInfo.vars[_variable.key] as string) || _variable.options?.defaultValue;
+    state.value = dashboardDetailGetters.dashboardInfo?.vars?.[_variable.key] || _variable.options?.defaultValue;
     changeVariables(state.value);
 }, { immediate: true });
 
