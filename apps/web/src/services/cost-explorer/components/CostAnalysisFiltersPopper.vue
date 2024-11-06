@@ -36,7 +36,7 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 import { getWorkspaceInfo } from '@/services/advanced/composables/refined-table-data';
 import CostAnalysisFiltersAddMoreButton
     from '@/services/cost-explorer/components/CostAnalysisFiltersAddMoreButton.vue';
-import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
+import { GROUP_BY, UNIFIED_COST_KEY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
@@ -85,8 +85,9 @@ const state = reactive({
             return { name: d, label: d };
         });
     }),
+    isUnifiedCost: computed(() => costAnalysisPageGetters.selectedDataSourceId === UNIFIED_COST_KEY),
     primaryCostOptions: computed<Record<string, any>>(() => ({
-        data_source_id: costAnalysisPageGetters.selectedDataSourceId,
+        ...(!state.isUnifiedCost && { data_source_id: costAnalysisPageGetters.selectedDataSourceId }),
     })),
     selectedItemsMap: {} as Record<string, SelectDropdownMenuItem[]>,
     handlerMap: computed(() => {
