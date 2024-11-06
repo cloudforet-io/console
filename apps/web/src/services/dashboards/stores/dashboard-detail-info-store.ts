@@ -224,6 +224,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             console.error('setDashboardInfo failed', dashboardInfo);
             return;
         }
+        state.vars = dashboardInfo.vars ?? {};
         const _dashboardInfo = cloneDeep(dashboardInfo);
         state.dashboardId = _dashboardInfo.dashboard_id;
         state.options = {
@@ -233,7 +234,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             },
             refresh_interval_option: _dashboardInfo.options?.refresh_interval_option ?? DEFAULT_REFRESH_INTERVAL,
         };
-        setVars(_dashboardInfo.vars ?? {});
     };
     const _setDashboardInfoStoreState = (dashboardInfo?: DashboardModel) => {
         if (!dashboardInfo || isEmpty(dashboardInfo)) {
