@@ -43,6 +43,14 @@ export const MENU_LIST: Menu[] = [
         ],
     },
     {
+        id: MENU_ID.ITSM,
+        needPermissionByRole: true,
+        subMenuList: [
+            { id: MENU_ID.ITSM_LANDING },
+            { id: MENU_ID.BOARD },
+        ],
+    },
+    {
 
         id: MENU_ID.IAM,
         needPermissionByRole: true,
@@ -96,6 +104,13 @@ export const ADMIN_MENU_LIST: Menu[] = [
             { id: MENU_ID.COST_REPORT },
             { id: MENU_ID.DATA_SOURCES },
             { id: MENU_ID.COST_ADVANCED_SETTINGS },
+        ],
+    },
+    {
+        id: MENU_ID.ITSM,
+        subMenuList: [
+            { id: MENU_ID.TASK_MANAGEMENT },
+            { id: MENU_ID.WORKFLOW },
         ],
     },
     {

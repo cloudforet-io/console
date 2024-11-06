@@ -8,6 +8,7 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
+import { ITSM_ROUTE } from '@/services/itsm/routes/route-constant';
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
@@ -255,5 +256,41 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         routeName: INFO_ROUTE.NOTICE._NAME,
         translationId: 'MENU.INFO_NOTICE',
         icon: 'ic_gnb_bell',
+    },
+    [MENU_ID.ITSM]: {
+        menuId: MENU_ID.ITSM,
+        routeName: ITSM_ROUTE._NAME,
+        translationId: 'ITSM', // TODO: change translation id
+        icon: 'ic_gnb_bell', // TODO: change icon
+    },
+    [MENU_ID.ITSM_LANDING]: {
+        menuId: MENU_ID.ITSM_LANDING,
+        routeName: ITSM_ROUTE.ITSM_LANDING._NAME,
+        translationId: 'Support Center', // TODO: change translation id
+        icon: 'ic_gnb_bell', // TODO: change icon
+    },
+    [MENU_ID.BOARD]: {
+        menuId: MENU_ID.BOARD,
+        routeName: ITSM_ROUTE.BOARD._NAME,
+        translationId: 'Board', // TODO: change translation id
+        icon: 'ic_gnb_bell', // TODO: change icon
+    },
+    [MENU_ID.BOARD]: {
+        menuId: MENU_ID.BOARD,
+        routeName: ITSM_ROUTE.BOARD._NAME,
+        translationId: 'Board', // TODO: change translation id
+        icon: 'ic_gnb_bell', // TODO: change icon
+    },
+    [MENU_ID.WORKFLOW]: {
+        menuId: MENU_ID.WORKFLOW,
+        routeName: ITSM_ROUTE.WORKFLOW._NAME,
+        translationId: 'Workflow', // TODO: change translation id
+        icon: 'ic_gnb_bell', // TODO: change icon
+    },
+    [MENU_ID.TASK_MANAGEMENT]: {
+        menuId: MENU_ID.TASK_MANAGEMENT,
+        routeName: ITSM_ROUTE.TASK_MANAGEMENT._NAME,
+        translationId: 'Task Management', // TODO: change translation id
+        icon: 'ic_gnb_bell', // TODO: change icon
     },
 });
