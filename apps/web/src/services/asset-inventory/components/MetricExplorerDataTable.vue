@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, reactive, watch, watchEffect,
+} from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import bytes from 'bytes';
@@ -15,6 +17,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PTextPagination, PToolboxTable } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import { byteFormatter, numberFormatter } from '@cloudforet/utils';
+
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { MetricDataAnalyzeParameters } from '@/schema/inventory/metric-data/api-verbs/analyze';
@@ -44,6 +47,7 @@ import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-refe
 import {
     useAllReferenceTypeInfoStore,
 } from '@/services/dashboards/stores/all-reference-type-info-store';
+
 
 
 const DATE_FORMAT_MAP = {
@@ -168,10 +172,15 @@ const setDataTableData = async () => {
     state.loading = true;
     const res = await analyzeMetricData();
     if (!res) return;
+    console.log(state.realtimeDate);
     state.items = getRefinedAssetAnalysisTableData(res.results, metricExplorerPageState.granularity, metricExplorerPageState.period ?? {}, state.realtimeDate);
     state.more = res.more;
     state.loading = false;
 };
+
+watchEffect(() => {
+    console.log(state.items);
+});
 
 /* Event */
 const handleChange = async (options: any = {}) => {
@@ -299,6 +308,18 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
             <span v-else>
                 {{ getRefinedColumnValue(field, value) }}
             </span>
+        </template>
+        <template #tf-col-format="{values}">
+            <tr v-if="Array.isArray(values) && values.length > 0">
+                <td>Total</td>
+                <td v-for="(value, i) in values.slice(1)"
+                    :key="`tf-col-${i}`"
+                    class="right"
+                >
+                    <span v-if="value.field.name !== 'Provider' && value.field.name !== 'Cloud Service Group' && value.field.name !== 'Cloud Service Type'">{{ value.val }}</span>
+                    <span v-else>{{ }}</span>
+                </td>
+            </tr>
         </template>
     </p-toolbox-table>
 </template>

@@ -65,6 +65,7 @@ export const getRefinedAssetAnalysisTableData = (results: MetricDataAnalyzeResul
         _results
             .filter((d) => d.date === realtimeDate)
             .forEach((d) => {
+                console.log('dsjfl;sdkjf', d);
                 refinedTableData.push({
                     ...d,
                     count: [
