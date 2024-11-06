@@ -101,6 +101,9 @@ export default class TokenAPI {
                 let scope = 'USER';
                 let workspaceId: string|undefined;
                 if (this.accessToken) {
+                    if (VERBOSE) {
+                        console.debug('TokenAPI.refreshAccessToken: has access token: ', jwtDecode(this.accessToken));
+                    }
                     const { rol, wid } = jwtDecode<JwtPayload&{rol: string, wid: string}>(this.accessToken);
                     if (rol === 'SYSTEM_ADMIN') scope = 'SYSTEM';
                     if (rol === 'DOMAIN_ADMIN') scope = 'DOMAIN';
@@ -111,12 +114,10 @@ export default class TokenAPI {
                 const response: AxiosPostResponse = await this.refreshInstance.post(REFRESH_URL, {
                     grant_type: 'REFRESH_TOKEN', token: this.refreshToken, scope, workspaceId,
                 });
-                this.setToken(response.data.access_token);
                 if (VERBOSE) {
-                    const decoded = jwtDecode<JwtPayload&{ttl: number}>(response.data.refresh_token);
-                    console.debug('TokenAPI.refreshAccessToken: success');
-                    console.debug(`TokenAPI.refreshAccessToken: new refresh token ttl: ${decoded.ttl}`);
+                    console.debug('TokenAPI.refreshAccessToken: response: ', response);
                 }
+                this.setToken(response.data.access_token);
                 return true;
             } catch (e) {
                 if (VERBOSE) {
