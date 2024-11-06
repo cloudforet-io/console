@@ -63,12 +63,16 @@ export default class TokenAPI {
     }
 
     setToken(accessToken: string, refreshToken?: string): void {
-        this.accessToken = accessToken;
-        if (refreshToken) {
-            this.refreshToken = refreshToken;
-            LocalStorageAccessor.setItem(REFRESH_TOKEN_KEY, refreshToken);
+        try {
+            this.accessToken = accessToken;
+            if (refreshToken) {
+                this.refreshToken = refreshToken;
+                LocalStorageAccessor.setItem(REFRESH_TOKEN_KEY, refreshToken);
+            }
+            TokenAPI.unsetRefreshingState();
+        } catch (e) {
+            console.error(e);
         }
-        TokenAPI.unsetRefreshingState();
     }
 
     getRefreshToken(): string|undefined|null {
@@ -155,6 +159,9 @@ export default class TokenAPI {
         if (token) {
             try {
                 const decodedToken = jwtDecode<JwtPayload>(token);
+                if (VERBOSE) {
+                    console.debug(`TokenAPI.getTokenExpirationTime: decodedToken.exp: ${decodedToken.exp}`);
+                }
                 return decodedToken.exp ?? -1;
             } catch (e) {
                 console.error(`Decode token error: ${e}`);
