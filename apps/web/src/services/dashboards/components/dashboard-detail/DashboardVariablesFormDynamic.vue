@@ -73,6 +73,7 @@ const state = reactive({
             const _resourceType = state.selectedSourceFrom === 'asset' ? MetricDataVariableModel.meta.resourceType : CostVariableModel.meta.resourceType;
             return {
                 method: 'dynamic',
+                type: 'reference',
                 reference: {
                     resourceType: _resourceType,
                     dataSourceId: state.selectedCostDataSourceId || state.selectedMetricId,
@@ -85,6 +86,7 @@ const state = reactive({
         }
         return {
             method: 'dynamic',
+            type: 'reference',
             reference: {
                 resourceType: state.selectedSourceFrom,
             },
@@ -108,6 +110,12 @@ const state = reactive({
     selectedSourceFrom: 'asset' as string|undefined,
     selectedValuesFrom: undefined as string|undefined,
     selectedSelectionType: 'single' as SelectionType,
+    disableValuesFrom: computed<boolean>(() => {
+        if (!state.selectedSourceFrom) return true;
+        if (state.selectedSourceFrom === 'asset' && !state.selectedMetricId) return true;
+        if (state.selectedSourceFrom === 'cost' && !state.selectedCostDataSourceId) return true;
+        return false;
+    }),
     /* Asset */
     // category
     categoryMenuItems: computed<MenuItem[]>(() => {
@@ -357,6 +365,7 @@ watch(() => props.originalData, (originalData) => {
         >
             <p-select-dropdown :selected="state.selectedValuesFrom"
                                :menu="state.valuesFromMenuItems"
+                               :disabled="state.disableValuesFrom"
                                use-fixed-menu-style
                                class="w-1/2"
                                @select="handleChangeValuesFrom"
