@@ -98,7 +98,7 @@ const advancedOptionsState = reactive({
         // { label: 'Day', name: 'days' },
     ]),
     timeDiffDateMap: computed<Record<string, SelectDropdownMenuItem[]>>(() => ({
-        years: range(3).map((i) => ({
+        years: range(2).map((i) => ({
             label: i === 0 ? 'Last 1 Year' : `Last ${i + 1} Years`,
             name: String(i + 1),
         })),
