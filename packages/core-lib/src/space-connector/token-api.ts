@@ -15,7 +15,7 @@ const REFRESH_TOKEN_KEY = 'spaceConnector/refreshToken';
 const REFRESH_URL = '/identity/token/grant';
 const IS_REFRESHING_KEY = 'spaceConnector/isRefreshing';
 
-const VERBOSE = false;
+const VERBOSE = true;
 
 export default class TokenAPI {
     private static instance: TokenAPI;
