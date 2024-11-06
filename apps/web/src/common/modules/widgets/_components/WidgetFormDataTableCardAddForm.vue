@@ -362,13 +362,11 @@ watch([
                 <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.TIME_DIFF')">
                     <div class="time-diff-dropdown-wrapper">
                         <p-select-dropdown class="time-diff-dropdown"
-                                           use-fixed-menu-style
                                            :menu="advancedOptionsState.timeDiffList"
                                            :selected="advancedOptionsState.proxySelectedTimeDiff"
                                            @update:selected="handleClickTimeDiff"
                         />
                         <p-select-dropdown class="time-diff-date-dropdown"
-                                           use-fixed-menu-style
                                            :disabled="advancedOptionsState.proxySelectedTimeDiff === 'none'"
                                            :menu="advancedOptionsState.timeDiffDateMap[advancedOptionsState.proxySelectedTimeDiff] || []"
                                            :selected="advancedOptionsState.proxySelectedTimeDiffDate"

@@ -3,10 +3,14 @@ import {
     computed, onMounted, onUnmounted, reactive, ref,
 } from 'vue';
 
+import { orderBy } from 'lodash';
+
 import {
     PI, PTooltip, PButton,
 } from '@cloudforet/mirinae';
 
+import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
+import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -27,12 +31,13 @@ const dataTableContentsRef = ref<HTMLElement|null>(null);
 const dataTableCardRef = ref<WidgetFormDataTableCard[]>([]);
 
 const storeState = reactive({
-    dataTables: computed(() => widgetGenerateState.dataTables),
+    dataTables: computed<Partial<PublicDataTableModel|PrivateDataTableModel>[]>(() => widgetGenerateState.dataTables),
     selectedDataTable: computed(() => widgetGenerateGetters.selectedDataTable),
     allDataTableInvalid: computed(() => widgetGenerateGetters.allDataTableInvalid),
 });
 
 const displayState = reactive({
+    dataTablesSortedByCreatedAt: computed<Partial<PublicDataTableModel|PrivateDataTableModel>[]>(() => orderBy(storeState.dataTables ?? [], ['created_at'], ['asc'])),
     dataTableAreaOpen: true,
     tableAreaHeight: (dataTableContentsRef.value?.clientHeight || 1000) / 4.5,
     minHeight: 32,
@@ -135,7 +140,7 @@ onMounted(async () => {
             <div class="data-table-area">
                 <div class="data-table-scroll-wrapper">
                     <div class="data-table-contents-wrapper">
-                        <widget-form-data-table-card v-for="(dataTable, index) in storeState.dataTables"
+                        <widget-form-data-table-card v-for="(dataTable, index) in displayState.dataTablesSortedByCreatedAt"
                                                      :ref="el => dataTableCardRef[index] = el"
                                                      :key="`data-table-${dataTable.data_table_id}`"
                                                      :item="dataTable"
