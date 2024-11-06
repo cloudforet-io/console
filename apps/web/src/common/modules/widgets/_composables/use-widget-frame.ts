@@ -30,6 +30,7 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-c
 import type { MetricFilter } from '@/services/asset-inventory/types/asset-analysis-type';
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
+import { DASHBOARD_VARS_SCHEMA_PRESET_KEYS } from '@/services/dashboards/constants/dashboard-vars-schema-preset';
 
 
 
@@ -98,7 +99,8 @@ const getFullDataLocation = (dataTable: DataTableModel, widgetOptions?: Record<W
         ...convertConsoleFiltersToMetricFilter(dataTable?.options?.filter ?? []),
         ...dashboardVars,
     };
-    const _filter = dataTable?.source_type === DATA_SOURCE_DOMAIN.COST ? _costFilters : _assetFilters;
+    const _filters = dataTable?.source_type === DATA_SOURCE_DOMAIN.COST ? _costFilters : _assetFilters;
+    const _refinedFilters = _filters.filter((d) => DASHBOARD_VARS_SCHEMA_PRESET_KEYS.includes(d.k));
 
     const _dateRange: DateRange = cloneDeep(dateRange);
     if (!_dateRange?.start) _dateRange.start = dateRange?.end;
@@ -106,7 +108,7 @@ const getFullDataLocation = (dataTable: DataTableModel, widgetOptions?: Record<W
         granularity: primitiveToQueryString(_granularity),
         group_by: arrayToQueryString(_groupBy),
         period: objectToQueryString(_dateRange),
-        filters: arrayToQueryString(_filter),
+        filters: arrayToQueryString(_refinedFilters),
     };
     if (dataTable?.source_type === DATA_SOURCE_DOMAIN.COST) {
         const _costDataSourceId = dataTable?.options?.[DATA_SOURCE_DOMAIN.COST]?.data_source_id;

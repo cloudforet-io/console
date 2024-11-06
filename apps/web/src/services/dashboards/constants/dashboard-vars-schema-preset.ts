@@ -45,3 +45,5 @@ export const DASHBOARD_VARS_SCHEMA_PRESET: DashboardGlobalVariablesSchema = {
         },
     },
 } as const;
+
+export const DASHBOARD_VARS_SCHEMA_PRESET_KEYS: Array<keyof DashboardGlobalVariablesSchema['properties']> = Object.keys(DASHBOARD_VARS_SCHEMA_PRESET.properties);
