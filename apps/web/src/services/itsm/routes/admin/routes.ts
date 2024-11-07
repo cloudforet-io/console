@@ -19,13 +19,13 @@ const adminItsmRoutes: RouteConfig = {
         menuId: MENU_ID.ITSM,
         translationId: MENU_INFO_MAP[MENU_ID.ITSM].translationId,
     },
-    redirect: () => makeAdminRouteName(ITSM_ROUTE.TASK_MANAGEMENT._NAME),
+    redirect: () => ({ name: makeAdminRouteName(ITSM_ROUTE.TASK_MANAGEMENT._NAME) }),
     component: ITSMContainer,
     children: [
         {
             path: 'task-management',
             name: makeAdminRouteName(ITSM_ROUTE.TASK_MANAGEMENT._NAME),
-            redirect: () => makeAdminRouteName(ITSM_ROUTE.TASK_MANAGEMENT.SETTINGS._NAME),
+            redirect: () => ({ name: makeAdminRouteName(ITSM_ROUTE.TASK_MANAGEMENT.SETTINGS._NAME) }),
             meta: {
                 menuId: MENU_ID.TASK_MANAGEMENT,
                 translationId: MENU_INFO_MAP[MENU_ID.TASK_MANAGEMENT].translationId,
