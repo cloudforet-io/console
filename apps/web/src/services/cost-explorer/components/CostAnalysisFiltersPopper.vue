@@ -62,6 +62,17 @@ const GROUP_BY_TO_VAR_MODELS: Record<string, VariableOption> = {
     [GROUP_BY.USAGE_TYPE]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost, dataKey: 'usage_type' },
 };
 
+const GROUP_BY_TO_VAR_MODELS_FOR_UNIFIED_COST: Record<string, VariableOption> = {
+    [GROUP_BY.WORKSPACE]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.workspace },
+    [GROUP_BY.PROJECT]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.project },
+    [GROUP_BY.PROJECT_GROUP]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.project_group },
+    [GROUP_BY.PRODUCT]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.unified_cost, dataKey: 'product' },
+    [GROUP_BY.PROVIDER]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.provider },
+    [GROUP_BY.SERVICE_ACCOUNT]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.service_account },
+    [GROUP_BY.REGION]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.unified_cost, dataKey: 'region' },
+    [GROUP_BY.USAGE_TYPE]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.unified_cost, dataKey: 'usage_type' },
+};
+
 const getInitialSelectedItemsMap = (): Record<string, SelectDropdownMenuItem[]> => ({
 });
 
@@ -103,7 +114,7 @@ const state = reactive({
 const getMenuHandler = (groupBy: string, modelOptions: Record<string, any>, primaryQueryOptions: Record<string, any>): AutocompleteHandler => {
     try {
         let variableModelInfo: VariableModelMenuHandlerInfo;
-        const _variableOption = GROUP_BY_TO_VAR_MODELS[groupBy];
+        const _variableOption = state.isUnifiedCost ? GROUP_BY_TO_VAR_MODELS_FOR_UNIFIED_COST[groupBy] : GROUP_BY_TO_VAR_MODELS[groupBy];
         let _queryOptions: Record<string, any> = {};
         if (groupBy === MANAGED_VARIABLE_MODELS.workspace.meta.idKey) {
             _queryOptions.is_dormant = false;
