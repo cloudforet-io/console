@@ -1,22 +1,23 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import { useRoute } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import { clone } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PIconButton, PHeading, PLazyImg, PDivider, PI, PHeadingLayout,
+    PIconButton, PHeading, PLazyImg, PDivider, PI, PHeadingLayout, PScopedNotification,
 } from '@cloudforet/mirinae';
-
-
 
 import { SpaceRouter } from '@/router';
 import type { CostQuerySetDeleteParameters } from '@/schema/cost-analysis/cost-query-set/api-verbs/delete';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
 
@@ -53,11 +54,15 @@ const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
+const appContextStore = useAppContextStore();
 
+const router = useRouter();
 const route = useRoute();
 
 const storeState = reactive({
     pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    isUnifiedCost: computed(() => costAnalysisPageGetters.isUnifiedCost),
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 const state = reactive({
     selectedMenuId: computed(() => {
@@ -132,6 +137,12 @@ const handleDeleteQueryConfirm = async () => {
     }
 };
 
+const handleRouteToUnifiedCostSettings = () => {
+    router.push({
+        name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.CURRENCY_CONVERTER._NAME),
+    }).catch(() => {});
+};
+
 watch(() => state.favoriteOptions, async (favoriteOptions) => {
     await gnbStore.setFavoriteItemId(favoriteOptions);
 }, { immediate: true });
@@ -180,9 +191,25 @@ watch(() => state.favoriteOptions, async (favoriteOptions) => {
                 <div class="currency-wrapper">
                     <span class="label">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CURRENCY') }}:</span>
                     <span>{{ CURRENCY_SYMBOL[costAnalysisPageGetters.currency] }}{{ costAnalysisPageGetters.currency }}</span>
+                    <p-icon-button v-if="storeState.isUnifiedCost && storeState.isAdminMode"
+                                   class="currency-setting-button"
+                                   name="ic_settings"
+                                   size="sm"
+                                   style-type="tertiary"
+                                   shape="square"
+                                   @click.stop="handleRouteToUnifiedCostSettings"
+                    />
                 </div>
             </template>
         </p-heading-layout>
+        <p-scoped-notification v-if="storeState.isUnifiedCost"
+                               class="mb-6"
+                               type="information"
+                               icon="ic_info-circle"
+                               layout="in-section"
+        >
+            {{ $t('COST_EXPLORER.COST_ANALYSIS.UNIFIED_COST_DESC') }}
+        </p-scoped-notification>
         <p-divider class="heading-divider" />
         <cost-analysis-query-form-modal :visible.sync="state.queryFormModalVisible"
                                         :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.EDIT_COST_ANALYSIS')"
@@ -213,13 +240,17 @@ watch(() => state.favoriteOptions, async (favoriteOptions) => {
     }
 
     .currency-wrapper {
-        @apply justify-end text-gray-800;
+        @apply justify-end text-gray-800 flex items-center;
         font-size: 0.875rem;
         flex-shrink: 0;
         line-height: 2rem;
         .label {
             font-weight: 700;
             padding-right: 0.25rem;
+        }
+
+        .currency-setting-button {
+            margin-left: 0.25rem;
         }
     }
 

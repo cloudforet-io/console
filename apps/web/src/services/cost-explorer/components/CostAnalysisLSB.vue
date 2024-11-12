@@ -181,12 +181,6 @@ const handleSelectUnifiedCostToggle = (value: boolean) => {
     })).catch(() => {});
 };
 
-// const handleRouteToUnifiedCostSettings = () => {
-//     router.push({
-//         name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.CURRENCY_CONVERTER._NAME),
-//     }).catch(() => {});
-// };
-
 </script>
 
 <template>
@@ -227,27 +221,6 @@ const handleSelectUnifiedCostToggle = (value: boolean) => {
                             </span>
                         </div>
                     </template>
-                    <!--                    <template #menu-item&#45;&#45;format="{item}">-->
-                    <!--                        <div class="menu-item-wrapper">-->
-                    <!--                            <div class="menu-item">-->
-                    <!--                                <span>{{ item.label }}</span>-->
-                    <!--                                <span class="selected-item-postfix">-->
-                    <!--                                    ({{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CURRENCY') }}: {{ getCurrentCurrencySet(item.name) }})-->
-                    <!--                                </span>-->
-                    <!--                                <beta-mark v-if="item.label === 'Kubernetes'"-->
-                    <!--                                           class="beta"-->
-                    <!--                                />-->
-                    <!--                            </div>-->
-                    <!--                            <p-icon-button v-if="item.name === UNIFIED_COST_KEY && storeState.isAdminUser"-->
-                    <!--                                           class="menu-icon"-->
-                    <!--                                           name="ic_settings"-->
-                    <!--                                           size="sm"-->
-                    <!--                                           style-type="tertiary"-->
-                    <!--                                           shape="square"-->
-                    <!--                                           @click.stop="handleRouteToUnifiedCostSettings"-->
-                    <!--                            />-->
-                    <!--                        </div>-->
-                    <!--                    </template>-->
                 </p-select-dropdown>
             </div>
         </template>
