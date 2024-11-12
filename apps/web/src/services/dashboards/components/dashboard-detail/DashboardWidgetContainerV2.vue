@@ -345,10 +345,6 @@ const handleClickAddWidget = () => {
     widgetGenerateStore.setOverlayType('ADD');
     widgetGenerateStore.setShowOverlay(true);
 };
-// const handleChangeDoNotShowDateRangeWarning = (value: boolean) => {
-//     dashboardSettings.updateDoNotShowDateRangeWarning(value);
-// };
-
 
 /* Watcher */
 watch(() => dashboardDetailState.dashboardWidgets, (widgets) => {
