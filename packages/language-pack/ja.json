@@ -1818,7 +1818,7 @@
 		"ANOMALY_DETECTION_CONFIGURATION": "異常コスト検知設定",
 		"COST_ADVANCED_SETTINGS": "詳細設定",
 		"COST_ANALYSIS": {
-			"UNIFIED_COST_DESC": ""
+			"UNIFIED_COST_DESC": "複数のデータソースのコストを一元管理できるようにサポートします。"
 		},
 		"CURRENCY_CONVERTER": "為替レート設定",
 		"CURRENCY_CONVERTER_PAGE": {

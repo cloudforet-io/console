@@ -1818,7 +1818,7 @@
 		"ANOMALY_DETECTION_CONFIGURATION": "이상 비용 탐지 설정",
 		"COST_ADVANCED_SETTINGS": "고급 설정",
 		"COST_ANALYSIS": {
-			"UNIFIED_COST_DESC": ""
+			"UNIFIED_COST_DESC": "모든 데이터 소스의 비용을 한 곳에서 통합하여 관리할 수 있도록 지원합니다."
 		},
 		"CURRENCY_CONVERTER": "환율 설정",
 		"CURRENCY_CONVERTER_PAGE": {
