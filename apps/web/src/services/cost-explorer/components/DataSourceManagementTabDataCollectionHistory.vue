@@ -22,7 +22,9 @@ import {
 import DataSourceManagementTabDataCollectionHistoryModal
     from '@/services/cost-explorer/components/DataSourceManagementTabDataCollectionHistoryModal.vue';
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
-import type { DataSourceItem, CostJobItem, CostJobStatusInfo } from '@/services/cost-explorer/types/data-sources-type';
+import type {
+    DataSourceItem, CostJobItem, CostJobStatusInfo, DataCollectionHistoryModalType,
+} from '@/services/cost-explorer/types/data-sources-type';
 
 const dataSourcesPageStore = useDataSourcesPageStore();
 const dataSourcesPageState = dataSourcesPageStore.state;
@@ -37,6 +39,7 @@ const storeState = reactive({
 const state = reactive({
     loading: false,
     modalVisible: false,
+    modalType: '' as DataCollectionHistoryModalType,
     selectedJobId: '',
     selectedJobItem: computed<CostJobItem|undefined>(() => storeState.jobList.find((item) => item.job_id === state.selectedJobId)),
 });
@@ -97,10 +100,12 @@ const getStatusInfo = (value: CostJobStatus): CostJobStatusInfo => {
 };
 const handleClickErrorDetail = (jobId: string) => {
     state.modalVisible = true;
+    state.modalType = 'ERROR';
     state.selectedJobId = jobId;
 };
 const handleClickResyncButton = () => {
-
+    state.modalVisible = true;
+    state.modalType = 'RE-SYNC';
 };
 
 const jobListApiQueryHelper = new ApiQueryHelper();
@@ -174,7 +179,9 @@ watch([() => storeState.activeTab, () => storeState.selectedItem], async () => {
                 </span>
             </template>
         </p-toolbox-table>
-        <data-source-management-tab-data-collection-history-modal :modal-visible.sync="state.modalVisible"
+        <data-source-management-tab-data-collection-history-modal v-if="state.modalVisible"
+                                                                  :modal-visible.sync="state.modalVisible"
+                                                                  :modal-type="state.modalType"
                                                                   :selected-job-item="state.selectedJobItem"
         />
     </div>

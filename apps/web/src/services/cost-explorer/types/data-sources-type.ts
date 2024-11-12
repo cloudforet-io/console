@@ -20,3 +20,5 @@ export type CostJobStatusInfo = {
 };
 
 export type CostLinkedAccountModalType = 'RESET'|'UPDATE';
+
+export type DataCollectionHistoryModalType = 'ERROR'|'RE-SYNC'|'CANCEL';
