@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
+import { cloneDeep } from 'lodash';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PDataTable, PHeading, PHeadingLayout,
@@ -83,7 +85,13 @@ const handleTagUpdate = async (newTags) => {
         tableState.tagEditPageVisible = false;
         state.items = convertUserTagsToKeyValueArray(newTags);
         userPageStore.$patch((_state) => {
-            _state.state.users[state.selectedIdx].tags = newTags;
+            const cloneUsers = cloneDeep(_state.state.users);
+            cloneUsers[state.selectedIdx].tags = newTags;
+            _state.state.users = cloneUsers;
+
+            const cloneSelectedUser = cloneDeep(_state.state.selectedUser);
+            cloneSelectedUser.tags = newTags;
+            _state.state.selectedUser = cloneSelectedUser;
         });
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('COMMON.TAGS.ALT_E_UPDATE'));
@@ -93,7 +101,7 @@ const handleTagUpdate = async (newTags) => {
 };
 
 /* Watcher */
-watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
+watch([() => props.activeTab, () => state.selectedUser], async () => {
     state.items = convertUserTagsToKeyValueArray(state.selectedUser.tags || {});
     tableState.tags = state.selectedUser.tags || {};
 }, { immediate: true });
