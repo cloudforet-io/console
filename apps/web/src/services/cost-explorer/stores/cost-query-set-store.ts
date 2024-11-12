@@ -27,6 +27,7 @@ export const useCostQuerySetStore = defineStore('cost-query-set', () => {
         costQuerySetList: [] as CostQuerySetModel[],
         selectedQuerySetId: undefined as string|undefined,
         selectedDataSourceId: undefined as string|undefined,
+        isUnifiedCostOn: true as boolean,
     });
 
     const getters = reactive({
@@ -51,6 +52,9 @@ export const useCostQuerySetStore = defineStore('cost-query-set', () => {
     };
     const setSelectedQuerySetId = (querySetId?: string): void => {
         state.selectedQuerySetId = querySetId;
+    };
+    const setUnifiedCostOn = (value: boolean) => {
+        state.isUnifiedCostOn = value;
     };
 
     /* Actions */
@@ -87,12 +91,14 @@ export const useCostQuerySetStore = defineStore('cost-query-set', () => {
         state.costQuerySetList = [];
         state.selectedDataSourceId = undefined;
         state.selectedQuerySetId = undefined;
+        state.isUnifiedCostOn = true;
     };
 
 
     const mutations = {
         setSelectedDataSourceId,
         setSelectedQuerySetId,
+        setUnifiedCostOn,
     };
     const actions = {
         reset,

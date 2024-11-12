@@ -79,7 +79,7 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
         costQueryList: computed(() => costQuerySetState.costQuerySetList),
         selectedQuerySet: computed(() => costQuerySetGetters.selectedQuerySet),
         selectedDataSourceId: computed(() => costQuerySetState.selectedDataSourceId),
-        isUnifiedCost: computed(() => getters.selectedDataSourceId === UNIFIED_COST_KEY),
+        isUnifiedCost: computed(() => costQuerySetState.isUnifiedCostOn),
         managedCostQuerySetList: computed(() => costQuerySetGetters.managedCostQuerySets),
         currency: computed<Currency>(() => {
             if (costQuerySetState.selectedDataSourceId) {
@@ -163,7 +163,7 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
             return results;
         }),
         dataSourceImageUrl: computed<string>(() => {
-            if (costQuerySetState.selectedDataSourceId) {
+            if (costQuerySetState.selectedDataSourceId && !costQuerySetState.isUnifiedCostOn) {
                 const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId ?? ''];
                 return allReferenceStore.getters.plugin[targetDataSource?.data?.plugin_info?.plugin_id]?.icon;
             }

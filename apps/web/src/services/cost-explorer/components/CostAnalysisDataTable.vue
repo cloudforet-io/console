@@ -398,6 +398,7 @@ watch(
         () => costAnalysisPageState,
         () => costAnalysisPageGetters.selectedDataSourceId,
         () => costAnalysisPageGetters.selectedQueryId,
+        () => costAnalysisPageGetters.isUnifiedCost,
     ],
     async ([, selectedDataSourceId]) => {
         if (!selectedDataSourceId) return;

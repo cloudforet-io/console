@@ -138,8 +138,9 @@ watch([
     () => costAnalysisPageState,
     () => costAnalysisPageGetters.selectedDataSourceId,
     () => costAnalysisPageGetters.selectedQueryId,
-], ([, selectedDataSourceId]) => {
-    if (costAnalysisPageState.period && selectedDataSourceId) setChartData(costAnalysisPageState.period);
+    () => costAnalysisPageGetters.isUnifiedCost,
+], ([, selectedDataSourceId, , isUnifiedCost]) => {
+    if (costAnalysisPageState.period && (selectedDataSourceId || isUnifiedCost)) setChartData(costAnalysisPageState.period);
 }, { immediate: true, deep: true });
 watch(() => state.groupByMenuItems, (after) => {
     if (!after.length) {
