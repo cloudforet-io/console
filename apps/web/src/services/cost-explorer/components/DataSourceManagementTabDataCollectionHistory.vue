@@ -5,8 +5,7 @@ import {
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PButton, PButtonModal,
-    PToolboxTable, PHeading, PI, PTextEditor, PHeadingLayout,
+    PButton, PToolboxTable, PHeading, PI, PHeadingLayout,
 } from '@cloudforet/mirinae';
 import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
@@ -20,6 +19,8 @@ import {
     blue, gray, green, red,
 } from '@/styles/colors';
 
+import DataSourceManagementTabDataCollectionHistoryModal
+    from '@/services/cost-explorer/components/DataSourceManagementTabDataCollectionHistoryModal.vue';
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
 import type { DataSourceItem, CostJobItem, CostJobStatusInfo } from '@/services/cost-explorer/types/data-sources-type';
 
@@ -173,33 +174,9 @@ watch([() => storeState.activeTab, () => storeState.selectedItem], async () => {
                 </span>
             </template>
         </p-toolbox-table>
-        <p-button-modal
-            :header-title="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ERROR_FOUND_TITLE')"
-            centered
-            size="md"
-            fade
-            backdrop
-            hide-footer-close-button
-            :visible.sync="state.modalVisible"
-            @confirm="state.modalVisible = false"
-        >
-            <template #body>
-                <div class="content">
-                    <p class="error-info">
-                        {{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ERROR_FOUND_CODE') }}:
-                        <span class="error-code">
-                            {{ state.selectedJobItem.error_code }}
-                        </span>
-                    </p>
-                    <p-text-editor read-only
-                                   :code="state.selectedJobItem.error_message"
-                    />
-                </div>
-            </template>
-            <template #confirm-button>
-                <span>{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ERROR_FOUND_OK') }}</span>
-            </template>
-        </p-button-modal>
+        <data-source-management-tab-data-collection-history-modal :modal-visible.sync="state.modalVisible"
+                                                                  :selected-job-item="state.selectedJobItem"
+        />
     </div>
 </template>
 
@@ -222,38 +199,6 @@ watch([() => storeState.activeTab, () => storeState.selectedItem], async () => {
         border: none;
         .icon-info {
             margin-right: 0.5rem;
-        }
-    }
-
-    .content {
-        @apply flex flex-col;
-        padding-top: 1rem;
-        padding-bottom: 0.75rem;
-        gap: 1rem;
-        .error-info {
-            @apply flex items-center text-label-md font-bold;
-            gap: 0.5rem;
-            .error-code {
-                @apply text-code-md text-red-600 font-normal bg-gray-100 border border-gray-200;
-                padding-right: 0.375rem;
-                padding-left: 0.375rem;
-                border-radius: 0.25rem;
-            }
-        }
-    }
-
-    /* custom design-system component - p-button-modal */
-    :deep(.p-button-modal) {
-        .modal-header {
-            min-height: unset;
-            margin-bottom: 1rem;
-        }
-    }
-
-    /* custom design-system component - p-text-editor */
-    :deep(.p-text-editor) {
-        .CodeMirror {
-            border-radius: 0.375rem;
         }
     }
 }
