@@ -74,7 +74,7 @@ const handleEditTag = () => {
 const handleCloseTag = async () => {
     tableState.tagEditPageVisible = false;
 };
-const handleTagUpdate = async (newTags) => {
+const handleTagUpdate = async (newTags:Tags) => {
     try {
         tableState.loading = true;
         await SpaceConnector.clientV2.identity.user.update<UserUpdateParameters, UserModel>({
@@ -93,6 +93,7 @@ const handleTagUpdate = async (newTags) => {
             cloneSelectedUser.tags = newTags;
             _state.state.selectedUser = cloneSelectedUser;
         });
+        tableState.tags = newTags;
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('COMMON.TAGS.ALT_E_UPDATE'));
     } finally {
