@@ -5,7 +5,7 @@ import type { TranslateResult } from 'vue-i18n';
 import dayjs from 'dayjs';
 
 import {
-    PButtonModal, PTextEditor, PFieldTitle, PToggleButton, PTextInput, PDatetimePicker,
+    PButtonModal, PTextEditor, PFieldTitle, PToggleButton, PTextInput, PDatetimePicker, PScopedNotification,
 } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
@@ -112,15 +112,20 @@ const handleConfirmButton = () => {
         :size="props.modalType === 'ERROR' ? 'md' : 'sm'"
         fade
         backdrop
+        :theme-color="props.modalType === 'CANCEL' ? 'alert' : 'primary'"
         :visible.sync="state.proxyVisible"
         class="data-source-management-tab-data-collection-history-modal"
         @confirm="handleConfirmButton"
     >
         <template #body>
             <div v-if="props.modalType === 'CANCEL'"
-                 class="error-content"
+                 class="cancel-content"
             >
-                cancel
+                <p-scoped-notification type="warning"
+                                       layout="in-section"
+                >
+                    <span class="content-inner">{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.CANCEL_MODAL_DESC') }}</span>
+                </p-scoped-notification>
             </div>
             <div v-else-if="props.modalType === 'RE-SYNC'"
                  class="re-sync-content"
@@ -183,6 +188,7 @@ const handleConfirmButton = () => {
         </template>
         <template #confirm-button>
             <span v-if="props.modalType === 'ERROR'">{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ERROR_FOUND_OK') }}</span>
+            <span v-else-if="props.modalType === 'CANCEL'">{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.CANCEL_BUTTON') }}</span>
         </template>
     </p-button-modal>
 </template>
@@ -218,6 +224,16 @@ const handleConfirmButton = () => {
                 @apply flex items-center;
                 gap: 0.5rem;
             }
+        }
+    }
+
+    .cancel-content {
+        margin-top: 1.375rem;
+        margin-bottom: 0.5rem;
+        .content-inner {
+            @apply block;
+            padding-top: 0.25rem;
+            padding-bottom: 0.375rem;
         }
     }
 
