@@ -20,7 +20,7 @@ import { showInfoMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { GROUP_BY_ITEM_MAP, UNIFIED_COST_KEY } from '@/services/cost-explorer/constants/cost-explorer-constant';
+import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
 
 
@@ -42,7 +42,6 @@ const state = reactive({
     selectedTagsMenu: [] as SelectDropdownMenuItem[],
     selectedAdditionalGroupByMenu: [] as SelectDropdownMenuItem[],
     dataSourceId: computed<string>(() => costAnalysisPageGetters.selectedDataSourceId ?? ''),
-    isUnifiedCost: computed(() => costAnalysisPageGetters.selectedDataSourceId === UNIFIED_COST_KEY),
 });
 
 /* fetcher */
@@ -149,7 +148,7 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
             {{ defaultGroupByItem.label }}
         </p-select-button>
         <div class="tags-button-wrapper">
-            <p-select-dropdown v-if="!state.isUnifiedCost"
+            <p-select-dropdown v-if="!costAnalysisPageGetters.isUnifiedCost"
                                :handler="tagsMenuHandler"
                                :selected.sync="state.selectedTagsMenu"
                                selection-label="Tags"

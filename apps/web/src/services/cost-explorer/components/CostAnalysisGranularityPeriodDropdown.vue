@@ -14,7 +14,7 @@ import { i18n } from '@/translations';
 
 import CostAnalysisPeriodSelectDropdown
     from '@/services/cost-explorer/components/CostAnalysisPeriodSelectDropdown.vue';
-import { GRANULARITY, UNIFIED_COST_KEY } from '@/services/cost-explorer/constants/cost-explorer-constant';
+import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import {
     DYNAMIC_COST_QUERY_SET_PARAMS,
 } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
@@ -27,7 +27,7 @@ const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
 
 const state = reactive({
-    isUnifiedCost: computed(() => costAnalysisPageGetters.selectedDataSourceId === UNIFIED_COST_KEY),
+    isUnifiedCost: computed(() => costAnalysisPageGetters.isUnifiedCost),
     granularityItems: computed<MenuItem[]>(() => (([
         {
             type: 'item',
