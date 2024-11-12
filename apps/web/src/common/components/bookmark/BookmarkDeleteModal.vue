@@ -196,6 +196,7 @@ const handleClose = () => {
             }
             .text-wrapper {
                 @apply flex flex-col text-label-md;
+                max-width: calc(100% - 3rem);
                 .link {
                     @apply truncate text-label-sm text-gray-500;
                     max-width: 22rem;

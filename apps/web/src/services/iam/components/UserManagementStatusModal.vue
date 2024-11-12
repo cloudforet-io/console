@@ -85,7 +85,7 @@ const checkModalConfirm = async () => {
             ErrorHandler.handleRequestError(new Error(''), vm.$tc(languageCode, failCount));
         }
     } catch (e: any) {
-        ErrorHandler.handleError(e);
+        ErrorHandler.handleError(e, true);
     } finally {
         state.loading = false;
         handleClose();

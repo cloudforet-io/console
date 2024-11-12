@@ -178,5 +178,13 @@ watch(() => store.state.user.isSessionExpired, (isSessionExpired) => {
         margin-right: -0.5rem;
         z-index: 1000;
     }
+
+    @screen mobile {
+        position: initial;
+        .notification-content {
+            width: 100%;
+            left: 0;
+        }
+    }
 }
 </style>
