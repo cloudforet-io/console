@@ -26,7 +26,7 @@ import type {
 } from '@/schema/inventory/collector-rule/type';
 import type { RegionListParameters } from '@/schema/inventory/region/api-verbs/list';
 import type { RegionModel } from '@/schema/inventory/region/model';
-import { i18n, i18n as _i18n } from '@/translations';
+import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -108,8 +108,8 @@ const state = reactive({
         return isConditionTooltipVisible;
     }),
     conditionPolicies: computed(() => ({
-        [COLLECTOR_RULE_CONDITION_POLICY.ALL]: _i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALL'),
-        [COLLECTOR_RULE_CONDITION_POLICY.ANY]: _i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ANY'),
+        [COLLECTOR_RULE_CONDITION_POLICY.ALL]: i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALL'),
+        [COLLECTOR_RULE_CONDITION_POLICY.ANY]: i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ANY'),
     })),
     selectedConditionRadioIdx: props.data?.conditions_policy ?? COLLECTOR_RULE_CONDITION_POLICY.ALL as CollectorRuleConditionPolicy,
     conditionKeyMenu: computed<SelectDropdownMenuItem[]>(() => {

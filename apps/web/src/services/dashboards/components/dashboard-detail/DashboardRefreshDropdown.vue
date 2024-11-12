@@ -93,7 +93,7 @@ const handleSelectRefreshIntervalOption = (option) => {
     if (!dashboardDetailGetters.disableManageButtons) {
         dashboardStore.updateDashboard(dashboardDetailState.dashboardId, {
             options: {
-                ...dashboardDetailGetters.dashboardInfo?.options || {},
+                ...dashboardDetailState.dashboardInfo?.options || {},
                 refresh_interval_option: option,
             },
         });

@@ -92,7 +92,7 @@ const toggleUseDashboardVarsSchema = debounce(async (dashboardId: string, variab
     try {
         const _dashboardVarsSchemaProperties: Record<string, DashboardGlobalVariable> = cloneDeep(dashboardDetailGetters.dashboardVarsSchemaProperties);
         const _use = !_dashboardVarsSchemaProperties[variableKey].use;
-        const _vars = cloneDeep(dashboardDetailGetters.dashboardInfo?.vars || {});
+        const _vars = cloneDeep(dashboardDetailState.dashboardInfo?.vars || {});
         const _tempVars = cloneDeep(dashboardDetailState.vars);
         if (!_use) {
             delete _vars[variableKey];
