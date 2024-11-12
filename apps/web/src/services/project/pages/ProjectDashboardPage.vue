@@ -57,9 +57,9 @@ const handleRefresh = async () => {
     if (widgetContainerRef.value) widgetContainerRef.value.refreshAllWidget();
 };
 /* api */
-const getDashboardData = async (dashboardId: string) => {
+const getDashboardDataAndListWidget = async (dashboardId: string) => {
     try {
-        await dashboardDetailStore.getDashboardInfo(dashboardId);
+        await dashboardDetailStore.getDashboardInfo({ dashboardId, fetchWidgets: true });
     } catch (e) {
         ErrorHandler.handleError(e);
     }
@@ -72,7 +72,7 @@ watch(() => props.dashboardId, async (dashboardId, prevDashboardId) => {
         dashboardDetailStore.reset();
     }
     dashboardDetailStore.setProjectId(props.id);
-    await getDashboardData(dashboardId);
+    await getDashboardDataAndListWidget(dashboardId);
 }, { immediate: true });
 
 onUnmounted(() => {
@@ -109,7 +109,9 @@ onUnmounted(() => {
                                                 @refresh="handleRefresh"
                     />
                 </div>
-                <div class="selectors">
+                <div v-if="!dashboardDetailState.loadingDashboard"
+                     class="selectors"
+                >
                     <dashboard-variables-v2 class="variable-selector-wrapper"
                                             is-project-dashboard
                                             :disable-save-button="dashboardDetailGetters.disableManageButtons"

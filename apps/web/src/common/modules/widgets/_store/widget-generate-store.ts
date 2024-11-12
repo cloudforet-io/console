@@ -44,7 +44,8 @@ type DataTableModel = PublicDataTableModel|PrivateDataTableModel;
 type WidgetModel = PublicWidgetModel|PrivateWidgetModel;
 type WidgetUpdateParameters = PublicWidgetUpdateParameters|PrivateWidgetUpdateParameters;
 export const useWidgetGenerateStore = defineStore('widget-generate', () => {
-    const dashboardDetailGetters = useDashboardDetailInfoStore().getters;
+    const dashboardDetailStore = useDashboardDetailInfoStore();
+    const dashboardDetailState = dashboardDetailStore.state;
     const state = reactive({
         // display
         showOverlay: false,
@@ -169,7 +170,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         createAddDataTable: async (addParams: Partial<DataTableAddParameters>):Promise<DataTableModel|undefined> => {
             const parameters = {
                 widget_id: state.widgetId,
-                vars: dashboardDetailGetters.dashboardInfo?.vars || {},
+                vars: dashboardDetailState.dashboardInfo?.vars || {},
                 ...addParams,
             } as DataTableAddParameters;
             const isPrivate = state.widgetId.startsWith('private');
@@ -190,7 +191,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         createTransformDataTable: async (transformParams: Partial<DataTableTransformParameters>, unsavedId: string): Promise<DataTableModel|undefined> => {
             const parameters = {
                 widget_id: state.widgetId,
-                vars: dashboardDetailGetters.dashboardInfo?.vars || {},
+                vars: dashboardDetailState.dashboardInfo?.vars || {},
                 ...transformParams,
             } as DataTableTransformParameters;
             const isPrivate = state.widgetId.startsWith('private');
@@ -259,7 +260,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 } else {
                     result = await fetcher({
                         ...updateParams,
-                        vars: dashboardDetailGetters.dashboardInfo?.vars || {},
+                        vars: dashboardDetailState.dashboardInfo?.vars || {},
                     });
                     if (state.widget?.state === 'ACTIVE') {
                         await actions.updateWidget({ state: 'INACTIVE' });
@@ -356,7 +357,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                     ...loadParams,
                     sort: _sort,
                     data_table_id: loadParams.data_table_id || state.selectedDataTableId as string, // for fetching without data_table_id
-                    vars: dashboardDetailGetters.dashboardInfo?.vars || {},
+                    vars: dashboardDetailState.dashboardInfo?.vars || {},
                 });
                 state.previewData = { results: results ?? [], total_count: total_count ?? 0 };
                 setDataTableLoadFailed(false);
