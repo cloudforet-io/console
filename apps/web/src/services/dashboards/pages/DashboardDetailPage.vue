@@ -60,9 +60,9 @@ const state = reactive({
     dashboardVariablesLoading: false,
 });
 
-const getDashboardData = async (dashboardId: string) => {
+const getDashboardDataAndListWidget = async (dashboardId: string) => {
     try {
-        await dashboardDetailStore.getDashboardInfo(dashboardId);
+        await dashboardDetailStore.getDashboardInfo({ dashboardId, fetchWidgets: true });
     } catch (e) {
         ErrorHandler.handleError(e);
         await SpaceRouter.router.push(getProperRouteLocation({ name: DASHBOARDS_ROUTE._NAME }));
@@ -71,7 +71,7 @@ const getDashboardData = async (dashboardId: string) => {
 
 /* Event */
 const handleRefresh = async () => {
-    if (dashboardDetailGetters.dashboardInfo?.version !== '1.0') await dashboardDetailStore.listDashboardWidgets();
+    if (dashboardDetailState.dashboardInfo?.version !== '1.0') await dashboardDetailStore.listDashboardWidgets();
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     if (widgetContainerRef.value) widgetContainerRef.value.refreshAllWidget();
@@ -92,7 +92,7 @@ watch(() => props.dashboardId, async (dashboardId, prevDashboardId) => {
     if (dashboardId && !prevDashboardId) { // this includes all three cases
         dashboardDetailStore.reset();
     }
-    await getDashboardData(dashboardId);
+    await getDashboardDataAndListWidget(dashboardId);
     // Set Dashboard Detail Custom breadcrumbs
     gnbStore.setBreadcrumbs(breadcrumbs.value);
 }, { immediate: true });
@@ -144,7 +144,9 @@ onUnmounted(() => {
                 />
             </div>
         </div>
-        <div class="dashboard-selectors">
+        <div v-if="!dashboardDetailState.loadingDashboard"
+             class="dashboard-selectors"
+        >
             <dashboard-variables v-if="dashboardDetailGetters.isDeprecatedDashboard"
                                  class="variable-selector-wrapper"
                                  :loading="state.dashboardVariablesLoading"

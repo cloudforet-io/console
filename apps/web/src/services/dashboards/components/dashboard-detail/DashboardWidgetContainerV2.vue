@@ -74,8 +74,6 @@ const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 const allReferenceStore = useAllReferenceStore();
-// const dashboardSettings = useDashboardSettingsStore();
-// const dashboardSettingsState = dashboardSettings.state;
 
 /* State */
 const containerRef = ref<HTMLElement|null>(null);
@@ -88,8 +86,7 @@ const state = reactive({
     mountedWidgetMap: {} as Record<string, boolean>,
     intersectedWidgetMap: {} as Record<string, boolean>,
     isAllWidgetsMounted: computed<boolean>(() => Object.values(state.mountedWidgetMap).every((d) => d)),
-    refinedWidgetInfoList: computed<RefinedWidgetInfo[]>(() => getRefinedWidgetInfoList(dashboardDetailState.dashboardWidgets)),
-    widgetLoading: true,
+    refinedWidgetInfoList: undefined as RefinedWidgetInfo[]|undefined,
     overlayType: 'EDIT' as 'EDIT' | 'EXPAND',
     showExpandOverlay: false,
     remountWidgetId: undefined as string|undefined,
@@ -102,9 +99,8 @@ const widgetDeleteState = reactive({
 
 /* Util */
 const { containerWidth } = useDashboardContainerWidth({ containerRef, observeResize: true });
-const getRefinedWidgetInfoList = (dashboardWidgets: Array<PublicWidgetModel|PrivateWidgetModel>): RefinedWidgetInfo[] => {
+const getRefinedWidgetInfoList = (dashboardWidgets: Array<PublicWidgetModel|PrivateWidgetModel>): RefinedWidgetInfo[]|undefined => {
     if (!dashboardWidgets.length) {
-        state.widgetLoading = false;
         return [];
     }
     const _refinedWidgets: RefinedWidgetInfo[] = [];
@@ -134,7 +130,6 @@ const getRefinedWidgetInfoList = (dashboardWidgets: Array<PublicWidgetModel|Priv
         widget.width = _widths[idx];
     });
 
-    state.widgetLoading = false;
     return _refinedWidgets;
 };
 const getWidgetLoading = () => {
@@ -356,12 +351,9 @@ const handleClickAddWidget = () => {
 
 
 /* Watcher */
-watch(() => dashboardDetailState.dashboardId, (dashboardId) => {
-    if (dashboardId) {
-        state.widgetLoading = true;
-        dashboardDetailStore.listDashboardWidgets();
-    }
-}, { immediate: true });
+watch(() => dashboardDetailState.dashboardWidgets, (widgets) => {
+    state.refinedWidgetInfoList = getRefinedWidgetInfoList(widgets);
+});
 watch(() => widgetGenerateState.showOverlay, async (showOverlay) => {
     if (!showOverlay && widgetGenerateState.overlayType !== 'EXPAND') {
         state.remountWidgetId = widgetGenerateState.latestWidgetId;
@@ -413,30 +405,7 @@ defineExpose({
     <div ref="containerRef"
          class="dashboard-widget-container"
     >
-        <!--        <p-scoped-notification v-if="!dashboardSettingsState.doNotShowDateRangeWarning && dashboardDetailState.showDateRangeNotification"-->
-        <!--                               type="information"-->
-        <!--                               icon="ic_info-circle"-->
-        <!--                               show-close-button-->
-        <!--                               :title="$t('DASHBOARDS.DETAIL.DATE_RANGE_NOTIFICATION_TITLE')"-->
-        <!--                               class="w-full"-->
-        <!--                               :visible="dashboardDetailState.showDateRangeNotification"-->
-        <!--                               @update:visible="dashboardDetailState.showDateRangeNotification = $event"-->
-        <!--        >-->
-        <!--            <div>-->
-        <!--                <p>{{ $t('DASHBOARDS.DETAIL.DATE_RANGE_NOTIFICATION_DESC1') }}</p>-->
-        <!--                <p>{{ $t('DASHBOARDS.DETAIL.DATE_RANGE_NOTIFICATION_DESC2') }} <b>({{ $t('DASHBOARDS.DETAIL.DATE_RANGE_NOTIFICATION_DESC3') }})</b></p>-->
-        <!--            </div>-->
-        <!--            <template #right>-->
-        <!--                <p-checkbox :selected="dashboardSettingsState.doNotShowDateRangeWarning"-->
-        <!--                            :value="true"-->
-        <!--                            class="pt-2"-->
-        <!--                            @change="handleChangeDoNotShowDateRangeWarning"-->
-        <!--                >-->
-        <!--                    {{ $t('DASHBOARDS.DETAIL.DO_NOT_SHOW_AGAIN') }}-->
-        <!--                </p-checkbox>-->
-        <!--            </template>-->
-        <!--        </p-scoped-notification>-->
-        <p-data-loader :loading="dashboardDetailState.loadingDashboard || state.widgetLoading"
+        <p-data-loader :loading="dashboardDetailState.loadingDashboard || dashboardDetailState.loadingWidgets"
                        :data="state.refinedWidgetInfoList"
                        loader-backdrop-color="gray.100"
                        disable-empty-case
@@ -459,7 +428,7 @@ defineExpose({
                                :loading="getWidgetLoading()"
                                :dashboard-options="dashboardDetailState.options"
                                :dashboard-vars="dashboardDetailGetters.refinedVars"
-                               :disable-refresh-on-variable-change="widgetGenerateState.showOverlay"
+                               :disable-refresh-on-variable-change="widgetGenerateState.showOverlay || dashboardDetailState.loadingDashboard"
                                :disable-manage-buttons="dashboardDetailGetters.disableManageButtons"
                                :all-reference-type-info="state.allReferenceTypeInfo"
                                @mounted="handleWidgetMounted(widget.widget_id)"
@@ -472,7 +441,7 @@ defineExpose({
                 </template>
             </div>
         </p-data-loader>
-        <div v-if="!(dashboardDetailState.loadingDashboard || state.widgetLoading) && !state.refinedWidgetInfoList?.length"
+        <div v-if="!(dashboardDetailState.loadingDashboard || dashboardDetailState.loadingWidgets) && !state.refinedWidgetInfoList?.length"
              class="no-data-wrapper"
         >
             <p-empty show-image
@@ -500,7 +469,7 @@ defineExpose({
         />
         <widget-form-overlay />
         <dashboard-reorder-sidebar
-            :widget-info-list="state.refinedWidgetInfoList"
+            :widget-info-list="state.refinedWidgetInfoList ?? []"
         />
     </div>
 </template>
