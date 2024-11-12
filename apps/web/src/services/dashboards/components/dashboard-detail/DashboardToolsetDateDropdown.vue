@@ -102,7 +102,7 @@ const handleSelectMonthMenuItem = (selected: string) => {
     if (!dashboardDetailGetters.disableManageButtons && !props.widgetMode) {
         dashboardStore.updateDashboard(dashboardDetailState.dashboardId, {
             options: {
-                ...dashboardDetailGetters.dashboardInfo?.options || {},
+                ...dashboardDetailState.dashboardInfo?.options || {},
                 date_range: state.selectedDateRange,
             },
         });

@@ -72,7 +72,7 @@ const state = reactive({
     modifiedVariablesSchemaProperties: computed<string[]>(() => {
         const results: string[] = [];
         state.newGlobalVariables.forEach((_var) => {
-            if (!isEqual(dashboardDetailGetters.dashboardInfo?.vars?.[_var.key], dashboardDetailState.vars?.[_var.key])) {
+            if (!isEqual(dashboardDetailState.dashboardInfo?.vars?.[_var.key], dashboardDetailState.vars?.[_var.key])) {
                 results.push(_var.key);
             }
         });
@@ -80,7 +80,7 @@ const state = reactive({
     }),
     showSaveButton: computed<boolean>(() => !props.disableSaveButton && state.modifiedVariablesSchemaProperties.length > 0),
     notChanged: computed(() => state.modifiedVariablesSchemaProperties.length === 0),
-    isSharedDashboard: computed<boolean>(() => !!dashboardDetailGetters.dashboardInfo?.shared && !storeState.isAdminMode),
+    isSharedDashboard: computed<boolean>(() => !!dashboardDetailState.dashboardInfo?.shared && !storeState.isAdminMode),
 });
 
 const handleClickSaveButton = () => {
@@ -88,7 +88,7 @@ const handleClickSaveButton = () => {
     dashboardDetailStore.setVars(dashboardDetailState.vars);
 };
 const handleResetVariables = () => {
-    const _originVars = props.originVars ?? dashboardDetailGetters.dashboardInfo?.vars ?? {};
+    const _originVars = props.originVars ?? dashboardDetailState.dashboardInfo?.vars ?? {};
     dashboardDetailStore.setVars(_originVars);
 };
 </script>

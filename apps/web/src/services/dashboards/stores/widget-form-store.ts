@@ -77,7 +77,7 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
     });
     const dashboardScope = computed<DashboardScope>(() => {
         if (appContextGetters.isAdminMode) return 'DOMAIN';
-        return dashboardDetailGetters.dashboardInfo.resource_group;
+        return dashboardDetailState.dashboardInfo?.resource_group;
     });
 
     const mergedWidgetState = computed<UnwrapRef<MergedBaseWidgetState>|undefined>(() => {
