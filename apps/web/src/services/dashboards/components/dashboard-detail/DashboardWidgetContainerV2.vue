@@ -132,10 +132,10 @@ const getRefinedWidgetInfoList = (dashboardWidgets: Array<PublicWidgetModel|Priv
 
     return _refinedWidgets;
 };
-const getWidgetLoading = () => {
+const getWidgetLoading = (widgetId: string) => {
     // if (!dashboardDetailGetters.isAllVariablesInitialized) return true;
     if (!state.isAllWidgetsMounted) return true;
-    // if (!state.intersectedWidgetMap[widgetId]) return true;
+    if (!state.intersectedWidgetMap[widgetId]) return true;
     return false;
 };
 const refreshAllWidget = debounce(async () => {
@@ -317,16 +317,6 @@ const handleWidgetMounted = (widgetId: string) => {
         [widgetId]: true,
     };
 };
-// eslint-disable-next-line no-undef
-const handleIntersectionObserver: IntersectionObserverCallback = async ([{ isIntersecting, target }], observer) => {
-    if (isIntersecting) {
-        if (state.isAllWidgetsMounted) {
-            state.intersectedWidgetMap[target.id] = true;
-            state.intersectedWidgetMap = { ...state.intersectedWidgetMap };
-            observer.unobserve(target);
-        }
-    }
-};
 const handleDeleteModalConfirm = async () => {
     const _targetWidgetId = widgetDeleteState.targetWidget?.widget_id as string;
     // 1. remove from dashboard layouts
@@ -368,6 +358,22 @@ watch(() => dashboardDetailState.dashboardWidgets, (dashboardWidgets) => {
         });
     }
 }, { immediate: true });
+defineExpose({
+    refreshAllWidget,
+});
+
+
+/* Widget Intersection Observer */
+// eslint-disable-next-line no-undef
+const handleIntersectionObserver: IntersectionObserverCallback = async ([{ isIntersecting, target }], observer) => {
+    if (isIntersecting) {
+        if (state.isAllWidgetsMounted) {
+            state.intersectedWidgetMap[target.id] = true;
+            state.intersectedWidgetMap = { ...state.intersectedWidgetMap };
+            observer.unobserve(target);
+        }
+    }
+};
 let widgetObserverMap: Record<string, IntersectionObserver> = {};
 const stopWidgetRefWatch = watch([widgetRef, () => state.isAllWidgetsMounted], ([widgetRefs, allMounted]) => {
     if (widgetObserverMap) {
@@ -387,13 +393,26 @@ const stopWidgetRefWatch = watch([widgetRef, () => state.isAllWidgetsMounted], (
     });
 });
 
-
 onBeforeUnmount(() => {
     stopWidgetRefWatch();
     Object.values(widgetObserverMap).forEach((observer) => observer.disconnect());
 });
-defineExpose({
-    refreshAllWidget,
+const stopWidgetInfoWatch = watch(() => state.refinedWidgetInfoList, (widgetInfoList) => {
+    if (!widgetInfoList || !Array.isArray(widgetInfoList)) return;
+
+    const mountedWidgetMap = {};
+    const intersectedWidgetMap = {};
+    widgetInfoList.forEach((widget) => {
+        mountedWidgetMap[widget.widget_id] = state.mountedWidgetMap[widget.widget_id];
+        intersectedWidgetMap[widget.widget_id] = state.intersectedWidgetMap[widget.widget_id];
+    });
+    state.mountedWidgetMap = mountedWidgetMap;
+    state.intersectedWidgetMap = intersectedWidgetMap;
+}, {
+    immediate: true, deep: true,
+});
+onBeforeUnmount(() => {
+    stopWidgetInfoWatch();
 });
 </script>
 
@@ -409,7 +428,6 @@ defineExpose({
             <div class="widgets-wrapper">
                 <template v-for="(widget) in state.refinedWidgetInfoList">
                     <component :is="widget.component"
-                               v-if="widget.widget_id !== state.remountWidgetId"
                                :id="widget.widget_id"
                                :key="widget.widget_id"
                                ref="widgetRef"
@@ -421,7 +439,7 @@ defineExpose({
                                :width="widget.width"
                                :widget-options="widget.options"
                                :mode="store.state.display.visibleSidebar ? 'edit-layout' : 'view'"
-                               :loading="getWidgetLoading()"
+                               :loading="getWidgetLoading(widget.widget_id)"
                                :dashboard-options="dashboardDetailState.options"
                                :dashboard-vars="dashboardDetailGetters.refinedVars"
                                :disable-refresh-on-variable-change="widgetGenerateState.showOverlay || dashboardDetailState.loadingDashboard"
