@@ -6,7 +6,7 @@ import {
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PButton, PButtonModal,
-    PToolboxTable, PHeading, PI, PTextEditor,
+    PToolboxTable, PHeading, PI, PTextEditor, PHeadingLayout,
 } from '@cloudforet/mirinae';
 import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
@@ -22,7 +22,6 @@ import {
 
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
 import type { DataSourceItem, CostJobItem, CostJobStatusInfo } from '@/services/cost-explorer/types/data-sources-type';
-
 
 const dataSourcesPageStore = useDataSourcesPageStore();
 const dataSourcesPageState = dataSourcesPageStore.state;
@@ -99,6 +98,9 @@ const handleClickErrorDetail = (jobId: string) => {
     state.modalVisible = true;
     state.selectedJobId = jobId;
 };
+const handleClickResyncButton = () => {
+
+};
 
 const jobListApiQueryHelper = new ApiQueryHelper();
 const handleChangeToolbox = async (options: ToolboxOptions) => {
@@ -127,15 +129,24 @@ watch([() => storeState.activeTab, () => storeState.selectedItem], async () => {
 </script>
 
 <template>
-    <div class="data-source-management-tab-detail-base-information">
-        <p-heading heading-type="sub"
-                   use-total-count
-                   :title="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.TAB_DETAILS_COLLECTION_JOB')"
-                   :total-count="storeState.totalCount"
-                   class="pt-8 px-4 pb-4"
-        />
+    <div class="data-source-management-tab-data-collection-history">
+        <p-heading-layout class="pt-8 px-4">
+            <template #heading>
+                <p-heading heading-type="sub"
+                           use-total-count
+                           :title="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.TAB_DETAILS_COLLECTION_HISTORY')"
+                           :total-count="storeState.totalCount"
+                />
+            </template>
+            <template #extra>
+                <p-button style-type="tertiary"
+                          @click="handleClickResyncButton"
+                >
+                    {{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.RESYNC') }}
+                </p-button>
+            </template>
+        </p-heading-layout>
         <p-toolbox-table :fields="tableState.fields"
-                         :searchable="false"
                          :items="storeState.jobList"
                          :loading="state.loading"
                          class="data-source-definition-table"
@@ -193,7 +204,7 @@ watch([() => storeState.activeTab, () => storeState.selectedItem], async () => {
 </template>
 
 <style lang="postcss" scoped>
-.data-source-management-tab-detail-base-information {
+.data-source-management-tab-data-collection-history {
     .title {
         @apply items-center;
 
@@ -208,7 +219,6 @@ watch([() => storeState.activeTab, () => storeState.selectedItem], async () => {
         }
     }
     .data-source-definition-table {
-        margin-top: -4.25rem;
         border: none;
         .icon-info {
             margin-right: 0.5rem;
