@@ -36,11 +36,11 @@ const state = reactive({
     modifiedVariablesSchemaProperties: computed<string[]>(() => {
         if (props.disableSaveButton) return [];
         const results: string[] = [];
-        const prevUsedProperties = Object.entries(dashboardDetailState.dashboardInfo?.variables_schema.properties ?? {}).filter(([, v]) => v.use);
+        const prevUsedProperties = Object.entries(dashboardDetailGetters.dashboardInfo?.variables_schema.properties ?? {}).filter(([, v]) => v.use);
         const currUsedProperties = Object.entries(dashboardDetailGetters.refinedVariablesSchema.properties).filter(([, v]) => v.use);
         // check variables changed
         currUsedProperties.forEach(([k]) => {
-            if (!isEqual(dashboardDetailState.dashboardInfo?.variables?.[k], dashboardDetailState.variables?.[k])) {
+            if (!isEqual(dashboardDetailGetters.dashboardInfo?.variables?.[k], dashboardDetailState.variables?.[k])) {
                 results.push(k);
             }
         });
@@ -58,8 +58,8 @@ const handleClickSaveButton = () => {
     });
 };
 const handleResetVariables = () => {
-    const _originVariables = props.originVariables ?? dashboardDetailState.dashboardInfo?.variables;
-    const _originVariablesSchema = props.originVariablesSchema ?? dashboardDetailState.dashboardInfo?.variables_schema;
+    const _originVariables = props.originVariables ?? dashboardDetailGetters.dashboardInfo?.variables;
+    const _originVariablesSchema = props.originVariablesSchema ?? dashboardDetailGetters.dashboardInfo?.variables_schema;
     dashboardDetailStore.resetVariables(_originVariables, _originVariablesSchema);
 };
 

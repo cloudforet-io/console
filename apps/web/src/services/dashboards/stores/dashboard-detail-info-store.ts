@@ -88,6 +88,7 @@ const refineProjectDashboardVariables = (variables: DashboardVariables, projectI
 
 export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', () => {
     const dashboardStore = useDashboardStore();
+    const dashboardState = dashboardStore.state;
     const appContextStore = useAppContextStore();
     const storeState = reactive({
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -96,7 +97,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const state = reactive({
         loadingDashboard: false,
         dashboardId: '' as string | undefined,
-        dashboardInfo: undefined as PublicDashboardModel|PrivateDashboardModel|undefined,
+        dashboard: undefined as PublicDashboardModel|PrivateDashboardModel|undefined,
         projectId: undefined as string | undefined,
         options: DASHBOARD_DEFAULT.options as DashboardOptions,
         vars: {} as DashboardVars,
@@ -118,21 +119,25 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     });
 
     const getters = reactive({
-        dashboardName: computed<string>(() => state.dashboardInfo?.name || ''),
-        dashboardLabels: computed<string[]>(() => state.dashboardInfo?.labels || []),
-        dashboardLayouts: computed<DashboardLayout[]>(() => state.dashboardInfo?.layouts || []),
-        dashboardVarsSchema: computed<DashboardVariablesSchema>(() => state.dashboardInfo?.vars_schema || {}),
-        dashboardVarsSchemaProperties: computed<Record<string, DashboardGlobalVariable>>(() => state.dashboardInfo?.vars_schema?.properties || {}),
+        dashboardInfo: computed<PublicDashboardModel|PrivateDashboardModel|undefined>(() => {
+            const _allDashboardItems = [...dashboardState.privateDashboardItems, ...dashboardState.publicDashboardItems];
+            return _allDashboardItems.find((d) => d.dashboard_id === state.dashboardId) || state.dashboard;
+        }),
+        dashboardName: computed<string>(() => getters.dashboardInfo?.name || ''),
+        dashboardLabels: computed<string[]>(() => getters.dashboardInfo?.labels || []),
+        dashboardLayouts: computed<DashboardLayout[]>(() => getters.dashboardInfo?.layouts || []),
+        dashboardVarsSchema: computed<DashboardVariablesSchema>(() => getters.dashboardInfo?.vars_schema || {}),
+        dashboardVarsSchemaProperties: computed<Record<string, DashboardGlobalVariable>>(() => getters.dashboardInfo?.vars_schema?.properties || {}),
         isPrivate: computed<boolean>(() => !!state.dashboardId?.startsWith('private')),
         //
         isAllVariablesInitialized: computed(() => Object.values(state.variablesInitMap).every((d) => d === true)),
-        isDeprecatedDashboard: computed<boolean>(() => state.dashboardInfo?.version === '1.0'),
+        isDeprecatedDashboard: computed<boolean>(() => getters.dashboardInfo?.version === '1.0'),
         disableManageButtons: computed<boolean>(() => {
             if (state.projectId) return true;
             if (state.dashboardId?.startsWith('private')) return false;
             if (storeState.isAdminMode) return false;
             if (storeState.isWorkspaceOwner) {
-                if (state.dashboardInfo?.workspace_id === '*') return true;
+                if (getters.dashboardInfo?.workspace_id === '*') return true;
                 return false;
             }
             return true;
@@ -181,7 +186,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         }),
         // only for 1.0 legacy dashboard
         dashboardWidgetInfoList: computed<DashboardLayoutWidgetInfo[]>(() => {
-            const _dashboardWidget: DashboardLayoutWidgetInfo[] = state.dashboardInfo?.layouts?.[0].widgets || [];
+            const _dashboardWidget: DashboardLayoutWidgetInfo[] = getters.dashboardInfo?.layouts?.[0].widgets || [];
             return _dashboardWidget.map((info) => ({
                 ...info,
                 widget_key: info.widget_key ?? getRandomId(),
@@ -221,7 +226,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             return;
         }
         state.vars = dashboardInfo.vars ?? {};
-        state.dashboardInfo = dashboardInfo;
+        state.dashboard = dashboardInfo;
         const _dashboardInfo = cloneDeep(dashboardInfo);
         state.dashboardId = _dashboardInfo.dashboard_id;
         state.options = {
@@ -240,7 +245,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
 
         const _dashboardInfo = cloneDeep(dashboardInfo);
         state.dashboardId = _dashboardInfo.dashboard_id;
-        state.dashboardInfo = _dashboardInfo;
+        state.dashboard = _dashboardInfo;
         state.options = {
             date_range: {
                 start: _dashboardInfo.options?.date_range?.start,
@@ -277,6 +282,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         // WARN:: from under this line, beware using originState. originState could reference irrelevant dashboard data
         state.dashboardId = dashboardId;
         state.loadingDashboard = true;
+        if (fetchWidgets) setDashboardWidgets([]);
         try {
             const params: GetDashboardParameters = { dashboard_id: dashboardId as string };
             const { status, response } = await fetcher<GetDashboardParameters, DashboardModel>(params);
@@ -310,8 +316,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     };
     // HACK: only for 1.0 dashboard
     const resetVariables = (originVariables?: DashboardVariables, originVariablesSchema?: DashboardVariablesSchema) => {
-        const _originVariables: DashboardVariables = originVariables ?? state.dashboardInfo?.variables ?? {};
-        const _originVariablesSchema: DashboardVariablesSchema = originVariablesSchema ?? state.dashboardInfo?.variables_schema ?? { properties: {}, order: [] };
+        const _originVariables: DashboardVariables = originVariables ?? getters.dashboardInfo?.variables ?? {};
+        const _originVariablesSchema: DashboardVariablesSchema = originVariablesSchema ?? getters.dashboardInfo?.variables_schema ?? { properties: {}, order: [] };
 
         // reset variables schema
         let _variableSchema = cloneDeep(state.variablesSchema);
