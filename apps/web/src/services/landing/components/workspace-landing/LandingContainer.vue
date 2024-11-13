@@ -5,8 +5,10 @@ import {
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import type { GrantInfo } from '@/store/modules/user/type';
 
 import FNB from '@/common/modules/navigations/FNB.vue';
 
@@ -23,15 +25,17 @@ const route = useRoute();
 
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
+    currentGrantInfo: computed<GrantInfo|undefined>(() => store.state.user.currentGrantInfo),
 });
 
-watch(() => storeState.workspaceList, () => {
+watch(() => storeState.workspaceList, (workspaceList) => {
+    if (!storeState.currentGrantInfo) return;
     const { force } = route.params;
     const isLanding = route.name === LANDING_ROUTE.DOMAIN._NAME;
 
     if (force === 'true') return;
 
-    const targetRoute = storeState.workspaceList.length === 0 || isLanding
+    const targetRoute = workspaceList.length === 0 || isLanding
         ? LANDING_ROUTE.DOMAIN._NAME
         : LANDING_ROUTE.WORKSPACE._NAME;
 
