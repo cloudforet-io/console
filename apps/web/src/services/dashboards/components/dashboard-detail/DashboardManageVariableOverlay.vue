@@ -87,7 +87,7 @@ const state = reactive({
         { name: 'buttons', label: ' ', width: '144px' },
     ] as DataTableField[],
     showDeleteWarning: computed<boolean>(() => {
-        const _varsKeys = Object.keys(dashboardDetailState.dashboardInfo?.vars || {});
+        const _varsKeys = Object.keys(dashboardDetailGetters.dashboardInfo?.vars || {});
         return _varsKeys.includes(state.selectedVariableKey);
     }),
 });
@@ -108,7 +108,7 @@ const deleteDashboardVarsSchema = async (dashboardId: string, variableKey: strin
     try {
         const _varsSchemaProperties = cloneDeep(dashboardDetailGetters.dashboardVarsSchemaProperties);
         delete _varsSchemaProperties[variableKey];
-        const _vars = cloneDeep(dashboardDetailState.dashboardInfo?.vars || {});
+        const _vars = cloneDeep(dashboardDetailGetters.dashboardInfo?.vars || {});
         const _tempVars = cloneDeep(dashboardDetailState.vars);
         delete _vars[variableKey];
         delete _tempVars[variableKey];
@@ -152,7 +152,7 @@ const cloneDashboardVarsSchema = async (dashboardId: string, variableKey: string
 };
 const updateUseDashboardVarsSchema = async (dashboardId: string, variableKey: string, use: boolean) => {
     try {
-        const _vars = cloneDeep(dashboardDetailState.dashboardInfo?.vars || {});
+        const _vars = cloneDeep(dashboardDetailGetters.dashboardInfo?.vars || {});
         const _tempVars = cloneDeep(dashboardDetailState.vars);
         delete _vars[variableKey];
         delete _tempVars[variableKey];

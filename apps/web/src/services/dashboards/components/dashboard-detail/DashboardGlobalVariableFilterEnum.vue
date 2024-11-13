@@ -83,7 +83,7 @@ watch(() => dashboardDetailGetters.dashboardVarsSchemaProperties, async (varsSch
     const _variable = props.variable as TextEnumVariable|NumberEnumVariable;
     if (isEqual(varsSchema[_variable.key], prevVarsSchema?.[varsSchema[_variable.key]])) return;
 
-    const value = dashboardDetailState.dashboardInfo?.vars?.[_variable.key];
+    const value = dashboardDetailGetters.dashboardInfo?.vars?.[_variable.key];
     if (value) {
         await initSelected(value);
     } else {

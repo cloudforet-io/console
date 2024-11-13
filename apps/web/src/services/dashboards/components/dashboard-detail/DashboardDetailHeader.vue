@@ -45,11 +45,11 @@ const { getControlMenuItems } = useDashboardControlMenuItems({
     dashboardList: computed(() => dashboardPageControlGetters.allDashboardItems),
 });
 const state = reactive({
-    isSharedDashboard: computed<boolean>(() => !!dashboardDetailState.dashboardInfo?.shared),
-    sharedScope: computed<DashboardScope|undefined>(() => dashboardDetailState.dashboardInfo?.scope),
+    isSharedDashboard: computed<boolean>(() => !!dashboardDetailGetters.dashboardInfo?.shared),
+    sharedScope: computed<DashboardScope|undefined>(() => dashboardDetailGetters.dashboardInfo?.scope),
     selectedSharedScope: 'WORKSPACE' as DashboardScope,
     showBadge: computed<boolean>(() => {
-        if (dashboardDetailState.dashboardInfo?.user_id) return true;
+        if (dashboardDetailGetters.dashboardInfo?.user_id) return true;
         // TODO: is admin type dashboard, return true
         return state.isSharedDashboard;
     }),
@@ -65,7 +65,7 @@ const state = reactive({
         if (dashboardDetailState.dashboardId?.startsWith('private')) return i18n.t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE');
         if (state.isSharedDashboard) {
             if (storeState.isAdminMode) {
-                if (dashboardDetailState.dashboardInfo?.scope === 'PROJECT') {
+                if (dashboardDetailGetters.dashboardInfo?.scope === 'PROJECT') {
                     return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
                 }
                 return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_WORKSPACES');
