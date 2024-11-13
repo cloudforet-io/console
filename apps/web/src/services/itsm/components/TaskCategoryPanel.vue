@@ -1,0 +1,107 @@
+<script setup lang="ts">
+import { onBeforeMount, reactive, computed } from 'vue';
+
+import {
+    PPaneLayout, PHeadingLayout, PFieldTitle, PButton, PDataTable, PBadge,
+} from '@cloudforet/mirinae';
+import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
+
+import { useTaskManagementPageStore } from '@/services/itsm/stores/admin/task-management-page-store';
+
+
+const taskManagementPageStore = useTaskManagementPageStore();
+const taskCategoryStore = taskManagementPageStore.taskCategoryStore;
+const packageStore = taskManagementPageStore.packageStore;
+
+const state = reactive({
+    categoryFields: computed<DataTableField[]>(() => [
+        {
+            name: 'name',
+            label: 'Category Name',
+            width: '20%',
+        },
+        {
+            name: 'package',
+            label: 'Package',
+            width: '10%',
+            sortable: true,
+        },
+        {
+            name: 'description',
+            label: 'Description',
+            width: '60%',
+        },
+        {
+            name: 'buttons',
+            label: ' ',
+        },
+    ]),
+    packageMap: computed(() => {
+        if (!packageStore.state.packages) return {};
+        return packageStore.state.packages.reduce((acc, cur) => {
+            acc[cur.package_id] = cur;
+            return acc;
+        }, {} as Record<string, any>);
+    }),
+});
+
+onBeforeMount(() => {
+    taskCategoryStore.fetchCategories();
+});
+</script>
+
+<template>
+    <p-pane-layout class="mt-4">
+        <p-heading-layout class="pt-6 px-4 mb-6">
+            <template #heading>
+                <p-field-title label="Task Category"
+                               size="lg"
+                               class="mb-2"
+                />
+                <p class="text-label-md text-gray-600">
+                    티켓의 유형을 그룹화한 것입니다. 고객은 티켓을 제출할 때 적절한 카테고리를 선택하여 담당자가 티켓을 효율적으로 관리할 수 있게 돕습니다.
+                </p>
+            </template>
+            <template #extra>
+                <p-button icon-left="ic_plus_bold"
+                          size="md"
+                          style-type="substitutive"
+                          @click="taskManagementPageStore.openAddCategoryModal()"
+                >
+                    Add Category
+                </p-button>
+            </template>
+        </p-heading-layout>
+        <p-data-table :loading="taskCategoryStore.state.loading"
+                      :items="taskCategoryStore.state.taskCategories"
+                      :fields="state.categoryFields"
+        >
+            <template #col-package-format="{ item }">
+                <p-badge shape="square"
+                         badge-type="subtle"
+                         style-type="gray200"
+                         size="md"
+                >
+                    {{ state.packageMap[item.package_id] ? state.packageMap[item.package_id].name : item.package_id }}
+                </p-badge>
+            </template>
+            <template #col-buttons-format="{ item }">
+                <p-button icon-left="ic_edit"
+                          size="sm"
+                          style-type="tertiary"
+                          @click="taskManagementPageStore.openEditCategoryModal(item.category_id)"
+                >
+                    Edit
+                </p-button>
+                <p-button class="ml-2"
+                          icon-left="ic_delete"
+                          size="sm"
+                          style-type="tertiary"
+                >
+                    Delete
+                </p-button>
+            </template>
+        </p-data-table>
+    </p-pane-layout>
+</template>
+

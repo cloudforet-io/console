@@ -3,5 +3,5 @@
 </script>
 
 <template>
-    <div class="admin-task-management-settings-page" />
+    <div>detail</div>
 </template>
