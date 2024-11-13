@@ -139,6 +139,9 @@ const handleClickResyncButton = () => {
 const handleSelectStatus = (selected: string) => {
     tableState.selectedStatusFilter = selected;
 };
+const handleConfirmModal = () => {
+    fetchJobList();
+};
 
 let jobListApiQueryHelper = new ApiQueryHelper();
 let jobListApiQuery = jobListApiQueryHelper.data;
@@ -262,6 +265,7 @@ watch([() => storeState.activeTab, () => storeState.selectedItem], async () => {
                                                                   :modal-visible.sync="state.modalVisible"
                                                                   :modal-type="state.modalType"
                                                                   :selected-job-item="state.selectedJobItem"
+                                                                  @confirm="handleConfirmModal"
         />
     </div>
 </template>

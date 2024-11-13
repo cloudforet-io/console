@@ -8,11 +8,13 @@ import {
     PButtonModal, PTextEditor, PFieldTitle, PToggleButton, PTextInput, PDatetimePicker, PScopedNotification,
 } from '@cloudforet/mirinae';
 
+import type { CostDataSourceSyncParameters } from '@/schema/cost-analysis/data-source/api-verbs/sync';
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import type { CostJobItem, DataCollectionHistoryModalType } from '@/services/cost-explorer/types/data-sources-type';
+import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
+import type { CostJobItem, DataCollectionHistoryModalType, DataSourceItem } from '@/services/cost-explorer/types/data-sources-type';
 
 interface DateOption {
     minDate?: string;
@@ -31,10 +33,19 @@ const props = withDefaults(defineProps<Props>(), {
     selectedJobItem: undefined,
 });
 
-const emit = defineEmits<{(e: 'update:modal-visible'): void }>();
+const dataSourcesPageStore = useDataSourcesPageStore();
+const dataSourcesPageGetters = dataSourcesPageStore.getters;
 
+const emit = defineEmits<{(e: 'update:modal-visible'): void,
+    (e: 'confirm'): void
+}>();
+
+const storeState = reactive({
+    selectedDataSourceItem: computed<DataSourceItem>(() => dataSourcesPageGetters.selectedDataSourceItem),
+});
 const state = reactive({
     proxyVisible: useProxyValue('modalVisible', props, emit),
+    loading: false,
     headerTitle: computed<TranslateResult>(() => {
         if (props.modalType === 'CANCEL') {
             return i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.CANCEL_MODAL_TITLE');
@@ -100,8 +111,23 @@ const handleChangeToggleButton = () => {
     state.endDateSetting = {};
 };
 
-const handleConfirmButton = () => {
-    state.proxyVisible = false;
+const handleConfirmButton = async () => {
+    if (props.modalType === 'ERROR') return;
+
+    let params: CostDataSourceSyncParameters;
+    try {
+        state.loading = true;
+        if (props.modalType === 'RE-SYNC') {
+            params = {
+                data_source_id: storeState.selectedDataSourceItem.data_source_id,
+            };
+            await dataSourcesPageStore.fetchSyncDatasource(params);
+        }
+        await emit('confirm');
+    } finally {
+        state.loading = false;
+        state.proxyVisible = false;
+    }
 };
 </script>
 
@@ -112,6 +138,7 @@ const handleConfirmButton = () => {
         :size="props.modalType === 'ERROR' ? 'md' : 'sm'"
         fade
         backdrop
+        :loading="state.loading"
         :theme-color="props.modalType === 'CANCEL' ? 'alert' : 'primary'"
         :visible.sync="state.proxyVisible"
         class="data-source-management-tab-data-collection-history-modal"
