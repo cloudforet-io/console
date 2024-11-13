@@ -44,7 +44,8 @@ type DataTableModel = PublicDataTableModel|PrivateDataTableModel;
 type WidgetModel = PublicWidgetModel|PrivateWidgetModel;
 type WidgetUpdateParameters = PublicWidgetUpdateParameters|PrivateWidgetUpdateParameters;
 export const useWidgetGenerateStore = defineStore('widget-generate', () => {
-    const dashboardDetailGetters = useDashboardDetailInfoStore().getters;
+    const dashboardDetailStore = useDashboardDetailInfoStore();
+    const dashboardDetailGetters = dashboardDetailStore.getters;
     const state = reactive({
         // display
         showOverlay: false,

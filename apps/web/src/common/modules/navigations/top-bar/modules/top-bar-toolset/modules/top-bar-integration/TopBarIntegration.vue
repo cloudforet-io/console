@@ -116,5 +116,13 @@ const handleIntegrationButtonClick = () => {
         margin-right: -0.5rem;
         z-index: 1000;
     }
+
+    @screen mobile {
+        position: initial;
+        .integration-content {
+            width: 100%;
+            left: 0;
+        }
+    }
 }
 </style>
