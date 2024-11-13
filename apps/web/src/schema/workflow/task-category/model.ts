@@ -1,5 +1,6 @@
 import type { Tags } from '@/schema/_common/model';
-import type { TaskStatusOption, TaskField } from '@/schema/workflow/_types/task-field-type';
+import type { TaskField } from '@/schema/workflow/_types/task-field-type';
+import type { TaskStatusOption } from '@/schema/workflow/task/type';
 
 export interface TaskCategoryModel {
     category_id: string;

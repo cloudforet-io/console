@@ -14,6 +14,10 @@ export const ITSM_ROUTE = Object.freeze({
     },
     TASK_MANAGEMENT: {
         _NAME: `${MENU_ID.ITSM}.${MENU_ID.TASK_MANAGEMENT}`,
-        SETTINGS: { _NAME: `${MENU_ID.ITSM}.${MENU_ID.TASK_MANAGEMENT}.settings` },
+        TASK_CATEGORY: {
+            _NAME: `${MENU_ID.ITSM}.${MENU_ID.TASK_MANAGEMENT}.task_category`,
+            DETAIL: { _NAME: `${MENU_ID.ITSM}.${MENU_ID.TASK_MANAGEMENT}.task_category.detail` },
+            CREATE: { _NAME: `${MENU_ID.ITSM}.${MENU_ID.TASK_MANAGEMENT}.task_category.create` },
+        },
     },
 });

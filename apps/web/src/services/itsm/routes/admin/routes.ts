@@ -9,7 +9,8 @@ import { ITSM_ROUTE } from '@/services/itsm/routes/route-constant';
 
 const ITSMContainer = () => import('@/services/itsm/ITSMContainer.vue');
 
-const AdminTaskManagementSettingsPage = () => import('@/services/itsm/pages/admin/AdminTaskManagementSettingsPage.vue');
+const AdminTaskManagementPage = () => import('@/services/itsm/pages/admin/AdminTaskManagementPage.vue');
+const AdminTaskCategoryDetailPage = () => import('@/services/itsm/pages/admin/AdminTaskCategoryDetailPage.vue');
 const AdminWorkflowPage = () => import('@/services/itsm/pages/admin/AdminWorkflowPage.vue');
 
 const adminItsmRoutes: RouteConfig = {
@@ -25,17 +26,24 @@ const adminItsmRoutes: RouteConfig = {
         {
             path: 'task-management',
             name: makeAdminRouteName(ITSM_ROUTE.TASK_MANAGEMENT._NAME),
-            redirect: () => ({ name: makeAdminRouteName(ITSM_ROUTE.TASK_MANAGEMENT.SETTINGS._NAME) }),
+            redirect: () => ({ name: makeAdminRouteName(ITSM_ROUTE.TASK_MANAGEMENT.TASK_CATEGORY._NAME) }),
             meta: {
                 menuId: MENU_ID.TASK_MANAGEMENT,
                 translationId: MENU_INFO_MAP[MENU_ID.TASK_MANAGEMENT].translationId,
             },
-            component: { template: '<router-view />' },
+            component: AdminTaskManagementPage as any,
             children: [
                 {
-                    path: 'settings',
-                    name: makeAdminRouteName(ITSM_ROUTE.TASK_MANAGEMENT.SETTINGS._NAME),
-                    component: AdminTaskManagementSettingsPage as any,
+                    path: 'task-category',
+                    name: makeAdminRouteName(ITSM_ROUTE.TASK_MANAGEMENT.TASK_CATEGORY._NAME),
+                    component: { template: '<router-view />' },
+                    children: [
+                        {
+                            path: ':taskCategoryId',
+                            name: makeAdminRouteName(ITSM_ROUTE.TASK_MANAGEMENT.TASK_CATEGORY.DETAIL._NAME),
+                            component: AdminTaskCategoryDetailPage as any,
+                        },
+                    ],
                 },
             ],
         },
