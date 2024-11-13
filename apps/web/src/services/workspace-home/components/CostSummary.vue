@@ -118,15 +118,15 @@ const handleSelectedProject = async (selectedProject: string[]) => {
 };
 const fillMissingMonths = (dataList: CostXYChartData[]): CostXYChartData[] => {
     const result: CostXYChartData[] = [];
+    const today = dayjs().utc();
     if (dataList.length === 0) return result;
 
     dataList.sort((a, b) => dayjs(a.date).utc().diff(dayjs(b.date).utc()));
 
     const startDate = dayjs(dataList[0]?.date).utc();
-    const endDate = dayjs(dataList[dataList.length - 1]?.date).utc();
     let currentDate = startDate;
 
-    while (!currentDate.isAfter(endDate)) {
+    while (!currentDate.isAfter(today, 'month')) {
         const dateToCheck = currentDate.clone();
         const data = dataList.find((item) => dayjs(item.date).utc().isSame(dateToCheck, 'month'));
         result.push(
