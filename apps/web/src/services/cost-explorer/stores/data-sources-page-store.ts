@@ -19,6 +19,7 @@ import type {
 } from '@/schema/cost-analysis/data-source-account/model';
 import type { CostDataSourceGetParameters } from '@/schema/cost-analysis/data-source/api-verbs/get';
 import type { CostDataSourceListParameters } from '@/schema/cost-analysis/data-source/api-verbs/list';
+import type { CostDataSourceSyncParameters } from '@/schema/cost-analysis/data-source/api-verbs/sync';
 import type { CostDataSourceModel } from '@/schema/cost-analysis/data-source/model';
 import type { CostJobListParameters } from '@/schema/cost-analysis/job/api-verbs/list';
 import type { CostJobModel } from '@/schema/cost-analysis/job/model';
@@ -262,6 +263,15 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
             } catch (e) {
                 ErrorHandler.handleError(e);
                 return [];
+            }
+        },
+        fetchSyncDatasource: async (params: CostDataSourceSyncParameters) => {
+            try {
+                await SpaceConnector.clientV2.costAnalysis.dataSource.sync<CostDataSourceSyncParameters, CostDataSourceModel>(
+                    params,
+                );
+            } catch (e: any) {
+                ErrorHandler.handleError(e, true);
             }
         },
     };
