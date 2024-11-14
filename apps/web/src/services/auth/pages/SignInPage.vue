@@ -90,7 +90,7 @@ const onSignIn = async (userId:string) => {
 
         if (!lastAccessedWorkspaceId) {
             await router.push({
-                name: LANDING_ROUTE._NAME,
+                name: LANDING_ROUTE.WORKSPACE._NAME,
             });
             return;
         }
