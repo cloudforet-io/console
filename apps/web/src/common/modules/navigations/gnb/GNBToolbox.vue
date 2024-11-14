@@ -60,7 +60,7 @@ const state = reactive({
             routes.push({
                 name: i18n.t('MENU.CONSOLE_HOME'),
                 to: {
-                    name: LANDING_ROUTE._NAME,
+                    name: LANDING_ROUTE.DOMAIN._NAME,
                 },
             });
         } else if (!storeState.isAdminMode && storeState.currentWorkspaceId) {

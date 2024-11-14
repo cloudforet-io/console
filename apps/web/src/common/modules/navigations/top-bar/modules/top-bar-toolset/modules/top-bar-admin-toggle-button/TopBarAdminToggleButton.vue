@@ -37,7 +37,7 @@ const handleToggleAdminMode = throttle(async () => {
     if (state.isAdminMode) {
         await userWorkspaceStore.load();
         if (state.workspaceList.length === 0) {
-            await router.push({ name: LANDING_ROUTE._NAME });
+            await router.push({ name: LANDING_ROUTE.DOMAIN._NAME });
             return;
         }
         appContextStore.exitAdminMode();

@@ -15,6 +15,7 @@ export const setUser = async (state: UserState, userInfo: UserState): Promise<vo
     state.requiredActions = userInfo.requiredActions;
     state.emailVerified = userInfo.emailVerified;
     state.mfa = userInfo.mfa;
+    state.currentRoleInfo = userInfo.currentRoleInfo;
 
     if (userInfo.language) {
         await setI18nLocale(userInfo.language);
