@@ -100,7 +100,7 @@ const state = reactive({
             to: getProperRouteLocation({
                 name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
                 params: {
-                    dataSourceId: costQuerySetState.selectedDataSourceId ?? '',
+                    dataSourceId: storeState.isUnifiedCostOn ? UNIFIED_COST_KEY : (costQuerySetState.selectedDataSourceId ?? ''),
                     costQuerySetId: d.cost_query_set_id,
                 },
             }),
@@ -180,6 +180,10 @@ const handleSelectUnifiedCostToggle = (value: boolean) => {
         },
     })).catch(() => {});
 };
+
+(() => {
+    costQuerySetStore.setUnifiedCostOn(storeState.isAdminMode);
+})();
 
 </script>
 

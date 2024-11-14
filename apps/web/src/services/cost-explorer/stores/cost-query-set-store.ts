@@ -13,6 +13,7 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { UNIFIED_COST_KEY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { ADMIN_MANAGED_COST_QUERY_SET_LIST, MANAGED_COST_QUERY_SET_LIST } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 
 
@@ -27,7 +28,7 @@ export const useCostQuerySetStore = defineStore('cost-query-set', () => {
         costQuerySetList: [] as CostQuerySetModel[],
         selectedQuerySetId: undefined as string|undefined,
         selectedDataSourceId: undefined as string|undefined,
-        isUnifiedCostOn: true as boolean,
+        isUnifiedCostOn: _state.isAdminMode as boolean,
     });
 
     const getters = reactive({
@@ -74,7 +75,7 @@ export const useCostQuerySetStore = defineStore('cost-query-set', () => {
         }
         try {
             const { status, response } = await fetcher({
-                data_source_id: state.selectedDataSourceId,
+                data_source_id: state.isUnifiedCostOn ? UNIFIED_COST_KEY : state.selectedDataSourceId,
                 query: apiQueryHelper.data,
             });
             if (status === 'succeed' && response?.results) {
@@ -91,7 +92,7 @@ export const useCostQuerySetStore = defineStore('cost-query-set', () => {
         state.costQuerySetList = [];
         state.selectedDataSourceId = undefined;
         state.selectedQuerySetId = undefined;
-        state.isUnifiedCostOn = true;
+        state.isUnifiedCostOn = _state.isAdminMode;
     };
 
 
