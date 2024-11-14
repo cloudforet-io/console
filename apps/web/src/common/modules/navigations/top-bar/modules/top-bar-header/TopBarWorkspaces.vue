@@ -143,7 +143,7 @@ const filterStarredItems = (menuItems: FavoriteItem[] = []): MenuItem[] => {
 };
 const handleClickAllWorkspaceButton = () => {
     router.push({
-        name: LANDING_ROUTE._NAME,
+        name: LANDING_ROUTE.WORKSPACE._NAME,
     });
 };
 const checkFavoriteItem = (id: string) => {
