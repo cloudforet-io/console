@@ -14,7 +14,7 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { UNIFIED_COST_KEY } from '@/services/cost-explorer/constants/cost-explorer-constant';
-import { ADMIN_MANAGED_COST_QUERY_SET_LIST, MANAGED_COST_QUERY_SET_LIST } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
+import { ADMIN_MANAGED_COST_QUERY_SET_LIST, MANAGED_COST_QUERY_SET_IDS, MANAGED_COST_QUERY_SET_LIST } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 
 
 export const useCostQuerySetStore = defineStore('cost-query-set', () => {
@@ -40,6 +40,7 @@ export const useCostQuerySetStore = defineStore('cost-query-set', () => {
             if (!state.selectedDataSourceId) return [];
             let _managedCostQuerySetList = MANAGED_COST_QUERY_SET_LIST;
             if (_state.isAdminMode) _managedCostQuerySetList = ADMIN_MANAGED_COST_QUERY_SET_LIST;
+            if (state.isUnifiedCostOn) _managedCostQuerySetList = _managedCostQuerySetList.filter((item) => item.cost_query_set_id !== MANAGED_COST_QUERY_SET_IDS.DAILY_PRODUCT);
             return _managedCostQuerySetList.map((item) => ({
                 ...item,
                 data_source_id: state.selectedDataSourceId,
