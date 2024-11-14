@@ -57,10 +57,10 @@ watch(() => dashboardDetailGetters.dashboardVarsSchemaProperties, (varsSchema, p
     const _variable = props.variable as NumberAnyVariable;
     if (isEqual(varsSchema[_variable.key], prevVarsSchema?.[varsSchema[_variable.key]])) return;
 
-    state.value = dashboardDetailState.dashboardInfo?.vars?.[_variable.key] || _variable.options.min;
+    state.value = dashboardDetailGetters.dashboardInfo?.vars?.[_variable.key] || _variable.options.min;
     changeVariables(state.value);
 
-    state.keyword = dashboardDetailState.dashboardInfo?.vars?.[_variable.key] || _variable.options.min;
+    state.keyword = dashboardDetailGetters.dashboardInfo?.vars?.[_variable.key] || _variable.options.min;
 }, { immediate: true });
 
 </script>
