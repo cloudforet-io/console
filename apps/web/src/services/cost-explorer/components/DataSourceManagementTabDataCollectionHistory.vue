@@ -8,7 +8,7 @@ import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-ut
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PButton, PToolboxTable, PHeading, PI, PHeadingLayout, PSelectStatus,
+    PButton, PToolboxTable, PHeading, PI, PHeadingLayout, PSelectStatus, PProgressBar,
 } from '@cloudforet/mirinae';
 import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
@@ -53,7 +53,8 @@ const tableState = reactive({
     pageLimit: 15,
     fields: computed<DefinitionField[]>(() => [
         { name: 'job_id', label: 'Job ID', sortable: false },
-        { name: 'status', label: 'Status', sortable: false },
+        { name: 'status', label: 'Collection Status', sortable: false },
+        { name: 'progress', label: 'Job Progress', sortable: false },
         { name: 'total_tasks', label: 'Total Task', sortable: false },
         { name: 'created_at', label: 'Created' },
         { name: 'finished_at', label: 'Finished', sortable: false },
@@ -142,6 +143,11 @@ const handleSelectStatus = (selected: string) => {
 const handleConfirmModal = () => {
     fetchJobList();
 };
+const getRemainedTasksPercentage = (item: CostJobItem) => {
+    const remainedTasks = item?.remained_tasks ?? 0;
+    const totalTasks = item?.total_tasks ?? 0;
+    return totalTasks > 0 ? (((totalTasks - remainedTasks) / totalTasks) * 100).toFixed(2) : 100;
+};
 
 let jobListApiQueryHelper = new ApiQueryHelper();
 let jobListApiQuery = jobListApiQueryHelper.data;
@@ -204,7 +210,9 @@ watch([() => storeState.activeTab, () => storeState.selectedItem], async () => {
                            :total-count="storeState.totalCount"
                 />
             </template>
-            <template #extra>
+            <template v-if="storeState.selectedDataSourceItem.state === 'ENABLED'"
+                      #extra
+            >
                 <p-button style-type="tertiary"
                           @click="handleClickResyncButton"
                 >
@@ -260,6 +268,16 @@ watch([() => storeState.activeTab, () => storeState.selectedItem], async () => {
                     {{ getStatusInfo(value).text }}
                 </span>
             </template>
+            <template #col-progress-format="{item}">
+                <div class="col-progress-bar">
+                    <p-progress-bar :percentage="getRemainedTasksPercentage(item)"
+                                    :color="green[500]"
+                                    size="md"
+                                    class="status-progress-bar"
+                    />
+                    <span>{{ getRemainedTasksPercentage(item) }}%</span>
+                </div>
+            </template>
         </p-toolbox-table>
         <data-source-management-tab-data-collection-history-modal v-if="state.modalVisible"
                                                                   :modal-visible.sync="state.modalVisible"
@@ -302,6 +320,10 @@ watch([() => storeState.activeTab, () => storeState.selectedItem], async () => {
         }
         .icon-info {
             margin-right: 0.5rem;
+        }
+        .col-progress-bar {
+            @apply flex items-center;
+            gap: 0.25rem;
         }
     }
 }

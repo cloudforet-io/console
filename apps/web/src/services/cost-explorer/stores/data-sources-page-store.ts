@@ -86,7 +86,7 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
         jobList: computed<CostJobItem[]>(() => (state.jobList.map((i) => ({
             ...i,
             total_tasks: i.total_tasks || 0,
-            finished_at: dayjs.utc(i.finished_at).tz(_getters.timezone).format('YYYY-MM-DD HH:mm:ss'),
+            finished_at: i.status === 'IN_PROGRESS' ? '--' : dayjs.utc(i.finished_at).tz(_getters.timezone).format('YYYY-MM-DD HH:mm:ss'),
             created_at: dayjs.utc(i.created_at).tz(_getters.timezone).format('YYYY-MM-DD HH:mm:ss'),
             duration: durationFormatter(i.created_at, i.finished_at, _getters.timezone) || '--',
         })))),
