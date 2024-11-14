@@ -97,6 +97,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const state = reactive({
         loadingDashboard: false,
         dashboardId: '' as string | undefined,
+        dashboard: undefined as PublicDashboardModel|PrivateDashboardModel|undefined,
         projectId: undefined as string | undefined,
         options: DASHBOARD_DEFAULT.options as DashboardOptions,
         vars: {} as DashboardVars,
@@ -120,7 +121,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const getters = reactive({
         dashboardInfo: computed<PublicDashboardModel|PrivateDashboardModel|undefined>(() => {
             const _allDashboardItems = [...dashboardState.privateDashboardItems, ...dashboardState.publicDashboardItems];
-            return _allDashboardItems.find((d) => d.dashboard_id === state.dashboardId);
+            return _allDashboardItems.find((d) => d.dashboard_id === state.dashboardId) || state.dashboard;
         }),
         dashboardName: computed<string>(() => getters.dashboardInfo?.name || ''),
         dashboardLabels: computed<string[]>(() => getters.dashboardInfo?.labels || []),
@@ -225,6 +226,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             return;
         }
         state.vars = dashboardInfo.vars ?? {};
+        state.dashboard = dashboardInfo;
         const _dashboardInfo = cloneDeep(dashboardInfo);
         state.dashboardId = _dashboardInfo.dashboard_id;
         state.options = {
@@ -243,6 +245,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
 
         const _dashboardInfo = cloneDeep(dashboardInfo);
         state.dashboardId = _dashboardInfo.dashboard_id;
+        state.dashboard = _dashboardInfo;
         state.options = {
             date_range: {
                 start: _dashboardInfo.options?.date_range?.start,
@@ -271,7 +274,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     };
     const privateDashboardGetFetcher = getCancellableFetcher(SpaceConnector.clientV2.dashboard.privateDashboard.get);
     const publicDashboardGetFetcher = getCancellableFetcher(SpaceConnector.clientV2.dashboard.publicDashboard.get);
-    const getDashboardInfo = async (dashboardId: undefined|string) => {
+    const getDashboardInfo = async ({ dashboardId, fetchWidgets = false }: { dashboardId: undefined|string, fetchWidgets?: boolean}) => {
         if (dashboardId === state.dashboardId || dashboardId === undefined) return;
 
         const isPrivate = dashboardId?.startsWith('private');
@@ -279,6 +282,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         // WARN:: from under this line, beware using originState. originState could reference irrelevant dashboard data
         state.dashboardId = dashboardId;
         state.loadingDashboard = true;
+        if (fetchWidgets) setDashboardWidgets([]);
         try {
             const params: GetDashboardParameters = { dashboard_id: dashboardId as string };
             const { status, response } = await fetcher<GetDashboardParameters, DashboardModel>(params);
@@ -287,6 +291,9 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
                     _setDashboardInfoStoreState(response);
                 } else {
                     _setDashboardInfoStoreStateV2(response);
+                }
+                if (fetchWidgets) {
+                    await listDashboardWidgets();
                 }
             }
         } catch (e) {

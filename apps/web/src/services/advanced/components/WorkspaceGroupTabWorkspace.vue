@@ -271,7 +271,7 @@ onMounted(async () => {
             <template #col-name-format="{ value, item }">
                 <div class="name-wrapper">
                     <workspace-logo-icon :text="value"
-                                         :theme="item?.tags.theme"
+                                         :theme="item?.tags?.theme"
                                          size="xs"
                     />
                     <p-link :text="value"

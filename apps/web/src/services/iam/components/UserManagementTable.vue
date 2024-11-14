@@ -362,7 +362,7 @@ const isWorkspaceGroupUser = (item: ExtendUserListItemType) => !!item?.role_bind
                 </span>
             </template>
             <template #col-tags-format="{value}">
-                <template v-if="!!Object.keys(value).length">
+                <template v-if="value && !!Object.keys(value).length">
                     <p-badge v-for="([key, val], idx) in Object.entries(value)"
                              :key="`${key}-${val}-${idx}`"
                              badge-type="subtle"
