@@ -99,6 +99,7 @@ export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<
 export const signOut = ({ commit }): void => {
     SpaceConnector.flushToken();
     commit('setCurrentGrantInfo', undefined);
+    commit('setCurrentRoleInfo', undefined);
 };
 const getRoleTypeFromToken = (token: string): RoleType => {
     const decodedToken = jwtDecode<JWTPayload>(token);
@@ -129,6 +130,7 @@ export const grantRoleAndLoadReferenceData: Action<UserState, any> = async ({ co
                 workspaceId: grantRequest.workspace_id,
                 pageAccess: rootRoleInfo?.pageAccess || undefined,
             };
+            console.log({ currentRoleType, grantInfo });
             commit('setCurrentGrantInfo', grantInfo);
 
             const currentRoleInfo = await getGrantedRole(response.role_id, currentRoleType, response.role_type);
