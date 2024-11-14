@@ -130,7 +130,6 @@ export const grantRoleAndLoadReferenceData: Action<UserState, any> = async ({ co
                 workspaceId: grantRequest.workspace_id,
                 pageAccess: rootRoleInfo?.pageAccess || undefined,
             };
-            console.log({ currentRoleType, grantInfo });
             commit('setCurrentGrantInfo', grantInfo);
 
             const currentRoleInfo = await getGrantedRole(response.role_id, currentRoleType, response.role_type);
