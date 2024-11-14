@@ -126,9 +126,10 @@
                     </slot>
                 </thead>
                 <tbody ref="tbodyRef">
-                    <slot v-if="showNoData"
-                          name="no-data"
-                          v-bind="getDefaultSlotProps()"
+                    <slot
+                        v-if="showNoData"
+                        name="no-data"
+                        v-bind="getDefaultSlotProps()"
                     >
                         <div class="no-data">
                             <slot name="no-data-format"
@@ -217,14 +218,26 @@
                         </tr>
                     </slot>
                 </tbody>
-                <tfoot>
-                    <slot name="foot"
-                          v-bind="getDefaultSlotProps()"
-                    >
-                        <slot name="tf-col-format"
-                              v-bind="getTfSlotProps()"
-                        />
-                    </slot>
+                <tfoot v-if="!showNoData">
+                    <tr>
+                        <slot name="foot"
+                              v-bind="getDefaultSlotProps()"
+                        >
+                            <td v-for="(field, colIndex) in leafFields"
+                                :key="`tf-${contextKey}-${colIndex}`"
+                                :class="field.textAlign || DATA_TABLE_CELL_TEXT_ALIGN.left"
+                            >
+                                <slot
+                                    name="tf-col-format"
+                                    v-bind="getTfSlotProps(field, colIndex)"
+                                >
+                                    <slot :name="`tf-col-${field.name}-format`"
+                                          v-bind="getTfSlotProps(field, colIndex)"
+                                    />
+                                </slot>
+                            </td>
+                        </slot>
+                    </tr>
                 </tfoot>
             </table>
         </div>
@@ -246,7 +259,7 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
+import type { PropType, SetupContext } from 'vue';
 import {
     toRefs,
     computed,
@@ -388,6 +401,10 @@ export default defineComponent<DataTableProps>({
             type: Boolean,
             default: false,
         },
+        footerTitle: {
+            type: String,
+            default: 'Total',
+        },
     },
     setup(props, { emit }) {
         const getChildFields = (
@@ -448,6 +465,7 @@ export default defineComponent<DataTableProps>({
         });
 
         const slots = useSlots();
+        const isExpandable = (_slots: SetupContext['slots']) => _slots['tf-col-format'] !== undefined || _slots.foot !== undefined;
 
         const state = reactive({
             tbodyRef: null as HTMLElement | null,
@@ -516,33 +534,14 @@ export default defineComponent<DataTableProps>({
             rowIndex,
         });
 
-        const getTfSlotProps = () => {
-            const valueArr: object[][] = (props.fields as DataTableFieldType[]).map(
-                (field, idx) => props.items.map((item) => {
-                    // TODO: console : item, field, getValue(item, field)
-                    console.log();
-                    return {
-                        val: getValue(item, field),
-                        colIdx: idx,
-                    };
-                }),
-            );
-            // console.log(valueArr);
+        const getTfSlotProps = (field, colIndex) => {
+            const values = props.items.map((item) => getValue(item, field));
 
-            if (slots['tf-col-format']) {
-                return {
-                    values: valueArr.map((val: object[], idx: number) => val.reduce(
-                        (a: any, b: any) => ({
-                            val: a.val + b.val,
-                            colIdx: idx,
-                            field: props.fields[idx],
-                        }),
-                        { val: 0 },
-                    )),
-                };
-            }
-            return {};
-            // TODO: 총합, 평균과 같은 footer종류에 대한 걸 서비스 페이지에서 직접 구현해야하는거면 slot은 어떻게 구현해야할지...?
+            return {
+                field,
+                colIndex,
+                values,
+            };
         };
 
         const getSelectedState = (item, index) => (props.multiSelect
@@ -688,6 +687,7 @@ export default defineComponent<DataTableProps>({
             getFieldColspan,
             getValue,
             slots,
+            isExpandable,
             getDefaultSlotProps,
             getHeadSlotProps,
             getColSlotProps,
