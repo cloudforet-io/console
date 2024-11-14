@@ -39,7 +39,7 @@ import CostAnalysisGranularityPeriodDropdown
     from '@/services/cost-explorer/components/CostAnalysisGranularityPeriodDropdown.vue';
 import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import {
-    DYNAMIC_COST_QUERY_SET_PARAMS,
+    DYNAMIC_COST_QUERY_SET_PARAMS, MANAGED_COST_QUERY_SET_ID_LIST,
 } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
@@ -168,8 +168,8 @@ const handleClickFilter = () => {
 const handleUpdateWorkspaceScope = (selectedItems: string) => {
     costAnalysisPageStore.setWorkspaceScope(selectedItems);
 };
-watch(() => costAnalysisPageGetters.selectedQueryId, (updatedQueryId) => {
-    if (updatedQueryId !== '') {
+watch([() => costAnalysisPageGetters.selectedQueryId, () => costAnalysisPageGetters.isUnifiedCost, () => costAnalysisPageGetters.selectedDataSourceId], ([updatedQueryId]) => {
+    if (updatedQueryId !== '' || MANAGED_COST_QUERY_SET_ID_LIST.includes(updatedQueryId)) {
         state.filtersPopoverVisible = false;
     }
 }, { immediate: true });

@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import { cloneDeep, isEmpty, sortBy } from 'lodash';
 import { defineStore } from 'pinia';
 
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter, ConsoleFilterValue } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { CostQuerySetCreateParameters } from '@/schema/cost-analysis/cost-query-set/api-verbs/create';
@@ -78,6 +78,16 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
         selectedQueryId: computed(() => costQuerySetState.selectedQuerySetId),
         costQueryList: computed(() => costQuerySetState.costQuerySetList),
         selectedQuerySet: computed(() => costQuerySetGetters.selectedQuerySet),
+        convertedOriginFilter: computed<Record<string, ConsoleFilterValue | ConsoleFilterValue[]>>(() => {
+            const originFilters:ConsoleFilter[] = getters.selectedQuerySet?.options?.filters ?? [];
+            const _selectedItemsMap: Record<string, ConsoleFilterValue | ConsoleFilterValue[]> = {};
+            (originFilters ?? []).forEach((queryFilter:ConsoleFilter) => {
+                if (queryFilter.k) {
+                    _selectedItemsMap[queryFilter.k] = queryFilter.v;
+                }
+            });
+            return _selectedItemsMap;
+        }),
         selectedDataSourceId: computed(() => costQuerySetState.selectedDataSourceId),
         isUnifiedCost: computed(() => costQuerySetState.isUnifiedCostOn),
         managedCostQuerySetList: computed(() => costQuerySetGetters.managedCostQuerySets),
