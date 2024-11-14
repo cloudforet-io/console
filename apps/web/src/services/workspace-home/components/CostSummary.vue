@@ -126,7 +126,7 @@ const fillMissingMonths = (dataList: CostXYChartData[]): CostXYChartData[] => {
     const startDate = dayjs(dataList[0]?.date).utc();
     let currentDate = startDate;
 
-    while (!currentDate.isAfter(today, 'month')) {
+    while (currentDate.isBefore(today, 'month')) {
         const dateToCheck = currentDate.clone();
         const data = dataList.find((item) => dayjs(item.date).utc().isSame(dateToCheck, 'month'));
         result.push(

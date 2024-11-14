@@ -1826,7 +1826,8 @@
 			"AGGREGATION_DATE": "集計日",
 			"EXCHANGE_RATE_SOURCE": "為替基準",
 			"LAST_DAY_OF_THE_MONTH": "月末",
-			"NOTIFICATION": "集計が完了すると、日付の変更は翌月から適用されます。"
+			"NOTIFICATION": "集計が完了すると、日付の変更は翌月から適用されます。",
+			"UPDATE_SUCCESS_ALT": "通貨設定が正常に更新されました"
 		}
 	},
 	"DASHBOARDS": {

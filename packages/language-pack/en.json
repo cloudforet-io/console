@@ -1826,7 +1826,8 @@
 			"AGGREGATION_DATE": "Aggregation Date",
 			"EXCHANGE_RATE_SOURCE": "Exchange Rate Source",
 			"LAST_DAY_OF_THE_MONTH": "Last day of the month",
-			"NOTIFICATION": "Once aggregated, date changes will take effect starting next month."
+			"NOTIFICATION": "Once aggregated, date changes will take effect starting next month.",
+			"UPDATE_SUCCESS_ALT": "Currency Settings successfully updated"
 		}
 	},
 	"DASHBOARDS": {

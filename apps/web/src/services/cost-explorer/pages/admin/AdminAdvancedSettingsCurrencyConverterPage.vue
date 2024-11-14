@@ -81,7 +81,7 @@ const handleSaveChanges = async () => {
             },
         });
         await initDomain(config);
-        showSuccessMessage(i18n.t('COMMON.SUCCESS'), '');
+        showSuccessMessage(i18n.t('COST_EXPLORER.CURRENCY_CONVERTER_PAGE.UPDATE_SUCCESS_ALT'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, e.message);
     } finally {
