@@ -1363,6 +1363,7 @@
 		},
 		"STARRED": "즐겨찾기",
 		"STARRED_NO_DATA": "즐겨찾기 없음",
+		"SUCCESS": "성공 ",
 		"TAGS": {
 			"ADD": "추가",
 			"ADD_TAG": "태그 추가",

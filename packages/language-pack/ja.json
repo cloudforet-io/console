@@ -1363,6 +1363,7 @@
 		},
 		"STARRED": "お気に入り",
 		"STARRED_NO_DATA": "お気に入りがありません。",
+		"SUCCESS": "成功",
 		"TAGS": {
 			"ADD": "追加",
 			"ADD_TAG": "タグの追加",

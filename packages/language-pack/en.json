@@ -1363,6 +1363,7 @@
 		},
 		"STARRED": "Starred",
 		"STARRED_NO_DATA": "No starred items",
+		"SUCCESS": "Success",
 		"TAGS": {
 			"ADD": "Add",
 			"ADD_TAG": "Add Tag",
