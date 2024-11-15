@@ -30,7 +30,7 @@ const storeState = reactive({
 const state = reactive({
     targetCostDataSource: computed<CostDataSourceItems|undefined>(() => {
         if (!costAnalysisPageGetters.selectedDataSourceId) return undefined;
-        return storeState.costDataSource[costAnalysisPageGetters.selectedDataSourceId];
+        return costAnalysisPageGetters.isUnifiedCost ? undefined : storeState.costDataSource[costAnalysisPageGetters.selectedDataSourceId];
     }),
     additionalMenuItems: computed<MenuItem[]>(() => {
         if (state.targetCostDataSource) {
