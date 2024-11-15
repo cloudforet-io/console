@@ -21,6 +21,7 @@ import type { CostDataSourceGetParameters } from '@/schema/cost-analysis/data-so
 import type { CostDataSourceListParameters } from '@/schema/cost-analysis/data-source/api-verbs/list';
 import type { CostDataSourceSyncParameters } from '@/schema/cost-analysis/data-source/api-verbs/sync';
 import type { CostDataSourceModel } from '@/schema/cost-analysis/data-source/model';
+import type { CostJobCancelParameters } from '@/schema/cost-analysis/job/api-verbs/cancel';
 import type { CostJobListParameters } from '@/schema/cost-analysis/job/api-verbs/list';
 import type { CostJobModel } from '@/schema/cost-analysis/job/model';
 import { store } from '@/store';
@@ -270,6 +271,13 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
                 await SpaceConnector.clientV2.costAnalysis.dataSource.sync<CostDataSourceSyncParameters, CostDataSourceModel>(
                     params,
                 );
+            } catch (e: any) {
+                ErrorHandler.handleError(e, true);
+            }
+        },
+        fetchCancelJob: async (params: CostJobCancelParameters) => {
+            try {
+                await SpaceConnector.clientV2.costAnalysis.job.cancel<CostJobCancelParameters, CostJobModel>(params);
             } catch (e: any) {
                 ErrorHandler.handleError(e, true);
             }

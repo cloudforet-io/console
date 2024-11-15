@@ -8,7 +8,6 @@ import {
     PButtonModal, PTextEditor, PFieldTitle, PToggleButton, PTextInput, PDatetimePicker, PScopedNotification,
 } from '@cloudforet/mirinae';
 
-import type { CostDataSourceSyncParameters } from '@/schema/cost-analysis/data-source/api-verbs/sync';
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -114,14 +113,17 @@ const handleChangeToggleButton = () => {
 const handleConfirmButton = async () => {
     if (props.modalType === 'ERROR') return;
 
-    let params: CostDataSourceSyncParameters;
     try {
         state.loading = true;
         if (props.modalType === 'RE-SYNC') {
-            params = {
+            await dataSourcesPageStore.fetchSyncDatasource({
                 data_source_id: storeState.selectedDataSourceItem.data_source_id,
-            };
-            await dataSourcesPageStore.fetchSyncDatasource(params);
+            });
+        }
+        if (props.modalType === 'CANCEL' && props.selectedJobItem) {
+            await dataSourcesPageStore.fetchCancelJob({
+                job_id: props.selectedJobItem?.job_id,
+            });
         }
         await emit('confirm');
     } finally {

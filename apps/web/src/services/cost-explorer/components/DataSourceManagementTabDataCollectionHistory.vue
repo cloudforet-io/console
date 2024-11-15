@@ -128,6 +128,11 @@ const getStatusInfo = (value: CostJobStatus): CostJobStatusInfo => {
     }
     return info;
 };
+const handleClickCancelDetail = (jobId: string) => {
+    state.modalVisible = true;
+    state.modalType = 'CANCEL';
+    state.selectedJobId = jobId;
+};
 const handleClickErrorDetail = (jobId: string) => {
     state.modalVisible = true;
     state.modalType = 'ERROR';
@@ -267,6 +272,14 @@ watch([() => storeState.activeTab, () => storeState.selectedItem], async () => {
                 <span v-else>
                     {{ getStatusInfo(value).text }}
                 </span>
+                <p-button v-if="storeState.selectedDataSourceItem.state === 'ENABLED' && value === 'IN_PROGRESS'"
+                          size="sm"
+                          style-type="tertiary"
+                          class="ml-2"
+                          @click="handleClickCancelDetail(item.job_id)"
+                >
+                    {{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.CANCEL') }}
+                </p-button>
             </template>
             <template #col-progress-format="{item}">
                 <div class="col-progress-bar">
