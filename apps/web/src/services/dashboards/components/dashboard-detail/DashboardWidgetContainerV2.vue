@@ -86,7 +86,7 @@ const state = reactive({
     mountedWidgetMap: {} as Record<string, boolean>,
     intersectedWidgetMap: {} as Record<string, boolean>,
     isAllWidgetsMounted: computed<boolean>(() => Object.values(state.mountedWidgetMap).every((d) => d)),
-    refinedWidgetInfoList: undefined as RefinedWidgetInfo[]|undefined,
+    refinedWidgetInfoList: [] as RefinedWidgetInfo[],
     overlayType: 'EDIT' as 'EDIT' | 'EXPAND',
     showExpandOverlay: false,
     remountWidgetId: undefined as string|undefined,
@@ -99,7 +99,7 @@ const widgetDeleteState = reactive({
 
 /* Util */
 const { containerWidth } = useDashboardContainerWidth({ containerRef, observeResize: true });
-const getRefinedWidgetInfoList = (dashboardWidgets: Array<PublicWidgetModel|PrivateWidgetModel>): RefinedWidgetInfo[]|undefined => {
+const getRefinedWidgetInfoList = (dashboardWidgets: Array<PublicWidgetModel|PrivateWidgetModel>): RefinedWidgetInfo[] => {
     if (!dashboardWidgets.length) {
         return [];
     }
