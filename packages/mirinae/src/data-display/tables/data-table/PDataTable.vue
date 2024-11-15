@@ -168,11 +168,12 @@
                             >
                                 <p-checkbox
                                     v-if="multiSelect"
-                                    v-model="proxyState.proxySelectIndex"
+                                    :value="rowIndex"
+                                    :selected="proxyState.proxySelectIndex"
                                     :disabled="
                                         getRowSelectable ? getRowSelectable(item, rowIndex) : false
                                     "
-                                    :value="rowIndex"
+                                    @change="proxyState.proxySelectIndex = $event"
                                 />
                                 <p-radio
                                     v-else
@@ -218,11 +219,12 @@
                         </tr>
                     </slot>
                 </tbody>
-                <tfoot v-if="!showNoData">
+                <tfoot v-if="!showNoData && isExpandable(slots)">
                     <tr>
                         <slot name="foot"
                               v-bind="getDefaultSlotProps()"
                         >
+                            <td v-if="selectable" />
                             <td v-for="(field, colIndex) in leafFields"
                                 :key="`tf-${contextKey}-${colIndex}`"
                                 :class="field.textAlign || DATA_TABLE_CELL_TEXT_ALIGN.left"
@@ -230,11 +232,7 @@
                                 <slot
                                     name="tf-col-format"
                                     v-bind="getTfSlotProps(field, colIndex)"
-                                >
-                                    <slot :name="`tf-col-${field.name}-format`"
-                                          v-bind="getTfSlotProps(field, colIndex)"
-                                    />
-                                </slot>
+                                />
                             </td>
                         </slot>
                     </tr>
@@ -294,7 +292,7 @@ interface TableField extends DataTableFieldType {
   depth?: number;
 }
 
-export default defineComponent<DataTableProps>({
+export default defineComponent<DataTableProps, any>({
     name: 'PDataTable',
     components: {
         PSpinner,
