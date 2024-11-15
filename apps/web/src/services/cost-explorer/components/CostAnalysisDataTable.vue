@@ -696,8 +696,8 @@ watch(
                     </p-link>
                 </span>
             </template>
-            <template v-if="tableState.items.length > 0"
-                      #tf-col-format="{field, colIndex, values}"
+            <template
+                #tf-col-format="{field, colIndex, values}"
             >
                 <span v-if="colIndex === 0">Total</span>
                 <span v-else-if="tableState.showFormattedData && !Object.values(GROUP_BY).includes(field.name)">
