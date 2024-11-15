@@ -44,6 +44,8 @@ export const getDataTableArgs = (): Args => ({
     colFormatNamedSlot: null,
     colFormatIndexSlot: null,
     loadingSlot: null,
+    footSlot: null,
+    tfColFormatSlot: null,
 });
 
 export const getDataTableArgsType = (): ArgTypes => ({
@@ -496,6 +498,26 @@ export const getDataTableArgsType = (): ArgTypes => ({
             type: 'text',
         },
     },
+    footSlot: {
+        name: 'foot',
+        description: 'Slot for inner HTML of tfoot.',
+        table: {
+            type: {
+                summary: null,
+            },
+            category: 'slots',
+        },
+    },
+    tfColFormatSlot: {
+        name: 'tf-col-format',
+        description: 'Slot for displaying processed data by utilizing column-specific data',
+        table: {
+            type: {
+                summary: null,
+            },
+            category: 'slots',
+        },
+    },
     /* events */
     onSelect: {
         name: 'select',
@@ -573,4 +595,5 @@ export const getDataTableArgsType = (): ArgTypes => ({
     /* eslint-disable no-template-curly-in-string */
     '`col-${colIndex}-format`': { table: { disable: true } },
     foot: { table: { disable: true } },
+    'tf-col-format': { table: { disable: true } },
 });
