@@ -219,7 +219,7 @@
                         </tr>
                     </slot>
                 </tbody>
-                <tfoot v-if="!showNoData && isExpandable(slots)">
+                <tfoot v-if="!showNoData && isExpandable">
                     <tr>
                         <slot name="foot"
                               v-bind="getDefaultSlotProps()"
@@ -257,7 +257,7 @@
 </template>
 
 <script lang="ts">
-import type { PropType, SetupContext } from 'vue';
+import type { PropType } from 'vue';
 import {
     toRefs,
     computed,
@@ -459,7 +459,8 @@ export default defineComponent<DataTableProps, any>({
         });
 
         const slots = useSlots();
-        const isExpandable = (_slots: SetupContext['slots']) => _slots['tf-col-format'] !== undefined || _slots.foot !== undefined;
+        const isExpandable = computed<boolean>(() => slots['tf-col-format'] !== undefined || slots.foot !== undefined);
+
 
         const state = reactive({
             tbodyRef: null as HTMLElement | null,
