@@ -399,10 +399,6 @@ export default defineComponent<DataTableProps, any>({
             type: Boolean,
             default: false,
         },
-        footerTitle: {
-            type: String,
-            default: 'Total',
-        },
     },
     setup(props, { emit }) {
         const getChildFields = (
