@@ -183,14 +183,6 @@ watch(() => workspaceGroupPageGetters.selectedWorkspaceGroupId, () => {
 onMounted(async () => {
     await workspaceGroupPageStore.fetchCostReportConfig();
 });
-
-const reduce = (arr: (number | undefined)[] | any) => arr.reduce((acc, value) => acc + (value ?? 0), 0);
-
-const costInfoReduce = (arr: (number | {month: any})[] | any) => {
-    const result = arr.reduce((acc, cur) => (acc + Object.keys(cur).includes('month') ? cur?.month : 0), 0);
-
-    return result;
-};
 </script>
 
 <template>
@@ -244,7 +236,7 @@ const costInfoReduce = (arr: (number | {month: any})[] | any) => {
                 <div class="th-tooltip">
                     <span>{{ field.label }}</span>
                     <p-tooltip
-                        :contents="String($t('IAM.WORKSPACE_GROUP.TOOLTIP_STATE'))"
+                        :contents="$t('IAM.WORKSPACE_GROUP.TOOLTIP_STATE')"
                         position="bottom"
                         class="tooltip-wrapper"
                         content-class="custom-tooltip-content"
@@ -262,7 +254,7 @@ const costInfoReduce = (arr: (number | {month: any})[] | any) => {
                 <div class="th-tooltip">
                     <span>{{ field.label }}</span>
                     <p-tooltip
-                        :contents="String($t('IAM.WORKSPACE_GROUP.TOOLTIP_COST'))"
+                        :contents="$t('IAM.WORKSPACE_GROUP.TOOLTIP_COST')"
                         position="bottom"
                         class="tooltip-wrapper"
                         content-class="custom-tooltip-content"
@@ -324,20 +316,6 @@ const costInfoReduce = (arr: (number | {month: any})[] | any) => {
                 >
                     {{ $t('IAM.WORKSPACE_GROUP.TAB.REMOVE') }}
                 </p-button>
-            </template>
-            <template v-if="tableState.tableItems.length > 0"
-                      #tf-col-format="{field, colIndex, values}"
-            >
-                <span v-if="colIndex === 0">Total</span>
-                <span v-else-if="field.name === 'user_count'">{{ reduce(values) }}</span>
-                <span v-else-if="field.name === 'service_account_count'">{{ reduce(values) }}</span>
-                <p
-                    v-else-if="field.name === 'cost_info'"
-                >
-                    <span>{{ CURRENCY_SYMBOL[state.currency ?? 'USD'] }}</span>
-                    {{ costInfoReduce(values) }}
-                </p>
-                <span v-else-if="field.name === 'state' && field.name === 'created_at'" />
             </template>
         </p-toolbox-table>
     </section>

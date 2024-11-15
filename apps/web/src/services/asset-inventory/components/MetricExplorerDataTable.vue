@@ -1,7 +1,5 @@
 <script lang="ts" setup>
-import {
-    computed, reactive, watch,
-} from 'vue';
+import { computed, reactive, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import bytes from 'bytes';
@@ -46,9 +44,6 @@ import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-refe
 import {
     useAllReferenceTypeInfoStore,
 } from '@/services/dashboards/stores/all-reference-type-info-store';
-
-
-
 
 
 const DATE_FORMAT_MAP = {
@@ -273,19 +268,6 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
         metricExplorerPageStore.setRefreshMetricData(false);
     }
 }, { immediate: false });
-
-// TODO: type definition
-const reduce = (arr: any[]) => {
-    const result = arr.reduce((acc, cur) => {
-        if (typeof cur === 'number') {
-            return acc + cur;
-        }
-
-        return acc;
-    }, 0);
-
-    return result;
-};
 </script>
 
 <template>
@@ -316,15 +298,6 @@ const reduce = (arr: any[]) => {
             </span>
             <span v-else>
                 {{ getRefinedColumnValue(field, value) }}
-            </span>
-        </template>
-
-        <template v-if="state.items.length > 0"
-                  #tf-col-format="{field, colIndex, values}"
-        >
-            <span v-if="colIndex === 0">Total</span>
-            <span v-else-if="!state.groupByFields.map((d) => d.name).includes(field.name)">
-                {{ values.length > 0 ? numberFormatter(reduce(values), {notation: 'compact'}) : 0 }}
             </span>
         </template>
     </p-toolbox-table>

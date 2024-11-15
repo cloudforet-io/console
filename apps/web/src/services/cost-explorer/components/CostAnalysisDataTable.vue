@@ -1,12 +1,8 @@
 <script lang="ts" setup>
-import {
-    computed, reactive, watch,
-} from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import dayjs from 'dayjs';
-import {
-    cloneDeep, find, sortBy,
-} from 'lodash';
+import { cloneDeep, find, sortBy } from 'lodash';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
@@ -16,16 +12,10 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PButtonModal,
-    PI,
-    PLink,
-    PToolboxTable,
-    PTextPagination,
-    PCollapsibleToggle,
+    PButtonModal, PI, PLink, PToolboxTable, PTextPagination, PCollapsibleToggle,
 } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import { numberFormatter } from '@cloudforet/utils';
-
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 
@@ -42,11 +32,7 @@ import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
 import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 import { usageUnitFormatter } from '@/lib/helper/usage-formatter';
-import {
-    arrayToQueryString,
-    objectToQueryString,
-    primitiveToQueryString,
-} from '@/lib/router-query-string';
+import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -60,25 +46,22 @@ import {
     ADDITIONAL_GROUP_BY_ITEM_MAP,
 } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import {
-    getDataTableCostFields,
-    getTimeUnitByGranularity,
+    getDataTableCostFields, getTimeUnitByGranularity,
 } from '@/services/cost-explorer/helpers/cost-analysis-data-table-helper';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
 import type {
-    Granularity,
-    Period,
-    DisplayDataType,
+    Granularity, Period, DisplayDataType,
 } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
 
 type CostAnalyzeRawData = {
-  [groupBy: string]: string | any;
-  value_sum?: Array<{
-    date: string;
-    value: number | null;
-  }>;
-  usage_unit?: string;
-  _total_value_sum?: number;
+    [groupBy: string]: string | any;
+    value_sum?: Array<{
+        date: string;
+        value: number|null;
+    }>;
+    usage_unit?: string;
+    _total_value_sum?: number;
 };
 
 const appContextStore = useAppContextStore();
@@ -87,12 +70,10 @@ const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
 
-const getValueSumKey = (dataType: string) => {
+const getValueSumKey = (dataType:string) => {
     switch (dataType) {
     case 'cost':
-        return costAnalysisPageGetters.isUnifiedCost
-            ? `cost.${costAnalysisPageGetters.currency}`
-            : 'cost';
+        return costAnalysisPageGetters.isUnifiedCost ? `cost.${costAnalysisPageGetters.currency}` : 'cost';
     case 'usage':
         return 'usage_quantity';
     default:
@@ -102,22 +83,12 @@ const getValueSumKey = (dataType: string) => {
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    projects: computed<ProjectReferenceMap>(
-        () => allReferenceStore.getters.project,
-    ),
-    projectGroups: computed<ProjectGroupReferenceMap>(
-        () => allReferenceStore.getters.projectGroup,
-    ),
-    providers: computed<ProviderReferenceMap>(
-        () => allReferenceStore.getters.provider,
-    ),
+    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
+    projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     regions: computed<RegionReferenceMap>(() => allReferenceStore.getters.region),
-    serviceAccounts: computed<ServiceAccountReferenceMap>(
-        () => allReferenceStore.getters.serviceAccount,
-    ),
-    workspaces: computed<WorkspaceReferenceMap>(
-        () => allReferenceStore.getters.workspace,
-    ),
+    serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceStore.getters.serviceAccount),
+    workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
 });
 const state = reactive({
     component: computed(() => PToolboxTable),
@@ -133,9 +104,7 @@ const state = reactive({
     analyzeQuery: computed(() => {
         let dateFormat = 'YYYY-MM';
         if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) dateFormat = 'YYYY';
-        const groupBy = state.isIncludedUsageTypeInGroupBy
-            ? [...costAnalysisPageState.groupBy, 'usage_unit']
-            : costAnalysisPageState.groupBy;
+        const groupBy = state.isIncludedUsageTypeInGroupBy ? [...costAnalysisPageState.groupBy, 'usage_unit'] : costAnalysisPageState.groupBy;
         const fields = {
             value_sum: {
                 key: getValueSumKey(costAnalysisPageState.displayDataType),
@@ -152,19 +121,14 @@ const state = reactive({
             field_group: ['date'],
         };
     }),
-    analyzeFetcher: computed(() => (costAnalysisPageGetters.isUnifiedCost
-        ? unifiedCostAnalyze
-        : fetchCostAnalyze)),
+    analyzeFetcher: computed(() => (costAnalysisPageGetters.isUnifiedCost ? unifiedCostAnalyze : fetchCostAnalyze)),
 });
 const tableState = reactive({
     loading: true,
     excelFields: computed<ExcelDataField[]>(() => {
         const fields: DataTableFieldType[] = [];
         if (costAnalysisPageState.groupBy.length) fields.push(...tableState.groupByFields);
-        if (
-            state.isIncludedUsageTypeInGroupBy
-      && costAnalysisPageState.displayDataType === 'usage'
-        ) {
+        if (state.isIncludedUsageTypeInGroupBy && costAnalysisPageState.displayDataType === 'usage') {
             fields.push({
                 name: 'usage_unit',
                 label: 'Usage Unit',
@@ -174,37 +138,12 @@ const tableState = reactive({
         }
         fields.push(...tableState.costFields);
         return fields.map((d) => {
-            const field: ExcelDataField = { key: d.name, name: d.label ?? '' };
-            if (d.name === GROUP_BY.WORKSPACE) {
-                field.reference = {
-                    reference_key: 'workspace_id',
-                    resource_type: 'identity.Workspace',
-                };
-            }
-            if (d.name === GROUP_BY.PROJECT) {
-                field.reference = {
-                    reference_key: 'project_id',
-                    resource_type: 'identity.Project',
-                };
-            }
-            if (d.name === GROUP_BY.SERVICE_ACCOUNT) {
-                field.reference = {
-                    reference_key: 'service_account_id',
-                    resource_type: 'identity.ServiceAccount',
-                };
-            }
-            if (d.name === GROUP_BY.REGION) {
-                field.reference = {
-                    reference_key: 'region_code',
-                    resource_type: 'inventory.Region',
-                };
-            }
-            if (d.name === GROUP_BY.PROVIDER) {
-                field.reference = {
-                    reference_key: 'provider',
-                    resource_type: 'identity.Provider',
-                };
-            }
+            const field: ExcelDataField = { key: d.name, name: (d.label) ?? '' };
+            if (d.name === GROUP_BY.WORKSPACE) field.reference = { reference_key: 'workspace_id', resource_type: 'identity.Workspace' };
+            if (d.name === GROUP_BY.PROJECT) field.reference = { reference_key: 'project_id', resource_type: 'identity.Project' };
+            if (d.name === GROUP_BY.SERVICE_ACCOUNT) field.reference = { reference_key: 'service_account_id', resource_type: 'identity.ServiceAccount' };
+            if (d.name === GROUP_BY.REGION) field.reference = { reference_key: 'region_code', resource_type: 'inventory.Region' };
+            if (d.name === GROUP_BY.PROVIDER) field.reference = { reference_key: 'provider', resource_type: 'identity.Provider' };
             return field;
         });
     }),
@@ -226,10 +165,7 @@ const tableState = reactive({
     fields: computed<DataTableFieldType[]>(() => {
         const fields: DataTableFieldType[] = [];
         if (costAnalysisPageState.groupBy.length) fields.push(...tableState.groupByFields);
-        if (
-            state.isIncludedUsageTypeInGroupBy
-      && costAnalysisPageState.displayDataType === 'usage'
-        ) {
+        if (state.isIncludedUsageTypeInGroupBy && costAnalysisPageState.displayDataType === 'usage') {
             fields.push({
                 name: 'usage_unit',
                 label: 'Usage Unit',
@@ -254,16 +190,12 @@ const getLink = (item: CostAnalyzeRawData, fieldName: string) => {
     if (item.region_code) {
         query.region = arrayToQueryString([item.region_code]);
     } else if (costAnalysisPageState.filters?.region_code?.length) {
-        query.region = arrayToQueryString(
-            costAnalysisPageState.filters.region_code,
-        );
+        query.region = arrayToQueryString(costAnalysisPageState.filters.region_code);
     }
     if (item.provider) {
         query.provider = primitiveToQueryString(item.provider);
     } else if (costAnalysisPageState.filters?.provider?.length) {
-        query.provider = primitiveToQueryString(
-            costAnalysisPageState.filters.provider[0],
-        );
+        query.provider = primitiveToQueryString(costAnalysisPageState.filters.provider[0]);
     }
 
     const dateIndex = Number(fieldName.split('.')[1]);
@@ -280,42 +212,27 @@ const getLink = (item: CostAnalyzeRawData, fieldName: string) => {
     if (typeof item.project_id === 'string') {
         query.project = arrayToQueryString([item.project_id]);
     } else if (costAnalysisPageState.filters?.project_id?.length) {
-        query.project = arrayToQueryString([
-            costAnalysisPageState.filters.project_id,
-        ]);
+        query.project = arrayToQueryString([costAnalysisPageState.filters.project_id]);
     }
 
     if (typeof item.service_account_id === 'string') {
         query.service_account = arrayToQueryString([item.service_account_id]);
     } else if (costAnalysisPageState.filters?.service_account_id?.length) {
-        query.service_account = arrayToQueryString([
-            costAnalysisPageState.filters.service_account_id,
-        ]);
+        query.service_account = arrayToQueryString([costAnalysisPageState.filters.service_account_id]);
     }
+
 
     const filters: ConsoleFilter[] = [];
     if (typeof item.project_group_id === 'string') {
         filters.push({ k: 'project_group_id', v: item.project_group_id, o: '=' });
     } else if (costAnalysisPageState.filters?.project_group_id?.length) {
-        filters.push({
-            k: 'project_group_id',
-            v: costAnalysisPageState.filters.project_group_id,
-            o: '=',
-        });
+        filters.push({ k: 'project_group_id', v: costAnalysisPageState.filters.project_group_id, o: '=' });
     }
 
     if (typeof item.product === 'string') {
-        filters.push({
-            k: 'ref_cloud_service_type.service_code',
-            v: item.product,
-            o: '=',
-        });
+        filters.push({ k: 'ref_cloud_service_type.service_code', v: item.product, o: '=' });
     } else if (costAnalysisPageState.filters?.product?.length) {
-        filters.push({
-            k: 'ref_cloud_service_type.service_code',
-            v: costAnalysisPageState.filters.product,
-            o: '=',
-        });
+        filters.push({ k: 'ref_cloud_service_type.service_code', v: costAnalysisPageState.filters.product, o: '=' });
     }
 
     return {
@@ -327,10 +244,7 @@ const getLink = (item: CostAnalyzeRawData, fieldName: string) => {
         },
     };
 };
-const isIncreasedByHalfOrMore = (
-    item: CostAnalyzeRawData,
-    fieldName: string,
-): boolean => {
+const isIncreasedByHalfOrMore = (item: CostAnalyzeRawData, fieldName: string): boolean => {
     const currIndex = Number(fieldName.split('.')[1]); // value_sum.0.value -> 0
     if (currIndex === 0) return false;
 
@@ -353,17 +267,11 @@ const fieldDescriptionFormatter = (field: DataTableFieldType): string => {
         return ` (${ADDITIONAL_GROUP_BY_ITEM_MAP[ADDITIONAL_GROUP_BY.TAGS].label})`;
     }
     if (field.name?.startsWith(`${ADDITIONAL_GROUP_BY.ADDITIONAL_INFO}_`)) {
-        return ` (${
-            ADDITIONAL_GROUP_BY_ITEM_MAP[ADDITIONAL_GROUP_BY.ADDITIONAL_INFO].label
-        })`;
+        return ` (${ADDITIONAL_GROUP_BY_ITEM_MAP[ADDITIONAL_GROUP_BY.ADDITIONAL_INFO].label})`;
     }
     return '';
 };
-const getRefinedChartTableData = (
-    results: CostAnalyzeRawData[] = [],
-    granularity: Granularity,
-    period: Period,
-) => {
+const getRefinedChartTableData = (results: CostAnalyzeRawData[] = [], granularity: Granularity, period: Period) => {
     const timeUnit = getTimeUnitByGranularity(granularity);
     let dateFormat = 'YYYY-MM-DD';
     if (timeUnit === 'month') dateFormat = 'YYYY-MM';
@@ -383,10 +291,7 @@ const getRefinedChartTableData = (
         let target = cloneDeep(d.value_sum);
         let now = dayjs.utc(_period.start).clone();
         while (now.isSameOrBefore(dayjs.utc(_period.end), timeUnit)) {
-            if (
-                !now.isAfter(today, timeUnit)
-        && !find(target, { date: now.format(dateFormat) })
-            ) {
+            if (!now.isAfter(today, timeUnit) && !find(target, { date: now.format(dateFormat) })) {
                 target?.push({ date: now.format(dateFormat), value: 0 });
             }
             now = now.add(1, timeUnit);
@@ -399,12 +304,7 @@ const getRefinedChartTableData = (
     });
     return refinedTableData;
 };
-const getTableValue = (
-    displayDataType: DisplayDataType,
-    showFormattedData: boolean,
-    value?: number,
-    usageUnit?: string,
-): string | undefined => {
+const getTableValue = (displayDataType: DisplayDataType, showFormattedData: boolean, value?: number, usageUnit?: string): string|undefined => {
     if (value === undefined) return value;
     if (displayDataType === 'usage') {
         return usageUnitFormatter(value, { unit: usageUnit }, showFormattedData);
@@ -415,31 +315,19 @@ const getTableValue = (
     return numberFormatter(value, { minimumFractionDigits: 2 });
 };
 
+
 /* api */
-const fetchCostAnalyze = getCancellableFetcher<
-  object,
-  AnalyzeResponse<CostAnalyzeRawData>
->(SpaceConnector.clientV2.costAnalysis.cost.analyze);
-const unifiedCostAnalyze = getCancellableFetcher<
-  object,
-  AnalyzeResponse<CostAnalyzeRawData>
->(SpaceConnector.clientV2.costAnalysis.unifiedCost.analyze);
+const fetchCostAnalyze = getCancellableFetcher<object, AnalyzeResponse<CostAnalyzeRawData>>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
+const unifiedCostAnalyze = getCancellableFetcher<object, AnalyzeResponse<CostAnalyzeRawData>>(SpaceConnector.clientV2.costAnalysis.unifiedCost.analyze);
 const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
-const listCostAnalysisTableData = async (): Promise<
-  AnalyzeResponse<CostAnalyzeRawData>
-> => {
+const listCostAnalysisTableData = async (): Promise<AnalyzeResponse<CostAnalyzeRawData>> => {
     try {
         tableState.loading = true;
         analyzeApiQueryHelper
             .setFilters(costAnalysisPageGetters.consoleFilters)
-            .setPage(
-                getPageStart(tableState.thisPage, tableState.pageSize),
-                tableState.pageSize,
-            );
+            .setPage(getPageStart(tableState.thisPage, tableState.pageSize), tableState.pageSize);
         const { status, response } = await state.analyzeFetcher({
-            data_source_id: costAnalysisPageGetters.isUnifiedCost
-                ? undefined
-                : costAnalysisPageGetters.selectedDataSourceId,
+            data_source_id: costAnalysisPageGetters.isUnifiedCost ? undefined : costAnalysisPageGetters.selectedDataSourceId,
             query: {
                 ...state.analyzeQuery,
                 ...analyzeApiQueryHelper.data,
@@ -457,13 +345,9 @@ const listCostAnalysisTableData = async (): Promise<
 const costAnalyzeExportQueryHelper = new QueryHelper();
 const listCostAnalysisExcelData = async (): Promise<CostAnalyzeRawData[]> => {
     try {
-        costAnalyzeExportQueryHelper.setFilters(
-            costAnalysisPageGetters.consoleFilters,
-        );
+        costAnalyzeExportQueryHelper.setFilters(costAnalysisPageGetters.consoleFilters);
         const { status, response } = await state.analyzeFetcher({
-            data_source_id: costAnalysisPageGetters.isUnifiedCost
-                ? undefined
-                : costAnalysisPageGetters.selectedDataSourceId,
+            data_source_id: costAnalysisPageGetters.isUnifiedCost ? undefined : costAnalysisPageGetters.selectedDataSourceId,
             query: {
                 ...state.analyzeQuery,
                 filter: costAnalyzeExportQueryHelper.apiQuery.filter,
@@ -479,27 +363,15 @@ const listCostAnalysisExcelData = async (): Promise<CostAnalyzeRawData[]> => {
 
 /* event */
 const handleChange = async (options: any = {}) => {
-    setApiQueryWithToolboxOptions(analyzeApiQueryHelper, options, {
-        queryTags: true,
-    });
+    setApiQueryWithToolboxOptions(analyzeApiQueryHelper, options, { queryTags: true });
     const { results, more } = await listCostAnalysisTableData();
-    if (costAnalysisPageState.period) {
-        tableState.items = getRefinedChartTableData(
-            results,
-            costAnalysisPageState.granularity,
-            costAnalysisPageState.period,
-        );
-    }
+    if (costAnalysisPageState.period) tableState.items = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
     tableState.more = more ?? false;
 };
 const handleExcelDownload = async () => {
     try {
         const results = await listCostAnalysisExcelData();
-        const refinedData = getRefinedChartTableData(
-            results,
-            costAnalysisPageState.granularity,
-            costAnalysisPageState.period ?? {},
-        );
+        const refinedData = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period ?? {});
         await downloadExcel({
             data: refinedData,
             fields: tableState.excelFields,
@@ -517,15 +389,9 @@ const handleExport = async () => {
 };
 const handleUpdateThisPage = async () => {
     const { results, more } = await listCostAnalysisTableData();
-    tableState.items = getRefinedChartTableData(
-        results,
-        costAnalysisPageState.granularity,
-        costAnalysisPageState.period ?? {},
-    );
+    tableState.items = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period ?? {});
     tableState.more = more ?? false;
 };
-
-const reduce = (arr: (number & undefined)[] | any) => arr.reduce((acc, value) => acc + (value ?? 0), 0);
 
 watch(
     [
@@ -538,17 +404,9 @@ watch(
         tableState.thisPage = 1;
         const { results, more } = await listCostAnalysisTableData();
         if (costAnalysisPageState.period) {
-            tableState.items = getRefinedChartTableData(
-                results,
-                costAnalysisPageState.granularity,
-                costAnalysisPageState.period,
-            );
+            tableState.items = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
             tableState.more = more ?? false;
-            tableState.costFields = getDataTableCostFields(
-                costAnalysisPageState.granularity,
-                costAnalysisPageState.period,
-                !!tableState.groupByFields.length,
-            );
+            tableState.costFields = getDataTableCostFields(costAnalysisPageState.granularity, costAnalysisPageState.period, !!tableState.groupByFields.length);
         }
     },
     { immediate: true, deep: true },
@@ -557,175 +415,106 @@ watch(
 
 <template>
     <fragment>
-        <p-toolbox-table
-            class="cost-analysis-data-table"
-            :loading="tableState.loading"
-            :fields="tableState.fields"
-            :items="tableState.items"
-            :searchable="false"
-            :page-size.sync="tableState.pageSize"
-            row-height-fixed
-            exportable
-            @change="handleChange"
-            @refresh="handleChange()"
-            @export="handleExport"
+        <p-toolbox-table class="cost-analysis-data-table"
+                         :loading="tableState.loading"
+                         :fields="tableState.fields"
+                         :items="tableState.items"
+                         :searchable="false"
+                         :page-size.sync="tableState.pageSize"
+                         row-height-fixed
+                         exportable
+                         @change="handleChange"
+                         @refresh="handleChange()"
+                         @export="handleExport"
         >
             <template #pagination-area>
-                <p-text-pagination
-                    :this-page.sync="tableState.thisPage"
-                    :disable-next-page="tableState.loading"
-                    :has-next-page="tableState.more"
-                    @update:thisPage="handleUpdateThisPage"
+                <p-text-pagination :this-page.sync="tableState.thisPage"
+                                   :disable-next-page="tableState.loading"
+                                   :has-next-page="tableState.more"
+                                   @update:thisPage="handleUpdateThisPage"
                 />
             </template>
             <template #toolbox-left>
                 <div class="toggle-wrapper">
-                    <span class="label">{{
-                        $t("BILLING.COST_MANAGEMENT.COST_ANALYSIS.ORIGINAL_DATA")
-                    }}</span>
-                    <p-collapsible-toggle
-                        :toggle-type="'switch'"
-                        :is-collapsed.sync="tableState.showFormattedData"
-                        class="collapsible-toggle"
+                    <span class="label">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ORIGINAL_DATA') }}</span>
+                    <p-collapsible-toggle :toggle-type="'switch'"
+                                          :is-collapsed.sync="tableState.showFormattedData"
+                                          class="collapsible-toggle"
                     />
                 </div>
             </template>
-            <template #th-format="{ field }">
+            <template #th-format="{field}">
                 {{ field.label }}
-                <span class="field-description">{{
-                    fieldDescriptionFormatter(field)
-                }}</span>
+                <span class="field-description">{{ fieldDescriptionFormatter(field) }}</span>
             </template>
-            <template #col-format="{ field, value, item }">
+            <template #col-format="{field, value, item}">
                 <span v-if="tableState.loading" />
-                <span
-                    v-else-if="Object.values(GROUP_BY).includes(field.name) && !value"
-                >
+                <span v-else-if="Object.values(GROUP_BY).includes(field.name) && !value">
                     Unknown
                 </span>
                 <span v-else-if="field.name === GROUP_BY.WORKSPACE">
-                    {{
-                        storeState.workspaces[value]
-                            ? storeState.workspaces[value].label
-                            : value
-                    }}
+                    {{ storeState.workspaces[value] ? storeState.workspaces[value].label : value }}
                 </span>
                 <span v-else-if="field.name === GROUP_BY.PROJECT_GROUP">
-                    {{
-                        storeState.projectGroups[value]
-                            ? storeState.projectGroups[value].label
-                            : value
-                    }}
+                    {{ storeState.projectGroups[value] ? storeState.projectGroups[value].label : value }}
                 </span>
                 <span v-else-if="field.name === GROUP_BY.PROJECT">
-                    {{
-                        storeState.projects[value]
-                            ? storeState.projects[value].label
-                            : value
-                    }}
+                    {{ storeState.projects[value] ? storeState.projects[value].label : value }}
                 </span>
                 <span v-else-if="field.name === GROUP_BY.PROVIDER">
-                    {{
-                        storeState.providers[value]
-                            ? storeState.providers[value].name
-                            : value
-                    }}
+                    {{ storeState.providers[value] ? storeState.providers[value].name : value }}
                 </span>
                 <span v-else-if="field.name === GROUP_BY.REGION">
-                    {{
-                        storeState.regions[value] ? storeState.regions[value].name : value
-                    }}
+                    {{ storeState.regions[value] ? storeState.regions[value].name : value }}
                 </span>
                 <span v-else-if="field.name === GROUP_BY.SERVICE_ACCOUNT">
-                    {{
-                        storeState.serviceAccounts[value]
-                            ? storeState.serviceAccounts[value].name
-                            : value
-                    }}
+                    {{ storeState.serviceAccounts[value] ? storeState.serviceAccounts[value].name : value }}
                 </span>
                 <span v-else-if="field.name === 'Instance Type'">
-                    {{ value ?? "Unknown" }}
+                    {{ value ?? 'Unknown' }}
                 </span>
                 <span v-else-if="field.name === 'totalCost'">
-                    {{ $t("BILLING.COST_MANAGEMENT.COST_ANALYSIS.TOTAL_COST") }}
+                    {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.TOTAL_COST') }}
                 </span>
                 <span v-else-if="field.isTagField">
-                    {{ value ?? "Unknown" }}
+                    {{ value ?? 'Unknown' }}
                 </span>
                 <span v-else-if="field.name === 'usage_unit'">
-                    {{ value ?? "--" }}
+                    {{ value ?? '--' }}
                 </span>
                 <span v-else-if="typeof value !== 'string'"
                       class="text-center"
                 >
-                    <p-link
-                        :to="
-                            !storeState.isAdminMode && value !== undefined
-                                ? getLink(item, field.name)
-                                : undefined
-                        "
-                        class="!align-middle"
-                        :class="{
-                            'no-link': storeState.isAdminMode || value === undefined,
-                        }"
+                    <p-link :to="(!storeState.isAdminMode && value !== undefined) ? getLink(item, field.name) : undefined"
+                            class="!align-middle"
+                            :class="{ 'no-link': storeState.isAdminMode || value === undefined }"
                     >
                         <span class="usage-wrapper">
-                            <span
-                                :class="
-                                    isIncreasedByHalfOrMore(item, field.name)
-                                        ? 'cell-text raised'
-                                        : undefined
-                                "
-                            >
-                                {{
-                                    getTableValue(
-                                        costAnalysisPageState.displayDataType,
-                                        tableState.showFormattedData,
-                                        value,
-                                        item.usage_unit
-                                    )
-                                }}
+                            <span :class="isIncreasedByHalfOrMore(item, field.name) ? 'cell-text raised' : undefined">
+                                {{ getTableValue(costAnalysisPageState.displayDataType, tableState.showFormattedData, value, item.usage_unit) }}
                             </span>
-                            <p-i
-                                v-if="isIncreasedByHalfOrMore(item, field.name)"
-                                name="ic_arrow-up-bold-alt"
-                                width="0.75rem"
-                                height="0.75rem"
+                            <p-i v-if="isIncreasedByHalfOrMore(item, field.name)"
+                                 name="ic_arrow-up-bold-alt"
+                                 width="0.75rem"
+                                 height="0.75rem"
                             />
                         </span>
                     </p-link>
                 </span>
             </template>
-            <template v-if="tableState.items.length > 0"
-                      #tf-col-format="{field, colIndex, values}"
-            >
-                <span v-if="colIndex === 0">Total</span>
-                <span v-else-if="tableState.showFormattedData && !Object.values(GROUP_BY).includes(field.name)">
-                    {{ Array.isArray(values) && values.length > 0 ? numberFormatter(reduce(values), {notation: 'compact'}) : 0 }}
-                </span>
-                <span v-else-if="!tableState.showFormattedData && !Object.values(GROUP_BY).includes(field.name)">
-                    {{ Array.isArray(values) && values.length > 0 ? numberFormatter(reduce(values), {minimumFractionDigits: 2}) : 0 }}
-                </span>
-                <span v-else />
-            </template>
         </p-toolbox-table>
-        <p-button-modal
-            :visible.sync="state.visibleExcelNotiModal"
-            hide-header
-            size="sm"
-            @confirm="handleExcelDownload"
+        <p-button-modal :visible.sync="state.visibleExcelNotiModal"
+                        hide-header
+                        size="sm"
+                        @confirm="handleExcelDownload"
         >
             <template #body>
                 <p class="mt-4">
-                    {{
-                        $t(
-                            "BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_EXCEL_DOWNLOAD_STACKED"
-                        )
-                    }}
+                    {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_EXCEL_DOWNLOAD_STACKED') }}
                 </p>
             </template>
             <template #confirm-button>
-                {{ $t("BILLING.COST_MANAGEMENT.COST_ANALYSIS.DOWNLOAD") }}
+                {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.DOWNLOAD') }}
             </template>
         </p-button-modal>
     </fragment>

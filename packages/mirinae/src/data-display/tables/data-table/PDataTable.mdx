@@ -66,8 +66,7 @@ interface DataTableFieldType {
 |col-\{colIndex\}-format|It replaces table body cells corresponding to `colIndex` while keeping the style.|item(`props.items[colIndex]`), rowIndex(`number`), field(`DataTableFieldType`), value(Display value calculated through field and item), colIndex(`number`), index(`number`. the same with rowIndex. will be DEPRECATED)|
 |col-\{field.name\}-format|It replaces table body cells corresponding to `field.name` while keeping the style.|item(`props.items[colIndex]`), rowIndex(`number`), field(`DataTableFieldType`), value(Display value calculated through field and item), colIndex(`number`), index(`number`. the same with rowIndex. will be DEPRECATED)|
 |col-format|It replaces table body cells while keeping the style.|item(`props.items[colIndex]`), rowIndex(`number`), field(`DataTableFieldType`), value(Display value calculated through field and item), colIndex(`number`), index(`number`. the same with rowIndex. will be DEPRECATED)|
-|foot|It replaces the table body’s tfoot to display additional information.|fields(`DataTableFieldType[]`)|
-|tf-col-format|It replaces the table body’s tfoot to display processed data by utilizing data from each column. |field(`DataTableFieldType`), colIndex(`number`), values(“Array of data grouped by column.)|
+
 
 <br/>
 
@@ -188,9 +187,6 @@ e.g.
 
 ## Beautify Text
 <Canvas of={PDataTableStories.BeautifyText} />
-
-## Foot
-<Canvas of={PDataTableStories.Foot} />
 
 ## Playground
 <Canvas of={PDataTableStories.Playground} />
