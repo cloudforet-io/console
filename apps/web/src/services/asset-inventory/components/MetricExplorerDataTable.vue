@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, watch, watchEffect,
+    computed, reactive, watch,
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
@@ -17,7 +17,6 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PTextPagination, PToolboxTable } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import { byteFormatter, numberFormatter } from '@cloudforet/utils';
-
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { MetricDataAnalyzeParameters } from '@/schema/inventory/metric-data/api-verbs/analyze';
@@ -47,6 +46,8 @@ import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-refe
 import {
     useAllReferenceTypeInfoStore,
 } from '@/services/dashboards/stores/all-reference-type-info-store';
+
+
 
 
 
@@ -172,15 +173,10 @@ const setDataTableData = async () => {
     state.loading = true;
     const res = await analyzeMetricData();
     if (!res) return;
-    console.log(state.realtimeDate);
     state.items = getRefinedAssetAnalysisTableData(res.results, metricExplorerPageState.granularity, metricExplorerPageState.period ?? {}, state.realtimeDate);
     state.more = res.more;
     state.loading = false;
 };
-
-watchEffect(() => {
-    console.log(state.items);
-});
 
 /* Event */
 const handleChange = async (options: any = {}) => {
@@ -277,6 +273,19 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
         metricExplorerPageStore.setRefreshMetricData(false);
     }
 }, { immediate: false });
+
+// TODO: type definition
+const reduce = (arr: any[]) => {
+    const result = arr.reduce((acc, cur) => {
+        if (typeof cur === 'number') {
+            return acc + cur;
+        }
+
+        return acc;
+    }, 0);
+
+    return result;
+};
 </script>
 
 <template>
@@ -309,17 +318,14 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
                 {{ getRefinedColumnValue(field, value) }}
             </span>
         </template>
-        <template #tf-col-format="{values}">
-            <tr v-if="Array.isArray(values) && values.length > 0">
-                <td>Total</td>
-                <td v-for="(value, i) in values.slice(1)"
-                    :key="`tf-col-${i}`"
-                    class="right"
-                >
-                    <span v-if="value.field.name !== 'Provider' && value.field.name !== 'Cloud Service Group' && value.field.name !== 'Cloud Service Type'">{{ value.val }}</span>
-                    <span v-else>{{ }}</span>
-                </td>
-            </tr>
+
+        <template v-if="state.items.length > 0"
+                  #tf-col-format="{field, colIndex, values}"
+        >
+            <span v-if="colIndex === 0">Total</span>
+            <span v-else-if="!state.groupByFields.map((d) => d.name).includes(field.name)">
+                {{ values.length > 0 ? numberFormatter(reduce(values), {notation: 'compact'}) : 0 }}
+            </span>
         </template>
     </p-toolbox-table>
 </template>
