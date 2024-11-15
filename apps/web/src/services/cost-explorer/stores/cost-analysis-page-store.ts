@@ -128,6 +128,7 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
             return getters.isUnifiedCost ? _managedGroupByItems : [..._managedGroupByItems, ..._additionalInfoGroupBy];
         }),
         metadataAdditionalInfoItems: computed<GroupByItem[]>(() => {
+            if (getters.isUnifiedCost) return [];
             if (!costQuerySetState.selectedDataSourceId) return [];
             const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId ?? ''];
             if (!targetDataSource || getters.isUnifiedCost) return [];
@@ -141,6 +142,7 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
                 }));
         }),
         additionalInfoKeysItems: computed<GroupByItem[]>(() => {
+            if (getters.isUnifiedCost) return [];
             if (!costQuerySetState.selectedDataSourceId) return [];
             const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId ?? ''];
             if (!targetDataSource) return [];
