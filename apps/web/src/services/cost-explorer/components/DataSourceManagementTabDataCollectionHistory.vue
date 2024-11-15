@@ -164,7 +164,7 @@ const handleClickResyncButton = () => {
     const createdDate = dayjs.tz(storeState.recentJobItem.created_at, storeState.timezone);
     const now = dayjs().tz(storeState.timezone);
     const diffInMinutes = now.diff(createdDate, 'minute');
-    // NOTE: If a task is restarted within 10 minutes of the last task's start time, the previous task may be canceled.
+    // NOTE: If a task is restarted within 10 minutes of the last task's start time, the restarted task may be canceled.
     state.modalType = (storeState.recentJobItem.status === 'IN_PROGRESS' && diffInMinutes < 10) ? 'RESTART' : 'RE-SYNC';
 };
 const handleSelectStatus = (selected: string) => {
