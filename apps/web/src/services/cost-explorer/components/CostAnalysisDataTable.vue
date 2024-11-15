@@ -4,7 +4,9 @@ import {
 } from 'vue';
 
 import dayjs from 'dayjs';
-import { cloneDeep, find, sortBy } from 'lodash';
+import {
+    cloneDeep, find, sortBy,
+} from 'lodash';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
@@ -523,6 +525,8 @@ const handleUpdateThisPage = async () => {
     tableState.more = more ?? false;
 };
 
+const reduce = (arr: (number & undefined)[] | any) => arr.reduce((acc, value) => acc + (value ?? 0), 0);
+
 watch(
     [
         () => costAnalysisPageState,
@@ -549,53 +553,6 @@ watch(
     },
     { immediate: true, deep: true },
 );
-
-// TODO: temporary values
-
-function aggregateData(data: any[], aggregateType: 'sum' | 'average') {
-    const dateMap = new Map<string, { total: number; count: number }>();
-
-    data.forEach(({ value_sum }) => {
-        value_sum.forEach(({ date, value }) => {
-            if (dateMap.has(date)) {
-                const entry: any = dateMap.get(date);
-                entry.total += value;
-                entry.count += 1;
-            } else {
-                dateMap.set(date, { total: value, count: 1 });
-            }
-        });
-    });
-
-    return Array.from(dateMap.entries()).map(([date, { total, count }]) => ({
-        date,
-        value: aggregateType === 'sum' ? total.toFixed(2) : total / count,
-    }));
-}
-
-const totalItems = computed(() => {
-    const sumData = aggregateData(tableState.items, 'sum');
-    const value = sumData.map((v) => v.value);
-    return value;
-});
-
-// const arr = ref([]);
-
-// watchEffect(() => {
-//     tableState.fields.forEach((field) => {
-//         if (Object.keys(field).includes('name') && field.name.includes('.')) {
-//             if (tableState.items.map((item) => item[`${field.name}`.split('.')[0]][`${field.name}`.split('.')[1]][`${field.name}`.split('.')[2]]).length > 0) {
-//                 arr.value.push(tableState.items.map((item) => item[`${field.name}`.split('.')[0]][`${field.name}`.split('.')[1]][`${field.name}`.split('.')[2]]));
-//             }
-//         }
-//     });
-// });
-
-// watchEffect(() => {
-//     // TODO: props로 arr.value를 넘겨주면 아래 수식은 pdatatable에서 처리해야함.
-//     const data = arr.value.map((v: number[]) => v.reduce((a, b) => a + b, 0));
-//     console.log(data);
-// });
 </script>
 
 <template>
@@ -607,8 +564,6 @@ const totalItems = computed(() => {
             :items="tableState.items"
             :searchable="false"
             :page-size.sync="tableState.pageSize"
-            :show-summary-row="true"
-            :summary-items="totalItems"
             row-height-fixed
             exportable
             @change="handleChange"
@@ -741,18 +696,17 @@ const totalItems = computed(() => {
                     </p-link>
                 </span>
             </template>
-            <template #tf-col-format="{ values }">
-                <tr v-if="Array.isArray(values) && values.length > 0">
-                    <td>Total</td>
-                    <td
-                        v-for="(value, i) in values.slice(1)"
-                        :key="`tf-col-${i}`"
-                        class="right"
-                    >
-                        <span v-if="value.field.name !== 'product'">{{ Number(value.val).toFixed(2) }}</span>
-                        <span v-else>{{ }}</span>
-                    </td>
-                </tr>
+            <template v-if="tableState.items.length > 0"
+                      #tf-col-format="{field, colIndex, values}"
+            >
+                <span v-if="colIndex === 0">Total</span>
+                <span v-else-if="tableState.showFormattedData && !Object.values(GROUP_BY).includes(field.name)">
+                    {{ Array.isArray(values) && values.length > 0 ? numberFormatter(reduce(values), {notation: 'compact'}) : 0 }}
+                </span>
+                <span v-else-if="!tableState.showFormattedData && !Object.values(GROUP_BY).includes(field.name)">
+                    {{ Array.isArray(values) && values.length > 0 ? numberFormatter(reduce(values), {minimumFractionDigits: 2}) : 0 }}
+                </span>
+                <span v-else />
             </template>
         </p-toolbox-table>
         <p-button-modal
