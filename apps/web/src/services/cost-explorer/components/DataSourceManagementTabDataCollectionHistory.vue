@@ -53,7 +53,7 @@ const tableState = reactive({
     pageLimit: 15,
     fields: computed<DefinitionField[]>(() => [
         { name: 'job_id', label: 'Job ID', sortable: false },
-        { name: 'status', label: 'Collection Status', sortable: false },
+        { name: 'status', label: 'Status', sortable: false },
         { name: 'progress', label: 'Job Progress', sortable: false },
         { name: 'total_tasks', label: 'Total Task', sortable: false },
         { name: 'created_at', label: 'Created' },
@@ -128,6 +128,22 @@ const getStatusInfo = (value: CostJobStatus): CostJobStatusInfo => {
     }
     return info;
 };
+const getRemainedTasksPercentage = (item: CostJobItem) => {
+    const remainedTasks = item?.remained_tasks || 0;
+    const totalTasks = item?.total_tasks || 0;
+
+    if (item.status === 'IN_PROGRESS') {
+        const percentage = ((totalTasks - remainedTasks) / totalTasks) * 100;
+        return percentage % 1 === 0 ? percentage : parseFloat(percentage.toFixed(2));
+    }
+
+    if (item.status === 'SUCCESS') {
+        return 100;
+    }
+
+    return 0;
+};
+
 const handleClickCancelDetail = (jobId: string) => {
     state.modalVisible = true;
     state.modalType = 'CANCEL';
@@ -147,11 +163,6 @@ const handleSelectStatus = (selected: string) => {
 };
 const handleConfirmModal = () => {
     fetchJobList();
-};
-const getRemainedTasksPercentage = (item: CostJobItem) => {
-    const remainedTasks = item?.remained_tasks ?? 0;
-    const totalTasks = item?.total_tasks ?? 0;
-    return totalTasks > 0 ? (((totalTasks - remainedTasks) / totalTasks) * 100).toFixed(2) : 100;
 };
 
 let jobListApiQueryHelper = new ApiQueryHelper();
@@ -337,6 +348,9 @@ watch([() => storeState.activeTab, () => storeState.selectedItem], async () => {
         .col-progress-bar {
             @apply flex items-center;
             gap: 0.25rem;
+            .status-progress-bar {
+                width: 6rem;
+            }
         }
     }
 }
