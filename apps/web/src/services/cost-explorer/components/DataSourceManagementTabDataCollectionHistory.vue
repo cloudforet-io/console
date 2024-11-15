@@ -3,6 +3,8 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
+import dayjs from 'dayjs';
+
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
@@ -15,6 +17,7 @@ import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/inpu
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
 
 import type { CostJobStatus } from '@/schema/cost-analysis/job/type';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useQueryTags } from '@/common/composables/query-tags';
@@ -40,6 +43,8 @@ const storeState = reactive({
     totalCount: computed<number>(() => dataSourcesPageState.jobListTotalCount),
     activeTab: computed<string>(() => dataSourcesPageState.activeTab),
     selectedDataSourceItem: computed<DataSourceItem>(() => dataSourcesPageGetters.selectedDataSourceItem),
+    recentJobItem: computed<CostJobItem>(() => dataSourcesPageGetters.jobList[0]),
+    timezone: computed<string>(() => store.state.user.timezone),
 });
 const state = reactive({
     loading: false,
@@ -156,7 +161,11 @@ const handleClickErrorDetail = (jobId: string) => {
 };
 const handleClickResyncButton = () => {
     state.modalVisible = true;
-    state.modalType = 'RE-SYNC';
+    const createdDate = dayjs.tz(storeState.recentJobItem.created_at, storeState.timezone);
+    const now = dayjs().tz(storeState.timezone);
+    const diffInMinutes = now.diff(createdDate, 'minute');
+    // NOTE: If a task is restarted within 10 minutes of the last task's start time, the previous task may be canceled.
+    state.modalType = (storeState.recentJobItem.status === 'IN_PROGRESS' && diffInMinutes < 10) ? 'RESTART' : 'RE-SYNC';
 };
 const handleSelectStatus = (selected: string) => {
     tableState.selectedStatusFilter = selected;
