@@ -8,7 +8,6 @@ import {
     PButtonModal, PTextEditor, PFieldTitle, PToggleButton, PTextInput, PDatetimePicker, PScopedNotification,
 } from '@cloudforet/mirinae';
 
-import type { CostDataSourceSyncParameters } from '@/schema/cost-analysis/data-source/api-verbs/sync';
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -61,67 +60,49 @@ const state = reactive({
         const end = dayjs.utc().format('YYYY-MM-DD');
         return `${start} ~ ${end}`;
     }),
-    invalid: computed<boolean>(() => {
-        if (!state.startDates.length || !state.endDates.length) return true;
-        const startDate = dayjs.utc(state.startDates[0]);
-        const endDate = dayjs.utc(state.endDates[0]);
-        return startDate.isAfter(endDate, 'month') || endDate.diff(startDate, 'year') >= 1;
-    }),
     startDates: [] as string[],
-    endDates: [] as string[],
     startDateSetting: computed<DateOption>(() => {
         const today = dayjs.utc();
         const minDate = today.subtract(35, 'month').format('YYYY-MM');
         const maxDate = today.format('YYYY-MM');
         return { minDate, maxDate };
     }),
-    endDateSetting: computed<DateOption>(() => {
-        let minDate;
-        let maxDate;
-        if (!state.startDates.length) return { minDate, maxDate };
-
-        const startDate = dayjs.utc(state.startDates[0]);
-        minDate = startDate.format('YYYY-MM');
-        const maxRawData = startDate.add(11, 'month');
-        if (maxRawData.isAfter(dayjs.utc())) {
-            maxDate = dayjs.utc().format('YYYY-MM');
-        } else maxDate = maxRawData.format('YYYY-MM');
-        return { minDate, maxDate };
+    modalValidation: computed<boolean>(() => {
+        if (props.modalType === 'RE-SYNC') {
+            if (state.toggleValue) return false;
+            return !state.startDates.length;
+        }
+        return false;
     }),
 });
 
-const handleUpdateSelectedDates = (type: 'start'|'end', selectedDates: string[]) => {
+const handleUpdateSelectedDates = (selectedDates: string[]) => {
     if (!selectedDates.length) return;
 
-    const originDates = type === 'start' ? state.startDates : state.endDates;
+    const originDates = state.startDates;
     if (dayjs.utc(originDates[0]).isSame(dayjs.utc(selectedDates[0]), 'day')) return;
 
-    if (type === 'start') {
-        state.startDates = selectedDates;
-        state.endDates = [];
-    } else {
-        state.endDates = selectedDates;
-    }
+    state.startDates = selectedDates;
 };
 const handleChangeToggleButton = () => {
-    state.invalid = false;
     state.startDates = [];
-    state.endDates = [];
-    state.startDateSetting = {};
-    state.endDateSetting = {};
 };
 
 const handleConfirmButton = async () => {
     if (props.modalType === 'ERROR') return;
 
-    let params: CostDataSourceSyncParameters;
     try {
         state.loading = true;
         if (props.modalType === 'RE-SYNC') {
-            params = {
+            await dataSourcesPageStore.fetchSyncDatasource({
+                start: state.toggleValue ? undefined : dayjs(state.startDates[0]).format('YYYY-MM'),
                 data_source_id: storeState.selectedDataSourceItem.data_source_id,
-            };
-            await dataSourcesPageStore.fetchSyncDatasource(params);
+            });
+        }
+        if (props.modalType === 'CANCEL' && props.selectedJobItem) {
+            await dataSourcesPageStore.fetchCancelJob({
+                job_id: props.selectedJobItem?.job_id,
+            });
         }
         await emit('confirm');
     } finally {
@@ -139,6 +120,7 @@ const handleConfirmButton = async () => {
         fade
         backdrop
         :loading="state.loading"
+        :disabled="state.modalValidation"
         :theme-color="props.modalType === 'CANCEL' ? 'alert' : 'primary'"
         :visible.sync="state.proxyVisible"
         class="data-source-management-tab-data-collection-history-modal"
@@ -178,22 +160,18 @@ const handleConfirmButton = async () => {
                         <div v-else
                              class="date-picker-wrapper"
                         >
-                            <p-datetime-picker class="datetime-picker"
+                            <p-datetime-picker class="datetime"
                                                :selected-dates="state.startDates"
-                                               :invalid="!!state.startDates.length && !!state.endDates.length && state.invalid"
                                                :min-date="state.startDateSetting.minDate"
                                                :max-date="state.startDateSetting.maxDate"
                                                data-type="yearToMonth"
-                                               @update:selected-dates="handleUpdateSelectedDates('start', $event)"
+                                               @update:selected-dates="handleUpdateSelectedDates"
                             />
                             <span> ~ </span>
-                            <p-datetime-picker class="datetime-picker"
-                                               :selected-dates="state.endDates"
-                                               :invalid="!!state.startDates.length && !!state.endDates.length && state.invalid"
-                                               :min-date="state.endDateSetting.minDate"
-                                               :max-date="state.endDateSetting.maxDate"
-                                               data-type="yearToMonth"
-                                               @update:selected-dates="handleUpdateSelectedDates('end', $event)"
+                            <p-text-input :value="dayjs.utc().format('YYYY-MM')"
+                                          disabled
+                                          block
+                                          class="datetime"
                             />
                         </div>
                     </div>
@@ -250,6 +228,10 @@ const handleConfirmButton = async () => {
             .date-picker-wrapper {
                 @apply flex items-center;
                 gap: 0.5rem;
+                .datetime {
+                    flex: 1;
+                    max-width: 12.25rem;
+                }
             }
         }
     }
