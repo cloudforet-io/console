@@ -915,6 +915,7 @@
 				"AUTO": "Auto",
 				"AUTO_DATA_RANGE": "Auto Data Range",
 				"AUTO_DATA_RANGE_DESC": "Turn off to collect data by manually setting the duration.",
+				"CANCEL": "Cancel",
 				"CANCELED": "Canceled",
 				"CANCEL_BUTTON": "Cancel Collecting",
 				"CANCEL_MODAL_DESC": "Canceling the current data collection job may result in a delay of approximately 10 minutes to restart the process. This action cannot be undone.",
