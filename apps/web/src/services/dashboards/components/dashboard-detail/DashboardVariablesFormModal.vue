@@ -81,7 +81,7 @@ const state = reactive({
     isDynamicFormValid: false,
     showUpdateWarning: computed<boolean>(() => {
         if (props.modalType === 'CREATE') return false;
-        const _varsKeys = Object.keys(dashboardDetailState.dashboardInfo?.vars || {});
+        const _varsKeys = Object.keys(dashboardDetailGetters.dashboardInfo?.vars || {});
         return _varsKeys.includes(props.variableKey || '');
     }),
     //
@@ -186,7 +186,7 @@ const updateDashboardVarsSchema = async (dashboardId: string) => {
             use: state.targetVariable?.use || false,
             created_by: state.targetVariable?.created_by,
         };
-        const _vars = cloneDeep(dashboardDetailState.dashboardInfo?.vars || {});
+        const _vars = cloneDeep(dashboardDetailGetters.dashboardInfo?.vars || {});
         const _tempVars = cloneDeep(dashboardDetailState.vars);
         delete _vars[_originalKey];
         delete _tempVars[_originalKey];

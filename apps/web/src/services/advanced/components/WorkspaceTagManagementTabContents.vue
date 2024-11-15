@@ -74,7 +74,7 @@ const handleEditTag = () => {
 const handleCloseTag = async () => {
     tableState.tagEditPageVisible = false;
 };
-const handleTagUpdate = async (newTags) => {
+const handleTagUpdate = async (newTags:Tags) => {
     try {
         tableState.loading = true;
         await SpaceConnector.clientV2.identity.workspace.update<WorkspaceUpdateParameters, WorkspaceModel>({
@@ -87,6 +87,7 @@ const handleTagUpdate = async (newTags) => {
         workspacePageStore.$patch((_state) => {
             _state.workspaces[state.selectedIdx].tags = newTags;
         });
+        tableState.tags = newTags;
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('COMMON.TAGS.ALT_E_UPDATE'));
     } finally {

@@ -99,6 +99,7 @@ const handleConfirm = async () => {
                 workspace_id: workspacePageStore.selectedWorkspaces[0].workspace_id,
                 name: state.name ?? '',
                 tags: {
+                    ...workspacePageStore.selectedWorkspaces[0].tags,
                     description: state.description ?? '',
                     theme: state.selectedTheme ?? 'blue',
                 },
