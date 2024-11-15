@@ -75,7 +75,7 @@ const state = reactive({
         icon: d.data_type === DATA_TABLE_TYPE.TRANSFORMED ? 'ic_transform-data' : 'ic_service_data-sources',
     }))),
     selectedDataTableId: computed(() => widgetGenerateState.selectedDataTableId),
-    errorModalCurrentType: undefined as 'default'|'geoMap'| 'progressCard'|undefined,
+    errorModalCurrentType: undefined as 'default'|'geoMap'|undefined,
 });
 
 
@@ -105,14 +105,6 @@ const checkDefaultValidation = () => {
         const filteredSelection = groupBySelection.filter((item) => (item?.name === 'Region'));
         if (filteredSelection.length === 0) {
             state.errorModalCurrentType = 'geoMap';
-            state.widgetDefaultValidationModalVisible = true;
-        }
-        break;
-    }
-    case 'progressCard': {
-        const dataInfo = selectedDataTable.data_info ?? {};
-        if (Object.keys(dataInfo).length < 2) {
-            state.errorModalCurrentType = 'progressCard';
             state.widgetDefaultValidationModalVisible = true;
         }
         break;
@@ -362,9 +354,6 @@ onMounted(() => {
             <template #body>
                 <p v-if="state.errorModalCurrentType === 'geoMap'">
                     {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.VALIDATION_MODAL.GEO_MAP_DESC') }}
-                </p>
-                <p v-else-if="state.errorModalCurrentType === 'progressCard'">
-                    {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.VALIDATION_MODAL.PROGRESS_CARD_DESC') }}
                 </p>
                 <p v-else>
                     {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.VALIDATION_MODAL.DESC', {
