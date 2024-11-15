@@ -424,6 +424,82 @@ export const BeautifyText: Story = {
     }),
 };
 
+export const Foot: Story = {
+    render: () => ({
+        components: { PDataTable },
+        template: `
+          <div class="my-4">
+             <div>
+               <p class="mb-4 font-xl font-bold">Foot</p>
+               <p-data-table :fields="fields" :items="items">
+                 <template #foot="{fields}">
+                     <td v-for="field in fields" :key="field.name">
+                       {{ field.name }}
+                     </td>
+                 </template>
+               </p-data-table>
+             </div>
+            <div class="mt-6">
+              <p class="mb-4 font-xl font-bold">tf-col-format: Determine display visibility through name of field. - Total</p>
+              <p-data-table :fields="fields" :items="items">
+                <template #tf-col-format="{field, colIndex, values}">
+                  <span v-if="colIndex === 0">Total</span>
+                  <span v-if="field.name !== 'cost'"></span>
+                  <span v-else>{{
+                      values.reduce((acc, cur) => Number(acc) + Number(cur), 0)
+                    }}</span>
+                </template>
+              </p-data-table>
+            </div>
+            <div class="mt-6">
+              <p class="mb-4 font-xl font-bold">tf-col-format: Determine display visibility through name of field. - Average</p>
+              <p-data-table :fields="fields" :items="items">
+                <template #tf-col-format="{field, colIndex, values}">
+                  <span v-if="colIndex === 0">Average</span>
+                  <span v-if="field.name !== 'cost'"></span>
+                  <span v-else>{{
+                    values.reduce((acc ,cur) => Number(acc) + Number(cur), 0) / values.length
+                    }}</span>
+                </template>
+              </p-data-table>
+            </div>
+            <div class="mt-6">
+              <!--              TODO: add description - about undisplayed row with colIndex-->
+              <p class="mb-4 font-xl font-bold">tf-col-format: Determine display visibility through Column Index. - Total</p>
+              <p-data-table :fields="fields" :items="items">
+                <template #tf-col-format="{field, colIndex, values}">
+                  <span v-if="colIndex === 0">Total</span>
+                  <span v-else-if="colIndex !== 3"></span>
+                  <span v-else>{{
+                      values.reduce((acc, cur) => Number(acc) + Number(cur), 0)
+                    }}</span>
+                </template>
+              </p-data-table>
+            </div>
+            <div class="mt-6">
+            <!--            TODO: if selectable === true -->
+              <p class="mb-4 font-xl font-bold">tf-col-format: When selectable is true.</p>
+              <p-data-table :fields="fields" :items="items" selectable>
+                <template #tf-col-format="{field, colIndex, values}">
+                  <span v-if="colIndex === 0">Total</span>
+                  <span v-else-if="colIndex !== 3"></span>
+                  <span v-else>{{
+                      values.reduce((acc, cur) => Number(acc) + Number(cur), 0)
+                    }}</span>
+                </template>
+              </p-data-table>
+            </div>
+          </div>
+        `,
+        setup() {
+            return {
+                fields: getUserFields(),
+                items: getUsers(5, 5),
+            };
+        },
+    }),
+};
+
 export const Playground: Story = {
     ...Template,
 };

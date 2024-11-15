@@ -217,6 +217,14 @@ const getServiceAccountRouteLocationByWorkspaceName = (item: WorkspaceModel) => 
 onMounted(async () => {
     await workspacePageStore.fetchCostReportConfig();
 });
+
+const reduce = (arr: (number & undefined)[]) => arr.reduce((acc, value) => acc + (value ?? 0), 0);
+
+const costInfoReduce = (arr: (number | {month: any})[] | any) => {
+    const result = arr.reduce((acc, cur) => (acc + Object.keys(cur).includes('month') ? cur?.month : 0), 0);
+
+    return result;
+};
 </script>
 
 <template>
@@ -274,7 +282,7 @@ onMounted(async () => {
                 <div class="th-tooltip">
                     <span>{{ field.label }}</span>
                     <p-tooltip
-                        :contents="$t('IAM.WORKSPACES.TOOLTIP_STATE')"
+                        :contents="String($t('IAM.WORKSPACES.TOOLTIP_STATE'))"
                         position="bottom"
                         class="tooltip-wrapper"
                         content-class="custom-tooltip-content"
@@ -292,7 +300,7 @@ onMounted(async () => {
                 <div class="th-tooltip">
                     <span>{{ field.label }}</span>
                     <p-tooltip
-                        :contents="$t('IAM.WORKSPACES.TOOLTIP_COST')"
+                        :contents="String($t('IAM.WORKSPACES.TOOLTIP_COST'))"
                         position="bottom"
                         class="tooltip-wrapper"
                     >
@@ -342,12 +350,21 @@ onMounted(async () => {
             </template>
             <template #col-cost_info-format="{value}">
                 <p>
-                    <span>{{ CURRENCY_SYMBOL[storeState.currency] }}</span>
+                    <span>{{ CURRENCY_SYMBOL[String(storeState.currency)] }}</span>
                     {{ numberFormatter(value?.month) || 0 }}
                 </p>
             </template>
             <template #col-created_at-format="{value}">
                 {{ iso8601Formatter(value, storeState.timezone) }}
+            </template>
+            <template #tf-col-format="{field, colIndex, values}">
+                <span v-if="colIndex === 0">Total</span>
+                <span v-if="field.name === 'user_count'">{{ reduce(values) }}</span>
+                <span v-if="field.name === 'service_account_count'">{{ reduce(values) }}</span>
+                <span v-if="field.name === 'cost_info'">
+                    <span>{{ CURRENCY_SYMBOL[storeState.currency ?? 'USD'] }}</span>
+                    {{ costInfoReduce(values) }}
+                </span>
             </template>
         </p-toolbox-table>
     </section>
