@@ -15,6 +15,7 @@ import CostTagKeyVariableModel from '@/lib/variable-models/managed-model/custom-
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { UNIFIED_COST_KEY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
 
 
@@ -42,7 +43,7 @@ const state = reactive({
     tagsMenuItems: [] as MenuItem[],
     selectedItems: [] as MenuItem[],
     searchText: '',
-    dataSourceId: computed<string>(() => costAnalysisPageGetters.selectedDataSourceId ?? ''),
+    dataSourceId: computed<string>(() => (costAnalysisPageGetters.isUnifiedCost ? UNIFIED_COST_KEY : (costAnalysisPageGetters.selectedDataSourceId ?? ''))),
 });
 
 const containerRef = ref<HTMLElement|null>(null);

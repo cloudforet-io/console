@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import { cloneDeep, isEmpty, sortBy } from 'lodash';
 import { defineStore } from 'pinia';
 
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter, ConsoleFilterValue } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { CostQuerySetCreateParameters } from '@/schema/cost-analysis/cost-query-set/api-verbs/create';
@@ -22,7 +22,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import {
-    DEFAULT_UNIFIED_COST_CURRENCY, GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP, UNIFIED_COST_KEY,
+    DEFAULT_UNIFIED_COST_CURRENCY, GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP,
 } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { convertRelativePeriodToPeriod } from '@/services/cost-explorer/helpers/cost-explorer-period-helper';
 import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
@@ -78,13 +78,23 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
         selectedQueryId: computed(() => costQuerySetState.selectedQuerySetId),
         costQueryList: computed(() => costQuerySetState.costQuerySetList),
         selectedQuerySet: computed(() => costQuerySetGetters.selectedQuerySet),
+        convertedOriginFilter: computed<Record<string, ConsoleFilterValue | ConsoleFilterValue[]>>(() => {
+            const originFilters:ConsoleFilter[] = getters.selectedQuerySet?.options?.filters ?? [];
+            const _selectedItemsMap: Record<string, ConsoleFilterValue | ConsoleFilterValue[]> = {};
+            (originFilters ?? []).forEach((queryFilter:ConsoleFilter) => {
+                if (queryFilter.k) {
+                    _selectedItemsMap[queryFilter.k] = queryFilter.v;
+                }
+            });
+            return _selectedItemsMap;
+        }),
         selectedDataSourceId: computed(() => costQuerySetState.selectedDataSourceId),
-        isUnifiedCost: computed(() => getters.selectedDataSourceId === UNIFIED_COST_KEY),
+        isUnifiedCost: computed(() => costQuerySetState.isUnifiedCostOn),
         managedCostQuerySetList: computed(() => costQuerySetGetters.managedCostQuerySets),
         currency: computed<Currency>(() => {
             if (costQuerySetState.selectedDataSourceId) {
                 const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId ?? ''];
-                if (costQuerySetState.selectedDataSourceId === UNIFIED_COST_KEY) return (domainGetters.domainUnifiedCostCurrency ?? DEFAULT_UNIFIED_COST_CURRENCY);
+                if (getters.isUnifiedCost) return (domainGetters.domainUnifiedCostCurrency ?? DEFAULT_UNIFIED_COST_CURRENCY);
                 return targetDataSource?.data?.plugin_info?.metadata?.currency ?? 'USD';
             }
             return 'USD';
@@ -115,12 +125,13 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
             const adminManagedGroupByItems = state.isAllWorkspaceSelected ? groupByItemValueList : workspaceRemovedGroupByItems;
 
             const _managedGroupByItems = _state.isAdminMode ? adminManagedGroupByItems : workspaceRemovedGroupByItems;
-            return [..._managedGroupByItems, ..._additionalInfoGroupBy];
+            return getters.isUnifiedCost ? _managedGroupByItems : [..._managedGroupByItems, ..._additionalInfoGroupBy];
         }),
         metadataAdditionalInfoItems: computed<GroupByItem[]>(() => {
+            if (getters.isUnifiedCost) return [];
             if (!costQuerySetState.selectedDataSourceId) return [];
             const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId ?? ''];
-            if (!targetDataSource) return [];
+            if (!targetDataSource || getters.isUnifiedCost) return [];
             const metadataAdditionalInfo = targetDataSource?.data?.plugin_info?.metadata?.additional_info;
             if (!metadataAdditionalInfo) return [];
             return Object.entries(metadataAdditionalInfo)
@@ -131,6 +142,7 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
                 }));
         }),
         additionalInfoKeysItems: computed<GroupByItem[]>(() => {
+            if (getters.isUnifiedCost) return [];
             if (!costQuerySetState.selectedDataSourceId) return [];
             const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId ?? ''];
             if (!targetDataSource) return [];
@@ -163,7 +175,7 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
             return results;
         }),
         dataSourceImageUrl: computed<string>(() => {
-            if (costQuerySetState.selectedDataSourceId) {
+            if (costQuerySetState.selectedDataSourceId && !costQuerySetState.isUnifiedCostOn) {
                 const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId ?? ''];
                 return allReferenceStore.getters.plugin[targetDataSource?.data?.plugin_info?.plugin_id]?.icon;
             }
