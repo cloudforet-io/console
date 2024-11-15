@@ -22,8 +22,6 @@ import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/m
 import type { VariableModelType } from '@/lib/variable-models';
 import type { Value } from '@/lib/variable-models/_base/types';
 
-
-
 export type DashboardType = typeof DASHBOARD_TYPE[keyof typeof DASHBOARD_TYPE];
 export type DashboardFolderType = 'PUBLIC'|'PRIVATE';
 
@@ -95,19 +93,6 @@ export interface DateRange {
 }
 
 export type AdminDashboardType = 'WORKSPACE'|'ADMIN';
-
-// dashboard template types
-export interface DashboardTemplate {
-    name: string;
-    version: number|string;
-    layouts: DashboardLayout[];
-    options: DashboardOptions;
-    variables?: DashboardVariables;
-    variables_schema?: DashboardVariablesSchema;
-    labels?: string[];
-    template_id: string;
-    template_type: TemplateType;
-}
 
 export type DashboardVars = Record<string, string[]|number[]|string|number>;
 
