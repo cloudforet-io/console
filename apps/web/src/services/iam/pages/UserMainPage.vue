@@ -93,8 +93,7 @@ callApiWithGrantGuard();
 
 /* Unmount */
 onUnmounted(() => {
-    userPageStore.$dispose();
-    userPageStore.$reset();
+    userPageStore.reset();
 });
 </script>
 
