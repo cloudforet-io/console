@@ -125,12 +125,12 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
             const adminManagedGroupByItems = state.isAllWorkspaceSelected ? groupByItemValueList : workspaceRemovedGroupByItems;
 
             const _managedGroupByItems = _state.isAdminMode ? adminManagedGroupByItems : workspaceRemovedGroupByItems;
-            return [..._managedGroupByItems, ..._additionalInfoGroupBy];
+            return getters.isUnifiedCost ? _managedGroupByItems : [..._managedGroupByItems, ..._additionalInfoGroupBy];
         }),
         metadataAdditionalInfoItems: computed<GroupByItem[]>(() => {
             if (!costQuerySetState.selectedDataSourceId) return [];
             const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId ?? ''];
-            if (!targetDataSource) return [];
+            if (!targetDataSource || getters.isUnifiedCost) return [];
             const metadataAdditionalInfo = targetDataSource?.data?.plugin_info?.metadata?.additional_info;
             if (!metadataAdditionalInfo) return [];
             return Object.entries(metadataAdditionalInfo)
