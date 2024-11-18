@@ -236,6 +236,7 @@ const costInfoReduce = (arr: (number | {month: any})[] | any) => {
                          exportable
                          :loading="false"
                          :multi-select="false"
+                         :show-footer="true"
                          disabled
                          :items="workspacePageState.workspaces"
                          :select-index="workspacePageState.selectedIndices"

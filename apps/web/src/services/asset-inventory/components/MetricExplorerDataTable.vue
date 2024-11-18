@@ -282,6 +282,7 @@ const reduce = (arr: (number | undefined)[] | any) => arr.reduce((acc, value) =>
                      :fields="state.fields"
                      :items="state.items"
                      :searchable="false"
+                     :show-footer="true"
                      :page-size.sync="state.pageSize"
                      row-height-fixed
                      row-cursor-pointer

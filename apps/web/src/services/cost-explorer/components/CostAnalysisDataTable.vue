@@ -240,7 +240,7 @@ const tableState = reactive({
         fields.push(...tableState.costFields);
         return fields;
     }),
-    items: [] as CostAnalyzeRawData[],
+    items: undefined as CostAnalyzeRawData[] | undefined,
     thisPage: 1,
     pageSize: 15,
     more: false,
@@ -563,6 +563,7 @@ watch(
             :fields="tableState.fields"
             :items="tableState.items"
             :searchable="false"
+            :show-footer="true"
             :page-size.sync="tableState.pageSize"
             row-height-fixed
             exportable

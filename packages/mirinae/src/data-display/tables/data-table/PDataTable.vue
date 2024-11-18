@@ -219,7 +219,7 @@
                         </tr>
                     </slot>
                 </tbody>
-                <tfoot v-if="!showNoData && isExpandable">
+                <tfoot v-if="!showNoData && showFooter">
                     <tr>
                         <slot name="foot"
                               v-bind="getDefaultSlotProps()"
@@ -264,7 +264,6 @@ import {
     reactive,
     watch,
     defineComponent,
-    useSlots,
 } from 'vue';
 
 import { get, range } from 'lodash';
@@ -399,6 +398,10 @@ export default defineComponent<DataTableProps, any>({
             type: Boolean,
             default: false,
         },
+        showFooter: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }) {
         const getChildFields = (
@@ -457,10 +460,6 @@ export default defineComponent<DataTableProps, any>({
                 emit,
             ),
         });
-
-        const slots = useSlots();
-        const isExpandable = computed<boolean>(() => slots['tf-col-format'] !== undefined || slots.foot !== undefined);
-
 
         const state = reactive({
             tbodyRef: null as HTMLElement | null,
@@ -681,8 +680,6 @@ export default defineComponent<DataTableProps, any>({
             getFieldRowspan,
             getFieldColspan,
             getValue,
-            slots,
-            isExpandable,
             getDefaultSlotProps,
             getHeadSlotProps,
             getColSlotProps,

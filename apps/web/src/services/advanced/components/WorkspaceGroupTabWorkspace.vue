@@ -229,6 +229,7 @@ const costInfoReduce = (arr: (number | {month: any})[] | any) => {
                          :total-count="workspaceTabState.workspacesInSelectedGroupTotalCount"
                          sort-by="name"
                          search-type="plain"
+                         :show-footer="true"
                          :sort-desc="workspaceTabState.sortDesc"
                          :this-page.sync="workspaceTabState.thisPage"
                          :search-text.sync="workspaceTabState.searchText"
