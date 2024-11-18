@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
 import { computed, reactive } from 'vue';
-import { useRouter } from 'vue-router/composables';
 
 import {
     PLink, PDivider, PCard, PButton, PI, screens,
@@ -9,13 +8,6 @@ import {
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
-
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
-
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
-
-const router = useRouter();
 
 const { width } = useWindowSize();
 
@@ -40,7 +32,6 @@ const state = reactive({
             type: 'role-type',
             title: i18n.t('LADING.DOMAIN.ROLE_TYPE_TITLE'),
             desc: i18n.t('LADING.DOMAIN.ROLE_TYPE_DESC'),
-            button: i18n.t('LADING.DOMAIN.ROLE_TYPE_BUTTON'),
             image: '/images/domain-landing/domain-landing_admin_role-type.png',
             srcSet: '/images/domain-landing/domain-landing_admin_role-type@2x.png 2x, /images/domain-landing/domain-landing_admin_role-type@3x.png 3x',
         },
@@ -48,7 +39,6 @@ const state = reactive({
             type: 'auto-sync',
             title: i18n.t('LADING.DOMAIN.AUTO_SYNC_TITLE'),
             desc: i18n.t('LADING.DOMAIN.AUTO_SYNC_DESC'),
-            button: i18n.t('LADING.DOMAIN.AUTO_SYNC_BUTTON'),
             image: '/images/domain-landing/domain-landing_admin_auto-sync.png',
             srcSet: '/images/domain-landing/domain-landing_admin_auto-sync@2x.png 2x, /images/domain-landing/domain-landing_admin_auto-sync@3x.png 3x',
         },
@@ -84,14 +74,6 @@ const handleClickCardButton = (type: string) => {
 
     if (type === 'quick-start-guide') {
         url = storeState.language === 'en' ? 'https://cloudforet.io/docs/guides/getting-started' : `https://cloudforet.io/${storeState.language}/docs/guides/getting-started`;
-    } else if (type === 'role-type') {
-        url = router.resolve({
-            name: makeAdminRouteName(IAM_ROUTE.ROLE._NAME),
-        }).href;
-    } else if (type === 'auto-sync') {
-        url = router.resolve({
-            name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME),
-        }).href;
     }
 
     if (url) {
@@ -247,6 +229,8 @@ const handleClickCardButton = (type: string) => {
         .card-wrapper {
             @apply flex-col;
             .card {
+                flex: initial;
+                height: 13.625rem;
                 .card-inner-wrapper {
                     padding: 1.25rem 1.125rem;
                 }
