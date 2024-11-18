@@ -7,9 +7,12 @@ import { clone } from 'lodash';
 
 import { PButton, screens, PTextButton } from '@cloudforet/mirinae';
 
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import type { MenuId } from '@/lib/menu/config';
@@ -20,6 +23,9 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 
+const userWorkspaceStore = useUserWorkspaceStore();
+const userWorkspaceGetters = userWorkspaceStore.getters;
+
 const router = useRouter();
 const route = useRoute();
 
@@ -27,6 +33,7 @@ const { width } = useWindowSize();
 
 const storeState = reactive({
     pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
 });
 const state = reactive({
     isTabletSize: computed(() => width.value < screens.tablet.max),
@@ -60,6 +67,13 @@ const handleClickButton = (type: string) => {
         }).href, '_blank');
     }
 };
+const handleExploreButton = () => {
+    if (storeState.workspaceList.length > 0) {
+        router.push({ name: LANDING_ROUTE.WORKSPACE._NAME });
+    } else {
+        handleClickButton('create');
+    }
+};
 </script>
 
 <template>
@@ -91,7 +105,7 @@ const handleClickButton = (type: string) => {
                 <p-text-button icon-left="ic_rocket-filled"
                                style-type="highlight"
                                class="workspace-button"
-                               @click="router.push({ name: LANDING_ROUTE.WORKSPACE._NAME })"
+                               @click="handleExploreButton"
                 >
                     {{ $t('LADING.DOMAIN.EXPLORE_WORKSPACE_TITLE') }}
                 </p-text-button>

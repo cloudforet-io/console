@@ -99,6 +99,7 @@ export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<
 export const signOut = ({ commit }): void => {
     SpaceConnector.flushToken();
     commit('setCurrentGrantInfo', undefined);
+    commit('setCurrentRoleInfo', undefined);
 };
 const getRoleTypeFromToken = (token: string): RoleType => {
     const decodedToken = jwtDecode<JWTPayload>(token);
