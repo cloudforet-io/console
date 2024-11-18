@@ -65,6 +65,7 @@ const Template: Story = {
                 :getRowClassNames="getRowClassNames"
                 :getRowSelectable="getRowSelectable"
                 :beautify-text="beautifyText"
+                :show-footer="showFooter"
                 @select="onSelect"
                 @rowLeftClick="onRowLeftClick"
                 @changeSort="onChangeSort"
@@ -72,6 +73,12 @@ const Template: Story = {
                 @update:sortBy="onUpdateSortBy"
                 @update:sortDesc="onUpdateSortDesc"
             >
+              <template #foot>
+                <span v-if="footSlot" v-html="footSlot" />
+              </template>
+              <template #tf-col-format>
+                <div v-if="tfColFormatSlot" v-html="tfColFormatSlot" />
+              </template>
             </p-data-table>
         </div>
         `,

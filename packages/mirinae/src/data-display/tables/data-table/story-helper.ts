@@ -35,6 +35,7 @@ export const getDataTableArgs = (): Args => ({
     getRowClassNames: undefined,
     getRowSelectable: undefined,
     beautifyText: false,
+    showFooter: false,
     headSlot: null,
     theadSlot: null,
     theadFormatSlot: null,
@@ -392,6 +393,20 @@ export const getDataTableArgsType = (): ArgTypes => ({
             },
         },
     },
+    showFooter: {
+        name: 'showFooter',
+        type: { name: 'boolean' },
+        description: 'Whether to display foot or not. Edit the slot `foot` or `tf-col-format` to see details.',
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+    },
     /* slots */
     headSlot: {
         name: 'head',
@@ -507,6 +522,9 @@ export const getDataTableArgsType = (): ArgTypes => ({
             },
             category: 'slots',
         },
+        control: {
+            type: 'text',
+        },
     },
     tfColFormatSlot: {
         name: 'tf-col-format',
@@ -516,6 +534,9 @@ export const getDataTableArgsType = (): ArgTypes => ({
                 summary: null,
             },
             category: 'slots',
+        },
+        control: {
+            type: 'text',
         },
     },
     /* events */
