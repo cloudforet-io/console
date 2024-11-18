@@ -39,11 +39,11 @@
 
 <script setup lang="ts">
 
+import PButton from '@/controls/buttons/button/PButton.vue';
+import type { ButtonStyle } from '@/controls/buttons/button/type';
+import { BUTTON_STYLE } from '@/controls/buttons/button/type';
 import imgGhost from '@/data-display/empty/assets/img_ghost.png';
 import { EmptyImageSize } from '@/data-display/empty/type';
-import PButton from '@/inputs/buttons/button/PButton.vue';
-import type { ButtonStyle } from '@/inputs/buttons/button/type';
-import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
 
 interface EmptyProps {
     showImage?: boolean;

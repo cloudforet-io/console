@@ -5,8 +5,8 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import { range } from 'lodash';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
+import PButton from '@/controls/buttons/button/PButton.vue';
 import { getDataLoaderArgs, getDataLoaderArgTypes, getDataLoaderParameters } from '@/feedbacks/loading/data-loader/story-helper';
-import PButton from '@/inputs/buttons/button/PButton.vue';
 
 
 

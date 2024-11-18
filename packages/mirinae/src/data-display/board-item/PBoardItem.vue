@@ -83,12 +83,12 @@ import {
 } from 'vue';
 import type { PropType } from 'vue';
 
+import PIconButton from '@/controls/buttons/icon-button/PIconButton.vue';
+import PSelectDropdown from '@/controls/dropdown/select-dropdown/PSelectDropdown.vue';
 import type { BoardItemProps, IconSet } from '@/data-display/board-item/type';
 import PTooltip from '@/data-display/tooltips/PTooltip.vue';
 import PI from '@/foundation/icons/PI.vue';
 import { useSelect } from '@/hooks';
-import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
-import PSelectDropdown from '@/inputs/dropdown/select-dropdown/PSelectDropdown.vue';
 
 export default defineComponent<BoardItemProps>({
     name: 'PBoardItem',

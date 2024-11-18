@@ -3,8 +3,8 @@ import { ref } from 'vue';
 import type { Meta } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
+import PTextarea from '@/controls/textarea/PTextarea.vue';
 import PI from '@/foundation/icons/PI.vue';
-import PTextarea from '@/inputs/textarea/PTextarea.vue';
 
 import type { UseTabOptions } from './type';
 import { useTab } from './use-tab';

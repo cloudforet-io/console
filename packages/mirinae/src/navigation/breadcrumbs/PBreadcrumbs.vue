@@ -5,11 +5,12 @@ import {
 
 import { useWindowSize } from '@vueuse/core';
 
-import { screens } from '@/index';
-import type { MenuItem } from '@/inputs/context-menu/type';
+import type { MenuItem } from '@/controls/context-menu/type';
 import BreadcrumbsEllipsisItem from '@/navigation/breadcrumbs/modules/BreadcrumbsEllipsisItem.vue';
 import BreadcrumbsItem from '@/navigation/breadcrumbs/modules/BreadcrumbsItem.vue';
 import type { Route } from '@/navigation/breadcrumbs/type';
+
+import screens from '@/styles/screens.cjs';
 
 interface Props {
     routes: Route[];

@@ -202,11 +202,11 @@ import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
 import { useProxyValue } from '@/hooks';
 import { copyAnyData } from '@/utils/helpers';
 
-const PCheckbox = () => import('@/inputs/checkbox/PCheckbox.vue');
+const PCheckbox = () => import('@/controls/checkbox/PCheckbox.vue');
 const PTextBeautifier = () => import('@/data-display/text-beautifier/PTextBeautifier.vue');
-const PRadio = () => import('@/inputs/radio/PRadio.vue');
+const PRadio = () => import('@/controls/radio/PRadio.vue');
 const PI = () => import('@/foundation/icons/PI.vue');
-const PCopyButton = () => import('@/inputs/buttons/copy-button/PCopyButton.vue');
+const PCopyButton = () => import('@/controls/buttons/copy-button/PCopyButton.vue');
 
 interface TableField extends DataTableFieldType {
     depth?: number;

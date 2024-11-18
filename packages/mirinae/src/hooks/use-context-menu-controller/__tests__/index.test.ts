@@ -3,10 +3,10 @@ import { defineComponent, ref } from 'vue';
 
 import { describe, expect } from 'vitest';
 
+import PContextMenu from '@/controls/context-menu/PContextMenu.vue';
+import type { MenuItem } from '@/controls/context-menu/type';
 import type { UseContextMenuControllerOptions } from '@/hooks/use-context-menu-controller/use-context-menu-controller';
 import { useContextMenuController } from '@/hooks/use-context-menu-controller/use-context-menu-controller';
-import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
-import type { MenuItem } from '@/inputs/context-menu/type';
 
 const localVue = createLocalVue();
 

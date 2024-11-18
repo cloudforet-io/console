@@ -1,7 +1,7 @@
 import type { ArgTypes, Parameters, Args } from '@storybook/vue';
 
+import { getToolboxArgTypes, getToolboxArgs } from '@/controls/toolbox/story-helper';
 import { getDataTableArgsType, getDataTableArgs } from '@/data-display/tables/data-table/story-helper';
-import { getToolboxArgTypes, getToolboxArgs } from '@/navigation/toolbox/story-helper';
 
 export const getToolboxTableArgs = (): Args => {
     const args: Args = {

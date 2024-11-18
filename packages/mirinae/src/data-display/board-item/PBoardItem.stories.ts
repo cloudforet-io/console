@@ -3,9 +3,9 @@ import { reactive, toRefs, computed } from 'vue';
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
+import PTextButton from '@/controls/buttons/text-button/PTextButton.vue';
 import { standardIconActionSet, extraIconActionSet } from '@/data-display/board-item/mock';
 import { getBoardItemArgTypes, getBoardItemParameters, getBoardItemArgs } from '@/data-display/board-item/story-helper';
-import PTextButton from '@/inputs/buttons/text-button/PTextButton.vue';
 import { I18nConnector } from '@/translations';
 
 

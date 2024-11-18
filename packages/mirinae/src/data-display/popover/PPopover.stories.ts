@@ -4,8 +4,8 @@ import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
-import PButton from '../../inputs/buttons/button/PButton.vue';
-import PTextInput from '../../inputs/input/text-input/PTextInput.vue';
+import PButton from '../../controls/buttons/button/PButton.vue';
+import PTextInput from '../../controls/input/text-input/PTextInput.vue';
 import PPopover from './PPopover.vue';
 import { getPopoverArgs, getPopoverParameters, getPopoverArgTypes } from './story-helper';
 

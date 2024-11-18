@@ -4,10 +4,11 @@ import { computed, reactive } from 'vue';
 import { useWindowSize } from '@vueuse/core';
 import type { Location } from 'vue-router';
 
+import PCopyButton from '@/controls/buttons/copy-button/PCopyButton.vue';
 import PI from '@/foundation/icons/PI.vue';
-import { screens } from '@/index';
-import PCopyButton from '@/inputs/buttons/copy-button/PCopyButton.vue';
 import type { Route } from '@/navigation/breadcrumbs/type';
+
+import screens from '@/styles/screens.cjs';
 
 interface Props {
     route: Route;

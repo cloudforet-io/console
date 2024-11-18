@@ -83,13 +83,13 @@ import {
 } from 'vue';
 import type { SetupContext } from 'vue';
 
+import { SEARCH_TYPES } from '@/controls/toolbox/config';
+import PToolbox from '@/controls/toolbox/PToolbox.vue';
 import { DATA_TABLE_STYLE_TYPE } from '@/data-display/tables/data-table/config';
 import PDataTable from '@/data-display/tables/data-table/PDataTable.vue';
 import type { ToolboxTableOptions, ToolboxTableProps } from '@/data-display/tables/toolbox-table/type';
 import { useProxyValue } from '@/hooks';
 import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
-import { SEARCH_TYPES } from '@/navigation/toolbox/config';
-import PToolbox from '@/navigation/toolbox/PToolbox.vue';
 
 
 export default defineComponent<ToolboxTableProps>({

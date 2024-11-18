@@ -1,7 +1,7 @@
 import type { Ref, UnwrapRef } from 'vue';
 import { computed, isRef, ref } from 'vue';
 
-import type { MenuItem } from '@/inputs/context-menu/type';
+import type { MenuItem } from '@/controls/context-menu/type';
 
 export interface MenuAttachHandlerRes<Item extends MenuItem = MenuItem> {
     results: Item[];

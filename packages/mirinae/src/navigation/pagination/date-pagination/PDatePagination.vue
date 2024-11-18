@@ -29,7 +29,7 @@ import dayjs from 'dayjs';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 
 
-import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
+import PIconButton from '@/controls/buttons/icon-button/PIconButton.vue';
 import type { DatePaginationProps } from '@/navigation/pagination/date-pagination/type';
 
 dayjs.extend(isSameOrAfter);
