@@ -325,9 +325,7 @@ const costInfoReduce = (arr: (number | {month: any})[] | any) => {
                     {{ $t('IAM.WORKSPACE_GROUP.TAB.REMOVE') }}
                 </p-button>
             </template>
-            <template v-if="tableState.tableItems.length > 0"
-                      #tf-col-format="{field, colIndex, values}"
-            >
+            <template #tf-col-format="{field, colIndex, values}">
                 <span v-if="colIndex === 0">Total</span>
                 <span v-else-if="field.name === 'user_count'">{{ reduce(values) }}</span>
                 <span v-else-if="field.name === 'service_account_count'">{{ reduce(values) }}</span>

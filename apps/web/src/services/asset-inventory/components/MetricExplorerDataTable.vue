@@ -319,9 +319,7 @@ const reduce = (arr: any[]) => {
             </span>
         </template>
 
-        <template v-if="state.items.length > 0"
-                  #tf-col-format="{field, colIndex, values}"
-        >
+        <template #tf-col-format="{field, colIndex, values}">
             <span v-if="colIndex === 0">Total</span>
             <span v-else-if="!state.groupByFields.map((d) => d.name).includes(field.name)">
                 {{ values.length > 0 ? numberFormatter(reduce(values), {notation: 'compact'}) : 0 }}
