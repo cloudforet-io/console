@@ -35,7 +35,7 @@ import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdow
 
 import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
-import type { XYChartData } from '@/services/cost-explorer/types/cost-explorer-chart-type';
+import type { CostXYChartData } from '@/services/cost-explorer/types/cost-explorer-chart-type';
 import type { UnifiedCostAnalyzeResult } from '@/services/cost-explorer/types/unified-cost-type';
 import CostSummaryChart from '@/services/workspace-home/components/CostSummaryChart.vue';
 import EmptySummaryData from '@/services/workspace-home/components/EmptySummaryData.vue';
@@ -66,7 +66,7 @@ const state = reactive({
     isDesktopSize: computed(() => width.value > screens.laptop.max),
     currency: computed<Currency|undefined>(() => storeState.costReportConfig?.currency || CURRENCY.USD),
     isWorkspaceMember: computed(() => storeState.getCurrentRoleInfo.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
-    chartData: undefined as XYChartData[]|undefined,
+    chartData: undefined as CostXYChartData[]|undefined,
     emptyData: computed<EmptyData>(() => {
         let result = {} as EmptyData;
         if (storeState.dataSource.length === 0) {
@@ -100,8 +100,8 @@ const state = reactive({
         const end = reportMonth.format('YYYY-MM');
         return { start, end };
     }),
-    recentMonthValue: computed<XYChartData|undefined>(() => state.chartData[state.chartData.length - 2]),
-    currentMonthValue: computed<XYChartData|undefined>(() => state.chartData[state.chartData.length - 1]),
+    recentMonthValue: computed<CostXYChartData|undefined>(() => state.chartData[state.chartData.length - 2]),
+    currentMonthValue: computed<CostXYChartData|undefined>(() => state.chartData[state.chartData.length - 1]),
     recentDateRangeText: computed<string>(() => {
         const lastMonth = dayjs().utc().subtract(1, 'month');
         return `${lastMonth.startOf('month').format('YYYY-MM-DD')} ~ ${lastMonth.endOf('month').format('YYYY-MM-DD')}`;
@@ -116,6 +116,27 @@ const handleSelectedProject = async (selectedProject: string[]) => {
     state.selectedProjects = selectedProject;
     await analyzeCostReportData();
 };
+const fillMissingMonths = (dataList: CostXYChartData[]): CostXYChartData[] => {
+    const result: CostXYChartData[] = [];
+    const today = dayjs().utc();
+    if (dataList.length === 0) return result;
+
+    dataList.sort((a, b) => dayjs(a.date).utc().diff(dayjs(b.date).utc()));
+
+    const startDate = dayjs(dataList[0]?.date).utc();
+    let currentDate = startDate;
+
+    while (currentDate.isBefore(today, 'month')) {
+        const dateToCheck = currentDate.clone();
+        const data = dataList.find((item) => dayjs(item.date).utc().isSame(dateToCheck, 'month'));
+        result.push(
+            data || { date: dateToCheck.add(1, 'month').format('YYYY-MM'), value: 0, is_confirmed: true },
+        );
+        currentDate = currentDate.add(1, 'month');
+    }
+    return result;
+};
+
 
 const analyzeCostReportData = async () => {
     state.loading = true;
@@ -138,11 +159,12 @@ const analyzeCostReportData = async () => {
                 ] : undefined,
             },
         });
-        const _chartData = (results || []).flatMap((item) => item?.value_sum?.map((valueSum) => ({
+        if (!results) return;
+        const _chartData = (results || []).flatMap((item) => ((item.value_sum ?? [])).map((valueSum) => ({
             ...valueSum,
             is_confirmed: item.is_confirmed,
         })));
-        state.chartData = sortBy(_chartData, 'date');
+        state.chartData = sortBy(fillMissingMonths(_chartData), 'date');
     } catch (e) {
         state.chartData = undefined;
         ErrorHandler.handleError(e);

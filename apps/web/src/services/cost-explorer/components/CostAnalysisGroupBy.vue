@@ -148,7 +148,8 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
             {{ defaultGroupByItem.label }}
         </p-select-button>
         <div class="tags-button-wrapper">
-            <p-select-dropdown :handler="tagsMenuHandler"
+            <p-select-dropdown v-if="!costAnalysisPageGetters.isUnifiedCost"
+                               :handler="tagsMenuHandler"
                                :selected.sync="state.selectedTagsMenu"
                                selection-label="Tags"
                                appearance-type="badge"

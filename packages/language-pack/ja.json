@@ -1363,6 +1363,7 @@
 		},
 		"STARRED": "お気に入り",
 		"STARRED_NO_DATA": "お気に入りがありません。",
+		"SUCCESS": "成功",
 		"TAGS": {
 			"ADD": "追加",
 			"ADD_TAG": "タグの追加",
@@ -1817,12 +1818,16 @@
 		},
 		"ANOMALY_DETECTION_CONFIGURATION": "異常コスト検知設定",
 		"COST_ADVANCED_SETTINGS": "詳細設定",
+		"COST_ANALYSIS": {
+			"UNIFIED_COST_DESC": "複数のデータソースのコストを一元管理できるようにサポートします。"
+		},
 		"CURRENCY_CONVERTER": "為替レート設定",
 		"CURRENCY_CONVERTER_PAGE": {
 			"AGGREGATION_DATE": "集計日",
 			"EXCHANGE_RATE_SOURCE": "為替基準",
 			"LAST_DAY_OF_THE_MONTH": "月末",
-			"NOTIFICATION": "集計が完了すると、日付の変更は翌月から適用されます。"
+			"NOTIFICATION": "集計が完了すると、日付の変更は翌月から適用されます。",
+			"UPDATE_SUCCESS_ALT": "通貨設定が正常に更新されました"
 		}
 	},
 	"DASHBOARDS": {

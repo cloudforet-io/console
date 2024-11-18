@@ -10,11 +10,14 @@ import {
     PPaneLayout, PTextInput, PSelectDropdown, PButton, PScopedNotification,
 } from '@cloudforet/mirinae';
 
+import { i18n } from '@/translations';
+
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 import type { Currency } from '@/store/modules/display/type';
 import { usePreferencesStore } from '@/store/preferences/preferences-store';
 
 import config from '@/lib/config';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { initDomain } from '@/lib/site-initializer/domain';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -78,8 +81,9 @@ const handleSaveChanges = async () => {
             },
         });
         await initDomain(config);
+        showSuccessMessage(i18n.t('COST_EXPLORER.CURRENCY_CONVERTER_PAGE.UPDATE_SUCCESS_ALT'), '');
     } catch (e) {
-        ErrorHandler.handleError(e);
+        ErrorHandler.handleRequestError(e, e.message);
     } finally {
         state.loading = false;
     }

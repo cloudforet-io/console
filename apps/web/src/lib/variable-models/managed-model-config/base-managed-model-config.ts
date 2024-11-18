@@ -21,6 +21,7 @@ import RegionVariableModel from '@/lib/variable-models/managed-model/resource-mo
 import RoleVariableModel from '@/lib/variable-models/managed-model/resource-model/role-variable-model';
 import SecretVariableModel from '@/lib/variable-models/managed-model/resource-model/secret-variable-model';
 import ServiceAccountVariableModel from '@/lib/variable-models/managed-model/resource-model/service-account-variable-model';
+import UnifiedCostVariableModel from '@/lib/variable-models/managed-model/resource-model/unified-cost-variable-model';
 import UserVariableModel from '@/lib/variable-models/managed-model/resource-model/user-variable-model';
 import WebhookVariableModel from '@/lib/variable-models/managed-model/resource-model/webhook-variable-model';
 import WorkspaceGroupVariableModel from '@/lib/variable-models/managed-model/resource-model/workspace-group-variable-model';
@@ -50,6 +51,7 @@ const RESOURCE_VARIABLE_MODELS = {
     workspace: WorkspaceVariableModel,
     workspace_group: WorkspaceGroupVariableModel,
     cost: CostVariableModel,
+    unified_cost: UnifiedCostVariableModel,
     metric_data: MetricDataVariableModel,
     role: RoleVariableModel,
 } as const;
