@@ -46,6 +46,7 @@ const Template: Story = {
                         v-bind="inputAttrs"
                         :value="value"
                         :size="size"
+                        :type="type"
                         :invalid="invalid"
                         :is-focused="isFocused"
                         :disabled="disabled" :block="block"

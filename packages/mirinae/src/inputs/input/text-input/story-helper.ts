@@ -95,6 +95,22 @@ export const getTextInputArgTypes = (): ArgTypes => {
             control: 'select',
             options: Object.values(INPUT_SIZE),
         },
+        type: {
+            name: 'type',
+            type: { name: 'string' },
+            description: 'Input Tag type. `text`, `password`, `number`, `email`, `tel`, `url`, `search`, `date`, `time`, `datetime-local`, `month`, `week` are available.',
+            table: {
+                type: {
+                    summary: 'string',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'text',
+                },
+            },
+            control: 'select',
+            options: ['text', 'password', 'number', 'email', 'tel', 'url', 'search', 'date', 'time', 'datetime-local', 'month', 'week'],
+        },
         isFocused: {
             name: 'isFocused',
             type: { name: 'boolean' },
