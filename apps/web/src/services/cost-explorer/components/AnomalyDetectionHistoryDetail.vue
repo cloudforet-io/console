@@ -2,7 +2,7 @@
 import {
     PLink,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 import AnomalyDetectionHistoryDetailTrend
     from '@/services/cost-explorer/components/AnomalyDetectionHistoryDetailTrend.vue';

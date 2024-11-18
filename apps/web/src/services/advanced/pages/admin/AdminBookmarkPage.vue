@@ -10,7 +10,7 @@ import { at, clone } from 'lodash';
 import {
     PHeading, PButton, PContextMenu, PHeadingLayout,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

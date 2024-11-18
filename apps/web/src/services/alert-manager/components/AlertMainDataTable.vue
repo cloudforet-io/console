@@ -14,9 +14,9 @@ import {
     PToolboxTable, PButton, PHeading, PBadge, PI, PLink, PHeadingLayout,
 } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
-import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
-import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
+import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
+import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 
 import type { AlertListParameters, AlertListResponse } from '@/schema/monitoring/alert/api-verbs/list';

@@ -7,7 +7,7 @@ import type { TranslateResult } from 'vue-i18n';
 import {
     PFieldGroup, PRadio, PTextInput, PLink,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { ESCALATION_POLICY_FINISH_CONDITION } from '@/schema/monitoring/escalation-policy/constant';

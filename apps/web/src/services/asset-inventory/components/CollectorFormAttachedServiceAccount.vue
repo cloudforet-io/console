@@ -7,8 +7,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PFieldGroup, PRadioGroup, PRadio, PSelectDropdown, PFieldTitle, PI,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
-import type { AutocompleteHandler } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
+import type { AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 
 import { i18n } from '@/translations';

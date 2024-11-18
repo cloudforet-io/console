@@ -6,7 +6,7 @@ import {
 import {
     PFieldGroup, PSelectButton,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { WIDGET_HEIGHT } from '@/common/modules/widgets/_constants/widget-field-constant';

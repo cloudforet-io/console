@@ -1,4 +1,4 @@
-import type { KeyItemSet } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
+import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
 import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
 

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { PLink, PButton, PPaneLayout } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 import { i18n } from '@/translations';
 

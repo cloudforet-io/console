@@ -11,7 +11,7 @@ import {
 import type {
     AutocompleteHandler,
     SelectDropdownMenuItem,
-} from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+} from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';

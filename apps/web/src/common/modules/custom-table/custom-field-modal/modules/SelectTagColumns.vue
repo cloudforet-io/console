@@ -23,7 +23,7 @@ import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 import {
     PTextInput,
 } from '@cloudforet/mirinae';
-import type { TextInputHandler, InputItem } from '@cloudforet/mirinae/types/inputs/input/text-input/type';
+import type { TextInputHandler, InputItem } from '@cloudforet/mirinae/types/controls/input/text-input/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';

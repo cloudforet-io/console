@@ -6,8 +6,8 @@ import {
 import {
     PI, PFieldGroup, PTextInput, PSelectDropdown,
 } from '@cloudforet/mirinae';
-import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
-import type { InputItem } from '@cloudforet/mirinae/types/inputs/input/text-input/type';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
+import type { InputItem } from '@cloudforet/mirinae/types/controls/input/text-input/type';
 
 import { SpaceRouter } from '@/router';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';

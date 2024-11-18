@@ -49,7 +49,7 @@ import {
 } from 'vue';
 
 import { PLink, PLazyImg, PPaneLayout } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { JobModel } from '@/schema/inventory/job/model';

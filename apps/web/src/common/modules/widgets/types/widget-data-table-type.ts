@@ -1,4 +1,4 @@
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import type { EvaluateExpressionType, DataTableQueryFilter } from '@/common/modules/widgets/types/widget-model';
 

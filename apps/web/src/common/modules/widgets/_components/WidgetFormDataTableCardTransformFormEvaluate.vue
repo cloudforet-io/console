@@ -4,8 +4,8 @@ import { computed, reactive } from 'vue';
 import {
     PIconButton, PI, PFieldGroup, PSelectButton, PTextInput, PButton, PTextarea, PButtonModal, PToggleButton, PLink, PFieldTitle,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import { i18n } from '@/translations';
 

@@ -7,9 +7,9 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PToolboxTable, PSelectDropdown, PButton, PBadge, PStatus,
 } from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
+import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
-import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';

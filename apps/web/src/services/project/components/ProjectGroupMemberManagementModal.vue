@@ -10,7 +10,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButtonModal, PDataLoader, PEmpty, PFieldGroup, PTextInput, PIconButton,
 } from '@cloudforet/mirinae';
-import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 
 import type { ProjectGroupAddUsersParameters } from '@/schema/identity/project-group/api-verbs/add-users';

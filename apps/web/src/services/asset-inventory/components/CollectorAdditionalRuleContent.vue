@@ -3,7 +3,7 @@ import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { PLink, PI, PTooltip } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 import { isNotEmpty } from '@cloudforet/utils';
 
 import {

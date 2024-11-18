@@ -10,7 +10,7 @@ import { clone, isEmpty } from 'lodash';
 import {
     PI, screens, PButton, PTextButton, PTooltip,
 } from '@cloudforet/mirinae';
-import type { ContextMenuType } from '@cloudforet/mirinae/src/inputs/context-menu/type';
+import type { ContextMenuType } from '@cloudforet/mirinae/src/controls/context-menu/type';
 
 import { store } from '@/store';
 

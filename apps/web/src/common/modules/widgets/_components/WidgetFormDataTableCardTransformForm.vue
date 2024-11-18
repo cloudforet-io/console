@@ -4,8 +4,8 @@ import { computed, reactive } from 'vue';
 import {
     PI, PFieldGroup, PSelectDropdown, PTextInput, PButton, PIconButton, PFieldTitle, PLink,
 } from '@cloudforet/mirinae';
-import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/src/inputs/dropdown/select-dropdown/type';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/src/controls/dropdown/select-dropdown/type';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 import getRandomId from '@/lib/random-id-generator';
 

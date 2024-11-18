@@ -5,7 +5,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PTooltip, PI, PToggleButton, PLink,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 
 import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';

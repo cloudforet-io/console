@@ -5,7 +5,7 @@ import { useRoute, useRouter } from 'vue-router/composables';
 import {
     PLazyImg, PSelectDropdown, PI, PToggleButton,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

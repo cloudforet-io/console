@@ -6,7 +6,7 @@ import {
 import {
     PIconModal, PButton, PProgressBar, PFieldGroup, PTextInput, PI, PSpinner, PLink, PDivider, PRadioGroup, PRadio, PCollapsibleToggle,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 import type { AgentModel } from '@/schema/identity/agent/model';
 import { store } from '@/store';

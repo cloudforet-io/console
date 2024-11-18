@@ -10,8 +10,8 @@ import { isArray } from 'lodash';
 import {
     PSelectDropdown, PContextMenu, PIconButton, PI, PTextInput,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
-import type { AutocompleteHandler } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
+import type { AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
 
