@@ -274,18 +274,7 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
     }
 }, { immediate: false });
 
-// TODO: type definition
-const reduce = (arr: any[]) => {
-    const result = arr.reduce((acc, cur) => {
-        if (typeof cur === 'number') {
-            return acc + cur;
-        }
-
-        return acc;
-    }, 0);
-
-    return result;
-};
+const reduce = (arr: (number | undefined)[] | any) => arr.reduce((acc, value) => acc + (value ?? 0), 0);
 </script>
 
 <template>
