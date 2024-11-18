@@ -52,19 +52,22 @@ const state = reactive({
         if (props.modalType === 'RE-SYNC') {
             return i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.RESYNC_MODAL_TITLE');
         }
+        if (props.modalType === 'RESTART') {
+            return i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.RESTART_MODAL_TITLE');
+        }
         return i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ERROR_FOUND_TITLE');
     }),
     toggleValue: true,
     thisMonthRange: computed<string>(() => {
-        const start = dayjs.utc().startOf('month').format('YYYY-MM-DD');
-        const end = dayjs.utc().format('YYYY-MM-DD');
+        const start = dayjs.utc().startOf('month').format('DD MMMM YYYY');
+        const end = dayjs.utc().format('DD MMMM YYYY');
         return `${start} ~ ${end}`;
     }),
     startDates: [] as string[],
     startDateSetting: computed<DateOption>(() => {
         const today = dayjs.utc();
-        const minDate = today.subtract(35, 'month').format('YYYY-MM');
-        const maxDate = today.format('YYYY-MM');
+        const minDate = today.subtract(35, 'month').format('MMMM YYYY');
+        const maxDate = today.format('MMMM YYYY');
         return { minDate, maxDate };
     }),
     modalValidation: computed<boolean>(() => {
@@ -93,7 +96,7 @@ const handleConfirmButton = async () => {
 
     try {
         state.loading = true;
-        if (props.modalType === 'RE-SYNC') {
+        if (props.modalType === 'RE-SYNC' || props.modalType === 'RESTART') {
             await dataSourcesPageStore.fetchSyncDatasource({
                 start: state.toggleValue ? undefined : dayjs(state.startDates[0]).format('YYYY-MM'),
                 data_source_id: storeState.selectedDataSourceItem.data_source_id,
@@ -121,19 +124,29 @@ const handleConfirmButton = async () => {
         backdrop
         :loading="state.loading"
         :disabled="state.modalValidation"
-        :theme-color="props.modalType === 'CANCEL' ? 'alert' : 'primary'"
+        :theme-color="props.modalType === 'CANCEL' || props.modalType === 'RESTART' ? 'alert' : 'primary'"
         :visible.sync="state.proxyVisible"
         class="data-source-management-tab-data-collection-history-modal"
         @confirm="handleConfirmButton"
     >
         <template #body>
-            <div v-if="props.modalType === 'CANCEL'"
+            <div v-if="props.modalType === 'CANCEL' || props.modalType === 'RESTART'"
                  class="cancel-content"
             >
                 <p-scoped-notification type="warning"
                                        layout="in-section"
                 >
-                    <span class="content-inner">{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.CANCEL_MODAL_DESC') }}</span>
+                    <span v-if="props.modalType === 'CANCEL'"
+                          class="content-inner"
+                    >
+                        {{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.CANCEL_MODAL_DESC') }}
+                    </span>
+                    <div v-else
+                         class="content-inner"
+                    >
+                        <b class="desc-title">{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.RESTART_MODAL_DESC_1') }}</b>
+                        <p>{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.RESTART_MODAL_DESC_2') }}</p>
+                    </div>
                 </p-scoped-notification>
             </div>
             <div v-else-if="props.modalType === 'RE-SYNC'"
@@ -194,6 +207,10 @@ const handleConfirmButton = async () => {
         <template #confirm-button>
             <span v-if="props.modalType === 'ERROR'">{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ERROR_FOUND_OK') }}</span>
             <span v-else-if="props.modalType === 'CANCEL'">{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.CANCEL_BUTTON') }}</span>
+            <span v-else-if="props.modalType === 'RESTART'">{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.RESTART_MODAL_BUTTON') }}</span>
+        </template>
+        <template #close-button>
+            <span v-if="props.modalType === 'RESTART' || props.modalType === 'CANCEL'">{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.KEEP_COLLECTING') }}</span>
         </template>
     </p-button-modal>
 </template>
@@ -243,6 +260,9 @@ const handleConfirmButton = async () => {
             @apply block;
             padding-top: 0.25rem;
             padding-bottom: 0.375rem;
+            .desc-title {
+                @apply text-yellow-700;
+            }
         }
     }
 
