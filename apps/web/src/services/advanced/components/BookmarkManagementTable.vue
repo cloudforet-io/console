@@ -6,9 +6,9 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import {
     PToolboxTable, PLazyImg, PI, PDataLoader, PSelectDropdown, PLink, PSelectStatus,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
-import { CONTEXT_MENU_TYPE } from '@cloudforet/mirinae/src/inputs/context-menu/type';
-import type { KeyItemSet, ValueHandlerMap, ValueItem } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
+import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
+import { CONTEXT_MENU_TYPE } from '@cloudforet/mirinae/src/controls/context-menu/type';
+import type { KeyItemSet, ValueHandlerMap, ValueItem } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';

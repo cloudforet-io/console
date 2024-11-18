@@ -28,7 +28,7 @@ import {
 
 import type { DictDynamicFieldProps, DictTypeOptions } from '@/data-display/dynamic/dynamic-field/templates/dict/type';
 import PTag from '@/data-display/tags/PTag.vue';
-import PLink from '@/inputs/link/PLink.vue';
+import PLink from '@/navigation/link/PLink.vue';
 
 export default defineComponent<DictDynamicFieldProps>({
     name: 'PDynamicFieldDict',

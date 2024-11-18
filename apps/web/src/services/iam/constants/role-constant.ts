@@ -1,5 +1,5 @@
 import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import type { KeyItemSet } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
+import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 

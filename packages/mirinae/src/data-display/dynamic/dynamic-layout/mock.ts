@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import { faker } from '@faker-js/faker';
 
-import { getQueryTags as getToolboxQueryTags } from '@/navigation/toolbox/mock';
+import { getQueryTags as getToolboxQueryTags } from '@/controls/toolbox/mock';
 
 const getCareerInfo = () => ({ company: faker.company.companyName(), from: faker.datatype.datetime() });
 const getTableRow = () => ({

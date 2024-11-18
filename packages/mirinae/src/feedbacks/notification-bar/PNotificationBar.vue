@@ -20,9 +20,9 @@
 <script lang="ts">
 import { defineComponent, reactive, toRefs } from 'vue';
 
+import PIconButton from '@/controls/buttons/icon-button/PIconButton.vue';
 import { styleTypes } from '@/feedbacks/notification-bar/config';
 import { useProxyValue } from '@/hooks';
-import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 
 export default defineComponent({
     name: 'PNotificationBar',

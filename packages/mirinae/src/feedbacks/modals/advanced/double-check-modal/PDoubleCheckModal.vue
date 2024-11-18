@@ -3,11 +3,11 @@ import { computed, reactive } from 'vue';
 
 import type { TranslateResult } from 'vue-i18n';
 
+import PFieldGroup from '@/controls/forms/field-group/PFieldGroup.vue';
+import PTextInput from '@/controls/input/text-input/PTextInput.vue';
 import PButtonModal from '@/feedbacks/modals/button-modal/PButtonModal.vue';
 import type { ModalSizeType } from '@/feedbacks/modals/type';
 import { useProxyValue } from '@/hooks';
-import PFieldGroup from '@/inputs/forms/field-group/PFieldGroup.vue';
-import PTextInput from '@/inputs/input/text-input/PTextInput.vue';
 
 
 interface Props {

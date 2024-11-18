@@ -8,7 +8,7 @@ import { PSelectDropdown, PTextButton } from '@cloudforet/mirinae';
 import type {
     AutocompleteHandler,
     SelectDropdownMenuItem,
-} from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+} from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
 import type { MetricLabelKey } from '@/schema/inventory/metric/type';

@@ -6,8 +6,8 @@ import type { BadgeProps } from '@/data-display/badge/type';
 import { BADGE_SHAPE } from '@/data-display/badge/type';
 import type { BadgeDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/badge/type';
 import type { BadgeOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
-import PLink from '@/inputs/link/PLink.vue';
-import { ACTION_ICON } from '@/inputs/link/type';
+import PLink from '@/navigation/link/PLink.vue';
+import { ACTION_ICON } from '@/navigation/link/type';
 import { commaFormatter, getColor } from '@/utils/helpers';
 
 export default {

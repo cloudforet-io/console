@@ -5,7 +5,7 @@ import {
     PHeading, PSkeleton, PSelectDropdown, PI, PBadge, PHeadingLayout,
 } from '@cloudforet/mirinae';
 import type { BadgeStyleType, BadgeType } from '@cloudforet/mirinae/src/data-display/badge/type';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import type { DashboardScope } from '@/schema/dashboard/_types/dashboard-type';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';

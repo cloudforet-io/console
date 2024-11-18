@@ -19,8 +19,8 @@ import {
     useContextMenuController,
     PSelectButtonGroup,
 } from '@cloudforet/mirinae';
-import { CONTEXT_MENU_TYPE } from '@cloudforet/mirinae/src/inputs/context-menu/type';
-import type { ValueItem } from '@cloudforet/mirinae/src/inputs/search/query-search/type';
+import { CONTEXT_MENU_TYPE } from '@cloudforet/mirinae/src/controls/context-menu/type';
+import type { ValueItem } from '@cloudforet/mirinae/src/controls/search/query-search/type';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';

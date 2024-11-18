@@ -6,7 +6,7 @@ import {
 import dayjs from 'dayjs';
 
 import { PButtonModal, PDatetimePicker, PFieldGroup } from '@cloudforet/mirinae';
-import type { DATA_TYPE } from '@cloudforet/mirinae/types/inputs/datetime-picker/type';
+import type { DATA_TYPE } from '@cloudforet/mirinae/types/controls/datetime-picker/type';
 
 
 interface DateOption {

@@ -9,7 +9,7 @@ import { debounce } from 'lodash';
 import {
     PButton, PContextMenu, useContextMenuController,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import CostTagKeyVariableModel from '@/lib/variable-models/managed-model/custom-resource-model/cost-tag-key-variable-model';
 

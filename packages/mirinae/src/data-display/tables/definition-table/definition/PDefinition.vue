@@ -84,10 +84,10 @@ import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
 
+import PCopyButton from '@/controls/buttons/copy-button/PCopyButton.vue';
 import type { DefinitionProps } from '@/data-display/tables/definition-table/definition/type';
 import PTag from '@/data-display/tags/PTag.vue';
 import PTextList from '@/data-display/text-list/PTextList.vue';
-import PCopyButton from '@/inputs/buttons/copy-button/PCopyButton.vue';
 
 type DataType = 'string'|'boolean'|'number'|'object'|'array'|'array_of_object'|'undefined';
 export default defineComponent<DefinitionProps>({

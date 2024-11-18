@@ -18,7 +18,7 @@ import {
     PSelectButton, PDatePagination, PDataTable, PTextButton, PI, PTooltip, PDataLoader,
 } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
-import type { SelectButtonType } from '@cloudforet/mirinae/types/inputs/buttons/select-button-group/type';
+import type { SelectButtonType } from '@cloudforet/mirinae/types/controls/buttons/select-button-group/type';
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';

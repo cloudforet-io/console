@@ -3,11 +3,11 @@ import { reactive, toRefs } from 'vue';
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
+import PButton from '@/controls/buttons/button/PButton.vue';
+import PSelectStatus from '@/controls/select-status/PSelectStatus.vue';
 import { getUserFields, getUsers } from '@/data-display/tables/data-table/mock';
 import { getToolboxTableArgs, getToolboxTableArgTypes, getToolboxTableParameters } from '@/data-display/tables/toolbox-table/story-helper';
 import { useProxyValue } from '@/hooks/use-proxy-state/use-proxy-state';
-import PButton from '@/inputs/buttons/button/PButton.vue';
-import PSelectStatus from '@/inputs/select-status/PSelectStatus.vue';
 
 import PToolboxTable from './PToolboxTable.vue';
 

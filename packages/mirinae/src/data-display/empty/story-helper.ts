@@ -1,7 +1,7 @@
 import type { ArgTypes, Parameters, Args } from '@storybook/vue';
 
+import { BUTTON_STYLE } from '@/controls/buttons/button/type';
 import { EmptyImageSize } from '@/data-display/empty/type';
-import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
 
 export const getEmptyArgs = (): Args => ({
     showImage: false,

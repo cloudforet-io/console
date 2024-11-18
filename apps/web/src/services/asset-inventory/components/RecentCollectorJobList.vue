@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 import {
     PTooltip, PI, PEmpty, PLink, PDataLoader,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

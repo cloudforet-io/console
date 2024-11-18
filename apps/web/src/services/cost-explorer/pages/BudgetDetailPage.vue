@@ -3,7 +3,7 @@ import { computed, reactive } from 'vue';
 import type { Location } from 'vue-router';
 
 import { PLink, PScopedNotification } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 import { store } from '@/store';

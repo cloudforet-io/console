@@ -4,10 +4,10 @@ import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
+import PButton from '@/controls/buttons/button/PButton.vue';
 import { DEFINITION_TABLE_STYLE_TYPE } from '@/data-display/tables/definition-table/config';
 import PDefinitionTable from '@/data-display/tables/definition-table/PDefinitionTable.vue';
 import { getDefinitionTableArgs, getDefinitionTableArgTypes, getDefinitionTableParameters } from '@/data-display/tables/definition-table/story-helper';
-import PButton from '@/inputs/buttons/button/PButton.vue';
 
 type PDefinitionTablePropsAndCustomArgs = ComponentProps<typeof PDefinitionTable>;
 

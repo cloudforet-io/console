@@ -78,6 +78,7 @@ import {
     computed, defineComponent, getCurrentInstance, reactive, toRefs,
 } from 'vue';
 
+import type { KeyItemSet } from '@/controls/search/query-search/type';
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import type { DynamicFieldHandler, DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
 import type { TextOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
@@ -91,7 +92,6 @@ import PHeading from '@/data-display/heading/PHeading.vue';
 import type { DataTableFieldType } from '@/data-display/tables/data-table/type';
 import PToolboxTable from '@/data-display/tables/toolbox-table/PToolboxTable.vue';
 import type { ToolboxTableOptions } from '@/data-display/tables/toolbox-table/type';
-import type { KeyItemSet } from '@/inputs/search/query-search/type';
 
 
 export default defineComponent<QuerySearchTableDynamicLayoutProps>({

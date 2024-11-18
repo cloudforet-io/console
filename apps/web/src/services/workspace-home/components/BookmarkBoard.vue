@@ -7,8 +7,8 @@ import type { TranslateResult } from 'vue-i18n';
 import {
     PLazyImg, PI, PEmpty, PCheckbox, PBoardItem, PSelectDropdown,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
-import { CONTEXT_MENU_TYPE } from '@cloudforet/mirinae/src/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
+import { CONTEXT_MENU_TYPE } from '@cloudforet/mirinae/src/controls/context-menu/type';
 
 import type { UserConfigModel } from '@/schema/config/user-config/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';

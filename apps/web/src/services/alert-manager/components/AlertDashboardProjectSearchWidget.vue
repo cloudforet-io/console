@@ -12,7 +12,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PPaneLayout, PToolbox, PI, PDataLoader,
 } from '@cloudforet/mirinae';
-import type { KeyItemSet } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
+import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

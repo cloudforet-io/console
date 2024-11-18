@@ -11,7 +11,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PLink, PButton, PIconButton, PHeading, PLazyImg, PHeadingLayout,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';

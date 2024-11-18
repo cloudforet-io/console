@@ -9,7 +9,7 @@ import { cloneDeep } from 'lodash';
 import {
     PFieldGroup, PSelectDropdown, PButton, PI, PButtonModal,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import NewMark from '@/common/components/marks/NewMark.vue';
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';

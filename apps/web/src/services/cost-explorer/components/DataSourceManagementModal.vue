@@ -5,7 +5,7 @@ import type { TranslateResult } from 'vue-i18n';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PButtonModal, PSelectDropdown, PFieldTitle } from '@cloudforet/mirinae';
-import type { AutocompleteHandler } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+import type { AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';

@@ -9,8 +9,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PFieldGroup, PTextInput, PJsonSchemaForm, PRadioGroup, PRadio,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
-import type { JsonSchema } from '@cloudforet/mirinae/types/inputs/forms/json-schema-form/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
+import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-schema-form/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { NotificationLevel } from '@/schema/notification/notification/type';
