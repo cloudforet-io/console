@@ -431,7 +431,7 @@ export const Foot: Story = {
           <div class="my-4">
              <div>
                <p class="mb-4 font-xl font-bold">Foot</p>
-               <p-data-table :fields="fields" :items="items" showFooter>
+               <p-data-table :fields="fields" :items="items" show-footer="true">
                  <template #foot="{fields}">
                      <td v-for="field in fields" :key="field.name">
                        {{ field.name }}
@@ -441,7 +441,7 @@ export const Foot: Story = {
              </div>
             <div class="mt-6">
               <p class="mb-4 font-xl font-bold">tf-col-format: Determine display visibility through name of field. - Total</p>
-              <p-data-table :fields="fields" :items="items" showFooter>
+              <p-data-table :fields="fields" :items="items" show-footer="true">
                 <template #tf-col-format="{field, colIndex, values}">
                   <span v-if="colIndex === 0">Total</span>
                   <span v-if="field.name !== 'cost'"></span>
@@ -453,7 +453,7 @@ export const Foot: Story = {
             </div>
             <div class="mt-6">
               <p class="mb-4 font-xl font-bold">tf-col-format: Determine display visibility through name of field. - Average</p>
-              <p-data-table :fields="fields" :items="items" showFooter>
+              <p-data-table :fields="fields" :items="items" show-footer="true">
                 <template #tf-col-format="{field, colIndex, values}">
                   <span v-if="colIndex === 0">Average</span>
                   <span v-if="field.name !== 'cost'"></span>
@@ -465,7 +465,7 @@ export const Foot: Story = {
             </div>
             <div class="mt-6">
               <p class="mb-4 font-xl font-bold">tf-col-format: Determine display visibility through Column Index. - Total</p>
-              <p-data-table :fields="fields" :items="items" showFooter>
+              <p-data-table :fields="fields" :items="items" show-footer="true">
                 <template #tf-col-format="{field, colIndex, values}">
                   <span v-if="colIndex === 0">Total</span>
                   <span v-else-if="colIndex !== 3"></span>
@@ -477,7 +477,7 @@ export const Foot: Story = {
             </div>
             <div class="mt-6">
               <p class="mb-4 font-xl font-bold">tf-col-format: When selectable is true.</p>
-              <p-data-table :fields="fields" :items="items" selectable showFooter>
+              <p-data-table :fields="fields" :items="items" selectable show-footer="true">
                 <template #tf-col-format="{field, colIndex, values}">
                   <span v-if="colIndex === 0">Total</span>
                   <span v-else-if="colIndex !== 3"></span>
