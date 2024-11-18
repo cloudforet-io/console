@@ -35,6 +35,7 @@ export const getDataTableArgs = (): Args => ({
     getRowClassNames: undefined,
     getRowSelectable: undefined,
     beautifyText: false,
+    showFooter: false,
     headSlot: null,
     theadSlot: null,
     theadFormatSlot: null,
@@ -44,6 +45,8 @@ export const getDataTableArgs = (): Args => ({
     colFormatNamedSlot: null,
     colFormatIndexSlot: null,
     loadingSlot: null,
+    footSlot: null,
+    tfColFormatSlot: null,
 });
 
 export const getDataTableArgsType = (): ArgTypes => ({
@@ -390,6 +393,20 @@ export const getDataTableArgsType = (): ArgTypes => ({
             },
         },
     },
+    showFooter: {
+        name: 'showFooter',
+        type: { name: 'boolean' },
+        description: 'Whether to display foot or not. Edit the slot `foot` or `tf-col-format` to see details.',
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+    },
     /* slots */
     headSlot: {
         name: 'head',
@@ -496,6 +513,32 @@ export const getDataTableArgsType = (): ArgTypes => ({
             type: 'text',
         },
     },
+    footSlot: {
+        name: 'foot',
+        description: 'Slot for inner HTML of tfoot.',
+        table: {
+            type: {
+                summary: null,
+            },
+            category: 'slots',
+        },
+        control: {
+            type: 'text',
+        },
+    },
+    tfColFormatSlot: {
+        name: 'tf-col-format',
+        description: 'Slot for displaying processed data by utilizing column-specific data',
+        table: {
+            type: {
+                summary: null,
+            },
+            category: 'slots',
+        },
+        control: {
+            type: 'text',
+        },
+    },
     /* events */
     onSelect: {
         name: 'select',
@@ -573,4 +616,5 @@ export const getDataTableArgsType = (): ArgTypes => ({
     /* eslint-disable no-template-curly-in-string */
     '`col-${colIndex}-format`': { table: { disable: true } },
     foot: { table: { disable: true } },
+    'tf-col-format': { table: { disable: true } },
 });

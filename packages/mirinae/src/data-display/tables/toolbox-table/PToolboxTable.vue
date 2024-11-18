@@ -59,6 +59,7 @@
                       :row-height-fixed="rowHeightFixed"
                       :row-cursor-pointer="rowCursorPointer"
                       :invalid="invalid"
+                      :show-footer="showFooter"
                       :get-row-class-names="getRowClassNames"
                       :get-row-selectable="getRowSelectable"
                       v-on="$listeners"
@@ -254,6 +255,10 @@ export default defineComponent<ToolboxTableProps>({
         timezone: {
             type: String,
             default: 'UTC',
+        },
+        showFooter: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props, { emit }: SetupContext) {
