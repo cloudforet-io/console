@@ -144,7 +144,7 @@ function isUseFieldValidatorReturn<T>(
  * { a: '', b: 0, c: useFieldValidator([], (val) => !!val.length) }
  * ```
  *
- * @param {ValidatorFn<T[keyof T]>} validators - It is a map of form key and validator function.
+ * @param {Partial<{[K in keyof T]: ValidatorFn<T[K]>}>} validators - It is a map of form key and validator function.
  * Only when the form value is not `useFieldValidator` result, the validator function is used.
  * e.g.
  * ```ts
