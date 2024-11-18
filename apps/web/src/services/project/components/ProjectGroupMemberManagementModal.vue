@@ -192,6 +192,7 @@ watch(() => props.visible, async (visible) => {
                             use-fixed-menu-style
                             :placeholder="$t('PROJECT.LANDING.ADD_GROUP_MEMBER')"
                             :page-size="5"
+                            block
                             @update="handleUpdateSelected"
                         />
                     </p-field-group>
