@@ -371,9 +371,6 @@ watch(() => isAllValid.value, (_isAllValid) => {
             /* custom design-system component - p-text-input */
             :deep(.p-text-input) {
                 width: 6rem;
-                input {
-                    width: 100%;
-                }
             }
 
             .rule-input-wrapper {
