@@ -7,7 +7,7 @@ import { useRouter } from 'vue-router/composables';
 import { cloneDeep } from 'lodash';
 
 import {
-    PButton, PHeading, PI, PIconButton, PTextButton, PHeadingLayout,
+    PButton, PHeading, PI, PTextButton, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
@@ -57,13 +57,11 @@ const workspaceHomePageState = workspaceHomePageStore.state;
 const router = useRouter();
 
 const storeState = reactive({
-    isDomainAdmin: computed<boolean>(() => store.getters['user/isDomainAdmin']),
     currentWorkspace: computed<WorkspaceModel|undefined>(() => userWorkspaceGetters.currentWorkspace),
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
     workspaceUserTotalCount: computed<number|undefined>(() => workspaceHomePageState.workspaceUserTotalCount),
     appsTotalCount: computed<number|undefined>(() => workspaceHomePageState.appsTotalCount),
     pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
-    isRootRoleReadonly: computed<boolean>(() => store.getters['user/isRootRoleReadonly']),
 });
 const state = reactive({
     selectedWorkspace: computed<WorkspaceModel>(() => storeState.workspaceList.find((workspace) => workspace.workspace_id === storeState.currentWorkspace?.workspace_id) || {} as WorkspaceModel),
@@ -144,19 +142,6 @@ const routerToWorkspaceUser = (isOpenModal: boolean) => {
                                                  :favorite-type="FAVORITE_TYPE.WORKSPACE"
                                                  class="favorite-button"
                                                  scale="0.8"
-                                />
-                                <p-icon-button v-if="storeState.isDomainAdmin && !storeState.isRootRoleReadonly"
-                                               name="ic_settings"
-                                               width="1.5rem"
-                                               height="1.5rem"
-                                               @click="handleActionButton('edit')"
-                                />
-                                <p-icon-button v-if="storeState.isDomainAdmin && !storeState.isRootRoleReadonly"
-                                               name="ic_delete"
-                                               width="1.5rem"
-                                               height="1.5rem"
-                                               class="delete-button"
-                                               @click="handleActionButton('delete')"
                                 />
                             </span>
                         </template>
