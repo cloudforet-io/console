@@ -41,6 +41,7 @@
                 >
                     <input v-bind="$attrs"
                            ref="inputRef"
+                           :class="{block}"
                            :tabindex="disabled || $attrs.readonly ? -1 : 0"
                            :type="inputType"
                            :value="displayedInputValue"
@@ -583,7 +584,7 @@ export default defineComponent<TextInputProps>({
         }
 
         input {
-            @apply truncate;
+            @apply truncate w-full;
             display: inline-block;
             flex-grow: 1;
             border-width: 0;
@@ -593,6 +594,7 @@ export default defineComponent<TextInputProps>({
             font-size: inherit;
             color: inherit;
             background-color: transparent;
+
             &::placeholder {
                 @apply text-gray-300;
             }

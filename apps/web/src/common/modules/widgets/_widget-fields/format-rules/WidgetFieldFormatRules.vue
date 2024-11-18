@@ -199,11 +199,6 @@ onMounted(() => {
                 width: 1.5rem;
             }
         }
-
-        /* custom design-system component - p-text-input */
-        :deep(.p-text-input) {
-            width: 100%;
-        }
     }
 }
 

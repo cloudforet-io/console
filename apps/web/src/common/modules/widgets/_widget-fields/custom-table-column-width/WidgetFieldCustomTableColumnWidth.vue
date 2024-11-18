@@ -271,9 +271,6 @@ onMounted(() => {
 :deep(.p-text-input) {
     width: 7.5rem;
 
-    input {
-        width: 100%;
-    }
     .input-container {
         padding-right: 1.5rem;
     }
