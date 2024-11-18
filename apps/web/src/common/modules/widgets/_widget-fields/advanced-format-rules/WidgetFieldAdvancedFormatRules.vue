@@ -231,11 +231,6 @@ onMounted(() => {
                 width: 1.5rem;
             }
         }
-
-        /* custom design-system component - p-text-input */
-        :deep(.p-text-input) {
-            width: 100%;
-        }
     }
 }
 
@@ -244,8 +239,5 @@ onMounted(() => {
     margin-bottom: 0;
     width: 100%;
     flex-shrink: 1;
-    .p-text-input > .input-container input {
-        width: 100%;
-    }
 }
 </style>

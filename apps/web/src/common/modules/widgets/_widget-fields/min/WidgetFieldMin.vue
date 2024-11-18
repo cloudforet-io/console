@@ -57,13 +57,6 @@ onMounted(() => {
 </template>
 
 <style lang="postcss" scoped>
-.widget-field-max {
-    /* custom design-system component - p-text-input */
-    :deep(.p-text-input) {
-        width: 100%;
-    }
-}
-
 /* custom design-system component - p-field-group */
 :deep(.p-field-group) {
     margin-bottom: 0;

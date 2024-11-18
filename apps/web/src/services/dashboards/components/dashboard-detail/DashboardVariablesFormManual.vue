@@ -266,7 +266,6 @@ watch(() => props.originalData, (originalData) => {
                         <p-text-input :value.sync="state.step"
                                       block
                                       type="number"
-                                      class="step-input"
                                       :invalid="!state.isStepValid"
                         />
                         <template #label-extra>
@@ -391,14 +390,6 @@ watch(() => props.originalData, (originalData) => {
     }
     .divider {
         margin: 0.75rem 0;
-    }
-    .step-input {
-        /* custom design-system component - p-text-input */
-        :deep(&.p-text-input) {
-            input {
-                width: 100%;
-            }
-        }
     }
 }
 </style>

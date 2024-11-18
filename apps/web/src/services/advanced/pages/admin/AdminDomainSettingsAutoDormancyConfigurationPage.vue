@@ -357,7 +357,6 @@ onMounted(async () => {
                     input[type="number"] {
                         -moz-appearance: textfield;
                         appearance: textfield;
-                        width: 100%;
                     }
 
                     input[type="number"]::-webkit-outer-spin-button,

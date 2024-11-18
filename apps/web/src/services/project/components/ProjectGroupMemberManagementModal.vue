@@ -191,6 +191,7 @@ watch(() => props.visible, async (visible) => {
                             use-fixed-menu-style
                             :placeholder="$t('PROJECT.LANDING.ADD_GROUP_MEMBER')"
                             :page-size="5"
+                            block
                             @update="handleUpdateSelected"
                         />
                     </p-field-group>
@@ -252,11 +253,6 @@ watch(() => props.visible, async (visible) => {
         @apply bg-white border border-primary3 rounded-md;
         min-height: 23rem;
         padding: 0.75rem;
-    }
-
-    /* custom design-system component - p-text-input */
-    :deep(.p-text-input) {
-        width: 100%;
     }
 
     .p-data-loader {
