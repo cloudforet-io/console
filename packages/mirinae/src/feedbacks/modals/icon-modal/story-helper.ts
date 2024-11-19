@@ -1,7 +1,7 @@
 import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 
+import { BUTTON_STYLE } from '@/controls/buttons/button/type';
 import { SizeMapping } from '@/feedbacks/modals/type';
-import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
 
 export const getIconModalArgs = (): Args => ({
     size: 'sm',

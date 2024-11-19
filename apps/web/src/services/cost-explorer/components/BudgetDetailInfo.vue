@@ -7,7 +7,7 @@ import type { Location } from 'vue-router/types/router';
 import {
     PPaneLayout, PLink, PI, PTextButton, PPopover,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 

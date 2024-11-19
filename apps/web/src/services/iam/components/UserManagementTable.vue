@@ -10,8 +10,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PBadge, PStatus, PToolboxTable, PButton, PSelectDropdown, PTooltip,
 } from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
-import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleBindingDeleteParameters } from '@/schema/identity/role-binding/api-verbs/delete';

@@ -3,9 +3,9 @@ import Vue from 'vue';
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
+import PButton from '@/controls/buttons/button/PButton.vue';
 import PNoticeAlert from '@/feedbacks/alert/notice-alert/PNoticeAlert.vue';
 import { getNoticeAlertArgs, getNoticeAlertArgTypes, getNoticeAlertParameters } from '@/feedbacks/alert/notice-alert/story-helper';
-import PButton from '@/inputs/buttons/button/PButton.vue';
 
 type PNoticeAlertPropsAndCustomArgs = ComponentProps<typeof PNoticeAlert>;
 

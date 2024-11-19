@@ -16,8 +16,8 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 import {
     PDataLoader, PDivider, PButton, PHeading, PEmpty,
 } from '@cloudforet/mirinae';
-import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
-import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
+import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
+import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
 import { SpaceRouter } from '@/router';
 import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';

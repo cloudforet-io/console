@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 import {
     PButtonModal, PFieldGroup, PDatetimePicker, useProxyValue,
 } from '@cloudforet/mirinae';
-import { DATA_TYPE } from '@cloudforet/mirinae/src/inputs/datetime-picker/type';
+import { DATA_TYPE } from '@cloudforet/mirinae/src/controls/datetime-picker/type';
 
 import type { Period } from '@/services/cost-explorer/types/cost-explorer-query-type';
 

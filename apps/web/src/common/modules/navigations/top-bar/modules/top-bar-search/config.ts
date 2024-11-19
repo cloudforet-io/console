@@ -1,6 +1,6 @@
 import type { TranslateResult } from 'vue-i18n';
 
-import type { ContextMenuType, MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { ContextMenuType, MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 export const SUGGESTION_TYPE = {
     DEFAULT_SERVICE: 'DEFAULT_SERVICE',

@@ -7,7 +7,7 @@ import yaml from 'js-yaml';
 import {
     PIconModal, PI, PPaneLayout, PDivider, PCollapsibleToggle, PButton, PLink, PTextEditor,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 
 import type { AppModel } from '@/schema/identity/app/model';

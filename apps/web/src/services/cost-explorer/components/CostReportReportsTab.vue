@@ -12,8 +12,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PButton, PHeading, PI, PToolboxTable, PSelectDropdown, PBadge, PTextButton, PHeadingLayout,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
-import type { KeyItemSet } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
+import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
 import { i18n } from '@/translations';
 

@@ -5,7 +5,7 @@ import {
 
 import { get } from 'lodash';
 
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import type { Granularity } from '@/schema/dashboard/_types/widget-type';
 

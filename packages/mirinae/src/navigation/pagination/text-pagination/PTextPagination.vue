@@ -30,7 +30,7 @@
 import type { SetupContext } from 'vue';
 import { computed, defineComponent, watch } from 'vue';
 
-import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
+import PIconButton from '@/controls/buttons/icon-button/PIconButton.vue';
 
 interface Props {
     thisPage?: number;

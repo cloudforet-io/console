@@ -8,7 +8,7 @@ import dayjs from 'dayjs';
 import {
     PI, PBadge, PLink,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import { store } from '@/store';

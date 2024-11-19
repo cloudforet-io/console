@@ -7,7 +7,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButtonModal, PFieldGroup, PSelectDropdown, PIconButton, PAvatar, PTextInput, PScopedNotification,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleListBasicRoleParameters } from '@/schema/identity/role/api-verbs/list-basic-role';

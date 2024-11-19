@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, defineProps, defineEmits } from 'vue';
 
+import PIconButton from '@/controls/buttons/icon-button/PIconButton.vue';
 import PHeading from '@/data-display/heading/PHeading.vue';
-import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 
 const props = defineProps<{
     title?: string;

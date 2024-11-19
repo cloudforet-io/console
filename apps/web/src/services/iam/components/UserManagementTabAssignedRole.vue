@@ -8,7 +8,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PHeading, PDataTable, PLink, PBadge,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 
 import type { Tags } from '@/schema/_common/model';

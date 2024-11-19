@@ -4,7 +4,7 @@ import { computed, reactive } from 'vue';
 import {
     PButton, PLink, PButtonModal, PCopyButton,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';

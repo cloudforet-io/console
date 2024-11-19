@@ -50,36 +50,36 @@ export { default as PScopedNotification } from './feedbacks/scoped-notification/
 export { default as PI } from './foundation/icons/PI.vue';
 
 
-/* Inputs */
-export { default as PLink } from './inputs/link/PLink.vue';
-export { default as PButton } from './inputs/buttons/button/PButton.vue';
-export { default as PCopyButton } from './inputs/buttons/copy-button/PCopyButton.vue';
-export { default as PIconButton } from './inputs/buttons/icon-button/PIconButton.vue';
-export { default as PSelectButtonGroup } from './inputs/buttons/select-button-group/PSelectButtonGroup.vue';
-export { default as PTextButton } from './inputs/buttons/text-button/PTextButton.vue';
-export { default as PToggleButton } from './inputs/buttons/toggle-button/PToggleButton.vue';
-export { default as PCheckbox } from './inputs/checkbox/PCheckbox.vue';
-export { default as PCheckboxGroup } from './inputs/checkbox-group/PCheckboxGroup.vue';
-export { default as PContextMenu } from './inputs/context-menu/PContextMenu.vue';
-export { default as PDatetimePicker } from './inputs/datetime-picker/PDatetimePicker.vue';
-export { default as PFilterableQueryDropdown } from './inputs/dropdown/filterable-query-dropdown/PFilterableQueryDropdown.vue';
-export { default as PSelectDropdown } from './inputs/dropdown/select-dropdown/PSelectDropdown.vue';
-export { default as PFileUploader } from './inputs/file-uploader/PFileUploader.vue';
-export { default as PFieldGroup } from './inputs/forms/field-group/PFieldGroup.vue';
-export { default as PJsonSchemaForm } from './inputs/forms/json-schema-form/PJsonSchemaForm.vue';
-export { default as PQueryInput } from './inputs/input/query-input/PQueryInput.vue';
-export { default as PTextInput } from './inputs/input/text-input/PTextInput.vue';
-export { default as PRadio } from './inputs/radio/PRadio.vue';
-export { default as PRadioGroup } from './inputs/radio-group/PRadioGroup.vue';
-export { default as PQuerySearch } from './inputs/search/query-search/PQuerySearch.vue';
-export { default as PQuerySearchTags } from './inputs/search/query-search-tags/PQuerySearchTags.vue';
-export { default as PSearch } from './inputs/search/search/PSearch.vue';
-export { default as PSelectButton } from './inputs/select-button/PSelectButton.vue';
-export { default as PSelectCard } from './inputs/select-card/PSelectCard.vue';
-export { default as PSelectStatus } from './inputs/select-status/PSelectStatus.vue';
-export { default as PTextEditor } from './inputs/text-editor/PTextEditor.vue';
-export { default as PTextarea } from './inputs/textarea/PTextarea.vue';
-export { default as PSlider } from './inputs/slider/PSlider.vue';
+/* Controls */
+export { default as PButton } from './controls/buttons/button/PButton.vue';
+export { default as PCopyButton } from './controls/buttons/copy-button/PCopyButton.vue';
+export { default as PIconButton } from './controls/buttons/icon-button/PIconButton.vue';
+export { default as PSelectButtonGroup } from './controls/buttons/select-button-group/PSelectButtonGroup.vue';
+export { default as PTextButton } from './controls/buttons/text-button/PTextButton.vue';
+export { default as PToggleButton } from './controls/buttons/toggle-button/PToggleButton.vue';
+export { default as PCheckbox } from './controls/checkbox/PCheckbox.vue';
+export { default as PCheckboxGroup } from './controls/checkbox-group/PCheckboxGroup.vue';
+export { default as PContextMenu } from './controls/context-menu/PContextMenu.vue';
+export { default as PDatetimePicker } from './controls/datetime-picker/PDatetimePicker.vue';
+export { default as PFilterableQueryDropdown } from './controls/dropdown/filterable-query-dropdown/PFilterableQueryDropdown.vue';
+export { default as PSelectDropdown } from './controls/dropdown/select-dropdown/PSelectDropdown.vue';
+export { default as PFileUploader } from './controls/file-uploader/PFileUploader.vue';
+export { default as PFieldGroup } from './controls/forms/field-group/PFieldGroup.vue';
+export { default as PJsonSchemaForm } from './controls/forms/json-schema-form/PJsonSchemaForm.vue';
+export { default as PQueryInput } from './controls/input/query-input/PQueryInput.vue';
+export { default as PTextInput } from './controls/input/text-input/PTextInput.vue';
+export { default as PRadio } from './controls/radio/PRadio.vue';
+export { default as PRadioGroup } from './controls/radio-group/PRadioGroup.vue';
+export { default as PQuerySearch } from './controls/search/query-search/PQuerySearch.vue';
+export { default as PQuerySearchTags } from './controls/search/query-search-tags/PQuerySearchTags.vue';
+export { default as PSearch } from './controls/search/search/PSearch.vue';
+export { default as PSelectButton } from './controls/select-button/PSelectButton.vue';
+export { default as PSelectCard } from './controls/select-card/PSelectCard.vue';
+export { default as PSelectStatus } from './controls/select-status/PSelectStatus.vue';
+export { default as PTextEditor } from './controls/text-editor/PTextEditor.vue';
+export { default as PTextarea } from './controls/textarea/PTextarea.vue';
+export { default as PSlider } from './controls/slider/PSlider.vue';
+export { default as PToolbox } from './controls/toolbox/PToolbox.vue';
 
 
 /* Layouts */
@@ -102,4 +102,4 @@ export { default as PBalloonTab } from './navigation/tabs/ballon-tab/PBalloonTab
 export { default as PBoxTab } from './navigation/tabs/box-tab/PBoxTab.vue';
 export { default as PButtonTab } from './navigation/tabs/button-tab/PButtonTab.vue';
 export { default as PTab } from './navigation/tabs/tab/PTab.vue';
-export { default as PToolbox } from './navigation/toolbox/PToolbox.vue';
+export { default as PLink } from './navigation/link/PLink.vue';

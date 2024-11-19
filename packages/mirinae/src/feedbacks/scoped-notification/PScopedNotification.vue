@@ -4,21 +4,17 @@
 // Story Category: Feedbacks
 // Story Title: ScopedNotification
 
-
 import { reactive } from 'vue';
 
 import type { TranslateResult } from 'vue-i18n';
 
+import PIconButton from '@/controls/buttons/icon-button/PIconButton.vue';
 import PI from '@/foundation/icons/PI.vue';
 import { useProxyValue } from '@/hooks';
-import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 
 import {
     gray, indigo, red, yellow, green, violet,
 } from '@/styles/colors.cjs';
-
-
-
 
 const ICON_COLOR_MAP = {
     information: indigo[500],

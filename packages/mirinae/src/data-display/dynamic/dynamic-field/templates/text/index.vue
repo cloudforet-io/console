@@ -15,8 +15,8 @@ import type { TranslateResult } from 'vue-i18n';
 
 import type { TextDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/text/type';
 import type { TextOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
-import PLink from '@/inputs/link/PLink.vue';
-import { ACTION_ICON } from '@/inputs/link/type';
+import PLink from '@/navigation/link/PLink.vue';
+import { ACTION_ICON } from '@/navigation/link/type';
 import { commaFormatter } from '@/utils/helpers';
 
 export default defineComponent<TextDynamicFieldProps>({

@@ -3,10 +3,10 @@ import { reactive, toRefs } from 'vue';
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
+import PButton from '@/controls/buttons/button/PButton.vue';
+import PTextEditor from '@/controls/text-editor/PTextEditor.vue';
 import PBadge from '@/data-display/badge/PBadge.vue';
 import { useProxyValue } from '@/hooks';
-import PButton from '@/inputs/buttons/button/PButton.vue';
-import PTextEditor from '@/inputs/text-editor/PTextEditor.vue';
 import {
     getTabArgTypes, getTabParameters, getTabArgs, Inner,
 } from '@/navigation/tabs/tab/story-helper';

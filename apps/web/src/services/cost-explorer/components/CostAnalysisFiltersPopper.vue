@@ -9,13 +9,14 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import {
     PSelectDropdown, PTextButton,
 } from '@cloudforet/mirinae';
-import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
+import getRandomId from '@/lib/random-id-generator';
 import { VariableModelFactory } from '@/lib/variable-models';
 import type {
     ManagedVariableModelKey,
@@ -62,8 +63,18 @@ const GROUP_BY_TO_VAR_MODELS: Record<string, VariableOption> = {
     [GROUP_BY.USAGE_TYPE]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost, dataKey: 'usage_type' },
 };
 
-const getInitialSelectedItemsMap = (): Record<string, SelectDropdownMenuItem[]> => ({
-});
+const GROUP_BY_TO_VAR_MODELS_FOR_UNIFIED_COST: Record<string, VariableOption> = {
+    [GROUP_BY.WORKSPACE]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.workspace },
+    [GROUP_BY.PROJECT]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.project },
+    [GROUP_BY.PROJECT_GROUP]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.project_group },
+    [GROUP_BY.PRODUCT]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.unified_cost, dataKey: 'product' },
+    [GROUP_BY.PROVIDER]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.provider },
+    [GROUP_BY.SERVICE_ACCOUNT]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.service_account },
+    [GROUP_BY.REGION]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.unified_cost, dataKey: 'region' },
+    [GROUP_BY.USAGE_TYPE]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.unified_cost, dataKey: 'usage_type' },
+};
+
+const getInitialSelectedItemsMap = (): Record<string, SelectDropdownMenuItem[]> => ({});
 
 const props = defineProps<{
     visible: boolean;
@@ -74,6 +85,7 @@ const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 const state = reactive({
+    randomId: '',
     loading: true,
     enabledFilters: computed<SelectDropdownMenuItem[]>(() => {
         if (!costAnalysisPageState.enabledFiltersProperties) return [];
@@ -85,8 +97,9 @@ const state = reactive({
             return { name: d, label: d };
         });
     }),
+    isUnifiedCost: computed(() => costAnalysisPageGetters.isUnifiedCost),
     primaryCostOptions: computed<Record<string, any>>(() => ({
-        data_source_id: costAnalysisPageGetters.selectedDataSourceId,
+        ...(!state.isUnifiedCost && { data_source_id: costAnalysisPageGetters.selectedDataSourceId }),
     })),
     selectedItemsMap: {} as Record<string, SelectDropdownMenuItem[]>,
     handlerMap: computed(() => {
@@ -102,7 +115,7 @@ const state = reactive({
 const getMenuHandler = (groupBy: string, modelOptions: Record<string, any>, primaryQueryOptions: Record<string, any>): AutocompleteHandler => {
     try {
         let variableModelInfo: VariableModelMenuHandlerInfo;
-        const _variableOption = GROUP_BY_TO_VAR_MODELS[groupBy];
+        const _variableOption = state.isUnifiedCost ? GROUP_BY_TO_VAR_MODELS_FOR_UNIFIED_COST[groupBy] : GROUP_BY_TO_VAR_MODELS[groupBy];
         let _queryOptions: Record<string, any> = {};
         if (groupBy === MANAGED_VARIABLE_MODELS.workspace.meta.idKey) {
             _queryOptions.is_dormant = false;
@@ -142,8 +155,8 @@ const getMenuHandler = (groupBy: string, modelOptions: Record<string, any>, prim
         return async () => ({ results: [] });
     }
 };
-const initSelectedFilters = () => {
-    const _filters = costAnalysisPageState.filters;
+const initSelectedFilters = (isReset = false) => {
+    const _filters = isReset ? costAnalysisPageGetters.convertedOriginFilter : costAnalysisPageState.filters;
     const _selectedItemsMap = {};
     Object.keys(_filters ?? {}).forEach((groupBy) => {
         if (storeState.isAdminMode && !costAnalysisPageState.isAllWorkspaceSelected && groupBy === GROUP_BY.WORKSPACE) {
@@ -151,7 +164,8 @@ const initSelectedFilters = () => {
             return;
         }
         _selectedItemsMap[groupBy] = _filters?.[groupBy].map((d) => ({ name: d, label: d })) ?? [];
-        if (costAnalysisPageState.enabledFiltersProperties?.indexOf(groupBy) === -1) {
+        const isGroupByExist = costAnalysisPageState.enabledFiltersProperties?.indexOf(groupBy) === -1;
+        if (isGroupByExist) {
             costAnalysisPageStore.setEnabledFiltersProperties([
                 ...(costAnalysisPageState.enabledFiltersProperties ?? []),
                 groupBy,
@@ -183,8 +197,7 @@ const handleDisabledFilters = (all?: boolean, disabledFilter?: string) => {
     }
 };
 const handleClickResetFilters = () => {
-    state.selectedItemsMap = getInitialSelectedItemsMap();
-
+    initSelectedFilters(true);
     const _originConsoleFilters: ConsoleFilter[]|undefined = costAnalysisPageGetters.selectedQuerySet?.options?.filters;
     const _originFilters: Record<string, string[]> = {};
     if (_originConsoleFilters?.length) {
@@ -193,10 +206,10 @@ const handleClickResetFilters = () => {
         });
     }
     costAnalysisPageStore.setFilters(_originFilters);
+    state.randomId = getRandomId();
 };
 
-watch(() => props.visible, (visible) => {
-    if (!visible) return;
+watch([() => costAnalysisPageGetters.selectedQueryId, () => costAnalysisPageGetters.isUnifiedCost, () => costAnalysisPageGetters.selectedDataSourceId], () => {
     initSelectedFilters();
 }, { immediate: true });
 
@@ -206,7 +219,7 @@ watch(() => props.visible, (visible) => {
     <div class="cost-analysis-filters-popper">
         <p-select-dropdown
             v-for="groupBy in state.enabledFilters"
-            :key="`filters-dropdown-${groupBy.name}`"
+            :key="`filters-dropdown-${groupBy.name}-${state.randomId}`"
             class="filters-popper-dropdown"
             is-filterable
             :handler="state.handlerMap[groupBy.name]"

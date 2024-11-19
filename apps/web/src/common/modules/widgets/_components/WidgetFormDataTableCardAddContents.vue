@@ -5,8 +5,8 @@ import {
 
 import { isArray, isEqual, uniq } from 'lodash';
 
-import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
-import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/src/inputs/dropdown/select-dropdown/type';
+import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/src/controls/dropdown/select-dropdown/type';
 
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { DataTableUpdateParameters } from '@/schema/dashboard/public-data-table/api-verbs/update';

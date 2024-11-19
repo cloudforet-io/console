@@ -17,11 +17,11 @@ import type { Currency } from '@/store/modules/display/type';
 
 import { green, blue, coral } from '@/styles/colors';
 
-import type { XYChartData } from '@/services/cost-explorer/types/cost-explorer-chart-type';
+import type { CostXYChartData } from '@/services/cost-explorer/types/cost-explorer-chart-type';
 
 interface Props {
     period: { start: string; end: string };
-    data: XYChartData[];
+    data: CostXYChartData[];
     currency: Currency|undefined;
 }
 const props = withDefaults(defineProps<Props>(), {
@@ -32,7 +32,7 @@ const chartContext = ref<HTMLElement|null>(null);
 
 const state = reactive({
     chart: null as EChartsType | null,
-    chartData: computed<XYChartData[]>(() => {
+    chartData: computed<CostXYChartData[]>(() => {
         const data = props.data ?? [];
         if (!data) return [];
         return data;

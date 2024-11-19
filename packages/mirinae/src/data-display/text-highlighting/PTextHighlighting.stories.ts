@@ -9,7 +9,7 @@ import PTextHighlighting from './PTextHighlighting.vue';
 type PTextHighlightingPropsAndCustomArgs = ComponentProps<typeof PTextHighlighting>;
 
 const meta : Meta<PTextHighlightingPropsAndCustomArgs> = {
-    title: 'Inputs/Text Highlighting',
+    title: 'Data Display/Text Highlighting',
     component: PTextHighlighting,
     argTypes: {
         ...getTextHighlightingArgTypes(),

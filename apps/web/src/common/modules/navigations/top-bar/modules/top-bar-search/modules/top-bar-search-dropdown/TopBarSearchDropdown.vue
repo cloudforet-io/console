@@ -9,7 +9,7 @@ import { debounce } from 'lodash';
 import {
     PTab, screens, PLazyImg, PI,
 } from '@cloudforet/mirinae';
-import type { ValueItem } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
+import type { ValueItem } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
 import { store } from '@/store';
 

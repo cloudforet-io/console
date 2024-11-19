@@ -9,11 +9,11 @@ import {
     PButton,
     PDataTable, PHeading, PLink, PSelectDropdown, PStatus, PTooltip,
 } from '@cloudforet/mirinae';
-import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import type {
     AutocompleteHandler,
     SelectDropdownMenuItem,
-} from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+} from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
+import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';

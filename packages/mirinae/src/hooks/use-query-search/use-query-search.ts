@@ -7,24 +7,24 @@ import {
     cloneDeep, debounce, find, throttle,
 } from 'lodash';
 
-import type PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
+import type PContextMenu from '@/controls/context-menu/PContextMenu.vue';
 import {
     defaultHandlerMap, formatterMap,
     inputTypeMap, inputValidatorMap,
     menuTypeMap,
     placeholderMap,
     supportOperatorMap,
-} from '@/inputs/search/query-search/config';
+} from '@/controls/search/query-search/config';
 import {
     findKey, getKeyMenuForm, getRootKeyItemHandler, getValueMenuForm,
-} from '@/inputs/search/query-search/helper';
-import { OPERATOR, operators } from '@/inputs/search/query-search/type';
+} from '@/controls/search/query-search/helper';
+import { OPERATOR, operators } from '@/controls/search/query-search/type';
 import type {
     KeyItem, OperatorType, KeyDataType,
     HandlerResponse, MenuType, ValueHandler,
     KeyMenuItem, ValueMenuItem,
     QueryItem, ValueItem, KeyItemSet, ValueHandlerMap,
-} from '@/inputs/search/query-search/type';
+} from '@/controls/search/query-search/type';
 
 const ROOT_KEY_SETTER = ':';
 const NUMBER_TYPES = ['integer', 'float'];

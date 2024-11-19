@@ -8,12 +8,15 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 import CenteredPageLayout from '@/common/modules/page-layouts/CenteredPageLayout.vue';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 
+import { UNIFIED_COST_KEY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import CostExplorerLSB from '@/services/cost-explorer/CostExplorerLSB.vue';
 import { useCostExplorerSettingsStore } from '@/services/cost-explorer/stores/cost-explorer-settings-store';
 import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
@@ -22,6 +25,7 @@ import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query
 const costQuerySetStore = useCostQuerySetStore();
 const costQuerySetState = costQuerySetStore.state;
 const costExplorerSettingsStore = useCostExplorerSettingsStore();
+const appContextStore = useAppContextStore();
 
 const route = useRoute();
 const setCostParams = async () => {
@@ -32,8 +36,10 @@ const setCostParams = async () => {
             const { status, response } = await fetcher({
                 query: {
                     only: ['data_source_id'],
+                    sort: [{ key: 'workspace_id', desc: appContextStore.getters.isAdminMode }],
                 },
             });
+
             if (status === 'succeed') {
                 const dataSourceId = response.results[0].data_source_id;
                 costQuerySetStore.setSelectedDataSourceId(dataSourceId);
@@ -42,13 +48,13 @@ const setCostParams = async () => {
             ErrorHandler.handleError(e);
         }
     }
-
+    const { dataSourceId, costQuerySetId } = route.params;
     /*
     * Both parameters are set in the route. (beforeEnter navigation guard in routes.ts)
     * */
-    if (route.params.dataSourceId && route.params.costQuerySetId) {
-        costQuerySetStore.setSelectedDataSourceId(route.params.dataSourceId);
-        costQuerySetStore.setSelectedQuerySetId(route.params.costQuerySetId);
+    if (dataSourceId && costQuerySetId) {
+        if (dataSourceId !== UNIFIED_COST_KEY) costQuerySetStore.setSelectedDataSourceId(dataSourceId);
+        costQuerySetStore.setSelectedQuerySetId(costQuerySetId);
     }
     await costQuerySetStore.listCostQuerySets();
 };

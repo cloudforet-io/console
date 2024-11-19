@@ -117,7 +117,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PFieldTitle, PRadioGroup, PRadio, PLazyImg, PSelectDropdown, PI, screens,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';

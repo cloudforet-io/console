@@ -4,7 +4,7 @@ import { computed, reactive, watch } from 'vue';
 import {
     PFieldGroup, PTextInput, PSelectDropdown, PRadioGroup, PRadio, PButton, PIconButton, PDivider, PTooltip, PI,
 } from '@cloudforet/mirinae';
-import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type {
     DashboardGlobalVariable, ManualVariable,
@@ -266,7 +266,6 @@ watch(() => props.originalData, (originalData) => {
                         <p-text-input :value.sync="state.step"
                                       block
                                       type="number"
-                                      class="step-input"
                                       :invalid="!state.isStepValid"
                         />
                         <template #label-extra>
@@ -391,14 +390,6 @@ watch(() => props.originalData, (originalData) => {
     }
     .divider {
         margin: 0.75rem 0;
-    }
-    .step-input {
-        /* custom design-system component - p-text-input */
-        :deep(&.p-text-input) {
-            input {
-                width: 100%;
-            }
-        }
     }
 }
 </style>

@@ -119,7 +119,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PSelectButtonGroup, PSelectDropdown, PIconButton, PButton, PLink, PSpinner,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 import { MONITORING_TYPE } from '@/schema/monitoring/data-source/constant';
 import { store } from '@/store';

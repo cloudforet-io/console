@@ -43,7 +43,7 @@ import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
 
-import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
+import PIconButton from '@/controls/buttons/icon-button/PIconButton.vue';
 import {
     STYLE_TYPE as SIDEBAR_STYLE_TYPE,
     SIZE as SIDEBAR_SIZE,

@@ -1,3 +1,4 @@
+import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type {
     DynamicField,
     EnumOptions,
@@ -6,7 +7,6 @@ import type {
     DynamicLayoutType,
     SearchSchema,
 } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
-import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
 import { forEach } from 'lodash';
 
 import {

@@ -1380,6 +1380,7 @@
 		},
 		"STARRED": "Starred",
 		"STARRED_NO_DATA": "No starred items",
+		"SUCCESS": "Success",
 		"TAGS": {
 			"ADD": "Add",
 			"ADD_TAG": "Add Tag",
@@ -1834,12 +1835,16 @@
 		},
 		"ANOMALY_DETECTION_CONFIGURATION": "Anomaly Detection Configuration",
 		"COST_ADVANCED_SETTINGS": "Advanced Settings",
+		"COST_ANALYSIS": {
+			"UNIFIED_COST_DESC": "Unified Cost enables consolidated cost management across multiple data sources."
+		},
 		"CURRENCY_CONVERTER": "Currency Converter",
 		"CURRENCY_CONVERTER_PAGE": {
 			"AGGREGATION_DATE": "Aggregation Date",
 			"EXCHANGE_RATE_SOURCE": "Exchange Rate Source",
 			"LAST_DAY_OF_THE_MONTH": "Last day of the month",
-			"NOTIFICATION": "Once aggregated, date changes will take effect starting next month."
+			"NOTIFICATION": "Once aggregated, date changes will take effect starting next month.",
+			"UPDATE_SUCCESS_ALT": "Currency Settings successfully updated"
 		}
 	},
 	"DASHBOARDS": {

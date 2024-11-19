@@ -6,7 +6,7 @@ import {
     PHeading, PButton, PDefinitionTable, PLink, PLazyImg, PHeadingLayout,
 } from '@cloudforet/mirinae';
 import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';

@@ -30,7 +30,7 @@ import { computed, reactive, toRefs } from 'vue';
 import {
     PLink, PI, PTooltip,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 import { SpaceRouter } from '@/router';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';

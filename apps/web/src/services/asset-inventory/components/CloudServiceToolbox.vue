@@ -5,8 +5,8 @@ import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { PToolbox } from '@cloudforet/mirinae';
-import type { QueryTag } from '@cloudforet/mirinae/types/inputs/search/query-search-tags/type';
-import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
+import type { QueryTag } from '@cloudforet/mirinae/types/controls/search/query-search-tags/type';
+import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
 
 import CloudServiceExcelExportOptionModal from '@/services/asset-inventory/components/CloudServiceExcelExportOptionModal.vue';

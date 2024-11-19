@@ -5,7 +5,7 @@ import {
 } from 'vue';
 
 import { PSelectDropdown, PFieldGroup } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import { VariableModelFactory } from '@/lib/variable-models';
 

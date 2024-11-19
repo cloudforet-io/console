@@ -11,8 +11,8 @@ import {
     PPagination, PToolbox,
     PButton,
 } from '@cloudforet/mirinae';
-import type { ValueItem } from '@cloudforet/mirinae/src/inputs/search/query-search/type';
-import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
+import type { ValueItem } from '@cloudforet/mirinae/src/controls/search/query-search/type';
+import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
 import { SpaceRouter } from '@/router';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';

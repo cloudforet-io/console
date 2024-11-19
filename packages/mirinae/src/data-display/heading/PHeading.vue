@@ -38,9 +38,9 @@
 import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
 
+import PIconButton from '@/controls/buttons/icon-button/PIconButton.vue';
 import type { HeadingType } from '@/data-display/heading/config';
 import { HEADING_TYPE } from '@/data-display/heading/config';
-import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import { commaFormatter } from '@/utils/helpers';
 
 interface Props {

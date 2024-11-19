@@ -4,11 +4,10 @@ import { reactive, ref } from 'vue';
 import { onClickOutside } from '@vueuse/core';
 import { useRouter } from 'vue-router/composables';
 
+import PContextMenu from '@/controls/context-menu/PContextMenu.vue';
+import type { MenuItem } from '@/controls/context-menu/type';
 import PI from '@/foundation/icons/PI.vue';
 import { useContextMenuController } from '@/hooks';
-import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
-import type { MenuItem } from '@/inputs/context-menu/type';
-
 
 interface Props {
     menu?: MenuItem[];

@@ -5,8 +5,8 @@ import {
     PDataLoader, PDynamicLayout, PButton,
 } from '@cloudforet/mirinae';
 import { DEFINITION_TABLE_STYLE_TYPE } from '@cloudforet/mirinae/src/data-display/tables/definition-table/config';
+import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-schema-form/type';
 import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
-import type { JsonSchema } from '@cloudforet/mirinae/types/inputs/forms/json-schema-form/type';
 
 
 import { SpaceRouter } from '@/router';

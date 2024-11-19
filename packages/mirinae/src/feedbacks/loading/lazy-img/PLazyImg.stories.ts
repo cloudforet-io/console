@@ -4,9 +4,9 @@ import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
+import PButton from '@/controls/buttons/button/PButton.vue';
 import { getLazyImgArgs, getLazyImgArgTypes, getLazyImgParameters } from '@/feedbacks/loading/lazy-img/story-helper';
 import PI from '@/foundation/icons/PI.vue';
-import PButton from '@/inputs/buttons/button/PButton.vue';
 
 
 

@@ -16,8 +16,8 @@ import type {
     QueryItem,
     ValueHandler,
     ValueHandlerMap,
-} from '@cloudforet/mirinae/types/inputs/search/query-search/type';
-import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
+} from '@cloudforet/mirinae/types/controls/search/query-search/type';
+import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

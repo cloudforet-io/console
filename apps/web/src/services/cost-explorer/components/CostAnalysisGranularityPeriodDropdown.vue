@@ -8,7 +8,7 @@ import dayjs from 'dayjs';
 import {
     PSelectDropdown, PBadge,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import { i18n } from '@/translations';
 
@@ -27,7 +27,8 @@ const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
 
 const state = reactive({
-    granularityItems: computed<MenuItem[]>(() => ([
+    isUnifiedCost: computed(() => costAnalysisPageGetters.isUnifiedCost),
+    granularityItems: computed<MenuItem[]>(() => (([
         {
             type: 'item',
             name: GRANULARITY.DAILY,
@@ -43,7 +44,7 @@ const state = reactive({
             name: GRANULARITY.YEARLY,
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.YEARLY'),
         },
-    ])),
+    ] as MenuItem[]).filter((item) => !(state.isUnifiedCost && item.name === GRANULARITY.DAILY)))),
     showPeriodBadge: computed<boolean>(() => costAnalysisPageGetters.selectedQueryId === DYNAMIC_COST_QUERY_SET_PARAMS || !costAnalysisPageState.relativePeriod),
     periodBadgeText: computed<string>(() => {
         if (!costAnalysisPageState.period) return '';
