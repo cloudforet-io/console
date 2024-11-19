@@ -30,6 +30,7 @@ const treemap: WidgetConfig = {
             },
         },
         numberFormat: {},
+        tooltipNumberFormat: {},
         displaySeriesLabel: {},
         displayAnnotation: {},
     },
