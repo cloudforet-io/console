@@ -34,6 +34,7 @@ const stackedColumnChart: WidgetConfig = {
             },
         },
         numberFormat: {},
+        tooltipNumberFormat: {},
         displaySeriesLabel: {},
         displayAnnotation: {},
     },
