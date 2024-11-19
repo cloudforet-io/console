@@ -7,8 +7,8 @@ import {
     PI, PTreeItem, PLabel, PPopover, PSelectDropdown,
 } from '@cloudforet/mirinae';
 import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
-import type { QueryTag } from '@cloudforet/mirinae/types/inputs/search/query-search-tags/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
+import type { QueryTag } from '@cloudforet/mirinae/types/controls/search/query-search-tags/type';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';

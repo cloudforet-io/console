@@ -6,10 +6,10 @@ import {
 
 import { isEmpty } from 'lodash';
 
+import type { MenuItem } from '@/controls/context-menu/type';
 import type { MenuAttachHandler } from '@/hooks/use-context-menu-controller/use-context-menu-attach';
 import { useContextMenuAttach } from '@/hooks/use-context-menu-controller/use-context-menu-attach';
 import { useContextMenuStyle } from '@/hooks/use-context-menu-style/use-context-menu-style';
-import type { MenuItem } from '@/inputs/context-menu/type';
 import { getTextHighlightRegex } from '@/utils/helpers';
 
 export interface UseContextMenuControllerOptions<Item extends MenuItem = MenuItem> {

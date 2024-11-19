@@ -8,7 +8,7 @@ import { cloneDeep } from 'lodash';
 import {
     PTextButton, PSelectDropdown, PStatus, PDataLoader,
 } from '@cloudforet/mirinae';
-import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 

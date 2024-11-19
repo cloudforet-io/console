@@ -10,7 +10,7 @@ import { isEmpty } from 'lodash';
 import {
     PButton, PDataLoader, PEmpty, PI, PIconButton,
 } from '@cloudforet/mirinae';
-import type { ContextMenuType, MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { ContextMenuType, MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';

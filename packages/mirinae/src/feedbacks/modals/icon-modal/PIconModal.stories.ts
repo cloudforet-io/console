@@ -6,8 +6,8 @@ import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
+import PButton from '@/controls/buttons/button/PButton.vue';
 import { getIconModalArgs, getIconModalArgTypes, getIconModalParameters } from '@/feedbacks/modals/icon-modal/story-helper';
-import PButton from '@/inputs/buttons/button/PButton.vue';
 
 import PIconModal from './PIconModal.vue';
 

@@ -69,7 +69,7 @@ import { useRouter } from 'vue-router/composables';
 import {
     PLink, PLazyImg, PLabel, PI, PTooltip,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 
 import type { PluginModel } from '@/schema/repository/plugin/model';

@@ -1,4 +1,4 @@
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import type { DateFieldType } from '@/common/modules/widgets/types/widget-data-type';

@@ -11,7 +11,7 @@ import { PFieldGroup, PRadio, PSelectDropdown } from '@cloudforet/mirinae';
 import type {
     AutocompleteHandler,
     SelectDropdownMenuItem,
-} from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+} from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 import { i18n } from '@/translations';

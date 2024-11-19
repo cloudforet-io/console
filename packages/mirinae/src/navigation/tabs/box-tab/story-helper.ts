@@ -3,7 +3,7 @@ import { reactive, toRefs } from 'vue';
 import type { SBType } from '@storybook/types';
 import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 
-import PButton from '@/inputs/buttons/button/PButton.vue';
+import PButton from '@/controls/buttons/button/PButton.vue';
 import { BOX_TAB_STYLE_TYPE } from '@/navigation/tabs/box-tab/config';
 
 export const getBoxTabArgs = (): Args => ({

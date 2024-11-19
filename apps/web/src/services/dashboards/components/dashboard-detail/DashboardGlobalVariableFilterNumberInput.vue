@@ -10,7 +10,7 @@ import { cloneDeep, isEqual } from 'lodash';
 import {
     PIconButton, PTextInput, PPopover, PButton, PI,
 } from '@cloudforet/mirinae';
-import type { InputItem } from '@cloudforet/mirinae/src/inputs/input/text-input/type';
+import type { InputItem } from '@cloudforet/mirinae/src/controls/input/text-input/type';
 
 import type {
     DashboardGlobalVariable,
@@ -149,10 +149,10 @@ watch(() => dashboardDetailGetters.dashboardVarsSchemaProperties, (varsSchema, p
     const _variable = props.variable as NumberAnyVariable;
     if (isEqual(varsSchema[_variable.key], prevVarsSchema?.[varsSchema[_variable.key]])) return;
 
-    state.value = (dashboardDetailState.dashboardInfo?.vars?.[_variable.key] as number) || _variable.options.min;
+    state.value = (dashboardDetailGetters.dashboardInfo?.vars?.[_variable.key] as number) || _variable.options.min;
     changeVariables(state.value);
 
-    state.keyword = (dashboardDetailState.dashboardInfo?.vars?.[_variable.key] as number) || _variable.options.min;
+    state.keyword = (dashboardDetailGetters.dashboardInfo?.vars?.[_variable.key] as number) || _variable.options.min;
 }, { immediate: true });
 
 

@@ -6,7 +6,7 @@ import type { Location } from 'vue-router';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { PLink } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 
 

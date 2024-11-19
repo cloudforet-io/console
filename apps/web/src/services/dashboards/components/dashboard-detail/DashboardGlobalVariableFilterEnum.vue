@@ -6,8 +6,8 @@ import { computed, reactive, watch } from 'vue';
 import { cloneDeep, flattenDeep, isEqual } from 'lodash';
 
 import { PSelectDropdown } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
-import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type {
     DashboardGlobalVariable,
@@ -83,7 +83,7 @@ watch(() => dashboardDetailGetters.dashboardVarsSchemaProperties, async (varsSch
     const _variable = props.variable as TextEnumVariable|NumberEnumVariable;
     if (isEqual(varsSchema[_variable.key], prevVarsSchema?.[varsSchema[_variable.key]])) return;
 
-    const value = dashboardDetailState.dashboardInfo?.vars?.[_variable.key];
+    const value = dashboardDetailGetters.dashboardInfo?.vars?.[_variable.key];
     if (value) {
         await initSelected(value);
     } else {

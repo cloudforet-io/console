@@ -104,6 +104,7 @@ const handleClickNameConfirm = async () => {
             <p-text-input :value="dataTableNameState.proxyDataTableName"
                           class="name-input"
                           size="sm"
+                          block
                           :is-focused="state.isUnsavedTransformed"
                           @update:value="handleUpdateDataTableName"
                           @keydown.enter="handleClickNameConfirm"
@@ -176,7 +177,7 @@ const handleClickNameConfirm = async () => {
 
         /* custom design-system component - p-text-input */
         :deep(.p-text-input) {
-            @apply w-full font-normal;
+            @apply font-normal;
             .tag-container {
                 padding: 0;
             }

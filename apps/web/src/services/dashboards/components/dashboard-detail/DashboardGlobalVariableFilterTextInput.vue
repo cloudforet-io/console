@@ -7,7 +7,7 @@ import {
 import { cloneDeep, isEqual } from 'lodash';
 
 import { PButton, PTag, PTextInput } from '@cloudforet/mirinae';
-import type { InputItem } from '@cloudforet/mirinae/src/inputs/input/text-input/type';
+import type { InputItem } from '@cloudforet/mirinae/src/controls/input/text-input/type';
 
 import type {
     DashboardGlobalVariable,
@@ -71,7 +71,7 @@ const changeVariables = (changedSelected?: string) => {
 watch(() => dashboardDetailGetters.dashboardVarsSchemaProperties, (varsSchema, prevVarsSchema) => {
     const _variable = props.variable as TextAnyVariable;
     if (isEqual(varsSchema[_variable.key], prevVarsSchema?.[_variable.key])) return;
-    state.value = dashboardDetailState.dashboardInfo?.vars?.[_variable.key] || _variable.options?.defaultValue;
+    state.value = dashboardDetailGetters.dashboardInfo?.vars?.[_variable.key] || _variable.options?.defaultValue;
     changeVariables(state.value);
 }, { immediate: true });
 

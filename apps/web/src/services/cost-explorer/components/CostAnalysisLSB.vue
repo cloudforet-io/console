@@ -3,25 +3,21 @@ import { computed, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PLazyImg, PSelectDropdown, PI, PIconButton,
+    PLazyImg, PSelectDropdown, PI, PToggleButton,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
-
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDomainStore } from '@/store/domain/domain-store';
-import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
 import { getCompoundKeyWithManagedCostQuerySetFavoriteKey } from '@/lib/helper/config-data-helper';
 
-import BetaMark from '@/common/components/marks/BetaMark.vue';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
@@ -37,8 +33,7 @@ import {
 
 
 import {
-    DEFAULT_UNIFIED_COST_CURRENCY,
-    UNIFIED_COST_KEY,
+    DEFAULT_UNIFIED_COST_CURRENCY, UNIFIED_COST_KEY,
 } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { MANAGED_COST_QUERY_SET_ID_LIST } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
@@ -70,6 +65,7 @@ const storeState = reactive({
     dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     unifiedCostCurrency: computed(() => domainGetters.domainUnifiedCostCurrency ?? DEFAULT_UNIFIED_COST_CURRENCY),
     isAdminUser: computed(() => store.state.user.roleType === 'DOMAIN_ADMIN'),
+    isUnifiedCostOn: computed(() => costQuerySetState.isUnifiedCostOn),
 });
 const state = reactive({
     loading: true,
@@ -87,7 +83,7 @@ const state = reactive({
                 to: getProperRouteLocation({
                     name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
                     params: {
-                        dataSourceId: costQuerySetState.selectedDataSourceId ?? '',
+                        dataSourceId: storeState.isUnifiedCostOn ? UNIFIED_COST_KEY : (costQuerySetState.selectedDataSourceId ?? ''),
                         costQuerySetId: d.cost_query_set_id,
                     },
                 }),
@@ -104,7 +100,7 @@ const state = reactive({
             to: getProperRouteLocation({
                 name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
                 params: {
-                    dataSourceId: costQuerySetState.selectedDataSourceId ?? '',
+                    dataSourceId: storeState.isUnifiedCostOn ? UNIFIED_COST_KEY : (costQuerySetState.selectedDataSourceId ?? ''),
                     costQuerySetId: d.cost_query_set_id,
                 },
             }),
@@ -149,30 +145,19 @@ const state = reactive({
 const dataSourceState = reactive({
     items: computed<MenuItem[]>(() => {
         const dataSourceMap: CostDataSourceReferenceMap = storeState.dataSourceMap;
-        return [
-            { name: UNIFIED_COST_KEY, label: 'Unified Cost', icon: 'ic_unified-cost' },
-            { type: 'divider' },
-            ...Object.entries(dataSourceMap).map(([key, value]) => ({
-                name: key,
-                label: value.name,
-                imageUrl: storeState.plugins[value.data.plugin_info?.plugin_id]?.icon ? storeState.plugins[value.data.plugin_info?.plugin_id]?.icon : 'error',
-            }))];
+        return Object.entries(dataSourceMap).map(([key, value]) => ({
+            name: key,
+            label: value.name,
+            imageUrl: storeState.plugins[value.data.plugin_info?.plugin_id]?.icon ? storeState.plugins[value.data.plugin_info?.plugin_id]?.icon : 'error',
+        }));
     }),
-    selected: computed(() => costQuerySetState.selectedDataSourceId ?? (storeState.isAdminMode ? UNIFIED_COST_KEY : Object.keys(storeState.dataSourceMap)[0])),
+    selected: computed(() => costQuerySetState.selectedDataSourceId ?? Object.keys(storeState.dataSourceMap)[0]),
 });
 
 const filterStarredItems = (menuItems: LSBItem[] = []): LSBItem[] => menuItems.filter((menu) => (menu.id && state.favoriteItemMap[menu.favoriteOptions?.id || menu.id])
     && menu.type === MENU_ITEM_TYPE.ITEM);
 
-const getCurrentCurrencySet = (dataSourceKey: string): string => {
-    const defaultCurrencySet = `${CURRENCY_SYMBOL.USD}${CURRENCY.USD}`;
-
-    const currentCurrency: string = dataSourceKey !== UNIFIED_COST_KEY ? storeState.dataSourceMap[dataSourceKey]?.data.plugin_info?.metadata?.currency : storeState.unifiedCostCurrency;
-    const currentSymbol: string = CURRENCY_SYMBOL[currentCurrency];
-    const result = (currentCurrency && currentSymbol) && `${currentSymbol}${currentCurrency}`;
-
-    return result || defaultCurrencySet;
-};
+// s
 const handleSelectDataSource = (selected: string) => {
     if (!selected) return;
     costQuerySetStore.setSelectedDataSourceId(selected);
@@ -185,11 +170,20 @@ const handleSelectDataSource = (selected: string) => {
     })).catch(() => {});
 };
 
-const handleRouteToUnifiedCostSettings = () => {
-    router.push({
-        name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.CURRENCY_CONVERTER._NAME),
-    }).catch(() => {});
+const handleSelectUnifiedCostToggle = (value: boolean) => {
+    costQuerySetStore.setUnifiedCostOn(value);
+    router.push(getProperRouteLocation({
+        name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+        params: {
+            dataSourceId: value ? UNIFIED_COST_KEY : (costQuerySetState.selectedDataSourceId ?? UNIFIED_COST_KEY),
+            costQuerySetId: costQuerySetGetters.managedCostQuerySets[0].cost_query_set_id,
+        },
+    })).catch(() => {});
 };
+
+(() => {
+    costQuerySetStore.setUnifiedCostOn(storeState.isAdminMode);
+})();
 
 </script>
 
@@ -198,54 +192,41 @@ const handleRouteToUnifiedCostSettings = () => {
            class="cost-analysis-l-s-b"
     >
         <template #collapsible-contents-data-source>
-            <p-select-dropdown class="select-options-dropdown"
-                               :menu="dataSourceState.items"
-                               :selected="dataSourceState.selected"
-                               use-fixed-menu-style
-                               is-fixed-width
-                               @update:selected="handleSelectDataSource"
-            >
-                <template #dropdown-button="item">
-                    <div class="selected-wrapper">
-                        <p-lazy-img v-if="item && item.imageUrl"
-                                    class="selected-icon"
-                                    :src="item.imageUrl"
-                                    width="1rem"
-                                    height="1rem"
-                        />
-                        <p-i v-if="item && item.icon"
-                             width="1rem"
-                             height="1rem"
-                             class="selected-icon"
-                             name="ic_unified-cost"
-                        />
-                        <span class="selected-text">
-                            {{ item?.label }}
-                        </span>
-                    </div>
-                </template>
-                <template #menu-item--format="{item}">
-                    <div class="menu-item-wrapper">
-                        <div class="menu-item">
-                            <span>{{ item.label }}</span>
-                            <span class="selected-item-postfix">
-                                ({{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CURRENCY') }}: {{ getCurrentCurrencySet(item.name) }})
-                            </span>
-                            <beta-mark v-if="item.label === 'Kubernetes'"
-                                       class="beta"
+            <div class="data-source-contents-wrapper">
+                <div class="unified-cost-toggle-wrapper">
+                    <p-toggle-button :value="costQuerySetState.isUnifiedCostOn"
+                                     @change-toggle="handleSelectUnifiedCostToggle"
+                    /><span>Unified Cost</span>
+                </div>
+                <p-select-dropdown class="select-options-dropdown"
+                                   :menu="dataSourceState.items"
+                                   :selected="dataSourceState.selected"
+                                   :disabled="costQuerySetState.isUnifiedCostOn"
+                                   use-fixed-menu-style
+                                   is-fixed-width
+                                   @update:selected="handleSelectDataSource"
+                >
+                    <template #dropdown-button="item">
+                        <div class="selected-wrapper">
+                            <p-lazy-img v-if="item && item.imageUrl"
+                                        class="selected-icon"
+                                        :src="item.imageUrl"
+                                        width="1rem"
+                                        height="1rem"
                             />
+                            <p-i v-if="item && item.icon"
+                                 width="1rem"
+                                 height="1rem"
+                                 class="selected-icon"
+                                 name="ic_unified-cost"
+                            />
+                            <span class="selected-text">
+                                {{ item?.label }}
+                            </span>
                         </div>
-                        <p-icon-button v-if="item.name === UNIFIED_COST_KEY && storeState.isAdminUser"
-                                       class="menu-icon"
-                                       name="ic_settings"
-                                       size="sm"
-                                       style-type="tertiary"
-                                       shape="square"
-                                       @click.stop="handleRouteToUnifiedCostSettings"
-                        />
-                    </div>
-                </template>
-            </p-select-dropdown>
+                    </template>
+                </p-select-dropdown>
+            </div>
         </template>
         <template #collapsible-contents-starred>
             <div v-if="state.starredMenuSet.length > 0">
@@ -280,17 +261,28 @@ const handleRouteToUnifiedCostSettings = () => {
         padding-left: 0.5rem;
         gap: 0.125rem;
     }
-    .show-more {
-        margin-left: 0.5rem;
-    }
-    .select-options-dropdown {
+
+    .data-source-contents-wrapper {
+        @apply flex flex-col gap-2;
         padding-right: 0.5rem;
         padding-left: 0.5rem;
+        padding-top: 0.5rem;
 
-        .menu-item-wrapper {
-            @apply flex justify-between;
+        .unified-cost-toggle-wrapper {
+            @apply flex items-center gap-2;
+
+            > span {
+                @apply text-label-md text-gray-900;
+            }
+        }
+        .select-options-dropdown {
+
+            .menu-item-wrapper {
+                @apply flex justify-between;
+            }
         }
     }
+
     .selected-item-postfix {
         @apply text-gray-500;
     }

@@ -8,8 +8,8 @@ import dayjs from 'dayjs';
 import { isEqual, range } from 'lodash';
 
 import { PSelectDropdown } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
-import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
 import { i18n } from '@/translations';

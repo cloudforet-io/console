@@ -3,7 +3,7 @@ import { reactive, ref, toRefs } from 'vue';
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
-import PButton from '@/inputs/buttons/button/PButton.vue';
+import PButton from '@/controls/buttons/button/PButton.vue';
 import { getOverlayLayoutArgTypes, getOverlayLayoutArgs, getOverlayLayoutParameters } from '@/layouts/overlay-layout/story-helper';
 
 

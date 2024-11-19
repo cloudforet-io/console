@@ -14,7 +14,7 @@ import {
     PButton, PSelectButton,
     PSelectDropdown, PToggleButton, PFieldTitle,
 } from '@cloudforet/mirinae';
-import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 
@@ -27,7 +27,7 @@ import {
 } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
 import type { CostAnalyzeRawData } from '@/services/cost-explorer/types/cost-analyze-type';
-import type { XYChartData } from '@/services/cost-explorer/types/cost-explorer-chart-type';
+import type { CostXYChartData } from '@/services/cost-explorer/types/cost-explorer-chart-type';
 import type {
     Period,
 } from '@/services/cost-explorer/types/cost-explorer-query-type';
@@ -41,7 +41,7 @@ const state = reactive({
     loading: true,
     legend: {} as Record<string, boolean>,
     data: {} as AnalyzeResponse<CostAnalyzeRawData>,
-    chartData: [] as XYChartData[],
+    chartData: [] as CostXYChartData[],
     chart: null as XYChart | null,
     groupByMenuItems: computed<SelectDropdownMenuItem[]>(() => costAnalysisPageState.groupBy.map((d) => {
         if (GROUP_BY_ITEM_MAP[d]) return GROUP_BY_ITEM_MAP[d];
@@ -138,8 +138,9 @@ watch([
     () => costAnalysisPageState,
     () => costAnalysisPageGetters.selectedDataSourceId,
     () => costAnalysisPageGetters.selectedQueryId,
-], ([, selectedDataSourceId]) => {
-    if (costAnalysisPageState.period && selectedDataSourceId) setChartData(costAnalysisPageState.period);
+    () => costAnalysisPageGetters.isUnifiedCost,
+], ([, selectedDataSourceId, , isUnifiedCost]) => {
+    if (costAnalysisPageState.period && (selectedDataSourceId || isUnifiedCost)) setChartData(costAnalysisPageState.period);
 }, { immediate: true, deep: true });
 watch(() => state.groupByMenuItems, (after) => {
     if (!after.length) {

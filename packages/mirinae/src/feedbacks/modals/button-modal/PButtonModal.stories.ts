@@ -6,10 +6,10 @@ import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
+import PButton from '@/controls/buttons/button/PButton.vue';
+import PSelectDropdown from '@/controls/dropdown/select-dropdown/PSelectDropdown.vue';
 import PButtonModal from '@/feedbacks/modals/button-modal/PButtonModal.vue';
 import { getButtonModalArgs, getButtonModalArgTypes, getButtonModalParameters } from '@/feedbacks/modals/button-modal/story-helper';
-import PButton from '@/inputs/buttons/button/PButton.vue';
-import PSelectDropdown from '@/inputs/dropdown/select-dropdown/PSelectDropdown.vue';
 
 
 

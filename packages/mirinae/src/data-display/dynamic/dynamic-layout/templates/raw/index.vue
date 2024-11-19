@@ -21,10 +21,10 @@ import {
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
+import PTextEditor from '@/controls/text-editor/PTextEditor.vue';
 import type { RawDynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/templates/raw/type';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import PHeading from '@/data-display/heading/PHeading.vue';
-import PTextEditor from '@/inputs/text-editor/PTextEditor.vue';
 
 export default {
     name: 'PDynamicLayoutRaw',

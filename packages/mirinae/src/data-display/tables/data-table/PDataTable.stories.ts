@@ -4,12 +4,12 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
 
+import PToggleButton from '@/controls/buttons/toggle-button/PToggleButton.vue';
+import PTextarea from '@/controls/textarea/PTextarea.vue';
 import { getUserFields, getUsers, getLongUsers } from '@/data-display/tables/data-table/mock';
 import PDataTable from '@/data-display/tables/data-table/PDataTable.vue';
 import { getDataTableArgs, getDataTableArgsType, getDataTableParameters } from '@/data-display/tables/data-table/story-helper';
 import { useProxyValue } from '@/hooks';
-import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton.vue';
-import PTextarea from '@/inputs/textarea/PTextarea.vue';
 
 
 import { DATA_TABLE_STYLE_TYPE } from './config';

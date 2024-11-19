@@ -21,8 +21,8 @@ import {
     PSelectDropdown,
     PTableCheckModal,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
-import type { KeyItemSet } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
+import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { WebhookDeleteParameters } from '@/schema/monitoring/webhook/api-verbs/delete';

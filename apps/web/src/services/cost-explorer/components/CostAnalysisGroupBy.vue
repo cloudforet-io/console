@@ -12,7 +12,7 @@ import {
 import type {
     AutocompleteHandler,
     SelectDropdownMenuItem,
-} from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+} from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import { i18n } from '@/translations';
 
@@ -148,7 +148,8 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
             {{ defaultGroupByItem.label }}
         </p-select-button>
         <div class="tags-button-wrapper">
-            <p-select-dropdown :handler="tagsMenuHandler"
+            <p-select-dropdown v-if="!costAnalysisPageGetters.isUnifiedCost"
+                               :handler="tagsMenuHandler"
                                :selected.sync="state.selectedTagsMenu"
                                selection-label="Tags"
                                appearance-type="badge"

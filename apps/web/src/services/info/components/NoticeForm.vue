@@ -9,7 +9,7 @@ import {
     PPaneLayout, PRadio, PRadioGroup,
     PTextInput,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import { SpaceRouter } from '@/router';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
@@ -186,11 +186,14 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
                                required
                 >
                     <template #default="{invalid}">
-                        <p-text-input :value="writerName"
-                                      :invalid="invalid"
-                                      :placeholder="$store.state.user.name || $t('INFO.NOTICE.FORM.PLACEHOLDER_REQUIRED')"
-                                      @update:value="setForm('writerName', $event)"
-                        />
+                        <div class="name-input-wrapper">
+                            <p-text-input :value="writerName"
+                                          block
+                                          :invalid="invalid"
+                                          :placeholder="$store.state.user.name || $t('INFO.NOTICE.FORM.PLACEHOLDER_REQUIRED')"
+                                          @update:value="setForm('writerName', $event)"
+                            />
+                        </div>
                     </template>
                 </p-field-group>
                 <p-field-group class="notice-label-wrapper"
@@ -283,12 +286,8 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
         }
     }
     .writer-name-input {
-        /* custom design-system component - p-text-input */
-        :deep(.p-text-input) {
-            @apply w-1/2;
-            .input-container {
-                @apply w-full;
-            }
+        .name-input-wrapper {
+            width: 50%;
         }
     }
     .notice-create-options-wrapper {

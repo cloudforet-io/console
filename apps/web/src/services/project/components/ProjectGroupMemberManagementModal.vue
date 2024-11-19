@@ -10,7 +10,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButtonModal, PDataLoader, PEmpty, PFieldGroup, PTextInput, PIconButton,
 } from '@cloudforet/mirinae';
-import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 
 import type { ProjectGroupAddUsersParameters } from '@/schema/identity/project-group/api-verbs/add-users';
@@ -187,6 +187,7 @@ watch(() => props.visible, async (visible) => {
                             :menu="state.userMenuItems"
                             :value.sync="state.searchText"
                             :selected="[]"
+                            block
                             use-auto-complete
                             use-fixed-menu-style
                             :placeholder="$t('PROJECT.LANDING.ADD_GROUP_MEMBER')"
@@ -252,11 +253,6 @@ watch(() => props.visible, async (visible) => {
         @apply bg-white border border-primary3 rounded-md;
         min-height: 23rem;
         padding: 0.75rem;
-    }
-
-    /* custom design-system component - p-text-input */
-    :deep(.p-text-input) {
-        width: 100%;
     }
 
     .p-data-loader {

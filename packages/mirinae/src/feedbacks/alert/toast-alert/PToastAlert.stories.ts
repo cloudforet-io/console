@@ -3,9 +3,9 @@ import Vue from 'vue';
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
+import PButton from '@/controls/buttons/button/PButton.vue';
 import PToastAlert from '@/feedbacks/alert/toast-alert/PToastAlert.vue';
 import { getToastAlertArgs, getToastAlertParameters, getToastAlertArgTypes } from '@/feedbacks/alert/toast-alert/story-helper';
-import PButton from '@/inputs/buttons/button/PButton.vue';
 
 
 type PToastAlertPropsAndCustomArgs = ComponentProps<typeof PToastAlert>;

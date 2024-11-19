@@ -3,8 +3,8 @@ import { ref } from 'vue';
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
+import PButton from '@/controls/buttons/button/PButton.vue';
 import { getTableCheckModalArgs, getTableCheckModalArgTypes, getTableCheckModalParameters } from '@/feedbacks/modals/advanced/table-check-modal/story-helper';
-import PButton from '@/inputs/buttons/button/PButton.vue';
 
 import PTableCheckModal from './PTableCheckModal.vue';
 

@@ -6,7 +6,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { getPeriodByGranularity } from '@/services/cost-explorer/helpers/cost-explorer-period-helper';
-import type { ChartData, XYChartData } from '@/services/cost-explorer/types/cost-explorer-chart-type';
+import type { ChartData, CostXYChartData } from '@/services/cost-explorer/types/cost-explorer-chart-type';
 import type {
     Period, Granularity,
 } from '@/services/cost-explorer/types/cost-explorer-query-type';
@@ -50,17 +50,17 @@ const _mergePrevChartDataAndCurrChartData = (prevData: ChartData, currData?: Cha
  *       => [{ date: '2021-01-01', cost: 10, limit: 100 }, { date: '2021-02-01', cost: 20, limit: 100 }, { date: '2021-03-01', cost: 30, limit: 200 }]
  * @usage CostAnalysisDynamicWidget
  */
-export const getStackedChartData = (chartData: XYChartData[], granularity: Granularity, period: Period): XYChartData[] => {
+export const getStackedChartData = (chartData: CostXYChartData[], granularity: Granularity, period: Period): CostXYChartData[] => {
     const timeUnit = getTimeUnitByGranularity(granularity);
     const dateFormat = DATE_FORMAT[timeUnit];
     const _period = getPeriodByGranularity(granularity, period);
 
-    const accumulatedChartData = [] as XYChartData[];
+    const accumulatedChartData = [] as CostXYChartData[];
     let now = dayjs.utc(_period.start).clone();
     const today = dayjs.utc();
     let accumulatedData: Record<string, number> = {};
     while (now.isSameOrBefore(dayjs.utc(_period.end), timeUnit)) {
-        let eachChartData: XYChartData = { date: now.format(dateFormat) };
+        let eachChartData: CostXYChartData = { date: now.format(dateFormat) };
         if (!now.isAfter(today, timeUnit)) {
             // eslint-disable-next-line no-loop-func
             const existData = chartData.find((d) => now.isSame(dayjs.utc(d.date), timeUnit));

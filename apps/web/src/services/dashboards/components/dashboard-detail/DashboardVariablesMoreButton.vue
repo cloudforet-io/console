@@ -11,7 +11,7 @@ import {
 } from 'lodash';
 
 import { PButton, PContextMenu, useContextMenuController } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
 import { i18n } from '@/translations';
@@ -92,7 +92,7 @@ const toggleUseDashboardVarsSchema = debounce(async (dashboardId: string, variab
     try {
         const _dashboardVarsSchemaProperties: Record<string, DashboardGlobalVariable> = cloneDeep(dashboardDetailGetters.dashboardVarsSchemaProperties);
         const _use = !_dashboardVarsSchemaProperties[variableKey].use;
-        const _vars = cloneDeep(dashboardDetailState.dashboardInfo?.vars || {});
+        const _vars = cloneDeep(dashboardDetailGetters.dashboardInfo?.vars || {});
         const _tempVars = cloneDeep(dashboardDetailState.vars);
         if (!_use) {
             delete _vars[variableKey];

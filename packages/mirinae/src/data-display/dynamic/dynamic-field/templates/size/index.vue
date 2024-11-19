@@ -6,8 +6,8 @@ import bytes from 'bytes';
 
 import type { SizeDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/size/type';
 import type { SizeOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
-import PLink from '@/inputs/link/PLink.vue';
-import { ACTION_ICON } from '@/inputs/link/type';
+import PLink from '@/navigation/link/PLink.vue';
+import { ACTION_ICON } from '@/navigation/link/type';
 
 const unitMap: Record<string, bytes.Unit> = {
     BYTES: 'B',

@@ -4,9 +4,9 @@ import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
+import PButton from '@/controls/buttons/button/PButton.vue';
 import PDefinition from '@/data-display/tables/definition-table/definition/PDefinition.vue';
 import { getDefinitionArgs, getDifinitionParameters, getDefinitionArgTypes } from '@/data-display/tables/definition-table/definition/story-helper';
-import PButton from '@/inputs/buttons/button/PButton.vue';
 
 type PDefinitionPropsAndCustomArgs = ComponentProps<typeof PDefinition>;
 

@@ -7,7 +7,7 @@ import type { TranslateResult } from 'vue-i18n';
 import {
     PToggleButton, PRadio, PButton, PCheckbox, PSelectDropdown, PBadge, PTooltip,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
 import type { EventRuleActions, EventRuleOptions } from '@/schema/monitoring/event-rule/type';

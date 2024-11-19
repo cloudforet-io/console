@@ -3,12 +3,12 @@ import {
     computed, reactive,
 } from 'vue';
 
-import { sortBy } from 'lodash';
+import { sortBy, startCase, toLower } from 'lodash';
 
 import {
     PFieldTitle, PContextMenu,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import { i18n } from '@/translations';
 
@@ -43,6 +43,7 @@ const state = reactive({
             .map((namespace) => namespace.data.group);
         const _groupMenuItems: MenuItem[] = [];
         const _uniqueGroups = Array.from(new Set(groups));
+
         sortBy(_uniqueGroups, (group) => group !== 'common').forEach((group) => {
             if (group === 'common') {
                 _groupMenuItems.push({
@@ -51,16 +52,13 @@ const state = reactive({
                     label: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.COMMON'),
                 });
             } else {
-                // provider case
                 const providerData = storeState.providers[group];
-                if (providerData) {
-                    _groupMenuItems.push({
-                        type: 'item',
-                        name: providerData.key,
-                        label: providerData.label,
-                        imageUrl: providerData.data.icon,
-                    });
-                }
+                _groupMenuItems.push({
+                    type: 'item',
+                    name: providerData?.key || group,
+                    label: providerData?.label || customSnakeToTitleCase(group),
+                    imageUrl: providerData?.data?.icon,
+                });
             }
         });
         return _groupMenuItems.filter((d) => d.label.toLowerCase().includes(state.categorySearchText.toLowerCase()));
@@ -97,6 +95,9 @@ const state = reactive({
     }),
     metricSearchText: '',
 });
+
+const customSnakeToTitleCase = (title: string) => startCase(toLower(title.replace(/_/g, ' ')));
+
 
 /* Event */
 const handleSelectCategory = (item: MenuItem) => {

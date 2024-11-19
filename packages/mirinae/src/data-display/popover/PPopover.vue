@@ -47,9 +47,9 @@ import {
 } from '@floating-ui/dom';
 import vClickOutside from 'v-click-outside';
 
+import PIconButton from '@/controls/buttons/icon-button/PIconButton.vue';
 import type { PopoverPlacement, PopoverTrigger } from '@/data-display/popover/type';
 import { POPOVER_PLACEMENT, POPOVER_TRIGGER } from '@/data-display/popover/type';
-import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 
 interface PopoverProps {
     isVisible?: boolean;

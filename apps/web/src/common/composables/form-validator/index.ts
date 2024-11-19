@@ -1,23 +1,30 @@
-import type { ComputedRef, UnwrapRef } from 'vue';
+import type { ComputedRef, UnwrapRef, Ref } from 'vue';
 import {
-    computed, reactive, ref,
+    computed, reactive, ref, readonly,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { clone } from 'lodash';
+type ValidatorResult = boolean | TranslateResult;
 
-type ValidatorResult = boolean|TranslateResult;
-// eslint-disable-next-line no-unused-vars
-interface Validator { (value?: any): ValidatorResult }
+export interface ValidatorFn<T> {
+    (value: UnwrapRef<T>): ValidatorResult
+}
+
 type ValidationResult = boolean;
 
-function useValueValidator<T = any>(
-    value: T,
-    validator?: Validator,
+
+type NotRef<T> = T extends Ref<any> ? never : T;
+
+const IDENTIFIER = Symbol('useFieldValidator');
+export function useFieldValidator<T>(
+    value: NotRef<T>,
+    validator?: ValidatorFn<T>,
     immediate = false,
 ) {
     const valueRef = ref<T>(value);
     const validationStarted = ref(immediate);
+
+    const trigger = ref(0);
 
     const setValue = (_value: UnwrapRef<T>) => {
         if (!validationStarted.value) validationStarted.value = true;
@@ -25,7 +32,11 @@ function useValueValidator<T = any>(
     };
 
     const validatorResult = computed<ValidatorResult>(() => {
-        if (validator) return validator(valueRef.value);
+        if (validator) {
+            // eslint-disable-next-line no-unused-expressions
+            trigger.value; // trigger dependency
+            return validator(valueRef.value);
+        }
         return true;
     });
 
@@ -35,7 +46,7 @@ function useValueValidator<T = any>(
         return !result;
     });
 
-    const isInvalid = computed<ValidationResult|undefined>(() => {
+    const isInvalid = computed<ValidationResult | undefined>(() => {
         if (!validationStarted.value) return undefined;
         return !validationResult.value;
     });
@@ -48,23 +59,24 @@ function useValueValidator<T = any>(
         return result;
     });
 
-    const reset = () => {
-        valueRef.value = value as UnwrapRef<T>;
-        validationStarted.value = immediate;
-    };
-
     const resetValidation = () => {
         validationStarted.value = immediate;
     };
 
+    const reset = () => {
+        valueRef.value = value as UnwrapRef<T>; // do not use setValue to avoid validation
+        resetValidation();
+    };
+
     const validate = () => {
         if (!validationStarted.value) validationStarted.value = true;
-        if (validator) valueRef.value = clone(valueRef.value);
-        return true;
+        trigger.value++;
+        return validationResult.value;
     };
 
     return {
-        value: computed<UnwrapRef<T>>(() => valueRef.value),
+        [IDENTIFIER]: true,
+        value: readonly(valueRef) as Readonly<Ref<T>>,
         validationResult,
         isInvalid,
         invalidText,
@@ -75,168 +87,113 @@ function useValueValidator<T = any>(
     };
 }
 
-type Forms<T> = {
-    [K in keyof T]: ComputedRef<T[K]>
+type FieldValidator<T> = ReturnType<typeof useFieldValidator<T>>;
+type ExtractFromFieldValidator<T> = T extends FieldValidator<infer U> ? U : never;
+type RawForms<T> = {
+    [K in keyof T]: T[K] | ExtractFromFieldValidator<T[K]>;
+};
+type FormRefs<T> = {
+    [K in keyof T]:Readonly<Ref<T[K] | ExtractFromFieldValidator<T[K]>>>
 };
 
-type Validators<T> = {
-    // eslint-disable-next-line no-unused-vars
-    [K in keyof T]: Validator
-};
-
+type FieldValue<T, K extends keyof T> = UnwrapRef<T[K]> | UnwrapRef<ExtractFromFieldValidator<T[K]>>;
 type ValueSetters<T> = {
-    // eslint-disable-next-line no-unused-vars
-    [K in keyof T]: (val: T[K]) => void
+    [K in keyof T]: ((_value: UnwrapRef<T[K]>) => void) | FieldValidator<ExtractFromFieldValidator<T[K]>>['setValue']
 };
 
 type InvalidTexts<T> = {
-    // eslint-disable-next-line no-unused-vars
     [K in keyof T]: ComputedRef<TranslateResult>
 };
 
 type InvalidState<T> = {
-    // eslint-disable-next-line no-unused-vars
-    [K in keyof T]: ComputedRef<ValidationResult|undefined>
+    [K in keyof T]: ComputedRef<ValidationResult | undefined>
 };
 
 type ValidationResults<T> = {
-    // eslint-disable-next-line no-unused-vars
     [K in keyof T]: ComputedRef<ValidationResult>
 };
 
 type Resets<T> = {
-    // eslint-disable-next-line no-unused-vars
     [K in keyof T]: () => void
 };
 
 type Validates<T> = {
-    // eslint-disable-next-line no-unused-vars
     [K in keyof T]: () => void
 };
 
 type ImmediateMap<T> = {
-    // eslint-disable-next-line no-unused-vars
     [K in keyof T]: boolean
 };
 
-/**
- * @param _forms
- * A set of form input data.
- * e.g. { a: '', b: 0, c: [], d: {} }
+function isUseFieldValidatorReturn<T>(
+    obj: any,
+): obj is FieldValidator<T> {
+    return (
+        obj
+        && typeof obj === 'object'
+        && (obj as FieldValidator<T>)[IDENTIFIER] === true
+    );
+}
+/*
+ * @template T - Form data type.
  *
- * @param validators
- * A set of validators.
- * e.g. { a: (val) => !!val, b: (val) => val > 0 ? '' : 'Invalid' }
- * Validators can return boolean, string or undefined.
- * When it returns boolean, true means valid, and false means invalid.
- * When it returns string, empty string means valid, and others mean invalid.
- * When it returns undefined, it means validation is not executed.
+ * @param {T?} _forms - A set of form input data.
+ * Form value can be any value or `useFieldValidator` result.
+ * e.g.:
+ * ```ts
+ * { a: '', b: 0, c: useFieldValidator([], (val) => !!val.length) }
+ * ```
  *
- * @param [_immediate]
- * Whether to start validation immediately or not.
- * Boolean or a set of booleans.
- * If it is boolean, it starts all validations immediately.
- * If it is object(e.g. { a: true }), only validators whose value for the property is true are executed immediately.
+ * @param {Partial<{[K in keyof T]: ValidatorFn<T[K]>}>} validators - It is a map of form key and validator function.
+ * Only when the form value is not `useFieldValidator` result, the validator function is used.
+ * e.g.
+ * ```ts
+ * { a: (val) => !!val, b: (val) => val > 0 ? '' : 'Invalid' }
+ * ```
+ * Validator functions can return `boolean`, string or `undefined`.
+ * When it returns `boolean`, `true` means valid, and `false` means invalid.
+ * When it returns `string`, empty string means valid, and others mean invalid.
+ * When it returns `undefined`, it means validation is not started.
+ *
+ * @param {boolean | Partial<ImmediateMap<T>>} _immediate - Whether to start validation immediately or not.
+ * If it is `boolean`, it starts all validations immediately.
+ * If it is `object`(e.g. `{ a: true }`), only validators whose value for the property is `true` are executed immediately.
  * Otherwise, it starts validation when value is updated at least once.
- * Default: false
+ * Default: `false`
  *
- * @returns {Object} {forms, invalidState, invalidTexts, isAllValid,
- * setForm, resetAll, resetValidations, validateAll, validate}
- * forms: A set of ComputedRef<T> form value.
- * invalidState: A set of ComputedRef invalid state.
- * invalidTexts: A set of ComputedRef invalid text.
- * isAllValid: ComputedRef<boolean>. Is all form values are valid or not.
- * initForm: Function. Initiate form's value by given property name or given form object.
- * setForm: Function. Change form's value by given property name or given form object.
- * resetAll: Function. Reset form values and validation states.
- * resetValidations: Function. Reset validation states.
- * validateAll: Function. Validate all form values. Returns result.
- * validate: Function. Validate form's value by given property name. Returns result.
- *
- * @example
- *
- <template>
- <p-field-group :invalid="invalidState.name" :invalid-text="invalidTexts.name">
- <p-text-input :value="name" @input="handleNameInput" />
- </p-field-group>
- <p-field-group :invalid="invalidState.address" :invalid-text="invalidTexts.address">
- <p-text-input :value="address" @input="handleAddressInput" />
- </p-field-group>
- <p-button :disabled="isAllValid">confirm</p-button>
- <p-button @click="handleReset">reset</p-button>
- </template>
-
- setup() {
-    const {
-        forms: { name, address },
-        invalidState,
-        invalidTexts,
-        setForm, isAllValid,
-    } = useFormValidator({
-        name: 'name',
-        address: '',
-    }, {
-        name: (val: string) => {
-            if (!val.trim()) return '이름을 작성하세요';
-            return true;
-        },
-        address: (val: string) => {
-            if (val.trim().length < 5) return '주소는 5자 이상 작성하세요';
-            return true;
-        },
-    });
-
-    const handleNameInput = (value) => {
-        setForm('name', value);
-    };
-
-    const handleAddressInput = () => {
-        setForm('address', value);
-    };
-
-    const handleReset = () => {
-        initForm({
-            name: 'name',
-            address: '',
-        })
-    };
-
-    return {
-        name,
-        address,
-        invalidState,
-        invalidTexts,
-        isAllValid,
-        handleNameInput,
-        handleAddressInput,
-        handleReset,
-    };
- }
  */
-export function useFormValidator<T extends Record<string, any> = any>(
-    _forms: T,
-    validators: Partial<Validators<T>>,
-    _immediate: Partial<ImmediateMap<T>>|boolean = false,
+export function useFormValidator<T extends Record<string, any|FieldValidator<any>> = Record<string, any|FieldValidator<any>>>(
+    formsOrFieldValidators: T,
+    validators: Partial<{[K in keyof T]: ValidatorFn<T[K]>}> = {},
+    _immediate: Partial<ImmediateMap<T>> | boolean = false,
 ) {
-    const formKeys: Array<keyof T> = Object.keys(_forms);
+    const _allKeys: (keyof T)[] = [];
 
-    const forms = {} as Forms<T>;
+    const forms = {} as FormRefs<T>;
     const valueSetters = {} as ValueSetters<T>;
-    const invalidTexts = {} as InvalidTexts<T>;
-    const invalidState = {} as InvalidState<T>;
-    const validationResults = {} as ValidationResults<T>;
-    const resets = {} as Resets<T>;
-    const resetValidationMap = {} as Resets<T>;
-    const validateMap = {} as Validates<T>;
 
-    formKeys.forEach((key) => {
-        const validator = validators[key];
-        const immediate = typeof _immediate === 'boolean' ? _immediate : _immediate[key];
+    const invalidTexts = {} as InvalidTexts<FormRefs<T>>;
+    const invalidState = {} as InvalidState<FormRefs<T>>;
+    const validationResults = {} as ValidationResults<FormRefs<T>>;
+    const resets = {} as Resets<FormRefs<T>>;
+    const resetValidationMap = {} as Resets<FormRefs<T>>;
+    const validateMap = {} as Validates<FormRefs<T>>;
+
+    Object.entries(formsOrFieldValidators).forEach(([key, valueOrFieldValidator]: [key: keyof T, valueOrFieldValidator: any]) => {
+        _allKeys.push(key);
+        let fieldValidator: FieldValidator<ExtractFromFieldValidator<T[keyof T]>> | FieldValidator<T[keyof T]>;
+        if (isUseFieldValidatorReturn<ExtractFromFieldValidator<T[keyof T]>>(valueOrFieldValidator)) {
+            fieldValidator = valueOrFieldValidator;
+        } else {
+            const value = valueOrFieldValidator;
+            const validator = validators[key];
+            const immediate: boolean = typeof _immediate === 'boolean' ? _immediate : !!_immediate[key as keyof T];
+            fieldValidator = useFieldValidator(value, validator, immediate);
+        }
 
         const {
             value, setValue, validationResult, isInvalid, invalidText, reset, resetValidation, validate,
-        } = useValueValidator(_forms[key], validator, immediate);
-
+        } = fieldValidator;
         forms[key] = value;
         valueSetters[key] = setValue;
         validationResults[key] = validationResult;
@@ -247,54 +204,51 @@ export function useFormValidator<T extends Record<string, any> = any>(
         validateMap[key] = validate;
     });
 
-    const isAllValid = computed<boolean>(() => Object.values(validationResults).every((validationResult) => validationResult.value));
+    const results = Object.values(validationResults);
+    const isAllValid = computed<boolean>(() => {
+        if (results.length === 0) return true;
+        return results.every((r) => r.value);
+    });
 
-    const setForm = (key: keyof T | T, value?: T[keyof T]) => {
-        if (typeof key === 'object') {
+    const setForm = <K extends keyof T = keyof T>(key: K | Partial<RawForms<T>>, value?: FieldValue<T, K>) => {
+        if (typeof key === 'object') { // if key is an object, update forms by the object
             const newForm = key;
             Object.keys(newForm).forEach((k) => {
                 const setter = valueSetters[k];
-                if (setter) setter(newForm[k]);
+                if (setter) setter(newForm[k] as UnwrapRef<T[K]>); // as UnwrapRef<T[K]> is needed to avoid type error
             });
         } else {
             const setter = valueSetters[key];
-            if (setter) setter(value as unknown as T[keyof T]);
-        }
-    };
-
-    const initForm = (key?: keyof T | T, value?: T[keyof T]) => {
-        if (typeof key === 'object' || key === undefined) {
-            const newForm = key ?? _forms;
-            Object.keys(newForm).forEach((k) => {
-                const setter = valueSetters[k];
-                if (setter) {
-                    setter(newForm[k]);
-                    resetValidationMap[k]();
-                }
-            });
-        } else {
-            const setter = valueSetters[key];
-            if (setter) {
-                setter(value as unknown as T[keyof T]);
-                resetValidationMap[key]();
-            }
+            if (setter) setter(value as UnwrapRef<T[K]>); // as UnwrapRef<T[K]> is needed to avoid type error
         }
     };
 
     const resetAll = () => {
-        formKeys.forEach((key) => {
+        _allKeys.forEach((key) => {
             resets[key]();
         });
     };
 
+    // TODO: Remove in the future.
+    /*
+    * @willBeDeprecated Use resetAll() instead.
+    */
+    const initForm = () => {
+        resetAll();
+    };
+
+    const resetValidation = (key: keyof T) => {
+        if (resetValidationMap[key]) resetValidationMap[key]();
+    };
+
     const resetValidations = () => {
-        formKeys.forEach((key) => {
+        _allKeys.forEach((key) => {
             resetValidationMap[key]();
         });
     };
 
     const validateAll = () => {
-        formKeys.forEach((key) => {
+        _allKeys.forEach((key) => {
             validateMap[key]();
         });
     };
@@ -311,6 +265,7 @@ export function useFormValidator<T extends Record<string, any> = any>(
         initForm,
         setForm,
         resetAll,
+        resetValidation,
         resetValidations,
         validateAll,
         validate,

@@ -36,8 +36,8 @@ import {
     computed, reactive,
 } from 'vue';
 
+import PIconButton from '@/controls/buttons/icon-button/PIconButton.vue';
 import { useProxyValue } from '@/hooks';
-import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import type { PaginationSize } from '@/navigation/pagination/pagination/type';
 import { PAGINATION_SIZE } from '@/navigation/pagination/pagination/type';
 

@@ -10,8 +10,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PDataLoader, PSelectButton, PSelectDropdown,
 } from '@cloudforet/mirinae';
-import type { SelectButtonType } from '@cloudforet/mirinae/types/inputs/buttons/select-button-group/type';
-import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+import type { SelectButtonType } from '@cloudforet/mirinae/types/controls/buttons/select-button-group/type';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';

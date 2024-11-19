@@ -14,7 +14,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PSelectButton, PCollapsibleToggle, PDataTable, PI, PIconButton, PSkeleton, PSelectDropdown, PLazyImg,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import { numberFormatter } from '@cloudforet/utils';
 
 import { i18n } from '@/translations';

@@ -7,11 +7,11 @@ import dayjs from 'dayjs';
 import { range } from 'lodash';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
+import PButton from '@/controls/buttons/button/PButton.vue';
 import PBadge from '@/data-display/badge/PBadge.vue';
 import { CARD_STYLE_TYPE } from '@/data-display/cards/card/config';
 import { getListCardArgTypes, getListCardParameters, getListCardArgs } from '@/data-display/cards/list-card/story-helper';
 import PI from '@/foundation/icons/PI.vue';
-import PButton from '@/inputs/buttons/button/PButton.vue';
 
 import PListCard from './PListCard.vue';
 

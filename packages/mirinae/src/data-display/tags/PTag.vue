@@ -39,8 +39,8 @@
 import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
 
+import type { CategoryItem, KeyItem, ValueItem } from '@/controls/search/query-search/type';
 import PI from '@/foundation/icons/PI.vue';
-import type { CategoryItem, KeyItem, ValueItem } from '@/inputs/search/query-search/type';
 
 interface Props {
     keyItem?: KeyItem;

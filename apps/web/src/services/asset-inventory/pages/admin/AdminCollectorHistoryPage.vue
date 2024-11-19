@@ -17,8 +17,8 @@ import {
     PHeading, PPagination, PLazyImg, PLink,
     PSelectButtonGroup, PStatus, PToolboxTable,
 } from '@cloudforet/mirinae';
+import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
-import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
 import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 
 import { SpaceRouter } from '@/router';
