@@ -239,7 +239,7 @@ const setRoleMap = async () => {
                             <img :src="useRoleFormatter(item.role_type).image"
                                  alt="role-type-icon"
                                  class="role-type-icon"
-                            ><span>{{ tableState.roleMap[item.role_id]?.name }}</span>
+                            ><span class="role-name">{{ tableState.roleMap[item.role_id]?.name }}</span>
                         </template>
                         <!-- eslint-disable vue/no-template-shadow -->
                         <template #menu-item--format="{ item }">
@@ -331,6 +331,10 @@ const setRoleMap = async () => {
             .role-type {
                 @apply text-label-sm text-gray-400;
             }
+        }
+        .role-name {
+            @apply truncate;
+            max-width: 19.375rem;
         }
     }
 

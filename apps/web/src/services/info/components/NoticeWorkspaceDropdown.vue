@@ -188,7 +188,6 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
 <style scoped lang="postcss">
 .notice-workspace-dropdown-wrapper {
     .notice-workspace-dropdown {
-        width: 50%;
         margin-top: 0.25rem;
         &.is-main {
             .menu-item-wrapper {
@@ -216,6 +215,10 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
         .selected-workspace-wrapper {
             @apply flex items-center;
             gap: 0.25rem;
+            .label {
+                @apply break-normal;
+                flex: 1;
+            }
         }
         .placeholder {
             @apply text-gray-600;

@@ -212,7 +212,7 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
                 @apply flex flex-grow items-center text-gray-800;
                 gap: 0.25rem;
                 .selected-item-text {
-                    @apply font-medium;
+                    @apply font-medium break-normal;
                 }
                 .selected-item-badge {
                     margin-left: 0.25rem;

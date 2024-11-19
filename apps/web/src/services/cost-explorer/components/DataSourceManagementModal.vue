@@ -161,7 +161,7 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
                                                  :theme="getWorkspaceInfo(dropdownState.selectedMenuId)?.tags?.theme"
                                                  size="xs"
                             />
-                            <span>{{ getWorkspaceInfo(dropdownState.selectedMenuId)?.name || '' }}</span>
+                            <span class="label">{{ getWorkspaceInfo(dropdownState.selectedMenuId)?.name || '' }}</span>
                         </div>
                         <span v-else
                               class="select"
@@ -173,7 +173,7 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
                                                  :theme="getWorkspaceInfo(item.name)?.tags?.theme"
                                                  size="xs"
                             />
-                            <span>{{ item.label }}</span>
+                            <span class="label">{{ item.label }}</span>
                             <span class="state"
                                   :class="[getWorkspaceInfo(item.name)?.state.toLowerCase()]"
                             />
@@ -203,6 +203,9 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
             .workspace-wrapper {
                 @apply flex items-center;
                 gap: 0.25rem;
+                .label {
+                    @apply break-normal;
+                }
             }
             .select {
                 @apply text-gray-600;
@@ -220,6 +223,10 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
                     &.disabled {
                         @apply bg-gray-300;
                     }
+                }
+                .label {
+                    @apply truncate;
+                    max-width: 21rem;
                 }
                 .description {
                     @apply text-label-md text-gray-500;
