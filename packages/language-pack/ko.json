@@ -1753,6 +1753,9 @@
 				"DESCRIPTION": "텍스트가 열 너비에 맞게 자동으로 줄바꿈됩니다.",
 				"TEXT_WRAP": "텍스트 줄바꿈"
 			},
+			"TOOLTIP_NUMBER_FORMAT": {
+				"TOOLTIP_NUMBER_FORMAT": ""
+			},
 			"TOP_PROJECTS": {
 				"CREATE_PROJECT": "프로젝트 생성",
 				"NO_PROJECT": "프로젝트 없음",

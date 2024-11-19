@@ -1753,6 +1753,9 @@
 				"DESCRIPTION": "Text is wrapped to fit the column width.",
 				"TEXT_WRAP": "Text Wrap"
 			},
+			"TOOLTIP_NUMBER_FORMAT": {
+				"TOOLTIP_NUMBER_FORMAT": "Tooltip Number Format"
+			},
 			"TOP_PROJECTS": {
 				"CREATE_PROJECT": "Create Project",
 				"NO_PROJECT": "No Project",
