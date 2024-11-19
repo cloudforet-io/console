@@ -13,8 +13,8 @@ import {
     PButton, PToolboxTable, PHeading, PI, PHeadingLayout, PSelectStatus, PProgressBar,
 } from '@cloudforet/mirinae';
 import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
-import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
-import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
+import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
+import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
 import type { CostJobStatus } from '@/schema/cost-analysis/job/type';
 import { store } from '@/store';
