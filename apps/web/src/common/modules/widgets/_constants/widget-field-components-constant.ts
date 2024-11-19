@@ -29,6 +29,7 @@ import subTotal from '@/common/modules/widgets/_widget-fields/sub-total/WidgetFi
 import tableColumnWidth from '@/common/modules/widgets/_widget-fields/table-column-width/WidgetFieldTableColumnWidth.vue';
 import tableDataField from '@/common/modules/widgets/_widget-fields/table-data-field/WidgetFieldTableDataField.vue';
 import textWrap from '@/common/modules/widgets/_widget-fields/text-wrap/WidgetFieldTextWrap.vue';
+import tooltipNumberFormat from '@/common/modules/widgets/_widget-fields/tooltip-number-format/WidgetFieldTooltipNumberFormat.vue';
 import total from '@/common/modules/widgets/_widget-fields/total/WidgetFieldTotal.vue';
 import widgetHeight from '@/common/modules/widgets/_widget-fields/widget-height/WidgetFieldWidgetHeight.vue';
 import xAxis from '@/common/modules/widgets/_widget-fields/x-axis/WidgetFieldXAxis.vue';
@@ -70,4 +71,5 @@ export const WIDGET_FIELD_COMPONENTS: Record<Partial<WidgetFieldName>, Component
     customTableColumnWidth,
     missingValue,
     widgetHeight,
+    tooltipNumberFormat,
 };

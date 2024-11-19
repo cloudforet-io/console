@@ -31,6 +31,7 @@ const lineChart: WidgetConfig = {
             },
         },
         numberFormat: {},
+        tooltipNumberFormat: {},
         displaySeriesLabel: {},
         missingValue: {},
         displayAnnotation: {},
