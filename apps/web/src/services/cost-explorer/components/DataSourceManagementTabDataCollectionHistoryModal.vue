@@ -66,8 +66,8 @@ const state = reactive({
     startDates: [] as string[],
     startDateSetting: computed<DateOption>(() => {
         const today = dayjs.utc();
-        const minDate = today.subtract(35, 'month').format('MMMM YYYY');
-        const maxDate = today.format('MMMM YYYY');
+        const minDate = today.subtract(12, 'month').format('YYYY-MM');
+        const maxDate = today.format('YYYY-MM');
         return { minDate, maxDate };
     }),
     modalValidation: computed<boolean>(() => {
@@ -82,9 +82,6 @@ const state = reactive({
 const handleUpdateSelectedDates = (selectedDates: string[]) => {
     if (!selectedDates.length) return;
 
-    const originDates = state.startDates;
-    if (dayjs.utc(originDates[0]).isSame(dayjs.utc(selectedDates[0]), 'day')) return;
-
     state.startDates = selectedDates;
 };
 const handleChangeToggleButton = () => {
@@ -92,10 +89,9 @@ const handleChangeToggleButton = () => {
 };
 
 const handleConfirmButton = async () => {
-    if (props.modalType === 'ERROR') return;
-
     try {
         state.loading = true;
+        if (props.modalType === 'ERROR') return;
         if (props.modalType === 'RE-SYNC' || props.modalType === 'RESTART') {
             await dataSourcesPageStore.fetchSyncDatasource({
                 start: state.toggleValue ? undefined : dayjs(state.startDates[0]).format('YYYY-MM'),
@@ -159,6 +155,7 @@ const handleConfirmButton = async () => {
                     <p-toggle-button :value.sync="state.toggleValue"
                                      class="toggle-button"
                                      show-state-text
+                                     :disabled="state.loading"
                                      :true-state-text="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.AUTO')"
                                      :false-state-text="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.MANUAL')"
                                      @change-toggle="handleChangeToggleButton"
