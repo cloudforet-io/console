@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import {
-    onBeforeMount, toRef, ref, computed,
+    onBeforeMount, toRef, ref, computed, watch, nextTick,
 } from 'vue';
 
 import {
-    POverlayLayout, PFieldGroup, PTextInput, PTextarea, PSelectDropdown, PButton, PToggleButton,
+    POverlayLayout, PFieldGroup, PTextInput, PTextarea, PSelectDropdown, PButton,
 } from '@cloudforet/mirinae';
 
 import type { PackageModel } from '@/schema/identity/package/model';
@@ -21,6 +21,7 @@ import { useTaskManagementPageStore } from '@/services/itsm/stores/admin/task-ma
 const workspaceReferenceStore = useWorkspaceReferenceStore();
 const taskManagementPageStore = useTaskManagementPageStore();
 const taskManagementPageState = taskManagementPageStore.state;
+const taskManagementPageGetters = taskManagementPageStore.getters;
 const packageStore = taskManagementPageStore.packageStore;
 const taskCategoryStore = taskManagementPageStore.taskCategoryStore;
 
@@ -40,8 +41,8 @@ const {
 
 /* category */
 const {
-    categoryMenuItems,
     selectedCategoryItems,
+    categoryMenuItemsHandler,
     categoryValidator,
     handleUpdateSelectedCategories,
     setInitialCategories,
@@ -54,17 +55,17 @@ const {
 /* form */
 const {
     forms: {
-        name, description, isDefaultPackage,
+        name, description,
     },
     invalidState,
     invalidTexts,
     setForm, isAllValid,
+    resetValidations,
 } = useFormValidator({
     name: '',
     description: '',
     categories: categoryValidator,
     workspaces: workspaceValidator,
-    isDefaultPackage: false,
 }, {
     name(value: string) {
         if (!value.trim().length) return 'Name is required';
@@ -124,16 +125,28 @@ const handleConfirm = async () => {
 
 onBeforeMount(() => {
     workspaceReferenceStore.load();
-    if (taskManagementPageState.editTargetPackageId) {
-        const targetPackage = packageStore.state.packages?.find((p) => p.package_id === taskManagementPageState.editTargetPackageId);
-        if (targetPackage) {
-            setForm({
-                name: targetPackage.name,
-                description: targetPackage.description,
-            });
-            setInitialWorkspaces(targetPackage.package_id);
-            setInitialCategories(targetPackage.package_id);
-        }
+});
+
+watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPageGetters.editTargetPackage], async ([visible, targetPackage], [prevVisible]) => {
+    if (!visible) {
+        if (!prevVisible) return; // prevent initial call
+        await nextTick(); // wait for closing animation
+        setForm({
+            name: '',
+            description: '',
+        });
+        setInitialWorkspaces();
+        setInitialCategories();
+        resetValidations();
+        return;
+    }
+    if (targetPackage) {
+        setForm({
+            name: targetPackage.name,
+            description: targetPackage.description,
+        });
+        setInitialWorkspaces(targetPackage.package_id);
+        setInitialCategories(targetPackage.package_id);
     }
 });
 </script>
@@ -144,41 +157,61 @@ onBeforeMount(() => {
                       :visible="taskManagementPageState.visiblePackageForm"
                       @close="handleCancelOrClose"
     >
-        <template #contents>
-            <p-field-group label="Name"
-                           required
-                           :invalid="!loading && invalidState.name"
-                           :invalid-text="invalidTexts.name"
-            >
-                <template #default="{ invalid }">
-                    <p-text-input :value="name"
-                                  :invalid="invalid"
-                                  @update:value="setForm('name', $event)"
+        <template #default>
+            <div class="p-6 w-full">
+                <p-field-group label="Name"
+                               required
+                               :invalid="!loading && invalidState.name"
+                               :invalid-text="invalidTexts.name"
+                >
+                    <template #default="{ invalid }">
+                        <p-text-input :value="name"
+                                      :invalid="invalid"
+                                      @update:value="setForm('name', $event)"
+                        />
+                    </template>
+                </p-field-group>
+                <p-field-group label="Description"
+                               required
+                               :invalid="invalidState.description"
+                               :invalid-text="invalidTexts.description"
+                >
+                    <p-textarea :value="description"
+                                :invalid="invalidState.description"
+                                placeholder="Describe this support package in a few words."
+                                @update:value="setForm('description', $event)"
                     />
-                </template>
-            </p-field-group>
-            <p-field-group label="Description"
-                           required
-                           :invalid="invalidState.description"
-                           :invalid-text="invalidTexts.description"
-            >
-                <p-textarea :value="description"
-                            :invalid="invalidState.description"
-                            placeholder="Describe this support package in a few words."
-                            @update:value="setForm('description', $event)"
-                />
-            </p-field-group>
-            <p-field-group :invalid="invalidState.workspaces"
-                           :invalid-text="invalidTexts.workspaces"
-                           label="Workspace"
-            >
-                <div class="mt-2">
-                    <p-select-dropdown :selected="selectedWorkspaceItems"
-                                       :invalid="invalidState.workspaces"
-                                       :handler="workspaceMenuItemsHandler"
-                                       :page-size="10"
+                </p-field-group>
+                <p-field-group :invalid="invalidState.workspaces"
+                               :invalid-text="invalidTexts.workspaces"
+                               label="Workspace"
+                >
+                    <div class="mt-2">
+                        <p-select-dropdown :selected="selectedWorkspaceItems"
+                                           :invalid="invalidState.workspaces"
+                                           :handler="workspaceMenuItemsHandler"
+                                           :page-size="10"
+                                           appearance-type="badge"
+                                           menu-position="left"
+                                           show-select-marker
+                                           multi-selectable
+                                           use-fixed-menu-style
+                                           block
+                                           show-clear-selection
+                                           is-filterable
+                                           init-selected-with-handler
+                                           @update:selected="handleUpdateSelectedWorkspaces"
+                        />
+                    </div>
+                </p-field-group>
+                <p-field-group label="Category"
+                               :invalid="invalidState.categories"
+                               :invalid-text="invalidTexts.categories"
+                >
+                    <p-select-dropdown :selected="selectedCategoryItems"
+                                       :handler="categoryMenuItemsHandler"
+                                       :invalid="invalidState.categories"
                                        appearance-type="badge"
-                                       menu-position="left"
                                        show-select-marker
                                        multi-selectable
                                        use-fixed-menu-style
@@ -186,54 +219,27 @@ onBeforeMount(() => {
                                        show-clear-selection
                                        is-filterable
                                        init-selected-with-handler
-                                       @update:selected="handleUpdateSelectedWorkspaces"
+                                       @update:selected="handleUpdateSelectedCategories"
                     />
-                </div>
-            </p-field-group>
-            <p-field-group label="Category"
-                           class="pb-6"
-                           required
-                           :invalid="invalidState.categories"
-                           :invalid-text="invalidTexts.categories"
-            >
-                <p-select-dropdown :selected="selectedCategoryItems"
-                                   :menu="categoryMenuItems"
-                                   :invalid="invalidState.categories"
-                                   appearance-type="badge"
-                                   show-select-marker
-                                   multi-selectable
-                                   use-fixed-menu-style
-                                   block
-                                   show-clear-selection
-                                   @update:selected="handleUpdateSelectedCategories"
-                />
-            </p-field-group>
-            <p-field-group label="Set as Default Package"
-                           class="pb-6"
-                           required
-                           :invalid="invalidState.categories"
-                           :invalid-text="invalidTexts.categories"
-            >
-                <p-toggle-button :value="isDefaultPackage"
-                                 @update:value="setForm('isDefaultPackage', $event)"
-                />
-            </p-field-group>
+                </p-field-group>
+            </div>
         </template>
         <template #footer>
-            <p-button style-type="transparent"
-                      :disabled="loading"
-                      @click="handleCancelOrClose"
-            >
-                Cancel
-            </p-button>
-            <p-button class="ml-3"
-                      style-type="primary"
-                      :loading="loading"
-                      :disabled="!isAllValid"
-                      @click="handleConfirm"
-            >
-                Confirm
-            </p-button>
+            <div class="p-3 flex flex-wrap gap-3 justify-end">
+                <p-button style-type="transparent"
+                          :disabled="loading"
+                          @click="handleCancelOrClose"
+                >
+                    Cancel
+                </p-button>
+                <p-button style-type="primary"
+                          :loading="loading"
+                          :disabled="!isAllValid"
+                          @click="handleConfirm"
+                >
+                    Confirm
+                </p-button>
+            </div>
         </template>
     </p-overlay-layout>
 </template>

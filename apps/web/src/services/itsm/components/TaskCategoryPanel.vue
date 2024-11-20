@@ -46,7 +46,7 @@ const state = reactive({
 });
 
 onBeforeMount(() => {
-    taskCategoryStore.fetchCategories();
+    // taskCategoryStore.fetchCategories();
 });
 </script>
 
@@ -73,7 +73,7 @@ onBeforeMount(() => {
             티켓의 유형을 그룹화한 것입니다. 고객은 티켓을 제출할 때 적절한 카테고리를 선택하여 담당자가 티켓을 효율적으로 관리할 수 있게 돕습니다.
         </p>
         <p-data-table :loading="taskCategoryStore.state.loading"
-                      :items="taskCategoryStore.state.taskCategories"
+                      :items="taskCategoryStore.getters.taskCategories"
                       :fields="state.categoryFields"
         >
             <template #col-package-format="{ item }">

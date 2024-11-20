@@ -1,7 +1,7 @@
 import type { Ref } from 'vue';
 import { computed, ref } from 'vue';
 
-import { getTextHighlightRegex } from '@cloudforet/mirinae/src';
+import { getTextHighlightRegex } from '@cloudforet/mirinae';
 import type { AutocompleteHandler, SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 
@@ -90,7 +90,8 @@ export const useWorkspaceField = ({
     //     // TODO: handle error
     //     }
     // };
-    const applyPackageToWorkspaces = async () => { // (packageId: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const applyPackageToWorkspaces = async (packageId: string) => {
         try {
             // const addedWorkspaces = selectedWorkspaceIds.value.filter((id) => !prevSelectedWorkspaceIds.value.includes(id));
             // const removedWorkspaces = prevSelectedWorkspaceIds.value.filter((id) => !selectedWorkspaceIds.value.includes(id));

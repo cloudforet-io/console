@@ -1,3 +1,5 @@
+import { asyncComputed } from '@vueuse/core';
+import type { Ref, DeepReadonly } from 'vue';
 import { reactive } from 'vue';
 
 import { defineStore } from 'pinia';
@@ -9,19 +11,25 @@ import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
 
 interface UseTaskCategoryStoreState {
     loading: boolean;
-    taskCategories?: TaskCategoryModel[];
+    items?: TaskCategoryModel[];
 }
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface UseTaskCategoryStoreGetters {
+    taskCategories: Ref<DeepReadonly<TaskCategoryModel[]>>
 }
 
 export const useTaskCategoryStore = defineStore('task-category', () => {
     const state = reactive<UseTaskCategoryStoreState>({
         loading: false,
-        taskCategories: undefined,
+        items: undefined,
     }) as UseTaskCategoryStoreState;
 
     const getters = reactive<UseTaskCategoryStoreGetters>({
+        taskCategories: asyncComputed<TaskCategoryModel[]>(async () => {
+            if (state.items === undefined) {
+                await actions.fetchCategories();
+            }
+            return state.items ?? [];
+        }, [], { lazy: true }),
     });
 
     const actions = {
@@ -29,7 +37,7 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
             return new Promise<void>((resolve) => {
                 state.loading = true;
                 setTimeout(() => {
-                    state.taskCategories = [
+                    state.items = [
                         {
                             category_id: 'category_1',
                             package_id: 'package_1',
@@ -167,7 +175,7 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
         async createCategory(param: Omit<TaskCategoryCreateParameters, 'status_options'|'package_id'>) {
             return new Promise<TaskCategoryModel>((resolve) => {
                 const result: TaskCategoryModel = {
-                    category_id: `category_${(state.taskCategories?.length ?? 0) + 1}`,
+                    category_id: `category_${(getters.taskCategories.length) + 1}`,
                     package_id: 'package_1', // default package id
                     name: param.name,
                     description: param.description ?? '',
@@ -203,14 +211,14 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
                     updated_at: '2021-09-01T00:00:00',
                     tags: param.tags ?? {},
                 };
-                state.taskCategories?.push(result);
+                state.items?.push(result);
                 resolve(result);
             });
         },
         async updateCategory(param: Omit<TaskCategoryUpdateParameters, 'status_options'>) {
             return new Promise<TaskCategoryModel>((resolve, reject) => {
                 setTimeout(() => {
-                    const targetCategory = state.taskCategories?.find((category) => category.category_id === param.category_id);
+                    const targetCategory = state.items?.find((category) => category.category_id === param.category_id);
                     if (targetCategory) {
                         if (param.name) targetCategory.name = param.name;
                         if (param.description) targetCategory.description = param.description ?? '';

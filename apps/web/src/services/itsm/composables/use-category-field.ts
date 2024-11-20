@@ -2,7 +2,7 @@ import type { Ref, DeepReadonly } from 'vue';
 import { computed, ref } from 'vue';
 
 import { getTextHighlightRegex } from '@cloudforet/mirinae';
-import type { AutocompleteHandler, SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+import type { AutocompleteHandler, SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { PackageModel } from '@/schema/identity/package/model';
 
@@ -10,6 +10,9 @@ import { useFieldValidator } from '@/common/composables/form-validator';
 
 import type { useTaskCategoryStore } from '@/services/itsm/stores/admin/task-category-store';
 
+interface CategoryItem extends SelectDropdownMenuItem {
+    packageId: string;
+}
 export const useCategoryField = ({
     defaultPackage,
     taskCategoryStore,
@@ -17,28 +20,24 @@ export const useCategoryField = ({
     defaultPackage: DeepReadonly<Ref<PackageModel|undefined>>;
     taskCategoryStore: ReturnType<typeof useTaskCategoryStore>
 }) => {
-    const taskCategoryState = taskCategoryStore.state;
-
-    const categoryMenuItems = computed<SelectDropdownMenuItem[]>(() => taskCategoryState.taskCategories?.map((c) => ({ name: c.category_id, label: c.name })) || []);
-    const categoryValidator = useFieldValidator<SelectDropdownMenuItem[]>(
+    const categoryValidator = useFieldValidator<CategoryItem[]>(
         [],
     );
     const selectedCategoryItems = categoryValidator.value;
     const selectedCategoryIds = computed<string[]>(() => selectedCategoryItems.value.map((c) => c.name));
 
-    const handleUpdateSelectedCategories = (selectedCategories: SelectDropdownMenuItem[]) => {
+    const handleUpdateSelectedCategories = (selectedCategories: CategoryItem[]) => {
         categoryValidator.setValue(selectedCategories);
     };
 
-    const allCategoryItems = computed<SelectDropdownMenuItem[]>(() => taskCategoryState.taskCategories?.map((c) => ({ name: c.category_id, label: c.name })) || []);
-    const categoryItemsByPackage = computed<Record<string, SelectDropdownMenuItem[]>>(() => {
-        if (taskCategoryState.taskCategories === undefined) return {};
-        const map: Record<string, SelectDropdownMenuItem[]> = {};
+    const allCategoryItems = computed<CategoryItem[]>(() => taskCategoryStore.getters.taskCategories.map((c) => ({ name: c.category_id, label: c.name, packageId: c.package_id })) || []);
+    const categoryItemsByPackage = computed<Record<string, CategoryItem[]>>(() => {
+        const map: Record<string, CategoryItem[]> = {};
         allCategoryItems.value.forEach((item) => {
-            if (Array.isArray(map[item.name])) {
-                map[item.name].push(item);
+            if (Array.isArray(map[item.packageId])) {
+                map[item.packageId].push(item);
             } else {
-                map[item.name] = [item];
+                map[item.packageId] = [item];
             }
         });
         return map;
@@ -53,7 +52,7 @@ export const useCategoryField = ({
         };
     };
 
-    const prevSelectedCategoryItems = ref<SelectDropdownMenuItem[]>([]);
+    const prevSelectedCategoryItems = ref<CategoryItem[]>([]);
     const prevSelectedCategoryIds = computed<string[]>(() => prevSelectedCategoryItems.value.map((c) => c.name));
     const setInitialCategories = (packageId?: string) => {
         prevSelectedCategoryItems.value = packageId ? categoryItemsByPackage.value[packageId] ?? [] : [];
@@ -101,7 +100,6 @@ export const useCategoryField = ({
     };
 
     return {
-        categoryMenuItems,
         selectedCategoryItems,
         selectedCategoryIds,
         categoryValidator,

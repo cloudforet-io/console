@@ -26,7 +26,7 @@ const {
     name(value: string) {
         if (!value.trim().length) return 'Name is required';
         if (value.length > 50) return 'Name should be less than 50 characters';
-        if (taskCategoryStore.state.taskCategories?.some((p) => taskManagementPageState.editTargetCategoryId !== p.category_id && p.name === value)) return 'Name already exists';
+        if (taskCategoryStore.getters.taskCategories.some((p) => taskManagementPageState.editTargetCategoryId !== p.category_id && p.name === value)) return 'Name already exists';
         return true;
     },
     description(value: string) {
@@ -59,7 +59,7 @@ const handleConfirm = async () => {
 
 onBeforeMount(() => {
     if (taskManagementPageState.editTargetCategoryId) {
-        const targetCategory = taskCategoryStore.state.taskCategories?.find((p) => p.category_id === taskManagementPageState.editTargetCategoryId);
+        const targetCategory = taskCategoryStore.getters.taskCategories.find((p) => p.category_id === taskManagementPageState.editTargetCategoryId);
         if (targetCategory) {
             setForm('name', targetCategory.name);
             setForm('description', targetCategory.description);

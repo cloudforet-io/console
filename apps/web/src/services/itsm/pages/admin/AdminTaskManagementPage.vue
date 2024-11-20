@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import {
-    PHeading,
-} from '@cloudforet/mirinae';
+import { PHeading } from '@cloudforet/mirinae';
 
 import CategoryForm from '@/services/itsm/components/CategoryForm.vue';
 import EnableLandingPanel from '@/services/itsm/components/EnableLandingPanel.vue';
@@ -26,8 +24,8 @@ const taskManagementPageState = taskManagementPageStore.state;
         <task-category-panel class="mb-4" />
         <enable-landing-panel />
         <!-- Overlay Modals -->
-        <package-form v-if="taskManagementPageState.visiblePackageForm" />
-        <category-form v-if="taskManagementPageState.visibleCategoryForm" />
+        <package-form :visible="taskManagementPageState.visiblePackageForm" />
+        <category-form :visible="taskManagementPageState.visibleCategoryForm" />
     </div>
 </template>
 

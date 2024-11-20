@@ -1,6 +1,9 @@
-import { reactive } from 'vue';
+import type { ComputedRef } from 'vue';
+import { reactive, computed } from 'vue';
 
 import { defineStore } from 'pinia';
+
+import type { PackageModel } from '@/schema/identity/package/model';
 
 import { usePackageStore } from '@/services/itsm/stores/admin/package-store';
 import { useTaskCategoryStore } from '@/services/itsm/stores/admin/task-category-store';
@@ -16,8 +19,8 @@ interface UseTaskManagementPageStoreState {
     editTargetCategoryId?: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface UseTaskManagementPageStoreGetters {
+    editTargetPackage: ComputedRef<PackageModel|undefined>
 }
 
 export const useTaskManagementPageStore = defineStore('task-management-page', () => {
@@ -34,6 +37,7 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
         editTargetCategoryId: undefined,
     });
     const getters = reactive<UseTaskManagementPageStoreGetters>({
+        editTargetPackage: computed<PackageModel|undefined>(() => packageStore.state.packages?.find((p) => p.package_id === state.editTargetPackageId)),
     });
     const actions = {
         setCurrentTemplateId(templateId: string) {

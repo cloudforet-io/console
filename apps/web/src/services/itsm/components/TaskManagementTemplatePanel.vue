@@ -4,7 +4,7 @@ import { reactive, computed } from 'vue';
 import {
     PPaneLayout, PHeading, PSelectDropdown, PI,
 } from '@cloudforet/mirinae';
-import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import { useTaskManagementPageStore } from '@/services/itsm/stores/admin/task-management-page-store';
 
