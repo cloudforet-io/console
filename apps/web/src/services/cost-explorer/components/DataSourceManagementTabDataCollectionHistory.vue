@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, reactive, watch,
+    computed, onMounted, onUnmounted, reactive, watch,
 } from 'vue';
 
 import dayjs from 'dayjs';
@@ -38,6 +38,7 @@ const dataSourcesPageState = dataSourcesPageStore.state;
 const dataSourcesPageGetters = dataSourcesPageStore.getters;
 
 const storeState = reactive({
+    dataSourceLoading: computed<boolean>(() => dataSourcesPageState.dataSourceLoading),
     selectedItem: computed<DataSourceItem>(() => dataSourcesPageGetters.selectedDataSourceItem),
     jobList: computed<CostJobItem[]>(() => dataSourcesPageGetters.jobList),
     totalCount: computed<number>(() => dataSourcesPageState.jobListTotalCount),
@@ -174,6 +175,12 @@ const handleSelectStatus = (selected: string) => {
 const handleConfirmModal = () => {
     fetchJobList();
 };
+const initJobTableData = async () => {
+    tableState.pageStart = 0;
+    tableState.pageLimit = 15;
+    tableState.selectedStatusFilter = 'ALL';
+    await fetchJobList();
+};
 
 let jobListApiQueryHelper = new ApiQueryHelper();
 let jobListApiQuery = jobListApiQueryHelper.data;
@@ -217,13 +224,21 @@ watch(() => tableState.selectedStatusFilter, async (selectedStatusFilter) => {
     }
 
     await fetchJobList();
-}, { immediate: true });
-watch([() => storeState.activeTab, () => storeState.selectedItem], async () => {
-    tableState.pageStart = 0;
-    tableState.pageLimit = 15;
+});
+watch(() => storeState.selectedItem, () => {
+    if (storeState.dataSourceLoading) return;
+    state.loading = true;
     tableState.selectedStatusFilter = 'ALL';
-    await fetchJobList();
-}, { immediate: true });
+    initJobTableData();
+});
+
+onMounted(() => {
+    tableState.selectedStatusFilter = 'ALL';
+    initJobTableData();
+});
+onUnmounted(() => {
+    dataSourcesPageStore.jobReset();
+});
 </script>
 
 <template>

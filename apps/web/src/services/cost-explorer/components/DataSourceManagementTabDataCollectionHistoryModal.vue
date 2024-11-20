@@ -59,14 +59,14 @@ const state = reactive({
     }),
     toggleValue: true,
     thisMonthRange: computed<string>(() => {
-        const start = dayjs.utc().startOf('month').format('DD MMMM YYYY');
-        const end = dayjs.utc().format('DD MMMM YYYY');
+        const start = dayjs.utc().startOf('month').format('YYYY-MM-DD');
+        const end = dayjs.utc().format('YYYY-MM-DD');
         return `${start} ~ ${end}`;
     }),
     startDates: [] as string[],
     startDateSetting: computed<DateOption>(() => {
         const today = dayjs.utc();
-        const minDate = today.subtract(12, 'month').format('YYYY-MM');
+        const minDate = today.subtract(10, 'month').format('YYYY-MM');
         const maxDate = today.format('YYYY-MM');
         return { minDate, maxDate };
     }),
