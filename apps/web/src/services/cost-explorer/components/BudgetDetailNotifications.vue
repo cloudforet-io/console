@@ -4,7 +4,7 @@ import { computed, reactive } from 'vue';
 import {
     PLink, PBadge, PButton, PCard, PIconButton, PSpinner,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 import { i18n } from '@/translations';
 

@@ -21,7 +21,7 @@ import type { TranslateResult } from 'vue-i18n';
 import type { StateDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/state/type';
 import PStatus from '@/data-display/status/PStatus.vue';
 import type { StatusProps } from '@/data-display/status/type';
-import PLink from '@/inputs/link/PLink.vue';
+import PLink from '@/navigation/link/PLink.vue';
 import { getColor } from '@/utils/helpers';
 
 

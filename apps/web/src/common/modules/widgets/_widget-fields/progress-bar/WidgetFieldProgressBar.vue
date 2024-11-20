@@ -8,7 +8,7 @@ import { cloneDeep } from 'lodash';
 import {
     PFieldGroup, PTextInput, PToggleButton, PSelectDropdown, PButton, PIconButton,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
 import { useProxyValue } from '@/common/composables/proxy-state';

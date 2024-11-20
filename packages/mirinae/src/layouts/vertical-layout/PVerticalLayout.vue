@@ -5,7 +5,8 @@ import {
 
 import PTooltip from '@/data-display/tooltips/PTooltip.vue';
 import PI from '@/foundation/icons/PI.vue';
-import { screens } from '@/index';
+
+import screens from '@/styles/screens.cjs';
 
 const MOBILE_WIDTH = '312';
 

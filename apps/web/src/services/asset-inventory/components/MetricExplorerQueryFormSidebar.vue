@@ -187,6 +187,7 @@ watch(() => metricExplorerPageState.showMetricQueryFormSidebar, (visible) => {
                 >
                     <p-text-input :value="name"
                                   :invalid="invalidState.name"
+                                  block
                                   @update:value="setForm('name', $event)"
                     />
                 </p-field-group>
@@ -215,6 +216,7 @@ watch(() => metricExplorerPageState.showMetricQueryFormSidebar, (visible) => {
                     <p-text-input v-if="metricExplorerPageState.metricQueryFormMode !== 'VIEW'"
                                   :value="unit"
                                   placeholder="Count"
+                                  block
                                   @update:value="setForm('unit', $event)"
                     />
                     <p v-else
@@ -278,9 +280,6 @@ watch(() => metricExplorerPageState.showMetricQueryFormSidebar, (visible) => {
         flex-direction: column;
         width: 100%;
         padding: 0 1.5rem;
-        :deep(.p-text-input) {
-            width: 100%;
-        }
 
         .query-field {
             @apply col-span-12;

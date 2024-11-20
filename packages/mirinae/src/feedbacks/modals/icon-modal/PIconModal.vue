@@ -72,11 +72,12 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
 
+import PButton from '@/controls/buttons/button/PButton.vue';
+import { BUTTON_STYLE } from '@/controls/buttons/button/type';
 import PLazyImg from '@/feedbacks/loading/lazy-img/PLazyImg.vue';
 import { useProxyValue } from '@/hooks';
-import PButton from '@/inputs/buttons/button/PButton.vue';
+
 import '../modal.pcss';
-import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
 
 const PI = () => import('@/foundation/icons/PI.vue');
 

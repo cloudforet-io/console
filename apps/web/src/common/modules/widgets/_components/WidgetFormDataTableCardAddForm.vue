@@ -9,8 +9,8 @@ import { range } from 'lodash';
 import {
     PFieldGroup, PDivider, PIconButton, PI, PButton, PSelectDropdown, PTextInput, PToggleButton, PFieldTitle,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
-import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/src/inputs/dropdown/select-dropdown/type';
+import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/src/controls/dropdown/select-dropdown/type';
 
 import { i18n } from '@/translations';
 

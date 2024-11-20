@@ -12,8 +12,8 @@ import {
 import {
     PFieldGroup, PButton, PContextMenu, useContextMenuController,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
-import type { AutocompleteHandler } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
+import type { AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { MetricLabelKey } from '@/schema/inventory/metric/type';
 

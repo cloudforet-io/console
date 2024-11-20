@@ -9,8 +9,8 @@ import utc from 'dayjs/plugin/utc';
 
 import type { DatetimeDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/datetime/type';
 import type { DatetimeOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
-import PLink from '@/inputs/link/PLink.vue';
-import { ACTION_ICON } from '@/inputs/link/type';
+import PLink from '@/navigation/link/PLink.vue';
+import { ACTION_ICON } from '@/navigation/link/type';
 
 
 dayjs.extend(utc);

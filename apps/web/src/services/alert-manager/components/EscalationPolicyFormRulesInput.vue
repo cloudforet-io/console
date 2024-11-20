@@ -10,7 +10,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PLink, PBadge, PIconButton, PSelectDropdown, PI, PButton, PTextInput, PRadio, PFieldGroup,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
@@ -371,9 +371,6 @@ watch(() => isAllValid.value, (_isAllValid) => {
             /* custom design-system component - p-text-input */
             :deep(.p-text-input) {
                 width: 6rem;
-                input {
-                    width: 100%;
-                }
             }
 
             .rule-input-wrapper {
@@ -409,12 +406,6 @@ watch(() => isAllValid.value, (_isAllValid) => {
                 margin-bottom: 0;
             }
 
-            /* custom design-system component - p-text-input */
-            :deep(.p-text-input) {
-                input {
-                    width: 100%;
-                }
-            }
             .repeat-input {
                 width: 6.5rem;
             }

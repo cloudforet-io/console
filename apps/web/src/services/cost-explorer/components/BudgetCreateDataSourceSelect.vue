@@ -2,7 +2,7 @@
 import { computed, reactive, watch } from 'vue';
 
 import { PFieldGroup, PSelectDropdown, PLazyImg } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';

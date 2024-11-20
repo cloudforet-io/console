@@ -2,9 +2,9 @@ import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
+import PButton from '@/controls/buttons/button/PButton.vue';
+import PSelectDropdown from '@/controls/dropdown/select-dropdown/PSelectDropdown.vue';
 import PHeading from '@/data-display/heading/PHeading.vue';
-import PButton from '@/inputs/buttons/button/PButton.vue';
-import PSelectDropdown from '@/inputs/dropdown/select-dropdown/PSelectDropdown.vue';
 
 import PHeadingLayout from './PHeadingLayout.vue';
 import { getHeadingLayoutArgTypes, getHeadingLayoutArgs, getHeadingLayoutParameters } from './story-helper';

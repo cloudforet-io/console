@@ -7,7 +7,7 @@ import { clone, map } from 'lodash';
 import {
     PPaneLayout, PFieldTitle, PButton, PSelectDropdown, PCopyButton,
 } from '@cloudforet/mirinae';
-import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

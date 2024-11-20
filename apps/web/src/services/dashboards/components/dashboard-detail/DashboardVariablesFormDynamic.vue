@@ -6,7 +6,7 @@ import { sortBy } from 'lodash';
 import {
     PContextMenu, PDivider, PFieldGroup, PFieldTitle, PRadio, PRadioGroup, PSelectDropdown,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
 import { i18n } from '@/translations';

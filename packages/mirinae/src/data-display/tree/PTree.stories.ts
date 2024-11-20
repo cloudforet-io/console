@@ -4,12 +4,12 @@ import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
+import PButton from '@/controls/buttons/button/PButton.vue';
+import PIconButton from '@/controls/buttons/icon-button/PIconButton.vue';
+import PTextInput from '@/controls/input/text-input/PTextInput.vue';
+import PRadio from '@/controls/radio/PRadio.vue';
 import { getTreeArgs, getTreeArgTypes } from '@/data-display/tree/story-helper';
 import PI from '@/foundation/icons/PI.vue';
-import PButton from '@/inputs/buttons/button/PButton.vue';
-import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
-import PTextInput from '@/inputs/input/text-input/PTextInput.vue';
-import PRadio from '@/inputs/radio/PRadio.vue';
 
 import { getTreeList, getTreeData, getRecursiveInfo } from './mock';
 import PTree from './PTree.vue';

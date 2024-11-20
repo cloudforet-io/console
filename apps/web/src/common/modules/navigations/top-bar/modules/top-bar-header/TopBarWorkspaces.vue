@@ -10,8 +10,8 @@ import { clone, sortBy } from 'lodash';
 import {
     PSelectDropdown, PTooltip, PI, PButton, PDivider, PTextHighlighting, PEmpty,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
-import { CONTEXT_MENU_TYPE } from '@cloudforet/mirinae/src/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
+import { CONTEXT_MENU_TYPE } from '@cloudforet/mirinae/src/controls/context-menu/type';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';

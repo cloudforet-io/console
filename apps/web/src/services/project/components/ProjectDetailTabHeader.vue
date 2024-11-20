@@ -11,7 +11,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PI, PIconButton, PSelectDropdown, PButtonModal, PButton, PEmpty, PLazyImg, PLink,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import DomainAdminImage from '@/assets/images/role/img_avatar_admin.png';
 import UserImage from '@/assets/images/role/img_avatar_no-role.png';

@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import { PSelectDropdown, PFieldGroup } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { getInitialSelectedMenuItem } from '@/common/modules/widgets/_helpers/widget-field-helper';

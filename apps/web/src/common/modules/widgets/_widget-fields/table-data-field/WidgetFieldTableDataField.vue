@@ -12,7 +12,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PSelectDropdown, PFieldGroup, PSelectButton, PDivider, PTextInput, PScopedNotification,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';

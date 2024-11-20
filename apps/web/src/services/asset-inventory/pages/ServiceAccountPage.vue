@@ -15,12 +15,12 @@ import {
     PHeading, PDynamicLayout, PButton, PSelectStatus, PPaneLayout, screens, PTab, PLazyImg, PStatus, PTooltip, PI,
     PHeadingLayout,
 } from '@cloudforet/mirinae';
+import type { ValueItem } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type {
     DynamicLayoutEventListener,
     DynamicLayoutFieldHandler,
 } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type';
 import type { DynamicLayoutOptions, SearchSchema } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
-import type { ValueItem } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';

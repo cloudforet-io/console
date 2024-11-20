@@ -34,7 +34,7 @@ import {
 import { get } from 'lodash';
 
 import type { TextListItem, TextListProps } from '@/data-display/text-list/type';
-import PLink from '@/inputs/link/PLink.vue';
+import PLink from '@/navigation/link/PLink.vue';
 import { isNotEmpty } from '@/utils/helpers';
 
 export default defineComponent<TextListProps>({

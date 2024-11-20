@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import { PFieldGroup, PSelectDropdown } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import { i18n } from '@/translations';
 

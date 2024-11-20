@@ -2,8 +2,8 @@ import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
+import type { QueryTag } from '@cloudforet/mirinae/src/controls/search/query-search-tags/type';
 import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
-import type { QueryTag } from '@cloudforet/mirinae/src/inputs/search/query-search-tags/type';
 
 import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
 import type { FolderModel } from '@/schema/dashboard/_types/folder-type';

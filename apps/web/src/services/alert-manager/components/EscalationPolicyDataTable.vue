@@ -5,7 +5,7 @@ import type { TranslateResult } from 'vue-i18n';
 import {
     PDataTable, PLink, PBadge,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';

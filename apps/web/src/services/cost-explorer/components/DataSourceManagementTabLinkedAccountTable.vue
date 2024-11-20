@@ -12,9 +12,9 @@ import {
 import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
 import type {
     AutocompleteHandler, SelectDropdownMenuItem,
-} from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
-import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
-import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
+} from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
+import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
+import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';

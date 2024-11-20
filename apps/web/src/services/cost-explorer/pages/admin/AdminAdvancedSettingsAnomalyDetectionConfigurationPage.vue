@@ -11,7 +11,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PPaneLayout, PToggleButton, PFieldTitle, PTextInput, PSelectDropdown, PI, PButton, PIconButton, PCheckbox, PLazyImg,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
 import type { DomainConfigGetParameters } from '@/schema/config/domain-config/api-verbs/get';

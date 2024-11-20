@@ -9,7 +9,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PFieldGroup, PLazyImg, PTextInput, PLink, PDataLoader, PSelectDropdown,
 } from '@cloudforet/mirinae';
-import type { JsonSchema } from '@cloudforet/mirinae/types/inputs/forms/json-schema-form/type';
+import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-schema-form/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { WebhookCreateParameters } from '@/schema/monitoring/webhook/api-verbs/create';

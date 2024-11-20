@@ -6,11 +6,11 @@ import {
 import { onClickOutside, useResizeObserver } from '@vueuse/core';
 import { throttle } from 'lodash';
 
+import PTextButton from '@/controls/buttons/text-button/PTextButton.vue';
+import PContextMenu from '@/controls/context-menu/PContextMenu.vue';
+import type { MenuItem } from '@/controls/context-menu/type';
 import PI from '@/foundation/icons/PI.vue';
 import { useTab } from '@/hooks/use-tab/use-tab';
-import PTextButton from '@/inputs/buttons/text-button/PTextButton.vue';
-import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
-import type { MenuItem } from '@/inputs/context-menu/type';
 import PDivider from '@/layouts/divider/PDivider.vue';
 import FolderTab from '@/navigation/tabs/tab/components/FolderTab.vue';
 import type { TabItem } from '@/navigation/tabs/tab/type';

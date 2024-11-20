@@ -11,9 +11,9 @@ import {
     PToolboxTable, PSelectDropdown, PStatus, PCopyButton, PBadge, PI,
 } from '@cloudforet/mirinae';
 import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
-import type { KeyItemSet } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
-import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
+import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query-search/type';
+import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import { APP_STATUS_TYPE } from '@/schema/identity/app/constant';

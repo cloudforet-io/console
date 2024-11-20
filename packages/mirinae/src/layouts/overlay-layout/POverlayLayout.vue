@@ -2,7 +2,7 @@
 
 import { vOnClickOutside } from '@vueuse/components';
 
-import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
+import PIconButton from '@/controls/buttons/icon-button/PIconButton.vue';
 
 interface Props {
     visible: boolean;

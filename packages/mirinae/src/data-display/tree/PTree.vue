@@ -101,6 +101,7 @@ import {
 import { unionBy } from 'lodash';
 import { focus } from 'vue-focus';
 
+import PTextInput from '@/controls/input/text-input/PTextInput.vue';
 import type { Store } from '@/data-display/tree/he-tree-vue/libs/draggable/types';
 import { getDefaultNode } from '@/data-display/tree/helper';
 import type {
@@ -118,7 +119,6 @@ import type {
 } from '@/data-display/tree/type';
 import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
 import PI from '@/foundation/icons/PI.vue';
-import PTextInput from '@/inputs/input/text-input/PTextInput.vue';
 
 import OriginTree from './he-tree-vue/components/Tree.vue';
 import type { WalkTreeDataCallback } from './he-tree-vue/tree-data';

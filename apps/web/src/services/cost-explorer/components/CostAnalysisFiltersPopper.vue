@@ -9,7 +9,7 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import {
     PSelectDropdown, PTextButton,
 } from '@cloudforet/mirinae';
-import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 

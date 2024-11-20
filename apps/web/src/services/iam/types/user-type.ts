@@ -1,6 +1,6 @@
 import type { TranslateResult } from 'vue-i18n';
 
-import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
 
 import type { Tags } from '@/schema/_common/model';
 import type { RoleType } from '@/schema/identity/role/type';

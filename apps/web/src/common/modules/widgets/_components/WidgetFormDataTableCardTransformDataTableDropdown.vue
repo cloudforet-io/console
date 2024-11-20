@@ -6,7 +6,7 @@ import {
 } from 'vue';
 
 import { PI, PContextMenu } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';

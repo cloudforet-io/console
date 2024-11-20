@@ -27,7 +27,7 @@ import {
 } from '@cloudforet/mirinae';
 import type {
     QueryItem, ValueHandlerMap, ValueHandler, KeyItemSet,
-} from '@cloudforet/mirinae/types/inputs/search/query-search/type';
+} from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderItem, ProviderReferenceMap } from '@/store/reference/provider-reference-store';

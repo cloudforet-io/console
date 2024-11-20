@@ -9,8 +9,8 @@ import bytes from 'bytes';
 import {
     PToolbox, PI, PSelectDropdown, PEmpty, PSpinner,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
-import type { ToolboxOptions } from '@cloudforet/mirinae/src/navigation/toolbox/type';
+import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
+import type { ToolboxOptions } from '@cloudforet/mirinae/src/controls/toolbox/type';
 import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
 import type { Page } from '@/schema/_common/type';
