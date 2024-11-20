@@ -42,7 +42,7 @@ const emit = defineEmits<{(e: 'update:modal-visible'): void,
 
 const storeState = reactive({
     selectedDataSourceItem: computed<DataSourceItem>(() => dataSourcesPageGetters.selectedDataSourceItem),
-    recentJobItem: computed<CostJobItem>(() => dataSourcesPageGetters.jobList[0]),
+    jobList: computed<CostJobItem[]>(() => dataSourcesPageGetters.jobList),
     timezone: computed<string>(() => store.state.user.timezone),
 });
 const state = reactive({
@@ -81,10 +81,12 @@ const state = reactive({
         return false;
     }),
     diffInMinutes: computed<number>(() => {
-        const createdDate = dayjs.tz(storeState.recentJobItem.created_at, storeState.timezone);
+        const recentJobItem = storeState.jobList.filter((i) => i.status === 'IN_PROGRESS')[0];
+        const createdDate = dayjs.tz(recentJobItem.created_at, storeState.timezone);
         const now = dayjs().tz(storeState.timezone);
         return now.diff(createdDate, 'minute');
     }),
+    hasInProgressItem: computed<boolean>(() => storeState.jobList.some((item) => item.status === 'IN_PROGRESS')),
 });
 
 const handleUpdateSelectedDates = (selectedDates: string[]) => {
@@ -106,7 +108,7 @@ const handleConfirmButton = async () => {
 
         case 'RE-SYNC':
         case 'RESTART':
-            if (storeState.recentJobItem.status === 'IN_PROGRESS' && state.diffInMinutes <= 10) return;
+            if (state.hasInProgressItem && state.diffInMinutes <= 10) return;
             await dataSourcesPageStore.fetchSyncDatasource({
                 start: state.toggleValue ? undefined : dayjs(state.startDates[0]).format('YYYY-MM'),
                 data_source_id: storeState.selectedDataSourceItem.data_source_id,
@@ -141,7 +143,7 @@ const handleConfirmButton = async () => {
         backdrop
         :loading="state.loading"
         :disabled="state.modalValidation"
-        :hide-footer-close-button="props.modalType === 'RESTART' && storeState.recentJobItem.status === 'IN_PROGRESS' && state.diffInMinutes <= 10"
+        :hide-footer-close-button="props.modalType === 'RESTART' && state.hasInProgressItem && state.diffInMinutes <= 10"
         :theme-color="props.modalType === 'CANCEL' || props.modalType === 'RESTART' ? 'alert' : 'primary'"
         :visible.sync="state.proxyVisible"
         class="data-source-management-tab-data-collection-history-modal"
@@ -232,7 +234,7 @@ const handleConfirmButton = async () => {
             <span v-if="props.modalType === 'ERROR'">{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ERROR_FOUND_OK') }}</span>
             <span v-else-if="props.modalType === 'CANCEL'">{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.CANCEL_BUTTON') }}</span>
             <span v-else-if="props.modalType === 'RESTART'
-                && storeState.recentJobItem.status !== 'IN_PROGRESS'
+                && state.hasInProgressItem
                 && state.diffInMinutes > 10"
             >
                 {{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.RESTART_MODAL_BUTTON') }}

@@ -41,7 +41,6 @@ const storeState = reactive({
     totalCount: computed<number>(() => dataSourcesPageState.jobListTotalCount),
     activeTab: computed<string>(() => dataSourcesPageState.activeTab),
     selectedDataSourceItem: computed<DataSourceItem>(() => dataSourcesPageGetters.selectedDataSourceItem),
-    recentJobItem: computed<CostJobItem>(() => dataSourcesPageGetters.jobList[0]),
 });
 const state = reactive({
     loading: false,
@@ -49,6 +48,7 @@ const state = reactive({
     modalType: '' as DataCollectionHistoryModalType,
     selectedJobId: '',
     selectedJobItem: computed<CostJobItem|undefined>(() => storeState.jobList.find((item) => item.job_id === state.selectedJobId)),
+    hasInProgressItem: computed<boolean>(() => storeState.jobList.some((item) => item.status === 'IN_PROGRESS')),
 });
 const tableState = reactive({
     pageStart: 0,
@@ -160,7 +160,7 @@ const handleClickErrorDetail = (jobId: string) => {
 const handleClickResyncButton = () => {
     state.modalVisible = true;
     // NOTE: If the latest job is in progress, it can be canceled and restarted only if 10 minutes have passed since the start time.
-    state.modalType = storeState.recentJobItem.status === 'IN_PROGRESS' ? 'RESTART' : 'RE-SYNC';
+    state.modalType = state.hasInProgressItem ? 'RESTART' : 'RE-SYNC';
 };
 const handleSelectStatus = (selected: string) => {
     tableState.selectedStatusFilter = selected;
