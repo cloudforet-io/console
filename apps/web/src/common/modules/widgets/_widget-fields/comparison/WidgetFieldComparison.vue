@@ -20,9 +20,11 @@ import type { GroupByValue } from '@/common/modules/widgets/_widget-fields/group
 import type { TableDataFieldValue } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
 import type { WidgetFieldComponentProps, WidgetFieldComponentEmit } from '@/common/modules/widgets/types/widget-field-type';
 
+
+
 const emit = defineEmits<WidgetFieldComponentEmit<ComparisonValue[]|undefined>>();
 
-const props = withDefaults(defineProps<WidgetFieldComponentProps<ComparisonOptions, ComparisonValue>>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<ComparisonOptions, ComparisonValue[]>>(), {
     widgetFieldSchema: () => ({
         options: {
             toggle: false,
@@ -43,17 +45,10 @@ const state = reactive({
             || Array.isArray(groupByField?.value) && isIncludingDateField(groupByField.value);
     }),
     infoText: computed(() => {
-        const tableDataField = props.allValueMap.tableDataField as TableDataFieldValue;
+        const tableDataField = props.allValueMap?.tableDataField as TableDataFieldValue;
         if (tableDataField) return i18n.t('COMMON.WIDGETS.COMPARISON.INFO_TOOLTIP_TABLE');
         return i18n.t('COMMON.WIDGETS.COMPARISON.INFO_TOOLTIP');
     }),
-    // compareWith: computed(() => {
-    //     const granularity = props.widgetFieldSchema.options?.granularity ?? GRANULARITY.DAILY;
-    //     if (granularity === GRANULARITY.MONTHLY) return i18n.t('COMMON.WIDGETS.COMPARISON.PREVIOUS_MONTH');
-    //     if (granularity === GRANULARITY.YEARLY) return i18n.t('COMMON.WIDGETS.COMPARISON.PREVIOUS_YEAR');
-    //     return i18n.t('COMMON.WIDGETS.COMPARISON.PREVIOUS_DAY');
-    // }),
-    // isForTable: computed(() => props.widgetFieldSchema.options?.forTable ?? false),
     initialValue: computed<ComparisonValue>(() => ({
         decreaseColor: DEFAULT_COMPARISON_COLOR.DECREASE,
         increaseColor: DEFAULT_COMPARISON_COLOR.INCREASE,
@@ -66,13 +61,6 @@ const state = reactive({
     ],
 });
 
-// const handleAddComparison = () => {
-//     state.proxyValue.push(cloneDeep(state.initialValue));
-//     state.isFieldNameValid.push(undefined);
-//     emit('update:value', state.proxyValue);
-// };
-
-// { key, index }:{key: 'decreaseColor'|'increaseColor'; index: number}
 const handleUpdateColor = (key:string, index:number, color:string) => {
     if (!state.proxyValue) return;
     const clonedValue = cloneDeep(state.proxyValue);
@@ -95,13 +83,6 @@ const handleUpdateFormat = (format: ComparisonFormat, index: number) => {
     clonedValue[index].format = format;
     state.proxyValue = clonedValue;
 };
-
-// const handleUpdateFieldName = (fieldName: string, index:number) => {
-//     state.proxyValue[index].fieldName = fieldName;
-//     const updatedValue = cloneDeep(state.isFieldNameValid);
-//     updatedValue[index] = fieldName.length > 0;
-//     state.isFieldNameValid = updatedValue;
-// };
 
 const checkValue = ():boolean => {
     if (state.toggleValue) {
@@ -158,7 +139,6 @@ onMounted(() => {
         <div v-if="state.toggleValue"
              class="contents-box"
         >
-            <!--             :class="{'for-table': state.isForTable}"-->
             <div v-for="(item, index) in state.proxyValue"
                  :key="index"
                  class="form-container"
@@ -166,19 +146,6 @@ onMounted(() => {
                 <div class="mb-2">
                     <p-divider v-if="index !== 0" />
                 </div>
-                <!--                <p-field-group v-if="state.isForTable"-->
-                <!--                               :label="$t('COMMON.WIDGETS.COMPARISON.FIELD_NAME')"-->
-                <!--                               :invalid="state.isFieldNameValid[index] === false"-->
-                <!--                               :invalid-text="$t('COMMON.WIDGETS.COMPARISON.NAME_INVALID_TEXT')"-->
-                <!--                               style-type="secondary"-->
-                <!--                               required-->
-                <!--                >-->
-                <!--                    <p-text-input :value="state.proxyValue[index].fieldName"-->
-                <!--                                  :invalid="state.isFieldNameValid[index] === false"-->
-                <!--                                  class="w-full"-->
-                <!--                                  @update:value="(name) => handleUpdateFieldName(name, index)"-->
-                <!--                    />-->
-                <!--                </p-field-group>-->
                 <div class="row-1">
                     <p-field-group :label="$t('COMMON.WIDGETS.COMPARISON.COMPARE_WITH')"
                                    class="left"
@@ -187,16 +154,6 @@ onMounted(() => {
                     >
                         <span class="compare-with">{{ $t('COMMON.WIDGETS.COMPARISON.PREVIOUS_PERIOD') }}</span>
                     </p-field-group>
-                    <!--                    <p-field-group v-if="state.isForTable"-->
-                    <!--                                   :label="$t('COMMON.WIDGETS.COMPARISON.COMPARE_TARGET')"-->
-                    <!--                                   style-type="secondary"-->
-                    <!--                                   class="w-full"-->
-                    <!--                                   required-->
-                    <!--                    >-->
-                    <!--                        <p-select-dropdown class="w-full"-->
-                    <!--                                           :menu="[1,2]"-->
-                    <!--                        />-->
-                    <!--                    </p-field-group>-->
                 </div>
                 <div class="row-2">
                     <div class="left">
@@ -231,13 +188,6 @@ onMounted(() => {
                     </p-field-group>
                 </div>
             </div>
-            <!--            <p-button v-if="state.isForTable"-->
-            <!--                      style-type="tertiary"-->
-            <!--                      icon-left="ic_plus_bold"-->
-            <!--                      @click="handleAddComparison"-->
-            <!--            >-->
-            <!--                {{ $t('COMMON.WIDGETS.COMPARISON.ADD_COMPARISON') }}-->
-            <!--            </p-button>-->
         </div>
     </div>
 </template>
@@ -250,9 +200,6 @@ onMounted(() => {
 
     .contents-box {
         margin-top: 0.5rem;
-        &.for-table {
-            @apply p-2 bg-gray-100 rounded;
-        }
 
         .row-1 {
             @apply flex gap-2;

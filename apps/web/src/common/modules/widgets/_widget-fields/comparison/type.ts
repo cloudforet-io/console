@@ -8,5 +8,4 @@ export interface ComparisonValue {
 
 export interface ComparisonOptions {
     toggle?: boolean;
-    // forTable?: boolean;
 }
