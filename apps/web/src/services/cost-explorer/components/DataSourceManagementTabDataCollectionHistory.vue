@@ -10,7 +10,7 @@ import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-ut
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PButton, PToolboxTable, PHeading, PI, PHeadingLayout, PSelectStatus, PProgressBar,
+    PButton, PToolboxTable, PHeading, PHeadingLayout, PSelectStatus, PProgressBar, PStatus,
 } from '@cloudforet/mirinae';
 import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
@@ -23,7 +23,7 @@ import { i18n } from '@/translations';
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import {
-    blue, gray, green, red,
+    gray, green, red,
 } from '@/styles/colors';
 
 import DataSourceManagementTabDataCollectionHistoryModal
@@ -119,12 +119,13 @@ const getStatusInfo = (value: CostJobStatus): CostJobStatusInfo => {
         info = {
             icon: 'ic_error-filled',
             color: red[400],
+            text: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.FAILURE'),
         };
         break;
     case 'IN_PROGRESS':
         info = {
             icon: 'ic_peacock-gradient-circle',
-            color: blue[400],
+            color: undefined,
             text: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.IN_PROGRESS'),
         };
         break;
@@ -276,30 +277,30 @@ watch([() => storeState.activeTab, () => storeState.selectedItem], async () => {
                 </div>
             </template>
             <template #col-status-format="{value, item}">
-                <p-i :name="getStatusInfo(value).icon"
-                     :color="getStatusInfo(value).color"
-                     width="1rem"
-                     height="1rem"
-                     class="icon-info"
-                />
-                <p-button v-if="value === 'FAILURE'"
-                          size="sm"
-                          style-type="tertiary"
-                          @click="handleClickErrorDetail(item.job_id)"
+                <p-status :icon="getStatusInfo(value).icon"
+                          :icon-color="getStatusInfo(value).color"
+                          :icon-animation="value === 'IN_PROGRESS' ? 'spin' : undefined"
                 >
-                    {{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ERROR_FOUND') }}
-                </p-button>
-                <span v-else>
-                    {{ getStatusInfo(value).text }}
-                </span>
-                <p-button v-if="storeState.selectedDataSourceItem.state === 'ENABLED' && value === 'IN_PROGRESS'"
-                          size="sm"
-                          style-type="tertiary"
-                          class="ml-2"
-                          @click="handleClickCancelDetail(item.job_id)"
-                >
-                    {{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.CANCEL') }}
-                </p-button>
+                    <span class="ml-1">
+                        {{ getStatusInfo(value).text }}
+                    </span>
+                    <p-button v-if="value === 'FAILURE'"
+                              size="sm"
+                              style-type="tertiary"
+                              class="ml-2"
+                              @click="handleClickErrorDetail(item.job_id)"
+                    >
+                        {{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ERROR_FOUND') }}
+                    </p-button>
+                    <p-button v-if="storeState.selectedDataSourceItem.state === 'ENABLED' && value === 'IN_PROGRESS'"
+                              size="sm"
+                              style-type="tertiary"
+                              class="ml-2"
+                              @click="handleClickCancelDetail(item.job_id)"
+                    >
+                        {{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.CANCEL') }}
+                    </p-button>
+                </p-status>
             </template>
             <template #col-progress-format="{item}">
                 <div class="col-progress-bar">
