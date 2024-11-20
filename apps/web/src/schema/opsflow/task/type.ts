@@ -1,4 +1,4 @@
-export type TaskStatusType = 'TODO'|'IN_PROGRESS'|'COMPLETE';
+export type TaskStatusType = 'TODO'|'IN_PROGRESS'|'COMPLETED';
 export interface TaskStatusOption {
     status_id: string;
     name: string;

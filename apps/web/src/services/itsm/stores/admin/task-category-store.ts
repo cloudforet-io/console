@@ -35,33 +35,44 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
                             package_id: 'package_1',
                             name: 'Billing and Payment',
                             description: '빌링 및 결제와 관련된 문의사항',
-                            status_options: [
-                                {
-                                    name: '요청',
-                                    status_type: 'TODO',
-                                    color: 'gray',
-                                },
-                                {
-                                    name: '진행중',
-                                    status_type: 'IN_PROGRESS',
-                                    color: 'blue',
-                                },
-                                {
-                                    name: '완료',
-                                    status_type: 'COMPLETE',
-                                    color: 'green',
-                                },
-                                {
-                                    name: '보류',
-                                    status_type: 'COMPLETE',
-                                    color: 'yellow',
-                                },
-                                {
-                                    name: '취소',
-                                    status_type: 'COMPLETE',
-                                    color: 'red',
-                                },
-                            ],
+                            status_options: {
+                                TODO: [
+                                    {
+                                        status_id: 'todo_1',
+                                        name: '요청',
+                                        color: 'gray',
+                                        is_default: true,
+                                    },
+                                ],
+                                IN_PROGRESS: [
+                                    {
+                                        status_id: 'in_progress_1',
+                                        name: '진행중',
+                                        color: 'blue',
+                                        is_default: true,
+                                    },
+                                ],
+                                COMPLETED: [
+                                    {
+                                        status_id: 'complete_1',
+                                        name: '완료',
+                                        color: 'green',
+                                        is_default: true,
+                                    },
+                                    {
+                                        status_id: 'complete_2',
+                                        name: '보류',
+                                        color: 'yellow',
+                                        is_default: false,
+                                    },
+                                    {
+                                        status_id: 'complete_3',
+                                        name: '취소',
+                                        color: 'red',
+                                        is_default: false,
+                                    },
+                                ],
+                            },
                             fields: [],
                             domain_id: '1',
                             created_at: '2021-09-01T00:00:00',
@@ -73,28 +84,38 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
                             package_id: 'package_1',
                             name: 'Service Limit In-Crease',
                             description: '서비스 한도 증가와 관련된 문의사항',
-                            status_options: [
-                                {
-                                    name: '요청',
-                                    status_type: 'TODO',
-                                    color: 'gray',
-                                },
-                                {
-                                    name: '확인중',
-                                    status_type: 'IN_PROGRESS',
-                                    color: 'yellow',
-                                },
-                                {
-                                    name: '진행중',
-                                    status_type: 'IN_PROGRESS',
-                                    color: 'blue',
-                                },
-                                {
-                                    name: '완료',
-                                    status_type: 'COMPLETE',
-                                    color: 'green',
-                                },
-                            ],
+                            status_options: {
+                                TODO: [
+                                    {
+                                        status_id: 'todo_1',
+                                        name: '요청',
+                                        color: 'gray',
+                                        is_default: true,
+                                    },
+                                ],
+                                IN_PROGRESS: [
+                                    {
+                                        status_id: 'in_progress_1',
+                                        name: '확인중',
+                                        color: 'yellow',
+                                        is_default: true,
+                                    },
+                                    {
+                                        status_id: 'in_progress_2',
+                                        name: '진행중',
+                                        color: 'blue',
+                                        is_default: false,
+                                    },
+                                ],
+                                COMPLETED: [
+                                    {
+                                        status_id: 'complete_1',
+                                        name: '완료',
+                                        color: 'green',
+                                        is_default: true,
+                                    },
+                                ],
+                            },
                             fields: [],
                             domain_id: '1',
                             created_at: '2021-09-01T00:00:00',
@@ -105,23 +126,32 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
                             package_id: 'package_2',
                             name: 'Technical Support',
                             description: '기술 지원과 관련된 문의사항',
-                            status_options: [
-                                {
-                                    name: '요청',
-                                    status_type: 'TODO',
-                                    color: 'gray',
-                                },
-                                {
-                                    name: '진행중',
-                                    status_type: 'IN_PROGRESS',
-                                    color: 'blue',
-                                },
-                                {
-                                    name: '완료',
-                                    status_type: 'COMPLETE',
-                                    color: 'green',
-                                },
-                            ],
+                            status_options: {
+                                TODO: [
+                                    {
+                                        status_id: 'todo_1',
+                                        name: '요청',
+                                        color: 'gray',
+                                        is_default: true,
+                                    },
+                                ],
+                                IN_PROGRESS: [
+                                    {
+                                        status_id: 'in_progress_1',
+                                        name: '진행중',
+                                        color: 'blue',
+                                        is_default: false,
+                                    },
+                                ],
+                                COMPLETED: [
+                                    {
+                                        status_id: 'complete_1',
+                                        name: '완료',
+                                        color: 'green',
+                                        is_default: true,
+                                    },
+                                ],
+                            },
                             fields: [],
                             domain_id: '1',
                             created_at: '2021-09-01T00:00:00',
@@ -141,19 +171,32 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
                     package_id: 'package_1', // default package id
                     name: param.name,
                     description: param.description ?? '',
-                    status_options: [{
-                        name: '요청',
-                        status_type: 'TODO',
-                        color: 'gray',
-                    }, {
-                        name: '진행중',
-                        status_type: 'IN_PROGRESS',
-                        color: 'blue',
-                    }, {
-                        name: '완료',
-                        status_type: 'COMPLETE',
-                        color: 'green',
-                    }],
+                    status_options: {
+                        TODO: [
+                            {
+                                status_id: 'todo_1',
+                                name: '요청',
+                                color: 'gray',
+                                is_default: true,
+                            },
+                        ],
+                        IN_PROGRESS: [
+                            {
+                                status_id: 'in_progress_1',
+                                name: '진행중',
+                                color: 'blue',
+                                is_default: true,
+                            },
+                        ],
+                        COMPLETED: [
+                            {
+                                status_id: 'complete_1',
+                                name: '완료',
+                                color: 'green',
+                                is_default: true,
+                            },
+                        ],
+                    },
                     fields: [],
                     domain_id: '1',
                     created_at: '2021-09-01T00:00:00',
