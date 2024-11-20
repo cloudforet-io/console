@@ -38,6 +38,7 @@ const dataSourcesPageState = dataSourcesPageStore.state;
 const dataSourcesPageGetters = dataSourcesPageStore.getters;
 
 const storeState = reactive({
+    dataSourceLoading: computed<boolean>(() => dataSourcesPageState.dataSourceLoading),
     selectedItem: computed<DataSourceItem>(() => dataSourcesPageGetters.selectedDataSourceItem),
     jobList: computed<CostJobItem[]>(() => dataSourcesPageGetters.jobList),
     totalCount: computed<number>(() => dataSourcesPageState.jobListTotalCount),
@@ -225,6 +226,8 @@ watch(() => tableState.selectedStatusFilter, async (selectedStatusFilter) => {
     await fetchJobList();
 });
 watch(() => storeState.selectedItem, () => {
+    if (storeState.dataSourceLoading) return;
+    state.loading = true;
     tableState.selectedStatusFilter = 'ALL';
     initJobTableData();
 });

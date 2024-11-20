@@ -52,6 +52,7 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
         dataSourceListSearchFilters: [] as ConsoleFilter[],
         selectedDataSourceIndices: undefined as number|undefined,
         selectedDataSourceItem: {} as DataSourceItem,
+        dataSourceLoading: false,
 
         jobList: [] as CostJobModel[],
         jobListTotalCount: 0,
@@ -201,10 +202,13 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
         },
         fetchDataSourceItem: async (params?: CostDataSourceListParameters) => {
             try {
+                state.dataSourceLoading = true;
                 state.selectedDataSourceItem = await SpaceConnector.clientV2.costAnalysis.dataSource.get<CostDataSourceGetParameters, CostDataSourceModel>(params);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.selectedDataSourceItem = {} as DataSourceItem;
+            } finally {
+                state.dataSourceLoading = false;
             }
         },
         fetchJobList: async (params: CostJobListParameters) => {
