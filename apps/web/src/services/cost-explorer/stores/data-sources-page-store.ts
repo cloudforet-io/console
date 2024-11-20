@@ -173,6 +173,10 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
                 type: undefined as CostLinkedAccountModalType|undefined,
             };
         },
+        jobReset: () => {
+            state.jobList = [];
+            state.jobListTotalCount = 0;
+        },
         fetchDataSourceList: async (params?: CostDataSourceListParameters) => {
             try {
                 const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.dataSource.list<CostDataSourceListParameters, ListResponse<CostDataSourceModel>>(params);
