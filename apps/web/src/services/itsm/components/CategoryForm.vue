@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { onBeforeMount, ref } from 'vue';
+import {
+    onBeforeMount, ref, watch, nextTick,
+} from 'vue';
 
 import {
     POverlayLayout, PFieldGroup, PTextInput, PTextarea, PButton,
@@ -11,6 +13,7 @@ import { useTaskManagementPageStore } from '@/services/itsm/stores/admin/task-ma
 
 const taskManagementPageStore = useTaskManagementPageStore();
 const taskManagementPageState = taskManagementPageStore.state;
+const taskManagementPageGetters = taskManagementPageStore.getters;
 const taskCategoryStore = taskManagementPageStore.taskCategoryStore;
 
 const {
@@ -28,9 +31,6 @@ const {
         if (value.length > 50) return 'Name should be less than 50 characters';
         if (taskCategoryStore.getters.taskCategories.some((p) => taskManagementPageState.editTargetCategoryId !== p.category_id && p.name === value)) return 'Name already exists';
         return true;
-    },
-    description(value: string) {
-        return value.length > 0 ? true : 'Description is required';
     },
 });
 
@@ -67,51 +67,70 @@ onBeforeMount(() => {
     }
 });
 
+watch([() => taskManagementPageState.visibleCategoryForm, () => taskManagementPageGetters.editTargetCategory], async ([visible, targetCategory], [prevVisible]) => {
+    if (!visible) {
+        if (!prevVisible) return; // prevent initial call
+        await nextTick(); // wait for closing animation
+        setForm({
+            name: '',
+            description: '',
+        });
+        return;
+    }
+    if (targetCategory) {
+        setForm({
+            name: targetCategory.name,
+            description: targetCategory.description,
+        });
+    }
+});
 </script>
 
 <template>
-    <p-overlay-layout header-title="Add Category"
+    <p-overlay-layout title="Add Category"
                       :visible="taskManagementPageState.visibleCategoryForm"
                       @close="handleCancelOrClose"
     >
-        <template #contents>
-            <p-field-group label="Name"
-                           required
-                           :invalid="invalidState.name"
-                           :invalid-text="invalidTexts.name"
-            >
-                <p-text-input :value="name"
-                              :invalid="invalidState.name"
-                              @update:value="setForm('name', $event)"
-                />
-            </p-field-group>
-            <p-field-group label="Description"
-                           required
-                           :invalid="invalidState.description"
-                           :invalid-text="invalidTexts.description"
-            >
-                <p-textarea :value="description"
-                            :invalid="invalidState.description"
-                            placeholder="Describe this support package in a few words."
-                            @update:value="setForm('description', $event)"
-                />
-            </p-field-group>
+        <template #default>
+            <div class="p-6 w-full">
+                <p-field-group label="Name"
+                               required
+                               :invalid="invalidState.name"
+                               :invalid-text="invalidTexts.name"
+                >
+                    <p-text-input :value="name"
+                                  :invalid="invalidState.name"
+                                  @update:value="setForm('name', $event)"
+                    />
+                </p-field-group>
+                <p-field-group label="Description"
+                               :invalid="invalidState.description"
+                               :invalid-text="invalidTexts.description"
+                >
+                    <p-textarea :value="description"
+                                :invalid="invalidState.description"
+                                placeholder="Describe this support package in a few words."
+                                @update:value="setForm('description', $event)"
+                    />
+                </p-field-group>
+            </div>
         </template>
         <template #footer>
-            <p-button style-type="transparent"
-                      :disabled="loading"
-                      @click="handleCancelOrClose"
-            >
-                Cancel
-            </p-button>
-            <p-button class="ml-3"
-                      style-type="primary"
-                      :loading="loading"
-                      :disabled="!isAllValid"
-                      @click="handleConfirm"
-            >
-                Confirm
-            </p-button>
+            <div class="py-3 px-6 flex flex-wrap gap-3 justify-end">
+                <p-button style-type="transparent"
+                          :disabled="loading"
+                          @click="handleCancelOrClose"
+                >
+                    Cancel
+                </p-button>
+                <p-button style-type="primary"
+                          :loading="loading"
+                          :disabled="!isAllValid"
+                          @click="handleConfirm"
+                >
+                    Confirm
+                </p-button>
+            </div>
         </template>
     </p-overlay-layout>
 </template>

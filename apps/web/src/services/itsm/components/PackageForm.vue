@@ -153,7 +153,7 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
 
 
 <template>
-    <p-overlay-layout header-title="Add Package"
+    <p-overlay-layout title="Add Package"
                       :visible="taskManagementPageState.visiblePackageForm"
                       @close="handleCancelOrClose"
     >
@@ -225,7 +225,7 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
             </div>
         </template>
         <template #footer>
-            <div class="p-3 flex flex-wrap gap-3 justify-end">
+            <div class="py-3 px-6 flex flex-wrap gap-3 justify-end">
                 <p-button style-type="transparent"
                           :disabled="loading"
                           @click="handleCancelOrClose"
