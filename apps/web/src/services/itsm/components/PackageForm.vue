@@ -1,16 +1,13 @@
 <script setup lang="ts">
 import {
-    onBeforeMount, toRef, ref,
+    onBeforeMount, toRef, ref, computed,
 } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    POverlayLayout, PFieldGroup, PTextInput, PTextarea, PSelectButton, PSelectDropdown, PButton, PToggleButton,
+    POverlayLayout, PFieldGroup, PTextInput, PTextarea, PSelectDropdown, PButton, PToggleButton,
 } from '@cloudforet/mirinae';
 
 import type { PackageModel } from '@/schema/identity/package/model';
-import type { WorkspaceAddPackageParameters } from '@/schema/identity/workspace/api-verbs/add-package';
-import type { WorkspaceRemovePackageParameters } from '@/schema/identity/workspace/api-verbs/remove-package';
 
 import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
 
@@ -31,16 +28,12 @@ const taskCategoryStore = taskManagementPageStore.taskCategoryStore;
 
 /* workspace */
 const {
-    WORKSPACE_SELECTION_TYPES,
-    workspaceScopes,
-    currentWorkspaceScope,
     selectedWorkspaceItems,
     workspaceMenuItemsHandler,
     workspaceValidator,
-    selectedWorkspaceIds,
-    handleChangeWorkspaceSelectionType,
     handleUpdateSelectedWorkspaces,
     setInitialWorkspaces,
+    applyPackageToWorkspaces,
 } = useWorkspaceField({
     workspaceReferenceMap: toRef(workspaceReferenceStore.state, 'items'),
 });
@@ -51,15 +44,16 @@ const {
     selectedCategoryItems,
     categoryValidator,
     handleUpdateSelectedCategories,
-    categories,
+    applyPackageToCategories,
 } = useCategoryField({
-    taskCategories: toRef(taskCategoryStore.state, 'taskCategories'),
+    defaultPackage: computed<PackageModel|undefined>(() => packageStore.state.packages?.find((p) => p.is_default)),
+    taskCategoryStore,
 });
 
 /* form */
 const {
     forms: {
-        name, description,
+        name, description, isDefaultPackage,
     },
     invalidState,
     invalidTexts,
@@ -69,6 +63,7 @@ const {
     description: '',
     categories: categoryValidator,
     workspaces: workspaceValidator,
+    isDefaultPackage: false,
 }, {
     name(value: string) {
         if (!value.trim().length) return 'Name is required';
@@ -81,57 +76,6 @@ const {
     },
 });
 
-/* methods */
-const addPackageToWorkspaces = async (supportPackage: PackageModel, workspaceIds: string[]) => {
-    try {
-        await Promise.allSettled([
-            ...workspaceIds.map((workspaceId) => SpaceConnector.clientV2.identity.workspace.addPackage<WorkspaceAddPackageParameters>({
-                package_id: supportPackage.package_id,
-                workspace_id: workspaceId,
-            })),
-        ]);
-    } catch (e) {
-        // TODO: handle error
-    }
-};
-const removePackageFromWorkspaces = async (supportPackage: PackageModel, workspaceIds: string[]) => {
-    try {
-        await Promise.allSettled([
-            ...workspaceIds.map((workspaceId) => SpaceConnector.clientV2.identity.workspace.removePackage<WorkspaceRemovePackageParameters>({
-                package_id: supportPackage.package_id,
-                workspace_id: workspaceId,
-            })),
-        ]);
-    } catch (e) {
-        // TODO: handle error
-    }
-};
-const applyPackageToWorkspaces = async (supportPackage: PackageModel, currentWorkspaceIds: string[], previousWorkspaceIds: string[]) => {
-    try {
-        const addedWorkspaces = currentWorkspaceIds.filter((id) => !previousWorkspaceIds.includes(id));
-        const removedWorkspaces = previousWorkspaceIds.filter((id) => !currentWorkspaceIds.includes(id));
-        await Promise.allSettled([
-            addPackageToWorkspaces(supportPackage, addedWorkspaces),
-            removePackageFromWorkspaces(supportPackage, removedWorkspaces),
-        ]);
-    } catch (e) {
-        // TODO: handle error
-    }
-};
-
-const updateCategories = async (supportPackage: PackageModel) => {
-    try {
-        await Promise.allSettled([
-            ...categories.value.map((c) => taskCategoryStore.updateCategory({
-                category_id: c,
-                package_id: supportPackage.package_id,
-            })),
-        ]);
-    } catch (e) {
-        // TODO: handle error
-    }
-};
-
 /* modal */
 const loading = ref(false);
 const handleCancelOrClose = () => {
@@ -143,17 +87,16 @@ const handleConfirm = async () => {
     loading.value = true;
     if (taskManagementPageState.editTargetPackageId) {
         try {
-            await Promise.allSettled([
-                packageStore.updatePackage({
-                    package_id: taskManagementPageState.editTargetPackageId,
-                    name: name.value,
-                    description: description.value,
-                    tags: {},
-                }),
-                ...categories.value.map((c) => taskCategoryStore.updateCategory({
-                    category_id: c,
-                    package_id: taskManagementPageState.editTargetPackageId,
-                })),
+            const updatedPackage = await packageStore.updatePackage({
+                package_id: taskManagementPageState.editTargetPackageId,
+                name: name.value,
+                description: description.value,
+                tags: {},
+            });
+            // bind workspaces and categories
+            await Promise.all([
+                applyPackageToWorkspaces(updatedPackage.package_id),
+                applyPackageToCategories(updatedPackage.package_id),
             ]);
         } catch (e) {
             ErrorHandler.handleRequestError(e, 'Failed to update package');
@@ -167,8 +110,8 @@ const handleConfirm = async () => {
             });
             // bind workspaces and categories
             await Promise.all([
-                applyPackageToWorkspaces(createdPackage, selectedWorkspaceIds.value, []),
-                updateCategories(createdPackage),
+                applyPackageToWorkspaces(createdPackage.package_id),
+                applyPackageToCategories(createdPackage.package_id),
             ]);
         } catch (e) {
             ErrorHandler.handleRequestError(e, 'Failed to create package');
@@ -192,19 +135,6 @@ onBeforeMount(() => {
         }
     }
 });
-/*
- <p-overlay-layout :visible="props.visible"
-                      style-type="secondary"
-                      size="full"
-                      :title="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.TITLE')"
-                      class="dashboard-manage-variable-overlay"
-                      @close="handleCloseOverlay"
-    >
-
-    :loading="loading"
-                    :disabled="!isAllValid"
-                    @confirm="handleConfirm"
- */
 </script>
 
 
@@ -237,24 +167,11 @@ onBeforeMount(() => {
                             @update:value="setForm('description', $event)"
                 />
             </p-field-group>
-            <p-field-group required
-                           :invalid="invalidState.workspaces"
+            <p-field-group :invalid="invalidState.workspaces"
                            :invalid-text="invalidTexts.workspaces"
-                           label="Workspace Scope"
+                           label="Workspace"
             >
-                <div class="flex flex-wrap gap-2">
-                    <p-select-button v-for="type in workspaceScopes"
-                                     :key="type"
-                                     :value="type"
-                                     :selected="currentWorkspaceScope"
-                                     @change="handleChangeWorkspaceSelectionType"
-                    >
-                        {{ WORKSPACE_SELECTION_TYPES[type].label }}
-                    </p-select-button>
-                </div>
-                <div v-if="currentWorkspaceScope === 'specific'"
-                     class="mt-2"
-                >
+                <div class="mt-2">
                     <p-select-dropdown :selected="selectedWorkspaceItems"
                                        :invalid="invalidState.workspaces"
                                        :handler="workspaceMenuItemsHandler"
@@ -296,7 +213,9 @@ onBeforeMount(() => {
                            :invalid="invalidState.categories"
                            :invalid-text="invalidTexts.categories"
             >
-                <p-toggle-button v-model="isDefaultPackage" />
+                <p-toggle-button :value="isDefaultPackage"
+                                 @update:value="setForm('isDefaultPackage', $event)"
+                />
             </p-field-group>
         </template>
         <template #footer>

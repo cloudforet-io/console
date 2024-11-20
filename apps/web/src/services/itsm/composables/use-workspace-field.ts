@@ -4,6 +4,7 @@ import { computed, ref } from 'vue';
 import { getTextHighlightRegex } from '@cloudforet/mirinae/src';
 import type { AutocompleteHandler, SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
+
 import type { WorkspaceReferenceMap, WorkspaceItem } from '@/store/reference/workspace-reference-store';
 
 import { useFieldValidator } from '@/common/composables/form-validator';
@@ -25,23 +26,11 @@ export const useWorkspaceField = ({
 }: {
     workspaceReferenceMap: Ref<WorkspaceReferenceMap|null>;
 }) => {
-    const workspaceScopes = computed<WorkspaceScope[]>(() => ['unset', 'all', 'specific']);
-    const currentWorkspaceScope = ref<WorkspaceScope>('unset');
-
     const workspaceValidator = useFieldValidator<SelectDropdownMenuItem[]>(
         [],
-        (value) => {
-            if (currentWorkspaceScope.value === 'specific') {
-                return value.length > 0 ? true : 'One or more workspaces are required';
-            }
-            return true;
-        },
     );
     const selectedWorkspaceItems = workspaceValidator.value;
-    const selectedWorkspaceIds = computed<string[]>(() => {
-        if (currentWorkspaceScope.value === 'all') return [];
-        return selectedWorkspaceItems.value.map((w) => w.name);
-    });
+    const selectedWorkspaceIds = computed<string[]>(() => selectedWorkspaceItems.value.map((w) => w.name));
 
     const allWorkspaceItems = computed<WorkspaceItem[]>(() => (workspaceReferenceMap.value ? Object.values(workspaceReferenceMap.value) : []));
     const workspaceItemsByPackage = computed<Record<string, WorkspaceItem[]>>(() => {
@@ -65,42 +54,63 @@ export const useWorkspaceField = ({
         };
     };
 
-    const handleChangeWorkspaceSelectionType = (type: WorkspaceScope) => {
-        if (currentWorkspaceScope.value === type) return;
-        workspaceValidator.setValue([]);
-        workspaceValidator.resetValidation();
-        currentWorkspaceScope.value = type;
-    };
     const handleUpdateSelectedWorkspaces = (selectedWorkspaces: SelectDropdownMenuItem[]) => {
         workspaceValidator.setValue(selectedWorkspaces);
     };
 
+    const prevSelectedWorkspaceItems = ref<WorkspaceItem[]>([]);
+    // const prevSelectedWorkspaceIds = computed<string[]>(() => prevSelectedWorkspaceItems.value.map((w) => w.name));
     const setInitialWorkspaces = (packageId?: string) => {
-        if (!packageId) { // create case
-            currentWorkspaceScope.value = 'unset';
-            workspaceValidator.setValue([]);
-        } else { // edit case
-            const prevSelectedWorkspaceItems = workspaceItemsByPackage.value[packageId] ?? [];
-            if (prevSelectedWorkspaceItems.length === 0) { // no workspace
-                currentWorkspaceScope.value = 'unset';
-                workspaceValidator.setValue([]);
-            } else { // edit case && has workspace
-                currentWorkspaceScope.value = 'specific';
-                workspaceValidator.setValue(prevSelectedWorkspaceItems);
-            }
+        prevSelectedWorkspaceItems.value = packageId ? workspaceItemsByPackage.value[packageId] ?? [] : [];
+        workspaceValidator.setValue(prevSelectedWorkspaceItems.value);
+    };
+
+
+    // const addPackageToWorkspaces = async (packageId: string, workspaceIds: string[]) => {
+    //     try {
+    //         // await Promise.allSettled([
+    //         //     ...workspaceIds.map((workspaceId) => SpaceConnector.clientV2.identity.workspace.addPackage<WorkspaceAddPackageParameters>({
+    //         //         package_id: packageId,
+    //         //         workspace_id: workspaceId,
+    //         //     })),
+    //         // ]);
+    //     } catch (e) {
+    //     // TODO: handle error
+    //     }
+    // };
+    // const removePackageFromWorkspaces = async (packageId: string, workspaceIds: string[]) => {
+    //     try {
+    //         // await Promise.allSettled([
+    //         //     ...workspaceIds.map((workspaceId) => SpaceConnector.clientV2.identity.workspace.removePackage<WorkspaceRemovePackageParameters>({
+    //         //         package_id: packageId,
+    //         //         workspace_id: workspaceId,
+    //         //     })),
+    //         // ]);
+    //     } catch (e) {
+    //     // TODO: handle error
+    //     }
+    // };
+    const applyPackageToWorkspaces = async () => { // (packageId: string) => {
+        try {
+            // const addedWorkspaces = selectedWorkspaceIds.value.filter((id) => !prevSelectedWorkspaceIds.value.includes(id));
+            // const removedWorkspaces = prevSelectedWorkspaceIds.value.filter((id) => !selectedWorkspaceIds.value.includes(id));
+            // await Promise.allSettled([
+            //     addPackageToWorkspaces(packageId, addedWorkspaces),
+            //     removePackageFromWorkspaces(packageId, removedWorkspaces),
+            // ]);
+        } catch (e) {
+        // TODO: handle error
         }
     };
 
     return {
         WORKSPACE_SELECTION_TYPES,
-        workspaceScopes,
-        currentWorkspaceScope,
         selectedWorkspaceItems,
         selectedWorkspaceIds,
         workspaceValidator,
         workspaceMenuItemsHandler,
-        handleChangeWorkspaceSelectionType,
         handleUpdateSelectedWorkspaces,
         setInitialWorkspaces,
+        applyPackageToWorkspaces,
     };
 };
