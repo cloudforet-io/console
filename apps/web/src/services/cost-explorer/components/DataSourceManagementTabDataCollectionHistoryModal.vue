@@ -8,6 +8,7 @@ import {
     PButtonModal, PTextEditor, PFieldTitle, PToggleButton, PTextInput, PDatetimePicker, PScopedNotification,
 } from '@cloudforet/mirinae';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -41,6 +42,8 @@ const emit = defineEmits<{(e: 'update:modal-visible'): void,
 
 const storeState = reactive({
     selectedDataSourceItem: computed<DataSourceItem>(() => dataSourcesPageGetters.selectedDataSourceItem),
+    recentJobItem: computed<CostJobItem>(() => dataSourcesPageGetters.jobList[0]),
+    timezone: computed<string>(() => store.state.user.timezone),
 });
 const state = reactive({
     proxyVisible: useProxyValue('modalVisible', props, emit),
@@ -77,6 +80,11 @@ const state = reactive({
         }
         return false;
     }),
+    diffInMinutes: computed<number>(() => {
+        const createdDate = dayjs.tz(storeState.recentJobItem.created_at, storeState.timezone);
+        const now = dayjs().tz(storeState.timezone);
+        return now.diff(createdDate, 'minute');
+    }),
 });
 
 const handleUpdateSelectedDates = (selectedDates: string[]) => {
@@ -91,18 +99,31 @@ const handleChangeToggleButton = () => {
 const handleConfirmButton = async () => {
     try {
         state.loading = true;
-        if (props.modalType === 'ERROR') return;
-        if (props.modalType === 'RE-SYNC' || props.modalType === 'RESTART') {
+
+        switch (props.modalType) {
+        case 'ERROR':
+            return;
+
+        case 'RE-SYNC':
+        case 'RESTART':
+            if (storeState.recentJobItem.status === 'IN_PROGRESS' && state.diffInMinutes <= 10) return;
             await dataSourcesPageStore.fetchSyncDatasource({
                 start: state.toggleValue ? undefined : dayjs(state.startDates[0]).format('YYYY-MM'),
                 data_source_id: storeState.selectedDataSourceItem.data_source_id,
             });
+            break;
+
+        case 'CANCEL':
+            if (props.selectedJobItem) {
+                await dataSourcesPageStore.fetchCancelJob({
+                    job_id: props.selectedJobItem?.job_id,
+                });
+            }
+            break;
+
+        default: break;
         }
-        if (props.modalType === 'CANCEL' && props.selectedJobItem) {
-            await dataSourcesPageStore.fetchCancelJob({
-                job_id: props.selectedJobItem?.job_id,
-            });
-        }
+
         await emit('confirm');
     } finally {
         state.loading = false;
@@ -120,6 +141,7 @@ const handleConfirmButton = async () => {
         backdrop
         :loading="state.loading"
         :disabled="state.modalValidation"
+        :hide-footer-close-button="props.modalType === 'RESTART' && storeState.recentJobItem.status === 'IN_PROGRESS' && state.diffInMinutes <= 10"
         :theme-color="props.modalType === 'CANCEL' || props.modalType === 'RESTART' ? 'alert' : 'primary'"
         :visible.sync="state.proxyVisible"
         class="data-source-management-tab-data-collection-history-modal"
@@ -140,8 +162,13 @@ const handleConfirmButton = async () => {
                     <div v-else
                          class="content-inner"
                     >
-                        <b class="desc-title">{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.RESTART_MODAL_DESC_1') }}</b>
-                        <p>{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.RESTART_MODAL_DESC_2') }}</p>
+                        <div v-if="state.diffInMinutes > 10">
+                            <b class="desc-title">{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.RESTART_MODAL_DESC_1') }}</b>
+                            <p>{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.RESTART_MODAL_DESC_2') }}</p>
+                        </div>
+                        <div v-else>
+                            <p>{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.RESTART_MODAL_CANCEL_DESC') }}</p>
+                        </div>
                     </div>
                 </p-scoped-notification>
             </div>
@@ -204,10 +231,15 @@ const handleConfirmButton = async () => {
         <template #confirm-button>
             <span v-if="props.modalType === 'ERROR'">{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ERROR_FOUND_OK') }}</span>
             <span v-else-if="props.modalType === 'CANCEL'">{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.CANCEL_BUTTON') }}</span>
-            <span v-else-if="props.modalType === 'RESTART'">{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.RESTART_MODAL_BUTTON') }}</span>
+            <span v-else-if="props.modalType === 'RESTART'
+                && storeState.recentJobItem.status !== 'IN_PROGRESS'
+                && state.diffInMinutes > 10"
+            >
+                {{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.RESTART_MODAL_BUTTON') }}
+            </span>
         </template>
         <template #close-button>
-            <span v-if="props.modalType === 'RESTART' || props.modalType === 'CANCEL'">{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.KEEP_COLLECTING') }}</span>
+            <span v-if="props.modalType === 'CANCEL'">{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.KEEP_COLLECTING') }}</span>
         </template>
     </p-button-modal>
 </template>
