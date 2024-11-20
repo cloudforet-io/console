@@ -2,24 +2,28 @@ import { reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import type { TaskCategoryCreateParameters } from '@/schema/workflow/task-category/api-verbs/create';
-import type { TaskCategoryUpdateParameters } from '@/schema/workflow/task-category/api-verbs/update';
-import type { TaskCategoryModel } from '@/schema/workflow/task-category/model';
+import type { TaskCategoryCreateParameters } from '@/schema/opsflow/task-category/api-verbs/create';
+import type { TaskCategoryUpdateParameters } from '@/schema/opsflow/task-category/api-verbs/update';
+import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
+
 
 interface UseTaskCategoryStoreState {
     loading: boolean;
     taskCategories?: TaskCategoryModel[];
-    creating: boolean;
-    updating: boolean;
+}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface UseTaskCategoryStoreGetters {
 }
 
 export const useTaskCategoryStore = defineStore('task-category', () => {
     const state = reactive<UseTaskCategoryStoreState>({
         loading: false,
         taskCategories: undefined,
-        creating: false,
-        updating: false,
     }) as UseTaskCategoryStoreState;
+
+    const getters = reactive<UseTaskCategoryStoreGetters>({
+    });
+
     const actions = {
         async fetchCategories() {
             return new Promise<void>((resolve) => {
@@ -130,12 +134,11 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
                 }, 1000);
             });
         },
-        async createCategory(param: Omit<TaskCategoryCreateParameters, 'status_options'>) {
-            return new Promise<void>((resolve) => {
-                state.creating = true;
-                state.taskCategories?.push({
+        async createCategory(param: Omit<TaskCategoryCreateParameters, 'status_options'|'package_id'>) {
+            return new Promise<TaskCategoryModel>((resolve) => {
+                const result: TaskCategoryModel = {
                     category_id: `category_${(state.taskCategories?.length ?? 0) + 1}`,
-                    package_id: param.package_id,
+                    package_id: 'package_1', // default package id
                     name: param.name,
                     description: param.description ?? '',
                     status_options: [{
@@ -156,29 +159,31 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
                     created_at: '2021-09-01T00:00:00',
                     updated_at: '2021-09-01T00:00:00',
                     tags: param.tags ?? {},
-                });
-                state.creating = false;
-                resolve();
+                };
+                state.taskCategories?.push(result);
+                resolve(result);
             });
         },
         async updateCategory(param: Omit<TaskCategoryUpdateParameters, 'status_options'>) {
-            return new Promise<void>((resolve) => {
-                state.updating = true;
+            return new Promise<TaskCategoryModel>((resolve, reject) => {
                 setTimeout(() => {
                     const targetCategory = state.taskCategories?.find((category) => category.category_id === param.category_id);
                     if (targetCategory) {
                         if (param.name) targetCategory.name = param.name;
-                        if (targetCategory.description) targetCategory.description = param.description ?? '';
-                        if (targetCategory.tags) targetCategory.tags = param.tags ?? {};
+                        if (param.description) targetCategory.description = param.description ?? '';
+                        if (param.tags) targetCategory.tags = param.tags ?? {};
+                        if (param.package_id) targetCategory.package_id = param.package_id;
+                        resolve(targetCategory);
+                    } else {
+                        reject(new Error('Category not found'));
                     }
-                    state.updating = false;
-                    resolve();
                 }, 1000);
             });
         },
     };
     return {
         state,
+        getters,
         ...actions,
     };
 });

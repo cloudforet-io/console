@@ -2,7 +2,7 @@ import { reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import type { TaskTypeModel } from '@/schema/workflow/task-type/model';
+import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
 
 import getRandomId from '@/lib/random-id-generator';
 

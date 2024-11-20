@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { reactive, computed, onBeforeMount } from 'vue';
+import { onBeforeMount, ref } from 'vue';
 
 import {
-    PButtonModal, PFieldGroup, PTextInput, PTextarea, PSelectDropdown,
+    POverlayLayout, PFieldGroup, PTextInput, PTextarea, PButton,
 } from '@cloudforet/mirinae';
-import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
@@ -13,10 +12,9 @@ import { useTaskManagementPageStore } from '@/services/itsm/stores/admin/task-ma
 const taskManagementPageStore = useTaskManagementPageStore();
 const taskManagementPageState = taskManagementPageStore.state;
 const taskCategoryStore = taskManagementPageStore.taskCategoryStore;
-const packageStore = taskManagementPageStore.packageStore;
 
 const {
-    forms: { name, description, supportPackage },
+    forms: { name, description },
     invalidState,
     invalidTexts,
     setForm, isAllValid,
@@ -24,7 +22,6 @@ const {
 } = useFormValidator({
     name: '',
     description: '',
-    supportPackage: packageStore.state.packages?.[0].package_id ?? '',
 }, {
     name(value: string) {
         if (!value.trim().length) return 'Name is required';
@@ -35,24 +32,12 @@ const {
     description(value: string) {
         return value.length > 0 ? true : 'Description is required';
     },
-    supportPackage(value: string) {
-        return value.length > 0 ? true : 'Support Package is required';
-    },
 });
 
-const state = reactive({
-    packageMenuItems: computed<SelectDropdownMenuItem[]>(() => {
-        if (!packageStore.state.packages) return [];
-        return packageStore.state.packages.map((p) => ({
-            name: p.package_id,
-            label: p.name,
-        }));
-    }),
-});
-
+const loading = ref(false);
 const handleCancelOrClose = () => {
     initForm();
-    taskManagementPageStore.closeAddOrEditCategoryModal();
+    taskManagementPageStore.closeCategoryForm();
 };
 const handleConfirm = async () => {
     if (!isAllValid.value) return;
@@ -62,16 +47,14 @@ const handleConfirm = async () => {
             category_id: taskManagementPageState.editTargetCategoryId,
             name: name.value,
             description: description.value,
-            package_id: supportPackage.value,
         });
     } else {
         await taskCategoryStore.createCategory({
             name: name.value,
             description: description.value,
-            package_id: supportPackage.value,
         });
     }
-    taskManagementPageStore.closeAddOrEditCategoryModal();
+    taskManagementPageStore.closeCategoryForm();
 };
 
 onBeforeMount(() => {
@@ -80,22 +63,18 @@ onBeforeMount(() => {
         if (targetCategory) {
             setForm('name', targetCategory.name);
             setForm('description', targetCategory.description);
-            setForm('supportPackage', targetCategory.package_id);
         }
     }
 });
+
 </script>
 
 <template>
-    <p-button-modal header-title="Add Category"
-                    :visible="taskManagementPageState.visibleAddOrEditCategoryModal"
-                    :loading="taskCategoryStore.state.creating || taskCategoryStore.state.updating"
-                    :disabled="!isAllValid"
-                    @cancel="handleCancelOrClose"
-                    @close="handleCancelOrClose"
-                    @confirm="handleConfirm"
+    <p-overlay-layout header-title="Add Category"
+                      :visible="taskManagementPageState.visibleCategoryForm"
+                      @close="handleCancelOrClose"
     >
-        <template #body>
+        <template #contents>
             <p-field-group label="Name"
                            required
                            :invalid="invalidState.name"
@@ -117,17 +96,22 @@ onBeforeMount(() => {
                             @update:value="setForm('description', $event)"
                 />
             </p-field-group>
-            <p-field-group label="Support Package"
-                           required
-            >
-                <p-select-dropdown :selected="supportPackage"
-                                   :menu="state.packageMenuItems"
-                                   block
-                                   :invalid="invalidState.supportPackage"
-                                   :invalid-text="invalidTexts.supportPackage"
-                                   @select="setForm('supportPackage', $event)"
-                />
-            </p-field-group>
         </template>
-    </p-button-modal>
+        <template #footer>
+            <p-button style-type="transparent"
+                      :disabled="loading"
+                      @click="handleCancelOrClose"
+            >
+                Cancel
+            </p-button>
+            <p-button class="ml-3"
+                      style-type="primary"
+                      :loading="loading"
+                      :disabled="!isAllValid"
+                      @click="handleConfirm"
+            >
+                Confirm
+            </p-button>
+        </template>
+    </p-overlay-layout>
 </template>

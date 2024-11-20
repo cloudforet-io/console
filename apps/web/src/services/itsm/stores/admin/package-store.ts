@@ -6,16 +6,15 @@ import type { PackageCreateParameters } from '@/schema/identity/package/api-verb
 import type { PackageUpdateParameters } from '@/schema/identity/package/api-verbs/update';
 import type { PackageModel } from '@/schema/identity/package/model';
 
+
 interface UsePackageStoreState {
     loading: boolean;
     packages?: PackageModel[];
-    creating: boolean;
 }
 export const usePackageStore = defineStore('package', () => {
     const state = reactive<UsePackageStoreState>({
         loading: false,
         packages: undefined,
-        creating: false,
     });
     const actions = {
         async fetchPackages() {
@@ -60,10 +59,9 @@ export const usePackageStore = defineStore('package', () => {
             });
         },
         async createPackage(param: PackageCreateParameters) {
-            return new Promise<void>((resolve) => {
-                state.creating = true;
+            return new Promise<PackageModel>((resolve) => {
                 setTimeout(() => {
-                    state.packages?.push({
+                    const result = {
                         package_id: `package_${(state.packages?.length ?? 0) + 1}`,
                         name: param.name,
                         description: param.description,
@@ -72,14 +70,14 @@ export const usePackageStore = defineStore('package', () => {
                         domain_id: '1',
                         created_at: '2021-09-01T00:00:00',
                         updated_at: '2021-09-01T00:00:00',
-                    });
-                    state.creating = false;
-                    resolve();
+                    };
+                    state.packages?.push(result);
+                    resolve(result);
                 }, 1000);
             });
         },
         async updatePackage(param: PackageUpdateParameters) {
-            return new Promise<void>((resolve) => {
+            return new Promise<PackageModel>((resolve, reject) => {
                 setTimeout(() => {
                     const targetPackage = state.packages?.find((p) => p.package_id === param.package_id);
                     if (targetPackage) {
@@ -87,8 +85,10 @@ export const usePackageStore = defineStore('package', () => {
                         targetPackage.description = param.description ?? targetPackage.description;
                         targetPackage.tags = param.tags ?? targetPackage.tags;
                         targetPackage.updated_at = Date.now().toString();
+                        resolve(targetPackage);
+                    } else {
+                        reject(new Error('Package not found'));
                     }
-                    resolve();
                 }, 1000);
             });
         },
