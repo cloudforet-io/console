@@ -2,7 +2,7 @@
 import { onBeforeMount, reactive, computed } from 'vue';
 
 import {
-    PPaneLayout, PHeadingLayout, PFieldTitle, PButton, PDataTable,
+    PPaneLayout, PHeadingLayout, PHeading, PButton, PDataTable, PIconButton,
 } from '@cloudforet/mirinae';
 import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 
@@ -38,26 +38,26 @@ onBeforeMount(() => {
 
 <template>
     <p-pane-layout class="mt-4">
-        <p-heading-layout class="pt-6 px-4 mb-6">
+        <p-heading-layout class="pt-6 px-4 mb-2">
             <template #heading>
-                <p-field-title label="Support Package"
-                               size="lg"
-                               class="mb-2"
+                <p-heading title="Support Package"
+                           heading-type="sub"
                 />
-                <p class="text-label-md text-gray-600">
-                    계약에 따라 고객이 이용할 수 있는 기능의 묶음입니다. 전체 서비스의 범위를 나타내며, 하위 카테고를 생성할 수 있습니다.
-                </p>
             </template>
             <template #extra>
+                <p-icon-button name="ic_refresh" />
                 <p-button icon-left="ic_plus_bold"
                           size="md"
                           style-type="substitutive"
-                          @click="taskManagementPageStore.openAddPackageModal()"
+                          @click="taskManagementPageStore.openAddPackageForm()"
                 >
                     Add Package
                 </p-button>
             </template>
         </p-heading-layout>
+        <p class="px-4 mb-6 text-label-md text-gray-600">
+            계약에 따라 고객이 이용할 수 있는 기능의 묶음입니다. 전체 서비스의 범위를 나타내며, 하위 카테고를 생성할 수 있습니다.
+        </p>
         <p-data-table :loading="packageStore.state.loading"
                       :items="packageStore.state.packages"
                       :fields="state.packageFields"
@@ -66,7 +66,7 @@ onBeforeMount(() => {
                 <p-button icon-left="ic_edit"
                           size="sm"
                           style-type="tertiary"
-                          @click="taskManagementPageStore.openEditPackageModal(item.package_id)"
+                          @click="taskManagementPageStore.openEditPackageForm(item.package_id)"
                 >
                     Edit
                 </p-button>

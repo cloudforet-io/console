@@ -1,25 +1,23 @@
-import type { ComputedRef } from 'vue';
-import { reactive, computed } from 'vue';
+import { reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
 import { usePackageStore } from '@/services/itsm/stores/admin/package-store';
-import { useTaskCategoryStore } from '@/services/itsm/stores/task-category-store';
+import { useTaskCategoryStore } from '@/services/itsm/stores/admin/task-category-store';
 // import { useTaskTypeStore } from '@/services/itsm/stores/task-type-store';
 
 interface UseTaskManagementPageStoreState {
     currentTemplateId?: string;
     // support package
-    visibleAddOrEditPackageModal: boolean;
+    visiblePackageForm: boolean;
     editTargetPackageId?: string;
     // category
-    visibleAddOrEditCategoryModal: boolean;
+    visibleCategoryForm: boolean;
     editTargetCategoryId?: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface UseTaskManagementPageStoreGetters {
-    currentTemplate: ComputedRef<any>;
-
 }
 
 export const useTaskManagementPageStore = defineStore('task-management-page', () => {
@@ -29,49 +27,43 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
     const state = reactive<UseTaskManagementPageStoreState>({
         currentTemplateId: 'support-center',
         // support package
-        visibleAddOrEditPackageModal: false,
+        visiblePackageForm: false,
         editTargetPackageId: undefined,
         // category
-        visibleAddOrEditCategoryModal: false,
+        visibleCategoryForm: false,
         editTargetCategoryId: undefined,
     });
     const getters = reactive<UseTaskManagementPageStoreGetters>({
-        currentTemplate: computed(() => ({
-            title: 'Support Center',
-            task_category: 'Ticket Category',
-            task_type: 'Ticket Topic',
-        })),
-
     });
     const actions = {
         setCurrentTemplateId(templateId: string) {
             state.currentTemplateId = templateId;
         },
         // support package
-        openAddPackageModal() {
+        openAddPackageForm() {
             state.editTargetPackageId = undefined;
-            state.visibleAddOrEditPackageModal = true;
+            state.visiblePackageForm = true;
         },
-        closeAddOrEditPackageModal() {
-            state.editTargetPackageId = undefined;
-            state.visibleAddOrEditPackageModal = false;
-        },
-        openEditPackageModal(packageId: string) {
+        openEditPackageForm(packageId: string) {
             state.editTargetPackageId = packageId;
-            state.visibleAddOrEditPackageModal = true;
+            state.visiblePackageForm = true;
+        },
+        closePackageForm() {
+            state.visiblePackageForm = false;
+            state.editTargetPackageId = undefined;
         },
         // category
-        openAddCategoryModal() {
+        openAddCategoryForm() {
             state.editTargetCategoryId = undefined;
-            state.visibleAddOrEditCategoryModal = true;
+            state.visibleCategoryForm = true;
         },
-        closeAddOrEditCategoryModal() {
-            state.editTargetCategoryId = undefined;
-            state.visibleAddOrEditCategoryModal = false;
-        },
-        openEditCategoryModal(categoryId: string) {
+        openEditCategoryForm(categoryId: string) {
             state.editTargetCategoryId = categoryId;
-            state.visibleAddOrEditCategoryModal = true;
+            state.visibleCategoryForm = true;
+        },
+        closeCategoryForm() {
+            state.visibleCategoryForm = false;
+            state.editTargetCategoryId = undefined;
         },
     };
     return {

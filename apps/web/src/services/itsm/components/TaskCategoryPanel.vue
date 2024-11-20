@@ -2,7 +2,7 @@
 import { onBeforeMount, reactive, computed } from 'vue';
 
 import {
-    PPaneLayout, PHeadingLayout, PFieldTitle, PButton, PDataTable, PBadge,
+    PPaneLayout, PHeadingLayout, PHeading, PButton, PDataTable, PBadge, PIconButton,
 } from '@cloudforet/mirinae';
 import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 
@@ -51,27 +51,27 @@ onBeforeMount(() => {
 </script>
 
 <template>
-    <p-pane-layout class="mt-4">
-        <p-heading-layout class="pt-6 px-4 mb-6">
+    <p-pane-layout>
+        <p-heading-layout class="pt-6 px-4 mb-2">
             <template #heading>
-                <p-field-title label="Task Category"
-                               size="lg"
-                               class="mb-2"
+                <p-heading title="Task Category"
+                           heading-type="sub"
                 />
-                <p class="text-label-md text-gray-600">
-                    티켓의 유형을 그룹화한 것입니다. 고객은 티켓을 제출할 때 적절한 카테고리를 선택하여 담당자가 티켓을 효율적으로 관리할 수 있게 돕습니다.
-                </p>
             </template>
             <template #extra>
+                <p-icon-button name="ic_refresh" />
                 <p-button icon-left="ic_plus_bold"
                           size="md"
                           style-type="substitutive"
-                          @click="taskManagementPageStore.openAddCategoryModal()"
+                          @click="taskManagementPageStore.openAddCategoryForm()"
                 >
                     Add Category
                 </p-button>
             </template>
         </p-heading-layout>
+        <p class="px-4 mb-6 text-label-md text-gray-600">
+            티켓의 유형을 그룹화한 것입니다. 고객은 티켓을 제출할 때 적절한 카테고리를 선택하여 담당자가 티켓을 효율적으로 관리할 수 있게 돕습니다.
+        </p>
         <p-data-table :loading="taskCategoryStore.state.loading"
                       :items="taskCategoryStore.state.taskCategories"
                       :fields="state.categoryFields"
@@ -89,7 +89,7 @@ onBeforeMount(() => {
                 <p-button icon-left="ic_edit"
                           size="sm"
                           style-type="tertiary"
-                          @click="taskManagementPageStore.openEditCategoryModal(item.category_id)"
+                          @click="taskManagementPageStore.openEditCategoryForm(item.category_id)"
                 >
                     Edit
                 </p-button>
