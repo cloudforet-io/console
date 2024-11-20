@@ -23,6 +23,7 @@ interface UseTaskManagementPageStoreState {
 interface UseTaskManagementPageStoreGetters {
     editTargetPackage: ComputedRef<PackageModel|undefined>;
     editTargetCategory: ComputedRef<DeepReadonly<TaskCategoryModel>|undefined>;
+    defaultPackage: ComputedRef<PackageModel|undefined>;
 }
 
 export const useTaskManagementPageStore = defineStore('task-management-page', () => {
@@ -41,6 +42,7 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
     const getters = reactive<UseTaskManagementPageStoreGetters>({
         editTargetPackage: computed<PackageModel|undefined>(() => packageStore.state.packages?.find((p) => p.package_id === state.editTargetPackageId)),
         editTargetCategory: computed<DeepReadonly<TaskCategoryModel>|undefined>(() => taskCategoryStore.getters.taskCategories.find((c) => c.category_id === state.editTargetCategoryId)),
+        defaultPackage: computed<PackageModel|undefined>(() => packageStore.state.packages?.find((p) => p.is_default)),
     });
     const actions = {
         setCurrentTemplateId(templateId: string) {

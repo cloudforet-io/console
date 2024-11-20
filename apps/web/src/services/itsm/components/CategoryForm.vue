@@ -7,6 +7,7 @@ import {
     POverlayLayout, PFieldGroup, PTextInput, PTextarea, PButton,
 } from '@cloudforet/mirinae';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import { useTaskManagementPageStore } from '@/services/itsm/stores/admin/task-management-page-store';
@@ -22,6 +23,7 @@ const {
     invalidTexts,
     setForm, isAllValid,
     initForm,
+    resetValidations,
 } = useFormValidator({
     name: '',
     description: '',
@@ -42,19 +44,29 @@ const handleCancelOrClose = () => {
 const handleConfirm = async () => {
     if (!isAllValid.value) return;
 
-    if (taskManagementPageState.editTargetCategoryId) {
-        await taskCategoryStore.updateCategory({
-            category_id: taskManagementPageState.editTargetCategoryId,
-            name: name.value,
-            description: description.value,
-        });
-    } else {
-        await taskCategoryStore.createCategory({
-            name: name.value,
-            description: description.value,
-        });
+    try {
+        loading.value = true;
+        if (taskManagementPageState.editTargetCategoryId) {
+            await taskCategoryStore.updateCategory({
+                category_id: taskManagementPageState.editTargetCategoryId,
+                name: name.value,
+                description: description.value,
+            });
+        } else {
+            if (!taskManagementPageGetters.defaultPackage) throw Error('Default package is not found');
+            await taskCategoryStore.createCategory({
+                name: name.value,
+                description: description.value,
+                package_id: taskManagementPageGetters.defaultPackage.package_id,
+            });
+        }
+        taskManagementPageStore.closeCategoryForm();
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, 'Failed to save category');
+        // TODO: handle error
+    } finally {
+        loading.value = false;
     }
-    taskManagementPageStore.closeCategoryForm();
 };
 
 onBeforeMount(() => {
@@ -75,6 +87,7 @@ watch([() => taskManagementPageState.visibleCategoryForm, () => taskManagementPa
             name: '',
             description: '',
         });
+        resetValidations();
         return;
     }
     if (targetCategory) {
@@ -95,20 +108,18 @@ watch([() => taskManagementPageState.visibleCategoryForm, () => taskManagementPa
             <div class="p-6 w-full">
                 <p-field-group label="Name"
                                required
-                               :invalid="invalidState.name"
+                               :invalid="!loading && invalidState.name"
                                :invalid-text="invalidTexts.name"
                 >
-                    <p-text-input :value="name"
-                                  :invalid="invalidState.name"
-                                  @update:value="setForm('name', $event)"
-                    />
+                    <template #default="{ invalid }">
+                        <p-text-input :value="name"
+                                      :invalid="invalid"
+                                      @update:value="setForm('name', $event)"
+                        />
+                    </template>
                 </p-field-group>
-                <p-field-group label="Description"
-                               :invalid="invalidState.description"
-                               :invalid-text="invalidTexts.description"
-                >
+                <p-field-group label="Description">
                     <p-textarea :value="description"
-                                :invalid="invalidState.description"
                                 placeholder="Describe this support package in a few words."
                                 @update:value="setForm('description', $event)"
                     />

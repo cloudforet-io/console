@@ -172,11 +172,11 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
                 }, 1000);
             });
         },
-        async createCategory(param: Omit<TaskCategoryCreateParameters, 'status_options'|'package_id'>) {
+        async createCategory(param: Omit<TaskCategoryCreateParameters, 'status_options'>) {
             return new Promise<TaskCategoryModel>((resolve) => {
                 const result: TaskCategoryModel = {
                     category_id: `category_${(getters.taskCategories.length) + 1}`,
-                    package_id: 'package_1', // default package id
+                    package_id: param.package_id,
                     name: param.name,
                     description: param.description ?? '',
                     status_options: {
