@@ -5,7 +5,7 @@ import {
     PHeadingLayout, PHeading, PSelectDropdown,
     PI, PToggleButton,
 } from '@cloudforet/mirinae';
-import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import AddOrEditCategoryModal from '@/services/itsm/components/AddOrEditCategoryModal.vue';
 import AddOrEditPackageModal from '@/services/itsm/components/AddOrEditPackageModal.vue';
