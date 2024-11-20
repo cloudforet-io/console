@@ -941,6 +941,7 @@
 				"RESETTING": "リセット中...",
 				"RESET_MODAL_TITLE": "ワークスペースに連携された{count}個のアカウントを初期化しますか？",
 				"RESTART_MODAL_BUTTON": "",
+				"RESTART_MODAL_CANCEL_DESC": "データ収集が進行中です。\n再同期を希望する場合は、進行中の作業をキャンセルしてから再同期を行ってください。",
 				"RESTART_MODAL_DESC_1": "",
 				"RESTART_MODAL_DESC_2": "",
 				"RESTART_MODAL_TITLE": "",
