@@ -44,6 +44,7 @@ const {
     selectedCategoryItems,
     categoryValidator,
     handleUpdateSelectedCategories,
+    setInitialCategories,
     applyPackageToCategories,
 } = useCategoryField({
     defaultPackage: computed<PackageModel|undefined>(() => packageStore.state.packages?.find((p) => p.is_default)),
@@ -131,7 +132,7 @@ onBeforeMount(() => {
                 description: targetPackage.description,
             });
             setInitialWorkspaces(targetPackage.package_id);
-            // TODO: set initial categories
+            setInitialCategories(targetPackage.package_id);
         }
     }
 });
