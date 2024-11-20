@@ -1,13 +1,15 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import { cloneDeep } from 'lodash';
 
 import {
-    PFieldTitle, PToggleButton, PFieldGroup, PSelectDropdown, PDivider, PI, PTooltip,
+    PFieldTitle, PToggleButton, PFieldGroup, PSelectDropdown, PI, PTooltip,
 } from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import { i18n } from '@/translations';
 
@@ -22,9 +24,9 @@ import type { WidgetFieldComponentProps, WidgetFieldComponentEmit } from '@/comm
 
 
 
-const emit = defineEmits<WidgetFieldComponentEmit<ComparisonValue[]|undefined>>();
+const emit = defineEmits<WidgetFieldComponentEmit<ComparisonValue|undefined>>();
 
-const props = withDefaults(defineProps<WidgetFieldComponentProps<ComparisonOptions, ComparisonValue[]>>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<ComparisonOptions, ComparisonValue>>(), {
     widgetFieldSchema: () => ({
         options: {
             toggle: false,
@@ -33,9 +35,9 @@ const props = withDefaults(defineProps<WidgetFieldComponentProps<ComparisonOptio
 });
 
 const state = reactive({
-    toggleValue: !!props.widgetFieldSchema.options?.toggle || !!props.value || false,
-    proxyValue: useProxyValue<ComparisonValue[]|undefined>('value', props, emit),
-    disabled: computed(() => { // NOTE: EXCEPTION FOR ONLY TABLE WIDGET
+    toggleValue: false,
+    proxyValue: useProxyValue<ComparisonValue|undefined>('value', props, emit),
+    disabled: computed<boolean>(() => { // NOTE: EXCEPTION FOR ONLY TABLE WIDGET
         const tableDataField = props.allValueMap?.tableDataField as TableDataFieldValue;
         if (!tableDataField) return false;
         const _tableDataFieldFieldValue = tableDataField.fieldType === 'staticField' ? tableDataField.staticFieldInfo?.fieldValue : tableDataField.dynamicFieldInfo?.fieldValue;
@@ -44,7 +46,7 @@ const state = reactive({
             || Array.isArray(_tableDataFieldFieldValue) && isIncludingDateField(_tableDataFieldFieldValue)
             || Array.isArray(groupByField?.value) && isIncludingDateField(groupByField.value);
     }),
-    infoText: computed(() => {
+    infoText: computed<TranslateResult>(() => {
         const tableDataField = props.allValueMap?.tableDataField as TableDataFieldValue;
         if (tableDataField) return i18n.t('COMMON.WIDGETS.COMPARISON.INFO_TOOLTIP_TABLE');
         return i18n.t('COMMON.WIDGETS.COMPARISON.INFO_TOOLTIP');
@@ -53,70 +55,51 @@ const state = reactive({
         decreaseColor: DEFAULT_COMPARISON_COLOR.DECREASE,
         increaseColor: DEFAULT_COMPARISON_COLOR.INCREASE,
         format: 'all',
+        toggleValue: true,
     })),
-    formatMenu: [
+    formatMenu: computed<SelectDropdownMenuItem[]>(() => [
         { label: i18n.t('COMMON.WIDGETS.COMPARISON.ALL'), name: 'all' },
         { label: `${i18n.t('COMMON.WIDGETS.COMPARISON.PERCENT')}(%)`, name: 'percent' },
         { label: i18n.t('COMMON.WIDGETS.COMPARISON.FIXED'), name: 'fixed' },
-    ],
+    ]),
 });
 
-const handleUpdateColor = (key:string, index:number, color:string) => {
-    if (!state.proxyValue) return;
+const handleUpdateColor = (key:string, color:string) => {
+    if (!state.proxyValue || !state.proxyValue?.toggleValue) return;
     const clonedValue = cloneDeep(state.proxyValue);
-    clonedValue[index][key] = color;
+    clonedValue[key] = color;
     state.proxyValue = clonedValue;
 };
 const handleUpdateToggle = (value: boolean) => {
-    state.toggleValue = value;
     if (value) {
-        initValue();
-        state.proxyValue = [cloneDeep(state.initialValue)];
+        state.proxyValue = cloneDeep(state.initialValue);
     } else {
-        state.proxyValue = undefined;
+        state.proxyValue = {
+            toggleValue: false,
+        };
     }
 };
 
-const handleUpdateFormat = (format: ComparisonFormat, index: number) => {
+const handleUpdateFormat = (format: ComparisonFormat) => {
     if (!state.proxyValue) return;
     const clonedValue = cloneDeep(state.proxyValue);
-    clonedValue[index].format = format;
+    clonedValue.format = format;
     state.proxyValue = clonedValue;
 };
 
 const checkValue = ():boolean => {
-    if (state.toggleValue) {
-        return !!state.proxyValue?.every((item) => item.decreaseColor && item.increaseColor && item.format);
+    if (state.proxyValue?.toggleValue) {
+        return !!state.proxyValue?.decreaseColor && !!state.proxyValue?.increaseColor && !!state.proxyValue?.format;
     }
     return true;
 };
 
-watch(() => state.proxyValue, () => {
+watch(() => state.proxyValue, (_value) => {
     emit('update:is-valid', checkValue());
+    if (!_value) {
+        state.proxyValue = cloneDeep(state.initialValue);
+    }
 }, { immediate: true });
-
-watch(() => props.value, (changed) => {
-    if (changed === undefined) state.toggleValue = false;
-    emit('update:is-valid', checkValue());
-});
-
-const initValue = () => {
-    if (props.value !== undefined) {
-        state.proxyValue = cloneDeep(props.value);
-    } else if (props.widgetFieldSchema.options?.toggle ?? false) {
-        state.proxyValue = [cloneDeep(state.initialValue)];
-    } else {
-        state.proxyValue = undefined;
-    }
-};
-
-onMounted(() => {
-    if (!state.toggleValue) state.proxyValue = undefined;
-    else {
-        initValue();
-    }
-});
-
 </script>
 
 <template>
@@ -131,64 +114,54 @@ onMounted(() => {
                     />
                 </p-tooltip>
             </p-field-title>
-            <p-toggle-button :value="state.toggleValue"
+            <p-toggle-button :value="state.proxyValue?.toggleValue"
                              :disabled="state.disabled"
                              @change-toggle="handleUpdateToggle"
             />
         </div>
-        <div v-if="state.toggleValue"
-             class="contents-box"
-        >
-            <div v-for="(item, index) in state.proxyValue"
-                 :key="index"
-                 class="form-container"
-            >
-                <div class="mb-2">
-                    <p-divider v-if="index !== 0" />
-                </div>
-                <div class="row-1">
-                    <p-field-group :label="$t('COMMON.WIDGETS.COMPARISON.COMPARE_WITH')"
-                                   class="left"
+        <template v-if="state.proxyValue?.toggleValue">
+            <div class="compare-with-wrapper">
+                <p-field-group :label="$t('COMMON.WIDGETS.COMPARISON.COMPARE_WITH')"
+                               class="left-part"
+                               style-type="secondary"
+                               required
+                >
+                    <span class="previous-period-text">{{ $t('COMMON.WIDGETS.COMPARISON.PREVIOUS_PERIOD') }}</span>
+                </p-field-group>
+            </div>
+            <div class="compare-input-wrapper">
+                <div class="left-part">
+                    <p-field-group :label="$t('COMMON.WIDGETS.COMPARISON.DECREASE')"
                                    style-type="secondary"
                                    required
                     >
-                        <span class="compare-with">{{ $t('COMMON.WIDGETS.COMPARISON.PREVIOUS_PERIOD') }}</span>
+                        <color-input :value="state.proxyValue.decreaseColor"
+                                     @update:value="(color) => handleUpdateColor('decreaseColor', color)"
+                        />
                     </p-field-group>
-                </div>
-                <div class="row-2">
-                    <div class="left">
-                        <p-field-group :label="$t('COMMON.WIDGETS.COMPARISON.DECREASE')"
-                                       style-type="secondary"
-                                       required
-                        >
-                            <color-input :value="state.proxyValue[index].decreaseColor"
-                                         @update:value="(color) => handleUpdateColor('decreaseColor', index, color)"
-                            />
-                        </p-field-group>
-                        <p-field-group :label="$t('COMMON.WIDGETS.COMPARISON.INCREASE')"
-                                       style-type="secondary"
-                                       required
-                        >
-                            <color-input :value="state.proxyValue[index].increaseColor"
-                                         @update:value="(color) => handleUpdateColor('increaseColor', index, color)"
-                            />
-                        </p-field-group>
-                    </div>
-                    <p-field-group :label="$t('COMMON.WIDGETS.COMPARISON.FORMAT')"
-                                   class="w-full"
+                    <p-field-group :label="$t('COMMON.WIDGETS.COMPARISON.INCREASE')"
                                    style-type="secondary"
                                    required
                     >
-                        <p-select-dropdown :menu="state.formatMenu"
-                                           use-fixed-menu-style
-                                           :selected="state.proxyValue[index].format"
-                                           block
-                                           @update:selected="(format) => handleUpdateFormat(format, index)"
+                        <color-input :value="state.proxyValue.increaseColor"
+                                     @update:value="(color) => handleUpdateColor('increaseColor', color)"
                         />
                     </p-field-group>
                 </div>
+                <p-field-group :label="$t('COMMON.WIDGETS.COMPARISON.FORMAT')"
+                               class="w-full"
+                               style-type="secondary"
+                               required
+                >
+                    <p-select-dropdown :menu="state.formatMenu"
+                                       use-fixed-menu-style
+                                       :selected="state.proxyValue.format"
+                                       block
+                                       @update:selected="(format) => handleUpdateFormat(format)"
+                    />
+                </p-field-group>
             </div>
-        </div>
+        </template>
     </div>
 </template>
 
@@ -198,27 +171,21 @@ onMounted(() => {
         @apply flex items-center gap-1 justify-between;
     }
 
-    .contents-box {
-        margin-top: 0.5rem;
-
-        .row-1 {
-            @apply flex gap-2;
-
-            .left {
-                flex-shrink: 0;
-            }
-
-            .compare-with {
-                @apply text-label-md text-gray-800;
-            }
+    .compare-with-wrapper {
+        @apply flex gap-2;
+        .left-part {
+            flex-shrink: 0;
         }
+        .previous-period-text {
+            @apply text-label-md text-gray-800;
+        }
+    }
 
-        .row-2 {
-            @apply flex gap-2;
-            .left {
-                @apply flex gap-3;
-                flex-shrink: 0;
-            }
+    .compare-input-wrapper {
+        @apply flex gap-2;
+        .left-part {
+            @apply flex gap-3;
+            flex-shrink: 0;
         }
     }
 }

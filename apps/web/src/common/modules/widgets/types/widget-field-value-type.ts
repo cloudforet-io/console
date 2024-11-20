@@ -30,7 +30,7 @@ import type { YAxisValue } from '@/common/modules/widgets/_widget-fields/y-axis/
 
 
 
-export type WidgetFieldValues = string | string[] | number | boolean | ComparisonValue[] | ProgressBarValue | FormatRulesValue[]
+export type WidgetFieldValues = string | string[] | number | boolean | ComparisonValue | ProgressBarValue | FormatRulesValue[]
     | LineByValue | StackByValue | CategoryByValue | GroupByValue
     | XAxisValue | YAxisValue | TableDataFieldValue | IconValue | TotalValue | ColorSchemaValue
     | WidgetHeaderValue | DateFormatValue | NumberFormatValue | DataFieldHeatmapColorValue
