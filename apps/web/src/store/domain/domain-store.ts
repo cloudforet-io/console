@@ -10,8 +10,8 @@ import type {
     Metadata,
 } from '@/schema/identity/domain/api-verbs/get-auth-info';
 
+import { DOMAIN_CONFIG_TYPE } from '@/store/domain/constant';
 import type { ExtendedAuthType, ExtraMenuSet } from '@/store/domain/type';
-import { DOMAIN_CONFIG_TYPE } from '@/store/domain/type';
 import type { Currency } from '@/store/modules/display/type';
 
 import config from '@/lib/config';

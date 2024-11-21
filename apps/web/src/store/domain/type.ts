@@ -1,3 +1,5 @@
+import type { DOMAIN_CONFIG_TYPE } from '@/store/domain/constant';
+
 export type ExtendedAuthType = 'GOOGLE_OAUTH2' | 'KEYCLOAK_OIDC' | 'SAML';
 
 
@@ -16,7 +18,4 @@ export interface ExtraSubMenu {
     label: string;
 }
 
-export const DOMAIN_CONFIG_TYPE = {
-    EXTRA_MENU: 'console:ext-menu',
-    SETTINGS: 'settings',
-} as const;
+export type DomainConfigType = typeof DOMAIN_CONFIG_TYPE[keyof typeof DOMAIN_CONFIG_TYPE];
