@@ -1,24 +1,27 @@
 <script setup lang="ts">
 import {
-    onBeforeMount, ref, watch, nextTick,
+    ref, onBeforeMount, nextTick, watch,
 } from 'vue';
 
+
 import {
-    POverlayLayout, PFieldGroup, PTextInput, PTextarea, PButton,
+    POverlayLayout, PFieldGroup, PTextInput, PSelectDropdown, PButton, PTextarea,
 } from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
+import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
 
-const taskManagementPageStore = useTaskManagementPageStore();
-const taskManagementPageState = taskManagementPageStore.state;
-const taskManagementPageGetters = taskManagementPageStore.getters;
-const taskCategoryStore = taskManagementPageStore.taskCategoryStore;
+
+const taskCategoryPageStore = useTaskCategoryPageStore();
+const taskCategoryPageState = taskCategoryPageStore.state;
+const taskCategoryPageGetters = taskCategoryPageStore.getters;
+
 
 const {
-    forms: { name, description },
+    forms: { name, assigneePool, description },
     invalidState,
     invalidTexts,
     setForm, isAllValid,
@@ -26,12 +29,12 @@ const {
     resetValidations,
 } = useFormValidator({
     name: '',
+    assigneePool: [] as SelectDropdownMenuItem,
     description: '',
 }, {
     name(value: string) {
         if (!value.trim().length) return 'Name is required';
         if (value.length > 50) return 'Name should be less than 50 characters';
-        if (taskCategoryStore.getters.taskCategories.some((p) => taskManagementPageState.editTargetCategoryId !== p.category_id && p.name === value)) return 'Name already exists';
         return true;
     },
 });
@@ -39,30 +42,25 @@ const {
 const loading = ref(false);
 const handleCancelOrClose = () => {
     initForm();
-    taskManagementPageStore.closeCategoryForm();
+    taskCategoryPageStore.closeTaskTypeForm();
 };
+
 const handleConfirm = async () => {
     if (!isAllValid.value) return;
-
+    if (!taskCategoryPageState.currentCategoryId) return;
     try {
         loading.value = true;
-        if (taskManagementPageState.editTargetCategoryId) {
-            await taskCategoryStore.update({
-                category_id: taskManagementPageState.editTargetCategoryId,
-                name: name.value,
-                description: description.value,
-            });
+        if (taskCategoryPageGetters.targetTaskType) {
+            // await taskCategoryStore.update({
+            //
+            // });
         } else {
-            if (!taskManagementPageGetters.defaultPackage) throw Error('Default package is not found');
-            await taskCategoryStore.create({
-                name: name.value,
-                description: description.value,
-                package_id: taskManagementPageGetters.defaultPackage.package_id,
-            });
+            // await taskCategoryStore.create({
+            // });
         }
-        taskManagementPageStore.closeCategoryForm();
+        taskCategoryPageStore.closeStatusForm();
     } catch (e) {
-        ErrorHandler.handleRequestError(e, 'Failed to save category');
+        ErrorHandler.handleRequestError(e, 'Failed to save task type');
         // TODO: handle error
     } finally {
         loading.value = false;
@@ -70,38 +68,38 @@ const handleConfirm = async () => {
 };
 
 onBeforeMount(() => {
-    if (taskManagementPageState.editTargetCategoryId) {
-        const targetCategory = taskCategoryStore.getters.taskCategories.find((p) => p.category_id === taskManagementPageState.editTargetCategoryId);
-        if (targetCategory) {
-            setForm('name', targetCategory.name);
-            setForm('description', targetCategory.description);
-        }
+    if (taskCategoryPageGetters.targetTaskType) {
+        const taskType = taskCategoryPageGetters.targetTaskType;
+        setForm('name', taskType.name);
+        setForm('assigneePool', taskType.assignee_pool);
+        setForm('description', taskType.description);
     }
 });
 
-watch([() => taskManagementPageState.visibleCategoryForm, () => taskManagementPageGetters.editTargetCategory], async ([visible, targetCategory], [prevVisible]) => {
+watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGetters.targetTaskType], async ([visible, target], [prevVisible]) => {
     if (!visible) {
         if (!prevVisible) return; // prevent initial call
         await nextTick(); // wait for closing animation
         setForm({
             name: '',
+            assigneePool: [],
             description: '',
         });
         resetValidations();
         return;
     }
-    if (targetCategory) {
-        setForm({
-            name: targetCategory.name,
-            description: targetCategory.description,
-        });
+    if (target) {
+        setForm('name', target.name);
+        setForm('assigneePool', target.assignee_pool);
+        setForm('description', target.description);
     }
 });
+
 </script>
 
 <template>
-    <p-overlay-layout title="Add Category"
-                      :visible="taskManagementPageState.visibleCategoryForm"
+    <p-overlay-layout :title="taskCategoryPageGetters.targetTaskType ? 'Edit Ticket Topic' : 'Add Ticket Topic'"
+                      :visible="taskCategoryPageState.visibleTaskTypeForm"
                       @close="handleCancelOrClose"
     >
         <template #default>
@@ -114,20 +112,32 @@ watch([() => taskManagementPageState.visibleCategoryForm, () => taskManagementPa
                     <template #default="{ invalid }">
                         <p-text-input :value="name"
                                       :invalid="invalid"
+                                      block
                                       @update:value="setForm('name', $event)"
+                        />
+                    </template>
+                </p-field-group>
+                <p-field-group label="Assignee Pool"
+                               :invalid="!loading && invalidState.assigneePool"
+                               :invalid-text="invalidTexts.assigneePool"
+                >
+                    <template #default="{ invalid }">
+                        <p-select-dropdown :selected="assigneePool"
+                                           :invalid="invalid"
+                                           block
                         />
                     </template>
                 </p-field-group>
                 <p-field-group label="Description">
                     <p-textarea :value="description"
-                                placeholder="Describe this support package in a few words."
+                                placeholder="Describe this ticket type in a few words."
                                 @update:value="setForm('description', $event)"
                     />
                 </p-field-group>
             </div>
         </template>
         <template #footer>
-            <div class="py-3 px-6 flex flex-wrap gap-3 justify-end">
+            <div class="py-3 px-6 flex flex-wrap gap-1 justify-end">
                 <p-button style-type="transparent"
                           :disabled="loading"
                           @click="handleCancelOrClose"

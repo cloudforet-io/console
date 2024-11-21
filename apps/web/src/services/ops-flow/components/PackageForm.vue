@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    onBeforeMount, toRef, ref, computed, watch, nextTick,
+    toRef, ref, computed, watch, nextTick,
 } from 'vue';
 
 import {
@@ -48,7 +48,7 @@ const {
     setInitialCategories,
     applyPackageToCategories,
 } = useCategoryField({
-    defaultPackage: computed<PackageModel|undefined>(() => packageStore.state.packages?.find((p) => p.is_default)),
+    defaultPackage: computed<PackageModel|undefined>(() => packageStore.getters.packages.find((p) => p.is_default)),
     taskCategoryStore,
 });
 
@@ -70,7 +70,7 @@ const {
     name(value: string) {
         if (!value.trim().length) return 'Name is required';
         if (value.length > 50) return 'Name should be less than 50 characters';
-        if (packageStore.state.packages?.some((p) => p.package_id !== taskManagementPageState.editTargetPackageId && p.name === value)) return 'Name already exists';
+        if (packageStore.getters.packages.some((p) => p.package_id !== taskManagementPageState.editTargetPackageId && p.name === value)) return 'Name already exists';
         return true;
     },
     description(value: string) {
@@ -89,7 +89,7 @@ const handleConfirm = async () => {
     loading.value = true;
     if (taskManagementPageState.editTargetPackageId) {
         try {
-            const updatedPackage = await packageStore.updatePackage({
+            const updatedPackage = await packageStore.update({
                 package_id: taskManagementPageState.editTargetPackageId,
                 name: name.value,
                 description: description.value,
@@ -105,7 +105,7 @@ const handleConfirm = async () => {
         }
     } else {
         try {
-            const createdPackage = await packageStore.createPackage({
+            const createdPackage = await packageStore.create({
                 name: name.value,
                 description: description.value,
                 tags: {},
@@ -122,10 +122,6 @@ const handleConfirm = async () => {
     taskManagementPageStore.closePackageForm();
     loading.value = false;
 };
-
-onBeforeMount(() => {
-    workspaceReferenceStore.load();
-});
 
 watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPageGetters.editTargetPackage], async ([visible, targetPackage], [prevVisible]) => {
     if (!visible) {

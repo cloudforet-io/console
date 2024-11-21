@@ -7,10 +7,6 @@ import PackageForm from '@/services/ops-flow/components/PackageForm.vue';
 import SupportPackagePanel from '@/services/ops-flow/components/SupportPackagePanel.vue';
 import TaskCategoryPanel from '@/services/ops-flow/components/TaskCategoryPanel.vue';
 import TaskManagementTemplatePanel from '@/services/ops-flow/components/TaskManagementTemplatePanel.vue';
-import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
-
-const taskManagementPageStore = useTaskManagementPageStore();
-const taskManagementPageState = taskManagementPageStore.state;
 
 </script>
 
@@ -24,8 +20,8 @@ const taskManagementPageState = taskManagementPageStore.state;
         <task-category-panel class="mb-4" />
         <enable-landing-panel />
         <!-- Overlay Modals -->
-        <package-form :visible="taskManagementPageState.visiblePackageForm" />
-        <category-form :visible="taskManagementPageState.visibleCategoryForm" />
+        <package-form />
+        <category-form />
     </div>
 </template>
 

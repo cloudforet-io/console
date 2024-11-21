@@ -6,7 +6,7 @@ export interface TaskCategoryUpdateParameters {
     category_id: string;
     name?: string;
     description?: string;
-    status_options: TaskStatusOptions;
+    status_options?: TaskStatusOptions;
     fields?: TaskField[];
     force?: boolean;
     tags?: Tags;

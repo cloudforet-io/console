@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { onBeforeMount, reactive, computed } from 'vue';
+import { reactive, computed } from 'vue';
 
 import {
-    PPaneLayout, PHeadingLayout, PHeading, PButton, PDataTable, PBadge, PIconButton,
+    PPaneLayout, PHeadingLayout, PHeading, PButton, PDataTable, PBadge, PIconButton, PLink,
 } from '@cloudforet/mirinae';
 import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
+import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
 
@@ -37,17 +40,14 @@ const state = reactive({
         },
     ]),
     packageMap: computed(() => {
-        if (!packageStore.state.packages) return {};
-        return packageStore.state.packages.reduce((acc, cur) => {
+        if (!packageStore.getters.packages) return {};
+        return packageStore.getters.packages.reduce((acc, cur) => {
             acc[cur.package_id] = cur;
             return acc;
         }, {} as Record<string, any>);
     }),
 });
 
-onBeforeMount(() => {
-    // taskCategoryStore.fetchCategories();
-});
 </script>
 
 <template>
@@ -76,6 +76,15 @@ onBeforeMount(() => {
                       :items="taskCategoryStore.getters.taskCategories"
                       :fields="state.categoryFields"
         >
+            <template #col-name-format="{ item }">
+                <p-link :text="item.name"
+                        :to="{
+                            name: makeAdminRouteName(OPS_FLOW_ROUTE.TASK_MANAGEMENT.TASK_CATEGORY.DETAIL._NAME),
+                            params: { taskCategoryId: item.category_id }
+                        }"
+                        highlight
+                />
+            </template>
             <template #col-package-format="{ item }">
                 <p-badge shape="square"
                          badge-type="subtle"

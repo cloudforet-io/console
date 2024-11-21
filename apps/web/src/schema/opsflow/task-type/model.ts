@@ -6,7 +6,7 @@ export interface TaskTypeModel {
     name: string;
     description: string;
     fields: TaskField[];
-    assignee?: string;
+    assignee_pool?: string[];
     tags: Tags;
     category_id: string;
     domain_id: string;
