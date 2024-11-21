@@ -1,17 +1,20 @@
 <script setup lang="ts">
-import { onBeforeMount, reactive, computed } from 'vue';
+import { reactive, computed } from 'vue';
 
 import {
-    PPaneLayout, PHeadingLayout, PHeading, PButton, PDataTable, PBadge, PIconButton,
+    PPaneLayout, PHeadingLayout, PHeading, PButton, PDataTable, PBadge, PIconButton, PLink,
 } from '@cloudforet/mirinae';
 import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 
-import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
+import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
+import { useTaskManagementStore } from '@/services/ops-flow/stores/admin/task-management-store';
 
 
-const taskManagementPageStore = useTaskManagementPageStore();
-const taskCategoryStore = taskManagementPageStore.taskCategoryStore;
-const packageStore = taskManagementPageStore.packageStore;
+const taskManagementStore = useTaskManagementStore();
+const taskCategoryStore = taskManagementStore.taskCategoryStore;
+const packageStore = taskManagementStore.packageStore;
 
 const state = reactive({
     categoryFields: computed<DataTableField[]>(() => [
@@ -45,9 +48,6 @@ const state = reactive({
     }),
 });
 
-onBeforeMount(() => {
-    // taskCategoryStore.fetchCategories();
-});
 </script>
 
 <template>
@@ -63,7 +63,7 @@ onBeforeMount(() => {
                 <p-button icon-left="ic_plus_bold"
                           size="md"
                           style-type="substitutive"
-                          @click="taskManagementPageStore.openAddCategoryForm()"
+                          @click="taskManagementStore.openAddCategoryForm()"
                 >
                     Add Category
                 </p-button>
@@ -76,6 +76,15 @@ onBeforeMount(() => {
                       :items="taskCategoryStore.getters.taskCategories"
                       :fields="state.categoryFields"
         >
+            <template #col-name-format="{ item }">
+                <p-link :text="item.name"
+                        :to="{
+                            name: makeAdminRouteName(OPS_FLOW_ROUTE.TASK_MANAGEMENT.TASK_CATEGORY.DETAIL._NAME),
+                            params: { taskCategoryId: item.category_id }
+                        }"
+                        highlight
+                />
+            </template>
             <template #col-package-format="{ item }">
                 <p-badge shape="square"
                          badge-type="subtle"
@@ -89,7 +98,7 @@ onBeforeMount(() => {
                 <p-button icon-left="ic_edit"
                           size="sm"
                           style-type="tertiary"
-                          @click="taskManagementPageStore.openEditCategoryForm(item.category_id)"
+                          @click="taskManagementStore.openEditCategoryForm(item.category_id)"
                 >
                     Edit
                 </p-button>

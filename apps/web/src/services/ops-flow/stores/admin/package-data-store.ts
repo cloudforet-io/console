@@ -11,7 +11,7 @@ interface UsePackageStoreState {
     loading: boolean;
     packages?: PackageModel[];
 }
-export const usePackageStore = defineStore('package', () => {
+export const usePackageDataStore = defineStore('package-data', () => {
     const state = reactive<UsePackageStoreState>({
         loading: false,
         packages: undefined,

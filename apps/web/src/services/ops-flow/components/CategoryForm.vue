@@ -10,12 +10,12 @@ import {
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
+import { useTaskManagementStore } from '@/services/ops-flow/stores/admin/task-management-store';
 
-const taskManagementPageStore = useTaskManagementPageStore();
-const taskManagementPageState = taskManagementPageStore.state;
-const taskManagementPageGetters = taskManagementPageStore.getters;
-const taskCategoryStore = taskManagementPageStore.taskCategoryStore;
+const taskManagementStore = useTaskManagementStore();
+const taskManagementState = taskManagementStore.state;
+const taskManagementGetters = taskManagementStore.getters;
+const taskCategoryStore = taskManagementStore.taskCategoryStore;
 
 const {
     forms: { name, description },
@@ -31,7 +31,7 @@ const {
     name(value: string) {
         if (!value.trim().length) return 'Name is required';
         if (value.length > 50) return 'Name should be less than 50 characters';
-        if (taskCategoryStore.getters.taskCategories.some((p) => taskManagementPageState.editTargetCategoryId !== p.category_id && p.name === value)) return 'Name already exists';
+        if (taskCategoryStore.getters.taskCategories.some((p) => taskManagementState.editTargetCategoryId !== p.category_id && p.name === value)) return 'Name already exists';
         return true;
     },
 });
@@ -39,28 +39,28 @@ const {
 const loading = ref(false);
 const handleCancelOrClose = () => {
     initForm();
-    taskManagementPageStore.closeCategoryForm();
+    taskManagementStore.closeCategoryForm();
 };
 const handleConfirm = async () => {
     if (!isAllValid.value) return;
 
     try {
         loading.value = true;
-        if (taskManagementPageState.editTargetCategoryId) {
+        if (taskManagementState.editTargetCategoryId) {
             await taskCategoryStore.updateCategory({
-                category_id: taskManagementPageState.editTargetCategoryId,
+                category_id: taskManagementState.editTargetCategoryId,
                 name: name.value,
                 description: description.value,
             });
         } else {
-            if (!taskManagementPageGetters.defaultPackage) throw Error('Default package is not found');
+            if (!taskManagementGetters.defaultPackage) throw Error('Default package is not found');
             await taskCategoryStore.createCategory({
                 name: name.value,
                 description: description.value,
-                package_id: taskManagementPageGetters.defaultPackage.package_id,
+                package_id: taskManagementGetters.defaultPackage.package_id,
             });
         }
-        taskManagementPageStore.closeCategoryForm();
+        taskManagementStore.closeCategoryForm();
     } catch (e) {
         ErrorHandler.handleRequestError(e, 'Failed to save category');
         // TODO: handle error
@@ -70,8 +70,8 @@ const handleConfirm = async () => {
 };
 
 onBeforeMount(() => {
-    if (taskManagementPageState.editTargetCategoryId) {
-        const targetCategory = taskCategoryStore.getters.taskCategories.find((p) => p.category_id === taskManagementPageState.editTargetCategoryId);
+    if (taskManagementState.editTargetCategoryId) {
+        const targetCategory = taskCategoryStore.getters.taskCategories.find((p) => p.category_id === taskManagementState.editTargetCategoryId);
         if (targetCategory) {
             setForm('name', targetCategory.name);
             setForm('description', targetCategory.description);
@@ -79,7 +79,7 @@ onBeforeMount(() => {
     }
 });
 
-watch([() => taskManagementPageState.visibleCategoryForm, () => taskManagementPageGetters.editTargetCategory], async ([visible, targetCategory], [prevVisible]) => {
+watch([() => taskManagementState.visibleCategoryForm, () => taskManagementGetters.editTargetCategory], async ([visible, targetCategory], [prevVisible]) => {
     if (!visible) {
         if (!prevVisible) return; // prevent initial call
         await nextTick(); // wait for closing animation
@@ -101,7 +101,7 @@ watch([() => taskManagementPageState.visibleCategoryForm, () => taskManagementPa
 
 <template>
     <p-overlay-layout title="Add Category"
-                      :visible="taskManagementPageState.visibleCategoryForm"
+                      :visible="taskManagementState.visibleCategoryForm"
                       @close="handleCancelOrClose"
     >
         <template #default>
