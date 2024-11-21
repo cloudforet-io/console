@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { PI, PBadge } from '@cloudforet/mirinae';
 
+import TaskStatusActionButton from '@/services/ops-flow/components/TaskStatusActionButton.vue';
+
 const props = defineProps<{
+    id: string;
     name: string;
     color: string;
 }>();
@@ -14,7 +17,7 @@ const props = defineProps<{
              height="1rem"
              class="drag-handle"
         />
-        <div>
+        <div class="flex-grow">
             <p-badge class="ml-2"
                      badge-type="subtle"
                      shape="square"
@@ -23,6 +26,7 @@ const props = defineProps<{
                 {{ props.name }}
             </p-badge>
         </div>
+        <task-status-action-button :id="props.id" />
     </li>
 </template>
 

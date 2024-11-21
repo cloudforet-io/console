@@ -52,6 +52,7 @@ watch(() => props.items, (newItems) => {
                        handle=".drag-handle"
             >
                 <task-status-draggable-item v-for="item in draggableItems"
+                                            :id="item.status_id"
                                             :key="item.status_id"
                                             :name="item.name"
                                             :color="item.color"

@@ -10,6 +10,10 @@ import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-cate
 
 interface UseTaskCategoryPageStoreState {
     currentCategoryId?: string;
+    // status
+    visibleStatusForm: boolean;
+    targetStatusId?: string;
+    visibleStatusDeleteModal: boolean;
 }
 
 interface UseTaskCategoryPageStoreGetters {
@@ -21,6 +25,10 @@ export const useTaskCategoryPageStore = defineStore('task-management-category-pa
     const taskCategoryStore = useTaskCategoryStore();
     const state = reactive<UseTaskCategoryPageStoreState>({
         currentCategoryId: undefined,
+        // status
+        visibleStatusForm: false,
+        targetStatusId: undefined,
+        visibleStatusDeleteModal: false,
     }) as UseTaskCategoryPageStoreState;
 
     const getters = reactive<UseTaskCategoryPageStoreGetters>({
@@ -41,6 +49,27 @@ export const useTaskCategoryPageStore = defineStore('task-management-category-pa
     const actions = {
         setCurrentCategoryId(categoryId: string) {
             state.currentCategoryId = categoryId;
+        },
+        // status
+        openAddStatusForm() {
+            state.targetStatusId = undefined;
+            state.visibleStatusForm = true;
+        },
+        openEditStatusForm(statusId: string) {
+            state.targetStatusId = statusId;
+            state.visibleStatusForm = true;
+        },
+        closeStatusForm() {
+            state.visibleStatusForm = false;
+            state.targetStatusId = undefined;
+        },
+        openDeleteStatusModal(statusId: string) {
+            state.targetStatusId = statusId;
+            state.visibleStatusDeleteModal = false;
+        },
+        closeDeleteStatusModal() {
+            state.visibleStatusDeleteModal = false;
+            state.targetStatusId = undefined;
         },
     };
     return {
