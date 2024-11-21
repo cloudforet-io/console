@@ -103,7 +103,7 @@ const state = reactive({
     comparisonDateRange: computed<DateRange>(() => getPreviousDateRange(state.granularity, dateRange.value)),
     // data for optional fields
     isComparisonEnabled: computed<boolean>(() => !isDateField(state.tableDataField) && !state.groupByField?.some((groupBy) => Object.values(DATE_FIELD).includes(groupBy))),
-    comparisonInfo: computed<ComparisonValue|undefined>(() => props.widgetOptions?.comparison?.[0] as ComparisonValue),
+    comparisonInfo: computed<ComparisonValue|undefined>(() => props.widgetOptions?.comparison as ComparisonValue),
     subTotalInfo: computed<TotalValue|undefined>(() => props.widgetOptions?.subTotal as TotalValue),
     totalInfo: computed<TotalValue|undefined>(() => props.widgetOptions?.total as TotalValue),
     progressBarInfo: computed<ProgressBarValue|undefined>(() => props.widgetOptions?.progressBar as ProgressBarValue),

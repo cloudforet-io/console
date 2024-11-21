@@ -39,6 +39,7 @@ import type {
 import { gray } from '@/styles/colors';
 
 
+
 type Data = ListResponse<{
     [key: string]: string|number;
 }>;
@@ -74,14 +75,14 @@ const state = reactive({
         const _comparison = state.currentValue - state.previousValue;
         if (!_comparison) return gray[700];
 
-        const _target = (props.widgetOptions?.comparison as ComparisonValue[])?.[0];
+        const _target: ComparisonValue|undefined = props.widgetOptions?.comparison;
         if (state.currentValue > state.previousValue) {
             return _target?.increaseColor;
         }
         return _target?.decreaseColor;
     }),
     comparisonValue: computed<string>(() => {
-        const _target = (props.widgetOptions?.comparison as ComparisonValue[])?.[0];
+        const _target: ComparisonValue|undefined = props.widgetOptions?.comparison;
         const _comparison = Math.abs(state.currentValue - state.previousValue);
         const _format = _target?.format || 'all';
         let _percentage = '--';
@@ -257,7 +258,7 @@ defineExpose<WidgetExpose<Data>>({
                       style="font-size: 56px;"
                 >{{ state.valueText }}</span>
             </div>
-            <div v-if="props.widgetOptions?.comparison && !state.previousLoading"
+            <div v-if="props.widgetOptions?.comparison?.toggleValue && !state.previousLoading"
                  class="comparison-wrapper"
             >
                 <p-i v-if="state.currentValue !== state.previousValue"
