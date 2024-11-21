@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeMount, reactive, computed } from 'vue';
+import { reactive, computed } from 'vue';
 
 import {
     PPaneLayout, PHeadingLayout, PHeading, PButton, PDataTable, PIconButton,
@@ -30,10 +30,6 @@ const state = reactive({
         },
     ]),
 });
-
-onBeforeMount(() => {
-    packageStore.fetchPackages();
-});
 </script>
 
 <template>
@@ -59,7 +55,7 @@ onBeforeMount(() => {
             계약에 따라 고객이 이용할 수 있는 기능의 묶음입니다. 전체 서비스의 범위를 나타내며, 하위 카테고를 생성할 수 있습니다.
         </p>
         <p-data-table :loading="packageStore.state.loading"
-                      :items="packageStore.state.packages"
+                      :items="packageStore.getters.packages"
                       :fields="state.packageFields"
         >
             <template #col-buttons-format="{ item }">

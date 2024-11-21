@@ -40,8 +40,8 @@ const state = reactive({
         },
     ]),
     packageMap: computed(() => {
-        if (!packageStore.state.packages) return {};
-        return packageStore.state.packages.reduce((acc, cur) => {
+        if (!packageStore.getters.packages) return {};
+        return packageStore.getters.packages.reduce((acc, cur) => {
             acc[cur.package_id] = cur;
             return acc;
         }, {} as Record<string, any>);

@@ -40,9 +40,9 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
         editTargetCategoryId: undefined,
     });
     const getters = reactive<UseTaskManagementPageStoreGetters>({
-        editTargetPackage: computed<PackageModel|undefined>(() => packageStore.state.packages?.find((p) => p.package_id === state.editTargetPackageId)),
+        editTargetPackage: computed<PackageModel|undefined>(() => packageStore.getters.packages.find((p) => p.package_id === state.editTargetPackageId)),
         editTargetCategory: computed<DeepReadonly<TaskCategoryModel>|undefined>(() => taskCategoryStore.getters.taskCategories.find((c) => c.category_id === state.editTargetCategoryId)),
-        defaultPackage: computed<PackageModel|undefined>(() => packageStore.state.packages?.find((p) => p.is_default)),
+        defaultPackage: computed<PackageModel|undefined>(() => packageStore.getters.packages.find((p) => p.is_default)),
     });
     const actions = {
         setCurrentTemplateId(templateId: string) {

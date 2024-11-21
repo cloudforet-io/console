@@ -84,7 +84,7 @@ onBeforeMount(() => {
         const { type, data } = taskCategoryPageGetters.targetStatusOption;
         setForm('name', data.name);
         setForm('statusType', statusTypeItems.value.find((p) => p.name === type) ?? statusTypeItems.value[0]);
-        setForm('color', data.color);
+        setForm('color', data.color ?? TASK_STATUS_COLOR_NAMES[0]);
     }
 });
 
@@ -95,7 +95,7 @@ watch([() => taskCategoryPageState.visibleStatusForm, () => taskCategoryPageGett
         setForm({
             name: '',
             statusType: statusTypeItems.value[0],
-            color: '',
+            color: TASK_STATUS_COLOR_NAMES[0],
         });
         resetValidations();
         return;
@@ -104,7 +104,7 @@ watch([() => taskCategoryPageState.visibleStatusForm, () => taskCategoryPageGett
         const { type, data } = target;
         setForm('name', data.name);
         setForm('statusType', statusTypeItems.value.find((p) => p.name === type) ?? statusTypeItems.value[0]);
-        setForm('color', data.color);
+        setForm('color', data.color ?? TASK_STATUS_COLOR_NAMES[0]);
     }
 });
 
@@ -125,6 +125,7 @@ watch([() => taskCategoryPageState.visibleStatusForm, () => taskCategoryPageGett
                     <template #default="{ invalid }">
                         <p-text-input :value="name"
                                       :invalid="invalid"
+                                      block
                                       @update:value="setForm('name', $event)"
                         />
                     </template>
@@ -138,6 +139,7 @@ watch([() => taskCategoryPageState.visibleStatusForm, () => taskCategoryPageGett
                         <p-select-dropdown :selected="[statusType]"
                                            :menu="statusTypeItems"
                                            :invalid="invalid"
+                                           block
                                            @select="setForm('statusType', $event)"
                         />
                     </template>

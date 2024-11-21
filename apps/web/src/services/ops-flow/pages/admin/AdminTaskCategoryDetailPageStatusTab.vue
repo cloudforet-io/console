@@ -2,7 +2,9 @@
 import { PHeadingLayout, PHeading, PButton } from '@cloudforet/mirinae';
 
 import TaskStatusTree from '@/services/ops-flow/components/TaskStatusTree.vue';
+import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
 
+const taskCategoryPageStore = useTaskCategoryPageStore();
 </script>
 
 <template>
@@ -16,6 +18,7 @@ import TaskStatusTree from '@/services/ops-flow/components/TaskStatusTree.vue';
             <template #extra>
                 <p-button style-type="substitutive"
                           icon-left="ic_plus_bold"
+                          @click="taskCategoryPageStore.openAddStatusForm()"
                 >
                     Add Status
                 </p-button>

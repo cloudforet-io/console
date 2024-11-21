@@ -1,3 +1,5 @@
+import { asyncComputed } from '@vueuse/core';
+import type { Ref, UnwrapRef } from 'vue';
 import { reactive } from 'vue';
 
 import { defineStore } from 'pinia';
@@ -9,15 +11,28 @@ import type { PackageModel } from '@/schema/identity/package/model';
 
 interface UsePackageStoreState {
     loading: boolean;
-    packages?: PackageModel[];
+    items?: PackageModel[];
+}
+interface UsePackageStoreGetters {
+    packages: Ref<Readonly<PackageModel[]>>
 }
 export const usePackageStore = defineStore('package', () => {
     const state = reactive<UsePackageStoreState>({
         loading: false,
-        packages: undefined,
+        items: undefined,
     });
+
+    const getters = reactive<UsePackageStoreGetters>({
+        packages: asyncComputed<PackageModel[]>(async () => {
+            if (state.items === undefined) {
+                await actions.list();
+            }
+            return state.items ?? [];
+        }, [], { lazy: true }),
+    }) as UnwrapRef<UsePackageStoreGetters>;
+
     const actions = {
-        async fetchPackages() {
+        async list() {
             return new Promise<PackageModel[]>((resolve) => {
                 state.loading = true;
                 setTimeout(() => {
@@ -56,17 +71,17 @@ export const usePackageStore = defineStore('package', () => {
                             updated_at: '2021-09-01T00:00:00',
                         },
                     ];
-                    state.packages = packages;
+                    state.items = packages;
                     state.loading = false;
                     resolve(packages);
                 }, 1000);
             });
         },
-        async createPackage(param: PackageCreateParameters) {
+        async create(param: PackageCreateParameters) {
             return new Promise<PackageModel>((resolve) => {
                 setTimeout(() => {
                     const result: PackageModel = {
-                        package_id: `package_${(state.packages?.length ?? 0) + 1}`,
+                        package_id: `package_${getters.packages.length + 1}`,
                         name: param.name,
                         description: param.description ?? '',
                         order: 4,
@@ -76,15 +91,16 @@ export const usePackageStore = defineStore('package', () => {
                         created_at: '2021-09-01T00:00:00',
                         updated_at: '2021-09-01T00:00:00',
                     };
-                    state.packages?.push(result);
+                    if (state.items) state.items.push(result);
+                    else state.items = [result];
                     resolve(result);
                 }, 1000);
             });
         },
-        async updatePackage(param: PackageUpdateParameters) {
+        async update(param: PackageUpdateParameters) {
             return new Promise<PackageModel>((resolve, reject) => {
                 setTimeout(() => {
-                    const targetPackage = state.packages?.find((p) => p.package_id === param.package_id);
+                    const targetPackage = getters.packages.find((p) => p.package_id === param.package_id);
                     if (targetPackage) {
                         targetPackage.name = param.name ?? targetPackage.name;
                         targetPackage.description = param.description ?? targetPackage.description;
@@ -100,7 +116,7 @@ export const usePackageStore = defineStore('package', () => {
         async setDefaultPackage(packageId: string) {
             return new Promise<PackageModel>((resolve, reject) => {
                 setTimeout(() => {
-                    const targetPackage = state.packages?.find((p) => p.package_id === packageId);
+                    const targetPackage = getters.packages.find((p) => p.package_id === packageId);
                     if (targetPackage) {
                         targetPackage.is_default = true;
                         resolve(targetPackage);
@@ -113,6 +129,7 @@ export const usePackageStore = defineStore('package', () => {
     };
     return {
         state,
+        getters,
         ...actions,
     };
 });

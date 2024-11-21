@@ -91,7 +91,7 @@ export const useTaskCategoryPageStore = defineStore('task-management-category-pa
                 index,
                 type: statusType,
             };
-            state.visibleStatusDeleteModal = false;
+            state.visibleStatusDeleteModal = true;
         },
         closeDeleteStatusModal() {
             state.visibleStatusDeleteModal = false;
