@@ -7,7 +7,7 @@ import costExplorerRoute from '@/services/cost-explorer/routes/routes';
 import dashboardsRoute from '@/services/dashboards/routes/routes';
 import iamRoutes from '@/services/iam/routes/routes';
 import infoRoute from '@/services/info/routes/routes';
-import itsmRoutes from '@/services/itsm/routes/routes';
+import opsFlowRoutes from '@/services/ops-flow/routes/routes';
 import projectRoute from '@/services/project/routes/routes';
 import workspaceHomeRoute from '@/services/workspace-home/routes/routes';
 
@@ -21,5 +21,5 @@ export const workspaceRoutes: RouteConfig[] = [
     alertManagerRoute,
     costExplorerRoute,
     infoRoute,
-    itsmRoutes,
+    opsFlowRoutes,
 ];

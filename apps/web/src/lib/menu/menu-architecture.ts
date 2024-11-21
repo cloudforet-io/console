@@ -43,10 +43,10 @@ export const MENU_LIST: Menu[] = [
         ],
     },
     {
-        id: MENU_ID.ITSM,
+        id: MENU_ID.OPS_FLOW,
         needPermissionByRole: true,
         subMenuList: [
-            { id: MENU_ID.ITSM_LANDING },
+            { id: MENU_ID.OPS_FLOW_LANDING },
             { id: MENU_ID.BOARD },
         ],
     },
@@ -107,7 +107,7 @@ export const ADMIN_MENU_LIST: Menu[] = [
         ],
     },
     {
-        id: MENU_ID.ITSM,
+        id: MENU_ID.OPS_FLOW,
         subMenuList: [
             { id: MENU_ID.TASK_MANAGEMENT },
             { id: MENU_ID.WORKFLOW },

@@ -14,9 +14,9 @@ import { useWorkspaceReferenceStore } from '@/store/reference/workspace-referenc
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import { useCategoryField } from '@/services/itsm/composables/use-category-field';
-import { useWorkspaceField } from '@/services/itsm/composables/use-workspace-field';
-import { useTaskManagementPageStore } from '@/services/itsm/stores/admin/task-management-page-store';
+import { useCategoryField } from '@/services/ops-flow/composables/use-category-field';
+import { useWorkspaceField } from '@/services/ops-flow/composables/use-workspace-field';
+import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
 const workspaceReferenceStore = useWorkspaceReferenceStore();
 const taskManagementPageStore = useTaskManagementPageStore();

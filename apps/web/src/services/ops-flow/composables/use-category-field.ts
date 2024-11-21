@@ -8,7 +8,7 @@ import type { PackageModel } from '@/schema/identity/package/model';
 
 import { useFieldValidator } from '@/common/composables/form-validator';
 
-import type { useTaskCategoryStore } from '@/services/itsm/stores/admin/task-category-store';
+import type { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
 
 interface CategoryItem extends SelectDropdownMenuItem {
     packageId: string;

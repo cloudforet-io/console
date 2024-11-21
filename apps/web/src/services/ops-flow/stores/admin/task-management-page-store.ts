@@ -6,9 +6,9 @@ import { defineStore } from 'pinia';
 import type { PackageModel } from '@/schema/identity/package/model';
 import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
 
-import { usePackageStore } from '@/services/itsm/stores/admin/package-store';
-import { useTaskCategoryStore } from '@/services/itsm/stores/admin/task-category-store';
-// import { useTaskTypeStore } from '@/services/itsm/stores/task-type-store';
+import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
+// import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 
 interface UseTaskManagementPageStoreState {
     currentTemplateId?: string;

@@ -6,7 +6,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 
-import { useTaskManagementPageStore } from '@/services/itsm/stores/admin/task-management-page-store';
+import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
 
 const taskManagementPageStore = useTaskManagementPageStore();

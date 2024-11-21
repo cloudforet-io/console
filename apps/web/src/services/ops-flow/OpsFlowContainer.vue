@@ -14,7 +14,7 @@ import {
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 
 export default defineComponent({
-    name: 'ITSMContainer',
+    name: 'OpsFlowContainer',
     components: {
         GeneralPageLayout,
     },

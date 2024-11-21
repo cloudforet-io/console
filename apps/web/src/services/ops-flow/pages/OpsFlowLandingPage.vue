@@ -3,6 +3,6 @@
 </script>
 
 <template>
-    <div class="itsm-landing-page" />
+    <div class="ops-flow-landing-page" />
 </template>
 
