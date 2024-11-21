@@ -31,6 +31,7 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useGoBack } from '@/common/composables/go-back';
 
+import TaskStatusForm from '@/services/ops-flow/components/TaskStatusForm.vue';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
 
@@ -119,5 +120,6 @@ defineExpose({ setPathFrom });
         >
             <router-view />
         </p-tab>
+        <task-status-form />
     </div>
 </template>

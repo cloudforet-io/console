@@ -2,13 +2,14 @@
 import { computed, ref, watch } from 'vue';
 import draggable from 'vuedraggable';
 
-import type { TaskStatusOption } from '@/schema/opsflow/task/type';
+import type { TaskStatusOption, TaskStatusType } from '@/schema/opsflow/task/type';
 
 import TaskStatusDraggableItem from '@/services/ops-flow/components/TaskStatusDraggableItem.vue';
 import TaskStatusListFoldButton from '@/services/ops-flow/components/TaskStatusListFoldButton.vue';
 
 const props = defineProps<{
     header: string;
+    type: TaskStatusType;
     items: TaskStatusOption[];
 }>();
 const emit = defineEmits<{(event: 'update:items', value: TaskStatusOption[]): void;
@@ -51,11 +52,13 @@ watch(() => props.items, (newItems) => {
                        ghost-class="ghost"
                        handle=".drag-handle"
             >
-                <task-status-draggable-item v-for="item in draggableItems"
+                <task-status-draggable-item v-for="(item, index) in draggableItems"
                                             :id="item.status_id"
                                             :key="item.status_id"
+                                            :index="index"
                                             :name="item.name"
                                             :color="item.color"
+                                            :type="props.type"
                 />
             </draggable>
         </div>

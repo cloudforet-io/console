@@ -35,6 +35,7 @@ const handleUpdateItems = (statusType: TaskStatusType, items: TaskStatusOption[]
     <div>
         <template v-for="taskStatus in taskStatusTree">
             <task-status-list :key="taskStatus.key"
+                              :type="taskStatus.key"
                               :header="taskStatus.name"
                               :items="taskCategoryPageGetters.statusOptions[taskStatus.key]"
                               @update:items="handleUpdateItems(taskStatus.key, $event)"

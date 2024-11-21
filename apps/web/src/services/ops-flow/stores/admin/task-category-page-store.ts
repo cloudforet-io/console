@@ -4,7 +4,7 @@ import { reactive, computed } from 'vue';
 import { defineStore } from 'pinia';
 
 import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
-import type { TaskStatusOptions } from '@/schema/opsflow/task/type';
+import type { TaskStatusOption, TaskStatusOptions, TaskStatusType } from '@/schema/opsflow/task/type';
 
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
 
@@ -12,13 +12,20 @@ interface UseTaskCategoryPageStoreState {
     currentCategoryId?: string;
     // status
     visibleStatusForm: boolean;
-    targetStatusId?: string;
+    targetStatus: {
+        type: TaskStatusType;
+        index: number;
+    }|undefined;
     visibleStatusDeleteModal: boolean;
 }
 
 interface UseTaskCategoryPageStoreGetters {
     currentCategory: ComputedRef<TaskCategoryModel|undefined>;
     statusOptions: ComputedRef<TaskStatusOptions>;
+    targetStatusOption: ComputedRef<{
+            type: TaskStatusType;
+            data: TaskStatusOption;
+        }|undefined>;
 }
 
 export const useTaskCategoryPageStore = defineStore('task-management-category-page', () => {
@@ -27,7 +34,7 @@ export const useTaskCategoryPageStore = defineStore('task-management-category-pa
         currentCategoryId: undefined,
         // status
         visibleStatusForm: false,
-        targetStatusId: undefined,
+        targetStatus: undefined,
         visibleStatusDeleteModal: false,
     }) as UseTaskCategoryPageStoreState;
 
@@ -44,6 +51,19 @@ export const useTaskCategoryPageStore = defineStore('task-management-category-pa
             }
             return category.status_options;
         }),
+        targetStatusOption: computed<{
+            type: TaskStatusType;
+            data: TaskStatusOption;
+        }|undefined>(() => {
+            if (!state.targetStatus) return undefined;
+            const { index, type } = state.targetStatus;
+            const statusOptions = getters.statusOptions;
+            if (!statusOptions) return undefined;
+            return {
+                type,
+                data: statusOptions[type][index],
+            };
+        }),
     }) as UnwrapRef<UseTaskCategoryPageStoreGetters>;
 
     const actions = {
@@ -52,24 +72,30 @@ export const useTaskCategoryPageStore = defineStore('task-management-category-pa
         },
         // status
         openAddStatusForm() {
-            state.targetStatusId = undefined;
+            state.targetStatus = undefined;
             state.visibleStatusForm = true;
         },
-        openEditStatusForm(statusId: string) {
-            state.targetStatusId = statusId;
+        openEditStatusForm(index: number, statusType: TaskStatusType) {
+            state.targetStatus = {
+                index,
+                type: statusType,
+            };
             state.visibleStatusForm = true;
         },
         closeStatusForm() {
             state.visibleStatusForm = false;
-            state.targetStatusId = undefined;
+            state.targetStatus = undefined;
         },
-        openDeleteStatusModal(statusId: string) {
-            state.targetStatusId = statusId;
+        openDeleteStatusModal(index: number, statusType: TaskStatusType) {
+            state.targetStatus = {
+                index,
+                type: statusType,
+            };
             state.visibleStatusDeleteModal = false;
         },
         closeDeleteStatusModal() {
             state.visibleStatusDeleteModal = false;
-            state.targetStatusId = undefined;
+            state.targetStatus = undefined;
         },
     };
     return {

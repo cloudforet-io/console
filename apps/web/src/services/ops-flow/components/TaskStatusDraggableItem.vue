@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { PI, PBadge } from '@cloudforet/mirinae';
 
+import type { TaskStatusType } from '@/schema/opsflow/task/type';
+
 import TaskStatusActionButton from '@/services/ops-flow/components/TaskStatusActionButton.vue';
 
 const props = defineProps<{
+    index: number;
     id: string;
     name: string;
     color: string;
+    type: TaskStatusType;
 }>();
 </script>
 
@@ -26,7 +30,10 @@ const props = defineProps<{
                 {{ props.name }}
             </p-badge>
         </div>
-        <task-status-action-button :id="props.id" />
+        <task-status-action-button :id="props.id"
+                                   :index="props.index"
+                                   :type="props.type"
+        />
     </li>
 </template>
 
