@@ -8,7 +8,6 @@ import {
     PButtonModal, PTextEditor, PFieldTitle, PToggleButton, PTextInput, PDatetimePicker, PScopedNotification,
 } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -43,7 +42,6 @@ const emit = defineEmits<{(e: 'update:modal-visible'): void,
 const storeState = reactive({
     selectedDataSourceItem: computed<DataSourceItem>(() => dataSourcesPageGetters.selectedDataSourceItem),
     jobList: computed<CostJobItem[]>(() => dataSourcesPageGetters.jobList),
-    timezone: computed<string>(() => store.state.user.timezone),
 });
 const state = reactive({
     proxyVisible: useProxyValue('modalVisible', props, emit),
@@ -80,12 +78,6 @@ const state = reactive({
         }
         return false;
     }),
-    diffInMinutes: computed<number>(() => {
-        const recentJobItem = storeState.jobList.filter((i) => i.status === 'IN_PROGRESS')[0];
-        const createdDate = dayjs.tz(recentJobItem.created_at, storeState.timezone);
-        const now = dayjs().tz(storeState.timezone);
-        return now.diff(createdDate, 'minute');
-    }),
     hasInProgressItem: computed<boolean>(() => storeState.jobList.some((item) => item.status === 'IN_PROGRESS')),
 });
 
@@ -108,7 +100,7 @@ const handleConfirmButton = async () => {
 
         case 'RE-SYNC':
         case 'RESTART':
-            if (state.hasInProgressItem && state.diffInMinutes <= 10) return;
+            if (state.hasInProgressItem) return;
             await dataSourcesPageStore.fetchSyncDatasource({
                 start: state.toggleValue ? undefined : dayjs(state.startDates[0]).format('YYYY-MM'),
                 data_source_id: storeState.selectedDataSourceItem.data_source_id,
@@ -143,7 +135,7 @@ const handleConfirmButton = async () => {
         backdrop
         :loading="state.loading"
         :disabled="state.modalValidation"
-        :hide-footer-close-button="props.modalType === 'RESTART' && state.hasInProgressItem && state.diffInMinutes <= 10"
+        :hide-footer-close-button="props.modalType === 'RESTART' && state.hasInProgressItem"
         :theme-color="props.modalType === 'CANCEL' || props.modalType === 'RESTART' ? 'alert' : 'primary'"
         :visible.sync="state.proxyVisible"
         class="data-source-management-tab-data-collection-history-modal"
@@ -164,13 +156,7 @@ const handleConfirmButton = async () => {
                     <div v-else
                          class="content-inner"
                     >
-                        <div v-if="state.diffInMinutes > 10">
-                            <b class="desc-title">{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.RESTART_MODAL_DESC_1') }}</b>
-                            <p>{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.RESTART_MODAL_DESC_2') }}</p>
-                        </div>
-                        <div v-else>
-                            <p>{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.RESTART_MODAL_CANCEL_DESC') }}</p>
-                        </div>
+                        <p>{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.RESTART_MODAL_CANCEL_DESC') }}</p>
                     </div>
                 </p-scoped-notification>
             </div>
@@ -234,8 +220,7 @@ const handleConfirmButton = async () => {
             <span v-if="props.modalType === 'ERROR'">{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ERROR_FOUND_OK') }}</span>
             <span v-else-if="props.modalType === 'CANCEL'">{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.CANCEL_BUTTON') }}</span>
             <span v-else-if="props.modalType === 'RESTART'
-                && state.hasInProgressItem
-                && state.diffInMinutes > 10"
+                && !state.hasInProgressItem"
             >
                 {{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.RESTART_MODAL_BUTTON') }}
             </span>
