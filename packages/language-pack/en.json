@@ -944,7 +944,7 @@
 				"RESTART_MODAL_CANCEL_DESC": "Data Collecting is still in progress.\nIf you want to re-sync, cancel the in progress job and proceed with the re-sync.",
 				"RESTART_MODAL_DESC_1": "Data collection is still in progress.",
 				"RESTART_MODAL_DESC_2": "Canceling the current data collection job may result in a delay when restarting the process. This action cannot be undone.",
-				"RESTART_MODAL_TITLE": "Do you want to cancel and re-start it?",
+				"RESTART_MODAL_TITLE": "Data Collecting is still in progress.",
 				"RESTRICTION_DESC": "Accessible in User Mode by Data Type",
 				"RESYNC": "Re-Sync",
 				"RESYNC_MODAL_TITLE": "Set a Re-sync Plan",
