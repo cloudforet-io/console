@@ -6,9 +6,6 @@
   "ADMIN_DOMAIN": "root",
   "AMCHARTS_LICENSE": {
     "ENABLED": false,
-    "CHARTS": "",
-    "MAPS": "",
-    "TIMELINE": "",
     "AM5_CHARTS": "",
     "AM5_MAPS": ""
   },
