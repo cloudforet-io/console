@@ -78,7 +78,6 @@ const state = reactive({
         }
         return false;
     }),
-    hasInProgressItem: computed<boolean>(() => storeState.jobList.some((item) => item.status === 'IN_PROGRESS')),
 });
 
 const handleUpdateSelectedDates = (selectedDates: string[]) => {
@@ -99,8 +98,6 @@ const handleConfirmButton = async () => {
             return;
 
         case 'RE-SYNC':
-        case 'RESTART':
-            if (state.hasInProgressItem) return;
             await dataSourcesPageStore.fetchSyncDatasource({
                 start: state.toggleValue ? undefined : dayjs(state.startDates[0]).format('YYYY-MM'),
                 data_source_id: storeState.selectedDataSourceItem.data_source_id,
@@ -135,7 +132,7 @@ const handleConfirmButton = async () => {
         backdrop
         :loading="state.loading"
         :disabled="state.modalValidation"
-        :hide-footer-close-button="(props.modalType === 'RESTART' && state.hasInProgressItem) || props.modalType === 'ERROR'"
+        :hide-footer-close-button="props.modalType === 'RESTART' || props.modalType === 'ERROR'"
         :theme-color="props.modalType === 'CANCEL' || props.modalType === 'RESTART' ? 'alert' : 'primary'"
         :visible.sync="state.proxyVisible"
         class="data-source-management-tab-data-collection-history-modal"
@@ -219,10 +216,8 @@ const handleConfirmButton = async () => {
         <template #confirm-button>
             <span v-if="props.modalType === 'ERROR'">{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ERROR_FOUND_OK') }}</span>
             <span v-else-if="props.modalType === 'CANCEL'">{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.CANCEL_BUTTON') }}</span>
-            <span v-else-if="props.modalType === 'RESTART'
-                && !state.hasInProgressItem"
-            >
-                {{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.RESTART_MODAL_BUTTON') }}
+            <span v-else-if="props.modalType === 'RESTART'">
+                {{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.CANCEL') }}
             </span>
         </template>
         <template #close-button>
