@@ -1,4 +1,4 @@
-import { DOMAIN_CONFIG_TYPE } from '@/store/domain/type';
+import { DOMAIN_CONFIG_TYPE } from '@/store/domain/constant';
 
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
