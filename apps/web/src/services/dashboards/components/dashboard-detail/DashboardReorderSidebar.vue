@@ -50,6 +50,7 @@ const handleChangeWidgetOrder = async () => {
         dashboard_id: dashboardDetailState.dashboardId || '',
         layouts: _updatedLayouts,
     });
+    dashboardDetailStore.setDashboardWidgets([...dashboardDetailState.dashboardWidgets]);
 };
 const getWidgetDefaultName = (widgetType: string): string => {
     const _config = getWidgetConfig(widgetType);
