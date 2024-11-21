@@ -3,7 +3,9 @@ import { PI, PBadge } from '@cloudforet/mirinae';
 
 import type { TaskStatusType } from '@/schema/opsflow/task/type';
 
-import TaskStatusActionButton from '@/services/ops-flow/components/TaskStatusActionButton.vue';
+import ActionMenuButton from '@/common/components/buttons/ActionMenuButton.vue';
+
+import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
 
 const props = defineProps<{
     index: number;
@@ -12,6 +14,15 @@ const props = defineProps<{
     color: string;
     type: TaskStatusType;
 }>();
+
+const taskCategoryPageStore = useTaskCategoryPageStore();
+
+const handleEdit = () => {
+    taskCategoryPageStore.openEditStatusForm(props.index, props.type);
+};
+const handleDelete = () => {
+    taskCategoryPageStore.openDeleteStatusModal(props.index, props.type);
+};
 </script>
 
 <template>
@@ -30,9 +41,8 @@ const props = defineProps<{
                 {{ props.name }}
             </p-badge>
         </div>
-        <task-status-action-button :id="props.id"
-                                   :index="props.index"
-                                   :type="props.type"
+        <action-menu-button @edit="handleEdit"
+                            @delete="handleDelete"
         />
     </li>
 </template>

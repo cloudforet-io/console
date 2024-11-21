@@ -4,7 +4,7 @@ import { reactive, computed } from 'vue';
 import {
     PPaneLayout, PHeadingLayout, PHeading, PButton, PDataTable, PIconButton,
 } from '@cloudforet/mirinae';
-import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
+import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 

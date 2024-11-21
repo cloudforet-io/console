@@ -5,17 +5,9 @@ import { ref, computed } from 'vue';
 import { PIconButton, PContextMenu, useContextMenuStyle } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import type { TaskStatusType } from '@/schema/opsflow/task/type';
-
-import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
-
-const props = defineProps<{
-    id: string;
-    index: number;
-    type: TaskStatusType;
+const emit = defineEmits<{(event: 'edit'): void;
+    (event: 'delete'): void;
 }>();
-
-const taskCategoryPageStore = useTaskCategoryPageStore();
 
 const containerRef = ref<HTMLElement|null>(null);
 const targetRef = ref<HTMLElement|null>(null);
@@ -43,9 +35,9 @@ onClickOutside(containerRef, hideMenu);
 
 const handleSelectMenu = (item: MenuItem) => {
     if (item.name === 'edit') {
-        taskCategoryPageStore.openEditStatusForm(props.index, props.type);
+        emit('edit');
     } else if (item.name === 'delete') {
-        taskCategoryPageStore.openDeleteStatusModal(props.index, props.type);
+        emit('delete');
     }
     hideMenu();
 };
