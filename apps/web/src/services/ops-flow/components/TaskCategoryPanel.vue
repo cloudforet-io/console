@@ -9,12 +9,12 @@ import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
-import { useTaskManagementStore } from '@/services/ops-flow/stores/admin/task-management-store';
+import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
 
-const taskManagementStore = useTaskManagementStore();
-const taskCategoryStore = taskManagementStore.taskCategoryStore;
-const packageStore = taskManagementStore.packageStore;
+const taskManagementPageStore = useTaskManagementPageStore();
+const taskCategoryStore = taskManagementPageStore.taskCategoryStore;
+const packageStore = taskManagementPageStore.packageStore;
 
 const state = reactive({
     categoryFields: computed<DataTableField[]>(() => [
@@ -63,7 +63,7 @@ const state = reactive({
                 <p-button icon-left="ic_plus_bold"
                           size="md"
                           style-type="substitutive"
-                          @click="taskManagementStore.openAddCategoryForm()"
+                          @click="taskManagementPageStore.openAddCategoryForm()"
                 >
                     Add Category
                 </p-button>
@@ -98,7 +98,7 @@ const state = reactive({
                 <p-button icon-left="ic_edit"
                           size="sm"
                           style-type="tertiary"
-                          @click="taskManagementStore.openEditCategoryForm(item.category_id)"
+                          @click="taskManagementPageStore.openEditCategoryForm(item.category_id)"
                 >
                     Edit
                 </p-button>

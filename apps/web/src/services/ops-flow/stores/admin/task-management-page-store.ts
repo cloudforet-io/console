@@ -6,11 +6,11 @@ import { defineStore } from 'pinia';
 import type { PackageModel } from '@/schema/identity/package/model';
 import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
 
-import { usePackageDataStore } from '@/services/ops-flow/stores/admin/package-data-store';
-import { useTaskCategoryDataStore } from '@/services/ops-flow/stores/admin/task-category-data-store';
+import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
 // import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 
-interface UseTaskManagementStoreState {
+interface UseTaskManagementPageStoreState {
     currentTemplateId?: string;
     // support package
     visiblePackageForm: boolean;
@@ -20,17 +20,17 @@ interface UseTaskManagementStoreState {
     editTargetCategoryId?: string;
 }
 
-interface UseTaskManagementStoreGetters {
+interface UseTaskManagementPageStoreGetters {
     editTargetPackage: ComputedRef<PackageModel|undefined>;
     editTargetCategory: ComputedRef<DeepReadonly<TaskCategoryModel>|undefined>;
     defaultPackage: ComputedRef<PackageModel|undefined>;
 }
 
-export const useTaskManagementStore = defineStore('task-management', () => {
-    const packageStore = usePackageDataStore();
-    const taskCategoryStore = useTaskCategoryDataStore();
+export const useTaskManagementPageStore = defineStore('task-management-page', () => {
+    const packageStore = usePackageStore();
+    const taskCategoryStore = useTaskCategoryStore();
     // const taskTypeStore = useTaskTypeStore();
-    const state = reactive<UseTaskManagementStoreState>({
+    const state = reactive<UseTaskManagementPageStoreState>({
         currentTemplateId: 'support-center',
         // support package
         visiblePackageForm: false,
@@ -39,7 +39,7 @@ export const useTaskManagementStore = defineStore('task-management', () => {
         visibleCategoryForm: false,
         editTargetCategoryId: undefined,
     });
-    const getters = reactive<UseTaskManagementStoreGetters>({
+    const getters = reactive<UseTaskManagementPageStoreGetters>({
         editTargetPackage: computed<PackageModel|undefined>(() => packageStore.state.packages?.find((p) => p.package_id === state.editTargetPackageId)),
         editTargetCategory: computed<DeepReadonly<TaskCategoryModel>|undefined>(() => taskCategoryStore.getters.taskCategories.find((c) => c.category_id === state.editTargetCategoryId)),
         defaultPackage: computed<PackageModel|undefined>(() => packageStore.state.packages?.find((p) => p.is_default)),

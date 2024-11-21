@@ -16,14 +16,14 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import { useCategoryField } from '@/services/ops-flow/composables/use-category-field';
 import { useWorkspaceField } from '@/services/ops-flow/composables/use-workspace-field';
-import { useTaskManagementStore } from '@/services/ops-flow/stores/admin/task-management-store';
+import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
 const workspaceReferenceStore = useWorkspaceReferenceStore();
-const taskManagementStore = useTaskManagementStore();
-const taskManagementState = taskManagementStore.state;
-const taskManagementGetters = taskManagementStore.getters;
-const packageStore = taskManagementStore.packageStore;
-const taskCategoryStore = taskManagementStore.taskCategoryStore;
+const taskManagementPageStore = useTaskManagementPageStore();
+const taskManagementPageState = taskManagementPageStore.state;
+const taskManagementPageGetters = taskManagementPageStore.getters;
+const packageStore = taskManagementPageStore.packageStore;
+const taskCategoryStore = taskManagementPageStore.taskCategoryStore;
 
 
 
@@ -70,7 +70,7 @@ const {
     name(value: string) {
         if (!value.trim().length) return 'Name is required';
         if (value.length > 50) return 'Name should be less than 50 characters';
-        if (packageStore.state.packages?.some((p) => p.package_id !== taskManagementState.editTargetPackageId && p.name === value)) return 'Name already exists';
+        if (packageStore.state.packages?.some((p) => p.package_id !== taskManagementPageState.editTargetPackageId && p.name === value)) return 'Name already exists';
         return true;
     },
     description(value: string) {
@@ -81,16 +81,16 @@ const {
 /* modal */
 const loading = ref(false);
 const handleCancelOrClose = () => {
-    taskManagementStore.closePackageForm();
+    taskManagementPageStore.closePackageForm();
 };
 
 const handleConfirm = async () => {
     if (!isAllValid.value) return;
     loading.value = true;
-    if (taskManagementState.editTargetPackageId) {
+    if (taskManagementPageState.editTargetPackageId) {
         try {
             const updatedPackage = await packageStore.updatePackage({
-                package_id: taskManagementState.editTargetPackageId,
+                package_id: taskManagementPageState.editTargetPackageId,
                 name: name.value,
                 description: description.value,
                 tags: {},
@@ -119,7 +119,7 @@ const handleConfirm = async () => {
             ErrorHandler.handleRequestError(e, 'Failed to create package');
         }
     }
-    taskManagementStore.closePackageForm();
+    taskManagementPageStore.closePackageForm();
     loading.value = false;
 };
 
@@ -127,7 +127,7 @@ onBeforeMount(() => {
     workspaceReferenceStore.load();
 });
 
-watch([() => taskManagementState.visiblePackageForm, () => taskManagementGetters.editTargetPackage], async ([visible, targetPackage], [prevVisible]) => {
+watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPageGetters.editTargetPackage], async ([visible, targetPackage], [prevVisible]) => {
     if (!visible) {
         if (!prevVisible) return; // prevent initial call
         await nextTick(); // wait for closing animation
@@ -154,7 +154,7 @@ watch([() => taskManagementState.visiblePackageForm, () => taskManagementGetters
 
 <template>
     <p-overlay-layout title="Add Package"
-                      :visible="taskManagementState.visiblePackageForm"
+                      :visible="taskManagementPageState.visiblePackageForm"
                       @close="handleCancelOrClose"
     >
         <template #default>

@@ -6,10 +6,10 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import { useTaskManagementStore } from '@/services/ops-flow/stores/admin/task-management-store';
+import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
-const taskManagementStore = useTaskManagementStore();
-const taskManagementState = taskManagementStore.state;
+const taskManagementPageStore = useTaskManagementPageStore();
+const taskManagementPageState = taskManagementPageStore.state;
 const state = reactive({
     enableLandingPage: false,
     templateMenuItems: computed<SelectDropdownMenuItem[]>(() => [
@@ -19,7 +19,7 @@ const state = reactive({
 });
 
 const handleSelectTemplate = (templateId: string) => {
-    taskManagementStore.setCurrentTemplateId(templateId);
+    taskManagementPageStore.setCurrentTemplateId(templateId);
 };
 </script>
 
@@ -32,7 +32,7 @@ const handleSelectTemplate = (templateId: string) => {
         <p class="mb-4 text-label-md text-gray-600">
             템플릿에 대한 Description
         </p>
-        <p-select-dropdown :selected="taskManagementState.currentTemplateId"
+        <p-select-dropdown :selected="taskManagementPageState.currentTemplateId"
                            :menu="state.templateMenuItems"
                            @select="handleSelectTemplate"
         >

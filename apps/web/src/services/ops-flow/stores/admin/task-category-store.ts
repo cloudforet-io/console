@@ -17,7 +17,7 @@ interface UseTaskCategoryStoreGetters {
     taskCategories: Ref<DeepReadonly<TaskCategoryModel[]>>
 }
 
-export const useTaskCategoryDataStore = defineStore('task-category-data', () => {
+export const useTaskCategoryStore = defineStore('task-category', () => {
     const state = reactive<UseTaskCategoryStoreState>({
         loading: false,
         items: undefined,

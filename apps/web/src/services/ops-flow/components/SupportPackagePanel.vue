@@ -6,11 +6,11 @@ import {
 } from '@cloudforet/mirinae';
 import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 
-import { useTaskManagementStore } from '@/services/ops-flow/stores/admin/task-management-store';
+import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
 
-const taskManagementStore = useTaskManagementStore();
-const packageStore = taskManagementStore.packageStore;
+const taskManagementPageStore = useTaskManagementPageStore();
+const packageStore = taskManagementPageStore.packageStore;
 
 const state = reactive({
     packageFields: computed<DataTableField[]>(() => [
@@ -49,7 +49,7 @@ onBeforeMount(() => {
                 <p-button icon-left="ic_plus_bold"
                           size="md"
                           style-type="substitutive"
-                          @click="taskManagementStore.openAddPackageForm()"
+                          @click="taskManagementPageStore.openAddPackageForm()"
                 >
                     Add Package
                 </p-button>
@@ -66,7 +66,7 @@ onBeforeMount(() => {
                 <p-button icon-left="ic_edit"
                           size="sm"
                           style-type="tertiary"
-                          @click="taskManagementStore.openEditPackageForm(item.package_id)"
+                          @click="taskManagementPageStore.openEditPackageForm(item.package_id)"
                 >
                     Edit
                 </p-button>

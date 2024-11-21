@@ -10,7 +10,7 @@ interface UseTaskTypeStoreState {
     taskTypes?: TaskTypeModel[];
 }
 
-export const useTaskTypeDataStore = defineStore('task-type-data', () => {
+export const useTaskTypeDataStore = defineStore('task-type', () => {
     const state = reactive<UseTaskTypeStoreState>({
         taskTypes: [
             {
