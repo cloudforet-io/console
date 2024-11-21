@@ -39,7 +39,7 @@ export const useTaskTypeStore = defineStore('task-type', () => {
                             task_type_id: 'task_type_1',
                             name: 'Account',
                             description: '계정과 관련된 문의사항',
-                            assignee: 'wanjin@mz.co.kr',
+                            assignee_pool: ['wanjin@mz.co.kr'],
                             fields: [
                                 {
                                     field_id: getRandomId(),
@@ -66,7 +66,7 @@ export const useTaskTypeStore = defineStore('task-type', () => {
                             task_type_id: 'task_type_2',
                             name: 'Invoice',
                             description: '청구서와 관련된 문의사항',
-                            assignee: 'bokjang@mz.co.kr',
+                            assignee_pool: ['bokjang@mz.co.kr'],
                             fields: [
                                 {
                                     field_id: getRandomId(),

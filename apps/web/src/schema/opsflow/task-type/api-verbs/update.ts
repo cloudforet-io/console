@@ -6,6 +6,7 @@ export interface TaskTypeUpdateParameters {
     name?: string;
     description?: string;
     fields?: TaskField[];
+    assignee_pool?: string[];
     tags?: Tags;
     category_id?: string;
 }

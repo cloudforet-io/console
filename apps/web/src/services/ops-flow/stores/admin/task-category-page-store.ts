@@ -35,6 +35,7 @@ interface UseTaskCategoryPageStoreGetters {
         }|undefined>;
     // task type
     taskTypes: ComputedRef<TaskTypeModel[]|undefined>;
+    targetTaskType: ComputedRef<TaskTypeModel|undefined>;
 }
 
 export const useTaskCategoryPageStore = defineStore('task-management-category-page', () => {
@@ -84,6 +85,10 @@ export const useTaskCategoryPageStore = defineStore('task-management-category-pa
             if (!state.currentCategoryId) return undefined;
             const allTaskTypes = taskTypeStore.getters.taskTypes;
             return allTaskTypes.filter((taskType) => taskType.category_id === state.currentCategoryId);
+        }),
+        targetTaskType: computed<TaskTypeModel|undefined>(() => {
+            if (!state.targetTaskTypeId) return undefined;
+            return taskTypeStore.getters.taskTypes.find((taskType) => taskType.task_type_id === state.targetTaskTypeId);
         }),
     }) as UnwrapRef<UseTaskCategoryPageStoreGetters>;
 

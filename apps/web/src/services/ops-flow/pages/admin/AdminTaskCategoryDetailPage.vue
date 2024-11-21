@@ -33,6 +33,7 @@ import { useGoBack } from '@/common/composables/go-back';
 
 import TaskStatusDeleteModal from '@/services/ops-flow/components/TaskStatusDeleteModal.vue';
 import TaskStatusForm from '@/services/ops-flow/components/TaskStatusForm.vue';
+import TaskTypeForm from '@/services/ops-flow/components/TaskTypeForm.vue';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
 
@@ -121,7 +122,9 @@ defineExpose({ setPathFrom });
         >
             <router-view />
         </p-tab>
+        <!-- modals -->
         <task-status-form />
         <task-status-delete-modal />
+        <task-type-form />
     </div>
 </template>
