@@ -135,7 +135,7 @@ const handleConfirmButton = async () => {
         backdrop
         :loading="state.loading"
         :disabled="state.modalValidation"
-        :hide-footer-close-button="props.modalType === 'RESTART' && state.hasInProgressItem"
+        :hide-footer-close-button="(props.modalType === 'RESTART' && state.hasInProgressItem) || props.modalType === 'ERROR'"
         :theme-color="props.modalType === 'CANCEL' || props.modalType === 'RESTART' ? 'alert' : 'primary'"
         :visible.sync="state.proxyVisible"
         class="data-source-management-tab-data-collection-history-modal"
