@@ -63,7 +63,7 @@ export const useCategoryField = ({
     const addPackageToCategories = async (packageId: string, categoryIds: string[]) => {
         try {
             await Promise.allSettled([
-                ...categoryIds.map((categoryId) => taskCategoryStore.updateCategory({
+                ...categoryIds.map((categoryId) => taskCategoryStore.update({
                     package_id: packageId,
                     category_id: categoryId,
                 })),
@@ -77,7 +77,7 @@ export const useCategoryField = ({
             if (!defaultPackage.value) throw new Error('Default package not found');
             const defaultPackageId = defaultPackage.value.package_id;
             await Promise.allSettled([
-                ...categoryIds.map((categoryId) => taskCategoryStore.updateCategory({
+                ...categoryIds.map((categoryId) => taskCategoryStore.update({
                     package_id: defaultPackageId,
                     category_id: categoryId,
                 })),

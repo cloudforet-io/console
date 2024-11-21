@@ -26,14 +26,14 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
     const getters = reactive<UseTaskCategoryStoreGetters>({
         taskCategories: asyncComputed<TaskCategoryModel[]>(async () => {
             if (state.items === undefined) {
-                await actions.fetchCategories();
+                await actions.list();
             }
             return state.items ?? [];
         }, [], { lazy: true }),
     });
 
     const actions = {
-        async fetchCategories() {
+        async list() {
             return new Promise<void>((resolve) => {
                 state.loading = true;
                 setTimeout(() => {
@@ -172,7 +172,7 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
                 }, 1000);
             });
         },
-        async createCategory(param: Omit<TaskCategoryCreateParameters, 'status_options'>) {
+        async create(param: Omit<TaskCategoryCreateParameters, 'status_options'>) {
             return new Promise<TaskCategoryModel>((resolve) => {
                 const result: TaskCategoryModel = {
                     category_id: `category_${(getters.taskCategories.length) + 1}`,
@@ -215,7 +215,7 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
                 resolve(result);
             });
         },
-        async updateCategory(param: Omit<TaskCategoryUpdateParameters, 'status_options'>) {
+        async update(param: Omit<TaskCategoryUpdateParameters, 'status_options'>) {
             return new Promise<TaskCategoryModel>((resolve, reject) => {
                 setTimeout(() => {
                     const targetCategory = state.items?.find((category) => category.category_id === param.category_id);
@@ -224,6 +224,18 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
                         if (param.description) targetCategory.description = param.description ?? '';
                         if (param.tags) targetCategory.tags = param.tags ?? {};
                         if (param.package_id) targetCategory.package_id = param.package_id;
+                        resolve(targetCategory);
+                    } else {
+                        reject(new Error('Category not found'));
+                    }
+                }, 1000);
+            });
+        },
+        async get(categoryId: string) {
+            return new Promise<TaskCategoryModel>((resolve, reject) => {
+                setTimeout(() => {
+                    const targetCategory = state.items?.find((category) => category.category_id === categoryId);
+                    if (targetCategory) {
                         resolve(targetCategory);
                     } else {
                         reject(new Error('Category not found'));

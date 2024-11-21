@@ -15,33 +15,39 @@ export default defineComponent({
     },
 });
 </script>
+
 <script setup lang="ts">
 /* eslint-disable import/first */
 // eslint-disable-next-line import/no-duplicates,import/order
-import type { DeepReadonly } from 'vue';
 // eslint-disable-next-line import/no-duplicates
-import { computed } from 'vue';
-import { useRoute } from 'vue-router/composables';
+import { computed, onBeforeMount } from 'vue';
+import { useRoute, useRouter } from 'vue-router/composables';
 
-import { PHeading } from '@cloudforet/mirinae';
+import { PHeading, PTab, PSkeleton } from '@cloudforet/mirinae';
+import type { TabItem } from '@cloudforet/mirinae/types/hooks/use-tab/type';
 
-import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useGoBack } from '@/common/composables/go-back';
 
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
-import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
+import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
 
+const props = defineProps<{
+    taskCategoryId: string;
+}>();
+const router = useRouter();
 const route = useRoute();
 
-const taskManagementPageStore = useTaskManagementPageStore();
-const taskCategoryStore = taskManagementPageStore.taskCategoryStore;
+const taskCategoryPageStore = useTaskCategoryPageStore();
+const taskCategoryPageGetters = taskCategoryPageStore.getters;
+const taskCategoryStore = taskCategoryPageStore.taskCategoryStore;
 
-const category = computed<DeepReadonly<TaskCategoryModel|undefined>>(() => taskCategoryStore.getters.taskCategories.find((c) => c.category_id === route.params.taskCategoryId));
-const headerTitle = computed(() => category.value?.name);
 
+/* header and back button */
+const loading = computed<boolean>(() => taskCategoryStore.state.loading);
+const headerTitle = computed<string>(() => taskCategoryPageGetters.currentCategory?.name ?? 'No Category');
 const {
     setPathFrom,
     handleClickBackButton,
@@ -49,13 +55,69 @@ const {
     name: makeAdminRouteName(OPS_FLOW_ROUTE.TASK_MANAGEMENT._NAME),
 });
 
+/* tabs */
+const tabs = computed<TabItem<object>[]>(() => [
+    {
+        name: 'status',
+        label: 'Status', // TODO: i18n
+        keepAlive: true,
+    },
+    {
+        name: 'taskType',
+        label: 'Ticket Topic', // TODO: i18n & template
+        keepAlive: true,
+    },
+]);
+const activeTab = computed(() => {
+    if (route.name === makeAdminRouteName(OPS_FLOW_ROUTE.TASK_MANAGEMENT.TASK_CATEGORY.DETAIL.TASK_TYPE._NAME)) return 'taskType';
+    return 'status';
+});
+const handleUpdateActiveTab = (tab: string) => {
+    if (tab === 'taskType') {
+        router.replace({
+            name: makeAdminRouteName(OPS_FLOW_ROUTE.TASK_MANAGEMENT.TASK_CATEGORY.DETAIL.TASK_TYPE._NAME),
+            params: {
+                taskCategoryId: props.taskCategoryId,
+            },
+        });
+    } else {
+        router.replace({
+            name: makeAdminRouteName(OPS_FLOW_ROUTE.TASK_MANAGEMENT.TASK_CATEGORY.DETAIL.STATUS._NAME),
+            params: {
+                taskCategoryId: props.taskCategoryId,
+            },
+        });
+    }
+};
+
+/* lifecycle */
+onBeforeMount(() => {
+    taskCategoryPageStore.setCurrentCategoryId(props.taskCategoryId);
+});
+
+/* expose */
 defineExpose({ setPathFrom });
 </script>
 
 <template>
-    <p-heading show-back-button
-               @click-back-button="handleClickBackButton"
-    >
-        {{ headerTitle }}
-    </p-heading>
+    <div>
+        <p-heading class="mb-6"
+                   show-back-button
+                   @click-back-button="handleClickBackButton"
+        >
+            <p-skeleton v-if="loading"
+                        height="1.75rem"
+                        width="12rem"
+            />
+            <template v-else>
+                {{ headerTitle }}
+            </template>
+        </p-heading>
+        <p-tab :tabs="tabs"
+               :active-tab="activeTab"
+               @update:active-tab="handleUpdateActiveTab"
+        >
+            <router-view />
+        </p-tab>
+    </div>
 </template>

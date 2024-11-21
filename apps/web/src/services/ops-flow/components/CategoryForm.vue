@@ -47,14 +47,14 @@ const handleConfirm = async () => {
     try {
         loading.value = true;
         if (taskManagementPageState.editTargetCategoryId) {
-            await taskCategoryStore.updateCategory({
+            await taskCategoryStore.update({
                 category_id: taskManagementPageState.editTargetCategoryId,
                 name: name.value,
                 description: description.value,
             });
         } else {
             if (!taskManagementPageGetters.defaultPackage) throw Error('Default package is not found');
-            await taskCategoryStore.createCategory({
+            await taskCategoryStore.create({
                 name: name.value,
                 description: description.value,
                 package_id: taskManagementPageGetters.defaultPackage.package_id,
