@@ -4,6 +4,7 @@ import { cloneDeep } from 'lodash';
 import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 
+import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/comparison/type';
 import type { WidgetHeaderValue } from '@/common/modules/widgets/_widget-fields/header/type';
 import type {
     TableDataFieldValueNoVersion,
@@ -171,6 +172,28 @@ const migrateTable = (widget: PublicWidgetModel|PrivateWidgetModel): PublicWidge
             tableDataField: migrateTableDataField(_options.tableDataField),
         };
     }
+    // Comparison version migration
+    _options = {
+        ..._options,
+        comparison: migrateComparison(_options.comparison),
+    };
+    return {
+        ...widget,
+        options: _options,
+    };
+};
+
+/**
+ * NumberCard
+ * Change Comparison Value Type (ComparisonValue[] -> ComparisonValue)
+ */
+const migrateNumberCard = (widget: PublicWidgetModel|PrivateWidgetModel): PublicWidgetModel|PrivateWidgetModel => {
+    let _options: WidgetOptions = cloneDeep(widget.options);
+    // Comparison version migration
+    _options = {
+        ..._options,
+        comparison: migrateComparison(_options.comparison),
+    };
     return {
         ...widget,
         options: _options,
@@ -219,6 +242,9 @@ export const migrateLegacyWidgetOptions = (dashboardWidgets: Array<PublicWidgetM
         if (widget.widget_type === 'table') {
             return migrateTable(widget);
         }
+        if (widget.widget_type === 'numberCard') {
+            return migrateNumberCard(widget);
+        }
         return widget;
     });
     migratedWidgets = migrateAllWidgets(migratedWidgets);
@@ -264,4 +290,24 @@ const migrateTableDataField = (tableDataField: LegacyTableDataFieldValue): Lates
     default:
         return tableDataField as LatestTableDataFieldValue;
     }
+};
+/**
+ * Comparison Migration
+ * Widgets: [Table, Number Card]
+ * Change Comparison Value Type (ComparisonValue[] -> ComparisonValue)
+ */
+const migrateComparison = (comparison?: ComparisonValue|ComparisonValue[]): ComparisonValue => {
+    if (comparison) {
+        if (Array.isArray(comparison)) {
+            const _comparisonValue: ComparisonValue = comparison[0];
+            return {
+                ..._comparisonValue,
+                toggleValue: true,
+            };
+        }
+        return comparison;
+    }
+    return {
+        toggleValue: false,
+    };
 };

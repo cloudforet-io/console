@@ -96,7 +96,7 @@ const checkValue = ():boolean => {
 
 watch(() => state.proxyValue, (_value) => {
     emit('update:is-valid', checkValue());
-    if (!_value) {
+    if (!_value && props.widgetFieldSchema?.options?.toggle) {
         state.proxyValue = cloneDeep(state.initialValue);
     }
 }, { immediate: true });
