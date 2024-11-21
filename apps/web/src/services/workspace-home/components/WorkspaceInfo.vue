@@ -238,6 +238,13 @@ const routerToWorkspaceUser = (isOpenModal: boolean) => {
         }
     }
 
+    /* custom design-system component - p-heading-layout */
+    :deep(.p-heading-layout) {
+        .extra-container {
+            margin-top: 0;
+        }
+    }
+
     @screen mobile {
         .invite-user-button, .create-app-button {
             @apply hidden;
