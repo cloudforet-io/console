@@ -1,5 +1,5 @@
 import { asyncComputed } from '@vueuse/core';
-import type { Ref, DeepReadonly } from 'vue';
+import type { Ref } from 'vue';
 import { reactive } from 'vue';
 
 import { defineStore } from 'pinia';
@@ -14,7 +14,7 @@ interface UseTaskCategoryStoreState {
     items?: TaskCategoryModel[];
 }
 interface UseTaskCategoryStoreGetters {
-    taskCategories: Ref<DeepReadonly<TaskCategoryModel[]>>
+    taskCategories: Ref<Readonly<TaskCategoryModel[]>>
 }
 
 export const useTaskCategoryStore = defineStore('task-category', () => {
@@ -48,7 +48,7 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
                                     {
                                         status_id: 'todo_1',
                                         name: '요청',
-                                        color: 'gray',
+                                        color: 'gray200',
                                         is_default: true,
                                     },
                                 ],
@@ -56,7 +56,7 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
                                     {
                                         status_id: 'in_progress_1',
                                         name: '진행중',
-                                        color: 'blue',
+                                        color: 'blue200',
                                         is_default: true,
                                     },
                                 ],
@@ -64,19 +64,19 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
                                     {
                                         status_id: 'complete_1',
                                         name: '완료',
-                                        color: 'green',
+                                        color: 'green200',
                                         is_default: true,
                                     },
                                     {
                                         status_id: 'complete_2',
                                         name: '보류',
-                                        color: 'yellow',
+                                        color: 'yellow200',
                                         is_default: false,
                                     },
                                     {
                                         status_id: 'complete_3',
                                         name: '취소',
-                                        color: 'red',
+                                        color: 'red100',
                                         is_default: false,
                                     },
                                 ],
@@ -97,7 +97,7 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
                                     {
                                         status_id: 'todo_1',
                                         name: '요청',
-                                        color: 'gray',
+                                        color: 'gray200',
                                         is_default: true,
                                     },
                                 ],
@@ -105,13 +105,13 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
                                     {
                                         status_id: 'in_progress_1',
                                         name: '확인중',
-                                        color: 'yellow',
+                                        color: 'yellow200',
                                         is_default: true,
                                     },
                                     {
                                         status_id: 'in_progress_2',
                                         name: '진행중',
-                                        color: 'blue',
+                                        color: 'blue200',
                                         is_default: false,
                                     },
                                 ],
@@ -119,7 +119,7 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
                                     {
                                         status_id: 'complete_1',
                                         name: '완료',
-                                        color: 'green',
+                                        color: 'green200',
                                         is_default: true,
                                     },
                                 ],
@@ -139,7 +139,7 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
                                     {
                                         status_id: 'todo_1',
                                         name: '요청',
-                                        color: 'gray',
+                                        color: 'gray200',
                                         is_default: true,
                                     },
                                 ],
@@ -147,7 +147,7 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
                                     {
                                         status_id: 'in_progress_1',
                                         name: '진행중',
-                                        color: 'blue',
+                                        color: 'blue200',
                                         is_default: false,
                                     },
                                 ],
@@ -155,7 +155,7 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
                                     {
                                         status_id: 'complete_1',
                                         name: '완료',
-                                        color: 'green',
+                                        color: 'green200',
                                         is_default: true,
                                     },
                                 ],
@@ -184,7 +184,7 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
                             {
                                 status_id: 'todo_1',
                                 name: '요청',
-                                color: 'gray',
+                                color: 'gray200',
                                 is_default: true,
                             },
                         ],
@@ -192,7 +192,7 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
                             {
                                 status_id: 'in_progress_1',
                                 name: '진행중',
-                                color: 'blue',
+                                color: 'blue200',
                                 is_default: true,
                             },
                         ],
@@ -200,7 +200,7 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
                             {
                                 status_id: 'complete_1',
                                 name: '완료',
-                                color: 'green',
+                                color: 'green200',
                                 is_default: true,
                             },
                         ],
@@ -215,7 +215,7 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
                 resolve(result);
             });
         },
-        async update(param: Omit<TaskCategoryUpdateParameters, 'status_options'>) {
+        async update(param: TaskCategoryUpdateParameters) {
             return new Promise<TaskCategoryModel>((resolve, reject) => {
                 setTimeout(() => {
                     const targetCategory = state.items?.find((category) => category.category_id === param.category_id);
@@ -224,6 +224,7 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
                         if (param.description) targetCategory.description = param.description ?? '';
                         if (param.tags) targetCategory.tags = param.tags ?? {};
                         if (param.package_id) targetCategory.package_id = param.package_id;
+                        if (param.status_options) targetCategory.status_options = param.status_options;
                         resolve(targetCategory);
                     } else {
                         reject(new Error('Category not found'));

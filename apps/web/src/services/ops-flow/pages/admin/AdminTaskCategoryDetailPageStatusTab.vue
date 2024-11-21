@@ -2,14 +2,7 @@
 import { PHeadingLayout, PHeading, PButton } from '@cloudforet/mirinae';
 
 import TaskStatusTree from '@/services/ops-flow/components/TaskStatusTree.vue';
-import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
 
-const taskCategoryPageStore = useTaskCategoryPageStore();
-
-const props = defineProps<{
-    taskCategoryId: string;
-}>();
-taskCategoryPageStore.setCurrentCategoryId(props.taskCategoryId);
 </script>
 
 <template>

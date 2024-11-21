@@ -1,4 +1,4 @@
-import type { DeepReadonly, ComputedRef, UnwrapRef } from 'vue';
+import type { ComputedRef, UnwrapRef } from 'vue';
 import { reactive, computed } from 'vue';
 
 import { defineStore } from 'pinia';
@@ -13,8 +13,8 @@ interface UseTaskCategoryPageStoreState {
 }
 
 interface UseTaskCategoryPageStoreGetters {
-    currentCategory: ComputedRef<DeepReadonly<TaskCategoryModel|undefined>>;
-    statusOptions: ComputedRef<DeepReadonly<TaskStatusOptions>>;
+    currentCategory: ComputedRef<TaskCategoryModel|undefined>;
+    statusOptions: ComputedRef<TaskStatusOptions>;
 }
 
 export const useTaskCategoryPageStore = defineStore('task-management-category-page', () => {
@@ -24,8 +24,8 @@ export const useTaskCategoryPageStore = defineStore('task-management-category-pa
     }) as UseTaskCategoryPageStoreState;
 
     const getters = reactive<UseTaskCategoryPageStoreGetters>({
-        currentCategory: computed<DeepReadonly<TaskCategoryModel|undefined>>(() => taskCategoryStore.getters.taskCategories.find((c) => c.category_id === state.currentCategoryId)),
-        statusOptions: computed<DeepReadonly<TaskStatusOptions>>(() => {
+        currentCategory: computed<TaskCategoryModel|undefined>(() => taskCategoryStore.getters.taskCategories.find((c) => c.category_id === state.currentCategoryId)),
+        statusOptions: computed<TaskStatusOptions>(() => {
             const category = getters.currentCategory;
             if (!category) {
                 return {

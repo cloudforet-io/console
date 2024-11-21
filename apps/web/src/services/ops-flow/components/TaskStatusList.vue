@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 import draggable from 'vuedraggable';
 
 import type { TaskStatusOption } from '@/schema/opsflow/task/type';
@@ -13,13 +13,26 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{(event: 'update:items', value: TaskStatusOption[]): void;
 }>();
-const draggableItems = computed({
+
+const isFolded = ref(false);
+
+// `localItems` acts as a proxy for `props.items`, allowing temporary local updates
+// while waiting for asynchronous changes to reflect in the parent.
+const localItems = ref<TaskStatusOption[]>(props.items);
+// `draggableItems` syncs `localItems` with the parent via an `update:items` event,
+// ensuring local changes are reflected in both states.
+const draggableItems = computed<TaskStatusOption[]>({
     get() {
-        return props.items;
+        return localItems.value;
     },
     set(value: TaskStatusOption[]) {
+        localItems.value = value;
         emit('update:items', value);
     },
+});
+
+watch(() => props.items, (newItems) => {
+    localItems.value = newItems;
 });
 
 </script>
@@ -27,17 +40,23 @@ const draggableItems = computed({
 <template>
     <div>
         <div class="pt-2 pb-1">
-            <task-status-list-fold-button>{{ props.header }}</task-status-list-fold-button>
+            <task-status-list-fold-button :is-folded.sync="isFolded">
+                {{ props.header }}
+            </task-status-list-fold-button>
         </div>
-        <draggable v-model="draggableItems"
-                   tag="ol"
-                   draggable=".draggable-item"
-                   ghost-class="ghost"
-        >
-            <task-status-draggable-item v-for="item in props.items"
-                                        :key="item.key"
-                                        :name="item.name"
-            />
-        </draggable>
+        <div v-show="!isFolded">
+            <draggable v-model="draggableItems"
+                       tag="ol"
+                       draggable=".task-status-draggable-item"
+                       ghost-class="ghost"
+                       handle=".drag-handle"
+            >
+                <task-status-draggable-item v-for="item in draggableItems"
+                                            :key="item.status_id"
+                                            :name="item.name"
+                                            :color="item.color"
+                />
+            </draggable>
+        </div>
     </div>
 </template>

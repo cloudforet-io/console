@@ -3,20 +3,44 @@ import { PI, PBadge } from '@cloudforet/mirinae';
 
 const props = defineProps<{
     name: string;
+    color: string;
 }>();
 </script>
 
 <template>
-    <li>
-        <p-i name="ic_drag-handle" />
-        <p-badge badge-type="subtle">
-            {{ props.name }}
-        </p-badge>
+    <li class="task-status-draggable-item">
+        <p-i name="ic_drag-handle"
+             width="1rem"
+             height="1rem"
+             class="drag-handle"
+        />
+        <div>
+            <p-badge class="ml-2"
+                     badge-type="subtle"
+                     shape="square"
+                     :style-type="props.color"
+            >
+                {{ props.name }}
+            </p-badge>
+        </div>
     </li>
 </template>
 
 <style lang="postcss" scoped>
-li {
+.task-status-draggable-item {
+    @apply flex items-center px-2 border border-b-0 border-gray-150;
     height: 2.625rem;
+    &:first-of-type {
+        @apply rounded-t-lg;
+    }
+    &:last-of-type {
+        @apply rounded-b-lg border-b;
+    }
+    &.ghost {
+        @apply rounded-lg border;
+    }
+    >.drag-handle {
+        cursor: grab;
+    }
 }
 </style>
