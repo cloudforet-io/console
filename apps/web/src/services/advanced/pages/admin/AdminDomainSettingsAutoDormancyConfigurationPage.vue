@@ -23,6 +23,7 @@ import { i18n as _i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
+import { DOMAIN_CONFIG_TYPE } from '@/store/domain/constant';
 import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
 import type { Currency } from '@/store/modules/display/type';
 
@@ -37,7 +38,6 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import type { DormancyConfig } from '@/services/advanced/types/preferences-type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
-const DORMANCY_CONFIG_NAME = 'identity:dormancy:workspace';
 
 const router = useRouter();
 const route = useRoute();
@@ -129,7 +129,7 @@ const handleSaveConfig = async () => {
 
 const createDomainDormancy = async (data: DormancyConfig) => {
     await SpaceConnector.client.config.domainConfig.create<DomainConfigUpdateParameters, DomainConfigModel>({
-        name: DORMANCY_CONFIG_NAME,
+        name: DOMAIN_CONFIG_TYPE.DORMANCY_WORKSPACE,
         data,
     });
 };
@@ -138,7 +138,7 @@ const updateDomainDormancy = async (data: DormancyConfig) => {
         await createDomainDormancy(data);
     } else {
         await SpaceConnector.client.config.domainConfig.update<DomainConfigUpdateParameters, DomainConfigModel>({
-            name: DORMANCY_CONFIG_NAME,
+            name: DOMAIN_CONFIG_TYPE.DORMANCY_WORKSPACE,
             data,
         });
     }
@@ -148,7 +148,7 @@ const updateDomainDormancy = async (data: DormancyConfig) => {
 const fetchDomainSettings = async () => {
     try {
         const res = await SpaceConnector.client.config.domainConfig.list<DomainConfigListParameters, ListResponse<DomainConfigModel>>({
-            name: DORMANCY_CONFIG_NAME,
+            name: DOMAIN_CONFIG_TYPE.DORMANCY_WORKSPACE,
         });
         state.dormancyConfig = res.results?.[0].data ?? null;
     } catch (e) {
