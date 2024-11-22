@@ -58,7 +58,22 @@ const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 
 const storeState = reactive({
-    metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
+    metrics: computed<MetricReferenceMap>(() => {
+        const filteredMetrics = (Object.values(allReferenceStore.getters.metric) as MetricReferenceItem[]).filter((metric) => {
+            if (metric.data.is_managed) {
+                return true;
+            }
+            if (!metric.data.is_managed) {
+                if (storeState.isAdminMode) {
+                    return metric.data.resource_group === 'DOMAIN';
+                }
+                return metric.data.resource_group === 'WORKSPACE';
+            }
+            return true;
+        });
+
+        return Object.fromEntries(filteredMetrics.map((metric: MetricReferenceItem) => [metric.key, metric]));
+    }),
     metricExamples: computed<MetricExampleModel[]>(() => gnbGetters.metricExamples),
     namespaces: computed<NamespaceReferenceMap>(() => allReferenceStore.getters.namespace),
     providers: computed(() => allReferenceStore.getters.provider),

@@ -1,13 +1,20 @@
 <script setup lang="ts">
-
+import {
+    computed, reactive, watchEffect,
+} from 'vue';
 
 import { PTreeView, PI, PTextHighlighting } from '@cloudforet/mirinae';
 import type { TreeDisplayMap, TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { gray } from '@/styles/colors';
+
+
+const appContextStore = useAppContextStore();
 
 interface Props {
     metricItems: TreeNode[];
@@ -18,6 +25,19 @@ interface Props {
 
 const props = defineProps<Props>();
 
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+});
+
+watchEffect(() => {
+    if (storeState.isAdminMode) {
+        props.metricItems.forEach((metricItem: TreeNode) => {
+            if (Object.keys(metricItem).includes(('children'))) {
+                delete metricItem.children;
+            }
+        });
+    }
+});
 </script>
 
 <template>
