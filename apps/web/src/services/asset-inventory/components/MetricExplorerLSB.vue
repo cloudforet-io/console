@@ -59,7 +59,7 @@ const metricExplorerPageState = metricExplorerPageStore.state;
 
 const storeState = reactive({
     metrics: computed<MetricReferenceMap>(() => {
-        const filteredMetrics = (Object.values(allReferenceStore.getters.metric) as MetricReferenceItem[]).filter((metric) => {
+        const filteredMetrics = Object.values(allReferenceStore.getters.metric).filter((metric) => {
             if (metric.data.is_managed) {
                 return true;
             }
@@ -72,7 +72,7 @@ const storeState = reactive({
             return true;
         });
 
-        return Object.fromEntries(filteredMetrics.map((metric: MetricReferenceItem) => [metric.key, metric]));
+        return Object.fromEntries(filteredMetrics.map((metric) => [metric.key, metric]));
     }),
     metricExamples: computed<MetricExampleModel[]>(() => gnbGetters.metricExamples),
     namespaces: computed<NamespaceReferenceMap>(() => allReferenceStore.getters.namespace),

@@ -26,7 +26,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const storeState = reactive({
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
 });
 
 watchEffect(() => {
