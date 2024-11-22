@@ -74,8 +74,9 @@ const state = reactive({
     }),
     hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
     selectedId: computed<string|undefined>(() => {
+        const routeName = getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME }).name;
         if (!props.isDetailPage) return undefined;
-        if (route.name === ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME) return route.params.metricId;
+        if (route.name === routeName) return route.params.metricId;
         return route.params.metricExampleId;
     }),
     inputValue: '',
