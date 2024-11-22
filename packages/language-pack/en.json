@@ -941,7 +941,7 @@
 				"RESETTING": "Resetting...",
 				"RESET_MODAL_TITLE": "Are you sure you want to reset workspaces for {count} linked accounts?",
 				"RESTART_MODAL_BUTTON": "Cancel and Re-start",
-				"RESTART_MODAL_CANCEL_DESC": "Data Collecting is still in progress.\nIf you want to re-sync, cancel the in progress job and proceed with the re-sync.",
+				"RESTART_MODAL_CANCEL_DESC": "f you want to re-sync, cancel the in progress job and proceed with the re-sync.",
 				"RESTART_MODAL_DESC_1": "Data collection is still in progress.",
 				"RESTART_MODAL_DESC_2": "Canceling the current data collection job may result in a delay when restarting the process. This action cannot be undone.",
 				"RESTART_MODAL_TITLE": "Data Collecting is still in progress.",
