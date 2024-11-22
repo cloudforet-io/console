@@ -115,7 +115,10 @@ export class SpaceRouter {
             } else { // Grant Process Not Needed
                 appContextStore.setGlobalGrantLoading(false);
                 next();
+                return;
             }
+
+            next();
         });
 
         SpaceRouter.router.afterEach((to) => {

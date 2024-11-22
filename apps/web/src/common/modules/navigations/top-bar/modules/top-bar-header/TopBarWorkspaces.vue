@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Vue, {
+import {
     computed, onMounted, reactive, ref, watch,
 } from 'vue';
 import type { Location } from 'vue-router';
@@ -8,20 +8,18 @@ import { useRouter } from 'vue-router/composables';
 import { clone, sortBy } from 'lodash';
 
 import {
-    PSelectDropdown, PTooltip, PI, PButton, PDivider, PTextHighlighting, PEmpty,
+    PSelectDropdown, PTooltip, PI, PButton, PTextHighlighting, PEmpty,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
 import { CONTEXT_MENU_TYPE } from '@cloudforet/mirinae/src/controls/context-menu/type';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
-
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
+import type { ReferenceData } from '@/lib/helper/config-data-helper';
 import { convertWorkspaceConfigToReferenceData } from '@/lib/helper/config-data-helper';
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
@@ -37,7 +35,6 @@ import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
 import { gray, violet } from '@/styles/colors';
 
-import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 
 const PAGE_SIZE = 9;
@@ -62,18 +59,16 @@ const router = useRouter();
 const selectDropdownRef = ref<PSelectDropdown|null>(null);
 
 const storeState = reactive({
-    isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
     workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
     selectedWorkspace: computed<WorkspaceModel|undefined>(() => workspaceStoreGetters.currentWorkspace),
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
-    favoriteItems: computed<FavoriteItem[]>(() => {
+    favoriteItems: computed<ReferenceData[]>(() => {
         const sortedList = sortBy(favoriteGetters.workspaceItems, 'label');
         return convertWorkspaceConfigToReferenceData(
             sortedList ?? [],
             storeState.workspaceList,
         );
     }),
-    isRootRoleReadonly: computed<boolean>(() => store.getters['user/isRootRoleReadonly']),
 });
 const state = reactive({
     visibleSelectDropdown: false,
@@ -90,24 +85,6 @@ const selectWorkspace = (name: string): void => {
     const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
     userWorkspaceStore.setCurrentWorkspace(workspaceId);
     router.push({ name: MENU_INFO_MAP[targetMenuId].routeName, params: { workspaceId } }).catch(() => {});
-};
-const handleClickButton = (hasNoWorkspace?: string) => {
-    const selectedWorkspaceId = !hasNoWorkspace && storeState.selectedWorkspace?.workspace_id || '';
-    appContextStore.enterAdminMode();
-    router.push({
-        name: makeAdminRouteName(ADVANCED_ROUTE.WORKSPACES._NAME),
-        query: {
-            hasNoWorkspace,
-            selectedWorkspaceId: !hasNoWorkspace ? selectedWorkspaceId : undefined,
-        },
-    });
-    Vue.notify({
-        group: 'toastTopCenter',
-        type: 'info',
-        title: i18n.t('COMMON.GNB.ADMIN.SWITCH_ADMIN') as string,
-        duration: 2000,
-        speed: 1,
-    });
 };
 const formatMenuItems = (menuItems: WorkspaceModel[] = []): MenuItem[] => {
     const result = menuItems.length > 0 ? [
@@ -143,7 +120,7 @@ const filterStarredItems = (menuItems: FavoriteItem[] = []): MenuItem[] => {
 };
 const handleClickAllWorkspaceButton = () => {
     router.push({
-        name: LANDING_ROUTE._NAME,
+        name: LANDING_ROUTE.WORKSPACE._NAME,
     });
 };
 const checkFavoriteItem = (id: string) => {
@@ -197,7 +174,7 @@ onMounted(() => {
         </div>
         <p-select-dropdown v-if="!props.isAdminMode"
                            ref="selectDropdownRef"
-                           :class="{'workspace-dropdown': true, 'is-domain-admin': storeState.isDomainAdmin}"
+                           :class="{'workspace-dropdown': true}"
                            style-type="transparent"
                            menu-width="20rem"
                            :visible-menu.sync="state.visibleSelectDropdown"
@@ -280,28 +257,6 @@ onMounted(() => {
                     >
                         {{ $t("COMMON.GNB.WORKSPACE.VIEW_WORKSPACES") }}
                     </p-button>
-                    <div v-if="storeState.isDomainAdmin && !storeState.isRootRoleReadonly"
-                         class="workspace-toolbox"
-                    >
-                        <p-divider />
-                        <p-button style-type="substitutive"
-                                  size="sm"
-                                  class="create-new-button tool"
-                                  icon-left="ic_plus_bold"
-                                  @click="handleClickButton('true')"
-                        >
-                            {{ $t("COMMON.GNB.WORKSPACE.CREATE_WORKSPACE") }}
-                        </p-button>
-                        <p-divider class="tools-divider" />
-                        <p-button style-type="tertiary"
-                                  size="sm"
-                                  class="manage-button tool"
-                                  icon-left="ic_settings"
-                                  @click="handleClickButton()"
-                        >
-                            {{ $t("COMMON.GNB.WORKSPACE.MANAGE_WORKSPACE") }}
-                        </p-button>
-                    </div>
                 </div>
             </template>
             <template #no-data-area>
@@ -475,12 +430,6 @@ onMounted(() => {
             }
             .bottom-slot-area {
                 padding: 0;
-            }
-        }
-
-        &.is-domain-admin {
-            .workspace-toolbox-wrapper {
-                padding-bottom: 1rem;
             }
         }
 

@@ -39,7 +39,6 @@ onUnmounted(() => {
             <template #heading>
                 <p-heading :title="$t('MENU.COST_EXPLORER_DATA_SOURCES')"
                            use-total-count
-                           use-selected-count
                            :total-count="storeState.totalCount"
                            :selected-count="storeState.selectedIndices ? 1 : undefined"
                 />
