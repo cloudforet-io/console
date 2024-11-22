@@ -185,7 +185,6 @@ watch(() => state.userId, (userId) => {
                 :modal-type="MODAL_TYPE.SEND"
             />
             <notice-popup v-if="!state.globalGrantLoading" />
-            <!--            <survey-modal />-->
         </template>
         <!-- Modal for Cross Browsing -->
         <recommended-browser-modal v-if="showsBrowserRecommendation()" />
