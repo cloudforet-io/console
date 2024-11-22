@@ -941,7 +941,7 @@
 				"RESETTING": "초기화 중...",
 				"RESET_MODAL_TITLE": "워크스페이스에 연결된 {count}개 계정을 초기화하시겠습니까?",
 				"RESTART_MODAL_BUTTON": "취소 후 다시 시작",
-				"RESTART_MODAL_CANCEL_DESC": "데이터 수집이 진행 중입니다.\n동기화를 원하실 경우, 진행 중인 작업을 먼저 취소하고 동기화를 진행하세요.",
+				"RESTART_MODAL_CANCEL_DESC": "동기화를 원하실 경우, 진행 중인 작업을 먼저 취소하고 동기화를 진행하세요.",
 				"RESTART_MODAL_DESC_1": "데이터 수집이 진행 중입니다.",
 				"RESTART_MODAL_DESC_2": "현재 데이터 수집 작업을 취소하면 다시 시작 시 지연이 발생할 수 있습니다. 이 작업은 취소할 수 없습니다.",
 				"RESTART_MODAL_TITLE": "데이터 수집이 진행 중입니다.",
