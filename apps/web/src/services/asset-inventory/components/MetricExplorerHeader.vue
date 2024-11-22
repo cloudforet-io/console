@@ -339,7 +339,8 @@ const handleOpenEditQuery = () => {
                         >
                             {{ $t('INVENTORY.METRIC_EXPLORER.DUPLICATE') }}
                         </p-button>
-                        <p-button style-type="tertiary"
+                        <p-button v-if="!storeState.isAdminMode"
+                                  style-type="tertiary"
                                   icon-left="ic_plus_bold"
                                   @click="handleOpenAddExampleModal"
                         >
