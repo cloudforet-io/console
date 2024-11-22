@@ -58,22 +58,7 @@ const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 
 const storeState = reactive({
-    metrics: computed<MetricReferenceMap>(() => {
-        const filteredMetrics = Object.values(allReferenceStore.getters.metric).filter((metric) => {
-            if (metric.data.is_managed) {
-                return true;
-            }
-            if (!metric.data.is_managed) {
-                if (storeState.isAdminMode) {
-                    return metric.data.resource_group === 'DOMAIN';
-                }
-                return metric.data.resource_group === 'WORKSPACE';
-            }
-            return true;
-        });
-
-        return Object.fromEntries(filteredMetrics.map((metric) => [metric.key, metric]));
-    }),
+    metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
     metricExamples: computed<MetricExampleModel[]>(() => gnbGetters.metricExamples),
     namespaces: computed<NamespaceReferenceMap>(() => allReferenceStore.getters.namespace),
     providers: computed(() => allReferenceStore.getters.provider),
@@ -85,12 +70,31 @@ const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 
+const filteredMetrics = ref<MetricReferenceMap>(allReferenceStore.getters.metric);
+
+watch(() => storeState.metrics, () => {
+    const filteredData = Object.values(storeState.metrics).filter((metric) => {
+        if (metric.data.is_managed) {
+            return true;
+        }
+        if (!metric.data.is_managed) {
+            if (storeState.isAdminMode) {
+                return metric.data.resource_group === 'DOMAIN';
+            }
+            return metric.data.resource_group === 'WORKSPACE';
+        }
+        return true;
+    });
+
+    filteredMetrics.value = Object.fromEntries(filteredData.map((metric) => [metric.key, metric]));
+});
+
 const state = reactive({
     loading: false,
     currentPath: computed(() => route.fullPath),
     currentMetricIdByUrl: computed(() => route.params.metricId),
     isDetailPage: computed(() => !!state.currentMetricIdByUrl),
-    currentMetrics: computed<MetricReferenceItem[]>(() => Object.values(storeState.metrics).filter((metric) => metric.data.namespace_id === storeState.selectedNamespace?.name)),
+    currentMetrics: computed<MetricReferenceItem[]>(() => Object.values(filteredMetrics.value).filter((metric) => metric.data.namespace_id === storeState.selectedNamespace?.name)),
     menuSet: computed(() => {
         const baseMenuSet = storeState.isAdminMode ? [] : [
             {
@@ -106,7 +110,7 @@ const state = reactive({
         return [...baseMenuSet, state.metricMenu];
     }),
     starredMenuSet: computed<LSBItem[]>(() => {
-        const metricMenuList: LSBItem[] = Object.values(storeState.metrics).map((metric) => ({
+        const metricMenuList: LSBItem[] = Object.values(filteredMetrics.value).map((metric) => ({
             type: 'item',
             id: metric.key,
             label: metric.name,
@@ -173,7 +177,7 @@ const state = reactive({
 const namespaceState = reactive({
     inputValue: '',
     collapsed: true,
-    selectedMetric: computed<MetricReferenceItem|undefined>(() => (state.isDetailPage ? storeState.metrics[state.currentMetricIdByUrl] : undefined)),
+    selectedMetric: computed<MetricReferenceItem|undefined>(() => (state.isDetailPage ? filteredMetrics.value[state.currentMetricIdByUrl] : undefined)),
     namespaces: computed<NamespaceReferenceItem[]>(() => Object.values(storeState.namespaces)),
     namespacesFilteredByInput: computed(() => {
         const keyword = namespaceState.inputValue.toLowerCase();
@@ -284,7 +288,7 @@ watch(() => route.params, async () => {
         const targetNamespace = namespaceState.namespaces.find((item) => item.key === namespaceState.selectedMetric?.data.namespace_id);
         metricExplorerPageStore.setSelectedNamespace({
             label: targetNamespace?.name,
-            name: namespaceState.selectedMetric.data.namespace_id,
+            name: namespaceState.selectedMetric?.data.namespace_id,
             group: targetNamespace?.data.group,
             category: targetNamespace.data.category,
             icon: targetNamespace.data.group === 'common' ? 'COMMON' : targetNamespace.data.icon,
@@ -326,7 +330,8 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
                         <p-tooltip v-for="(item, idx) of state.starredMenuSet"
                                    :key="`asset-analysis-starred-${idx}`"
                                    position="bottom"
-                                   :contents="item.favoriteOptions?.type === FAVORITE_TYPE.METRIC_EXAMPLE ? `${storeState.metrics[item.to?.params?.metricId || '']?.name} > ${item.label}` : item.label"
+                                   :contents="item.favoriteOptions?.type === FAVORITE_TYPE.METRIC_EXAMPLE ? `${filteredMetrics.value[item.to?.params?.metricId
+                                       || '']?.name} > ${item.label}` : item.label"
                         >
                             <l-s-b-router-menu-item :item="item"
                                                     :idx="idx"
