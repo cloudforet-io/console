@@ -8,6 +8,8 @@ import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
+import ActionMenuButton from '@/common/components/buttons/ActionMenuButton.vue';
+
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
@@ -95,20 +97,11 @@ const state = reactive({
                 </p-badge>
             </template>
             <template #col-buttons-format="{ item }">
-                <p-button icon-left="ic_edit"
-                          size="sm"
-                          style-type="tertiary"
-                          @click="taskManagementPageStore.openEditCategoryForm(item.category_id)"
-                >
-                    Edit
-                </p-button>
-                <p-button class="ml-2"
-                          icon-left="ic_delete"
-                          size="sm"
-                          style-type="tertiary"
-                >
-                    Delete
-                </p-button>
+                <div class="flex justify-end">
+                    <action-menu-button @edit="taskManagementPageStore.openEditCategoryForm(item.category_id)"
+                                        @delete="taskManagementPageStore.openDeleteCategoryModal(item.package_id)"
+                    />
+                </div>
             </template>
         </p-data-table>
     </p-pane-layout>

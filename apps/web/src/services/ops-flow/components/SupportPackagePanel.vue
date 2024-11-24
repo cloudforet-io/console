@@ -4,7 +4,10 @@ import { reactive, computed } from 'vue';
 import {
     PPaneLayout, PHeadingLayout, PHeading, PButton, PDataTable, PIconButton,
 } from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
+
+import ActionMenuButton from '@/common/components/buttons/ActionMenuButton.vue';
 
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
@@ -28,6 +31,11 @@ const state = reactive({
             name: 'buttons',
             label: ' ',
         },
+    ]),
+    menu: computed<MenuItem[]>(() => [
+        { name: 'edit', icon: 'ic_edit', label: 'Edit' },
+        { name: 'set-as-default', icon: 'ic_check-circle', label: 'Set as Default' },
+        { name: 'delete', icon: 'ic_delete', label: 'Delete' },
     ]),
 });
 </script>
@@ -59,20 +67,13 @@ const state = reactive({
                       :fields="state.packageFields"
         >
             <template #col-buttons-format="{ item }">
-                <p-button icon-left="ic_edit"
-                          size="sm"
-                          style-type="tertiary"
-                          @click="taskManagementPageStore.openEditPackageForm(item.package_id)"
-                >
-                    Edit
-                </p-button>
-                <p-button class="ml-2"
-                          icon-left="ic_delete"
-                          size="sm"
-                          style-type="tertiary"
-                >
-                    Delete
-                </p-button>
+                <div class="flex justify-end">
+                    <action-menu-button :menu="state.menu"
+                                        @edit="taskManagementPageStore.openEditPackageForm(item.package_id)"
+                                        @delete="taskManagementPageStore.openDeletePackageModal(item.package_id)"
+                                        @set-as-default="taskManagementPageStore.openSetDefaultPackageModal(item.package_id)"
+                    />
+                </div>
             </template>
         </p-data-table>
     </p-pane-layout>

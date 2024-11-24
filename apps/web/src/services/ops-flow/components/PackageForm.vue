@@ -70,7 +70,7 @@ const {
     name(value: string) {
         if (!value.trim().length) return 'Name is required';
         if (value.length > 50) return 'Name should be less than 50 characters';
-        if (packageStore.getters.packages.some((p) => p.package_id !== taskManagementPageState.editTargetPackageId && p.name === value)) return 'Name already exists';
+        if (packageStore.getters.packages.some((p) => p.package_id !== taskManagementPageState.targetPackageId && p.name === value)) return 'Name already exists';
         return true;
     },
     description(value: string) {
@@ -87,10 +87,10 @@ const handleCancelOrClose = () => {
 const handleConfirm = async () => {
     if (!isAllValid.value) return;
     loading.value = true;
-    if (taskManagementPageState.editTargetPackageId) {
+    if (taskManagementPageState.targetPackageId) {
         try {
             const updatedPackage = await packageStore.update({
-                package_id: taskManagementPageState.editTargetPackageId,
+                package_id: taskManagementPageState.targetPackageId,
                 name: name.value,
                 description: description.value,
                 tags: {},
