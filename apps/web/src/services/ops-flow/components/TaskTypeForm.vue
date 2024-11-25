@@ -13,6 +13,7 @@ import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import TaskFieldsConfiguration from '@/services/ops-flow/components/TaskFieldsConfiguration.vue';
 import { useAssigneePoolField } from '@/services/ops-flow/composables/use-assignee-pool-field';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
 
@@ -151,6 +152,9 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
                                 placeholder="Describe this ticket type in a few words."
                                 @update:value="setForm('description', $event)"
                     />
+                </p-field-group>
+                <p-field-group label="Fields Configuration">
+                    <task-fields-configuration />
                 </p-field-group>
             </div>
         </template>
