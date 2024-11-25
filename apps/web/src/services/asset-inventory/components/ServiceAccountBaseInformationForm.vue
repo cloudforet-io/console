@@ -10,7 +10,6 @@ import {
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
-import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
 import { i18n } from '@/translations';
@@ -36,6 +35,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const serviceAccountPageStore = useServiceAccountPageStore();
+const serviceAccountPageGetters = serviceAccountPageStore.getters;
 
 const {
     forms: { serviceAccountName },
@@ -57,13 +57,12 @@ const {
 });
 const state = reactive({
     serviceAccountType: computed(() => serviceAccountPageStore.state.serviceAccountType),
-    isTrustedAccount: computed(() => serviceAccountPageStore.state.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
     originServiceAccountData: computed<Partial<TrustedAccountModel & ServiceAccountModel>>(() => serviceAccountPageStore.state.originServiceAccountItem),
     originForm: computed(() => ({
         accountName: state.originServiceAccountData?.name,
         customSchemaForm: state.originServiceAccountData?.data,
         tags: state.originServiceAccountData?.tags,
-        ...((!state.isTrustedAccount && state.originServiceAccountData && ('project_id' in state.originServiceAccountData)) && {
+        ...((!serviceAccountPageGetters.isTrustedAccount && state.originServiceAccountData && ('project_id' in state.originServiceAccountData)) && {
             projectForm: { selectedProjectId: state.originServiceAccountData?.project_id ?? '' },
         }),
     })),
@@ -77,13 +76,13 @@ const state = reactive({
     formData: computed<BaseInformationForm>(() => ({
         accountName: serviceAccountName.value,
         customSchemaForm: state.customSchemaForm,
-        ...(!state.isTrustedAccount && { projectForm: state.projectForm }),
+        ...(!serviceAccountPageGetters.isTrustedAccount && { projectForm: state.projectForm }),
         tags: state.tags,
     })),
     isSameValueWithOrigin: computed(() => isEqual(state.formData, state.originForm)),
     isAllValid: computed(() => ((invalidState.serviceAccountName === false)
         && !state.isSameValueWithOrigin
-        && (state.isTrustedAccount ? true : (state.isProjectFormValid || state.originForm?.projectForm?.selectedProjectId))
+        && (serviceAccountPageGetters.isTrustedAccount ? true : (state.isProjectFormValid || state.originForm?.projectForm?.selectedProjectId))
         && state.isTagsValid
         && (isEmpty(props.schema) ? true : state.isCustomSchemaFormValid))),
 });
@@ -170,7 +169,7 @@ watch(() => state.originForm, (originForm) => {
                             :language="$store.state.user.language"
                             @validate="handleAccountValidate"
         />
-        <p-field-group v-if="!state.isTrustedAccount"
+        <p-field-group v-if="!serviceAccountPageGetters.isTrustedAccount"
                        class="project-field"
                        required
                        :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE')"

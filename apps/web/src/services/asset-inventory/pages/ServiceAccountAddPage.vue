@@ -99,7 +99,7 @@ const formState = reactive({
 });
 
 const createAccount = async (): Promise<string|undefined> => {
-    if (!props.provider) throw new Error('Invalid parameter');
+    if (!props.provider) return undefined;
     const data = formState.baseInformationForm.customSchemaForm;
 
     let res: TrustedAccountModel|ServiceAccountModel;
@@ -118,7 +118,7 @@ const createAccount = async (): Promise<string|undefined> => {
 
     const attachedTrustedAccountId = formState.credentialForm.attachedTrustedAccountId;
     try {
-        if (!formState.baseInformationForm.accountName || !data || !formState.baseInformationForm.projectForm) throw new Error('Invalid form data: accountName, data, projectForm');
+        if (!formState.baseInformationForm.accountName || !data) return undefined;
         if (state.isTrustedAccount) {
             res = await SpaceConnector.clientV2.identity.trustedAccount.create<TrustedAccountCreateParameters, TrustedAccountModel>({
                 provider: props.provider,
@@ -147,10 +147,9 @@ const createAccount = async (): Promise<string|undefined> => {
                 secret_data: secretData,
                 tags: formState.baseInformationForm.tags,
                 trusted_account_id: attachedTrustedAccountId,
-                project_id: formState.baseInformationForm.projectForm.selectedProjectId,
+                project_id: formState.baseInformationForm.projectForm?.selectedProjectId ?? '',
             });
         }
-
         return (!state.isTrustedAccount && ('service_account_id' in res)) ? res.service_account_id : res.trusted_account_id;
     } catch (e) {
         ErrorHandler.handleError(e);
