@@ -95,9 +95,7 @@ const state = reactive({
                 @apply font-bold;
             }
 
-            @screen mobile {
-                @apply hidden;
-            }
+            @apply mobile:hidden;
         }
         .user-account-wrapper {
             width: 100%;

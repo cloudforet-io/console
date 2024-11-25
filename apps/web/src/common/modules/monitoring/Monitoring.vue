@@ -12,7 +12,7 @@
             <span class="title">
                 {{ $t('COMMON.MONITORING.RESOURCE') }}
             </span>
-            <span class="ml-4 text-gray text-sm">
+            <span class="ml-4 text-gray-default text-sm">
                 * {{ $t('COMMON.MONITORING.LIMIT_OF_RESOURCE', {
                     limitCount: 16,
                 }) }}
@@ -62,7 +62,7 @@
         <section class="chart-section">
             <i18n path="COMMON.MONITORING.DISPLAY_TIMEZONE"
                   tag="p"
-                  class="text-sm text-gray mb-12"
+                  class="text-sm text-gray-default mb-12"
             >
                 <template #timezone>
                     <strong>{{ $t('COMMON.MONITORING.LOCAL_TIME') }}</strong>
@@ -471,18 +471,6 @@ section {
         grid-auto-rows: auto;
         row-gap: 3rem;
         column-gap: 1rem;
-
-        .p-metric-chart {
-            @apply col-span-3;
-
-            @screen laptop {
-                @apply col-span-4;
-            }
-
-            @screen tablet {
-                @apply col-span-12;
-            }
-        }
     }
 
     /* custom design-system component - p-button */

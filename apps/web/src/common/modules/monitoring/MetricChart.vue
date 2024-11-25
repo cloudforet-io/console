@@ -164,7 +164,7 @@ useResizeObserver(chartContext, throttle(() => {
             @apply text-sm font-bold capitalize truncate;
         }
         .chart-unit {
-            @apply text-sm text-gray flex-shrink ml-2;
+            @apply text-sm text-gray-default flex-shrink ml-2;
         }
     }
 

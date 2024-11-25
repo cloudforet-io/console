@@ -411,7 +411,7 @@ useResizeObserver(chartContext, throttle(() => {
     @apply col-span-12;
 
     @screen lg {
-        @apply col-span-6;
+        grid-column: span 6 / span 6;
     }
 
     .date-range-text {
@@ -455,7 +455,7 @@ useResizeObserver(chartContext, throttle(() => {
     @apply col-span-12;
 
     @screen lg {
-        @apply col-span-6;
+        grid-column: span 6 / span 6;
     }
 
     .amount-col {

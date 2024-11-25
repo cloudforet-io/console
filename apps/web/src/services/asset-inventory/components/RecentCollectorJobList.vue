@@ -162,9 +162,9 @@ watch(() => props.recentJobs, () => {
 
         @screen mobile {
             .jobs-contents {
-                @apply relative;
+                position: relative;
                 &::before {
-                    @apply absolute;
+                    position: absolute;
                     content: '';
                     top: 0;
                     bottom: 0;
@@ -219,7 +219,7 @@ watch(() => props.recentJobs, () => {
     }
 
     @screen mobile {
-        @apply absolute;
+        position: absolute;
         top: 0;
         right: 0;
     }

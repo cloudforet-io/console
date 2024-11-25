@@ -212,7 +212,7 @@ const updateUser = async (userParam: UpdateUserRequest) => {
 
     @screen mobile {
         .input-form-wrapper {
-            @apply flex-col;
+            flex-direction: column;
         }
         .p-text-input {
             width: 100%;

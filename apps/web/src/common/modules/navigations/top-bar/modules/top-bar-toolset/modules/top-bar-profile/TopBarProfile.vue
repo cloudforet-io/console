@@ -418,7 +418,7 @@ watch(() => props.visible, (value) => {
         }
     }
 
-    @define-mixin menu-dropdown {
+    .profile-menu-wrapper {
         @apply bg-white border border-gray-200 rounded-xs;
         position: absolute;
         top: 100%;
@@ -426,9 +426,7 @@ watch(() => props.visible, (value) => {
         left: auto;
         z-index: 1000;
         box-shadow: 0 0 0.875rem rgba(0, 0, 0, 0.1);
-    }
-    .profile-menu-wrapper {
-        @mixin menu-dropdown;
+
         min-width: 19.5rem;
 
         .user-info {
@@ -486,7 +484,12 @@ watch(() => props.visible, (value) => {
                     .value {
                         position: relative;
                         .language-menu-wrapper, .currency-menu-wrapper {
-                            @mixin menu-dropdown;
+                            @apply bg-white border border-gray-200 rounded-xs;
+                            position: absolute;
+                            top: 100%;
+                            right: -0.5rem;
+                            box-shadow: 0 0 0.875rem rgba(0, 0, 0, 0.1);
+
                             left: -1rem;
                             min-width: 9.25rem;
                             max-height: 21rem;

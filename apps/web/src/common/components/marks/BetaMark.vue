@@ -7,7 +7,7 @@
 
 <style lang="postcss">
 .beta-mark {
-    @apply text-coral;
+    @apply text-coral-default;
     font-size: 0.625rem;
     vertical-align: text-top;
     cursor: default;

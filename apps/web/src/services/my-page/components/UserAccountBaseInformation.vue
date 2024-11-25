@@ -198,7 +198,7 @@ watch(() => store.state.user.language, (language) => {
 
     @screen mobile {
         .input-form-wrapper {
-            @apply flex-col;
+            flex-direction: column;
         }
         .p-text-input,
         .p-select-dropdown {
