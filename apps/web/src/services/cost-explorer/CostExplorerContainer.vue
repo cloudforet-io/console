@@ -58,9 +58,20 @@ const setCostParams = async () => {
     }
     await costQuerySetStore.listCostQuerySets();
 };
+const changeCostQuerySet = () => {
+    const { dataSourceId, costQuerySetId } = route.params;
+    if (dataSourceId && costQuerySetId) {
+        if (dataSourceId !== UNIFIED_COST_KEY) costQuerySetStore.setSelectedDataSourceId(dataSourceId);
+        costQuerySetStore.setSelectedQuerySetId(costQuerySetId);
+    }
+};
 const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE', 'DOMAIN'], setCostParams);
 
-watch(() => route.params, async () => {
+watch(() => route.params, async (after, before) => {
+    if ((after.workspaceId === before?.workspaceId) && (after.dataSourceId === before?.dataSourceId)) {
+        changeCostQuerySet();
+        return;
+    }
     await callApiWithGrantGuard();
 }, { immediate: true });
 
