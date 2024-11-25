@@ -79,7 +79,7 @@ onBeforeMount(() => {
     }
 });
 
-watch([() => taskManagementPageState.visibleCategoryForm, () => taskManagementPageGetters.editTargetCategory], async ([visible, targetCategory], [prevVisible]) => {
+watch([() => taskManagementPageState.visibleCategoryForm, () => taskManagementPageGetters.targetCategory], async ([visible, targetCategory], [prevVisible]) => {
     if (!visible) {
         if (!prevVisible) return; // prevent initial call
         await nextTick(); // wait for closing animation

@@ -116,6 +116,9 @@ export const usePackageStore = defineStore('package', () => {
         async setDefaultPackage(packageId: string) {
             return new Promise<PackageModel>((resolve, reject) => {
                 setTimeout(() => {
+                    const prevDefaultPackage = getters.packages.find((p) => p.is_default);
+                    if (prevDefaultPackage?.package_id === packageId) return;
+                    if (prevDefaultPackage) prevDefaultPackage.is_default = false;
                     const targetPackage = getters.packages.find((p) => p.package_id === packageId);
                     if (targetPackage) {
                         targetPackage.is_default = true;

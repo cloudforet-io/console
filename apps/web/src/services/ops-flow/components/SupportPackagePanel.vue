@@ -2,7 +2,7 @@
 import { reactive, computed } from 'vue';
 
 import {
-    PPaneLayout, PHeadingLayout, PHeading, PButton, PDataTable, PIconButton,
+    PPaneLayout, PHeadingLayout, PHeading, PButton, PDataTable, PIconButton, PBadge,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
@@ -66,12 +66,25 @@ const state = reactive({
                       :items="packageStore.getters.packages"
                       :fields="state.packageFields"
         >
+            <template #col-name-format="{ item }">
+                <span class="inline-flex items-center gap-2">
+                    {{ item.name }}
+                    <p-badge v-if="item.is_default"
+                             badge-type="solid-outline"
+                             style-type="gray500"
+                    >
+                        Default
+                    </p-badge>
+                </span>
+            </template>
             <template #col-buttons-format="{ item }">
                 <div class="flex justify-end">
-                    <action-menu-button :menu="state.menu"
+                    <action-menu-button :menu="item.package_id === taskManagementPageStore.getters.defaultPackage?.package_id
+                                            ? undefined
+                                            : state.menu"
                                         @edit="taskManagementPageStore.openEditPackageForm(item.package_id)"
-                                        @delete="taskManagementPageStore.openDeletePackageModal(item.package_id)"
                                         @set-as-default="taskManagementPageStore.openSetDefaultPackageModal(item.package_id)"
+                                        @delete="taskManagementPageStore.openDeletePackageModal(item.package_id)"
                     />
                 </div>
             </template>

@@ -123,7 +123,7 @@ const handleConfirm = async () => {
     loading.value = false;
 };
 
-watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPageGetters.editTargetPackage], async ([visible, targetPackage], [prevVisible]) => {
+watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPageGetters.targetPackage], async ([visible, targetPackage], [prevVisible]) => {
     if (!visible) {
         if (!prevVisible) return; // prevent initial call
         await nextTick(); // wait for closing animation
