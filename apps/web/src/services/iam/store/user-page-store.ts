@@ -67,6 +67,26 @@ export const useUserPageStore = defineStore('page-user', () => {
     });
     const actions = {
         // User
+        reset() {
+            state.isAdminMode = false;
+            state.loading = true;
+            state.users = [] as UserListItemType[];
+            state.selectedUser = {} as UserListItemType;
+            state.roles = [] as RoleModel[];
+            state.totalCount = 0;
+            state.selectedIndices = [];
+            state.pageStart = 1;
+            state.pageLimit = 15;
+            state.searchFilters = [] as ConsoleFilter[];
+            state.afterWorkspaceCreated = false;
+            state.createdWorkspaceId = undefined as string | undefined;
+            state.modal = {
+                type: '',
+                title: '',
+                themeColor: 'primary',
+                visible: undefined,
+            } as ModalState;
+        },
         async listUsers(params: UserListParameters) {
             try {
                 const res = await SpaceConnector.clientV2.identity.user.list<UserListParameters, ListResponse<UserModel>>(params);

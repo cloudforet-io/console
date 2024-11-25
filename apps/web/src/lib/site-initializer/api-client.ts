@@ -339,8 +339,8 @@ export const initApiClient = async (store, config) => {
             token: existingRefreshToken,
             scope: 'USER',
         };
-        const reponse = await SpaceConnector.clientV2.identity.token.grant<TokenGrantParameters, TokenGrantModel>(grantRequest);
-        SpaceConnector.setToken(reponse.access_token);
+        const response = await SpaceConnector.clientV2.identity.token.grant<TokenGrantParameters, TokenGrantModel>(grantRequest);
+        SpaceConnector.setToken(response.access_token);
         store.commit('user/setCurrentGrantInfo', { scope: 'USER' });
         store.commit('user/setCurrentRoleInfo', undefined);
     } catch (e) {

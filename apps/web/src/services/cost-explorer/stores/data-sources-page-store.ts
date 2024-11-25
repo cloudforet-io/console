@@ -19,7 +19,9 @@ import type {
 } from '@/schema/cost-analysis/data-source-account/model';
 import type { CostDataSourceGetParameters } from '@/schema/cost-analysis/data-source/api-verbs/get';
 import type { CostDataSourceListParameters } from '@/schema/cost-analysis/data-source/api-verbs/list';
+import type { CostDataSourceSyncParameters } from '@/schema/cost-analysis/data-source/api-verbs/sync';
 import type { CostDataSourceModel } from '@/schema/cost-analysis/data-source/model';
+import type { CostJobCancelParameters } from '@/schema/cost-analysis/job/api-verbs/cancel';
 import type { CostJobListParameters } from '@/schema/cost-analysis/job/api-verbs/list';
 import type { CostJobModel } from '@/schema/cost-analysis/job/model';
 import { store } from '@/store';
@@ -50,6 +52,7 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
         dataSourceListSearchFilters: [] as ConsoleFilter[],
         selectedDataSourceIndices: undefined as number|undefined,
         selectedDataSourceItem: {} as DataSourceItem,
+        dataSourceLoading: false,
 
         jobList: [] as CostJobModel[],
         jobListTotalCount: 0,
@@ -85,7 +88,7 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
         jobList: computed<CostJobItem[]>(() => (state.jobList.map((i) => ({
             ...i,
             total_tasks: i.total_tasks || 0,
-            finished_at: dayjs.utc(i.finished_at).tz(_getters.timezone).format('YYYY-MM-DD HH:mm:ss'),
+            finished_at: i.status === 'IN_PROGRESS' ? '--' : dayjs.utc(i.finished_at).tz(_getters.timezone).format('YYYY-MM-DD HH:mm:ss'),
             created_at: dayjs.utc(i.created_at).tz(_getters.timezone).format('YYYY-MM-DD HH:mm:ss'),
             duration: durationFormatter(i.created_at, i.finished_at, _getters.timezone) || '--',
         })))),
@@ -171,6 +174,10 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
                 type: undefined as CostLinkedAccountModalType|undefined,
             };
         },
+        jobReset: () => {
+            state.jobList = [];
+            state.jobListTotalCount = 0;
+        },
         fetchDataSourceList: async (params?: CostDataSourceListParameters) => {
             try {
                 const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.dataSource.list<CostDataSourceListParameters, ListResponse<CostDataSourceModel>>(params);
@@ -195,10 +202,13 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
         },
         fetchDataSourceItem: async (params?: CostDataSourceListParameters) => {
             try {
+                state.dataSourceLoading = true;
                 state.selectedDataSourceItem = await SpaceConnector.clientV2.costAnalysis.dataSource.get<CostDataSourceGetParameters, CostDataSourceModel>(params);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.selectedDataSourceItem = {} as DataSourceItem;
+            } finally {
+                state.dataSourceLoading = false;
             }
         },
         fetchJobList: async (params: CostJobListParameters) => {
@@ -262,6 +272,22 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
             } catch (e) {
                 ErrorHandler.handleError(e);
                 return [];
+            }
+        },
+        fetchSyncDatasource: async (params: CostDataSourceSyncParameters) => {
+            try {
+                await SpaceConnector.clientV2.costAnalysis.dataSource.sync<CostDataSourceSyncParameters, CostDataSourceModel>(
+                    params,
+                );
+            } catch (e: any) {
+                ErrorHandler.handleError(e, true);
+            }
+        },
+        fetchCancelJob: async (params: CostJobCancelParameters) => {
+            try {
+                await SpaceConnector.clientV2.costAnalysis.job.cancel<CostJobCancelParameters, CostJobModel>(params);
+            } catch (e: any) {
+                ErrorHandler.handleError(e, true);
             }
         },
     };

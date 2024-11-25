@@ -1,18 +1,20 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-import { PToolboxTable, PLazyImg, PI } from '@cloudforet/mirinae';
+import {
+    PToolboxTable, PLazyImg, PI, PStatus,
+} from '@cloudforet/mirinae';
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import { red } from '@/styles/colors';
 
+import { datasourceStateFormatter } from '@/services/cost-explorer/composables/data-source-handler';
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
 import type { DataSourceItem } from '@/services/cost-explorer/types/data-sources-type';
 
@@ -53,6 +55,12 @@ const tableState = reactive({
             sortable: false,
         },
         {
+            name: 'state',
+            label: 'State',
+            type: 'item',
+            sortable: false,
+        },
+        {
             name: 'data_source_account_count',
             label: 'Linked Account',
             type: 'item',
@@ -76,11 +84,13 @@ const tableState = reactive({
         items: [
             { name: 'name', label: 'Name' },
             { name: 'data_source_id', label: 'ID' },
+            { name: 'state', label: 'State' },
             { name: 'created_at', label: 'Registered Time', dataType: 'datetime' },
         ],
     }]),
     valueHandlerMap: computed<ValueHandlerMap>(() => ({
         name: makeDistinctValueHandler('cost_analysis.DataSource', 'name'),
+        state: makeDistinctValueHandler('cost_analysis.DataSource', 'state'),
         data_source_id: makeDistinctValueHandler('cost_analysis.DataSource', 'data_source_id'),
         created_at: makeDistinctValueHandler('cost_analysis.DataSource', 'created_at'),
     })),
@@ -149,6 +159,11 @@ const fetchDataSourceList = async () => {
                     />
                     <span>{{ value }}</span>
                 </div>
+            </template>
+            <template #col-state-format="{value}">
+                <p-status v-bind="datasourceStateFormatter(value)"
+                          class="capitalize"
+                />
             </template>
             <template #col-data_source_account_count-format="{value, item}">
                 <div class="col-data-source-account-count">
