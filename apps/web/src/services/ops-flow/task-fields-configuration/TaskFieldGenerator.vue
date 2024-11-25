@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { defineAsyncComponent, computed } from 'vue';
+import {
+    defineAsyncComponent, computed, onBeforeMount, toRef,
+} from 'vue';
 
 import {
     PFieldGroup, PTextInput, PToggleButton, PCheckbox,
@@ -24,37 +26,58 @@ const COMPONENT_MAP = {
 
 const props = defineProps<{
     fieldType: TaskFieldType;
+    fieldId: string;
 }>();
 
 const taskFieldMetadataStore = useTaskFieldMetadataStore();
-
+const fieldMetadata = computed<TaskFieldTypeMetadata>(() => taskFieldMetadataStore.taskFieldTypeMetadataMap[props.fieldType]);
 const {
+    isDefaultField,
     fieldId,
     fieldName,
+    setFieldName,
+    isFieldNameInvalid,
+    fieldNameInvalidText,
+    resetFieldNameValidation,
     options,
     isRequired,
     isPrimary,
     isFolded,
 } = useTaskFieldGenerator({
-    fieldMetadata: computed<TaskFieldTypeMetadata>(() => taskFieldMetadataStore.taskFieldTypeMetadataMap[props.fieldType]),
+    fieldId: toRef(props, 'fieldId'),
 });
 
+onBeforeMount(() => {
+    setFieldName(fieldMetadata.value.name);
+    resetFieldNameValidation();
+    isRequired.value = isDefaultField.value;
+    isPrimary.value = isDefaultField.value;
+    isFolded.value = isDefaultField.value;
+});
 </script>
 
 <template>
     <div class="bg-white border border-gray-150 rounded-lg">
-        <task-field-generator-header :field-type="props.fieldType"
+        <task-field-generator-header :field-metadata="fieldMetadata"
                                      :name="fieldName"
                                      :is-required="isRequired"
                                      :is-deletable="DEFAULT_FIELD_ID_MAP[props.fieldType] === undefined"
-                                     :is-folded.sync="isFolded"
+                                     :is-folded="isFolded"
+                                     :is-default-field="isDefaultField"
+                                     @update:is-folded="isFolded = $event"
         />
         <div v-if="!isFolded">
             <div class="py-4 pl-8 pr-2 border-b border-gray-150">
                 <p-field-group label="Field Name"
+                               :invalid-text="fieldNameInvalidText"
+                               :invalid="isFieldNameInvalid"
                                required
                 >
-                    <p-text-input />
+                    <p-text-input :value="fieldName"
+                                  :placeholder="fieldMetadata.name"
+                                  :invalid="isFieldNameInvalid"
+                                  @update:value="setFieldName"
+                    />
                 </p-field-group>
                 <component :is="COMPONENT_MAP[props.fieldType]"
                            :key="fieldId"
@@ -68,13 +91,18 @@ const {
                         Display this field during task creation
                     </p>
                     <p-toggle-button :value.sync="isPrimary"
+                                     :disabled="isDefaultField"
                                      show-state-text
                                      position="left"
                     />
                 </p-field-group>
             </div>
             <div class="h-9 pl-8 flex items-center">
-                <p-checkbox :selected.sync="isRequired">
+                <p-checkbox :selected="isRequired"
+                            :value="true"
+                            :disabled="isDefaultField"
+                            @change="isRequired = $event"
+                >
                     This Field is Required
                 </p-checkbox>
             </div>

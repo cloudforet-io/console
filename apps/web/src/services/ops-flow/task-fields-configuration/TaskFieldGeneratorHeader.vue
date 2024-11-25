@@ -2,25 +2,22 @@
 
 import { PI, PBadge, PIconButton } from '@cloudforet/mirinae';
 
-import type { TaskFieldType } from '@/schema/opsflow/_types/task-field-type';
 
 import TaskFieldTypeIcon from '@/services/ops-flow/task-fields-configuration/components/TaskFieldTypeIcon.vue';
-import {
-    useTaskFieldMetadataStore,
-} from '@/services/ops-flow/task-fields-configuration/stores/use-task-field-metadata-store';
+import type { TaskFieldTypeMetadata } from '@/services/ops-flow/task-fields-configuration/types/task-field-type-metadata-type';
 
 const props = defineProps<{
-    fieldType: TaskFieldType;
+    fieldMetadata: TaskFieldTypeMetadata;
     name: string;
     isRequired: boolean;
     isDeletable: boolean;
     isFolded: boolean;
+    isDefaultField: boolean;
 }>();
 const emit = defineEmits<{(event: 'update:is-folded', value: boolean): void
     (event: 'delete'): void
 }>();
 
-const taskFieldMetadataStore = useTaskFieldMetadataStore();
 
 </script>
 
@@ -33,21 +30,22 @@ const taskFieldMetadataStore = useTaskFieldMetadataStore();
              @click="emit('update:is-folded', !props.isFolded)"
         />
         <task-field-type-icon class="flex-shrink-0"
-                              :icon="taskFieldMetadataStore.taskFieldTypeMetadataMap[props.fieldType].icon"
+                              :icon="fieldMetadata.icon"
         />
-        <span class="flex-grow text-label-md pl-2">{{ props.name }}</span>
-        <p-badge v-if="!props.isRequired"
+        <span class="flex-grow text-label-md pl-2">{{ props.name || fieldMetadata.name }}</span>
+        <p-badge v-if="props.isRequired"
                  class="flex-shrink-0"
                  badge-type="subtle"
                  style-type="gray100"
         >
             Required
         </p-badge>
-        <p-icon-button v-if="!isDeletable"
+        <p-icon-button v-if="!isDefaultField"
                        shape="square"
                        size="sm"
                        style-type="transparent"
-                       icon="ic_delete"
+                       name="ic_delete"
+                       class="ml-1"
                        @click="emit('delete')"
         />
     </div>
