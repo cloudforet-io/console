@@ -4,13 +4,13 @@ import { defineAsyncComponent } from 'vue';
 import { PHeading } from '@cloudforet/mirinae';
 
 import EnableLandingPanel from '@/services/ops-flow/components/EnableLandingPanel.vue';
-import SupportPackagePanel from '@/services/ops-flow/components/SupportPackagePanel.vue';
+import PackagePanel from '@/services/ops-flow/components/PackagePanel.vue';
 import TaskCategoryPanel from '@/services/ops-flow/components/TaskCategoryPanel.vue';
 import TaskManagementTemplatePanel from '@/services/ops-flow/components/TaskManagementTemplatePanel.vue';
 
 const PackageForm = defineAsyncComponent(() => import('@/services/ops-flow/components/PackageForm.vue'));
-const SetDefaultPackageModal = defineAsyncComponent(() => import('@/services/ops-flow/components/SetDefaultPackageModal.vue'));
-const DeletePackageModal = defineAsyncComponent(() => import('@/services/ops-flow/components/DeletePackageModal.vue'));
+const PackageSetDefaultModal = defineAsyncComponent(() => import('@/services/ops-flow/components/PackageSetDefaultModal.vue'));
+const PackageDeleteModal = defineAsyncComponent(() => import('@/services/ops-flow/components/PackageDeleteModal.vue'));
 
 const CategoryForm = defineAsyncComponent(() => import('@/services/ops-flow/components/CategoryForm.vue'));
 
@@ -22,14 +22,14 @@ const CategoryForm = defineAsyncComponent(() => import('@/services/ops-flow/comp
                    title="Task Management"
         />
         <task-management-template-panel class="mb-4" />
-        <support-package-panel class="mb-4" />
+        <package-panel class="mb-4" />
         <task-category-panel class="mb-4" />
         <enable-landing-panel />
 
         <!-- package modals -->
         <package-form />
-        <set-default-package-modal />
-        <delete-package-modal />
+        <package-set-default-modal />
+        <package-delete-modal />
 
         <!-- category modals -->
         <category-form />
