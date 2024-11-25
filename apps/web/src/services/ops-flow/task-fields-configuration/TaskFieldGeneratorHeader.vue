@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 
 import { PI, PBadge, PIconButton } from '@cloudforet/mirinae';
 
@@ -15,22 +14,23 @@ const props = defineProps<{
     name: string;
     isRequired: boolean;
     isDeletable: boolean;
+    isFolded: boolean;
 }>();
-const emit = defineEmits<{(event: 'delete'): void
+const emit = defineEmits<{(event: 'update:is-folded', value: boolean): void
+    (event: 'delete'): void
 }>();
 
 const taskFieldMetadataStore = useTaskFieldMetadataStore();
 
-const isFolded = ref(false);
 </script>
 
 <template>
     <div class="p-2 rounded-t-lg border-gray-150 flex items-center"
-         :class="isFolded ? 'rounded-b-lg border-b-0' : 'border-b'"
+         :class="props.isFolded ? 'rounded-b-lg border-b-0' : 'border-b'"
     >
-        <p-i :name="isFolded ? 'ic_chevron-right' : 'ic_chevron-down'"
+        <p-i :name="props.isFolded ? 'ic_chevron-right' : 'ic_chevron-down'"
              class="flex-shrink-0 cursor-pointer mr-1"
-             @click="isFolded = !isFolded"
+             @click="emit('update:is-folded', !props.isFolded)"
         />
         <task-field-type-icon class="flex-shrink-0"
                               :icon="taskFieldMetadataStore.taskFieldTypeMetadataMap[props.fieldType].icon"

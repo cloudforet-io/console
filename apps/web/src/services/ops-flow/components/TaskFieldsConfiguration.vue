@@ -10,7 +10,7 @@ const taskFieldMetadataStore = useTaskFieldMetadataStore();
 
 <template>
     <div class="grid grid-cols-12 rounded-lg border border-gray-200">
-        <div class="col-span-8 p-4 pl-2 rounded-l-lg bg-gray-100 border-r border-gray-200">
+        <div class="col-span-8 p-4 pl-2 flex flex-col gap-2 rounded-l-lg bg-gray-100 border-r border-gray-200">
             <task-field-generator v-for="field in taskFieldMetadataStore.defaultFields"
                                   :key="field.field_id"
                                   :field-type="field.field_type"
