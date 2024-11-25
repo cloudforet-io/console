@@ -9,12 +9,15 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import {
     PSelectDropdown, PTextButton,
 } from '@cloudforet/mirinae';
-import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
+import type { AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
 import getRandomId from '@/lib/random-id-generator';
 import { VariableModelFactory } from '@/lib/variable-models';
@@ -31,6 +34,9 @@ import {
     getVariableModelMenuHandler,
 } from '@/lib/variable-models/variable-model-menu-handler';
 
+import {
+    useCostDataSourceFilterMenuItems,
+} from '@/common/composables/data-source/use-cost-data-source-filter-menu-items';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
@@ -40,12 +46,14 @@ import CostAnalysisFiltersAddMoreButton
 import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
 
+
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetters = userWorkspaceStore.getters;
 const appContextStore = useAppContextStore();
+const allReferenceStore = useAllReferenceStore();
 
 interface VariableOption {
     key: ManagedVariableModelKey;
@@ -74,7 +82,7 @@ const GROUP_BY_TO_VAR_MODELS_FOR_UNIFIED_COST: Record<string, VariableOption> = 
     [GROUP_BY.USAGE_TYPE]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.unified_cost, dataKey: 'usage_type' },
 };
 
-const getInitialSelectedItemsMap = (): Record<string, SelectDropdownMenuItem[]> => ({});
+const getInitialSelectedItemsMap = (): Record<string, MenuItem[]> => ({});
 
 const props = defineProps<{
     visible: boolean;
@@ -83,16 +91,26 @@ const props = defineProps<{
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
+});
+const { managedGroupByItems, additionalInfoGroupByItems } = useCostDataSourceFilterMenuItems({
+    isAdminMode: computed(() => storeState.isAdminMode),
+    costDataSource: computed(() => storeState.costDataSource[costAnalysisPageGetters.selectedDataSourceId ?? '']),
 });
 const state = reactive({
     randomId: '',
     loading: true,
-    enabledFilters: computed<SelectDropdownMenuItem[]>(() => {
+    enabledFilters: computed<MenuItem[]>(() => {
         if (!costAnalysisPageState.enabledFiltersProperties) return [];
         return costAnalysisPageState.enabledFiltersProperties.map((d) => {
             // NOTE: only for project group case (not in group by but in filters)
             if (d === GROUP_BY.PROJECT_GROUP) return { name: d, label: 'Project Group' };
-            const targetItem = costAnalysisPageGetters.defaultGroupByItems.find((item) => item.name === d);
+
+            const defaultGroupByItems = [
+                ...managedGroupByItems.value,
+                ...additionalInfoGroupByItems.value,
+            ];
+            const targetItem = defaultGroupByItems.find((item) => item.name === d);
             if (targetItem) return targetItem;
             return { name: d, label: d };
         });
@@ -101,7 +119,7 @@ const state = reactive({
     primaryCostOptions: computed<Record<string, any>>(() => ({
         ...(!state.isUnifiedCost && { data_source_id: costAnalysisPageGetters.selectedDataSourceId }),
     })),
-    selectedItemsMap: {} as Record<string, SelectDropdownMenuItem[]>,
+    selectedItemsMap: {} as Record<string, MenuItem[]>,
     handlerMap: computed(() => {
         const handlerMaps = {};
         state.enabledFilters.forEach((filter) => {
@@ -176,7 +194,7 @@ const initSelectedFilters = (isReset = false) => {
 };
 
 /* Event */
-const handleUpdateFiltersDropdown = (groupBy: string, selectedItems: SelectDropdownMenuItem[]) => {
+const handleUpdateFiltersDropdown = (groupBy: string, selectedItems: MenuItem[]) => {
     const selectedItemsMap = cloneDeep(state.selectedItemsMap);
     selectedItemsMap[groupBy] = selectedItems;
     state.selectedItemsMap = selectedItemsMap;
