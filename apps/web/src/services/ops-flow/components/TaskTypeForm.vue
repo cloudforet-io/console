@@ -114,6 +114,7 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
 <template>
     <p-overlay-layout :title="taskCategoryPageGetters.targetTaskType ? 'Edit Ticket Topic' : 'Add Ticket Topic'"
                       :visible="taskCategoryPageState.visibleTaskTypeForm"
+                      size="lg"
                       @close="handleCancelOrClose"
     >
         <template #default>
