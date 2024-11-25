@@ -31,7 +31,7 @@ const {
     name(value: string) {
         if (!value.trim().length) return 'Name is required';
         if (value.length > 50) return 'Name should be less than 50 characters';
-        if (taskCategoryStore.getters.taskCategories.some((p) => taskManagementPageState.editTargetCategoryId !== p.category_id && p.name === value)) return 'Name already exists';
+        if (taskCategoryStore.getters.taskCategories.some((p) => taskManagementPageState.targetCategoryId !== p.category_id && p.name === value)) return 'Name already exists';
         return true;
     },
 });
@@ -46,9 +46,9 @@ const handleConfirm = async () => {
 
     try {
         loading.value = true;
-        if (taskManagementPageState.editTargetCategoryId) {
+        if (taskManagementPageState.targetCategoryId) {
             await taskCategoryStore.update({
-                category_id: taskManagementPageState.editTargetCategoryId,
+                category_id: taskManagementPageState.targetCategoryId,
                 name: name.value,
                 description: description.value,
             });
@@ -70,8 +70,8 @@ const handleConfirm = async () => {
 };
 
 onBeforeMount(() => {
-    if (taskManagementPageState.editTargetCategoryId) {
-        const targetCategory = taskCategoryStore.getters.taskCategories.find((p) => p.category_id === taskManagementPageState.editTargetCategoryId);
+    if (taskManagementPageState.targetCategoryId) {
+        const targetCategory = taskCategoryStore.getters.taskCategories.find((p) => p.category_id === taskManagementPageState.targetCategoryId);
         if (targetCategory) {
             setForm('name', targetCategory.name);
             setForm('description', targetCategory.description);
@@ -79,7 +79,7 @@ onBeforeMount(() => {
     }
 });
 
-watch([() => taskManagementPageState.visibleCategoryForm, () => taskManagementPageGetters.editTargetCategory], async ([visible, targetCategory], [prevVisible]) => {
+watch([() => taskManagementPageState.visibleCategoryForm, () => taskManagementPageGetters.targetCategory], async ([visible, targetCategory], [prevVisible]) => {
     if (!visible) {
         if (!prevVisible) return; // prevent initial call
         await nextTick(); // wait for closing animation
