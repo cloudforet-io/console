@@ -1,7 +1,7 @@
 import type { ComputedRef } from 'vue';
 import { computed, reactive, watch } from 'vue';
 
-import { isEmpty, sortBy } from 'lodash';
+import { sortBy } from 'lodash';
 
 import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
 
@@ -16,39 +16,57 @@ import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explo
 
 
 
+interface CostDataSourceFilterMenuItem extends MenuItem {
+    presetKeys?: string[];
+    visible?: boolean;
+}
 interface UseCostDataSourceFilterMenuItems {
     isAdminMode: ComputedRef<boolean>;
     costDataSource: ComputedRef<CostDataSourceItems|undefined>;
 }
 interface UseCostDataSourceFiltersReturn {
-    menuItems: ComputedRef<MenuItem[]>;
+    managedGroupByItems: ComputedRef<CostDataSourceFilterMenuItem[]>;
+    additionalInfoGroupByItems: ComputedRef<CostDataSourceFilterMenuItem[]>; // metadataAdditionalInfoItems or costAdditionalInfoKeysItems
+    metadataAdditionalInfoItems: ComputedRef<CostDataSourceFilterMenuItem[]>;
+    costAdditionalInfoKeysItems: ComputedRef<CostDataSourceFilterMenuItem[]>;
+    tagsFilterItems: ComputedRef<CostDataSourceFilterMenuItem[]>;
+    menuItems: ComputedRef<CostDataSourceFilterMenuItem[]>;
 }
 export const useCostDataSourceFilterMenuItems = ({
     isAdminMode, costDataSource,
 }: UseCostDataSourceFilterMenuItems): UseCostDataSourceFiltersReturn => {
     const state = reactive({
-        managedGroupByItems: computed<MenuItem[]>(() => {
-            if (isAdminMode) return Object.values(GROUP_BY_ITEM_MAP);
+        managedGroupByItems: computed<CostDataSourceFilterMenuItem[]>(() => {
+            if (isAdminMode.value) return Object.values(GROUP_BY_ITEM_MAP);
             return Object.values(GROUP_BY_ITEM_MAP).filter((item) => item.name !== 'workspace_id');
         }),
-        additionalInfoGroupByItems: computed<MenuItem[]>(() => {
-            if (!costDataSource) return [];
-            const additionalInfo = costDataSource.value?.data?.plugin_info?.metadata?.additional_info;
-            if (additionalInfo && !isEmpty(additionalInfo)) {
-                return sortBy(Object.entries(additionalInfo).map(([k]) => ({
+        additionalInfoGroupByItems: computed<CostDataSourceFilterMenuItem[]>(() => {
+            if (state.metadataAdditionalInfoItems.length) return state.metadataAdditionalInfoItems;
+            return state.costAdditionalInfoKeysItems;
+        }),
+        metadataAdditionalInfoItems: computed<CostDataSourceFilterMenuItem[]>(() => {
+            if (!costDataSource?.value) return [];
+            const metadataAdditionalInfo = costDataSource.value?.data?.plugin_info?.metadata?.additional_info || {};
+            const metadataAdditionalInfoItems: CostDataSourceFilterMenuItem[] = Object.entries(metadataAdditionalInfo)
+                .map(([k]) => ({
                     name: `additional_info.${k}`,
                     label: k,
-                    presetKeys: additionalInfo[k].enums,
-                })), 'label');
-            }
-            return sortBy((costDataSource.value?.data?.cost_additional_info_keys ?? [])
-                .map((key) => ({
-                    name: `additional_info.${key}`,
-                    label: key,
-                })), 'label');
+                    presetKeys: metadataAdditionalInfo[k].enums,
+                    visible: metadataAdditionalInfo[k].visible,
+                }));
+            return sortBy(metadataAdditionalInfoItems, 'label');
         }),
-        tagsFilterItems: [] as MenuItem[],
-        menuItems: computed<MenuItem[]>(() => ([
+        costAdditionalInfoKeysItems: computed<CostDataSourceFilterMenuItem[]>(() => {
+            if (!costDataSource?.value) return [];
+            const costAdditionalInfoKeys: string[] = costDataSource.value?.data?.cost_additional_info_keys ?? [];
+            const costAdditionalInfoKeysItems: CostDataSourceFilterMenuItem[] = costAdditionalInfoKeys.map((key) => ({
+                name: `additional_info.${key}`,
+                label: key,
+            }));
+            return sortBy(costAdditionalInfoKeysItems, 'label');
+        }),
+        tagsFilterItems: [] as CostDataSourceFilterMenuItem[],
+        menuItems: computed<CostDataSourceFilterMenuItem[]>(() => ([
             ...state.managedGroupByItems,
             ...state.additionalInfoGroupByItems,
             ...state.tagsFilterItems,
@@ -76,6 +94,11 @@ export const useCostDataSourceFilterMenuItems = ({
     }, { immediate: true });
 
     return {
+        managedGroupByItems: computed(() => state.managedGroupByItems),
+        additionalInfoGroupByItems: computed(() => state.additionalInfoGroupByItems),
+        metadataAdditionalInfoItems: computed(() => state.metadataAdditionalInfoItems),
+        costAdditionalInfoKeysItems: computed(() => state.costAdditionalInfoKeysItems),
+        tagsFilterItems: computed(() => state.tagsFilterItems),
         menuItems: computed(() => state.menuItems),
     };
 };
