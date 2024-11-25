@@ -30,7 +30,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 interface UserResourceItemData {
     roleInfo?: Partial<RoleModel>;
 }
-type UserReferenceItem = Required<Pick<ReferenceItem<UserResourceItemData>, 'key'|'label'|'name'|'data'>>;
+export type UserReferenceItem = Required<Pick<ReferenceItem<UserResourceItemData>, 'key'|'label'|'name'|'data'>>;
 export type UserReferenceMap = ReferenceMap<UserReferenceItem>;
 
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours

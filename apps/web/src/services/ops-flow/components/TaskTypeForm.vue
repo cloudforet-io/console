@@ -1,27 +1,40 @@
 <script setup lang="ts">
 import {
-    ref, onBeforeMount, nextTick, watch,
+    ref, onBeforeMount, nextTick, watch, toRef,
 } from 'vue';
 
 
 import {
     POverlayLayout, PFieldGroup, PTextInput, PSelectDropdown, PButton, PTextarea,
 } from '@cloudforet/mirinae';
-import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
+
+import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import { useAssigneePoolField } from '@/services/ops-flow/composables/use-assignee-pool-field';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
 
 
 const taskCategoryPageStore = useTaskCategoryPageStore();
 const taskCategoryPageState = taskCategoryPageStore.state;
 const taskCategoryPageGetters = taskCategoryPageStore.getters;
+const userReferenceStore = useUserReferenceStore();
 
+
+/* assignee pool */
+const {
+    selectedUserItems,
+    userMenuItemsHandler,
+    handleUpdateSelectedUserItems,
+    setInitialUsers,
+} = useAssigneePoolField({
+    userReferenceMap: toRef(userReferenceStore.getters, 'userItems'),
+});
 
 const {
-    forms: { name, assigneePool, description },
+    forms: { name, description },
     invalidState,
     invalidTexts,
     setForm, isAllValid,
@@ -29,7 +42,6 @@ const {
     resetValidations,
 } = useFormValidator({
     name: '',
-    assigneePool: [] as SelectDropdownMenuItem,
     description: '',
 }, {
     name(value: string) {
@@ -71,8 +83,8 @@ onBeforeMount(() => {
     if (taskCategoryPageGetters.targetTaskType) {
         const taskType = taskCategoryPageGetters.targetTaskType;
         setForm('name', taskType.name);
-        setForm('assigneePool', taskType.assignee_pool);
         setForm('description', taskType.description);
+        setInitialUsers(taskType.assignee_pool);
     }
 });
 
@@ -82,16 +94,17 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
         await nextTick(); // wait for closing animation
         setForm({
             name: '',
-            assigneePool: [],
             description: '',
         });
+        setInitialUsers([]);
         resetValidations();
         return;
     }
     if (target) {
         setForm('name', target.name);
-        setForm('assigneePool', target.assignee_pool);
         setForm('description', target.description);
+        setInitialUsers(target.assignee_pool);
+        resetValidations();
     }
 });
 
@@ -122,9 +135,14 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
                                :invalid-text="invalidTexts.assigneePool"
                 >
                     <template #default="{ invalid }">
-                        <p-select-dropdown :selected="assigneePool"
+                        <p-select-dropdown show-select-marker
                                            :invalid="invalid"
-                                           block
+                                           :selected="selectedUserItems"
+                                           :handler="userMenuItemsHandler"
+                                           is-filterable
+                                           use-fixed-menu-style
+                                           show-delete-all-button
+                                           @update:selected="handleUpdateSelectedUserItems"
                         />
                     </template>
                 </p-field-group>
