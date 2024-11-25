@@ -12,7 +12,8 @@ const PackageForm = defineAsyncComponent(() => import('@/services/ops-flow/compo
 const PackageSetDefaultModal = defineAsyncComponent(() => import('@/services/ops-flow/components/PackageSetDefaultModal.vue'));
 const PackageDeleteModal = defineAsyncComponent(() => import('@/services/ops-flow/components/PackageDeleteModal.vue'));
 
-const CategoryForm = defineAsyncComponent(() => import('@/services/ops-flow/components/CategoryForm.vue'));
+const TaskCategoryForm = defineAsyncComponent(() => import('@/services/ops-flow/components/TaskCategoryForm.vue'));
+const TaskCategoryDeleteModal = defineAsyncComponent(() => import('@/services/ops-flow/components/TaskCategoryDeleteModal.vue'));
 
 </script>
 
@@ -32,7 +33,8 @@ const CategoryForm = defineAsyncComponent(() => import('@/services/ops-flow/comp
         <package-delete-modal />
 
         <!-- category modals -->
-        <category-form />
+        <task-category-form />
+        <task-category-delete-modal />
     </div>
 </template>
 

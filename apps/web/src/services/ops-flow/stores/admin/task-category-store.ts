@@ -244,6 +244,19 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
                 }, 1000);
             });
         },
+        async delete(categoryId: string) {
+            return new Promise<void>((resolve, reject) => {
+                setTimeout(() => {
+                    const targetCategoryIndex = state.items?.findIndex((category) => category.category_id === categoryId);
+                    if (targetCategoryIndex !== undefined && targetCategoryIndex >= 0) {
+                        state.items?.splice(targetCategoryIndex, 1);
+                        resolve();
+                    } else {
+                        reject(new Error('Category not found'));
+                    }
+                }, 1000);
+            });
+        },
     };
     return {
         state,

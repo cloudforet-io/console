@@ -99,7 +99,7 @@ const state = reactive({
             <template #col-buttons-format="{ item }">
                 <div class="flex justify-end">
                     <action-menu-button @edit="taskManagementPageStore.openEditCategoryForm(item.category_id)"
-                                        @delete="taskManagementPageStore.openDeleteCategoryModal(item.package_id)"
+                                        @delete="taskManagementPageStore.openDeleteCategoryModal(item.category_id)"
                     />
                 </div>
             </template>
