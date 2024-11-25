@@ -224,7 +224,7 @@ export const useWidgetDateRange = (options: UseWidgetDateRangeOptions): UseWidge
         startValue: number,
         endValue: number,
         usePreviewFormat?: boolean,
-    ) => {
+    ): DateRange => {
         const _dateFormat = getDateFormat(granularity);
         const baseDate = basedOnDate ? dayjs.utc(basedOnDate).endOf('month') : dayjs.utc(basedOnDate);
 
