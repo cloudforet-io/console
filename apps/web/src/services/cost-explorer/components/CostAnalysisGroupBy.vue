@@ -13,15 +13,24 @@ import type {
     AutocompleteHandler,
     SelectDropdownMenuItem,
 } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
+
 import { showInfoMessage } from '@/lib/helper/notice-alert-helper';
 
+import {
+    useCostDataSourceFilterMenuItems,
+} from '@/common/composables/data-source/use-cost-data-source-filter-menu-items';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
+
 
 
 interface GroupBySelectButtonItem {
@@ -32,9 +41,18 @@ interface GroupBySelectButtonItem {
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
-
+const appContextStore = useAppContextStore();
+const allReferenceStore = useAllReferenceStore();
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
+});
+const { metadataAdditionalInfoItems } = useCostDataSourceFilterMenuItems({
+    isAdminMode: computed(() => storeState.isAdminMode),
+    costDataSource: computed(() => storeState.costDataSource[costAnalysisPageGetters.selectedDataSourceId ?? '']),
+});
 const state = reactive({
-    groupByItems: computed<SelectDropdownMenuItem[]>(() => [...costAnalysisPageGetters.managedGroupByItems, ...state.selectedAdditionalGroupByMenu]),
+    groupByItems: computed<SelectDropdownMenuItem[]>(() => [...costAnalysisPageGetters.visibleGroupByItems, ...state.selectedAdditionalGroupByMenu]),
     selectedGroupByItems: computed<SelectDropdownMenuItem[]>(() => costAnalysisPageState.groupBy.map((d) => {
         if (GROUP_BY_ITEM_MAP[d]) return GROUP_BY_ITEM_MAP[d];
         return { name: d, label: d.split('.')[1] };
@@ -42,6 +60,10 @@ const state = reactive({
     selectedTagsMenu: [] as SelectDropdownMenuItem[],
     selectedAdditionalGroupByMenu: [] as SelectDropdownMenuItem[],
     dataSourceId: computed<string>(() => costAnalysisPageGetters.selectedDataSourceId ?? ''),
+    groupByDropdownMenuItems: computed<MenuItem[]>(() => {
+        if (costAnalysisPageGetters.isUnifiedCost) return [];
+        return metadataAdditionalInfoItems.value.filter((d) => !d.visible);
+    }),
 });
 
 /* fetcher */
@@ -82,7 +104,7 @@ const setSelectedTagsMenu = (groupBy?: string[]) => {
 const setSelectedAdditionalInfoGroupBy = (groupBy?: string[]) => {
     if (!groupBy) return;
     state.selectedAdditionalGroupByMenu = groupBy
-        .filter((d) => !costAnalysisPageGetters.managedGroupByItems.map((v) => v.name).includes(d))
+        .filter((d) => !costAnalysisPageGetters.visibleGroupByItems.map((v) => v.name).includes(d))
         .filter((d) => d.startsWith('additional_info.'))
         .map((d) => ({ name: d, label: d.split('.')[1] })) ?? [];
 };
@@ -163,8 +185,8 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
                                @clear-selection="handleClearTagsGroupBy"
             />
         </div>
-        <p-select-dropdown v-if="costAnalysisPageGetters.metadataAdditionalInfoItems.length"
-                           :menu="costAnalysisPageGetters.metadataAdditionalInfoItems"
+        <p-select-dropdown v-if="state.groupByDropdownMenuItems.length"
+                           :menu="state.groupByDropdownMenuItems"
                            :selected.sync="state.selectedAdditionalGroupByMenu"
                            style-type="tertiary-icon-button"
                            button-icon="ic_ellipsis-horizontal"
