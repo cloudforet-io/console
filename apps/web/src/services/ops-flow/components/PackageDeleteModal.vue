@@ -22,10 +22,10 @@ const handleConfirm = async () => {
             throw new Error('[Console Error] Cannot delete package without a target package');
         }
         await packageStore.delete(taskManagementPageStore.state.targetPackageId);
-        taskManagementPageStore.closeDeletePackageModal();
     } catch (e) {
         ErrorHandler.handleRequestError(e, 'Failed to delete package');
     } finally {
+        taskManagementPageStore.closeDeletePackageModal();
         loading.value = false;
     }
 };
