@@ -49,7 +49,9 @@ const state = reactive({
                 />
             </template>
             <template #extra>
-                <p-icon-button name="ic_refresh" />
+                <p-icon-button name="ic_refresh"
+                               @click="packageStore.list()"
+                />
                 <p-button icon-left="ic_plus_bold"
                           size="md"
                           style-type="substitutive"
