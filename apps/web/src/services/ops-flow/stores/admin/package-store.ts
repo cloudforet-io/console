@@ -129,6 +129,19 @@ export const usePackageStore = defineStore('package', () => {
                 }, 1000);
             });
         },
+        async delete(packageId: string) {
+            return new Promise<void>((resolve, reject) => {
+                setTimeout(() => {
+                    const index = state.items?.findIndex((p) => p.package_id === packageId);
+                    if (index !== undefined && index >= 0) {
+                        state.items?.splice(index, 1);
+                        resolve();
+                    } else {
+                        reject(new Error('Package not found'));
+                    }
+                }, 1000);
+            });
+        },
     };
     return {
         state,

@@ -10,6 +10,7 @@ import TaskManagementTemplatePanel from '@/services/ops-flow/components/TaskMana
 
 const PackageForm = defineAsyncComponent(() => import('@/services/ops-flow/components/PackageForm.vue'));
 const SetDefaultPackageModal = defineAsyncComponent(() => import('@/services/ops-flow/components/SetDefaultPackageModal.vue'));
+const DeletePackageModal = defineAsyncComponent(() => import('@/services/ops-flow/components/DeletePackageModal.vue'));
 
 const CategoryForm = defineAsyncComponent(() => import('@/services/ops-flow/components/CategoryForm.vue'));
 
@@ -28,6 +29,7 @@ const CategoryForm = defineAsyncComponent(() => import('@/services/ops-flow/comp
         <!-- package modals -->
         <package-form />
         <set-default-package-modal />
+        <delete-package-modal />
 
         <!-- category modals -->
         <category-form />
