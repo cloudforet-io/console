@@ -4,9 +4,18 @@ import { reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
+
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { PackageCreateParameters } from '@/schema/identity/package/api-verbs/create';
+import type { PackageDeleteParameters } from '@/schema/identity/package/api-verbs/delete';
+import type { PackageListParameters } from '@/schema/identity/package/api-verbs/list';
+import type { PackageSetDefaultParameters } from '@/schema/identity/package/api-verbs/set-default';
 import type { PackageUpdateParameters } from '@/schema/identity/package/api-verbs/update';
 import type { PackageModel } from '@/schema/identity/package/model';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 interface UsePackageStoreState {
@@ -31,115 +40,40 @@ export const usePackageStore = defineStore('package', () => {
         }, [], { lazy: true }),
     }) as UnwrapRef<UsePackageStoreGetters>;
 
+    const fetchList = getCancellableFetcher<PackageListParameters, ListResponse<PackageModel>>(SpaceConnector.clientV2.identity.package.list);
     const actions = {
         async list() {
-            return new Promise<PackageModel[]>((resolve) => {
-                state.loading = true;
-                setTimeout(() => {
-                    const packages: PackageModel[] = [
-                        {
-                            package_id: 'package_1',
-                            name: 'Advanced',
-                            description: '고급 패키지',
-                            order: 1,
-                            is_default: false,
-                            tags: {},
-                            domain_id: '1',
-                            created_at: '2021-09-01T00:00:00',
-                            updated_at: '2021-09-01T00:00:00',
-                        },
-                        {
-                            package_id: 'package_2',
-                            name: 'Standard',
-                            description: '표준 패키지',
-                            order: 2,
-                            is_default: false,
-                            tags: {},
-                            domain_id: '1',
-                            created_at: '2021-09-01T00:00:00',
-                            updated_at: '2021-09-01T00:00:00',
-                        },
-                        {
-                            package_id: 'package_3',
-                            name: 'Basic',
-                            description: '기본 패키지',
-                            order: 3,
-                            is_default: true,
-                            tags: {},
-                            domain_id: '1',
-                            created_at: '2021-09-01T00:00:00',
-                            updated_at: '2021-09-01T00:00:00',
-                        },
-                    ];
-                    state.items = packages;
-                    state.loading = false;
-                    resolve(packages);
-                }, 1000);
-            });
+            state.loading = true;
+            try {
+                const result = await fetchList({});
+                if (result.status === 'succeed') {
+                    state.items = result.response.results;
+                }
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            } finally {
+                state.loading = false;
+            }
         },
         async create(param: PackageCreateParameters) {
-            return new Promise<PackageModel>((resolve) => {
-                setTimeout(() => {
-                    const result: PackageModel = {
-                        package_id: `package_${getters.packages.length + 1}`,
-                        name: param.name,
-                        description: param.description ?? '',
-                        order: 4,
-                        is_default: false,
-                        tags: param.tags ?? {},
-                        domain_id: '1',
-                        created_at: '2021-09-01T00:00:00',
-                        updated_at: '2021-09-01T00:00:00',
-                    };
-                    if (state.items) state.items.push(result);
-                    else state.items = [result];
-                    resolve(result);
-                }, 1000);
-            });
+            const response = await SpaceConnector.clientV2.identity.package.create<PackageCreateParameters, PackageModel>(param);
+            return response;
         },
         async update(param: PackageUpdateParameters) {
-            return new Promise<PackageModel>((resolve, reject) => {
-                setTimeout(() => {
-                    const targetPackage = getters.packages.find((p) => p.package_id === param.package_id);
-                    if (targetPackage) {
-                        targetPackage.name = param.name ?? targetPackage.name;
-                        targetPackage.description = param.description ?? targetPackage.description;
-                        targetPackage.tags = param.tags ?? targetPackage.tags;
-                        targetPackage.updated_at = Date.now().toString();
-                        resolve(targetPackage);
-                    } else {
-                        reject(new Error('Package not found'));
-                    }
-                }, 1000);
-            });
+            const response = await SpaceConnector.clientV2.identity.package.update<PackageUpdateParameters, PackageModel>(param);
+            return response;
         },
         async setDefaultPackage(packageId: string) {
-            return new Promise<PackageModel>((resolve, reject) => {
-                setTimeout(() => {
-                    const prevDefaultPackage = getters.packages.find((p) => p.is_default);
-                    if (prevDefaultPackage?.package_id === packageId) return;
-                    if (prevDefaultPackage) prevDefaultPackage.is_default = false;
-                    const targetPackage = getters.packages.find((p) => p.package_id === packageId);
-                    if (targetPackage) {
-                        targetPackage.is_default = true;
-                        resolve(targetPackage);
-                    } else {
-                        reject(new Error('Package not found'));
-                    }
-                }, 1000);
+            const prevDefaultPackage = getters.packages.find((p) => p.is_default);
+            if (prevDefaultPackage?.package_id === packageId) return prevDefaultPackage;
+            const response = await SpaceConnector.clientV2.identity.package.setDefaultPackage<PackageSetDefaultParameters, PackageModel>({
+                package_id: packageId,
             });
+            return response;
         },
         async delete(packageId: string) {
-            return new Promise<void>((resolve, reject) => {
-                setTimeout(() => {
-                    const index = state.items?.findIndex((p) => p.package_id === packageId);
-                    if (index !== undefined && index >= 0) {
-                        state.items?.splice(index, 1);
-                        resolve();
-                    } else {
-                        reject(new Error('Package not found'));
-                    }
-                }, 1000);
+            await SpaceConnector.clientV2.identity.package.delete<PackageDeleteParameters, undefined>({
+                package_id: packageId,
             });
         },
     };

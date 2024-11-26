@@ -37,6 +37,17 @@ const state = reactive({
         { name: 'set-as-default', icon: 'ic_check-circle', label: 'Set as Default' },
         { name: 'delete', icon: 'ic_delete', label: 'Delete' },
     ]),
+    defaultPackageMenu: computed<MenuItem[]>(() => [
+        {
+            name: 'edit', icon: 'ic_edit', label: 'Edit',
+        },
+        {
+            name: 'set-as-default', icon: 'ic_check-circle', label: 'Set as Default', disabled: true, iconColor: 'inherit',
+        },
+        {
+            name: 'delete', icon: 'ic_delete', label: 'Delete', disabled: true, iconColor: 'inherit',
+        },
+    ]),
 });
 </script>
 
@@ -82,7 +93,7 @@ const state = reactive({
             <template #col-buttons-format="{ item }">
                 <div class="flex justify-end">
                     <action-menu-button :menu="item.package_id === taskManagementPageStore.getters.defaultPackage?.package_id
-                                            ? undefined
+                                            ? state.defaultPackageMenu
                                             : state.menu"
                                         @edit="taskManagementPageStore.openEditPackageForm(item.package_id)"
                                         @set-as-default="taskManagementPageStore.openSetDefaultPackageModal(item.package_id)"

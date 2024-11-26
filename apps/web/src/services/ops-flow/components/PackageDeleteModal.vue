@@ -3,6 +3,8 @@ import { ref, computed } from 'vue';
 
 import { PButtonModal } from '@cloudforet/mirinae';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AssociatedCategories from '@/services/ops-flow/components/AssociatedCategories.vue';
@@ -22,6 +24,7 @@ const handleConfirm = async () => {
             throw new Error('[Console Error] Cannot delete package without a target package');
         }
         await packageStore.delete(taskManagementPageStore.state.targetPackageId);
+        showSuccessMessage('Successfully deleted the package', '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, 'Failed to delete package');
     } finally {
