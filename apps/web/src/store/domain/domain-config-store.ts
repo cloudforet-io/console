@@ -9,7 +9,7 @@ import type { DomainConfigGetParameters } from '@/schema/config/domain-config/ap
 import type { DomainConfigSetParameters } from '@/schema/config/domain-config/api-verbs/set';
 import type { DomainConfigModel } from '@/schema/config/domain-config/model';
 
-import { DOMAIN_CONFIG_TYPE } from '@/store/domain/constant';
+import { DOMAIN_CONFIG_NAMES } from '@/store/domain/constant';
 import type { DomainConfigKey } from '@/store/domain/type';
 
 
@@ -23,29 +23,28 @@ export const useDomainConfigStore = defineStore('domain-config', () => {
         domainConfigMap: {},
     });
     const _getterObj = {} as UseDomainConfigStoreGetters;
-    Object.keys(DOMAIN_CONFIG_TYPE).forEach((key) => {
-        const type = DOMAIN_CONFIG_TYPE[key as DomainConfigKey];
-        _getterObj[key] = computed<DomainConfigModel|undefined>(() => state.domainConfigMap[type]);
+    Object.keys(DOMAIN_CONFIG_NAMES).forEach((key) => {
+        _getterObj[key] = computed<DomainConfigModel|undefined>(() => state.domainConfigMap[key]);
     });
     const getters = reactive<UseDomainConfigStoreGetters>(_getterObj);
 
     const actions = {
         async get<T extends Record<string, any> = Record<string, any>>(key: DomainConfigKey): Promise<DomainConfigModel<T>> {
-            const domainConfigType = DOMAIN_CONFIG_TYPE[key];
+            const name = DOMAIN_CONFIG_NAMES[key];
             if (state.domainConfigMap[key]) return state.domainConfigMap[key] as DomainConfigModel<T>;
             const domainConfig = await SpaceConnector.client.config.domainConfig.get<DomainConfigGetParameters, DomainConfigModel<T>>({
-                name: domainConfigType,
+                name,
             });
-            state.domainConfigMap[key] = domainConfig;
+            state.domainConfigMap = { ...state.domainConfigMap, [key]: domainConfig };
             return domainConfig;
         },
         async set<T extends Record<string, any> = Record<string, any>>(key: DomainConfigKey, data: T) {
-            const domainConfigType = DOMAIN_CONFIG_TYPE[key];
+            const name = DOMAIN_CONFIG_NAMES[key];
             const domainConfig = await SpaceConnector.client.config.domainConfig.set<DomainConfigSetParameters, DomainConfigModel<T>>({
-                name: domainConfigType,
+                name,
                 data,
             });
-            state.domainConfigMap[key] = domainConfig;
+            state.domainConfigMap = { ...state.domainConfigMap, [key]: domainConfig };
             return domainConfig;
         },
 

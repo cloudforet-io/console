@@ -5,8 +5,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { DomainConfigModel } from '@/schema/config/domain-config/model';
 
-import { useDomainConfigStore } from '@/store/admin/domain-config-store';
-import { DOMAIN_CONFIG_TYPE } from '@/store/domain/constant';
+import { DOMAIN_CONFIG_NAMES } from '@/store/domain/constant';
+import { useDomainConfigStore } from '@/store/domain/domain-config-store';
 import type { DomainConfigKey } from '@/store/domain/type';
 
 vi.mock('@cloudforet/core-lib/space-connector', () => ({
@@ -23,7 +23,7 @@ vi.mock('@cloudforet/core-lib/space-connector', () => ({
 }));
 const testKey: DomainConfigKey = 'EXTRA_MENU';
 const testData: DomainConfigModel = {
-    name: DOMAIN_CONFIG_TYPE[testKey],
+    name: DOMAIN_CONFIG_NAMES[testKey],
     data: { value: 'testValue' },
     tags: {},
     domain_id: 'testDomainId',
@@ -86,5 +86,12 @@ describe('useDomainConfigStore', () => {
 
         store.reset();
         expect(store.state.domainConfigMap).toEqual({});
+    });
+
+    it('getters return the correct data', () => {
+        const store = useDomainConfigStore();
+        store.state.domainConfigMap = { ...store.state.domainConfigMap, [testKey]: testData };
+
+        expect(store.getters[testKey]).toEqual(testData);
     });
 });

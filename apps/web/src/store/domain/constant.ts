@@ -1,4 +1,4 @@
-export const DOMAIN_CONFIG_TYPE = {
+export const DOMAIN_CONFIG_NAMES = {
     EXTRA_MENU: 'console:ext-menu',
     SETTINGS: 'settings',
     TASK_LANDING: 'console:task-management:landing',
