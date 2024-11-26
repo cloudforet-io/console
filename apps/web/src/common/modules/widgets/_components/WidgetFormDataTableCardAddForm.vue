@@ -57,7 +57,7 @@ const emit = defineEmits<{(e: 'update:filter', value: Record<string, string[]>):
     (e: 'update:selected-group-by-items', value: any[]): void;
     (e: 'update:data-field-name', value: string): void;
     (e: 'update:data-unit', value: string): void;
-    (e: 'update:addtional-labels', value: AdditionalLabel[]): void;
+    (e: 'update:additional-labels', value: AdditionalLabel[]): void;
     (e: 'update:separate-date', value: boolean): void;
     (e: 'update:selected-time-diff', value: string): void;
     (e: 'update:selected-time-diff-date', value: string): void;
