@@ -41,7 +41,7 @@ const state = reactive({
 </script>
 
 <template>
-    <p-pane-layout class="mt-4">
+    <p-pane-layout>
         <p-heading-layout class="pt-6 px-4 mb-2">
             <template #heading>
                 <p-heading title="Support Package"

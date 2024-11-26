@@ -29,7 +29,7 @@ const removeEmpty = (obj: any): LocaleMessageObject => Object.keys(obj)
     );
 
 const supportLanguages = ['en', 'ko', 'ja'] as const;
-type SupportLanguage = typeof supportLanguages[number];
+export type SupportLanguage = typeof supportLanguages[number];
 
 const loadLocaleFiles = async (lang: string) => {
     // load necessary files

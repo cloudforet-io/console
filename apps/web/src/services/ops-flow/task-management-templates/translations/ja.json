@@ -1,0 +1,16 @@
+{
+	"default": {
+		"createTask": "",
+		"taskCategory": "",
+		"taskProgress": "",
+		"taskType": "",
+		"templateName": ""
+	},
+	"service-desk": {
+		"createTask": "",
+		"taskCategory": "",
+		"taskProgress": "",
+		"taskType": "",
+		"templateName": ""
+	}
+}
