@@ -45,6 +45,7 @@ import type { LegendValue } from '@/common/modules/widgets/_widget-fields/legend
 import type { MissingValueValue } from '@/common/modules/widgets/_widget-fields/missing-value/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type { TableDataFieldValue } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
+import type { TooltipNumberFormatValue } from '@/common/modules/widgets/_widget-fields/tooltip-number-format/type';
 import type { XAxisValue } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { DateRange, DynamicFieldData, StaticFieldData } from '@/common/modules/widgets/types/widget-data-type';
 import type {
@@ -79,7 +80,7 @@ const state = reactive({
     }),
     chartData: [],
     isAreaChart: computed<boolean>(() => props.widgetName === 'stackedAreaChart'),
-    unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
+    unitMap: computed<Record<string, string>>(() => widgetFrameProps.value.unitMap || {}),
     chartOptions: computed<LineSeriesOption>(() => ({
         color: MASSIVE_CHART_COLORS,
         grid: {
@@ -106,11 +107,19 @@ const state = reactive({
                 if (state.xAxisField === DATE_FIELD.DATE) {
                     _axisValue = dayjs.utc(_axisValue).format(state.dateFormat);
                 }
-                if (state.unit) _axisValue += ` (${state.unit})`;
                 const _values = _params.map((p) => {
-                    const _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.dataField, p.seriesName);
-                    const _value = p.value ? numberFormatter(p.value) : undefined;
+                    const _unit: string|undefined = state.unitMap[state.dynamicFieldInfo?.criteria || p.seriesName];
+                    let _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.dataField, p.seriesName);
+                    let _value = p.value ? numberFormatter(p.value) : undefined;
                     if (!_value) return undefined;
+                    if (_unit) _seriesName = `${_seriesName} (${_unit})`;
+                    if (state.tooltipNumberFormat?.toggleValue) {
+                        if (state.dataFieldInfo?.fieldType === 'staticField') {
+                            _value = getFormattedNumber(p.value, p.seriesName, state.numberFormat, _unit);
+                        } else {
+                            _value = getFormattedNumber(p.value, state.dynamicFieldInfo?.criteria, state.numberFormat, _unit);
+                        }
+                    }
                     return `${p.marker} ${_seriesName}: <b>${_value}</b>`;
                 });
                 return [_axisValue, ..._values].filter((d) => !!d).join('<br/>');
@@ -171,6 +180,7 @@ const state = reactive({
         return DATE_FORMAT?.[_dateFormat]?.[state.granularity];
     }),
     numberFormat: computed<NumberFormatValue>(() => props.widgetOptions?.numberFormat as NumberFormatValue),
+    tooltipNumberFormat: computed<TooltipNumberFormatValue>(() => props.widgetOptions?.tooltipNumberFormat as TooltipNumberFormatValue),
     displaySeriesLabel: computed(() => (props.widgetOptions?.displaySeriesLabel as DisplaySeriesLabelValue)),
     missingValue: computed<string|undefined>(() => (props.widgetOptions?.missingValue as MissingValueValue)?.value),
 });
@@ -223,7 +233,7 @@ const getDynamicFieldData = (rawData: DynamicFieldData): any[] => {
     // get chart data
     const _seriesData: any[] = [];
     const _defaultValue = state.missingValue === 'lineToZero' ? 0 : undefined;
-    const _unit = widgetFrameProps.value.unitMap?.[state.dataField];
+    const _unit: string|undefined = state.unitMap[state.dynamicFieldInfo?.criteria];
     _seriesFields.forEach((field) => {
         const _data: number[] = [];
         state.xAxisData?.forEach((d) => {
@@ -253,7 +263,7 @@ const getStaticFieldData = (rawData: StaticFieldData): any[] => {
     const _seriesData: any[] = [];
     const _defaultValue = state.missingValue === 'lineToZero' ? 0 : undefined;
     state.dataField?.forEach((field) => {
-        const _unit = widgetFrameProps.value.unitMap?.[field];
+        const _unit: string|undefined = state.unitMap[field];
         _seriesData.push({
             name: field,
             type: 'line',

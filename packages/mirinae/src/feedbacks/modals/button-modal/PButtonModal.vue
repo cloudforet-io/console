@@ -30,7 +30,7 @@
                                          class="header-img"
                                          color="inherit transparent"
                                     />
-                                    <span class="header-title">{{ headerTitle }}</span>
+                                    <span class="header-title"><slot name="header-title">{{ headerTitle }}</slot></span>
                                 </span>
                             </slot>
                             <p-icon-button v-if="!hideHeaderCloseButton"

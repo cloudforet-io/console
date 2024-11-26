@@ -5,6 +5,6 @@ export interface CostReportConfigUpdateRecipientsParameters {
     cost_report_config_id: string;
     recipients?: {
         role_types: RoleType[];
-        emails: string[];
+        emails?: string[];
     };
 }

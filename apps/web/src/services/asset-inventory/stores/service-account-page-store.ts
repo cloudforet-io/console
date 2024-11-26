@@ -42,6 +42,7 @@ interface Getters {
     lastJobStatus: ComputedRef<IdentityJobStatus>;
     autoSyncDocsLink: ComputedRef<string>;
     currency: ComputedRef<Currency|undefined>;
+    isTrustedAccount: ComputedRef<boolean>;
 }
 
 interface State {
@@ -120,6 +121,7 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
             return `https://cloudforet.io/${language}docs/guides/asset-inventory/service-account/`;
         }),
         currency: computed(() => state.costReportConfig?.currency),
+        isTrustedAccount: computed(() => state.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
     });
     const actions = {
         initState: () => {

@@ -31,6 +31,7 @@ const clusteredColumnChart: WidgetConfig = {
             },
         },
         numberFormat: {},
+        tooltipNumberFormat: {},
         displaySeriesLabel: {},
         displayAnnotation: {},
     },

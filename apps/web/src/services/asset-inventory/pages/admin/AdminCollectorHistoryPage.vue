@@ -105,7 +105,6 @@ const state = reactive({
     pageSize: 30,
     thisPage: 1,
     totalCount: 0,
-    isDomainOwner: computed(() => store.state.user.userType === 'DOMAIN_OWNER'),
     selectedStatus: 'ALL',
     items: [] as any[],
     sortBy: 'created_at',
