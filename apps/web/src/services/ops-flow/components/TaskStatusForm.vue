@@ -131,7 +131,8 @@ watch([() => taskCategoryPageState.visibleStatusForm, () => taskCategoryPageGett
                         />
                     </template>
                 </p-field-group>
-                <p-field-group label="Status Type"
+                <p-field-group v-if="!taskCategoryPageGetters.targetStatusOption?.data?.is_default"
+                               label="Status Type"
                                required
                                :invalid="!loading && invalidState.statusType"
                                :invalid-text="invalidTexts.statusType"
