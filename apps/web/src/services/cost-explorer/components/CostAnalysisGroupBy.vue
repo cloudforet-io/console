@@ -52,7 +52,13 @@ const { metadataAdditionalInfoItems } = useCostDataSourceFilterMenuItems({
     costDataSource: computed(() => storeState.costDataSource[costAnalysisPageGetters.selectedDataSourceId ?? '']),
 });
 const state = reactive({
-    groupByItems: computed<SelectDropdownMenuItem[]>(() => [...costAnalysisPageGetters.visibleGroupByItems, ...state.selectedAdditionalGroupByMenu]),
+    groupByItems: computed<SelectDropdownMenuItem[]>(() => {
+        const _allGroupByItems = [...costAnalysisPageGetters.visibleGroupByItems, ...state.selectedAdditionalGroupByMenu];
+        return _allGroupByItems.map((d) => {
+            if (GROUP_BY_ITEM_MAP[d.name]) return GROUP_BY_ITEM_MAP[d.name];
+            return { name: d.name, label: d.label };
+        });
+    }),
     selectedGroupByItems: computed<SelectDropdownMenuItem[]>(() => costAnalysisPageState.groupBy.map((d) => {
         if (GROUP_BY_ITEM_MAP[d]) return GROUP_BY_ITEM_MAP[d];
         return { name: d, label: d.split('.')[1] };
