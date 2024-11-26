@@ -10,7 +10,7 @@ import type {
     Metadata,
 } from '@/schema/identity/domain/api-verbs/get-auth-info';
 
-import { DOMAIN_CONFIG_TYPE } from '@/store/domain/constant';
+import { DOMAIN_CONFIG_NAMES } from '@/store/domain/constant';
 import type { ExtendedAuthType, ExtraMenuSet } from '@/store/domain/type';
 import type { Currency } from '@/store/modules/display/type';
 
@@ -45,7 +45,7 @@ export const useDomainStore = defineStore('domain-store', () => {
             const idpName = state.authOptions?.idp_name?.replace('Sign In with ', '');
             return extendedAuthTypes[state.extendedAuthType as string] || (`${state.extendedAuthType} (${idpName})`);
         }),
-        domainExtraMenu: computed(() => state.config?.settings?.[DOMAIN_CONFIG_TYPE.EXTRA_MENU]),
+        domainExtraMenu: computed(() => state.config?.settings?.[DOMAIN_CONFIG_NAMES.EXTRA_MENU]),
         domainSymbolImage: computed<string|undefined>(() => {
             const domainSettings = state.config?.settings;
             if (domainSettings?.symbol_favicon_url) return domainSettings.symbol_favicon_url;

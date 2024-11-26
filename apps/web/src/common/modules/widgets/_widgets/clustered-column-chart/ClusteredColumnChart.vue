@@ -48,6 +48,7 @@ import type { DisplaySeriesLabelValue } from '@/common/modules/widgets/_widget-f
 import type { LegendValue } from '@/common/modules/widgets/_widget-fields/legend/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type { TableDataFieldValue } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
+import type { TooltipNumberFormatValue } from '@/common/modules/widgets/_widget-fields/tooltip-number-format/type';
 import type { XAxisValue } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type {
@@ -80,6 +81,7 @@ const chartContext = ref<HTMLElement|null>(null);
 const state = reactive({
     loading: false,
     errorMessage: undefined as string|undefined,
+    unitMap: computed<Record<string, string>>(() => widgetFrameProps.value.unitMap || {}),
     data: null as Data | null,
     chart: null as EChartsType | null,
     xAxisData: computed<string[]>(() => {
@@ -118,10 +120,17 @@ const state = reactive({
                     _axisValue = dayjs.utc(_axisValue).format(state.dateFormat);
                 }
                 const _values = _params.map((p) => {
-                    const _unit = widgetFrameProps.value.unitMap?.[p.seriesName];
+                    const _unit: string|undefined = state.unitMap[state.dynamicFieldInfo?.criteria || p.seriesName];
                     let _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.dataField, p.seriesName);
+                    let _value = numberFormatter(p.value) || '';
+                    if (state.tooltipNumberFormat?.toggleValue) {
+                        if (state.dataFieldInfo?.fieldType === 'staticField') {
+                            _value = getFormattedNumber(p.value, p.seriesName, state.numberFormat, _unit);
+                        } else {
+                            _value = getFormattedNumber(p.value, state.dynamicFieldInfo?.criteria, state.numberFormat, _unit);
+                        }
+                    }
                     if (_unit) _seriesName = `${_seriesName} (${_unit})`;
-                    const _value = numberFormatter(p.value) || '';
                     return `${p.marker} ${_seriesName}: <b>${_value}</b>`;
                 });
                 return [_axisValue, ..._values].join('<br/>');
@@ -183,6 +192,7 @@ const state = reactive({
         return DATE_FORMAT?.[_dateFormat]?.[state.granularity];
     }),
     numberFormat: computed<NumberFormatValue>(() => props.widgetOptions?.numberFormat as NumberFormatValue),
+    tooltipNumberFormat: computed<TooltipNumberFormatValue>(() => props.widgetOptions?.tooltipNumberFormat as TooltipNumberFormatValue),
     displaySeriesLabel: computed(() => (props.widgetOptions?.displaySeriesLabel as DisplaySeriesLabelValue)),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
@@ -255,7 +265,7 @@ const getStaticFieldData = (rawData: StaticFieldData) => {
     // get chart data
     const _seriesData: any[] = [];
     state.dataField?.forEach((field) => {
-        const _unit = widgetFrameProps.value.unitMap?.[field];
+        const _unit: string|undefined = state.unitMap[field];
         _seriesData.push({
             name: field,
             type: 'bar',
@@ -286,7 +296,7 @@ const getDynamicFieldData = (rawData: DynamicFieldData) => {
     // get chart data
     const _seriesData: any[] = [];
     const _threshold = getThreshold(rawData);
-    const _unit = widgetFrameProps.value.unitMap?.[state.dataField];
+    const _unit: string|undefined = state.unitMap[state.dynamicFieldInfo?.criteria];
     _seriesFields.forEach((field) => {
         const _data: number[] = [];
         state.xAxisData.forEach((d) => {

@@ -19,7 +19,7 @@ import type { DomainConfigSetParameters } from '@/schema/config/domain-config/ap
 import type { DomainConfigModel } from '@/schema/config/domain-config/model';
 import { store } from '@/store';
 
-import { DOMAIN_CONFIG_TYPE } from '@/store/domain/constant';
+import { DOMAIN_CONFIG_NAMES } from '@/store/domain/constant';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import type { MenuId } from '@/lib/menu/config';
@@ -128,7 +128,7 @@ interface AnomalyDetectionConfig {
 const fetchConfig = async ():Promise<AnomalyDetectionConfig|undefined> => {
     try {
         const data = await SpaceConnector.clientV2.config.domainConfig.get<DomainConfigGetParameters, DomainConfigModel<AnomalyDetectionConfig>>({
-            name: DOMAIN_CONFIG_TYPE.ANOMALY_DETECTION_CONFIGURATION,
+            name: DOMAIN_CONFIG_NAMES.ANOMALY_DETECTION_CONFIGURATION,
         });
         return data.data;
     } catch (e) {
@@ -145,7 +145,7 @@ const filterNotificationRulesAndRemovedUnSelectedItem = (notificationRules: Part
 
 const setConfig = async () => {
     const params: DomainConfigSetParameters<AnomalyDetectionConfig> = {
-        name: DOMAIN_CONFIG_TYPE.ANOMALY_DETECTION_CONFIGURATION,
+        name: DOMAIN_CONFIG_NAMES.ANOMALY_DETECTION_CONFIGURATION,
         data: {
             enabled: state.statusToggle,
             notification_rules: filterNotificationRulesAndRemovedUnSelectedItem(state.notificationRules),

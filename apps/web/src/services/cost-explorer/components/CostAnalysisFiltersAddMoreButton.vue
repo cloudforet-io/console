@@ -4,43 +4,61 @@ import {
     computed, defineEmits, reactive, ref, toRef, watch,
 } from 'vue';
 
-import { debounce } from 'lodash';
+import { cloneDeep, debounce } from 'lodash';
 
 import {
     PButton, PContextMenu, useContextMenuController,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import CostTagKeyVariableModel from '@/lib/variable-models/managed-model/custom-resource-model/cost-tag-key-variable-model';
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
+import {
+    useCostDataSourceFilterMenuItems,
+} from '@/common/composables/data-source/use-cost-data-source-filter-menu-items';
 
 import { UNIFIED_COST_KEY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
+
 
 
 const emit = defineEmits<{(e: 'disable-filter', value: string): void;
     (e: 'disable-all-filters'): void;
 }>();
 
+const appContextStore = useAppContextStore();
+const allReferenceStore = useAllReferenceStore();
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
+});
+const { managedGroupByItems, additionalInfoGroupByItems, tagsFilterItems } = useCostDataSourceFilterMenuItems({
+    isAdminMode: computed(() => storeState.isAdminMode),
+    costDataSource: computed(() => storeState.costDataSource[costAnalysisPageGetters.selectedDataSourceId ?? '']),
+});
 
 const state = reactive({
     menuItems: computed<MenuItem[]>(() => {
-        const tagsMenuItems = state.tagsMenuItems;
+        const defaultGroupByItems = [
+            ...managedGroupByItems.value,
+            ...additionalInfoGroupByItems.value,
+        ];
+        const tagsMenuItems = cloneDeep(tagsFilterItems.value);
         if (!tagsMenuItems.length) {
-            return costAnalysisPageGetters.defaultGroupByItems;
+            return defaultGroupByItems;
         }
         return [
-            ...costAnalysisPageGetters.defaultGroupByItems,
+            ...defaultGroupByItems,
             { type: 'header', label: 'Tags', name: 'tags' },
             ...tagsMenuItems,
         ];
     }),
     initiated: false,
-    tagsMenuItems: [] as MenuItem[],
     selectedItems: [] as MenuItem[],
     searchText: '',
     dataSourceId: computed<string>(() => (costAnalysisPageGetters.isUnifiedCost ? UNIFIED_COST_KEY : (costAnalysisPageGetters.selectedDataSourceId ?? ''))),
@@ -68,21 +86,6 @@ const {
     pageSize: 10,
 });
 onClickOutside(containerRef, hideContextMenu);
-
-/* Api */
-const getTagsResources = async (): Promise<{name: string; key: string}[]> => {
-    try {
-        const options = {
-            cost_data_source: state.dataSourceId,
-        };
-        const costTagKeyVariableModel = new CostTagKeyVariableModel();
-        const response = await costTagKeyVariableModel.list({ options });
-        return response.results;
-    } catch (e: any) {
-        ErrorHandler.handleError(e);
-        return [];
-    }
-};
 
 /* Event */
 const handleClickAddMore = () => {
@@ -123,14 +126,6 @@ watch(() => costAnalysisPageState.enabledFiltersProperties, (_enabledFiltersProp
         state.selectedItems = state.menuItems.filter((d) => _enabledFiltersProperties.includes(d.name));
     }
 }, { immediate: true });
-
-watch(() => state.dataSourceId, async (dataSourceId) => {
-    if (!dataSourceId) return;
-    state.initiated = false;
-    const tagsResources = await getTagsResources();
-    state.tagsMenuItems = tagsResources ? tagsResources.map((d) => ({ name: d.key, label: d.name })) : [];
-    state.initiated = true;
-}, { immediate: true });
 </script>
 
 <template>
@@ -148,7 +143,6 @@ watch(() => state.dataSourceId, async (dataSourceId) => {
                         ref="contextMenuRef"
                         class="add-more-context-menu"
                         searchable
-                        :loading="!state.initiated"
                         :search-text="state.searchText"
                         :menu="refinedMenu"
                         :selected="state.selectedItems"

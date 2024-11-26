@@ -72,7 +72,7 @@ const storeState = reactive({
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
     costDataSources: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
 });
-const { menuItems: costDataSourceMenuItems } = useCostDataSourceFilterMenuItems({
+const { allItems: costDataSourceMenuItems } = useCostDataSourceFilterMenuItems({
     isAdminMode: computed(() => storeState.isAdminMode),
     costDataSource: computed(() => storeState.costDataSources[props.sourceId]),
 });
