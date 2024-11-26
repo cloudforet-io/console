@@ -1,6 +1,7 @@
 import type { Action } from 'vuex';
 
 import { jwtDecode } from 'jwt-decode';
+import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
@@ -89,6 +90,9 @@ export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<
         SpaceConnector.setToken(response.access_token, response.refresh_token);
     }
 
+    if (isEmpty(response)) {
+        throw new Error();
+    }
 
     const userInfo = await getUserInfo();
     commit('setUser', userInfo);
