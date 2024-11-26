@@ -188,6 +188,7 @@ watch([() => state.menuIds, () => state.isSelectDropdownVisible], async (menuIds
                                 use-fixed-menu-style
                                 show-select-marker
                                 disable-handler
+                                is-fixed-width
                                 :visible-menu.sync="state.isSelectDropdownVisible"
                                 :menu="menuList"
                                 :selected.sync="selectedItems"
