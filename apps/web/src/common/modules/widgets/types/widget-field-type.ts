@@ -29,6 +29,7 @@ import type { SubTotalOptions } from '@/common/modules/widgets/_widget-fields/su
 import type { TableColumnWidthOptions } from '@/common/modules/widgets/_widget-fields/table-column-width/type';
 import type { TableDataFieldOptions } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
 import type { TextWrapOptions } from '@/common/modules/widgets/_widget-fields/text-wrap/type';
+import type { TooltipNumberFormatOptions } from '@/common/modules/widgets/_widget-fields/tooltip-number-format/type';
 import type { TotalOptions } from '@/common/modules/widgets/_widget-fields/total/type';
 import type { WidgetHeightOptions } from '@/common/modules/widgets/_widget-fields/widget-height/type';
 import type { XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
@@ -46,7 +47,7 @@ export type WidgetFieldOptions = DataFieldOptions | TableDataFieldOptions | XAxi
     | ComparisonOptions | ProgressBarOptions | ColorSchemaOptions | PieChartTypeOptions | DateFormatOptions
     | NumberFormatOptions | DataFieldHeatmapColorOptions | TextWrapOptions | TableColumnWidthOptions | CustomTableColumnWidthOptions
     | MissingValueOptions | WidgetHeightOptions | DisplaySeriesLabelOptions | DateRangeOptions
-    | DateAggregationOptionsOptions;
+    | DateAggregationOptionsOptions | TooltipNumberFormatOptions;
 
 export interface WidgetFieldSchema<FieldOption=WidgetFieldOptions> {
     options?: Partial<FieldOption>;
@@ -60,7 +61,7 @@ export type WidgetFieldName = 'dataField' | 'tableDataField' | 'xAxis' | 'yAxis'
     | 'progressBar'
     | 'formatRules' | 'advancedFormatRules'
     | 'granularity' | 'dateRange' | 'dateAggregationOptions' | 'colorSchema' | 'pieChartType'
-    | 'dateFormat' | 'numberFormat' | 'dataFieldHeatmapColor'
+    | 'dateFormat' | 'numberFormat' | 'tooltipNumberFormat' | 'dataFieldHeatmapColor'
     | 'displayAnnotation' | 'displaySeriesLabel' | 'textWrap' | 'tableColumnWidth' | 'customTableColumnWidth'
     | 'missingValue' | 'widgetHeight'
     | 'widgetHeader';

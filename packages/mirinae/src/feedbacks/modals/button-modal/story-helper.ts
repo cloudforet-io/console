@@ -314,6 +314,15 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
             defaultValue: 'Modal Header',
         },
     },
+    headerTitleSlot: {
+        name: 'header-title',
+        description: 'Slot for header title. If you use this slot, `headerTitle` prop will be ignored.\n'
+            + 'It is recommended to use this slot when you want to customize the header title without changing the whole style of the header.\n'
+            + 'If you want to change the whole style of the header, use `header` slot.',
+        table: {
+            category: 'slots',
+        },
+    },
     body: {
         name: 'body',
         description: 'Slot for body content',

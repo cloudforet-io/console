@@ -42,6 +42,7 @@ const pieChart: WidgetConfig = {
             },
         },
         numberFormat: {},
+        tooltipNumberFormat: {},
         displaySeriesLabel: {
             options: {
                 showFormatField: true,

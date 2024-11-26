@@ -139,6 +139,7 @@ const handleSaveQuerySet = async () => {
                 metadata: { filters_schema: { enabled_properties: costAnalysisPageState.enabledFiltersProperties ?? [] } },
             },
         });
+        await costAnalysisPageStore.listCostQueryList();
         showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVE_QUERY'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_SAVED_QUERY'));
@@ -152,7 +153,7 @@ const handleClickSaveAsButton = () => {
     state.queryFormModalVisible = true;
 };
 const handleUpdateQuery = async (updatedQueryId: string) => {
-    await costAnalysisPageStore.getCostQueryList();
+    await costAnalysisPageStore.listCostQueryList();
     await costAnalysisPageStore.selectQueryId(updatedQueryId);
     await SpaceRouter.router.push(getProperRouteLocation({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,

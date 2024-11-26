@@ -41,7 +41,7 @@ const state = reactive({
     currentWorkspaceId: computed(() => storeState.currentWorkspace?.workspace_id),
     refinedUserItems: computed(() => workspacePageState.workspaceUsers.map((user) => ({
         ...user,
-        role: workspacePageStore.roleMap[workspacePageStore.roleBindingMap[user.role_binding_info.role_binding_id].role_id],
+        role: workspacePageStore.roleMap[workspacePageStore.roleBindingMap[user.role_binding_info.role_binding_id]?.role_id],
         last_accessed_at: calculateTime(user?.last_accessed_at, workspacePageStore.timezone),
     }))),
 });

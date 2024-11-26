@@ -6,8 +6,9 @@ import type { KeyItem } from '@cloudforet/mirinae/src/controls/search/query-sear
 import type { ValueHandler, KeyDataType } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
-
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+
+import { DATASOURCE_STATE_COLOR } from '@/services/cost-explorer/constants/datasource-constant';
 
 export const makeDataSourceDistinctValueHandler = (
     filters?: ApiFilter[],
@@ -112,3 +113,10 @@ export const convertWorkspaceSearchValue = (options, workspaceList?: WorkspaceMo
 
     return options;
 };
+
+const colorBindFactory = (colorMapping, textFnc) => (value) => ({
+    text: textFnc(value),
+    ...colorMapping[value],
+});
+export const datasourceStateFormatter = colorBindFactory(DATASOURCE_STATE_COLOR, (value) => value.toLowerCase());
+

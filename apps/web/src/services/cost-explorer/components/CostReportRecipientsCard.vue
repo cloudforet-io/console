@@ -35,7 +35,6 @@ const props = defineProps<Props>();
 
 const costReportPageStore = useCostReportPageStore();
 const costReportPageState = costReportPageStore.state;
-const costReportPageGetters = costReportPageStore.getters;
 const appContextStore = useAppContextStore();
 
 const storeState = reactive({
@@ -51,7 +50,6 @@ const updateRecipients = async (val: boolean): Promise<boolean> => {
         const updatedConfig = await SpaceConnector.clientV2.costAnalysis.costReportConfig.updateRecipients<CostReportConfigUpdateRecipientsParameters, CostReportConfigModel>({
             cost_report_config_id: costReportPageState.costReportConfig?.cost_report_config_id ?? '',
             recipients: {
-                ...costReportPageGetters.recipients,
                 role_types: val ? ['WORKSPACE_OWNER'] : [],
             },
         });

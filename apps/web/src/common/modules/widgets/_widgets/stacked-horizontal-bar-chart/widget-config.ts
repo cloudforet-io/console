@@ -36,6 +36,7 @@ const stackedHorizontalBarChart: WidgetConfig = {
             },
         },
         numberFormat: {},
+        tooltipNumberFormat: {},
         displaySeriesLabel: {},
         displayAnnotation: {},
     },

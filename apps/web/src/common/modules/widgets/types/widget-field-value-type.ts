@@ -22,6 +22,7 @@ import type { StackByValue } from '@/common/modules/widgets/_widget-fields/stack
 import type { TableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/table-column-width/type';
 import type { TableDataFieldValue } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
 import type { TextWrapValue } from '@/common/modules/widgets/_widget-fields/text-wrap/type';
+import type { TooltipNumberFormatValue } from '@/common/modules/widgets/_widget-fields/tooltip-number-format/type';
 import type { TotalValue } from '@/common/modules/widgets/_widget-fields/total/type';
 import type { WidgetHeightValue } from '@/common/modules/widgets/_widget-fields/widget-height/type';
 import type { XAxisValue } from '@/common/modules/widgets/_widget-fields/x-axis/type';
@@ -29,10 +30,10 @@ import type { YAxisValue } from '@/common/modules/widgets/_widget-fields/y-axis/
 
 
 
-export type WidgetFieldValues = string | string[] | number | boolean | ComparisonValue[] | ProgressBarValue | FormatRulesValue[]
+export type WidgetFieldValues = string | string[] | number | boolean | ComparisonValue | ProgressBarValue | FormatRulesValue[]
     | LineByValue | StackByValue | CategoryByValue | GroupByValue
     | XAxisValue | YAxisValue | TableDataFieldValue | IconValue | TotalValue | ColorSchemaValue
     | WidgetHeaderValue | DateFormatValue | NumberFormatValue | DataFieldHeatmapColorValue
     | DisplayAnnotationValue | DisplaySeriesLabelValue | TextWrapValue | TableColumnWidthValue | CustomTableColumnWidthValue
     | LegendValue | WidgetHeightValue | MissingValueValue | AdvancedFormatRulesValue | DateRangeValue
-    | DateAggregationOptionsValue;
+    | DateAggregationOptionsValue | TooltipNumberFormatValue;

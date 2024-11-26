@@ -13,7 +13,7 @@ export interface CostReportConfigModel {
     currency: Currency;
     recipients: {
         role_types: RoleType[];
-        emails: string[];
+        emails?: string[];
     };
     data_source_filter: {
         state: Extract<CostReportConfigStatus, 'ENABLED' | 'DISABLED'>;

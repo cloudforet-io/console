@@ -31,6 +31,7 @@ const stackedAreaChart: WidgetConfig = {
             },
         },
         numberFormat: {},
+        tooltipNumberFormat: {},
         displaySeriesLabel: {},
         missingValue: {},
         displayAnnotation: {},

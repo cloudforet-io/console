@@ -43,6 +43,7 @@ import type { DisplaySeriesLabelValue } from '@/common/modules/widgets/_widget-f
 import type { GroupByValue } from '@/common/modules/widgets/_widget-fields/group-by/type';
 import type { LegendValue } from '@/common/modules/widgets/_widget-fields/legend/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
+import type { TooltipNumberFormatValue } from '@/common/modules/widgets/_widget-fields/tooltip-number-format/type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
@@ -127,8 +128,11 @@ const state = reactive({
                 if (state.groupByField === DATE_FIELD.DATE) {
                     _name = dayjs.utc(_name).format(state.dateFormat);
                 }
+                let _value = numberFormatter(params.value) || '';
+                if (state.tooltipNumberFormat?.toggleValue) {
+                    _value = getFormattedNumber(params.value, state.dataField, state.numberFormat, state.unit);
+                }
                 if (state.unit) _name = `${_name} (${state.unit})`;
-                const _value = numberFormatter(params.value) || '';
                 return `${params.marker} ${_name}: <b>${_value}</b>`;
             },
         },
@@ -170,6 +174,7 @@ const state = reactive({
         return DATE_FORMAT?.[_dateFormat]?.[state.granularity];
     }),
     numberFormat: computed<NumberFormatValue>(() => props.widgetOptions?.numberFormat as NumberFormatValue),
+    tooltipNumberFormat: computed<TooltipNumberFormatValue>(() => props.widgetOptions?.tooltipNumberFormat as TooltipNumberFormatValue),
     displaySeriesLabel: computed(() => (props.widgetOptions?.displaySeriesLabel as DisplaySeriesLabelValue)),
     seriesFormat: computed<string>(() => state.displaySeriesLabel?.format || 'numeric'),
 });

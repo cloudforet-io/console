@@ -297,8 +297,8 @@ const handleCloneWidget = async (widget: RefinedWidgetInfo) => {
             widget_id: createdWidget.widget_id,
             state: 'ACTIVE',
         });
-        dashboardDetailStore.setDashboardWidgets([...dashboardDetailState.dashboardWidgets, completedWidget]);
         await dashboardStore.addWidgetToDashboard(dashboardDetailState.dashboardId, createdWidget.widget_id);
+        dashboardDetailStore.setDashboardWidgets([...dashboardDetailState.dashboardWidgets, completedWidget]);
         showSuccessMessage(i18n.t('COMMON.WIDGETS.CLONE_SUCCESS_MSG'), '');
     } catch (e: any) {
         showErrorMessage(e.message, e);

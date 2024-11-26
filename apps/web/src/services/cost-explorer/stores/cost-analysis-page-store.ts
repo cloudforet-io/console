@@ -1,11 +1,12 @@
 import { computed, reactive } from 'vue';
 
 import dayjs from 'dayjs';
-import { cloneDeep, isEmpty, sortBy } from 'lodash';
+import { cloneDeep, isEmpty } from 'lodash';
 import { defineStore } from 'pinia';
 
 import type { ConsoleFilter, ConsoleFilterValue } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import type { CostQuerySetCreateParameters } from '@/schema/cost-analysis/cost-query-set/api-verbs/create';
 import type { CostQuerySetUpdateParameters } from '@/schema/cost-analysis/cost-query-set/api-verbs/update';
@@ -17,8 +18,11 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import { useDomainStore } from '@/store/domain/domain-store';
 import type { Currency } from '@/store/modules/display/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
-
+import {
+    useCostDataSourceFilterMenuItems,
+} from '@/common/composables/data-source/use-cost-data-source-filter-menu-items';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import {
@@ -32,10 +36,6 @@ import type {
 } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
 
-interface GroupByItem {
-    name: GroupBy|string;
-    label: string;
-}
 
 const getRefinedFilters = (consoleFilters?: ConsoleFilter[]): Record<string, string[]> => {
     if (!consoleFilters || isEmpty(consoleFilters)) return {};
@@ -59,6 +59,11 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
 
     const _state = reactive({
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+        costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
+    });
+    const { costAdditionalInfoKeysItems, metadataAdditionalInfoItems } = useCostDataSourceFilterMenuItems({
+        isAdminMode: computed(() => _state.isAdminMode),
+        costDataSource: computed(() => _state.costDataSource[costQuerySetState.selectedDataSourceId ?? '']),
     });
     const state = reactive({
         granularity: GRANULARITY.MONTHLY as Granularity,
@@ -99,26 +104,13 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
             }
             return 'USD';
         }),
-        defaultGroupByItems: computed<GroupByItem[]>(() => {
-            if (getters.metadataAdditionalInfoItems.length) {
-                return [...getters.managedGroupByItems, ...getters.metadataAdditionalInfoItems];
-            }
-            return [...getters.managedGroupByItems, ...getters.additionalInfoKeysItems];
-        }),
-        managedGroupByItems: computed<GroupByItem[]>(() => {
-            const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId ?? ''];
-            const metadataAdditionalInfo = targetDataSource?.data?.plugin_info?.metadata?.additional_info;
-            let _additionalInfoGroupBy: GroupByItem[] = [];
-            if (metadataAdditionalInfo && !isEmpty(metadataAdditionalInfo)) {
-                _additionalInfoGroupBy = Object.entries(metadataAdditionalInfo)
-                    .filter(([, value]) => value?.visible)
-                    .map(([key, value]) => ({
-                        name: `additional_info.${key}`,
-                        label: value?.name,
-                        presetKeys: metadataAdditionalInfo[key].enums,
-                    }));
-            } else {
-                _additionalInfoGroupBy = cloneDeep(getters.additionalInfoKeysItems);
+        visibleGroupByItems: computed<MenuItem[]>(() => {
+            let _additionalInfoGroupBy: MenuItem[] = [];
+            const _metadataAdditionalInfoItems = cloneDeep(metadataAdditionalInfoItems.value);
+            if (_metadataAdditionalInfoItems.length) {
+                _additionalInfoGroupBy = _metadataAdditionalInfoItems.filter((d) => d.visible);
+            } else if (!getters.isUnifiedCost) {
+                _additionalInfoGroupBy = cloneDeep(costAdditionalInfoKeysItems.value);
             }
             const groupByItemValueList = Object.values(GROUP_BY_ITEM_MAP);
             const workspaceRemovedGroupByItems = groupByItemValueList.filter((d) => d.name !== GROUP_BY.WORKSPACE);
@@ -126,33 +118,6 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
 
             const _managedGroupByItems = _state.isAdminMode ? adminManagedGroupByItems : workspaceRemovedGroupByItems;
             return getters.isUnifiedCost ? _managedGroupByItems : [..._managedGroupByItems, ..._additionalInfoGroupBy];
-        }),
-        metadataAdditionalInfoItems: computed<GroupByItem[]>(() => {
-            if (getters.isUnifiedCost) return [];
-            if (!costQuerySetState.selectedDataSourceId) return [];
-            const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId ?? ''];
-            if (!targetDataSource || getters.isUnifiedCost) return [];
-            const metadataAdditionalInfo = targetDataSource?.data?.plugin_info?.metadata?.additional_info;
-            if (!metadataAdditionalInfo) return [];
-            return Object.entries(metadataAdditionalInfo)
-                .filter(([, value]) => !value?.visible)
-                .map(([key, value]) => ({
-                    name: `additional_info.${key}`,
-                    label: value?.name,
-                }));
-        }),
-        additionalInfoKeysItems: computed<GroupByItem[]>(() => {
-            if (getters.isUnifiedCost) return [];
-            if (!costQuerySetState.selectedDataSourceId) return [];
-            const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId ?? ''];
-            if (!targetDataSource) return [];
-            const costAdditionalInfoKeys = targetDataSource?.data?.cost_additional_info_keys ?? [];
-            const additionalInfoGroupBy: GroupByItem[] = costAdditionalInfoKeys
-                .map((d) => ({
-                    name: `additional_info.${d}`,
-                    label: d,
-                }));
-            return [...sortBy(additionalInfoGroupBy, 'label')];
         }),
         consoleFilters: computed<ConsoleFilter[]>(() => {
             const results: ConsoleFilter[] = [];
@@ -270,7 +235,7 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
                     .filter((d) => d !== GROUP_BY.WORKSPACE);
             }
         } else {
-            state.enabledFiltersProperties = getters.managedGroupByItems.map((d) => d.name);
+            state.enabledFiltersProperties = getters.visibleGroupByItems.map((d) => d.name);
         }
     };
     const saveQuery = async (name: string): Promise<CostQuerySetModel|undefined> => {
@@ -315,7 +280,7 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
         }
         return updatedQueryData;
     };
-    const getCostQueryList = async () => {
+    const listCostQueryList = async () => {
         await costQuerySetStore.listCostQuerySets();
     };
 
@@ -325,7 +290,7 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
         saveQuery,
         selectQueryId,
         editQuery,
-        getCostQueryList,
+        listCostQueryList,
     };
     const mutations = {
         setChartGroupBy,
