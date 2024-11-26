@@ -7,7 +7,8 @@ import {
     PPaneLayout, PHeading, PToggleButton,
 } from '@cloudforet/mirinae';
 
-import { useDomainConfigStore } from '@/store/admin/domain-config-store';
+
+import { useDomainConfigStore } from '@/store/domain/domain-config-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

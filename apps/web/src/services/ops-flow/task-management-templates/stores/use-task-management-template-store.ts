@@ -7,7 +7,7 @@ import { APIError } from '@cloudforet/core-lib/space-connector/error';
 
 import { i18n, type SupportLanguage } from '@/translations';
 
-import { useDomainConfigStore } from '@/store/admin/domain-config-store';
+import { useDomainConfigStore } from '@/store/domain/domain-config-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
