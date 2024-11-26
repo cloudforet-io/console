@@ -58,22 +58,7 @@ const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 
 const storeState = reactive({
-    metrics: computed<MetricReferenceMap>(() => {
-        const filteredMetrics = Object.values(allReferenceStore.getters.metric).filter((metric) => {
-            if (metric.data.is_managed) {
-                return true;
-            }
-            if (!metric.data.is_managed) {
-                if (storeState.isAdminMode) {
-                    return metric.data.resource_group === 'DOMAIN';
-                }
-                return metric.data.resource_group === 'WORKSPACE';
-            }
-            return true;
-        });
-
-        return Object.fromEntries(filteredMetrics.map((metric) => [metric.key, metric]));
-    }),
+    metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
     metricExamples: computed<MetricExampleModel[]>(() => gnbGetters.metricExamples),
     namespaces: computed<NamespaceReferenceMap>(() => allReferenceStore.getters.namespace),
     providers: computed(() => allReferenceStore.getters.provider),
@@ -284,7 +269,7 @@ watch(() => route.params, async () => {
         const targetNamespace = namespaceState.namespaces.find((item) => item.key === namespaceState.selectedMetric?.data.namespace_id);
         metricExplorerPageStore.setSelectedNamespace({
             label: targetNamespace?.name,
-            name: namespaceState.selectedMetric.data.namespace_id,
+            name: namespaceState.selectedMetric?.data.namespace_id,
             group: targetNamespace?.data.group,
             category: targetNamespace.data.category,
             icon: targetNamespace.data.group === 'common' ? 'COMMON' : targetNamespace.data.icon,
@@ -326,7 +311,8 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
                         <p-tooltip v-for="(item, idx) of state.starredMenuSet"
                                    :key="`asset-analysis-starred-${idx}`"
                                    position="bottom"
-                                   :contents="item.favoriteOptions?.type === FAVORITE_TYPE.METRIC_EXAMPLE ? `${storeState.metrics[item.to?.params?.metricId || '']?.name} > ${item.label}` : item.label"
+                                   :contents="item.favoriteOptions?.type === FAVORITE_TYPE.METRIC_EXAMPLE ? `${storeState.metrics[item.to?.params?.metricId
+                                       || '']?.name} > ${item.label}` : item.label"
                         >
                             <l-s-b-router-menu-item :item="item"
                                                     :idx="idx"

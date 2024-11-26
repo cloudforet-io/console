@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, reactive, watchEffect,
+    computed, reactive, watchEffect, ref, watch,
 } from 'vue';
 
 import { PTreeView, PI, PTextHighlighting } from '@cloudforet/mirinae';
@@ -29,6 +29,17 @@ const storeState = reactive({
     isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
 });
 
+const filteredMetricItems = ref<TreeNode[]>([]);
+
+watch(() => props.metricItems, (updatedMetricItems) => {
+    filteredMetricItems.value = updatedMetricItems.filter(((metricItem) => {
+        if (storeState.isAdminMode) {
+            return metricItem.data.data.resource_group === 'DOMAIN';
+        }
+        return metricItem.data.data.resource_group === 'WORKSPACE';
+    }));
+}, { immediate: true, deep: true });
+
 watchEffect(() => {
     if (storeState.isAdminMode) {
         props.metricItems.forEach((metricItem: TreeNode) => {
@@ -41,7 +52,7 @@ watchEffect(() => {
 </script>
 
 <template>
-    <p-tree-view :tree-data="props.metricItems"
+    <p-tree-view :tree-data="filteredMetricItems"
                  :selected-id="props.selectedId"
                  :tree-display-map="props.treeDisplayMap"
                  use-default-indent
