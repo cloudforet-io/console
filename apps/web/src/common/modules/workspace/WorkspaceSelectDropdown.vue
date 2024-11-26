@@ -101,6 +101,7 @@ watch(() => workspaceState.selectedItems, (selectedItems) => {
                        parent-id="workspace-role-form"
                        show-select-marker
                        show-select-header
+                       is-fixed-width
                        is-filterable
                        show-delete-all-button
                        class="workspace-select-dropdown"

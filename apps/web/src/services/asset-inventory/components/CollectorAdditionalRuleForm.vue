@@ -570,7 +570,6 @@ onMounted(() => {
                                        required
                         >
                             <workspace-select-dropdown class="action-workspace"
-                                                       is-fixed-width
                                                        :selected-workspace-ids="state.selectedWorkspaceId"
                                                        @update:selected-workspace-ids="handleSelectWorkspaceId"
                             />
