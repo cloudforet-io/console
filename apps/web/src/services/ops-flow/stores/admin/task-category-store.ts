@@ -4,9 +4,17 @@ import { reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
+
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { TaskCategoryCreateParameters } from '@/schema/opsflow/task-category/api-verbs/create';
+import type { TaskCategoryGetParameters } from '@/schema/opsflow/task-category/api-verbs/get';
+import type { TaskCategoryListParameters } from '@/schema/opsflow/task-category/api-verbs/list';
 import type { TaskCategoryUpdateParameters } from '@/schema/opsflow/task-category/api-verbs/update';
 import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 interface UseTaskCategoryStoreState {
@@ -16,7 +24,17 @@ interface UseTaskCategoryStoreState {
 interface UseTaskCategoryStoreGetters {
     taskCategories: Ref<Readonly<TaskCategoryModel[]>>
 }
-
+const DEFAULT_STATUS_OPTIONS: TaskCategoryCreateParameters['status_options'] = {
+    TODO: [
+        { name: 'To Do', color: 'blue200', is_default: true },
+    ],
+    IN_PROGRESS: [
+        { name: 'In Progress', color: 'yellow200', is_default: true },
+    ],
+    COMPLETED: [
+        { name: 'Done', color: 'green200', is_default: true },
+    ],
+};
 export const useTaskCategoryStore = defineStore('task-category', () => {
     const state = reactive<UseTaskCategoryStoreState>({
         loading: false,
@@ -32,229 +50,42 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
         }, [], { lazy: true }),
     });
 
+
+    const fetchList = getCancellableFetcher<TaskCategoryListParameters, ListResponse<TaskCategoryModel>>(SpaceConnector.client.opsFlow.taskCategory.list);
     const actions = {
         async list() {
-            return new Promise<void>((resolve) => {
-                state.loading = true;
-                setTimeout(() => {
-                    state.items = [
-                        {
-                            category_id: 'category_1',
-                            package_id: 'package_1',
-                            name: 'Billing and Payment',
-                            description: '빌링 및 결제와 관련된 문의사항',
-                            status_options: {
-                                TODO: [
-                                    {
-                                        status_id: 'todo_1',
-                                        name: '요청',
-                                        color: 'gray200',
-                                        is_default: true,
-                                    },
-                                ],
-                                IN_PROGRESS: [
-                                    {
-                                        status_id: 'in_progress_1',
-                                        name: '진행중',
-                                        color: 'blue200',
-                                        is_default: true,
-                                    },
-                                ],
-                                COMPLETED: [
-                                    {
-                                        status_id: 'complete_1',
-                                        name: '완료',
-                                        color: 'green200',
-                                        is_default: true,
-                                    },
-                                    {
-                                        status_id: 'complete_2',
-                                        name: '보류',
-                                        color: 'yellow200',
-                                        is_default: false,
-                                    },
-                                    {
-                                        status_id: 'complete_3',
-                                        name: '취소',
-                                        color: 'red100',
-                                        is_default: false,
-                                    },
-                                ],
-                            },
-                            fields: [],
-                            domain_id: '1',
-                            created_at: '2021-09-01T00:00:00',
-                            updated_at: '2021-09-01T00:00:00',
-                            tags: {},
-                        },
-                        {
-                            category_id: 'category_2',
-                            package_id: 'package_1',
-                            name: 'Service Limit In-Crease',
-                            description: '서비스 한도 증가와 관련된 문의사항',
-                            status_options: {
-                                TODO: [
-                                    {
-                                        status_id: 'todo_1',
-                                        name: '요청',
-                                        color: 'gray200',
-                                        is_default: true,
-                                    },
-                                ],
-                                IN_PROGRESS: [
-                                    {
-                                        status_id: 'in_progress_1',
-                                        name: '확인중',
-                                        color: 'yellow200',
-                                        is_default: true,
-                                    },
-                                    {
-                                        status_id: 'in_progress_2',
-                                        name: '진행중',
-                                        color: 'blue200',
-                                        is_default: false,
-                                    },
-                                ],
-                                COMPLETED: [
-                                    {
-                                        status_id: 'complete_1',
-                                        name: '완료',
-                                        color: 'green200',
-                                        is_default: true,
-                                    },
-                                ],
-                            },
-                            fields: [],
-                            domain_id: '1',
-                            created_at: '2021-09-01T00:00:00',
-                            updated_at: '2021-09-01T00:00:00',
-                            tags: {},
-                        }, {
-                            category_id: 'category_3',
-                            package_id: 'package_2',
-                            name: 'Technical Support',
-                            description: '기술 지원과 관련된 문의사항',
-                            status_options: {
-                                TODO: [
-                                    {
-                                        status_id: 'todo_1',
-                                        name: '요청',
-                                        color: 'gray200',
-                                        is_default: true,
-                                    },
-                                ],
-                                IN_PROGRESS: [
-                                    {
-                                        status_id: 'in_progress_1',
-                                        name: '진행중',
-                                        color: 'blue200',
-                                        is_default: false,
-                                    },
-                                ],
-                                COMPLETED: [
-                                    {
-                                        status_id: 'complete_1',
-                                        name: '완료',
-                                        color: 'green200',
-                                        is_default: true,
-                                    },
-                                ],
-                            },
-                            fields: [],
-                            domain_id: '1',
-                            created_at: '2021-09-01T00:00:00',
-                            updated_at: '2021-09-01T00:00:00',
-                            tags: {},
-                        },
-                    ];
-                    state.loading = false;
-                    resolve();
-                }, 1000);
-            });
+            state.loading = true;
+            try {
+                const result = await fetchList({});
+                if (result.status === 'succeed') {
+                    state.items = result.response.results;
+                }
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            } finally {
+                state.loading = false;
+            }
         },
-        async create(param: Omit<TaskCategoryCreateParameters, 'status_options'>) {
-            return new Promise<TaskCategoryModel>((resolve) => {
-                const result: TaskCategoryModel = {
-                    category_id: `category_${(getters.taskCategories.length) + 1}`,
-                    package_id: param.package_id,
-                    name: param.name,
-                    description: param.description ?? '',
-                    status_options: {
-                        TODO: [
-                            {
-                                status_id: 'todo_1',
-                                name: '요청',
-                                color: 'gray200',
-                                is_default: true,
-                            },
-                        ],
-                        IN_PROGRESS: [
-                            {
-                                status_id: 'in_progress_1',
-                                name: '진행중',
-                                color: 'blue200',
-                                is_default: true,
-                            },
-                        ],
-                        COMPLETED: [
-                            {
-                                status_id: 'complete_1',
-                                name: '완료',
-                                color: 'green200',
-                                is_default: true,
-                            },
-                        ],
-                    },
-                    fields: [],
-                    domain_id: '1',
-                    created_at: '2021-09-01T00:00:00',
-                    updated_at: '2021-09-01T00:00:00',
-                    tags: param.tags ?? {},
-                };
-                state.items?.push(result);
-                resolve(result);
+        async create(params: Omit<TaskCategoryCreateParameters, 'status_options'>) {
+            const response = await SpaceConnector.client.opsFlow.taskCategory.create<TaskCategoryCreateParameters, TaskCategoryModel>({
+                ...params,
+                status_options: DEFAULT_STATUS_OPTIONS,
             });
+            return response;
         },
-        async update(param: TaskCategoryUpdateParameters) {
-            return new Promise<TaskCategoryModel>((resolve, reject) => {
-                setTimeout(() => {
-                    const targetCategory = state.items?.find((category) => category.category_id === param.category_id);
-                    if (targetCategory) {
-                        if (param.name) targetCategory.name = param.name;
-                        if (param.description) targetCategory.description = param.description ?? '';
-                        if (param.tags) targetCategory.tags = param.tags ?? {};
-                        if (param.package_id) targetCategory.package_id = param.package_id;
-                        if (param.status_options) targetCategory.status_options = param.status_options;
-                        resolve(targetCategory);
-                    } else {
-                        reject(new Error('Category not found'));
-                    }
-                }, 1000);
-            });
+        async update(params: TaskCategoryUpdateParameters) {
+            const response = await SpaceConnector.client.opsFlow.taskCategory.update<TaskCategoryUpdateParameters, TaskCategoryModel>(params);
+            return response;
         },
         async get(categoryId: string) {
-            return new Promise<TaskCategoryModel>((resolve, reject) => {
-                setTimeout(() => {
-                    const targetCategory = state.items?.find((category) => category.category_id === categoryId);
-                    if (targetCategory) {
-                        resolve(targetCategory);
-                    } else {
-                        reject(new Error('Category not found'));
-                    }
-                }, 1000);
+            const response = await SpaceConnector.client.opsFlow.taskCategory.update<TaskCategoryGetParameters, TaskCategoryModel>({
+                category_id: categoryId,
             });
+            return response;
         },
         async delete(categoryId: string) {
-            return new Promise<void>((resolve, reject) => {
-                setTimeout(() => {
-                    const targetCategoryIndex = state.items?.findIndex((category) => category.category_id === categoryId);
-                    if (targetCategoryIndex !== undefined && targetCategoryIndex >= 0) {
-                        state.items?.splice(targetCategoryIndex, 1);
-                        resolve();
-                    } else {
-                        reject(new Error('Category not found'));
-                    }
-                }, 1000);
+            await SpaceConnector.client.opsFlow.taskCategory.delete({
+                category_id: categoryId,
             });
         },
     };
