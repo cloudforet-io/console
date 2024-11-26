@@ -153,7 +153,7 @@ const handleClickSaveAsButton = () => {
     state.queryFormModalVisible = true;
 };
 const handleUpdateQuery = async (updatedQueryId: string) => {
-    await costAnalysisPageStore.getCostQueryList();
+    await costAnalysisPageStore.listCostQueryList();
     await costAnalysisPageStore.selectQueryId(updatedQueryId);
     await SpaceRouter.router.push(getProperRouteLocation({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,

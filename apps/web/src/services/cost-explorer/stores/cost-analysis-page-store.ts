@@ -280,7 +280,7 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
         }
         return updatedQueryData;
     };
-    const getCostQueryList = async () => {
+    const listCostQueryList = async () => {
         await costQuerySetStore.listCostQuerySets();
     };
 
@@ -290,7 +290,7 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
         saveQuery,
         selectQueryId,
         editQuery,
-        getCostQueryList,
+        listCostQueryList,
     };
     const mutations = {
         setChartGroupBy,
