@@ -59,6 +59,7 @@ watch(() => props.items, (newItems) => {
                                             :name="item.name"
                                             :color="item.color"
                                             :type="props.type"
+                                            :is-default="item.is_default"
                 />
             </draggable>
         </div>

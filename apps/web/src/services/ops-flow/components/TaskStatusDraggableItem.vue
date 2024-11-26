@@ -1,7 +1,11 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+
 import { PI, PBadge } from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import type { TaskStatusType } from '@/schema/opsflow/task/type';
+
 
 import ActionMenuButton from '@/common/components/buttons/ActionMenuButton.vue';
 
@@ -13,8 +17,25 @@ const props = defineProps<{
     name: string;
     color: string;
     type: TaskStatusType;
+    isDefault?: boolean;
 }>();
 
+const menu = computed<MenuItem[]>(() => [
+    { name: 'edit', icon: 'ic_edit', label: 'Edit' },
+    { name: 'set-as-default', icon: 'ic_check-circle', label: 'Set as Default' },
+    { name: 'delete', icon: 'ic_delete', label: 'Delete' },
+]);
+const defaultStatusMenu = computed<MenuItem[]>(() => [
+    {
+        name: 'edit', icon: 'ic_edit', label: 'Edit',
+    },
+    {
+        name: 'set-as-default', icon: 'ic_check-circle', label: 'Set as Default', disabled: true, iconColor: 'inherit',
+    },
+    {
+        name: 'delete', icon: 'ic_delete', label: 'Delete', disabled: true, iconColor: 'inherit',
+    },
+]);
 const taskCategoryPageStore = useTaskCategoryPageStore();
 
 const handleEdit = () => {
@@ -40,8 +61,17 @@ const handleDelete = () => {
             >
                 {{ props.name }}
             </p-badge>
+            <p-badge v-if="props.isDefault"
+                     class="ml-1"
+                     badge-type="solid-outline"
+                     style-type="gray500"
+                     shape="round"
+            >
+                Default
+            </p-badge>
         </div>
-        <action-menu-button @edit="handleEdit"
+        <action-menu-button :menu="props.isDefault ? defaultStatusMenu : menu"
+                            @edit="handleEdit"
                             @delete="handleDelete"
         />
     </li>
