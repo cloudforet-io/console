@@ -12,7 +12,7 @@ export type TaskFieldEnum = {
 interface TextTaskFieldOptions {
     example: string;
 }
-interface ParagraphTaskFieldOptions {
+export interface ParagraphTaskFieldOptions {
     example: string;
 }
 export interface DropdownTaskFieldOptions {

@@ -1,8 +1,31 @@
 <script setup lang="ts">
+import type { DropdownTaskFieldOptions, ParagraphTaskFieldOptions } from '@/schema/opsflow/_types/task-field-type';
+
+import TextEditor from '@/common/components/editor/TextEditor.vue';
+
+const props = withDefaults(defineProps<{
+    options: ParagraphTaskFieldOptions;
+}>(), {
+    options: () => ({
+        example: '',
+    }),
+});
+const emit = defineEmits<{(event: 'update:options', value: DropdownTaskFieldOptions): void;
+}>();
+
 </script>
 
 <template>
     <div>
-        TBU
+        <text-editor :value="props.options.example"
+                     placeholder="Enter the default description to be displayed."
+                     @update:value="emit('update:options', { ...props.options, example: $event })"
+        />
     </div>
 </template>
+
+<style lang="postcss" scoped>
+.text-editor {
+    min-height: 224px;
+}
+</style>

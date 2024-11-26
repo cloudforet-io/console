@@ -5,6 +5,7 @@ import {
 
 import { Color } from '@tiptap/extension-color';
 import Link from '@tiptap/extension-link';
+import Placeholder from '@tiptap/extension-placeholder';
 import TextAlign from '@tiptap/extension-text-align';
 import TextStyle from '@tiptap/extension-text-style';
 import Underline from '@tiptap/extension-underline';
@@ -23,6 +24,7 @@ interface Props {
     imageUploader?: ImageUploader;
     attachments?: Attachment[];
     invalid?: boolean;
+    placeholder?: string;
 }
 const props = withDefaults(defineProps<Props>(), {
     value: '',
@@ -32,6 +34,7 @@ const props = withDefaults(defineProps<Props>(), {
     }),
     attachments: () => [],
     invalid: false,
+    placeholder: '',
 });
 const emit = defineEmits<{(e: 'update:value', value: string): void;
     (e: 'update:attachments', attachments: Attachment[]): void;
@@ -58,6 +61,9 @@ onMounted(() => {
                         class: 'inline-code',
                     },
                 },
+            }),
+            Placeholder.configure({
+                placeholder: props.placeholder,
             }),
             Underline,
             Link,
@@ -110,6 +116,15 @@ watch([() => props.value, () => props.attachments], ([value, attachments], prev)
             min-height: inherit;
             &:focus {
                 @apply outline-none;
+            }
+
+            /* Placeholder (at the top) */
+            p.is-editor-empty:first-child::before {
+                @apply text-gray-400;
+                content: attr(data-placeholder);
+                float: left;
+                height: 0;
+                pointer-events: none;
             }
         }
     }

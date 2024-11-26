@@ -36,7 +36,12 @@ const enums = computed<ControllableTaskFieldEnum[]>({
     },
     set(value: ControllableTaskFieldEnum[]) {
         localEnums.value = value;
-        emit('update:options', { enums: value });
+        emit('update:options', {
+            enums: value.map((d) => ({
+                key: d.key,
+                name: d.name,
+            })),
+        });
     },
 });
 
