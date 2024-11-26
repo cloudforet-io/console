@@ -1771,6 +1771,9 @@
 				"DESCRIPTION": "テキストは列幅に合わせて折り返されます。",
 				"TEXT_WRAP": "テキストの折り返し"
 			},
+			"TOOLTIP_NUMBER_FORMAT": {
+				"TOOLTIP_NUMBER_FORMAT": ""
+			},
 			"TOP_PROJECTS": {
 				"CREATE_PROJECT": "プロジェクト作成",
 				"NO_PROJECT": "プロジェクトなし",

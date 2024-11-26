@@ -40,6 +40,7 @@ import type { DateFormatValue } from '@/common/modules/widgets/_widget-fields/da
 import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { DisplaySeriesLabelValue } from '@/common/modules/widgets/_widget-fields/display-series-label/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
+import type { TooltipNumberFormatValue } from '@/common/modules/widgets/_widget-fields/tooltip-number-format/type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
@@ -74,7 +75,10 @@ const state = reactive({
             formatter: (params) => {
                 let _name = getReferenceLabel(props.allReferenceTypeInfo, state.categoryByField, params.name);
                 if (state.unit) _name = `${_name} (${state.unit})`;
-                const _value = numberFormatter(params.value) || '';
+                let _value = numberFormatter(params.value) || '';
+                if (state.tooltipNumberFormat?.toggleValue) {
+                    _value = getFormattedNumber(params.value, state.dataField, state.numberFormat, state.unit);
+                }
                 return `${params.marker} ${_name}: <b>${_value}</b>`;
             },
         },
@@ -116,6 +120,7 @@ const state = reactive({
         return DATE_FORMAT?.[_dateFormat]?.[state.granularity];
     }),
     numberFormat: computed<NumberFormatValue>(() => props.widgetOptions?.numberFormat as NumberFormatValue),
+    tooltipNumberFormat: computed<TooltipNumberFormatValue>(() => props.widgetOptions?.tooltipNumberFormat as TooltipNumberFormatValue),
     displaySeriesLabel: computed(() => (props.widgetOptions?.displaySeriesLabel as DisplaySeriesLabelValue)),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
