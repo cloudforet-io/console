@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    defineAsyncComponent, computed, onBeforeMount, toRef,
+    defineAsyncComponent, computed, onBeforeMount, toRef, watch,
 } from 'vue';
 
 import {
@@ -28,24 +28,32 @@ const props = defineProps<{
     fieldType: TaskFieldType;
     fieldId: string;
 }>();
+const emit = defineEmits<{(event: 'delete'): void;
+    (event: 'update:is-valid', value: boolean): void;
+}>();
 
 const taskFieldMetadataStore = useTaskFieldMetadataStore();
-const fieldMetadata = computed<TaskFieldTypeMetadata>(() => taskFieldMetadataStore.taskFieldTypeMetadataMap[props.fieldType]);
+const taskFieldMetadataStoreGetters = taskFieldMetadataStore.getters;
+const fieldMetadata = computed<TaskFieldTypeMetadata>(() => taskFieldMetadataStoreGetters.taskFieldTypeMetadataMap[props.fieldType]);
 const {
     isDefaultField,
     fieldId,
     fieldName,
     setFieldName,
     isFieldNameInvalid,
-    fieldNameInvalidText,
     resetFieldNameValidation,
     options,
     isRequired,
     isPrimary,
     isFolded,
+    isAllValid,
 } = useTaskFieldGenerator({
     fieldId: toRef(props, 'fieldId'),
 });
+
+watch(isAllValid, (isValid) => {
+    emit('update:is-valid', isValid);
+}, { immediate: true });
 
 onBeforeMount(() => {
     setFieldName(fieldMetadata.value.name);
@@ -65,11 +73,11 @@ onBeforeMount(() => {
                                      :is-folded="isFolded"
                                      :is-default-field="isDefaultField"
                                      @update:is-folded="isFolded = $event"
+                                     @delete="emit('delete')"
         />
         <div v-if="!isFolded">
             <div class="py-4 pl-8 pr-2 border-b border-gray-150">
                 <p-field-group label="Field Name"
-                               :invalid-text="fieldNameInvalidText"
                                :invalid="isFieldNameInvalid"
                                required
                 >
