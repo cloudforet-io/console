@@ -30,7 +30,7 @@ interface UseCostDataSourceFiltersReturn {
     metadataAdditionalInfoItems: ComputedRef<CostDataSourceFilterMenuItem[]>;
     costAdditionalInfoKeysItems: ComputedRef<CostDataSourceFilterMenuItem[]>;
     tagsFilterItems: ComputedRef<CostDataSourceFilterMenuItem[]>;
-    menuItems: ComputedRef<CostDataSourceFilterMenuItem[]>;
+    allItems: ComputedRef<CostDataSourceFilterMenuItem[]>;
 }
 export const useCostDataSourceFilterMenuItems = ({
     isAdminMode, costDataSource,
@@ -66,7 +66,7 @@ export const useCostDataSourceFilterMenuItems = ({
             return sortBy(costAdditionalInfoKeysItems, 'label');
         }),
         tagsFilterItems: [] as CostDataSourceFilterMenuItem[],
-        menuItems: computed<CostDataSourceFilterMenuItem[]>(() => ([
+        allItems: computed<CostDataSourceFilterMenuItem[]>(() => ([
             ...state.managedGroupByItems,
             ...state.additionalInfoGroupByItems,
             ...state.tagsFilterItems,
@@ -99,6 +99,6 @@ export const useCostDataSourceFilterMenuItems = ({
         metadataAdditionalInfoItems: computed(() => state.metadataAdditionalInfoItems),
         costAdditionalInfoKeysItems: computed(() => state.costAdditionalInfoKeysItems),
         tagsFilterItems: computed(() => state.tagsFilterItems),
-        menuItems: computed(() => state.menuItems),
+        allItems: computed(() => state.allItems),
     };
 };

@@ -193,7 +193,7 @@ const state = reactive({
     selectedCostDataSourceId: undefined as string|undefined,
     selectedCostDataSourceMenuItem: computed<MenuItem[]>(() => state.costDataSourceMenuItems.filter((d) => d.name === state.selectedCostDataSourceId)),
 });
-const { menuItems: costDataSourceFilterMenuItems } = useCostDataSourceFilterMenuItems({
+const { allItems: costDataSourceFilterMenuItems } = useCostDataSourceFilterMenuItems({
     isAdminMode: computed(() => storeState.isAdminMode),
     costDataSource: computed(() => storeState.costDataSources[state.selectedCostDataSourceId]),
 });
