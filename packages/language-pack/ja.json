@@ -3849,7 +3849,7 @@
 				"CLEAR": "削除",
 				"COLLECT_DATA": "データ収集",
 				"CONSOLE": "コンソールに接続",
-				"DEFAULT_FILTER_DESC": "{count}",
+				"DEFAULT_FILTER_DESC": "高度な検索フィルター {count} 件が適用されています。",
 				"DELETE": "削除",
 				"NO_SELECTED_SERVER": "サーバーを選択すると、詳細な情報が表示されます",
 				"TAB_DETAILS": "詳細情報",
