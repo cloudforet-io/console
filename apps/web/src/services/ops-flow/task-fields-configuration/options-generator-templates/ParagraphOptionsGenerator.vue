@@ -11,7 +11,9 @@ const props = withDefaults(defineProps<{
     }),
 });
 const emit = defineEmits<{(event: 'update:options', value: DropdownTaskFieldOptions): void;
+    (event: 'update:is-valid', value: boolean): void;
 }>();
+emit('update:is-valid', true);
 
 </script>
 

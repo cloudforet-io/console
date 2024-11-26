@@ -39,14 +39,14 @@ const optionsComponent = computed<ReturnType<typeof defineAsyncComponent>|undefi
 
 const isDefaultField = computed(() => !!DEFAULT_FIELD_ID_MAP[props.fieldId]);
 const {
-    value: name, setValue: setName, resetValidation: resetNameValidation, invalidState: isNameInvalid, validationResult: isNameValid,
+    value: name, setValue: setName, resetValidation: resetNameValidation, isInvalid: isNameInvalid, validationResult: isNameValid,
 } = useFieldValidator<string|undefined>('', (val?: string) => (val ? val.trim().length > 0 : false));
 const options = ref<TaskFieldOptions>({});
 const isOptionsValid = ref<boolean>(false);
 const isRequired = ref<boolean>(false);
 const isPrimary = ref<boolean>(false);
 const isFolded = ref<boolean>(false);
-const isAllValid = computed<boolean>(() => isNameValid.value && isOptionsValid.value);
+const isAllValid = computed<boolean>(() => isNameValid.value && (optionsComponent.value ? isOptionsValid.value : true));
 
 watch(isAllValid, (isValid) => {
     emit('update:is-valid', isValid);
