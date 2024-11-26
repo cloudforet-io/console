@@ -33,6 +33,9 @@ const filteredMetricItems = ref<TreeNode[]>([]);
 
 watch(() => props.metricItems, (updatedMetricItems) => {
     filteredMetricItems.value = updatedMetricItems.filter(((metricItem) => {
+        if (metricItem.data.is_managed) {
+            return true;
+        }
         if (storeState.isAdminMode) {
             return metricItem.data.data.resource_group === 'DOMAIN';
         }
