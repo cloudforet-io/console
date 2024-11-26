@@ -6,7 +6,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { DomainConfigModel } from '@/schema/config/domain-config/model';
 
 import { useDomainConfigStore } from '@/store/admin/domain-config-store';
-import type { DomainConfigType } from '@/store/domain/type';
+import { DOMAIN_CONFIG_TYPE } from '@/store/domain/constant';
+import type { DomainConfigKey } from '@/store/domain/type';
 
 vi.mock('@cloudforet/core-lib/space-connector', () => ({
     SpaceConnector: {
@@ -20,9 +21,9 @@ vi.mock('@cloudforet/core-lib/space-connector', () => ({
         },
     },
 }));
-const testKey = 'testKey' as DomainConfigType;
+const testKey: DomainConfigKey = 'EXTRA_MENU';
 const testData: DomainConfigModel = {
-    name: testKey,
+    name: DOMAIN_CONFIG_TYPE[testKey],
     data: { value: 'testValue' },
     tags: {},
     domain_id: 'testDomainId',
@@ -57,7 +58,7 @@ describe('useDomainConfigStore', () => {
         SpaceConnector.client.config.domainConfig.get.mockImplementation(async () => testData);
 
         const result = await store.get(testKey);
-        expect(SpaceConnector.client.config.domainConfig.get).toHaveBeenCalledWith({ name: testKey });
+        expect(SpaceConnector.client.config.domainConfig.get).toHaveBeenCalledWith({ name: testData.name });
         expect(result).toEqual(testData);
         expect(store.state.domainConfigMap[testKey]).toEqual(testData);
     });
@@ -71,7 +72,7 @@ describe('useDomainConfigStore', () => {
 
         const result = await store.set(testKey, { value: 'updatedValue' });
         expect(SpaceConnector.client.config.domainConfig.set).toHaveBeenCalledWith({
-            name: testKey,
+            name: testData.name,
             data: { value: 'updatedValue' },
         });
         const newData = { ...testData, data: { value: 'updatedValue' } };

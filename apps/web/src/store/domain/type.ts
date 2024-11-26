@@ -18,4 +18,4 @@ export interface ExtraSubMenu {
     label: string;
 }
 
-export type DomainConfigType = typeof DOMAIN_CONFIG_TYPE[keyof typeof DOMAIN_CONFIG_TYPE];
+export type DomainConfigKey = keyof typeof DOMAIN_CONFIG_TYPE;
