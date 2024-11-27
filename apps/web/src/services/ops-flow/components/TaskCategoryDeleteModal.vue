@@ -27,6 +27,9 @@ const handleConfirm = async () => {
 const handleCloseOrCancel = () => {
     taskManagementPageStore.closeDeleteCategoryModal();
 };
+const handleClosed = () => {
+    taskManagementPageStore.resetTargetCategoryId();
+};
 </script>
 
 <template>
@@ -37,5 +40,6 @@ const handleCloseOrCancel = () => {
                   @confirm="handleConfirm"
                   @close="handleCloseOrCancel"
                   @cancel="handleCloseOrCancel"
+                  @closed="handleClosed"
     />
 </template>

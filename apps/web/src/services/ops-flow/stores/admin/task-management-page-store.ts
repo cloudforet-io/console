@@ -89,6 +89,9 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
         },
         closeSetDefaultPackageModal() {
             state.visibleSetDefaultPackageModal = false;
+            // do not reset targetPackageId here and handle it after the modal is closed
+        },
+        resetTargetPackageId() {
             state.targetPackageId = undefined;
         },
         // category
@@ -110,6 +113,9 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
         },
         closeDeleteCategoryModal() {
             state.visibleDeleteCategoryModal = false;
+            // do not reset targetCategoryId here and handle it after the modal is closed
+        },
+        resetTargetCategoryId() {
             state.targetCategoryId = undefined;
         },
     };

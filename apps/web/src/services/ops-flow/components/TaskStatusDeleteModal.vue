@@ -16,6 +16,9 @@ const handleConfirm = async () => {
 const handleCloseOrCancel = () => {
     taskCategoryPageStore.closeDeleteStatusModal();
 };
+const handleClosed = () => {
+    taskCategoryPageStore.resetTargetStatus();
+};
 </script>
 
 <template>
@@ -26,5 +29,6 @@ const handleCloseOrCancel = () => {
                   @confirm="handleConfirm"
                   @close="handleCloseOrCancel"
                   @cancel="handleCloseOrCancel"
+                  @closed="handleClosed"
     />
 </template>

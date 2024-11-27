@@ -31,6 +31,9 @@ const handleConfirm = async () => {
 const handleCloseOrCancel = () => {
     taskManagementPageStore.closeSetDefaultPackageModal();
 };
+const handleClosed = () => {
+    taskManagementPageStore.resetTargetPackageId();
+};
 </script>
 
 <template>
@@ -40,6 +43,7 @@ const handleCloseOrCancel = () => {
                     @confirm="handleConfirm"
                     @close="handleCloseOrCancel"
                     @cancel="handleCloseOrCancel"
+                    @closed="handleClosed"
     >
         <template #header-title>
             Set <strong>{{ name }}</strong> as the default package.

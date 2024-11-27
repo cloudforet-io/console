@@ -15,8 +15,8 @@ interface UseTaskCategoryPageStoreState {
     // status
     visibleStatusForm: boolean;
     targetStatus: {
+        statusId: string;
         type: TaskStatusType;
-        index: number;
     }|undefined;
     visibleStatusDeleteModal: boolean;
     // task type
@@ -72,12 +72,14 @@ export const useTaskCategoryPageStore = defineStore('task-management-category-pa
             data: TaskStatusOption;
         }|undefined>(() => {
             if (!state.targetStatus) return undefined;
-            const { index, type } = state.targetStatus;
+            const { statusId, type } = state.targetStatus;
             const statusOptions = getters.statusOptions;
             if (!statusOptions) return undefined;
+            const data = statusOptions[type].find((status) => status.status_id === statusId);
+            if (!data) return undefined;
             return {
                 type,
-                data: statusOptions[type][index],
+                data,
             };
         }),
         // task type
@@ -101,9 +103,9 @@ export const useTaskCategoryPageStore = defineStore('task-management-category-pa
             state.targetStatus = undefined;
             state.visibleStatusForm = true;
         },
-        openEditStatusForm(index: number, statusType: TaskStatusType) {
+        openEditStatusForm(statusId: string, statusType: TaskStatusType) {
             state.targetStatus = {
-                index,
+                statusId,
                 type: statusType,
             };
             state.visibleStatusForm = true;
@@ -112,15 +114,18 @@ export const useTaskCategoryPageStore = defineStore('task-management-category-pa
             state.visibleStatusForm = false;
             state.targetStatus = undefined;
         },
-        openDeleteStatusModal(index: number, statusType: TaskStatusType) {
+        openDeleteStatusModal(statusId: string, statusType: TaskStatusType) {
             state.targetStatus = {
-                index,
+                statusId,
                 type: statusType,
             };
             state.visibleStatusDeleteModal = true;
         },
         closeDeleteStatusModal() {
             state.visibleStatusDeleteModal = false;
+            // do not reset targetStatus here and handle it after the modal is closed
+        },
+        resetTargetStatus() {
             state.targetStatus = undefined;
         },
         // task type
@@ -142,6 +147,9 @@ export const useTaskCategoryPageStore = defineStore('task-management-category-pa
         },
         closeDeleteTaskTypeModal() {
             state.visibleTaskTypeDeleteModal = false;
+            // do not reset targetTaskTypeId here and handle it after the modal is closed
+        },
+        resetTargetTaskTypeId() {
             state.targetTaskTypeId = undefined;
         },
     };

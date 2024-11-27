@@ -57,24 +57,31 @@ export const usePackageStore = defineStore('package', () => {
         },
         async create(param: PackageCreateParameters) {
             const response = await SpaceConnector.clientV2.identity.package.create<PackageCreateParameters, PackageModel>(param);
+            state.items?.push(response);
             return response;
         },
         async update(param: PackageUpdateParameters) {
             const response = await SpaceConnector.clientV2.identity.package.update<PackageUpdateParameters, PackageModel>(param);
+            state.items = state.items?.map((item) => (item.package_id === response.package_id ? response : item));
             return response;
         },
         async setDefaultPackage(packageId: string) {
             const prevDefaultPackage = getters.packages.find((p) => p.is_default);
             if (prevDefaultPackage?.package_id === packageId) return prevDefaultPackage;
-            const response = await SpaceConnector.clientV2.identity.package.setDefaultPackage<PackageSetDefaultParameters, PackageModel>({
+            const response = await SpaceConnector.clientV2.identity.package.setDefault<PackageSetDefaultParameters, PackageModel>({
                 package_id: packageId,
             });
+            const prev = state.items?.find((p) => p.is_default);
+            if (prev) prev.is_default = false;
+            const current = state.items?.find((p) => p.package_id === packageId);
+            if (current) current.is_default = true;
             return response;
         },
         async delete(packageId: string) {
             await SpaceConnector.clientV2.identity.package.delete<PackageDeleteParameters, undefined>({
                 package_id: packageId,
             });
+            state.items = state.items?.filter((item) => item.package_id !== packageId);
         },
     };
     return {

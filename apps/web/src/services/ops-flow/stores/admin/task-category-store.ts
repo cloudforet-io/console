@@ -51,7 +51,7 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
     });
 
 
-    const fetchList = getCancellableFetcher<TaskCategoryListParameters, ListResponse<TaskCategoryModel>>(SpaceConnector.client.opsFlow.taskCategory.list);
+    const fetchList = getCancellableFetcher<TaskCategoryListParameters, ListResponse<TaskCategoryModel>>(SpaceConnector.clientV2.opsflow.taskCategory.list);
     const actions = {
         async list() {
             state.loading = true;
@@ -67,26 +67,32 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
             }
         },
         async create(params: Omit<TaskCategoryCreateParameters, 'status_options'>) {
-            const response = await SpaceConnector.client.opsFlow.taskCategory.create<TaskCategoryCreateParameters, TaskCategoryModel>({
+            const response = await SpaceConnector.clientV2.opsflow.taskCategory.create<TaskCategoryCreateParameters, TaskCategoryModel>({
                 ...params,
                 status_options: DEFAULT_STATUS_OPTIONS,
             });
+            state.items?.push(response);
             return response;
         },
         async update(params: TaskCategoryUpdateParameters) {
-            const response = await SpaceConnector.client.opsFlow.taskCategory.update<TaskCategoryUpdateParameters, TaskCategoryModel>(params);
+            const response = await SpaceConnector.clientV2.opsflow.taskCategory.update<TaskCategoryUpdateParameters, TaskCategoryModel>(params);
+            const item = state.items?.find((c) => c.category_id === response.category_id);
+            if (item) {
+                Object.assign(item, response);
+            }
             return response;
         },
         async get(categoryId: string) {
-            const response = await SpaceConnector.client.opsFlow.taskCategory.update<TaskCategoryGetParameters, TaskCategoryModel>({
+            const response = await SpaceConnector.clientV2.opsflow.taskCategory.update<TaskCategoryGetParameters, TaskCategoryModel>({
                 category_id: categoryId,
             });
             return response;
         },
         async delete(categoryId: string) {
-            await SpaceConnector.client.opsFlow.taskCategory.delete({
+            await SpaceConnector.clientV2.opsflow.taskCategory.delete({
                 category_id: categoryId,
             });
+            state.items = state.items?.filter((item) => item.category_id !== categoryId);
         },
     };
     return {

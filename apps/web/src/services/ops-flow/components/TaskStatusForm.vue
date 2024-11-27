@@ -3,6 +3,7 @@ import {
     ref, computed, onBeforeMount, nextTick, watch,
 } from 'vue';
 
+import { cloneDeep } from 'lodash';
 
 import {
     POverlayLayout, PFieldGroup, PTextInput, PSelectDropdown, PButton, PI,
@@ -10,17 +11,19 @@ import {
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import { TASK_STATUS_COLOR_NAMES } from '@/schema/opsflow/task/constant';
+import type { TaskStatusColorName, TaskStatusOptionWithOptionalId, TaskStatusType } from '@/schema/opsflow/task/type';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
 
-
 const taskCategoryPageStore = useTaskCategoryPageStore();
 const taskCategoryPageState = taskCategoryPageStore.state;
 const taskCategoryPageGetters = taskCategoryPageStore.getters;
-
+const taskCategoryStore = taskCategoryPageStore.taskCategoryStore;
 
 /* status type */
 const statusIdAndNames = computed<[id: string, name: string][]>(() => Object.values(taskCategoryPageStore.getters.statusOptions).flat().map((p) => [p.status_id, p.name]));
@@ -41,7 +44,7 @@ const {
 } = useFormValidator({
     name: '',
     statusType: statusTypeItems.value[0] as SelectDropdownMenuItem,
-    color: '',
+    color: '' as TaskStatusColorName,
 }, {
     name(value: string) {
         if (!value.trim().length) return 'Name is required';
@@ -64,17 +67,41 @@ const handleConfirm = async () => {
     try {
         loading.value = true;
         if (taskCategoryPageGetters.targetStatusOption) {
-            // await taskCategoryStore.update({
-            //
-            // });
+            const newStatusOptions = cloneDeep(taskCategoryPageGetters.statusOptions);
+            const { type, data } = taskCategoryPageGetters.targetStatusOption;
+            if (statusType.value.name !== type) {
+                newStatusOptions[statusType.value as unknown as TaskStatusType].push({
+                    ...data,
+                    name: name.value,
+                    color: color.value,
+                });
+                newStatusOptions[type] = newStatusOptions[type].filter((p) => p.status_id !== data.status_id);
+            } else {
+                const target = newStatusOptions[type].find((p) => p.status_id === data.status_id);
+                if (!target) throw new Error('[Console Error] Failed to find target status option');
+                target.name = name.value;
+                target.color = color.value;
+            }
+
+            await taskCategoryStore.update({
+                category_id: taskCategoryPageState.currentCategoryId,
+                status_options: newStatusOptions,
+            });
         } else {
-            // await taskCategoryStore.create({
-            // });
+            const newStatusOptions: Record<TaskStatusType, TaskStatusOptionWithOptionalId[]> = cloneDeep(taskCategoryPageGetters.statusOptions);
+            newStatusOptions[statusType.value as unknown as TaskStatusType].push({
+                name: name.value,
+                color: color.value,
+            });
+            await taskCategoryStore.update({
+                category_id: taskCategoryPageState.currentCategoryId,
+                status_options: newStatusOptions,
+            });
         }
+        showSuccessMessage('Successfully saved the category', '');
         taskCategoryPageStore.closeStatusForm();
     } catch (e) {
         ErrorHandler.handleRequestError(e, 'Failed to save category');
-        // TODO: handle error
     } finally {
         loading.value = false;
     }

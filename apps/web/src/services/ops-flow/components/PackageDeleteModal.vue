@@ -35,6 +35,9 @@ const handleConfirm = async () => {
 const handleCloseOrCancel = () => {
     taskManagementPageStore.closeDeletePackageModal();
 };
+const handleClosed = () => {
+    taskManagementPageStore.resetTargetPackageId();
+};
 </script>
 
 <template>
@@ -47,6 +50,7 @@ const handleCloseOrCancel = () => {
                     @confirm="handleConfirm"
                     @close="handleCloseOrCancel"
                     @cancel="handleCloseOrCancel"
+                    @closed="handleClosed"
     >
         <template #body>
             <p v-if="!deletable"
