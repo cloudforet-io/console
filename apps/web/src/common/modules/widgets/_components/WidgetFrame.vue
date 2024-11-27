@@ -16,12 +16,12 @@ import { i18n } from '@/translations';
 
 import { WIDGET_WIDTH_STR_MAP } from '@/common/modules/widgets/_constants/widget-display-constant';
 import { WIDGET_HEIGHT } from '@/common/modules/widgets/_constants/widget-field-constant';
-import type { WidgetFrameEmit } from '@/common/modules/widgets/types/widget-display-type';
+import type { WidgetEmit } from '@/common/modules/widgets/types/widget-display-type';
 import type { WidgetFrameProps } from '@/common/modules/widgets/types/widget-frame-type';
 
 
 const props = defineProps<WidgetFrameProps>();
-const emit = defineEmits<WidgetFrameEmit>();
+const emit = defineEmits<WidgetEmit>();
 const router = useRouter();
 const state = reactive({
     isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
