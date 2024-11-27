@@ -353,8 +353,6 @@ export const BehaviorsAndStates: Story = {
         `,
         setup(props, { emit }) {
             const state = reactive({
-                // proxySortBy: useProxyValue('sortBy', props, emit),
-                // proxySortDesc: useProxyValue('sortDesc', props, emit),
                 proxySelectIndex: useProxyValue('selectIndex', props, emit),
                 fields: getBehaviorsAndStatesFields(),
                 items: getBehaviorsAndStatesData(6, 6),
