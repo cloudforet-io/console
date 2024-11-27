@@ -61,7 +61,6 @@ const storeState = reactive({
     pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
 });
 const state = reactive({
-    loading: true,
     currentPath: computed(() => route.fullPath),
     publicV2DashboardMenuSet: computed(() => getDashboardMenuSet(dashboardPageControlGetters.publicDashboardItems)),
     privateV2DashboardMenuSet: computed(() => getDashboardMenuSet(dashboardPageControlGetters.privateDashboardItems)),
