@@ -6,7 +6,7 @@ import {
 import dayjs from 'dayjs';
 
 import {
-    PFieldGroup, PToggleButton, PSelectDropdown, PI, PDatetimePicker, PTooltip,
+    PFieldGroup, PToggleButton, PSelectDropdown, PI, PDatetimePicker, PTooltip, PTextInput,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
@@ -15,29 +15,36 @@ import { i18n } from '@/translations';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import {
+    DATE_RANGE_ADVANCED_OPERATOR_MAP,
     DATE_RANGE_DAILY_VALUE_MAP,
     DATE_RANGE_DAILY_VALUES, DATE_RANGE_MONTHLY_VALUE_MAP,
     DATE_RANGE_MONTHLY_VALUES, DATE_RANGE_YEARLY_VALUE_MAP, DATE_RANGE_YEARLY_VALUES,
 } from '@/common/modules/widgets/_widget-fields/date-range/constant';
-import type { DateRangeOptions, DateRangeValue, DateRangeValueType } from '@/common/modules/widgets/_widget-fields/date-range/type';
+import type {
+    DateRangeAdvancedOperator,
+    DateRangeOptions,
+    DateRangeValue,
+    DateRangeValueType,
+} from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type {
     WidgetFieldComponentProps,
     WidgetFieldComponentEmit,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 const GRANULARITY_UNIT_MAP = {
-    MONTHLY: 'Month',
-    DAILY: 'Day',
-    YEARLY: 'Year',
+    MONTHLY: { singular: 'Month', plural: 'Months' },
+    DAILY: { singular: 'Day', plural: 'Days' },
+    YEARLY: { singular: 'Year', plural: 'Years' },
 };
 
-const MONTHLY_ENABLED_VALUES = ['auto', ...DATE_RANGE_MONTHLY_VALUES, 'custom'];
-const DAILY_ENABLED_VALUES = ['auto', ...DATE_RANGE_DAILY_VALUES, 'custom'];
-const YEARLY_ENABLED_VALUES = ['auto', ...DATE_RANGE_YEARLY_VALUES, 'custom'];
+const MONTHLY_ENABLED_VALUES = ['auto', ...DATE_RANGE_MONTHLY_VALUES, 'custom', 'advanced'];
+const DAILY_ENABLED_VALUES = ['auto', ...DATE_RANGE_DAILY_VALUES, 'custom', 'advanced'];
+const YEARLY_ENABLED_VALUES = ['auto', ...DATE_RANGE_YEARLY_VALUES, 'custom', 'advanced'];
 
 const getCommonDateRangeValueLabel = (value: string): string => {
     if (value === 'auto') return 'Auto';
     if (value === 'custom') return 'Custom';
+    if (value === 'advanced') return 'Advanced';
     return 'Auto';
 };
 
@@ -67,6 +74,10 @@ const state = reactive({
         const currentYear = dayjs().year();
         return Array.from({ length: 10 }, (_, i) => ({ name: currentYear - i, label: (currentYear - i).toString() }));
     }),
+    advancedOperatorMenuItems: computed<MenuItem[]>(() => [
+        { name: DATE_RANGE_ADVANCED_OPERATOR_MAP.ADD, label: 'Plus', icon: 'ic_plus-circle' },
+        { name: DATE_RANGE_ADVANCED_OPERATOR_MAP.SUBSTRACT, label: 'Minus', icon: 'ic_minus_circle' },
+    ]),
     isValid: computed<boolean>(() => {
         const _value = state.proxyValue?.options?.value;
         if (!_value) return false;
@@ -105,6 +116,24 @@ const checkInvalidCustomValue = () => {
             if (state.granularity === 'DAILY' && _endDate.diff(_startDate, 'day') >= 31) return { invalid: true, text: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.DATE_RANGE_INVALID_LIMIT_TEXT') };
             if (_startDate.isAfter(_endDate)) return { invalid: true, text: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.DATE_RANGE_INVALID_RANGE_TEXT') };
         }
+    } else if (_value === 'advanced') {
+        if (
+            (state.proxyValue.options.start === undefined || state.proxyValue.options.end === undefined)
+            || (Number.isNaN(state.proxyValue.options.start) || Number.isNaN(state.proxyValue.options.end))
+        ) return { invalid: true, text: '' };
+        const _startOperator = state.proxyValue?.options?.start_operator;
+        const _endOperator = state.proxyValue?.options?.end_operator;
+        const _start = state.proxyValue?.options?.start as number|undefined;
+        const _end = state.proxyValue?.options?.end as number|undefined;
+        const _startValue: number = _startOperator === DATE_RANGE_ADVANCED_OPERATOR_MAP.ADD ? _start || 0 : (_start || 0) * -1;
+        const _endValue: number = _endOperator === DATE_RANGE_ADVANCED_OPERATOR_MAP.ADD ? _end || 0 : (_end || 0) * -1;
+
+        const gap = _endValue - _startValue;
+
+        if (gap < 0) return { invalid: true, text: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.DATE_RANGE_INVALID_RANGE_TEXT') };
+        if (state.granularity === 'YEARLY' && gap >= 3) return { invalid: true, text: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.DATE_RANGE_INVALID_LIMIT_TEXT') };
+        if (state.granularity === 'MONTHLY' && gap >= 12) return { invalid: true, text: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.DATE_RANGE_INVALID_LIMIT_TEXT') };
+        if (state.granularity === 'DAILY' && gap >= 31) return { invalid: true, text: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.DATE_RANGE_INVALID_LIMIT_TEXT') };
     }
     return { invalid: false, text: '' };
 };
@@ -131,6 +160,17 @@ const handleSelectDateRangeValue = (selected: DateRangeValueType) => {
                 value: selected,
                 start: _start,
                 end: _end,
+            },
+        };
+    } else if (selected === 'advanced') {
+        state.proxyValue = {
+            inherit: state.proxyValue?.inherit,
+            options: {
+                value: selected,
+                start: 0,
+                end: 0,
+                start_operator: DATE_RANGE_ADVANCED_OPERATOR_MAP.ADD,
+                end_operator: DATE_RANGE_ADVANCED_OPERATOR_MAP.ADD,
             },
         };
     } else {
@@ -209,6 +249,26 @@ const handleUpdateDisinheritDailyCustomSelectedDates = (selectedDates: string[])
     };
 };
 
+const handleSelectAdvancedOperator = (type: 'start_operator'|'end_operator', selected: DateRangeAdvancedOperator) => {
+    state.proxyValue = {
+        inherit: state.proxyValue?.inherit,
+        options: {
+            ...state.proxyValue?.options,
+            [type]: selected,
+        },
+    };
+};
+
+const handleUpdateAdvancedValue = (type: 'start'|'end', value: number) => {
+    state.proxyValue = {
+        inherit: state.proxyValue?.inherit,
+        options: {
+            ...state.proxyValue?.options,
+            [type]: parseInt(value),
+        },
+    };
+};
+
 /* Watcher */
 watch(() => state.granularity, () => {
     state.proxyValue = {
@@ -237,8 +297,10 @@ onMounted(() => {
             inherit: props.value?.inherit,
             options: {
                 value: checkInvalidValueAndSetValidValue(props.value?.options?.value, state.granularity),
-                start: props.value?.options?.value === 'custom' ? props.value?.options?.start : undefined,
-                end: props.value?.options?.value === 'custom' ? props.value?.options?.end : undefined,
+                start: props.value?.options?.value === 'custom' || props.value?.options?.value === 'advanced' ? props.value?.options?.start : undefined,
+                end: props.value?.options?.value === 'custom' || props.value?.options?.value === 'advanced' ? props.value?.options?.end : undefined,
+                start_operator: props.value?.options?.value === 'advanced' ? props.value?.options?.start_operator : undefined,
+                end_operator: props.value?.options?.value === 'advanced' ? props.value?.options?.end_operator : undefined,
             },
         };
     } else {
@@ -291,7 +353,7 @@ onMounted(() => {
                     </div>
                     <div class="value-detail">
                         <div v-if="state.proxyValue?.options?.value === 'custom'"
-                             class="custom-range-selector"
+                             class="custom-advanced-range-selector"
                         >
                             <div class="select-wrapper">
                                 <!--Inherit CASE-->
@@ -303,7 +365,7 @@ onMounted(() => {
                                             <span class="field-label">
                                                 {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.START') }}
                                                 <span class="granularity-unit">
-                                                    ({{ GRANULARITY_UNIT_MAP[state.granularity] }})
+                                                    ({{ GRANULARITY_UNIT_MAP[state.granularity]?.singular }})
                                                 </span>
                                             </span>
                                         </template>
@@ -321,7 +383,7 @@ onMounted(() => {
                                             <span class="field-label">
                                                 {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.END') }}
                                                 <span class="granularity-unit">
-                                                    ({{ GRANULARITY_UNIT_MAP[state.granularity] }})
+                                                    ({{ GRANULARITY_UNIT_MAP[state.granularity]?.sigular }})
                                                 </span>
                                             </span>
                                         </template>
@@ -345,7 +407,7 @@ onMounted(() => {
                                                 <span class="field-label">
                                                     {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.START') }}
                                                     <span class="granularity-unit">
-                                                        ({{ GRANULARITY_UNIT_MAP[state.granularity] }})
+                                                        ({{ GRANULARITY_UNIT_MAP[state.granularity]?.singular }})
                                                     </span>
                                                 </span>
                                             </template>
@@ -363,7 +425,7 @@ onMounted(() => {
                                                 <span class="field-label">
                                                     {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.END') }}
                                                     <span class="granularity-unit">
-                                                        ({{ GRANULARITY_UNIT_MAP[state.granularity] }})
+                                                        ({{ GRANULARITY_UNIT_MAP[state.granularity]?.singular }})
                                                     </span>
                                                 </span>
                                             </template>
@@ -432,6 +494,105 @@ onMounted(() => {
                                 {{ checkInvalidCustomValue().text }}
                             </p>
                         </div>
+                        <div v-else-if="state.proxyValue?.options?.value === 'advanced'"
+                             class="custom-advanced-range-selector"
+                        >
+                            <div class="select-wrapper">
+                                <p-field-group class="selector-field-group"
+                                               required
+                                >
+                                    <template #label>
+                                        <span class="field-label">
+                                            {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.START') }}
+                                        </span>
+                                    </template>
+                                    <div class="advanced-field-content">
+                                        <div class="range-preview">
+                                            {{ dateRange.start }}
+                                        </div>
+                                        <div class="advanced-content-wrapper">
+                                            <div class="operator">
+                                                <span>Today</span>
+                                                <p-select-dropdown class="advanced-selector"
+                                                                   :menu="state.advancedOperatorMenuItems"
+                                                                   :selected="state.proxyValue?.options?.start_operator"
+                                                                   :invalid="checkInvalidCustomValue().invalid"
+                                                                   @update:selected="handleSelectAdvancedOperator('start_operator', $event)"
+                                                >
+                                                    <template #dropdown-button="item">
+                                                        <div class="selected">
+                                                            <p-i :name="item?.icon"
+                                                                 width="1rem"
+                                                                 height="1rem"
+                                                            />
+                                                            <span>{{ item?.label }}</span>
+                                                        </div>
+                                                    </template>
+                                                </p-select-dropdown>
+                                            </div>
+                                            <div class="value">
+                                                <p-text-input class="advanced-input"
+                                                              type="number"
+                                                              :value="state.proxyValue?.options?.start"
+                                                              :invalid="checkInvalidCustomValue().invalid"
+                                                              @update:value="handleUpdateAdvancedValue('start', $event)"
+                                                />
+                                                <span>{{ GRANULARITY_UNIT_MAP[state.granularity]?.plural }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </p-field-group>
+                                <p-field-group class="selector-field-group"
+                                               required
+                                >
+                                    <template #label>
+                                        <span class="field-label">
+                                            {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.END') }}
+                                        </span>
+                                    </template>
+                                    <div class="advanced-field-content">
+                                        <div class="range-preview">
+                                            {{ dateRange.end }}
+                                        </div>
+                                        <div class="advanced-content-wrapper">
+                                            <div class="operator">
+                                                <span>Today</span>
+                                                <p-select-dropdown class="advanced-selector"
+                                                                   :menu="state.advancedOperatorMenuItems"
+                                                                   :selected="state.proxyValue?.options?.end_operator"
+                                                                   :invalid="checkInvalidCustomValue().invalid"
+                                                                   @update:selected="handleSelectAdvancedOperator('end_operator', $event)"
+                                                >
+                                                    <template #dropdown-button="item">
+                                                        <div class="selected">
+                                                            <p-i :name="item?.icon"
+                                                                 width="1rem"
+                                                                 height="1rem"
+                                                            />
+                                                            <span>{{ item?.label }}</span>
+                                                        </div>
+                                                    </template>
+                                                </p-select-dropdown>
+                                            </div>
+                                            <div class="value">
+                                                <p-text-input class="advanced-input"
+                                                              type="number"
+                                                              :value="state.proxyValue?.options?.end"
+                                                              :invalid="checkInvalidCustomValue().invalid"
+                                                              @update:value="handleUpdateAdvancedValue('end', $event)"
+                                                />
+                                                <span>{{ GRANULARITY_UNIT_MAP[state.granularity]?.plural }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </p-field-group>
+                            </div>
+                            <p v-if="checkInvalidCustomValue().invalid"
+                               class="invalid-text"
+                            >
+                                {{ checkInvalidCustomValue().text }}
+                            </p>
+                        </div>
                         <div v-else
                              class="date-preview"
                         >
@@ -472,7 +633,7 @@ onMounted(() => {
                     height: 2rem;
                     padding: 0.375rem 0.75rem;
                 }
-                .custom-range-selector {
+                .custom-advanced-range-selector {
                     .select-wrapper {
                         @apply flex gap-2;
                         .selector-field-group {
@@ -481,6 +642,34 @@ onMounted(() => {
                                 @apply text-label-sm text-gray-900 font-bold;
                                 .granularity-unit {
                                     @apply text-gray-500 font-normal;
+                                }
+                            }
+                            .advanced-field-content {
+                                @apply rounded-l;
+                                .range-preview {
+                                    @apply bg-gray-100 text-label-md text-gray-900 rounded-t-lg;
+                                    padding: 0.375rem 0.75rem;
+                                }
+                                .advanced-content-wrapper {
+                                    @apply border border-gray-150 rounded-b-lg;
+                                    padding: 0.75rem 0.5rem;
+                                    .operator {
+                                        @apply flex items-center gap-1 flex-wrap;
+                                        margin-bottom: 0.25rem;
+                                    }
+                                    .value {
+                                        @apply flex items-center gap-1 flex-wrap;
+                                    }
+                                    .advanced-selector {
+                                        @apply flex-1;
+                                        .selected {
+                                            @apply flex items-center gap-1 text-label-md text-gray-800;
+                                        }
+                                    }
+                                    .advanced-input {
+                                        @apply flex-1;
+                                        min-width: 6.5rem;
+                                    }
                                 }
                             }
                         }
