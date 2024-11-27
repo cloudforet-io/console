@@ -171,5 +171,6 @@ export const useTaskCategoryPageStore = defineStore('task-management-category-pa
         getters,
         ...actions,
         taskCategoryStore,
+        taskTypeStore,
     };
 });

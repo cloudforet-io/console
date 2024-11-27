@@ -20,6 +20,7 @@ export const useTaskFieldsConfiguration = () => {
 
     return {
         taskFieldsValidator,
+        fields,
         setFields,
         addField(field: TaskFieldTypeMetadata) {
             const fieldId = getRandomId();
@@ -30,9 +31,8 @@ export const useTaskFieldsConfiguration = () => {
                 name: field.name,
                 is_required: false,
                 is_primary: false,
-                is_folded: false,
                 options: {},
-            }]);
+            } as TaskField]);
         },
         removeField(fieldId: string) {
             validationMap.delete(fieldId);

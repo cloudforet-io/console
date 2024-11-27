@@ -9,6 +9,7 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { TaskCategoryCreateParameters } from '@/schema/opsflow/task-category/api-verbs/create';
+import type { TaskCategoryDeleteParameters } from '@/schema/opsflow/task-category/api-verbs/delete';
 import type { TaskCategoryGetParameters } from '@/schema/opsflow/task-category/api-verbs/get';
 import type { TaskCategoryListParameters } from '@/schema/opsflow/task-category/api-verbs/list';
 import type { TaskCategoryUpdateParameters } from '@/schema/opsflow/task-category/api-verbs/update';
@@ -53,10 +54,10 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
 
     const fetchList = getCancellableFetcher<TaskCategoryListParameters, ListResponse<TaskCategoryModel>>(SpaceConnector.clientV2.opsflow.taskCategory.list);
     const actions = {
-        async list() {
+        async list(params: TaskCategoryListParameters = {}) {
             state.loading = true;
             try {
-                const result = await fetchList({});
+                const result = await fetchList(params);
                 if (result.status === 'succeed') {
                     state.items = result.response.results;
                 }
@@ -89,7 +90,7 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
             return response;
         },
         async delete(categoryId: string) {
-            await SpaceConnector.clientV2.opsflow.taskCategory.delete({
+            await SpaceConnector.clientV2.opsflow.taskCategory.delete<TaskCategoryDeleteParameters, TaskCategoryModel>({
                 category_id: categoryId,
             });
             state.items = state.items?.filter((item) => item.category_id !== categoryId);

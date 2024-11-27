@@ -4,11 +4,22 @@ import { reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
+
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { TaskTypeCreateParameters } from '@/schema/opsflow/task-type/api-verbs/create';
+import type { TaskTypeDeleteParameters } from '@/schema/opsflow/task-type/api-verbs/delete';
+import type { TaskTypeGetParameters } from '@/schema/opsflow/task-type/api-verbs/get';
+import type { TaskTypeListParameters } from '@/schema/opsflow/task-type/api-verbs/list';
+import type { TaskTypeUpdateParameters } from '@/schema/opsflow/task-type/api-verbs/update';
+import type { TaskTypeUpdateFieldsParameters } from '@/schema/opsflow/task-type/api-verbs/update-fields';
 import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
 
-import getRandomId from '@/lib/random-id-generator';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface UseTaskTypeStoreState {
+    loading: boolean;
     items?: TaskTypeModel[];
 }
 
@@ -18,6 +29,7 @@ interface UseTaskTypeStoreGetters {
 
 export const useTaskTypeStore = defineStore('task-type', () => {
     const state = reactive<UseTaskTypeStoreState>({
+        loading: false,
         items: undefined,
     }) as UseTaskTypeStoreState;
 
@@ -30,114 +42,52 @@ export const useTaskTypeStore = defineStore('task-type', () => {
         }, [], { lazy: true }),
     }) as UnwrapRef<UseTaskTypeStoreGetters>;
 
+    const fetchList = getCancellableFetcher<TaskTypeListParameters, ListResponse<TaskTypeModel>>(SpaceConnector.clientV2.opsflow.taskType.list);
     const actions = {
-        async list() {
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    state.items = [
-                        {
-                            task_type_id: 'task_type_1',
-                            name: 'Account',
-                            description: '계정과 관련된 문의사항',
-                            assignee_pool: ['wanjin@mz.co.kr'],
-                            fields: [
-                                {
-                                    field_id: getRandomId(),
-                                    name: '제목',
-                                    field_type: 'TEXT',
-                                    is_required: true,
-                                    is_primary: true,
-                                },
-                                {
-                                    field_id: getRandomId(),
-                                    name: '설명',
-                                    field_type: 'PARAGRAPH',
-                                    is_required: false,
-                                    is_primary: true,
-                                },
-                            ],
-                            category_id: 'category_1',
-                            tags: {},
-                            domain_id: '1',
-                            created_at: '2021-09-01T00:00:00',
-                            updated_at: '2021-09-01T00:00:00',
-                        },
-                        {
-                            task_type_id: 'task_type_2',
-                            name: 'Invoice',
-                            description: '청구서와 관련된 문의사항',
-                            assignee_pool: ['bokjang@mz.co.kr'],
-                            fields: [
-                                {
-                                    field_id: getRandomId(),
-                                    name: '제목',
-                                    field_type: 'TEXT',
-                                    is_required: true,
-                                    is_primary: true,
-                                },
-                                {
-                                    field_id: getRandomId(),
-                                    name: '설명',
-                                    field_type: 'PARAGRAPH',
-                                    is_required: true,
-                                    is_primary: true,
-                                },
-                                {
-                                    field_id: getRandomId(),
-                                    name: '서비스',
-                                    field_type: 'DROPDOWN',
-                                    options: ['서비스1', '서비스2', '서비스3'],
-                                    is_required: false,
-                                },
-                                {
-                                    field_id: getRandomId(),
-                                    name: '연결된 자산',
-                                    field_type: 'ASSET',
-                                    is_required: false,
-                                },
-                                {
-                                    field_id: getRandomId(),
-                                    name: '담당자',
-                                    field_type: 'USER',
-                                    is_required: false,
-                                },
-                            ],
-                            category_id: 'category_1',
-                            tags: {},
-                            domain_id: '1',
-                            created_at: '2021-09-01T00:00:00',
-                            updated_at: '2021-09-01T00:00:00',
-                        },
-                        {
-                            task_type_id: 'task_type_3',
-                            name: 'Billing',
-                            description: '빌링과 관련된 문의사항',
-                            fields: [
-                                {
-                                    field_id: getRandomId(),
-                                    name: '제목',
-                                    field_type: 'TEXT',
-                                    is_required: true,
-                                    is_primary: true,
-                                },
-                                {
-                                    field_id: getRandomId(),
-                                    name: '설명',
-                                    field_type: 'PARAGRAPH',
-                                    is_required: false,
-                                    is_primary: false,
-                                },
-                            ],
-                            category_id: 'category_2',
-                            tags: {},
-                            domain_id: '1',
-                            created_at: '2021-09-01T00:00:00',
-                            updated_at: '2021-09-01T00:00:00',
-                        },
-                    ];
-                    resolve(state.items);
-                }, 1000);
+        async list(params: TaskTypeListParameters = {}) {
+            state.loading = true;
+            try {
+                const result = await fetchList(params);
+                if (result.status === 'succeed') {
+                    state.items = result.response.results;
+                }
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            } finally {
+                state.loading = false;
+            }
+        },
+        async create(params: TaskTypeCreateParameters) {
+            const response = await SpaceConnector.clientV2.opsflow.taskType.create<TaskTypeCreateParameters, TaskTypeModel>(params);
+            state.items?.push(response);
+        },
+        async update(params: TaskTypeUpdateParameters) {
+            const response = await SpaceConnector.clientV2.opsflow.taskType.update<TaskTypeUpdateParameters, TaskTypeModel>(params);
+            const item = state.items?.find((c) => c.category_id === response.category_id);
+            if (item) {
+                Object.assign(item, response);
+            }
+            return response;
+        },
+        async updateFields(params: TaskTypeUpdateFieldsParameters) {
+            const response = await SpaceConnector.clientV2.opsflow.taskType.updateFields<TaskTypeUpdateFieldsParameters, TaskTypeModel>(params);
+            const item = state.items?.find((c) => c.category_id === response.category_id);
+            if (item) {
+                Object.assign(item, response);
+            }
+            return response;
+        },
+        async get(taskTypeId: string) {
+            const response = await SpaceConnector.clientV2.opsflow.taskType.get<TaskTypeGetParameters, TaskTypeModel>({
+                task_type_id: taskTypeId,
             });
+            return response;
+        },
+        async delete(taskTypeId: string) {
+            await SpaceConnector.clientV2.opsflow.taskType.delete<TaskTypeDeleteParameters, TaskTypeModel>({
+                task_type_id: taskTypeId,
+            });
+            state.items = state.items?.filter((item) => item.task_type_id !== taskTypeId);
         },
     };
     return {

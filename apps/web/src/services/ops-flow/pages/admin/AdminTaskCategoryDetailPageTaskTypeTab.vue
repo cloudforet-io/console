@@ -9,8 +9,10 @@ import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tabl
 import ActionMenuButton from '@/common/components/buttons/ActionMenuButton.vue';
 
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
+import { useTaskTypeStore } from '@/services/ops-flow/stores/admin/task-type-store';
 
 const taskCategoryPageStore = useTaskCategoryPageStore();
+const taskTypeStore = useTaskTypeStore();
 
 const taskTypeFields = computed<DataTableField[]>(() => [
     {
@@ -39,7 +41,9 @@ const taskTypeFields = computed<DataTableField[]>(() => [
                 </p-heading>
             </template>
             <template #extra>
-                <p-icon-button name="ic_refresh" />
+                <p-icon-button name="ic_refresh"
+                               @click="taskTypeStore.list()"
+                />
                 <p-button style-type="substitutive"
                           icon-left="ic_plus_bold"
                           @click="taskCategoryPageStore.openAddTaskTypeForm()"

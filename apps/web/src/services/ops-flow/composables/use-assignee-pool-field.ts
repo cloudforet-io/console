@@ -22,6 +22,7 @@ export const useAssigneePoolField = ({
         isUserGroup: false, // TODO: Implement isUserGroup
     })));
     const selectedUserItems = ref<SelectDropdownMenuItem[]>([]);
+    const assigneePool = computed<string[]>(() => selectedUserItems.value.map((item) => item.name));
     const userMenuItemsHandler: AutocompleteHandler = async (keyword: string, pageStart = 1, pageLimit = 10) => {
         const filteredItems = allUserItems.value.filter((item) => getTextHighlightRegex(keyword).test(item.label));
         const _totalCount = pageStart - 1 + Number(pageLimit);
@@ -45,6 +46,7 @@ export const useAssigneePoolField = ({
 
     return {
         selectedUserItems,
+        assigneePool,
         userMenuItemsHandler,
         handleUpdateSelectedUserItems,
         setInitialUsers,
