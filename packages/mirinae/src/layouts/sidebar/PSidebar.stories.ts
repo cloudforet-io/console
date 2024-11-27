@@ -245,6 +245,27 @@ export const MediumSize: Story = {
     }),
 };
 
+export const Backdrop: Story = {
+    render: () => ({
+        components: { PSidebar },
+        template: `
+            <div style="height: 500px;">
+                <p-sidebar :visible="true"
+                            title="Backdrop"
+                            :hide-close-button="true"
+                            :backdrop="true"
+                            class="mt-4"
+                >
+                    <div class="p-4 min-h-full flex justify-center items-center">
+                        Non-sidebar area
+                    </div>
+                </p-sidebar>
+            </div>
+            <!--<div>-->
+        `,
+    }),
+};
+
 export const SmallSize: Story = {
     render: () => ({
         components: { PSidebar },
