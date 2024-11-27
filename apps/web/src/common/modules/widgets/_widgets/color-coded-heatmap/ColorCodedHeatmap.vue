@@ -52,7 +52,6 @@ const state = reactive({
     loading: false,
     errorMessage: undefined as string|undefined,
     data: null as Data | null,
-    unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
     boxWidth: computed<number>(() => {
         if (!props.width) return BOX_MIN_WIDTH;
         const widgetContentWidth = props.width;

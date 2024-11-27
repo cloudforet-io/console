@@ -42,14 +42,8 @@ export interface WidgetEmit {
     (event: 'click-delete'): void;
     (event: 'click-edit'): void;
     (event: 'toggle-size', size: WidgetSize): void;
-}
-
-export interface WidgetFrameEmit {
-    (event: 'click-expand'): void;
-    (event: 'click-delete'): void;
-    (event: 'click-edit'): void;
+    // for only widget frame
     (event: 'click-clone'): void;
-    (event: 'toggle-size', size: WidgetSize): void;
 }
 
 export type WidgetOverlayType = 'ADD'|'EDIT'|'EXPAND';
