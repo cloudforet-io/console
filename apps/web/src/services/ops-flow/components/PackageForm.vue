@@ -82,6 +82,9 @@ const loading = ref(false);
 const handleCancelOrClose = () => {
     taskManagementPageStore.closePackageForm();
 };
+const handleClosed = () => {
+    taskManagementPageStore.resetTargetPackageId();
+};
 
 const handleConfirm = async () => {
     if (!isAllValid.value) return;
@@ -171,6 +174,7 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
     <p-overlay-layout title="Add Package"
                       :visible="taskManagementPageState.visiblePackageForm"
                       @close="handleCancelOrClose"
+                      @closed="handleClosed"
     >
         <template #default>
             <div class="p-6 w-full">

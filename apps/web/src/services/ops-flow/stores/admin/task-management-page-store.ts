@@ -73,7 +73,7 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
         },
         closePackageForm() {
             state.visiblePackageForm = false;
-            state.targetPackageId = undefined;
+            // do not reset targetPackageId here and handle it after the modal is closed
         },
         openDeletePackageModal(packageId: string) {
             state.targetPackageId = packageId;
@@ -81,7 +81,7 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
         },
         closeDeletePackageModal() {
             state.visibleDeletePackageModal = false;
-            state.targetPackageId = undefined;
+            // do not reset targetPackageId here and handle it after the modal is closed
         },
         openSetDefaultPackageModal(packageId: string) {
             state.targetPackageId = packageId;
@@ -105,7 +105,7 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
         },
         closeCategoryForm() {
             state.visibleCategoryForm = false;
-            state.targetCategoryId = undefined;
+            // do not reset targetCategoryId here and handle it after the modal is closed
         },
         openDeleteCategoryModal(categoryId: string) {
             state.targetCategoryId = categoryId;

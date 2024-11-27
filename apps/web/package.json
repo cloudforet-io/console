@@ -111,6 +111,7 @@
     "tsconfig": "*",
     "vite": "^5.4.0",
     "vite-plugin-stylelint": "^3.3.3",
+    "vite-plugin-vue-devtools": "^7.6.4",
     "vite-plugin-vue-type-imports": "^0.2.4",
     "vitest": "^0.34.5",
     "vue-template-compiler": "2.7.16"

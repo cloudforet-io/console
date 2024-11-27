@@ -72,6 +72,9 @@ const handleCancelOrClose = () => {
     initForm();
     taskCategoryPageStore.closeTaskTypeForm();
 };
+const handleClosed = () => {
+    taskCategoryPageStore.resetTargetTaskTypeId();
+};
 
 const handleConfirm = async () => {
     if (!isAllValid.value) return;
@@ -123,6 +126,7 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
                       :visible="taskCategoryPageState.visibleTaskTypeForm"
                       size="lg"
                       @close="handleCancelOrClose"
+                      @closed="handleClosed"
     >
         <template #default>
             <div class="p-6 w-full">

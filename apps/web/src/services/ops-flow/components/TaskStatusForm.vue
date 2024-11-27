@@ -11,7 +11,11 @@ import {
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import { TASK_STATUS_COLOR_NAMES } from '@/schema/opsflow/task/constant';
-import type { TaskStatusColorName, TaskStatusOptionWithOptionalId, TaskStatusType } from '@/schema/opsflow/task/type';
+import type {
+    TaskStatusColorName,
+    TaskStatusOption, TaskStatusOptions,
+    TaskStatusType,
+} from '@/schema/opsflow/task/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -44,7 +48,7 @@ const {
 } = useFormValidator({
     name: '',
     statusType: statusTypeItems.value[0] as SelectDropdownMenuItem,
-    color: '' as TaskStatusColorName,
+    color: TASK_STATUS_COLOR_NAMES[0] as TaskStatusColorName,
 }, {
     name(value: string) {
         if (!value.trim().length) return 'Name is required';
@@ -61,47 +65,72 @@ const handleCancelOrClose = () => {
     taskCategoryPageStore.closeStatusForm();
 };
 
-const handleConfirm = async () => {
-    if (!isAllValid.value) return;
-    if (!taskCategoryPageState.currentCategoryId) return;
+const updateStatusOptions = async (categoryId: string, allStatusOptions: TaskStatusOptions, targetStatusOption: {
+            type: TaskStatusType;
+            data: TaskStatusOption;
+        }) => {
     try {
-        loading.value = true;
-        if (taskCategoryPageGetters.targetStatusOption) {
-            const newStatusOptions = cloneDeep(taskCategoryPageGetters.statusOptions);
-            const { type, data } = taskCategoryPageGetters.targetStatusOption;
-            if (statusType.value.name !== type) {
-                newStatusOptions[statusType.value as unknown as TaskStatusType].push({
-                    ...data,
-                    name: name.value,
-                    color: color.value,
-                });
-                newStatusOptions[type] = newStatusOptions[type].filter((p) => p.status_id !== data.status_id);
-            } else {
-                const target = newStatusOptions[type].find((p) => p.status_id === data.status_id);
-                if (!target) throw new Error('[Console Error] Failed to find target status option');
-                target.name = name.value;
-                target.color = color.value;
-            }
-
-            await taskCategoryStore.update({
-                category_id: taskCategoryPageState.currentCategoryId,
-                status_options: newStatusOptions,
-            });
-        } else {
-            const newStatusOptions: Record<TaskStatusType, TaskStatusOptionWithOptionalId[]> = cloneDeep(taskCategoryPageGetters.statusOptions);
-            newStatusOptions[statusType.value as unknown as TaskStatusType].push({
+        const newStatusOptions = cloneDeep(allStatusOptions);
+        const { type, data } = targetStatusOption;
+        if (statusType.value.name !== type) {
+            newStatusOptions[statusType.value.name].push({
+                ...data,
                 name: name.value,
                 color: color.value,
             });
-            await taskCategoryStore.update({
-                category_id: taskCategoryPageState.currentCategoryId,
-                status_options: newStatusOptions,
-            });
+            newStatusOptions[type] = newStatusOptions[type].filter((p) => p.status_id !== data.status_id);
+        } else {
+            const target = newStatusOptions[type].find((p) => p.status_id === data.status_id);
+            if (!target) throw new Error('[Console Error] Failed to find target status option');
+            target.name = name.value;
+            target.color = color.value;
         }
-        showSuccessMessage('Successfully saved the category', '');
+
+        await taskCategoryStore.update({
+            category_id: categoryId,
+            status_options: newStatusOptions,
+            force: true,
+        });
+        showSuccessMessage('Task status option updated successfully', '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, 'Failed to update task status option');
+    }
+};
+
+const createStatusOption = async (categoryId: string, allStatusOptions: TaskStatusOptions) => {
+    try {
+        const newStatusOptions = cloneDeep(allStatusOptions);
+        newStatusOptions[statusType.value.name].push({
+            name: name.value,
+            color: color.value,
+        });
+
+        await taskCategoryStore.update({
+            category_id: categoryId,
+            status_options: newStatusOptions,
+            force: true,
+        });
+        showSuccessMessage('Task status option created successfully', '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, 'Failed to create task status option');
+    }
+};
+
+const handleConfirm = async () => {
+    if (!isAllValid.value) return;
+    try {
+        if (!taskCategoryPageState.currentCategoryId) {
+            throw new Error('Category ID is required');
+        }
+        loading.value = true;
+        if (taskCategoryPageGetters.targetStatusOption) {
+            await updateStatusOptions(taskCategoryPageState.currentCategoryId, taskCategoryPageGetters.statusOptions, taskCategoryPageGetters.targetStatusOption);
+        } else {
+            await createStatusOption(taskCategoryPageState.currentCategoryId, taskCategoryPageGetters.statusOptions);
+        }
         taskCategoryPageStore.closeStatusForm();
     } catch (e) {
-        ErrorHandler.handleRequestError(e, 'Failed to save category');
+        ErrorHandler.handleError(e);
     } finally {
         loading.value = false;
     }

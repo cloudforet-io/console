@@ -41,6 +41,9 @@ const handleCancelOrClose = () => {
     initForm();
     taskManagementPageStore.closeCategoryForm();
 };
+const handleClosed = () => {
+    taskManagementPageStore.resetTargetCategoryId();
+};
 const handleConfirm = async () => {
     if (!isAllValid.value) return;
 
@@ -103,6 +106,7 @@ watch([() => taskManagementPageState.visibleCategoryForm, () => taskManagementPa
     <p-overlay-layout title="Add Category"
                       :visible="taskManagementPageState.visibleCategoryForm"
                       @close="handleCancelOrClose"
+                      @closed="handleClosed"
     >
         <template #default>
             <div class="p-6 w-full">

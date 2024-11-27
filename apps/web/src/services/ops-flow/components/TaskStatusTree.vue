@@ -3,6 +3,10 @@ import { computed } from 'vue';
 
 import type { TaskStatusOption, TaskStatusType } from '@/schema/opsflow/task/type';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import TaskStatusList from '@/services/ops-flow/components/TaskStatusList.vue';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
 
@@ -19,15 +23,22 @@ const taskStatusTree = computed<{
     { key: 'COMPLETED', name: 'Completed' },
 ]);
 
-const handleUpdateItems = (statusType: TaskStatusType, items: TaskStatusOption[]) => {
-    if (!taskCategoryPageStore.state.currentCategoryId) return;
-    taskCategoryStore.update({
-        category_id: taskCategoryPageStore.state.currentCategoryId,
-        status_options: {
-            ...taskCategoryPageGetters.statusOptions,
-            [statusType]: items,
-        },
-    });
+const handleUpdateItems = async (statusType: TaskStatusType, items: TaskStatusOption[]) => {
+    try {
+        if (!taskCategoryPageStore.state.currentCategoryId) {
+            throw new Error('Category ID is required');
+        }
+        await taskCategoryStore.update({
+            category_id: taskCategoryPageStore.state.currentCategoryId,
+            status_options: {
+                ...taskCategoryPageGetters.statusOptions,
+                [statusType]: items,
+            },
+        });
+        showSuccessMessage('Task status options updated successfully', '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, 'Failed to update task status options');
+    }
 };
 </script>
 

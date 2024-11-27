@@ -19,6 +19,7 @@ interface UseTaskCategoryPageStoreState {
         type: TaskStatusType;
     }|undefined;
     visibleStatusDeleteModal: boolean;
+    visibleSetDefaultStatusModal: boolean;
     // task type
     visibleTaskTypeForm: boolean;
     targetTaskTypeId?: string;
@@ -47,6 +48,7 @@ export const useTaskCategoryPageStore = defineStore('task-management-category-pa
         visibleStatusForm: false,
         targetStatus: undefined,
         visibleStatusDeleteModal: false,
+        visibleSetDefaultStatusModal: false,
         // task type
         visibleTaskTypeForm: false,
         targetTaskTypeId: undefined,
@@ -112,7 +114,7 @@ export const useTaskCategoryPageStore = defineStore('task-management-category-pa
         },
         closeStatusForm() {
             state.visibleStatusForm = false;
-            state.targetStatus = undefined;
+            // do not reset targetStatus here and handle it after the modal is closed
         },
         openDeleteStatusModal(statusId: string, statusType: TaskStatusType) {
             state.targetStatus = {
@@ -123,6 +125,17 @@ export const useTaskCategoryPageStore = defineStore('task-management-category-pa
         },
         closeDeleteStatusModal() {
             state.visibleStatusDeleteModal = false;
+            // do not reset targetStatus here and handle it after the modal is closed
+        },
+        openSetDefaultStatusModal(statusId: string, statusType: TaskStatusType) {
+            state.targetStatus = {
+                statusId,
+                type: statusType,
+            };
+            state.visibleSetDefaultStatusModal = true;
+        },
+        closeSetDefaultStatusModal() {
+            state.visibleSetDefaultStatusModal = false;
             // do not reset targetStatus here and handle it after the modal is closed
         },
         resetTargetStatus() {
@@ -139,7 +152,7 @@ export const useTaskCategoryPageStore = defineStore('task-management-category-pa
         },
         closeTaskTypeForm() {
             state.visibleTaskTypeForm = false;
-            state.targetTaskTypeId = undefined;
+            // do not reset targetTaskTypeId here and handle it after the modal is closed
         },
         openDeleteTaskTypeModal(taskTypeId: string) {
             state.targetTaskTypeId = taskTypeId;

@@ -44,6 +44,9 @@ const handleEdit = () => {
 const handleDelete = () => {
     taskCategoryPageStore.openDeleteStatusModal(props.id, props.type);
 };
+const handleSetDefault = () => {
+    taskCategoryPageStore.openSetDefaultStatusModal(props.id, props.type);
+};
 </script>
 
 <template>
@@ -73,6 +76,7 @@ const handleDelete = () => {
         <action-menu-button :menu="props.isDefault ? defaultStatusMenu : menu"
                             @edit="handleEdit"
                             @delete="handleDelete"
+                            @set-as-default="handleSetDefault"
         />
     </li>
 </template>
