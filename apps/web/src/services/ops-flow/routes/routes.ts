@@ -40,6 +40,7 @@ const opsFlowRoutes: RouteConfig = {
             meta: {
                 menuId: MENU_ID.BOARD,
                 translationId: MENU_INFO_MAP[MENU_ID.BOARD].translationId,
+                lsbVisible: true,
             },
             component: BoardPage as any,
             children: [
