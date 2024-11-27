@@ -5,8 +5,11 @@ import { ref, computed } from 'vue';
 import { PIconButton, PContextMenu, useContextMenuStyle } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
+interface ActionMenuItem extends MenuItem {
+    name: string;
+}
 const props = withDefaults(defineProps<{
-    menu?: MenuItem[];
+    menu?: ActionMenuItem[];
 }>(), {
     menu: undefined,
 });
@@ -27,7 +30,7 @@ useContextMenuStyle({
     position: 'right',
     menuWidth: '192px',
 });
-const menu = computed<MenuItem[]>(() => props.menu ?? [
+const menu = computed<ActionMenuItem[]>(() => props.menu ?? [
     { name: 'edit', icon: 'ic_edit', label: 'Edit' },
     { name: 'delete', icon: 'ic_delete', label: 'Delete' },
 ]);
@@ -39,7 +42,7 @@ const hideMenu = () => {
 };
 onClickOutside(containerRef, hideMenu);
 
-const handleSelectMenu = (item: MenuItem) => {
+const handleSelectMenu = (item: ActionMenuItem) => {
     emit(item.name);
     hideMenu();
 };

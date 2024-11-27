@@ -3,7 +3,7 @@ import type { Tags } from '@/schema/_common/model';
 export interface PackageModel {
     package_id: string;
     name: string;
-    description: string;
+    description?: string;
     order: number;
     is_default: boolean;
     tags: Tags;

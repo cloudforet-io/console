@@ -2,43 +2,54 @@
 import { reactive, computed } from 'vue';
 
 import {
-    PPaneLayout, PHeading, PSelectDropdown, PI,
+    PSelectDropdown, PI,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
+import {
+    TASK_MANAGEMENT_TEMPLATE_TYPES,
+} from '@/services/ops-flow/task-management-templates/constants/task-management-template-constant';
+import {
+    useTaskManagementTemplateStore,
+} from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
+import type {
+    TaskManagementTemplateType,
+} from '@/services/ops-flow/task-management-templates/types/task-management-template-type';
 
-const taskManagementPageStore = useTaskManagementPageStore();
-const taskManagementPageState = taskManagementPageStore.state;
+const taskManagementTemplateStore = useTaskManagementTemplateStore();
+const taskManagementTemplateState = taskManagementTemplateStore.state;
+
 const state = reactive({
-    enableLandingPage: false,
-    templateMenuItems: computed<SelectDropdownMenuItem[]>(() => [
-        { name: 'default', label: 'Default', icon: 'ic_service_alert-manager' },
-        { name: 'support-center', label: 'Support Center', icon: 'ic_auth0' },
-    ]),
+    templateMenuItems: computed<SelectDropdownMenuItem[]>(() => TASK_MANAGEMENT_TEMPLATE_TYPES.map((templateType) => ({
+        name: templateType,
+        label: taskManagementTemplateStore.translate('templateName', templateType),
+    }))),
 });
 
-const handleSelectTemplate = (templateId: string) => {
-    taskManagementPageStore.setCurrentTemplateId(templateId);
+const handleSelectTemplate = async (templateId: TaskManagementTemplateType) => {
+    if (templateId === taskManagementTemplateState.templateId) return;
+    await taskManagementTemplateStore.updateTemplateId(templateId);
 };
+
+taskManagementTemplateStore.setInitialTemplateId();
 </script>
 
 <template>
-    <p-pane-layout class="p-4">
-        <p-heading class="mb-2"
-                   title="Template Type"
-                   heading-type="sub"
-        />
-        <p class="mb-4 text-label-md text-gray-600">
-            템플릿에 대한 Description
-        </p>
-        <p-select-dropdown :selected="taskManagementPageState.currentTemplateId"
-                           :menu="state.templateMenuItems"
-                           @select="handleSelectTemplate"
-        >
-            <template #dropdown-button="{ label, icon }">
-                <p-i :name="icon" /> {{ label }}
-            </template>
-        </p-select-dropdown>
-    </p-pane-layout>
+    <div class="inline-flex px-4 py-2 rounded-lg bg-gray-150">
+        <div class="flex items-center gap-2 flex-wrap">
+            <div class="inline-flex items-center gap-1 text-gray-700 font-bold">
+                <span class="text-label-md">Template Type</span>
+                <p-i name="ic_info-circle"
+                     width="1rem"
+                     height="1rem"
+                />
+            </div>
+            <p-select-dropdown :selected="taskManagementTemplateState.templateId"
+                               :menu="state.templateMenuItems"
+                               class="w-64"
+                               style-type="rounded"
+                               @select="handleSelectTemplate"
+            />
+        </div>
+    </div>
 </template>

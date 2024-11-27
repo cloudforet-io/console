@@ -11,6 +11,8 @@ import type { PackageModel } from '@/schema/identity/package/model';
 
 import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
@@ -62,8 +64,8 @@ const {
     setForm, isAllValid,
     resetValidations,
 } = useFormValidator({
-    name: '',
-    description: '',
+    name: '' as string,
+    description: '' as string|undefined,
     categories: categoryValidator,
     workspaces: workspaceValidator,
 }, {
@@ -72,9 +74,6 @@ const {
         if (value.length > 50) return 'Name should be less than 50 characters';
         if (packageStore.getters.packages.some((p) => p.package_id !== taskManagementPageState.targetPackageId && p.name === value)) return 'Name already exists';
         return true;
-    },
-    description(value: string) {
-        return value.length > 0 ? true : 'Description is required';
     },
 });
 
@@ -96,10 +95,20 @@ const handleConfirm = async () => {
                 tags: {},
             });
             // bind workspaces and categories
-            await Promise.all([
+            const errorMessages: string[] = [];
+            const responses = await Promise.allSettled([
                 applyPackageToWorkspaces(updatedPackage.package_id),
                 applyPackageToCategories(updatedPackage.package_id),
             ]);
+            responses.forEach((response) => {
+                if (response.status === 'rejected') {
+                    errorMessages.push(response.reason.message);
+                }
+            });
+            if (errorMessages.length) {
+                throw new Error(errorMessages.join('\n'));
+            }
+            showSuccessMessage('Successfully updated the package', '');
         } catch (e) {
             ErrorHandler.handleRequestError(e, 'Failed to update package');
         }
@@ -111,10 +120,20 @@ const handleConfirm = async () => {
                 tags: {},
             });
             // bind workspaces and categories
-            await Promise.all([
+            const errorMessages: string[] = [];
+            const responses = await Promise.allSettled([
                 applyPackageToWorkspaces(createdPackage.package_id),
                 applyPackageToCategories(createdPackage.package_id),
             ]);
+            responses.forEach((response) => {
+                if (response.status === 'rejected') {
+                    errorMessages.push(response.reason.message);
+                }
+            });
+            if (errorMessages.length) {
+                throw new Error(errorMessages.join('\n'));
+            }
+            showSuccessMessage('Successfully added the package', '');
         } catch (e) {
             ErrorHandler.handleRequestError(e, 'Failed to create package');
         }

@@ -14,7 +14,6 @@ import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-cate
 // import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 
 interface UseTaskManagementPageStoreState {
-    currentTemplateId?: string;
     // support package
     visiblePackageForm: boolean;
     targetPackageId?: string;
@@ -40,7 +39,6 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
     const workspaceReferenceStore = useWorkspaceReferenceStore();
     // const taskTypeStore = useTaskTypeStore();
     const state = reactive<UseTaskManagementPageStoreState>({
-        currentTemplateId: 'support-center',
         // support package
         visiblePackageForm: false,
         targetPackageId: undefined,
@@ -64,9 +62,6 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
         defaultPackage: computed<PackageModel|undefined>(() => packageStore.getters.packages.find((p) => p.is_default)),
     });
     const actions = {
-        setCurrentTemplateId(templateId: string) {
-            state.currentTemplateId = templateId;
-        },
         // support package
         openAddPackageForm() {
             state.targetPackageId = undefined;

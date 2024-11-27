@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    ref, onBeforeMount, nextTick, watch, toRef,
+    ref, nextTick, watch, toRef,
 } from 'vue';
 
 
@@ -13,9 +13,12 @@ import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import TaskFieldsConfiguration from '@/services/ops-flow/components/TaskFieldsConfiguration.vue';
 import { useAssigneePoolField } from '@/services/ops-flow/composables/use-assignee-pool-field';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
+import {
+    useTaskFieldsConfiguration,
+} from '@/services/ops-flow/task-fields-configuration/composables/use-task-fields-configuration';
+import TaskFieldsConfiguration from '@/services/ops-flow/task-fields-configuration/TaskFieldsConfiguration.vue';
 
 
 const taskCategoryPageStore = useTaskCategoryPageStore();
@@ -34,8 +37,19 @@ const {
     userReferenceMap: toRef(userReferenceStore.getters, 'userItems'),
 });
 
+/* task field configuration */
 const {
-    forms: { name, description },
+    taskFieldsValidator,
+    setFields,
+    addField,
+    removeField,
+    updateFieldValidation,
+    setInitialFields,
+} = useTaskFieldsConfiguration();
+
+/* form validation */
+const {
+    forms: { name, description, fields },
     invalidState,
     invalidTexts,
     setForm, isAllValid,
@@ -44,6 +58,7 @@ const {
 } = useFormValidator({
     name: '',
     description: '',
+    fields: taskFieldsValidator,
 }, {
     name(value: string) {
         if (!value.trim().length) return 'Name is required';
@@ -80,15 +95,6 @@ const handleConfirm = async () => {
     }
 };
 
-onBeforeMount(() => {
-    if (taskCategoryPageGetters.targetTaskType) {
-        const taskType = taskCategoryPageGetters.targetTaskType;
-        setForm('name', taskType.name);
-        setForm('description', taskType.description);
-        setInitialUsers(taskType.assignee_pool);
-    }
-});
-
 watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGetters.targetTaskType], async ([visible, target], [prevVisible]) => {
     if (!visible) {
         if (!prevVisible) return; // prevent initial call
@@ -98,6 +104,7 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
             description: '',
         });
         setInitialUsers([]);
+        setInitialFields([]);
         resetValidations();
         return;
     }
@@ -105,7 +112,7 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
         setForm('name', target.name);
         setForm('description', target.description);
         setInitialUsers(target.assignee_pool);
-        resetValidations();
+        setInitialFields(target.fields);
     }
 });
 
@@ -114,6 +121,7 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
 <template>
     <p-overlay-layout :title="taskCategoryPageGetters.targetTaskType ? 'Edit Ticket Topic' : 'Add Ticket Topic'"
                       :visible="taskCategoryPageState.visibleTaskTypeForm"
+                      size="lg"
                       @close="handleCancelOrClose"
     >
         <template #default>
@@ -153,8 +161,16 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
                                 @update:value="setForm('description', $event)"
                     />
                 </p-field-group>
-                <p-field-group label="Fields Configuration">
-                    <task-fields-configuration />
+                <p-field-group label="Fields Configuration"
+                               required
+                >
+                    <task-fields-configuration class="mt-2"
+                                               :fields="fields"
+                                               @update:fields="setFields"
+                                               @add-field="addField"
+                                               @remove-field="removeField"
+                                               @update-field-validation="updateFieldValidation"
+                    />
                 </p-field-group>
             </div>
         </template>

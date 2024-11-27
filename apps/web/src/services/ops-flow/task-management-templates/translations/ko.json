@@ -1,0 +1,16 @@
+{
+	"default": {
+		"createTask": "",
+		"taskCategory": "",
+		"taskProgress": "",
+		"taskType": "",
+		"templateName": "기본"
+	},
+	"service-desk": {
+		"createTask": "",
+		"taskCategory": "",
+		"taskProgress": "",
+		"taskType": "",
+		"templateName": "서비스 데스크"
+	}
+}

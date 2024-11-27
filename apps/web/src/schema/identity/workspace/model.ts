@@ -1,5 +1,4 @@
 import type { Tags } from '@/schema/_common/model';
-import type { PackageModel } from '@/schema/identity/package/model';
 
 export type WorkspaceState = 'ENABLED' | 'DISABLED' | 'DORMANT';
 
@@ -7,7 +6,7 @@ export interface WorkspaceModel {
     workspace_id: string;
     name: string;
     state: WorkspaceState;
-    packages: PackageModel[];
+    packages: string[];
     tags: Tags;
     is_managed?: boolean;
     reference_id?: string;

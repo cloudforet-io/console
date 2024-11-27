@@ -9,6 +9,8 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
+import { TASK_STATUS_COLOR_NAMES } from '@/schema/opsflow/task/constant';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
@@ -29,7 +31,6 @@ const statusTypeItems = computed<SelectDropdownMenuItem[]>(() => [
 ]);
 
 /* color chips */
-const TASK_STATUS_COLOR_NAMES = ['gray200', 'violet200', 'blue200', 'peacock200', 'green200', 'yellow200', 'coral200', 'red200'];
 const {
     forms: { name, statusType, color },
     invalidState,
@@ -130,7 +131,8 @@ watch([() => taskCategoryPageState.visibleStatusForm, () => taskCategoryPageGett
                         />
                     </template>
                 </p-field-group>
-                <p-field-group label="Status Type"
+                <p-field-group v-if="!taskCategoryPageGetters.targetStatusOption?.data?.is_default"
+                               label="Status Type"
                                required
                                :invalid="!loading && invalidState.statusType"
                                :invalid-text="invalidTexts.statusType"

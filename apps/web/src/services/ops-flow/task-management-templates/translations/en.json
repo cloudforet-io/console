@@ -1,0 +1,16 @@
+{
+	"default": {
+		"createTask": "Create Task",
+		"taskCategory": "Task Category",
+		"taskProgress": "Task Progress",
+		"taskType": "Task Type",
+		"templateName": "Default"
+	},
+	"service-desk": {
+		"createTask": "Create Ticket",
+		"taskCategory": "Support Category",
+		"taskProgress": "Ticket Progress",
+		"taskType": "Request Type",
+		"templateName": "Service Desk"
+	}
+}

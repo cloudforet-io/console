@@ -3,6 +3,8 @@ import { ref, computed } from 'vue';
 
 import { PButtonModal } from '@cloudforet/mirinae';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
@@ -19,6 +21,7 @@ const handleConfirm = async () => {
         }
         await packageStore.setDefaultPackage(taskManagementPageStore.state.targetPackageId);
         taskManagementPageStore.closeSetDefaultPackageModal();
+        showSuccessMessage('Successfully set the default package', '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, 'Failed to set default package');
     } finally {
