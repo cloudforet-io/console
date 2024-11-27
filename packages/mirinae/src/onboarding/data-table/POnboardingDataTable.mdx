@@ -2,7 +2,8 @@
 
 {/* PonboardingDataTable.mdx */}
 
-import { Canvas, Meta, Controls } from '@storybook/blocks';
+import { Canvas, Meta, Controls, Description } from '@storybook/blocks';
+import { DATA_TABLE_CELL_TEXT_ALIGN, DATA_TABLE_STYLE_TYPE, DATA_TABLE_TYPE } from "@/onboarding/data-table/config";
 
 import * as POnboardingDataTableStories from './POnboardingDataTable.stories';
 
@@ -10,13 +11,151 @@ import * as POnboardingDataTableStories from './POnboardingDataTable.stories';
 <Meta of={POnboardingDataTableStories} />
 # Data Table
 <br/>
+<br/>
+
+### Fields
+
+`fields` props must be an array of `DataTableFieldType`. <br/>
+
+```typescript
+import {DataTableCellTextAlign} from "./type";
+
+interface DataTableFieldType {
+    name: string;
+    label?: string;
+    textAlign?:DataTableCellTextAlign;
+    sortable?: boolean;
+}
+```
+|Property|Description|
+|--|--|
+|name|The path(key) for getting the value from the object(each item in `items` props). Required.|
+|label|Display name for the column(field) head.|
+|textAlign|If you want to align text in the cell, give the value. <Description markdown={`${Object.values(DATA_TABLE_CELL_TEXT_ALIGN).map(d => `\`${d}\``).join(', ')} are available.`}/> |
+|sortable|Whether to sortable the table by the column or not. If it's not given, it follows the `sortable` props.|
+<br/>
+
+### Props
 
 <br/>
+```typescript
+import { DataTableField, DataTableType, DataTableStyleType } from "./type";
+
+interface DataTableProps {
+    loading?: boolean;
+    fields: DataTableField[];
+    items: any[];
+    showFooter?: boolean;
+    selectable?: boolean;
+    selectIndex?: number[] | number;
+    multiSelectable?: boolean;
+    rowClickMultiSelectMode?: boolean;
+    getRowSelectable?: (item: any, i: number) => boolean;
+    styleType: DataTableStyleType;
+    type: DataTableType;
+    headerLeftSlot: boolean;
+    headerRightSlot: boolean;
+    columnLeftSlot: boolean;
+    columnRightSlot: boolean;
+}
+```
+
+|Property|Description|
+|--|--|
+|loading| |
+|fields| It is array of DataTableType (Required) |
+|items| It is an array of elements in a table (Required) |
+|showFooter| It will be show footer in a table |
+|selectable| Allow to select item with type equal 'checkbox' or 'radio' |
+|selectIndex| It is an array contains selected elements |
+|multiSelectable| Allow to select multiple item with type equal 'checkbox' |
+|rowClickMultiSelectMode| Allow clicking on the line will select with mode multipleSelect |
+|rowClickMultiSelectMode| Allow clicking on the line will select with mode multipleSelect |
+|type| It can choose between default, radio, and checkbox |
+|styleType| It can change the table style. |
+|headerLeftSlot| Allow to display left column header and using header-left-\{fieldCol.name\}-col to display the corresponding column |
+|headerRightSlot| Allow to display right column header and using header-right-\{fieldCol.name\}-col to display the corresponding column |
+|columnLeftSlot| Allow to display left column and using column-left-\{fieldCol.name\} to display the corresponding column |
+|columnRightSlot| Allow to display right column and using column-right-\{fieldCol.name\} to display the corresponding column |
+
+<br/>
+### Slots
+
+|Name|Description|Props|
+|--|--|--|
+|header-left-\{fieldCol.name\}-col|It replaces the table header left slot.| headerLeftSlot |
+|header-right-\{fieldCol.name\}-col|It replaces the table header right slot.| headerRightSlot |
+|no-data-format|It replaced what is displayed in the no data | |
+|column-left-\{fieldCol.name\} | It can add icons or other elements using slots to the left of all text in a specific column, excluding headers. | columnLeftSlot |
+|column-right-\{fieldCol.name\} | It can add icons or other elements using slots to the right of all text in a specific column, excluding headers. | columnRightSlot |
+|col-\{fieldCol.name\}-format | It replaces table body cells corresponding to `field.name`. | |
+|footer|It replaces the table body’s tfoot to display additional information.|fields(`DataTableFieldType[]`)|
+|tf-col-format|It replaces the table body’s tfoot to display processed data by utilizing data from each column. |field(`DataTableFieldType`), colIndex(`number`), values(“Array of data grouped by column.)|
+|loading|It replaces loading in table | |
+
+<br/>
+<br/>
+
 ## Basic
 <Canvas of={POnboardingDataTableStories.Basic} />
 
+<br/>
+<br/>
+
+## Stripe
+
+<Canvas of={POnboardingDataTableStories.Stripe} />
+
+<br/>
+<br/>
+
+## Loading
+
+<Canvas of={POnboardingDataTableStories.Loading} />
+
+<br/>
+<br/>
+
+## NoData
+
+<Canvas of={POnboardingDataTableStories.NoData} />
+
+<br/>
+<br/>
+
+## ColumnCopyButton
+
+<Canvas of={POnboardingDataTableStories.ColumnCopyButton} />
+
+<br/>
+<br/>
+
+## HeaderSlot
+
+<Canvas of={POnboardingDataTableStories.HeaderSlot} />
+
+<br/>
+<br/>
+
+## ColumnSlot
+
+<Canvas of={POnboardingDataTableStories.ColumnSlot} />
+
+<br/>
+<br/>
+
+## Sortable
+
+<Canvas of={POnboardingDataTableStories.Sortable} />
+
+<br/>
+<br/>
+
 ## BehaviorsAndStates
 <Canvas of={POnboardingDataTableStories.BehaviorsAndStates} />
+
+<br/>
+<br/>
 
 ## Playground
 <Canvas of={POnboardingDataTableStories.Playground} />
