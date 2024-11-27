@@ -24,6 +24,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{(e: 'update:visible', val: boolean): void;
     (e: 'close'): void;
+    (e: 'closed'): void;
 }>();
 
 const handleClose = () => {
@@ -34,7 +35,9 @@ const handleClose = () => {
 
 <template>
     <div class="p-overlay-layout">
-        <transition name="fade">
+        <transition name="fade"
+                    @after-leave="emit('closed')"
+        >
             <div v-if="props.visible"
                  class="background-overlay"
             />
