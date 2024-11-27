@@ -19,6 +19,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
 
+import { showInfoMessage } from '@/lib/helper/notice-alert-helper';
 import getRandomId from '@/lib/random-id-generator';
 
 import { useCostDataSourceFilterMenuItems } from '@/common/composables/data-source/use-cost-data-source-filter-menu-items';
@@ -51,7 +52,7 @@ interface Props {
     /* Validation */
     formInvalid: boolean;
 }
-
+const MAX_GROUP_BY_COUNT = 3;
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:filter', value: Record<string, string[]>): void;
     (e: 'update:selected-group-by-items', value: any[]): void;
@@ -94,8 +95,6 @@ const advancedOptionsState = reactive({
         { label: 'None', name: 'none' },
         { label: 'Year', name: 'years' },
         { label: 'Month', name: 'months' },
-        // TODO: to be deprecated
-        // { label: 'Day', name: 'days' },
     ]),
     timeDiffDateMap: computed<Record<string, SelectDropdownMenuItem[]>>(() => ({
         years: range(2).map((i) => ({
@@ -106,11 +105,6 @@ const advancedOptionsState = reactive({
             label: i === 0 ? 'Last 1 Month' : `Last ${i + 1} Months`,
             name: String(i + 1),
         })),
-        // TODO: to be deprecated
-        // days: range(31).map((i) => ({
-        //     label: i === 0 ? 'Last 1 Day' : `Last ${i + 1} Days`,
-        //     name: String(i + 1),
-        // })),
     })),
 });
 
@@ -139,7 +133,6 @@ const reservedLabelState = reactive({
 });
 
 const groupByState = reactive({
-    loading: false,
     items: computed(() => {
         if (props.sourceType === DATA_SOURCE_DOMAIN.COST) {
             return costDataSourceMenuItems.value;
@@ -204,12 +197,18 @@ const handleClickTimeDiffDate = (timeDiffDate: string) => {
     advancedOptionsState.proxySelectedTimeDiffDate = timeDiffDate;
 
     const defaultFieldName = props.sourceItems.find((source) => source.name === props.sourceKey)?.label || '';
-    const timediffOptions = {
+    const timeDiffOptions = {
         none: '',
         months: 'month',
         years: 'year',
     };
-    state.proxyDataFieldName = `${defaultFieldName} (- ${timeDiffDate} ${timediffOptions[advancedOptionsState.proxySelectedTimeDiff]})`;
+    state.proxyDataFieldName = `${defaultFieldName} (- ${timeDiffDate} ${timeDiffOptions[advancedOptionsState.proxySelectedTimeDiff]})`;
+};
+const handleUpdateSelectedGroupBy = (selectedItem: SelectDropdownMenuItem, isSelected: boolean) => {
+    if (isSelected && (state.proxySelectedGroupByItems.length > MAX_GROUP_BY_COUNT)) {
+        state.proxySelectedGroupByItems = state.proxySelectedGroupByItems.filter((d) => d.name !== selectedItem.name);
+        showInfoMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.ALT_E_ADD_GROUP_BY'), '');
+    }
 };
 
 /* Utils */
@@ -244,7 +243,9 @@ watch([
 
 <template>
     <div class="widget-form-data-table-card-add-form">
-        <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.GROUP_BY')">
+        <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.GROUP_BY')"
+                       :help-text="$t('COMMON.WIDGETS.DATA_TABLE.FORM.GROUP_BY_HELP_TEXT')"
+        >
             <p-select-dropdown :menu="groupByState.items"
                                :selected.sync="state.proxySelectedGroupByItems"
                                multi-selectable
@@ -253,6 +254,7 @@ watch([
                                show-select-marker
                                is-filterable
                                block
+                               @select="handleUpdateSelectedGroupBy"
             />
         </p-field-group>
         <widget-form-data-table-card-filters :key="props.filterFormKey"
