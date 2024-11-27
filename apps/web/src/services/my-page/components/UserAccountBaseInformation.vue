@@ -152,6 +152,7 @@ watch(() => store.state.user.language, (language) => {
                                            :placeholder="$t('COMMON.PROFILE.TIMEZONE')"
                                            :page-size="10"
                                            is-filterable
+                                           is-fixed-width
                                            show-delete-all-button
                         />
                     </template>

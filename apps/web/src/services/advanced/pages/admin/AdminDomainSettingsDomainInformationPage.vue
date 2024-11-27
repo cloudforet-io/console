@@ -112,6 +112,7 @@ watch(() => domainConfigGetters.language, (val) => {
                                    :selected.sync="state.selectedTimezone"
                                    :page-size="10"
                                    :disabled="!state.hasReadWriteAccess"
+                                   is-fixed-width
                                    is-filterable
                 />
             </div>

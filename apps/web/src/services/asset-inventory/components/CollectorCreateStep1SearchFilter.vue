@@ -60,6 +60,7 @@
                 <p-select-dropdown :selected="state.selectedProvider"
                                    :menu="state.providerList"
                                    class="select-dropdown"
+                                   is-fixed-width
                                    @update:selected="handleChangeProvider"
                 >
                     <template #dropdown-button="item">
@@ -91,6 +92,7 @@
             <div class="repository">
                 <p-select-dropdown :selected.sync="state.selectedRepository"
                                    :menu="state.repositoryList"
+                                   is-fixed-width
                                    class="select-dropdown"
                 >
                     <template #dropdown-button="item">

@@ -9,7 +9,7 @@ import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-ut
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PButton, PHeading,
+    PButton, PHeading, PHeadingLayout,
 } from '@cloudforet/mirinae';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
@@ -152,14 +152,16 @@ onUnmounted(() => {
 
 <template>
     <div class="data-source-management-tab-linked-account">
-        <p-heading heading-type="sub"
-                   use-total-count
-                   use-selected-count
-                   :selected-count="storeState.selectedLinkedAccountsIndices.length"
-                   :title="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.TAB_LINKED_ACCOUNT_TITLE')"
-                   :total-count="storeState.linkedAccountsTotalCount"
-                   class="pt-8 px-4 pb-4"
-        >
+        <p-heading-layout class="pt-8 px-4 pb-4">
+            <template #heading>
+                <p-heading heading-type="sub"
+                           use-total-count
+                           use-selected-count
+                           :selected-count="storeState.selectedLinkedAccountsIndices.length"
+                           :title="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.TAB_LINKED_ACCOUNT_TITLE')"
+                           :total-count="storeState.linkedAccountsTotalCount"
+                />
+            </template>
             <template v-if="props.hasReadWriteAccess"
                       #extra
             >
@@ -178,7 +180,7 @@ onUnmounted(() => {
                     </p-button>
                 </div>
             </template>
-        </p-heading>
+        </p-heading-layout>
         <data-source-management-tab-linked-account-table :has-read-write-access="props.hasReadWriteAccess"
                                                          @confirm="handleChangeLinkedAccountToolbox"
                                                          @select-filter="handleChangedSelectFilter"
@@ -191,13 +193,9 @@ onUnmounted(() => {
 
 <style lang="postcss" scoped>
 .data-source-management-tab-linked-account {
-    .title {
-        @apply items-center;
-        margin-bottom: 0;
-        .extra-wrapper {
-            @apply flex;
-            gap: 0.5rem;
-        }
+    .extra-wrapper {
+        @apply flex;
+        gap: 0.5rem;
     }
 }
 </style>
