@@ -7,6 +7,7 @@ export interface MetricModel {
     name: string;
     metric_type: MetricType;
     resource_type: string;
+    resource_group: 'DOMAIN' | 'WORKSPACE',
     query_options: Record<string, any>;
     date_field: string;
     unit: string;
