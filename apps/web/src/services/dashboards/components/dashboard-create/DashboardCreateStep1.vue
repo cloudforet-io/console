@@ -257,7 +257,7 @@ onMounted(() => {
                 display: flex;
                 gap: 1rem;
                 margin-top: 2rem;
-                justify-content: end;
+                justify-content: flex-end;
             }
         }
     }
