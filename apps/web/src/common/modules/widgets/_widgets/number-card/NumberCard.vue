@@ -43,6 +43,7 @@ import { gray } from '@/styles/colors';
 type Data = ListResponse<{
     [key: string]: string|number;
 }>;
+
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 const topPartRef = ref<null | HTMLElement>(null);
