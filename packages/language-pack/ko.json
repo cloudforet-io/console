@@ -100,7 +100,8 @@
 			"TITLE": "서비스",
 			"TOTAL_ALERTS": "",
 			"USER_GROUP": "",
-			"VALIDATION_NAME_UNIQUE": ""
+			"VALIDATION_NAME_UNIQUE": "",
+			"WEBHOOK": "웹훅 ({cnt})"
 		},
 		"SET_UP": "",
 		"SHOW_MORE": "더보기",
@@ -112,7 +113,7 @@
 			"GUIDE": "사용자 가이드",
 			"LABEL_NAME": "이름",
 			"LABEL_STATE": "상태",
-			"TITLE": "웹훅 ({cnt})",
+			"TITLE": "웹훅",
 			"VERSION": "버전 ",
 			"WEBHOOK_URL": "웹훅 URL"
 		}
