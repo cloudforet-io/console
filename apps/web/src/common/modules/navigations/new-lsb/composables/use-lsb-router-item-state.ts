@@ -1,7 +1,7 @@
 import type { UnwrapRef, Ref } from 'vue';
 import { computed } from 'vue';
 import type { Location } from 'vue-router';
-import { useRouter } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
@@ -9,20 +9,20 @@ import type { LSBIcon } from '@/common/modules/navigations/new-lsb/type';
 
 interface UseLsbRouterItemProps {
     to?: Ref<Readonly<Location>>;
-    currentPath?: Ref<Readonly<string>>;
     icon?: Ref<Readonly<LSBIcon>>;
     imgIcon?: Ref<Readonly<string>>;
 }
 export const useLsbRouterItemState = (props: UnwrapRef<UseLsbRouterItemProps>) => {
     const router = useRouter();
+    const route = useRoute();
 
     const isSelected = computed<boolean>(() => {
-        let currentPath = props.currentPath;
-        if (!currentPath || !props.to) return false;
+        if (!props.to) return false;
 
         const resolved = router.resolve(props.to);
         if (!resolved) return false;
 
+        let currentPath = route.fullPath;
         if (currentPath.indexOf('?') > 0) {
             currentPath = currentPath.slice(0, currentPath.indexOf('?'));
         }
