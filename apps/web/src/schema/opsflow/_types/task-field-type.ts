@@ -10,10 +10,10 @@ export type TaskFieldEnum = {
     name: string;
 };
 interface TextTaskFieldOptions {
-    example: string;
+    example?: string;
 }
 export interface ParagraphTaskFieldOptions {
-    example: string;
+    example?: string;
 }
 export interface DropdownTaskFieldOptions {
     enums: TaskFieldEnum[];
