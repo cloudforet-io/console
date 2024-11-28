@@ -35,8 +35,9 @@ const opsFlowRoutes: RouteConfig = {
             component: OpsFlowLandingPage as any,
         },
         {
-            path: 'board',
+            path: 'board:categoryId?',
             name: OPS_FLOW_ROUTE.BOARD._NAME,
+            props: true,
             meta: {
                 menuId: MENU_ID.BOARD,
                 translationId: MENU_INFO_MAP[MENU_ID.BOARD].translationId,
