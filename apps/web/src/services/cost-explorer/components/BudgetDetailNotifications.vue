@@ -270,7 +270,7 @@ const handleBudgetNotifications = () => {
     }
 
     @screen tablet {
-        @apply flex-col;
+        flex-direction: column;
         row-gap: 1.5em;
 
         .noti-condition {

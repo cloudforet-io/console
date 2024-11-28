@@ -44,7 +44,7 @@ export const AllIcons: Story = {
             <div style="width: 100%; padding: 32px; border: 1px solid #eee; display: grid; row-gap: 1rem; column-gap: 1rem;  grid-template-columns: repeat(auto-fill, minmax(200px,1fr));">
                 <div v-for="icon in icons" :key="icon" class="flex flex-col items-center p-4 rounded hover:bg-secondary-2">
                     <p-i :name="icon" class="flex-shrink-0"/>
-                    <label class="mt-4 whitespace-no-wrap break-words text-xs text-gray-600" >{{icon}}</label>
+                    <label class="mt-4 whitespace-nowrap break-words text-xs text-gray-600" >{{icon}}</label>
                 </div>
             </div>
         `,
@@ -63,7 +63,7 @@ export const Animation: Story = {
             <div style="padding: 32px; border: 1px solid #eee; display: grid; row-gap: 1rem; column-gap: 1rem;  grid-template-columns: repeat(auto-fill, minmax(100px,1fr));">
                 <div v-for="icon in icons" :key="icon" class="flex flex-col items-center p-4 rounded hover:bg-secondary-2">
                     <p-i :name="icon" animation="spin" class="flex-shrink-0"/>
-                    <label class="mt-4 whitespace-no-wrap break-words text-xs text-gray-600" >{{icon}}</label>
+                    <label class="mt-4 whitespace-nowrap break-words text-xs text-gray-600" >{{icon}}</label>
                 </div>
             </div>
         `,

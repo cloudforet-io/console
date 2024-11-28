@@ -163,6 +163,7 @@ watch(() => state.selectedItems, (selectedItems) => {
                 <notice-workspace-dropdown v-if="state.selectedToolId === 'specific'"
                                            :selected-items.sync="state.selectedItems"
                                            class="dropdown"
+                                           :class="{'is-multi-selected': state.selectedItems.length > 1}"
                 />
             </div>
             <p-toolbox :pagination-visible="false"
@@ -257,10 +258,15 @@ watch(() => state.selectedItems, (selectedItems) => {
                 &.no-data {
                     padding: 0;
                 }
+                &.is-multi-selected {
+                    :deep(.notice-workspace-dropdown .label) {
+                        max-width: 12rem;
+                    }
+                }
             }
             :deep(.notice-workspace-dropdown .label) {
                 @apply truncate;
-                max-width: 12rem;
+                max-width: 15rem;
             }
         }
     }

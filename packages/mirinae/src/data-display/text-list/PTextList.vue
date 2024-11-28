@@ -3,7 +3,7 @@
         <component :is="component"
                    v-for="(item, i) in displayItems"
                    :key="i"
-                   class="list-item"
+                   class="list-item-wrapper"
                    :class="{'line-break': isLineBreak && i < displayItems.length - 1}"
                    :href="getHref(item, i)"
                    :target="linkTarget || undefined"
@@ -93,7 +93,7 @@ export default defineComponent<TextListProps>({
 
 <style lang="postcss">
 .p-text-list {
-    > .list-item {
+    > .list-item-wrapper {
         > .delimiter {
             white-space: pre;
         }

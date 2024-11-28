@@ -227,7 +227,7 @@ const handleClickCardButton = (type: string) => {
 
     @screen tablet {
         .card-wrapper {
-            @apply flex-col;
+            flex-direction: column;
             .card {
                 flex: initial;
                 height: 13.625rem;

@@ -1,6 +1,6 @@
 {
   "name": "web",
-  "version": "2.0.0-dev241",
+  "version": "2.0.0-dev242",
   "private": true,
   "description": "Cloudforet Console Web Application",
   "author": "Cloudforet",
@@ -62,13 +62,14 @@
     "keycloak-js": "^10.0.2",
     "lodash": "^4.17.21",
     "numeral": "^2.0.6",
-    "pinia": "^2.0.28",
+    "pinia": "^2.2.7",
     "portal-vue": "^2.1.7",
     "process": "^0.11.10",
     "prosemirror-model": "^1.19.2",
     "prosemirror-state": "^1.4.3",
     "prosemirror-transform": "^1.7.3",
     "prosemirror-view": "^1.31.5",
+    "qrcode": "^1.5.4",
     "uuid": "^8.3.2",
     "v-click-outside": "^3.0.1",
     "v-tooltip": "^2.0.3",
@@ -81,8 +82,7 @@
     "vue-selecto": "^1.6.4",
     "vuedraggable": "^2.24.3",
     "vuex": "^3.6.2",
-    "webfontloader": "^1.6.28",
-    "qrcode": "^1.5.4"
+    "webfontloader": "^1.6.28"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.21.4",

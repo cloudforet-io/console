@@ -23,7 +23,7 @@ import UserConfigStarred from '@/services/workspace-home/components/UserConfigSt
     }
 
     @screen mobile {
-        @apply flex-col;
+        flex-direction: column;
         .box-wrapper {
             min-height: unset;
         }

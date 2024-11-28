@@ -333,14 +333,8 @@ onMounted(async () => {
         }
         .collector-lists {
             @apply grid grid-cols-3 gap-4;
-
-            @screen desktop {
-                @apply grid-cols-2;
-            }
-
-            @screen tablet {
-                @apply flex flex-col;
-            }
+            @apply desktop:grid-cols-2;
+            @apply tablet:flex tablet:flex-col;
         }
     }
 }

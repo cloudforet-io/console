@@ -453,7 +453,7 @@ watch(() => isAllValid.value, (_isAllValid) => {
 
         .label-row {
             .col-step {
-                @apply col-span-2;
+                grid-column: span 2 / span 2;
             }
             .col-notification, .col-rule {
                 display: none;
@@ -462,7 +462,7 @@ watch(() => isAllValid.value, (_isAllValid) => {
         .content-row {
             height: auto;
             .col-step {
-                @apply col-span-2;
+                grid-column: span 2 / span 2;
                 height: 100%;
                 padding-top: 0.375rem;
             }
@@ -470,16 +470,21 @@ watch(() => isAllValid.value, (_isAllValid) => {
                 display: none;
             }
             .col-mobile-input {
-                @apply col-span-8 grid grid-cols-8 text-gray-900;
+                grid-column: span 8 / span 8;
+                display: grid;
+                grid-template-columns: repeat(8, minmax(0, 1fr));
+
+                --tw-text-opacity: 1;
+                color: rgb(35 37 51 / var(--tw-text-opacity, 1));
                 row-gap: 0.5rem;
                 font-size: 0.75rem;
 
                 .label {
-                    @apply col-span-4;
+                    grid-column: span 4 / span 4;
                     margin: auto 0;
                 }
                 .input {
-                    @apply col-span-4;
+                    grid-column: span 4 / span 4;
 
                     /* custom design-system component - p-select-dropdown */
                     :deep(.p-select-dropdown) {
@@ -490,7 +495,7 @@ watch(() => isAllValid.value, (_isAllValid) => {
                     }
                 }
                 .col-mobile-rule {
-                    @apply col-span-8;
+                    grid-column: span 8 / span 8;
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
@@ -503,15 +508,17 @@ watch(() => isAllValid.value, (_isAllValid) => {
         }
         .add-row {
             .col-icon {
-                @apply col-span-2;
+                grid-column: span 2 / span 2;
             }
             .col-mobile-label {
-                @apply col-span-4 text-gray-900;
+                --tw-text-opacity: 1;
+                color: rgb(35 37 51 / var(--tw-text-opacity, 1));
+                grid-column: span 4 / span 4;
                 display: block;
                 font-size: 0.75rem;
             }
             .col-input {
-                @apply col-span-4;
+                grid-column: span 4 / span 4;
                 .repeat-input {
                     width: 6rem;
                 }
@@ -520,7 +527,7 @@ watch(() => isAllValid.value, (_isAllValid) => {
                 display: none;
             }
             .add-button {
-                @apply col-span-12;
+                grid-column: span 12 / span 12;
                 position: relative;
                 margin-top: 0.75rem;
             }

@@ -1,13 +1,20 @@
 <script setup lang="ts">
-
+import {
+    computed, reactive, watchEffect, ref, watch,
+} from 'vue';
 
 import { PTreeView, PI, PTextHighlighting } from '@cloudforet/mirinae';
 import type { TreeDisplayMap, TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { gray } from '@/styles/colors';
+
+
+const appContextStore = useAppContextStore();
 
 interface Props {
     metricItems: TreeNode[];
@@ -18,10 +25,37 @@ interface Props {
 
 const props = defineProps<Props>();
 
+const storeState = reactive({
+    isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
+});
+
+const filteredMetricItems = ref<TreeNode[]>([]);
+
+watch(() => props.metricItems, (updatedMetricItems) => {
+    filteredMetricItems.value = updatedMetricItems.filter(((metricItem) => {
+        if (metricItem.data.is_managed) {
+            return true;
+        }
+        if (storeState.isAdminMode) {
+            return metricItem.data.data.resource_group === 'DOMAIN';
+        }
+        return metricItem.data.data.resource_group === 'WORKSPACE';
+    }));
+}, { immediate: true, deep: true });
+
+watchEffect(() => {
+    if (storeState.isAdminMode) {
+        props.metricItems.forEach((metricItem: TreeNode) => {
+            if (Object.keys(metricItem).includes(('children'))) {
+                delete metricItem.children;
+            }
+        });
+    }
+});
 </script>
 
 <template>
-    <p-tree-view :tree-data="props.metricItems"
+    <p-tree-view :tree-data="filteredMetricItems"
                  :selected-id="props.selectedId"
                  :tree-display-map="props.treeDisplayMap"
                  use-default-indent

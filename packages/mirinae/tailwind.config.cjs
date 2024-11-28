@@ -18,6 +18,7 @@ const percent = _.fromPairs(rawPercent.map((value) => [value, `${eval(value) * 1
 module.exports = {
     theme: {
         borderRadius: {
+            DEFAULT: '0.25rem',
             none: '0',
             '2xs': '0.063rem', // 1px
             xs: '0.125rem', // 2px
@@ -39,6 +40,7 @@ module.exports = {
             ...defaultTheme.minWidth,
             ...theme('spacing'),
             ...percent,
+            'full': '100%',
             '2xs': theme('screens.2xs.min'),
             xs: theme('screens.xs.min'),
             sm: theme('screens.sm.min'),
@@ -72,18 +74,18 @@ module.exports = {
             serif: ['Roboto'],
         },
         screens: {
-            '2xs': { min: '375px' },
-            xs: { min: '478px' },
-            sm: { min: '576px' },
-            md: { min: '768px' },
-            lg: { min: '1024px' },
-            xl: { min: '1440px' },
-            '2xl': { min: '1920px' },
-            '3xl': { min: '2560px' },
-            mobile: { max: `${screens.mobile.max}px` },
-            tablet: { max: `${screens.tablet.max}px` },
-            laptop: { max: `${screens.laptop.max}px` },
-            desktop: { max: `${screens.desktop.max}px` },
+            '2xs': '375px' ,
+            xs: '478px' ,
+            sm: '576px' ,
+            md: '768px' ,
+            lg: '1024px' ,
+            xl: '1440px' ,
+            '2xl': '1920px' ,
+            '3xl': '2560px' ,
+            mobile: { max:`${screens.mobile.max}px`},
+            tablet: { max:`${screens.tablet.max}px`},
+            laptop: { max:`${screens.laptop.max}px`},
+            desktop: { max:`${screens.desktop.max}px`},
         },
         fontSize: {
             ...defaultTheme.fontSize,

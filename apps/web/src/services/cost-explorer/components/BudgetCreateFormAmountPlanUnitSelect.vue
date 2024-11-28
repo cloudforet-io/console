@@ -91,7 +91,7 @@ const handleUnitChange = (value?: BudgetTimeUnit) => {
 
 @screen mobile {
     .budget-create-form-amount-plan-unit-select {
-        @apply flex-col;
+        flex-direction: column;
         row-gap: 0.5rem;
     }
 }

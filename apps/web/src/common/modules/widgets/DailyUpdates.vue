@@ -345,7 +345,8 @@ export default {
             background-color: rgba(theme('colors.white'));
         }
         .title {
-            @apply text-sm leading-normal;
+            font-size: 0.875rem;
+            line-height: 1.5;
         }
     }
 }
@@ -373,7 +374,7 @@ export default {
 }
 
 .card-wrapper {
-    @apply overflow-hidden whitespace-no-wrap w-full rounded-md;
+    @apply overflow-hidden whitespace-nowrap w-full rounded-md;
     height: 100%;
     &.fixed-height {
         height: 16rem;

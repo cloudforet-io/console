@@ -226,13 +226,6 @@ const adminAssetInventoryRoute: RouteConfig = {
                             props: true,
                             component: MetricExplorerDetailPage as any,
                         },
-                        {
-                            path: ':metricExampleId',
-                            name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME),
-                            meta: { label: ({ params }) => params.metricExampleId, lsbVisible: true },
-                            props: true,
-                            component: MetricExplorerDetailPage as any,
-                        },
                     ],
                 },
             ],

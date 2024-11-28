@@ -112,6 +112,7 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
                            :handler="workspaceMenuHandler"
                            show-select-marker
                            is-filterable
+                           is-fixed-width
                            page-size="10"
                            multi-selectable
                            appearance-type="badge"
@@ -132,6 +133,7 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
                     <p-badge v-if="state.proxySelectedItems.length > 1"
                              style-type="blue200"
                              badge-type="subtle"
+                             class="badge"
                     >
                         + {{ state.proxySelectedItems.length - 1 }}
                     </p-badge>
@@ -188,7 +190,6 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
 <style scoped lang="postcss">
 .notice-workspace-dropdown-wrapper {
     .notice-workspace-dropdown {
-        width: 50%;
         margin-top: 0.25rem;
         &.is-main {
             .menu-item-wrapper {
@@ -215,7 +216,14 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
         }
         .selected-workspace-wrapper {
             @apply flex items-center;
+            width: 100%;
             gap: 0.25rem;
+            .label {
+                @apply truncate;
+            }
+            .badge {
+                min-width: 2.125rem;
+            }
         }
         .placeholder {
             @apply text-gray-600;
