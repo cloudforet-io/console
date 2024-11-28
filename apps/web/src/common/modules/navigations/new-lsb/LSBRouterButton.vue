@@ -76,7 +76,7 @@ const {
     &.selected {
         @apply bg-blue-200;
     }
-    &:hover {
+    &:hover:not(.selected) {
         @apply bg-blue-100 cursor-pointer;
     }
 }

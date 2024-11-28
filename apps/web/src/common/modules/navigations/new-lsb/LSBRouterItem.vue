@@ -138,7 +138,7 @@ const {
             }
         }
     }
-    &:hover {
+    &:hover:not(.selected) {
         @apply bg-blue-100 cursor-pointer;
     }
     .item-text {
