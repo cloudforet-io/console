@@ -472,6 +472,11 @@ section {
         row-gap: 3rem;
         column-gap: 1rem;
     }
+    .p-metric-chart {
+        @apply col-span-3;
+        @apply laptop:col-span-4;
+        @apply tablet:col-span-12;
+    }
 
     /* custom design-system component - p-button */
     :deep(.more-btn) {
