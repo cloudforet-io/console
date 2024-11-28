@@ -20,7 +20,7 @@ export const MENU_ID = Object.freeze({
     DATA_SOURCES: 'data_sources',
     ALERT_MANAGER: 'alert_manager',
     ALERT_MANAGER_DASHBOARD: 'alert_manager_dashboard',
-    ALERT: 'alert',
+    ALERTS: 'alerts',
     ESCALATION_POLICY: 'escalation_policy',
     IAM: 'iam',
     USER: 'user',

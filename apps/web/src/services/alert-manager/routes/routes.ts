@@ -37,15 +37,15 @@ const alertManagerRoutes: RouteConfig = {
         {
             path: 'alert',
             meta: {
-                menuId: MENU_ID.ALERT,
-                translationId: MENU_INFO_MAP[MENU_ID.ALERT].translationId,
+                menuId: MENU_ID.ALERTS,
+                translationId: MENU_INFO_MAP[MENU_ID.ALERTS].translationId,
             },
             component: { template: '<router-view />' },
             children: [
                 {
                     path: '/',
                     name: ALERT_MANAGER_ROUTE.ALERT._NAME,
-                    meta: { menuId: MENU_ID.ALERT },
+                    meta: { menuId: MENU_ID.ALERTS },
                     component: AlertMainPage as any,
                 },
                 {
