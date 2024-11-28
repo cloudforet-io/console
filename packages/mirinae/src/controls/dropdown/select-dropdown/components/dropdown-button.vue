@@ -191,7 +191,7 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
 .dropdown-button-component {
     /* style type - default */
     .dropdown-button {
-        @apply flex justify-between items-center bg-white text-label-md font-normal border rounded border-gray-300 cursor-pointer;
+        @apply flex justify-between items-center bg-white text-label-md font-normal border rounded-default border-gray-300 cursor-pointer;
         width: 100%;
         min-height: 2rem;
         gap: 0.25rem;
@@ -267,7 +267,7 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
             @apply cursor-not-allowed text-gray-300;
         }
         &.tertiary-icon-button {
-            @apply bg-gray-200 rounded border-transparent;
+            @apply bg-gray-200 rounded-default border-transparent;
         }
     }
 
@@ -344,7 +344,7 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
         }
     }
     &.tertiary-icon-button {
-        @apply border border-gray-300 rounded bg-white;
+        @apply border border-gray-300 rounded-default bg-white;
         &:not(.disabled, .readonly, .invalid):hover {
             @apply bg-gray-100;
         }
@@ -419,7 +419,7 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
             @apply bg-blue-300 text-secondary;
         }
         &.tertiary-icon-button {
-            @apply bg-gray-200 rounded;
+            @apply bg-gray-200 rounded-default;
         }
     }
 
@@ -451,7 +451,7 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
             }
         }
         &.tertiary-icon-button {
-            @apply bg-gray-200 rounded;
+            @apply bg-gray-200 rounded-default;
         }
     }
 

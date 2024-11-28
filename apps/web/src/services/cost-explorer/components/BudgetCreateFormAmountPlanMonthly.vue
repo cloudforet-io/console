@@ -216,24 +216,24 @@ watch(() => state.monthAmountInputMap, (monthAmountInputMap) => {
 
     @screen tablet {
         .input-wrapper {
-            @apply grid-cols-4;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
         }
     }
 
     @screen mobile {
         .header {
-            @apply relative;
+            position: relative;
             .title {
-                @apply flex-shrink;
+                flex-shrink: 1;
             }
             .p-button {
-                @apply absolute;
+                position: absolute;
                 bottom: 0;
                 right: 0;
             }
         }
         .input-wrapper {
-            @apply grid-cols-2;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
         }
     }
 }

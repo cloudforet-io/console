@@ -229,7 +229,7 @@ watch(() => props.activatedProjects, async (activatedProjects) => {
     @screen mobile {
         .box-group {
             .box {
-                @apply col-span-12;
+                grid-column: span 12 / span 12;
             }
         }
     }

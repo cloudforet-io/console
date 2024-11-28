@@ -272,7 +272,8 @@ const handleClickBoardItem = (item: WorkspaceBoardSet) => {
     }
 
     @screen mobile {
-        @apply flex flex-col;
+        display: flex;
+        flex-direction: column;
         gap: 0.5rem;
     }
 }

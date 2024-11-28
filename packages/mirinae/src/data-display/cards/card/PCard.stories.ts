@@ -149,7 +149,7 @@ export const Slots: Story = {
                     <div class="flex justify-between items-center">
                         <span>8.5</span><span>145</span>
                     </div>
-                    <div class="flex justify-between items-center text-gray text-xs mt-1">
+                    <div class="flex justify-between items-center text-gray-default text-xs mt-1">
                         <span>Dail Average</span><span class="text-right">Monthly Total</span>
                     </div>
                 </p-card>

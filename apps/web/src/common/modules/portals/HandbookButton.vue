@@ -195,7 +195,7 @@ export default defineComponent({
 
 @screen lg {
     .handbook-contents {
-        @apply overflow-auto;
+        overflow: auto;
         height: calc(100vh - 10.325rem);
         &::before {
             bottom: 2.225rem;
@@ -209,7 +209,7 @@ export default defineComponent({
                 height: calc(100% - 3.5rem);
             }
             .tab-pane {
-                @apply overflow-auto;
+                overflow: auto;
                 height: calc(100% - 6.25rem);
             }
         }

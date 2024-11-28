@@ -2,7 +2,7 @@
 const spaceoneTailwindConfig = require('@cloudforet/mirinae/tailwind.config.cjs');
 
 module.exports = {
-    purge: [
+    content: [
         "./index.html",
         "./src/**/*.{js,ts,jsx,tsx,vue}",
     ],

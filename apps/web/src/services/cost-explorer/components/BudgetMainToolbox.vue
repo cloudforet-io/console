@@ -250,9 +250,11 @@ watch(() => state.sort, (sort) => { emit('update-sort', sort); });
 
     @screen mobile {
         .top {
-            @apply flex flex-wrap gap-4;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
             .period-box {
-                @apply pl-0;
+                padding-left: 0;
 
                 &::before {
                     display: none;

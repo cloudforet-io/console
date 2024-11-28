@@ -326,7 +326,7 @@ export default defineComponent<SearchProps>({
             @apply border-secondary;
         }
         .input-wrapper {
-            @apply flex flex-wrap flex-grow row-gap-2;
+            @apply flex flex-wrap flex-grow gap-y-2;
         }
         input {
             @apply border-0 bg-transparent w-full;
