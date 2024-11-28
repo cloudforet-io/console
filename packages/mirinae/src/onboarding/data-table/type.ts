@@ -18,11 +18,17 @@ export interface DataTableProps {
     loading?: boolean;
     fields: DataTableField[];
     items: any[];
+    stripe?: boolean;
+    border?: boolean;
+    columnCopyButton?: boolean;
+    sortable? : boolean;
+    sortBy? : string;
+    sortDesc?: boolean;
+    disableHover?: boolean;
     showFooter?: boolean;
     selectable?: boolean;
     selectIndex?: number[] | number;
     multiSelectable?: boolean;
-    rowClickMultiSelectMode?: boolean;
     getRowSelectable?: (item: any, i: number) => boolean;
     styleType: DataTableStyleType;
     type: DataTableType;
