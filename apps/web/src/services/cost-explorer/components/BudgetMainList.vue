@@ -200,10 +200,7 @@ const handleUpdateSort = (sort: Sort) => {
     }
     .budget-list-card-box {
         @apply grid grid-cols-2 gap-4;
-
-        @screen mobile {
-            @apply grid-cols-1;
-        }
+        @apply mobile:grid-cols-1;
     }
 }
 </style>

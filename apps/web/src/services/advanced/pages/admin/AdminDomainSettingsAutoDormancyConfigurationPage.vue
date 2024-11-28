@@ -390,13 +390,14 @@ onMounted(async () => {
 
     @screen tablet {
         .cost-report-button {
-            @apply hidden;
+            display: none;
         }
     }
 
     @screen mobile {
         .cost-wrapper {
-            @apply flex-col items-center;
+            flex-direction: column;
+            align-items: center;
             .cost-threshold-chart {
                 width: auto;
                 height: auto;

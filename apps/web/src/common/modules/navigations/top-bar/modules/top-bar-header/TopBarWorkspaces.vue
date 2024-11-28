@@ -309,9 +309,7 @@ onMounted(() => {
             gap: 0.25rem;
 
             .omitable-text {
-                @screen mobile {
-                    @apply hidden;
-                }
+                @apply mobile:hidden;
             }
         }
 
@@ -442,17 +440,13 @@ onMounted(() => {
             vertical-align: bottom;
             padding-left: 0.5rem;
 
-            @screen tablet {
-                @apply hidden;
-            }
+            @apply tablet:hidden;
         }
         .tablet-selected {
             @apply hidden text-label-lg text-gray-800;
             padding-left: 0.75rem;
 
-            @screen tablet {
-                @apply inline-block;
-            }
+            @apply tablet:inline-block;
         }
     }
 }

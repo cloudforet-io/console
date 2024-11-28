@@ -474,7 +474,7 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
                         @apply bg-blue-100 cursor-pointer;
                     }
                     .text {
-                        @apply text-label-md overflow-hidden whitespace-no-wrap;
+                        @apply text-label-md overflow-hidden whitespace-nowrap;
                         text-overflow: ellipsis;
                     }
                 }

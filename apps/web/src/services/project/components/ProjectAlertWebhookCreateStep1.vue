@@ -164,7 +164,7 @@ onMounted(async () => {
     @screen tablet {
         min-width: 30rem;
         .card-wrapper {
-            @apply grid-cols-1;
+            grid-template-columns: repeat(1, minmax(0, 1fr));
             .card {
                 max-width: initial;
             }

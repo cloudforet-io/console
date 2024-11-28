@@ -103,7 +103,7 @@ const handleOpenMenu = (menuId: MenuId) => {
 @screen mobile {
     .top-bar {
         .middle-section {
-            @apply justify-end;
+            justify-content: flex-end;
         }
     }
 }

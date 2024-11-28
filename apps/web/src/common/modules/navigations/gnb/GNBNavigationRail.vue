@@ -298,7 +298,7 @@ onMounted(async () => {
                 &.is-selected {
                     @apply relative bg-violet-100 text-violet-600;
                     &::before {
-                        @apply absolute bg-violet;
+                        @apply absolute bg-violet-default;
                         content: '';
                         top: 0.125rem;
                         left: -0.75rem;

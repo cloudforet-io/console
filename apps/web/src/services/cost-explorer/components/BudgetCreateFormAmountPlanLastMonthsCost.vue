@@ -183,10 +183,11 @@ watch([() => props.projectId, () => props.dataSourceId, () => props.workspaceId]
     @screen mobile {
         padding-right: 8.75rem;
         label {
-            @apply block;
+            display: block;
         }
         .data {
-            @apply border-none block;
+            display: block;
+            border-style: none;
             padding: 0;
         }
     }

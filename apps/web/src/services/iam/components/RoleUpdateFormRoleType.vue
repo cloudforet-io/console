@@ -151,14 +151,14 @@ watch(() => props.initialData, (initialData) => {
         }
 
         @screen tablet {
-            @apply flex-col;
+            flex-direction: column;
             max-width: 43rem;
             .card {
                 padding-top: 1rem;
                 padding-bottom: 1rem;
                 .card-content {
                     .role-type-icon {
-                        @apply hidden;
+                        display: none;
                     }
                     .role-type-description {
                         max-width: unset;

@@ -89,8 +89,8 @@ export const Direction: Story = {
         components: { PCheckboxGroup, PCheckbox },
         template: `
         <div>
-            <div class="flex flex-col row-gap-8">
-                <div class="flex flex-col row-gap-2">
+            <div class="flex flex-col gap-y-8">
+                <div class="flex flex-col gap-y-2">
                     <p>Horizontal (default)</p>
                     <p-checkbox-group direction="horizontal">
                         <p-checkbox :key="value" v-for="value in horizontalValues" v-model="horizontalSelected" :value="value">
@@ -98,7 +98,7 @@ export const Direction: Story = {
                         </p-checkbox>
                     </p-checkbox-group>
                 </div>
-                <div class="flex flex-col row-gap-2">
+                <div class="flex flex-col gap-y-2">
                     <p>Vertical</p>
                     <p-checkbox-group direction="vertical">
                         <p-checkbox :key="value" v-for="value in verticalValues" v-model="verticalSelected" :value="value">

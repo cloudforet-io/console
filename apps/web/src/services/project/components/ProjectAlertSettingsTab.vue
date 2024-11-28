@@ -317,7 +317,7 @@ const init = async () => {
     @screen tablet {
         .section {
             &.notification-policy-wrapper, &.auto-recovery-wrapper, &.event-rule-wrapper {
-                @apply col-span-12;
+                grid-column: span 12 / span 12;
             }
         }
     }

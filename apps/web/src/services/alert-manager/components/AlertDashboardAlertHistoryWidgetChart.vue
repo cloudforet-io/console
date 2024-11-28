@@ -213,10 +213,3 @@ watch(() => props.activatedProjects, async (activatedProjects) => {
     }
 }
 </style>
-<style lang="postcss">
-.AlertHistoryChartAxisRendererX-group {
-    @screen tablet {
-        display: none;
-    }
-}
-</style>
