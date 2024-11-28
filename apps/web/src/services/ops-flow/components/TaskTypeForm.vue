@@ -17,7 +17,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import { useAssigneePoolField } from '@/services/ops-flow/composables/use-assignee-pool-field';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
-import { useTaskTypeStore } from '@/services/ops-flow/stores/admin/task-type-store';
+import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 import {
     useTaskFieldsConfiguration,
 } from '@/services/ops-flow/task-fields-configuration/composables/use-task-fields-configuration';

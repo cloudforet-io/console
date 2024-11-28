@@ -1,11 +1,11 @@
-import { asyncComputed } from '@vueuse/core';
-import type { Ref, UnwrapRef } from 'vue';
 import { reactive } from 'vue';
 
+import { merge } from 'lodash';
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
+import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { TaskTypeCreateParameters } from '@/schema/opsflow/task-type/api-verbs/create';
@@ -19,42 +19,39 @@ import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface UseTaskTypeStoreState {
-    loading: boolean;
     items?: TaskTypeModel[];
-}
-
-interface UseTaskTypeStoreGetters {
-    taskTypes: Ref<Readonly<TaskTypeModel[]>>
+    itemsByCategoryId: Record<string, TaskTypeModel[]|undefined>;
 }
 
 export const useTaskTypeStore = defineStore('task-type', () => {
     const state = reactive<UseTaskTypeStoreState>({
-        loading: false,
         items: undefined,
-    }) as UseTaskTypeStoreState;
-
-    const getters = reactive<UseTaskTypeStoreGetters>({
-        taskTypes: asyncComputed<TaskTypeModel[]>(async () => {
-            if (!state.items) {
-                await actions.list();
-            }
-            return state.items ?? [];
-        }, [], { lazy: true }),
-    }) as UnwrapRef<UseTaskTypeStoreGetters>;
+        itemsByCategoryId: {
+            all: undefined,
+        },
+    });
 
     const fetchList = getCancellableFetcher<TaskTypeListParameters, ListResponse<TaskTypeModel>>(SpaceConnector.clientV2.opsflow.taskType.list);
     const actions = {
-        async list(params: TaskTypeListParameters = {}) {
-            state.loading = true;
+        async listByCategoryId(categoryId: string|'all', query?: Query, force?: boolean): Promise<TaskTypeModel[]> {
+            if (!query && state.itemsByCategoryId[categoryId] && !force) {
+                return state.itemsByCategoryId[categoryId] as TaskTypeModel[];
+            }
+
             try {
-                const result = await fetchList(params);
-                if (result.status === 'succeed') {
-                    state.items = result.response.results;
+                let _query: Query = categoryId === 'all' ? {} : { filter: [{ k: 'category_id', v: categoryId, o: 'eq' }] };
+                if (query) {
+                    _query = merge(query, _query);
                 }
+                const result = await fetchList({ query: _query });
+                if (result.status === 'succeed') {
+                    if (query) return result.response.results ?? [];
+                    state.itemsByCategoryId[categoryId] = result.response.results;
+                }
+                return state.itemsByCategoryId[categoryId] ?? [];
             } catch (e) {
                 ErrorHandler.handleError(e);
-            } finally {
-                state.loading = false;
+                return state.itemsByCategoryId[categoryId] ?? [];
             }
         },
         async create(params: TaskTypeCreateParameters) {
@@ -91,8 +88,6 @@ export const useTaskTypeStore = defineStore('task-type', () => {
         },
     };
     return {
-        state,
-        getters,
         ...actions,
     };
 });

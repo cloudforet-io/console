@@ -1,4 +1,5 @@
-import type { ComputedRef, UnwrapRef } from 'vue';
+import { asyncComputed } from '@vueuse/core';
+import type { ComputedRef, UnwrapRef, Ref } from 'vue';
 import { reactive, computed } from 'vue';
 
 import { defineStore } from 'pinia';
@@ -7,8 +8,10 @@ import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
 import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
 import type { TaskStatusOption, TaskStatusOptions, TaskStatusType } from '@/schema/opsflow/task/type';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
-import { useTaskTypeStore } from '@/services/ops-flow/stores/admin/task-type-store';
+import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 
 interface UseTaskCategoryPageStoreState {
     currentCategoryId?: string;
@@ -35,7 +38,7 @@ interface UseTaskCategoryPageStoreGetters {
             data: TaskStatusOption;
         }|undefined>;
     // task type
-    taskTypes: ComputedRef<TaskTypeModel[]|undefined>;
+    taskTypes: Ref<Readonly<TaskTypeModel[]>|undefined>;
     targetTaskType: ComputedRef<TaskTypeModel|undefined>;
 }
 
@@ -85,14 +88,14 @@ export const useTaskCategoryPageStore = defineStore('task-management-category-pa
             };
         }),
         // task type
-        taskTypes: computed<TaskTypeModel[]|undefined>(() => {
+        taskTypes: asyncComputed<TaskTypeModel[]|undefined>(async () => {
             if (!state.currentCategoryId) return undefined;
-            const allTaskTypes = taskTypeStore.getters.taskTypes;
-            return allTaskTypes.filter((taskType) => taskType.category_id === state.currentCategoryId);
-        }),
+            const taskTypes = await taskTypeStore.listByCategoryId(state.currentCategoryId);
+            return taskTypes;
+        }, undefined, { lazy: true }),
         targetTaskType: computed<TaskTypeModel|undefined>(() => {
             if (!state.targetTaskTypeId) return undefined;
-            return taskTypeStore.getters.taskTypes.find((taskType) => taskType.task_type_id === state.targetTaskTypeId);
+            return getters.taskTypes?.find((taskType) => taskType.task_type_id === state.targetTaskTypeId);
         }),
     }) as UnwrapRef<UseTaskCategoryPageStoreGetters>;
 
@@ -142,6 +145,16 @@ export const useTaskCategoryPageStore = defineStore('task-management-category-pa
             state.targetStatus = undefined;
         },
         // task type
+        async listTaskTypes() {
+            try {
+                if (!state.currentCategoryId) throw new Error('currentCategoryId is not set');
+                const taskTypes = await taskTypeStore.listByCategoryId(state.currentCategoryId, undefined, true);
+                return taskTypes;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                return [];
+            }
+        },
         openAddTaskTypeForm() {
             state.targetTaskTypeId = undefined;
             state.visibleTaskTypeForm = true;
@@ -171,6 +184,5 @@ export const useTaskCategoryPageStore = defineStore('task-management-category-pa
         getters,
         ...actions,
         taskCategoryStore,
-        taskTypeStore,
     };
 });

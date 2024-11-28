@@ -37,7 +37,6 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
     const packageStore = usePackageStore();
     const taskCategoryStore = useTaskCategoryStore();
     const workspaceReferenceStore = useWorkspaceReferenceStore();
-    // const taskTypeStore = useTaskTypeStore();
     const state = reactive<UseTaskManagementPageStoreState>({
         // support package
         visiblePackageForm: false,

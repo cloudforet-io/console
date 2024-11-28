@@ -9,10 +9,9 @@ import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tabl
 import ActionMenuButton from '@/common/components/buttons/ActionMenuButton.vue';
 
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
-import { useTaskTypeStore } from '@/services/ops-flow/stores/admin/task-type-store';
 
 const taskCategoryPageStore = useTaskCategoryPageStore();
-const taskTypeStore = useTaskTypeStore();
+const taskCategoryPageGetters = taskCategoryPageStore.getters;
 
 const taskTypeFields = computed<DataTableField[]>(() => [
     {
@@ -42,7 +41,7 @@ const taskTypeFields = computed<DataTableField[]>(() => [
             </template>
             <template #extra>
                 <p-icon-button name="ic_refresh"
-                               @click="taskTypeStore.list()"
+                               @click="taskCategoryPageStore.listTaskTypes()"
                 />
                 <p-button style-type="substitutive"
                           icon-left="ic_plus_bold"
@@ -56,8 +55,8 @@ const taskTypeFields = computed<DataTableField[]>(() => [
             티켓 양식으로 티켓에 포함된 필드와 데이터를 결정합니다. 여러 티켓 양식을 만들 수 있습니다. <br>
             예를 들어 서비스별로 서로 다른 양식을 만들 수 있습니다. 그런 경우에는 최종 사용자가 적절한 양식을 선택하여 요청을 제출합니다.
         </p>
-        <p-data-table :loading="!taskCategoryPageStore.getters.taskTypes"
-                      :items="taskCategoryPageStore.getters.taskTypes"
+        <p-data-table :loading="!taskCategoryPageGetters.taskTypes"
+                      :items="taskCategoryPageGetters.taskTypes"
                       :fields="taskTypeFields"
         >
             <template #col-buttons-format="{ item }">
