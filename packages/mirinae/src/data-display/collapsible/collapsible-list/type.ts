@@ -1,10 +1,10 @@
 import type { COLLAPSIBLE_LIST_THEME, COLLAPSIBLE_LIST_TOGGLE_POSITION } from '@/data-display/collapsible/collapsible-list/config';
 import type { COLLAPSIBLE_TOGGLE_TYPE } from '@/data-display/collapsible/collapsible-toggle/type';
 
-export interface CollapsibleItem {
+export interface CollapsibleItem<T = string> {
     name?: string;
     title?: string;
-    data: string;
+    data: T;
 }
 
 export interface CollapsibleListProps {
