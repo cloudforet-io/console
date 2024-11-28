@@ -1,6 +1,4 @@
-import { asyncComputed } from '@vueuse/core';
-import type { Ref } from 'vue';
-import { reactive } from 'vue';
+import { reactive, computed } from 'vue';
 
 import { defineStore } from 'pinia';
 
@@ -22,9 +20,6 @@ interface UseTaskCategoryStoreState {
     loading: boolean;
     items?: TaskCategoryModel[];
 }
-interface UseTaskCategoryStoreGetters {
-    taskCategories: Ref<Readonly<TaskCategoryModel[]>>
-}
 const DEFAULT_STATUS_OPTIONS: TaskCategoryCreateParameters['status_options'] = {
     TODO: [
         { name: 'To Do', color: 'blue200', is_default: true },
@@ -40,16 +35,17 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
     const state = reactive<UseTaskCategoryStoreState>({
         loading: false,
         items: undefined,
-    }) as UseTaskCategoryStoreState;
+    });
 
-    const getters = reactive<UseTaskCategoryStoreGetters>({
-        taskCategories: asyncComputed<TaskCategoryModel[]>(async () => {
+    const getters = {
+        loading: computed<boolean>(() => state.loading),
+        taskCategories: computed<TaskCategoryModel[]>(() => {
             if (state.items === undefined) {
-                await actions.list();
+                actions.list();
             }
             return state.items ?? [];
-        }, [], { lazy: true }),
-    });
+        }),
+    };
 
 
     const fetchList = getCancellableFetcher<TaskCategoryListParameters, ListResponse<TaskCategoryModel>>(SpaceConnector.clientV2.opsflow.taskCategory.list);

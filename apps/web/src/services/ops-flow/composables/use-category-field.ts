@@ -8,18 +8,18 @@ import type { PackageModel } from '@/schema/identity/package/model';
 
 import { useFieldValidator } from '@/common/composables/form-validator';
 
-import type { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
 
 interface CategoryItem extends SelectDropdownMenuItem {
     packageId: string;
 }
 export const useCategoryField = ({
     defaultPackage,
-    taskCategoryStore,
 }: {
     defaultPackage: DeepReadonly<Ref<PackageModel|undefined>>;
-    taskCategoryStore: ReturnType<typeof useTaskCategoryStore>
 }) => {
+    const taskCategoryStore = useTaskCategoryStore();
+
     const categoryValidator = useFieldValidator<CategoryItem[]>(
         [],
     );

@@ -76,7 +76,7 @@ const state = reactive({
         <p class="px-4 mb-6 text-label-md text-gray-600">
             계약에 따라 고객이 이용할 수 있는 기능의 묶음입니다. 전체 서비스의 범위를 나타내며, 하위 카테고를 생성할 수 있습니다.
         </p>
-        <p-data-table :loading="packageStore.state.loading"
+        <p-data-table :loading="packageStore.getters.loading"
                       :items="packageStore.getters.packages"
                       :fields="state.packageFields"
         >

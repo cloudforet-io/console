@@ -26,11 +26,11 @@ import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
 
 const taskCategoryPageStore = useTaskCategoryPageStore();
-const taskCategoryPageState = taskCategoryPageStore.$state;
+const taskCategoryPageState = taskCategoryPageStore.state;
 const taskCategoryStore = useTaskCategoryStore();
 
 /* status type */
-const statusIdAndNames = computed<[id: string, name: string][]>(() => Object.values(taskCategoryPageStore.statusOptions).flat().map((p) => [p.status_id, p.name]));
+const statusIdAndNames = computed<[id: string, name: string][]>(() => Object.values(taskCategoryPageStore.getters.statusOptions).flat().map((p) => [p.status_id, p.name]));
 const statusTypeItems = computed<SelectDropdownMenuItem[]>(() => [
     { label: 'To-do', name: 'TODO' },
     { label: 'In progress', name: 'IN_PROGRESS' },
@@ -53,7 +53,7 @@ const {
     name(value: string) {
         if (!value.trim().length) return 'Name is required';
         if (value.length > 50) return 'Name should be less than 50 characters';
-        const statusId = taskCategoryPageStore.targetStatusOption?.data.status_id;
+        const statusId = taskCategoryPageStore.getters.targetStatusOption?.data.status_id;
         if (statusIdAndNames.value.some((p) => p[1] === value && p[0] !== statusId)) return 'Name already exists';
         return true;
     },
@@ -123,10 +123,10 @@ const handleConfirm = async () => {
             throw new Error('Category ID is required');
         }
         loading.value = true;
-        if (taskCategoryPageStore.targetStatusOption) {
-            await updateStatusOptions(taskCategoryPageState.currentCategoryId, taskCategoryPageStore.statusOptions, taskCategoryPageStore.targetStatusOption);
+        if (taskCategoryPageStore.getters.targetStatusOption) {
+            await updateStatusOptions(taskCategoryPageState.currentCategoryId, taskCategoryPageStore.getters.statusOptions, taskCategoryPageStore.getters.targetStatusOption);
         } else {
-            await createStatusOption(taskCategoryPageState.currentCategoryId, taskCategoryPageStore.statusOptions);
+            await createStatusOption(taskCategoryPageState.currentCategoryId, taskCategoryPageStore.getters.statusOptions);
         }
         taskCategoryPageStore.closeStatusForm();
     } catch (e) {
@@ -137,15 +137,15 @@ const handleConfirm = async () => {
 };
 
 onBeforeMount(() => {
-    if (taskCategoryPageStore.targetStatusOption) {
-        const { type, data } = taskCategoryPageStore.targetStatusOption;
+    if (taskCategoryPageStore.getters.targetStatusOption) {
+        const { type, data } = taskCategoryPageStore.getters.targetStatusOption;
         setForm('name', data.name);
         setForm('statusType', statusTypeItems.value.find((p) => p.name === type) ?? statusTypeItems.value[0]);
         setForm('color', data.color ?? TASK_STATUS_COLOR_NAMES[0]);
     }
 });
 
-watch([() => taskCategoryPageState.visibleStatusForm, () => taskCategoryPageStore.targetStatusOption], async ([visible, target], [prevVisible]) => {
+watch([() => taskCategoryPageState.visibleStatusForm, () => taskCategoryPageStore.getters.targetStatusOption], async ([visible, target], [prevVisible]) => {
     if (!visible) {
         if (!prevVisible) return; // prevent initial call
         await nextTick(); // wait for closing animation
@@ -168,7 +168,7 @@ watch([() => taskCategoryPageState.visibleStatusForm, () => taskCategoryPageStor
 </script>
 
 <template>
-    <p-overlay-layout :title="taskCategoryPageStore.targetStatusOption ? 'Edit Status' : 'Add Status'"
+    <p-overlay-layout :title="taskCategoryPageStore.getters.targetStatusOption ? 'Edit Status' : 'Add Status'"
                       :visible="taskCategoryPageState.visibleStatusForm"
                       @close="handleCancelOrClose"
     >
@@ -187,7 +187,7 @@ watch([() => taskCategoryPageState.visibleStatusForm, () => taskCategoryPageStor
                         />
                     </template>
                 </p-field-group>
-                <p-field-group v-if="!taskCategoryPageStore.targetStatusOption?.data?.is_default"
+                <p-field-group v-if="!taskCategoryPageStore.getters.targetStatusOption?.data?.is_default"
                                label="Status Type"
                                required
                                :invalid="!loading && invalidState.statusType"

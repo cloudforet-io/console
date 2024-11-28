@@ -41,8 +41,8 @@ const loading = ref<boolean>(false);
 const handleConfirm = async () => {
     try {
         loading.value = true;
-        if (!taskCategoryPageStore.$state.currentCategoryId) throw new Error('Category ID is required');
-        await deleteStatusOption(taskCategoryPageStore.$state.currentCategoryId, taskCategoryPageStore.statusOptions, taskCategoryPageStore.targetStatusOption);
+        if (!taskCategoryPageStore.state.currentCategoryId) throw new Error('Category ID is required');
+        await deleteStatusOption(taskCategoryPageStore.state.currentCategoryId, taskCategoryPageStore.getters.statusOptions, taskCategoryPageStore.getters.targetStatusOption);
         taskCategoryPageStore.closeDeleteStatusModal();
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -59,7 +59,7 @@ const handleClosed = () => {
 </script>
 
 <template>
-    <delete-modal :visible="taskCategoryPageStore.$state.visibleStatusDeleteModal"
+    <delete-modal :visible="taskCategoryPageStore.state.visibleStatusDeleteModal"
                   header-title="Are you sure you want to delete this status?"
                   size="sm"
                   :loading="loading"

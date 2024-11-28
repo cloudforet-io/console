@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import {
-    ref, nextTick, watch, toRef,
+    ref, nextTick, watch,
 } from 'vue';
 
 
 import {
     POverlayLayout, PFieldGroup, PTextInput, PSelectDropdown, PButton, PTextarea,
 } from '@cloudforet/mirinae';
-
-import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -25,9 +23,8 @@ import TaskFieldsConfiguration from '@/services/ops-flow/task-fields-configurati
 
 
 const taskCategoryPageStore = useTaskCategoryPageStore();
-const taskCategoryPageState = taskCategoryPageStore.$state;
+const taskCategoryPageState = taskCategoryPageStore.state;
 const taskTypeStore = useTaskTypeStore();
-const userReferenceStore = useUserReferenceStore();
 
 
 /* assignee pool */
@@ -37,9 +34,7 @@ const {
     userMenuItemsHandler,
     handleUpdateSelectedUserItems,
     setInitialUsers,
-} = useAssigneePoolField({
-    userReferenceMap: toRef(userReferenceStore.getters, 'userItems'),
-});
+} = useAssigneePoolField();
 
 /* task field configuration */
 const {
@@ -135,8 +130,8 @@ const handleConfirm = async () => {
     try {
         if (!taskCategoryPageState.currentCategoryId) throw new Error('Category ID is not set');
         loading.value = true;
-        if (taskCategoryPageStore.targetTaskType) {
-            await updateTaskType(taskCategoryPageStore.targetTaskType.category_id, taskCategoryPageState.currentCategoryId);
+        if (taskCategoryPageStore.getters.targetTaskType) {
+            await updateTaskType(taskCategoryPageStore.getters.targetTaskType.category_id, taskCategoryPageState.currentCategoryId);
         } else {
             await createTaskType(taskCategoryPageState.currentCategoryId);
         }
@@ -148,7 +143,7 @@ const handleConfirm = async () => {
     }
 };
 
-watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageStore.targetTaskType], async ([visible, target], [prevVisible]) => {
+watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageStore.getters.targetTaskType], async ([visible, target], [prevVisible]) => {
     if (!visible) {
         if (!prevVisible) return; // prevent initial call
         await nextTick(); // wait for closing animation
@@ -172,7 +167,7 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageSt
 </script>
 
 <template>
-    <p-overlay-layout :title="taskCategoryPageStore.targetTaskType ? 'Edit Ticket Topic' : 'Add Ticket Topic'"
+    <p-overlay-layout :title="taskCategoryPageStore.getters.targetTaskType ? 'Edit Ticket Topic' : 'Add Ticket Topic'"
                       :visible="taskCategoryPageState.visibleTaskTypeForm"
                       size="lg"
                       @close="handleCancelOrClose"

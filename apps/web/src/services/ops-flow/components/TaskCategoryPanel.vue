@@ -82,7 +82,7 @@ const state = reactive({
         <p class="px-4 mb-6 text-label-md text-gray-600">
             티켓의 유형을 그룹화한 것입니다. 고객은 티켓을 제출할 때 적절한 카테고리를 선택하여 담당자가 티켓을 효율적으로 관리할 수 있게 돕습니다.
         </p>
-        <p-data-table :loading="taskCategoryStore.state.loading"
+        <p-data-table :loading="taskCategoryStore.getters.loading"
                       :items="taskCategoryStore.getters.taskCategories"
                       :fields="state.categoryFields"
         >

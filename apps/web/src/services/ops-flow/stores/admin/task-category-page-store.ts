@@ -1,7 +1,6 @@
 import { asyncComputed } from '@vueuse/core';
-import type { ComputedRef, UnwrapRef, Ref } from 'vue';
 import {
-    reactive, computed, toRefs,
+    reactive, computed,
 } from 'vue';
 
 import { defineStore } from 'pinia';
@@ -31,37 +30,22 @@ interface UseTaskCategoryPageStoreState {
     visibleTaskTypeDeleteModal: boolean;
 }
 
-interface UseTaskCategoryPageStoreGetters {
-    currentCategory: ComputedRef<TaskCategoryModel|undefined>;
-    // status
-    statusOptions: ComputedRef<TaskStatusOptions>;
-    targetStatusOption: ComputedRef<{
-            type: TaskStatusType;
-            data: TaskStatusOption;
-        }|undefined>;
-    // task type
-    taskTypes: Ref<Readonly<TaskTypeModel[]>|undefined>;
-    targetTaskType: ComputedRef<TaskTypeModel|undefined>;
-}
-
-const initialState = (): UseTaskCategoryPageStoreState => ({
-    currentCategoryId: undefined,
-    // status
-    visibleStatusForm: false,
-    targetStatus: undefined,
-    visibleStatusDeleteModal: false,
-    visibleSetDefaultStatusModal: false,
-    // task type
-    visibleTaskTypeForm: false,
-    targetTaskTypeId: undefined,
-    visibleTaskTypeDeleteModal: false,
-}
-);
 export const useTaskCategoryPageStore = defineStore('task-category-page', () => {
     const taskCategoryStore = useTaskCategoryStore();
     const taskTypeStore = useTaskTypeStore();
-    const state = reactive<UseTaskCategoryPageStoreState>(initialState());
-    const getters = reactive<UseTaskCategoryPageStoreGetters>({
+    const state = reactive<UseTaskCategoryPageStoreState>({
+        currentCategoryId: undefined,
+        // status
+        visibleStatusForm: false,
+        targetStatus: undefined,
+        visibleStatusDeleteModal: false,
+        visibleSetDefaultStatusModal: false,
+        // task type
+        visibleTaskTypeForm: false,
+        targetTaskTypeId: undefined,
+        visibleTaskTypeDeleteModal: false,
+    });
+    const getters = {
         currentCategory: computed<TaskCategoryModel|undefined>(() => taskCategoryStore.getters.taskCategories.find((c) => c.category_id === state.currentCategoryId)),
         // status
         statusOptions: computed<TaskStatusOptions>(() => {
@@ -100,7 +84,7 @@ export const useTaskCategoryPageStore = defineStore('task-category-page', () => 
             if (!state.targetTaskTypeId) return undefined;
             return getters.taskTypes?.find((taskType) => taskType.task_type_id === state.targetTaskTypeId);
         }),
-    });
+    };
     const actions = {
         setCurrentCategoryId(categoryId: string) {
             state.currentCategoryId = categoryId;
@@ -182,8 +166,8 @@ export const useTaskCategoryPageStore = defineStore('task-category-page', () => 
         },
     };
     return {
-        ...toRefs(state),
-        ...toRefs<UnwrapRef<UseTaskCategoryPageStoreGetters>>(getters),
+        state,
+        getters,
         ...actions,
     };
 });

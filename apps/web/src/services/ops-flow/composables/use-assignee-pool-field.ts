@@ -1,21 +1,20 @@
 import type { Ref } from 'vue';
-import { ref, computed } from 'vue';
+import { ref, computed, toRef } from 'vue';
 
 import { getTextHighlightRegex } from '@cloudforet/mirinae';
 import type { AutocompleteHandler, SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
+import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 
 interface UserDropdownItem {
     name: string;
     label: string;
     isUserGroup?: boolean;
 }
-export const useAssigneePoolField = ({
-    userReferenceMap,
-}: {
-    userReferenceMap: Ref<UserReferenceMap>;
-}) => {
+export const useAssigneePoolField = () => {
+    const userReferenceStore = useUserReferenceStore();
+    const userReferenceMap: Ref<UserReferenceMap> = toRef(userReferenceStore.getters, 'userItems');
     const allUserItems = computed<UserDropdownItem[]>(() => Object.values(userReferenceMap.value).map((u) => ({
         name: u.key,
         label: u.label,

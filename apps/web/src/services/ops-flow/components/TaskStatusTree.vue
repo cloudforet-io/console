@@ -25,13 +25,13 @@ const taskStatusTree = computed<{
 
 const handleUpdateItems = async (statusType: TaskStatusType, items: TaskStatusOption[]) => {
     try {
-        if (!taskCategoryPageStore.$state.currentCategoryId) {
+        if (!taskCategoryPageStore.state.currentCategoryId) {
             throw new Error('Category ID is required');
         }
         await taskCategoryStore.update({
-            category_id: taskCategoryPageStore.$state.currentCategoryId,
+            category_id: taskCategoryPageStore.state.currentCategoryId,
             status_options: {
-                ...taskCategoryPageStore.statusOptions,
+                ...taskCategoryPageStore.getters.statusOptions,
                 [statusType]: items,
             },
         });
@@ -48,7 +48,7 @@ const handleUpdateItems = async (statusType: TaskStatusType, items: TaskStatusOp
             <task-status-list :key="taskStatus.key"
                               :type="taskStatus.key"
                               :header="taskStatus.name"
-                              :items="taskCategoryPageStore.statusOptions[taskStatus.key]"
+                              :items="taskCategoryPageStore.getters.statusOptions[taskStatus.key]"
                               @update:items="handleUpdateItems(taskStatus.key, $event)"
             />
         </template>

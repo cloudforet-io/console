@@ -50,8 +50,8 @@ const taskCategoryStore = useTaskCategoryStore();
 
 
 /* header and back button */
-const loading = computed<boolean>(() => taskCategoryStore.state.loading);
-const headerTitle = computed<string>(() => taskCategoryPageStore.currentCategory?.name ?? 'No Category');
+const loading = computed<boolean>(() => taskCategoryStore.getters.loading);
+const headerTitle = computed<string>(() => taskCategoryPageStore.getters.currentCategory?.name ?? 'No Category');
 const {
     setPathFrom,
     handleClickBackButton,

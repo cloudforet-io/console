@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    toRef, ref, computed, watch, nextTick,
+    ref, computed, watch, nextTick,
 } from 'vue';
 
 import {
@@ -8,8 +8,6 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { PackageModel } from '@/schema/identity/package/model';
-
-import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -19,15 +17,12 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useCategoryField } from '@/services/ops-flow/composables/use-category-field';
 import { useWorkspaceField } from '@/services/ops-flow/composables/use-workspace-field';
 import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
-import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
-const workspaceReferenceStore = useWorkspaceReferenceStore();
 const taskManagementPageStore = useTaskManagementPageStore();
 const taskManagementPageState = taskManagementPageStore.state;
 const taskManagementPageGetters = taskManagementPageStore.getters;
 const packageStore = usePackageStore();
-const taskCategoryStore = useTaskCategoryStore();
 
 
 
@@ -39,9 +34,7 @@ const {
     handleUpdateSelectedWorkspaces,
     setInitialWorkspaces,
     applyPackageToWorkspaces,
-} = useWorkspaceField({
-    workspaceReferenceMap: toRef(workspaceReferenceStore.state, 'items'),
-});
+} = useWorkspaceField();
 
 /* category */
 const {
@@ -53,7 +46,6 @@ const {
     applyPackageToCategories,
 } = useCategoryField({
     defaultPackage: computed<PackageModel|undefined>(() => packageStore.getters.packages.find((p) => p.is_default)),
-    taskCategoryStore,
 });
 
 /* form */

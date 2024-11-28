@@ -1,6 +1,5 @@
 import { asyncComputed } from '@vueuse/core';
-import type { Ref, UnwrapRef } from 'vue';
-import { reactive } from 'vue';
+import { reactive, computed } from 'vue';
 
 import { defineStore } from 'pinia';
 
@@ -22,23 +21,21 @@ interface UsePackageStoreState {
     loading: boolean;
     items?: PackageModel[];
 }
-interface UsePackageStoreGetters {
-    packages: Ref<Readonly<PackageModel[]>>
-}
 export const usePackageStore = defineStore('package', () => {
     const state = reactive<UsePackageStoreState>({
         loading: false,
         items: undefined,
     });
 
-    const getters = reactive<UsePackageStoreGetters>({
+    const getters = {
+        loading: computed(() => state.loading),
         packages: asyncComputed<PackageModel[]>(async () => {
             if (state.items === undefined) {
                 await actions.list();
             }
             return state.items ?? [];
         }, [], { lazy: true }),
-    }) as UnwrapRef<UsePackageStoreGetters>;
+    };
 
     const fetchList = getCancellableFetcher<PackageListParameters, ListResponse<PackageModel>>(SpaceConnector.clientV2.identity.package.list);
     const actions = {
@@ -66,7 +63,7 @@ export const usePackageStore = defineStore('package', () => {
             return response;
         },
         async setDefaultPackage(packageId: string) {
-            const prevDefaultPackage = getters.packages.find((p) => p.is_default);
+            const prevDefaultPackage = getters.packages.value.find((p) => p.is_default);
             if (prevDefaultPackage?.package_id === packageId) return prevDefaultPackage;
             const response = await SpaceConnector.clientV2.identity.package.setDefault<PackageSetDefaultParameters, PackageModel>({
                 package_id: packageId,
@@ -85,7 +82,6 @@ export const usePackageStore = defineStore('package', () => {
         },
     };
     return {
-        state,
         getters,
         ...actions,
     };

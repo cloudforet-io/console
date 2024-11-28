@@ -18,7 +18,7 @@ const taskCategoryPageStore = useTaskCategoryPageStore();
 const taskCategoryStore = useTaskCategoryStore();
 
 const loading = ref<boolean>(false);
-const name = computed(() => taskCategoryPageStore.targetStatusOption?.data?.name ?? '');
+const name = computed(() => taskCategoryPageStore.getters.targetStatusOption?.data?.name ?? '');
 
 const setAsDefaultStatus = async (categoryId: string, allStatusOptions: TaskStatusOptions, targetStatusOption: {
             type: TaskStatusType;
@@ -46,10 +46,13 @@ const setAsDefaultStatus = async (categoryId: string, allStatusOptions: TaskStat
 const handleConfirm = async () => {
     loading.value = true;
     try {
-        if (!taskCategoryPageStore.targetStatusOption) {
+        if (!taskCategoryPageStore.state.currentCategoryId) {
+            throw new Error('Category ID is required');
+        }
+        if (!taskCategoryPageStore.getters.targetStatusOption) {
             throw new Error('[Console Error] Cannot set default status without a target status');
         }
-        await setAsDefaultStatus(taskCategoryPageStore.$state.currentCategoryId, taskCategoryPageStore.statusOptions, taskCategoryPageStore.targetStatusOption);
+        await setAsDefaultStatus(taskCategoryPageStore.state.currentCategoryId, taskCategoryPageStore.getters.statusOptions, taskCategoryPageStore.getters.targetStatusOption);
         taskCategoryPageStore.closeSetDefaultStatusModal();
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -66,7 +69,7 @@ const handleClosed = () => {
 </script>
 
 <template>
-    <p-button-modal :visible="taskCategoryPageStore.$state.visibleSetDefaultStatusModal"
+    <p-button-modal :visible="taskCategoryPageStore.state.visibleSetDefaultStatusModal"
                     size="sm"
                     :loading="loading"
                     @confirm="handleConfirm"
