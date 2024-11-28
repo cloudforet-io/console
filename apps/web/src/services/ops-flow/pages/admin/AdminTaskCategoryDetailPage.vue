@@ -20,7 +20,7 @@ export default defineComponent({
 /* eslint-disable import/first */
 // eslint-disable-next-line import/no-duplicates,import/order
 // eslint-disable-next-line import/no-duplicates
-import { computed, onBeforeMount } from 'vue';
+import { computed, onBeforeMount, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PHeading, PTab, PSkeleton } from '@cloudforet/mirinae';
@@ -37,6 +37,7 @@ import TaskStatusSetDefaultModal from '@/services/ops-flow/components/TaskStatus
 import TaskTypeForm from '@/services/ops-flow/components/TaskTypeForm.vue';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
 
 const props = defineProps<{
     taskCategoryId: string;
@@ -45,13 +46,12 @@ const router = useRouter();
 const route = useRoute();
 
 const taskCategoryPageStore = useTaskCategoryPageStore();
-const taskCategoryPageGetters = taskCategoryPageStore.getters;
-const taskCategoryStore = taskCategoryPageStore.taskCategoryStore;
+const taskCategoryStore = useTaskCategoryStore();
 
 
 /* header and back button */
 const loading = computed<boolean>(() => taskCategoryStore.state.loading);
-const headerTitle = computed<string>(() => taskCategoryPageGetters.currentCategory?.name ?? 'No Category');
+const headerTitle = computed<string>(() => taskCategoryPageStore.currentCategory?.name ?? 'No Category');
 const {
     setPathFrom,
     handleClickBackButton,
@@ -97,6 +97,9 @@ const handleUpdateActiveTab = (tab: string) => {
 /* lifecycle */
 onBeforeMount(() => {
     taskCategoryPageStore.setCurrentCategoryId(props.taskCategoryId);
+});
+onUnmounted(() => {
+    taskCategoryPageStore.$dispose();
 });
 
 /* expose */

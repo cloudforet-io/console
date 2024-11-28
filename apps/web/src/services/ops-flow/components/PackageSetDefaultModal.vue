@@ -7,10 +7,12 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
 const taskManagementPageStore = useTaskManagementPageStore();
-const packageStore = taskManagementPageStore.packageStore;
+const packageStore = usePackageStore();
+
 const loading = ref<boolean>(false);
 const name = computed(() => taskManagementPageStore.getters.targetPackage?.name ?? '');
 const handleConfirm = async () => {

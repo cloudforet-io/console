@@ -25,8 +25,7 @@ import TaskFieldsConfiguration from '@/services/ops-flow/task-fields-configurati
 
 
 const taskCategoryPageStore = useTaskCategoryPageStore();
-const taskCategoryPageState = taskCategoryPageStore.state;
-const taskCategoryPageGetters = taskCategoryPageStore.getters;
+const taskCategoryPageState = taskCategoryPageStore.$state;
 const taskTypeStore = useTaskTypeStore();
 const userReferenceStore = useUserReferenceStore();
 
@@ -136,8 +135,8 @@ const handleConfirm = async () => {
     try {
         if (!taskCategoryPageState.currentCategoryId) throw new Error('Category ID is not set');
         loading.value = true;
-        if (taskCategoryPageGetters.targetTaskType) {
-            await updateTaskType(taskCategoryPageGetters.targetTaskType.category_id, taskCategoryPageState.currentCategoryId);
+        if (taskCategoryPageStore.targetTaskType) {
+            await updateTaskType(taskCategoryPageStore.targetTaskType.category_id, taskCategoryPageState.currentCategoryId);
         } else {
             await createTaskType(taskCategoryPageState.currentCategoryId);
         }
@@ -149,7 +148,7 @@ const handleConfirm = async () => {
     }
 };
 
-watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGetters.targetTaskType], async ([visible, target], [prevVisible]) => {
+watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageStore.targetTaskType], async ([visible, target], [prevVisible]) => {
     if (!visible) {
         if (!prevVisible) return; // prevent initial call
         await nextTick(); // wait for closing animation
@@ -173,7 +172,7 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
 </script>
 
 <template>
-    <p-overlay-layout :title="taskCategoryPageGetters.targetTaskType ? 'Edit Ticket Topic' : 'Add Ticket Topic'"
+    <p-overlay-layout :title="taskCategoryPageStore.targetTaskType ? 'Edit Ticket Topic' : 'Add Ticket Topic'"
                       :visible="taskCategoryPageState.visibleTaskTypeForm"
                       size="lg"
                       @close="handleCancelOrClose"

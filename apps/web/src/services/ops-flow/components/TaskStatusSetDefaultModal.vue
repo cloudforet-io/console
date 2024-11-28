@@ -12,13 +12,13 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
 
 const taskCategoryPageStore = useTaskCategoryPageStore();
-const taskCategoryPageGetters = taskCategoryPageStore.getters;
-const taskCategoryStore = taskCategoryPageStore.taskCategoryStore;
+const taskCategoryStore = useTaskCategoryStore();
 
 const loading = ref<boolean>(false);
-const name = computed(() => taskCategoryPageGetters.targetStatusOption?.data?.name ?? '');
+const name = computed(() => taskCategoryPageStore.targetStatusOption?.data?.name ?? '');
 
 const setAsDefaultStatus = async (categoryId: string, allStatusOptions: TaskStatusOptions, targetStatusOption: {
             type: TaskStatusType;
@@ -46,10 +46,10 @@ const setAsDefaultStatus = async (categoryId: string, allStatusOptions: TaskStat
 const handleConfirm = async () => {
     loading.value = true;
     try {
-        if (!taskCategoryPageGetters.targetStatusOption) {
+        if (!taskCategoryPageStore.targetStatusOption) {
             throw new Error('[Console Error] Cannot set default status without a target status');
         }
-        await setAsDefaultStatus(taskCategoryPageStore.state.currentCategoryId, taskCategoryPageGetters.statusOptions, taskCategoryPageGetters.targetStatusOption);
+        await setAsDefaultStatus(taskCategoryPageStore.$state.currentCategoryId, taskCategoryPageStore.statusOptions, taskCategoryPageStore.targetStatusOption);
         taskCategoryPageStore.closeSetDefaultStatusModal();
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -66,7 +66,7 @@ const handleClosed = () => {
 </script>
 
 <template>
-    <p-button-modal :visible="taskCategoryPageStore.state.visibleSetDefaultStatusModal"
+    <p-button-modal :visible="taskCategoryPageStore.$state.visibleSetDefaultStatusModal"
                     size="sm"
                     :loading="loading"
                     @confirm="handleConfirm"

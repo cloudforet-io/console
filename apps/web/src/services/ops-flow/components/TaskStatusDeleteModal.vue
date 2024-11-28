@@ -11,9 +11,10 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
 
 const taskCategoryPageStore = useTaskCategoryPageStore();
-const taskCategoryStore = taskCategoryPageStore.taskCategoryStore;
+const taskCategoryStore = useTaskCategoryStore();
 
 const deleteStatusOption = async (categoryId: string, allStatusOptions: TaskStatusOptions, targetStatusOption: {
             type: TaskStatusType;
@@ -40,8 +41,8 @@ const loading = ref<boolean>(false);
 const handleConfirm = async () => {
     try {
         loading.value = true;
-        if (!taskCategoryPageStore.state.currentCategoryId) throw new Error('Category ID is required');
-        await deleteStatusOption(taskCategoryPageStore.state.currentCategoryId, taskCategoryPageStore.getters.statusOptions, taskCategoryPageStore.getters.targetStatusOption);
+        if (!taskCategoryPageStore.$state.currentCategoryId) throw new Error('Category ID is required');
+        await deleteStatusOption(taskCategoryPageStore.$state.currentCategoryId, taskCategoryPageStore.statusOptions, taskCategoryPageStore.targetStatusOption);
         taskCategoryPageStore.closeDeleteStatusModal();
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -58,7 +59,7 @@ const handleClosed = () => {
 </script>
 
 <template>
-    <delete-modal :visible="taskCategoryPageStore.state.visibleStatusDeleteModal"
+    <delete-modal :visible="taskCategoryPageStore.$state.visibleStatusDeleteModal"
                   header-title="Are you sure you want to delete this status?"
                   size="sm"
                   :loading="loading"

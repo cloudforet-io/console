@@ -9,10 +9,10 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import TaskStatusList from '@/services/ops-flow/components/TaskStatusList.vue';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
 
 const taskCategoryPageStore = useTaskCategoryPageStore();
-const taskCategoryPageGetters = taskCategoryPageStore.getters;
-const taskCategoryStore = taskCategoryPageStore.taskCategoryStore;
+const taskCategoryStore = useTaskCategoryStore();
 
 const taskStatusTree = computed<{
     key: TaskStatusType,
@@ -25,13 +25,13 @@ const taskStatusTree = computed<{
 
 const handleUpdateItems = async (statusType: TaskStatusType, items: TaskStatusOption[]) => {
     try {
-        if (!taskCategoryPageStore.state.currentCategoryId) {
+        if (!taskCategoryPageStore.$state.currentCategoryId) {
             throw new Error('Category ID is required');
         }
         await taskCategoryStore.update({
-            category_id: taskCategoryPageStore.state.currentCategoryId,
+            category_id: taskCategoryPageStore.$state.currentCategoryId,
             status_options: {
-                ...taskCategoryPageGetters.statusOptions,
+                ...taskCategoryPageStore.statusOptions,
                 [statusType]: items,
             },
         });
@@ -48,7 +48,7 @@ const handleUpdateItems = async (statusType: TaskStatusType, items: TaskStatusOp
             <task-status-list :key="taskStatus.key"
                               :type="taskStatus.key"
                               :header="taskStatus.name"
-                              :items="taskCategoryPageGetters.statusOptions[taskStatus.key]"
+                              :items="taskCategoryPageStore.statusOptions[taskStatus.key]"
                               @update:items="handleUpdateItems(taskStatus.key, $event)"
             />
         </template>

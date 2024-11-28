@@ -18,14 +18,16 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import { useCategoryField } from '@/services/ops-flow/composables/use-category-field';
 import { useWorkspaceField } from '@/services/ops-flow/composables/use-workspace-field';
+import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
 const workspaceReferenceStore = useWorkspaceReferenceStore();
 const taskManagementPageStore = useTaskManagementPageStore();
 const taskManagementPageState = taskManagementPageStore.state;
 const taskManagementPageGetters = taskManagementPageStore.getters;
-const packageStore = taskManagementPageStore.packageStore;
-const taskCategoryStore = taskManagementPageStore.taskCategoryStore;
+const packageStore = usePackageStore();
+const taskCategoryStore = useTaskCategoryStore();
 
 
 

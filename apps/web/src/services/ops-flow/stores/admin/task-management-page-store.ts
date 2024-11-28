@@ -119,8 +119,6 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
         },
     };
     return {
-        packageStore,
-        taskCategoryStore,
         state,
         getters,
         ...actions,

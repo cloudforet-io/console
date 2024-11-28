@@ -9,11 +9,12 @@ import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tabl
 
 import ActionMenuButton from '@/common/components/buttons/ActionMenuButton.vue';
 
+import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
 
 const taskManagementPageStore = useTaskManagementPageStore();
-const packageStore = taskManagementPageStore.packageStore;
+const packageStore = usePackageStore();
 
 const state = reactive({
     packageFields: computed<DataTableField[]>(() => [

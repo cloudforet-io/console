@@ -11,14 +11,16 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 import ActionMenuButton from '@/common/components/buttons/ActionMenuButton.vue';
 
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
+import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
 const taskManagementPageStore = useTaskManagementPageStore();
-const taskCategoryStore = taskManagementPageStore.taskCategoryStore;
-const packageStore = taskManagementPageStore.packageStore;
+const taskCategoryStore = useTaskCategoryStore();
+const packageStore = usePackageStore();
 
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 

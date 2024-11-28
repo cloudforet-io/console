@@ -9,10 +9,11 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AssociatedCategories from '@/services/ops-flow/components/AssociatedCategories.vue';
 import AssociatedWorkspaces from '@/services/ops-flow/components/AssociatedWorkspaces.vue';
+import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
 const taskManagementPageStore = useTaskManagementPageStore();
-const packageStore = taskManagementPageStore.packageStore;
+const packageStore = usePackageStore();
 
 const deletable = computed(() => !taskManagementPageStore.getters.associatedCategoriesToPackage.length
         && !taskManagementPageStore.getters.associatedWorkspacesToPackage.length);

@@ -19,27 +19,23 @@ import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface UseTaskTypeStoreState {
-    items?: TaskTypeModel[];
     itemsByCategoryId: Record<string, TaskTypeModel[]|undefined>;
 }
 
 export const useTaskTypeStore = defineStore('task-type', () => {
     const state = reactive<UseTaskTypeStoreState>({
-        items: undefined,
-        itemsByCategoryId: {
-            all: undefined,
-        },
+        itemsByCategoryId: {},
     });
 
     const fetchList = getCancellableFetcher<TaskTypeListParameters, ListResponse<TaskTypeModel>>(SpaceConnector.clientV2.opsflow.taskType.list);
     const actions = {
-        async listByCategoryId(categoryId: string|'all', query?: Query, force?: boolean): Promise<TaskTypeModel[]> {
+        async listByCategoryId(categoryId: string, query?: Query, force?: boolean): Promise<TaskTypeModel[]> {
             if (!query && state.itemsByCategoryId[categoryId] && !force) {
                 return state.itemsByCategoryId[categoryId] as TaskTypeModel[];
             }
 
             try {
-                let _query: Query = categoryId === 'all' ? {} : { filter: [{ k: 'category_id', v: categoryId, o: 'eq' }] };
+                let _query: Query = { filter: [{ k: 'category_id', v: categoryId, o: 'eq' }] };
                 if (query) {
                     _query = merge(query, _query);
                 }
@@ -56,11 +52,17 @@ export const useTaskTypeStore = defineStore('task-type', () => {
         },
         async create(params: TaskTypeCreateParameters) {
             const response = await SpaceConnector.clientV2.opsflow.taskType.create<TaskTypeCreateParameters, TaskTypeModel>(params);
-            state.items?.push(response);
+            const categoryId = response.category_id;
+            if (state.itemsByCategoryId[categoryId]) {
+                state.itemsByCategoryId[categoryId]?.push(response);
+            } else {
+                state.itemsByCategoryId[categoryId] = [response];
+            }
         },
         async update(params: TaskTypeUpdateParameters) {
             const response = await SpaceConnector.clientV2.opsflow.taskType.update<TaskTypeUpdateParameters, TaskTypeModel>(params);
-            const item = state.items?.find((c) => c.category_id === response.category_id);
+            const categoryId = response.category_id;
+            const item = state.itemsByCategoryId[categoryId]?.find((c) => c.category_id === categoryId);
             if (item) {
                 Object.assign(item, response);
             }
@@ -68,7 +70,8 @@ export const useTaskTypeStore = defineStore('task-type', () => {
         },
         async updateFields(params: TaskTypeUpdateFieldsParameters) {
             const response = await SpaceConnector.clientV2.opsflow.taskType.updateFields<TaskTypeUpdateFieldsParameters, TaskTypeModel>(params);
-            const item = state.items?.find((c) => c.category_id === response.category_id);
+            const categoryId = response.category_id;
+            const item = state.itemsByCategoryId[categoryId]?.find((c) => c.category_id === categoryId);
             if (item) {
                 Object.assign(item, response);
             }
@@ -78,13 +81,19 @@ export const useTaskTypeStore = defineStore('task-type', () => {
             const response = await SpaceConnector.clientV2.opsflow.taskType.get<TaskTypeGetParameters, TaskTypeModel>({
                 task_type_id: taskTypeId,
             });
+            const categoryId = response.category_id;
+            const item = state.itemsByCategoryId[categoryId]?.find((c) => c.category_id === categoryId);
+            if (item) {
+                Object.assign(item, response);
+            }
             return response;
         },
         async delete(taskTypeId: string) {
-            await SpaceConnector.clientV2.opsflow.taskType.delete<TaskTypeDeleteParameters, TaskTypeModel>({
+            const response = await SpaceConnector.clientV2.opsflow.taskType.delete<TaskTypeDeleteParameters, TaskTypeModel>({
                 task_type_id: taskTypeId,
             });
-            state.items = state.items?.filter((item) => item.task_type_id !== taskTypeId);
+            const categoryId = response.category_id;
+            state.itemsByCategoryId[categoryId] = state.itemsByCategoryId[categoryId]?.filter((item) => item.task_type_id !== taskTypeId);
         },
     };
     return {
