@@ -242,7 +242,7 @@ watch(() => costTypeRef.value, (costType) => {
     }
 
     @screen tablet {
-        @apply flex-col;
+        flex-direction: column;
         row-gap: 0.5rem;
         .summary-card {
             width: auto;

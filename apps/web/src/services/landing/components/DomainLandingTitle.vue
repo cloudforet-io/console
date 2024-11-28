@@ -77,7 +77,8 @@ const handleClickStartButton = () => {
 
     @screen tablet {
         .title {
-            @apply text-display-md;
+            font-size: 1.5rem;
+            line-height: 1.25;
             max-width: 40.5rem;
             .icon {
                 width: 2rem !important;

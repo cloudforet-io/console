@@ -181,9 +181,8 @@ export default {
     align-items: center;
     flex-wrap: nowrap;
 
-    @screen lg {
-        @apply min-w-16;
-    }
+    @apply lg:min-w-16;
+
     .page-number-wrapper {
         @apply min-h-8 min-w-12 items-center justify-center inline-flex cursor-pointer;
         .page-number-list {
@@ -203,9 +202,7 @@ export default {
             }
         }
 
-        @screen lg {
-            @apply min-w-16;
-        }
+        @apply lg:min-w-16;
     }
     &.sm {
         .page-number-wrapper {

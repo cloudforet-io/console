@@ -253,11 +253,11 @@ const onConfirmResolve = () => {
 
     @screen mobile {
         .only-desktop {
-            @apply hidden;
+            display: none;
         }
 
         .only-mobile {
-            @apply inline-block;
+            display: inline-block;
         }
     }
 }

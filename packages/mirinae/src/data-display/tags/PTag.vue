@@ -130,7 +130,7 @@ export default defineComponent<Props>({
         }
     }
     &.outline {
-        @apply text-gray-dark bg-transparent border border-gray-200;
+        @apply text-gray-dark bg-transparent border border-gray-200 outline-0;
         &.selected {
             @apply bg-blue-200 border-blue-300;
         }

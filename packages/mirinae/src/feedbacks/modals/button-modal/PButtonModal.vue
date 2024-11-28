@@ -2,6 +2,7 @@
     <section class="p-button-modal">
         <transition v-if="visible"
                     name="modal"
+                    @after-leave="onModalLeave"
         >
             <div class="modal-mask"
                  :class="[{'no-backdrop':!backdrop}, {'absolute': !!absolute}]"
@@ -251,6 +252,9 @@ export default defineComponent<ButtonModalProps>({
         const onConfirmClick = () => {
             emit('confirm');
         };
+        const onModalLeave = () => {
+            emit('closed');
+        };
 
         return {
             ...toRefs(state),
@@ -262,6 +266,7 @@ export default defineComponent<ButtonModalProps>({
             onCloseClick,
             onCancelClick,
             onConfirmClick,
+            onModalLeave,
         };
     },
 });

@@ -129,9 +129,7 @@ export default {
             margin-right: 1rem;
         }
 
-        @screen lg {
-            @apply min-w-16;
-        }
+        @apply lg:min-w-16;
     }
 }
 </style>

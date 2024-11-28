@@ -134,6 +134,7 @@ watch(() => state.searchText, debounce(async (searchText) => {
                        :selected="state.selected"
                        disable-handler
                        use-fixed-menu-style
+                       is-fixed-width
                        is-filterable
                        @click-button="handleClickCreateButton"
                        @click-show-more="handleClickShowMore"

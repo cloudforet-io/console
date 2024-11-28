@@ -399,7 +399,9 @@ const handleRouteToSignInWithRedirectPath = () => {
         @screen tablet {
             margin-top: 0;
             .main-contents-wrapper {
-                @apply row-start-1 row-end-1 col-span-12;
+                grid-row-start: 1;
+                grid-row-end: 1;
+                grid-column: span 12 / span 12;
             }
         }
     }

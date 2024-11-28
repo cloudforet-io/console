@@ -10,7 +10,7 @@ import type { DomainConfigListParameters } from '@/schema/config/domain-config/a
 import type { DomainConfigUpdateParameters } from '@/schema/config/domain-config/api-verbs/update';
 import type { DomainConfigModel } from '@/schema/config/domain-config/model';
 
-import { DOMAIN_CONFIG_TYPE } from '@/store/domain/constant';
+import { DOMAIN_CONFIG_NAMES } from '@/store/domain/constant';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -36,7 +36,7 @@ export const usePreferencesStore = defineStore('domain-config', () => {
     const fetchPreferences = async () => {
         try {
             const res = await SpaceConnector.client.config.domainConfig.list<DomainConfigListParameters, ListResponse<DomainConfigModel>>({
-                name: DOMAIN_CONFIG_TYPE.SETTINGS,
+                name: DOMAIN_CONFIG_NAMES.SETTINGS,
             });
             state.domainConfig = res.results?.[0] ?? null;
         } catch (e) {
@@ -47,7 +47,7 @@ export const usePreferencesStore = defineStore('domain-config', () => {
     const createPreferences = async (data: PreferencesData) => {
         try {
             state.domainConfig = await SpaceConnector.client.config.domainConfig.create<DomainConfigCreateParameters, DomainConfigModel>({
-                name: DOMAIN_CONFIG_TYPE.SETTINGS,
+                name: DOMAIN_CONFIG_NAMES.SETTINGS,
                 data,
             });
         } catch (e) {
@@ -62,7 +62,7 @@ export const usePreferencesStore = defineStore('domain-config', () => {
         }
         try {
             state.domainConfig = await SpaceConnector.client.config.domainConfig.update<DomainConfigUpdateParameters, DomainConfigModel>({
-                name: DOMAIN_CONFIG_TYPE.SETTINGS,
+                name: DOMAIN_CONFIG_NAMES.SETTINGS,
                 data: {
                     ...state.domainConfig.data,
                     ...data,

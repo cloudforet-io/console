@@ -17,6 +17,7 @@ import {
 } from '@/store/reference/cost-data-source-reference-store';
 import type { EscalationPolicyReferenceMap } from '@/store/reference/escalation-policy-reference-store';
 import { useEscalationPolicyReferenceStore } from '@/store/reference/escalation-policy-reference-store';
+import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
 import { useMetricReferenceStore } from '@/store/reference/metric-reference-store';
 import { useNamespaceReferenceStore } from '@/store/reference/namespace-reference-store';
 import { usePluginReferenceStore } from '@/store/reference/plugin-reference-store';
@@ -127,7 +128,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
         escalationPolicy: computed<EscalationPolicyReferenceMap>(() => escalationPolicyReferenceStore.getters.escalationPolicyItems),
         escalation_policy: computed<EscalationPolicyReferenceMap>(() => escalationPolicyReferenceStore.getters.escalationPolicyItems),
         namespace: computed(() => namespaceReferenceStore.getters.namespaceItems),
-        metric: computed(() => metricReferenceStore.getters.metricItems),
+        metric: computed<MetricReferenceMap>(() => metricReferenceStore.getters.metricItems),
         role: computed(() => roleReferenceStore.getters.roleItems),
     });
 

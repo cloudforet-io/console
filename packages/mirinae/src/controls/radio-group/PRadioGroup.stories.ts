@@ -89,8 +89,8 @@ export const Direction: Story = {
         components: { PRadioGroup, PRadio },
         template: `
         <div>
-            <div class="flex flex-col row-gap-8">
-                <div class="flex flex-col row-gap-2">
+            <div class="flex flex-col gap-y-8">
+                <div class="flex flex-col gap-y-2">
                     <p>Horizontal (default)</p>
                     <p-radio-group direction="horizontal">
                         <p-radio :key="value" v-for="value in horizontalValues" v-model="horizontalSelected" :value="value">
@@ -98,7 +98,7 @@ export const Direction: Story = {
                         </p-radio>
                     </p-radio-group>
                 </div>
-                <div class="flex flex-col row-gap-2">
+                <div class="flex flex-col gap-y-2">
                     <p>Vertical</p>
                     <p-radio-group direction="vertical">
                         <p-radio :key="value" v-for="value in verticalValues" v-model="verticalSelected" :value="value">

@@ -589,9 +589,7 @@ onUnmounted(() => {
             @apply col-span-12;
             position: relative;
 
-            @screen lg {
-                @apply col-span-7;
-            }
+            @apply lg:col-span-7;
             .toggle-button-group {
                 position: absolute;
                 right: 0.5rem;
@@ -606,15 +604,8 @@ onUnmounted(() => {
             }
         }
         .summary-wrapper {
-            @apply col-span-12;
+            @apply col-span-12 md:col-span-4 lg:col-span-2;
 
-            @screen md {
-                @apply col-span-4;
-            }
-
-            @screen lg {
-                @apply col-span-2;
-            }
             .sub-title {
                 padding-left: 0.5rem;
             }
@@ -686,15 +677,8 @@ onUnmounted(() => {
             }
         }
         .region-service-wrapper {
-            @apply col-span-12;
+            @apply col-span-12 md:col-span-5 lg:col-span-3;
 
-            @screen md {
-                @apply col-span-5;
-            }
-
-            @screen lg {
-                @apply col-span-3;
-            }
             .sub-title {
                 padding-left: 0.5rem;
             }

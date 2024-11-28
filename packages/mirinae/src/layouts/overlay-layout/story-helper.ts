@@ -164,6 +164,19 @@ export const getOverlayLayoutArgTypes = (): ArgTypes => ({
             category: 'events',
         },
     },
+    closed: {
+        name: 'closed',
+        description: 'Emitted when it is closed. It waits for the transition to end.',
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
     // default
     'title-right-extra': { table: { disable: true } },
     default: { table: { disable: true } },

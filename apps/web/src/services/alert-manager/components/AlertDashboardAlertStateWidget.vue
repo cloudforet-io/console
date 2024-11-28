@@ -481,7 +481,9 @@ watch([() => state.isAssignedToMe, () => tabState.activeTab], async () => {
                         }
                     }
                     .body {
-                        @apply border-t-0 rounded-t-none;
+                        border-top-width: 0;
+                        border-top-left-radius: 0;
+                        border-top-right-radius: 0;
                         max-height: 21.875rem;
                     }
                 }

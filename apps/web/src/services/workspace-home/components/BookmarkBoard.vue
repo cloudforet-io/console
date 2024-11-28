@@ -400,7 +400,7 @@ const checkSelectedId = (id?: string) => {
 
         @screen tablet {
             .bookmark-board-wrapper {
-                @apply grid-cols-4;
+                grid-template-columns: repeat(4, minmax(0, 1fr));
             }
         }
 
@@ -411,10 +411,10 @@ const checkSelectedId = (id?: string) => {
                     :deep(.p-board-item) {
                         &:last-child {
                             .content {
-                                @apply items-center justify-center;
-
+                                align-items: center;
+                                justify-content: center;
                                 .bookmark-label {
-                                    @apply hidden;
+                                    display: none;
                                 }
                             }
                         }
@@ -425,7 +425,7 @@ const checkSelectedId = (id?: string) => {
                 :deep(.p-board-item) {
                     padding: 0.5rem;
                     .content {
-                        @apply flex-col;
+                        flex-direction: column;
                         gap: 0.125rem;
                     }
                 }
@@ -443,7 +443,7 @@ const checkSelectedId = (id?: string) => {
                         }
 
                         .show-more {
-                            @apply bg-transparent;
+                            background-color: transparent;
                         }
 
                         .folder-item-icon-wrapper {
@@ -460,7 +460,7 @@ const checkSelectedId = (id?: string) => {
                             }
                         }
                         .overlay {
-                            @apply hidden;
+                            display: none;
                         }
                     }
                 }
@@ -474,12 +474,12 @@ const checkSelectedId = (id?: string) => {
             @apply grid-cols-4;
 
             @screen tablet {
-                @apply grid-cols-1;
+                grid-template-columns: repeat(1, minmax(0, 1fr));
 
                 /* custom design-system component - p-board-item */
                 :deep(.p-board-item) {
                     .content-area .desktop {
-                        @apply block;
+                        display: block;
                     }
                 }
             }
