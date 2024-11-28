@@ -23,8 +23,7 @@
     "eslint-config-custom": "*",
     "husky": "^8.0.3",
     "lint-staged": "^13.2.0",
-    "turbo": "^1.10.5",
-    "tailwindcss": "^3.4.15"
+    "turbo": "^1.10.5"
   },
   "engines": {
     "npm": ">=10.2.3",
