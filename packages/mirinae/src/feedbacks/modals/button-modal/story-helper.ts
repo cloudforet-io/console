@@ -419,6 +419,16 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
             category: 'events',
         },
     },
+    onClosed: {
+        name: 'closed',
+        description: 'Emitted when modal is closed. It waits for the transition to end.',
+        table: {
+            type: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
     onUpdateVisible: {
         name: 'update:visible',
         description: 'Emitted when update visible',

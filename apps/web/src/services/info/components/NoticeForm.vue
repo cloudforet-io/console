@@ -215,6 +215,7 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
                     <notice-workspace-dropdown v-if="workspaceState.selectedRadioIdx === 1"
                                                :selected-items.sync="workspaceState.selectedItems"
                                                :type="props.type"
+                                               class="workspace-dropdown"
                     />
                 </p-field-group>
                 <p-field-group class="notice-label-wrapper"
@@ -292,6 +293,10 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
     }
     .notice-create-options-wrapper {
         @apply flex flex-col gap-2;
+    }
+
+    .workspace-dropdown {
+        width: 50%;
     }
 }
 .notice-create-buttons-wrapper {
