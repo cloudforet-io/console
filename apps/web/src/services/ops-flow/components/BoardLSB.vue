@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import LSBContainer from '@/common/modules/navigations/new-lsb/LSBContainer.vue';
 import LSBDivider from '@/common/modules/navigations/new-lsb/LSBDivider.vue';
 import LSBRouterButton from '@/common/modules/navigations/new-lsb/LSBRouterButton.vue';
@@ -10,14 +11,15 @@ import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-cate
 
 const taskCategoryStore = useTaskCategoryStore();
 const taskCategoryGetters = taskCategoryStore.getters;
+const { getProperRouteLocation } = useProperRouteLocation();
 </script>
 
 <template>
     <l-s-b-container>
         <l-s-b-router-button icon="ic_dots-4-square"
-                             :to="{
+                             :to="getProperRouteLocation({
                                  name: OPS_FLOW_ROUTE.BOARD._NAME
-                             }"
+                             })"
         >
             All Categories
         </l-s-b-router-button>
@@ -27,10 +29,10 @@ const taskCategoryGetters = taskCategoryStore.getters;
                            :id="category.category_id"
                            :key="category.category_id"
                            :index="idx"
-                           :to="{
+                           :to="getProperRouteLocation({
                                name: OPS_FLOW_ROUTE.BOARD._NAME,
-                               categoryId: category.category_id
-                           }"
+                               params: { categoryId: category.category_id }
+                           })"
         >
             {{ category.name }}
         </l-s-b-router-item>
