@@ -22,6 +22,8 @@ export const MENU_ID = Object.freeze({
     ALERT_MANAGER_DASHBOARD: 'alert_manager_dashboard',
     ALERTS: 'alerts',
     ESCALATION_POLICY: 'escalation_policy',
+    ALERT_MANAGER_V2: 'alert_manager_v2',
+    SERVICE: 'service',
     IAM: 'iam',
     USER: 'user',
     ROLE: 'role',
