@@ -1,13 +1,25 @@
 <script setup lang="ts">
+import { useRoute } from 'vue-router/composables';
+
 import {
     PHeadingLayout, PHeading, PButton,
 } from '@cloudforet/mirinae';
 
-import BoardTaskTable from '@/services/ops-flow/components/BoardTaskTable.vue';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
-// const props = defineProps<{
-//     categoryId?: string;
-// }>();
+import BoardTaskTable from '@/services/ops-flow/components/BoardTaskTable.vue';
+import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
+import type { TaskCreatePageQuery } from '@/services/ops-flow/types/task-create-page-type';
+
+const route = useRoute();
+
+const { getProperRouteLocation } = useProperRouteLocation();
+
+const taskCreatePageLink = getProperRouteLocation({
+    name: OPS_FLOW_ROUTE.BOARD.TASK_CREATE._NAME,
+    query: { categoryId: route.query.categoryId } as TaskCreatePageQuery,
+});
+
 </script>
 
 <template>
@@ -17,9 +29,16 @@ import BoardTaskTable from '@/services/ops-flow/components/BoardTaskTable.vue';
                 <p-heading>Board</p-heading>
             </template>
             <template #extra>
-                <p-button icon-left="ic_plus_bold">
-                    Create Ticket
-                </p-button>
+                <router-link v-slot="{ navigate }"
+                             :to="taskCreatePageLink"
+                             custom
+                >
+                    <p-button icon-left="ic_plus_bold"
+                              @click="navigate"
+                    >
+                        Create Ticket
+                    </p-button>
+                </router-link>
             </template>
         </p-heading-layout>
         <board-task-table />

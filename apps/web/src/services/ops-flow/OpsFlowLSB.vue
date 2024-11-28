@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, defineAsyncComponent } from 'vue';
+import { computed, reactive } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import { clone } from 'lodash';
@@ -7,7 +7,8 @@ import { clone } from 'lodash';
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
-const BoardLSB = defineAsyncComponent(() => import('@/services/ops-flow/components/BoardLSB.vue'));
+import BoardLSB from '@/services/ops-flow/components/BoardLSB.vue';
+
 
 const route = useRoute();
 

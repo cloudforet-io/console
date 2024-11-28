@@ -14,6 +14,8 @@ const OpsFlowLandingPage = () => import('@/services/ops-flow/pages/OpsFlowLandin
 const BoardPage = () => import('@/services/ops-flow/pages/BoardPage.vue');
 const TaskDetailPage = () => import('@/services/ops-flow/pages/TaskDetailPage.vue');
 const TaskCreatePage = () => import('@/services/ops-flow/pages/TaskCreatePage.vue');
+const TaskCreatePageContentTab = () => import('@/services/ops-flow/pages/TaskCreatePageContentTab.vue');
+const TaskCreatePageProgressTab = () => import('@/services/ops-flow/pages/TaskCreatePageProgressTab.vue');
 
 const opsFlowRoutes: RouteConfig = {
     path: 'ops-flow',
@@ -35,28 +37,38 @@ const opsFlowRoutes: RouteConfig = {
             component: OpsFlowLandingPage as any,
         },
         {
-            path: 'board/:categoryId?',
+            path: 'board',
             name: OPS_FLOW_ROUTE.BOARD._NAME,
-            props: true,
             meta: {
                 menuId: MENU_ID.BOARD,
                 translationId: MENU_INFO_MAP[MENU_ID.BOARD].translationId,
                 lsbVisible: true,
             },
             component: BoardPage as any,
+        },
+        {
+            path: 'board/task-create',
+            name: OPS_FLOW_ROUTE.BOARD.TASK_CREATE._NAME,
+            redirect: { name: OPS_FLOW_ROUTE.BOARD.TASK_CREATE.CONTENT._NAME },
+            component: TaskCreatePage as any,
             children: [
                 {
-                    path: ':taskId',
-                    name: OPS_FLOW_ROUTE.BOARD.TASK_DETAIL._NAME,
-                    props: true,
-                    component: TaskDetailPage as any,
+                    path: 'content',
+                    name: OPS_FLOW_ROUTE.BOARD.TASK_CREATE.CONTENT._NAME,
+                    component: TaskCreatePageContentTab as any,
                 },
                 {
-                    path: 'task-create',
-                    name: OPS_FLOW_ROUTE.BOARD.TASK_CREATE._NAME,
-                    component: TaskCreatePage as any,
+                    path: 'progress',
+                    name: OPS_FLOW_ROUTE.BOARD.TASK_CREATE.PROGRESS._NAME,
+                    component: TaskCreatePageProgressTab as any,
                 },
             ],
+        },
+        {
+            path: 'board/:taskId',
+            name: OPS_FLOW_ROUTE.BOARD.TASK_DETAIL._NAME,
+            props: true,
+            component: TaskDetailPage as any,
         },
     ],
 };

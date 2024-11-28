@@ -1,6 +1,6 @@
 <template>
     <fragment>
-        <vertical-page-layout v-if="$route.meta.lsbVisible"
+        <vertical-page-layout v-if="route.meta.lsbVisible"
                               class="ops-flow-container"
         >
             <template #sidebar>
@@ -16,26 +16,13 @@
     </fragment>
 </template>
 
-<script lang="ts">
-import {
-    defineComponent,
-} from 'vue';
+<script setup lang="ts">
+import { useRoute } from 'vue-router/composables';
 
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 
 import OpsFlowLSB from '@/services/ops-flow/OpsFlowLSB.vue';
 
-export default defineComponent({
-    name: 'OpsFlowContainer',
-    components: {
-        VerticalPageLayout,
-        GeneralPageLayout,
-        OpsFlowLSB,
-    },
-    setup() {
-        return {
-        };
-    },
-});
+const route = useRoute();
 </script>

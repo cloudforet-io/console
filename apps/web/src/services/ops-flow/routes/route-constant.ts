@@ -6,7 +6,11 @@ export const OPS_FLOW_ROUTE = Object.freeze({
     BOARD: {
         _NAME: `${MENU_ID.OPS_FLOW}.${MENU_ID.BOARD}`,
         TASK_DETAIL: { _NAME: `${MENU_ID.OPS_FLOW}.${MENU_ID.BOARD}.task_detail` },
-        TASK_CREATE: { _NAME: `${MENU_ID.OPS_FLOW}.${MENU_ID.BOARD}.task_create` },
+        TASK_CREATE: {
+            _NAME: `${MENU_ID.OPS_FLOW}.${MENU_ID.BOARD}.task_create`,
+            CONTENT: { _NAME: `${MENU_ID.OPS_FLOW}.${MENU_ID.BOARD}.task_create.content` },
+            PROGRESS: { _NAME: `${MENU_ID.OPS_FLOW}.${MENU_ID.BOARD}.task_create.progress` },
+        },
     },
     WORKFLOW: {
         _NAME: `${MENU_ID.OPS_FLOW}.${MENU_ID.WORKFLOW}`,

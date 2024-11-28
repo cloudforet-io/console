@@ -19,7 +19,11 @@ export const useBoardPageStore = defineStore('board-page', () => {
     const getters = reactive<UseBoardPageStoreGetters>({
         currentCategory: computed<TaskCategoryModel|undefined>(() => taskCategoryStore.getters.taskCategories.find((c) => c.category_id === state.currentCategoryId)),
     });
-    const actions = {};
+    const actions = {
+        setCurrentCategoryId(categoryId: string) {
+            state.currentCategoryId = categoryId;
+        },
+    };
     return {
         state,
         getters,

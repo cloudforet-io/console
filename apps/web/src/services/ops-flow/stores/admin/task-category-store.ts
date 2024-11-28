@@ -1,4 +1,4 @@
-import { reactive, computed } from 'vue';
+import { reactive, computed, watch } from 'vue';
 
 import { defineStore } from 'pinia';
 
@@ -12,6 +12,8 @@ import type { TaskCategoryGetParameters } from '@/schema/opsflow/task-category/a
 import type { TaskCategoryListParameters } from '@/schema/opsflow/task-category/api-verbs/list';
 import type { TaskCategoryUpdateParameters } from '@/schema/opsflow/task-category/api-verbs/update';
 import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -92,6 +94,15 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
             state.items = state.items?.filter((item) => item.category_id !== categoryId);
         },
     };
+
+    const disposeSelf = () => {
+        const store = useTaskCategoryStore();
+        store.$dispose();
+    };
+    const appContextStore = useAppContextStore();
+    watch(() => appContextStore.getters.isAdminMode, () => {
+        disposeSelf();
+    });
     return {
         state,
         getters,

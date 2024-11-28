@@ -31,7 +31,7 @@ const { getProperRouteLocation } = useProperRouteLocation();
                            :index="idx"
                            :to="getProperRouteLocation({
                                name: OPS_FLOW_ROUTE.BOARD._NAME,
-                               params: { categoryId: category.category_id }
+                               query: { categoryId: category.category_id }
                            })"
         >
             {{ category.name }}
