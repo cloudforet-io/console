@@ -41,7 +41,6 @@ const fields = ref<TaskField[]>([
         field_type: 'LABELS',
         is_required: true,
         is_primary: true,
-        options: {},
     },
     {
         field_id: 'field_4',
@@ -59,7 +58,6 @@ const fields = ref<TaskField[]>([
         field_type: 'DATE',
         is_required: true,
         is_primary: true,
-        options: {},
     },
     {
         field_id: 'field_6',
@@ -67,7 +65,34 @@ const fields = ref<TaskField[]>([
         field_type: 'PROJECT',
         is_required: true,
         is_primary: true,
-        options: {},
+    },
+    {
+        field_id: 'field_7',
+        name: 'provider',
+        field_type: 'PROVIDER',
+        is_required: true,
+        is_primary: true,
+    },
+    {
+        field_id: 'field_8',
+        name: 'service_account',
+        field_type: 'SERVICE_ACCOUNT',
+        is_required: true,
+        is_primary: true,
+    },
+    {
+        field_id: 'field_9',
+        name: 'user',
+        field_type: 'USER',
+        is_required: true,
+        is_primary: true,
+    },
+    {
+        field_id: 'field_10',
+        name: 'asset',
+        field_type: 'ASSET',
+        is_required: true,
+        is_primary: true,
     },
 ]);
 
@@ -75,9 +100,13 @@ const data = ref<Record<string, any>>({
     field_1: 'text',
     field_2: 'paragraph',
     field_3: ['label1', 'label2'],
-    field_4: '1',
+    field_4: [{ key: 'a', name: 'option1' }, { key: 'b', name: 'option2' }],
     field_5: '2022-01-01',
-    field_6: 'project',
+    field_6: ['project'],
+    field_7: ['provider'],
+    field_8: ['service_account'],
+    field_9: ['user'],
+    field_10: ['asset'],
 });
 
 </script>

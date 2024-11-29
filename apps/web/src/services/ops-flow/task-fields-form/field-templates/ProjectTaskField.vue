@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import {
-    PFieldGroup, PTextInput,
+    PFieldGroup,
 } from '@cloudforet/mirinae';
 
 import type { TextTaskField } from '@/schema/opsflow/_types/task-field-type';
 
+import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
+
 import { useTaskFieldValidation } from '@/services/ops-flow/task-fields-form/composables/use-task-field-validation';
 import type { TaskFieldFormProps } from '@/services/ops-flow/task-fields-form/types/task-field-form-type';
 
-const props = defineProps<TaskFieldFormProps<TextTaskField, string>>();
+const props = defineProps<TaskFieldFormProps<TextTaskField, string[]>>();
 
-const emit = defineEmits<{(event: 'update:value', value: string): void;
+const emit = defineEmits<{(event: 'update:value', value: string[]): void;
 }>();
 
 const {
@@ -18,7 +20,7 @@ const {
     isInvalid, invalidText,
 } = useTaskFieldValidation(props);
 
-const handleUpdate = (val: string) => {
+const handleUpdate = (val: string[]) => {
     setValue(val);
     emit('update:value', val);
 };
@@ -30,9 +32,10 @@ const handleUpdate = (val: string) => {
                    :invalid="isInvalid"
                    :invalid-text="invalidText"
     >
-        <p-text-input :value="value"
-                      :invalid="isInvalid"
-                      @update:value="handleUpdate"
+        <project-select-dropdown project-selectable
+                                 :project-group-selectable="false"
+                                 :selected-project-ids="value"
+                                 @update:selected-project-ids="handleUpdate"
         />
     </p-field-group>
 </template>

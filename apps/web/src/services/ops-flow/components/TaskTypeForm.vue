@@ -5,15 +5,15 @@ import {
 
 
 import {
-    POverlayLayout, PFieldGroup, PTextInput, PSelectDropdown, PButton, PTextarea,
+    POverlayLayout, PFieldGroup, PTextInput, PButton, PTextarea,
 } from '@cloudforet/mirinae';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
+import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
-import { useAssigneePoolField } from '@/services/ops-flow/composables/use-assignee-pool-field';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
 import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 import {
@@ -26,15 +26,6 @@ const taskCategoryPageStore = useTaskCategoryPageStore();
 const taskCategoryPageState = taskCategoryPageStore.state;
 const taskTypeStore = useTaskTypeStore();
 
-
-/* assignee pool */
-const {
-    selectedUserItems,
-    assigneePool,
-    userMenuItemsHandler,
-    handleUpdateSelectedUserItems,
-    setInitialUsers,
-} = useAssigneePoolField();
 
 /* task field configuration */
 const {
@@ -49,7 +40,7 @@ const {
 
 /* form validation */
 const {
-    forms: { name, description },
+    forms: { name, description, assigneePool },
     invalidState,
     invalidTexts,
     setForm, isAllValid,
@@ -58,6 +49,7 @@ const {
 } = useFormValidator({
     name: '',
     description: '',
+    assigneePool: [] as string[],
     fields: taskFieldsValidator,
 }, {
     name(value: string) {
@@ -150,16 +142,18 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageSt
         setForm({
             name: '',
             description: '',
+            assigneePool: [],
         });
-        setInitialUsers([]);
         setInitialFields([]);
         resetValidations();
         return;
     }
     if (target) {
-        setForm('name', target.name);
-        setForm('description', target.description);
-        setInitialUsers(target.assignee_pool);
+        setForm({
+            name: target.name,
+            description: target.description,
+            assigneePool: target.assignee_pool,
+        });
         setInitialFields(target.fields);
     }
 });
@@ -189,13 +183,8 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageSt
                     </template>
                 </p-field-group>
                 <p-field-group label="Assignee Pool">
-                    <p-select-dropdown show-select-marker
-                                       :selected="selectedUserItems"
-                                       :handler="userMenuItemsHandler"
-                                       is-filterable
-                                       use-fixed-menu-style
-                                       show-delete-all-button
-                                       @update:selected="handleUpdateSelectedUserItems"
+                    <user-select-dropdown :selected-user-ids="assigneePool"
+                                          @update:user-ids="setForm('assigneePool', $event)"
                     />
                 </p-field-group>
                 <p-field-group label="Description">
