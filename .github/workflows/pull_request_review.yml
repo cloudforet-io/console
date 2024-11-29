@@ -1,9 +1,5 @@
 name: "[PR] Review"
 
-permissions:
-  issues: write
-  contents: read
-
 on:
   pull_request:
     types: [opened, synchronize, reopened]
@@ -82,7 +78,7 @@ jobs:
           grep -rl "TODO" ./apps/web/ > todo_files.txt || true
 
       - name: Comment on Pull Request with TODO files
-        if: always()
+        if: github.event.issue.pull_request
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
