@@ -4,7 +4,7 @@ import { computed, reactive } from 'vue';
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
 import {
-    PDivider, PCard, PToolbox, PI, PTextButton,
+    PDivider, PSelectCard, PToolbox, PI, PTextButton,
 } from '@cloudforet/mirinae';
 import type { ToolboxOptions } from '@cloudforet/mirinae/src/controls/toolbox/type';
 import type { QueryTag } from '@cloudforet/mirinae/types/controls/search/query-search-tags/type';
@@ -49,6 +49,9 @@ const handleChangeToolbox = async (options: ToolboxOptions) => {
 const handleClickEscalationPolicy = () => {
     console.log('TODO: handleClickEscalationPolicy');
 };
+const handleClickServiceItem = () => {
+    console.log('TODO: handleClickServiceItem');
+};
 
 const fetchServiceList = () => {
     console.log('TODO: fetchServiceList');
@@ -69,8 +72,8 @@ const fetchServiceList = () => {
                    @refresh="fetchServiceList"
         />
         <div class="list-card-wrapper">
-            <p-card :header="false"
-                    class="card"
+            <p-select-card class="card"
+                           @change="handleClickServiceItem"
             >
                 <div class="card-inner-wrapper">
                     <p class="text-label-xl font-bold">
@@ -147,7 +150,7 @@ const fetchServiceList = () => {
                         </div>
                     </div>
                 </div>
-            </p-card>
+            </p-select-card>
         </div>
     </div>
 </template>
@@ -162,9 +165,9 @@ const fetchServiceList = () => {
         .card {
             min-width: 30rem;
             max-width: 28rem;
+            padding: 1.25rem 1.5rem 1.5rem;
             .card-inner-wrapper {
-                @apply flex flex-col;
-                padding: 0.5rem 0.625rem 0.625rem;
+                @apply flex flex-col w-full;
                 gap: 1.75rem;
                 .contents {
                     @apply flex justify-between;
