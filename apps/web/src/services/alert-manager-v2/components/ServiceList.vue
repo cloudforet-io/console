@@ -52,6 +52,13 @@ const handleClickEscalationPolicy = () => {
 const handleClickServiceItem = () => {
     console.log('TODO: handleClickServiceItem');
 };
+const handleClickWebhookItem = (item: string) => {
+    if (item === 'chevron') {
+        console.log('TODO: route to webhook main page');
+    } else {
+        console.log('TODO: route to webhook detail page');
+    }
+};
 
 const fetchServiceList = () => {
     console.log('TODO: fetchServiceList');
@@ -117,8 +124,8 @@ const fetchServiceList = () => {
                                 </p>
                                 <div class="webhook-list">
                                     <!-- TODO: check the link & icon -->
-                                    <a class="webhook"
-                                       :href="undefined"
+                                    <span class="webhook"
+                                          @click.stop="handleClickWebhookItem('item')"
                                     >
                                         <p-i name="ic_check"
                                              class="icon success"
@@ -126,9 +133,9 @@ const fetchServiceList = () => {
                                              width="0.875rem"
                                              color="inherit"
                                         />
-                                    </a>
-                                    <a class="webhook chevron"
-                                       :href="undefined"
+                                    </span>
+                                    <span class="webhook chevron"
+                                          @click.stop="handleClickWebhookItem('chevron')"
                                     >
                                         <p-i
                                             name="ic_chevron-right"
@@ -136,14 +143,14 @@ const fetchServiceList = () => {
                                             height="1.125rem"
                                             color="inherit"
                                         />
-                                    </a>
+                                    </span>
                                 </div>
                             </div>
                             <div class="mt-4">
                                 <p class="title">
                                     {{ $t('ALERT_MANAGER.ESCALATION_POLICY.TITLE', { cnt: 11 }) }}
                                 </p>
-                                <p-text-button @click="handleClickEscalationPolicy">
+                                <p-text-button @click.stop="handleClickEscalationPolicy">
                                     temp default policy
                                 </p-text-button>
                             </div>
@@ -212,6 +219,9 @@ const fetchServiceList = () => {
                                 @apply flex items-center justify-center rounded-full bg-gray-100 border border-white ;
                                 width: 1.5rem;
                                 height: 1.5rem;
+                                &:hover {
+                                    @apply bg-blue-200;
+                                }
                                 & + .webhook {
                                     margin-left: -0.25rem;
                                 }
