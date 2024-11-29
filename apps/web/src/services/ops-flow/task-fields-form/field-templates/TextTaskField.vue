@@ -3,5 +3,5 @@
 </script>
 
 <template>
-    <div>TaskFieldForm</div>
+    <div>TextTaskFieldForm</div>
 </template>

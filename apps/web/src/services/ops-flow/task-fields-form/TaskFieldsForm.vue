@@ -7,16 +7,16 @@ import type { TaskField, TaskFieldType } from '@/schema/opsflow/_types/task-fiel
 
 
 const COMPONENT_MAP: Partial<Record<TaskFieldType, ReturnType<typeof defineAsyncComponent>>> = {
-    TEXT: defineAsyncComponent(() => import('@/services/ops-flow/task-field-forms/field-templates/TextTaskField.vue')),
-    PARAGRAPH: defineAsyncComponent(() => import('@/services/ops-flow/task-field-forms/field-templates/ParagraphTaskField.vue')),
-    LABELS: defineAsyncComponent(() => import('@/services/ops-flow/task-field-forms/field-templates/LabelsTaskField.vue')),
-    DROPDOWN: defineAsyncComponent(() => import('@/services/ops-flow/task-field-forms/field-templates/DropdownTaskField.vue')),
-    DATE: defineAsyncComponent(() => import('@/services/ops-flow/task-field-forms/field-templates/DateTaskField.vue')),
-    USER: defineAsyncComponent(() => import('@/services/ops-flow/task-field-forms/field-templates/UserTaskField.vue')),
-    ASSET: defineAsyncComponent(() => import('@/services/ops-flow/task-field-forms/field-templates/AssetTaskField.vue')),
-    PROJECT: defineAsyncComponent(() => import('@/services/ops-flow/task-field-forms/field-templates/ProjectTaskField.vue')),
-    PROVIDER: defineAsyncComponent(() => import('@/services/ops-flow/task-field-forms/field-templates/ProviderTaskField.vue')),
-    SERVICE_ACCOUNT: defineAsyncComponent(() => import('@/services/ops-flow/task-field-forms/field-templates/ServiceAccountTaskField.vue')),
+    TEXT: defineAsyncComponent(() => import('@/services/ops-flow/task-fields-form/field-templates/TextTaskField.vue')),
+    PARAGRAPH: defineAsyncComponent(() => import('@/services/ops-flow/task-fields-form/field-templates/ParagraphTaskField.vue')),
+    LABELS: defineAsyncComponent(() => import('@/services/ops-flow/task-fields-form/field-templates/LabelsTaskField.vue')),
+    DROPDOWN: defineAsyncComponent(() => import('@/services/ops-flow/task-fields-form/field-templates/DropdownTaskField.vue')),
+    DATE: defineAsyncComponent(() => import('@/services/ops-flow/task-fields-form/field-templates/DateTaskField.vue')),
+    USER: defineAsyncComponent(() => import('@/services/ops-flow/task-fields-form/field-templates/UserTaskField.vue')),
+    ASSET: defineAsyncComponent(() => import('@/services/ops-flow/task-fields-form/field-templates/AssetTaskField.vue')),
+    PROJECT: defineAsyncComponent(() => import('@/services/ops-flow/task-fields-form/field-templates/ProjectTaskField.vue')),
+    PROVIDER: defineAsyncComponent(() => import('@/services/ops-flow/task-fields-form/field-templates/ProviderTaskField.vue')),
+    SERVICE_ACCOUNT: defineAsyncComponent(() => import('@/services/ops-flow/task-fields-form/field-templates/ServiceAccountTaskField.vue')),
 };
 const fields = ref<TaskField[]>([
     {
