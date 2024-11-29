@@ -43,7 +43,7 @@ jobs:
         if: always()
         uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.PAT_TOKEN }}
           script: |
               github.rest.pulls.createReview({
                 pull_number: context.payload.pull_request.number,
