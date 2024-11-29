@@ -73,6 +73,34 @@ jobs:
       - name: Test
         run: npm run test
 
+      - name: Check for TODOs in ./apps/web/
+        run: |
+          grep -rl "TODO" ./apps/web/ > todo_files.txt || true
+
+      - name: Comment on Pull Request with TODO files
+        if: always()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const todoFiles = fs.readFileSync('todo_files.txt', 'utf8').trim();
+            if (todoFiles) {
+              const filesList = todoFiles.split('\n').map(file => `- ${file}`).join('\n');
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `### 📝 TODOs Found\nThe following files contain TODOs:\n\n${filesList}`
+              });
+            } else {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `### ✅ No TODOs Found\nGood job! No TODOs were found in the \`./apps/web/\` directory.`
+              });
+            }
+
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
