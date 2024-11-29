@@ -31,6 +31,7 @@ import type { TabItem } from '@cloudforet/mirinae/types/hooks/use-tab/type';
 import { useGoBack } from '@/common/composables/go-back';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
+import BoardTaskComment from '@/services/ops-flow/components/BoardTaskComment.vue';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import type { BoardPageQuery } from '@/services/ops-flow/types/board-page-type';
 
@@ -115,12 +116,16 @@ defineExpose({ setPathFrom });
                 </p-button>
             </template>
         </p-heading-layout>
-        <p-tab :tabs="tabs"
-               :active-tab="activeTab"
-               @update:active-tab="handleUpdateActiveTab"
-        >
-            <router-view />
-        </p-tab>
+        <div class="mr-auto flex flex-wrap w-full gap-4">
+            <p-tab class="flex-1 w-full min-w-[600px] tablet:min-w-full"
+                   :tabs="tabs"
+                   :active-tab="activeTab"
+                   @update:active-tab="handleUpdateActiveTab"
+            >
+                <router-view />
+            </p-tab>
+            <board-task-comment class="flex-1 w-full min-w-[360px] lg:max-w-[528px] tablet:min-w-full" />
+        </div>
     </div>
 </template>
 
