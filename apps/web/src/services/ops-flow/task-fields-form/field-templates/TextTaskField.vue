@@ -1,30 +1,39 @@
 <script setup lang="ts">
 import {
-    PTextInput,
+    PFieldGroup, PTextInput,
 } from '@cloudforet/mirinae';
 
 import type { TextTaskField } from '@/schema/opsflow/_types/task-field-type';
 
-import BaseTaskField from '@/services/ops-flow/task-fields-form/field-templates/_base/BaseTaskField.vue';
+import { useTaskFieldValidation } from '@/services/ops-flow/task-fields-form/composables/use-task-field-validation';
 import type { TaskFieldFormProps } from '@/services/ops-flow/task-fields-form/types/task-field-form-type';
 
 const props = defineProps<TaskFieldFormProps<TextTaskField, string>>();
 
 const emit = defineEmits<{(event: 'update:value', value: string): void;
 }>();
-const handleUpdate = (value: string, update: (value: string) => void) => {
-    update(value);
-    emit('update:value', value);
+
+const {
+    value, setValue,
+    isInvalid, invalidText,
+} = useTaskFieldValidation(props);
+
+const handleUpdate = (val: string) => {
+    setValue(val);
+    emit('update:value', val);
 };
 </script>
 
 <template>
-    <base-task-field v-bind="props">
-        <template #default="{ value, invalid, update }">
-            <p-text-input :value="value"
-                          :invalid="invalid"
-                          @update:value="handleUpdate($event, update)"
-            />
-        </template>
-    </base-task-field>
+    <p-field-group :label="field.name"
+                   :required="field.is_required"
+                   :invalid="isInvalid"
+                   :invalid-text="invalidText"
+    >
+        <p-text-input :value="value"
+                      :placeholder="props.field.options?.example"
+                      :invalid="isInvalid"
+                      @update:value="handleUpdate"
+        />
+    </p-field-group>
 </template>
