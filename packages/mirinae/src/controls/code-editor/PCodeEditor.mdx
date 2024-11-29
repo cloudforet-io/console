@@ -1,0 +1,58 @@
+{/* PCodeEditor.mdx */}
+
+import { Canvas, Meta, Controls } from '@storybook/blocks';
+
+import * as PCodeEditorStories from './PCodeEditor.stories';
+
+<Meta of={PCodeEditorStories} />
+
+
+# Code Editor
+<br/>
+<br/>
+
+
+## Basic
+<br/>
+<br/>
+<Canvas of={PCodeEditorStories.Basic} />
+
+<br/>
+<br/>
+
+## Loading
+<br/>
+<br/>
+<Canvas of={PCodeEditorStories.Loading} />
+
+<br/>
+<br/>
+
+## Highlight Lines
+<br/>
+<br/>
+<Canvas of={PCodeEditorStories.HighlightLines} />
+
+<br/>
+<br/>
+
+## Change Code
+<br/>
+<br/>
+<Canvas of={PCodeEditorStories.ChangeCode} />
+
+<br/>
+<br/>
+
+## Auto Reformat on Code Change (string only)
+<br/>
+<br/>
+<Canvas of={PCodeEditorStories.AutoReformatonCodeChangeStringOnly} />
+
+<br/>
+<br/>
+
+
+## Playground
+<Canvas of={PCodeEditorStories.Playground} />
+<Controls of={PCodeEditorStories.Playground} />

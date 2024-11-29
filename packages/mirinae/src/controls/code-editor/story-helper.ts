@@ -24,14 +24,14 @@ const sampleCodeObj = {
 };
 export const sampleCode = JSON.stringify(sampleCodeObj, null, ' ');
 
-export const getTextEditorParameters = (): Parameters => ({
+export const getCodeEditorParameters = (): Parameters => ({
     design: {
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6169%3A182308',
     },
 });
 
-export const getTextEditorArgs = (): Args => ({
+export const getCodeEditorArgs = (): Args => ({
     code: sampleCode,
     options: {
         tabSize: 4,
@@ -55,7 +55,7 @@ export const getTextEditorArgs = (): Args => ({
     loader: null,
 });
 
-export const getTextEditorArgTypes = (): ArgTypes => ({
+export const getCodeEditorArgTypes = (): ArgTypes => ({
     code: {
         name: 'code',
         description: 'Code',
@@ -88,7 +88,7 @@ export const getTextEditorArgTypes = (): ArgTypes => ({
     readOnly: {
         name: 'readOnly',
         type: { name: 'boolean' },
-        description: 'Whether Mode of text editor is ReadOnly',
+        description: 'Whether Mode of code editor is ReadOnly',
         defaultValue: false,
         table: {
             type: {

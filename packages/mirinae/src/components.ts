@@ -76,7 +76,7 @@ export { default as PSearch } from './controls/search/search/PSearch.vue';
 export { default as PSelectButton } from './controls/select-button/PSelectButton.vue';
 export { default as PSelectCard } from './controls/select-card/PSelectCard.vue';
 export { default as PSelectStatus } from './controls/select-status/PSelectStatus.vue';
-export { default as PTextEditor } from './controls/text-editor/PTextEditor.vue';
+export { default as PCodeEditor } from './controls/code-editor/PCodeEditor.vue';
 export { default as PTextarea } from './controls/textarea/PTextarea.vue';
 export { default as PSlider } from './controls/slider/PSlider.vue';
 export { default as PToolbox } from './controls/toolbox/PToolbox.vue';
