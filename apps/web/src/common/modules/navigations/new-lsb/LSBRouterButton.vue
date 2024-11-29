@@ -5,7 +5,7 @@ import type { Location } from 'vue-router';
 import { PLazyImg, PI } from '@cloudforet/mirinae';
 
 import { useLsbRouterItemState } from '@/common/modules/navigations/new-lsb/composables/use-lsb-router-item-state';
-import type { LSBIcon } from '@/common/modules/navigations/new-lsb/type';
+import type { LSBIcon, LSBRouterPredicate } from '@/common/modules/navigations/new-lsb/type';
 
 const props = defineProps<{
     label?: TranslateResult;
@@ -13,6 +13,7 @@ const props = defineProps<{
     imgIcon?: string;
     to?: Location;
     currentPath?: string;
+    predicate: LSBRouterPredicate;
     openNewTab?: boolean;
 }>();
 

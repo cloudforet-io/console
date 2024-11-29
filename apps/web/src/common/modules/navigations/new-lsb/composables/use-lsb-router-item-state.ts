@@ -5,12 +5,13 @@ import { useRoute, useRouter } from 'vue-router/composables';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
-import type { LSBIcon } from '@/common/modules/navigations/new-lsb/type';
+import type { LSBIcon, LSBRouterPredicate } from '@/common/modules/navigations/new-lsb/type';
 
 interface UseLsbRouterItemProps {
     to?: Ref<Readonly<Location>>;
     icon?: Ref<Readonly<LSBIcon>>;
     imgIcon?: Ref<Readonly<string>>;
+    predicate?: LSBRouterPredicate;
 }
 export const useLsbRouterItemState = (props: UnwrapRef<UseLsbRouterItemProps>) => {
     const router = useRouter();
@@ -18,6 +19,10 @@ export const useLsbRouterItemState = (props: UnwrapRef<UseLsbRouterItemProps>) =
 
     const isSelected = computed<boolean>(() => {
         if (!props.to) return false;
+
+        if (props.predicate) {
+            return props.predicate(props.to, route);
+        }
 
         const resolved = router.resolve(props.to);
         if (!resolved) return false;
