@@ -11,6 +11,7 @@ import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 const IamContainer = () => import('@/services/iam/IamContainer.vue');
 
 const UserMainPage = () => import('@/services/iam/pages/UserMainPage.vue');
+const UserGroupMainPage = () => import('@/services/iam/pages/UserGroupMainPage.vue');
 const AppMainPage = () => import('@/services/iam/pages/AppMainPage.vue');
 
 const iamRoutes: RouteConfig = {
@@ -31,6 +32,15 @@ const iamRoutes: RouteConfig = {
                 translationId: MENU_INFO_MAP[MENU_ID.USER].translationId,
             },
             component: UserMainPage as any,
+        },
+        {
+            path: 'user-group',
+            name: IAM_ROUTE.USER_GROUP._NAME,
+            meta: {
+                menuId: MENU_ID.USER_GROUP,
+                translationId: MENU_INFO_MAP[MENU_ID.USER_GROUP].translationId,
+            },
+            component: UserGroupMainPage as any,
         },
         {
             path: 'app',
