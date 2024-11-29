@@ -5,6 +5,7 @@ import type { ComponentProps } from 'vue-component-type-helpers';
 
 import PButton from '@/controls/buttons/button/PButton.vue';
 import PToggleButton from '@/controls/buttons/toggle-button/PToggleButton.vue';
+import PCodeEditor from '@/controls/code-editor/PCodeEditor.vue';
 import { menuItems } from '@/controls/context-menu/mock';
 import {
     getSelectDropdownMenu,
@@ -16,7 +17,6 @@ import {
     getSelectDropdownParameters,
 } from '@/controls/dropdown/select-dropdown/story-helper';
 import { SELECT_DROPDOWN_STYLE_TYPE } from '@/controls/dropdown/select-dropdown/type';
-import PTextEditor from '@/controls/text-editor/PTextEditor.vue';
 import { useProxyValue } from '@/hooks/use-proxy-state/use-proxy-state';
 
 import PSelectDropdown from './PSelectDropdown.vue';
@@ -649,7 +649,7 @@ export const IsFilterable: Story = {
 export const ShowRelatedHeadertotheSelectedZone: Story = {
     render: () => ({
         props: Object.keys(getSelectDropdownArgTypes()),
-        components: { PSelectDropdown, PButton, PTextEditor },
+        components: { PSelectDropdown, PButton, PCodeEditor },
         template: `
             <div>
                 <p class="text-label-lg font-bold my-3">show headers</p>
@@ -659,7 +659,7 @@ export const ShowRelatedHeadertotheSelectedZone: Story = {
                 <p-select-dropdown :menu="menu" multi-selectable is-filterable hide-header-without-items />
                 <br/>
                 <br/>
-                <p-text-editor :code="JSON.stringify(menu, null, 2)"
+                <p-code-editor :code="JSON.stringify(menu, null, 2)"
                             mode="readOnly"
                             style="height: 200px; max-height: 400px;"
                 />

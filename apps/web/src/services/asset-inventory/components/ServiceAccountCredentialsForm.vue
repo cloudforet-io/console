@@ -9,7 +9,7 @@ import { isEmpty } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PFieldGroup, PRadio, PTextEditor, PSelectDropdown, PLink, PCopyButton, PI, PTab, PJsonSchemaForm,
+    PFieldGroup, PRadio, PCodeEditor, PSelectDropdown, PLink, PCopyButton, PI, PTab, PJsonSchemaForm,
 } from '@cloudforet/mirinae';
 import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
@@ -383,7 +383,7 @@ watch([() => storeState.secretSchema, () => state.isTrustedAccount], () => {
                                    :invalid="!checkJsonStringAvailable(formState.credentialJson)"
                                    :invalid-text="$t('IDENTITY.SERVICE_ACCOUNT.ADD.JSON_INVALID')"
                     >
-                        <p-text-editor :code.sync="formState.credentialJson"
+                        <p-code-editor :code.sync="formState.credentialJson"
                                        :disable-auto-reformat="true"
                         />
                     </p-field-group>

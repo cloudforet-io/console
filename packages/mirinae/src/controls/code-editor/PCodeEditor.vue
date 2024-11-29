@@ -5,7 +5,7 @@
 * */
 
 /**
- * PTextEditor can get any types,
+ * PCodeEditor can get any types,
  * CodeMirror can get String ONLY
  */
 import {
@@ -183,7 +183,7 @@ const textareaRef = toRef(state, 'textareaRef');
 </script>
 
 <template>
-    <div class="p-text-editor">
+    <div class="p-code-editor">
         <p-data-loader :data="true"
                        :loading="props.loading"
                        disable-empty-case
@@ -203,7 +203,7 @@ const textareaRef = toRef(state, 'textareaRef');
 @import 'codemirror/theme/dracula.css';
 @import 'codemirror/addon/lint/lint.css';
 @import 'codemirror/addon/fold/foldgutter.css';
-.p-text-editor {
+.p-code-editor {
     height: 100%;
     min-height: 5rem;
     > .p-data-loader {

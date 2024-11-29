@@ -7,7 +7,7 @@ import { find } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PHeading, PI, PTextEditor, PEmpty, PDataTable,
+    PHeading, PI, PCodeEditor, PEmpty, PDataTable,
 } from '@cloudforet/mirinae';
 import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
@@ -262,7 +262,7 @@ watch(() => state.selectedRole.role_id, async (roleId) => {
                         </span>
                     </div>
                     <div v-else>
-                        <p-text-editor :code="state.permissionsCode"
+                        <p-code-editor :code="state.permissionsCode"
                                        class="content-wrapper"
                                        read-only
                         />
