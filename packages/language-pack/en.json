@@ -99,7 +99,7 @@
 			"SKIP_FOR_LATER": "Skip for Later",
 			"TITLE": "Service",
 			"TOTAL_ALERTS": "Total Alerts",
-			"USER_GROUP": "{cnt} User Group",
+			"USER_GROUP": "User Group",
 			"VALIDATION_NAME_UNIQUE": "A service with this name already exists.",
 			"WEBHOOK": "Webhook ({cnt})"
 		},
