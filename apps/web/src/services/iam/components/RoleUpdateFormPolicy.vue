@@ -3,7 +3,7 @@ import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PHeading, PI, PRadioGroup, PRadio, PTextEditor,
+    PHeading, PI, PRadioGroup, PRadio, PCodeEditor,
 } from '@cloudforet/mirinae';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
@@ -97,7 +97,7 @@ watch(() => props.initialPermissions, (value) => {
                 {{ $t('IAM.ROLE.FORM.DEFAULT_API_POLICY_HELP_TEXT') }}
             </span>
         </div>
-        <p-text-editor v-else
+        <p-code-editor v-else
                        :code="state.code"
                        class="content-wrapper"
                        @update:code="handleCodeUpdate"

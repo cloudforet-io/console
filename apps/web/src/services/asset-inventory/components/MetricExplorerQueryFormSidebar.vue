@@ -5,7 +5,7 @@ import { useRoute, useRouter } from 'vue-router/composables';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PFieldGroup, PTextInput, PTextEditor, PButton, POverlayLayout,
+    PFieldGroup, PTextInput, PCodeEditor, PButton, POverlayLayout,
 } from '@cloudforet/mirinae';
 
 
@@ -229,7 +229,7 @@ watch(() => metricExplorerPageState.showMetricQueryFormSidebar, (visible) => {
                                :label="$t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.QUERY_OPTION')"
                                required
                 >
-                    <p-text-editor :code="code"
+                    <p-code-editor :code="code"
                                    :read-only="metricExplorerPageState.metricQueryFormMode === 'VIEW'"
                                    @update:code="setForm('code', $event)"
                     />

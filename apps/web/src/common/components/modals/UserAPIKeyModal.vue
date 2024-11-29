@@ -5,7 +5,7 @@ import { reactive, watch } from 'vue';
 import yaml from 'js-yaml';
 
 import {
-    PIconModal, PI, PPaneLayout, PDivider, PCollapsibleToggle, PButton, PLink, PTextEditor,
+    PIconModal, PI, PPaneLayout, PDivider, PCollapsibleToggle, PButton, PLink, PCodeEditor,
 } from '@cloudforet/mirinae';
 import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
@@ -124,7 +124,7 @@ watch(() => props.visible, async (visible) => {
                     >
                         {{ state.isAPICollapsed ? $t('IDENTITY.USER.API_KEY.SHOW') : $t('IDENTITY.USER.API_KEY.HIDE') }}
                     </p-collapsible-toggle>
-                    <p-text-editor v-if="!state.isAPICollapsed"
+                    <p-code-editor v-if="!state.isAPICollapsed"
                                    class="m-4"
                                    :code="state.clientSecretCode"
                                    folded
@@ -168,7 +168,7 @@ watch(() => props.visible, async (visible) => {
                     >
                         {{ state.isSpacectlCollapsed ? $t('IDENTITY.USER.API_KEY.SHOW') : $t('IDENTITY.USER.API_KEY.HIDE') }}
                     </p-collapsible-toggle>
-                    <p-text-editor v-if="!state.isSpacectlCollapsed"
+                    <p-code-editor v-if="!state.isSpacectlCollapsed"
                                    class="m-4"
                                    :code="state.yamlItem"
                                    folded
