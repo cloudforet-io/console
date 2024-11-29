@@ -25,8 +25,6 @@ on:
 jobs:
   review:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
     env:
       NODE_ENV: 'development'
 
@@ -43,7 +41,7 @@ jobs:
 
       - name: Comment on Pull Request with TODO files
         if: always()
-        uses: actions/github-script@v6
+        uses: actions/github-script@v5
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
