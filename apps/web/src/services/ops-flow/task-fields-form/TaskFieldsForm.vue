@@ -20,7 +20,7 @@ const COMPONENT_MAP: Partial<Record<TaskFieldType, ReturnType<typeof defineAsync
 };
 const fields = ref<TaskField[]>([
     {
-        field_id: '1',
+        field_id: 'field_1',
         name: 'text',
         field_type: 'TEXT',
         is_required: true,
@@ -28,7 +28,7 @@ const fields = ref<TaskField[]>([
         options: {},
     },
     {
-        field_id: '2',
+        field_id: 'field_2',
         name: 'paragraph',
         field_type: 'PARAGRAPH',
         is_required: true,
@@ -36,7 +36,7 @@ const fields = ref<TaskField[]>([
         options: {},
     },
     {
-        field_id: '3',
+        field_id: 'field_3',
         name: 'labels',
         field_type: 'LABELS',
         is_required: true,
@@ -44,7 +44,7 @@ const fields = ref<TaskField[]>([
         options: {},
     },
     {
-        field_id: '4',
+        field_id: 'field_4',
         name: 'dropdown',
         field_type: 'DROPDOWN',
         is_required: true,
@@ -54,7 +54,7 @@ const fields = ref<TaskField[]>([
         },
     },
     {
-        field_id: '5',
+        field_id: 'field_5',
         name: 'date',
         field_type: 'DATE',
         is_required: true,
@@ -62,7 +62,7 @@ const fields = ref<TaskField[]>([
         options: {},
     },
     {
-        field_id: '8',
+        field_id: 'field_6',
         name: 'project',
         field_type: 'PROJECT',
         is_required: true,
@@ -71,13 +71,25 @@ const fields = ref<TaskField[]>([
     },
 ]);
 
+const data = ref<Record<string, any>>({
+    field_1: 'text',
+    field_2: 'paragraph',
+    field_3: ['label1', 'label2'],
+    field_4: '1',
+    field_5: '2022-01-01',
+    field_6: 'project',
+});
+
 </script>
 
 <template>
-    <div>
+    <div class="flex flex-col gap-4">
         <component :is="COMPONENT_MAP[field.field_type]"
                    v-for="field in fields"
                    :key="field.field_id"
+                   :field="field"
+                   :value="data[field.field_id]"
+                   @update:value="data[field.field_id] = $event"
         />
     </div>
 </template>

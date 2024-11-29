@@ -33,7 +33,7 @@ interface BaseTaskField {
     is_required?: boolean;
     is_primary?: boolean; // whether to display field during task creation
 }
-interface TextTaskField extends BaseTaskField {
+export interface TextTaskField extends BaseTaskField {
     field_type: 'TEXT';
     options: TextTaskFieldOptions;
 }
