@@ -7,7 +7,7 @@ import type { TaskFieldFormProps } from '@/services/ops-flow/task-fields-form/ty
 
 
 const stringValidatorTypes: TaskFieldType[] = ['TEXT', 'PARAGRAPH', 'DATE'];
-const stringArrayValidatorTypes: TaskFieldType[] = ['DROPDOWN', 'USER', 'ASSET', 'PROJECT', 'PROVIDER', 'SERVICE_ACCOUNT'];
+const stringArrayValidatorTypes: TaskFieldType[] = ['DROPDOWN', 'USER', 'PROJECT']; // , 'PROVIDER', 'SERVICE_ACCOUNT', 'ASSET'];
 export const useTaskFieldValidation = <TField extends TaskField, TValue>(props: TaskFieldFormProps<TField, any>) => {
     const stringValidator: ValidatorFn<TValue> = (val): string|boolean => {
         if (val === undefined || val === null) {
