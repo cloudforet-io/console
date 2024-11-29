@@ -4,7 +4,7 @@ import { computed, reactive } from 'vue';
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
 import {
-    PDivider, PCard, PToolbox, PI, PTextButton,
+    PDivider, PSelectCard, PToolbox, PI, PTextButton,
 } from '@cloudforet/mirinae';
 import type { ToolboxOptions } from '@cloudforet/mirinae/src/controls/toolbox/type';
 import type { QueryTag } from '@cloudforet/mirinae/types/controls/search/query-search-tags/type';
@@ -49,6 +49,16 @@ const handleChangeToolbox = async (options: ToolboxOptions) => {
 const handleClickEscalationPolicy = () => {
     console.log('TODO: handleClickEscalationPolicy');
 };
+const handleClickServiceItem = () => {
+    console.log('TODO: handleClickServiceItem');
+};
+const handleClickWebhookItem = (item: string) => {
+    if (item === 'chevron') {
+        console.log('TODO: route to webhook main page');
+    } else {
+        console.log('TODO: route to webhook detail page');
+    }
+};
 
 const fetchServiceList = () => {
     console.log('TODO: fetchServiceList');
@@ -69,8 +79,8 @@ const fetchServiceList = () => {
                    @refresh="fetchServiceList"
         />
         <div class="list-card-wrapper">
-            <p-card :header="false"
-                    class="card"
+            <p-select-card class="card"
+                           @change="handleClickServiceItem"
             >
                 <div class="card-inner-wrapper">
                     <p class="text-label-xl font-bold">
@@ -114,8 +124,8 @@ const fetchServiceList = () => {
                                 </p>
                                 <div class="webhook-list">
                                     <!-- TODO: check the link & icon -->
-                                    <a class="webhook"
-                                       :href="undefined"
+                                    <span class="webhook"
+                                          @click.stop="handleClickWebhookItem('item')"
                                     >
                                         <p-i name="ic_check"
                                              class="icon success"
@@ -123,9 +133,9 @@ const fetchServiceList = () => {
                                              width="0.875rem"
                                              color="inherit"
                                         />
-                                    </a>
-                                    <a class="webhook chevron"
-                                       :href="undefined"
+                                    </span>
+                                    <span class="webhook chevron"
+                                          @click.stop="handleClickWebhookItem('chevron')"
                                     >
                                         <p-i
                                             name="ic_chevron-right"
@@ -133,21 +143,21 @@ const fetchServiceList = () => {
                                             height="1.125rem"
                                             color="inherit"
                                         />
-                                    </a>
+                                    </span>
                                 </div>
                             </div>
                             <div class="mt-4">
                                 <p class="title">
                                     {{ $t('ALERT_MANAGER.ESCALATION_POLICY.TITLE', { cnt: 11 }) }}
                                 </p>
-                                <p-text-button @click="handleClickEscalationPolicy">
+                                <p-text-button @click.stop="handleClickEscalationPolicy">
                                     temp default policy
                                 </p-text-button>
                             </div>
                         </div>
                     </div>
                 </div>
-            </p-card>
+            </p-select-card>
         </div>
     </div>
 </template>
@@ -162,9 +172,9 @@ const fetchServiceList = () => {
         .card {
             min-width: 30rem;
             max-width: 28rem;
+            padding: 1.25rem 1.5rem 1.5rem;
             .card-inner-wrapper {
-                @apply flex flex-col;
-                padding: 0.5rem 0.625rem 0.625rem;
+                @apply flex flex-col w-full;
                 gap: 1.75rem;
                 .contents {
                     @apply flex justify-between;
@@ -209,6 +219,9 @@ const fetchServiceList = () => {
                                 @apply flex items-center justify-center rounded-full bg-gray-100 border border-white ;
                                 width: 1.5rem;
                                 height: 1.5rem;
+                                &:hover {
+                                    @apply bg-blue-200;
+                                }
                                 & + .webhook {
                                     margin-left: -0.25rem;
                                 }
