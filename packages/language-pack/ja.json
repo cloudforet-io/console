@@ -100,7 +100,8 @@
 			"TITLE": "サービス",
 			"TOTAL_ALERTS": "",
 			"USER_GROUP": "",
-			"VALIDATION_NAME_UNIQUE": ""
+			"VALIDATION_NAME_UNIQUE": "",
+			"WEBHOOK": "ウェプフク ({cnt})"
 		},
 		"SET_UP": "",
 		"SHOW_MORE": "もっと見る",
@@ -112,7 +113,7 @@
 			"GUIDE": "ユーザーガイド",
 			"LABEL_NAME": "名前",
 			"LABEL_STATE": "状態",
-			"TITLE": "ウェプフク ({cnt})",
+			"TITLE": "ウェプフク ",
 			"VERSION": "バージョン",
 			"WEBHOOK_URL": "ウェプフク URL"
 		}

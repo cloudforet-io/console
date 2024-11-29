@@ -8,6 +8,7 @@ import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import { ALERT_MANAGER_V2_ROUTE } from '@/services/alert-manager-v2/routes/route-constant';
 
+const AlertManagerContainer = () => import('@/services/alert-manager-v2/AlertManagerContainer.vue');
 const ServiceMainPage = () => import('@/services/alert-manager-v2/pages/ServiceMainPage.vue');
 
 const alertManagerV2Routes: RouteConfig = {
@@ -18,7 +19,7 @@ const alertManagerV2Routes: RouteConfig = {
         translationId: MENU_INFO_MAP[MENU_ID.ALERT_MANAGER_V2].translationId,
     },
     redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
-    component: { template: '<router-view />' },
+    component: AlertManagerContainer,
     children: [
         {
             path: 'service',

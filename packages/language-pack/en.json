@@ -100,7 +100,8 @@
 			"TITLE": "Service",
 			"TOTAL_ALERTS": "Total Alerts",
 			"USER_GROUP": "{cnt} User Group",
-			"VALIDATION_NAME_UNIQUE": "A service with this name already exists."
+			"VALIDATION_NAME_UNIQUE": "A service with this name already exists.",
+			"WEBHOOK": "Webhook ({cnt})"
 		},
 		"SET_UP": "Set Up",
 		"SHOW_MORE": "show more",
@@ -112,7 +113,7 @@
 			"GUIDE": "the Guide",
 			"LABEL_NAME": "Name",
 			"LABEL_STATE": "State",
-			"TITLE": "Webhook ({cnt})",
+			"TITLE": "Webhook",
 			"VERSION": "Version",
 			"WEBHOOK_URL": "Webhook URL"
 		}
