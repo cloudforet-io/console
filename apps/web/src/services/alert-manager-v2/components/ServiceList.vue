@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
@@ -13,7 +14,11 @@ import { useQueryTags } from '@/common/composables/query-tags';
 
 import { red } from '@/styles/colors';
 
+import { ALERT_MANAGER_V2_ROUTE } from '@/services/alert-manager-v2/routes/route-constant';
+
 const pageSizeOptions = [15, 30, 45];
+
+const router = useRouter();
 
 const handlerState = reactive({
     keyItemSets: computed<KeyItemSet[]>(() => [{
@@ -46,11 +51,16 @@ const handleChangeToolbox = async (options: ToolboxOptions) => {
     if (options.pageStart !== undefined) state.pageStart = options.pageStart;
 };
 
+const handleClickServiceItem = (id: string) => {
+    router.push({
+        name: ALERT_MANAGER_V2_ROUTE.SERVICE.DETAIL._NAME,
+        params: {
+            serviceId: id,
+        },
+    });
+};
 const handleClickEscalationPolicy = () => {
     console.log('TODO: handleClickEscalationPolicy');
-};
-const handleClickServiceItem = () => {
-    console.log('TODO: handleClickServiceItem');
 };
 const handleClickWebhookItem = (item: string) => {
     if (item === 'chevron') {
@@ -80,7 +90,7 @@ const fetchServiceList = () => {
         />
         <div class="list-card-wrapper">
             <p-select-card class="card"
-                           @change="handleClickServiceItem"
+                           @change="handleClickServiceItem('id')"
             >
                 <div class="card-inner-wrapper">
                     <p class="text-label-xl font-bold">
