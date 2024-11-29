@@ -7,6 +7,7 @@ import {
     PDivider, PCard, PToolbox, PI, PTextButton,
 } from '@cloudforet/mirinae';
 import type { ToolboxOptions } from '@cloudforet/mirinae/src/controls/toolbox/type';
+import type { QueryTag } from '@cloudforet/mirinae/types/controls/search/query-search-tags/type';
 
 import { useQueryTags } from '@/common/composables/query-tags';
 
@@ -28,7 +29,7 @@ const handlerState = reactive({
 const state = reactive({
     pageStart: 1,
     pageLimit: 15,
-    queryTags: computed(() => queryTagsHelper.queryTags.value),
+    queryTags: computed<QueryTag[]>(() => queryTagsHelper.queryTags.value),
 });
 
 const queryTagsHelper = useQueryTags({
