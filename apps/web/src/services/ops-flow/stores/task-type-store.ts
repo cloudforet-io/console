@@ -108,6 +108,7 @@ export const useTaskTypeStore = defineStore('task-type', () => {
         disposeSelf();
     });
     return {
+        state,
         ...actions,
     };
 });

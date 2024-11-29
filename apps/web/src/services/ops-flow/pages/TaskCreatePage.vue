@@ -28,16 +28,24 @@ import {
 } from '@cloudforet/mirinae';
 import type { TabItem } from '@cloudforet/mirinae/types/hooks/use-tab/type';
 
+import { queryStringToString } from '@/lib/router-query-string';
+
 import { useGoBack } from '@/common/composables/go-back';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import BoardTaskComment from '@/services/ops-flow/components/BoardTaskComment.vue';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
+import { useTaskCreatePageStore } from '@/services/ops-flow/stores/task-create-page-store';
 import type { BoardPageQuery } from '@/services/ops-flow/types/board-page-type';
+import type { TaskCreatePageQueryValue } from '@/services/ops-flow/types/task-create-page-type';
 
 const router = useRouter();
 const route = useRoute();
+
+const taskCreatePageStore = useTaskCreatePageStore();
+
 const { getProperRouteLocation } = useProperRouteLocation();
+
 
 /* header and back button */
 const loading = false; // computed<boolean>(() => taskCategoryStore.getters.loading);
@@ -82,12 +90,16 @@ const handleUpdateActiveTab = (tab: string) => {
     }
 };
 
+
+
+const categoryId = computed<TaskCreatePageQueryValue['categoryId']>(() => queryStringToString(route.query.categoryId));
+
 /* lifecycle */
 onBeforeMount(() => {
-    // taskCategoryPageStore.setCurrentCategoryId(props.taskCategoryId);
+    taskCreatePageStore.setCurrentCategoryId(categoryId.value);
 });
 onUnmounted(() => {
-    // taskCategoryPageStore.$dispose();
+    taskCreatePageStore.$dispose();
 });
 
 /* expose */

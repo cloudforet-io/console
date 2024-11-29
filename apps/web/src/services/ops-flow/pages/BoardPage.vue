@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watch } from 'vue';
+import { watch, computed } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import {
@@ -19,10 +19,10 @@ const { getProperRouteLocation } = useProperRouteLocation();
 
 const boardPageStore = useBoardPageStore();
 
-const taskCreatePageLink = getProperRouteLocation({
+const taskCreatePageLink = computed(() => getProperRouteLocation({
     name: OPS_FLOW_ROUTE.BOARD.TASK_CREATE._NAME,
     query: { categoryId: route.query.categoryId } as TaskCreatePageQuery,
-});
+}));
 
 watch(() => route.query.categoryId, (categoryId) => {
     boardPageStore.setCurrentCategoryId(categoryId as string);

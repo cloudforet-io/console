@@ -16,7 +16,7 @@ import type { TaskModel } from '@/schema/opsflow/task/model';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 interface UseTaskTypeStoreState {
-    itemsByTaskId: Record<string, TaskModel[]|undefined>;
+    itemsByTaskId: Record<string, TaskModel|undefined>;
 }
 
 export const useTaskStore = defineStore('task', () => {
@@ -39,19 +39,13 @@ export const useTaskStore = defineStore('task', () => {
         async create(params: TaskCreateParameters) {
             const response = await SpaceConnector.clientV2.opsflow.task.create<TaskCreateParameters, TaskModel>(params);
             const categoryId = response.category_id;
-            if (state.itemsByTaskId[categoryId]) {
-                state.itemsByTaskId[categoryId]?.push(response);
-            } else {
-                state.itemsByTaskId[categoryId] = [response];
-            }
+            state.itemsByTaskId[categoryId] = response;
+            return response;
         },
         async update(params: TaskUpdateParameters) {
             const response = await SpaceConnector.clientV2.opsflow.task.update<TaskUpdateParameters, TaskModel>(params);
             const categoryId = response.category_id;
-            const item = state.itemsByTaskId[categoryId]?.find((c) => c.category_id === categoryId);
-            if (item) {
-                Object.assign(item, response);
-            }
+            state.itemsByTaskId[categoryId] = response;
             return response;
         },
         async get(taskId: string) {
@@ -59,10 +53,7 @@ export const useTaskStore = defineStore('task', () => {
                 task_id: taskId,
             });
             const categoryId = response.category_id;
-            const item = state.itemsByTaskId[categoryId]?.find((c) => c.category_id === categoryId);
-            if (item) {
-                Object.assign(item, response);
-            }
+            state.itemsByTaskId[categoryId] = response;
             return response;
         },
         async delete(taskId: string) {
@@ -70,7 +61,7 @@ export const useTaskStore = defineStore('task', () => {
                 task_id: taskId,
             });
             const categoryId = response.category_id;
-            state.itemsByTaskId[categoryId] = state.itemsByTaskId[categoryId]?.filter((item) => item.task_type_id !== taskId);
+            delete state.itemsByTaskId[categoryId];
         },
     };
 
@@ -83,6 +74,7 @@ export const useTaskStore = defineStore('task', () => {
         disposeSelf();
     });
     return {
+        state,
         ...actions,
     };
 });
