@@ -2,11 +2,13 @@
 import { ref, computed, watch } from 'vue';
 
 import {
-    PFieldTitle, PSelectDropdown, PButton, PPaneLayout,
+    PFieldTitle, PSelectDropdown, PPaneLayout,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { TaskStatusOptions } from '@/schema/opsflow/task/type';
+
+import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
 import { useTaskCreatePageStore } from '@/services/ops-flow/stores/task-create-page-store';
@@ -55,6 +57,9 @@ const allStatusItems = computed<SelectDropdownMenuItem[]>(() => {
     });
     return items;
 });
+
+/* assignee */
+const assignee = ref<string|undefined>('');
 
 watch([
     () => taskCategoryStore.getters.loading,
@@ -142,13 +147,10 @@ watch([
                     >
                         Assign to
                     </p-field-title>
-                    <p-button style-type="tertiary"
-                              size="sm"
-                    >
-                        Assign
-                    </p-button>
                 </div>
-                <span class="text-label-md">wanzargen@zzz.com</span>
+                <user-select-dropdown :user-ids="[assignee]"
+                                      @update:user-ids="assignee = $event[0]"
+                />
             </div>
         </div>
     </p-pane-layout>
