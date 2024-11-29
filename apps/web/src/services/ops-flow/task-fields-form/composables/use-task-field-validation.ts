@@ -8,8 +8,8 @@ import type { TaskFieldFormProps } from '@/services/ops-flow/task-fields-form/ty
 
 const stringValidatorTypes: TaskFieldType[] = ['TEXT', 'PARAGRAPH'];
 const stringArrayValidatorTypes: TaskFieldType[] = ['DROPDOWN', 'USER', 'ASSET', 'PROJECT', 'PROVIDER', 'SERVICE_ACCOUNT'];
-export const useTaskFieldValidation = (props: TaskFieldFormProps<TaskField, any>) => {
-    const stringValidator: ValidatorFn<any> = (val: any): string|boolean => {
+export const useTaskFieldValidation = <TField extends TaskField, TValue>(props: TaskFieldFormProps<TField, any>) => {
+    const stringValidator: ValidatorFn<TValue> = (val): string|boolean => {
         if (val === undefined || val === null) {
             if (props.field.is_required) {
                 return 'This field is required';
@@ -25,7 +25,7 @@ export const useTaskFieldValidation = (props: TaskFieldFormProps<TaskField, any>
         return true;
     };
 
-    const stringArrayValidator: ValidatorFn<any> = (val: any): string|boolean => {
+    const stringArrayValidator: ValidatorFn<TValue> = (val): string|boolean => {
         if (val === undefined || val === null) {
             if (props.field.is_required) {
                 return 'This field is required';
@@ -53,7 +53,7 @@ export const useTaskFieldValidation = (props: TaskFieldFormProps<TaskField, any>
     };
 
 
-    const fieldValidator = useFieldValidator(props.value, (val) => {
+    const fieldValidator = useFieldValidator<TValue>(props.value, (val) => {
         if (stringValidatorTypes.includes(props.field.field_type)) {
             return stringValidator(val);
         }

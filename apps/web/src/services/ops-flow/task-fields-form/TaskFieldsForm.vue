@@ -100,7 +100,7 @@ const data = ref<Record<string, any>>({
     field_1: 'text',
     field_2: 'paragraph',
     field_3: ['label1', 'label2'],
-    field_4: [{ key: 'a', name: 'option1' }, { key: 'b', name: 'option2' }],
+    field_4: ['1'],
     field_5: '2022-01-01',
     field_6: ['project'],
     field_7: ['provider'],

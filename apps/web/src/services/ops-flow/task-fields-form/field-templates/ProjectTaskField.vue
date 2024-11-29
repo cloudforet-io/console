@@ -3,14 +3,14 @@ import {
     PFieldGroup,
 } from '@cloudforet/mirinae';
 
-import type { TextTaskField } from '@/schema/opsflow/_types/task-field-type';
+import type { OtherTaskField } from '@/schema/opsflow/_types/task-field-type';
 
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import { useTaskFieldValidation } from '@/services/ops-flow/task-fields-form/composables/use-task-field-validation';
 import type { TaskFieldFormProps } from '@/services/ops-flow/task-fields-form/types/task-field-form-type';
 
-const props = defineProps<TaskFieldFormProps<TextTaskField, string[]>>();
+const props = defineProps<TaskFieldFormProps<OtherTaskField, string[]>>();
 
 const emit = defineEmits<{(event: 'update:value', value: string[]): void;
 }>();
@@ -18,7 +18,7 @@ const emit = defineEmits<{(event: 'update:value', value: string[]): void;
 const {
     value, setValue,
     isInvalid, invalidText,
-} = useTaskFieldValidation(props);
+} = useTaskFieldValidation<OtherTaskField, string[]>(props);
 
 const handleUpdate = (val: string[]) => {
     setValue(val);

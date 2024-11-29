@@ -18,7 +18,7 @@ const emit = defineEmits<{(event: 'update:value', value: string): void;
 const {
     value, setValue,
     isInvalid, invalidText,
-} = useTaskFieldValidation(props);
+} = useTaskFieldValidation<ParagraphTaskField, string>(props);
 
 const handleUpdate = (val: string) => {
     setValue(val);
