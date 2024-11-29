@@ -1,4 +1,4 @@
-import { reactive } from 'vue';
+import { reactive, watch } from 'vue';
 
 import { merge } from 'lodash';
 import { defineStore } from 'pinia';
@@ -15,6 +15,8 @@ import type { TaskTypeListParameters } from '@/schema/opsflow/task-type/api-verb
 import type { TaskTypeUpdateParameters } from '@/schema/opsflow/task-type/api-verbs/update';
 import type { TaskTypeUpdateFieldsParameters } from '@/schema/opsflow/task-type/api-verbs/update-fields';
 import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -96,6 +98,15 @@ export const useTaskTypeStore = defineStore('task-type', () => {
             state.itemsByCategoryId[categoryId] = state.itemsByCategoryId[categoryId]?.filter((item) => item.task_type_id !== taskTypeId);
         },
     };
+
+    const disposeSelf = () => {
+        const store = useTaskTypeStore();
+        store.$dispose();
+    };
+    const appContextStore = useAppContextStore();
+    watch(() => appContextStore.getters.isAdminMode, () => {
+        disposeSelf();
+    });
     return {
         ...actions,
     };

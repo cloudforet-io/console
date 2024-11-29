@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { watch } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import {
@@ -9,15 +10,22 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 
 import BoardTaskTable from '@/services/ops-flow/components/BoardTaskTable.vue';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
+import { useBoardPageStore } from '@/services/ops-flow/stores/board-page-store';
 import type { TaskCreatePageQuery } from '@/services/ops-flow/types/task-create-page-type';
 
 const route = useRoute();
 
 const { getProperRouteLocation } = useProperRouteLocation();
 
+const boardPageStore = useBoardPageStore();
+
 const taskCreatePageLink = getProperRouteLocation({
     name: OPS_FLOW_ROUTE.BOARD.TASK_CREATE._NAME,
     query: { categoryId: route.query.categoryId } as TaskCreatePageQuery,
+});
+
+watch(() => route.query.categoryId, (categoryId) => {
+    boardPageStore.setCurrentCategoryId(categoryId as string);
 });
 
 </script>
