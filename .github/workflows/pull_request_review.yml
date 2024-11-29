@@ -27,6 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NODE_ENV: 'development'
+      ACTIONS_STEP_DEBUG: true
 
     steps:
       - name: Checkout code
@@ -40,7 +41,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            github.rest.pulls.createReview({
+            github.rest.pulls.createComment({
               pull_number: context.payload.pull_request.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
