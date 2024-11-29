@@ -35,18 +35,17 @@ interface BaseTaskField {
 }
 export interface TextTaskField extends BaseTaskField {
     field_type: 'TEXT';
-    options: TextTaskFieldOptions;
+    options?: TextTaskFieldOptions;
 }
-interface ParagraphTaskField extends BaseTaskField {
+export interface ParagraphTaskField extends BaseTaskField {
     field_type: 'PARAGRAPH';
-    options: ParagraphTaskFieldOptions;
+    options?: ParagraphTaskFieldOptions;
 }
-interface DropdownTaskField extends BaseTaskField {
+export interface DropdownTaskField extends BaseTaskField {
     field_type: 'DROPDOWN';
-    options: DropdownTaskFieldOptions;
+    options?: DropdownTaskFieldOptions;
 }
 interface OtherTaskField extends BaseTaskField {
     field_type: Exclude<TaskFieldType, 'TEXT'|'PARAGRAPH'|'DROPDOWN'>;
-    options: object;
 }
 export type TaskField = TextTaskField | ParagraphTaskField | DropdownTaskField | OtherTaskField;
