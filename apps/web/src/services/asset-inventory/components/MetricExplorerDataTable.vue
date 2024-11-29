@@ -311,7 +311,7 @@ const reduce = (arr: (number | undefined)[] | any) => arr.reduce((acc, value) =>
 
         <template #tf-col-format="{field, colIndex, values}">
             <span v-if="colIndex === 0">Total</span>
-            <p v-if="!state.groupByFields.map((d) => d.name).includes(field.name) && values.length > 0">
+            <p v-else-if="!state.groupByFields.map((d) => d.name).includes(field.name) && values.length > 0">
                 <span v-if="dayjs.utc().format(DATE_FORMAT_MAP[metricExplorerPageState.granularity]) === field.label">
                     {{ values.filter(e => typeof e === 'number').length === 0 ? '--' : numberFormatter(reduce(values), {notation: 'compact'}) }}
                 </span>

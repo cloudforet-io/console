@@ -8,7 +8,7 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PButton, PButtonModal, PI, PTextEditor, PToolbox, PEmpty,
+    PButton, PButtonModal, PI, PCodeEditor, PToolbox, PEmpty,
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -154,7 +154,7 @@ const onCopyClick = () => {
         >
             <template #body>
                 <div class="content-wrapper">
-                    <p-text-editor :code="state.selectedItem"
+                    <p-code-editor :code="state.selectedItem"
                                    class="code-block"
                                    read-only
                                    folded

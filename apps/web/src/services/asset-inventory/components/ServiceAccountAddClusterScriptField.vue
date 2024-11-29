@@ -3,7 +3,7 @@
 import { reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { PButton, PTextEditor, PTextHighlighting } from '@cloudforet/mirinae';
+import { PButton, PCodeEditor, PTextHighlighting } from '@cloudforet/mirinae';
 
 import { copyAnyData } from '@/lib/helper/copy-helper';
 
@@ -64,7 +64,7 @@ const handleClickCopyButton = (script: any) => {
         <div class="script-wrapper"
              :style="{'height': props.scriptHeight}"
         >
-            <p-text-editor read-only
+            <p-code-editor read-only
                            :code="props.script"
                            :options="state.options"
             />

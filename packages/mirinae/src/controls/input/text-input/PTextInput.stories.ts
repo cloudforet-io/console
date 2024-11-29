@@ -5,6 +5,7 @@ import Fuse from 'fuse.js';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
 import PButton from '@/controls/buttons/button/PButton.vue';
+import PCodeEditor from '@/controls/code-editor/PCodeEditor.vue';
 import PFieldGroup from '@/controls/forms/field-group/PFieldGroup.vue';
 import { getTextInputMenu, getTextInputMenuWithMultiTypes } from '@/controls/input/text-input/mock';
 import {
@@ -13,9 +14,9 @@ import {
     getTextInputParameters,
 } from '@/controls/input/text-input/story-helper';
 import { INPUT_SIZE } from '@/controls/input/text-input/type';
-import PTextEditor from '@/controls/text-editor/PTextEditor.vue';
 
 import PTextInput from './PTextInput.vue';
+
 
 type PTextInputPropsAndCustomArgs = ComponentProps<typeof PTextInput>;
 
@@ -443,7 +444,7 @@ export const Slots: Story = {
 export const InputAttributes: Story = {
     render: () => ({
         components: {
-            PTextInput, PTextEditor, PButton, PFieldGroup,
+            PTextInput, PCodeEditor, PButton, PFieldGroup,
         },
         template: `
             <div>
@@ -452,7 +453,7 @@ export const InputAttributes: Story = {
                     :invalid="!!errorMessage"
                     :invalid-text="errorMessage"
                 >
-                    <p-text-editor :code="JSON.stringify(attributes, null, 2)"
+                    <p-code-editor :code="JSON.stringify(attributes, null, 2)"
                                    @update:code="handleUpdateCode"
                     />
                 </p-field-group>

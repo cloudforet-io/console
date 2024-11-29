@@ -3,7 +3,7 @@ import { computed, reactive, watch } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButtonModal, PTextEditor, PButton,
+    PButtonModal, PCodeEditor, PButton,
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -120,7 +120,7 @@ watch(() => props.visible, async (visible) => {
     >
         <template #body>
             <div class="code-wrapper">
-                <p-text-editor :code="state.sharedDashboard"
+                <p-code-editor :code="state.sharedDashboard"
                                readonly
                                folded
                                :loading="state.loading"
