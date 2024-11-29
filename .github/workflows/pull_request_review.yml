@@ -81,7 +81,7 @@ jobs:
         if: always()
         uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.PAT_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
             const todoFiles = fs.readFileSync('todo_files.txt', 'utf8').trim();
