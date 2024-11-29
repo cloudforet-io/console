@@ -1,8 +1,5 @@
 name: "[PR] Review"
 
-permissions:
-  pull-requests: 'write'
-
 on:
   pull_request:
     types: [opened, synchronize, reopened]
@@ -28,6 +25,8 @@ on:
 jobs:
   review:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     env:
       NODE_ENV: 'development'
 
