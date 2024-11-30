@@ -16,13 +16,13 @@ const emit = defineEmits<{(event: 'update:value', value: string): void;
 }>();
 
 const {
-    value, setValue,
+    fieldValue, setFieldValue,
     isInvalid, invalidText,
 } = useTaskFieldValidation<OtherTaskField, string>(props);
 
-const selectedDates = computed(() => (value ? [value] : []));
+const selectedDates = computed(() => (fieldValue.value ? [fieldValue.value] : []));
 const handleUpdate = (val: string[]) => {
-    setValue(val[0] ?? '');
+    setFieldValue(val[0] ?? '');
     emit('update:value', val[0] ?? '');
 };
 </script>

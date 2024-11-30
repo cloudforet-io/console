@@ -16,12 +16,12 @@ const emit = defineEmits<{(event: 'update:value', value: string): void;
 }>();
 
 const {
-    value, setValue,
+    fieldValue, setFieldValue,
     isInvalid, invalidText,
 } = useTaskFieldValidation<ParagraphTaskField, string>(props);
 
 const handleUpdate = (val: string) => {
-    setValue(val);
+    setFieldValue(val);
     emit('update:value', val);
 };
 </script>
@@ -32,7 +32,7 @@ const handleUpdate = (val: string) => {
                    :invalid="isInvalid"
                    :invalid-text="invalidText"
     >
-        <text-editor :value="value"
+        <text-editor :value="fieldValue"
                      :placeholder="props.field.options?.example"
                      :invalid="isInvalid"
                      @update:value="handleUpdate"

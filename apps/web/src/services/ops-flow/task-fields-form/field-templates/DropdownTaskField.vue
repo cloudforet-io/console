@@ -17,7 +17,7 @@ const emit = defineEmits<{(event: 'update:value', value: string[]): void;
 }>();
 
 const {
-    value, setValue,
+    fieldValue, setFieldValue,
     isInvalid, invalidText,
 } = useTaskFieldValidation<DropdownTaskField, string[]>(props);
 
@@ -33,7 +33,7 @@ const allItems = computed<DropdownItem[]>(() => {
     }));
 });
 
-const selectedItems = computed<DropdownItem[]>(() => value.value.map((item) => ({
+const selectedItems = computed<DropdownItem[]>(() => fieldValue.value.map((item) => ({
     name: item,
     label: allItems.value.find((i) => i.name === item)?.label ?? item,
 })));
@@ -47,7 +47,7 @@ const dropdownItemsHandler: AutocompleteHandler = async (keyword: string, pageSt
     };
 };
 const handleUpdate = (val: DropdownItem[]) => {
-    setValue(val.map((item) => item.name));
+    setFieldValue(val.map((item) => item.name));
     emit('update:value', val.map((item) => item.name));
 };
 </script>

@@ -14,12 +14,12 @@ const emit = defineEmits<{(event: 'update:value', value: string): void;
 }>();
 
 const {
-    value, setValue,
+    fieldValue, setFieldValue,
     isInvalid, invalidText,
 } = useTaskFieldValidation(props);
 
 const handleUpdate = (val: string) => {
-    setValue(val);
+    setFieldValue(val);
     emit('update:value', val);
 };
 </script>
@@ -30,7 +30,7 @@ const handleUpdate = (val: string) => {
                    :invalid="isInvalid"
                    :invalid-text="invalidText"
     >
-        <p-text-input :value="value"
+        <p-text-input :value="fieldValue"
                       :placeholder="props.field.options?.example"
                       :invalid="isInvalid"
                       @update:value="handleUpdate"

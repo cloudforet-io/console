@@ -184,6 +184,7 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageSt
                 </p-field-group>
                 <p-field-group label="Assignee Pool">
                     <user-select-dropdown :selected-user-ids="assigneePool"
+                                          selection-type="multiple"
                                           @update:user-ids="setForm('assigneePool', $event)"
                     />
                 </p-field-group>

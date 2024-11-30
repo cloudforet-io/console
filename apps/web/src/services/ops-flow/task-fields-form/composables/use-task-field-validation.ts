@@ -53,7 +53,11 @@ export const useTaskFieldValidation = <TField extends TaskField, TValue>(props: 
     };
 
 
-    const fieldValidator = useFieldValidator<TValue>(props.value, (val) => {
+    const {
+        value: fieldValue,
+        setValue: setFieldValue,
+        invalidText, isInvalid,
+    } = useFieldValidator<TValue>(props.value, (val) => {
         if (stringValidatorTypes.includes(props.field.field_type)) {
             return stringValidator(val);
         }
@@ -64,6 +68,9 @@ export const useTaskFieldValidation = <TField extends TaskField, TValue>(props: 
     });
 
     return {
-        ...fieldValidator,
+        fieldValue,
+        setFieldValue,
+        invalidText,
+        isInvalid,
     };
 };

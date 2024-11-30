@@ -8,6 +8,7 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 
 import type { TaskStatusOptions } from '@/schema/opsflow/task/type';
 
+import { useFormValidator } from '@/common/composables/form-validator';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
@@ -58,8 +59,18 @@ const allStatusItems = computed<SelectDropdownMenuItem[]>(() => {
     return items;
 });
 
-/* assignee */
-const assignee = ref<string|undefined>('');
+/* form */
+const {
+    forms: { assignee },
+    setForm,
+} = useFormValidator({
+    assignee: '',
+}, {
+    assignee(value) {
+        if (!value) return 'Assignee is required';
+        return true;
+    },
+});
 
 watch([
     () => taskCategoryStore.getters.loading,
@@ -113,6 +124,7 @@ watch([
                 </p-field-title>
                 <p-select-dropdown :selected="selectedCategoryItem"
                                    :menu="allCategoryItems"
+                                   :loading="taskCategoryStore.getters.loading"
                                    @update:selected="selectedCategoryItem = $event"
                 />
             </div>
@@ -124,6 +136,7 @@ watch([
                 </p-field-title>
                 <p-select-dropdown :selected="selectedTaskTypeItem"
                                    :menu="allTaskTypeItems"
+                                   :loading="taskCategoryStore.getters.loading"
                                    @update:selected="selectedTaskTypeItem = $event"
                 />
             </div>
@@ -137,6 +150,7 @@ watch([
                 </p-field-title>
                 <p-select-dropdown :selected="selectedStatusItem"
                                    :menu="allStatusItems"
+                                   :loading="taskCategoryStore.getters.loading"
                                    @update:selected="selectedStatusItem = $event"
                 />
             </div>
@@ -148,8 +162,8 @@ watch([
                         Assign to
                     </p-field-title>
                 </div>
-                <user-select-dropdown :user-ids="[assignee]"
-                                      @update:user-ids="assignee = $event[0]"
+                <user-select-dropdown :user-id="assignee"
+                                      @update:user-id="setForm('assignee', $event)"
                 />
             </div>
         </div>

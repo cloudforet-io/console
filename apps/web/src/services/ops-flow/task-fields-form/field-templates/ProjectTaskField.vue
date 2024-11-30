@@ -16,12 +16,12 @@ const emit = defineEmits<{(event: 'update:value', value: string[]): void;
 }>();
 
 const {
-    value, setValue,
+    fieldValue, setFieldValue,
     isInvalid, invalidText,
 } = useTaskFieldValidation<OtherTaskField, string[]>(props);
 
 const handleUpdate = (val: string[]) => {
-    setValue(val);
+    setFieldValue(val);
     emit('update:value', val);
 };
 </script>
@@ -34,7 +34,7 @@ const handleUpdate = (val: string[]) => {
     >
         <project-select-dropdown project-selectable
                                  :project-group-selectable="false"
-                                 :selected-project-ids="value"
+                                 :selected-project-ids="fieldValue"
                                  @update:selected-project-ids="handleUpdate"
         />
     </p-field-group>
