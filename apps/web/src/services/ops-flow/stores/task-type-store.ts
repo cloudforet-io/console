@@ -31,6 +31,24 @@ export const useTaskTypeStore = defineStore('task-type', () => {
 
     const fetchList = getCancellableFetcher<TaskTypeListParameters, ListResponse<TaskTypeModel>>(SpaceConnector.clientV2.opsflow.taskType.list);
     const actions = {
+        async listByCategoryIds(categoryIds: string[]): Promise<Record<string, TaskTypeModel[]>> {
+            const _categoryIds = categoryIds.filter((categoryId) => !state.itemsByCategoryId[categoryId]);
+            if (_categoryIds.length === 0) {
+                return state.itemsByCategoryId as Record<string, TaskTypeModel[]>;
+            }
+
+            try {
+                const result = await fetchList({ query: { filter: [{ k: 'category_id', v: _categoryIds, o: 'in' }] } });
+                if (result.status === 'succeed') {
+                    _categoryIds.forEach((categoryId) => {
+                        state.itemsByCategoryId[categoryId] = result.response.results?.filter((item) => item.category_id === categoryId);
+                    });
+                }
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
+            return state.itemsByCategoryId as Record<string, TaskTypeModel[]>;
+        },
         async listByCategoryId(categoryId: string, query?: Query, force?: boolean): Promise<TaskTypeModel[]> {
             if (!query && state.itemsByCategoryId[categoryId] && !force) {
                 return state.itemsByCategoryId[categoryId] as TaskTypeModel[];

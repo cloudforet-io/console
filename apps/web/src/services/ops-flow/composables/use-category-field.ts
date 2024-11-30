@@ -7,17 +7,20 @@ import { useFieldValidator } from '@/common/composables/form-validator';
 
 import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
+import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 
 interface CategoryItem extends SelectDropdownMenuItem {
     packageId: string;
 }
 export const useCategoryField = ({
-    isRequired,
+    isRequired, hasTaskTypeOnly,
 }: {
     isRequired?: boolean;
+    hasTaskTypeOnly?: boolean;
 } = {}) => {
     const packageStore = usePackageStore();
     const taskCategoryStore = useTaskCategoryStore();
+    const taskTypeStore = useTaskTypeStore();
 
     const categoryValidator = useFieldValidator<CategoryItem[]>(
         [],
@@ -33,7 +36,25 @@ export const useCategoryField = ({
         categoryValidator.setValue(selectedCategories);
     };
 
-    const allCategoryItems = computed<CategoryItem[]>(() => taskCategoryStore.getters.taskCategories.map((c) => ({ name: c.category_id, label: c.name, packageId: c.package_id })) || []);
+    const allCategoryItems = computed<CategoryItem[]>(() => {
+        if (hasTaskTypeOnly) {
+            taskTypeStore.listByCategoryIds(taskCategoryStore.getters.taskCategories.map((c) => c.category_id));
+            return taskCategoryStore.getters.taskCategories.filter((c) => {
+                const taskTypes = taskTypeStore.state.itemsByCategoryId[c.category_id];
+                return taskTypes && taskTypes.length > 0;
+            }).map((c) => ({
+                name: c.category_id,
+                label: c.name,
+                packageId: c.package_id,
+            }));
+        }
+        return taskCategoryStore.getters.taskCategories.map((c) => ({
+            name: c.category_id,
+            label: c.name,
+            packageId: c.package_id,
+        }))
+            || [];
+    });
     const categoryItemsByPackage = computed<Record<string, CategoryItem[]>>(() => {
         const map: Record<string, CategoryItem[]> = {};
         allCategoryItems.value.forEach((item) => {

@@ -33,6 +33,7 @@ const {
     setSelectedCategoryItems,
 } = useCategoryField({
     isRequired: true,
+    hasTaskTypeOnly: true,
 });
 
 /* task type */
