@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import {
-    ref, computed, watch, nextTick,
+    ref, watch, nextTick,
 } from 'vue';
 
 import {
     POverlayLayout, PFieldGroup, PTextInput, PTextarea, PSelectDropdown, PButton,
 } from '@cloudforet/mirinae';
-
-import type { PackageModel } from '@/schema/identity/package/model';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -41,12 +39,10 @@ const {
     selectedCategoryItems,
     categoryMenuItemsHandler,
     categoryValidator,
-    handleUpdateSelectedCategories,
+    setSelectedCategoryItems,
     setInitialCategories,
     applyPackageToCategories,
-} = useCategoryField({
-    defaultPackage: computed<PackageModel|undefined>(() => packageStore.getters.packages.find((p) => p.is_default)),
-});
+} = useCategoryField();
 
 /* form */
 const {
@@ -232,7 +228,7 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
                                        show-clear-selection
                                        is-filterable
                                        init-selected-with-handler
-                                       @update:selected="handleUpdateSelectedCategories"
+                                       @update:selected="setSelectedCategoryItems"
                     />
                 </p-field-group>
             </div>

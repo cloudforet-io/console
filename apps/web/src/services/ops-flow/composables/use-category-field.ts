@@ -1,32 +1,35 @@
-import type { Ref, DeepReadonly } from 'vue';
 import { computed, ref } from 'vue';
 
 import { getTextHighlightRegex } from '@cloudforet/mirinae';
 import type { AutocompleteHandler, SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { PackageModel } from '@/schema/identity/package/model';
-
 import { useFieldValidator } from '@/common/composables/form-validator';
 
+import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
 
 interface CategoryItem extends SelectDropdownMenuItem {
     packageId: string;
 }
 export const useCategoryField = ({
-    defaultPackage,
+    isRequired,
 }: {
-    defaultPackage: DeepReadonly<Ref<PackageModel|undefined>>;
-}) => {
+    isRequired?: boolean;
+} = {}) => {
+    const packageStore = usePackageStore();
     const taskCategoryStore = useTaskCategoryStore();
 
     const categoryValidator = useFieldValidator<CategoryItem[]>(
         [],
+        isRequired ? (val) => {
+            if (val.length === 0) return 'Please select a category';
+            return true;
+        } : undefined,
     );
     const selectedCategoryItems = categoryValidator.value;
     const selectedCategoryIds = computed<string[]>(() => selectedCategoryItems.value.map((c) => c.name));
 
-    const handleUpdateSelectedCategories = (selectedCategories: CategoryItem[]) => {
+    const setSelectedCategoryItems = (selectedCategories: CategoryItem[]) => {
         categoryValidator.setValue(selectedCategories);
     };
 
@@ -74,8 +77,8 @@ export const useCategoryField = ({
     };
     const bindDefaultPackageToCategories = async (categoryIds: string[]) => {
         try {
-            if (!defaultPackage.value) throw new Error('Default package not found');
-            const defaultPackageId = defaultPackage.value.package_id;
+            if (!packageStore.getters.defaultPackage) throw new Error('Default package not found');
+            const defaultPackageId = packageStore.getters.defaultPackage.package_id;
             await Promise.allSettled([
                 ...categoryIds.map((categoryId) => taskCategoryStore.update({
                     package_id: defaultPackageId,
@@ -100,11 +103,12 @@ export const useCategoryField = ({
     };
 
     return {
+        loadingCategories: computed(() => taskCategoryStore.getters.loading),
         selectedCategoryItems,
         selectedCategoryIds,
         categoryValidator,
         categoryMenuItemsHandler,
-        handleUpdateSelectedCategories,
+        setSelectedCategoryItems,
         setInitialCategories,
         applyPackageToCategories,
     };

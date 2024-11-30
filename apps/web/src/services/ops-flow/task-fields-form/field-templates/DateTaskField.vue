@@ -8,22 +8,23 @@ import {
 import type { OtherTaskField } from '@/schema/opsflow/_types/task-field-type';
 
 import { useTaskFieldValidation } from '@/services/ops-flow/task-fields-form/composables/use-task-field-validation';
-import type { TaskFieldFormProps } from '@/services/ops-flow/task-fields-form/types/task-field-form-type';
+import type {
+    TaskFieldFormEmits,
+    TaskFieldFormProps,
+} from '@/services/ops-flow/task-fields-form/types/task-field-form-type';
 
 const props = defineProps<TaskFieldFormProps<OtherTaskField, string>>();
 
-const emit = defineEmits<{(event: 'update:value', value: string): void;
-}>();
+const emit = defineEmits<TaskFieldFormEmits<string>>();
 
 const {
-    fieldValue, setFieldValue,
+    fieldValue, updateFieldValue,
     isInvalid, invalidText,
-} = useTaskFieldValidation<OtherTaskField, string>(props);
+} = useTaskFieldValidation(props, emit);
 
 const selectedDates = computed(() => (fieldValue.value ? [fieldValue.value] : []));
 const handleUpdate = (val: string[]) => {
-    setFieldValue(val[0] ?? '');
-    emit('update:value', val[0] ?? '');
+    updateFieldValue(val[0] ?? '');
 };
 </script>
 

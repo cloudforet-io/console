@@ -6,22 +6,16 @@ import {
 import type { TextTaskField } from '@/schema/opsflow/_types/task-field-type';
 
 import { useTaskFieldValidation } from '@/services/ops-flow/task-fields-form/composables/use-task-field-validation';
-import type { TaskFieldFormProps } from '@/services/ops-flow/task-fields-form/types/task-field-form-type';
+import type { TaskFieldFormEmits, TaskFieldFormProps } from '@/services/ops-flow/task-fields-form/types/task-field-form-type';
 
 const props = defineProps<TaskFieldFormProps<TextTaskField, string>>();
 
-const emit = defineEmits<{(event: 'update:value', value: string): void;
-}>();
+const emit = defineEmits<TaskFieldFormEmits<string>>();
 
 const {
-    fieldValue, setFieldValue,
+    fieldValue, updateFieldValue,
     isInvalid, invalidText,
-} = useTaskFieldValidation(props);
-
-const handleUpdate = (val: string) => {
-    setFieldValue(val);
-    emit('update:value', val);
-};
+} = useTaskFieldValidation(props, emit);
 </script>
 
 <template>
@@ -33,7 +27,8 @@ const handleUpdate = (val: string) => {
         <p-text-input :value="fieldValue"
                       :placeholder="props.field.options?.example"
                       :invalid="isInvalid"
-                      @update:value="handleUpdate"
+                      block
+                      @update:value="updateFieldValue"
         />
     </p-field-group>
 </template>

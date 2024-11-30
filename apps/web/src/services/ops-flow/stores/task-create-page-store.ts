@@ -35,6 +35,9 @@ export const useTaskCreatePageStore = defineStore('task-create-page', () => {
         setCurrentCategoryId(categoryId?: string) {
             state.currentCategoryId = categoryId;
         },
+        setCurrentTaskTypeId(taskTypeId?: string) {
+            state.currentTaskTypeId = taskTypeId;
+        },
     };
     return {
         state,

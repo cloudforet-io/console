@@ -35,6 +35,7 @@ export const usePackageStore = defineStore('package', () => {
             }
             return state.items ?? [];
         }, [], { lazy: true }),
+        defaultPackage: computed<PackageModel|undefined>(() => getters.packages.find((p) => p.is_default)),
     };
 
     const fetchList = getCancellableFetcher<PackageListParameters, ListResponse<PackageModel>>(SpaceConnector.clientV2.identity.package.list);

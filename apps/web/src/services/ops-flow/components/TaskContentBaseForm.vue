@@ -2,7 +2,7 @@
 import { ref, computed, watch } from 'vue';
 
 import {
-    PFieldTitle, PSelectDropdown, PPaneLayout,
+    PFieldGroup, PFieldTitle, PSelectDropdown, PPaneLayout,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
@@ -11,9 +11,13 @@ import type { TaskStatusOptions } from '@/schema/opsflow/task/type';
 import { useFormValidator } from '@/common/composables/form-validator';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
+import { useCategoryField } from '@/services/ops-flow/composables/use-category-field';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
 import { useTaskCreatePageStore } from '@/services/ops-flow/stores/task-create-page-store';
 import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
+
+const emit = defineEmits<{(event: 'update:is-valid', value: boolean): void;
+}>();
 
 const taskCreatePageStore = useTaskCreatePageStore();
 const taskCreatePageGetters = taskCreatePageStore.getters;
@@ -21,11 +25,15 @@ const taskCategoryStore = useTaskCategoryStore();
 const taskTypeStore = useTaskTypeStore();
 
 /* category */
-const selectedCategoryItem = ref<SelectDropdownMenuItem[]>([]);
-const allCategoryItems = computed<SelectDropdownMenuItem[]>(() => taskCategoryStore.getters.taskCategories.map((category) => ({
-    name: category.category_id,
-    label: category.name,
-})));
+const {
+    loadingCategories,
+    selectedCategoryItems,
+    categoryValidator,
+    categoryMenuItemsHandler,
+    setSelectedCategoryItems,
+} = useCategoryField({
+    isRequired: true,
+});
 
 /* task type */
 const selectedTaskTypeItem = ref<SelectDropdownMenuItem[]>([]);
@@ -63,7 +71,11 @@ const allStatusItems = computed<SelectDropdownMenuItem[]>(() => {
 const {
     forms: { assignee },
     setForm,
+    invalidState,
+    invalidTexts,
+    isAllValid,
 } = useFormValidator({
+    category: categoryValidator,
     assignee: '',
 }, {
     assignee(value) {
@@ -72,6 +84,7 @@ const {
     },
 });
 
+/* initiate form */
 watch([
     () => taskCategoryStore.getters.loading,
     () => taskCreatePageGetters.currentCategory,
@@ -79,16 +92,25 @@ watch([
     if (loading) return;
     if (currentCategory) {
         // init selected category
-        selectedCategoryItem.value = [{
+        setSelectedCategoryItems([{
             name: currentCategory.category_id,
             label: currentCategory.name,
-        }];
+            packageId: currentCategory.package_id,
+        }]);
         // init task type
         const taskTypes = await taskTypeStore.listByCategoryId(currentCategory.category_id);
         allTaskTypeItems.value = taskTypes.map((taskType) => ({
             name: taskType.task_type_id,
             label: taskType.name,
         }));
+        if (taskCreatePageGetters.currentTaskType) {
+            selectedTaskTypeItem.value = [{
+                name: taskCreatePageGetters.currentTaskType.task_type_id,
+                label: taskCreatePageGetters.currentTaskType.name,
+            }];
+        } else {
+            selectedTaskTypeItem.value = allTaskTypeItems.value.length ? [allTaskTypeItems.value[0]] : [];
+        }
 
         // init status
         const defaultStatus = currentCategory.status_options.TODO.find((status) => status.is_default);
@@ -99,17 +121,13 @@ watch([
             }];
         }
     }
-    if (taskCreatePageGetters.currentTaskType) {
-        selectedTaskTypeItem.value = [{
-            name: taskCreatePageGetters.currentTaskType.task_type_id,
-            label: taskCreatePageGetters.currentTaskType.name,
-        }];
-    } else {
-        selectedTaskTypeItem.value = allTaskTypeItems.value.length ? [allTaskTypeItems.value[0]] : [];
-    }
 }, { immediate: true });
 
 
+/* validation event */
+watch(isAllValid, (isValid) => {
+    emit('update:is-valid', isValid);
+}, { immediate: true });
 
 </script>
 
@@ -117,16 +135,20 @@ watch([
     <p-pane-layout class="py-6 px-4 flex flex-wrap gap-4">
         <div class="base-form-top-wrapper">
             <div class="base-form-field-wrapper">
-                <p-field-title size="md"
-                               color="gray"
+                <p-field-group label="Category"
+                               style-type="secondary"
+                               required
+                               :invalid="invalidState.category"
+                               :invalid-text="invalidTexts.category"
                 >
-                    Category
-                </p-field-title>
-                <p-select-dropdown :selected="selectedCategoryItem"
-                                   :menu="allCategoryItems"
-                                   :loading="taskCategoryStore.getters.loading"
-                                   @update:selected="selectedCategoryItem = $event"
-                />
+                    <p-select-dropdown :selected="selectedCategoryItems"
+                                       :handler="categoryMenuItemsHandler"
+                                       :loading="loadingCategories"
+                                       :invalid="invalidState.category"
+                                       block
+                                       @update:selected="setSelectedCategoryItems"
+                    />
+                </p-field-group>
             </div>
             <div class="base-form-field-wrapper">
                 <p-field-title size="md"

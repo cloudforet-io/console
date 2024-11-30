@@ -9,17 +9,19 @@ import type { AutocompleteHandler, SelectDropdownMenuItem } from '@cloudforet/mi
 import type { DropdownTaskField } from '@/schema/opsflow/_types/task-field-type';
 
 import { useTaskFieldValidation } from '@/services/ops-flow/task-fields-form/composables/use-task-field-validation';
-import type { TaskFieldFormProps } from '@/services/ops-flow/task-fields-form/types/task-field-form-type';
+import type {
+    TaskFieldFormEmits,
+    TaskFieldFormProps,
+} from '@/services/ops-flow/task-fields-form/types/task-field-form-type';
 
 const props = defineProps<TaskFieldFormProps<DropdownTaskField, string[]>>();
 
-const emit = defineEmits<{(event: 'update:value', value: string[]): void;
-}>();
+const emit = defineEmits<TaskFieldFormEmits<string[]>>();
 
 const {
-    fieldValue, setFieldValue,
+    fieldValue, updateFieldValue,
     isInvalid, invalidText,
-} = useTaskFieldValidation<DropdownTaskField, string[]>(props);
+} = useTaskFieldValidation(props, emit);
 
 interface DropdownItem extends SelectDropdownMenuItem {
     label: string;
@@ -47,8 +49,7 @@ const dropdownItemsHandler: AutocompleteHandler = async (keyword: string, pageSt
     };
 };
 const handleUpdate = (val: DropdownItem[]) => {
-    setFieldValue(val.map((item) => item.name));
-    emit('update:value', val.map((item) => item.name));
+    updateFieldValue(val.map((item) => item.name));
 };
 </script>
 

@@ -8,22 +8,19 @@ import type { OtherTaskField } from '@/schema/opsflow/_types/task-field-type';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import { useTaskFieldValidation } from '@/services/ops-flow/task-fields-form/composables/use-task-field-validation';
-import type { TaskFieldFormProps } from '@/services/ops-flow/task-fields-form/types/task-field-form-type';
+import type {
+    TaskFieldFormEmits,
+    TaskFieldFormProps,
+} from '@/services/ops-flow/task-fields-form/types/task-field-form-type';
 
 const props = defineProps<TaskFieldFormProps<OtherTaskField, string[]>>();
 
-const emit = defineEmits<{(event: 'update:value', value: string[]): void;
-}>();
+const emit = defineEmits<TaskFieldFormEmits<string[]>>();
 
 const {
-    fieldValue, setFieldValue,
+    fieldValue, updateFieldValue,
     isInvalid, invalidText,
-} = useTaskFieldValidation<OtherTaskField, string[]>(props);
-
-const handleUpdate = (val: string[]) => {
-    setFieldValue(val);
-    emit('update:value', val);
-};
+} = useTaskFieldValidation(props, emit);
 </script>
 
 <template>
@@ -35,7 +32,7 @@ const handleUpdate = (val: string[]) => {
         <project-select-dropdown project-selectable
                                  :project-group-selectable="false"
                                  :selected-project-ids="fieldValue"
-                                 @update:selected-project-ids="handleUpdate"
+                                 @update:selected-project-ids="updateFieldValue"
         />
     </p-field-group>
 </template>

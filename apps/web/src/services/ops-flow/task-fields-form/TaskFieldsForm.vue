@@ -24,6 +24,9 @@ const COMPONENT_MAP: Partial<Record<TaskFieldType, ReturnType<typeof defineAsync
 };
 const UnknownTaskField = defineAsyncComponent(() => import('@/services/ops-flow/task-fields-form/field-templates/UnknownTaskField.vue'));
 
+const emit = defineEmits<{(event: 'update:is-valid', value: boolean): void;
+}>();
+
 const taskCreatePageStore = useTaskCreatePageStore();
 const taskCreatePageGetters = taskCreatePageStore.getters;
 const taskCategoryStore = useTaskCategoryStore();
@@ -132,7 +135,7 @@ const descriptionField = computed<TaskField>(() => ({
     field_id: 'description',
     name: 'Description', // TODO: i18n
     field_type: 'PARAGRAPH',
-    is_required: true,
+    is_required: false,
     is_primary: true,
     options: {
         example: 'Task Description',
@@ -141,9 +144,13 @@ const descriptionField = computed<TaskField>(() => ({
 const fields = ref<TaskField[]>([]);
 
 const name = ref('');
+const isNameValid = ref(false);
 const description = ref('');
 const data = ref<Record<string, any>>({});
+const validationMap = ref<Record<string, boolean>>({});
+const isAllValid = computed<boolean>(() => isNameValid.value && Object.values(validationMap.value).every((isValid) => isValid));
 
+/* initiate fields */
 watch([
     () => taskCategoryStore.getters.loading,
     () => taskCreatePageGetters.currentCategory,
@@ -154,6 +161,11 @@ watch([
     }
 }, { immediate: true });
 
+/* validation event */
+watch(isAllValid, (isValid) => {
+    emit('update:is-valid', isValid);
+}, { immediate: true });
+
 </script>
 
 <template>
@@ -162,6 +174,7 @@ watch([
         <text-task-field :field="nameField"
                          :value="name"
                          @update:value="name = $event"
+                         @update:is-valid="isNameValid = $event"
         />
         <paragraph-task-field :field="descriptionField"
                               :value="description"
@@ -174,6 +187,7 @@ watch([
                    :field="field"
                    :value="data[field.field_id]"
                    @update:value="data[field.field_id] = $event"
+                   @update:is-valid="validationMap[field.field_id] = $event"
         />
     </div>
 </template>
