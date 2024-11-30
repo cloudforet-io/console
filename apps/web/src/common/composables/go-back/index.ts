@@ -22,5 +22,6 @@ export const useGoBack = (mainRoute: Location) => {
     return {
         setPathFrom,
         handleClickBackButton,
+        goBack: handleClickBackButton,
     };
 };

@@ -1,30 +1,39 @@
+import type { Ref } from 'vue';
 import {
     ref, readonly,
 } from 'vue';
 import type { Route } from 'vue-router';
 import { useRouter } from 'vue-router/composables';
 
-export const useConfirmRouteLeave = () => {
+export const useConfirmRouteLeave = ({
+    passConfirmation,
+}: {
+    passConfirmation?: Ref<boolean>
+} = {}) => {
     const router = useRouter();
 
-    const isConfirmBackModalVisible = ref(false);
+    const isConfirmLeaveModalVisible = ref(false);
     const isConfirmed = ref(false);
     let nextRoute: Route|undefined;
 
     const openConfirmBackModal = () => {
-        isConfirmBackModalVisible.value = true;
+        isConfirmLeaveModalVisible.value = true;
     };
-    const handleConfirmBack = () => {
+    const confirmRouteLeave = () => {
         isConfirmed.value = true;
-        isConfirmBackModalVisible.value = false;
+        isConfirmLeaveModalVisible.value = false;
         router.push(nextRoute);
     };
-    const handleCancelBack = () => {
-        isConfirmBackModalVisible.value = false;
+    const stopRouteLeave = () => {
+        isConfirmLeaveModalVisible.value = false;
         nextRoute = undefined;
     };
 
     const handleBeforeRouteLeave = (to, from, next) => {
+        if (passConfirmation?.value) {
+            next();
+            return;
+        }
         if (!isConfirmed.value) {
             nextRoute = to;
             openConfirmBackModal();
@@ -35,9 +44,9 @@ export const useConfirmRouteLeave = () => {
     };
 
     return {
-        isConfirmBackModalVisible: readonly(isConfirmBackModalVisible),
-        handleConfirmBack,
-        handleCancelBack,
+        isConfirmLeaveModalVisible: readonly(isConfirmLeaveModalVisible),
+        confirmRouteLeave,
+        stopRouteLeave,
         handleBeforeRouteLeave,
     };
 };
