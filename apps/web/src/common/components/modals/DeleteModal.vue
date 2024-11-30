@@ -9,6 +9,7 @@
                     :hide-footer="hideFooter"
                     theme-color="alert"
                     :loading="loading"
+                    :hide-header-close-button="hideCloseButton"
                     @confirm="handleConfirm"
                     @close="$emit('close')"
                     @cancel="$emit('cancel')"
@@ -93,6 +94,10 @@ export default {
             default: false,
         },
         enableScroll: {
+            type: Boolean,
+            default: false,
+        },
+        hideCloseButton: {
             type: Boolean,
             default: false,
         },
