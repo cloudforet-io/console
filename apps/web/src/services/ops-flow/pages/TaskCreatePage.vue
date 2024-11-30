@@ -21,7 +21,7 @@ export default defineComponent({
 // eslint-disable-next-line import/no-duplicates,import/order
 // eslint-disable-next-line import/no-duplicates
 import { computed, onBeforeMount, onUnmounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router/composables';
+import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router/composables';
 
 import {
     PHeadingLayout, PHeading, PButton, PTab, PSkeleton,
@@ -30,6 +30,8 @@ import type { TabItem } from '@cloudforet/mirinae/types/hooks/use-tab/type';
 
 import { queryStringToString } from '@/lib/router-query-string';
 
+import ConfirmBackModal from '@/common/components/modals/ConfirmBackModal.vue';
+import { useConfirmRouteLeave } from '@/common/composables/confirm-route-leave';
 import { useGoBack } from '@/common/composables/go-back';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
@@ -56,8 +58,14 @@ const {
 } = useGoBack(getProperRouteLocation({
     name: OPS_FLOW_ROUTE.BOARD._NAME,
     query: { categoryId: route.query.categoryId } as BoardPageQuery,
-}));
-
+}), true);
+const {
+    isConfirmBackModalVisible,
+    handleBeforeRouteLeave,
+    handleConfirmBack,
+    handleCancelBack,
+} = useConfirmRouteLeave();
+onBeforeRouteLeave(handleBeforeRouteLeave);
 
 /* tabs */
 const tabs = computed<TabItem<object>[]>(() => [
@@ -138,6 +146,11 @@ defineExpose({ setPathFrom });
             </p-tab>
             <board-task-comment class="flex-1 w-full min-w-[360px] lg:max-w-[528px] tablet:min-w-full" />
         </div>
+        <!-- modals -->
+        <confirm-back-modal :visible="isConfirmBackModalVisible"
+                            @confirm="handleConfirmBack"
+                            @cancel="handleCancelBack"
+        />
     </div>
 </template>
 
