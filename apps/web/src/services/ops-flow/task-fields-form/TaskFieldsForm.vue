@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    defineAsyncComponent, ref, watch,
+    defineAsyncComponent, ref, watch, computed,
 } from 'vue';
 
 import type { TaskField, TaskFieldType } from '@/schema/opsflow/_types/task-field-type';
@@ -8,10 +8,11 @@ import type { TaskField, TaskFieldType } from '@/schema/opsflow/_types/task-fiel
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
 import { useTaskCreatePageStore } from '@/services/ops-flow/stores/task-create-page-store';
 
-
+const TextTaskField = defineAsyncComponent(() => import('@/services/ops-flow/task-fields-form/field-templates/TextTaskField.vue'));
+const ParagraphTaskField = defineAsyncComponent(() => import('@/services/ops-flow/task-fields-form/field-templates/ParagraphTaskField.vue'));
 const COMPONENT_MAP: Partial<Record<TaskFieldType, ReturnType<typeof defineAsyncComponent>>> = {
-    TEXT: defineAsyncComponent(() => import('@/services/ops-flow/task-fields-form/field-templates/TextTaskField.vue')),
-    PARAGRAPH: defineAsyncComponent(() => import('@/services/ops-flow/task-fields-form/field-templates/ParagraphTaskField.vue')),
+    TEXT: TextTaskField,
+    PARAGRAPH: ParagraphTaskField,
     LABELS: defineAsyncComponent(() => import('@/services/ops-flow/task-fields-form/field-templates/LabelsTaskField.vue')),
     DROPDOWN: defineAsyncComponent(() => import('@/services/ops-flow/task-fields-form/field-templates/DropdownTaskField.vue')),
     DATE: defineAsyncComponent(() => import('@/services/ops-flow/task-fields-form/field-templates/DateTaskField.vue')),
@@ -117,8 +118,30 @@ const taskCategoryStore = useTaskCategoryStore();
 //     field_9: ['user'],
 //     field_10: ['asset'],
 // });
-
+const nameField = computed<TaskField>(() => ({
+    field_id: 'name',
+    name: 'Title', // TODO: i18n
+    field_type: 'TEXT',
+    is_required: true,
+    is_primary: true,
+    options: {
+        example: 'Task Title',
+    },
+}));
+const descriptionField = computed<TaskField>(() => ({
+    field_id: 'description',
+    name: 'Description', // TODO: i18n
+    field_type: 'PARAGRAPH',
+    is_required: true,
+    is_primary: true,
+    options: {
+        example: 'Task Description',
+    },
+}));
 const fields = ref<TaskField[]>([]);
+
+const name = ref('');
+const description = ref('');
 const data = ref<Record<string, any>>({});
 
 watch([
@@ -135,6 +158,16 @@ watch([
 
 <template>
     <div class="flex flex-col gap-4">
+        <!-- Default Fields -->
+        <text-task-field :field="nameField"
+                         :value="name"
+                         @update:value="name = $event"
+        />
+        <paragraph-task-field :field="descriptionField"
+                              :value="description"
+                              @update:value="description = $event"
+        />
+        <!-- Dynamic Fields -->
         <component :is="COMPONENT_MAP[field.field_type] ?? UnknownTaskField"
                    v-for="field in fields"
                    :key="field.field_id"

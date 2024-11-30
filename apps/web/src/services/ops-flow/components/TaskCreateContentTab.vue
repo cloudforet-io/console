@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router/composables';
-
 import { PButton } from '@cloudforet/mirinae';
 
 import TaskContentBaseForm from '@/services/ops-flow/components/TaskContentBaseForm.vue';
 import TaskFieldsForm from '@/services/ops-flow/task-fields-form/TaskFieldsForm.vue';
 
-const router = useRouter();
+const emit = defineEmits<{(event: 'cancel', isFormFilled: boolean): void;
+}>();
 </script>
 
 <template>
@@ -15,7 +14,7 @@ const router = useRouter();
         <task-fields-form />
         <div class="py-3 flex flex-wrap gap-1 justify-end">
             <p-button style-type="transparent"
-                      @click="router.back()"
+                      @click="emit('cancel')"
             >
                 Cancel
             </p-button>

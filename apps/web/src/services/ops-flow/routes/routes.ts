@@ -14,8 +14,6 @@ const OpsFlowLandingPage = () => import('@/services/ops-flow/pages/OpsFlowLandin
 const BoardPage = () => import('@/services/ops-flow/pages/BoardPage.vue');
 const TaskDetailPage = () => import('@/services/ops-flow/pages/TaskDetailPage.vue');
 const TaskCreatePage = () => import('@/services/ops-flow/pages/TaskCreatePage.vue');
-const TaskCreatePageContentTab = () => import('@/services/ops-flow/pages/TaskCreatePageContentTab.vue');
-const TaskCreatePageProgressTab = () => import('@/services/ops-flow/pages/TaskCreatePageProgressTab.vue');
 
 const opsFlowRoutes: RouteConfig = {
     path: 'ops-flow',
@@ -49,20 +47,7 @@ const opsFlowRoutes: RouteConfig = {
         {
             path: 'board/task-create',
             name: OPS_FLOW_ROUTE.BOARD.TASK_CREATE._NAME,
-            redirect: { name: OPS_FLOW_ROUTE.BOARD.TASK_CREATE.CONTENT._NAME },
             component: TaskCreatePage as any,
-            children: [
-                {
-                    path: 'content',
-                    name: OPS_FLOW_ROUTE.BOARD.TASK_CREATE.CONTENT._NAME,
-                    component: TaskCreatePageContentTab as any,
-                },
-                {
-                    path: 'progress',
-                    name: OPS_FLOW_ROUTE.BOARD.TASK_CREATE.PROGRESS._NAME,
-                    component: TaskCreatePageProgressTab as any,
-                },
-            ],
         },
         {
             path: 'board/:taskId',

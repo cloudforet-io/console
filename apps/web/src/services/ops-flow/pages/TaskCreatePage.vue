@@ -19,8 +19,10 @@ export default defineComponent({
 <script setup lang="ts">
 /* eslint-disable import/first */
 // eslint-disable-next-line import/no-duplicates,import/order
-// eslint-disable-next-line import/no-duplicates
-import { computed, onBeforeMount, onUnmounted } from 'vue';
+import {
+    computed, onBeforeMount, onUnmounted, defineAsyncComponent, ref,
+    // eslint-disable-next-line import/no-duplicates
+} from 'vue';
 import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router/composables';
 
 import {
@@ -41,6 +43,9 @@ import { useTaskCreatePageStore } from '@/services/ops-flow/stores/task-create-p
 import type { BoardPageQuery } from '@/services/ops-flow/types/board-page-type';
 import type { TaskCreatePageQueryValue } from '@/services/ops-flow/types/task-create-page-type';
 
+const TaskCreateContentTab = defineAsyncComponent(() => import('@/services/ops-flow/components/TaskCreateContentTab.vue'));
+const TaskCreateProgressTab = defineAsyncComponent(() => import('@/services/ops-flow/components/TaskCreateProgressTab.vue'));
+
 const router = useRouter();
 const route = useRoute();
 
@@ -54,17 +59,20 @@ const loading = false; // computed<boolean>(() => taskCategoryStore.getters.load
 const headerTitle = 'Inquiry Service Request'; // computed<string>(() => taskCategoryPageStore.getters.currentCategory?.name ?? 'No Category');
 const {
     setPathFrom,
-    handleClickBackButton,
+    goBack,
 } = useGoBack(getProperRouteLocation({
     name: OPS_FLOW_ROUTE.BOARD._NAME,
     query: { categoryId: route.query.categoryId } as BoardPageQuery,
 }), true);
+const isContentFilled = ref<boolean>(false);
 const {
-    isConfirmBackModalVisible,
+    isConfirmLeaveModalVisible,
     handleBeforeRouteLeave,
-    handleConfirmBack,
-    handleCancelBack,
-} = useConfirmRouteLeave();
+    confirmRouteLeave,
+    stopRouteLeave,
+} = useConfirmRouteLeave({
+    passConfirmation: computed(() => !isContentFilled.value),
+});
 onBeforeRouteLeave(handleBeforeRouteLeave);
 
 /* tabs */
@@ -80,24 +88,17 @@ const tabs = computed<TabItem<object>[]>(() => [
         keepAlive: true,
     },
 ]);
-const activeTab = computed(() => {
-    if (route.name === OPS_FLOW_ROUTE.BOARD.TASK_CREATE.CONTENT._NAME) return 'content';
-    return 'progress';
-});
-const handleUpdateActiveTab = (tab: string) => {
-    if (tab === 'content') {
-        router.replace(getProperRouteLocation({
-            name: OPS_FLOW_ROUTE.BOARD.TASK_CREATE.CONTENT._NAME,
-            // TODO: query
-        }));
-    } else {
-        router.replace(getProperRouteLocation({
-            name: OPS_FLOW_ROUTE.BOARD.TASK_CREATE.PROGRESS._NAME,
-            // TODO: query
-        }));
-    }
+const activeTab = ref<'content'|'progress'>('content');
+const handleUpdateActiveTab = (tab: 'content'|'progress') => {
+    activeTab.value = tab;
+    router.replace({
+        hash: `#${tab}`,
+    });
 };
-
+const handleClickContentTabCancel = (isFilled: boolean) => {
+    isContentFilled.value = isFilled;
+    goBack();
+};
 
 
 const categoryId = computed<TaskCreatePageQueryValue['categoryId']>(() => queryStringToString(route.query.categoryId));
@@ -105,6 +106,9 @@ const categoryId = computed<TaskCreatePageQueryValue['categoryId']>(() => queryS
 /* lifecycle */
 onBeforeMount(() => {
     taskCreatePageStore.setCurrentCategoryId(categoryId.value);
+    if (route.hash === '#progress') {
+        activeTab.value = 'progress';
+    }
 });
 onUnmounted(() => {
     taskCreatePageStore.$dispose();
@@ -119,7 +123,7 @@ defineExpose({ setPathFrom });
         <p-heading-layout class="mb-6">
             <template #heading>
                 <p-heading show-back-button
-                           @click-back-button="handleClickBackButton"
+                           @click-back-button="goBack"
                 >
                     <p-skeleton v-if="loading"
                                 height="1.75rem"
@@ -142,14 +146,19 @@ defineExpose({ setPathFrom });
                    :active-tab="activeTab"
                    @update:active-tab="handleUpdateActiveTab"
             >
-                <router-view />
+                <template #content>
+                    <task-create-content-tab @cancel="handleClickContentTabCancel" />
+                </template>
+                <template #progress>
+                    <task-create-progress-tab />
+                </template>
             </p-tab>
             <board-task-comment class="flex-1 w-full min-w-[360px] lg:max-w-[528px] tablet:min-w-full" />
         </div>
         <!-- modals -->
-        <confirm-back-modal :visible="isConfirmBackModalVisible"
-                            @confirm="handleConfirmBack"
-                            @cancel="handleCancelBack"
+        <confirm-back-modal :visible="isConfirmLeaveModalVisible"
+                            @confirm="confirmRouteLeave"
+                            @cancel="stopRouteLeave"
         />
     </div>
 </template>
