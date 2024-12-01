@@ -9,6 +9,7 @@ export const getPFieldGroupArgs = (): Args => ({
     valid: false,
     required: false,
     styleType: 'primary',
+    noSpacing: false,
     labelSlot: null,
     labelExtraSlot: null,
     validSlot: null,
@@ -146,6 +147,21 @@ export const getPFieldGroupArgTypes = (): ArgTypes => ({
         },
         control: 'select',
         options: ['primary', 'secondary'],
+    },
+    noSpacing: {
+        name: 'noSpacing',
+        type: { name: 'boolean' },
+        description: 'Props for hide spacing',
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: 'boolean',
     },
     labelSlot: {
         name: 'label',

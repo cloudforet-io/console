@@ -1,10 +1,11 @@
 <template>
     <div class="p-field-group"
-         :class="[styleType]"
+         :class="{[styleType]: true, 'no-spacing': noSpacing}"
     >
         <div class="field-title-box">
             <p-field-title v-if="label || $scopedSlots.label"
                            class="form-label"
+                           :class="{'no-spacing': noSpacing}"
                            :size="styleType === 'primary' ? 'md' : 'sm'"
                            :color="styleType === 'primary' ? 'dark' : 'gray'"
                            @click="$emit('click-field-title')"
@@ -14,12 +15,14 @@
                 </slot>
                 <span v-if="!required"
                       class="optional-mark"
+                      :class="{'no-spacing': noSpacing}"
                 >({{ $t('COMPONENT.FIELD_GROUP.OPTIONAL') }})</span>
                 <slot name="label-extra" />
             </p-field-title>
         </div>
         <small v-if="$scopedSlots.help || helpText"
                class="help-msg"
+               :class="{'no-spacing': noSpacing}"
         >
             <slot name="help">{{ helpText }}</slot>
         </small>
@@ -28,6 +31,7 @@
         />
         <div v-show="invalid"
              class="invalid-feedback"
+             :class="{'no-spacing': noSpacing}"
         >
             <slot name="invalid">
                 {{ invalidText }}
@@ -35,6 +39,7 @@
         </div>
         <div v-if="validText"
              class="valid-feedback"
+             :class="{'no-spacing': noSpacing}"
              :style="{display: valid&&!invalid? 'block':'none'}"
         >
             <slot name="valid">
@@ -61,6 +66,7 @@ interface Props {
     valid?: boolean;
     required?: boolean;
     styleType?: FieldGroupStyleType;
+    noSpacing?: boolean;
 }
 
 export default defineComponent<Props>({
@@ -99,20 +105,24 @@ export default defineComponent<Props>({
             type: String,
             default: 'primary',
         },
+        noSpacing: {
+            type: Boolean,
+            default: false,
+        },
     },
 });
 </script>
 
 <style lang="postcss">
 .p-field-group {
-    &.primary {
+    &.primary:not(.no-spacing) {
         margin-bottom: 1rem;
     }
-    &.secondary {
+    &.secondary:not(.no-spacing) {
         margin-bottom: 0.5rem;
     }
 
-    .form-label {
+    .form-label:not(.no-spacing) {
         padding-bottom: 0.25rem;
     }
     .label-box {
@@ -124,23 +134,32 @@ export default defineComponent<Props>({
         font-size: 0.75rem;
         line-height: 1.4;
         margin-left: 0.25rem;
-        margin-bottom: 0.25rem;
         font-weight: normal;
+        &:not(.no-spacing) {
+            margin-bottom: 0.25rem;
+        }
     }
     .help-msg {
-        @apply block mb-2;
+        @apply block;
+        &:not(.no-spacing) {
+            @apply mb-2;
+        }
     }
     .invalid-feedback {
         @apply text-alert;
         font-size: 0.75rem;
         line-height: 0.875rem;
-        margin-top: 0.25rem;
+        &:not(.no-spacing) {
+            margin-top: 0.25rem;
+        }
     }
     .valid-feedback {
         @apply text-safe;
         font-size: 0.75rem;
         line-height: 0.875rem;
-        margin-top: 0.25rem;
+        &:not(.no-spacing) {
+            margin-top: 0.25rem;
+        }
     }
     small {
         font-size: 0.75rem;
