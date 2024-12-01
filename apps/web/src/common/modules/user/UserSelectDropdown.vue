@@ -26,6 +26,7 @@ const props = withDefaults(defineProps<{
      useFixedMenuStyle?: boolean;
      invalid?: boolean;
      disabled?: boolean;
+     userPool?: string[];
 }>(), {
     userId: '',
     userIds: () => [],
@@ -33,6 +34,7 @@ const props = withDefaults(defineProps<{
     useFixedMenuStyle: false,
     invalid: false,
     disabled: false,
+    userPool: undefined,
 });
 
 const emit = defineEmits<{(event: 'update:user-ids', value: string[]): void;
@@ -42,10 +44,18 @@ const emit = defineEmits<{(event: 'update:user-ids', value: string[]): void;
 const userReferenceStore = useUserReferenceStore();
 const loading = computed(() => userReferenceStore.getters.loading);
 const userReferenceMap: Ref<Readonly<UserReferenceMap>> = toRef(userReferenceStore.getters, 'userItems');
-const allUserItems = computed<UserDropdownItem[]>(() => Object.values(userReferenceMap.value).map((u) => ({
-    name: u.key,
-    label: u.label,
-})));
+const allUserItems = computed<UserDropdownItem[]>(() => {
+    if (props.userPool && props.userPool.length > 0) {
+        return props.userPool.map((userId) => ({
+            name: userId,
+            label: userReferenceMap.value[userId]?.label ?? userId,
+        }));
+    }
+    return Object.values(userReferenceMap.value).map((u: UserReferenceMap[string]) => ({
+        name: u.key,
+        label: u.label,
+    }));
+});
 const selectedUserItems = ref<SelectDropdownMenuItem[]>([]);
 const userMenuItemsHandler: AutocompleteHandler = async (keyword: string, pageStart = 1, pageLimit = 10) => {
     const filteredItems = allUserItems.value.filter((item) => getTextHighlightRegex(keyword).test(item.label));

@@ -74,7 +74,7 @@ const assigneeValidator = useFieldValidator('', (value) => {
 const assignee = assigneeValidator.value;
 const handleUpdateSelectedAssignee = (userId?: string) => {
     taskContentFormStore.setAssignee(userId);
-    assigneeValidator.setValue(userId);
+    assigneeValidator.setValue(userId ?? '');
 };
 
 /* form validator */
@@ -107,6 +107,7 @@ watch([
         // init selected status
         const defaultStatus = currentCategory.status_options.TODO.find((status) => status.is_default);
         setInitialStatus(defaultStatus);
+        taskContentFormStore.setStatusId(defaultStatus?.status_id);
         // init selected assignee
         assigneeValidator.setValue('');
     }
@@ -197,6 +198,7 @@ watch(() => taskContentFormGetters.currentTaskType, (currentTaskType) => {
                     <user-select-dropdown :user-id="assignee"
                                           :invalid="invalidState.assignee"
                                           :disabled="!taskContentFormGetters.currentTaskType"
+                                          :user-pool="taskContentFormGetters.currentTaskType?.assignee_pool"
                                           @update:user-id="handleUpdateSelectedAssignee"
                     />
                 </p-field-group>

@@ -1,4 +1,3 @@
-import type { ComputedRef } from 'vue';
 import { reactive, computed } from 'vue';
 
 import { isEmpty } from 'lodash';
@@ -15,41 +14,62 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
 import { useTaskStore } from '@/services/ops-flow/stores/task-store';
 import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
+import {
+    useTaskFieldMetadataStore,
+} from '@/services/ops-flow/task-fields-configuration/stores/use-task-field-metadata-store';
+import type { DefaultTaskFieldId } from '@/services/ops-flow/task-fields-configuration/types/task-field-type-metadata-type';
 
+interface UseTaskCreatePageStoreState {
+    // base form
+    currentCategoryId?: string;
+    currentTaskTypeId?: string;
+    statusId?: string;
+    assignee?: string;
+    isBaseFormValid: boolean;
+    // default field form
+    defaultData: Partial<Record<DefaultTaskFieldId, any>>;
+    defaultDataValidationMap: Record<string, boolean>;
+    // task type field form
+    data: Record<string, any>;
+    dataValidationMap: Record<string, boolean>;
+    // overall
+    mode: 'create-minimal'|'create'|'edit'|'view'; // create-minimal: create task without status and assignee
+    hasUnsavedChanges: boolean;
+    createTaskLoading: boolean;
+}
 interface UseTaskCreatePageStoreGetters {
-    currentCategory: ComputedRef<TaskCategoryModel|undefined>;
-    currentTaskType: ComputedRef<TaskTypeModel|undefined>;
-    currentFields: ComputedRef<TaskField[]>;
-    isFieldFormValid: ComputedRef<boolean>;
-    isAllValid: ComputedRef<boolean>;
+    currentCategory: TaskCategoryModel|undefined;
+    currentTaskType: TaskTypeModel|undefined;
+    currentFields: TaskField[];
+    isDefaultFieldValid: boolean;
+    isFieldValid: boolean;
+    isAllValid: boolean;
 }
 export const useTaskContentFormStore = defineStore('task-content-form', () => {
     const taskCategoryStore = useTaskCategoryStore();
     const taskTypeStore = useTaskTypeStore();
     const taskStore = useTaskStore();
+    const taskFieldMetadataStore = useTaskFieldMetadataStore();
 
-    const state = reactive({
+    const state = reactive<UseTaskCreatePageStoreState>({
         // base form
-        currentCategoryId: undefined as string|undefined,
-        currentTaskTypeId: undefined as string|undefined,
-        statusId: undefined as string|undefined,
-        assignee: undefined as string|undefined,
+        currentCategoryId: undefined,
+        currentTaskTypeId: undefined,
+        statusId: undefined,
+        assignee: undefined,
         isBaseFormValid: false,
         // default field form
-        name: '',
-        isNameValid: false,
-        description: '',
-        project: undefined as string|undefined,
-        isProjectValid: false,
+        defaultData: {},
+        defaultDataValidationMap: {},
         // task type field form
-        data: {} as Record<string, any>,
-        dataValidationMap: {} as Record<string, boolean>,
+        data: {},
+        dataValidationMap: {},
         // overall
-        mode: 'create' as 'create-minimal'|'create'|'edit'|'view', // create-minimal: create task without status and assignee
+        mode: 'create',
         hasUnsavedChanges: false,
         createTaskLoading: false,
     });
-    const getters: UseTaskCreatePageStoreGetters = {
+    const getters = {
         // base form
         currentCategory: computed<TaskCategoryModel|undefined>(() => taskCategoryStore.getters.taskCategories.find((c) => c.category_id === state.currentCategoryId)),
         currentTaskType: computed<TaskTypeModel|undefined>(() => {
@@ -64,10 +84,11 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
             const taskType = getters.currentTaskType;
             return taskType ? taskType.fields : [];
         }),
-        isFieldFormValid: computed<boolean>(() => state.isNameValid && state.isProjectValid && Object.values(state.dataValidationMap).every((isValid) => isValid)),
+        isDefaultFieldValid: computed<boolean>(() => taskFieldMetadataStore.getters.defaultFields.every((field) => state.defaultDataValidationMap[field.field_id])),
+        isFieldValid: computed<boolean>(() => getters.currentFields?.every((field) => state.dataValidationMap[field.field_id]) ?? true),
         // overall
-        isAllValid: computed<boolean>(() => state.isBaseFormValid && getters.isFieldFormValid),
-    };
+        isAllValid: computed<boolean>(() => state.isBaseFormValid && getters.isDefaultFieldValid && getters.isFieldValid),
+    } as unknown as UseTaskCreatePageStoreGetters; // HACK: to avoid type error
     const actions = {
         setCurrentCategoryId(categoryId?: string) {
             if (state.currentCategoryId === categoryId) return;
@@ -81,7 +102,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
             state.dataValidationMap = {};
         },
         setStatusId(statusId?: string) {
-            state.currentStatusId = statusId;
+            state.statusId = statusId;
         },
         setAssignee(assignee?: string) {
             state.assignee = assignee;
@@ -90,28 +111,20 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
             state.isBaseFormValid = isValid;
         },
         // default field form
-        setName(name: string) {
-            state.name = name;
+        setDefaultFieldData(fieldId: DefaultTaskFieldId, value: any) {
+            state.defaultData[fieldId] = value;
             state.hasUnsavedChanges = true;
         },
-        setIsNameValid(isValid: boolean) {
-            state.isNameValid = isValid;
-        },
-        setDescription(description: string) {
-            state.description = description;
-            state.hasUnsavedChanges = true;
-        },
-        setProject(projectId: string) {
-            state.projectId = projectId;
-            state.hasUnsavedChanges = true;
-        },
-        setIsProjectValid(isValid: boolean) {
-            state.isProjectValid = isValid;
+        setDefaultFieldValidation(fieldId: DefaultTaskFieldId, isValid: boolean) {
+            state.defaultDataValidationMap = { ...state.defaultDataValidationMap, [fieldId]: isValid };
         },
         // task type field form
         setFieldData(fieldId: string, value: any) {
             state.data[fieldId] = value;
             state.hasUnsavedChanges = true;
+        },
+        setFieldValidation(fieldId: string, isValid: boolean) {
+            state.dataValidationMap = { ...state.dataValidationMap, [fieldId]: isValid };
         },
         resetFieldData() {
             state.data = {};
@@ -126,12 +139,12 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
                 state.createTaskLoading = true;
                 await taskStore.create({
                     task_type_id: state.currentTaskTypeId as string,
-                    name: state.name,
+                    name: state.defaultData.title,
                     status_id: state.statusId as string,
-                    description: state.description || undefined,
+                    description: state.defaultData.description || undefined,
                     assignee: state.assignee || undefined,
                     data: isEmpty(state.data) ? undefined : state.data,
-                    project_id: state.project as string,
+                    project_id: state.defaultData.project?.[0],
                 });
                 showSuccessMessage('Task created successfully', '');
                 state.createTaskLoading = false;
