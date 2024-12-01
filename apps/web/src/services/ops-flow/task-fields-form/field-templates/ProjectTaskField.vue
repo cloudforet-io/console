@@ -28,8 +28,10 @@ const {
                    :required="field.is_required"
                    :invalid="isInvalid"
                    :invalid-text="invalidText"
+                   no-spacing
     >
-        <project-select-dropdown project-selectable
+        <project-select-dropdown class="my-1"
+                                 project-selectable
                                  :project-group-selectable="false"
                                  :selected-project-ids="fieldValue"
                                  @update:selected-project-ids="updateFieldValue"

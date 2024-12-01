@@ -23,8 +23,10 @@ const {
                    :required="field.is_required"
                    :invalid="isInvalid"
                    :invalid-text="invalidText"
+                   no-spacing
     >
-        <p-text-input :value="fieldValue"
+        <p-text-input class="my-1"
+                      :value="fieldValue"
                       :placeholder="props.field.options?.example"
                       :invalid="isInvalid"
                       block

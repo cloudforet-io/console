@@ -28,8 +28,10 @@ const {
                    :required="field.is_required"
                    :invalid="isInvalid"
                    :invalid-text="invalidText"
+                   no-spacing
     >
-        <user-select-dropdown :user-ids="fieldValue"
+        <user-select-dropdown class="my-1"
+                              :user-ids="fieldValue"
                               selection-type="multiple"
                               :invalid="isInvalid"
                               @update:user-ids="updateFieldValue"

@@ -33,8 +33,9 @@ const handleUpdate = (val: string[]) => {
                    :required="field.is_required"
                    :invalid="isInvalid"
                    :invalid-text="invalidText"
+                   no-spacing
     >
-        <p-datetime-picker class="datetime-picker"
+        <p-datetime-picker class="my-1"
                            :selected-dates="selectedDates"
                            :invalid="isInvalid"
                            @update:selected-dates="handleUpdate"

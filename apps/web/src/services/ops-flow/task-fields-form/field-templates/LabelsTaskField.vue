@@ -28,8 +28,10 @@ const {
                    :required="field.is_required"
                    :invalid="isInvalid"
                    :invalid-text="invalidText"
+                   no-spacing
     >
-        <labels-input :labels="fieldValue"
+        <labels-input class="my-1"
+                      :labels="fieldValue"
                       editable
                       @update:value="updateFieldValue"
         />

@@ -20,7 +20,7 @@ export default defineComponent({
 /* eslint-disable import/first */
 // eslint-disable-next-line import/no-duplicates,import/order
 import {
-    computed, onBeforeMount, onUnmounted,
+    ref, computed, onBeforeMount, onUnmounted,
     // eslint-disable-next-line import/no-duplicates
 } from 'vue';
 import { useRoute, onBeforeRouteLeave } from 'vue-router/composables';
@@ -66,27 +66,32 @@ const {
 }), true);
 
 /* confirm leave modal */
+const hasCreated = ref(false);
 const {
     isConfirmLeaveModalVisible,
     handleBeforeRouteLeave,
     confirmRouteLeave,
     stopRouteLeave,
 } = useConfirmRouteLeave({
-    passConfirmation: computed(() => !taskContentFormState.hasUnsavedChanges),
+    passConfirmation: computed(() => !taskContentFormState.hasUnsavedChanges || hasCreated.value),
 });
 onBeforeRouteLeave(handleBeforeRouteLeave);
 
 /* form button handling */
 const handleConfirm = async () => {
     if (!taskContentFormGetters.isAllValid) return;
-    const result = await taskContentFormStore.createTask();
-    if (result) goBack();
+    hasCreated.value = await taskContentFormStore.createTask();
+    if (hasCreated.value) goBack();
 };
 
 /* lifecycle */
 onBeforeMount(() => {
     taskContentFormStore.setCurrentCategoryId(categoryId.value);
-    taskContentFormStore.setMode('create');
+    if (route.hash === '#minimal') {
+        taskContentFormStore.setMode('create-minimal');
+    } else {
+        taskContentFormStore.setMode('create');
+    }
 });
 onUnmounted(() => {
     taskContentFormStore.$reset();

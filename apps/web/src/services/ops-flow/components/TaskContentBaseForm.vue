@@ -42,6 +42,7 @@ const {
     setInitialTaskType,
 } = useTaskTypeField({
     categoryId: computed(() => taskContentFormGetters.currentCategory?.category_id),
+    isRequired: true,
 });
 const handleUpdateSelectedTaskType = (items) => {
     taskContentFormStore.setCurrentTaskTypeId(items[0].name);
@@ -57,6 +58,7 @@ const {
     setInitialStatus,
 } = useTaskStatusField({
     categoryId: computed(() => taskContentFormGetters.currentCategory?.category_id),
+    isRequired: true,
 });
 const handleUpdateSelectedStatus = (items) => {
     taskContentFormStore.setStatusId(items[0].name);
@@ -122,14 +124,14 @@ watch(() => taskContentFormGetters.currentTaskType, (currentTaskType) => {
 </script>
 
 <template>
-    <component :is="taskContentFormState.mode === 'create' ? 'div' : PPaneLayout"
+    <component :is="taskContentFormState.mode === 'create-minimal' ? 'div' : PPaneLayout"
                class="flex flex-wrap gap-4"
-               :class="taskContentFormState.mode === 'create' ? '' : 'py-6 px-4'"
+               :class="taskContentFormState.mode === 'create-minimal' ? '' : 'py-6 px-4'"
     >
         <div class="base-form-top-wrapper">
             <div class="base-form-field-wrapper">
                 <p-field-group label="Category"
-                               :style-type="taskContentFormState.mode === 'create' ? 'primary' : 'secondary'"
+                               :style-type="taskContentFormState.mode === 'create-minimal' ? 'primary' : 'secondary'"
                                required
                                :invalid="invalidState.category"
                                :invalid-text="invalidTexts.category"
@@ -144,7 +146,7 @@ watch(() => taskContentFormGetters.currentTaskType, (currentTaskType) => {
             </div>
             <div class="base-form-field-wrapper">
                 <p-field-group label="Type"
-                               :style-type="taskContentFormState.mode === 'create' ? 'primary' : 'secondary'"
+                               :style-type="taskContentFormState.mode === 'create-minimal' ? 'primary' : 'secondary'"
                                required
                                :invalid="invalidState.taskType"
                                :invalid-text="invalidTexts.taskType"
@@ -159,7 +161,7 @@ watch(() => taskContentFormGetters.currentTaskType, (currentTaskType) => {
                 </p-field-group>
             </div>
         </div>
-        <div v-if="taskContentFormState.mode !== 'create'"
+        <div v-if="taskContentFormState.mode !== 'create-minimal'"
              class="base-form-top-wrapper"
         >
             <div class="base-form-field-wrapper">

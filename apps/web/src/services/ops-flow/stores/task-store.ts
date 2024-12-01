@@ -38,30 +38,28 @@ export const useTaskStore = defineStore('task', () => {
         },
         async create(params: TaskCreateParameters) {
             const response = await SpaceConnector.clientV2.opsflow.task.create<TaskCreateParameters, TaskModel>(params);
-            const categoryId = response.category_id;
-            state.itemsByTaskId[categoryId] = response;
+            const taskId = response.task_type_id;
+            state.itemsByTaskId[taskId] = response;
             return response;
         },
         async update(params: TaskUpdateParameters) {
             const response = await SpaceConnector.clientV2.opsflow.task.update<TaskUpdateParameters, TaskModel>(params);
-            const categoryId = response.category_id;
-            state.itemsByTaskId[categoryId] = response;
+            const taskId = response.task_type_id;
+            state.itemsByTaskId[taskId] = response;
             return response;
         },
         async get(taskId: string) {
             const response = await SpaceConnector.clientV2.opsflow.task.get<TaskGetParameters, TaskModel>({
                 task_id: taskId,
             });
-            const categoryId = response.category_id;
-            state.itemsByTaskId[categoryId] = response;
+            state.itemsByTaskId[taskId] = response;
             return response;
         },
         async delete(taskId: string) {
-            const response = await SpaceConnector.clientV2.opsflow.task.delete<TaskDeleteParameters, TaskModel>({
+            await SpaceConnector.clientV2.opsflow.task.delete<TaskDeleteParameters, TaskModel>({
                 task_id: taskId,
             });
-            const categoryId = response.category_id;
-            delete state.itemsByTaskId[categoryId];
+            delete state.itemsByTaskId[taskId];
         },
     };
 

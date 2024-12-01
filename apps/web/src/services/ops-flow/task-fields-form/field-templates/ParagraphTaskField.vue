@@ -28,8 +28,10 @@ const {
                    :required="field.is_required"
                    :invalid="isInvalid"
                    :invalid-text="invalidText"
+                   no-spacing
     >
-        <text-editor :value="fieldValue"
+        <text-editor class="my-1"
+                     :value="fieldValue"
                      :placeholder="props.field.options?.example"
                      :invalid="isInvalid"
                      @update:value="updateFieldValue"

@@ -58,8 +58,10 @@ const handleUpdate = (val: DropdownItem[]) => {
                    :required="field.is_required"
                    :invalid="isInvalid"
                    :invalid-text="invalidText"
+                   no-spacing
     >
-        <p-select-dropdown show-select-marker
+        <p-select-dropdown class="my-1"
+                           show-select-marker
                            :selected="selectedItems"
                            :handler="dropdownItemsHandler"
                            is-filterable
