@@ -1,11 +1,9 @@
 import { reactive, watch } from 'vue';
 
-import { merge } from 'lodash';
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
-import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { TaskTypeCreateParameters } from '@/schema/opsflow/task-type/api-verbs/create';
@@ -21,11 +19,13 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface UseTaskTypeStoreState {
+    loading: boolean;
     itemsByCategoryId: Record<string, TaskTypeModel[]|undefined>;
 }
 
 export const useTaskTypeStore = defineStore('task-type', () => {
     const state = reactive<UseTaskTypeStoreState>({
+        loading: false,
         itemsByCategoryId: {},
     });
 
@@ -38,36 +38,38 @@ export const useTaskTypeStore = defineStore('task-type', () => {
             }
 
             try {
+                state.loading = true;
                 const result = await fetchList({ query: { filter: [{ k: 'category_id', v: _categoryIds, o: 'in' }] } });
                 if (result.status === 'succeed') {
                     _categoryIds.forEach((categoryId) => {
                         state.itemsByCategoryId[categoryId] = result.response.results?.filter((item) => item.category_id === categoryId);
                     });
+                    state.loading = false;
                 }
             } catch (e) {
                 ErrorHandler.handleError(e);
+                state.loading = false;
             }
             return state.itemsByCategoryId as Record<string, TaskTypeModel[]>;
         },
-        async listByCategoryId(categoryId: string, query?: Query, force?: boolean): Promise<TaskTypeModel[]> {
-            if (!query && state.itemsByCategoryId[categoryId] && !force) {
+        async listByCategoryId(categoryId: string, force?: boolean): Promise<TaskTypeModel[]|undefined> {
+            if (state.itemsByCategoryId[categoryId] && !force) {
                 return state.itemsByCategoryId[categoryId] as TaskTypeModel[];
             }
 
             try {
-                let _query: Query = { filter: [{ k: 'category_id', v: categoryId, o: 'eq' }] };
-                if (query) {
-                    _query = merge(query, _query);
-                }
-                const result = await fetchList({ query: _query });
+                state.loading = true;
+                const result = await fetchList({ query: { filter: [{ k: 'category_id', v: categoryId, o: 'eq' }] } });
                 if (result.status === 'succeed') {
-                    if (query) return result.response.results ?? [];
                     state.itemsByCategoryId[categoryId] = result.response.results;
+                    state.loading = false;
+                    return result.response.results;
                 }
-                return state.itemsByCategoryId[categoryId] ?? [];
+                return undefined;
             } catch (e) {
                 ErrorHandler.handleError(e);
-                return state.itemsByCategoryId[categoryId] ?? [];
+                state.loading = false;
+                return state.itemsByCategoryId[categoryId];
             }
         },
         async create(params: TaskTypeCreateParameters) {

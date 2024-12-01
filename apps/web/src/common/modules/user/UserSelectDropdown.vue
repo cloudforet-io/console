@@ -25,12 +25,14 @@ const props = withDefaults(defineProps<{
      selectionType?: 'single'|'multiple';
      useFixedMenuStyle?: boolean;
      invalid?: boolean;
+     disabled?: boolean;
 }>(), {
     userId: '',
     userIds: () => [],
     selectionType: 'single',
     useFixedMenuStyle: false,
     invalid: false,
+    disabled: false,
 });
 
 const emit = defineEmits<{(event: 'update:user-ids', value: string[]): void;
@@ -63,7 +65,7 @@ const handleUpdateSelectedUserItems = (selectedUsers: SelectDropdownMenuItem[]) 
     selectedUserItems.value = selectedUsers; // it updates currentUserId and currentUserIds automatically
     if (props.selectionType === 'single') {
         if (currentUserId.value === props.userId) return; // prevent unnecessary update
-        emit('update:user-id', selectedUsers[0].name);
+        emit('update:user-id', selectedUsers[0]?.name ?? '');
     } else {
         if (isEqual(currentUserIds.value, props.userIds)) return; // prevent unnecessary update
         emit('update:user-ids', currentUserIds.value);
@@ -114,6 +116,7 @@ watch([loading, () => props.userId, () => props.userIds], ([_loading, newUserId,
                        :handler="userMenuItemsHandler"
                        is-filterable
                        :invalid="props.invalid"
+                       :disabled="props.disabled"
                        :use-fixed-menu-style="useFixedMenuStyle"
                        show-delete-all-button
                        @update:selected="handleUpdateSelectedUserItems"

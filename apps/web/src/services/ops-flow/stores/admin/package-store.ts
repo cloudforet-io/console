@@ -1,5 +1,5 @@
 import { asyncComputed } from '@vueuse/core';
-import { reactive, computed } from 'vue';
+import { watch, reactive, computed } from 'vue';
 
 import { defineStore } from 'pinia';
 
@@ -13,6 +13,8 @@ import type { PackageListParameters } from '@/schema/identity/package/api-verbs/
 import type { PackageSetDefaultParameters } from '@/schema/identity/package/api-verbs/set-default';
 import type { PackageUpdateParameters } from '@/schema/identity/package/api-verbs/update';
 import type { PackageModel } from '@/schema/identity/package/model';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -82,6 +84,14 @@ export const usePackageStore = defineStore('package', () => {
             state.items = state.items?.filter((item) => item.package_id !== packageId);
         },
     };
+    const disposeSelf = () => {
+        const store = usePackageStore();
+        store.$dispose();
+    };
+    const appContextStore = useAppContextStore();
+    watch(() => appContextStore.getters.isAdminMode, () => {
+        disposeSelf();
+    });
     return {
         getters,
         ...actions,

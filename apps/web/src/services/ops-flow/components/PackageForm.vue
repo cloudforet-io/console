@@ -40,7 +40,7 @@ const {
     categoryMenuItemsHandler,
     categoryValidator,
     setSelectedCategoryItems,
-    setInitialCategories,
+    setInitialCategoriesByPackageId,
     applyPackageToCategories,
 } = useCategoryField();
 
@@ -144,7 +144,7 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
             description: '',
         });
         setInitialWorkspaces();
-        setInitialCategories();
+        setInitialCategoriesByPackageId();
         resetValidations();
         return;
     }
@@ -154,7 +154,7 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
             description: targetPackage.description,
         });
         setInitialWorkspaces(targetPackage.package_id);
-        setInitialCategories(targetPackage.package_id);
+        setInitialCategoriesByPackageId(targetPackage.package_id);
     }
 });
 </script>

@@ -134,7 +134,7 @@ export const useTaskCategoryPageStore = defineStore('task-category-page', () => 
         async listTaskTypes() {
             try {
                 if (!state.currentCategoryId) throw new Error('currentCategoryId is not set');
-                const taskTypes = await taskTypeStore.listByCategoryId(state.currentCategoryId, undefined, true);
+                const taskTypes = await taskTypeStore.listByCategoryId(state.currentCategoryId, true);
                 return taskTypes;
             } catch (e) {
                 ErrorHandler.handleError(e);

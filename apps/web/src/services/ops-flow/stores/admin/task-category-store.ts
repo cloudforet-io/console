@@ -52,17 +52,26 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
 
     const fetchList = getCancellableFetcher<TaskCategoryListParameters, ListResponse<TaskCategoryModel>>(SpaceConnector.clientV2.opsflow.taskCategory.list);
     const actions = {
-        async list(params: TaskCategoryListParameters = {}) {
-            state.loading = true;
+        async list(paramsOrForce?: TaskCategoryListParameters|true): Promise<TaskCategoryModel[]|undefined> {
+            const force = paramsOrForce === true;
+            if (!force && state.items) return state.items;
+            const params = force ? undefined : paramsOrForce;
             try {
-                const result = await fetchList(params);
+                state.loading = true;
+                const result = await fetchList(params ?? {});
                 if (result.status === 'succeed') {
+                    state.loading = false;
+                    if (params) {
+                        return result.response.results;
+                    }
                     state.items = result.response.results;
+                    return result.response.results;
                 }
+                return undefined;
             } catch (e) {
                 ErrorHandler.handleError(e);
-            } finally {
                 state.loading = false;
+                return undefined;
             }
         },
         async create(params: Omit<TaskCategoryCreateParameters, 'status_options'>) {
@@ -82,7 +91,9 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
             return response;
         },
         async get(categoryId: string) {
-            const response = await SpaceConnector.clientV2.opsflow.taskCategory.update<TaskCategoryGetParameters, TaskCategoryModel>({
+            const category = state.items?.find((item) => item.category_id === categoryId);
+            if (category) return category;
+            const response = await SpaceConnector.clientV2.opsflow.taskCategory.get<TaskCategoryGetParameters, TaskCategoryModel>({
                 category_id: categoryId,
             });
             return response;

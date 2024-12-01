@@ -24,16 +24,17 @@ export const useTaskCreatePageStore = defineStore('task-create-page', () => {
     const getters: UseTaskCreatePageStoreGetters = {
         currentCategory: computed<TaskCategoryModel|undefined>(() => taskCategoryStore.getters.taskCategories.find((c) => c.category_id === state.currentCategoryId)),
         currentTaskType: computed<TaskTypeModel|undefined>(() => {
-            if (!state.currentTaskTypeId) return undefined;
-            if (!taskTypeStore.state.itemsByCategoryId[state.currentTaskTypeId]) {
-                taskTypeStore.listByCategoryId(state.currentTaskTypeId);
+            if (!state.currentCategoryId || !state.currentTaskTypeId) return undefined;
+            if (!taskTypeStore.state.itemsByCategoryId[state.currentCategoryId]) {
+                taskTypeStore.listByCategoryId(state.currentCategoryId);
             }
-            return taskTypeStore.state.itemsByCategoryId[state.currentTaskTypeId]?.find((c) => c.category_id === state.currentTaskTypeId);
+            return taskTypeStore.state.itemsByCategoryId[state.currentCategoryId]?.find((t) => t.task_type_id === state.currentTaskTypeId);
         }),
     };
     const actions = {
         setCurrentCategoryId(categoryId?: string) {
             state.currentCategoryId = categoryId;
+            state.currentTaskTypeId = undefined;
         },
         setCurrentTaskTypeId(taskTypeId?: string) {
             state.currentTaskTypeId = taskTypeId;

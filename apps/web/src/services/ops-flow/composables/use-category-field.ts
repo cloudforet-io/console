@@ -36,10 +36,25 @@ export const useCategoryField = ({
         categoryValidator.setValue(selectedCategories);
     };
 
-    const allCategoryItems = computed<CategoryItem[]>(() => {
+    const allCategoryItems = ref<CategoryItem[]>([]);
+    const categoryItemsByPackage = computed<Record<string, CategoryItem[]>>(() => {
+        const map: Record<string, CategoryItem[]> = {};
+        allCategoryItems.value.forEach((item) => {
+            if (Array.isArray(map[item.packageId])) {
+                map[item.packageId].push(item);
+            } else {
+                map[item.packageId] = [item];
+            }
+        });
+        return map;
+    });
+
+    const loadAllCategoryItems = async (): Promise<CategoryItem[]> => {
+        const taskCategories = await taskCategoryStore.list() ?? [];
+
         if (hasTaskTypeOnly) {
-            taskTypeStore.listByCategoryIds(taskCategoryStore.getters.taskCategories.map((c) => c.category_id));
-            return taskCategoryStore.getters.taskCategories.filter((c) => {
+            await taskTypeStore.listByCategoryIds(taskCategories.map((c) => c.category_id));
+            return taskCategories.filter((c) => {
                 const taskTypes = taskTypeStore.state.itemsByCategoryId[c.category_id];
                 return taskTypes && taskTypes.length > 0;
             }).map((c) => ({
@@ -52,21 +67,10 @@ export const useCategoryField = ({
             name: c.category_id,
             label: c.name,
             packageId: c.package_id,
-        }))
-            || [];
-    });
-    const categoryItemsByPackage = computed<Record<string, CategoryItem[]>>(() => {
-        const map: Record<string, CategoryItem[]> = {};
-        allCategoryItems.value.forEach((item) => {
-            if (Array.isArray(map[item.packageId])) {
-                map[item.packageId].push(item);
-            } else {
-                map[item.packageId] = [item];
-            }
-        });
-        return map;
-    });
+        })) || [];
+    };
     const categoryMenuItemsHandler: AutocompleteHandler = async (keyword: string, pageStart = 1, pageLimit = 10) => {
+        allCategoryItems.value = await loadAllCategoryItems();
         const filteredItems = allCategoryItems.value.filter((item) => getTextHighlightRegex(keyword).test(item.label as string));
         const _totalCount = pageStart - 1 + Number(pageLimit);
         const _slicedResults = filteredItems.slice(pageStart - 1, _totalCount);
@@ -78,8 +82,12 @@ export const useCategoryField = ({
 
     const prevSelectedCategoryItems = ref<CategoryItem[]>([]);
     const prevSelectedCategoryIds = computed<string[]>(() => prevSelectedCategoryItems.value.map((c) => c.name));
-    const setInitialCategories = (packageId?: string) => {
+    const setInitialCategoriesByPackageId = (packageId?: string) => {
         prevSelectedCategoryItems.value = packageId ? categoryItemsByPackage.value[packageId] ?? [] : [];
+        categoryValidator.setValue(prevSelectedCategoryItems.value);
+    };
+    const setInitialCategories = (categoryIds: string[]) => {
+        prevSelectedCategoryItems.value = allCategoryItems.value.filter((c) => categoryIds.includes(c.name));
         categoryValidator.setValue(prevSelectedCategoryItems.value);
     };
 
@@ -124,12 +132,12 @@ export const useCategoryField = ({
     };
 
     return {
-        loadingCategories: computed(() => taskCategoryStore.getters.loading),
         selectedCategoryItems,
         selectedCategoryIds,
         categoryValidator,
         categoryMenuItemsHandler,
         setSelectedCategoryItems,
+        setInitialCategoriesByPackageId,
         setInitialCategories,
         applyPackageToCategories,
     };

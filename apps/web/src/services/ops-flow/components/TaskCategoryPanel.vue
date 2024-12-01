@@ -68,7 +68,7 @@ const state = reactive({
             </template>
             <template #extra>
                 <p-icon-button name="ic_refresh"
-                               @click="taskCategoryStore.list()"
+                               @click="taskCategoryStore.list(true)"
                 />
                 <p-button icon-left="ic_plus_bold"
                           size="md"
