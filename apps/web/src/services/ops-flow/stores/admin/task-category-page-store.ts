@@ -77,9 +77,9 @@ export const useTaskCategoryPageStore = defineStore('task-category-page', () => 
         // task type
         taskTypes: asyncComputed<TaskTypeModel[]|undefined>(async () => {
             if (!state.currentCategoryId) return undefined;
-            const taskTypes = await taskTypeStore.listByCategoryId(state.currentCategoryId);
-            return taskTypes;
-        }, undefined, { lazy: false, onError: ErrorHandler.handleError }),
+            if (!taskTypeStore.state.itemsByCategoryId[state.currentCategoryId]) await taskTypeStore.listByCategoryId(state.currentCategoryId);
+            return taskTypeStore.state.itemsByCategoryId[state.currentCategoryId];
+        }, undefined, { lazy: true, onError: ErrorHandler.handleError }),
         targetTaskType: computed<TaskTypeModel|undefined>(() => {
             if (!state.targetTaskTypeId) return undefined;
             return getters.taskTypes?.find((taskType) => taskType.task_type_id === state.targetTaskTypeId);

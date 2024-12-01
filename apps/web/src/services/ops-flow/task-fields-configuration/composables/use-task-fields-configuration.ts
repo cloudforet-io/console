@@ -43,12 +43,12 @@ export const useTaskFieldsConfiguration = () => {
             // manually trigger validation to update invalid state
             validateFields();
         },
-        setInitialFields(initialFields: TaskField[]) {
+        setInitialFields(initialFields?: TaskField[]) {
             validationMap.clear();
-            initialFields.forEach((field) => {
+            initialFields?.forEach((field) => {
                 validationMap.set(field.field_id, true);
             });
-            setFields(initialFields);
+            setFields(initialFields ?? []);
         },
     };
 };

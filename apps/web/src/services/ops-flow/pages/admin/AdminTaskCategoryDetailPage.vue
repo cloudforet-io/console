@@ -34,6 +34,7 @@ import { useGoBack } from '@/common/composables/go-back';
 import TaskStatusDeleteModal from '@/services/ops-flow/components/TaskStatusDeleteModal.vue';
 import TaskStatusForm from '@/services/ops-flow/components/TaskStatusForm.vue';
 import TaskStatusSetDefaultModal from '@/services/ops-flow/components/TaskStatusSetDefaultModal.vue';
+import TaskTypeDeleteModal from '@/services/ops-flow/components/TaskTypeDeleteModal.vue';
 import TaskTypeForm from '@/services/ops-flow/components/TaskTypeForm.vue';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
@@ -134,5 +135,6 @@ defineExpose({ setPathFrom });
 
         <!-- task type -->
         <task-type-form />
+        <task-type-delete-modal />
     </div>
 </template>

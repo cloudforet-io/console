@@ -3,10 +3,13 @@ import {
     ref, nextTick, watch,
 } from 'vue';
 
+import { isEqual } from 'lodash';
 
 import {
     POverlayLayout, PFieldGroup, PTextInput, PButton, PTextarea,
 } from '@cloudforet/mirinae';
+
+import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -91,17 +94,24 @@ const createTaskType = async (categoryId: string) => {
         ErrorHandler.handleRequestError(e, 'Failed to create task type');
     }
 };
-const updateTaskType = async (taskTypeId: string, categoryId: string) => {
+const updateTaskType = async (initialTaskType: TaskTypeModel) => {
     try {
-        const result = await Promise.allSettled([
-            taskTypeStore.update({
-                task_type_id: taskTypeId,
+        const promises: Promise<any>[] = [];
+        if (initialTaskType.name !== name.value
+            || initialTaskType.description !== description.value
+            || !isEqual(initialTaskType.assignee_pool, assigneePool.value)
+        ) {
+            promises.push(taskTypeStore.update({
+                task_type_id: initialTaskType.task_type_id,
                 name: name.value,
                 description: description.value,
                 assignee_pool: assigneePool.value,
-            }),
-            updateTaskTypeFields(taskTypeId, categoryId),
-        ]);
+            }));
+        }
+        if (!isEqual(fields.value, initialTaskType.fields)) {
+            promises.push(updateTaskTypeFields(initialTaskType.task_type_id, initialTaskType.category_id));
+        }
+        const result = await Promise.allSettled(promises);
         const errorMessages: string[] = [];
         result.forEach((res) => {
             if (res.status === 'rejected') {
@@ -123,7 +133,7 @@ const handleConfirm = async () => {
         if (!taskCategoryPageState.currentCategoryId) throw new Error('Category ID is not set');
         loading.value = true;
         if (taskCategoryPageStore.getters.targetTaskType) {
-            await updateTaskType(taskCategoryPageStore.getters.targetTaskType.category_id, taskCategoryPageState.currentCategoryId);
+            await updateTaskType(taskCategoryPageStore.getters.targetTaskType);
         } else {
             await createTaskType(taskCategoryPageState.currentCategoryId);
         }

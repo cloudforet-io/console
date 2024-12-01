@@ -61,7 +61,7 @@ export const useTaskTypeStore = defineStore('task-type', () => {
                 state.loading = true;
                 const result = await fetchList({ query: { filter: [{ k: 'category_id', v: categoryId, o: 'eq' }] } });
                 if (result.status === 'succeed') {
-                    state.itemsByCategoryId[categoryId] = result.response.results;
+                    state.itemsByCategoryId = { ...state.itemsByCategoryId, [categoryId]: result.response.results };
                     state.loading = false;
                     return result.response.results;
                 }
@@ -76,9 +76,15 @@ export const useTaskTypeStore = defineStore('task-type', () => {
             const response = await SpaceConnector.clientV2.opsflow.taskType.create<TaskTypeCreateParameters, TaskTypeModel>(params);
             const categoryId = response.category_id;
             if (state.itemsByCategoryId[categoryId]) {
-                state.itemsByCategoryId[categoryId]?.push(response);
+                state.itemsByCategoryId = {
+                    ...state.itemsByCategoryId,
+                    [categoryId]: [...state.itemsByCategoryId[categoryId] as TaskTypeModel[], response],
+                };
             } else {
-                state.itemsByCategoryId[categoryId] = [response];
+                state.itemsByCategoryId = {
+                    ...state.itemsByCategoryId,
+                    [categoryId]: [response],
+                };
             }
         },
         async update(params: TaskTypeUpdateParameters) {
@@ -110,12 +116,25 @@ export const useTaskTypeStore = defineStore('task-type', () => {
             }
             return response;
         },
-        async delete(taskTypeId: string) {
-            const response = await SpaceConnector.clientV2.opsflow.taskType.delete<TaskTypeDeleteParameters, TaskTypeModel>({
+        async delete(taskTypeId: string, categoryId?: string) {
+            await SpaceConnector.clientV2.opsflow.taskType.delete<TaskTypeDeleteParameters, TaskTypeModel>({
                 task_type_id: taskTypeId,
             });
-            const categoryId = response.category_id;
-            state.itemsByCategoryId[categoryId] = state.itemsByCategoryId[categoryId]?.filter((item) => item.task_type_id !== taskTypeId);
+            if (categoryId) {
+                state.itemsByCategoryId = {
+                    ...state.itemsByCategoryId,
+                    [categoryId]: state.itemsByCategoryId[categoryId]?.filter((item) => item.task_type_id !== taskTypeId),
+                };
+            } else {
+                const deleted = Object.values(state.itemsByCategoryId).find((items) => items?.find((item) => item.task_type_id === taskTypeId));
+                const _categoryId = deleted?.[0]?.category_id;
+                if (_categoryId) {
+                    state.itemsByCategoryId = {
+                        ...state.itemsByCategoryId,
+                        [_categoryId]: state.itemsByCategoryId[_categoryId]?.filter((item) => item.task_type_id !== taskTypeId),
+                    };
+                }
+            }
         },
     };
 
