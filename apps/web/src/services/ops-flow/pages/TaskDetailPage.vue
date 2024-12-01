@@ -1,7 +1,193 @@
-<script setup lang="ts">
+<script lang="ts">
+// eslint-disable-next-line import/order,import/no-duplicates
+import { defineComponent, type ComponentPublicInstance } from 'vue';
 
+interface IInstance extends ComponentPublicInstance {
+    setPathFrom(from: any): void
+}
+
+export default defineComponent({
+    beforeRouteEnter(to, from, next) {
+        next((vm) => {
+            const instance = vm as unknown as IInstance;
+            instance.setPathFrom(from);
+        });
+    },
+});
+</script>
+
+<script setup lang="ts">
+/* eslint-disable import/first */
+// eslint-disable-next-line import/no-duplicates,import/order
+import {
+    computed, onBeforeMount, onUnmounted, defineAsyncComponent, ref,
+    // eslint-disable-next-line import/no-duplicates
+} from 'vue';
+import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router/composables';
+
+import {
+    PHeadingLayout, PHeading, PButton, PTab, PSkeleton,
+} from '@cloudforet/mirinae';
+import type { TabItem } from '@cloudforet/mirinae/types/hooks/use-tab/type';
+
+import { queryStringToString } from '@/lib/router-query-string';
+
+import ConfirmBackModal from '@/common/components/modals/ConfirmBackModal.vue';
+import { useConfirmRouteLeave } from '@/common/composables/confirm-route-leave';
+import { useGoBack } from '@/common/composables/go-back';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+
+import BoardTaskComment from '@/services/ops-flow/components/BoardTaskComment.vue';
+import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
+import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
+import type { BoardPageQuery } from '@/services/ops-flow/types/board-page-type';
+import type { TaskCreatePageQueryValue } from '@/services/ops-flow/types/task-create-page-type';
+
+const TaskContentBaseForm = defineAsyncComponent(() => import('@/services/ops-flow/components/TaskContentBaseForm.vue'));
+const TaskFieldsForm = defineAsyncComponent(() => import('@/services/ops-flow/task-fields-form/TaskFieldsForm.vue'));
+const TaskCreateProgressTab = defineAsyncComponent(() => import('@/services/ops-flow/components/TaskCreateProgressTab.vue'));
+
+
+const taskContentFormStore = useTaskContentFormStore();
+const taskContentFormState = taskContentFormStore.state;
+const taskContentFormGetters = taskContentFormStore.getters;
+
+/* route and query */
+const router = useRouter();
+const route = useRoute();
+const categoryId = computed<TaskCreatePageQueryValue['categoryId']>(() => queryStringToString(route.query.categoryId));
+const { getProperRouteLocation } = useProperRouteLocation();
+
+
+/* header and back button */
+const loading = false; // computed<boolean>(() => taskCategoryStore.getters.loading);
+const headerTitle = 'Inquiry Service Request'; // computed<string>(() => taskCategoryPageStore.getters.currentCategory?.name ?? 'No Category');
+const {
+    setPathFrom,
+    goBack,
+} = useGoBack(getProperRouteLocation({
+    name: OPS_FLOW_ROUTE.BOARD._NAME,
+    query: { categoryId: route.query.categoryId } as BoardPageQuery,
+}), true);
+
+/* confirm leave modal */
+const {
+    isConfirmLeaveModalVisible,
+    handleBeforeRouteLeave,
+    confirmRouteLeave,
+    stopRouteLeave,
+} = useConfirmRouteLeave({
+    passConfirmation: computed(() => !taskContentFormState.hasUnsavedChanges),
+});
+onBeforeRouteLeave(handleBeforeRouteLeave);
+
+/* tabs */
+const tabs = computed<TabItem<object>[]>(() => [
+    {
+        name: 'content',
+        label: 'Content', // TODO: i18n
+        keepAlive: true,
+    },
+    {
+        name: 'progress',
+        label: 'Progress', // TODO: i18n & template
+        keepAlive: true,
+    },
+]);
+const activeTab = ref<'content'|'progress'>('content');
+const handleUpdateActiveTab = (tab: 'content'|'progress') => {
+    activeTab.value = tab;
+    router.replace({
+        hash: `#${tab}`,
+    });
+};
+
+/* form button handling */
+const handleSaveChanges = async () => {
+    if (!taskContentFormGetters.isAllValid) return;
+    const result = await taskContentFormStore.createTask();
+    if (result) goBack();
+};
+
+/* lifecycle */
+onBeforeMount(() => {
+    taskContentFormStore.setCurrentCategoryId(categoryId.value);
+    if (route.hash === '#progress') {
+        activeTab.value = 'progress';
+    }
+    taskContentFormStore.setMode('view'); // TODO: differentiate by user permission
+});
+onUnmounted(() => {
+    taskContentFormStore.$reset();
+    taskContentFormStore.$dispose();
+});
+
+/* expose */
+defineExpose({ setPathFrom });
 </script>
 
 <template>
-    <div class="task-detail-page" />
+    <div>
+        <p-heading-layout class="mb-6">
+            <template #heading>
+                <p-heading show-back-button
+                           @click-back-button="goBack"
+                >
+                    <p-skeleton v-if="loading"
+                                height="1.75rem"
+                                width="12rem"
+                    />
+                    <template v-else>
+                        {{ headerTitle }}
+                    </template>
+                </p-heading>
+            </template>
+            <template #extra>
+                <p-button style-type="negative-secondary">
+                    Delete
+                </p-button>
+            </template>
+        </p-heading-layout>
+        <div class="mr-auto flex flex-wrap w-full gap-4">
+            <div class="flex-1 w-full min-w-[600px] tablet:min-w-full">
+                <p-tab class="w-full"
+                       :tabs="tabs"
+                       :active-tab="activeTab"
+                       @update:active-tab="handleUpdateActiveTab"
+                >
+                    <template #content>
+                        <div class="w-full">
+                            <task-content-base-form class="mb-4" />
+                            <task-fields-form />
+                        </div>
+                    </template>
+                    <template #progress>
+                        <task-create-progress-tab />
+                    </template>
+                </p-tab>
+                <div v-if="taskContentFormState.mode === 'edit'"
+                     class="py-3 flex flex-wrap gap-1 justify-end"
+                >
+                    <p-button style-type="transparent"
+                              @click="goBack()"
+                    >
+                        Cancel
+                    </p-button>
+                    <p-button style-type="primary"
+                              :disabled="!taskContentFormGetters.isAllValid"
+                              @click="handleSaveChanges"
+                    >
+                        Confirm
+                    </p-button>
+                </div>
+            </div>
+            <board-task-comment class="flex-1 w-full min-w-[360px] lg:max-w-[528px] tablet:min-w-full" />
+        </div>
+        <!-- modals -->
+        <confirm-back-modal :visible="isConfirmLeaveModalVisible"
+                            @confirm="confirmRouteLeave"
+                            @cancel="stopRouteLeave"
+        />
+    </div>
 </template>
+

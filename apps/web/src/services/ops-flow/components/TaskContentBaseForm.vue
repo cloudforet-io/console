@@ -5,20 +5,18 @@ import {
     PFieldGroup, PSelectDropdown, PPaneLayout,
 } from '@cloudforet/mirinae';
 
-import { useFormValidator } from '@/common/composables/form-validator';
+import { useFieldValidator, useFormValidator } from '@/common/composables/form-validator';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
 import { useCategoryField } from '@/services/ops-flow/composables/use-category-field';
 import { useTaskStatusField } from '@/services/ops-flow/composables/use-task-status-field';
 import { useTaskTypeField } from '@/services/ops-flow/composables/use-task-type-field';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
-import { useTaskCreatePageStore } from '@/services/ops-flow/stores/task-create-page-store';
+import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
 
-const emit = defineEmits<{(event: 'update:is-valid', value: boolean): void;
-}>();
-
-const taskCreatePageStore = useTaskCreatePageStore();
-const taskCreatePageGetters = taskCreatePageStore.getters;
+const taskContentFormStore = useTaskContentFormStore();
+const taskContentFormState = taskContentFormStore.state;
+const taskContentFormGetters = taskContentFormStore.getters;
 const taskCategoryStore = useTaskCategoryStore();
 
 /* category */
@@ -32,7 +30,7 @@ const {
     hasTaskTypeOnly: true,
 });
 const handleUpdateSelectedCategory = (items) => {
-    taskCreatePageStore.setCurrentCategoryId(items[0].name);
+    taskContentFormStore.setCurrentCategoryId(items[0].name);
     // watcher automatically updates forms
 };
 
@@ -43,10 +41,10 @@ const {
     taskTypeMenuItemsHandler,
     setInitialTaskType,
 } = useTaskTypeField({
-    categoryId: computed(() => taskCreatePageGetters.currentCategory?.category_id),
+    categoryId: computed(() => taskContentFormGetters.currentCategory?.category_id),
 });
 const handleUpdateSelectedTaskType = (items) => {
-    taskCreatePageStore.setCurrentTaskTypeId(items[0].name);
+    taskContentFormStore.setCurrentTaskTypeId(items[0].name);
     // watcher automatically updates forms
 };
 
@@ -58,13 +56,27 @@ const {
     setSelectedStatusItems,
     setInitialStatus,
 } = useTaskStatusField({
-    categoryId: computed(() => taskCreatePageGetters.currentCategory?.category_id),
+    categoryId: computed(() => taskContentFormGetters.currentCategory?.category_id),
 });
+const handleUpdateSelectedStatus = (items) => {
+    taskContentFormStore.setStatusId(items[0].name);
+    setSelectedStatusItems(items);
+};
 
-/* form */
+/* assignee */
+const assigneeValidator = useFieldValidator('', (value) => {
+    if (!taskContentFormGetters.currentCategory || !taskContentFormGetters.currentTaskType) return true;
+    if (!value) return 'Assignee is required';
+    return true;
+});
+const assignee = assigneeValidator.value;
+const handleUpdateSelectedAssignee = (userId?: string) => {
+    taskContentFormStore.setAssignee(userId);
+    assigneeValidator.setValue(userId);
+};
+
+/* form validator */
 const {
-    forms: { assignee },
-    setForm,
     invalidState,
     invalidTexts,
     isAllValid,
@@ -73,19 +85,16 @@ const {
     category: categoryValidator,
     taskType: taskTypeValidator,
     status: taskStatusValidator,
-    assignee: '',
-}, {
-    assignee(value) {
-        if (!taskCreatePageGetters.currentCategory || !taskCreatePageGetters.currentTaskType) return true;
-        if (!value) return 'Assignee is required';
-        return true;
-    },
+    assignee: assigneeValidator,
 });
+watch(isAllValid, (isValid) => {
+    taskContentFormStore.setIsBaseFormValid(isValid);
+}, { immediate: true });
 
-/* initiate and update automatically by related fields */
+/* automatically initiate and update form */
 watch([
     () => taskCategoryStore.getters.loading,
-    () => taskCreatePageGetters.currentCategory,
+    () => taskContentFormGetters.currentCategory,
 ], async ([loading, currentCategory]) => {
     if (loading) return;
     if (currentCategory) {
@@ -97,33 +106,30 @@ watch([
         const defaultStatus = currentCategory.status_options.TODO.find((status) => status.is_default);
         setInitialStatus(defaultStatus);
         // init selected assignee
-        setForm('assignee', '');
+        assigneeValidator.setValue('');
     }
     resetValidations();
 }, { immediate: true });
-watch(() => taskCreatePageGetters.currentTaskType, (currentTaskType) => {
+watch(() => taskContentFormGetters.currentTaskType, (currentTaskType) => {
     if (currentTaskType) {
         // init selected task type
         setInitialTaskType(currentTaskType.task_type_id);
         // init selected assignee
-        setForm('assignee', '');
+        assigneeValidator.setValue('');
     }
     resetValidations();
 }, { immediate: true });
-
-/* validation event */
-watch(isAllValid, (isValid) => {
-    emit('update:is-valid', isValid);
-}, { immediate: true });
-
 </script>
 
 <template>
-    <p-pane-layout class="py-6 px-4 flex flex-wrap gap-4">
+    <component :is="taskContentFormState.mode === 'create' ? 'div' : PPaneLayout"
+               class="flex flex-wrap gap-4"
+               :class="taskContentFormState.mode === 'create' ? '' : 'py-6 px-4'"
+    >
         <div class="base-form-top-wrapper">
             <div class="base-form-field-wrapper">
                 <p-field-group label="Category"
-                               style-type="secondary"
+                               :style-type="taskContentFormState.mode === 'create' ? 'primary' : 'secondary'"
                                required
                                :invalid="invalidState.category"
                                :invalid-text="invalidTexts.category"
@@ -138,7 +144,7 @@ watch(isAllValid, (isValid) => {
             </div>
             <div class="base-form-field-wrapper">
                 <p-field-group label="Type"
-                               style-type="secondary"
+                               :style-type="taskContentFormState.mode === 'create' ? 'primary' : 'secondary'"
                                required
                                :invalid="invalidState.taskType"
                                :invalid-text="invalidTexts.taskType"
@@ -146,14 +152,16 @@ watch(isAllValid, (isValid) => {
                     <p-select-dropdown :selected="selectedTaskTypeItems"
                                        :handler="taskTypeMenuItemsHandler"
                                        :invalid="invalidState.taskType"
-                                       :disabled="!taskCreatePageGetters.currentCategory"
+                                       :disabled="!taskContentFormGetters.currentCategory"
                                        block
                                        @update:selected="handleUpdateSelectedTaskType"
                     />
                 </p-field-group>
             </div>
         </div>
-        <div class="base-form-top-wrapper">
+        <div v-if="taskContentFormState.mode !== 'create'"
+             class="base-form-top-wrapper"
+        >
             <div class="base-form-field-wrapper">
                 <p-field-group label="Status"
                                style-type="secondary"
@@ -164,9 +172,9 @@ watch(isAllValid, (isValid) => {
                     <p-select-dropdown :selected="selectedStatusItems"
                                        :handler="statusMenuItemsHandler"
                                        :invalid="invalidState.status"
-                                       :disabled="!taskCreatePageGetters.currentCategory"
+                                       :disabled="!taskContentFormGetters.currentCategory"
                                        block
-                                       @update:selected="setSelectedStatusItems"
+                                       @update:selected="handleUpdateSelectedStatus"
                     />
                 </p-field-group>
             </div>
@@ -186,13 +194,13 @@ watch(isAllValid, (isValid) => {
                 >
                     <user-select-dropdown :user-id="assignee"
                                           :invalid="invalidState.assignee"
-                                          :disabled="!taskCreatePageGetters.currentTaskType"
-                                          @update:user-id="setForm('assignee', $event)"
+                                          :disabled="!taskContentFormGetters.currentTaskType"
+                                          @update:user-id="handleUpdateSelectedAssignee"
                     />
                 </p-field-group>
             </div>
         </div>
-    </p-pane-layout>
+    </component>
 </template>
 
 <style scoped lang="postcss">
