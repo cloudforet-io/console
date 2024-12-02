@@ -31,7 +31,8 @@
     "postcss-config-custom": "*",
     "storybook": "^7.6.10",
     "tsconfig": "*",
-    "vue-component-type-helpers": "^2.0.26"
+    "vue-component-type-helpers": "^2.0.26",
+    "@cloudforet/mirinae": "*"
   },
   "peerDependencies": {
     "react": "18.3.1",
