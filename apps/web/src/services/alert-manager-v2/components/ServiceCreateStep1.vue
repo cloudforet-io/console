@@ -2,11 +2,10 @@
 import {
     computed, onMounted, reactive, watch,
 } from 'vue';
-import { useRouter } from 'vue-router/composables';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PFieldGroup, PTextInput, PTooltip, PI, PSelectDropdown, PAvatar, PButton,
+    PFieldGroup, PTextInput, PTooltip, PI, PSelectDropdown, PAvatar,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
@@ -18,15 +17,11 @@ import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import { ALERT_MANAGER_V2_ROUTE } from '@/services/alert-manager-v2/routes/route-constant';
+import ServiceCreateStepContainer from '@/services/alert-manager-v2/components/ServiceCreateStepContainer.vue';
 import { useServiceFormStore } from '@/services/alert-manager-v2/store/service-form-store';
-
-const emit = defineEmits<{(e: 'update:currentStep', step: number): void}>();
 
 const serviceFormStore = useServiceFormStore();
 const serviceFormState = serviceFormStore.state;
-
-const router = useRouter();
 
 const formDataState = reactive({
     workspaceUserLoading: false,
@@ -78,12 +73,6 @@ const convertToSnakeCase = (str) => str
     .replace(/_$/g, '')
     .toLowerCase();
 const getUserName = (id: string) => formDataState.workspaceUsersData.find((i) => i.user_id === id)?.name;
-const handleClickPrevButton = () => {
-    router.push({ name: ALERT_MANAGER_V2_ROUTE.SERVICE._NAME });
-};
-const handleClickNextButton = () => {
-    emit('update:currentStep', 2);
-};
 const handleChangeInput = (label: 'name'|'key'|'member'|'description', value?: string) => {
     if (label !== 'member') setForm(label, value);
     // TODO: Add logic to separate user group data
@@ -122,7 +111,9 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="service-create-step1">
+    <service-create-step-container class="service-create-step1"
+                                   :is-all-form-valid="state.isAllFormValid"
+    >
         <form>
             <p-field-group :label="$t('ALERT_MANAGER.SERVICE.LABEL_NAME')"
                            :invalid-text="invalidTexts.name"
@@ -192,25 +183,7 @@ onMounted(async () => {
                 />
             </p-field-group>
         </form>
-        <div class="buttons-wrapper">
-            <p-button style-type="transparent"
-                      class="step-left-base-button"
-                      size="lg"
-                      @click="handleClickPrevButton"
-            >
-                {{ $t('ALERT_MANAGER.CANCEL') }}
-            </p-button>
-            <p-button :disabled="!state.isAllFormValid"
-                      class="step-right-button"
-                      style-type="substitutive"
-                      icon-right="ic_arrow-right"
-                      size="lg"
-                      @click="handleClickNextButton"
-            >
-                {{ $t('ALERT_MANAGER.CONTINUE') }}
-            </p-button>
-        </div>
-    </div>
+    </service-create-step-container>
 </template>
 
 <style scoped lang="postcss">
@@ -218,11 +191,6 @@ onMounted(async () => {
     .member-menu-item {
         @apply flex items-center;
         gap: 0.25rem;
-    }
-    .buttons-wrapper {
-        @apply flex justify-end;
-        padding-top: 2rem;
-        gap: 1rem;
     }
 }
 </style>

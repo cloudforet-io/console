@@ -9,24 +9,30 @@ import { i18n } from '@/translations';
 
 import ServiceCreateStep1 from '@/services/alert-manager-v2/components/ServiceCreateStep1.vue';
 import { ALERT_MANAGER_V2_ROUTE } from '@/services/alert-manager-v2/routes/route-constant';
+import { useServiceFormStore } from '@/services/alert-manager-v2/store/service-form-store';
 
 type headerInfoByStep = {
     title: TranslateResult;
     desc: TranslateResult;
 };
 
+const serviceFormStore = useServiceFormStore();
+const serviceFormState = serviceFormStore.state;
+
 const router = useRouter();
 
+const storeState = reactive({
+    step: computed(() => serviceFormState.currentStep),
+});
 const state = reactive({
-    step: 1,
     headerInfo: computed<headerInfoByStep>(() => {
-        if (state.step === 1) {
+        if (storeState.step === 1) {
             return {
                 title: i18n.t('ALERT_MANAGER.SERVICE.CREATE_SERVICE_TITLE'),
                 desc: i18n.t('ALERT_MANAGER.SERVICE.CREATE_SERVICE_DESC'),
             };
         }
-        if (state.step === 2) {
+        if (storeState.step === 2) {
             return {
                 title: i18n.t('ALERT_MANAGER.SERVICE.INTEGRATE_TOOL_TITLE'),
                 desc: i18n.t('ALERT_MANAGER.SERVICE.INTEGRATE_TOOL_DESC'),
@@ -42,9 +48,6 @@ const state = reactive({
 const handleClickClose = () => {
     router.push({ name: ALERT_MANAGER_V2_ROUTE.SERVICE._NAME });
 };
-const handleChangeStep = (step: number) => {
-    state.step = step;
-};
 </script>
 
 <template>
@@ -52,13 +55,19 @@ const handleChangeStep = (step: number) => {
         <p-centered-layout-header :title="state.headerInfo.title"
                                   :description="state.headerInfo.desc"
                                   show-step
-                                  :current-step="state.step"
+                                  :current-step="storeState.step"
                                   :total-steps="3"
                                   :show-close-button="true"
                                   @close="handleClickClose"
         />
-        <service-create-step1 v-if="state.step === 1"
-                              @update:currentStep="handleChangeStep"
-        />
+        <service-create-step1 v-if="storeState.step === 1" />
     </div>
 </template>
+
+<style scoped lang="postcss">
+.service-create-page {
+    max-width: 45rem;
+    padding-right: 2.5rem;
+    padding-left: 2.5rem;
+}
+</style>
