@@ -3,6 +3,7 @@ import { computed, onUnmounted, reactive } from 'vue';
 
 import ServiceCreateStep2SelectWebhookType
     from '@/services/alert-manager-v2/components/ServiceCreateStep2SelectWebhookType.vue';
+import ServiceCreateStep2WebhookForm from '@/services/alert-manager-v2/components/ServiceCreateStep2WebhookForm.vue';
 import ServiceCreateStepContainer from '@/services/alert-manager-v2/components/ServiceCreateStepContainer.vue';
 import { useServiceFormStore } from '@/services/alert-manager-v2/store/service-form-store';
 
@@ -33,5 +34,6 @@ onUnmounted(() => {
                                    :is-all-form-valid="state.isAllFormValid"
     >
         <service-create-step2-select-webhook-type v-if="storeState.currentSubStep === 1" />
+        <service-create-step2-webhook-form v-else-if="storeState.currentSubStep === 2" />
     </service-create-step-container>
 </template>
