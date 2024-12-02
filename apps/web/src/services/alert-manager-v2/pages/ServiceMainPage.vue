@@ -1,12 +1,17 @@
 <script setup lang="ts">
+import { useRouter } from 'vue-router/composables';
+
 import {
     PButton, PHeading, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
 import ServiceList from '@/services/alert-manager-v2/components/ServiceList.vue';
+import { ALERT_MANAGER_V2_ROUTE } from '@/services/alert-manager-v2/routes/route-constant';
+
+const router = useRouter();
 
 const handleClickCreateButton = () => {
-    console.log('TODO: handleClickCreateButton');
+    router.push({ name: ALERT_MANAGER_V2_ROUTE.SERVICE.CREATE._NAME });
 };
 </script>
 
