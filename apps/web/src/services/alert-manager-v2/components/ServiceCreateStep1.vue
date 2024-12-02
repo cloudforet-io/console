@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive, watch,
+    computed, onMounted, onUnmounted, reactive, watch,
 } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -107,6 +107,10 @@ watch(() => state.isFocusedKey, (isFocusedKey) => {
 
 onMounted(async () => {
     await listWorkspaceUsers();
+});
+
+onUnmounted(() => {
+    serviceFormStore.initStep1();
 });
 </script>
 

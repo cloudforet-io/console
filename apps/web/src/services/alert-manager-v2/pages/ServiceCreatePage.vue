@@ -24,6 +24,7 @@ const router = useRouter();
 
 const storeState = reactive({
     step: computed(() => serviceFormState.currentStep),
+    subStep: computed(() => serviceFormState.currentSubStep),
 });
 const state = reactive({
     headerInfo: computed<headerInfoByStep>(() => {
@@ -44,6 +45,15 @@ const state = reactive({
             desc: i18n.t('ALERT_MANAGER.NOTIFICATIONS.SET_UP_DESC'),
         };
     }),
+    isWideLayout: computed<boolean>(() => {
+        const wideLayoutSteps = [
+            { step: 2, subStep: 1 },
+            { step: 3, subStep: 1 },
+        ];
+        return wideLayoutSteps.some(
+            ({ step, subStep }) => storeState.step === step && storeState.subStep === subStep,
+        );
+    }),
 });
 
 const handleClickClose = () => {
@@ -51,13 +61,13 @@ const handleClickClose = () => {
 };
 
 onUnmounted(() => {
-    serviceFormStore.init();
+    serviceFormStore.initState();
 });
 </script>
 
 <template>
     <div class="service-create-page"
-         :class="`step${storeState.step}`"
+         :class="{'wide': state.isWideLayout}"
     >
         <p-centered-layout-header :title="state.headerInfo.title"
                                   :description="state.headerInfo.desc"
@@ -74,13 +84,13 @@ onUnmounted(() => {
 
 <style scoped lang="postcss">
 .service-create-page {
-    &.step1 {
-        max-width: 45rem;
-        padding-right: 2.5rem;
-        padding-left: 2.5rem;
-    }
-    &.step2 {
+    max-width: 45rem;
+    padding-right: 2.5rem;
+    padding-left: 2.5rem;
+    &.wide {
         max-width: 59.5rem;
+        padding-right: 0;
+        padding-left: 0;
     }
 }
 </style>
