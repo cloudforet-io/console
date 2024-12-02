@@ -11,6 +11,7 @@ import { ALERT_MANAGER_V2_ROUTE } from '@/services/alert-manager-v2/routes/route
 const AlertManagerContainer = () => import('@/services/alert-manager-v2/AlertManagerContainer.vue');
 const ServiceMainPage = () => import('@/services/alert-manager-v2/pages/ServiceMainPage.vue');
 const ServiceDetailPage = () => import('@/services/alert-manager-v2/pages/ServiceDetailPage.vue');
+const ServiceCreatePage = () => import('@/services/alert-manager-v2/pages/ServiceCreatePage.vue');
 
 const alertManagerV2Routes: RouteConfig = {
     path: 'alert-manager-v2',
@@ -35,6 +36,12 @@ const alertManagerV2Routes: RouteConfig = {
                     name: ALERT_MANAGER_V2_ROUTE.SERVICE._NAME,
                     meta: { menuId: MENU_ID.SERVICE },
                     component: ServiceMainPage as any,
+                },
+                {
+                    path: 'create',
+                    name: ALERT_MANAGER_V2_ROUTE.SERVICE.CREATE._NAME,
+                    meta: { centeredLayout: true },
+                    component: ServiceCreatePage as any,
                 },
                 {
                     path: ':serviceId',
