@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, onUnmounted, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import { useRouter } from 'vue-router/composables';
 
@@ -48,6 +48,10 @@ const state = reactive({
 const handleClickClose = () => {
     router.push({ name: ALERT_MANAGER_V2_ROUTE.SERVICE._NAME });
 };
+
+onUnmounted(() => {
+    serviceFormStore.init();
+});
 </script>
 
 <template>

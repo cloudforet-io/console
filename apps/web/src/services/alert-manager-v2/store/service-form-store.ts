@@ -27,6 +27,13 @@ export const useServiceFormStore = defineStore('service-form', () => {
     });
 
     const actions = {
+        init() {
+            state.currentStep = 1;
+            state.name = '';
+            state.key = '';
+            state.member = {};
+            state.description = '';
+        },
         setCurrentStep(step: number) {
             state.currentStep = step;
         },
