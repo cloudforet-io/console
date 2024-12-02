@@ -2,19 +2,19 @@ import type { Ref } from 'vue';
 import {
     ref, readonly,
 } from 'vue';
-import type { Route } from 'vue-router';
-import { useRouter } from 'vue-router/composables';
+import type { Location } from 'vue-router';
+
+// CAUTION: Do not change to useRouter() because useRouter is only available in script setup
+import { SpaceRouter } from '@/router';
 
 export const useConfirmRouteLeave = ({
     passConfirmation,
 }: {
     passConfirmation?: Ref<boolean>
 } = {}) => {
-    const router = useRouter();
-
     const isConfirmLeaveModalVisible = ref(false);
     const isConfirmed = ref(false);
-    let nextRoute: Route|undefined;
+    let nextRoute: Location|undefined;
 
     const openConfirmBackModal = () => {
         isConfirmLeaveModalVisible.value = true;
@@ -22,7 +22,7 @@ export const useConfirmRouteLeave = ({
     const confirmRouteLeave = () => {
         isConfirmed.value = true;
         isConfirmLeaveModalVisible.value = false;
-        router.push(nextRoute);
+        if (nextRoute) SpaceRouter.router.push(nextRoute);
     };
     const stopRouteLeave = () => {
         isConfirmLeaveModalVisible.value = false;
