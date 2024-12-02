@@ -2,6 +2,7 @@ import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 
+import type WidgetFieldValueManager from '@/common/modules/widgets/_widget-field-value-manager';
 import type { AdvancedFormatRulesOptions } from '@/common/modules/widgets/_widget-fields/advanced-format-rules/type';
 import type { CategoryByOptions } from '@/common/modules/widgets/_widget-fields/category-by/type';
 import type { ColorSchemaOptions } from '@/common/modules/widgets/_widget-fields/color-schema/type';
@@ -77,6 +78,13 @@ export interface WidgetFieldComponentProps<FieldOptions, FieldValue = any> {
     widgetConfig?: WidgetConfig;
     widgetId?: string;
     dateRange?: DateRange;
+}
+
+export interface _WidgetFieldComponentProps<FieldOptions> {
+    widgetFieldSchema: WidgetFieldSchema<FieldOptions>;
+    manager: WidgetFieldValueManager;
+    widgetConfig: WidgetConfig;
+    widgetId: string;
 }
 
 export interface WidgetFieldComponentEmit<ValueType> {
