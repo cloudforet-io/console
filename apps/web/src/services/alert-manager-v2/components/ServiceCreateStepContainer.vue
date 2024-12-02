@@ -22,11 +22,11 @@ const serviceFormState = serviceFormStore.state;
 const router = useRouter();
 
 const storeState = reactive({
-    currentStep: computed(() => serviceFormState.currentStep),
+    currentStep: computed<number>(() => serviceFormState.currentStep),
 });
 const state = reactive({
-    previousStep: computed(() => serviceFormState.currentStep - 1),
-    nextStep: computed(() => serviceFormState.currentStep + 1),
+    previousStep: computed<number>(() => serviceFormState.currentStep - 1),
+    nextStep: computed<number>(() => serviceFormState.currentStep + 1),
 });
 
 const handleClickPrevButton = () => {
