@@ -26,6 +26,11 @@ const state = reactive({
     }),
 });
 
+const handleCreateWebhook = async () => {
+    console.log('TODO: handleCreateWebhook');
+    serviceFormStore.setCurrentSubStep(3);
+};
+
 onUnmounted(() => {
     serviceFormStore.initStep2();
 });
@@ -33,7 +38,9 @@ onUnmounted(() => {
 
 <template>
     <service-create-step-container class="service-create-step2"
+                                   :selected-webhook-type-id="storeState.selectedWebhookTypeId"
                                    :is-all-form-valid="state.isAllFormValid"
+                                   @create="handleCreateWebhook"
     >
         <service-create-step2-select-webhook-type v-if="storeState.currentSubStep === 1" />
         <service-create-step2-webhook-form v-else-if="storeState.currentSubStep === 2" />
