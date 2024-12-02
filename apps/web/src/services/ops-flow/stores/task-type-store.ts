@@ -1,4 +1,4 @@
-import { reactive, watch } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import { defineStore } from 'pinia';
 
@@ -29,6 +29,10 @@ export const useTaskTypeStore = defineStore('task-type', () => {
         itemsByCategoryId: {},
     });
 
+    const getters = {
+        loading: computed(() => state.loading),
+    };
+
     const fetchList = getCancellableFetcher<TaskTypeListParameters, ListResponse<TaskTypeModel>>(SpaceConnector.clientV2.opsflow.taskType.list);
     const actions = {
         async listByCategoryIds(categoryIds: string[]): Promise<Record<string, TaskTypeModel[]>> {
@@ -42,8 +46,9 @@ export const useTaskTypeStore = defineStore('task-type', () => {
                 const result = await fetchList({ query: { filter: [{ k: 'category_id', v: _categoryIds, o: 'in' }] } });
                 if (result.status === 'succeed') {
                     _categoryIds.forEach((categoryId) => {
-                        state.itemsByCategoryId[categoryId] = result.response.results?.filter((item) => item.category_id === categoryId);
+                        state.itemsByCategoryId[categoryId] ??= result.response.results?.filter((item) => item.category_id === categoryId);
                     });
+                    state.itemsByCategoryId = { ...state.itemsByCategoryId }; // trigger reactivity
                     state.loading = false;
                 }
             } catch (e) {
@@ -86,6 +91,7 @@ export const useTaskTypeStore = defineStore('task-type', () => {
                     [categoryId]: [response],
                 };
             }
+            return response;
         },
         async update(params: TaskTypeUpdateParameters) {
             const response = await SpaceConnector.clientV2.opsflow.taskType.update<TaskTypeUpdateParameters, TaskTypeModel>(params);
@@ -140,14 +146,16 @@ export const useTaskTypeStore = defineStore('task-type', () => {
 
     const disposeSelf = () => {
         const store = useTaskTypeStore();
+        store.$reset();
         store.$dispose();
     };
     const appContextStore = useAppContextStore();
-    watch(() => appContextStore.getters.isAdminMode, () => {
+    watch([() => appContextStore.getters.isAdminMode, () => appContextStore.getters.workspaceId], () => {
         disposeSelf();
     });
     return {
         state,
+        getters,
         ...actions,
     };
 });

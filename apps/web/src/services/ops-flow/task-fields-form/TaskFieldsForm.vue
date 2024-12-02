@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    defineAsyncComponent,
+    defineAsyncComponent, onUnmounted,
 } from 'vue';
 
 import type { TaskFieldType } from '@/schema/opsflow/_types/task-field-type';
@@ -28,6 +28,10 @@ const taskContentFormStore = useTaskContentFormStore();
 const taskContentFormState = taskContentFormStore.state;
 const taskContentFormGetters = taskContentFormStore.getters;
 const taskFieldMetadataStore = useTaskFieldMetadataStore();
+
+onUnmounted(() => {
+    taskContentFormStore.resetFieldsForm();
+});
 </script>
 
 <template>

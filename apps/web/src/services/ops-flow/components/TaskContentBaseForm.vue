@@ -11,20 +11,18 @@ import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 import { useCategoryField } from '@/services/ops-flow/composables/use-category-field';
 import { useTaskStatusField } from '@/services/ops-flow/composables/use-task-status-field';
 import { useTaskTypeField } from '@/services/ops-flow/composables/use-task-type-field';
-import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
 import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
 
 const taskContentFormStore = useTaskContentFormStore();
 const taskContentFormState = taskContentFormStore.state;
 const taskContentFormGetters = taskContentFormStore.getters;
-const taskCategoryStore = useTaskCategoryStore();
 
 /* category */
 const {
     selectedCategoryItems,
     categoryValidator,
     categoryMenuItemsHandler,
-    setInitialCategories,
+    setInitialCategory,
 } = useCategoryField({
     isRequired: true,
     hasTaskTypeOnly: true,
@@ -94,14 +92,10 @@ watch(isAllValid, (isValid) => {
 }, { immediate: true });
 
 /* automatically initiate and update form */
-watch([
-    () => taskCategoryStore.getters.loading,
-    () => taskContentFormGetters.currentCategory,
-], async ([loading, currentCategory]) => {
-    if (loading) return;
+watch(() => taskContentFormGetters.currentCategory, async (currentCategory) => {
     if (currentCategory) {
         // init selected category
-        setInitialCategories([currentCategory.category_id]);
+        await setInitialCategory(currentCategory.category_id);
         // init selected task type
         setInitialTaskType();
         // init selected status

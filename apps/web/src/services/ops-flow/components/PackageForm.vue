@@ -144,7 +144,7 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
             description: '',
         });
         setInitialWorkspaces();
-        setInitialCategoriesByPackageId();
+        await setInitialCategoriesByPackageId();
         resetValidations();
         return;
     }
@@ -154,7 +154,7 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
             description: targetPackage.description,
         });
         setInitialWorkspaces(targetPackage.package_id);
-        setInitialCategoriesByPackageId(targetPackage.package_id);
+        await setInitialCategoriesByPackageId(targetPackage.package_id);
     }
 });
 </script>

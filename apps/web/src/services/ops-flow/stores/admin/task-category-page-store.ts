@@ -30,6 +30,19 @@ interface UseTaskCategoryPageStoreState {
     visibleTaskTypeDeleteModal: boolean;
 }
 
+interface UseTaskCategoryPageStoreGetters {
+    currentCategory: TaskCategoryModel|undefined;
+    // status
+    statusOptions: TaskStatusOptions;
+    targetStatusOption: {
+        type: TaskStatusType;
+        data: TaskStatusOption;
+    }|undefined;
+    // task type
+    taskTypes: TaskTypeModel[]|undefined;
+    targetTaskType: TaskTypeModel|undefined;
+}
+
 export const useTaskCategoryPageStore = defineStore('task-category-page', () => {
     const taskCategoryStore = useTaskCategoryStore();
     const taskTypeStore = useTaskTypeStore();
@@ -45,7 +58,7 @@ export const useTaskCategoryPageStore = defineStore('task-category-page', () => 
         targetTaskTypeId: undefined,
         visibleTaskTypeDeleteModal: false,
     });
-    const getters = {
+    const getters: UseTaskCategoryPageStoreGetters = {
         currentCategory: computed<TaskCategoryModel|undefined>(() => taskCategoryStore.getters.taskCategories.find((c) => c.category_id === state.currentCategoryId)),
         // status
         statusOptions: computed<TaskStatusOptions>(() => {
@@ -84,7 +97,7 @@ export const useTaskCategoryPageStore = defineStore('task-category-page', () => 
             if (!state.targetTaskTypeId) return undefined;
             return getters.taskTypes?.find((taskType) => taskType.task_type_id === state.targetTaskTypeId);
         }),
-    };
+    } as unknown as UseTaskCategoryPageStoreGetters;
     const actions = {
         setCurrentCategoryId(categoryId: string) {
             state.currentCategoryId = categoryId;

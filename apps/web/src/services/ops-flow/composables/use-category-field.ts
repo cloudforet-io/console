@@ -86,8 +86,9 @@ export const useCategoryField = ({
         prevSelectedCategoryItems.value = packageId ? categoryItemsByPackage.value[packageId] ?? [] : [];
         categoryValidator.setValue(prevSelectedCategoryItems.value);
     };
-    const setInitialCategories = (categoryIds: string[]) => {
-        prevSelectedCategoryItems.value = allCategoryItems.value.filter((c) => categoryIds.includes(c.name));
+    const setInitialCategory = async (categoryId: string) => {
+        allCategoryItems.value = await loadAllCategoryItems();
+        prevSelectedCategoryItems.value = allCategoryItems.value.filter((c) => c.name === categoryId);
         categoryValidator.setValue(prevSelectedCategoryItems.value);
     };
 
@@ -138,7 +139,7 @@ export const useCategoryField = ({
         categoryMenuItemsHandler,
         setSelectedCategoryItems,
         setInitialCategoriesByPackageId,
-        setInitialCategories,
+        setInitialCategory,
         applyPackageToCategories,
     };
 };

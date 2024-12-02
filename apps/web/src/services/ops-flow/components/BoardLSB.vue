@@ -2,6 +2,7 @@
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import LSBContainer from '@/common/modules/navigations/new-lsb/LSBContainer.vue';
 import LSBDivider from '@/common/modules/navigations/new-lsb/LSBDivider.vue';
+import LSBLoadingSpinner from '@/common/modules/navigations/new-lsb/LSBLoadingSpinner.vue';
 import LSBRouterButton from '@/common/modules/navigations/new-lsb/LSBRouterButton.vue';
 import LSBRouterItem from '@/common/modules/navigations/new-lsb/LSBRouterItem.vue';
 import LSBTopTitle from '@/common/modules/navigations/new-lsb/LSBTopTitle.vue';
@@ -29,6 +30,7 @@ const predicate: LSBRouterPredicate = (to, currentRoute) => to.query?.categoryId
         </l-s-b-router-button>
         <l-s-b-divider />
         <l-s-b-top-title>Category</l-s-b-top-title>
+        <l-s-b-loading-spinner :loading="taskCategoryGetters.loading" />
         <l-s-b-router-item v-for="(category, idx) in taskCategoryGetters.taskCategories"
                            :id="`${category.category_id}-${idx}`"
                            :key="`${category.category_id}-${idx}`"

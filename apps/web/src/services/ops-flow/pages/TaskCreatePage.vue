@@ -63,7 +63,7 @@ const {
 } = useGoBack(getProperRouteLocation({
     name: OPS_FLOW_ROUTE.BOARD._NAME,
     query: { categoryId: categoryId.value } as BoardPageQuery,
-}), true);
+}));
 
 /* confirm leave modal */
 const hasCreated = ref(false);

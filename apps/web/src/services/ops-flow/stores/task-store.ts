@@ -65,10 +65,11 @@ export const useTaskStore = defineStore('task', () => {
 
     const disposeSelf = () => {
         const store = useTaskStore();
+        store.$reset();
         store.$dispose();
     };
     const appContextStore = useAppContextStore();
-    watch(() => appContextStore.getters.isAdminMode, () => {
+    watch([() => appContextStore.getters.isAdminMode, () => appContextStore.getters.workspaceId], () => {
         disposeSelf();
     });
     return {

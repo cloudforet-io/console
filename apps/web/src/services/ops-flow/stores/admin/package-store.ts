@@ -66,7 +66,7 @@ export const usePackageStore = defineStore('package', () => {
             return response;
         },
         async setDefaultPackage(packageId: string) {
-            const prevDefaultPackage = getters.packages.value.find((p) => p.is_default);
+            const prevDefaultPackage = getters.packages.find((p) => p.is_default);
             if (prevDefaultPackage?.package_id === packageId) return prevDefaultPackage;
             const response = await SpaceConnector.clientV2.identity.package.setDefault<PackageSetDefaultParameters, PackageModel>({
                 package_id: packageId,

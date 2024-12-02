@@ -27,6 +27,7 @@ import TaskFieldsConfiguration from '@/services/ops-flow/task-fields-configurati
 
 const taskCategoryPageStore = useTaskCategoryPageStore();
 const taskCategoryPageState = taskCategoryPageStore.state;
+const taskCategoryPageGetters = taskCategoryPageStore.getters;
 const taskTypeStore = useTaskTypeStore();
 
 
@@ -58,6 +59,9 @@ const {
     name(value: string) {
         if (!value.trim().length) return 'Name is required';
         if (value.length > 50) return 'Name should be less than 50 characters';
+        if (!taskCategoryPageGetters.taskTypes) return true;
+        const isDuplicated = taskCategoryPageGetters.taskTypes.some((taskType) => taskType.name === value && taskType.task_type_id !== taskCategoryPageGetters.targetTaskType?.task_type_id);
+        if (isDuplicated) return 'Name already exists';
         return true;
     },
 });
@@ -132,8 +136,8 @@ const handleConfirm = async () => {
     try {
         if (!taskCategoryPageState.currentCategoryId) throw new Error('Category ID is not set');
         loading.value = true;
-        if (taskCategoryPageStore.getters.targetTaskType) {
-            await updateTaskType(taskCategoryPageStore.getters.targetTaskType);
+        if (taskCategoryPageGetters.targetTaskType) {
+            await updateTaskType(taskCategoryPageGetters.targetTaskType);
         } else {
             await createTaskType(taskCategoryPageState.currentCategoryId);
         }
@@ -145,7 +149,7 @@ const handleConfirm = async () => {
     }
 };
 
-watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageStore.getters.targetTaskType], async ([visible, target], [prevVisible]) => {
+watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGetters.targetTaskType], async ([visible, target], [prevVisible]) => {
     if (!visible) {
         if (!prevVisible) return; // prevent initial call
         await nextTick(); // wait for closing animation
@@ -171,7 +175,7 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageSt
 </script>
 
 <template>
-    <p-overlay-layout :title="taskCategoryPageStore.getters.targetTaskType ? 'Edit Ticket Topic' : 'Add Ticket Topic'"
+    <p-overlay-layout :title="taskCategoryPageGetters.targetTaskType ? 'Edit Ticket Topic' : 'Add Ticket Topic'"
                       :visible="taskCategoryPageState.visibleTaskTypeForm"
                       size="lg"
                       @close="handleCancelOrClose"

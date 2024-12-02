@@ -1,4 +1,4 @@
-import type { TaskField } from '@/schema/opsflow/_types/task-field-type';
+import type { TaskField, TaskFieldSelectionType, TaskFieldType } from '@/schema/opsflow/_types/task-field-type';
 
 import getRandomId from '@/lib/random-id-generator';
 
@@ -8,6 +8,19 @@ import type {
     TaskFieldTypeMetadata,
 } from '@/services/ops-flow/task-fields-configuration/types/task-field-type-metadata-type';
 
+const DEFAULT_SELECTION_TYPE_MAP: Record<TaskFieldType, TaskFieldSelectionType|undefined> = {
+    GLOBAL: undefined,
+    TEXT: undefined,
+    PARAGRAPH: undefined,
+    LABELS: 'MULTI',
+    DROPDOWN: 'MULTI',
+    DATE: undefined,
+    USER: 'MULTI',
+    ASSET: 'MULTI',
+    PROJECT: 'MULTI',
+    PROVIDER: 'MULTI',
+    SERVICE_ACCOUNT: 'MULTI',
+};
 export const useTaskFieldsConfiguration = () => {
     const validationMap = new Map<string, boolean>();
 
@@ -30,6 +43,7 @@ export const useTaskFieldsConfiguration = () => {
                 field_type: field.type,
                 name: field.name,
                 is_required: false,
+                selection_type: DEFAULT_SELECTION_TYPE_MAP[field.type],
                 is_primary: false,
                 options: {},
             } as TaskField]);

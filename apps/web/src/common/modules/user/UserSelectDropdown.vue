@@ -129,6 +129,8 @@ watch([loading, () => props.userId, () => props.userIds], ([_loading, newUserId,
                        :disabled="props.disabled"
                        :use-fixed-menu-style="useFixedMenuStyle"
                        show-delete-all-button
+                       :multi-selectable="props.selectionType === 'multiple'"
+                       appearance-type="badge"
                        @update:selected="handleUpdateSelectedUserItems"
     />
 </template>

@@ -126,11 +126,13 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         setFieldValidation(fieldId: string, isValid: boolean) {
             state.dataValidationMap = { ...state.dataValidationMap, [fieldId]: isValid };
         },
-        resetFieldData() {
+        // overall
+        resetFieldsForm() {
+            state.defaultData = {};
+            state.defaultDataValidationMap = {};
             state.data = {};
             state.dataValidationMap = {};
         },
-        // overall
         setMode(mode: 'create-minimal'|'create'|'edit'|'view') {
             state.mode = mode;
         },

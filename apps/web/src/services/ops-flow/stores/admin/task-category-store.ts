@@ -108,10 +108,11 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
 
     const disposeSelf = () => {
         const store = useTaskCategoryStore();
+        store.$reset();
         store.$dispose();
     };
     const appContextStore = useAppContextStore();
-    watch(() => appContextStore.getters.isAdminMode, () => {
+    watch([() => appContextStore.getters.isAdminMode, () => appContextStore.getters.workspaceId], () => {
         disposeSelf();
     });
     return {
