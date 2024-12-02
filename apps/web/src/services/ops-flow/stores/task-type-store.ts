@@ -46,7 +46,7 @@ export const useTaskTypeStore = defineStore('task-type', () => {
                 const result = await fetchList({ query: { filter: [{ k: 'category_id', v: _categoryIds, o: 'in' }] } });
                 if (result.status === 'succeed') {
                     _categoryIds.forEach((categoryId) => {
-                        state.itemsByCategoryId[categoryId] ??= result.response.results?.filter((item) => item.category_id === categoryId);
+                        state.itemsByCategoryId[categoryId] ??= result.response.results?.filter((item) => item.category_id === categoryId) ?? [];
                     });
                     state.itemsByCategoryId = { ...state.itemsByCategoryId }; // trigger reactivity
                     state.loading = false;
@@ -66,9 +66,9 @@ export const useTaskTypeStore = defineStore('task-type', () => {
                 state.loading = true;
                 const result = await fetchList({ query: { filter: [{ k: 'category_id', v: categoryId, o: 'eq' }] } });
                 if (result.status === 'succeed') {
-                    state.itemsByCategoryId = { ...state.itemsByCategoryId, [categoryId]: result.response.results };
+                    state.itemsByCategoryId = { ...state.itemsByCategoryId, [categoryId]: result.response.results ?? [] };
                     state.loading = false;
-                    return result.response.results;
+                    return result.response.results ?? [];
                 }
                 return undefined;
             } catch (e) {

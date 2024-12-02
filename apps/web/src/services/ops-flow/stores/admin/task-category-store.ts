@@ -62,10 +62,10 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
                 if (result.status === 'succeed') {
                     state.loading = false;
                     if (params) {
-                        return result.response.results;
+                        return result.response.results ?? [];
                     }
-                    state.items = result.response.results;
-                    return result.response.results;
+                    state.items = result.response.results ?? [];
+                    return result.response.results ?? [];
                 }
                 return undefined;
             } catch (e) {

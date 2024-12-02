@@ -129,7 +129,7 @@ const fields: DataTableField[] = [
             </div>
         </div>
         <p-data-table :fields="fields"
-                      :items="[]"
+                      :items="tasks"
         />
     </p-pane-layout>
 </template>

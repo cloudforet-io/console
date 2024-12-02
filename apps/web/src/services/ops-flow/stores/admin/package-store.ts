@@ -47,7 +47,7 @@ export const usePackageStore = defineStore('package', () => {
             try {
                 const result = await fetchList({});
                 if (result.status === 'succeed') {
-                    state.items = result.response.results;
+                    state.items = result.response.results ?? [];
                 }
             } catch (e) {
                 ErrorHandler.handleError(e);
