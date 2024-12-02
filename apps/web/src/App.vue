@@ -95,7 +95,7 @@ watch(() => route.path, () => {
 watch(() => state.userId, (userId) => {
     if (userId) {
         store.dispatch('display/initSettings');
-        console.log('test');
+        console.log('test2');
     }
 }, { immediate: true });
 </script>
