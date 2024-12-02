@@ -5,7 +5,6 @@
         <div class="field-title-box">
             <p-field-title v-if="label || $scopedSlots.label"
                            class="form-label"
-                           :class="{'no-spacing': noSpacing}"
                            :size="styleType === 'primary' ? 'md' : 'sm'"
                            :color="styleType === 'primary' ? 'dark' : 'gray'"
                            @click="$emit('click-field-title')"
@@ -15,14 +14,12 @@
                 </slot>
                 <span v-if="!required"
                       class="optional-mark"
-                      :class="{'no-spacing': noSpacing}"
                 >({{ $t('COMPONENT.FIELD_GROUP.OPTIONAL') }})</span>
                 <slot name="label-extra" />
             </p-field-title>
         </div>
         <small v-if="$scopedSlots.help || helpText"
                class="help-msg"
-               :class="{'no-spacing': noSpacing}"
         >
             <slot name="help">{{ helpText }}</slot>
         </small>
@@ -31,7 +28,6 @@
         />
         <div v-show="invalid"
              class="invalid-feedback"
-             :class="{'no-spacing': noSpacing}"
         >
             <slot name="invalid">
                 {{ invalidText }}
@@ -39,7 +35,6 @@
         </div>
         <div v-if="validText"
              class="valid-feedback"
-             :class="{'no-spacing': noSpacing}"
              :style="{display: valid&&!invalid? 'block':'none'}"
         >
             <slot name="valid">
@@ -115,14 +110,14 @@ export default defineComponent<Props>({
 
 <style lang="postcss">
 .p-field-group {
-    &.primary:not(.no-spacing) {
+    &.primary {
         margin-bottom: 1rem;
     }
-    &.secondary:not(.no-spacing) {
+    &.secondary {
         margin-bottom: 0.5rem;
     }
 
-    .form-label:not(.no-spacing) {
+    .form-label {
         padding-bottom: 0.25rem;
     }
     .label-box {
@@ -135,37 +130,51 @@ export default defineComponent<Props>({
         line-height: 1.4;
         margin-left: 0.25rem;
         font-weight: normal;
-        &:not(.no-spacing) {
-            margin-bottom: 0.25rem;
-        }
+        margin-bottom: 0.25rem;
     }
     .help-msg {
-        @apply block;
-        &:not(.no-spacing) {
-            @apply mb-2;
-        }
+        @apply block mb-2;
     }
     .invalid-feedback {
         @apply text-alert;
         font-size: 0.75rem;
         line-height: 0.875rem;
-        &:not(.no-spacing) {
-            margin-top: 0.25rem;
-        }
+        margin-top: 0.25rem;
     }
     .valid-feedback {
         @apply text-safe;
         font-size: 0.75rem;
         line-height: 0.875rem;
-        &:not(.no-spacing) {
-            margin-top: 0.25rem;
-        }
+        margin-top: 0.25rem;
     }
     small {
         font-size: 0.75rem;
     }
     .is-invalid {
         @apply border border-alert;
+    }
+    &.no-spacing {
+        &.primary {
+            margin-bottom: 0;
+        }
+        &.secondary {
+            margin-bottom: 0;
+        }
+        .form-label {
+            padding-bottom: 0;
+        }
+        .optional-mark {
+            margin-bottom: 0;
+        }
+        .help-msg {
+            margin-bottom: 0;
+        }
+        .invalid-feedback {
+            margin-top: 0;
+        }
+        .valid-feedback {
+            margin-top: 0;
+        }
     }
 }
 
