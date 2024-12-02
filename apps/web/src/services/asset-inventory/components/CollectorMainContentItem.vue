@@ -244,7 +244,7 @@ watch(() => props.item.schedule, (schedule) => {
                 margin-top: 1.125rem;
 
                 @screen tablet {
-                    @apply flex-col;
+                    flex-direction: column;
                     gap: 1rem;
                 }
                 .collector-info-view {
@@ -258,7 +258,7 @@ watch(() => props.item.schedule, (schedule) => {
                     }
 
                     @screen mobile {
-                        @apply relative;
+                        position: relative;
                         display: initial;
                     }
                 }

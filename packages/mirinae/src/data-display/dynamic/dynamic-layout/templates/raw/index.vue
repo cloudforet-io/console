@@ -6,7 +6,7 @@
         >
             {{ layoutName }}
         </p-heading>
-        <p-text-editor class="m-4"
+        <p-code-editor class="m-4"
                        :code="rootData"
                        :loading="loading"
                        folded
@@ -21,16 +21,17 @@ import {
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
-import PTextEditor from '@/controls/text-editor/PTextEditor.vue';
+import PCodeEditor from '@/controls/code-editor/PCodeEditor.vue';
 import type { RawDynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/templates/raw/type';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import PHeading from '@/data-display/heading/PHeading.vue';
+
 
 export default {
     name: 'PDynamicLayoutRaw',
     components: {
         PHeading,
-        PTextEditor,
+        PCodeEditor,
     },
     props: {
         name: {

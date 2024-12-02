@@ -5,9 +5,9 @@ import type { ComponentProps } from 'vue-component-type-helpers';
 
 import PButton from '@/controls/buttons/button/PButton.vue';
 import PToggleButton from '@/controls/buttons/toggle-button/PToggleButton.vue';
+import PCodeEditor from '@/controls/code-editor/PCodeEditor.vue';
 import { menuItems, longMenuItems, getContextMenuItems } from '@/controls/context-menu/mock';
 import { getContextMenuArgTypes, getContextMenuArgs, getContextMenuParameters } from '@/controls/context-menu/story-helper';
-import PTextEditor from '@/controls/text-editor/PTextEditor.vue';
 import PEmpty from '@/data-display/empty/PEmpty.vue';
 import PI from '@/foundation/icons/PI.vue';
 import { getTextHighlightRegex } from '@/utils/helpers';
@@ -188,7 +188,7 @@ export const HeaderSlot: Story = {
 export const NoDataSlot: Story = {
     render: () => ({
         props: Object.keys(getContextMenuArgTypes()),
-        components: { PContextMenu, PEmpty, PTextEditor },
+        components: { PContextMenu, PEmpty, PCodeEditor },
         template: `
             <div class="flex h-full flex-col">
                 <div class="mt-4">
@@ -209,7 +209,7 @@ export const NoDataSlot: Story = {
 export const MenuSlot: Story = {
     render: () => ({
         props: Object.keys(getContextMenuArgTypes()),
-        components: { PContextMenu, PTextEditor },
+        components: { PContextMenu, PCodeEditor },
         template: `
             <div class="flex h-full flex-col">
                 <div class="mt-4">
@@ -233,7 +233,7 @@ export const MenuSlot: Story = {
                             <pre ref="slotPropsRef">{{slotProps}}</pre>
                         </template>
                     </p-context-menu>
-                    <p-text-editor v-if="slotPropsText" read-only :code="slotPropsText" folded style="font-size: 12px;" />
+                    <p-code-editor v-if="slotPropsText" read-only :code="slotPropsText" folded style="font-size: 12px;" />
                 </div>
             </div>
         <!--<div>-->
@@ -257,7 +257,7 @@ export const MenuSlot: Story = {
 export const ItemSlots: Story = {
     render: () => ({
         props: Object.keys(getContextMenuArgTypes()),
-        components: { PContextMenu, PI, PTextEditor },
+        components: { PContextMenu, PI, PCodeEditor },
         template: `
             <div class="flex h-full flex-col">
                 <div class="mt-4">
@@ -278,7 +278,7 @@ export const ItemSlots: Story = {
                             <pre ref="slotPropsRef">{{slotProps}}</pre>
                         </template>
                     </p-context-menu>
-                    <p-text-editor v-if="slotPropsText" read-only :code="slotPropsText" folded style="font-size: 12px;" />
+                    <p-code-editor v-if="slotPropsText" read-only :code="slotPropsText" folded style="font-size: 12px;" />
                 </div>
             </div>
         <!--<div>-->
@@ -302,7 +302,7 @@ export const ItemSlots: Story = {
 export const HeaderSlots: Story = {
     render: () => ({
         props: Object.keys(getContextMenuArgTypes()),
-        components: { PContextMenu, PI, PTextEditor },
+        components: { PContextMenu, PI, PCodeEditor },
         template: `
             <div class="flex h-full flex-col">
                 <div class="mt-4">
@@ -323,7 +323,7 @@ export const HeaderSlots: Story = {
                             <pre ref="slotPropsRef">{{slotProps}}</pre>
                         </template>
                     </p-context-menu>
-                    <p-text-editor v-if="slotPropsText" read-only :code="slotPropsText" folded style="font-size: 12px;" />
+                    <p-code-editor v-if="slotPropsText" read-only :code="slotPropsText" folded style="font-size: 12px;" />
                 </div>
             </div>
             <!--<div>-->
@@ -367,7 +367,7 @@ export const BottomSlot: Story = {
 export const SearchSlots: Story = {
     render: () => ({
         props: Object.keys(getContextMenuArgTypes()),
-        components: { PContextMenu, PEmpty, PTextEditor },
+        components: { PContextMenu, PEmpty, PCodeEditor },
         template: `
             <div class="flex h-full flex-col">
                 <div class="mt-4">
@@ -420,7 +420,7 @@ export const ItemsHeightFixed: Story = {
 export const HighlightTermAndItemTextListSlot: Story = {
     render: () => ({
         props: Object.keys(getContextMenuArgTypes()),
-        components: { PContextMenu, PTextEditor },
+        components: { PContextMenu, PCodeEditor },
         template: `
             <div>
                 <p class="text-lg my-4">highlight term: 'o'</p>
@@ -432,7 +432,7 @@ export const HighlightTermAndItemTextListSlot: Story = {
                     </template>
                 </p-context-menu>
                 <p class="text-lg my-4">The last item's <strong>Slot Props</strong> for <strong>item-text-list</strong> slot with highlight term: 'o'</p>
-                <p-text-editor v-if="slotPropsText" read-only :code="slotPropsText" folded style="font-size: 12px;" />
+                <p-code-editor v-if="slotPropsText" read-only :code="slotPropsText" folded style="font-size: 12px;" />
                 <p-context-menu v-show="false" :menu="menu" highlight-term="o">
                     <template #item-text-list="slotProps">
                         <pre ref="slotPropsRef">{{slotProps}}</pre>

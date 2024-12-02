@@ -102,7 +102,7 @@ const state = reactive({
     letter-spacing: 0.02rem;
     padding: 0 0.5rem;
 
-    @apply text-white bg-gray;
+    @apply text-white bg-gray-500;
     &.badge-round {
         @apply rounded-full;
     }

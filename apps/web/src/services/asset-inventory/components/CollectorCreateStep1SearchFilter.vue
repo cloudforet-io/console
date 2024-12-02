@@ -60,6 +60,7 @@
                 <p-select-dropdown :selected="state.selectedProvider"
                                    :menu="state.providerList"
                                    class="select-dropdown"
+                                   is-fixed-width
                                    @update:selected="handleChangeProvider"
                 >
                     <template #dropdown-button="item">
@@ -91,6 +92,7 @@
             <div class="repository">
                 <p-select-dropdown :selected.sync="state.selectedRepository"
                                    :menu="state.repositoryList"
+                                   is-fixed-width
                                    class="select-dropdown"
                 >
                     <template #dropdown-button="item">
@@ -241,12 +243,13 @@ watch(() => state.selectedRepository, (repository) => {
 }
 
 @screen tablet {
-    @apply flex-col;
+    flex-direction: column;
 
     .left-area {
         width: 100%;
         .dropdown-container {
-            @apply flex gap-4;
+            display: flex;
+            gap: 1rem;
         }
     }
 }
@@ -254,7 +257,9 @@ watch(() => state.selectedRepository, (repository) => {
 @screen mobile {
     .left-area {
         .dropdown-container {
-            @apply grid grid-cols-2 gap-4;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
             width: 100%;
         }
     }

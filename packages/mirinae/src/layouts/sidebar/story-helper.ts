@@ -132,6 +132,21 @@ export const getSidebarArgTypes = (): ArgTypes => ({
         },
         control: null,
     },
+    backdrop: {
+        name: 'backdrop',
+        type: { name: 'boolean' },
+        description: 'Show backdrop or not',
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: true,
+            },
+        },
+        control: 'boolean',
+    },
     // slot
     titleSlot: {
         name: 'title',

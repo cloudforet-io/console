@@ -105,9 +105,7 @@ export default defineComponent<Props>({
     align-items: center;
     flex-wrap: nowrap;
 
-    @screen lg {
-        @apply min-w-16;
-    }
+    @apply lg:min-w-16;
 }
 .page-number {
     @apply min-h-8 min-w-12 items-center justify-center inline-flex cursor-default;
@@ -119,9 +117,7 @@ export default defineComponent<Props>({
         }
     }
 
-    @screen lg {
-        @apply min-w-16;
-    }
+    @apply lg:min-w-16;
 }
 
 </style>

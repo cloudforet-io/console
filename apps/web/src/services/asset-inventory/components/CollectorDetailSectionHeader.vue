@@ -3,7 +3,7 @@ import { useWindowSize } from '@vueuse/core';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PButton, PHeading, PIconButton, screens,
+    PButton, PHeading, PIconButton, screens, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
 const props = defineProps<{
@@ -24,12 +24,14 @@ const handleClickEdit = () => {
 </script>
 
 <template>
-    <p-heading class="pt-8 px-4 pb-4"
-               :title="props.title"
-               heading-type="sub"
-               :use-total-count="props.totalCount !== undefined"
-               :total-count="props.totalCount"
-    >
+    <p-heading-layout class="pt-8 px-4 pb-4">
+        <template #heading>
+            <p-heading :title="props.title"
+                       heading-type="sub"
+                       :use-total-count="props.totalCount !== undefined"
+                       :total-count="props.totalCount"
+            />
+        </template>
         <template v-if="!props.editMode && !props.hideEditButton"
                   #extra
         >
@@ -49,5 +51,5 @@ const handleClickEdit = () => {
                            @click="handleClickEdit"
             />
         </template>
-    </p-heading>
+    </p-heading-layout>
 </template>

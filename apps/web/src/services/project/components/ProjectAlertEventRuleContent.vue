@@ -211,10 +211,10 @@ table {
 
 @screen tablet {
     .left-section {
-        @apply col-span-12;
+        grid-column: span 12 / span 12;
     }
     .right-section {
-        @apply col-span-12;
+        grid-column: span 12 / span 12;
         margin-top: 1rem;
     }
 }

@@ -5,7 +5,7 @@ import {
 
 import dayjs from 'dayjs';
 import {
-    cloneDeep, find, sortBy,
+    cloneDeep, find, lowerCase, sortBy,
 } from 'lodash';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
@@ -24,6 +24,7 @@ import {
     PCollapsibleToggle,
 } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 import { numberFormatter } from '@cloudforet/utils';
 
 
@@ -155,6 +156,7 @@ const state = reactive({
     analyzeFetcher: computed(() => (costAnalysisPageGetters.isUnifiedCost
         ? unifiedCostAnalyze
         : fetchCostAnalyze)),
+    visibleGroupByItems: computed<MenuItem[]>(() => costAnalysisPageGetters.visibleGroupByItems),
 });
 const tableState = reactive({
     loading: true,
@@ -702,10 +704,16 @@ watch(
                 #tf-col-format="{field, colIndex, values}"
             >
                 <span v-if="colIndex === 0">Total</span>
-                <span v-else-if="tableState.showFormattedData && !Object.values(GROUP_BY).includes(field.name)">
+                <span v-else-if="tableState.showFormattedData
+                    && (!state.visibleGroupByItems.map(item => lowerCase(item.name)).includes(lowerCase(field.name))
+                        && !state.visibleGroupByItems.map(item => lowerCase(item.label)).includes(lowerCase(field.name)))"
+                >
                     {{ Array.isArray(values) && values.length > 0 ? numberFormatter(reduce(values), {notation: 'compact'}) : 0 }}
                 </span>
-                <span v-else-if="!tableState.showFormattedData && !Object.values(GROUP_BY).includes(field.name)">
+                <span v-else-if="!tableState.showFormattedData
+                    && (!state.visibleGroupByItems.map(item => lowerCase(item.name)).includes(lowerCase(field.name))
+                        && !state.visibleGroupByItems.map(item => lowerCase(item.label)).includes(lowerCase(field.name)))"
+                >
                     {{ Array.isArray(values) && values.length > 0 ? numberFormatter(reduce(values), {minimumFractionDigits: 2}) : 0 }}
                 </span>
                 <span v-else />

@@ -122,7 +122,7 @@ const state = reactive({
         @apply w-full;
     }
     .search-result-text {
-        @apply overflow-hidden whitespace-no-wrap;
+        @apply overflow-hidden whitespace-nowrap;
         text-overflow: ellipsis;
     }
     .search-empty {

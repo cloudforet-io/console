@@ -158,17 +158,18 @@ watch([() => state.selectedAlertState, () => state.selectedUrgency, () => state.
     }
 
     @screen mobile {
-        @apply overflow-x-auto w-full flex-wrap;
-
+        width: 100%;
+        flex-wrap: wrap;
+        overflow-x: auto;
         .filter {
-            @apply w-full;
+            width: 100%;
             margin: 0.5rem 0;
 
             &.filter-assigned {
                 /* custom design-system component - p-checkbox */
                 :deep(.p-checkbox) {
                     .text {
-                        @apply inline-block;
+                        display: inline-block;
                         margin-left: 0.375rem;
                     }
                 }
@@ -176,11 +177,11 @@ watch([() => state.selectedAlertState, () => state.selectedUrgency, () => state.
         }
 
         .only-desktop {
-            @apply hidden;
+            display: none;
         }
 
         .only-mobile {
-            @apply inline-block;
+            display: inline-block;
         }
     }
 }

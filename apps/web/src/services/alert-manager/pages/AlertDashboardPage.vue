@@ -99,10 +99,10 @@ const listProjectAlertConfig = async () => {
     @screen tablet {
         .widget-wrapper {
             .current-project-status-widget {
-                @apply col-span-6;
+                grid-column: span 6 / span 6;
             }
             .top5-project-activity-widget {
-                @apply col-span-6;
+                grid-column: span 6 / span 6;
             }
         }
     }
@@ -110,10 +110,10 @@ const listProjectAlertConfig = async () => {
     @screen mobile {
         .widget-wrapper {
             .current-project-status-widget {
-                @apply col-span-12;
+                grid-column: span 12 / span 12;
             }
             .top5-project-activity-widget {
-                @apply col-span-12;
+                grid-column: span 12 / span 12;
             }
         }
     }

@@ -50,7 +50,8 @@ const state = reactive({
         overflow-y: auto;
 
         .contents-wrapper {
-            @apply flex-col static;
+            flex-direction: column;
+            position: static;
         }
     }
 }

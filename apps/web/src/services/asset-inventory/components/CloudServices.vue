@@ -276,18 +276,9 @@ export default {
 <style lang="postcss" scoped>
 .card-wrapper {
     @apply grid gap-2 grid-cols-1;
-
-    @screen sm {
-        @apply grid-cols-2;
-    }
-
-    @screen md {
-        @apply grid-cols-4;
-    }
-
-    @screen lg {
-        @apply grid-cols-1;
-    }
+    @apply sm:grid-cols-2;
+    @apply md:grid-cols-4;
+    @apply lg:grid-cols-1;
 
     .card {
         display: flex;
@@ -345,7 +336,7 @@ export default {
         font-size: 0.875rem;
     }
     .name {
-        @apply text-xs text-gray truncate leading-tight;
+        @apply text-xs text-gray-default truncate leading-tight;
         text-decoration: none;
     }
     .count {

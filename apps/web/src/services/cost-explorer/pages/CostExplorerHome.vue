@@ -190,12 +190,13 @@ const SERVICE_CONTENTS = {
 
 @screen tablet {
     .service-topic {
-        @apply flex-col;
+        flex-direction: column;
         .service-contents {
             width: 100%;
             text-align: center;
             h2 {
-                @apply text-display-lg;
+                font-size: 2rem/* 32px */;
+                line-height: 1.25;
             }
         }
         .image-wrapper {
@@ -206,7 +207,7 @@ const SERVICE_CONTENTS = {
         }
     }
     .sub-menu-list {
-        @apply flex-col;
+        flex-direction: column;
     }
 }
 

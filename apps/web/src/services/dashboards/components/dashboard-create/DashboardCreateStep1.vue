@@ -232,9 +232,7 @@ onMounted(() => {
         @apply flex gap-4;
         margin-top: 1.5rem;
 
-        @screen tablet {
-            @apply flex-col;
-        }
+        @apply tablet:flex-col;
 
         .template-contents-area {
             flex-grow: 1;
@@ -259,7 +257,7 @@ onMounted(() => {
                 display: flex;
                 gap: 1rem;
                 margin-top: 2rem;
-                justify-content: end;
+                justify-content: flex-end;
             }
         }
     }

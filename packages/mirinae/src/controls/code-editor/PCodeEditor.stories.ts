@@ -4,40 +4,41 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
 import PButton from '@/controls/buttons/button/PButton.vue';
-import { getJsonObject } from '@/controls/text-editor/mock';
+import { getJsonObject } from '@/controls/code-editor/mock';
 import {
-    getTextEditorArgs, getTextEditorParameters, getTextEditorArgTypes, sampleCode,
-} from '@/controls/text-editor/story-helper';
+    getCodeEditorArgs, getCodeEditorParameters, getCodeEditorArgTypes, sampleCode,
+} from '@/controls/code-editor/story-helper';
 
-import PTextEditor from './PTextEditor.vue';
+import PCodeEditor from './PCodeEditor.vue';
 
-type PTextEditorPropsAndCustomArgs = ComponentProps<typeof PTextEditor>;
 
-const meta : Meta<PTextEditorPropsAndCustomArgs> = {
-    title: 'Controls/Text Editor',
-    component: PTextEditor,
+type PCodeEditorPropsAndCustomArgs = ComponentProps<typeof PCodeEditor>;
+
+const meta : Meta<PCodeEditorPropsAndCustomArgs> = {
+    title: 'Controls/Code Editor',
+    component: PCodeEditor,
     argTypes: {
-        ...getTextEditorArgTypes(),
+        ...getCodeEditorArgTypes(),
     },
     parameters: {
-        ...getTextEditorParameters(),
+        ...getCodeEditorParameters(),
     },
     args: {
-        ...getTextEditorArgs(),
+        ...getCodeEditorArgs(),
     },
 };
 
 export default meta;
-type Story = StoryObj<typeof PTextEditor>;
+type Story = StoryObj<typeof PCodeEditor>;
 
 
 const Template: Story = {
     render: (args, { argTypes }) => ({
         props: Object.keys(argTypes),
-        components: { PTextEditor },
+        components: { PCodeEditor },
         template: `
             <div class="h-full w-full overflow p-8">
-                <p-text-editor :code="code"
+                <p-code-editor :code="code"
                     :folded="folded"
                     :read-only="readOnly" :loading="loading"
                     :highlight-lines="highlightLines"
@@ -50,10 +51,10 @@ const Template: Story = {
 
 export const Basic: Story = {
     render: () => ({
-        components: { PTextEditor },
+        components: { PCodeEditor },
         template: `
             <div class="h-full w-full overflow p-8">
-                <p-text-editor :code="sampleCode" folded />
+                <p-code-editor :code="sampleCode" folded />
             </div>
         `,
         setup() {
@@ -69,10 +70,10 @@ export const Basic: Story = {
 
 export const Loading: Story = {
     render: () => ({
-        components: { PTextEditor, PButton },
+        components: { PCodeEditor, PButton },
         template: `
             <div class="h-full w-full overflow p-8">
-                <p-text-editor :loading="loading" :code="sampleCode" folded />
+                <p-code-editor :loading="loading" :code="sampleCode" folded />
                 <p-button class="mt-4" @click="changeCode">Load Code!</p-button>
             </div>
         `,
@@ -100,10 +101,10 @@ export const Loading: Story = {
 
 export const HighlightLines: Story = {
     render: () => ({
-        components: { PTextEditor },
+        components: { PCodeEditor },
         template: `
             <div class="h-full w-full overflow p-8">
-                <p-text-editor :code="sampleCode" folded :highlight-lines="[2,3,4]" />
+                <p-code-editor :code="sampleCode" folded :highlight-lines="[2,3,4]" />
             </div>
         `,
         setup() {
@@ -119,10 +120,10 @@ export const HighlightLines: Story = {
 
 export const ChangeCode: Story = {
     render: () => ({
-        components: { PTextEditor },
+        components: { PCodeEditor },
         template: `
             <div class="h-full w-full overflow p-8">
-                <p-text-editor :code="sampleCode" folded />
+                <p-code-editor :code="sampleCode" folded />
                 <button @click="handleChangeCode">Change Code!</button>
             </div>
         `,
@@ -143,10 +144,10 @@ export const ChangeCode: Story = {
 
 export const AutoReformatonCodeChangeStringOnly: Story = {
     render: () => ({
-        components: { PTextEditor, PButton },
+        components: { PCodeEditor, PButton },
         template: `
             <div class="h-full w-full overflow p-8">
-                <p-text-editor :code="sampleCode" folded :disable-auto-reformat="disableAutoReformat" class="mb-4" />
+                <p-code-editor :code="sampleCode" folded :disable-auto-reformat="disableAutoReformat" class="mb-4" />
                 <p-button @click="handleChangeCode(false)">Change Code & Reformat (default)</p-button>
                 <p-button style-type="highlight" @click="handleChangeCode(true)">Change Code & Do not Reformat Automatically</p-button>
             <p class="text-red-600 font-bold mt-4">This feature works only when the code prop's type is string</p>

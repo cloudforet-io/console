@@ -95,10 +95,12 @@ const dateFormatter = (date: string) => dayjs(date).format('MMMM YYYY');
 
 @screen mobile {
     .monthly-wrapper > p:nth-child(6n+1), .monthly-wrapper > p:nth-child(6n+2), .monthly-wrapper > p:nth-child(6n+3) {
-        @apply bg-white;
+        --tw-bg-opacity: 1;
+        background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
     }
     .monthly-wrapper > p:nth-child(4n+1), .monthly-wrapper > p:nth-child(4n+2) {
-        @apply bg-gray-100;
+        --tw-bg-opacity: 1;
+        background-color: rgb(247 247 247 / var(--tw-bg-opacity, 1));
     }
 }
 </style>

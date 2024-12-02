@@ -158,9 +158,9 @@ const getIconName = (icon: LSBIcon): string => {
         @apply bg-blue-100 cursor-pointer;
     }
     .text-wrapper {
-        @apply inline-flex items-center overflow-hidden whitespace-no-wrap;
+        @apply inline-flex items-center overflow-hidden whitespace-nowrap;
         .text {
-            @apply overflow-hidden whitespace-no-wrap;
+            @apply overflow-hidden whitespace-nowrap;
             text-overflow: ellipsis;
         }
         .icon {

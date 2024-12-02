@@ -24,6 +24,7 @@
         <div class="dropdown-container">
             <p-select-dropdown :selected="state.selectedProvider"
                                :menu="state.providerList"
+                               is-fixed-width
                                class="select-dropdown"
                                @update:selected="handleChangeProvider"
             >

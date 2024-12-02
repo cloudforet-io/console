@@ -249,16 +249,18 @@ watch(() => state.currentDate, async () => {
     @screen tablet {
         .content-wrapper {
             .summary-wrapper {
-                @apply col-span-12 row-start-2;
+                grid-column: span 12 / span 12;
+                grid-row-start: 2;
 
                 /* custom design-system component - p-card */
                 :deep(.p-card) {
-                    @apply col-span-6;
+                    grid-column: span 6 / span 6;
                 }
             }
 
             .chart-wrapper {
-                @apply col-span-12 row-start-1;
+                grid-column: span 12 / span 12;
+                grid-row-start: 1;
                 height: 12rem;
                 padding-bottom: 1rem;
             }
@@ -270,7 +272,7 @@ watch(() => state.currentDate, async () => {
             .summary-wrapper {
                 /* custom design-system component - p-card */
                 :deep(.p-card) {
-                    @apply col-span-12;
+                    grid-column: span 12 / span 12;
                 }
             }
         }
