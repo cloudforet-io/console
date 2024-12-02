@@ -1,8 +1,10 @@
-import type { WidgetFieldTypeMap, WidgetFieldValue, WidgetFieldValueMap } from '@/common/modules/widgets/_widget-field-value-manager/type';
+import type { FieldValueValidator, WidgetFieldTypeMap, WidgetFieldValueMap } from '@/common/modules/widgets/_widget-field-value-manager/type';
+import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 
-type FieldValueValidator<T extends WidgetFieldValue> = (fieldValue: T) => boolean;
 
 export default class WidgetFieldValueManager {
+    private widgetConfig: WidgetConfig;
+
     private originData: WidgetFieldValueMap;
 
     private modifiedData: WidgetFieldValueMap;
@@ -12,15 +14,17 @@ export default class WidgetFieldValueManager {
     private validationErrors: Record<string, string> = {};
 
     constructor(
+        widgetConfig: WidgetConfig,
         originData: WidgetFieldValueMap,
         fieldValidators: Record<keyof WidgetFieldTypeMap, FieldValueValidator<any>>,
     ) {
+        this.widgetConfig = widgetConfig;
         this.originData = originData;
         this.modifiedData = { ...originData };
         this.fieldValidators = fieldValidators;
     }
 
-    setFieldValue<Key extends keyof WidgetFieldTypeMap>(key: Key, value: WidgetFieldTypeMap[Key]): boolean {
+    setFieldValue<Key extends keyof WidgetFieldTypeMap>(key: Key, value: WidgetFieldTypeMap[Key]['value']): boolean {
         const field = this.modifiedData[key] || this.originData[key];
         if (!field) {
             throw new Error(`Field "${key}" does not exist.`);
@@ -30,7 +34,7 @@ export default class WidgetFieldValueManager {
 
         const validator = this.fieldValidators[key];
         if (validator) {
-            const isValid = validator(this.modifiedData[key]);
+            const isValid = validator(this.modifiedData[key], this.widgetConfig);
             if (!isValid) {
                 this.validationErrors[key as string] = `Invalid value for field "${key}"`;
                 return false;
@@ -47,7 +51,7 @@ export default class WidgetFieldValueManager {
 
         Object.entries(this.modifiedData).forEach(([key, field]) => {
             const validator = this.fieldValidators[key];
-            if (validator && !validator(field)) {
+            if (validator && !validator(field, this.widgetConfig)) {
                 this.validationErrors[key] = `Invalid value for field "${key}"`;
                 isValid = false;
             }
@@ -60,8 +64,10 @@ export default class WidgetFieldValueManager {
         return this.validationErrors;
     }
 
-    getData(): WidgetFieldValueMap {
-        return this.modifiedData;
+    get computedData(): WidgetFieldValueMap {
+        return new Proxy(this.modifiedData, {
+            get: (target, key) => target[key as keyof WidgetFieldValueMap],
+        });
     }
 
     resetToOrigin(): void {

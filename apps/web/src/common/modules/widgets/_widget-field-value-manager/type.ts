@@ -5,6 +5,7 @@ import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/co
 import type { CustomTableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
 import type { DataFieldHeatmapColorValue } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
 import type { DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
+import type { DateAggregationOptionsValue } from '@/common/modules/widgets/_widget-fields/date-aggregation-options/type';
 import type { DateFormatValue } from '@/common/modules/widgets/_widget-fields/date-format/type';
 import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { DisplayAnnotationValue } from '@/common/modules/widgets/_widget-fields/display-annotation/type';
@@ -32,49 +33,53 @@ import type { TotalValue } from '@/common/modules/widgets/_widget-fields/total/t
 import type { WidgetHeightValue } from '@/common/modules/widgets/_widget-fields/widget-height/type';
 import type { XAxisValue } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { YAxisValue } from '@/common/modules/widgets/_widget-fields/y-axis/type';
+import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
+
+export type FieldValueValidator<T extends WidgetFieldValue> = (fieldValue: T, widgetConfig: WidgetConfig) => boolean;
 
 export interface WidgetFieldValueMap {
-    [key: string]: WidgetFieldValue;
+    [fieldKey: string]: WidgetFieldValue;
 }
 
-export interface WidgetFieldValue {
-    value: any;
+export interface WidgetFieldValue<T = any> {
+    value: T;
     meta?: Record<string, any>;
 }
 
 export interface WidgetFieldTypeMap {
-    xAxis: XAxisValue;
-    yAxis: YAxisValue;
-    widgetHeight: WidgetHeightValue;
-    total: TotalValue;
-    tooltipNumberFormat: TooltipNumberFormatValue;
-    textWrap: TextWrapValue;
-    tableDataField: TableDataFieldValue;
-    tableColumnWidth: TableColumnWidthValue;
-    subTotal: SubTotalValue;
-    stackBy: StackByValue;
-    progressVar: ProgressBarValue;
-    pieChartType: PieChartTypeValue;
-    numberFormat: NumberFormatValue;
-    missingValue: MissingValueValue;
-    min: MinValue;
-    max: MaxValue;
-    lineBy: LineByValue;
-    legend: LegendValue;
-    icon: IconValue;
-    header: WidgetHeaderValue;
-    groupBy: GroupByValue;
-    granularity: GranularityValue;
-    formatRules: FormatRulesValue;
-    displaySeriesLabel: DisplaySeriesLabelValue;
-    displayAnnotation: DisplayAnnotationValue;
-    dateRange: DateRangeValue;
-    dateFormat: DateFormatValue;
-    dataFieldHeatmapColor: DataFieldHeatmapColorValue;
-    dataField: DataFieldValue;
-    customTableColumnWidth: CustomTableColumnWidthValue;
-    comparison: ComparisonValue;
-    colorSchema: ColorSchemaValue;
-    categoryBy: CategoryByValue;
-    advancedFormatRules: AdvancedFormatRulesValue;
+    xAxis: WidgetFieldValue<XAxisValue>;
+    yAxis: WidgetFieldValue<YAxisValue>;
+    widgetHeight: WidgetFieldValue<WidgetHeightValue>;
+    total: WidgetFieldValue<TotalValue>;
+    tooltipNumberFormat: WidgetFieldValue<TooltipNumberFormatValue>;
+    textWrap: WidgetFieldValue<TextWrapValue>;
+    tableDataField: WidgetFieldValue<TableDataFieldValue>;
+    tableColumnWidth: WidgetFieldValue<TableColumnWidthValue>;
+    subTotal: WidgetFieldValue<SubTotalValue>;
+    stackBy: WidgetFieldValue<StackByValue>;
+    progressBar: WidgetFieldValue<ProgressBarValue>;
+    pieChartType: WidgetFieldValue<PieChartTypeValue>;
+    numberFormat: WidgetFieldValue<NumberFormatValue>;
+    missingValue: WidgetFieldValue<MissingValueValue>;
+    min: WidgetFieldValue<MinValue>;
+    max: WidgetFieldValue<MaxValue>;
+    lineBy: WidgetFieldValue<LineByValue>;
+    legend: WidgetFieldValue<LegendValue>;
+    icon: WidgetFieldValue<IconValue>;
+    header: WidgetFieldValue<WidgetHeaderValue>;
+    groupBy: WidgetFieldValue<GroupByValue>;
+    granularity: WidgetFieldValue<GranularityValue>;
+    formatRules: WidgetFieldValue<FormatRulesValue>;
+    displaySeriesLabel: WidgetFieldValue<DisplaySeriesLabelValue>;
+    displayAnnotation: WidgetFieldValue<DisplayAnnotationValue>;
+    dateRange: WidgetFieldValue<DateRangeValue>;
+    dateFormat: WidgetFieldValue<DateFormatValue>;
+    dataFieldHeatmapColor: WidgetFieldValue<DataFieldHeatmapColorValue>;
+    dataField: WidgetFieldValue<DataFieldValue>;
+    dateAggregationOptions: WidgetFieldValue<DateAggregationOptionsValue>;
+    customTableColumnWidth: WidgetFieldValue<CustomTableColumnWidthValue>;
+    comparison: WidgetFieldValue<ComparisonValue>;
+    colorSchema: WidgetFieldValue<ColorSchemaValue>;
+    categoryBy: WidgetFieldValue<CategoryByValue>;
+    advancedFormatRules: WidgetFieldValue<AdvancedFormatRulesValue>;
 }
