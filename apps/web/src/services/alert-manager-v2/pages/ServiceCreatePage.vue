@@ -8,6 +8,7 @@ import { PCenteredLayoutHeader } from '@cloudforet/mirinae';
 import { i18n } from '@/translations';
 
 import ServiceCreateStep1 from '@/services/alert-manager-v2/components/ServiceCreateStep1.vue';
+import ServiceCreateStep2 from '@/services/alert-manager-v2/components/ServiceCreateStep2.vue';
 import { ALERT_MANAGER_V2_ROUTE } from '@/services/alert-manager-v2/routes/route-constant';
 import { useServiceFormStore } from '@/services/alert-manager-v2/store/service-form-store';
 
@@ -55,7 +56,9 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="service-create-page">
+    <div class="service-create-page"
+         :class="`step${storeState.step}`"
+    >
         <p-centered-layout-header :title="state.headerInfo.title"
                                   :description="state.headerInfo.desc"
                                   show-step
@@ -65,13 +68,19 @@ onUnmounted(() => {
                                   @close="handleClickClose"
         />
         <service-create-step1 v-if="storeState.step === 1" />
+        <service-create-step2 v-if="storeState.step === 2" />
     </div>
 </template>
 
 <style scoped lang="postcss">
 .service-create-page {
-    max-width: 45rem;
-    padding-right: 2.5rem;
-    padding-left: 2.5rem;
+    &.step1 {
+        max-width: 45rem;
+        padding-right: 2.5rem;
+        padding-left: 2.5rem;
+    }
+    &.step2 {
+        max-width: 59.5rem;
+    }
 }
 </style>
