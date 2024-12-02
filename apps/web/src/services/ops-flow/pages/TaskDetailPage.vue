@@ -68,7 +68,7 @@ const {
 } = useGoBack(getProperRouteLocation({
     name: OPS_FLOW_ROUTE.BOARD._NAME,
     query: { categoryId: route.query.categoryId } as BoardPageQuery,
-}), true);
+}));
 
 /* confirm leave modal */
 const {
@@ -156,7 +156,7 @@ defineExpose({ setPathFrom });
                        @update:active-tab="handleUpdateActiveTab"
                 >
                     <template #content>
-                        <div class="w-full">
+                        <div class="w-full pt-6 px-4 pb-10">
                             <task-content-base-form class="mb-4" />
                             <task-fields-form />
                         </div>

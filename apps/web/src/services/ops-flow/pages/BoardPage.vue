@@ -26,7 +26,7 @@ const taskCreatePageLink = computed(() => getProperRouteLocation({
 
 watch(() => route.query.categoryId, (categoryId) => {
     boardPageStore.setCurrentCategoryId(categoryId as string);
-});
+}, { immediate: true });
 
 </script>
 
