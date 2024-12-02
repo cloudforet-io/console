@@ -44,6 +44,7 @@
 			"VIEW_RESOURCE": "",
 			"WARNING": "警告"
 		},
+		"ALT_S_COPIED": "コピーしました",
 		"CANCEL": "キャンセル",
 		"CONTINUE": "次へ",
 		"CREATE": "生成",
@@ -95,6 +96,7 @@
 			"MEMBERS": "構成員",
 			"OPEN_ALERTS": "",
 			"OVERVIEW": "概要",
+			"SELECT": "選択する",
 			"SERVICE_MEMBER": "",
 			"SHOW_IN_ALERTS": "",
 			"SKIP_FOR_LATER": "後で収集",
@@ -116,6 +118,7 @@
 			"LABEL_NAME": "名前",
 			"LABEL_STATE": "状態",
 			"TITLE": "ウェプフク ",
+			"VALIDATION_NAME_MAX": "名前の最大文字数は40文字です。",
 			"VERSION": "バージョン",
 			"WEBHOOK_URL": "ウェプフク URL"
 		}

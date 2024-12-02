@@ -55,7 +55,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="service-create-step2-sub-step1">
+    <div class="service-create-step2-select-webhook-type">
         <p-select-card v-for="(item, index) in state.webhookTypeList"
                        :key="`webhook-${index}`"
                        v-model="state.selectedWebhookType"
@@ -77,7 +77,7 @@ onMounted(async () => {
 </template>
 
 <style scoped lang="postcss">
-.service-create-step2-sub-step1 {
+.service-create-step2-select-webhook-type {
     @apply grid grid-cols-3;
     gap: 0.5rem;
     .card {

@@ -128,10 +128,11 @@ onMounted(async () => {
     .webhook-item {
         @apply flex w-full;
         margin-bottom: 1.5rem;
-        gap: 0.75rem;
+        gap: 1rem;
         .info {
             @apply flex flex-col;
             gap: 0.125rem;
+            flex: 1;
         }
     }
 }

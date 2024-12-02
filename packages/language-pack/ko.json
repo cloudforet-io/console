@@ -44,6 +44,7 @@
 			"VIEW_RESOURCE": "",
 			"WARNING": "경고"
 		},
+		"ALT_S_COPIED": "복사됨",
 		"CANCEL": "취소",
 		"CONTINUE": "계속하기",
 		"CREATE": "생성",
@@ -95,6 +96,7 @@
 			"MEMBERS": "멤버",
 			"OPEN_ALERTS": "",
 			"OVERVIEW": "전체 요약",
+			"SELECT": "선택하기",
 			"SERVICE_MEMBER": "",
 			"SHOW_IN_ALERTS": "",
 			"SKIP_FOR_LATER": "다음에 진행 ",
@@ -116,6 +118,7 @@
 			"LABEL_NAME": "이름",
 			"LABEL_STATE": "상태",
 			"TITLE": "웹훅",
+			"VALIDATION_NAME_MAX": "40글자 미만으로 입력해주세요.",
 			"VERSION": "버전 ",
 			"WEBHOOK_URL": "웹훅 URL"
 		}
