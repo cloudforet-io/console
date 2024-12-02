@@ -23,17 +23,11 @@ export const useServiceFormStore = defineStore('service-form', () => {
     });
 
     const actions = {
-        setName(name: string) {
-            state.name = name;
-        },
-        setKey(key: string) {
-            state.key = key;
-        },
-        setMember(member: ServiceMemberType) {
-            state.member = member;
-        },
-        setDescription(description: string) {
-            state.description = description;
+        setFormStep1(form: ServiceFormState) {
+            state.name = form.name;
+            state.key = form.key;
+            state.member = form.member;
+            state.description = form.description;
         },
     };
 

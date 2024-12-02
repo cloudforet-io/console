@@ -78,14 +78,23 @@ const convertToSnakeCase = (str) => str
     .replace(/_$/g, '')
     .toLowerCase();
 const getUserName = (id: string) => formDataState.workspaceUsersData.find((i) => i.user_id === id)?.name;
-const syncServiceKey = () => {
-    setForm('key', convertToSnakeCase(serviceFormState.name));
-};
 const handleClickPrevButton = () => {
     router.push({ name: ALERT_MANAGER_V2_ROUTE.SERVICE._NAME });
 };
 const handleClickNextButton = () => {
     emit('update:currentStep', 2);
+};
+const handleChangeInput = (label: 'name'|'key'|'member'|'description', value?: string) => {
+    if (label !== 'member') setForm(label, value);
+    // TODO: Add logic to separate user group data
+    serviceFormStore.setFormStep1({
+        name: name.value,
+        key: key.value,
+        member: {
+            USER: formDataState.selectedMemberItems.map((i) => i.name),
+        },
+        description: description.value,
+    });
 };
 
 const listWorkspaceUsers = async () => {
@@ -95,6 +104,7 @@ const listWorkspaceUsers = async () => {
         formDataState.workspaceUsersData = results || [];
     } catch (e) {
         ErrorHandler.handleError(e);
+        formDataState.workspaceUsersData = [];
     } finally {
         formDataState.workspaceUserLoading = false;
     }
@@ -102,23 +112,8 @@ const listWorkspaceUsers = async () => {
 
 watch(() => state.isFocusedKey, (isFocusedKey) => {
     if (isFocusedKey && !serviceFormState.key) {
-        syncServiceKey();
+        handleChangeInput('key', convertToSnakeCase(serviceFormState.name));
     }
-});
-watch(name, (value) => {
-    serviceFormStore.setName(value);
-});
-watch(key, (value) => {
-    serviceFormStore.setKey(value);
-});
-watch(() => formDataState.selectedMemberItems, (value) => {
-    // TODO: Add logic to separate user group data
-    serviceFormStore.setMember({
-        USER: value.map((i) => i.name),
-    });
-});
-watch(description, (value) => {
-    serviceFormStore.setDescription(value);
 });
 
 onMounted(async () => {
@@ -138,7 +133,7 @@ onMounted(async () => {
                     <p-text-input :value="name"
                                   block
                                   :invalid="invalid"
-                                  @update:value="setForm('name', $event)"
+                                  @update:value="handleChangeInput('name', $event)"
                     />
                 </template>
             </p-field-group>
@@ -162,7 +157,7 @@ onMounted(async () => {
                                   block
                                   :is-focused.sync="state.isFocusedKey"
                                   :invalid="invalid"
-                                  @update:value="setForm('key', $event)"
+                                  @update:value="handleChangeInput('key', $event)"
                     />
                 </template>
             </p-field-group>
@@ -177,6 +172,7 @@ onMounted(async () => {
                                    is-filterable
                                    show-delete-all-button
                                    show-select-marker
+                                   @update:selected="handleChangeInput('member', $event)"
                 >
                     <template #menu-item--format="{ item }">
                         <div class="member-menu-item">
@@ -192,7 +188,7 @@ onMounted(async () => {
             <p-field-group :label="$t('ALERT_MANAGER.DESCRIPTION')">
                 <p-text-input :value="description"
                               block
-                              @update:value="setForm('description', $event)"
+                              @update:value="handleChangeInput('description', $event)"
                 />
             </p-field-group>
         </form>
