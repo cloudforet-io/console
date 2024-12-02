@@ -21,6 +21,8 @@ interface ServiceFormStoreState {
     currentSubStep: number;
     selectedWebhookType: PluginModel;
     webhookName: string;
+    // TODO: add type
+    selectedProtocol: any;
 }
 
 export const useServiceFormStore = defineStore('service-form', () => {
@@ -37,6 +39,8 @@ export const useServiceFormStore = defineStore('service-form', () => {
         // webhook
         selectedWebhookType: {} as PluginModel,
         webhookName: '',
+        // notification
+        selectedProtocol: {},
     });
 
     const actions = {
@@ -53,6 +57,7 @@ export const useServiceFormStore = defineStore('service-form', () => {
             };
         },
         initStep2() {
+            state.currentSubStep = 1;
             state.selectedWebhookType = {} as PluginModel;
             state.webhookName = '';
         },
@@ -70,6 +75,10 @@ export const useServiceFormStore = defineStore('service-form', () => {
         },
         setWebhookName(name: string) {
             state.webhookName = name;
+        },
+        // TODO: add type
+        setSelectedProtocol(protocol: any) {
+            state.selectedProtocol = protocol;
         },
     };
 

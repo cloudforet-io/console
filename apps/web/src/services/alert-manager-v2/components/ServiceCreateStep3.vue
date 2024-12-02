@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, onUnmounted, reactive } from 'vue';
 
+import ServiceCreateStep3SelectProtocol
+    from '@/services/alert-manager-v2/components/ServiceCreateStep3SelectProtocol.vue';
 import ServiceCreateStepContainer from '@/services/alert-manager-v2/components/ServiceCreateStepContainer.vue';
 import { useServiceFormStore } from '@/services/alert-manager-v2/store/service-form-store';
 
@@ -29,6 +31,6 @@ onUnmounted(() => {
                                    :selected-item-id="storeState.selectedProtocol"
                                    :is-all-form-valid="state.isAllFormValid"
     >
-        step 3
+        <service-create-step3-select-protocol v-if="storeState.currentSubStep === 1" />
     </service-create-step-container>
 </template>
