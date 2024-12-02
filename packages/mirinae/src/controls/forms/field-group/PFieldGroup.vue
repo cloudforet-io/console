@@ -1,6 +1,6 @@
 <template>
     <div class="p-field-group"
-         :class="[styleType]"
+         :class="{[styleType]: true, 'no-spacing': noSpacing}"
     >
         <div class="field-title-box">
             <p-field-title v-if="label || $scopedSlots.label"
@@ -61,6 +61,7 @@ interface Props {
     valid?: boolean;
     required?: boolean;
     styleType?: FieldGroupStyleType;
+    noSpacing?: boolean;
 }
 
 export default defineComponent<Props>({
@@ -99,6 +100,10 @@ export default defineComponent<Props>({
             type: String,
             default: 'primary',
         },
+        noSpacing: {
+            type: Boolean,
+            default: false,
+        },
     },
 });
 </script>
@@ -124,8 +129,8 @@ export default defineComponent<Props>({
         font-size: 0.75rem;
         line-height: 1.4;
         margin-left: 0.25rem;
-        margin-bottom: 0.25rem;
         font-weight: normal;
+        margin-bottom: 0.25rem;
     }
     .help-msg {
         @apply block mb-2;
@@ -147,6 +152,29 @@ export default defineComponent<Props>({
     }
     .is-invalid {
         @apply border border-alert;
+    }
+    &.no-spacing {
+        &.primary {
+            margin-bottom: 0;
+        }
+        &.secondary {
+            margin-bottom: 0;
+        }
+        .form-label {
+            padding-bottom: 0;
+        }
+        .optional-mark {
+            margin-bottom: 0;
+        }
+        .help-msg {
+            margin-bottom: 0;
+        }
+        .invalid-feedback {
+            margin-top: 0;
+        }
+        .valid-feedback {
+            margin-top: 0;
+        }
     }
 }
 
