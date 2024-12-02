@@ -42,6 +42,9 @@ export const SUBTLE_STYLE_TYPE = {
     gray200: 'gray200',
     yellow200: 'yellow200',
     red100: 'red100',
+    peacock200: 'peacock200',
+    coral200: 'coral200',
+    red200: 'red200',
 } as const;
 export const BADGE_STYLE_TYPE = {
     ...SOLID_STYLE_TYPE,
