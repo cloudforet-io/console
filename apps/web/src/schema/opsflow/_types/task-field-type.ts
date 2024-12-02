@@ -10,10 +10,10 @@ export type TaskFieldEnum = {
     name: string;
 };
 interface TextTaskFieldOptions {
-    example: string;
+    example?: string;
 }
 export interface ParagraphTaskFieldOptions {
-    example: string;
+    example?: string;
 }
 export interface DropdownTaskFieldOptions {
     enums: TaskFieldEnum[];
@@ -33,20 +33,19 @@ interface BaseTaskField {
     is_required?: boolean;
     is_primary?: boolean; // whether to display field during task creation
 }
-interface TextTaskField extends BaseTaskField {
+export interface TextTaskField extends BaseTaskField {
     field_type: 'TEXT';
-    options: TextTaskFieldOptions;
+    options?: TextTaskFieldOptions;
 }
-interface ParagraphTaskField extends BaseTaskField {
+export interface ParagraphTaskField extends BaseTaskField {
     field_type: 'PARAGRAPH';
-    options: ParagraphTaskFieldOptions;
+    options?: ParagraphTaskFieldOptions;
 }
-interface DropdownTaskField extends BaseTaskField {
+export interface DropdownTaskField extends BaseTaskField {
     field_type: 'DROPDOWN';
-    options: DropdownTaskFieldOptions;
+    options?: DropdownTaskFieldOptions;
 }
-interface OtherTaskField extends BaseTaskField {
+export interface OtherTaskField extends BaseTaskField {
     field_type: Exclude<TaskFieldType, 'TEXT'|'PARAGRAPH'|'DROPDOWN'>;
-    options: object;
 }
 export type TaskField = TextTaskField | ParagraphTaskField | DropdownTaskField | OtherTaskField;

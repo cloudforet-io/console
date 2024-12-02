@@ -39,10 +39,13 @@ const defaultStatusMenu = computed<MenuItem[]>(() => [
 const taskCategoryPageStore = useTaskCategoryPageStore();
 
 const handleEdit = () => {
-    taskCategoryPageStore.openEditStatusForm(props.index, props.type);
+    taskCategoryPageStore.openEditStatusForm(props.id, props.type);
 };
 const handleDelete = () => {
-    taskCategoryPageStore.openDeleteStatusModal(props.index, props.type);
+    taskCategoryPageStore.openDeleteStatusModal(props.id, props.type);
+};
+const handleSetDefault = () => {
+    taskCategoryPageStore.openSetDefaultStatusModal(props.id, props.type);
 };
 </script>
 
@@ -73,6 +76,7 @@ const handleDelete = () => {
         <action-menu-button :menu="props.isDefault ? defaultStatusMenu : menu"
                             @edit="handleEdit"
                             @delete="handleDelete"
+                            @set-as-default="handleSetDefault"
         />
     </li>
 </template>

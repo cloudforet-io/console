@@ -20,7 +20,7 @@ export default defineComponent({
 /* eslint-disable import/first */
 // eslint-disable-next-line import/no-duplicates,import/order
 // eslint-disable-next-line import/no-duplicates
-import { computed, onBeforeMount } from 'vue';
+import { computed, onBeforeMount, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PHeading, PTab, PSkeleton } from '@cloudforet/mirinae';
@@ -33,9 +33,12 @@ import { useGoBack } from '@/common/composables/go-back';
 
 import TaskStatusDeleteModal from '@/services/ops-flow/components/TaskStatusDeleteModal.vue';
 import TaskStatusForm from '@/services/ops-flow/components/TaskStatusForm.vue';
+import TaskStatusSetDefaultModal from '@/services/ops-flow/components/TaskStatusSetDefaultModal.vue';
+import TaskTypeDeleteModal from '@/services/ops-flow/components/TaskTypeDeleteModal.vue';
 import TaskTypeForm from '@/services/ops-flow/components/TaskTypeForm.vue';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
 
 const props = defineProps<{
     taskCategoryId: string;
@@ -44,13 +47,12 @@ const router = useRouter();
 const route = useRoute();
 
 const taskCategoryPageStore = useTaskCategoryPageStore();
-const taskCategoryPageGetters = taskCategoryPageStore.getters;
-const taskCategoryStore = taskCategoryPageStore.taskCategoryStore;
+const taskCategoryStore = useTaskCategoryStore();
 
 
 /* header and back button */
-const loading = computed<boolean>(() => taskCategoryStore.state.loading);
-const headerTitle = computed<string>(() => taskCategoryPageGetters.currentCategory?.name ?? 'No Category');
+const loading = computed<boolean>(() => taskCategoryStore.getters.loading);
+const headerTitle = computed<string>(() => taskCategoryPageStore.getters.currentCategory?.name ?? 'No Category');
 const {
     setPathFrom,
     handleClickBackButton,
@@ -97,6 +99,9 @@ const handleUpdateActiveTab = (tab: string) => {
 onBeforeMount(() => {
     taskCategoryPageStore.setCurrentCategoryId(props.taskCategoryId);
 });
+onUnmounted(() => {
+    taskCategoryPageStore.$dispose();
+});
 
 /* expose */
 defineExpose({ setPathFrom });
@@ -122,9 +127,14 @@ defineExpose({ setPathFrom });
         >
             <router-view />
         </p-tab>
-        <!-- modals -->
+
+        <!-- task status -->
         <task-status-form />
         <task-status-delete-modal />
+        <task-status-set-default-modal />
+
+        <!-- task type -->
         <task-type-form />
+        <task-type-delete-modal />
     </div>
 </template>

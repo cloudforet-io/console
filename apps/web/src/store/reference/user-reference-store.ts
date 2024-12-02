@@ -70,6 +70,7 @@ export const useUserReferenceStore = defineStore('reference-user', () => {
     });
 
     const getters = reactive({
+        loading: computed<boolean>(() => state.items === null),
         userItems: asyncComputed<UserReferenceMap>(async () => {
             if (store.getters['user/getCurrentGrantInfo'].scope === 'USER') return {};
             if (state.items === null) await load();

@@ -1,6 +1,4 @@
-import { asyncComputed } from '@vueuse/core';
-import type { Ref } from 'vue';
-import { reactive } from 'vue';
+import { reactive, computed, watch } from 'vue';
 
 import { defineStore } from 'pinia';
 
@@ -9,10 +7,13 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { TaskCategoryCreateParameters } from '@/schema/opsflow/task-category/api-verbs/create';
+import type { TaskCategoryDeleteParameters } from '@/schema/opsflow/task-category/api-verbs/delete';
 import type { TaskCategoryGetParameters } from '@/schema/opsflow/task-category/api-verbs/get';
 import type { TaskCategoryListParameters } from '@/schema/opsflow/task-category/api-verbs/list';
 import type { TaskCategoryUpdateParameters } from '@/schema/opsflow/task-category/api-verbs/update';
 import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -20,9 +21,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 interface UseTaskCategoryStoreState {
     loading: boolean;
     items?: TaskCategoryModel[];
-}
-interface UseTaskCategoryStoreGetters {
-    taskCategories: Ref<Readonly<TaskCategoryModel[]>>
 }
 const DEFAULT_STATUS_OPTIONS: TaskCategoryCreateParameters['status_options'] = {
     TODO: [
@@ -39,56 +37,84 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
     const state = reactive<UseTaskCategoryStoreState>({
         loading: false,
         items: undefined,
-    }) as UseTaskCategoryStoreState;
-
-    const getters = reactive<UseTaskCategoryStoreGetters>({
-        taskCategories: asyncComputed<TaskCategoryModel[]>(async () => {
-            if (state.items === undefined) {
-                await actions.list();
-            }
-            return state.items ?? [];
-        }, [], { lazy: true }),
     });
 
+    const getters = {
+        loading: computed<boolean>(() => state.loading),
+        taskCategories: computed<TaskCategoryModel[]>(() => {
+            if (state.items === undefined) {
+                actions.list();
+            }
+            return state.items ?? [];
+        }),
+    };
 
-    const fetchList = getCancellableFetcher<TaskCategoryListParameters, ListResponse<TaskCategoryModel>>(SpaceConnector.client.opsFlow.taskCategory.list);
+
+    const fetchList = getCancellableFetcher<TaskCategoryListParameters, ListResponse<TaskCategoryModel>>(SpaceConnector.clientV2.opsflow.taskCategory.list);
     const actions = {
-        async list() {
-            state.loading = true;
+        async list(paramsOrForce?: TaskCategoryListParameters|true): Promise<TaskCategoryModel[]|undefined> {
+            const force = paramsOrForce === true;
+            if (!force && state.items) return state.items;
+            const params = force ? undefined : paramsOrForce;
             try {
-                const result = await fetchList({});
+                state.loading = true;
+                const result = await fetchList(params ?? {});
                 if (result.status === 'succeed') {
-                    state.items = result.response.results;
+                    state.loading = false;
+                    if (params) {
+                        return result.response.results ?? [];
+                    }
+                    state.items = result.response.results ?? [];
+                    return result.response.results ?? [];
                 }
+                return undefined;
             } catch (e) {
                 ErrorHandler.handleError(e);
-            } finally {
                 state.loading = false;
+                return undefined;
             }
         },
         async create(params: Omit<TaskCategoryCreateParameters, 'status_options'>) {
-            const response = await SpaceConnector.client.opsFlow.taskCategory.create<TaskCategoryCreateParameters, TaskCategoryModel>({
+            const response = await SpaceConnector.clientV2.opsflow.taskCategory.create<TaskCategoryCreateParameters, TaskCategoryModel>({
                 ...params,
                 status_options: DEFAULT_STATUS_OPTIONS,
             });
+            state.items?.push(response);
             return response;
         },
         async update(params: TaskCategoryUpdateParameters) {
-            const response = await SpaceConnector.client.opsFlow.taskCategory.update<TaskCategoryUpdateParameters, TaskCategoryModel>(params);
+            const response = await SpaceConnector.clientV2.opsflow.taskCategory.update<TaskCategoryUpdateParameters, TaskCategoryModel>(params);
+            const item = state.items?.find((c) => c.category_id === response.category_id);
+            if (item) {
+                Object.assign(item, response);
+            }
             return response;
         },
         async get(categoryId: string) {
-            const response = await SpaceConnector.client.opsFlow.taskCategory.update<TaskCategoryGetParameters, TaskCategoryModel>({
+            const category = state.items?.find((item) => item.category_id === categoryId);
+            if (category) return category;
+            const response = await SpaceConnector.clientV2.opsflow.taskCategory.get<TaskCategoryGetParameters, TaskCategoryModel>({
                 category_id: categoryId,
             });
             return response;
         },
         async delete(categoryId: string) {
-            await SpaceConnector.client.opsFlow.taskCategory.delete({
+            await SpaceConnector.clientV2.opsflow.taskCategory.delete<TaskCategoryDeleteParameters, TaskCategoryModel>({
                 category_id: categoryId,
             });
+            state.items = state.items?.filter((item) => item.category_id !== categoryId);
         },
     };
+
+    const disposeSelf = () => {
+        const store = useTaskCategoryStore();
+        store.$reset();
+        store.$dispose();
+    };
+    const appContextStore = useAppContextStore();
+    watch([() => appContextStore.getters.isAdminMode, () => appContextStore.getters.workspaceId], () => {
+        disposeSelf();
+    });
     return {
         state,
         getters,

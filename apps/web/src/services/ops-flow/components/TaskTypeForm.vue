@@ -1,20 +1,24 @@
 <script setup lang="ts">
 import {
-    ref, nextTick, watch, toRef,
+    ref, nextTick, watch,
 } from 'vue';
 
+import { isEqual } from 'lodash';
 
 import {
-    POverlayLayout, PFieldGroup, PTextInput, PSelectDropdown, PButton, PTextarea,
+    POverlayLayout, PFieldGroup, PTextInput, PButton, PTextarea,
 } from '@cloudforet/mirinae';
 
-import { useUserReferenceStore } from '@/store/reference/user-reference-store';
+import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
+import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
-import { useAssigneePoolField } from '@/services/ops-flow/composables/use-assignee-pool-field';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
+import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 import {
     useTaskFieldsConfiguration,
 } from '@/services/ops-flow/task-fields-configuration/composables/use-task-fields-configuration';
@@ -24,22 +28,13 @@ import TaskFieldsConfiguration from '@/services/ops-flow/task-fields-configurati
 const taskCategoryPageStore = useTaskCategoryPageStore();
 const taskCategoryPageState = taskCategoryPageStore.state;
 const taskCategoryPageGetters = taskCategoryPageStore.getters;
-const userReferenceStore = useUserReferenceStore();
+const taskTypeStore = useTaskTypeStore();
 
-
-/* assignee pool */
-const {
-    selectedUserItems,
-    userMenuItemsHandler,
-    handleUpdateSelectedUserItems,
-    setInitialUsers,
-} = useAssigneePoolField({
-    userReferenceMap: toRef(userReferenceStore.getters, 'userItems'),
-});
 
 /* task field configuration */
 const {
     taskFieldsValidator,
+    fields,
     setFields,
     addField,
     removeField,
@@ -49,7 +44,7 @@ const {
 
 /* form validation */
 const {
-    forms: { name, description, fields },
+    forms: { name, description, assigneePool },
     invalidState,
     invalidTexts,
     setForm, isAllValid,
@@ -58,11 +53,15 @@ const {
 } = useFormValidator({
     name: '',
     description: '',
+    assigneePool: [] as string[],
     fields: taskFieldsValidator,
 }, {
     name(value: string) {
         if (!value.trim().length) return 'Name is required';
         if (value.length > 50) return 'Name should be less than 50 characters';
+        if (!taskCategoryPageGetters.taskTypes) return true;
+        const isDuplicated = taskCategoryPageGetters.taskTypes.some((taskType) => taskType.name === value && taskType.task_type_id !== taskCategoryPageGetters.targetTaskType?.task_type_id);
+        if (isDuplicated) return 'Name already exists';
         return true;
     },
 });
@@ -72,24 +71,79 @@ const handleCancelOrClose = () => {
     initForm();
     taskCategoryPageStore.closeTaskTypeForm();
 };
+const handleClosed = () => {
+    taskCategoryPageStore.resetTargetTaskTypeId();
+};
+
+const updateTaskTypeFields = async (taskTypeId: string, categoryId: string) => {
+    await taskTypeStore.updateFields({
+        task_type_id: taskTypeId,
+        fields: fields.value,
+        category_id: categoryId,
+        force: true,
+    });
+};
+
+const createTaskType = async (categoryId: string) => {
+    try {
+        await taskTypeStore.create({
+            name: name.value,
+            description: description.value,
+            assignee_pool: assigneePool.value,
+            category_id: categoryId,
+            fields: fields.value,
+        });
+        showSuccessMessage('Task type created successfully', '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, 'Failed to create task type');
+    }
+};
+const updateTaskType = async (initialTaskType: TaskTypeModel) => {
+    try {
+        const promises: Promise<any>[] = [];
+        if (initialTaskType.name !== name.value
+            || initialTaskType.description !== description.value
+            || !isEqual(initialTaskType.assignee_pool, assigneePool.value)
+        ) {
+            promises.push(taskTypeStore.update({
+                task_type_id: initialTaskType.task_type_id,
+                name: name.value,
+                description: description.value,
+                assignee_pool: assigneePool.value,
+            }));
+        }
+        if (!isEqual(fields.value, initialTaskType.fields)) {
+            promises.push(updateTaskTypeFields(initialTaskType.task_type_id, initialTaskType.category_id));
+        }
+        const result = await Promise.allSettled(promises);
+        const errorMessages: string[] = [];
+        result.forEach((res) => {
+            if (res.status === 'rejected') {
+                errorMessages.push(res.reason.message);
+            }
+        });
+        if (errorMessages.length) {
+            throw new Error(errorMessages.join('\n'));
+        }
+        showSuccessMessage('Task type updated successfully', '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, 'Failed to update task type');
+    }
+};
 
 const handleConfirm = async () => {
     if (!isAllValid.value) return;
-    if (!taskCategoryPageState.currentCategoryId) return;
     try {
+        if (!taskCategoryPageState.currentCategoryId) throw new Error('Category ID is not set');
         loading.value = true;
         if (taskCategoryPageGetters.targetTaskType) {
-            // await taskCategoryStore.update({
-            //
-            // });
+            await updateTaskType(taskCategoryPageGetters.targetTaskType);
         } else {
-            // await taskCategoryStore.create({
-            // });
+            await createTaskType(taskCategoryPageState.currentCategoryId);
         }
-        taskCategoryPageStore.closeStatusForm();
+        taskCategoryPageStore.closeTaskTypeForm();
     } catch (e) {
-        ErrorHandler.handleRequestError(e, 'Failed to save task type');
-        // TODO: handle error
+        ErrorHandler.handleError(e);
     } finally {
         loading.value = false;
     }
@@ -102,16 +156,18 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
         setForm({
             name: '',
             description: '',
+            assigneePool: [],
         });
-        setInitialUsers([]);
         setInitialFields([]);
         resetValidations();
         return;
     }
     if (target) {
-        setForm('name', target.name);
-        setForm('description', target.description);
-        setInitialUsers(target.assignee_pool);
+        setForm({
+            name: target.name,
+            description: target.description,
+            assigneePool: target.assignee_pool,
+        });
         setInitialFields(target.fields);
     }
 });
@@ -123,6 +179,7 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
                       :visible="taskCategoryPageState.visibleTaskTypeForm"
                       size="lg"
                       @close="handleCancelOrClose"
+                      @closed="handleClosed"
     >
         <template #default>
             <div class="p-6 w-full">
@@ -139,21 +196,11 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
                         />
                     </template>
                 </p-field-group>
-                <p-field-group label="Assignee Pool"
-                               :invalid="!loading && invalidState.assigneePool"
-                               :invalid-text="invalidTexts.assigneePool"
-                >
-                    <template #default="{ invalid }">
-                        <p-select-dropdown show-select-marker
-                                           :invalid="invalid"
-                                           :selected="selectedUserItems"
-                                           :handler="userMenuItemsHandler"
-                                           is-filterable
-                                           use-fixed-menu-style
-                                           show-delete-all-button
-                                           @update:selected="handleUpdateSelectedUserItems"
-                        />
-                    </template>
+                <p-field-group label="Assignee Pool">
+                    <user-select-dropdown :selected-user-ids="assigneePool"
+                                          selection-type="multiple"
+                                          @update:user-ids="setForm('assigneePool', $event)"
+                    />
                 </p-field-group>
                 <p-field-group label="Description">
                     <p-textarea :value="description"

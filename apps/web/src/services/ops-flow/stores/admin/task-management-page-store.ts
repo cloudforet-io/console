@@ -1,4 +1,4 @@
-import type { ComputedRef, DeepReadonly } from 'vue';
+import type { DeepReadonly } from 'vue';
 import { reactive, computed } from 'vue';
 
 import { defineStore } from 'pinia';
@@ -11,7 +11,6 @@ import { useWorkspaceReferenceStore } from '@/store/reference/workspace-referenc
 
 import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
-// import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 
 interface UseTaskManagementPageStoreState {
     // support package
@@ -25,19 +24,10 @@ interface UseTaskManagementPageStoreState {
     visibleDeleteCategoryModal: boolean;
 }
 
-interface UseTaskManagementPageStoreGetters {
-    targetPackage: ComputedRef<PackageModel|undefined>;
-    associatedCategoriesToPackage: ComputedRef<DeepReadonly<TaskCategoryModel[]>>;
-    associatedWorkspacesToPackage: ComputedRef<WorkspaceItem[]>;
-    targetCategory: ComputedRef<DeepReadonly<TaskCategoryModel>|undefined>;
-    defaultPackage: ComputedRef<PackageModel|undefined>;
-}
-
 export const useTaskManagementPageStore = defineStore('task-management-page', () => {
     const packageStore = usePackageStore();
     const taskCategoryStore = useTaskCategoryStore();
     const workspaceReferenceStore = useWorkspaceReferenceStore();
-    // const taskTypeStore = useTaskTypeStore();
     const state = reactive<UseTaskManagementPageStoreState>({
         // support package
         visiblePackageForm: false,
@@ -49,7 +39,7 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
         targetCategoryId: undefined,
         visibleDeleteCategoryModal: false,
     });
-    const getters = reactive<UseTaskManagementPageStoreGetters>({
+    const getters = {
         targetPackage: computed<PackageModel|undefined>(() => packageStore.getters.packages.find((p) => p.package_id === state.targetPackageId)),
         associatedCategoriesToPackage: computed<DeepReadonly<TaskCategoryModel[]>>(() => taskCategoryStore.getters.taskCategories.filter((c) => c.package_id === state.targetPackageId)),
         associatedWorkspacesToPackage: computed<WorkspaceItem[]>(() => {
@@ -60,7 +50,7 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
         }),
         targetCategory: computed<DeepReadonly<TaskCategoryModel>|undefined>(() => taskCategoryStore.getters.taskCategories.find((c) => c.category_id === state.targetCategoryId)),
         defaultPackage: computed<PackageModel|undefined>(() => packageStore.getters.packages.find((p) => p.is_default)),
-    });
+    };
     const actions = {
         // support package
         openAddPackageForm() {
@@ -73,7 +63,7 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
         },
         closePackageForm() {
             state.visiblePackageForm = false;
-            state.targetPackageId = undefined;
+            // do not reset targetPackageId here and handle it after the modal is closed
         },
         openDeletePackageModal(packageId: string) {
             state.targetPackageId = packageId;
@@ -81,7 +71,7 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
         },
         closeDeletePackageModal() {
             state.visibleDeletePackageModal = false;
-            state.targetPackageId = undefined;
+            // do not reset targetPackageId here and handle it after the modal is closed
         },
         openSetDefaultPackageModal(packageId: string) {
             state.targetPackageId = packageId;
@@ -89,6 +79,9 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
         },
         closeSetDefaultPackageModal() {
             state.visibleSetDefaultPackageModal = false;
+            // do not reset targetPackageId here and handle it after the modal is closed
+        },
+        resetTargetPackageId() {
             state.targetPackageId = undefined;
         },
         // category
@@ -102,7 +95,7 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
         },
         closeCategoryForm() {
             state.visibleCategoryForm = false;
-            state.targetCategoryId = undefined;
+            // do not reset targetCategoryId here and handle it after the modal is closed
         },
         openDeleteCategoryModal(categoryId: string) {
             state.targetCategoryId = categoryId;
@@ -110,12 +103,13 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
         },
         closeDeleteCategoryModal() {
             state.visibleDeleteCategoryModal = false;
+            // do not reset targetCategoryId here and handle it after the modal is closed
+        },
+        resetTargetCategoryId() {
             state.targetCategoryId = undefined;
         },
     };
     return {
-        packageStore,
-        taskCategoryStore,
         state,
         getters,
         ...actions,

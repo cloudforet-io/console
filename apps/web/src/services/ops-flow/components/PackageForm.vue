@@ -1,15 +1,11 @@
 <script setup lang="ts">
 import {
-    toRef, ref, computed, watch, nextTick,
+    ref, watch, nextTick,
 } from 'vue';
 
 import {
     POverlayLayout, PFieldGroup, PTextInput, PTextarea, PSelectDropdown, PButton,
 } from '@cloudforet/mirinae';
-
-import type { PackageModel } from '@/schema/identity/package/model';
-
-import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -18,14 +14,13 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import { useCategoryField } from '@/services/ops-flow/composables/use-category-field';
 import { useWorkspaceField } from '@/services/ops-flow/composables/use-workspace-field';
+import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
-const workspaceReferenceStore = useWorkspaceReferenceStore();
 const taskManagementPageStore = useTaskManagementPageStore();
 const taskManagementPageState = taskManagementPageStore.state;
 const taskManagementPageGetters = taskManagementPageStore.getters;
-const packageStore = taskManagementPageStore.packageStore;
-const taskCategoryStore = taskManagementPageStore.taskCategoryStore;
+const packageStore = usePackageStore();
 
 
 
@@ -37,22 +32,17 @@ const {
     handleUpdateSelectedWorkspaces,
     setInitialWorkspaces,
     applyPackageToWorkspaces,
-} = useWorkspaceField({
-    workspaceReferenceMap: toRef(workspaceReferenceStore.state, 'items'),
-});
+} = useWorkspaceField();
 
 /* category */
 const {
     selectedCategoryItems,
     categoryMenuItemsHandler,
     categoryValidator,
-    handleUpdateSelectedCategories,
-    setInitialCategories,
+    setSelectedCategoryItems,
+    setInitialCategoriesByPackageId,
     applyPackageToCategories,
-} = useCategoryField({
-    defaultPackage: computed<PackageModel|undefined>(() => packageStore.getters.packages.find((p) => p.is_default)),
-    taskCategoryStore,
-});
+} = useCategoryField();
 
 /* form */
 const {
@@ -81,6 +71,9 @@ const {
 const loading = ref(false);
 const handleCancelOrClose = () => {
     taskManagementPageStore.closePackageForm();
+};
+const handleClosed = () => {
+    taskManagementPageStore.resetTargetPackageId();
 };
 
 const handleConfirm = async () => {
@@ -151,7 +144,7 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
             description: '',
         });
         setInitialWorkspaces();
-        setInitialCategories();
+        await setInitialCategoriesByPackageId();
         resetValidations();
         return;
     }
@@ -161,7 +154,7 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
             description: targetPackage.description,
         });
         setInitialWorkspaces(targetPackage.package_id);
-        setInitialCategories(targetPackage.package_id);
+        await setInitialCategoriesByPackageId(targetPackage.package_id);
     }
 });
 </script>
@@ -171,6 +164,7 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
     <p-overlay-layout title="Add Package"
                       :visible="taskManagementPageState.visiblePackageForm"
                       @close="handleCancelOrClose"
+                      @closed="handleClosed"
     >
         <template #default>
             <div class="p-6 w-full">
@@ -234,7 +228,7 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
                                        show-clear-selection
                                        is-filterable
                                        init-selected-with-handler
-                                       @update:selected="handleUpdateSelectedCategories"
+                                       @update:selected="setSelectedCategoryItems"
                     />
                 </p-field-group>
             </div>

@@ -11,14 +11,16 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 import ActionMenuButton from '@/common/components/buttons/ActionMenuButton.vue';
 
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
+import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
 const taskManagementPageStore = useTaskManagementPageStore();
-const taskCategoryStore = taskManagementPageStore.taskCategoryStore;
-const packageStore = taskManagementPageStore.packageStore;
+const taskCategoryStore = useTaskCategoryStore();
+const packageStore = usePackageStore();
 
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
@@ -66,7 +68,7 @@ const state = reactive({
             </template>
             <template #extra>
                 <p-icon-button name="ic_refresh"
-                               @click="taskCategoryStore.list()"
+                               @click="taskCategoryStore.list(true)"
                 />
                 <p-button icon-left="ic_plus_bold"
                           size="md"
@@ -80,7 +82,7 @@ const state = reactive({
         <p class="px-4 mb-6 text-label-md text-gray-600">
             티켓의 유형을 그룹화한 것입니다. 고객은 티켓을 제출할 때 적절한 카테고리를 선택하여 담당자가 티켓을 효율적으로 관리할 수 있게 돕습니다.
         </p>
-        <p-data-table :loading="taskCategoryStore.state.loading"
+        <p-data-table :loading="taskCategoryStore.getters.loading"
                       :items="taskCategoryStore.getters.taskCategories"
                       :fields="state.categoryFields"
         >

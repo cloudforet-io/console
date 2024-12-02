@@ -1,5 +1,7 @@
-import type { ComputedRef, UnwrapRef } from 'vue';
-import { reactive, computed } from 'vue';
+import { asyncComputed } from '@vueuse/core';
+import {
+    reactive, computed,
+} from 'vue';
 
 import { defineStore } from 'pinia';
 
@@ -7,18 +9,21 @@ import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
 import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
 import type { TaskStatusOption, TaskStatusOptions, TaskStatusType } from '@/schema/opsflow/task/type';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
-import { useTaskTypeStore } from '@/services/ops-flow/stores/admin/task-type-store';
+import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 
 interface UseTaskCategoryPageStoreState {
     currentCategoryId?: string;
     // status
     visibleStatusForm: boolean;
     targetStatus: {
+        statusId: string;
         type: TaskStatusType;
-        index: number;
     }|undefined;
     visibleStatusDeleteModal: boolean;
+    visibleSetDefaultStatusModal: boolean;
     // task type
     visibleTaskTypeForm: boolean;
     targetTaskTypeId?: string;
@@ -26,19 +31,19 @@ interface UseTaskCategoryPageStoreState {
 }
 
 interface UseTaskCategoryPageStoreGetters {
-    currentCategory: ComputedRef<TaskCategoryModel|undefined>;
+    currentCategory: TaskCategoryModel|undefined;
     // status
-    statusOptions: ComputedRef<TaskStatusOptions>;
-    targetStatusOption: ComputedRef<{
-            type: TaskStatusType;
-            data: TaskStatusOption;
-        }|undefined>;
+    statusOptions: TaskStatusOptions;
+    targetStatusOption: {
+        type: TaskStatusType;
+        data: TaskStatusOption;
+    }|undefined;
     // task type
-    taskTypes: ComputedRef<TaskTypeModel[]|undefined>;
-    targetTaskType: ComputedRef<TaskTypeModel|undefined>;
+    taskTypes: TaskTypeModel[]|undefined;
+    targetTaskType: TaskTypeModel|undefined;
 }
 
-export const useTaskCategoryPageStore = defineStore('task-management-category-page', () => {
+export const useTaskCategoryPageStore = defineStore('task-category-page', () => {
     const taskCategoryStore = useTaskCategoryStore();
     const taskTypeStore = useTaskTypeStore();
     const state = reactive<UseTaskCategoryPageStoreState>({
@@ -47,13 +52,13 @@ export const useTaskCategoryPageStore = defineStore('task-management-category-pa
         visibleStatusForm: false,
         targetStatus: undefined,
         visibleStatusDeleteModal: false,
+        visibleSetDefaultStatusModal: false,
         // task type
         visibleTaskTypeForm: false,
         targetTaskTypeId: undefined,
         visibleTaskTypeDeleteModal: false,
     });
-
-    const getters = reactive<UseTaskCategoryPageStoreGetters>({
+    const getters: UseTaskCategoryPageStoreGetters = {
         currentCategory: computed<TaskCategoryModel|undefined>(() => taskCategoryStore.getters.taskCategories.find((c) => c.category_id === state.currentCategoryId)),
         // status
         statusOptions: computed<TaskStatusOptions>(() => {
@@ -72,26 +77,27 @@ export const useTaskCategoryPageStore = defineStore('task-management-category-pa
             data: TaskStatusOption;
         }|undefined>(() => {
             if (!state.targetStatus) return undefined;
-            const { index, type } = state.targetStatus;
+            const { statusId, type } = state.targetStatus;
             const statusOptions = getters.statusOptions;
             if (!statusOptions) return undefined;
+            const data = statusOptions[type].find((status) => status.status_id === statusId);
+            if (!data) return undefined;
             return {
                 type,
-                data: statusOptions[type][index],
+                data,
             };
         }),
         // task type
-        taskTypes: computed<TaskTypeModel[]|undefined>(() => {
+        taskTypes: asyncComputed<TaskTypeModel[]|undefined>(async () => {
             if (!state.currentCategoryId) return undefined;
-            const allTaskTypes = taskTypeStore.getters.taskTypes;
-            return allTaskTypes.filter((taskType) => taskType.category_id === state.currentCategoryId);
-        }),
+            if (!taskTypeStore.state.itemsByCategoryId[state.currentCategoryId]) await taskTypeStore.listByCategoryId(state.currentCategoryId);
+            return taskTypeStore.state.itemsByCategoryId[state.currentCategoryId];
+        }, undefined, { lazy: true, onError: ErrorHandler.handleError }),
         targetTaskType: computed<TaskTypeModel|undefined>(() => {
             if (!state.targetTaskTypeId) return undefined;
-            return taskTypeStore.getters.taskTypes.find((taskType) => taskType.task_type_id === state.targetTaskTypeId);
+            return getters.taskTypes?.find((taskType) => taskType.task_type_id === state.targetTaskTypeId);
         }),
-    }) as UnwrapRef<UseTaskCategoryPageStoreGetters>;
-
+    } as unknown as UseTaskCategoryPageStoreGetters;
     const actions = {
         setCurrentCategoryId(categoryId: string) {
             state.currentCategoryId = categoryId;
@@ -101,29 +107,53 @@ export const useTaskCategoryPageStore = defineStore('task-management-category-pa
             state.targetStatus = undefined;
             state.visibleStatusForm = true;
         },
-        openEditStatusForm(index: number, statusType: TaskStatusType) {
+        openEditStatusForm(statusId: string, statusType: TaskStatusType) {
             state.targetStatus = {
-                index,
+                statusId,
                 type: statusType,
             };
             state.visibleStatusForm = true;
         },
         closeStatusForm() {
             state.visibleStatusForm = false;
-            state.targetStatus = undefined;
+            // do not reset targetStatus here and handle it after the modal is closed
         },
-        openDeleteStatusModal(index: number, statusType: TaskStatusType) {
+        openDeleteStatusModal(statusId: string, statusType: TaskStatusType) {
             state.targetStatus = {
-                index,
+                statusId,
                 type: statusType,
             };
             state.visibleStatusDeleteModal = true;
         },
         closeDeleteStatusModal() {
             state.visibleStatusDeleteModal = false;
+            // do not reset targetStatus here and handle it after the modal is closed
+        },
+        openSetDefaultStatusModal(statusId: string, statusType: TaskStatusType) {
+            state.targetStatus = {
+                statusId,
+                type: statusType,
+            };
+            state.visibleSetDefaultStatusModal = true;
+        },
+        closeSetDefaultStatusModal() {
+            state.visibleSetDefaultStatusModal = false;
+            // do not reset targetStatus here and handle it after the modal is closed
+        },
+        resetTargetStatus() {
             state.targetStatus = undefined;
         },
         // task type
+        async listTaskTypes() {
+            try {
+                if (!state.currentCategoryId) throw new Error('currentCategoryId is not set');
+                const taskTypes = await taskTypeStore.listByCategoryId(state.currentCategoryId, true);
+                return taskTypes;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                return [];
+            }
+        },
         openAddTaskTypeForm() {
             state.targetTaskTypeId = undefined;
             state.visibleTaskTypeForm = true;
@@ -134,7 +164,7 @@ export const useTaskCategoryPageStore = defineStore('task-management-category-pa
         },
         closeTaskTypeForm() {
             state.visibleTaskTypeForm = false;
-            state.targetTaskTypeId = undefined;
+            // do not reset targetTaskTypeId here and handle it after the modal is closed
         },
         openDeleteTaskTypeModal(taskTypeId: string) {
             state.targetTaskTypeId = taskTypeId;
@@ -142,6 +172,9 @@ export const useTaskCategoryPageStore = defineStore('task-management-category-pa
         },
         closeDeleteTaskTypeModal() {
             state.visibleTaskTypeDeleteModal = false;
+            // do not reset targetTaskTypeId here and handle it after the modal is closed
+        },
+        resetTargetTaskTypeId() {
             state.targetTaskTypeId = undefined;
         },
     };
@@ -149,6 +182,5 @@ export const useTaskCategoryPageStore = defineStore('task-management-category-pa
         state,
         getters,
         ...actions,
-        taskCategoryStore,
     };
 });

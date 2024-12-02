@@ -1,6 +1,5 @@
 import { asyncComputed } from '@vueuse/core';
-import type { Ref, UnwrapRef } from 'vue';
-import { reactive } from 'vue';
+import { watch, reactive, computed } from 'vue';
 
 import { defineStore } from 'pinia';
 
@@ -15,6 +14,8 @@ import type { PackageSetDefaultParameters } from '@/schema/identity/package/api-
 import type { PackageUpdateParameters } from '@/schema/identity/package/api-verbs/update';
 import type { PackageModel } from '@/schema/identity/package/model';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
@@ -22,23 +23,22 @@ interface UsePackageStoreState {
     loading: boolean;
     items?: PackageModel[];
 }
-interface UsePackageStoreGetters {
-    packages: Ref<Readonly<PackageModel[]>>
-}
 export const usePackageStore = defineStore('package', () => {
     const state = reactive<UsePackageStoreState>({
         loading: false,
         items: undefined,
     });
 
-    const getters = reactive<UsePackageStoreGetters>({
+    const getters = {
+        loading: computed(() => state.loading),
         packages: asyncComputed<PackageModel[]>(async () => {
             if (state.items === undefined) {
                 await actions.list();
             }
             return state.items ?? [];
         }, [], { lazy: true }),
-    }) as UnwrapRef<UsePackageStoreGetters>;
+        defaultPackage: computed<PackageModel|undefined>(() => getters.packages.find((p) => p.is_default)),
+    };
 
     const fetchList = getCancellableFetcher<PackageListParameters, ListResponse<PackageModel>>(SpaceConnector.clientV2.identity.package.list);
     const actions = {
@@ -47,7 +47,7 @@ export const usePackageStore = defineStore('package', () => {
             try {
                 const result = await fetchList({});
                 if (result.status === 'succeed') {
-                    state.items = result.response.results;
+                    state.items = result.response.results ?? [];
                 }
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -57,28 +57,42 @@ export const usePackageStore = defineStore('package', () => {
         },
         async create(param: PackageCreateParameters) {
             const response = await SpaceConnector.clientV2.identity.package.create<PackageCreateParameters, PackageModel>(param);
+            state.items?.push(response);
             return response;
         },
         async update(param: PackageUpdateParameters) {
             const response = await SpaceConnector.clientV2.identity.package.update<PackageUpdateParameters, PackageModel>(param);
+            state.items = state.items?.map((item) => (item.package_id === response.package_id ? response : item));
             return response;
         },
         async setDefaultPackage(packageId: string) {
             const prevDefaultPackage = getters.packages.find((p) => p.is_default);
             if (prevDefaultPackage?.package_id === packageId) return prevDefaultPackage;
-            const response = await SpaceConnector.clientV2.identity.package.setDefaultPackage<PackageSetDefaultParameters, PackageModel>({
+            const response = await SpaceConnector.clientV2.identity.package.setDefault<PackageSetDefaultParameters, PackageModel>({
                 package_id: packageId,
             });
+            const prev = state.items?.find((p) => p.is_default);
+            if (prev) prev.is_default = false;
+            const current = state.items?.find((p) => p.package_id === packageId);
+            if (current) current.is_default = true;
             return response;
         },
         async delete(packageId: string) {
             await SpaceConnector.clientV2.identity.package.delete<PackageDeleteParameters, undefined>({
                 package_id: packageId,
             });
+            state.items = state.items?.filter((item) => item.package_id !== packageId);
         },
     };
+    const disposeSelf = () => {
+        const store = usePackageStore();
+        store.$dispose();
+    };
+    const appContextStore = useAppContextStore();
+    watch(() => appContextStore.getters.isAdminMode, () => {
+        disposeSelf();
+    });
     return {
-        state,
         getters,
         ...actions,
     };

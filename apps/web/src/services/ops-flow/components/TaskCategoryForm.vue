@@ -10,12 +10,13 @@ import {
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
 const taskManagementPageStore = useTaskManagementPageStore();
 const taskManagementPageState = taskManagementPageStore.state;
 const taskManagementPageGetters = taskManagementPageStore.getters;
-const taskCategoryStore = taskManagementPageStore.taskCategoryStore;
+const taskCategoryStore = useTaskCategoryStore();
 
 const {
     forms: { name, description },
@@ -40,6 +41,9 @@ const loading = ref(false);
 const handleCancelOrClose = () => {
     initForm();
     taskManagementPageStore.closeCategoryForm();
+};
+const handleClosed = () => {
+    taskManagementPageStore.resetTargetCategoryId();
 };
 const handleConfirm = async () => {
     if (!isAllValid.value) return;
@@ -103,6 +107,7 @@ watch([() => taskManagementPageState.visibleCategoryForm, () => taskManagementPa
     <p-overlay-layout title="Add Category"
                       :visible="taskManagementPageState.visibleCategoryForm"
                       @close="handleCancelOrClose"
+                      @closed="handleClosed"
     >
         <template #default>
             <div class="p-6 w-full">

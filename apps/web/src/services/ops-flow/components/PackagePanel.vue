@@ -9,11 +9,12 @@ import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tabl
 
 import ActionMenuButton from '@/common/components/buttons/ActionMenuButton.vue';
 
+import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
 
 const taskManagementPageStore = useTaskManagementPageStore();
-const packageStore = taskManagementPageStore.packageStore;
+const packageStore = usePackageStore();
 
 const state = reactive({
     packageFields: computed<DataTableField[]>(() => [
@@ -75,7 +76,7 @@ const state = reactive({
         <p class="px-4 mb-6 text-label-md text-gray-600">
             계약에 따라 고객이 이용할 수 있는 기능의 묶음입니다. 전체 서비스의 범위를 나타내며, 하위 카테고를 생성할 수 있습니다.
         </p>
-        <p-data-table :loading="packageStore.state.loading"
+        <p-data-table :loading="packageStore.getters.loading"
                       :items="packageStore.getters.packages"
                       :fields="state.packageFields"
         >

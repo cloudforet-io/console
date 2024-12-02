@@ -4,10 +4,11 @@ import { ref } from 'vue';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
 const taskManagementPageStore = useTaskManagementPageStore();
-const taskCategoryStore = taskManagementPageStore.taskCategoryStore;
+const taskCategoryStore = useTaskCategoryStore();
 
 const loading = ref<boolean>(false);
 const handleConfirm = async () => {
@@ -27,6 +28,9 @@ const handleConfirm = async () => {
 const handleCloseOrCancel = () => {
     taskManagementPageStore.closeDeleteCategoryModal();
 };
+const handleClosed = () => {
+    taskManagementPageStore.resetTargetCategoryId();
+};
 </script>
 
 <template>
@@ -37,5 +41,6 @@ const handleCloseOrCancel = () => {
                   @confirm="handleConfirm"
                   @close="handleCloseOrCancel"
                   @cancel="handleCloseOrCancel"
+                  @closed="handleClosed"
     />
 </template>

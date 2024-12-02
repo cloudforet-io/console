@@ -1,4 +1,5 @@
 export const DEFAULT_FIELD_ID_MAP = {
     title: 'title',
-    content: 'content',
-};
+    description: 'description',
+    project: 'project',
+} as const;

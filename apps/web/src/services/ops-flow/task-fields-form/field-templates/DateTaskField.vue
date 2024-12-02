@@ -1,0 +1,44 @@
+<script setup lang="ts">
+import { computed } from 'vue';
+
+import {
+    PFieldGroup, PDatetimePicker,
+} from '@cloudforet/mirinae';
+
+import type { OtherTaskField } from '@/schema/opsflow/_types/task-field-type';
+
+import { useTaskFieldValidation } from '@/services/ops-flow/task-fields-form/composables/use-task-field-validation';
+import type {
+    TaskFieldFormEmits,
+    TaskFieldFormProps,
+} from '@/services/ops-flow/task-fields-form/types/task-field-form-type';
+
+const props = defineProps<TaskFieldFormProps<OtherTaskField, string>>();
+
+const emit = defineEmits<TaskFieldFormEmits<string>>();
+
+const {
+    fieldValue, updateFieldValue,
+    isInvalid, invalidText,
+} = useTaskFieldValidation(props, emit);
+
+const selectedDates = computed(() => (fieldValue.value ? [fieldValue.value] : []));
+const handleUpdate = (val: string[]) => {
+    updateFieldValue(val[0] ?? '');
+};
+</script>
+
+<template>
+    <p-field-group :label="field.name"
+                   :required="field.is_required"
+                   :invalid="isInvalid"
+                   :invalid-text="invalidText"
+                   no-spacing
+    >
+        <p-datetime-picker class="my-1"
+                           :selected-dates="selectedDates"
+                           :invalid="isInvalid"
+                           @update:selected-dates="handleUpdate"
+        />
+    </p-field-group>
+</template>

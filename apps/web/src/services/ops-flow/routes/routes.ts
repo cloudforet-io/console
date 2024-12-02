@@ -40,21 +40,20 @@ const opsFlowRoutes: RouteConfig = {
             meta: {
                 menuId: MENU_ID.BOARD,
                 translationId: MENU_INFO_MAP[MENU_ID.BOARD].translationId,
+                lsbVisible: true,
             },
             component: BoardPage as any,
-            children: [
-                {
-                    path: ':taskId',
-                    name: OPS_FLOW_ROUTE.BOARD.TASK_DETAIL._NAME,
-                    props: true,
-                    component: TaskDetailPage as any,
-                },
-                {
-                    path: 'task-create',
-                    name: OPS_FLOW_ROUTE.BOARD.TASK_CREATE._NAME,
-                    component: TaskCreatePage as any,
-                },
-            ],
+        },
+        {
+            path: 'board/task-create',
+            name: OPS_FLOW_ROUTE.BOARD.TASK_CREATE._NAME,
+            component: TaskCreatePage as any,
+        },
+        {
+            path: 'board/:taskId',
+            name: OPS_FLOW_ROUTE.BOARD.TASK_DETAIL._NAME,
+            props: true,
+            component: TaskDetailPage as any,
         },
     ],
 };

@@ -1,5 +1,4 @@
-import type { Ref } from 'vue';
-import { computed, ref } from 'vue';
+import { computed, ref, toRef } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getTextHighlightRegex } from '@cloudforet/mirinae';
@@ -8,7 +7,7 @@ import type { AutocompleteHandler, SelectDropdownMenuItem } from '@cloudforet/mi
 import type { WorkspaceAddPackageParameters } from '@/schema/identity/workspace/api-verbs/add-package';
 import type { WorkspaceRemovePackageParameters } from '@/schema/identity/workspace/api-verbs/remove-package';
 
-import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
+import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
 
 import { useFieldValidator } from '@/common/composables/form-validator';
 
@@ -24,11 +23,9 @@ const WORKSPACE_SELECTION_TYPES = {
 };
 export type WorkspaceScope = 'unset'|'all'|'specific';
 
-export const useWorkspaceField = ({
-    workspaceReferenceMap,
-}: {
-    workspaceReferenceMap: Ref<WorkspaceReferenceMap|null>;
-}) => {
+export const useWorkspaceField = () => {
+    const workspaceReferenceStore = useWorkspaceReferenceStore();
+    const workspaceReferenceMap = toRef(workspaceReferenceStore.state, 'items');
     const workspaceValidator = useFieldValidator<SelectDropdownMenuItem[]>(
         [],
     );

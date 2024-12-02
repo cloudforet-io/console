@@ -5,7 +5,7 @@ import type { TaskPriority } from '@/schema/opsflow/task/type';
 export interface TaskCreateParameters {
     task_type_id: string;
     name: string;
-    status: string;
+    status_id: string;
     priority?: TaskPriority;
     description?: string;
     files?: FileModel[];
