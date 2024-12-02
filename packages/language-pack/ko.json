@@ -44,6 +44,7 @@
 			"VIEW_RESOURCE": "",
 			"WARNING": "경고"
 		},
+		"CANCEL": "취소",
 		"CONTINUE": "계속하기",
 		"CREATE": "생성",
 		"DELETE": "삭제",
@@ -99,6 +100,7 @@
 			"SKIP_FOR_LATER": "다음에 진행 ",
 			"TITLE": "서비스",
 			"TOTAL_ALERTS": "",
+			"USER": "사용자",
 			"USER_GROUP": "",
 			"VALIDATION_NAME_UNIQUE": "",
 			"WEBHOOK": "웹훅 ({cnt})"

@@ -44,6 +44,7 @@
 			"VIEW_RESOURCE": "",
 			"WARNING": "警告"
 		},
+		"CANCEL": "キャンセル",
 		"CONTINUE": "次へ",
 		"CREATE": "生成",
 		"DELETE": "削除",
@@ -99,6 +100,7 @@
 			"SKIP_FOR_LATER": "後で収集",
 			"TITLE": "サービス",
 			"TOTAL_ALERTS": "",
+			"USER": "ユーザー",
 			"USER_GROUP": "",
 			"VALIDATION_NAME_UNIQUE": "",
 			"WEBHOOK": "ウェプフク ({cnt})"

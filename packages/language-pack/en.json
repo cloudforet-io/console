@@ -44,6 +44,7 @@
 			"VIEW_RESOURCE": "View resource",
 			"WARNING": "Warning"
 		},
+		"CANCEL": "Cancel",
 		"CONTINUE": "Continue",
 		"CREATE": "Create",
 		"DELETE": "Delete",
@@ -99,6 +100,7 @@
 			"SKIP_FOR_LATER": "Skip for Later",
 			"TITLE": "Service",
 			"TOTAL_ALERTS": "Total Alerts",
+			"USER": "User",
 			"USER_GROUP": "User Group",
 			"VALIDATION_NAME_UNIQUE": "A service with this name already exists.",
 			"WEBHOOK": "Webhook ({cnt})"
