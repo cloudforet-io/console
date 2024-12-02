@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, onUnmounted, reactive } from 'vue';
 
+import ServiceCreateStep2CreatedWebhook
+    from '@/services/alert-manager-v2/components/ServiceCreateStep2CreatedWebhook.vue';
 import ServiceCreateStep2SelectWebhookType
     from '@/services/alert-manager-v2/components/ServiceCreateStep2SelectWebhookType.vue';
 import ServiceCreateStep2WebhookForm from '@/services/alert-manager-v2/components/ServiceCreateStep2WebhookForm.vue';
@@ -35,5 +37,6 @@ onUnmounted(() => {
     >
         <service-create-step2-select-webhook-type v-if="storeState.currentSubStep === 1" />
         <service-create-step2-webhook-form v-else-if="storeState.currentSubStep === 2" />
+        <service-create-step2-created-webhook v-else-if="storeState.currentSubStep === 3" />
     </service-create-step-container>
 </template>

@@ -1,0 +1,161 @@
+<script lang="ts" setup>
+import {
+    computed, reactive,
+} from 'vue';
+
+import { isEmpty } from 'lodash';
+
+import {
+    PDefinitionTable, PButton, PStatus, PMarkdown, PLazyImg, PLink,
+} from '@cloudforet/mirinae';
+
+import type { WebhookModel } from '@/schema/monitoring/webhook/model';
+import type { PluginModel } from '@/schema/repository/plugin/model';
+import { store } from '@/store';
+import { i18n as _i18n } from '@/translations';
+
+import { assetUrlConverter } from '@/lib/helper/asset-helper';
+import { copyAnyData } from '@/lib/helper/copy-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import { useServiceFormStore } from '@/services/alert-manager-v2/store/service-form-store';
+import { userStateFormatter } from '@/services/iam/composables/refined-table-data';
+
+interface Props {
+    succeedWebhook?: WebhookModel;
+}
+const props = withDefaults(defineProps<Props>(), {
+    succeedWebhook: undefined,
+});
+
+const serviceFormStore = useServiceFormStore();
+const serviceFormState = serviceFormStore.state;
+
+const storeState = reactive({
+    language: computed(() => store.state.user.language),
+    selectedWebhookType: computed<PluginModel>(() => serviceFormState.selectedWebhookType),
+});
+
+const state = reactive({
+    fields: computed(() => [
+        { name: 'name', label: _i18n.t('ALERT_MANAGER.WEBHOOK.LABEL_NAME') },
+        { name: 'state', label: _i18n.t('ALERT_MANAGER.WEBHOOK.LABEL_STATE') },
+        { name: 'version', label: _i18n.t('ALERT_MANAGER.WEBHOOK.VERSION') },
+    ]),
+    data: computed(() => ({
+        name: props.succeedWebhook?.name,
+        state: props.succeedWebhook?.state,
+        version: props.succeedWebhook?.plugin_info?.version,
+    })),
+    guideDocsLink: computed(() => {
+        const language = storeState.language === 'ko' ? 'ko/' : '';
+        return `https://cloudforet.io/${language}docs/guides/plugins/alert-manager-webhook/`;
+    }),
+});
+
+const handleCopyWebhookUrl = () => {
+    copyAnyData(props.succeedWebhook?.webhook_url || '');
+    showSuccessMessage(_i18n.t('ALERT_MANAGER.ALT_S_COPIED'), '');
+};
+</script>
+
+<template>
+    <div class="service-create-step2-created-webhook">
+        <div class="webhook-item">
+            <p-lazy-img :src="assetUrlConverter(storeState.selectedWebhookType.tags?.icon || '')"
+                        width="2.5rem"
+                        height="2.5rem"
+                        error-icon="ic_webhook"
+            />
+            <span class="info">
+                <i18n path="ALERT_MANAGER.WEBHOOK.CREATE_DESC">
+                    <template #guide>
+                        <p-link new-tab
+                                highlight
+                                action-icon="external-link"
+                                :href="props.succeedWebhook?.plugin_info"
+                        >
+                            {{ $t('ALERT_MANAGER.WEBHOOK.GUIDE') }}
+                        </p-link>
+                    </template>
+                </i18n>
+            </span>
+        </div>
+        <div class="table">
+            <p-definition-table :fields="state.fields"
+                                :data="state.data"
+                                :skeleton-rows="3"
+                                disable-copy
+                                style-type="white"
+            >
+                <template #data-state="{ value }">
+                    <p-status
+                        class="capitalize"
+                        v-bind="userStateFormatter(value)"
+                    />
+                </template>
+            </p-definition-table>
+        </div>
+        <div class="webhook-url">
+            <div class="left">
+                <p class="title">
+                    {{ $t('ALERT_MANAGER.WEBHOOK.WEBHOOK_URL') }}
+                </p>
+                <p class="url">
+                    {{ props.succeedWebhook?.webhook_url }}
+                </p>
+            </div>
+            <p-button icon-left="ic_copy"
+                      style-type="secondary"
+                      class="button"
+                      @click="handleCopyWebhookUrl"
+            >
+                {{ $t('ALERT_MANAGER.WEBHOOK.COPY_WEBHOOK_URL') }}
+            </p-button>
+        </div>
+        <p-markdown v-if="storeState.selectedWebhookType?.docs && !isEmpty(storeState.selectedWebhookType?.docs)"
+                    :markdown="storeState.selectedWebhookType?.docs"
+                    :language="storeState.language"
+                    remove-spacing
+                    class="markdown"
+        />
+    </div>
+</template>
+
+<style lang="postcss" scoped>
+.service-create-step2-created-webhook {
+    @apply flex flex-col;
+    gap: 1rem;
+    .webhook-item {
+        @apply flex flex-col items-center justify-center text-paragraph-md;
+        gap: 1.5rem;
+        padding-bottom: 0.5rem;
+    }
+    .table {
+        @apply border border-gray-200 rounded-lg;
+    }
+
+    .webhook-url {
+        @apply border border-gray-200 rounded-lg bg-violet-100 flex justify-between gap-2 text-gray-900 text-label-md;
+        text-align: left;
+        padding: 1rem 1rem 1.25rem 1rem;
+        .left {
+            flex-grow: 0;
+            .title {
+                @apply font-bold mb-2;
+            }
+            .url {
+                line-break: anywhere;
+            }
+        }
+        .button {
+            flex-shrink: 0;
+        }
+    }
+    .markdown {
+        @apply border border-gray-200;
+        padding: 1rem;
+        border-radius: 0.375rem;
+    }
+}
+</style>
