@@ -5,6 +5,7 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
 
+import PSelectDropdown from '@/controls/dropdown/select-dropdown/PSelectDropdown.vue';
 import PFieldGroup from '@/controls/forms/field-group/PFieldGroup.vue';
 import { getTextareaArgs, getTextareaParameters, getTextareaArgTypes } from '@/controls/textarea/story-helper';
 import { useProxyValue } from '@/hooks';
@@ -44,6 +45,7 @@ const Template: Story = {
                 :readonly="readonly"
                 :disabled="disabled"
                 :invalid="invalid"
+                :resize="resize"
             />
         </div>
         `,
@@ -159,6 +161,40 @@ export const Invalid: Story = {
                     }
                     return '';
                 }),
+            });
+            return {
+                ...toRefs(state),
+            };
+        },
+    }),
+};
+
+export const Resize: Story = {
+    render: () => ({
+        components: { PTextarea, PSelectDropdown },
+        template: `
+            <div class="h-full w-full overflow p-8">
+                <p-select-dropdown :menu="resizeMenu" 
+                                   :selected="selected"
+                                   @update:selected="selected = $event"
+                />
+                <br/>
+                <br/>
+                <p-textarea :value="value" :resize="selected[0].name" />
+            </div>
+        `,
+        setup() {
+            const state = reactive({
+                value: faker.lorem.sentence(30),
+                resizeMenu: [
+                    { name: 'none', label: 'none' },
+                    { name: 'both', label: 'both' },
+                    { name: 'horizontal', label: 'horizontal' },
+                    { name: 'vertical', label: 'vertical' },
+                    { name: 'block', label: 'block' },
+                    { name: 'inline', label: 'inline' },
+                ],
+                selected: [{ name: 'block', label: 'block' }],
             });
             return {
                 ...toRefs(state),

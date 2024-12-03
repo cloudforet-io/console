@@ -28,6 +28,7 @@ export interface DatetimePickerProps {
     styleType: STYLE_TYPE;
     invalid?: boolean;
     disabled?: boolean;
+    readonly?: boolean;
     minDate?: DateOption;
     maxDate?: DateOption;
     selectMode: SELECT_MODE;
