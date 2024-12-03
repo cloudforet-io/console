@@ -6,6 +6,7 @@ import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type
 
 import { i18n } from '@/translations';
 
+import ServiceDetailTabsOverview from '@/services/alert-manager-v2/components/ServiceDetailTabsOverview.vue';
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
 
 const tabState = reactive({
@@ -25,7 +26,7 @@ const tabState = reactive({
            :active-tab.sync="tabState.activeTab"
     >
         <template #overview>
-            overview
+            <service-detail-tabs-overview />
         </template>
         <template #webhook>
             webhook
