@@ -46,6 +46,7 @@ interface Props {
     hideCreateButton?: boolean;
     workspaceId?: string;
     isInitSelectedItem?: boolean;
+    block?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -280,7 +281,7 @@ watch(() => state._selectedProjectIds, (selectedProjectIds) => {
     <div class="project-select-dropdown">
         <p-select-dropdown :loading="state.loading"
                            :visible-menu="state.visibleMenu"
-                           show-select-marker
+                           :show-select-marker="!props.readonly"
                            :multi-selectable="props.multiSelectable"
                            :use-fixed-menu-style="props.useFixedMenuStyle"
                            :invalid="props.invalid"
@@ -291,8 +292,9 @@ watch(() => state._selectedProjectIds, (selectedProjectIds) => {
                            :readonly="props.readonly"
                            :menu-position="props.position"
                            disable-handler
+                           :block="props.block"
                            appearance-type="stack"
-                           is-filterable
+                           :is-filterable="!props.readonly"
                            @update:visible-menu="handleUpdateVisibleMenu"
                            @delete-tag="handleDeleteTag"
         >
@@ -311,7 +313,9 @@ watch(() => state._selectedProjectIds, (selectedProjectIds) => {
                 </p-badge>
                 {{ state.selectedItems[0]?.label }}
             </template>
-            <template #menu-menu>
+            <template v-if="!props.readonly"
+                      #menu-menu
+            >
                 <div class="button-wrapper top">
                     <p-button icon-left="ic_refresh"
                               style-type="tertiary"

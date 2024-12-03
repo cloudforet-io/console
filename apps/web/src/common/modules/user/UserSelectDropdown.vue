@@ -26,6 +26,7 @@ const props = withDefaults(defineProps<{
      useFixedMenuStyle?: boolean;
      invalid?: boolean;
      disabled?: boolean;
+     readonly?: boolean;
      userPool?: string[];
 }>(), {
     userId: '',
@@ -127,6 +128,7 @@ watch([loading, () => props.userId, () => props.userIds], ([_loading, newUserId,
                        is-filterable
                        :invalid="props.invalid"
                        :disabled="props.disabled"
+                       :readonly="props.readonly"
                        :use-fixed-menu-style="useFixedMenuStyle"
                        show-delete-all-button
                        :multi-selectable="props.selectionType === 'multiple'"
