@@ -8,6 +8,7 @@ import { PCenteredLayoutHeader } from '@cloudforet/mirinae';
 import { i18n } from '@/translations';
 
 import ServiceCreateStep1 from '@/services/alert-manager-v2/components/ServiceCreateStep1.vue';
+import ServiceCreateStep2 from '@/services/alert-manager-v2/components/ServiceCreateStep2.vue';
 import { ALERT_MANAGER_V2_ROUTE } from '@/services/alert-manager-v2/routes/route-constant';
 import { useServiceFormStore } from '@/services/alert-manager-v2/store/service-form-store';
 
@@ -23,6 +24,7 @@ const router = useRouter();
 
 const storeState = reactive({
     step: computed(() => serviceFormState.currentStep),
+    subStep: computed(() => serviceFormState.currentSubStep),
 });
 const state = reactive({
     headerInfo: computed<headerInfoByStep>(() => {
@@ -43,6 +45,15 @@ const state = reactive({
             desc: i18n.t('ALERT_MANAGER.NOTIFICATIONS.SET_UP_DESC'),
         };
     }),
+    isWideLayout: computed<boolean>(() => {
+        const wideLayoutSteps = [
+            { step: 2, subStep: 1 },
+            { step: 3, subStep: 1 },
+        ];
+        return wideLayoutSteps.some(
+            ({ step, subStep }) => storeState.step === step && storeState.subStep === subStep,
+        );
+    }),
 });
 
 const handleClickClose = () => {
@@ -50,12 +61,14 @@ const handleClickClose = () => {
 };
 
 onUnmounted(() => {
-    serviceFormStore.init();
+    serviceFormStore.initState();
 });
 </script>
 
 <template>
-    <div class="service-create-page">
+    <div class="service-create-page"
+         :class="{'wide': state.isWideLayout}"
+    >
         <p-centered-layout-header :title="state.headerInfo.title"
                                   :description="state.headerInfo.desc"
                                   show-step
@@ -65,6 +78,7 @@ onUnmounted(() => {
                                   @close="handleClickClose"
         />
         <service-create-step1 v-if="storeState.step === 1" />
+        <service-create-step2 v-if="storeState.step === 2" />
     </div>
 </template>
 
@@ -73,5 +87,10 @@ onUnmounted(() => {
     max-width: 45rem;
     padding-right: 2.5rem;
     padding-left: 2.5rem;
+    &.wide {
+        max-width: 59.5rem;
+        padding-right: 0;
+        padding-left: 0;
+    }
 }
 </style>

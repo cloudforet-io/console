@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive, watch,
+    computed, onMounted, onUnmounted, reactive, watch,
 } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -52,9 +52,9 @@ const {
     invalidTexts,
     isAllValid,
 } = useFormValidator({
-    name: serviceFormState.name,
-    key: serviceFormState.key,
-    description: serviceFormState.description,
+    name: serviceFormState.step1Form.name,
+    key: serviceFormState.step1Form.key,
+    description: serviceFormState.step1Form.description,
 }, {
     name() {
         // TODO: Implement validation logic
@@ -72,7 +72,7 @@ const convertToSnakeCase = (str) => str
     .replace(/_+/g, '_')
     .replace(/_$/g, '')
     .toLowerCase();
-const getUserName = (id: string) => formDataState.workspaceUsersData.find((i) => i.user_id === id)?.name;
+const getUserName = (id: string): string => formDataState.workspaceUsersData.find((i) => i.user_id === id)?.name;
 const handleChangeInput = (label: 'name'|'key'|'member'|'description', value?: string) => {
     if (label !== 'member') setForm(label, value);
     // TODO: Add logic to separate user group data
@@ -100,13 +100,17 @@ const listWorkspaceUsers = async () => {
 };
 
 watch(() => state.isFocusedKey, (isFocusedKey) => {
-    if (isFocusedKey && !serviceFormState.key) {
-        handleChangeInput('key', convertToSnakeCase(serviceFormState.name));
+    if (isFocusedKey && !serviceFormState.step1Form.key) {
+        handleChangeInput('key', convertToSnakeCase(serviceFormState.step1Form.name));
     }
 });
 
 onMounted(async () => {
     await listWorkspaceUsers();
+});
+
+onUnmounted(() => {
+    serviceFormStore.initStep1();
 });
 </script>
 

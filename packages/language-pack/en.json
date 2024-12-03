@@ -44,6 +44,7 @@
 			"VIEW_RESOURCE": "View resource",
 			"WARNING": "Warning"
 		},
+		"ALT_S_COPIED": "Copied",
 		"CANCEL": "Cancel",
 		"CONTINUE": "Continue",
 		"CREATE": "Create",
@@ -95,6 +96,7 @@
 			"MEMBERS": "Members",
 			"OPEN_ALERTS": "Open Alerts",
 			"OVERVIEW": "Overview",
+			"SELECT": "Select",
 			"SERVICE_MEMBER": "Service Member",
 			"SHOW_IN_ALERTS": "Show in Alerts",
 			"SKIP_FOR_LATER": "Skip for Later",
@@ -116,6 +118,7 @@
 			"LABEL_NAME": "Name",
 			"LABEL_STATE": "State",
 			"TITLE": "Webhook",
+			"VALIDATION_NAME_MAX": "The maximum length of a name is 40 characters.",
 			"VERSION": "Version",
 			"WEBHOOK_URL": "Webhook URL"
 		}
