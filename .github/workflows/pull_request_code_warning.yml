@@ -33,29 +33,46 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Check for TODOs
+        id: check_todo
         run: |
           echo "Checking for TODOs..."
-          grep -rl "TODO" . --exclude-dir={node_modules,.git} > todo_files.txt || true
-          if [ -s todo_files.txt ]; then
-            echo "The following files contain TODOs:"
-            cat todo_files.txt
-            while IFS= read -r file; do
-              echo "::warning file=$file::File contains TODO"
-            done < todo_files.txt
+          TODO_COUNT=$(grep -rnw . -e "TODO" --exclude-dir={node_modules,.git} | tee todo_results.txt | wc -l)
+          if [ "$TODO_COUNT" -gt 0 ]; then
+            echo "Found $TODO_COUNT TODO(s):"
+            grep -rnw . -e "TODO" --exclude-dir={node_modules,.git} | while read -r line; do
+              FILE=$(echo "$line" | cut -d: -f1)
+              LINE=$(echo "$line" | cut -d: -f2)
+              MESSAGE=$(echo "$line" | cut -d: -f3-)
+            done
           else
             echo "No TODOs found."
           fi
+          echo "todo_count=$TODO_COUNT" >> $GITHUB_ENV
 
       - name: Check for console.log
+        id: check_console_log
         run: |
           echo "Checking for console.log..."
-          grep -rl "console.log" . --exclude-dir={node_modules,.git} > console_log_files.txt || true
-          if [ -s console_log_files.txt ]; then
-            echo "The following files contain console.log:"
-            cat console_log_files.txt
-            while IFS= read -r file; do
-              echo "::warning file=$file::File contains console.log"
-            done < console_log_files.txt
+          LOG_COUNT=$(grep -rnw . -e "console.log" --exclude-dir={node_modules,.git} | tee console_log_results.txt | wc -l)
+          if [ "$LOG_COUNT" -gt 0 ]; then
+            echo "Found $LOG_COUNT console.log statement(s):"
+            grep -rnw . -e "console.log" --exclude-dir={node_modules,.git} | while read -r line; do
+              FILE=$(echo "$line" | cut -d: -f1)
+              LINE=$(echo "$line" | cut -d: -f2)
+              MESSAGE=$(echo "$line" | cut -d: -f3-)
+            done
           else
-            echo "No console.log found."
+            echo "No console.log statements found."
+          fi
+          echo "console_log_count=$LOG_COUNT" >> $GITHUB_ENV
+
+      - name: Fail if issues found
+        run: |
+          echo "TODO Count: $todo_count"
+          echo "console.log Count: $console_log_count"
+          if [ "$todo_count" -gt 0 ] || [ "$console_log_count" -gt 0 ]; then
+            echo "Workflow failed. TODO count: $todo_count, console.log count: $console_log_count"
+            exit 1
+          else
+            echo "No issues found. Workflow passed."
           fi
