@@ -3,11 +3,13 @@ import {
     defineAsyncComponent, computed, onBeforeMount, ref, watch,
 } from 'vue';
 
+import { isEqual } from 'lodash';
+
 import {
     PFieldGroup, PTextInput, PToggleButton, PCheckbox,
 } from '@cloudforet/mirinae';
 
-import type { TaskFieldOptions, TaskFieldType } from '@/schema/opsflow/_types/task-field-type';
+import type { TaskField, TaskFieldOptions, TaskFieldType } from '@/schema/opsflow/_types/task-field-type';
 
 import { useFieldValidator } from '@/common/composables/form-validator';
 
@@ -24,20 +26,20 @@ const COMPONENT_MAP: Partial<Record<TaskFieldType, ReturnType<typeof defineAsync
 };
 
 const props = defineProps<{
-    fieldType: TaskFieldType;
-    fieldId: string;
+    field: TaskField;
 }>();
 const emit = defineEmits<{(event: 'delete'): void;
+    (event: 'update:field', value: TaskField): void;
     (event: 'update:is-valid', value: boolean): void;
 }>();
 
 const taskFieldMetadataStore = useTaskFieldMetadataStore();
 const taskFieldMetadataStoreGetters = taskFieldMetadataStore.getters;
 
-const fieldMetadata = computed<TaskFieldTypeMetadata>(() => taskFieldMetadataStoreGetters.taskFieldTypeMetadataMap[props.fieldType]);
-const optionsComponent = computed<ReturnType<typeof defineAsyncComponent>|undefined>(() => COMPONENT_MAP[props.fieldType]);
+const fieldMetadata = computed<TaskFieldTypeMetadata>(() => taskFieldMetadataStoreGetters.taskFieldTypeMetadataMap[props.field.field_type]);
+const optionsComponent = computed<ReturnType<typeof defineAsyncComponent>|undefined>(() => COMPONENT_MAP[props.field.field_type]);
 
-const isDefaultField = computed(() => !!DEFAULT_FIELD_ID_MAP[props.fieldId]);
+const isDefaultField = computed(() => !!DEFAULT_FIELD_ID_MAP[props.field.field_id]);
 const {
     value: name, setValue: setName, resetValidation: resetNameValidation, isInvalid: isNameInvalid, validationResult: isNameValid,
 } = useFieldValidator<string|undefined>('', (val?: string) => (val ? val.trim().length > 0 : false));
@@ -48,15 +50,45 @@ const isPrimary = ref<boolean>(false);
 const isFolded = ref<boolean>(false);
 const isAllValid = computed<boolean>(() => isNameValid.value && (optionsComponent.value ? isOptionsValid.value : true));
 
+// const MULTI_SELECTION_FIELD_TYPES = [
+//     'LABELS',
+//     'DROPDOWN',
+//     'USER',
+//     'ASSET',
+//     'PROJECT',
+//     'PROVIDER',
+//     'SERVICE_ACCOUNT',
+// ]
+// const HAS_SELECTION_TYPE = [
+//     'DROPDOWN',
+//     'USER',
+//     'ASSET',
+//     'PROJECT',
+//     'PROVIDER',
+//     'SERVICE_ACCOUNT',
+// ]
+const field = computed<TaskField>(() => ({
+    ...props.field,
+    name: name.value,
+    options: options.value,
+    is_required: isRequired.value,
+    is_primary: isPrimary.value,
+}));
+watch(field, (newField) => {
+    if (isEqual(newField, props.field)) return;
+    emit('update:field', newField);
+});
 watch(isAllValid, (isValid) => {
     emit('update:is-valid', isValid);
 }, { immediate: true });
 
 onBeforeMount(() => {
-    setName(fieldMetadata.value.name);
+    setName(props.field.name ?? fieldMetadata.value.name);
     resetNameValidation();
-    isRequired.value = isDefaultField.value;
-    isPrimary.value = isDefaultField.value;
+    options.value = props.field.options ?? {};
+    isOptionsValid.value = false;
+    isRequired.value = props.field.is_required ?? isDefaultField.value;
+    isPrimary.value = props.field.is_primary ?? isDefaultField.value;
     isFolded.value = isDefaultField.value;
 });
 </script>
@@ -66,7 +98,7 @@ onBeforeMount(() => {
         <task-field-generator-header :field-metadata="fieldMetadata"
                                      :name="name"
                                      :is-required="isRequired"
-                                     :is-deletable="DEFAULT_FIELD_ID_MAP[props.fieldType] === undefined"
+                                     :is-deletable="DEFAULT_FIELD_ID_MAP[props.field.field_type] === undefined"
                                      :is-folded="isFolded"
                                      :is-default-field="isDefaultField"
                                      @update:is-folded="isFolded = $event"
@@ -79,7 +111,7 @@ onBeforeMount(() => {
                                required
                 >
                     <p-text-input :value="name"
-                                  :placeholder="fieldMetadata.name"
+                                  :placeholder="props.field.name || fieldMetadata.name"
                                   :invalid="isNameInvalid"
                                   @update:value="setName($event)"
                     />

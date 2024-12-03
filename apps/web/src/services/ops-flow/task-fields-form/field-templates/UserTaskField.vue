@@ -34,6 +34,7 @@ const {
                               :user-ids="fieldValue"
                               selection-type="multiple"
                               :invalid="isInvalid"
+                              :readonly="props.readonly"
                               @update:user-ids="updateFieldValue"
         />
     </p-field-group>

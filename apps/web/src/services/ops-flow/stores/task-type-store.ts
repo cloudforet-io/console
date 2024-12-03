@@ -96,18 +96,24 @@ export const useTaskTypeStore = defineStore('task-type', () => {
         async update(params: TaskTypeUpdateParameters) {
             const response = await SpaceConnector.clientV2.opsflow.taskType.update<TaskTypeUpdateParameters, TaskTypeModel>(params);
             const categoryId = response.category_id;
-            const item = state.itemsByCategoryId[categoryId]?.find((c) => c.category_id === categoryId);
-            if (item) {
-                Object.assign(item, response);
+            if (state.itemsByCategoryId[categoryId]) {
+                const idx = state.itemsByCategoryId[categoryId]?.findIndex((c) => c.task_type_id === response.task_type_id);
+                if (idx !== -1) {
+                    state.itemsByCategoryId[categoryId]?.splice(idx, 1, response);
+                    state.itemsByCategoryId = { ...state.itemsByCategoryId };
+                }
             }
             return response;
         },
         async updateFields(params: TaskTypeUpdateFieldsParameters) {
             const response = await SpaceConnector.clientV2.opsflow.taskType.updateFields<TaskTypeUpdateFieldsParameters, TaskTypeModel>(params);
             const categoryId = response.category_id;
-            const item = state.itemsByCategoryId[categoryId]?.find((c) => c.category_id === categoryId);
-            if (item) {
-                Object.assign(item, response);
+            if (state.itemsByCategoryId[categoryId]) {
+                const idx = state.itemsByCategoryId[categoryId]?.findIndex((c) => c.task_type_id === response.task_type_id);
+                if (idx !== -1) {
+                    state.itemsByCategoryId[categoryId]?.splice(idx, 1, response);
+                    state.itemsByCategoryId = { ...state.itemsByCategoryId };
+                }
             }
             return response;
         },
@@ -116,9 +122,19 @@ export const useTaskTypeStore = defineStore('task-type', () => {
                 task_type_id: taskTypeId,
             });
             const categoryId = response.category_id;
-            const item = state.itemsByCategoryId[categoryId]?.find((c) => c.category_id === categoryId);
-            if (item) {
-                Object.assign(item, response);
+            if (state.itemsByCategoryId[categoryId]) {
+                const idx = state.itemsByCategoryId[categoryId]?.findIndex((c) => c.task_type_id === response.task_type_id);
+                if (idx !== -1) {
+                    state.itemsByCategoryId[categoryId]?.splice(idx, 1, response);
+                    state.itemsByCategoryId = { ...state.itemsByCategoryId };
+                } else {
+                    state.itemsByCategoryId = {
+                        ...state.itemsByCategoryId,
+                        [categoryId]: [response],
+                    };
+                }
+            } else {
+                state.itemsByCategoryId = { ...state.itemsByCategoryId, [categoryId]: [response] };
             }
             return response;
         },

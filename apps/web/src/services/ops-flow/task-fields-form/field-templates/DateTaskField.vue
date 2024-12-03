@@ -38,6 +38,7 @@ const handleUpdate = (val: string[]) => {
         <p-datetime-picker class="my-1"
                            :selected-dates="selectedDates"
                            :invalid="isInvalid"
+                           :readonly="props.readonly"
                            @update:selected-dates="handleUpdate"
         />
     </p-field-group>

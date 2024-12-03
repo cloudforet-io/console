@@ -31,9 +31,11 @@ const {
                    no-spacing
     >
         <project-select-dropdown class="my-1"
+                                 block
                                  project-selectable
                                  :project-group-selectable="false"
                                  :selected-project-ids="fieldValue"
+                                 :readonly="props.readonly"
                                  @update:selected-project-ids="updateFieldValue"
         />
     </p-field-group>

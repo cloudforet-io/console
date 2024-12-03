@@ -134,6 +134,7 @@ watch(() => taskContentFormGetters.currentTaskType, (currentTaskType) => {
                     <p-select-dropdown :selected="selectedCategoryItems"
                                        :handler="categoryMenuItemsHandler"
                                        :invalid="invalidState.category"
+                                       :disabled="taskContentFormState.mode === 'view'"
                                        block
                                        @update:selected="handleUpdateSelectedCategory"
                     />
@@ -149,7 +150,7 @@ watch(() => taskContentFormGetters.currentTaskType, (currentTaskType) => {
                     <p-select-dropdown :selected="selectedTaskTypeItems"
                                        :handler="taskTypeMenuItemsHandler"
                                        :invalid="invalidState.taskType"
-                                       :disabled="!taskContentFormGetters.currentCategory"
+                                       :disabled="taskContentFormState.mode === 'view' || !taskContentFormGetters.currentCategory"
                                        block
                                        @update:selected="handleUpdateSelectedTaskType"
                     />
@@ -169,7 +170,7 @@ watch(() => taskContentFormGetters.currentTaskType, (currentTaskType) => {
                     <p-select-dropdown :selected="selectedStatusItems"
                                        :handler="statusMenuItemsHandler"
                                        :invalid="invalidState.status"
-                                       :disabled="!taskContentFormGetters.currentCategory"
+                                       :disabled="taskContentFormState.mode === 'view' || !taskContentFormGetters.currentCategory"
                                        block
                                        @update:selected="handleUpdateSelectedStatus"
                     />
@@ -191,7 +192,7 @@ watch(() => taskContentFormGetters.currentTaskType, (currentTaskType) => {
                 >
                     <user-select-dropdown :user-id="assignee"
                                           :invalid="invalidState.assignee"
-                                          :disabled="!taskContentFormGetters.currentTaskType"
+                                          :disabled="taskContentFormState.mode === 'view' || !taskContentFormGetters.currentTaskType"
                                           :user-pool="taskContentFormGetters.currentTaskType?.assignee_pool"
                                           @update:user-id="handleUpdateSelectedAssignee"
                     />

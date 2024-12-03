@@ -29,21 +29,17 @@ const emit = defineEmits<{(event: 'update:options', value: DropdownTaskFieldOpti
     (event: 'update:is-valid', value: boolean): void;
 }>();
 
-const localEnums = ref<ControllableTaskFieldEnum[]>([]);
-const enums = computed<ControllableTaskFieldEnum[]>({
-    get() {
-        return localEnums.value;
-    },
-    set(value: ControllableTaskFieldEnum[]) {
-        localEnums.value = value;
-        emit('update:options', {
-            enums: value.map((d) => ({
-                key: d.key,
-                name: d.name,
-            })),
-        });
-    },
-});
+const enums = ref<ControllableTaskFieldEnum[]>([]);
+const updateEnum = (index: number, key: 'key' | 'name', value: string) => {
+    enums.value[index][key] = value;
+    // remove _id from the enum object
+    emit('update:options', {
+        enums: enums.value.map((e) => ({
+            key: e.key,
+            name: e.name,
+        })),
+    });
+};
 
 
 const allKeys = computed<string[]>(() => enums.value.map((item) => item.key));
@@ -103,8 +99,8 @@ onBeforeMount(() => {
                                                :value="item.key"
                                                :index="idx"
                                                :values="allKeys"
-                                               @update:name="item.name = $event"
-                                               @update:value="item.key = $event"
+                                               @update:name="updateEnum(idx, 'name', $event)"
+                                               @update:value="updateEnum(idx, 'key', $event)"
                                                @update:is-valid="validationMap[item._id] = $event"
                 />
                 <p-icon-button shape="square"

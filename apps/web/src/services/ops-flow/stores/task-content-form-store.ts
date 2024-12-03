@@ -6,6 +6,7 @@ import { defineStore } from 'pinia';
 import type { TaskField } from '@/schema/opsflow/_types/task-field-type';
 import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
 import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
+import type { TaskModel } from '@/schema/opsflow/task/model';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -127,6 +128,20 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
             state.dataValidationMap = { ...state.dataValidationMap, [fieldId]: isValid };
         },
         // overall
+        setCurrentTask(task: TaskModel) {
+            state.currentCategoryId = task.category_id;
+            state.currentTaskTypeId = task.task_type_id;
+            state.statusId = task.status_id;
+            state.assignee = task.assignee;
+            state.defaultData = {
+                title: task.name,
+                description: task.description,
+                project: task.project_id ? [task.project_id] : undefined,
+            };
+            state.data = task.data ?? {};
+            state.defaultDataValidationMap = {};
+            state.dataValidationMap = {};
+        },
         resetFieldsForm() {
             state.defaultData = {};
             state.defaultDataValidationMap = {};

@@ -38,21 +38,21 @@ export const useTaskStore = defineStore('task', () => {
         },
         async create(params: TaskCreateParameters) {
             const response = await SpaceConnector.clientV2.opsflow.task.create<TaskCreateParameters, TaskModel>(params);
-            const taskId = response.task_type_id;
-            state.itemsByTaskId[taskId] = response;
+            const taskId = response.task_id;
+            state.itemsByTaskId = { ...state.itemsByTaskId, [taskId]: response };
             return response;
         },
         async update(params: TaskUpdateParameters) {
             const response = await SpaceConnector.clientV2.opsflow.task.update<TaskUpdateParameters, TaskModel>(params);
-            const taskId = response.task_type_id;
-            state.itemsByTaskId[taskId] = response;
+            const taskId = response.task_id;
+            state.itemsByTaskId = { ...state.itemsByTaskId, [taskId]: response };
             return response;
         },
         async get(taskId: string) {
             const response = await SpaceConnector.clientV2.opsflow.task.get<TaskGetParameters, TaskModel>({
                 task_id: taskId,
             });
-            state.itemsByTaskId[taskId] = response;
+            state.itemsByTaskId = { ...state.itemsByTaskId, [taskId]: response };
             return response;
         },
         async delete(taskId: string) {

@@ -3,7 +3,7 @@ import {
     ref, nextTick, watch,
 } from 'vue';
 
-import { isEqual } from 'lodash';
+import { isEqual, cloneDeep } from 'lodash';
 
 import {
     POverlayLayout, PFieldGroup, PTextInput, PButton, PTextarea,
@@ -75,11 +75,10 @@ const handleClosed = () => {
     taskCategoryPageStore.resetTargetTaskTypeId();
 };
 
-const updateTaskTypeFields = async (taskTypeId: string, categoryId: string) => {
+const updateTaskTypeFields = async (taskTypeId: string) => {
     await taskTypeStore.updateFields({
         task_type_id: taskTypeId,
         fields: fields.value,
-        category_id: categoryId,
         force: true,
     });
 };
@@ -98,22 +97,23 @@ const createTaskType = async (categoryId: string) => {
         ErrorHandler.handleRequestError(e, 'Failed to create task type');
     }
 };
-const updateTaskType = async (initialTaskType: TaskTypeModel) => {
+
+const updateTaskType = async (target: TaskTypeModel) => {
     try {
         const promises: Promise<any>[] = [];
-        if (initialTaskType.name !== name.value
-            || initialTaskType.description !== description.value
-            || !isEqual(initialTaskType.assignee_pool, assigneePool.value)
+        if (target.name !== name.value
+            || target.description !== description.value
+            || !isEqual(target.assignee_pool, assigneePool.value)
         ) {
             promises.push(taskTypeStore.update({
-                task_type_id: initialTaskType.task_type_id,
+                task_type_id: target.task_type_id,
                 name: name.value,
                 description: description.value,
                 assignee_pool: assigneePool.value,
             }));
         }
-        if (!isEqual(fields.value, initialTaskType.fields)) {
-            promises.push(updateTaskTypeFields(initialTaskType.task_type_id, initialTaskType.category_id));
+        if (!isEqual(fields.value, target.fields)) {
+            promises.push(updateTaskTypeFields(target.task_type_id));
         }
         const result = await Promise.allSettled(promises);
         const errorMessages: string[] = [];
@@ -131,13 +131,14 @@ const updateTaskType = async (initialTaskType: TaskTypeModel) => {
     }
 };
 
+let initialTaskType: TaskTypeModel|undefined;
 const handleConfirm = async () => {
     if (!isAllValid.value) return;
     try {
         if (!taskCategoryPageState.currentCategoryId) throw new Error('Category ID is not set');
         loading.value = true;
-        if (taskCategoryPageGetters.targetTaskType) {
-            await updateTaskType(taskCategoryPageGetters.targetTaskType);
+        if (initialTaskType) {
+            await updateTaskType(initialTaskType);
         } else {
             await createTaskType(taskCategoryPageState.currentCategoryId);
         }
@@ -159,10 +160,12 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
             assigneePool: [],
         });
         setInitialFields([]);
+        initialTaskType = undefined;
         resetValidations();
         return;
     }
     if (target) {
+        initialTaskType = cloneDeep(target);
         setForm({
             name: target.name,
             description: target.description,

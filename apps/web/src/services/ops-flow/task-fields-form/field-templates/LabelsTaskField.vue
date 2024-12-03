@@ -32,7 +32,7 @@ const {
     >
         <labels-input class="my-1"
                       :labels="fieldValue"
-                      editable
+                      :editable="!props.disabled"
                       @update:value="updateFieldValue"
         />
     </p-field-group>

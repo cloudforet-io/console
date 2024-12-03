@@ -42,6 +42,7 @@ onUnmounted(() => {
                    :key="field.field_id"
                    :field="field"
                    :value="taskContentFormState.defaultData[field.field_id]"
+                   :readonly="taskContentFormState.mode === 'view'"
                    @update:value="taskContentFormStore.setDefaultFieldData(field.field_id, $event)"
                    @update:is-valid="taskContentFormStore.setDefaultFieldValidation(field.field_id, $event)"
         />
@@ -51,6 +52,7 @@ onUnmounted(() => {
                    :key="field.field_id"
                    :field="field"
                    :value="taskContentFormState.data[field.field_id]"
+                   :readonly="taskContentFormState.mode === 'view'"
                    @update:value="taskContentFormStore.setFieldData(field.field_id, $event)"
                    @update:is-valid="taskContentFormStore.setFieldValidation(field.field_id, $event)"
         />

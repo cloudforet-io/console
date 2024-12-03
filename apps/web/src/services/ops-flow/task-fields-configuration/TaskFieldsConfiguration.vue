@@ -40,8 +40,7 @@ const draggableFields = computed<TaskField[]>({
             <div class="flex flex-col gap-2">
                 <task-field-generator v-for="field in taskFieldMetadataStoreGetters.defaultFields"
                                       :key="field.field_id"
-                                      :field-type="field.field_type"
-                                      :field-id="field.field_id"
+                                      :field="field"
                 />
             </div>
             <div class="border-t border-gray-200 mt-4 pt-4">
@@ -62,9 +61,9 @@ const draggableFields = computed<TaskField[]>({
                             />
                         </span>
                         <task-field-generator class="flex-grow"
-                                              :field-type="field.field_type"
-                                              :field-id="field.field_id"
+                                              :field="field"
                                               @delete="emit('remove-field', field.field_id, idx)"
+                                              @update:field="draggableFields[idx] = $event"
                                               @update:is-valid="emit('update-field-validation', field.field_id, $event)"
                         />
                     </div>

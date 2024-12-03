@@ -28,17 +28,18 @@ interface DropdownItem extends SelectDropdownMenuItem {
 }
 
 const allItems = computed<DropdownItem[]>(() => {
-    if (!props.field.options?.enums) return [];
-    return props.field.options.enums.map((item) => ({
+    const enums = props.field.options?.enums;
+    if (!Array.isArray(enums)) return [];
+    return enums.map((item) => ({
         name: item.key,
         label: item.name,
     }));
 });
 
-const selectedItems = computed<DropdownItem[]>(() => fieldValue.value.map((item) => ({
+const selectedItems = computed<DropdownItem[]>(() => fieldValue.value?.map((item) => ({
     name: item,
     label: allItems.value.find((i) => i.name === item)?.label ?? item,
-})));
+})) ?? []);
 const dropdownItemsHandler: AutocompleteHandler = async (keyword: string, pageStart = 1, pageLimit = 10) => {
     const filteredItems = allItems.value.filter((item) => getTextHighlightRegex(keyword).test(item.label));
     const _totalCount = pageStart - 1 + Number(pageLimit);
@@ -62,10 +63,13 @@ const handleUpdate = (val: DropdownItem[]) => {
     >
         <p-select-dropdown class="my-1"
                            show-select-marker
+                           :menu="allItems"
                            :selected="selectedItems"
                            :handler="dropdownItemsHandler"
-                           is-filterable
-                           show-delete-all-button
+                           :readonly="props.readonly"
+                           appearance-type="stack"
+                           multi-selectable
+                           block
                            @update:selected="handleUpdate"
         />
     </p-field-group>

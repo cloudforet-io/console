@@ -6,6 +6,7 @@ import {
 import type { ParagraphTaskField } from '@/schema/opsflow/_types/task-field-type';
 
 import TextEditor from '@/common/components/editor/TextEditor.vue';
+import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 
 import { useTaskFieldValidation } from '@/services/ops-flow/task-fields-form/composables/use-task-field-validation';
 import type {
@@ -30,7 +31,14 @@ const {
                    :invalid-text="invalidText"
                    no-spacing
     >
-        <text-editor class="my-1"
+        <text-editor-viewer v-if="props.readonly"
+                            class="my-1"
+                            :contents="fieldValue"
+                            :attachments="props.attachments"
+                            show-in-box
+        />
+        <text-editor v-else
+                     class="my-1"
                      :value="fieldValue"
                      :placeholder="props.field.options?.example"
                      :invalid="isInvalid"

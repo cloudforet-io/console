@@ -29,6 +29,7 @@ const {
                       :value="fieldValue"
                       :placeholder="props.field.options?.example"
                       :invalid="isInvalid"
+                      :readonly="props.readonly"
                       block
                       @update:value="updateFieldValue"
         />
