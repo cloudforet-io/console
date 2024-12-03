@@ -9,11 +9,18 @@ import {
     PFieldGroup, PTextInput, PToggleButton, PCheckbox,
 } from '@cloudforet/mirinae';
 
-import type { TaskField, TaskFieldOptions, TaskFieldType } from '@/schema/opsflow/_types/task-field-type';
+import type {
+    TaskField,
+    TaskFieldOptions,
+    TaskFieldType,
+} from '@/schema/opsflow/_types/task-field-type';
 
 import { useFieldValidator } from '@/common/composables/form-validator';
 
-import { DEFAULT_FIELD_ID_MAP } from '@/services/ops-flow/task-fields-configuration/constants/default-field-constant';
+import {
+    DEFAULT_FIELD_ID_MAP,
+    MULTI_SELECTION_FIELD_TYPES,
+} from '@/services/ops-flow/task-fields-configuration/constants/default-field-constant';
 import {
     useTaskFieldMetadataStore,
 } from '@/services/ops-flow/task-fields-configuration/stores/use-task-field-metadata-store';
@@ -50,30 +57,19 @@ const isPrimary = ref<boolean>(false);
 const isFolded = ref<boolean>(false);
 const isAllValid = computed<boolean>(() => isNameValid.value && (optionsComponent.value ? isOptionsValid.value : true));
 
-// const MULTI_SELECTION_FIELD_TYPES = [
-//     'LABELS',
-//     'DROPDOWN',
-//     'USER',
-//     'ASSET',
-//     'PROJECT',
-//     'PROVIDER',
-//     'SERVICE_ACCOUNT',
-// ]
-// const HAS_SELECTION_TYPE = [
-//     'DROPDOWN',
-//     'USER',
-//     'ASSET',
-//     'PROJECT',
-//     'PROVIDER',
-//     'SERVICE_ACCOUNT',
-// ]
-const field = computed<TaskField>(() => ({
-    ...props.field,
-    name: name.value,
-    options: options.value,
-    is_required: isRequired.value,
-    is_primary: isPrimary.value,
-}));
+const field = computed<TaskField>(() => {
+    const result: TaskField = {
+        ...props.field,
+        name: name.value,
+        options: options.value,
+        is_required: isRequired.value,
+        is_primary: isPrimary.value,
+    };
+    if (!result.selection_type && MULTI_SELECTION_FIELD_TYPES.includes(props.field.field_type)) {
+        result.selection_type = 'MULTI';
+    }
+    return result;
+});
 watch(field, (newField) => {
     if (isEqual(newField, props.field)) return;
     emit('update:field', newField);

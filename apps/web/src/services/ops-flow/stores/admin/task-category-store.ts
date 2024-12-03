@@ -104,11 +104,15 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
             });
             state.items = state.items?.filter((item) => item.category_id !== categoryId);
         },
+        reset() {
+            state.loading = false;
+            state.items = undefined;
+        },
     };
 
     const disposeSelf = () => {
         const store = useTaskCategoryStore();
-        store.$reset();
+        store.reset();
         store.$dispose();
     };
     const appContextStore = useAppContextStore();

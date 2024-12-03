@@ -102,11 +102,14 @@ export const useCommentStore = defineStore('comment', () => {
                 state.itemsByTaskId[taskId] = state.itemsByTaskId[taskId]?.filter((c) => c.comment_id !== commentId);
             }
         },
+        reset() {
+            state.itemsByTaskId = {};
+        },
     };
 
     const disposeSelf = () => {
         const store = useCommentStore();
-        store.$reset();
+        store.reset();
         store.$dispose();
     };
     const appContextStore = useAppContextStore();

@@ -158,11 +158,15 @@ export const useTaskTypeStore = defineStore('task-type', () => {
                 }
             }
         },
+        reset() {
+            state.loading = false;
+            state.itemsByCategoryId = {};
+        },
     };
 
     const disposeSelf = () => {
         const store = useTaskTypeStore();
-        store.$reset();
+        store.reset();
         store.$dispose();
     };
     const appContextStore = useAppContextStore();

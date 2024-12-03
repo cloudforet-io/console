@@ -61,11 +61,14 @@ export const useTaskStore = defineStore('task', () => {
             });
             delete state.itemsByTaskId[taskId];
         },
+        reset() {
+            state.itemsByTaskId = {};
+        },
     };
 
     const disposeSelf = () => {
         const store = useTaskStore();
-        store.$reset();
+        store.reset();
         store.$dispose();
     };
     const appContextStore = useAppContextStore();
