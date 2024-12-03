@@ -11,14 +11,14 @@ import ServiceCreateStep1 from '@/services/alert-manager-v2/components/ServiceCr
 import ServiceCreateStep2 from '@/services/alert-manager-v2/components/ServiceCreateStep2.vue';
 import ServiceCreateStep3 from '@/services/alert-manager-v2/components/ServiceCreateStep3.vue';
 import { ALERT_MANAGER_V2_ROUTE } from '@/services/alert-manager-v2/routes/route-constant';
-import { useServiceFormStore } from '@/services/alert-manager-v2/store/service-form-store';
+import { useServiceCreateFormStore } from '@/services/alert-manager-v2/store/service-create-form-store';
 
 type headerInfoByStep = {
     title: TranslateResult;
     desc: TranslateResult;
 };
 
-const serviceFormStore = useServiceFormStore();
+const serviceFormStore = useServiceCreateFormStore();
 const serviceFormState = serviceFormStore.state;
 
 const router = useRouter();
