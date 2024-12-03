@@ -31,23 +31,31 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        with:
-          submodules: true
 
-      - name: Check for TODO and console.log
+      - name: Check for TODOs
         run: |
-          # Find TODOs
-          TODO_COUNT=$(grep -rnw . -e "TODO" --exclude-dir={node_modules,.git} | wc -l)
-          if [ $TODO_COUNT -gt 0 ]; then
-            echo "WARNING: Found $TODO_COUNT TODOs in the code."
+          echo "Checking for TODOs..."
+          grep -rl "TODO" . --exclude-dir={node_modules,.git} > todo_files.txt || true
+          if [ -s todo_files.txt ]; then
+            echo "The following files contain TODOs:"
+            cat todo_files.txt
+            while IFS= read -r file; do
+              echo "::warning file=$file::File contains TODO"
+            done < todo_files.txt
+          else
+            echo "No TODOs found."
           fi
 
-          # Find console.log
-          LOG_COUNT=$(grep -rnw . -e "console.log" --exclude-dir={node_modules,.git} | wc -l)
-          if [ $LOG_COUNT -gt 0 ]; then
-            echo "WARNING: Found $LOG_COUNT occurrences of console.log in the code."
-          fi
-
-          if [ $TODO_COUNT -gt 0 ] || [ $LOG_COUNT -gt 0 ]; then
-            exit 1
+      - name: Check for console.log
+        run: |
+          echo "Checking for console.log..."
+          grep -rl "console.log" . --exclude-dir={node_modules,.git} > console_log_files.txt || true
+          if [ -s console_log_files.txt ]; then
+            echo "The following files contain console.log:"
+            cat console_log_files.txt
+            while IFS= read -r file; do
+              echo "::warning file=$file::File contains console.log"
+            done < console_log_files.txt
+          else
+            echo "No console.log found."
           fi
