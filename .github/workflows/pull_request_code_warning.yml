@@ -36,35 +36,25 @@ jobs:
         id: check_todo
         run: |
           echo "Checking for TODOs..."
-          TODO_FILES=$(grep -rl "TODO" . --exclude-dir={node_modules,.git} || true)
-          TODO_COUNT=0
-          if [ -n "$TODO_FILES" ]; then
-            for FILE in $TODO_FILES; do
-              echo "::warning file=$FILE::File contains TODO"
-            done
-            TODO_COUNT=$(echo "$TODO_FILES" | wc -l)
-            echo "Found $TODO_COUNT file(s) with TODO."
+          grep -rl "TODO" . --exclude-dir={node_modules,.git} > todo_files.txt || true
+          if [ -s todo_files.txt ]; then
+            echo "The following files contain TODO:"
+            cat todo_files.txt
           else
             echo "No TODOs found."
           fi
-          echo "todo_count=$TODO_COUNT" >> $GITHUB_ENV
 
       - name: Check for console.log
         id: check_console_log
         run: |
           echo "Checking for console.log..."
-          LOG_FILES=$(grep -rl "console.log" . --exclude-dir={node_modules,.git} || true)
-          LOG_COUNT=0
-          if [ -n "$LOG_FILES" ]; then
-            for FILE in $LOG_FILES; do
-              echo "::warning file=$FILE::File contains console.log"
-            done
-            LOG_COUNT=$(echo "$LOG_FILES" | wc -l)
-            echo "Found $LOG_COUNT file(s) with console.log."
+          grep -rl "console.log" . --exclude-dir={node_modules,.git} > console_log_files.txt || true
+          if [ -s console_log_files.txt ]; then
+            echo "The following files contain console.log:"
+            cat console_log_files.txt
           else
-            echo "No console.log statements found."
+            echo "No console.log found."
           fi
-          echo "console_log_count=$LOG_COUNT" >> $GITHUB_ENV
 
       - name: Fail if issues found
         run: |
