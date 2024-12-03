@@ -15,7 +15,8 @@ interface ServiceStep1FormState {
     description: string;
 }
 
-interface ServiceFormStoreState extends ServiceStep1FormState {
+interface ServiceFormStoreState {
+    step1Form: ServiceStep1FormState;
     currentStep: number;
     currentSubStep: number;
     selectedWebhookType: PluginModel;
@@ -27,10 +28,12 @@ export const useServiceFormStore = defineStore('service-form', () => {
         currentStep: 1,
         currentSubStep: 1,
         // service
-        name: '',
-        key: '',
-        member: {},
-        description: '',
+        step1Form: {
+            name: '',
+            key: '',
+            member: {},
+            description: '',
+        },
         // webhook
         selectedWebhookType: {} as PluginModel,
         webhookName: '',
@@ -42,10 +45,12 @@ export const useServiceFormStore = defineStore('service-form', () => {
             state.currentSubStep = 1;
         },
         initStep1() {
-            state.name = '';
-            state.key = '';
-            state.member = {};
-            state.description = '';
+            state.step1Form = {
+                name: '',
+                key: '',
+                member: {},
+                description: '',
+            };
         },
         initStep2() {
             state.selectedWebhookType = {} as PluginModel;
@@ -58,10 +63,7 @@ export const useServiceFormStore = defineStore('service-form', () => {
             state.currentSubStep = step;
         },
         setFormStep1(form: ServiceStep1FormState) {
-            state.name = form.name;
-            state.key = form.key;
-            state.member = form.member;
-            state.description = form.description;
+            state.step1Form = form;
         },
         setSelectedWebhookType(webhookType: PluginModel) {
             state.selectedWebhookType = webhookType;

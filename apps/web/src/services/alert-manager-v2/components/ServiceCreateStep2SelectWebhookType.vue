@@ -29,7 +29,7 @@ const handleSelectWebhook = () => {
     serviceFormStore.setSelectedWebhookType(state.selectedWebhookType);
 };
 
-const getRepositoryID = async () => {
+const getRepositoryID = async (): Promise<string> => {
     const res = await SpaceConnector.clientV2.repository.repository.list<RepositoryListParameters, ListResponse<RepositoryModel>>({
         repository_type: 'remote',
     });
