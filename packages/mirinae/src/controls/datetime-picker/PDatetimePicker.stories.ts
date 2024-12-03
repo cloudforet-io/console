@@ -108,6 +108,37 @@ export const InvalidDatetimePicker: Story = {
     }),
 };
 
+export const DisabledDatetimePicker: Story = {
+    render: () => ({
+        components: { PDatetimePicker },
+        i18n: I18nConnector.i18n,
+        template: `
+            <table style="border-collapse: separate; border-spacing: 16px;">
+            <tr>
+                <td><p-datetime-picker disabled :selected-dates.sync="selectedDates" /></td>
+                <td><p-datetime-picker disabled style-type="text" :selected-dates.sync="selectedDates" /></td>
+            </tr>
+            <tr>
+                <td><p-datetime-picker disabled data-type="yearToTime" :selected-dates.sync="selectedDates" /></td>
+                <td><p-datetime-picker disabled data-type="yearToTime" style-type="text" :selected-dates.sync="selectedDates" /></td>
+            </tr>
+            <tr>
+                <td><p-datetime-picker disabled data-type="time" /></td>
+                <td><p-datetime-picker disabled data-type="time" style-type="text" /></td>
+            </tr>
+            </table>
+        `,
+        setup() {
+            const state = reactive({
+                selectedDates: ['2021-10-01T00:00:00+09:00'],
+            });
+            return {
+                ...toRefs(state),
+            };
+        },
+    }),
+};
+
 export const DefaultWithTimePicker: Story = {
     render: () => ({
         components: { PDatetimePicker },
