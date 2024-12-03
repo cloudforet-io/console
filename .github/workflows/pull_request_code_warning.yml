@@ -40,7 +40,7 @@ jobs:
           TODO_COUNT=0
           if [ -n "$TODO_FILES" ]; then
             echo "The following files contain TODO:"
-            ::warning:: echo "$TODO_FILES"
+            echo "::warning:: $TODO_FILES"
             TODO_COUNT=$(echo "$TODO_FILES" | wc -l)
           else
             echo "No TODOs found."
