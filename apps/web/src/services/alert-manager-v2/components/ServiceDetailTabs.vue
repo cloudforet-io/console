@@ -8,6 +8,9 @@ import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type
 
 import { i18n } from '@/translations';
 
+import ServiceDetailTabsNotifications from '@/services/alert-manager-v2/components/ServiceDetailTabsNotifications.vue';
+import ServiceDetailTabsNotificationsDetailTabs
+    from '@/services/alert-manager-v2/components/ServiceDetailTabsNotificationsDetailTabs.vue';
 import ServiceDetailTabsOverview from '@/services/alert-manager-v2/components/ServiceDetailTabsOverview.vue';
 import ServiceDetailTabsWebhook from '@/services/alert-manager-v2/components/ServiceDetailTabsWebhook.vue';
 import ServiceDetailTabsWebhookDetailTabs
@@ -27,12 +30,13 @@ const tabState = reactive({
 });
 const state = reactive({
     selectedWebhook: [],
+    selectedNotifications: [],
 });
 </script>
 
 <template>
     <div>
-        <div v-if="tabState.activeTab === SERVICE_DETAIL_TABS.WEBHOOK">
+        <div v-if="tabState.activeTab === SERVICE_DETAIL_TABS.WEBHOOK || tabState.activeTab === SERVICE_DETAIL_TABS.NOTIFICATIONS">
             <p-horizontal-layout :height="522">
                 <template #container="{ height }">
                     <p-tab :tabs="tabState.tabs"
@@ -42,11 +46,17 @@ const state = reactive({
                         <template #webhook>
                             <service-detail-tabs-webhook :selected-item.sync="state.selectedWebhook" />
                         </template>
+                        <template #notifications>
+                            <service-detail-tabs-notifications :selected-item.sync="state.selectedNotifications" />
+                        </template>
                     </p-tab>
                 </template>
             </p-horizontal-layout>
             <service-detail-tabs-webhook-detail-tabs v-if="state.selectedWebhook[0]"
                                                      :selected-webhook="state.selectedWebhook[0]"
+            />
+            <service-detail-tabs-notifications-detail-tabs v-else-if="state.selectedNotifications[0]"
+                                                           :selected-notifications="state.selectedNotifications[0]"
             />
         </div>
         <p-tab v-else
@@ -55,9 +65,6 @@ const state = reactive({
         >
             <template #overview>
                 <service-detail-tabs-overview />
-            </template>
-            <template #notifications>
-                notifications
             </template>
             <template #event_rule>
                 event_rule

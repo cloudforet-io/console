@@ -36,3 +36,11 @@ export const WEBHOOK_STATE_COLOR = {
         textColor: styles.gray[900],
     },
 } as const;
+
+export const NOTIFICATIONS_DETAIL_TABS = {
+    DETAIL: 'detail',
+} as const;
+export const NOTIFICATION_STATE = {
+    ENABLED: 'ENABLED',
+    DISABLED: 'DISABLED',
+} as const;
