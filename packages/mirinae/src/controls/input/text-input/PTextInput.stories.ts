@@ -355,9 +355,6 @@ export const Readonly: Story = {
                 <p class="text-label-lg font-bold my-3">Multi input with 'stack' appearance type</p>
                 <p-text-input :menu="menu" :selected="selected" multi-input use-auto-complete appearance-type="stack" readonly />
                 <br/>
-                <p class="text-label-lg font-bold my-3">Multi input with 'basic', 'masking' appearance type - it doesn't work</p>
-                <p-text-input :menu="menu" :selected="selected" multi-input appearance-type="masking" readonly />
-                <br/>
             </div>
         `,
         setup() {

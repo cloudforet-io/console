@@ -8,7 +8,7 @@
              :class="{invalid: isSelectedInvalid || invalid, disabled, readonly}"
              @keyup.down="focusOnContextMenu(0)"
              @keyup.esc.capture.stop="hideMenu"
-             @click.stop="showMenu(true)"
+             @click.stop="handleClickInput"
         >
             <div class="tag-container">
                 <template v-if="proxySelected.length > 0 && multiInput">
@@ -30,7 +30,7 @@
                         {{ proxySelected[0].label || proxySelected[0].name }}
                         <p-badge v-if="proxySelected.length > 1"
                                  badge-type="subtle"
-                                 :style-type="disabled ? 'gray200' : 'blue200'"
+                                 :style-type="readonly || disabled ? 'gray200' : 'blue200'"
                         >
                             +{{ proxySelected.length - 1 }}
                         </p-badge>
@@ -443,6 +443,14 @@ export default defineComponent<TextInputProps>({
         });
 
         /* input event listeners */
+        const handleClickInput = () => {
+            if (props.disabled) return;
+            if (props.readonly) {
+                if (props.appearanceType !== 'badge') return;
+                if (proxySelected.value.length <= 1) return;
+            }
+            showMenu(true);
+        };
         const handleInput = (event) => {
             updateInputValue(event.target.value);
             if (props.useAutoComplete) {
@@ -535,6 +543,7 @@ export default defineComponent<TextInputProps>({
             /* input type */
             inputType,
             /* input event listeners */
+            handleClickInput,
             handleInput,
             handleInputFocus,
             handleInputKeyup,
