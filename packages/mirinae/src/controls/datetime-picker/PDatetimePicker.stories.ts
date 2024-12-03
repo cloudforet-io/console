@@ -49,6 +49,8 @@ const Template: Story = {
                 :select-mode="selectMode"
                 :data-type="dataType"
                 :invalid="invalid"
+                :disabled="disabled"
+                :readonly="readonly"
                 @update:selectedDates="onUpdateSelectedDates"
                 @close="onClose"
             />
