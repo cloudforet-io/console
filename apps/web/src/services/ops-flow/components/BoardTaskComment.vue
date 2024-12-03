@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onBeforeMount } from 'vue';
 
 import {
     PPaneLayout, PHeading, PButton, PTextarea, PCollapsibleList, PTextBeautifier,
@@ -8,40 +8,35 @@ import type { CollapsibleItem } from '@cloudforet/mirinae/types/data-display/col
 
 import type { CommentModel } from '@/schema/opsflow/comment/model';
 
-const comments = ref<CommentModel[]>([
-    {
-        comment_id: 'comment_1',
-        comment: 'This is a comment',
-        comment_type: 'COMMENT',
-        is_edited: false,
-        mentions: {
-            USER: ['wanzargen@mz.co.kr'],
-        },
-        task_id: 'task_1',
-        project_id: 'project_1',
-        domain_id: 'domain_1',
-        workspace_id: 'workspace_1',
-        created_at: '2021-09-01T00:00:00Z',
-        updated_at: '2021-09-01T00:00:00Z',
-    },
-    {
-        comment_id: 'comment_2',
-        comment: 'This is a comment 2',
-        comment_type: 'COMMENT',
-        is_edited: false,
-        mentions: {},
-        task_id: 'task_1',
-        project_id: 'project_1',
-        domain_id: 'domain_1',
-        workspace_id: 'workspace_1',
-        created_at: '2021-09-02T00:00:00Z',
-        updated_at: '2021-09-02T00:00:00Z',
-    },
-]);
+import { useCommentStore } from '@/services/ops-flow/stores/comment-store';
+
+const props = defineProps<{
+    taskId: string;
+}>();
+
+const commentStore = useCommentStore();
+
+const comments = computed<CommentModel[]>(() => commentStore.state.itemsByTaskId[props.taskId] ?? []);
 const commentItems = computed<CollapsibleItem<CommentModel>[]>(() => comments.value.map((comment) => ({
     title: comment.created_at,
     data: comment,
 })));
+const comment = ref('');
+
+const handleAddComment = async () => {
+    if (!comment.value.trim().length) return;
+    await commentStore.create({
+        task_id: props.taskId,
+        comment: comment.value,
+    }, true);
+};
+onBeforeMount(async () => {
+    await commentStore.listByTaskId(props.taskId, {
+        query: {
+            sort: [{ key: 'created_at', desc: true }],
+        },
+    });
+});
 </script>
 
 <template>
@@ -52,9 +47,12 @@ const commentItems = computed<CollapsibleItem<CommentModel>[]>(() => comments.va
         />
         <p-textarea class="mb-3"
                     placehoder="Add Comment"
+                    :value="comment"
+                    @update:value="comment = $event"
         />
         <p-button class="mb-6"
                   style-type="tertiary"
+                  @click="handleAddComment"
         >
             Add Comment
         </p-button>

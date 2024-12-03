@@ -30,6 +30,8 @@ import {
 } from '@cloudforet/mirinae';
 import type { TabItem } from '@cloudforet/mirinae/types/hooks/use-tab/type';
 
+import type { TaskModel } from '@/schema/opsflow/task/model';
+
 import { queryStringToString } from '@/lib/router-query-string';
 
 import ConfirmBackModal from '@/common/components/modals/ConfirmBackModal.vue';
@@ -40,6 +42,7 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import BoardTaskComment from '@/services/ops-flow/components/BoardTaskComment.vue';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
+import { useTaskStore } from '@/services/ops-flow/stores/task-store';
 import type { BoardPageQuery } from '@/services/ops-flow/types/board-page-type';
 import type { TaskCreatePageQueryValue } from '@/services/ops-flow/types/task-create-page-type';
 
@@ -48,9 +51,17 @@ const TaskFieldsForm = defineAsyncComponent(() => import('@/services/ops-flow/ta
 const TaskCreateProgressTab = defineAsyncComponent(() => import('@/services/ops-flow/components/TaskCreateProgressTab.vue'));
 
 
+const props = defineProps<{
+    taskId: string;
+}>();
+
 const taskContentFormStore = useTaskContentFormStore();
 const taskContentFormState = taskContentFormStore.state;
 const taskContentFormGetters = taskContentFormStore.getters;
+const taskStore = useTaskStore();
+
+/* task */
+const task = ref<TaskModel|undefined>();
 
 /* route and query */
 const router = useRouter();
@@ -61,13 +72,13 @@ const { getProperRouteLocation } = useProperRouteLocation();
 
 /* header and back button */
 const loading = false; // computed<boolean>(() => taskCategoryStore.getters.loading);
-const headerTitle = 'Inquiry Service Request'; // computed<string>(() => taskCategoryPageStore.getters.currentCategory?.name ?? 'No Category');
+const headerTitle = computed<string>(() => task?.value?.name ?? 'Inquiry Service Request'); // TODO: i18n
 const {
     setPathFrom,
     goBack,
 } = useGoBack(getProperRouteLocation({
     name: OPS_FLOW_ROUTE.BOARD._NAME,
-    query: { categoryId: route.query.categoryId } as BoardPageQuery,
+    query: { categoryId: categoryId.value } as BoardPageQuery,
 }));
 
 /* confirm leave modal */
@@ -110,12 +121,13 @@ const handleSaveChanges = async () => {
 };
 
 /* lifecycle */
-onBeforeMount(() => {
-    taskContentFormStore.setCurrentCategoryId(categoryId.value);
+onBeforeMount(async () => {
     if (route.hash === '#progress') {
         activeTab.value = 'progress';
     }
     taskContentFormStore.setMode('view'); // TODO: differentiate by user permission
+    task.value = await taskStore.get(props.taskId);
+    taskContentFormStore.setCurrentTask(task.value);
 });
 onUnmounted(() => {
     taskContentFormStore.$reset();
@@ -181,7 +193,9 @@ defineExpose({ setPathFrom });
                     </p-button>
                 </div>
             </div>
-            <board-task-comment class="flex-1 w-full min-w-[360px] lg:max-w-[528px] tablet:min-w-full" />
+            <board-task-comment class="flex-1 w-full min-w-[360px] lg:max-w-[528px] tablet:min-w-full"
+                                :task-id="props.taskId"
+            />
         </div>
         <!-- modals -->
         <confirm-back-modal :visible="isConfirmLeaveModalVisible"

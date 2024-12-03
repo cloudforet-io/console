@@ -82,7 +82,8 @@ export const useCategoryField = ({
 
     const prevSelectedCategoryItems = ref<CategoryItem[]>([]);
     const prevSelectedCategoryIds = computed<string[]>(() => prevSelectedCategoryItems.value.map((c) => c.name));
-    const setInitialCategoriesByPackageId = (packageId?: string) => {
+    const setInitialCategoriesByPackageId = async (packageId?: string) => {
+        allCategoryItems.value = await loadAllCategoryItems();
         prevSelectedCategoryItems.value = packageId ? categoryItemsByPackage.value[packageId] ?? [] : [];
         categoryValidator.setValue(prevSelectedCategoryItems.value);
     };
@@ -94,41 +95,56 @@ export const useCategoryField = ({
 
 
     const addPackageToCategories = async (packageId: string, categoryIds: string[]) => {
-        try {
-            await Promise.allSettled([
-                ...categoryIds.map((categoryId) => taskCategoryStore.update({
-                    package_id: packageId,
-                    category_id: categoryId,
-                })),
-            ]);
-        } catch (e) {
-        // TODO: handle error
+        const responses = await Promise.allSettled([
+            ...categoryIds.map((categoryId) => taskCategoryStore.update({
+                package_id: packageId,
+                category_id: categoryId,
+            })),
+        ]);
+        const errorMessages: string[] = [];
+        responses.forEach((response, index) => {
+            if (response.status === 'rejected') {
+                errorMessages.push(`- Category ID: ${categoryIds[index]}, Reason: ${response.reason.message}`);
+            }
+        });
+        if (errorMessages.length > 0) {
+            throw new Error(`Failed to add package to categories:\n${errorMessages.join('\n')}`);
         }
     };
     const bindDefaultPackageToCategories = async (categoryIds: string[]) => {
-        try {
-            if (!packageStore.getters.defaultPackage) throw new Error('Default package not found');
-            const defaultPackageId = packageStore.getters.defaultPackage.package_id;
-            await Promise.allSettled([
-                ...categoryIds.map((categoryId) => taskCategoryStore.update({
-                    package_id: defaultPackageId,
-                    category_id: categoryId,
-                })),
-            ]);
-        } catch (e) {
-        // TODO: handle error
+        if (!packageStore.getters.defaultPackage) throw new Error('Default package not found');
+        const defaultPackageId = packageStore.getters.defaultPackage.package_id;
+        const responses = await Promise.allSettled([
+            ...categoryIds.map((categoryId) => taskCategoryStore.update({
+                package_id: defaultPackageId,
+                category_id: categoryId,
+            })),
+        ]);
+        const errorMessages: string[] = [];
+        responses.forEach((response, index) => {
+            if (response.status === 'rejected') {
+                errorMessages.push(`- Category ID: ${categoryIds[index]}, Reason: ${response.reason.message}`);
+            }
+        });
+        if (errorMessages.length > 0) {
+            throw new Error(`Failed to bind default package to categories:\n${errorMessages.join('\n')}`);
         }
     };
     const applyPackageToCategories = async (packageId: string) => {
-        try {
-            const addedCategories = selectedCategoryIds.value.filter((id) => !prevSelectedCategoryIds.value.includes(id));
-            const removedCategories = prevSelectedCategoryIds.value.filter((id) => !selectedCategoryIds.value.includes(id));
-            await Promise.allSettled([
-                addPackageToCategories(packageId, addedCategories),
-                bindDefaultPackageToCategories(removedCategories),
-            ]);
-        } catch (e) {
-        // TODO: handle error
+        const addedCategories = selectedCategoryIds.value.filter((id) => !prevSelectedCategoryIds.value.includes(id));
+        const removedCategories = prevSelectedCategoryIds.value.filter((id) => !selectedCategoryIds.value.includes(id));
+        const responses = await Promise.allSettled([
+            addPackageToCategories(packageId, addedCategories),
+            bindDefaultPackageToCategories(removedCategories),
+        ]);
+        const errorMessages: string[] = [];
+        responses.forEach((response) => {
+            if (response.status === 'rejected') {
+                errorMessages.push(response.reason.message);
+            }
+        });
+        if (errorMessages.length > 0) {
+            throw new Error(`Failed to apply package to categories:\n${errorMessages.join('\n')}`);
         }
     };
 
