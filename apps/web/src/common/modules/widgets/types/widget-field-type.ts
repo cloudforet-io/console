@@ -2,14 +2,15 @@ import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 
+import type WidgetFieldValueManager from '@/common/modules/widgets/_widget-field-value-manager';
 import type { AdvancedFormatRulesOptions } from '@/common/modules/widgets/_widget-fields/advanced-format-rules/type';
 import type { CategoryByOptions } from '@/common/modules/widgets/_widget-fields/category-by/type';
 import type { ColorSchemaOptions } from '@/common/modules/widgets/_widget-fields/color-schema/type';
 import type { ComparisonOptions } from '@/common/modules/widgets/_widget-fields/comparison/type';
 import type { CustomTableColumnWidthOptions } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
-import type { DateAggregationOptionsOptions } from '@/common/modules/widgets/_widget-fields/data-aggregation-options/type';
 import type { DataFieldHeatmapColorOptions } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
 import type { DataFieldOptions } from '@/common/modules/widgets/_widget-fields/data-field/type';
+import type { DateAggregationOptionsOptions } from '@/common/modules/widgets/_widget-fields/date-aggregation-options/type';
 import type { DateFormatOptions } from '@/common/modules/widgets/_widget-fields/date-format/type';
 import type { DateRangeOptions } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { DisplaySeriesLabelOptions } from '@/common/modules/widgets/_widget-fields/display-series-label/type';
@@ -77,6 +78,14 @@ export interface WidgetFieldComponentProps<FieldOptions, FieldValue = any> {
     widgetConfig?: WidgetConfig;
     widgetId?: string;
     dateRange?: DateRange;
+}
+
+// TODO: replace this with WidgetFieldComponentProps
+export interface _WidgetFieldComponentProps<FieldOptions> {
+    widgetFieldSchema: WidgetFieldSchema<FieldOptions>;
+    manager: WidgetFieldValueManager;
+    widgetConfig: WidgetConfig;
+    widgetId: string;
 }
 
 export interface WidgetFieldComponentEmit<ValueType> {

@@ -1,4 +1,4 @@
-import type { DATE_AGGREGATION_OPTIONS } from '@/common/modules/widgets/_widget-fields/data-aggregation-options/constant';
+import type { DATE_AGGREGATION_OPTIONS } from '@/common/modules/widgets/_widget-fields/date-aggregation-options/constant';
 
 export interface DateAggregationOptionsValue {
     value: DateAggregationOtionsType;

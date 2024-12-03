@@ -7,12 +7,12 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
-import { DATE_AGGREGATION_OPTIONS } from '@/common/modules/widgets/_widget-fields/data-aggregation-options/constant';
+import { DATE_AGGREGATION_OPTIONS } from '@/common/modules/widgets/_widget-fields/date-aggregation-options/constant';
 import type {
     DateAggregationOptionsOptions,
     DateAggregationOptionsValue,
     DateAggregationOtionsType,
-} from '@/common/modules/widgets/_widget-fields/data-aggregation-options/type';
+} from '@/common/modules/widgets/_widget-fields/date-aggregation-options/type';
 import type {
     WidgetFieldComponentProps,
     WidgetFieldComponentEmit,
