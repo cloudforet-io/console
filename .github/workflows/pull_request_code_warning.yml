@@ -1,0 +1,53 @@
+name: "[PR] Code Warning"
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    path-ignores:
+      - '.github/**'
+      - '**/deploy/**'
+      - '**/Dockerfile'
+      - '**/*.dockerfile'
+      - '**/*.dockerignore'
+      - '**/LICENSE'
+      - '**/AUTHORS'
+      - '**/.husky/**'
+      - '**/commitlint.config.js'
+      - '**/.lintstagedrc.js'
+      - '**/*.md'
+      - '**/*.env'
+    branches:
+      - master
+      - feature-*
+    workflow_dispatch:
+
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    env:
+      NODE_ENV: 'development'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Check for TODO and console.log
+        run: |
+          # Find TODOs
+          TODO_COUNT=$(grep -rnw . -e "TODO" --exclude-dir={node_modules,.git} | wc -l)
+          if [ $TODO_COUNT -gt 0 ]; then
+            echo "WARNING: Found $TODO_COUNT TODOs in the code."
+          fi
+
+          # Find console.log
+          LOG_COUNT=$(grep -rnw . -e "console.log" --exclude-dir={node_modules,.git} | wc -l)
+          if [ $LOG_COUNT -gt 0 ]; then
+            echo "WARNING: Found $LOG_COUNT occurrences of console.log in the code."
+          fi
+
+          if [ $TODO_COUNT -gt 0 ] || [ $LOG_COUNT -gt 0 ]; then
+            exit 1
+          fi
