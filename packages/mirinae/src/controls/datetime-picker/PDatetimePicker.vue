@@ -6,12 +6,14 @@
              open : visiblePicker,
              'time-type': dataType === DATA_TYPE.time,
              invalid,
+             disabled,
          }"
     >
         <div class="input-sizer">
             <input type="text"
                    :placeholder="dataType === DATA_TYPE.time ? $t('COMPONENT.DATETIME_PICKER.SELECT_TIME') : $t('COMPONENT.DATETIME_PICKER.SELECT_DATE')"
                    data-input
+                   :disabled="disabled"
             >
         </div>
         <p-i :name="dataType === DATA_TYPE.time ? 'ic_alarm-clock' : 'ic_calendar'"
@@ -78,6 +80,14 @@ export default {
             default: STYLE_TYPE.default,
             validator: (styleType) => Object.values(STYLE_TYPE).includes(styleType as string),
         },
+        invalid: {
+            type: Boolean,
+            default: false,
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
         minDate: {
             type: [String, Date],
             default: undefined,
@@ -95,10 +105,6 @@ export default {
             type: String,
             default: DATA_TYPE.yearToDate,
             validator: (dataType: any) => Object.values(DATA_TYPE).includes(dataType),
-        },
-        invalid: {
-            type: Boolean,
-            default: false,
         },
     },
     setup(props: DatetimePickerProps, { emit }) {
@@ -211,10 +217,10 @@ export default {
             }
         };
 
-        watch(() => state.datePickerRef, (datePickerRef) => {
-            if (datePickerRef) {
+        watch([() => state.datePickerRef, () => props.disabled], ([datePickerRef, disabled]) => {
+            if (datePickerRef && !disabled) {
                 createDatePicker(datePickerRef);
-            }
+            } else if (disabled && state.datePicker) state.datePicker = null;
         });
         watch([() => props.minDate, () => props.maxDate], () => {
             if (state.datePickerRef) {
@@ -242,6 +248,15 @@ export default {
     padding-right: 0.5rem;
     font-size: 0.875rem;
     letter-spacing: -0.01rem;
+    &.disabled {
+        @apply cursor-not-allowed text-gray-300;
+        input {
+            @apply cursor-not-allowed;
+            &:disabled {
+                @apply bg-transparent border-0;
+            }
+        }
+    }
     .input-sizer {
         width: 100%;
         height: 100%;
@@ -266,15 +281,15 @@ export default {
     }
 
     /* active */
-    &:hover,
-    &.open,
-    &:focus-within {
+    &:hover:not(.disabled),
+    &.open:not(.disabled),
+    &:focus-within:not(.disabled) {
         @apply text-secondary border-secondary;
         cursor: pointer;
     }
 
     /* invalid */
-    &.invalid {
+    &.invalid:not(.disabled) {
         @apply border-red-500;
         color: initial;
 

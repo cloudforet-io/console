@@ -26,6 +26,8 @@ export type STYLE_TYPE = typeof STYLE_TYPE[keyof typeof STYLE_TYPE];
 export interface DatetimePickerProps {
     selectedDates: string[];
     styleType: STYLE_TYPE;
+    invalid?: boolean;
+    disabled?: boolean;
     minDate?: DateOption;
     maxDate?: DateOption;
     selectMode: SELECT_MODE;
