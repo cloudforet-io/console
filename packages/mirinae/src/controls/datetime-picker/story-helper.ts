@@ -7,6 +7,8 @@ export const getDatetimePickerArgs = (): Args => ({
     selectedDates: [],
     styleType: STYLE_TYPE.default,
     invalid: false,
+    disabled: false,
+    readonly: false,
     minDate: undefined,
     maxDate: undefined,
     selectMode: SELECT_MODE.single,
@@ -56,6 +58,36 @@ export const getDatetimePickerArgTypes = (): ArgTypes => ({
         name: 'invalid',
         type: { name: 'boolean' },
         description: 'Whether to apply invalid style or not.',
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: 'boolean',
+    },
+    disabled: {
+        name: 'disabled',
+        type: { name: 'boolean' },
+        description: 'Whether to disable datetime picker or not.',
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: 'boolean',
+    },
+    readonly: {
+        name: 'readonly',
+        type: { name: 'boolean' },
+        description: 'Whether to make datetime picker readonly or not.',
         table: {
             type: {
                 summary: 'boolean',

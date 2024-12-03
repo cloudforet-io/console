@@ -88,6 +88,7 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
         selected: props.selectedItems.length > 0,
         'is-fixed-width': props.isFixedWidth,
         'selection-highlight': props.selectionHighlight && props.selectedItems.length > 0,
+        'has-items': props.readonly && displayBadgeValueOnDropdownButton,
     }"
     >
         <span v-if="[SELECT_DROPDOWN_STYLE_TYPE.ICON_BUTTON, SELECT_DROPDOWN_STYLE_TYPE.TERTIARY_ICON_BUTTON].includes(props.styleType)"
@@ -139,8 +140,8 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
                                 <span class="selected-item-text">{{ displayValueOnDropdownButton }}</span>
                                 <p-badge v-if="displayBadgeValueOnDropdownButton"
                                          class="selected-item-badge"
-                                         :style-type="props.disabled ? 'gray200' : 'blue200'"
-                                         :badge-type="props.disabled ? 'solid' : 'subtle'"
+                                         :style-type="props.readonly || props.disabled ? 'gray200' : 'blue200'"
+                                         :badge-type="props.readonly || props.disabled ? 'solid' : 'subtle'"
                                 >
                                     {{ displayBadgeValueOnDropdownButton }}
                                 </p-badge>
@@ -151,6 +152,7 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
                                 <p-tag v-for="(item, idx) in props.selectedItems"
                                        :key="item.name"
                                        class="selected-tag"
+                                       :deletable="!props.readonly && !props.disabled"
                                        @delete="handleTagDelete(item, idx)"
                                 >
                                     {{ item.label || item.name }}
@@ -272,17 +274,25 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
     }
 
     &.readonly {
-        .dropdown-button {
-            @apply text-gray-300 border-gray-300 cursor-default;
-            .selected-item {
-                @apply text-gray-800;
+        &:not(.has-items) {
+            .dropdown-button {
+                @apply text-gray-300;
+                .selected-item {
+                    @apply text-gray-800;
+                }
+                .arrow-button {
+                    @apply text-gray-300;
+                }
             }
+        }
+        .dropdown-button {
+            @apply cursor-default;
             .arrow-button {
-                @apply text-gray-300 cursor-default;
+                @apply cursor-default;
             }
         }
         .dropdown-icon-button {
-            @apply text-gray-300 cursor-default;
+            @apply cursor-default;
         }
     }
 
@@ -325,9 +335,12 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
         }
     }
     &.icon-button, &.tertiary-icon-button {
-        @apply flex items-center justify-center text-gray-900 cursor-pointer;
+        @apply flex items-center justify-center text-gray-900;
         width: 2rem;
         height: 2rem;
+        &:not(.disabled, .readonly) {
+            @apply cursor-pointer;
+        }
         .dropdown-icon-button-wrapper {
             @apply flex items-center justify-center;
             width: 2rem;
@@ -388,13 +401,15 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
     }
 
     &.opened {
-        .dropdown-button {
-            @apply border-secondary;
-            .arrow-button {
-                @apply text-secondary;
+        &:not(.readonly) {
+            .dropdown-button {
+                @apply border-secondary;
+                .arrow-button {
+                    @apply text-secondary;
+                }
             }
         }
-        &.rounded {
+        &.rounded:not(.readonly) {
             .dropdown-button {
                 @apply bg-gray-100 border-gray-200;
             }
@@ -415,10 +430,10 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
                 }
             }
         }
-        &.icon-button {
+        &.icon-button:not(.readonly) {
             @apply bg-blue-300 text-secondary;
         }
-        &.tertiary-icon-button {
+        &.tertiary-icon-button:not(.readonly) {
             @apply bg-gray-200 rounded-default;
         }
     }
