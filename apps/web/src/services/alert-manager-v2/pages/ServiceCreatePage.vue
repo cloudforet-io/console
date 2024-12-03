@@ -10,14 +10,14 @@ import { i18n } from '@/translations';
 import ServiceCreateStep1 from '@/services/alert-manager-v2/components/ServiceCreateStep1.vue';
 import ServiceCreateStep2 from '@/services/alert-manager-v2/components/ServiceCreateStep2.vue';
 import { ALERT_MANAGER_V2_ROUTE } from '@/services/alert-manager-v2/routes/route-constant';
-import { useServiceFormStore } from '@/services/alert-manager-v2/store/service-form-store';
+import { useServiceCreateFormStore } from '@/services/alert-manager-v2/store/service-create-form-store';
 
 type headerInfoByStep = {
     title: TranslateResult;
     desc: TranslateResult;
 };
 
-const serviceFormStore = useServiceFormStore();
+const serviceFormStore = useServiceCreateFormStore();
 const serviceFormState = serviceFormStore.state;
 
 const router = useRouter();

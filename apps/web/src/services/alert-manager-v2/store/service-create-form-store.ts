@@ -23,7 +23,7 @@ interface ServiceFormStoreState {
     webhookName: string;
 }
 
-export const useServiceFormStore = defineStore('service-form', () => {
+export const useServiceCreateFormStore = defineStore('service-create-form', () => {
     const state = reactive<ServiceFormStoreState>({
         currentStep: 1,
         currentSubStep: 1,

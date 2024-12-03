@@ -7,9 +7,9 @@ import ServiceCreateStep2SelectWebhookType
     from '@/services/alert-manager-v2/components/ServiceCreateStep2SelectWebhookType.vue';
 import ServiceCreateStep2WebhookForm from '@/services/alert-manager-v2/components/ServiceCreateStep2WebhookForm.vue';
 import ServiceCreateStepContainer from '@/services/alert-manager-v2/components/ServiceCreateStepContainer.vue';
-import { useServiceFormStore } from '@/services/alert-manager-v2/store/service-form-store';
+import { useServiceCreateFormStore } from '@/services/alert-manager-v2/store/service-create-form-store';
 
-const serviceFormStore = useServiceFormStore();
+const serviceFormStore = useServiceCreateFormStore();
 const serviceFormState = serviceFormStore.state;
 
 const storeState = reactive({
