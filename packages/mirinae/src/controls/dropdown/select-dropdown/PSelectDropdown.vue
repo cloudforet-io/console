@@ -377,7 +377,7 @@ defineExpose({ reloadMenu });
                         :show-select-marker="props.showSelectMarker"
                         :show-clear-selection="props.isFilterable || props.showClearSelection"
                         :reset-selected-on-unmounted="props.resetSelectedOnUnmounted"
-                        @select="props.readonly ? undefined : handleSelectMenuItem"
+                        @select="handleSelectMenuItem"
                         @click-done="handleClickDone"
                         @click-show-more="handleClickShowMore"
                         @clear-selection="handleClearSelection"
