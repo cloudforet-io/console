@@ -5,7 +5,7 @@
     >
         <div ref="targetRef"
              class="input-container"
-             :class="{invalid: isSelectedInvalid || invalid, disabled}"
+             :class="{invalid: isSelectedInvalid || invalid, disabled, readonly}"
              @keyup.down="focusOnContextMenu(0)"
              @keyup.esc.capture.stop="hideMenu"
              @click.stop="showMenu(true)"
@@ -15,7 +15,7 @@
                     <template v-if="appearanceType === 'stack'">
                         <p-tag v-for="(tag, index) in proxySelected"
                                :key="index"
-                               :deletable="!disabled"
+                               :deletable="!disabled && !readonly"
                                :selected="index === deleteTargetIdx"
                                :invalid="isSelectedItemInvalid(tag, Number(index))"
                                class="tag"
@@ -24,7 +24,7 @@
                             {{ tag.label || tag.name }}
                         </p-tag>
                     </template>
-                    <span v-else-if="appearanceType === 'badge' && !isInputFocused"
+                    <span v-else-if="appearanceType === 'badge' && (readonly || !isInputFocused)"
                           class="selected-text"
                     >
                         {{ proxySelected[0].label || proxySelected[0].name }}
@@ -42,10 +42,11 @@
                     <input v-bind="$attrs"
                            ref="inputRef"
                            :class="{block}"
-                           :tabindex="disabled || $attrs.readonly ? -1 : 0"
+                           :tabindex="(disabled || readonly) ? -1 : 0"
                            :type="inputType"
                            :value="displayedInputValue"
                            :disabled="disabled"
+                           :readonly="readonly"
                            :placeholder="placeholder"
                            :autocomplete="!$attrs.autocomplete ? 'off' : $attrs.autocomplete"
                            size="1"
@@ -81,7 +82,7 @@
                 {{ !proxyShowPassword ? $t('COMPONENT.TEXT_INPUT.HIDE') : $t('COMPONENT.TEXT_INPUT.SHOW') }}
             </p-button>
             <p-i v-else
-                 v-show="(isInputFocused || isSelectedInvalid)"
+                 v-show="!readonly && (isInputFocused || isSelectedInvalid)"
                  class="delete-all-icon"
                  name="ic_close"
                  height="1rem"
@@ -99,16 +100,17 @@
             </span>
         </div>
         <p-context-menu v-if="useAutoComplete"
-                        v-show="proxyVisibleMenu && refinedMenu.length > 0"
+                        v-show="readonly ? proxyVisibleMenu && proxySelected.length > 0 : proxyVisibleMenu && refinedMenu.length > 0"
                         ref="menuRef"
-                        :menu="refinedMenu"
+                        :menu="readonly ? proxySelected : refinedMenu"
                         :highlight-term="typeof proxyInputValue === 'string' ? proxyInputValue : undefined"
                         :loading="loading || contextMenuLoading"
                         :style="{...contextMenuStyle, maxWidth: contextMenuStyle.minWidth, width: contextMenuStyle.minWidth}"
-                        :selected="proxySelected"
+                        :selected="readonly ? [] : proxySelected"
+                        :readonly="readonly"
                         :multi-selectable="multiInput"
-                        @update:selected="handleUpdateSelected"
-                        @focus="handleFocusMenuItem"
+                        @update:selected="readonly ? undefined : handleUpdateSelected"
+                        @focus="readonly ? undefined : handleFocusMenuItem"
                         @keyup:up:end="focusOnInput()"
                         @keyup:down:end="focusOnContextMenu()"
                         @click-show-more="handleClickShowMore"
@@ -149,6 +151,7 @@ interface TextInputProps {
     size?: InputSize;
     isFocused?: boolean;
     disabled: boolean;
+    readonly: boolean;
     block: boolean;
     invalid: boolean;
     placeholder: string;
@@ -199,6 +202,10 @@ export default defineComponent<TextInputProps>({
             default: false,
         },
         disabled: {
+            type: Boolean,
+            default: false,
+        },
+        readonly: {
             type: Boolean,
             default: false,
         },
@@ -561,10 +568,10 @@ export default defineComponent<TextInputProps>({
         &.disabled {
             @apply border-gray-300 bg-gray-100;
         }
-        &.focused, &:focus-within:not(.disabled):not(.invalid) {
+        &.focused, &:focus-within:not(.disabled):not(.readonly):not(.invalid) {
             @apply border-secondary bg-blue-100;
         }
-        &:hover:not(.disabled):not(.invalid) {
+        &:hover:not(.disabled):not(.readonly):not(.invalid) {
             @apply border-secondary;
         }
         > .tag-container {

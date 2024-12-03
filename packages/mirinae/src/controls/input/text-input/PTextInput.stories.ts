@@ -335,6 +335,45 @@ export const Disabled: Story = {
     }),
 };
 
+export const Readonly: Story = {
+    render: () => ({
+        components: { PTextInput },
+        template: `
+            <div>
+                <p class="text-label-lg font-bold my-3">Single input with 'basic', 'badge', 'stack' appearance type</p>
+                <p-text-input value="hello" appearance-type="basic" readonly />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Single input with 'masking' appearance type, 'password' input type</p>
+                <p-text-input value="password" appearance-type="masking" type="password" readonly />
+                <br/>
+                <br/>
+                <hr/>
+                <br/>
+                <p class="text-label-lg font-bold my-3">Multi input with 'badge' appearance type</p>
+                <p-text-input :menu="menu" :selected="selected" multi-input use-auto-complete appearance-type="badge" readonly />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Multi input with 'stack' appearance type</p>
+                <p-text-input :menu="menu" :selected="selected" multi-input use-auto-complete appearance-type="stack" readonly />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Multi input with 'basic', 'masking' appearance type - it doesn't work</p>
+                <p-text-input :menu="menu" :selected="selected" multi-input appearance-type="masking" readonly />
+                <br/>
+            </div>
+        `,
+        setup() {
+            const items = getTextInputMenu();
+            const state = reactive({
+                menu: items,
+                selected: items.slice(0, 3),
+            });
+            return {
+                ...toRefs(state),
+            };
+        },
+    }),
+};
+
+
 export const BlockAndMultiInput: Story = {
     render: () => ({
         components: { PTextInput },
