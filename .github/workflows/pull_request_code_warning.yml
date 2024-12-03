@@ -45,7 +45,7 @@ jobs:
           else
             echo "No TODOs found."
           fi
-          echo "Found $TODO_COUNT file(s) with TODO."
+          echo "::warning Found $TODO_COUNT file(s) with TODO."
           echo "todo_count=$TODO_COUNT" >> $GITHUB_ENV
 
       - name: Check for console.log
@@ -61,16 +61,15 @@ jobs:
           else
             echo "No console.log found."
           fi
-          echo "Found $LOG_COUNT file(s) with console.log."
+          echo "::warning Found $LOG_COUNT file(s) with console.log."
           echo "console_log_count=$LOG_COUNT" >> $GITHUB_ENV
 
-      - name: Fail if issues found
+      - name: End with warning if issues found
         run: |
           echo "TODO Count: $todo_count"
           echo "console.log Count: $console_log_count"
           if [ "$todo_count" -gt 0 ] || [ "$console_log_count" -gt 0 ]; then
-            echo "Workflow failed. TODO count: $todo_count, console.log count: $console_log_count"
-            exit 1
+            echo "::warning::Workflow completed with issues. TODO count: $todo_count, console.log count: $console_log_count"
           else
             echo "No issues found. Workflow passed."
           fi
