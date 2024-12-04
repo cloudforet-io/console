@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import {
+    computed, reactive, watch,
+} from 'vue';
 
 import {
     PHorizontalLayout, PTab,
@@ -7,6 +9,8 @@ import {
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
 import { i18n } from '@/translations';
+
+import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import ServiceDetailTabsNotifications from '@/services/alert-manager-v2/components/ServiceDetailTabsNotifications.vue';
 import ServiceDetailTabsNotificationsDetailTabs
@@ -33,6 +37,10 @@ const state = reactive({
     selectedWebhook: [],
     selectedNotifications: [],
 });
+
+watch(() => tabState.activeTab, (activeTab) => {
+    replaceUrlQuery('tab', activeTab);
+}, { immediate: true });
 </script>
 
 <template>

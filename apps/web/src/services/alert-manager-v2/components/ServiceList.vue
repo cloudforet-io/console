@@ -14,6 +14,7 @@ import { useQueryTags } from '@/common/composables/query-tags';
 
 import { red } from '@/styles/colors';
 
+import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
 import { ALERT_MANAGER_V2_ROUTE } from '@/services/alert-manager-v2/routes/route-constant';
 
 const pageSizeOptions = [15, 30, 45];
@@ -56,6 +57,9 @@ const handleClickServiceItem = (id: string) => {
         name: ALERT_MANAGER_V2_ROUTE.SERVICE.DETAIL._NAME,
         params: {
             serviceId: id,
+        },
+        query: {
+            tab: SERVICE_DETAIL_TABS.OVERVIEW,
         },
     });
 };
