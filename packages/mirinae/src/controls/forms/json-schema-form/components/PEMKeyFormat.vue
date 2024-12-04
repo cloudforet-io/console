@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import PTextEditor from '@/controls/text-editor/PTextEditor.vue';
+import PCodeEditor from '@/controls/code-editor/PCodeEditor.vue';
 
 interface Props {
     readonly: any;
@@ -18,7 +18,7 @@ const handleUpdateData = (code: string) => {
 
 <template>
     <div>
-        <p-text-editor :code="props.value"
+        <p-code-editor :code="props.value"
                        disable-auto-reformat
                        :read-only="props.readonly"
                        @update:code="handleUpdateData"

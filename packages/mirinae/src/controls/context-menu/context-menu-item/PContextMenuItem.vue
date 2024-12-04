@@ -197,7 +197,7 @@ export default defineComponent<ContextMenuItemProps>({
     align-items: center;
     padding: 0.5rem;
     cursor: pointer;
-    &:not(.disabled) {
+    &:not(.disabled):not(.readonly) {
         &:hover, &:focus {
             @apply bg-blue-100;
             &.is-anchor {
@@ -212,9 +212,9 @@ export default defineComponent<ContextMenuItemProps>({
         cursor: not-allowed;
     }
     &.readonly {
-        cursor: not-allowed;
+        cursor: default;
     }
-    &.selected:not(.disabled) {
+    &.selected:not(.disabled):not(.readonly) {
         @apply bg-blue-200;
     }
     > .select-marker {

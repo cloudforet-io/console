@@ -6,17 +6,22 @@
              open : visiblePicker,
              'time-type': dataType === DATA_TYPE.time,
              invalid,
+             disabled,
+             readonly,
          }"
     >
         <div class="input-sizer">
             <input type="text"
                    :placeholder="dataType === DATA_TYPE.time ? $t('COMPONENT.DATETIME_PICKER.SELECT_TIME') : $t('COMPONENT.DATETIME_PICKER.SELECT_DATE')"
                    data-input
+                   :disabled="disabled"
+                   :readonly="readonly"
             >
         </div>
         <p-i :name="dataType === DATA_TYPE.time ? 'ic_alarm-clock' : 'ic_calendar'"
              color="inherit"
-             data-toggle
+             :data-toggle="!readonly"
+             class="datetime-toggle"
              width="1.25rem"
              height="1.25rem"
         />
@@ -78,6 +83,18 @@ export default {
             default: STYLE_TYPE.default,
             validator: (styleType) => Object.values(STYLE_TYPE).includes(styleType as string),
         },
+        invalid: {
+            type: Boolean,
+            default: false,
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
+        readonly: {
+            type: Boolean,
+            default: false,
+        },
         minDate: {
             type: [String, Date],
             default: undefined,
@@ -95,10 +112,6 @@ export default {
             type: String,
             default: DATA_TYPE.yearToDate,
             validator: (dataType: any) => Object.values(DATA_TYPE).includes(dataType),
-        },
-        invalid: {
-            type: Boolean,
-            default: false,
         },
     },
     setup(props: DatetimePickerProps, { emit }) {
@@ -165,6 +178,7 @@ export default {
             emit('close');
         };
         const handleOpenPicker = () => {
+            if (props.readonly) return;
             state.visiblePicker = true;
         };
 
@@ -181,6 +195,7 @@ export default {
                     onValueUpdate: handleUpdateValue,
                     onOpen: handleOpenPicker,
                     onClose: handleClosePicker,
+                    clickOpens: !props.readonly,
                 });
             } else {
                 let defaultDate;
@@ -207,17 +222,18 @@ export default {
                     onOpen: handleOpenPicker,
                     onClose: handleClosePicker,
                     plugins: state.plugins,
+                    clickOpens: !props.readonly,
                 });
             }
         };
 
-        watch(() => state.datePickerRef, (datePickerRef) => {
-            if (datePickerRef) {
+        watch([() => state.datePickerRef, () => props.disabled], ([datePickerRef, disabled]) => {
+            if (datePickerRef && !disabled) {
                 createDatePicker(datePickerRef);
-            }
+            } else if (disabled && state.datePicker) state.datePicker = null;
         });
         watch([() => props.minDate, () => props.maxDate], () => {
-            if (state.datePickerRef) {
+            if (state.datePickerRef && !props.disabled) {
                 state.datePicker?.clear();
                 createDatePicker(state.datePickerRef);
             }
@@ -242,6 +258,27 @@ export default {
     padding-right: 0.5rem;
     font-size: 0.875rem;
     letter-spacing: -0.01rem;
+    &.disabled {
+        @apply cursor-not-allowed bg-gray-100 text-gray-300;
+        input {
+            @apply cursor-not-allowed;
+            &:disabled {
+                @apply bg-transparent border-0;
+            }
+        }
+    }
+    &.readonly {
+        @apply cursor-default;
+        input {
+            @apply cursor-default;
+            &:read-only {
+                @apply bg-transparent border-0;
+            }
+        }
+        .datetime-toggle {
+            @apply text-gray-300;
+        }
+    }
     .input-sizer {
         width: 100%;
         height: 100%;
@@ -266,15 +303,15 @@ export default {
     }
 
     /* active */
-    &:hover,
-    &.open,
-    &:focus-within {
+    &:hover:not(.disabled):not(.readonly),
+    &.open:not(.disabled):not(.readonly),
+    &:focus-within:not(.disabled):not(.readonly) {
         @apply text-secondary border-secondary;
         cursor: pointer;
     }
 
     /* invalid */
-    &.invalid {
+    &.invalid:not(.disabled):not(.readonly) {
         @apply border-red-500;
         color: initial;
 

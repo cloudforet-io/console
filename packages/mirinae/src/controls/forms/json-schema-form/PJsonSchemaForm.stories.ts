@@ -17,7 +17,7 @@ import {
 } from '@/controls/forms/json-schema-form/mock';
 
 import { VALIDATION_MODES } from '@/controls/forms/json-schema-form/type';
-import PTextEditor from '@/controls/text-editor/PTextEditor.vue';
+import PCodeEditor from '@/controls/code-editor/PCodeEditor.vue';
 import {
     getSelectDropdownMenuWithMultiTypes,
 } from '@/controls/dropdown/select-dropdown/mock';
@@ -103,7 +103,7 @@ const Template: Story = {
 
 export const Basic: Story = {
     render: () => ({
-        components: { PJsonSchemaForm, PTextEditor, PHeading },
+        components: { PJsonSchemaForm, PCodeEditor, PHeading },
         i18n: I18nConnector.i18n,
         template: `
             <div class="flex gap-4">
@@ -117,13 +117,13 @@ export const Basic: Story = {
             </div>
             <div class="bg-coral-100 p-4">
                 <p-heading class="mb-6">Schema</p-heading>
-                <p-text-editor :code="JSON.stringify(schema, null, 2)"
+                <p-code-editor :code="JSON.stringify(schema, null, 2)"
                                mode="readOnly"
                                folded
                                style="height: auto"
                 />
                 <p-heading class="mb-6">Form Data</p-heading>
-                <p-text-editor :code="JSON.stringify(formData, null, 2)"
+                <p-code-editor :code="JSON.stringify(formData, null, 2)"
                                mode="readOnly"
                                style="height: auto"
                 />
@@ -146,7 +146,7 @@ export const Basic: Story = {
 
 export const Language: Story = {
     render: () => ({
-        components: { PJsonSchemaForm, PTextEditor, PSelectDropdown },
+        components: { PJsonSchemaForm, PCodeEditor, PSelectDropdown },
         template: `
             <div class="flex gap-4">
             <p-json-schema-form
@@ -159,7 +159,7 @@ export const Language: Story = {
                                    :selected="language"
                                    :menu="languages"
                 />
-                <p-text-editor :code="JSON.stringify(schema, null, 2)"
+                <p-code-editor :code="JSON.stringify(schema, null, 2)"
                                mode="readOnly"
                                folded
                 />
@@ -183,7 +183,7 @@ export const Language: Story = {
 
 export const ResetonSchemaChange: Story = {
     render: () => ({
-        components: { PJsonSchemaForm, PTextEditor, PButton },
+        components: { PJsonSchemaForm, PCodeEditor, PButton },
         i18n: I18nConnector.i18n,
         template: `
             <div class="flex gap-4">
@@ -198,7 +198,7 @@ export const ResetonSchemaChange: Story = {
                 <p-button style-type="highlight"
                           class="mb-4"
                           @click="changeFormData">Change Form Data</p-button>
-                <p-text-editor :code="JSON.stringify(schema, null, 2)"
+                <p-code-editor :code="JSON.stringify(schema, null, 2)"
                                mode="readOnly"
                                folded
                 />
@@ -229,7 +229,7 @@ export const ResetonSchemaChange: Story = {
 export const ValidationMode: Story = {
     render: () => ({
         components: {
-            PJsonSchemaForm, PTextEditor, PSelectDropdown, PHeading,
+            PJsonSchemaForm, PCodeEditor, PSelectDropdown, PHeading,
         },
         i18n: I18nConnector.i18n,
         template: `
@@ -245,12 +245,12 @@ export const ValidationMode: Story = {
                 <p-select-dropdown class="mb-4"
                                    :selected="validationMode" :menu="validationModes" />
                 <p-heading class="mb-6">Schema</p-heading>
-                <p-text-editor :code="JSON.stringify(schema, null, 2)"
+                <p-code-editor :code="JSON.stringify(schema, null, 2)"
                                mode="readOnly"
                                folded
                 />
                 <p-heading class="mb-6">Form Data</p-heading>
-                <p-text-editor :code="JSON.stringify(formData, null, 2)"
+                <p-code-editor :code="JSON.stringify(formData, null, 2)"
                                mode="readOnly"
                                style="height: auto"
                 />
@@ -274,7 +274,7 @@ export const ValidationMode: Story = {
 
 export const JsonInputMode: Story = {
     render: () => ({
-        components: { PJsonSchemaForm, PTextEditor, PHeading },
+        components: { PJsonSchemaForm, PCodeEditor, PHeading },
         i18n: I18nConnector.i18n,
         template: `
             <div class="grid gap-4 grid-cols-12">
@@ -287,13 +287,13 @@ export const JsonInputMode: Story = {
             </div>
             <div class="col-span-6 bg-coral-100 p-4">
                 <p-heading class="mb-6">Schema</p-heading>
-                <p-text-editor :code="JSON.stringify(schema, null, 2)"
+                <p-code-editor :code="JSON.stringify(schema, null, 2)"
                                mode="readOnly"
                                folded
                                style="height: auto"
                 />
                 <p-heading class="mt-4 mb-6">Form Data</p-heading>
-                <p-text-editor :code="JSON.stringify(formData, null, 2)"
+                <p-code-editor :code="JSON.stringify(formData, null, 2)"
                                mode="readOnly"
                                style="height: auto"
                 />
@@ -315,7 +315,7 @@ export const JsonInputMode: Story = {
 
 export const UniformWidth: Story = {
     render: () => ({
-        components: { PJsonSchemaForm, PTextEditor, PHeading },
+        components: { PJsonSchemaForm, PCodeEditor, PHeading },
         i18n: I18nConnector.i18n,
         template: `
             <div class="flex gap-4">

@@ -17,7 +17,7 @@ import UpdateMark from '@/common/components/marks/UpdateMark.vue';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FAVORITE_TYPE, type FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
 import { useLsbRouterItemState } from '@/common/modules/navigations/new-lsb/composables/use-lsb-router-item-state';
-import type { HighlightTagType, LSBIcon } from '@/common/modules/navigations/new-lsb/type';
+import type { HighlightTagType, LSBIcon, LSBRouterPredicate } from '@/common/modules/navigations/new-lsb/type';
 
 interface Props {
     id: string;
@@ -26,6 +26,7 @@ interface Props {
     imgIcon?: string;
     to?: Location;
     currentPath?: string;
+    predicate?: LSBRouterPredicate;
     openNewTab?: boolean;
     highlightTag?: HighlightTagType;
     favoriteOptions?: FavoriteOptions;
@@ -138,7 +139,7 @@ const {
             }
         }
     }
-    &:hover {
+    &:hover:not(.selected) {
         @apply bg-blue-100 cursor-pointer;
     }
     .item-text {

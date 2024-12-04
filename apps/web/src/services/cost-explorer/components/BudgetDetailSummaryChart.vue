@@ -51,6 +51,8 @@ const state = reactive({
             show: false,
         },
         tooltip: {
+            confine: true,
+            valueFormatter: (val) => numberFormatter(val) || '',
         },
         xAxis: {
             type: 'category',

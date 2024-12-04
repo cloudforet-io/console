@@ -17,7 +17,7 @@ import {
     PButton,
     PI,
     PButtonModal,
-    PTextEditor,
+    PCodeEditor,
     PTooltip,
     PStatus,
     PDivider,
@@ -384,7 +384,7 @@ watch(() => state.trustedAccountId, async (ta) => {
                         @confirm="handleCloseErrorModal"
         >
             <template #body>
-                <p-text-editor :code="state.lastSyncJob?.error_message" />
+                <p-code-editor :code="state.lastSyncJob?.error_message" />
             </template>
             <template #footer-extra>
                 {{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FINISHED') }}: {{ dayjs(state.lastSyncJob.finished_at).tz(state.timezone).format('YYYY-MM-DD HH:mm:ss') }}

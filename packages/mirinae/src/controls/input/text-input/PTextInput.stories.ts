@@ -5,6 +5,7 @@ import Fuse from 'fuse.js';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
 import PButton from '@/controls/buttons/button/PButton.vue';
+import PCodeEditor from '@/controls/code-editor/PCodeEditor.vue';
 import PFieldGroup from '@/controls/forms/field-group/PFieldGroup.vue';
 import { getTextInputMenu, getTextInputMenuWithMultiTypes } from '@/controls/input/text-input/mock';
 import {
@@ -13,9 +14,9 @@ import {
     getTextInputParameters,
 } from '@/controls/input/text-input/story-helper';
 import { INPUT_SIZE } from '@/controls/input/text-input/type';
-import PTextEditor from '@/controls/text-editor/PTextEditor.vue';
 
 import PTextInput from './PTextInput.vue';
+
 
 type PTextInputPropsAndCustomArgs = ComponentProps<typeof PTextInput>;
 
@@ -334,6 +335,42 @@ export const Disabled: Story = {
     }),
 };
 
+export const Readonly: Story = {
+    render: () => ({
+        components: { PTextInput },
+        template: `
+            <div>
+                <p class="text-label-lg font-bold my-3">Single input with 'basic', 'badge', 'stack' appearance type</p>
+                <p-text-input value="hello" appearance-type="basic" readonly />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Single input with 'masking' appearance type, 'password' input type</p>
+                <p-text-input value="password" appearance-type="masking" type="password" readonly />
+                <br/>
+                <br/>
+                <hr/>
+                <br/>
+                <p class="text-label-lg font-bold my-3">Multi input with 'badge' appearance type</p>
+                <p-text-input :menu="menu" :selected="selected" multi-input use-auto-complete appearance-type="badge" readonly />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Multi input with 'stack' appearance type</p>
+                <p-text-input :menu="menu" :selected="selected" multi-input use-auto-complete appearance-type="stack" readonly />
+                <br/>
+            </div>
+        `,
+        setup() {
+            const items = getTextInputMenu();
+            const state = reactive({
+                menu: items,
+                selected: items.slice(0, 3),
+            });
+            return {
+                ...toRefs(state),
+            };
+        },
+    }),
+};
+
+
 export const BlockAndMultiInput: Story = {
     render: () => ({
         components: { PTextInput },
@@ -443,7 +480,7 @@ export const Slots: Story = {
 export const InputAttributes: Story = {
     render: () => ({
         components: {
-            PTextInput, PTextEditor, PButton, PFieldGroup,
+            PTextInput, PCodeEditor, PButton, PFieldGroup,
         },
         template: `
             <div>
@@ -452,7 +489,7 @@ export const InputAttributes: Story = {
                     :invalid="!!errorMessage"
                     :invalid-text="errorMessage"
                 >
-                    <p-text-editor :code="JSON.stringify(attributes, null, 2)"
+                    <p-code-editor :code="JSON.stringify(attributes, null, 2)"
                                    @update:code="handleUpdateCode"
                     />
                 </p-field-group>
