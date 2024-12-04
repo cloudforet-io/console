@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
-import { useRoute, useRouter } from 'vue-router/composables';
+import { useRouter } from 'vue-router/composables';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
@@ -10,6 +10,7 @@ import {
 import type { ToolboxOptions } from '@cloudforet/mirinae/src/controls/toolbox/type';
 import type { QueryTag } from '@cloudforet/mirinae/types/controls/search/query-search-tags/type';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import { red } from '@/styles/colors';
@@ -20,7 +21,8 @@ import { ALERT_MANAGER_V2_ROUTE } from '@/services/alert-manager-v2/routes/route
 const pageSizeOptions = [15, 30, 45];
 
 const router = useRouter();
-const route = useRoute();
+
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const handlerState = reactive({
     keyItemSets: computed<KeyItemSet[]>(() => [{
@@ -54,16 +56,15 @@ const handleChangeToolbox = async (options: ToolboxOptions) => {
 };
 
 const handleClickServiceItem = (id: string) => {
-    router.push({
+    router.push(getProperRouteLocation({
         name: ALERT_MANAGER_V2_ROUTE.SERVICE.DETAIL._NAME,
         params: {
-            ...route.params,
             serviceId: id,
         },
         query: {
             tab: SERVICE_DETAIL_TABS.OVERVIEW,
         },
-    });
+    }));
 };
 const handleClickEscalationPolicy = () => {
     console.log('TODO: handleClickEscalationPolicy');
