@@ -38,9 +38,9 @@ const selected = ref<string|undefined>();
                     <div class="grid grid-cols-2 gap-4 justify-center items-center">
                         <p-select-card v-for="category in taskCategoryGetters.taskCategories"
                                        :key="category.categroy_id"
-                                       class="w-[352px] h-[50px] min-h-[50px]"
-                                       :value="category.categroy_id"
+                                       class="w-[352px] !py-4"
                                        :label="category.name"
+                                       :value="category.categroy_id"
                                        :selected="selected"
                         />
                     </div>
