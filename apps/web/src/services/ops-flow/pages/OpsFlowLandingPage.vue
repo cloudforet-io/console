@@ -1,29 +1,37 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import type { Query } from '@cloudforet/core-lib/space-connector/type';
 import {
-    PFieldTitle, PButton, PDivider, PSelectCard, PPaneLayout, PEmpty, PRadioGroup, PRadio,
+    PFieldTitle, PButton, PDivider, PSelectCard, PPaneLayout, PEmpty, PRadioGroup, PRadio, PDataLoader,
 } from '@cloudforet/mirinae';
 
 import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
+import type { TaskModel } from '@/schema/opsflow/task/model';
+import { store } from '@/store';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
+import { useTaskStore } from '@/services/ops-flow/stores/task-store';
 import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 import type { TaskCreatePageQuery } from '@/services/ops-flow/types/task-create-page-type';
+
 
 const router = useRouter();
 
 const taskCategoryStore = useTaskCategoryStore();
 const taskTypeStore = useTaskTypeStore();
 const taskTypeState = taskTypeStore.state;
+const taskStore = useTaskStore();
 
 const { getProperRouteLocation } = useProperRouteLocation();
 
+const loading = ref(true);
 const availableCategories = ref<TaskCategoryModel[]>([]);
 const { forms: { category, taskType }, setForm, isAllValid } = useFormValidator({
     category: '',
@@ -36,7 +44,13 @@ const { forms: { category, taskType }, setForm, isAllValid } = useFormValidator(
         return !!val;
     },
 });
-
+const tasks = ref<TaskModel[]>([]);
+const userId = computed(() => store.state.user.userId);
+const taskQueryHelper = new QueryHelper();
+const taskQuery = computed<Query>(() => taskQueryHelper.setFilters([
+    { k: 'created_by', v: userId.value, o: '=' },
+    { k: 'status_type', v: 'COMPLETED', o: '!=' },
+]).apiQuery);
 const handleChangeCategory = async (value: string) => {
     setForm('category', value);
     await taskTypeStore.listByCategoryId(value);
@@ -52,11 +66,19 @@ const goToTaskCreatePage = () => {
     }));
 };
 
+
 onMounted(async () => {
-    const allCategories = await taskCategoryStore.list() ?? [];
+    loading.value = true;
+    const allCategories = await taskCategoryStore.list();
+    if (!allCategories || !allCategories.length) {
+        loading.value = false;
+        return;
+    }
     await taskTypeStore.listByCategoryIds(allCategories.map((c) => c.category_id));
     availableCategories.value = allCategories.filter((c) => taskTypeState.itemsByCategoryId[c.category_id]?.length);
     setForm('category', availableCategories.value[0]?.category_id);
+    tasks.value = await taskStore.list({ query: taskQuery.value }) ?? [];
+    loading.value = false;
 });
 </script>
 
@@ -65,71 +87,87 @@ onMounted(async () => {
         <div class="mb-6 text-center text-display-md font-bold">
             Support Center
         </div>
-        <div class="max-w-[712px] mx-auto">
-            <div class="mb-4 pt-4 flex justify-between">
-                <p-field-title label="Active Ticket" />
-                <router-link custom
-                             :to="getProperRouteLocation({
-                                 name: OPS_FLOW_ROUTE.BOARD._NAME,
-                                 query: {categoryId: category.value }
-                             })"
-                >
-                    <template #default="{navigate}">
-                        <p-button style-type="secondary"
-                                  size="sm"
-                                  @click="navigate"
-                        >
-                            View All Tickets
-                        </p-button>
-                    </template>
-                </router-link>
-            </div>
-            <p-pane-layout class="mb-10 min-h-20 flex items-center justify-center">
-                <p-empty>No Active Tickets</p-empty>
-            </p-pane-layout>
-            <p-divider />
-            <div class="mt-10">
-                <p class="mb-6 text-display-md">
-                    Category
-                </p>
-                <div class="flex justify-center">
-                    <div class="grid grid-cols-2 gap-4 justify-center items-center">
-                        <p-select-card v-for="c in availableCategories"
-                                       :key="c.category_id"
-                                       class="category-card"
-                                       :label="c.name"
-                                       :value="c.category_id"
-                                       :selected="category"
-                                       @change="handleChangeCategory"
-                        />
+        <p-data-loader :loading="loading"
+                       :data="availableCategories"
+                       loader-backdrop-color="gray.100"
+                       class="min-h-72"
+        >
+            <div class="max-w-[712px] mx-auto">
+                <div class="mb-4 pt-4 flex justify-between">
+                    <p-field-title label="Active Ticket" />
+                    <router-link custom
+                                 :to="getProperRouteLocation({
+                                     name: OPS_FLOW_ROUTE.BOARD._NAME,
+                                     query: {categoryId: category.value }
+                                 })"
+                    >
+                        <template #default="{navigate}">
+                            <p-button style-type="secondary"
+                                      size="sm"
+                                      @click="navigate"
+                            >
+                                View All Tickets
+                            </p-button>
+                        </template>
+                    </router-link>
+                </div>
+                <p-pane-layout class="mb-10 min-h-20 flex items-center justify-center">
+                    <div v-if="tasks.length" /> <!-- TODO: Implement TaskList -->
+                    <p-empty v-else>
+                        No Active Tickets
+                    </p-empty>
+                </p-pane-layout>
+                <p-divider />
+                <div class="mt-10">
+                    <p class="mb-6 text-display-md">
+                        Category
+                    </p>
+                    <div class="flex justify-center">
+                        <div class="grid grid-cols-2 gap-4 justify-center items-center">
+                            <p-select-card v-for="c in availableCategories"
+                                           :key="c.category_id"
+                                           class="category-card"
+                                           :label="c.name"
+                                           :value="c.category_id"
+                                           :selected="category"
+                                           @change="handleChangeCategory"
+                            />
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="mt-10">
-                <p class="mb-6 text-display-md">
-                    Topic
-                </p>
-                <p-radio-group v-if="category">
-                    <p-radio v-for="t in taskTypeState.itemsByCategoryId[category]"
-                             :key="t.task_type_id"
-                             :value="t.task_type_id"
-                             :selected="taskType"
-                             @change="handleChangeTaskType"
+                <div class="mt-10">
+                    <p class="mb-6 text-display-md">
+                        Topic
+                    </p>
+                    <p-radio-group v-if="category">
+                        <p-radio v-for="t in taskTypeState.itemsByCategoryId[category]"
+                                 :key="t.task_type_id"
+                                 :value="t.task_type_id"
+                                 :selected="taskType"
+                                 @change="handleChangeTaskType"
+                        >
+                            {{ t.name }}
+                        </p-radio>
+                    </p-radio-group>
+                </div>
+                <div class="mt-10 flex justify-end">
+                    <p-button style-type="substitutive"
+                              icon-right="ic_arrow-right"
+                              :disabled="!isAllValid"
+                              @click="goToTaskCreatePage"
                     >
-                        {{ t.name }}
-                    </p-radio>
-                </p-radio-group>
+                        Next
+                    </p-button>
+                </div>
             </div>
-            <div class="mt-10 flex justify-end">
-                <p-button style-type="substitutive"
-                          icon-right="ic_arrow-right"
-                          :disabled="!isAllValid"
-                          @click="goToTaskCreatePage"
+            <template #no-data>
+                <p-empty class="my-20"
+                         show-image
                 >
-                    Next
-                </p-button>
-            </div>
-        </div>
+                    No Available Category
+                </p-empty>
+            </template>
+        </p-data-loader>
     </div>
 </template>
 
