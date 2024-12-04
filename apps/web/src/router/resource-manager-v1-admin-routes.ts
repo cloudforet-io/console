@@ -9,7 +9,7 @@ import adminInfoRoute from '@/services/info/routes/admin/routes';
 import adminWorkspaceHomeRoutes from '@/services/workspace-home/routes/admin/routes';
 
 
-export const adminRoutes: RouteConfig[] = [
+export const resourceManagerV1AdminRoutes: RouteConfig[] = [
     adminWorkspaceHomeRoutes,
     adminDashboardsRoutes,
     adminCostExplorerRoutes,
