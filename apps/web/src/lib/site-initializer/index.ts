@@ -8,6 +8,7 @@ import { setI18nLocale } from '@/translations';
 import { ERROR_ROUTE } from '@/router/constant';
 import { errorRoutes } from '@/router/error-routes';
 import { integralRoutes } from '@/router/integral-routes';
+import { resourceManagerV1IntegralRoutes } from '@/router/resource-manager-v1-integral-routes';
 
 import config from '@/lib/config';
 import { initRequestIdleCallback } from '@/lib/request-idle-callback-polyfill';
@@ -36,10 +37,11 @@ const initQueryHelper = (store) => {
 
 let isRouterInitialized = false;
 const initRouter = (domainId?: string) => {
+    const isResourceManagerVersionV2 = config.get('RESOURCE_MANAGER_VERSION') === 'v2';
     if (!domainId) {
         SpaceRouter.init(errorRoutes);
     } else {
-        SpaceRouter.init(integralRoutes);
+        SpaceRouter.init(isResourceManagerVersionV2 ? integralRoutes : resourceManagerV1IntegralRoutes);
     }
     isRouterInitialized = true;
 };
