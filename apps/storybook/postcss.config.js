@@ -1,17 +1,18 @@
+/* eslint-disable global-require, @typescript-eslint/no-var-requires */
 const path = require('path');
 
 const getPostcssConfig = require('postcss-config-custom');
 
 module.exports = getPostcssConfig({
     tailwindcssOptions: {
-        config: path.resolve(__dirname, 'tailwind.config.cjs'),
+        config: path.resolve(__dirname, 'tailwind.config.js'),
     },
     postcssEasyImportOptions: {
-        path: ['@cloudforet/mirinae/src', 'node_modules'],
+        path: ['../../packages/mirinae/src', 'node_modules'],
     },
     postcssSimpleVarsOptions: {
         variables() {
-            return require('@cloudforet/mirinae/src/styles/variables.cjs');
+            return require('../../packages/mirinae/src/styles/variables.cjs');
         },
     },
     disablePostcssImport: true,
