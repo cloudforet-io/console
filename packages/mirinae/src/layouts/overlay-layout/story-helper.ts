@@ -77,7 +77,7 @@ export const getOverlayLayoutArgTypes = (): ArgTypes => ({
             category: 'props',
         },
         control: 'select',
-        options: ['md', 'lg'],
+        options: ['sm', 'md', 'lg', 'full'],
     },
     isFixedSize: {
         name: 'isFixedSize',
