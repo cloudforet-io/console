@@ -26,11 +26,12 @@ import { i18n as _i18n } from '@/translations';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { webhookStateFormatter } from '@/services/alert-manager-v2/composables/refined-table-data';
 import { WEBHOOK_STATE } from '@/services/alert-manager-v2/constants/alert-manager-constant';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import { ALERT_MANAGER_V2_ROUTE } from '@/services/alert-manager-v2/routes/route-constant';
 
 interface Props {
     // TODO: add type
@@ -44,9 +45,12 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update:selected-item', value: string[]): void;
 }>();
 
-const router = useRouter();
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
+
+const router = useRouter();
+
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const webhookListApiQueryHelper = new ApiQueryHelper()
     .setPageStart(1).setPageLimit(15)
@@ -128,7 +132,9 @@ const state = reactive({
 });
 
 const handleClickCreateButton = () => {
-    router.push({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT.WEBHOOK.CREATE._NAME });
+    router.push(getProperRouteLocation({
+        name: ALERT_MANAGER_V2_ROUTE.SERVICE.DETAIL.WEBHOOK.CREATE._NAME,
+    }));
 };
 const handleSelectDropdownItem = (name) => {
     console.log('TODO: handleSelectDropdownItem', name);

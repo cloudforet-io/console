@@ -7,6 +7,9 @@ import { PButton } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+
+import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
 import { ALERT_MANAGER_V2_ROUTE } from '@/services/alert-manager-v2/routes/route-constant';
 import { useServiceCreateFormStore } from '@/services/alert-manager-v2/store/service-create-form-store';
 
@@ -32,6 +35,8 @@ const serviceFormStore = useServiceCreateFormStore();
 const serviceFormState = serviceFormStore.state;
 
 const router = useRouter();
+
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
     currentStep: computed<number>(() => serviceFormState.currentStep),
@@ -125,7 +130,15 @@ const handleClickSelectButton = () => {
     }
 };
 const handleClickSkipButton = () => {
-    console.log('TODO: handleClickSkipButton');
+    router.push(getProperRouteLocation({
+        name: ALERT_MANAGER_V2_ROUTE.SERVICE.DETAIL._NAME,
+        params: {
+            serviceId: 'temp id',
+        },
+        query: {
+            tab: SERVICE_DETAIL_TABS.SETTINGS,
+        },
+    }));
 };
 </script>
 
