@@ -1,5 +1,13 @@
 import { green, red } from '@/styles/colors';
 
+// TODO: Replace this with the actual value
+export const _FORMAT_RULE_TYPE = {
+    numberThreshold: 'numberThreshold',
+    percentThreshold: 'percentThreshold',
+    textThreshold: 'textThreshold',
+    textNumberTreshold: 'textNumberTreshold',
+} as const;
+
 export const FORMAT_RULE_TYPE = {
     threshold: 'threshold',
     percentThreshold: 'percentThreshold',

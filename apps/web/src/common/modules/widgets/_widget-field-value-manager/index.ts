@@ -13,14 +13,25 @@ export default class WidgetFieldValueManager {
 
     private validationErrors: Record<string, string> = {};
 
+    static applyDefaultValue(originData: WidgetFieldValueMap, defaultValueMap: Record<keyof WidgetFieldTypeMap, any>): WidgetFieldValueMap {
+        const result: WidgetFieldValueMap = { ...originData };
+        Object.entries(defaultValueMap).forEach(([key, value]) => {
+            if (result[key as keyof WidgetFieldValueMap] === undefined) {
+                result[key as keyof WidgetFieldValueMap] = value;
+            }
+        });
+        return result;
+    }
+
     constructor(
         widgetConfig: WidgetConfig,
         originData: WidgetFieldValueMap,
         fieldValidators: Record<keyof WidgetFieldTypeMap, FieldValueValidator<any>>,
+        defaultValueMap: Record<keyof WidgetFieldTypeMap, any>,
     ) {
         this.widgetConfig = widgetConfig;
         this.originData = originData;
-        this.modifiedData = { ...originData };
+        this.modifiedData = WidgetFieldValueManager.applyDefaultValue(originData, defaultValueMap);
         this.fieldValidators = fieldValidators;
     }
 
@@ -64,7 +75,7 @@ export default class WidgetFieldValueManager {
         return this.validationErrors;
     }
 
-    get computedData(): WidgetFieldValueMap {
+    get data(): WidgetFieldValueMap {
         return new Proxy(this.modifiedData, {
             get: (target, key) => target[key as keyof WidgetFieldValueMap],
         });
