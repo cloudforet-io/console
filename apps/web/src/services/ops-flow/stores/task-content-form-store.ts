@@ -23,6 +23,7 @@ import type { DefaultTaskFieldId } from '@/services/ops-flow/task-fields-configu
 interface UseTaskCreatePageStoreState {
     // base form
     currentCategoryId?: string;
+    currentTaskType?: TaskTypeModel;
     statusId?: string;
     assignee?: string;
     isBaseFormValid: boolean;
@@ -39,7 +40,6 @@ interface UseTaskCreatePageStoreState {
 }
 interface UseTaskCreatePageStoreGetters {
     currentCategory: TaskCategoryModel|undefined;
-    currentTaskType: TaskTypeModel|undefined;
     currentFields: TaskField[];
     isDefaultFieldValid: boolean;
     isFieldValid: boolean;
@@ -74,7 +74,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         currentCategory: computed<TaskCategoryModel|undefined>(() => taskCategoryStore.getters.taskCategories.find((c) => c.category_id === state.currentCategoryId)),
         // task type field form
         currentFields: computed<TaskField[]>(() => {
-            const taskType = getters.currentTaskType;
+            const taskType = state.currentTaskType;
             return taskType ? taskType.fields : [];
         }),
         isDefaultFieldValid: computed<boolean>(() => taskFieldMetadataStore.getters.defaultFields.every((field) => state.defaultDataValidationMap[field.field_id])),
@@ -94,9 +94,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
                 if (taskTypeStore.state.fullFieldsItemMap[taskTypeId]) {
                     state.currentTaskType = taskTypeStore.state.fullFieldsItemMap[taskTypeId];
                 } else {
-                    state.currentTaskType = await taskTypeStore.getWithFullFields({
-                        task_type_id: taskTypeId,
-                    });
+                    state.currentTaskType = await taskTypeStore.getWithFullFields(taskTypeId);
                 }
             } else {
                 state.currentTaskType = undefined;

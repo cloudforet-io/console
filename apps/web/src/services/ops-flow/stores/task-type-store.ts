@@ -100,7 +100,7 @@ export const useTaskTypeStore = defineStore('task-type', () => {
             const response = await SpaceConnector.clientV2.opsflow.taskType.update<TaskTypeUpdateParameters, TaskTypeModel>(params);
             const categoryId = response.category_id;
             if (state.itemsByCategoryId[categoryId]) {
-                const idx = state.itemsByCategoryId[categoryId]?.findIndex((c) => c.task_type_id === response.task_type_id);
+                const idx = state.itemsByCategoryId[categoryId]?.findIndex((c) => c.task_type_id === response.task_type_id) ?? -1;
                 if (idx !== -1) {
                     state.itemsByCategoryId[categoryId]?.splice(idx, 1, response);
                     state.itemsByCategoryId = { ...state.itemsByCategoryId };
@@ -112,7 +112,7 @@ export const useTaskTypeStore = defineStore('task-type', () => {
             const response = await SpaceConnector.clientV2.opsflow.taskType.updateFields<TaskTypeUpdateFieldsParameters, TaskTypeModel>(params);
             const categoryId = response.category_id;
             if (state.itemsByCategoryId[categoryId]) {
-                const idx = state.itemsByCategoryId[categoryId]?.findIndex((c) => c.task_type_id === response.task_type_id);
+                const idx = state.itemsByCategoryId[categoryId]?.findIndex((c) => c.task_type_id === response.task_type_id) ?? -1;
                 if (idx !== -1) {
                     state.itemsByCategoryId[categoryId]?.splice(idx, 1, response);
                     state.itemsByCategoryId = { ...state.itemsByCategoryId };
@@ -125,17 +125,17 @@ export const useTaskTypeStore = defineStore('task-type', () => {
                 return state.fullFieldsItemMap[taskTypeId];
             }
             try {
-                const response = await fetchGet({
+                const result = await fetchGet({
                     task_type_id: taskTypeId,
                     include_category_fields: true,
                 });
-                if (response.status === 'succeed') {
+                if (result.status === 'succeed') {
                     state.fullFieldsItemMap = {
                         ...state.fullFieldsItemMap,
-                        [taskTypeId]: response.result,
+                        [taskTypeId]: result.response,
                     };
                 }
-                return response.result;
+                return result.response;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 return undefined;
