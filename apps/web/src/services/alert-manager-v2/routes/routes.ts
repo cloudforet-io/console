@@ -60,12 +60,14 @@ const alertManagerV2Routes: RouteConfig = {
                         {
                             path: 'webhook/create',
                             name: ALERT_MANAGER_V2_ROUTE.SERVICE.DETAIL.WEBHOOK.CREATE._NAME,
+                            props: true,
                             meta: { centeredLayout: true },
                             component: ServiceDetailWebhookCreatePage as any,
                         },
                         {
                             path: 'notifications/create',
                             name: ALERT_MANAGER_V2_ROUTE.SERVICE.DETAIL.NOTIFICATIONS.CREATE._NAME,
+                            props: true,
                             meta: { centeredLayout: true },
                             component: ServiceDetailNotificationsCreatePage as any,
                         },
