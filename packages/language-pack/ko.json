@@ -1,5 +1,6 @@
 {
 	"ALERT_MANAGER": {
+		"ACTION": "작업",
 		"ALERTS": {
 			"ACCOUNT_ID": "계정 ID",
 			"ACKNOWLEDGED": "확인",
@@ -52,9 +53,11 @@
 		"CREATE": "생성",
 		"DELETE": "삭제",
 		"DESCRIPTION": "설명",
+		"DISABLED": "비활성화",
 		"DONE": "완료",
 		"EDIT": "편집하기",
 		"EDIT_NAME": "이름 수정",
+		"ENABLE": "활성화",
 		"ESCALATION_POLICY": {
 			"CHANNEL": "채널",
 			"STEP": "단계 {step}",
@@ -112,11 +115,14 @@
 		"SET_UP": "",
 		"SHOW_MORE": "더보기",
 		"STATUS": "상태",
+		"UPDATE": "수정",
 		"WEBHOOK": {
+			"BASE_INFO_TITLE": "기본 정보",
 			"COPY_WEBHOOK_URL": "웹훅 URL 복사하기 ",
 			"CREATE_DESC": "웹훅 URL을 복사한 후, {guide}를 참고하여 설정해 주세요.",
 			"CREATE_SUCCESS_TITLE": "웹훅 생성 완료! ",
 			"GUIDE": "사용자 가이드",
+			"HELP": "가이드",
 			"LABEL_NAME": "이름",
 			"LABEL_STATE": "상태",
 			"REQUEST": "",

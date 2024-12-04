@@ -1,5 +1,6 @@
 {
 	"ALERT_MANAGER": {
+		"ACTION": "Action",
 		"ALERTS": {
 			"ACCOUNT_ID": "Account ID",
 			"ACKNOWLEDGED": "Acknowledged",
@@ -52,9 +53,11 @@
 		"CREATE": "Create",
 		"DELETE": "Delete",
 		"DESCRIPTION": "Description",
+		"DISABLED": "Disable",
 		"DONE": "Done",
 		"EDIT": "Edit",
 		"EDIT_NAME": "Edit Name",
+		"ENABLE": "Enable",
 		"ESCALATION_POLICY": {
 			"CHANNEL": "Channel",
 			"STEP": "Step {step}",
@@ -112,11 +115,14 @@
 		"SET_UP": "Set Up",
 		"SHOW_MORE": "show more",
 		"STATUS": "Status",
+		"UPDATE": "Update",
 		"WEBHOOK": {
+			"BASE_INFO_TITLE": "Base Information",
 			"COPY_WEBHOOK_URL": "Copy the Webhook URL",
 			"CREATE_DESC": "Now, Copy the Webhook URL and follow {guide}",
 			"CREATE_SUCCESS_TITLE": "Webhook Successfully Created!",
 			"GUIDE": "the Guide",
+			"HELP": "Help",
 			"LABEL_NAME": "Name",
 			"LABEL_STATE": "State",
 			"REQUEST": "Request: {cnt}",

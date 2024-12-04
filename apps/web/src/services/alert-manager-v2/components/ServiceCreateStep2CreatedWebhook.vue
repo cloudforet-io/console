@@ -18,7 +18,7 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { copyAnyData } from '@/lib/helper/copy-helper';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-import { useServiceFormStore } from '@/services/alert-manager-v2/store/service-form-store';
+import { useServiceCreateFormStore } from '@/services/alert-manager-v2/store/service-create-form-store';
 import { userStateFormatter } from '@/services/iam/composables/refined-table-data';
 
 interface Props {
@@ -28,7 +28,7 @@ const props = withDefaults(defineProps<Props>(), {
     succeedWebhook: undefined,
 });
 
-const serviceFormStore = useServiceFormStore();
+const serviceFormStore = useServiceCreateFormStore();
 const serviceFormState = serviceFormStore.state;
 
 const storeState = reactive({

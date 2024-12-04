@@ -7,9 +7,9 @@ import {
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
-import { useServiceFormStore } from '@/services/alert-manager-v2/store/service-form-store';
+import { useServiceCreateFormStore } from '@/services/alert-manager-v2/store/service-create-form-store';
 
-const serviceFormStore = useServiceFormStore();
+const serviceFormStore = useServiceCreateFormStore();
 
 const state = reactive({
     // TODO: temp data

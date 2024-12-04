@@ -1,5 +1,6 @@
 {
 	"ALERT_MANAGER": {
+		"ACTION": "作業",
 		"ALERTS": {
 			"ACCOUNT_ID": "アカウントID",
 			"ACKNOWLEDGED": "確認",
@@ -52,9 +53,11 @@
 		"CREATE": "生成",
 		"DELETE": "削除",
 		"DESCRIPTION": "説明",
+		"DISABLED": "無効化",
 		"DONE": "完了",
 		"EDIT": "編集",
 		"EDIT_NAME": "名の編集",
+		"ENABLE": "有効化",
 		"ESCALATION_POLICY": {
 			"CHANNEL": "チャンネル名",
 			"STEP": "ステップ {step}",
@@ -112,11 +115,14 @@
 		"SET_UP": "",
 		"SHOW_MORE": "もっと見る",
 		"STATUS": "ステータス",
+		"UPDATE": "編集",
 		"WEBHOOK": {
+			"BASE_INFO_TITLE": "基本情報",
 			"COPY_WEBHOOK_URL": "Webhook URLをコピー",
 			"CREATE_DESC": "ウェブフックURLをコピーした後、{guide}を参照して設定してください。",
 			"CREATE_SUCCESS_TITLE": "ウェプフク追加に成功!",
 			"GUIDE": "ユーザーガイド",
+			"HELP": "ヘルプ",
 			"LABEL_NAME": "名前",
 			"LABEL_STATE": "状態",
 			"REQUEST": "",

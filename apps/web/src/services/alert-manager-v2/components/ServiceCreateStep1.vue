@@ -18,9 +18,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import ServiceCreateStepContainer from '@/services/alert-manager-v2/components/ServiceCreateStepContainer.vue';
-import { useServiceFormStore } from '@/services/alert-manager-v2/store/service-form-store';
+import { useServiceCreateFormStore } from '@/services/alert-manager-v2/store/service-create-form-store';
 
-const serviceFormStore = useServiceFormStore();
+const serviceFormStore = useServiceCreateFormStore();
 const serviceFormState = serviceFormStore.state;
 
 const formDataState = reactive({
