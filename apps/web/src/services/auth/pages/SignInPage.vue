@@ -76,7 +76,7 @@ const state = reactive({
 const onSignIn = async (userId:string) => {
     appContextStore.setGlobalGrantLoading(true);
     try {
-        const isSameUserAsPreviouslyLoggedInUser = state.beforeUser === userId;
+        const isFirstUserOrSameUserAsPreviouslyLoggedInUser = !state.beforeUser || state.beforeUser === userId;
         const hasBoundWorkspaces = userWorkspaceStore.getters.workspaceList.length > 0;
         const defaultRoute = getDefaultRouteAfterSignIn(hasBoundWorkspaces);
         const lastAccessedWorkspaceId = await getLastAccessedWorkspaceId();
@@ -94,7 +94,7 @@ const onSignIn = async (userId:string) => {
             });
             return;
         }
-        if (!props.previousPath || !isSameUserAsPreviouslyLoggedInUser) {
+        if (!props.previousPath || !isFirstUserOrSameUserAsPreviouslyLoggedInUser) {
             await router.push(defaultRoute).catch(() => {});
             return;
         }
