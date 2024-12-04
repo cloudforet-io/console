@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, onUnmounted, reactive } from 'vue';
 
-import ServiceCreateStep2CreatedWebhook
-    from '@/services/alert-manager-v2/components/ServiceCreateStep2CreatedWebhook.vue';
-import ServiceCreateStep2SelectWebhookType
-    from '@/services/alert-manager-v2/components/ServiceCreateStep2SelectWebhookType.vue';
-import ServiceCreateStep2WebhookForm from '@/services/alert-manager-v2/components/ServiceCreateStep2WebhookForm.vue';
 import ServiceCreateStepContainer from '@/services/alert-manager-v2/components/ServiceCreateStepContainer.vue';
+import WebhookCreateForm from '@/services/alert-manager-v2/components/WebhookCreateForm.vue';
+import WebhookCreateSuccessMode
+    from '@/services/alert-manager-v2/components/WebhookCreateSuccessMode.vue';
+import WebhookCreateTypeSelector
+    from '@/services/alert-manager-v2/components/WebhookCreateTypeSelector.vue';
 import { useServiceCreateFormStore } from '@/services/alert-manager-v2/store/service-create-form-store';
 
 const serviceFormStore = useServiceCreateFormStore();
@@ -41,8 +41,8 @@ onUnmounted(() => {
                                    :is-all-form-valid="state.isAllFormValid"
                                    @create="handleCreateWebhook"
     >
-        <service-create-step2-select-webhook-type v-if="storeState.currentSubStep === 1" />
-        <service-create-step2-webhook-form v-else-if="storeState.currentSubStep === 2" />
-        <service-create-step2-created-webhook v-else-if="storeState.currentSubStep === 3" />
+        <webhook-create-type-selector v-if="storeState.currentSubStep === 1" />
+        <webhook-create-form v-else-if="storeState.currentSubStep === 2" />
+        <webhook-create-success-mode v-else-if="storeState.currentSubStep === 3" />
     </service-create-step-container>
 </template>
