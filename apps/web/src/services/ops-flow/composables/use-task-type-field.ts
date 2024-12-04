@@ -4,6 +4,8 @@ import { ref, computed } from 'vue';
 import { getTextHighlightRegex } from '@cloudforet/mirinae';
 import type { AutocompleteHandler, SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
+import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
+
 import { useFieldValidator } from '@/common/composables/form-validator';
 
 import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
@@ -51,13 +53,8 @@ export const useTaskTypeField = ({
         };
     };
 
-    const setInitialTaskType = (taskTypeId?: string) => {
-        if (!taskTypeId) {
-            taskTypeValidator.setValue([]);
-            return;
-        }
-        const currentTaskTypeItem = allTaskTypeItems.value.find((item) => item.name === taskTypeId);
-        taskTypeValidator.setValue(currentTaskTypeItem ? [currentTaskTypeItem] : []);
+    const setInitialTaskType = (taskType?: TaskTypeModel) => {
+        taskTypeValidator.setValue(taskType ? [{ name: taskType.task_type_id, label: taskType.name }] : []);
     };
 
 

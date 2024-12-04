@@ -42,8 +42,8 @@ const {
     categoryId: computed(() => taskContentFormGetters.currentCategory?.category_id),
     isRequired: true,
 });
-const handleUpdateSelectedTaskType = (items) => {
-    taskContentFormStore.setCurrentTaskTypeId(items[0].name);
+const handleUpdateSelectedTaskType = async (items) => {
+    await taskContentFormStore.setCurrentTaskType(items[0].name);
     // watcher automatically updates forms
 };
 
@@ -65,7 +65,7 @@ const handleUpdateSelectedStatus = (items) => {
 
 /* assignee */
 const assigneeValidator = useFieldValidator('', (value) => {
-    if (!taskContentFormGetters.currentCategory || !taskContentFormGetters.currentTaskType) return true;
+    if (!taskContentFormGetters.currentCategory || !taskContentFormState.currentTaskType) return true;
     if (!value) return 'Assignee is required';
     return true;
 });
@@ -107,10 +107,10 @@ watch(() => taskContentFormGetters.currentCategory, async (currentCategory) => {
     }
     resetValidations();
 }, { immediate: true });
-watch(() => taskContentFormGetters.currentTaskType, (currentTaskType) => {
+watch(() => taskContentFormState.currentTaskType, (currentTaskType) => {
     if (currentTaskType) {
         // init selected task type
-        setInitialTaskType(currentTaskType.task_type_id);
+        setInitialTaskType(currentTaskType);
         // init selected assignee
         assigneeValidator.setValue('');
     }
@@ -192,8 +192,8 @@ watch(() => taskContentFormGetters.currentTaskType, (currentTaskType) => {
                 >
                     <user-select-dropdown :user-id="assignee"
                                           :invalid="invalidState.assignee"
-                                          :disabled="taskContentFormState.mode === 'view' || !taskContentFormGetters.currentTaskType"
-                                          :user-pool="taskContentFormGetters.currentTaskType?.assignee_pool"
+                                          :disabled="taskContentFormState.mode === 'view' || !taskContentFormState.currentTaskType"
+                                          :user-pool="taskContentFormState.currentTaskType?.assignee_pool"
                                           @update:user-id="handleUpdateSelectedAssignee"
                     />
                 </p-field-group>

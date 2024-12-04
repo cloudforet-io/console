@@ -21,12 +21,14 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 interface UseTaskTypeStoreState {
     loading: boolean;
     itemsByCategoryId: Record<string, TaskTypeModel[]|undefined>;
+    fullFieldsItemMap: Record<string, TaskTypeModel|undefined>;
 }
 
 export const useTaskTypeStore = defineStore('task-type', () => {
     const state = reactive<UseTaskTypeStoreState>({
         loading: false,
         itemsByCategoryId: {},
+        fullFieldsItemMap: {},
     });
 
     const getters = {
@@ -34,6 +36,7 @@ export const useTaskTypeStore = defineStore('task-type', () => {
     };
 
     const fetchList = getCancellableFetcher<TaskTypeListParameters, ListResponse<TaskTypeModel>>(SpaceConnector.clientV2.opsflow.taskType.list);
+    const fetchGet = getCancellableFetcher<TaskTypeGetParameters, TaskTypeModel>(SpaceConnector.clientV2.opsflow.taskType.get);
     const actions = {
         async listByCategoryIds(categoryIds: string[]): Promise<Record<string, TaskTypeModel[]>> {
             const _categoryIds = categoryIds.filter((categoryId) => !state.itemsByCategoryId[categoryId]);
@@ -117,26 +120,26 @@ export const useTaskTypeStore = defineStore('task-type', () => {
             }
             return response;
         },
-        async get(taskTypeId: string) {
-            const response = await SpaceConnector.clientV2.opsflow.taskType.get<TaskTypeGetParameters, TaskTypeModel>({
-                task_type_id: taskTypeId,
-            });
-            const categoryId = response.category_id;
-            if (state.itemsByCategoryId[categoryId]) {
-                const idx = state.itemsByCategoryId[categoryId]?.findIndex((c) => c.task_type_id === response.task_type_id);
-                if (idx !== -1) {
-                    state.itemsByCategoryId[categoryId]?.splice(idx, 1, response);
-                    state.itemsByCategoryId = { ...state.itemsByCategoryId };
-                } else {
-                    state.itemsByCategoryId = {
-                        ...state.itemsByCategoryId,
-                        [categoryId]: [response],
+        async getWithFullFields(taskTypeId: string, force?: boolean): Promise<TaskTypeModel|undefined> {
+            if (state.fullFieldsItemMap[taskTypeId] && !force) {
+                return state.fullFieldsItemMap[taskTypeId];
+            }
+            try {
+                const response = await fetchGet({
+                    task_type_id: taskTypeId,
+                    include_category_fields: true,
+                });
+                if (response.status === 'succeed') {
+                    state.fullFieldsItemMap = {
+                        ...state.fullFieldsItemMap,
+                        [taskTypeId]: response.result,
                     };
                 }
-            } else {
-                state.itemsByCategoryId = { ...state.itemsByCategoryId, [categoryId]: [response] };
+                return response.result;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                return undefined;
             }
-            return response;
         },
         async delete(taskTypeId: string, categoryId?: string) {
             await SpaceConnector.clientV2.opsflow.taskType.delete<TaskTypeDeleteParameters, TaskTypeModel>({
@@ -161,6 +164,7 @@ export const useTaskTypeStore = defineStore('task-type', () => {
         reset() {
             state.loading = false;
             state.itemsByCategoryId = {};
+            state.fullFieldsItemMap = {};
         },
     };
 

@@ -23,7 +23,6 @@ import type { DefaultTaskFieldId } from '@/services/ops-flow/task-fields-configu
 interface UseTaskCreatePageStoreState {
     // base form
     currentCategoryId?: string;
-    currentTaskTypeId?: string;
     statusId?: string;
     assignee?: string;
     isBaseFormValid: boolean;
@@ -55,7 +54,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
     const state = reactive<UseTaskCreatePageStoreState>({
         // base form
         currentCategoryId: undefined,
-        currentTaskTypeId: undefined,
+        currentTaskType: undefined,
         statusId: undefined,
         assignee: undefined,
         isBaseFormValid: false,
@@ -73,13 +72,6 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
     const getters = {
         // base form
         currentCategory: computed<TaskCategoryModel|undefined>(() => taskCategoryStore.getters.taskCategories.find((c) => c.category_id === state.currentCategoryId)),
-        currentTaskType: computed<TaskTypeModel|undefined>(() => {
-            if (!state.currentCategoryId || !state.currentTaskTypeId) return undefined;
-            if (!taskTypeStore.state.itemsByCategoryId[state.currentCategoryId]) {
-                taskTypeStore.listByCategoryId(state.currentCategoryId);
-            }
-            return taskTypeStore.state.itemsByCategoryId[state.currentCategoryId]?.find((t) => t.task_type_id === state.currentTaskTypeId);
-        }),
         // task type field form
         currentFields: computed<TaskField[]>(() => {
             const taskType = getters.currentTaskType;
@@ -94,11 +86,21 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         setCurrentCategoryId(categoryId?: string) {
             if (state.currentCategoryId === categoryId) return;
             state.currentCategoryId = categoryId;
-            state.currentTaskTypeId = undefined;
+            state.currentTaskType = undefined;
         },
-        setCurrentTaskTypeId(taskTypeId?: string) {
-            if (state.currentTaskTypeId === taskTypeId) return;
-            state.currentTaskTypeId = taskTypeId;
+        async setCurrentTaskType(taskTypeId?: string) {
+            if (state.currentTaskType?.task_type_id === taskTypeId) return;
+            if (taskTypeId) {
+                if (taskTypeStore.state.fullFieldsItemMap[taskTypeId]) {
+                    state.currentTaskType = taskTypeStore.state.fullFieldsItemMap[taskTypeId];
+                } else {
+                    state.currentTaskType = await taskTypeStore.getWithFullFields({
+                        task_type_id: taskTypeId,
+                    });
+                }
+            } else {
+                state.currentTaskType = undefined;
+            }
             state.data = {};
             state.dataValidationMap = {};
         },
@@ -130,7 +132,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         // overall
         setCurrentTask(task: TaskModel) {
             state.currentCategoryId = task.category_id;
-            state.currentTaskTypeId = task.task_type_id;
+            actions.setCurrentTaskType(task.task_type_id);
             state.statusId = task.status_id;
             state.assignee = task.assignee;
             state.defaultData = {
@@ -153,9 +155,10 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         },
         async createTask() {
             try {
+                if (!state.currentTaskType) throw new Error('Task type is not selected');
                 state.createTaskLoading = true;
                 await taskStore.create({
-                    task_type_id: state.currentTaskTypeId as string,
+                    task_type_id: state.currentTaskType.task_type_id,
                     name: state.defaultData.title,
                     status_id: state.statusId as string,
                     description: state.defaultData.description || undefined,
