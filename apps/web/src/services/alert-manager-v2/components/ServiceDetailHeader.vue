@@ -10,9 +10,13 @@ import { i18n } from '@/translations';
 
 import { gray } from '@/styles/colors';
 
-const props = defineProps<{
+interface Props {
     serviceId: string;
-}>();
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    serviceId: '',
+});
 
 const state = reactive({
     menuItems: computed<MenuItem[]>(() => [
