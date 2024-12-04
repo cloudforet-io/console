@@ -113,7 +113,7 @@ onUnmounted(() => {
         <webhook-create-type-selector v-if="state.currentStep === 1" />
         <webhook-create-form v-else-if="state.currentStep === 2" />
         <webhook-create-success-mode v-else-if="state.currentStep === 3" />
-        <div class="flex justify-end mt-2">
+        <div class="flex justify-end mt-8">
             <p-button v-if="state.currentStep === 3"
                       style-type="transparent"
                       size="lg"
