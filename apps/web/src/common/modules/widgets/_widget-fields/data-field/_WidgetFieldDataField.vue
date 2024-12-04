@@ -2,13 +2,14 @@
 
 <script lang="ts" setup>
 import {
-    computed, reactive,
+    computed, reactive, watch,
 } from 'vue';
 
 import { PSelectDropdown, PFieldGroup } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
+import { widgetValidatorRegistry } from '@/common/modules/widgets/_widget-field-value-manager/constant/validator-registry';
 import type { DataFieldOptions, DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
 import type {
     _WidgetFieldComponentProps,
@@ -21,9 +22,10 @@ const props = withDefaults(defineProps<_WidgetFieldComponentProps<DataFieldOptio
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
 
+const validator = widgetValidatorRegistry[FIELD_KEY];
 
 const state = reactive({
-    fieldValue: computed<DataFieldValue>(() => props.manager.computedData[FIELD_KEY].value),
+    fieldValue: computed<DataFieldValue>(() => props.manager.data[FIELD_KEY].value),
     multiselectable: computed(() => props.widgetFieldSchema?.options?.multiSelectable),
     menuItems: computed<MenuItem[]>(() => {
         const dataInfoList = Object.keys(widgetGenerateGetters.selectedDataTable?.data_info ?? {}) ?? [];
@@ -32,8 +34,7 @@ const state = reactive({
             label: d,
         }));
     }),
-    invalid: computed(() => props.manager.getValidationErrors()[FIELD_KEY]),
-
+    invalid: computed(() => validator(state.fieldValue, props.widgetConfig)),
     selectedItem: computed<MenuItem[]|string|undefined>(() => {
         if (!state.menuItems.length) return undefined;
         if (state.multiselectable) {
@@ -53,6 +54,18 @@ const convertToMenuItem = (data: string[]) => data.map((d) => ({
     name: d,
     label: d,
 }));
+
+/* Watcher */
+// initial field value
+watch(() => state.selectedItem, (menuItem) => {
+    if (menuItem?.length && !state.fieldValue.data) {
+        if (state.multiselectable) {
+            props.manager.setFieldValue(FIELD_KEY, { ...state.fieldValue, data: [menuItem[0]] });
+        } else {
+            props.manager.setFieldValue(FIELD_KEY, { ...state.fieldValue, field: menuItem[0].name });
+        }
+    }
+}, { immediate: true });
 
 </script>
 
