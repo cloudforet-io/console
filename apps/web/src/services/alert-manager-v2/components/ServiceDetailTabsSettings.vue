@@ -94,7 +94,7 @@ const handleClickEditButton = () => {
         <div class="p-4 mx-4 bg-blue-100 rounded-lg">
             <div class="flex gap-4">
                 <p-card v-for="(item, index) in state.settingCardItems"
-                        :key="`setting-card-${index}`"
+                        :key="`setting-card-${i18n.locale}-${index}`"
                         :header="false"
                         class="flex-1"
                 >
