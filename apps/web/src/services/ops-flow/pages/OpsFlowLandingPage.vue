@@ -68,11 +68,21 @@ onMounted(async () => {
         <div class="max-w-[712px] mx-auto">
             <div class="mb-4 pt-4 flex justify-between">
                 <p-field-title label="Active Ticket" />
-                <p-button style-type="secondary"
-                          size="sm"
+                <router-link custom
+                             :to="getProperRouteLocation({
+                                 name: OPS_FLOW_ROUTE.BOARD._NAME,
+                                 query: {categoryId: category.value }
+                             })"
                 >
-                    View All Tickets
-                </p-button>
+                    <template #default="{navigate}">
+                        <p-button style-type="secondary"
+                                  size="sm"
+                                  @click="navigate"
+                        >
+                            View All Tickets
+                        </p-button>
+                    </template>
+                </router-link>
             </div>
             <p-pane-layout class="mb-10 min-h-20 flex items-center justify-center">
                 <p-empty>No Active Tickets</p-empty>
