@@ -1,4 +1,5 @@
 import { asyncComputed } from '@vueuse/core';
+import type { DeepReadonly } from 'vue';
 import {
     reactive, computed,
 } from 'vue';
@@ -7,11 +8,13 @@ import { defineStore } from 'pinia';
 
 import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
 import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
+import type { TaskModel } from '@/schema/opsflow/task/model';
 import type { TaskStatusOption, TaskStatusOptions, TaskStatusType } from '@/schema/opsflow/task/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
+import { useTaskStore } from '@/services/ops-flow/stores/task-store';
 import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 
 interface UseTaskCategoryPageStoreState {
@@ -28,6 +31,7 @@ interface UseTaskCategoryPageStoreState {
     visibleTaskTypeForm: boolean;
     targetTaskTypeId?: string;
     visibleTaskTypeDeleteModal: boolean;
+    associatedTasksToTypeMap: Record<string, TaskModel[]>;
 }
 
 interface UseTaskCategoryPageStoreGetters {
@@ -41,11 +45,13 @@ interface UseTaskCategoryPageStoreGetters {
     // task type
     taskTypes: TaskTypeModel[]|undefined;
     targetTaskType: TaskTypeModel|undefined;
+    associatedTasksToType: TaskModel[];
 }
 
 export const useTaskCategoryPageStore = defineStore('task-category-page', () => {
     const taskCategoryStore = useTaskCategoryStore();
     const taskTypeStore = useTaskTypeStore();
+    const taskStore = useTaskStore();
     const state = reactive<UseTaskCategoryPageStoreState>({
         currentCategoryId: undefined,
         // status
@@ -57,6 +63,7 @@ export const useTaskCategoryPageStore = defineStore('task-category-page', () => 
         visibleTaskTypeForm: false,
         targetTaskTypeId: undefined,
         visibleTaskTypeDeleteModal: false,
+        associatedTasksToTypeMap: {},
     });
     const getters: UseTaskCategoryPageStoreGetters = {
         currentCategory: computed<TaskCategoryModel|undefined>(() => taskCategoryStore.getters.taskCategories.find((c) => c.category_id === state.currentCategoryId)),
@@ -96,6 +103,19 @@ export const useTaskCategoryPageStore = defineStore('task-category-page', () => 
         targetTaskType: computed<TaskTypeModel|undefined>(() => {
             if (!state.targetTaskTypeId) return undefined;
             return getters.taskTypes?.find((taskType) => taskType.task_type_id === state.targetTaskTypeId);
+        }),
+        associatedTasksToType: computed<DeepReadonly<TaskModel[]>>(() => {
+            if (!state.targetTaskTypeId) return [];
+            const taskTypeId = state.targetTaskTypeId;
+            if (state.associatedTasksToTypeMap[taskTypeId]) return state.associatedTasksToTypeMap[taskTypeId];
+            taskStore.list({ task_type_id: taskTypeId }).then((tasks) => {
+                if (!tasks) return;
+                state.associatedTasksToTypeMap = {
+                    ...state.associatedTasksToTypeMap,
+                    [taskTypeId]: tasks,
+                };
+            });
+            return state.associatedTasksToTypeMap[taskTypeId] ?? [];
         }),
     } as unknown as UseTaskCategoryPageStoreGetters;
     const actions = {

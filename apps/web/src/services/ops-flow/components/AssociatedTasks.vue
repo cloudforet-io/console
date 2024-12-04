@@ -4,9 +4,11 @@ import { computed } from 'vue';
 import { PFieldTitle, PDataTable } from '@cloudforet/mirinae';
 import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
-import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
+import type { TaskModel } from '@/schema/opsflow/task/model';
 
-const taskManagementPageStore = useTaskManagementPageStore();
+const props = defineProps<{
+    tasks: TaskModel[];
+}>();
 
 const fields = computed<DataTableField[]>(() => [
     {
@@ -28,7 +30,7 @@ const fields = computed<DataTableField[]>(() => [
             Task
         </p-field-title>
         <p-data-table :fields="fields"
-                      :items="taskManagementPageStore.getters.associatedTasksToCategory"
+                      :items="props.tasks"
         />
     </div>
 </template>

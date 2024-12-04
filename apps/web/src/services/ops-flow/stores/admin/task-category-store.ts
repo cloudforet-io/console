@@ -22,6 +22,10 @@ interface UseTaskCategoryStoreState {
     loading: boolean;
     items?: TaskCategoryModel[];
 }
+interface UseTaskCategoryStoreGetters {
+    loading: boolean;
+    taskCategories: TaskCategoryModel[];
+}
 const DEFAULT_STATUS_OPTIONS: TaskCategoryCreateParameters['status_options'] = {
     TODO: [
         { name: 'To Do', color: 'blue200', is_default: true },
@@ -39,7 +43,7 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
         items: undefined,
     });
 
-    const getters = {
+    const getters: UseTaskCategoryStoreGetters = {
         loading: computed<boolean>(() => state.loading),
         taskCategories: computed<TaskCategoryModel[]>(() => {
             if (state.items === undefined) {
@@ -47,8 +51,7 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
             }
             return state.items ?? [];
         }),
-    };
-
+    } as unknown as UseTaskCategoryStoreGetters; // HACK: to avoid type error
 
     const fetchList = getCancellableFetcher<TaskCategoryListParameters, ListResponse<TaskCategoryModel>>(SpaceConnector.clientV2.opsflow.taskCategory.list);
     const actions = {

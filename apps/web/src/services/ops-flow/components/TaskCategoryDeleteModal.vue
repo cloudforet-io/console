@@ -56,6 +56,8 @@ const handleClosed = () => {
                 하위 태스크가 존재하므로 카테고리 삭제가 불가합니다.
             </p>
         </template>
-        <associated-tasks v-if="!!taskManagementPageStore.getters.associatedTasksToCategory.length" />
+        <associated-tasks v-if="!!taskManagementPageStore.getters.associatedTasksToCategory.length"
+                          :tasks="taskManagementPageStore.getters.associatedTasksToCategory"
+        />
     </p-button-modal>
 </template>
