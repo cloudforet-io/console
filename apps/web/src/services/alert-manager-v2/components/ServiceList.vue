@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
-import { useRouter } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
@@ -20,6 +20,7 @@ import { ALERT_MANAGER_V2_ROUTE } from '@/services/alert-manager-v2/routes/route
 const pageSizeOptions = [15, 30, 45];
 
 const router = useRouter();
+const route = useRoute();
 
 const handlerState = reactive({
     keyItemSets: computed<KeyItemSet[]>(() => [{
@@ -56,6 +57,7 @@ const handleClickServiceItem = (id: string) => {
     router.push({
         name: ALERT_MANAGER_V2_ROUTE.SERVICE.DETAIL._NAME,
         params: {
+            ...route.params,
             serviceId: id,
         },
         query: {

@@ -3,10 +3,13 @@ import { useElementSize } from '@vueuse/core/index';
 import { computed, reactive, ref } from 'vue';
 
 import {
-    PFieldTitle, PIconButton, PLazyImg, PDivider, PLink,
+    PFieldTitle, PIconButton, PLazyImg, PDivider, PTextButton,
 } from '@cloudforet/mirinae';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
+
+import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
+import { useServiceDetailPageStore } from '@/services/alert-manager-v2/store/service-detail-page-store';
 
 const ITEM_DEFAULT_WIDTH = 120 + 8;
 const DEFAULT_LEFT_PADDING = 16;
@@ -14,6 +17,7 @@ const DEFAULT_LEFT_PADDING = 16;
 const rowItemsWrapperRef = ref<null | HTMLElement>(null);
 const itemEl = ref<null | HTMLElement>(null);
 
+const serviceDetailPageStore = useServiceDetailPageStore();
 const { width: rowItemsWrapperWidth } = useElementSize(rowItemsWrapperRef);
 
 const state = reactive({
@@ -62,9 +66,9 @@ const handleClickArrowButton = (increment: number) => {
     element.el.style.marginLeft = increment === 1 ? `-${marginLeft}px` : `${marginLeft}px`;
 };
 
-const handleRouteDetail = () => {
-    console.log('handleRouteDetail');
-};
+const handleRouteDetail = () => (
+    serviceDetailPageStore.setActiveTab(SERVICE_DETAIL_TABS.NOTIFICATIONS)
+);
 </script>
 
 <template>
@@ -119,12 +123,11 @@ const handleRouteDetail = () => {
         <div>
             <p-divider class="bg-gray-150" />
             <div class="link-wrapper">
-                <p-link :text="$t('ALERT_MANAGER.SERVICE.DETAILS')"
-                        action-icon="internal-link"
-                        new-tab
-                        highlight
-                        :to="handleRouteDetail"
-                />
+                <p-text-button style-type="highlight"
+                               @click="handleRouteDetail"
+                >
+                    {{ $t('ALERT_MANAGER.SERVICE.DETAILS') }}
+                </p-text-button>
             </div>
         </div>
     </div>
