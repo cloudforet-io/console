@@ -96,7 +96,7 @@ onMounted(async () => {
                     <div class="grid grid-cols-2 gap-4 justify-center items-center">
                         <p-select-card v-for="c in availableCategories"
                                        :key="c.category_id"
-                                       class="w-[352px] !py-4"
+                                       class="category-card"
                                        :label="c.name"
                                        :value="c.category_id"
                                        :selected="category"
@@ -132,4 +132,10 @@ onMounted(async () => {
         </div>
     </div>
 </template>
+
+<style lang="postcss" scoped>
+.category-card {
+    @apply w-[352px] py-4;
+}
+</style>
 

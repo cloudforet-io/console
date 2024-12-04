@@ -5,6 +5,8 @@ import { EXTERNAL_PAGE_ROUTE } from '@/router/constant';
 import AlertPublicDetailPage from '@/common/pages/AlertPublicDetailPage.vue';
 import CostReportDetailPage from '@/common/pages/CostReportDetailPage.vue';
 
+import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
+
 export const externalRoutes: RouteConfig[] = [
     {
         path: '/cost-report-detail',
@@ -23,5 +25,10 @@ export const externalRoutes: RouteConfig[] = [
             alertUrl: route.query.monitoring_url,
         }),
         component: AlertPublicDetailPage,
+    },
+    {
+        path: '/ops-flow-landing',
+        name: EXTERNAL_PAGE_ROUTE.OPS_FLOW_LANDING._NAME,
+        redirect: { name: OPS_FLOW_ROUTE.LANDING._NAME },
     },
 ];
