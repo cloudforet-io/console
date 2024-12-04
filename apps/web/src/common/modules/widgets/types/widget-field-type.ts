@@ -83,7 +83,7 @@ export interface WidgetFieldComponentProps<FieldOptions, FieldValue = any> {
 // TODO: replace this with WidgetFieldComponentProps
 export interface _WidgetFieldComponentProps<FieldOptions> {
     widgetFieldSchema: WidgetFieldSchema<FieldOptions>;
-    manager: WidgetFieldValueManager;
+    fieldManager: WidgetFieldValueManager;
     widgetConfig: WidgetConfig;
     widgetId: string;
 }

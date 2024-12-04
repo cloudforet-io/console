@@ -25,7 +25,7 @@ const widgetGenerateGetters = widgetGenerateStore.getters;
 const validator = widgetValidatorRegistry[FIELD_KEY];
 
 const state = reactive({
-    fieldValue: computed<DataFieldValue>(() => props.manager.data[FIELD_KEY].value),
+    fieldValue: computed<DataFieldValue>(() => props.fieldManager.data[FIELD_KEY].value),
     multiselectable: computed(() => props.widgetFieldSchema?.options?.multiSelectable),
     menuItems: computed<MenuItem[]>(() => {
         const dataInfoList = Object.keys(widgetGenerateGetters.selectedDataTable?.data_info ?? {}) ?? [];
@@ -47,7 +47,7 @@ const state = reactive({
 /* Event */
 const handleChangeValue = (val: string|MenuItem[]) => {
     const newValue = Array.isArray(val) ? val.map((item) => item.name as string) : val;
-    props.manager.setFieldValue(FIELD_KEY, { data: newValue });
+    props.fieldManager.setFieldValue(FIELD_KEY, { data: newValue });
 };
 
 const convertToMenuItem = (data: string[]) => data.map((d) => ({
@@ -60,9 +60,9 @@ const convertToMenuItem = (data: string[]) => data.map((d) => ({
 watch(() => state.selectedItem, (menuItem) => {
     if (menuItem?.length && !state.fieldValue.data) {
         if (state.multiselectable) {
-            props.manager.setFieldValue(FIELD_KEY, { ...state.fieldValue, data: [menuItem[0]] });
+            props.fieldManager.setFieldValue(FIELD_KEY, { ...state.fieldValue, data: [menuItem[0]] });
         } else {
-            props.manager.setFieldValue(FIELD_KEY, { ...state.fieldValue, field: menuItem[0].name });
+            props.fieldManager.setFieldValue(FIELD_KEY, { ...state.fieldValue, field: menuItem[0].name });
         }
     }
 }, { immediate: true });

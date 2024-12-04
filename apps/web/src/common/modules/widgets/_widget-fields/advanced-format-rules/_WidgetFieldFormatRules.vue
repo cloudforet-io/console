@@ -36,7 +36,7 @@ const { labelsMenuItem } = useGranularityMenuItem(props, FIELD_KEY);
 const validator = widgetValidatorRegistry[FIELD_KEY];
 
 const state = reactive({
-    fieldValue: computed<_FormatRulesValue>(() => props.manager.data[FIELD_KEY].value),
+    fieldValue: computed<_FormatRulesValue>(() => props.fieldManager.data[FIELD_KEY].value),
     type: computed<_FormatRulesType>(() => props.widgetFieldSchema?.options?.formatRulesType as _FormatRulesType),
     invalid: computed(() => validator(state.fieldValue, props.widgetConfig)),
     selectedField: computed<string|undefined>(() => {
@@ -50,23 +50,23 @@ const state = reactive({
 /* Event */
 const handleClickAddRule = () => {
     const _newRule: ThresholdValue = { number: undefined, text: undefined, color: state.fieldValue.baseColor };
-    props.manager.setFieldValue(FIELD_KEY, { ...state.fieldValue, rules: [...state.fieldValue.rules, _newRule] });
+    props.fieldManager.setFieldValue(FIELD_KEY, { ...state.fieldValue, rules: [...state.fieldValue.rules, _newRule] });
 };
 const handleDelete = (idx: number) => {
     const _rules = cloneDeep(state.fieldValue.rules);
     _rules.splice(idx, 1);
-    props.manager.setFieldValue(FIELD_KEY, { ...state.fieldValue, rules: _rules });
+    props.fieldManager.setFieldValue(FIELD_KEY, { ...state.fieldValue, rules: _rules });
 };
 const handleFormatRuleInput = (idx: number|string, key: 'text'|'number'|'color', val: string) => {
     const _rules = cloneDeep(state.fieldValue.rules);
     _rules[idx][key] = key === 'number' ? parseFloat(val) : val;
-    props.manager.setFieldValue(FIELD_KEY, { ...state.fieldValue, rules: _rules });
+    props.fieldManager.setFieldValue(FIELD_KEY, { ...state.fieldValue, rules: _rules });
 };
 const handleBaseColor = (val: string) => {
-    props.manager.setFieldValue(FIELD_KEY, { ...state.fieldValue, baseColor: val });
+    props.fieldManager.setFieldValue(FIELD_KEY, { ...state.fieldValue, baseColor: val });
 };
 const handleUpdateField = (val: string) => {
-    props.manager.setFieldValue(FIELD_KEY, { ...state.fieldValue, field: val });
+    props.fieldManager.setFieldValue(FIELD_KEY, { ...state.fieldValue, field: val });
 };
 
 /* Watcher */
@@ -75,7 +75,7 @@ watch(() => labelsMenuItem.value, (menuItem) => {
     if (menuItem?.length && props.widgetFieldSchema.options?.useField && !state.fieldValue.field) {
         const _defaultIndex = getDefaultMenuItemIndex(menuItem, state.fieldValue.field, true);
         const _selectedValue = getInitialSelectedMenuItem(menuItem, state.fieldValue.field, _defaultIndex);
-        props.manager.setFieldValue(FIELD_KEY, { ...state.fieldValue, field: _selectedValue });
+        props.fieldManager.setFieldValue(FIELD_KEY, { ...state.fieldValue, field: _selectedValue });
     }
 }, { immediate: true });
 
