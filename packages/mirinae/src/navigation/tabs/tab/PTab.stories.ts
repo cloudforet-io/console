@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
 import PButton from '@/controls/buttons/button/PButton.vue';
-import PTextEditor from '@/controls/text-editor/PTextEditor.vue';
+import PCodeEditor from '@/controls/code-editor/PCodeEditor.vue';
 import PBadge from '@/data-display/badge/PBadge.vue';
 import { useProxyValue } from '@/hooks';
 import {
@@ -121,7 +121,7 @@ export const Stretch: Story = {
 
 export const TabMenuType: Story = {
     render: () => ({
-        components: { PTab, PTextEditor },
+        components: { PTab, PCodeEditor },
         template: `
             <div class="w-full p-8">
                 <p-tab
@@ -130,7 +130,7 @@ export const TabMenuType: Story = {
                 />
                 <br/>
                 <br/>
-                <p-text-editor :code="JSON.stringify(tabs, null, 2)"
+                <p-code-editor :code="JSON.stringify(tabs, null, 2)"
                                mode="readOnly"
                                style="height: 200px; max-height: 400px;"
                 />

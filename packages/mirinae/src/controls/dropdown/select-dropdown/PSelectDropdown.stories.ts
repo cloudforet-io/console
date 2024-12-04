@@ -5,6 +5,7 @@ import type { ComponentProps } from 'vue-component-type-helpers';
 
 import PButton from '@/controls/buttons/button/PButton.vue';
 import PToggleButton from '@/controls/buttons/toggle-button/PToggleButton.vue';
+import PCodeEditor from '@/controls/code-editor/PCodeEditor.vue';
 import { menuItems } from '@/controls/context-menu/mock';
 import {
     getSelectDropdownMenu,
@@ -16,7 +17,6 @@ import {
     getSelectDropdownParameters,
 } from '@/controls/dropdown/select-dropdown/story-helper';
 import { SELECT_DROPDOWN_STYLE_TYPE } from '@/controls/dropdown/select-dropdown/type';
-import PTextEditor from '@/controls/text-editor/PTextEditor.vue';
 import { useProxyValue } from '@/hooks/use-proxy-state/use-proxy-state';
 
 import PSelectDropdown from './PSelectDropdown.vue';
@@ -235,10 +235,11 @@ export const Disabled: Story = {
     }),
 };
 
-export const ReadOnly: Story = {
+export const Readonly: Story = {
     render: () => ({
         components: { PSelectDropdown },
         template: `
+            <div>
             <table class="w-full border-separate border-spacing-1">
                 <thead>
                     <tr>
@@ -254,22 +255,43 @@ export const ReadOnly: Story = {
                     <tr>
                         <th>default</th>
                         <th v-for="styleType in styleTypes" :key="styleType" class="font-normal">
-                            <p-select-dropdown :menu="menuItems" :styleType="styleType" class="m-2"/>
+                            <p-select-dropdown :menu="menuItems" :selected="singleSelected" :styleType="styleType" class="m-2"/>
                         </th>
                     </tr>
                     <tr>
-                        <th>readOnly</th>
+                        <th>readonly</th>
                         <th v-for="styleType in styleTypes" :key="styleType" class="font-normal">
-                            <p-select-dropdown readonly :menu="menuItems" :styleType="styleType" class="m-2" />
+                            <p-select-dropdown readonly :menu="menuItems" :selected="singleSelected" :styleType="styleType" class="m-2" />
                         </th>
                     </tr>
                 </tbody>
             </table>
+            <div style="margin-top: 1rem;">
+                <p class="text-label-lg font-bold my-3">Single select with 'basic', 'badge', 'stack' appearance type</p>
+                <p-select-dropdown :menu="menuItems" :selected="singleSelected" readonly />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Multi select with 'basic' appearance type</p>
+                <p-select-dropdown :menu="menuItems" :selected="multiSelected"  multi-selectable readonly />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Multi select with 'badge' appearance type</p>
+                <p-select-dropdown :menu="menuItems" :selected="multiSelected" multi-selectable appearance-type="badge" readonly />
+                <p-select-dropdown :menu="menuItems" :selected="singleSelected" multi-selectable appearance-type="badge" readonly />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Multi select with 'stack' appearance type</p>
+                <p-select-dropdown :menu="menuItems" :selected="multiSelected" multi-selectable appearance-type="stack" readonly />
+                <br/>
+            </div>
+        </div>
         `,
         setup() {
+            const state = reactive({
+                singleSelected: [menuItems.find((d) => !d.type || d.type === 'item')],
+                multiSelected: menuItems.filter((d) => !d.type || d.type === 'item').splice(0, 5),
+            });
             return {
                 menuItems,
                 styleTypes: Object.values(SELECT_DROPDOWN_STYLE_TYPE),
+                ...toRefs(state),
             };
         },
     }),
@@ -649,7 +671,7 @@ export const IsFilterable: Story = {
 export const ShowRelatedHeadertotheSelectedZone: Story = {
     render: () => ({
         props: Object.keys(getSelectDropdownArgTypes()),
-        components: { PSelectDropdown, PButton, PTextEditor },
+        components: { PSelectDropdown, PButton, PCodeEditor },
         template: `
             <div>
                 <p class="text-label-lg font-bold my-3">show headers</p>
@@ -659,7 +681,7 @@ export const ShowRelatedHeadertotheSelectedZone: Story = {
                 <p-select-dropdown :menu="menu" multi-selectable is-filterable hide-header-without-items />
                 <br/>
                 <br/>
-                <p-text-editor :code="JSON.stringify(menu, null, 2)"
+                <p-code-editor :code="JSON.stringify(menu, null, 2)"
                             mode="readOnly"
                             style="height: 200px; max-height: 400px;"
                 />

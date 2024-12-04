@@ -6,6 +6,7 @@
               :disabled="disabled"
               class="p-textarea"
               :class="{invalid}"
+              :style="{resize}"
               v-on="$listeners"
     />
 </template>
@@ -47,6 +48,10 @@ export default defineComponent({
         invalid: {
             type: Boolean,
             default: false,
+        },
+        resize: {
+            type: String,
+            default: 'block',
         },
     },
     setup(props, { emit }) {

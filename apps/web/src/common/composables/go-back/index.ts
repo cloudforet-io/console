@@ -1,5 +1,6 @@
 import type { Location } from 'vue-router';
 
+// CAUTION: Do not change to useRouter() because useRouter is only available in script setup
 import { SpaceRouter } from '@/router';
 
 export const useGoBack = (mainRoute: Location) => {
@@ -21,5 +22,6 @@ export const useGoBack = (mainRoute: Location) => {
     return {
         setPathFrom,
         handleClickBackButton,
+        goBack: handleClickBackButton,
     };
 };

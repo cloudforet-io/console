@@ -38,6 +38,7 @@ const Template: Story = {
                             :help-text="helpText" :required="required"
                             :label="label"
                             :style-type="styleType"
+                           :no-spacing="noSpacing"
             >
                 <template v-if="labelSlot" #label>
                     <div v-html="labelSlot"/>
@@ -130,6 +131,32 @@ export const StyleType: Story = {
                 <p-field-group label="Secondary" style-type="secondary">
                     <p-text-input value="Wanjin"/>
                 </p-field-group>
+            </div>
+        `,
+    }),
+};
+
+export const NoSpacing: Story = {
+    render: () => ({
+        components: { PFieldGroup, PTextInput },
+        template: `
+            <div>
+                <p-field-group label="Primary" style-type="primary" no-spacing>
+                    <p-text-input value="Wanjin"/>
+                </p-field-group>
+                <br/>
+                <p-field-group label="Secondary" style-type="secondary" no-spacing>
+                    <p-text-input value="Wanjin"/>
+                </p-field-group>
+                <br/>
+                <p-field-group label="Invalid Text" invalid invalid-text="name is required field." no-spacing>
+                        <p-text-input placeholder="Name" invalid value=""/>
+                </p-field-group>
+                <br/>
+                <p-field-group label="Valid Text" valid valid-text="this is an appropriate name." no-spacing>
+                    <p-text-input placeholder="Name" value="Wanjin"/>
+                </p-field-group>
+                <br/>
             </div>
         `,
     }),

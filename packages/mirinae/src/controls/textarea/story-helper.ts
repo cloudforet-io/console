@@ -8,6 +8,7 @@ export const getTextareaArgs = (): Args => ({
     readonly: false,
     invalid: false,
     disabled: false,
+    resizable: false,
     'v-model': '',
 });
 
@@ -106,6 +107,20 @@ export const getTextareaArgTypes = (): ArgTypes => ({
             },
         },
         control: 'boolean',
+    },
+    resize: {
+        name: 'resize',
+        description: 'CSS resize property for textarea.',
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'block',
+            },
+        },
+        control: 'text',
     },
     'v-model': {
         name: 'v-model',

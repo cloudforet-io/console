@@ -5,7 +5,7 @@ import type { TranslateResult } from 'vue-i18n';
 import dayjs from 'dayjs';
 
 import {
-    PButtonModal, PTextEditor, PFieldTitle, PToggleButton, PTextInput, PDatetimePicker, PScopedNotification,
+    PButtonModal, PCodeEditor, PFieldTitle, PToggleButton, PTextInput, PDatetimePicker, PScopedNotification,
 } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
@@ -208,7 +208,7 @@ const handleConfirmButton = async () => {
                         {{ props.selectedJobItem.error_code }}
                     </span>
                 </p>
-                <p-text-editor read-only
+                <p-code-editor read-only
                                :code="props.selectedJobItem.error_message"
                 />
             </div>

@@ -8,7 +8,7 @@
                        :class="{'no-margin': !isRoot}"
                        :invalid="getJsonInputInvalidState()"
         >
-            <p-text-editor :code="jsonInputData"
+            <p-code-editor :code="jsonInputData"
                            disable-auto-reformat
                            :read-only="schema.disabled"
                            @update:code="handleUpdateJsonData(schema, $event)"
@@ -167,6 +167,7 @@ import addFormats from 'ajv-formats';
 import { isEqual } from 'lodash';
 
 import PToggleButton from '@/controls/buttons/toggle-button/PToggleButton.vue';
+import PCodeEditor from '@/controls/code-editor/PCodeEditor.vue';
 import PSelectDropdown from '@/controls/dropdown/select-dropdown/PSelectDropdown.vue';
 import PFieldGroup from '@/controls/forms/field-group/PFieldGroup.vue';
 import GenerateIdFormat from '@/controls/forms/json-schema-form/components/GenerateIdFormat.vue';
@@ -189,10 +190,10 @@ import type {
 } from '@/controls/forms/json-schema-form/type';
 import { VALIDATION_MODES } from '@/controls/forms/json-schema-form/type';
 import PTextInput from '@/controls/input/text-input/PTextInput.vue';
-import PTextEditor from '@/controls/text-editor/PTextEditor.vue';
 import PMarkdown from '@/data-display/markdown/PMarkdown.vue';
 import type { SupportLanguage } from '@/translations';
 import { supportLanguages } from '@/translations';
+
 
 const PJsonSchemaForm = () => ({
     // eslint-disable-next-line import/no-self-import
@@ -204,7 +205,7 @@ export default defineComponent<JsonSchemaFormProps>({
         PEMKeyFormat,
         PJsonSchemaForm,
         PSelectDropdown,
-        PTextEditor,
+        PCodeEditor,
         GenerateIdFormat,
         PMarkdown,
         PFieldGroup,
