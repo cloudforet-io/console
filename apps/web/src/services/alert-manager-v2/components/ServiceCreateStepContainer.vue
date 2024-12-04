@@ -13,16 +13,17 @@ import { useServiceFormStore } from '@/services/alert-manager-v2/store/service-f
 type actionButtonType = {
     label: TranslateResult,
     hasIcon?: boolean,
+    isLast?: boolean,
 };
 
 interface Props {
     isAllFormValid: boolean;
-    selectedWebhookTypeId?: string;
+    selectedItemId?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     isAllFormValid: false,
-    selectedWebhookTypeId: undefined,
+    selectedItemId: undefined,
 });
 
 const emit = defineEmits<{(e: 'create'): void}>();
@@ -61,6 +62,7 @@ const state = reactive({
         },
         '3-2': {
             label: i18n.t('ALERT_MANAGER.SET_UP'),
+            isLast: true,
         },
     })),
     actionButtonInfo: computed<actionButtonType>(() => {
@@ -85,7 +87,7 @@ const handlePrevNavigation = () => {
         return;
     }
     if (storeState.currentStep === 2) {
-        if (props.selectedWebhookTypeId) {
+        if (props.selectedItemId) {
             if (storeState.currentSubStep === 3) {
                 router.push({ name: ALERT_MANAGER_V2_ROUTE.SERVICE._NAME });
                 return;
@@ -94,6 +96,13 @@ const handlePrevNavigation = () => {
             return;
         }
     }
+    if (storeState.currentStep === 3) {
+        if (storeState.currentSubStep === 2) {
+            serviceFormStore.setCurrentSubStep(state.previousSubStep);
+            return;
+        }
+    }
+
     serviceFormStore.setCurrentStep(state.previousStep);
 };
 const handleNextNavigation = () => {
@@ -111,7 +120,7 @@ const handleActionButton = () => {
 };
 
 const handleClickSelectButton = () => {
-    if (storeState.currentStep === 2 && props.selectedWebhookTypeId) {
+    if (props.selectedItemId) {
         serviceFormStore.setCurrentSubStep(state.nextSubStep);
     }
 };
@@ -151,8 +160,8 @@ const handleClickSkipButton = () => {
             </p-button>
             <p-button :disabled="!props.isAllFormValid"
                       class="step-right-button"
-                      style-type="substitutive"
-                      :icon-right="state.actionButtonInfo.hasIcon ? 'ic_arrow-right' : undefined"
+                      :style-type="state.actionButtonInfo?.isLast ? 'primary' : 'substitutive'"
+                      :icon-right="state.actionButtonInfo?.hasIcon ? 'ic_arrow-right' : undefined"
                       size="lg"
                       @click="handleActionButton"
             >

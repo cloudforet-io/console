@@ -18,7 +18,6 @@ const storeState = reactive({
     webhookName: computed<string>(() => serviceFormState.webhookName || ''),
 });
 const state = reactive({
-    versionLoading: false,
     isAllFormValid: computed(() => {
         if (storeState.currentSubStep === 1) return storeState.selectedWebhookTypeId !== '';
         if (storeState.currentSubStep === 2) return storeState.webhookName !== '';
@@ -38,7 +37,7 @@ onUnmounted(() => {
 
 <template>
     <service-create-step-container class="service-create-step2"
-                                   :selected-webhook-type-id="storeState.selectedWebhookTypeId"
+                                   :selected-item-id="storeState.selectedWebhookTypeId"
                                    :is-all-form-valid="state.isAllFormValid"
                                    @create="handleCreateWebhook"
     >
