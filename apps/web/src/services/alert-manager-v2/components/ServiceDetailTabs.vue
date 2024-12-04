@@ -12,6 +12,7 @@ import ServiceDetailTabsNotifications from '@/services/alert-manager-v2/componen
 import ServiceDetailTabsNotificationsDetailTabs
     from '@/services/alert-manager-v2/components/ServiceDetailTabsNotificationsDetailTabs.vue';
 import ServiceDetailTabsOverview from '@/services/alert-manager-v2/components/ServiceDetailTabsOverview.vue';
+import ServiceDetailTabsSettings from '@/services/alert-manager-v2/components/ServiceDetailTabsSettings.vue';
 import ServiceDetailTabsWebhook from '@/services/alert-manager-v2/components/ServiceDetailTabsWebhook.vue';
 import ServiceDetailTabsWebhookDetailTabs
     from '@/services/alert-manager-v2/components/ServiceDetailTabsWebhookDetailTabs.vue';
@@ -23,8 +24,8 @@ const tabState = reactive({
         { label: i18n.t('ALERT_MANAGER.SERVICE.OVERVIEW'), name: SERVICE_DETAIL_TABS.OVERVIEW },
         { label: i18n.t('ALERT_MANAGER.WEBHOOK.TITLE'), name: SERVICE_DETAIL_TABS.WEBHOOK },
         { label: i18n.t('ALERT_MANAGER.NOTIFICATIONS.TITLE'), name: SERVICE_DETAIL_TABS.NOTIFICATIONS },
-        { label: i18n.t('ALERT_MANAGER.EVENT_RULE.TITLE'), name: SERVICE_DETAIL_TABS.EVENT_RULE },
-        { label: i18n.t('ALERT_MANAGER.ESCALATION_POLICY.TITLE'), name: SERVICE_DETAIL_TABS.ESCALATION_POLICY },
+        // { label: i18n.t('ALERT_MANAGER.EVENT_RULE.TITLE'), name: SERVICE_DETAIL_TABS.EVENT_RULE },
+        { label: i18n.t('ALERT_MANAGER.SERVICE.SETTINGS'), name: SERVICE_DETAIL_TABS.SETTINGS },
     ])),
     activeTab: SERVICE_DETAIL_TABS.OVERVIEW as ServiceDetailTabsType,
 });
@@ -66,11 +67,8 @@ const state = reactive({
             <template #overview>
                 <service-detail-tabs-overview />
             </template>
-            <template #event_rule>
-                event_rule
-            </template>
-            <template #escalation_policy>
-                escalation_policy
+            <template #settings>
+                <service-detail-tabs-settings />
             </template>
         </p-tab>
     </div>

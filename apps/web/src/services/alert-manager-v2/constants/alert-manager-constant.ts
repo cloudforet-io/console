@@ -5,7 +5,12 @@ export const SERVICE_DETAIL_TABS = {
     WEBHOOK: 'webhook',
     NOTIFICATIONS: 'notifications',
     EVENT_RULE: 'event_rule',
-    ESCALATION_POLICY: 'escalation_policy',
+    SETTINGS: 'settings',
+} as const;
+export const SERVICE_SETTING_CARD = {
+    NOTIFICATION_POLICY: 'notification_policy',
+    AUTO_RECOVERY: 'auto_recovery',
+    RULE_SET: 'rule_set',
 } as const;
 
 export const ALERT_STATUS_FILTER = {
