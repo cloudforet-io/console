@@ -73,7 +73,7 @@ const handleClickArrowButton = (increment: number) => {
 };
 
 const handleRouteDetail = () => (
-    serviceDetailPageStore.setActiveTab(SERVICE_DETAIL_TABS.WEBHOOK)
+    serviceDetailPageStore.setCurrentTab(SERVICE_DETAIL_TABS.WEBHOOK)
 );
 </script>
 

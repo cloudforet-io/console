@@ -71,7 +71,7 @@ const handleClickArrowButton = (increment: number) => {
 };
 
 const handleRouteDetail = () => (
-    serviceDetailPageStore.setActiveTab(SERVICE_DETAIL_TABS.SETTINGS)
+    serviceDetailPageStore.setCurrentTab(SERVICE_DETAIL_TABS.SETTINGS)
 );
 </script>
 
