@@ -25,7 +25,7 @@ export default class WidgetFieldValueManager {
 
     constructor(
         widgetConfig: WidgetConfig,
-        originData: WidgetFieldValueMap, // default 적용된 Data
+        originData: WidgetFieldValueMap,
         fieldValidators: Record<keyof WidgetFieldTypeMap, FieldValueValidator<any>>,
         defaultValueMap: Record<keyof WidgetFieldTypeMap, any>,
     ) {
