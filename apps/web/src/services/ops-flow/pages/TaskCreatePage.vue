@@ -53,6 +53,7 @@ const taskContentFormGetters = taskContentFormStore.getters;
 const route = useRoute();
 const { getProperRouteLocation } = useProperRouteLocation();
 const categoryId = computed<TaskCreatePageQueryValue['categoryId']>(() => queryStringToString(route.query.categoryId));
+const taskTypeId = computed<TaskCreatePageQueryValue['taskTypeId']>(() => queryStringToString(route.query.taskTypeId));
 
 /* header and back button */
 const loading = false; // computed<boolean>(() => taskCategoryStore.getters.loading);
@@ -87,7 +88,8 @@ const handleConfirm = async () => {
 /* lifecycle */
 onBeforeMount(() => {
     taskContentFormStore.setCurrentCategoryId(categoryId.value);
-    if (route.hash === '#minimal') {
+    taskContentFormStore.setCurrentTaskType(taskTypeId.value);
+    if (taskTypeId.value) {
         taskContentFormStore.setMode('create-minimal');
     } else {
         taskContentFormStore.setMode('create');

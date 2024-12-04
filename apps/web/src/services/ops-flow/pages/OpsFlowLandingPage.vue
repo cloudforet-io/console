@@ -1,15 +1,63 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import {
-    PFieldTitle, PButton, PDivider, PSelectCard, PPaneLayout, PEmpty,
+    PFieldTitle, PButton, PDivider, PSelectCard, PPaneLayout, PEmpty, PRadioGroup, PRadio,
 } from '@cloudforet/mirinae';
 
+import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
+
+import { useFormValidator } from '@/common/composables/form-validator';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+
+import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
+import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
+import type { TaskCreatePageQuery } from '@/services/ops-flow/types/task-create-page-type';
+
+const router = useRouter();
 
 const taskCategoryStore = useTaskCategoryStore();
-const taskCategoryGetters = taskCategoryStore.getters;
-const selected = ref<string|undefined>();
+const taskTypeStore = useTaskTypeStore();
+const taskTypeState = taskTypeStore.state;
+
+const { getProperRouteLocation } = useProperRouteLocation();
+
+const availableCategories = ref<TaskCategoryModel[]>([]);
+const { forms: { category, taskType }, setForm, isAllValid } = useFormValidator({
+    category: '',
+    taskType: '',
+}, {
+    category(val: string) {
+        return !!val;
+    },
+    taskType(val: string) {
+        return !!val;
+    },
+});
+
+const handleChangeCategory = async (value: string) => {
+    setForm('category', value);
+    await taskTypeStore.listByCategoryId(value);
+    setForm('taskType', taskTypeState.itemsByCategoryId[value]?.[0]?.task_type_id);
+};
+const handleChangeTaskType = (value: string) => {
+    setForm('taskType', value);
+};
+const goToTaskCreatePage = () => {
+    router.push(getProperRouteLocation({
+        name: OPS_FLOW_ROUTE.BOARD.TASK_CREATE._NAME,
+        query: { categoryId: category.value, taskTypeId: taskType.value } as TaskCreatePageQuery,
+    }));
+};
+
+onMounted(async () => {
+    const allCategories = await taskCategoryStore.list() ?? [];
+    await taskTypeStore.listByCategoryIds(allCategories.map((c) => c.category_id));
+    availableCategories.value = allCategories.filter((c) => taskTypeState.itemsByCategoryId[c.category_id]?.length);
+    setForm('category', availableCategories.value[0]?.category_id);
+});
 </script>
 
 <template>
@@ -36,19 +84,37 @@ const selected = ref<string|undefined>();
                 </p>
                 <div class="flex justify-center">
                     <div class="grid grid-cols-2 gap-4 justify-center items-center">
-                        <p-select-card v-for="category in taskCategoryGetters.taskCategories"
-                                       :key="category.categroy_id"
+                        <p-select-card v-for="c in availableCategories"
+                                       :key="c.category_id"
                                        class="w-[352px] !py-4"
-                                       :label="category.name"
-                                       :value="category.categroy_id"
-                                       :selected="selected"
+                                       :label="c.name"
+                                       :value="c.category_id"
+                                       :selected="category"
+                                       @change="handleChangeCategory"
                         />
                     </div>
                 </div>
             </div>
+            <div class="mt-10">
+                <p class="mb-6 text-display-md">
+                    Topic
+                </p>
+                <p-radio-group v-if="category">
+                    <p-radio v-for="t in taskTypeState.itemsByCategoryId[category]"
+                             :key="t.task_type_id"
+                             :value="t.task_type_id"
+                             :selected="taskType"
+                             @change="handleChangeTaskType"
+                    >
+                        {{ t.name }}
+                    </p-radio>
+                </p-radio-group>
+            </div>
             <div class="mt-10 flex justify-end">
                 <p-button style-type="substitutive"
                           icon-right="ic_arrow-right"
+                          :disabled="!isAllValid"
+                          @click="goToTaskCreatePage"
                 >
                     Next
                 </p-button>
