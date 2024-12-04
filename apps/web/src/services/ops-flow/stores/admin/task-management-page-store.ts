@@ -5,12 +5,14 @@ import { defineStore } from 'pinia';
 
 import type { PackageModel } from '@/schema/identity/package/model';
 import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
+import type { TaskModel } from '@/schema/opsflow/task/model';
 
 import type { WorkspaceItem } from '@/store/reference/workspace-reference-store';
 import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
 
 import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
+import { useTaskStore } from '@/services/ops-flow/stores/task-store';
 
 interface UseTaskManagementPageStoreState {
     // support package
@@ -22,12 +24,15 @@ interface UseTaskManagementPageStoreState {
     visibleCategoryForm: boolean;
     targetCategoryId?: string;
     visibleDeleteCategoryModal: boolean;
+    // task
+    associatedTasksToCategoryMap: Record<string, TaskModel[]>;
 }
 
 export const useTaskManagementPageStore = defineStore('task-management-page', () => {
     const packageStore = usePackageStore();
     const taskCategoryStore = useTaskCategoryStore();
     const workspaceReferenceStore = useWorkspaceReferenceStore();
+    const taskStore = useTaskStore();
     const state = reactive<UseTaskManagementPageStoreState>({
         // support package
         visiblePackageForm: false,
@@ -38,6 +43,7 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
         visibleCategoryForm: false,
         targetCategoryId: undefined,
         visibleDeleteCategoryModal: false,
+        associatedTasksToCategoryMap: {},
     });
     const getters = {
         targetPackage: computed<PackageModel|undefined>(() => packageStore.getters.packages.find((p) => p.package_id === state.targetPackageId)),
@@ -47,6 +53,19 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
             if (!targetPackageId) return [];
             const workspaceItems: WorkspaceItem[] = Object.values(workspaceReferenceStore.getters.workspaceItems);
             return workspaceItems.filter((w) => w.data.packages?.includes(targetPackageId));
+        }),
+        associatedTasksToCategory: computed<DeepReadonly<TaskModel[]>>(() => {
+            if (!state.targetCategoryId) return [];
+            const categoryId = state.targetCategoryId;
+            if (state.associatedTasksToCategoryMap[categoryId]) return state.associatedTasksToCategoryMap[categoryId];
+            taskStore.list({ category_id: categoryId }).then((tasks) => {
+                if (!tasks) return;
+                state.associatedTasksToCategoryMap = {
+                    ...state.associatedTasksToCategoryMap,
+                    [categoryId]: tasks,
+                };
+            });
+            return state.associatedTasksToCategoryMap[categoryId] ?? [];
         }),
         targetCategory: computed<DeepReadonly<TaskCategoryModel>|undefined>(() => taskCategoryStore.getters.taskCategories.find((c) => c.category_id === state.targetCategoryId)),
         defaultPackage: computed<PackageModel|undefined>(() => packageStore.getters.packages.find((p) => p.is_default)),
