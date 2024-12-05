@@ -14,6 +14,8 @@ const ServiceDetailPage = () => import('@/services/alert-manager-v2/pages/Servic
 const ServiceCreatePage = () => import('@/services/alert-manager-v2/pages/ServiceCreatePage.vue');
 const ServiceDetailWebhookCreatePage = () => import('@/services/alert-manager-v2/pages/ServiceDetailWebhookCreatePage.vue');
 const ServiceDetailNotificationsCreatePage = () => import('@/services/alert-manager-v2/pages/ServiceDetailNotificationsCreatePage.vue');
+const AlertsMainPage = () => import('@/services/alert-manager-v2/pages/AlertsMainPage.vue');
+const AlertsDetailPage = () => import('@/services/alert-manager-v2/pages/AlertsDetailPage.vue');
 
 const alertManagerV2Routes: RouteConfig = {
     path: 'alert-manager-v2',
@@ -70,6 +72,28 @@ const alertManagerV2Routes: RouteConfig = {
                             component: ServiceDetailNotificationsCreatePage as any,
                         },
                     ],
+                },
+            ],
+        },
+        {
+            path: 'alerts',
+            meta: {
+                menuId: MENU_ID.ALERTS,
+                translationId: MENU_INFO_MAP[MENU_ID.ALERTS].translationId,
+            },
+            component: { template: '<router-view />' },
+            children: [
+                {
+                    path: '/',
+                    name: ALERT_MANAGER_V2_ROUTE.ALERTS._NAME,
+                    meta: { menuId: MENU_ID.ALERTS },
+                    component: AlertsMainPage as any,
+                },
+                {
+                    path: ':alertsId',
+                    name: ALERT_MANAGER_V2_ROUTE.ALERTS.DETAIL._NAME,
+                    props: true,
+                    component: AlertsDetailPage as any,
                 },
             ],
         },
