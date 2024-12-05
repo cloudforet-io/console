@@ -8,7 +8,7 @@ import {
     PHorizontalLayout, PHeading, PButton, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import type { MenuId } from '@/lib/menu/config';
@@ -25,13 +25,14 @@ import { useRolePageStore } from '@/services/iam/store/role-page-store';
 
 const rolePageStore = useRolePageStore();
 const rolePageState = rolePageStore.$state;
+const userStore = useUserStore();
 const { getProperRouteLocation } = useProperRouteLocation();
 
 const router = useRouter();
 const route = useRoute();
 
 const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     selectedMenuId: computed(() => {

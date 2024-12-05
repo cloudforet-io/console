@@ -12,9 +12,10 @@ import {
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useUserStore } from '@/store/user/user-store';
+
 import config from '@/lib/config';
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
-
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -23,11 +24,12 @@ import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 
 const router = useRouter();
 
+const userStore = useUserStore();
 
 const state = reactive({
     userId: '' as string | undefined,
     password: '',
-    loading: computed(() => store.state.user.isSignInLoading),
+    loading: computed(() => userStore.state.isSignInLoading),
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
 });
 
@@ -77,7 +79,7 @@ const signIn = async () => {
     try {
         await loadAuth().signIn(credentials, 'LOCAL');
         await store.dispatch('display/hideSignInErrorMessage');
-        if (store.state.user.requiredActions?.includes('UPDATE_PASSWORD')) {
+        if (userStore.state.requiredActions?.includes('UPDATE_PASSWORD')) {
             await router.push({ name: AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME });
         } else {
             emit('sign-in', state.userId);

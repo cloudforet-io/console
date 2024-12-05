@@ -8,10 +8,10 @@ import {
     PPaneLayout, PFieldTitle, PTextInput, PButton,
 } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { usePreferencesStore } from '@/store/preferences/preferences-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import type { MenuId } from '@/lib/menu/config';
@@ -25,11 +25,12 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 const router = useRouter();
 const domainConfigStore = usePreferencesStore();
 const domainConfigGetters = domainConfigStore.getters;
+const userStore = useUserStore();
 
 const route = useRoute();
 
 const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     isChanged: computed<boolean>(() => {

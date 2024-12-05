@@ -19,11 +19,11 @@ import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
 import type { PostModel } from '@/schema/board/post/model';
 import type { FileModel } from '@/schema/file-manager/model';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
-import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useNoticeStore } from '@/store/notice';
+import { useUserStore } from '@/store/user/user-store';
 
 import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -45,14 +45,15 @@ const noticeDetailStore = useNoticeDetailStore();
 const noticeDetailState = noticeDetailStore.state;
 const appContextStore = useAppContextStore();
 const appContextGetters = appContextStore.getters;
+const userStore = useUserStore();
 const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextGetters.isAdminMode),
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
+    timezone: computed<string|undefined>(() => userStore.state.timezone),
 });
 const state = reactive({
-    timezone: computed(() => store.state.user.timezone),
     loading: false,
     noticePostData: computed<PostModel|undefined>(() => noticeDetailState.post),
     prevNoticePost: undefined as PostModel | undefined,
@@ -71,7 +72,7 @@ const state = reactive({
             params: { postId: state.nextNoticePost.post_id },
         };
     }),
-    hasDomainRoleUser: computed<boolean>(() => store.getters['user/isDomainAdmin']),
+    hasDomainRoleUser: computed<boolean>(() => userStore.getters.isDomainAdmin),
     isAllWorkspace: computed<boolean>(() => (!state.noticePostData?.workspaces || state.noticePostData?.workspaces?.includes('*')) ?? true),
     scopedWorkspaceList: computed<WorkspaceModel[]|undefined>(() => {
         if (state.isAllWorkspace) return undefined;
@@ -168,7 +169,7 @@ watch(() => props.postId, (postId) => {
                      class="post-title"
                 >
                     <span>
-                        {{ iso8601Formatter(state.noticePostData.created_at, state.timezone) }}
+                        {{ iso8601Formatter(state.noticePostData.created_at, storeState.timezone) }}
                     </span>
                     <p-i v-if="state.noticePostData.writer"
                          width="0.125rem"

@@ -20,6 +20,7 @@ import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProtocolReferenceMap } from '@/store/reference/protocol-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -29,6 +30,7 @@ import type { NotificationAddFormDataPayload } from '@/services/my-page/types/no
 
 const SPACEONE_USER_CHANNEL_TYPE = 'SpaceONE User' as const;
 const allReferenceStore = useAllReferenceStore();
+const userStore = useUserStore();
 const PROTOCOL_TYPE = {
     INTERNAL: 'INTERNAL',
     EXTERNAL: 'EXTERNAL',
@@ -48,6 +50,7 @@ const emit = defineEmits<{(event: 'change', payload: NotificationAddFormDataPayl
 
 const storeState = reactive({
     protocols: computed<ProtocolReferenceMap>(() => allReferenceStore.getters.protocol),
+    language: computed<string|undefined>(() => userStore.state.language),
 });
 const state = reactive({
     protocol: computed(() => storeState.protocols[props.protocolId] ?? null),
@@ -177,7 +180,7 @@ watch([() => props.protocolId, () => props.protocolType], async ([protocolId, pr
                             :key="props.protocolId"
                             :form-data="state.schemaForm"
                             :schema="state.schema"
-                            :language="$store.state.user.language"
+                            :language="storeState.language"
                             class="schema-form"
                             @change="handleSchemaFormChange"
         />

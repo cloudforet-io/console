@@ -8,8 +8,9 @@ import {
 } from '@cloudforet/mirinae';
 import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
@@ -38,10 +39,7 @@ const props = withDefaults(defineProps<Props>(), {
     historyLink: undefined,
 });
 
-const storeState = reactive({
-    timezone: computed(() => store.state.user.timezone),
-});
-
+const userStore = useUserStore();
 const state = reactive({
     loading: true,
     completedJobs: computed<MinimalJobInfo[]|undefined>(() => {
@@ -61,7 +59,7 @@ const handleTooltipContent = (job: MinimalJobInfo) => {
     if (status === JOB_STATE.SUCCESS) content = 'INVENTORY.COLLECTOR.MAIN.JOB_SUCCESS';
     if (status === JOB_STATE.CANCELED) content = 'INVENTORY.COLLECTOR.MAIN.JOB_CANCELED';
     if (status === JOB_STATE.FAILURE) content = 'INVENTORY.COLLECTOR.MAIN.JOB_FAILURE';
-    return i18n.t(content, { date: dayjs.utc(finished_at).tz(storeState.timezone).format('YYYY-MM-DD hh:mm:ss') });
+    return i18n.t(content, { date: dayjs.utc(finished_at).tz(userStore.state.timezone).format('YYYY-MM-DD hh:mm:ss') });
 };
 
 watch(() => props.recentJobs, () => {

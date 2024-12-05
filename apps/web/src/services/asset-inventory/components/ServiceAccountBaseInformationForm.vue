@@ -14,6 +14,8 @@ import type { ServiceAccountModel } from '@/schema/identity/service-account/mode
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
 import { i18n } from '@/translations';
 
+import { useUserStore } from '@/store/user/user-store';
+
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import TagsInput from '@/common/components/inputs/TagsInput.vue';
 import { useFormValidator } from '@/common/composables/form-validator';
@@ -34,6 +36,7 @@ const props = withDefaults(defineProps<Props>(), {
     mode: 'CREATE',
 });
 
+const userStore = useUserStore();
 const serviceAccountPageStore = useServiceAccountPageStore();
 const serviceAccountPageGetters = serviceAccountPageStore.getters;
 
@@ -85,6 +88,7 @@ const state = reactive({
         && (serviceAccountPageGetters.isTrustedAccount ? true : (state.isProjectFormValid || state.originForm?.projectForm?.selectedProjectId))
         && state.isTagsValid
         && (isEmpty(props.schema) ? true : state.isCustomSchemaFormValid))),
+    language: computed<string|undefined>(() => userStore.state.language),
 });
 
 /* Util */
@@ -166,7 +170,7 @@ watch(() => state.originForm, (originForm) => {
                             class="p-json-schema-form"
                             :form-data.sync="state.customSchemaForm"
                             :schema="props.schema"
-                            :language="$store.state.user.language"
+                            :language="state.language"
                             @validate="handleAccountValidate"
         />
         <p-field-group v-if="!serviceAccountPageGetters.isTrustedAccount"

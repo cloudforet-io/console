@@ -11,6 +11,8 @@ import {
 
 import { store } from '@/store';
 
+import { useUserStore } from '@/store/user/user-store';
+
 import TopBarNotificationsContextMenu
     from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-notifications/modules/TopBarNotificationsContextMenu.vue';
 
@@ -25,9 +27,10 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void}>();
 
+const userStore = useUserStore();
 const state = reactive({
     hasNotifications: computed(() => store.getters['display/hasUncheckedNotifications']),
-    isNoRoleUser: computed<boolean>(() => store.getters['user/isNoRoleUser']),
+    isNoRoleUser: computed<boolean>(() => userStore.getters.isNoRoleUser),
     notificationCount: 0,
     iconColor: computed<string>(() => {
         if (props.visible) return blue[600];
@@ -74,7 +77,7 @@ onUnmounted(() => {
     store.dispatch('display/stopCheckNotification');
 });
 
-watch(() => store.state.user.isSessionExpired, (isSessionExpired) => {
+watch(() => userStore.state.isSessionExpired, (isSessionExpired) => {
     if (isSessionExpired) {
         store.dispatch('display/stopCheckNotification');
     }

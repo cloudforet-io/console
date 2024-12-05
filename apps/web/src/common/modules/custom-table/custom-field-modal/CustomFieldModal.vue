@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import {
     computed, onMounted, reactive, watch,
 } from 'vue';
@@ -15,17 +14,16 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { UserConfigGetParameters } from '@/schema/config/user-config/api-verbs/get';
 import type { UserConfigUpdateParameters } from '@/schema/config/user-config/api-verbs/update';
 import type { UserConfigModel } from '@/schema/config/user-config/model';
-import { store } from '@/store';
+import type { UserType } from '@/schema/identity/user/type';
 import { i18n } from '@/translations';
 
-import type { UserState } from '@/store/modules/user/type';
+import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import ColumnItem from '@/common/modules/custom-table/custom-field-modal/modules/ColumnItem.vue';
-
 
 
 
@@ -63,8 +61,11 @@ const emit = defineEmits<{(e: 'complete'): void;
     (e: 'custom-field-loaded', fields: DataTableFieldType[]|undefined): void;
 }>();
 
-const _userConfigMap = computed<UserState>(() => store.state.user);
-
+const userStore = useUserStore();
+const storeState = reactive({
+    userId: computed<string|undefined>(() => userStore.state.userId),
+    userType: computed<UserType|undefined>(() => userStore.state.userType),
+});
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     search: '',
@@ -156,8 +157,8 @@ const getCustomTableField = async (userData:{userType:string, userId: string}, r
 const getCurrentColumns = async (): Promise<DataTableFieldType[]> => {
     try {
         const currentSavedFields = await getCustomTableField({
-            userType: _userConfigMap.value.userType ?? 'USER',
-            userId: _userConfigMap.value.userId ?? '',
+            userType: storeState.userType ?? 'USER',
+            userId: storeState.userId ?? '',
         }, props.resourceType) ?? [];
         if (!currentSavedFields) return props.defaultField ?? [];
         return currentSavedFields;
@@ -179,8 +180,8 @@ const handleConfirm = async () => {
     try {
         await updateCustomTableField(
             {
-                userType: _userConfigMap.value.userType ?? 'USER',
-                userId: _userConfigMap.value.userId ?? '',
+                userType: storeState.userType ?? 'USER',
+                userId: storeState.userId ?? '',
             },
             props.resourceType,
             state.selectedColumns,

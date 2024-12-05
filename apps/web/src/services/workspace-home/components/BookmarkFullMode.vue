@@ -2,7 +2,8 @@
 import { computed, reactive } from 'vue';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import { store } from '@/store';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
@@ -25,12 +26,13 @@ const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
 const workspaceHomePageStore = useWorkspaceHomePageStore();
 const workspaceHomePageState = workspaceHomePageStore.state;
+const userStore = useUserStore();
 
 const storeState = reactive({
     bookmarkType: computed<BookmarkType|undefined>(() => bookmarkState.bookmarkType),
 
     isFileFullMode: computed<boolean>(() => workspaceHomePageState.isFileFullMode),
-    isWorkspaceMember: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
+    isWorkspaceMember: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
 });
 </script>
 

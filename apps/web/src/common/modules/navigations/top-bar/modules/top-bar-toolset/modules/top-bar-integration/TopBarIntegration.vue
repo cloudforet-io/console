@@ -8,7 +8,7 @@ import {
     PI, PTooltip,
 } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
+import { useUserStore } from '@/store/user/user-store';
 
 import TopBarIntegrationContextMenu
     from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-integration/modules/TopBarIntegrationContextMenu.vue';
@@ -24,8 +24,9 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void}>();
 
+const userStore = useUserStore();
 const state = reactive({
-    isNoRoleUser: computed<boolean>(() => store.getters['user/isNoRoleUser']),
+    isNoRoleUser: computed<boolean>(() => userStore.getters.isNoRoleUser),
 });
 
 /* Util */

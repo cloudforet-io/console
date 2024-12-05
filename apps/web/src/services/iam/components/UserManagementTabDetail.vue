@@ -11,10 +11,10 @@ import { iso8601Formatter } from '@cloudforet/utils';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import config from '@/lib/config';
 import { postUserValidationEmail } from '@/lib/helper/verify-email-helper';
@@ -40,11 +40,11 @@ const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
 const userPageGetters = userPageStore.getters;
 const allReferenceStore = useAllReferenceStore();
+const userStore = useUserStore();
 
 const emit = defineEmits<{(e: 'refresh', id: string): void }>();
 
 const storeState = reactive({
-    userInfo: computed(() => store.state.user),
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
     workspaceGroup: computed(() => allReferenceStore.getters.workspaceGroup),
 });
@@ -149,7 +149,7 @@ const handleClickVerifyButton = async () => {
             email: tableState.refinedUserItems.email || '',
         });
         emit('refresh', tableState.refinedUserItems.user_id || '');
-        await store.dispatch('user/setUser', { email: tableState.refinedUserItems.email });
+        await userStore.updateUser({ email: tableState.refinedUserItems.email });
     } catch (e: any) {
         ErrorHandler.handleError(e);
     } finally {
@@ -263,7 +263,7 @@ const handleClickVerifyButton = async () => {
                 </span>
             </template>
             <template #data-created_at="{data}">
-                {{ iso8601Formatter(data, userPageGetters.timezone) }}
+                {{ iso8601Formatter(data, userStore.state.timezone) }}
             </template>
             <template #data-email="{data}">
                 <div v-if="data && data !== ''"

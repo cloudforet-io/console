@@ -20,8 +20,9 @@ import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -49,9 +50,11 @@ const props = defineProps<Props>();
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
 const userPageGetters = userPageStore.getters;
+const userStore = useUserStore();
 
 const storeState = reactive({
-    loginUserId: computed(() => store.state.user.userId),
+    loginUserId: computed<string|undefined>(() => userStore.state.userId),
+    timezone: computed<string|undefined>(() => userStore.state.timezone),
 });
 const state = reactive({
     fieldByMode: computed(() => (userPageState.isAdminMode
@@ -230,17 +233,17 @@ watch(() => userPageState.selectedIndices[0], (index) => {
                         />
                     </template>
                     <template #col-last_accessed_at-format="{ value }">
-                        <span v-if="calculateTime(value, userPageGetters.timezone) === -1">
+                        <span v-if="calculateTime(value, storeState.timezone) === -1">
                             -
                         </span>
-                        <span v-else-if="calculateTime(value, userPageGetters.timezone) === 0">
+                        <span v-else-if="calculateTime(value, storeState.timezone) === 0">
                             {{ $t('IAM.USER.MAIN.TODAY') }}
                         </span>
-                        <span v-else-if="calculateTime(value, userPageGetters.timezone) === 1">
+                        <span v-else-if="calculateTime(value, storeState.timezone) === 1">
                             {{ $t('IAM.USER.MAIN.YESTERDAY') }}
                         </span>
                         <span v-else>
-                            {{ calculateTime(value, userPageGetters.timezone) }} {{ $t('IAM.USER.MAIN.DAYS') }}
+                            {{ calculateTime(value, storeState.timezone) }} {{ $t('IAM.USER.MAIN.DAYS') }}
                         </span>
                     </template>
                     <template #col-role_type-format="{value}">

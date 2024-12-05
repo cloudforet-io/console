@@ -15,7 +15,6 @@ import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type
 
 import type { ProjectModel } from '@/schema/identity/project/model';
 import type { WebhookModel } from '@/schema/monitoring/webhook/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -23,6 +22,7 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -53,12 +53,13 @@ const projectDetailPageState = projectDetailPageStore.state;
 const projectDetailPageGetters = projectDetailPageStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
 const dashboardStore = useDashboardStore();
+const userStore = useUserStore();
 
 const storeState = reactive({
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
     selectedWebhookItem: computed<WebhookModel|undefined>(() => projectDetailPageGetters.selectedWebhookItem),
-    language: computed(() => store.state.user.language),
+    language: computed<string|undefined>(() => userStore.state.language),
     dashboardList: computed(() => dashboardStore.state.publicDashboardItems),
     folderList: computed(() => dashboardStore.state.publicFolderItems),
 });
