@@ -7,6 +7,8 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import type { UserGroupListItemType } from '@/schema/identity/user-group/type';
 
+import type { ModalState } from '@/services/iam/types/user-group-type';
+
 export const useUserGroupPageStore = defineStore('page-user-group', () => {
     const state = reactive({
         loading: true,
@@ -17,6 +19,12 @@ export const useUserGroupPageStore = defineStore('page-user-group', () => {
         pageStart: 1,
         pageLimit: 15,
         searchFilters: [] as ConsoleFilter[],
+        modal: {
+            type: '',
+            title: '',
+            themeColor: 'primary',
+            visible: undefined,
+        } as ModalState,
     });
     const getters = reactive({
         selectedUserGroups: computed((): UserGroupListItemType[] => {
@@ -38,9 +46,26 @@ export const useUserGroupPageStore = defineStore('page-user-group', () => {
             state.pageStart = 1;
             state.pageLimit = 15;
             state.searchFilters = [] as ConsoleFilter[];
+            state.modal = {
+                type: '',
+                title: '',
+                themeColor: 'primary',
+                visiable: undefined,
+            } as ModalState;
         },
         async listUserGroups() {
             //     TODO: api connect
+        },
+        updateModalSettings({
+            type, title, themeColor, visible,
+        }: ModalState) {
+            state.modal = {
+                ...state.modal,
+                type,
+                title,
+                themeColor,
+                visible: visible ?? undefined,
+            };
         },
     };
     return {

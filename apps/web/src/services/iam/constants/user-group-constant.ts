@@ -40,3 +40,10 @@ export const USER_GROUP_USERS_SEARCH_HANDLERS = {
         },
     ],
 };
+
+export const USER_GROUP_MODAL_TYPE = {
+    UPDATE: 'update',
+    REMOVE: 'remove',
+    ADD_NEW_USER: 'add_new_user',
+    CREATE: 'create',
+};
