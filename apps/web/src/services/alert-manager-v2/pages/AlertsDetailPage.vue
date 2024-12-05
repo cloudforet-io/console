@@ -24,10 +24,7 @@ const props = withDefaults(defineProps<Props>(), {
                 <alert-detail-summary :id="props.alertId" />
 
                 <alert-detail-info-table :id="props.alertId" />
-                <alert-detail-tabs :id="props.alertId" />
-                <alert-detail-tabs :id="props.alertId"
-                                   class="timeline-and-event"
-                />
+                <alert-detail-tabs />
             </div>
             <alert-detail-note :id="props.alertId"
                                class="note"
