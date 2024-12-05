@@ -47,9 +47,8 @@ import { useTaskStore } from '@/services/ops-flow/stores/task-store';
 import type { BoardPageQuery } from '@/services/ops-flow/types/board-page-type';
 import type { TaskCreatePageQueryValue } from '@/services/ops-flow/types/task-create-page-type';
 
-const TaskContentBaseForm = defineAsyncComponent(() => import('@/services/ops-flow/components/TaskContentBaseForm.vue'));
-const TaskFieldsForm = defineAsyncComponent(() => import('@/services/ops-flow/task-fields-form/TaskFieldsForm.vue'));
-const TaskCreateProgressTab = defineAsyncComponent(() => import('@/services/ops-flow/components/TaskCreateProgressTab.vue'));
+const TaskContentTab = defineAsyncComponent(() => import('@/services/ops-flow/components/TaskContentTab.vue'));
+const TaskProgressTab = defineAsyncComponent(() => import('@/services/ops-flow/components/TaskProgressTab.vue'));
 
 
 const props = defineProps<{
@@ -171,13 +170,10 @@ defineExpose({ setPathFrom });
                        @update:active-tab="handleUpdateActiveTab"
                 >
                     <template #content>
-                        <div class="w-full pt-6 px-4 pb-10">
-                            <task-content-base-form class="mb-4" />
-                            <task-fields-form />
-                        </div>
+                        <task-content-tab />
                     </template>
                     <template #progress>
-                        <task-create-progress-tab />
+                        <task-progress-tab />
                     </template>
                 </p-tab>
                 <div v-if="taskContentFormState.mode === 'edit'"
@@ -196,7 +192,7 @@ defineExpose({ setPathFrom });
                     </p-button>
                 </div>
             </div>
-            <board-task-comment class="flex-1 w-full min-w-[360px] lg:max-w-[528px] tablet:min-w-full"
+            <board-task-comment class="flex-1 w-full h-fit min-w-[360px] lg:max-w-[528px] tablet:min-w-full"
                                 :task-id="props.taskId"
             />
         </div>
