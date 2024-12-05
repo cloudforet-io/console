@@ -1,9 +1,24 @@
 <script lang="ts" setup>
 import { PHorizontalLayout } from '@cloudforet/mirinae';
 
+import UserGroupManagementEditModal from '@/services/iam/components/UserGroupManagementEditModal.vue';
 import UserGroupManagementHeader from '@/services/iam/components/UserGroupManagementHeader.vue';
 import UserGroupManagementTab from '@/services/iam/components/UserGroupManagementTab.vue';
 import UserGroupManagementTable from '@/services/iam/components/UserGroupManagementTable.vue';
+import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
+
+const userGroupPageStore = useUserGroupPageStore();
+const userGroupPageState = userGroupPageStore.state;
+
+/* API */
+const refreshUserGroupList = () => {
+    userGroupPageState.loading = true;
+    try {
+        console.log('TODO: Refresh User Group List');
+    } finally {
+        userGroupPageState.loading = false;
+    }
+};
 </script>
 
 <template>
@@ -15,6 +30,7 @@ import UserGroupManagementTable from '@/services/iam/components/UserGroupManagem
             </template>
         </p-horizontal-layout>
         <user-group-management-tab />
+        <user-group-management-edit-modal @confirm="refreshUserGroupList" />
     </section>
 </template>
 
