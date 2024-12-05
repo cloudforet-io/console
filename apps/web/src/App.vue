@@ -69,14 +69,14 @@ useResizeObserver(topNotiRef, (entries) => {
 
 const goToSignIn = async () => {
     state.isRoutingToSignIn = true;
-    const res: Location = {
+    const to: Location = {
         name: AUTH_ROUTE.SIGN_OUT._NAME,
         query: { previousPath: route.fullPath },
     };
     store.commit('user/setCurrentGrantInfo', undefined);
     errorStore.setVisibleSessionExpiredError(false);
 
-    await router.push(res);
+    await router.push(to);
     state.isRoutingToSignIn = false;
 };
 const showsBrowserRecommendation = () => {

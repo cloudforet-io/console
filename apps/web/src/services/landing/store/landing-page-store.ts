@@ -11,6 +11,7 @@ import { sortTableItems } from '@/common/utils/table-sort';
 interface LandingPageStoreState {
     loading: boolean;
     selectedWorkspaceGroup: string;
+    redirectPath?: string;
 }
 
 export const useLandingPageStore = defineStore('landing-page-store', () => {
@@ -20,6 +21,7 @@ export const useLandingPageStore = defineStore('landing-page-store', () => {
     const state = reactive<LandingPageStoreState>({
         loading: false,
         selectedWorkspaceGroup: 'all',
+        redirectPath: undefined,
     });
 
     const groupUserTableState = reactive({
@@ -32,7 +34,7 @@ export const useLandingPageStore = defineStore('landing-page-store', () => {
         pageLimit: 15,
     });
 
-    const getters = reactive({
+    const getters = {
         loading: computed<boolean>(() => state.loading),
         // workspaceGroupUser
         workspaceGroupUsers: computed<WorkspaceUser[]>(() => userWorkspaceGroupStoreGetters.workspaceGroupMap[state.selectedWorkspaceGroup]?.users || []),
@@ -48,9 +50,12 @@ export const useLandingPageStore = defineStore('landing-page-store', () => {
 
             return sortedSelectedGroupUsers?.slice(groupUserTableState.pageStart - 1, groupUserTableState.pageStart - 1 + groupUserTableState.pageLimit);
         }),
-    });
+    };
 
     const actions = {
+        setRedirectPath(redirectPath?: string) {
+            state.redirectPath = redirectPath;
+        },
         setLoading: (loading: boolean) => {
             state.loading = loading;
         },

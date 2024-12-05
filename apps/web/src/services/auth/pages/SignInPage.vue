@@ -36,6 +36,7 @@ import IDPWSignIn from '@/services/auth/authenticator/local/template/ID_PW.vue';
 import SignInRightContainer from '@/services/auth/components/SignInRightContainer.vue';
 import { getDefaultRouteAfterSignIn } from '@/services/auth/helpers/default-route-helper';
 import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
+import type { WorkspaceLandingPageQuery } from '@/services/landing/type/workspace-landing-page-type';
 
 
 interface Props {
@@ -76,7 +77,7 @@ const state = reactive({
 const onSignIn = async (userId:string) => {
     appContextStore.setGlobalGrantLoading(true);
     try {
-        const isSameUserAsPreviouslyLoggedInUser = state.beforeUser === userId;
+        const isFirstUserOrSameUserAsPreviouslyLoggedInUser = !state.beforeUser || state.beforeUser === userId;
         const hasBoundWorkspaces = userWorkspaceStore.getters.workspaceList.length > 0;
         const defaultRoute = getDefaultRouteAfterSignIn(hasBoundWorkspaces);
         const lastAccessedWorkspaceId = await getLastAccessedWorkspaceId();
@@ -91,10 +92,11 @@ const onSignIn = async (userId:string) => {
         if (!lastAccessedWorkspaceId) {
             await router.push({
                 name: LANDING_ROUTE.WORKSPACE._NAME,
+                query: { redirectPath: props.previousPath } as WorkspaceLandingPageQuery,
             });
             return;
         }
-        if (!props.previousPath || !isSameUserAsPreviouslyLoggedInUser) {
+        if (!props.previousPath || !isFirstUserOrSameUserAsPreviouslyLoggedInUser) {
             await router.push(defaultRoute).catch(() => {});
             return;
         }
