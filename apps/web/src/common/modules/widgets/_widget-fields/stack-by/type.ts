@@ -6,8 +6,13 @@ export interface StackByValue {
 
 export interface StackByOptions {
     dataTarget?: string;
-    max?: number;
+    max: number;
     defaultMaxCount: number;
     defaultIndex?: number;
     excludeDateField?: boolean;
+}
+
+export interface _StackByValue {
+    data?: string;
+    count: number;
 }

@@ -3,9 +3,13 @@ export interface XAxisValue {
     count: number;
 }
 export interface XAxisOptions {
-    dataTarget?: string;
-    max?: number;
+    dataTarget: string;
+    max: number;
     defaultMaxCount: number;
     defaultIndex?: number;
     excludeDateField?: boolean;
+}
+export interface _XAxisValue {
+    data?: string;
+    count: number;
 }

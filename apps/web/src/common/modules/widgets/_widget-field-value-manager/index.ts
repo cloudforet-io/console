@@ -1,4 +1,6 @@
-import type { FieldValueValidator, WidgetFieldTypeMap, WidgetFieldValueMap } from '@/common/modules/widgets/_widget-field-value-manager/type';
+import type { WidgetFieldDefaultValueSetterRegistry } from '@/common/modules/widgets/_widget-field-value-manager/constant/default-value-registry';
+import type { WidgetValidatorRegistry } from '@/common/modules/widgets/_widget-field-value-manager/constant/validator-registry';
+import type { WidgetFieldTypeMap, WidgetFieldValueMap } from '@/common/modules/widgets/_widget-field-value-manager/type';
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 
 
@@ -9,30 +11,35 @@ export default class WidgetFieldValueManager {
 
     private modifiedData: WidgetFieldValueMap;
 
-    private fieldValidators: Record<keyof WidgetFieldTypeMap, FieldValueValidator<any>>;
+    private fieldValidators: WidgetValidatorRegistry;
+
+    private defaultValueSetters: WidgetFieldDefaultValueSetterRegistry;
 
     private validationErrors: Record<string, string> = {};
 
-    static applyDefaultValue(originData: WidgetFieldValueMap, defaultValueMap: Record<keyof WidgetFieldTypeMap, any>): WidgetFieldValueMap {
+    static applyDefaultValue(originData: WidgetFieldValueMap, widgetConfig: WidgetConfig, defaultValueSetters: WidgetFieldDefaultValueSetterRegistry): WidgetFieldValueMap {
         const result: WidgetFieldValueMap = { ...originData };
-        Object.entries(defaultValueMap).forEach(([key, value]) => {
-            if (result[key as keyof WidgetFieldValueMap] === undefined) {
-                result[key as keyof WidgetFieldValueMap] = value;
+
+        Object.entries(defaultValueSetters).forEach(([key, setter]) => {
+            if (!result[key]) {
+                result[key] = { value: setter(widgetConfig) };
             }
         });
+
         return result;
     }
 
     constructor(
         widgetConfig: WidgetConfig,
         originData: WidgetFieldValueMap,
-        fieldValidators: Record<keyof WidgetFieldTypeMap, FieldValueValidator<any>>,
-        defaultValueMap: Record<keyof WidgetFieldTypeMap, any>,
+        fieldValidators: WidgetValidatorRegistry,
+        defaultValueSetters: WidgetFieldDefaultValueSetterRegistry,
     ) {
         this.widgetConfig = widgetConfig;
-        this.originData = originData;
-        this.modifiedData = WidgetFieldValueManager.applyDefaultValue(originData, defaultValueMap);
         this.fieldValidators = fieldValidators;
+        this.defaultValueSetters = defaultValueSetters;
+        this.originData = originData;
+        this.modifiedData = WidgetFieldValueManager.applyDefaultValue(originData, widgetConfig, defaultValueSetters);
     }
 
     setFieldValue<Key extends keyof WidgetFieldTypeMap>(key: Key, value: WidgetFieldTypeMap[Key]['value']): boolean {

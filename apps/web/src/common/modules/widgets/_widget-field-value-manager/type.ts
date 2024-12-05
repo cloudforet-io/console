@@ -1,5 +1,5 @@
-import type { AdvancedFormatRulesValue } from '@/common/modules/widgets/_widget-fields/advanced-format-rules/type';
-import type { CategoryByValue } from '@/common/modules/widgets/_widget-fields/category-by/type';
+import type { _FormatRulesValue } from '@/common/modules/widgets/_widget-fields/advanced-format-rules/type';
+import type { _CategoryByValue } from '@/common/modules/widgets/_widget-fields/category-by/type';
 import type { ColorSchemaValue } from '@/common/modules/widgets/_widget-fields/color-schema/type';
 import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/comparison/type';
 import type { CustomTableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
@@ -23,7 +23,7 @@ import type { MissingValueValue } from '@/common/modules/widgets/_widget-fields/
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type { PieChartTypeValue } from '@/common/modules/widgets/_widget-fields/pie-chart-type/type';
 import type { ProgressBarValue } from '@/common/modules/widgets/_widget-fields/progress-bar/type';
-import type { StackByValue } from '@/common/modules/widgets/_widget-fields/stack-by/type';
+import type { _StackByValue } from '@/common/modules/widgets/_widget-fields/stack-by/type';
 import type { SubTotalValue } from '@/common/modules/widgets/_widget-fields/sub-total/type';
 import type { TableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/table-column-width/type';
 import type { TableDataFieldValue } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
@@ -31,11 +31,12 @@ import type { TextWrapValue } from '@/common/modules/widgets/_widget-fields/text
 import type { TooltipNumberFormatValue } from '@/common/modules/widgets/_widget-fields/tooltip-number-format/type';
 import type { TotalValue } from '@/common/modules/widgets/_widget-fields/total/type';
 import type { WidgetHeightValue } from '@/common/modules/widgets/_widget-fields/widget-height/type';
-import type { XAxisValue } from '@/common/modules/widgets/_widget-fields/x-axis/type';
-import type { YAxisValue } from '@/common/modules/widgets/_widget-fields/y-axis/type';
+import type { _XAxisValue } from '@/common/modules/widgets/_widget-fields/x-axis/type';
+import type { _YAxisValue } from '@/common/modules/widgets/_widget-fields/y-axis/type';
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 
 export type FieldValueValidator<T extends WidgetFieldValue> = (fieldValue: T, widgetConfig: WidgetConfig) => boolean;
+export type FieldDefaultValueConvertor<T extends keyof WidgetFieldTypeMap> = (widgetConfig: WidgetConfig) => WidgetFieldTypeMap[T]['value'];
 
 export interface WidgetFieldValueMap {
     [fieldKey: string]: WidgetFieldValue;
@@ -47,8 +48,8 @@ export interface WidgetFieldValue<T = any> {
 }
 
 export interface WidgetFieldTypeMap {
-    xAxis: WidgetFieldValue<XAxisValue>;
-    yAxis: WidgetFieldValue<YAxisValue>;
+    xAxis: WidgetFieldValue<_XAxisValue>;
+    yAxis: WidgetFieldValue<_YAxisValue>;
     widgetHeight: WidgetFieldValue<WidgetHeightValue>;
     total: WidgetFieldValue<TotalValue>;
     tooltipNumberFormat: WidgetFieldValue<TooltipNumberFormatValue>;
@@ -56,7 +57,7 @@ export interface WidgetFieldTypeMap {
     tableDataField: WidgetFieldValue<TableDataFieldValue>;
     tableColumnWidth: WidgetFieldValue<TableColumnWidthValue>;
     subTotal: WidgetFieldValue<SubTotalValue>;
-    stackBy: WidgetFieldValue<StackByValue>;
+    stackBy: WidgetFieldValue<_StackByValue>;
     progressBar: WidgetFieldValue<ProgressBarValue>;
     pieChartType: WidgetFieldValue<PieChartTypeValue>;
     numberFormat: WidgetFieldValue<NumberFormatValue>;
@@ -80,6 +81,6 @@ export interface WidgetFieldTypeMap {
     customTableColumnWidth: WidgetFieldValue<CustomTableColumnWidthValue>;
     comparison: WidgetFieldValue<ComparisonValue>;
     colorSchema: WidgetFieldValue<ColorSchemaValue>;
-    categoryBy: WidgetFieldValue<CategoryByValue>;
-    advancedFormatRules: WidgetFieldValue<AdvancedFormatRulesValue>;
+    categoryBy: WidgetFieldValue<_CategoryByValue>;
+    advancedFormatRules: WidgetFieldValue<_FormatRulesValue>;
 }
