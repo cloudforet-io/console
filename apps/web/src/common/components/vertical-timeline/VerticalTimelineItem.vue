@@ -9,21 +9,21 @@ const props = withDefaults(defineProps<{
     styleType?: StyleType;
     title: string;
     description?: string;
-    createdAt?: string;
+    datetime?: string;
     timezone?: string;
     isLastItem?: boolean;
 }>(), {
     styleType: 'gray',
     title: '',
     description: '',
-    createdAt: '',
+    datetime: '',
     timezone: 'UTC',
     isLastItem: false,
 });
 const emit = defineEmits<{(event: 'click'): void;
 }>();
 
-const timestamp = computed(() => (props.createdAt ? iso8601Formatter(props.createdAt, props.timezone) : ''));
+const timestamp = computed(() => (props.datetime ? iso8601Formatter(props.datetime, props.timezone) : ''));
 const date = computed(() => {
     if (timestamp.value) {
         return timestamp.value.split(' ')[0];
