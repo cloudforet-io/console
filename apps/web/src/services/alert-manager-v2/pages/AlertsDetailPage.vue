@@ -23,9 +23,8 @@ const props = withDefaults(defineProps<Props>(), {
             <div class="flex flex-col gap-4">
                 <alert-detail-summary :id="props.alertId" />
 
-                <alert-detail-info-table :id="props.alertId"
-                                         class="info"
-                />
+                <alert-detail-info-table :id="props.alertId" />
+                <alert-detail-tabs :id="props.alertId" />
                 <alert-detail-tabs :id="props.alertId"
                                    class="timeline-and-event"
                 />
