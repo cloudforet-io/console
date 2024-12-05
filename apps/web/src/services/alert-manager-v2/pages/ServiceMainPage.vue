@@ -5,13 +5,19 @@ import {
     PButton, PHeading, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+
 import ServiceList from '@/services/alert-manager-v2/components/ServiceList.vue';
 import { ALERT_MANAGER_V2_ROUTE } from '@/services/alert-manager-v2/routes/route-constant';
 
 const router = useRouter();
 
+const { getProperRouteLocation } = useProperRouteLocation();
+
 const handleClickCreateButton = () => {
-    router.push({ name: ALERT_MANAGER_V2_ROUTE.SERVICE.CREATE._NAME });
+    router.push(getProperRouteLocation({
+        name: ALERT_MANAGER_V2_ROUTE.SERVICE.CREATE._NAME,
+    }));
 };
 </script>
 

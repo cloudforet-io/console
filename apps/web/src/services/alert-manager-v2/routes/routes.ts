@@ -12,6 +12,8 @@ const AlertManagerContainer = () => import('@/services/alert-manager-v2/AlertMan
 const ServiceMainPage = () => import('@/services/alert-manager-v2/pages/ServiceMainPage.vue');
 const ServiceDetailPage = () => import('@/services/alert-manager-v2/pages/ServiceDetailPage.vue');
 const ServiceCreatePage = () => import('@/services/alert-manager-v2/pages/ServiceCreatePage.vue');
+const ServiceDetailWebhookCreatePage = () => import('@/services/alert-manager-v2/pages/ServiceDetailWebhookCreatePage.vue');
+const ServiceDetailNotificationsCreatePage = () => import('@/services/alert-manager-v2/pages/ServiceDetailNotificationsCreatePage.vue');
 
 const alertManagerV2Routes: RouteConfig = {
     path: 'alert-manager-v2',
@@ -47,8 +49,27 @@ const alertManagerV2Routes: RouteConfig = {
                     path: ':serviceId',
                     name: ALERT_MANAGER_V2_ROUTE.SERVICE.DETAIL._NAME,
                     props: true,
-                    meta: { label: ({ params }) => params.serviceId },
-                    component: ServiceDetailPage as any,
+                    component: { template: '<router-view />' },
+                    children: [
+                        {
+                            path: '/',
+                            name: ALERT_MANAGER_V2_ROUTE.SERVICE.DETAIL._NAME,
+                            props: true,
+                            component: ServiceDetailPage as any,
+                        },
+                        {
+                            path: 'webhook/create',
+                            name: ALERT_MANAGER_V2_ROUTE.SERVICE.DETAIL.WEBHOOK.CREATE._NAME,
+                            meta: { centeredLayout: true },
+                            component: ServiceDetailWebhookCreatePage as any,
+                        },
+                        {
+                            path: 'notifications/create',
+                            name: ALERT_MANAGER_V2_ROUTE.SERVICE.DETAIL.NOTIFICATIONS.CREATE._NAME,
+                            meta: { centeredLayout: true },
+                            component: ServiceDetailNotificationsCreatePage as any,
+                        },
+                    ],
                 },
             ],
         },

@@ -66,15 +66,33 @@ const handleClickServiceItem = (id: string) => {
         },
     }));
 };
-const handleClickEscalationPolicy = () => {
-    console.log('TODO: handleClickEscalationPolicy');
+const handleClickEscalationPolicy = (id: string) => {
+    router.push(getProperRouteLocation({
+        name: ALERT_MANAGER_V2_ROUTE.SERVICE.DETAIL._NAME,
+        params: {
+            serviceId: id,
+        },
+        query: {
+            tab: SERVICE_DETAIL_TABS.SETTINGS,
+        },
+    }));
 };
-const handleClickWebhookItem = (item: string) => {
+const handleClickWebhookItem = (item: string, id: string) => {
     if (item === 'chevron') {
         console.log('TODO: route to webhook main page');
     } else {
         console.log('TODO: route to webhook detail page');
     }
+
+    router.push(getProperRouteLocation({
+        name: ALERT_MANAGER_V2_ROUTE.SERVICE.DETAIL._NAME,
+        params: {
+            serviceId: id,
+        },
+        query: {
+            tab: SERVICE_DETAIL_TABS.WEBHOOK,
+        },
+    }));
 };
 
 const fetchServiceList = () => {
@@ -97,7 +115,7 @@ const fetchServiceList = () => {
         />
         <div class="list-card-wrapper">
             <p-select-card class="card"
-                           @change="handleClickServiceItem('id')"
+                           @change="handleClickServiceItem('temp id')"
             >
                 <div class="card-inner-wrapper">
                     <p class="text-label-xl font-bold">
@@ -142,7 +160,7 @@ const fetchServiceList = () => {
                                 <div class="webhook-list">
                                     <!-- TODO: check the link & icon -->
                                     <span class="webhook"
-                                          @click.stop="handleClickWebhookItem('item')"
+                                          @click.stop="handleClickWebhookItem('item', 'temp id')"
                                     >
                                         <p-i name="ic_check"
                                              class="icon success"
@@ -152,7 +170,7 @@ const fetchServiceList = () => {
                                         />
                                     </span>
                                     <span class="webhook chevron"
-                                          @click.stop="handleClickWebhookItem('chevron')"
+                                          @click.stop="handleClickWebhookItem('chevron', 'temp id')"
                                     >
                                         <p-i
                                             name="ic_chevron-right"
@@ -167,7 +185,7 @@ const fetchServiceList = () => {
                                 <p class="title">
                                     {{ $t('ALERT_MANAGER.ESCALATION_POLICY.TITLE', { cnt: 11 }) }}
                                 </p>
-                                <p-text-button @click.stop="handleClickEscalationPolicy">
+                                <p-text-button @click.stop="handleClickEscalationPolicy('temp id')">
                                     temp default policy
                                 </p-text-button>
                             </div>
