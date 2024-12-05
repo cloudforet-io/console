@@ -1,8 +1,19 @@
 <script lang="ts" setup>
 import { PHeading, PButton, PHeadingLayout } from '@cloudforet/mirinae';
 
+import { i18n } from '@/translations';
+
+import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
+
+const userGroupPageStore = useUserGroupPageStore();
+
 const handleCreateGroup = () => {
-    console.log('TODO: handleCreateGroup');
+    userGroupPageStore.updateModalSettings({
+        type: 'create',
+        title: i18n.t('IAM.USER_GROUP.MODAL.CREATE_USER_GROUP.TITLE'),
+        themeColor: 'primary',
+        visible: 'create',
+    });
 };
 </script>
 

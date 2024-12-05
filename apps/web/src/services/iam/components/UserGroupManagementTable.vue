@@ -1,4 +1,4 @@
-<script lang="ts" setup="">
+<script lang="ts" setup>
 import { computed, reactive } from 'vue';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
@@ -6,9 +6,11 @@ import { PToolboxTable, PSelectDropdown } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
+import { i18n } from '@/translations';
+
 import { useQueryTags } from '@/common/composables/query-tags';
 
-import { USER_GROUP_SEARCH_HANDLERS } from '@/services/iam/constants/user-group-constant';
+import { USER_GROUP_MODAL_TYPE, USER_GROUP_SEARCH_HANDLERS } from '@/services/iam/constants/user-group-constant';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
 interface Props {
@@ -57,21 +59,27 @@ const tableState = reactive({
     ]),
 });
 
+const editState = reactive({
+    isRemoveAble: computed<boolean>(() => userGroupPageState.selectedIndices.length > 0),
+    isEditable: computed<boolean>(() => userGroupPageState.selectedIndices.length === 1),
+});
+
 const dropdownState = reactive({
     visible: false,
     loading: false,
+    selectedAction: '',
     menuItems: computed<MenuItem[]>(() => [
         {
-            name: 'update', label: 'Update', type: 'item',
+            name: 'update', label: i18n.t('IAM.USER_GROUP.ACTION.UPDATE'), type: 'item', disabled: !editState.isEditable,
         },
         {
-            name: 'remove', label: 'Remove', type: 'item',
+            name: 'remove', label: i18n.t('IAM.USER_GROUP.ACTION.REMOVE'), type: 'item', disabled: !editState.isRemoveAble,
         },
         {
             type: 'divider',
         },
         {
-            name: 'add_new_user', label: 'Add New User', type: 'item',
+            name: 'add_new_user', label: i18n.t('IAM.USER_GROUP.ACTION.ADD_NEW_USER'), type: 'item',
         },
     ]),
     // selectedMenuItems: [] as SelectDropdownMenuItem[],
@@ -87,9 +95,25 @@ const handleChange = () => {
 
 /* API */
 const handleSelectDropdown = async (inputText: string) => {
-    // dropdownState.loading = true;
+    dropdownState.loading = true;
 
-    console.log(inputText, 'TODO: handleSelectDropdown');
+    switch (inputText) {
+    case USER_GROUP_MODAL_TYPE.UPDATE:
+        console.log('TODO: Open Update User Group Modal');
+        dropdownState.loading = false;
+        break;
+    case USER_GROUP_MODAL_TYPE.REMOVE:
+        console.log('TODO: Remove API');
+        dropdownState.loading = false;
+        break;
+    case USER_GROUP_MODAL_TYPE.ADD_NEW_USER:
+        console.log('TODO: Open Add Users to Selected User Group Modal');
+        dropdownState.loading = false;
+        break;
+    default:
+        dropdownState.loading = false;
+        break;
+    }
 };
 </script>
 
@@ -117,7 +141,7 @@ const handleSelectDropdown = async (inputText: string) => {
             >
                 <p-select-dropdown
                     :menu="dropdownState.menuItems"
-                    placeholder="Action "
+                    placeholder="Action"
                     @select="handleSelectDropdown"
                 />
             </template>
