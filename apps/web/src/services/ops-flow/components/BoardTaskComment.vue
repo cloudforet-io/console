@@ -29,21 +29,30 @@ const commentItems = computed<CollapsibleItem<CommentModel>[]>(() => comments.va
 })));
 const comment = ref('');
 
-const addComment = async () => {
+const addComment = async (cmt: string) => {
     try {
         await commentStore.create({
             task_id: props.taskId,
-            comment: comment.value,
+            comment: cmt,
         }, true);
         showSuccessMessage('Comment added successfully', '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, 'Failed to add comment');
     }
 };
-const handleAddComment = async () => {
-    if (!comment.value.trim().length) return;
-    await addComment();
+const addCommentAndApplyToEvents = async (cmt: string) => {
+    if (!cmt.trim().length) return;
+    await addComment(cmt);
     await taskDetailPageStore.loadNewEvents();
+};
+const handleClickAddComment = () => {
+    addCommentAndApplyToEvents(comment.value);
+    comment.value = '';
+};
+const handleKeyEnter = (e: KeyboardEvent) => {
+    if (e.shiftKey) return;
+    addCommentAndApplyToEvents(comment.value);
+    comment.value = '';
 };
 onBeforeMount(async () => {
     await commentStore.listByTaskId(props.taskId, {
@@ -64,10 +73,12 @@ onBeforeMount(async () => {
                     placehoder="Add Comment"
                     :value="comment"
                     @update:value="comment = $event"
+                    @keydown.enter.prevent
+                    @keyup.enter="handleKeyEnter"
         />
         <p-button class="mb-6"
                   style-type="tertiary"
-                  @click="handleAddComment"
+                  @click="handleClickAddComment"
         >
             Add Comment
         </p-button>
