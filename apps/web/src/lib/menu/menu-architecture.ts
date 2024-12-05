@@ -70,7 +70,7 @@ export const MENU_LIST: Menu[] = [
 ];
 
 
-export const MENU_LIST_FOR_RESOURCE_MANAGER: Menu[] = [
+export const MENU_LIST_FOR_RESOURCE_MANAGER_V2: Menu[] = [
     {
         id: MENU_ID.WORKSPACE_HOME,
         needPermissionByRole: true,
@@ -185,7 +185,7 @@ export const ADMIN_MENU_LIST: Menu[] = [
     },
 ];
 
-export const ADMIN_MENU_LIST_FOR_RESOURCE_MANAGER: Menu[] = [
+export const ADMIN_MENU_LIST_FOR_RESOURCE_MANAGER_V2: Menu[] = [
     {
         id: MENU_ID.DASHBOARDS,
     },

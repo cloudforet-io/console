@@ -5,7 +5,7 @@ import { getDefaultPageAccessPermissionList } from '@/lib/access-control/page-ac
 import config from '@/lib/config';
 import type { Menu, MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
-import { MENU_LIST, MENU_LIST_FOR_RESOURCE_MANAGER } from '@/lib/menu/menu-architecture';
+import { MENU_LIST, MENU_LIST_FOR_RESOURCE_MANAGER_V2 } from '@/lib/menu/menu-architecture';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import type { PageAccessMenuItem } from '@/services/iam/types/role-type';
@@ -34,7 +34,7 @@ export const getPageAccessMenuListByRoleType = (roleType: RoleType): PageAccessM
     const results: PageAccessMenuItem[] = [];
     const defaultMenuIdsByRoleType = getDefaultPageAccessPermissionList(roleType);
     const isResourceManagerVersionV2 = config.get('RESOURCE_MANAGER_VERSION') === 'v2';
-    const menuListByVersion = (isResourceManagerVersionV2 ? MENU_LIST_FOR_RESOURCE_MANAGER : MENU_LIST);
+    const menuListByVersion = (isResourceManagerVersionV2 ? MENU_LIST_FOR_RESOURCE_MANAGER_V2 : MENU_LIST);
     menuListByVersion.forEach((menu) => {
         if (menu.needPermissionByRole && defaultMenuIdsByRoleType.includes(menu.id)) {
             if (menu.id === MENU_ID.WORKSPACE_HOME) return;
