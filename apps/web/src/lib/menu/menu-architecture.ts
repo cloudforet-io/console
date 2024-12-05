@@ -101,7 +101,7 @@ export const MENU_LIST_FOR_RESOURCE_MANAGER_V2: Menu[] = [
         ],
     },
     {
-        id: MENU_ID.ALERT_MANAGER_V2,
+        id: MENU_ID.ALERT_MANAGER,
         needPermissionByRole: true,
         subMenuList: [
             { id: MENU_ID.SERVICE, needPermissionByRole: true },

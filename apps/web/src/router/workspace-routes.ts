@@ -1,7 +1,7 @@
 import type { RouteConfig } from 'vue-router';
 
 
-import alertManagerV2Routes from '@/services/alert-manager-v2/routes/routes';
+import alertManagerRoutesV2 from '@/services/alert-manager-v2/routes/routes';
 import assetInventoryRouteV2 from '@/services/asset-inventory-v2/routes/routes';
 import costExplorerRoute from '@/services/cost-explorer/routes/routes';
 import dashboardsRoute from '@/services/dashboards/routes/routes';
@@ -17,7 +17,7 @@ export const workspaceRoutes: RouteConfig[] = [
     iamRoutes,
     assetInventoryRouteV2,
     projectRoute,
-    alertManagerV2Routes,
+    alertManagerRoutesV2,
     costExplorerRoute,
     infoRoute,
 ];
