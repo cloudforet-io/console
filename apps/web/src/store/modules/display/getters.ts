@@ -19,9 +19,12 @@ import type {
     DisplayState, DisplayMenu, SidebarProps,
 } from '@/store/modules/display/type';
 
+import config from '@/lib/config';
 import type { Menu, MenuId, MenuInfo } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
-import { ADMIN_MENU_LIST, MENU_LIST } from '@/lib/menu/menu-architecture';
+import {
+    ADMIN_MENU_LIST, ADMIN_MENU_LIST_FOR_RESOURCE_MANAGER, MENU_LIST, MENU_LIST_FOR_RESOURCE_MANAGER,
+} from '@/lib/menu/menu-architecture';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 export const hasUncheckedNotifications: Getter<DisplayState, any> = (state): boolean => state.uncheckedNotificationCount > 0;
@@ -114,9 +117,12 @@ export const allMenuList: Getter<DisplayState, any> = (state, getters, rootState
     const appContextStore = useAppContextStore();
     const appContextState = appContextStore.$state;
     const userWorkspaceStore = useUserWorkspaceStore();
+    const isResourceManagerVersionV2 = config.get('RESOURCE_MANAGER_VERSION') === 'v2';
+    const menuListByVersion = (isResourceManagerVersionV2 ? MENU_LIST_FOR_RESOURCE_MANAGER : MENU_LIST);
+    const adminMenuListByVersion = (isResourceManagerVersionV2 ? ADMIN_MENU_LIST_FOR_RESOURCE_MANAGER : ADMIN_MENU_LIST);
     const isAdminMode = appContextState.getters.isAdminMode;
     const currentWorkspaceId = userWorkspaceStore.getters.currentWorkspaceId;
-    const menuList = isAdminMode ? ADMIN_MENU_LIST : MENU_LIST;
+    const menuList = isAdminMode ? adminMenuListByVersion : menuListByVersion;
     let _allGnbMenuList: DisplayMenu[];
 
     _allGnbMenuList = getDisplayMenuList(menuList, isAdminMode, currentWorkspaceId);
