@@ -2,10 +2,6 @@ import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
-
-import { store } from '@/store';
-
 import { initServiceSettingsStore } from '@/store/util';
 
 
@@ -23,24 +19,14 @@ export const useDashboardSettingsStore = defineStore('dashboard-settings', () =>
     });
 
     /* Action */
-    const updateDoNotShowDateRangeWarning = (value: boolean) => {
-        const userId = store.state.user.userId;
-        const settings = LocalStorageAccessor.getItem(userId) ?? {};
-        settings.dashboard = {
-            doNotShowDateRangeWarning: value,
-        };
-        LocalStorageAccessor.setItem(userId, settings);
-        state.doNotShowDateRangeWarning = value;
-    };
-    const initState = () => {
-        const localStorageItem = initServiceSettingsStore<DashboardSettingsStore>('dashboard');
+    const initState = (userId?: string) => {
+        const localStorageItem = initServiceSettingsStore<DashboardSettingsStore>('dashboard', userId);
         state.doNotShowDateRangeWarning = localStorageItem?.doNotShowDateRangeWarning ?? false;
     };
 
     return {
         state,
         getters,
-        updateDoNotShowDateRangeWarning,
         initState,
     };
 });

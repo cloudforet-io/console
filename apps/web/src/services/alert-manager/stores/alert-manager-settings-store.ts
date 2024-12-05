@@ -19,8 +19,8 @@ export const useAlertManagerSettingsStore = defineStore('alert-manager-settings'
         setAlertLastCheckTime(time: string) {
             this.alertLastCheckTime = time;
         },
-        initState() {
-            const localStorageItem = initServiceSettingsStore<AlertManagerSettingsStore>('alertManager');
+        initState(userId?: string) {
+            const localStorageItem = initServiceSettingsStore<AlertManagerSettingsStore>('alertManager', userId);
             this.alertLastCheckTime = localStorageItem?.alertLastCheckTime ?? '';
         },
     },

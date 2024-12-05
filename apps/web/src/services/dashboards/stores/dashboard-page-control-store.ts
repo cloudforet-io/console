@@ -12,10 +12,10 @@ import type { PrivateFolderModel } from '@/schema/dashboard/private-folder/model
 import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
 import type { PublicFolderModel } from '@/schema/dashboard/public-folder/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import {
     getDashboardTreeData,
@@ -52,9 +52,10 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
     const appContextStore = useAppContextStore();
     const dashboardStore = useDashboardStore();
     const dashboardState = dashboardStore.state;
+    const userStore = useUserStore();
     const storeState = reactive({
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-        isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+        isWorkspaceOwner: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     });
     const state = reactive({
         // folder
