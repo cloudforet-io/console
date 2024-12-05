@@ -15,7 +15,7 @@ export const ALERT_MANAGER_V2_ROUTE = Object.freeze({
             },
         },
     },
-    ALERT: {
+    ALERTS: {
         _NAME: `${MENU_ID.ALERT_MANAGER_V2}.${MENU_ID.ALERTS}`,
         DETAIL: { _NAME: `${MENU_ID.ALERT_MANAGER_V2}.${MENU_ID.ALERTS}.detail` },
     },

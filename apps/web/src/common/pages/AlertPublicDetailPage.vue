@@ -127,7 +127,7 @@ const calculateTime = (time) => {
 const handleRouteToSignInWithRedirectPath = () => {
     if (SpaceConnector.getRefreshToken()) {
         router.push({
-            name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME,
+            name: ALERT_MANAGER_ROUTE.ALERTS.DETAIL._NAME,
             params: {
                 id: state.alertData?.alert_id,
                 workspaceId: state.alertData?.workspace_id,

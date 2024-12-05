@@ -156,7 +156,7 @@ const onClickBox = (projectId, date) => {
         { k: 'created_at', v: date.split(' ')[0], o: '=t' },
     ]);
     vm.$router.replace({
-        name: ALERT_MANAGER_ROUTE.ALERT._NAME,
+        name: ALERT_MANAGER_ROUTE.ALERTS._NAME,
         query: {
             filters: urlQueryHelper.rawQueryStrings,
             state: ALERT_STATE_FILTER.ALL,

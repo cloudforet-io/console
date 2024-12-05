@@ -438,7 +438,7 @@ initPage();
                     <template v-if="value">
                         <p-link highlight
                                 :to="{
-                                    name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME,
+                                    name: ALERT_MANAGER_ROUTE.ALERTS.DETAIL._NAME,
                                     params: { id: item.alert_id }
                                 }"
                         >
@@ -449,7 +449,7 @@ initPage();
                 <template #col-alert_number-format="{ value, item }">
                     <p-link highlight
                             :to="{
-                                name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME,
+                                name: ALERT_MANAGER_ROUTE.ALERTS.DETAIL._NAME,
                                 params: { id: item.alert_id }
                             }"
                     >

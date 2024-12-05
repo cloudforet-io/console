@@ -3,7 +3,7 @@ import { MENU_ID } from '@/lib/menu/config';
 export const ALERT_MANAGER_ROUTE = Object.freeze({
     _NAME: MENU_ID.ALERT_MANAGER,
     DASHBOARD: { _NAME: `${MENU_ID.ALERT_MANAGER}.${MENU_ID.ALERT_MANAGER_DASHBOARD}` },
-    ALERT: {
+    ALERTS: {
         _NAME: `${MENU_ID.ALERT_MANAGER}.${MENU_ID.ALERTS}`,
         DETAIL: { _NAME: `${MENU_ID.ALERT_MANAGER}.${MENU_ID.ALERTS}.detail` },
     },
