@@ -92,14 +92,16 @@ export const useTaskDetailPageStore = defineStore('task-detail-page', () => {
                     query: listEventsQueryHelper.dataV2,
                 });
                 if (res.status === 'succeed') {
-                    state.page += EVENT_PAGE_SIZE;
-                    state.events = state.events ? state.events.concat(res.response.results ?? []) : res.response.results ?? [];
                     const totalCount = res.response.total_count ?? 0;
+                    let addedEvents = res.response.results ?? [];
                     if (state.lastTotalCount && totalCount > state.lastTotalCount) {
+                        const diff = totalCount - state.lastTotalCount;
+                        addedEvents = addedEvents.slice(diff);
                         await actions.loadNewEvents();
-                    } else {
-                        state.lastTotalCount = totalCount;
                     }
+                    state.page += addedEvents.length;
+                    state.events = state.events ? state.events.concat(addedEvents) : addedEvents;
+                    state.lastTotalCount = totalCount;
                     state.loadingEvents = false;
                 }
             } catch (e) {
