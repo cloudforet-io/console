@@ -3,7 +3,7 @@ import type { GrantScope } from '@/schema/identity/token/type';
 import type { UserMfa } from '@/schema/identity/user/model';
 import type { AuthType, UserType } from '@/schema/identity/user/type';
 
-import type { PageAccessType } from '@/lib/access-control/config';
+
 
 export type LanguageCode = 'ko' | 'en' | string;
 // export type Timezone = 'UTC' | 'Asia/Seoul' | string;
@@ -11,7 +11,7 @@ export type LanguageCode = 'ko' | 'en' | string;
 export interface RoleInfo {
     roleType: RoleType;
     roleId: string;
-    pageAccess: PageAccessType[]|string[];
+    pageAccess: string[];
 }
 
 export interface GrantInfo {
@@ -47,18 +47,7 @@ export interface SignInRequest {
     domainId: string;
 }
 
-// TODO: this will be replaced with UserModel
-export interface UpdateUserRequest {
-    user_id?: string;
-    name?: string;
-    password?: string;
-    email?: string;
-    language?: string;
-    timezone?: string;
-    tags?: Record<string, any>;
-    domain_id?: string
-    verify_code?: string
-    email_verified?: boolean
-    mfa?: any
+export interface JWTPayload {
+    rol: RoleType;
 }
 
