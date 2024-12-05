@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { asyncComputed } from '@vueuse/core';
 import { computed, reactive } from 'vue';
 
@@ -8,12 +9,11 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { EscalationPolicyListParameters } from '@/schema/monitoring/escalation-policy/api-verbs/list';
 import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
-// eslint-disable-next-line import/no-cycle
-import { store } from '@/store';
 
 import type {
     ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -25,13 +25,14 @@ const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
 export const useEscalationPolicyReferenceStore = defineStore('reference-escalation-policy', () => {
+    const userStore = useUserStore();
     const state = reactive({
         items: null as EscalationPolicyReferenceMap | null,
     });
 
     const getters = reactive({
         escalationPolicyItems: asyncComputed<EscalationPolicyReferenceMap>(async () => {
-            if (store.getters['user/getCurrentGrantInfo'].scope !== 'WORKSPACE') return {};
+            if (userStore.state.currentGrantInfo?.scope !== 'WORKSPACE') return {};
             if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),

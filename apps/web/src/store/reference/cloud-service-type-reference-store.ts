@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { asyncComputed } from '@vueuse/core';
 import { computed, reactive } from 'vue';
 
@@ -8,12 +9,11 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CloudServiceTypeListParameters } from '@/schema/inventory/cloud-service-type/api-verbs/list';
 import type { CloudServiceTypeModel } from '@/schema/inventory/cloud-service-type/model';
-// eslint-disable-next-line import/no-cycle
-import { store } from '@/store';
 
 import type {
     ReferenceItem, ReferenceLoadOptions, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
+import { useUserStore } from '@/store/user/user-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
@@ -28,14 +28,16 @@ export type CloudServiceTypeReferenceMap = ReferenceMap<CloudServiceTypeItem>;
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
+
 export const useCloudServiceTypeReferenceStore = defineStore('reference-cloud-service-type', () => {
+    const userStore = useUserStore();
     const state = reactive({
         items: null as CloudServiceTypeReferenceMap | null,
     });
 
     const getters = reactive({
         cloudServiceTypeItems: asyncComputed<CloudServiceTypeReferenceMap>(async () => {
-            if (store.getters['user/getCurrentGrantInfo'].scope === 'USER') return {};
+            if (!userStore.state.currentGrantInfo?.scope || userStore.state.currentGrantInfo?.scope === 'USER') return {};
             if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),
