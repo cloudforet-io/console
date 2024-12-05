@@ -2,9 +2,10 @@ import type { RoleType } from '@/schema/identity/role/type';
 
 import { PAGE_ACCESS } from '@/lib/access-control/config';
 import { getDefaultPageAccessPermissionList } from '@/lib/access-control/page-access-helper';
+import config from '@/lib/config';
 import type { Menu, MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
-import { MENU_LIST } from '@/lib/menu/menu-architecture';
+import { MENU_LIST, MENU_LIST_FOR_RESOURCE_MANAGER } from '@/lib/menu/menu-architecture';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import type { PageAccessMenuItem } from '@/services/iam/types/role-type';
@@ -32,7 +33,9 @@ const flattenSubMenuList = (subMenuList: Menu[], defaultMenuIds: MenuId[], trans
 export const getPageAccessMenuListByRoleType = (roleType: RoleType): PageAccessMenuItem[] => {
     const results: PageAccessMenuItem[] = [];
     const defaultMenuIdsByRoleType = getDefaultPageAccessPermissionList(roleType);
-    MENU_LIST.forEach((menu) => {
+    const isResourceManagerVersionV2 = config.get('RESOURCE_MANAGER_VERSION') === 'v2';
+    const menuListByVersion = (isResourceManagerVersionV2 ? MENU_LIST_FOR_RESOURCE_MANAGER : MENU_LIST);
+    menuListByVersion.forEach((menu) => {
         if (menu.needPermissionByRole && defaultMenuIdsByRoleType.includes(menu.id)) {
             if (menu.id === MENU_ID.WORKSPACE_HOME) return;
             const menuInfo = MENU_INFO_MAP[menu.id];
