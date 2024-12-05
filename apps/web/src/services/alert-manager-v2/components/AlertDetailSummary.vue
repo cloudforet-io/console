@@ -17,16 +17,6 @@ import { red } from '@/styles/colors';
 
 import { useAlertPageStore } from '@/services/alert-manager-v2/stores/alert-page-store';
 
-interface Props {
-    id: string;
-    manageDisabled?: boolean;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    id: '',
-    manageDisabled: false,
-});
-
 const calculateTime = (time):string => {
     const today = dayjs().toISOString();
     const createdTime = iso8601Formatter(time, 'UTC');

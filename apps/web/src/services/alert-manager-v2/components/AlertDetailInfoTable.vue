@@ -14,7 +14,7 @@ import AlertDetailInfoTableDescription from '@/services/alert-manager-v2/compone
 import { ALERT_SEVERITY_COLORS, ALERT_SEVERITY_LABELS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
 
 const storeState = reactive({
-    timezone: computed(() => store.state.user.timezone),
+    timezone: computed<string>(() => store.state.user.timezone),
 });
 const tableState = reactive({
     fields: computed<DefinitionField[]>(() => [
