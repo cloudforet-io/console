@@ -8,12 +8,18 @@ import type { CollapsibleItem } from '@cloudforet/mirinae/types/data-display/col
 
 import type { CommentModel } from '@/schema/opsflow/comment/model';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import { useCommentStore } from '@/services/ops-flow/stores/comment-store';
+import { useTaskDetailPageStore } from '@/services/ops-flow/stores/task-detail-page-store';
 
 const props = defineProps<{
     taskId: string;
 }>();
 
+const taskDetailPageStore = useTaskDetailPageStore();
 const commentStore = useCommentStore();
 
 const comments = computed<CommentModel[]>(() => commentStore.state.itemsByTaskId[props.taskId] ?? []);
@@ -23,12 +29,21 @@ const commentItems = computed<CollapsibleItem<CommentModel>[]>(() => comments.va
 })));
 const comment = ref('');
 
+const addComment = async () => {
+    try {
+        await commentStore.create({
+            task_id: props.taskId,
+            comment: comment.value,
+        }, true);
+        showSuccessMessage('Comment added successfully', '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, 'Failed to add comment');
+    }
+};
 const handleAddComment = async () => {
     if (!comment.value.trim().length) return;
-    await commentStore.create({
-        task_id: props.taskId,
-        comment: comment.value,
-    }, true);
+    await addComment();
+    await taskDetailPageStore.loadNewEvents();
 };
 onBeforeMount(async () => {
     await commentStore.listByTaskId(props.taskId, {

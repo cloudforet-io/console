@@ -42,6 +42,7 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import BoardTaskComment from '@/services/ops-flow/components/BoardTaskComment.vue';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
+import { useTaskDetailPageStore } from '@/services/ops-flow/stores/task-detail-page-store';
 import { useTaskStore } from '@/services/ops-flow/stores/task-store';
 import type { BoardPageQuery } from '@/services/ops-flow/types/board-page-type';
 import type { TaskCreatePageQueryValue } from '@/services/ops-flow/types/task-create-page-type';
@@ -55,6 +56,7 @@ const props = defineProps<{
     taskId: string;
 }>();
 
+const taskDetailPageStore = useTaskDetailPageStore();
 const taskContentFormStore = useTaskContentFormStore();
 const taskContentFormState = taskContentFormStore.state;
 const taskContentFormGetters = taskContentFormStore.getters;
@@ -122,6 +124,7 @@ const handleSaveChanges = async () => {
 
 /* lifecycle */
 onBeforeMount(async () => {
+    taskDetailPageStore.setCurrentTaskId(props.taskId);
     if (route.hash === '#progress') {
         activeTab.value = 'progress';
     }
