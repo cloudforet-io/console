@@ -26,9 +26,7 @@ const props = withDefaults(defineProps<Props>(), {
                 <alert-detail-info-table :id="props.alertId" />
                 <alert-detail-tabs />
             </div>
-            <alert-detail-note :id="props.alertId"
-                               class="note"
-            />
+            <alert-detail-note class="w-4/12" />
         </div>
     </div>
 </template>
