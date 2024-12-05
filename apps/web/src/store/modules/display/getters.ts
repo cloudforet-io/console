@@ -18,6 +18,7 @@ import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 import type {
     DisplayState, DisplayMenu, SidebarProps,
 } from '@/store/modules/display/type';
+import { useUserStore } from '@/store/user/user-store';
 
 import type { Menu, MenuId, MenuInfo } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
@@ -114,6 +115,7 @@ export const allMenuList: Getter<DisplayState, any> = (state, getters, rootState
     const appContextStore = useAppContextStore();
     const appContextState = appContextStore.$state;
     const userWorkspaceStore = useUserWorkspaceStore();
+    const userStore = useUserStore();
     const isAdminMode = appContextState.getters.isAdminMode;
     const currentWorkspaceId = userWorkspaceStore.getters.currentWorkspaceId;
     const menuList = isAdminMode ? ADMIN_MENU_LIST : MENU_LIST;
@@ -122,7 +124,7 @@ export const allMenuList: Getter<DisplayState, any> = (state, getters, rootState
     _allGnbMenuList = getDisplayMenuList(menuList, isAdminMode, currentWorkspaceId);
     _allGnbMenuList = filterMenuByRoute(_allGnbMenuList, SpaceRouter.router);
     if (!isAdminMode) {
-        _allGnbMenuList = filterMenuByAccessPermission(_allGnbMenuList, rootGetters['user/pageAccessPermissionList']);
+        _allGnbMenuList = filterMenuByAccessPermission(_allGnbMenuList, userStore.getters.pageAccessPermissionList);
     }
 
     if (!isMyPage) {

@@ -7,6 +7,7 @@ import { store } from '@/store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useDomainStore } from '@/store/domain/domain-store';
 import { useErrorStore } from '@/store/error/error-store';
+import { useUserStore } from '@/store/user/user-store';
 
 
 abstract class Authenticator {
@@ -14,7 +15,8 @@ abstract class Authenticator {
         const userWorkspaceStore = useUserWorkspaceStore();
         const errorStore = useErrorStore();
         const domainStore = useDomainStore();
-        await store.dispatch('user/signIn', {
+        const userStore = useUserStore();
+        await userStore.signIn({
             domainId: domainStore.state.domainId,
             credentials,
             authType,
@@ -27,9 +29,10 @@ abstract class Authenticator {
 
     static async signOut(): Promise<void> {
         const errorStore = useErrorStore();
+        const userStore = useUserStore();
         try {
             if (SpaceRouter.router) {
-                await store.dispatch('user/signOut');
+                await userStore.signOut();
                 const userWorkspaceStore = useUserWorkspaceStore();
                 userWorkspaceStore.reset();
                 await store.dispatch('display/hideSignInErrorMessage');

@@ -16,8 +16,11 @@ import type { NotificationModel } from '@/schema/notification/notification/model
 
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 import type { DisplayState } from '@/store/modules/display/type';
+import { pinia } from '@/store/pinia';
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
 
 
 export const showHandbook = ({ commit }): void => {
@@ -99,11 +102,12 @@ export const checkNotification: Action<DisplayState, any> = async ({
         debugCheckNotification('[CHECK NOTI]', ' start');
         notificationListApiToken = axios.CancelToken.source();
 
-        const currentTime = dayjs.tz(dayjs.utc(), rootState.user.timezone);
+        const userStore = useUserStore(pinia);
+        const currentTime = dayjs.tz(dayjs.utc(), userStore.state.timezone);
         const lastNotificationReadTimeStr = rootState.display.gnbNotificationLastReadTime;
-        const lastNotificationReadTime = lastNotificationReadTimeStr ? dayjs(lastNotificationReadTimeStr).tz(rootState.user.timezone) : undefined;
+        const lastNotificationReadTime = lastNotificationReadTimeStr ? dayjs(lastNotificationReadTimeStr).tz(userStore.state.timezone) : undefined;
         const param = getNotificationListParam(
-            rootState.user.userId,
+            userStore.state.userId || '',
             currentTime,
             lastNotificationReadTime,
         );
