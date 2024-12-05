@@ -35,7 +35,7 @@ const handleConfirm = async () => {
 <template>
     <delete-modal header-title="Are you sure you want to delete this comment?"
                   :visible="taskDetailPageStore.state.visibleCommentDeleteModal"
-                  :disabled="loading"
+                  :loading="loading"
                   @close="taskDetailPageStore.closeCommentDeleteModal()"
                   @cancel="taskDetailPageStore.closeCommentDeleteModal()"
                   @confirm="handleConfirm"

@@ -39,8 +39,10 @@ const commentItems = computed<CollapsibleItem<CommentModel>[]>(() => comments.va
 })));
 const comment = ref('');
 
+const addingComment = ref<boolean>(false);
 const addComment = async (cmt: string) => {
     try {
+        addingComment.value = true;
         await commentStore.create({
             task_id: props.taskId,
             comment: cmt,
@@ -48,6 +50,8 @@ const addComment = async (cmt: string) => {
         showSuccessMessage('Comment added successfully', '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, 'Failed to add comment');
+    } finally {
+        addingComment.value = false;
     }
 };
 const addCommentAndApplyToEvents = async (cmt: string) => {
@@ -80,7 +84,7 @@ onBeforeMount(async () => {
                    title="Comment"
         />
         <p-textarea class="mb-3"
-                    placehoder="Add Comment"
+                    placeholder="Add Comment"
                     :value="comment"
                     @update:value="comment = $event"
                     @keydown.enter.prevent
@@ -88,6 +92,7 @@ onBeforeMount(async () => {
         />
         <p-button class="mb-6"
                   style-type="tertiary"
+                  :loading="addingComment"
                   @click="handleClickAddComment"
         >
             Add Comment
