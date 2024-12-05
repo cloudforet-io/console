@@ -5,6 +5,8 @@ import {
     PHeadingLayout, PHeading, PButton, PToolboxTable, PBadge,
 } from '@cloudforet/mirinae';
 
+import { i18n } from '@/translations';
+
 import { useUserGroupNotificationChannelPageStore } from '@/services/iam/store/user-group-notification-channel-page-store';
 
 const userGroupNotificationChannelPageStore = useUserGroupNotificationChannelPageStore();
@@ -52,7 +54,7 @@ const handleSelect = async (index) => {
                 <p-heading heading-type="sub"
                            use-total-count
                            :total-count="userGroupNotificationChannelPageState.totalCount"
-                           title="Notification Channel"
+                           :title="i18n.t('IAM.USER_GROUP.TAB.NOTIFICATION_CHANNEL.TITLE')"
                 />
             </template>
             <template #extra>
@@ -61,17 +63,17 @@ const handleSelect = async (index) => {
                         <p-button style-type="tertiary"
                                   icon-left="ic_plus"
                         >
-                            {{ $t('IAM.USER_GROUP.MAIN.NOTIFICATIONS_CHANNEL.ADD') }}
+                            {{ $t('IAM.USER_GROUP.TAB.NOTIFICATION_CHANNEL.ADD') }}
                         </p-button>
                         <p-button style-type="tertiary"
                                   icon-left="ic_edit-text"
                         >
-                            {{ $t('IAM.USER_GROUP.MAIN.NOTIFICATIONS_CHANNEL.EDIT') }}
+                            {{ $t('IAM.USER_GROUP.TAB.NOTIFICATION_CHANNEL.EDIT') }}
                         </p-button>
                         <p-button style-type="tertiary"
                                   icon-left="ic_delete"
                         >
-                            {{ $t('IAM.USER_GROUP.MAIN.NOTIFICATIONS_CHANNEL.DELETE') }}
+                            {{ $t('IAM.USER_GROUP.TAB.NOTIFICATION_CHANNEL.DELETE') }}
                         </p-button>
                     </div>
                 </div>
@@ -147,5 +149,8 @@ const handleSelect = async (index) => {
             gap: 8px;
         }
     }
+}
+:deep(.p-toolbox-table) {
+    border-width: 0;
 }
 </style>

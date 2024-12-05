@@ -5,6 +5,8 @@ import { computed, reactive } from 'vue';
 import { PTab } from '@cloudforet/mirinae';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
+import { i18n } from '@/translations';
+
 import UserGroupManagementTabNotificationChannel
     from '@/services/iam/components/UserGroupManagementTabNotificationChannel.vue';
 import UserGroupManagementTabUsers from '@/services/iam/components/UserGroupManagementTabUsers.vue';
@@ -17,8 +19,8 @@ const userGroupPageState = userGroupPageStore.state;
 const userGroupTabs = reactive({
     activeTab: USER_GROUP_TABS.USERS,
     tabs: computed<TabItem[]>(() => ([
-        { label: 'Users', name: USER_GROUP_TABS.USERS },
-        { label: 'Notification Channel', name: USER_GROUP_TABS.NOTIFICATION_CHANNEL },
+        { label: i18n.t('IAM.USER_GROUP.TAB.USERS.TITLE'), name: USER_GROUP_TABS.USERS },
+        { label: i18n.t('IAM.USER_GROUP.TAB.NOTIFICATION_CHANNEL.TITLE'), name: USER_GROUP_TABS.NOTIFICATION_CHANNEL },
     ])),
 });
 </script>

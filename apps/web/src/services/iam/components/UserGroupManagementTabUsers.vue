@@ -9,6 +9,8 @@ import {
 } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
+import { i18n } from '@/translations';
+
 import { USER_GROUP_USERS_SEARCH_HANDLERS } from '@/services/iam/constants/user-group-constant';
 import { useUserGroupUsersPageStore } from '@/services/iam/store/user-group-users-page-store';
 
@@ -53,7 +55,7 @@ const handleSelect = async (index) => {
                            use-selected-count
                            use-total-count
                            :total-count="userGroupUsersPageState.totalCount"
-                           title="Users"
+                           :title="`${i18n.t('IAM.USER_GROUP.TAB.USERS.TITLE')}`"
                 />
             </template>
             <template #extra>
@@ -63,12 +65,12 @@ const handleSelect = async (index) => {
                                   icon-left="ic_plus"
                                   :disabled="!isUserSelected"
                         >
-                            {{ $t('IAM.USER_GROUP.MAIN.USERS.ADD_USER') }}
+                            {{ $t('IAM.USER_GROUP.TAB.USERS.ADD_USER') }}
                         </p-button>
                         <p-button style-type="tertiary"
                                   :disabled="!isUserSelected"
                         >
-                            {{ $t('IAM.USER_GROUP.MAIN.USERS.REMOVE') }}
+                            {{ $t('IAM.USER_GROUP.TAB.USERS.REMOVE') }}
                         </p-button>
                     </div>
                 </div>
@@ -96,5 +98,8 @@ const handleSelect = async (index) => {
             gap: 8px;
         }
     }
+}
+:deep(.p-toolbox-table) {
+    border-width: 0;
 }
 </style>
