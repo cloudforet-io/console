@@ -21,6 +21,7 @@ export const ALERT_STATUS_FILTER = {
 export const ALERT_URGENCY_FILTER = {
     HIGH: 'High',
     LOW: 'Low',
+    ERROR: 'ERROR',
 } as const;
 
 export const WEBHOOK_DETAIL_TABS = {
