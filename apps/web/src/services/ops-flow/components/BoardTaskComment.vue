@@ -7,9 +7,13 @@ import {
 import type { CollapsibleItem } from '@cloudforet/mirinae/types/data-display/collapsible/collapsible-list/type';
 
 import type { CommentModel } from '@/schema/opsflow/comment/model';
+import { store } from '@/store';
+
+import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
+import ActionMenuButton from '@/common/components/buttons/ActionMenuButton.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useCommentStore } from '@/services/ops-flow/stores/comment-store';
@@ -21,7 +25,13 @@ const props = defineProps<{
 
 const taskDetailPageStore = useTaskDetailPageStore();
 const commentStore = useCommentStore();
-
+const userReferenceStore = useUserReferenceStore();
+const userId = computed(() => store.state.user.userId);
+const getAuthor = (item: CommentModel) => {
+    const u = item.created_by;
+    return userReferenceStore.getters.userItems[u]?.label ?? u ?? 'Unknown';
+};
+const getWritePermission = (item: CommentModel) => item.created_by === userId.value;
 const comments = computed<CommentModel[]>(() => commentStore.state.itemsByTaskId[props.taskId] ?? []);
 const commentItems = computed<CollapsibleItem<CommentModel>[]>(() => comments.value.map((comment) => ({
     title: comment.created_at,
@@ -87,9 +97,16 @@ onBeforeMount(async () => {
                             :line-clamp="2"
         >
             <template #no-styled-title="{data}">
-                <div class="flex gap-1">
-                    <span class="text-paragraph-md font-bold text-blue-900">Author</span>
-                    <span class="text-paragraph-sm text-gray-400">{{ data.created_at }}</span>
+                <div class="flex w-full gap-1 items-center">
+                    <span class="text-paragraph-md font-bold text-blue-900">{{ getAuthor(data) }}</span>
+                    <span class="flex-grow text-paragraph-sm text-gray-400">{{ data.created_at }}</span>
+                    <action-menu-button v-if="getWritePermission(data)"
+                                        style-type="tertiary"
+                                        size="sm"
+                                        class="flex-shrink-0"
+                                        :menu="['delete']"
+                                        @delete="taskDetailPageStore.openCommentDeleteModal(data)"
+                    />
                 </div>
             </template>
             <template #default="{data}">

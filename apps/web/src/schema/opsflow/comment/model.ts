@@ -4,6 +4,7 @@ export interface CommentModel {
     comment_id: string;
     comment: string;
     comment_type: CommentType;
+    created_by: string;
     is_edited: boolean;
     mentions: MentionTargets;
     task_id: string;

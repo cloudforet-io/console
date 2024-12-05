@@ -40,6 +40,7 @@ import { useGoBack } from '@/common/composables/go-back';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import BoardTaskComment from '@/services/ops-flow/components/BoardTaskComment.vue';
+import CommentDeleteModal from '@/services/ops-flow/components/CommentDeleteModal.vue';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
 import { useTaskDetailPageStore } from '@/services/ops-flow/stores/task-detail-page-store';
@@ -201,6 +202,7 @@ defineExpose({ setPathFrom });
                             @confirm="confirmRouteLeave"
                             @cancel="stopRouteLeave"
         />
+        <comment-delete-modal :visible="taskDetailPageStore.state.visibleCommentDeleteModal" />
     </div>
 </template>
 

@@ -7,6 +7,7 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { CommentModel } from '@/schema/opsflow/comment/model';
 import type { EventListParameters } from '@/schema/opsflow/event/api-verbs/list';
 import type { EventModel } from '@/schema/opsflow/event/model';
 
@@ -15,10 +16,14 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 const EVENT_PAGE_SIZE = 3;
 interface UseTaskDetailPageStoreState {
     taskId?: string;
+    // events
     page: number;
     loadingEvents: boolean;
     events?: EventModel[];
     lastTotalCount?: number;
+    // comments
+    visibleCommentDeleteModal: boolean;
+    targetComment?: CommentModel;
 }
 
 interface UseTaskDetailPageStoreGetters {
@@ -29,10 +34,14 @@ interface UseTaskDetailPageStoreGetters {
 export const useTaskDetailPageStore = defineStore('task-detail-page', () => {
     const state = reactive<UseTaskDetailPageStoreState>({
         taskId: undefined,
+        // events
         page: 1,
         loadingEvents: true,
         events: undefined,
         lastTotalCount: undefined,
+        // comments
+        visibleCommentDeleteModal: false,
+        targetComment: undefined,
     });
     const getters: UseTaskDetailPageStoreGetters = {
         firstLoadingEvents: computed<boolean>(() => !state.events),
@@ -53,6 +62,7 @@ export const useTaskDetailPageStore = defineStore('task-detail-page', () => {
         setCurrentTaskId(taskId: string) {
             state.taskId = taskId;
         },
+        // events
         async loadNewEvents() {
             try {
                 if (!state.taskId) throw new Error('Task ID is not set');
@@ -114,6 +124,15 @@ export const useTaskDetailPageStore = defineStore('task-detail-page', () => {
             state.loadingEvents = true;
             state.events = undefined;
             state.lastTotalCount = undefined;
+        },
+        // comments
+        openCommentDeleteModal(comment: CommentModel) {
+            state.targetComment = comment;
+            state.visibleCommentDeleteModal = true;
+        },
+        closeCommentDeleteModal() {
+            state.visibleCommentDeleteModal = false;
+            state.targetComment = undefined;
         },
     };
     return {
