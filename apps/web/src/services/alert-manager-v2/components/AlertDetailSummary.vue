@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import {
     PPaneLayout, PSelectDropdown, PI,
 } from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import { ALERT_STATE, ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
@@ -26,7 +27,7 @@ const props = withDefaults(defineProps<Props>(), {
     manageDisabled: false,
 });
 
-const calculateTime = (time) => {
+const calculateTime = (time):string => {
     const today = dayjs().toISOString();
     const createdTime = iso8601Formatter(time, 'UTC');
     const todayTime = iso8601Formatter(today, 'UTC');
@@ -43,13 +44,13 @@ const state = reactive({
     alertState: 'TRIGGERED',
     alertUrgency: 'HIGH',
     reassignModalVisible: false,
-    duration: computed(() => calculateTime(alertPageState.alertData?.created_at)),
-    alertStateList: computed(() => ([
+    duration: computed<string>(() => calculateTime(alertPageState.alertData?.created_at)),
+    alertStateList: computed<SelectDropdownMenuItem[]>(() => ([
         { name: ALERT_STATE.TRIGGERED, label: i18n.t('ALERT_MANAGER.ALERTS.TRIGGERED') },
         { name: ALERT_STATE.ACKNOWLEDGED, label: i18n.t('ALERT_MANAGER.ALERTS.ACKNOWLEDGED') },
         { name: ALERT_STATE.RESOLVED, label: i18n.t('ALERT_MANAGER.ALERTS.RESOLVED') },
     ])),
-    alertUrgencyList: computed(() => ([
+    alertUrgencyList: computed<SelectDropdownMenuItem[]>(() => ([
         { name: ALERT_URGENCY.HIGH, label: i18n.t('ALERT_MANAGER.ALERTS.HIGH') },
         { name: ALERT_URGENCY.LOW, label: i18n.t('ALERT_MANAGER.ALERTS.LOW') },
     ])),
