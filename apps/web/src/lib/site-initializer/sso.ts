@@ -2,6 +2,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { useDomainStore } from '@/store/domain/domain-store';
 import { pinia } from '@/store/pinia';
+import { useUserStore } from '@/store/user/user-store';
 
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
 
@@ -17,6 +18,7 @@ export const checkSsoAccessToken = async (store) => {
     const params = new URLSearchParams(queryString);
     const ssoAccessToken = params.get('sso_access_token');
     const domainStore = useDomainStore(pinia);
+    const userStore = useUserStore(pinia);
 
     // only for reset-password page
     if (ssoAccessToken && currentPath === '/') {
@@ -24,7 +26,7 @@ export const checkSsoAccessToken = async (store) => {
             try {
                 const authType = domainStore.state.extendedAuthType;
                 await loadAuth(authType).signOut();
-                await store.dispatch('user/setIsSessionExpired', true);
+                userStore.setIsSessionExpired(true);
             } catch (e) {
                 ErrorHandler.handleError(e);
             }
