@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import {
+    computed, onMounted, onUnmounted, reactive, watch,
+} from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import {
     PHorizontalLayout, PTab,
@@ -7,6 +10,8 @@ import {
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
 import { i18n } from '@/translations';
+
+import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import ServiceDetailTabsNotifications from '@/services/alert-manager-v2/components/ServiceDetailTabsNotifications.vue';
 import ServiceDetailTabsNotificationsDetailTabs
@@ -17,7 +22,13 @@ import ServiceDetailTabsWebhook from '@/services/alert-manager-v2/components/Ser
 import ServiceDetailTabsWebhookDetailTabs
     from '@/services/alert-manager-v2/components/ServiceDetailTabsWebhookDetailTabs.vue';
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
+import { useServiceDetailPageStore } from '@/services/alert-manager-v2/store/service-detail-page-store';
 import type { ServiceDetailTabsType } from '@/services/alert-manager-v2/types/alert-manager-type';
+
+const serviceDetailPageStore = useServiceDetailPageStore();
+const serviceDetailPageState = serviceDetailPageStore.state;
+
+const route = useRoute();
 
 const tabState = reactive({
     tabs: computed<TabItem[]>(() => ([
@@ -29,9 +40,32 @@ const tabState = reactive({
     ])),
     activeTab: SERVICE_DETAIL_TABS.OVERVIEW as ServiceDetailTabsType,
 });
+const storeState = reactive({
+    currentTab: computed<ServiceDetailTabsType>(() => serviceDetailPageState.currentTab),
+});
 const state = reactive({
     selectedWebhook: [],
     selectedNotifications: [],
+});
+
+watch(() => tabState.activeTab, (activeTab) => {
+    serviceDetailPageStore.setCurrentTab(activeTab);
+    replaceUrlQuery('tab', activeTab);
+});
+watch(() => storeState.currentTab, (currentTab) => {
+    tabState.activeTab = currentTab;
+});
+
+onMounted(() => {
+    if (route.query.tab) {
+        serviceDetailPageStore.setCurrentTab(route.query.tab as ServiceDetailTabsType);
+    } else {
+        serviceDetailPageStore.setCurrentTab(SERVICE_DETAIL_TABS.OVERVIEW);
+    }
+});
+
+onUnmounted(() => {
+    serviceDetailPageStore.initState();
 });
 </script>
 

@@ -10,15 +10,19 @@ import {
 import type { ToolboxOptions } from '@cloudforet/mirinae/src/controls/toolbox/type';
 import type { QueryTag } from '@cloudforet/mirinae/types/controls/search/query-search-tags/type';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import { red } from '@/styles/colors';
 
+import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
 import { ALERT_MANAGER_V2_ROUTE } from '@/services/alert-manager-v2/routes/route-constant';
 
 const pageSizeOptions = [15, 30, 45];
 
 const router = useRouter();
+
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const handlerState = reactive({
     keyItemSets: computed<KeyItemSet[]>(() => [{
@@ -52,12 +56,15 @@ const handleChangeToolbox = async (options: ToolboxOptions) => {
 };
 
 const handleClickServiceItem = (id: string) => {
-    router.push({
+    router.push(getProperRouteLocation({
         name: ALERT_MANAGER_V2_ROUTE.SERVICE.DETAIL._NAME,
         params: {
             serviceId: id,
         },
-    });
+        query: {
+            tab: SERVICE_DETAIL_TABS.OVERVIEW,
+        },
+    }));
 };
 const handleClickEscalationPolicy = () => {
     console.log('TODO: handleClickEscalationPolicy');
