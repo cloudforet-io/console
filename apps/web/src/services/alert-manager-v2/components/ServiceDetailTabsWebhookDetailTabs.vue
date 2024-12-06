@@ -8,10 +8,10 @@ import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tab
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
 import type { PluginModel } from '@/schema/repository/plugin/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { webhookStateFormatter } from '@/services/alert-manager-v2/composables/refined-table-data';
 import { WEBHOOK_DETAIL_TABS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
@@ -28,9 +28,10 @@ const props = withDefaults(defineProps<Props>(), {
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
+const userStore = useUserStore();
 
 const storeState = reactive({
-    language: computed(() => store.state.user.language),
+    language: computed(() => userStore.state.language),
     plugins: computed<PluginModel[]>(() => Object.values(allReferenceGetters.plugin)),
 });
 const tabState = reactive({

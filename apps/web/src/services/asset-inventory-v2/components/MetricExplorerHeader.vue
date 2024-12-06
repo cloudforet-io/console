@@ -20,11 +20,11 @@ import type { MetricExampleModel } from '@/schema/inventory/metric-example/model
 import type { MetricCreateParameters } from '@/schema/inventory/metric/api-verbs/create';
 import type { MetricDeleteParameters } from '@/schema/inventory/metric/api-verbs/delete';
 import type { MetricModel } from '@/schema/inventory/metric/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -57,12 +57,13 @@ const appContextStore = useAppContextStore();
 
 const router = useRouter();
 const route = useRoute();
+const userStore = useUserStore();
 
 const storeState = reactive({
     namespaces: computed(() => allReferenceStore.getters.namespace),
     currentMetric: computed(() => metricExplorerPageState.metric),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     selectedMenuId: computed(() => {

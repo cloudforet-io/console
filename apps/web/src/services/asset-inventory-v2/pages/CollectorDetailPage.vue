@@ -39,10 +39,11 @@ import { SpaceRouter } from '@/router';
 import type { CollectorDeleteParameters } from '@/schema/inventory/collector/api-verbs/delete';
 import type { CollectorGetParameters } from '@/schema/inventory/collector/api-verbs/get';
 import type { CollectorModel } from '@/schema/inventory/collector/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -87,6 +88,7 @@ const collectorJobStore = useCollectorJobStore();
 const collectorJobState = collectorJobStore.$state;
 const collectorDataModalStore = useCollectorDataModalStore();
 const collectorDetailPageStore = useCollectorDetailPageStore();
+const userStore = useUserStore();
 
 const route = useRoute();
 
@@ -101,7 +103,7 @@ watch(() => collectorFormState.originCollector, async (collector) => {
 const queryHelper = new QueryHelper();
 
 const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     selectedMenuId: computed(() => {
@@ -115,7 +117,7 @@ const state = reactive({
     }),
     hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
     isNotiVisible: computed(() => !collectorDetailPageStore.getters.isEditableCollector),
-    isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
+    isDomainAdmin: computed(() => userStore.getters.isDomainAdmin),
     loading: true,
     collector: computed<CollectorModel|null>(() => collectorFormState.originCollector),
     collectorName: computed<string>(() => state.collector?.name ?? ''),

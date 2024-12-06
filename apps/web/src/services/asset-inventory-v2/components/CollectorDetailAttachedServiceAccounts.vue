@@ -17,13 +17,13 @@ import { iso8601Formatter } from '@cloudforet/utils';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { SecretListParameters } from '@/schema/secret/secret/api-verbs/list';
 import type { SecretModel } from '@/schema/secret/secret/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -49,8 +49,8 @@ const { getProperRouteLocation } = useProperRouteLocation();
 const allReferenceStore = useAllReferenceStore();
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
-
 const collectorDataModalStore = useCollectorDataModalStore();
+const userStore = useUserStore();
 
 const fields: DefinitionField[] = [
     { name: 'service_account_id', label: 'Account Name' },
@@ -72,7 +72,7 @@ const attachedServiceAccountList = computed(() => [
 ]);
 
 const state = reactive({
-    timezone: computed(() => store.state.user.timezone),
+    timezone: computed<string|undefined>(() => userStore.state.timezone),
     loading: true,
     secrets: null as null|SecretModel[],
     // query states

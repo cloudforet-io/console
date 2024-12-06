@@ -7,10 +7,13 @@ import {
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { NoteModel } from '@/schema/monitoring/note/model';
-import { store } from '@/store';
+
+import { useUserStore } from '@/store/user/user-store';
+
+const userStore = useUserStore();
 
 const storeState = reactive({
-    timezone: computed<string>(() => store.state.user.timezone),
+    timezone: computed<string>(() => userStore.state.timezone ?? 'UTC'),
 });
 const state = reactive({
     noteInput: '',
