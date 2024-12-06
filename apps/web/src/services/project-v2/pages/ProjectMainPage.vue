@@ -10,12 +10,12 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { MENU_ID } from '@/lib/menu/config';
 
@@ -43,9 +43,10 @@ const projectPageState = projectPageStore.state;
 const menuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement | null>(null);
 const route = useRoute();
+const userStore = useUserStore();
 
 const storeState = reactive({
-    userId: computed(() => store.state.user.userId),
+    userId: computed(() => userStore.state.userId),
     groupName: computed(() => storeState.projectGroups[state.currentProjectGroupId]?.name),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),

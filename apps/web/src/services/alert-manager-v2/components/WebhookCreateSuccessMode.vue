@@ -11,8 +11,9 @@ import {
 
 import type { WebhookModel } from '@/schema/monitoring/webhook/model';
 import type { PluginModel } from '@/schema/repository/plugin/model';
-import { store } from '@/store';
 import { i18n as _i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { copyAnyData } from '@/lib/helper/copy-helper';
@@ -30,9 +31,10 @@ const props = withDefaults(defineProps<Props>(), {
 
 const serviceFormStore = useServiceCreateFormStore();
 const serviceFormState = serviceFormStore.state;
+const userStore = useUserStore();
 
 const storeState = reactive({
-    language: computed(() => store.state.user.language),
+    language: computed(() => userStore.state.language),
     selectedWebhookType: computed<PluginModel>(() => serviceFormState.selectedWebhookType),
 });
 

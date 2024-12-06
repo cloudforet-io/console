@@ -11,10 +11,10 @@ import {
 
 import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
 import type { ProjectModel } from '@/schema/identity/project/model';
-import { store } from '@/store';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
@@ -34,6 +34,7 @@ interface UserItem {
 }
 
 const allReferenceStore = useAllReferenceStore();
+const userStore = useUserStore();
 const storeState = reactive({
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
 });
@@ -51,7 +52,7 @@ const state = reactive({
         return users.filter((d) => {
             const searchText = state.searchText.toLowerCase();
             return d.user_id.toLowerCase().includes(searchText)
-                        || d.user_name.toLowerCase().includes(searchText);
+                || d.user_name.toLowerCase().includes(searchText);
         });
     }),
     loading: true,
@@ -59,7 +60,7 @@ const state = reactive({
     searchText: '',
     pageLimit: 15,
     pageStart: 1,
-    timezone: computed(() => store.state.user.timezone ?? 'UTC'),
+    timezone: computed(() => userStore.state.timezone ?? 'UTC'),
 });
 
 const getProjectUserData = async () => {

@@ -7,14 +7,18 @@ import {
 import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
+
 
 import AlertDetailInfoTableDescription from '@/services/alert-manager-v2/components/AlertDetailInfoTableDescription.vue';
 import { ALERT_SEVERITY_COLORS, ALERT_SEVERITY_LABELS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
 
+const userStore = useUserStore();
+
 const storeState = reactive({
-    timezone: computed<string>(() => store.state.user.timezone),
+    timezone: computed<string>(() => userStore.state.timezone ?? 'UTC'),
 });
 const tableState = reactive({
     fields: computed<DefinitionField[]>(() => [

@@ -7,7 +7,8 @@ import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { CollectorModel } from '@/schema/inventory/collector/model';
 import type { JobModel } from '@/schema/inventory/job/model';
-import { store } from '@/store';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import RecentCollectorJobList from '@/services/asset-inventory/components/RecentCollectorJobList.vue';
 
@@ -18,8 +19,9 @@ const props = defineProps<{
     historyLink?: Location
 }>();
 
+const userStore = useUserStore();
 const state = reactive({
-    timezone: computed(() => store.state.user.timezone),
+    timezone: computed(() => userStore.state.timezone),
 });
 </script>
 

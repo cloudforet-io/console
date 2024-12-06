@@ -13,22 +13,25 @@ import type { ProjectCreateParameters } from '@/schema/identity/project/api-verb
 import type { ProjectUpdateParameters } from '@/schema/identity/project/api-verbs/udpate';
 import type { ProjectUpdateProjectTypeParameters } from '@/schema/identity/project/api-verbs/update-project-type';
 import type { ProjectModel } from '@/schema/identity/project/model';
-import { store } from '@/store';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import getRandomId from '@/lib/random-id-generator';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { useProjectTree } from '@/services/project-v2/composables/use-project-tree';
+import { useProjectTree } from '@/services/project/composables/use-project-tree';
 import type {
     ProjectGroupTreeItem, ProjectGroupTreeNodeData, ProjectTreeNodeData, ProjectTreeRoot,
-} from '@/services/project-v2/types/project-tree-type';
+} from '@/services/project/types/project-tree-type';
 
 
 const projectTreeHelper = useProjectTree();
 export const useProjectPageStore = defineStore('page-project', () => {
+    const userStore = useUserStore();
+
     const _state = reactive({
-        currentRoleType: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType),
+        currentRoleType: computed(() => userStore.state.currentRoleInfo?.roleType),
     });
     const state = reactive({
         projectTreeKey: getRandomId(),
