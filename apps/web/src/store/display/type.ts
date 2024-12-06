@@ -1,3 +1,4 @@
+import type { ComputedRef } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import type { Location } from 'vue-router';
 
@@ -33,9 +34,9 @@ export interface DisplayStoreState {
 }
 
 export interface DisplayStoreGetters {
-    hasUncheckedNotifications: boolean;
-    isHandbookVisible: boolean;
-    sidebarProps: Partial<SidebarProps>;
+    hasUncheckedNotifications: ComputedRef<boolean>;
+    isHandbookVisible: ComputedRef<boolean>;
+    sidebarProps: ComputedRef<Partial<SidebarProps>>;
 }
 
 export interface SidebarProps {
