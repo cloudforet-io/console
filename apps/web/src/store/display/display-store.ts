@@ -103,7 +103,7 @@ export const useDisplayStore = defineStore('display-store', () => {
         gnbNotificationLastReadTime: '',
     });
 
-    const getters: DisplayStoreGetters = {
+    const getters = reactive<DisplayStoreGetters>({
         hasUncheckedNotifications: computed<boolean>(() => !!(state.uncheckedNotificationCount && state.uncheckedNotificationCount > 0)),
         isHandbookVisible: computed<boolean>(() => state.visibleSidebar && (state.sidebarType === SIDEBAR_TYPE.handbook)),
         sidebarProps: computed<Partial<SidebarProps>>(() => {
@@ -134,7 +134,7 @@ export const useDisplayStore = defineStore('display-store', () => {
             }
             return { styleType: 'primary', disableButton: false, size: 'md' };
         }),
-    } as unknown as DisplayStoreGetters;
+    });
 
     /* Mutations */
     const setVisibleSidebar = (val: boolean) => { state.visibleSidebar = val; };

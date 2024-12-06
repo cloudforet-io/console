@@ -1,3 +1,5 @@
+import type { ComputedRef } from 'vue';
+
 import type { RoleType } from '@/schema/identity/role/type';
 import type { GrantScope } from '@/schema/identity/token/type';
 import type { UserMfa } from '@/schema/identity/user/model';
@@ -42,14 +44,14 @@ export interface UserStoreState {
 }
 
 export interface UserStoreGetters {
-    isDomainAdmin: boolean;
-    isSystemAdmin: boolean;
-    languageLabel: string;
-    isNoRoleUser: boolean;
-    hasAdminOrWorkspaceOwnerRole: boolean;
-    hasPermission: boolean;
-    pageAccessPermissionList: MenuId[];
-    pageAccessPermissionMap: PageAccessMap;
+    isDomainAdmin: ComputedRef<boolean>;
+    isSystemAdmin: ComputedRef<boolean>;
+    languageLabel: ComputedRef<string>;
+    isNoRoleUser: ComputedRef<boolean>;
+    hasAdminOrWorkspaceOwnerRole: ComputedRef<boolean>;
+    hasPermission: ComputedRef<boolean>;
+    pageAccessPermissionList: ComputedRef<MenuId[]>;
+    pageAccessPermissionMap: ComputedRef<PageAccessMap>;
 }
 
 export interface SignInRequest {

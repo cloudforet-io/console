@@ -137,8 +137,7 @@ export const useUserStore = defineStore('user-store', () => {
         isSignInLoading: false,
         mfa: storedUserState.mfa,
     });
-
-    const getters: UserStoreGetters = {
+    const getters = reactive<UserStoreGetters>({
         isDomainAdmin: computed<boolean>(() => state.roleType === ROLE_TYPE.DOMAIN_ADMIN),
         isSystemAdmin: computed<boolean>(() => state.roleType === ROLE_TYPE.SYSTEM_ADMIN),
         languageLabel: computed<string>(() => languages[state.language as string] || state.language),
@@ -188,7 +187,7 @@ export const useUserStore = defineStore('user-store', () => {
             });
             return result;
         }),
-    } as unknown as UserStoreGetters;
+    });
 
     /* Mutations */
     const setIsSessionExpired = (val: boolean) => { state.isSessionExpired = val; };
