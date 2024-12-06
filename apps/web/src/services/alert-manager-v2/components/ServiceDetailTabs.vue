@@ -22,7 +22,7 @@ import ServiceDetailTabsWebhook from '@/services/alert-manager-v2/components/Ser
 import ServiceDetailTabsWebhookDetailTabs
     from '@/services/alert-manager-v2/components/ServiceDetailTabsWebhookDetailTabs.vue';
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
-import { useServiceDetailPageStore } from '@/services/alert-manager-v2/store/service-detail-page-store';
+import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
 import type { ServiceDetailTabsType } from '@/services/alert-manager-v2/types/alert-manager-type';
 
 const serviceDetailPageStore = useServiceDetailPageStore();

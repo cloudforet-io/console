@@ -18,7 +18,7 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { copyAnyData } from '@/lib/helper/copy-helper';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-import { useServiceCreateFormStore } from '@/services/alert-manager-v2/store/service-create-form-store';
+import { useServiceCreateFormStore } from '@/services/alert-manager-v2/stores/service-create-form-store';
 import { userStateFormatter } from '@/services/iam/composables/refined-table-data';
 
 interface Props {

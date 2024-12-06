@@ -10,7 +10,7 @@ import ServiceCreateStep1 from '@/services/alert-manager-v2/components/ServiceCr
 import ServiceCreateStep2 from '@/services/alert-manager-v2/components/ServiceCreateStep2.vue';
 import ServiceCreateStep3 from '@/services/alert-manager-v2/components/ServiceCreateStep3.vue';
 import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
-import { useServiceCreateFormStore } from '@/services/alert-manager-v2/store/service-create-form-store';
+import { useServiceCreateFormStore } from '@/services/alert-manager-v2/stores/service-create-form-store';
 import type { createHeaderInfoByStep } from '@/services/alert-manager-v2/types/alert-manager-type';
 
 const serviceFormStore = useServiceCreateFormStore();

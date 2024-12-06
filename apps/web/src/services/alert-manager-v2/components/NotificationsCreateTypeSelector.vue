@@ -7,7 +7,7 @@ import {
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
-import { useServiceCreateFormStore } from '@/services/alert-manager-v2/store/service-create-form-store';
+import { useServiceCreateFormStore } from '@/services/alert-manager-v2/stores/service-create-form-store';
 
 const serviceFormStore = useServiceCreateFormStore();
 

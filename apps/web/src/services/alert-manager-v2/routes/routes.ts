@@ -92,7 +92,7 @@ const alertManagerRoutesV2: RouteConfig = {
                     component: AlertsMainPage as any,
                 },
                 {
-                    path: ':alertsId',
+                    path: ':alertId',
                     name: ALERT_MANAGER_ROUTE_V2.ALERTS.DETAIL._NAME,
                     props: true,
                     component: AlertsDetailPage as any,

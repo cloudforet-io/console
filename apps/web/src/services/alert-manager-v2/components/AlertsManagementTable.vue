@@ -18,11 +18,11 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 
 import { red } from '@/styles/colors';
 
+import { useAlertStateI18n } from '@/services/alert-manager-v2/composables/alert-state-i18n';
+import { useAlertUrgencyI18n } from '@/services/alert-manager-v2/composables/alert-urgency-i18n';
 import { ALERT_URGENCY_FILTER } from '@/services/alert-manager-v2/constants/alert-manager-constant';
+import { alertStateBadgeStyleTypeFormatter } from '@/services/alert-manager-v2/helpers/alert-badge-helper';
 import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
-import { useAlertStateI18n } from '@/services/alert-manager/composables/alert-state-i18n';
-import { useAlertUrgencyI18n } from '@/services/alert-manager/composables/alert-urgency-i18n';
-import { alertStateBadgeStyleTypeFormatter } from '@/services/alert-manager/helpers/alert-badge-helper';
 
 const { getProperRouteLocation } = useProperRouteLocation();
 
@@ -64,6 +64,7 @@ const state = reactive({
     loading: false,
     items: [{
         alert_number: 1,
+        alert_id: 'temp alert id',
         title: 'temp alert',
         state: 'ENABLED',
         service_id: 'temp id',
@@ -130,7 +131,7 @@ const handleExportToExcel = () => {
                     <p-link highlight
                             :to="{
                                 name: ALERT_MANAGER_ROUTE_V2.ALERTS.DETAIL._NAME,
-                                params: { id: item.alert_id }
+                                params: { alertId: item.alert_id }
                             }"
                     >
                         <span class="title-link">{{ value }}</span>
