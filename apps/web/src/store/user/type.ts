@@ -3,6 +3,9 @@ import type { GrantScope } from '@/schema/identity/token/type';
 import type { UserMfa } from '@/schema/identity/user/model';
 import type { AuthType, UserType } from '@/schema/identity/user/type';
 
+import type { PageAccessMap } from '@/lib/access-control/config';
+import type { MenuId } from '@/lib/menu/config';
+
 
 
 export type LanguageCode = 'ko' | 'en' | string;
@@ -20,7 +23,7 @@ export interface GrantInfo {
     pageAccess?: string[];
 }
 
-export interface UserState {
+export interface UserStoreState {
     isSessionExpired?: boolean;
     userId?: string;
     userType?: UserType;
@@ -36,6 +39,17 @@ export interface UserState {
     emailVerified?: boolean;
     isSignInLoading?: boolean;
     mfa?: UserMfa
+}
+
+export interface UserStoreGetters {
+    isDomainAdmin: boolean;
+    isSystemAdmin: boolean;
+    languageLabel: string;
+    isNoRoleUser: boolean;
+    hasAdminOrWorkspaceOwnerRole: boolean;
+    hasPermission: boolean;
+    pageAccessPermissionList: MenuId[];
+    pageAccessPermissionMap: PageAccessMap;
 }
 
 export interface SignInRequest {

@@ -32,8 +32,9 @@ import { languages, MANAGED_ROLES, USER_STORAGE_KEY } from '@/store/user/constan
 import type {
     RoleInfo,
     SignInRequest,
-    UserState,
     JWTPayload,
+    UserStoreGetters,
+    UserStoreState,
 } from '@/store/user/type';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
@@ -48,7 +49,7 @@ import { setCurrentAccessedWorkspaceId } from '@/lib/site-initializer/last-acces
 
 
 
-const getUserInfo = async (): Promise<Partial<UserState>> => {
+const getUserInfo = async (): Promise<Partial<UserStoreState>> => {
     const response = await SpaceConnector.clientV2.identity.userProfile.get<
     undefined,
     UserModel
@@ -113,14 +114,14 @@ const getRoleTypeFromToken = (token: string): RoleType => {
 };
 
 export const useUserStore = defineStore('user-store', () => {
-    let storedUserState: Partial<UserState> = {};
+    let storedUserState: Partial<UserStoreState> = {};
     try {
         storedUserState = LocalStorageAccessor.getItem(USER_STORAGE_KEY) ?? {};
     } catch (e) {
         LocalStorageAccessor.removeItem(USER_STORAGE_KEY);
     }
 
-    const state = reactive<UserState>({
+    const state = reactive<UserStoreState>({
         isSessionExpired: undefined,
         userId: storedUserState.userId,
         userType: storedUserState.userType,
@@ -138,7 +139,7 @@ export const useUserStore = defineStore('user-store', () => {
         mfa: storedUserState.mfa,
     });
 
-    const getters = reactive({
+    const getters: UserStoreGetters = {
         isDomainAdmin: computed<boolean>(() => state.roleType === ROLE_TYPE.DOMAIN_ADMIN),
         isSystemAdmin: computed<boolean>(() => state.roleType === ROLE_TYPE.SYSTEM_ADMIN),
         languageLabel: computed<string>(() => languages[state.language as string] || state.language),
@@ -163,7 +164,7 @@ export const useUserStore = defineStore('user-store', () => {
 
             return result;
         }),
-        pageAccessPermissionMap: computed(() => {
+        pageAccessPermissionMap: computed<PageAccessMap>(() => {
             const result: PageAccessMap = {};
 
             const roleType = state.currentRoleInfo?.roleType ?? 'USER';
@@ -173,7 +174,7 @@ export const useUserStore = defineStore('user-store', () => {
 
             const isAllReadOnly = checkAllMenuReadonly(roleBasePagePermissions);
 
-            getters.pageAccessPermissionList.forEach((menuId) => {
+            getters.pageAccessPermissionList?.forEach((menuId) => {
                 if (!result[menuId]) {
                     if (roleType === ROLE_TYPE.DOMAIN_ADMIN) {
                         result[menuId] = {
@@ -188,7 +189,7 @@ export const useUserStore = defineStore('user-store', () => {
             });
             return result;
         }),
-    });
+    } as unknown as UserStoreGetters;
 
     /* Mutations */
     const setIsSessionExpired = (val: boolean) => { state.isSessionExpired = val; };
@@ -215,7 +216,7 @@ export const useUserStore = defineStore('user-store', () => {
     };
 
     /* Actions */
-    const setUserInfo = async (userInfo: UserState) => {
+    const setUserInfo = async (userInfo: UserStoreState) => {
         state.userId = userInfo.userId;
         state.authType = userInfo.authType;
         state.roleType = userInfo.roleType;

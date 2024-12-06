@@ -21,7 +21,7 @@ export interface DisplayMenu extends Menu {
     href?: string;
 }
 
-export interface DisplayState {
+export interface DisplayStoreState {
     visibleSidebar: boolean;
     sidebarType: SidebarType;
     isInitialized: boolean;
@@ -30,6 +30,12 @@ export interface DisplayState {
     isSignInFailed: boolean;
     visibleMobileGuideModal: boolean;
     gnbNotificationLastReadTime: string;
+}
+
+export interface DisplayStoreGetters {
+    hasUncheckedNotifications: boolean;
+    isHandbookVisible: boolean;
+    sidebarProps: Partial<SidebarProps>;
 }
 
 export interface SidebarProps {

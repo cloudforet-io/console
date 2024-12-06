@@ -25,7 +25,8 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { SIDEBAR_TYPE } from '@/store/display/constant';
 import type {
-    DisplayMenu, DisplayState, SidebarProps, SidebarType,
+    DisplayMenu, DisplayStoreState, SidebarProps, SidebarType,
+    DisplayStoreGetters,
 } from '@/store/display/type';
 import { useUserStore } from '@/store/user/user-store';
 
@@ -91,7 +92,7 @@ const getDisplayMenuList = (menuList: Menu[], isAdminMode?: boolean, currentWork
 export const useDisplayStore = defineStore('display-store', () => {
     const userStore = useUserStore();
 
-    const state = reactive<DisplayState>({
+    const state = reactive<DisplayStoreState>({
         visibleSidebar: false,
         sidebarType: SIDEBAR_TYPE.info as SidebarType,
         isInitialized: false,
@@ -102,7 +103,7 @@ export const useDisplayStore = defineStore('display-store', () => {
         gnbNotificationLastReadTime: '',
     });
 
-    const getters = reactive({
+    const getters: DisplayStoreGetters = {
         hasUncheckedNotifications: computed<boolean>(() => !!(state.uncheckedNotificationCount && state.uncheckedNotificationCount > 0)),
         isHandbookVisible: computed<boolean>(() => state.visibleSidebar && (state.sidebarType === SIDEBAR_TYPE.handbook)),
         sidebarProps: computed<Partial<SidebarProps>>(() => {
@@ -133,7 +134,7 @@ export const useDisplayStore = defineStore('display-store', () => {
             }
             return { styleType: 'primary', disableButton: false, size: 'md' };
         }),
-    });
+    } as unknown as DisplayStoreGetters;
 
     /* Mutations */
     const setVisibleSidebar = (val: boolean) => { state.visibleSidebar = val; };
