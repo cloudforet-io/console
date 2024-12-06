@@ -4,5 +4,5 @@ export interface DataFieldOptions {
 }
 
 export interface DataFieldValue {
-    data: string|string[];
+    data?: string|string[];
 }

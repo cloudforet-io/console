@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, watch,
+    computed, reactive,
 } from 'vue';
 
 import { cloneDeep } from 'lodash';
@@ -8,16 +8,14 @@ import { cloneDeep } from 'lodash';
 import {
     PButton, PFieldGroup, PIconButton, PTextInput, PSelectDropdown,
 } from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
-import { useGranularityMenuItem } from '@/common/modules/widgets/_composables/use-granularity-menu-items';
 import {
     _FORMAT_RULE_TYPE,
 } from '@/common/modules/widgets/_constants/widget-field-constant';
-import {
-    getDefaultMenuItemIndex,
-    getInitialSelectedMenuItem,
-} from '@/common/modules/widgets/_helpers/widget-field-helper';
+import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
+import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import { widgetValidatorRegistry } from '@/common/modules/widgets/_widget-field-value-manager/constant/validator-registry';
 import type {
     _FormatRulesValue, _FormatRulesOptions, ThresholdValue, _FormatRulesType,
@@ -31,7 +29,8 @@ import type {
 const FIELD_KEY = 'formatRules';
 
 const props = defineProps<_WidgetFieldComponentProps<_FormatRulesOptions>>();
-const { labelsMenuItem } = useGranularityMenuItem(props, FIELD_KEY);
+const widgetGenerateStore = useWidgetGenerateStore();
+const widgetGenerateGetters = widgetGenerateStore.getters;
 
 const validator = widgetValidatorRegistry[FIELD_KEY];
 
@@ -45,6 +44,15 @@ const state = reactive({
             return state.fieldValue.field;
         }
         return undefined;
+    }),
+    menuItems: computed<MenuItem[]>(() => {
+        const dataTarget = props.widgetFieldSchema?.options?.dataTarget;
+        if (!widgetGenerateGetters.selectedDataTable || !dataTarget) return [];
+        const dataInfoList = sortWidgetTableFields(Object.keys(widgetGenerateGetters.selectedDataTable?.[dataTarget] ?? {})) ?? [];
+        return dataInfoList.map((d) => ({
+            name: d,
+            label: d,
+        }));
     }),
 });
 
@@ -70,16 +78,6 @@ const handleUpdateField = (val: string) => {
     props.fieldManager.setFieldValue(FIELD_KEY, { ...state.fieldValue, field: val });
 };
 
-/* Watcher */
-// initial field value by labels info
-watch(() => labelsMenuItem.value, (menuItem) => {
-    if (menuItem?.length && props.widgetFieldSchema.options?.useField && !state.fieldValue.field) {
-        const _defaultIndex = getDefaultMenuItemIndex(menuItem, state.fieldValue.field, true);
-        const _selectedValue = getInitialSelectedMenuItem(menuItem, state.fieldValue.field, _defaultIndex);
-        props.fieldManager.setFieldValue(FIELD_KEY, { ...state.fieldValue, field: _selectedValue });
-    }
-}, { immediate: true });
-
 </script>
 
 <template>
@@ -98,7 +96,7 @@ watch(() => labelsMenuItem.value, (menuItem) => {
                            required
                            class="pb-1"
             >
-                <p-select-dropdown :menu="labelsMenuItem"
+                <p-select-dropdown :menu="state.menuItems"
                                    :selected="state.selectedField"
                                    use-fixed-menu-style
                                    :invalid="state.selectedField === undefined"
