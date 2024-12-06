@@ -9,13 +9,6 @@ export const ASSET_INVENTORY_ROUTE_V2 = {
         NO_RESOURCE: { _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.CLOUD_SERVICE}.no_resource` },
         DETAIL: { _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.CLOUD_SERVICE}.detail` },
     },
-    SERVER: {
-        _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.SERVER}`,
-    },
-    SECURITY: {
-        _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.SECURITY}`,
-        DETAIL: { _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.SECURITY}.detail` },
-    },
     COLLECTOR: {
         _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.COLLECTOR}`,
         CREATE: {

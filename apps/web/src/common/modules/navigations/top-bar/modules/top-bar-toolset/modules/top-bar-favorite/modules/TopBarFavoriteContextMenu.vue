@@ -20,7 +20,6 @@ import { i18n } from '@/translations';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
@@ -29,7 +28,6 @@ import type { ProjectReferenceMap } from '@/store/reference/project-reference-st
 import { isUserAccessibleToMenu } from '@/lib/access-control';
 import type { PageAccessMap } from '@/lib/access-control/config';
 import {
-    convertCloudServiceConfigToReferenceData,
     convertCostAnalysisConfigToReferenceData,
     convertDashboardConfigToReferenceData,
     convertMenuConfigToReferenceData, convertMetricConfigToReferenceData, convertMetricExampleConfigToReferenceData,
@@ -83,7 +81,6 @@ const router = useRouter();
 const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
-    cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
     metricExamples: computed<MetricExampleModel[]>(() => gnbStoreGetters.metricExamples),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
@@ -96,7 +93,6 @@ const state = reactive({
     showAll: false,
     showAllType: undefined as undefined|FavoriteType,
     accessProject: computed<boolean>(() => !isEmpty(storeState.pageAccessPermissionMap[MENU_ID.PROJECT])),
-    accessCloudService: computed<boolean>(() => !isEmpty(storeState.pageAccessPermissionMap[MENU_ID.CLOUD_SERVICE])),
     items: computed<FavoriteMenuItem[]>(() => {
         const results: FavoriteMenuItem[] = [];
         if (state.favoriteMenuItems.length) {
@@ -119,26 +115,12 @@ const state = reactive({
             });
             results.push(...state.favoriteProjects.slice(0, FAVORITE_LIMIT));
         }
-        if (state.favoriteCloudServiceItems.length) {
-            if (results.length !== 0) results.push({ type: 'divider' });
-            results.push({
-                name: 'title', label: i18n.t('MENU.ASSET_INVENTORY_CLOUD_SERVICE'), type: 'header', itemType: FAVORITE_TYPE.CLOUD_SERVICE,
-            });
-            results.push(...state.favoriteCloudServiceItems.slice(0, FAVORITE_LIMIT));
-        }
         if (state.favoriteMetricItems.length) {
             if (results.length !== 0) results.push({ type: 'divider' });
             results.push({
                 name: 'title', label: i18n.t('MENU.ASSET_INVENTORY_METRIC_EXPLORER'), type: 'header', itemType: FAVORITE_TYPE.METRIC,
             });
             results.push(...state.favoriteMetricItems.slice(0, FAVORITE_LIMIT));
-        }
-        if (state.favoriteSecurityItems.length) {
-            if (results.length !== 0) results.push({ type: 'divider' });
-            results.push({
-                name: 'title', label: i18n.t('MENU.ASSET_INVENTORY_SECURITY'), type: 'header', itemType: FAVORITE_TYPE.SECURITY,
-            });
-            results.push(...state.favoriteSecurityItems.slice(0, FAVORITE_LIMIT));
         }
         if (state.favoriteCostAnalysisItems.length) {
             if (results.length !== 0) results.push({ type: 'divider' });
@@ -164,17 +146,9 @@ const state = reactive({
             items = state.favoriteProjects;
             label = i18n.t('COMMON.GNB.FAVORITES.ALL_PROJECTS');
         }
-        if (state.showAllType === FAVORITE_TYPE.CLOUD_SERVICE) {
-            items = state.favoriteCloudServiceItems;
-            label = i18n.t('COMMON.GNB.FAVORITES.ALL_CLOUD_SERVICES');
-        }
         if (state.showAllType === FAVORITE_TYPE.COST_ANALYSIS) {
             items = state.favoriteCostAnalysisItems;
             label = i18n.t('COMMON.GNB.FAVORITES.ALL_COST_ANALYSIS');
-        }
-        if (state.showAllType === FAVORITE_TYPE.SECURITY) {
-            items = state.favoriteSecurityItems;
-            label = i18n.t('COMMON.GNB.FAVORITES.ALL_SECURITY');
         }
         return [
             {
@@ -206,13 +180,6 @@ const state = reactive({
             [...dashboardState.publicDashboardItems, ...dashboardState.privateDashboardItems],
         );
     }),
-    favoriteCloudServiceItems: computed<FavoriteItem[]>(() => {
-        const isUserAccessible = isUserAccessibleToMenu(MENU_ID.CLOUD_SERVICE, store.getters['user/pageAccessPermissionList']);
-        return isUserAccessible ? convertCloudServiceConfigToReferenceData(
-            favoriteGetters.cloudServiceItems ?? [],
-            storeState.cloudServiceTypes,
-        ) : [];
-    }),
     favoriteMetricItems: computed<FavoriteItem[]>(() => {
         const isUserAccessible = isUserAccessibleToMenu(MENU_ID.METRIC_EXPLORER, store.getters['user/pageAccessPermissionList']);
         if (!isUserAccessible) return [];
@@ -230,13 +197,6 @@ const state = reactive({
         const favoriteProjectGroupItems = convertProjectGroupConfigToReferenceData(favoriteGetters.projectGroupItems ?? [], storeState.projectGroups);
         return [...favoriteProjectGroupItems, ...favoriteProjectItems];
     }),
-    favoriteSecurityItems: computed<FavoriteItem[]>(() => {
-        const isUserAccessible = isUserAccessibleToMenu(MENU_ID.SECURITY, store.getters['user/pageAccessPermissionList']);
-        return isUserAccessible ? convertCloudServiceConfigToReferenceData(
-            favoriteGetters.securityItems ?? [],
-            storeState.cloudServiceTypes,
-        ) : [];
-    }),
 });
 
 /* Util */
@@ -244,10 +204,8 @@ const getItemLength = (type: FavoriteType): number => {
     if (type === FAVORITE_TYPE.MENU) return state.favoriteMenuItems.length;
     if (type === FAVORITE_TYPE.DASHBOARD) return state.favoriteDashboardItems.length;
     if (type === FAVORITE_TYPE.PROJECT) return state.favoriteProjects.length;
-    if (type === FAVORITE_TYPE.CLOUD_SERVICE) return state.favoriteCloudServiceItems.length;
     if (type === FAVORITE_TYPE.METRIC) return state.favoriteMetricItems.length;
     if (type === FAVORITE_TYPE.COST_ANALYSIS) return state.favoriteCostAnalysisItems.length;
-    if (type === FAVORITE_TYPE.SECURITY) return state.favoriteSecurityItems.length;
     return 0;
 };
 
@@ -257,10 +215,6 @@ const handleClickMenuButton = (type: FavoriteType) => {
     if (type === FAVORITE_TYPE.PROJECT) {
         router.replace({
             name: PROJECT_ROUTE._NAME,
-        });
-    } else if (type === FAVORITE_TYPE.CLOUD_SERVICE) {
-        router.replace({
-            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
         });
     }
     emit('close');
@@ -291,16 +245,6 @@ const handleSelect = (item: FavoriteMenuItem) => {
         router.push(referenceRouter(itemName, { resource_type: 'identity.Project' })).catch(() => {});
     } else if (item.itemType === FAVORITE_TYPE.PROJECT_GROUP) {
         router.push(referenceRouter(itemName, { resource_type: 'identity.ProjectGroup' })).catch(() => {});
-    } else if (item.itemType === FAVORITE_TYPE.CLOUD_SERVICE) {
-        const itemInfo: string[] = itemName.split('.');
-        router.push({
-            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-            params: {
-                provider: itemInfo[0],
-                group: itemInfo[1],
-                name: itemInfo[2],
-            },
-        }).catch(() => {});
     } else if (item.itemType === FAVORITE_TYPE.METRIC) {
         router.push({
             name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
@@ -326,16 +270,6 @@ const handleSelect = (item: FavoriteMenuItem) => {
             params: {
                 dataSourceId,
                 costQuerySetId: parsedKeys ? parsedKeys[1] : itemName,
-            },
-        }).catch(() => {});
-    } else if (item.itemType === FAVORITE_TYPE.SECURITY) {
-        const itemInfo: string[] = itemName.split('.');
-        router.push({
-            name: ASSET_INVENTORY_ROUTE.SECURITY.DETAIL._NAME,
-            params: {
-                provider: itemInfo[0],
-                group: itemInfo[1],
-                name: itemInfo[2],
             },
         }).catch(() => {});
     }
@@ -423,13 +357,6 @@ callApiWithGrantGuard();
                                   @click="handleClickMenuButton(FAVORITE_TYPE.PROJECT)"
                         >
                             {{ $t('COMMON.GNB.FAVORITES.GO_TO_PROJECT') }}
-                        </p-button>
-                        <p-button v-if="state.accessCloudService"
-                                  style-type="tertiary"
-                                  size="md"
-                                  @click="handleClickMenuButton(FAVORITE_TYPE.CLOUD_SERVICE)"
-                        >
-                            {{ $t('COMMON.GNB.FAVORITES.GO_TO_CLOUD_SERVICE') }}
                         </p-button>
                     </template>
                     {{ $t('COMMON.GNB.FAVORITES.FAVORITES_HELP_TEXT') }}
