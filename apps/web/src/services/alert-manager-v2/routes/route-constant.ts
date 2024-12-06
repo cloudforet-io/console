@@ -1,22 +1,22 @@
 import { MENU_ID } from '@/lib/menu/config';
 
-export const ALERT_MANAGER_V2_ROUTE = Object.freeze({
-    _NAME: MENU_ID.ALERT_MANAGER_V2,
+export const ALERT_MANAGER_ROUTE_V2 = Object.freeze({
+    _NAME: MENU_ID.ALERT_MANAGER,
     SERVICE: {
-        _NAME: `${MENU_ID.ALERT_MANAGER_V2}.${MENU_ID.SERVICE}`,
-        CREATE: { _NAME: `${MENU_ID.ALERT_MANAGER_V2}.${MENU_ID.SERVICE}.create` },
+        _NAME: `${MENU_ID.ALERT_MANAGER}.${MENU_ID.SERVICE}`,
+        CREATE: { _NAME: `${MENU_ID.ALERT_MANAGER}.${MENU_ID.SERVICE}.create` },
         DETAIL: {
-            _NAME: `${MENU_ID.ALERT_MANAGER_V2}.${MENU_ID.SERVICE}.detail`,
+            _NAME: `${MENU_ID.ALERT_MANAGER}.${MENU_ID.SERVICE}.detail`,
             WEBHOOK: {
-                CREATE: { _NAME: `${MENU_ID.ALERT_MANAGER_V2}.${MENU_ID.SERVICE}.detail.webhook.create` },
+                CREATE: { _NAME: `${MENU_ID.ALERT_MANAGER}.${MENU_ID.SERVICE}.detail.webhook.create` },
             },
             NOTIFICATIONS: {
-                CREATE: { _NAME: `${MENU_ID.ALERT_MANAGER_V2}.${MENU_ID.SERVICE}.detail.notification.create` },
+                CREATE: { _NAME: `${MENU_ID.ALERT_MANAGER}.${MENU_ID.SERVICE}.detail.notification.create` },
             },
         },
     },
-    ALERT: {
-        _NAME: `${MENU_ID.ALERT_MANAGER_V2}.${MENU_ID.ALERTS}`,
-        DETAIL: { _NAME: `${MENU_ID.ALERT_MANAGER_V2}.${MENU_ID.ALERTS}.detail` },
+    ALERTS: {
+        _NAME: `${MENU_ID.ALERT_MANAGER}.${MENU_ID.ALERTS}`,
+        DETAIL: { _NAME: `${MENU_ID.ALERT_MANAGER}.${MENU_ID.ALERTS}.detail` },
     },
 });

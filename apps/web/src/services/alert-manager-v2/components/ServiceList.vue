@@ -16,7 +16,7 @@ import { useQueryTags } from '@/common/composables/query-tags';
 import { red } from '@/styles/colors';
 
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
-import { ALERT_MANAGER_V2_ROUTE } from '@/services/alert-manager-v2/routes/route-constant';
+import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
 
 const pageSizeOptions = [15, 30, 45];
 
@@ -57,7 +57,7 @@ const handleChangeToolbox = async (options: ToolboxOptions) => {
 
 const handleClickServiceItem = (id: string) => {
     router.push(getProperRouteLocation({
-        name: ALERT_MANAGER_V2_ROUTE.SERVICE.DETAIL._NAME,
+        name: ALERT_MANAGER_ROUTE_V2.SERVICE.DETAIL._NAME,
         params: {
             serviceId: id,
         },
@@ -68,7 +68,7 @@ const handleClickServiceItem = (id: string) => {
 };
 const handleClickEscalationPolicy = (id: string) => {
     router.push(getProperRouteLocation({
-        name: ALERT_MANAGER_V2_ROUTE.SERVICE.DETAIL._NAME,
+        name: ALERT_MANAGER_ROUTE_V2.SERVICE.DETAIL._NAME,
         params: {
             serviceId: id,
         },
@@ -85,7 +85,7 @@ const handleClickWebhookItem = (item: string, id: string) => {
     }
 
     router.push(getProperRouteLocation({
-        name: ALERT_MANAGER_V2_ROUTE.SERVICE.DETAIL._NAME,
+        name: ALERT_MANAGER_ROUTE_V2.SERVICE.DETAIL._NAME,
         params: {
             serviceId: id,
         },

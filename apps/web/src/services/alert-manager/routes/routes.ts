@@ -44,13 +44,13 @@ const alertManagerRoutes: RouteConfig = {
             children: [
                 {
                     path: '/',
-                    name: ALERT_MANAGER_ROUTE.ALERT._NAME,
+                    name: ALERT_MANAGER_ROUTE.ALERTS._NAME,
                     meta: { menuId: MENU_ID.ALERTS },
                     component: AlertMainPage as any,
                 },
                 {
                     path: ':id?',
-                    name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME,
+                    name: ALERT_MANAGER_ROUTE.ALERTS.DETAIL._NAME,
                     meta: { label: ({ params }) => params.id, copiable: true },
                     props: true,
                     component: AlertDetailPage as any,

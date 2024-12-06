@@ -10,7 +10,7 @@ import { i18n } from '@/translations';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
-import { ALERT_MANAGER_V2_ROUTE } from '@/services/alert-manager-v2/routes/route-constant';
+import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
 import { useServiceCreateFormStore } from '@/services/alert-manager-v2/store/service-create-form-store';
 
 type actionButtonType = {
@@ -88,13 +88,13 @@ const handleNavigation = (direction: 'prev' | 'next') => {
 };
 const handlePrevNavigation = () => {
     if (storeState.currentStep === 1) {
-        router.push({ name: ALERT_MANAGER_V2_ROUTE.SERVICE._NAME });
+        router.push({ name: ALERT_MANAGER_ROUTE_V2.SERVICE._NAME });
         return;
     }
     if (storeState.currentStep === 2) {
         if (props.selectedItemId) {
             if (storeState.currentSubStep === 3) {
-                router.push({ name: ALERT_MANAGER_V2_ROUTE.SERVICE._NAME });
+                router.push({ name: ALERT_MANAGER_ROUTE_V2.SERVICE._NAME });
                 return;
             }
             serviceFormStore.setCurrentSubStep(state.previousSubStep);
@@ -131,7 +131,7 @@ const handleClickSelectButton = () => {
 };
 const handleClickSkipButton = () => {
     router.push(getProperRouteLocation({
-        name: ALERT_MANAGER_V2_ROUTE.SERVICE.DETAIL._NAME,
+        name: ALERT_MANAGER_ROUTE_V2.SERVICE.DETAIL._NAME,
         params: {
             serviceId: 'temp id',
         },
