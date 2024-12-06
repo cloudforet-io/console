@@ -10,7 +10,6 @@ import SpaceDesignSystem from '@cloudforet/mirinae';
 
 import directive from '@/directives';
 import { SpaceRouter } from '@/router';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { pinia } from '@/store/pinia';
@@ -43,13 +42,12 @@ Vue.config.productionTip = import.meta.env.DEV;
 
 /** ********** INITIALIZE ************** */
 (async () => {
-    await siteInit(store);
+    await siteInit();
 
     new Vue({
         el: '#app',
         router: SpaceRouter.router,
         i18n,
-        store,
         components: {
             App,
         },

@@ -14,12 +14,15 @@ import {
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { EventListParameters } from '@/schema/monitoring/event/api-verbs/list';
 import type { EventModel } from '@/schema/monitoring/event/model';
-import { store } from '@/store';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import { copyAnyData } from '@/lib/helper/copy-helper';
 
 import AlertDetailTabsPushedEventVerticalTimeline
     from '@/services/alert-manager/components/AlertDetailTabsPushedEventVerticalTimeline.vue';
+
+
 
 const PAGE_SIZE = 10;
 
@@ -31,9 +34,10 @@ const eventListApiQueryHelper = new ApiQueryHelper()
     .setPage(1, 10);
 let eventListApiQuery = eventListApiQueryHelper.data;
 
+const userStore = useUserStore();
 const state = reactive({
     itemList: [] as EventModel[],
-    timezone: computed(() => store.state.user.timezone),
+    timezone: computed(() => userStore.state.timezone),
     totalCount: 0,
     thisPage: 1,
     pageLimit: 10,

@@ -12,6 +12,7 @@ import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import InfoMessage from '@/common/components/guidance/InfoMessage.vue';
 
@@ -32,6 +33,7 @@ const emit = defineEmits<{(event: 'change'): void;
 }>();
 
 const allReferenceStore = useAllReferenceStore();
+const userStore = useUserStore();
 const {
     state: notificationItemState,
     cancelEdit,
@@ -50,6 +52,7 @@ const state = reactive({
     valueList: [],
     //
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
+    language: computed<string|undefined>(() => userStore.state.language),
     schema: props.channelData.schema,
     isSecretData: computed<boolean>(() => !!props.channelData.secret_id),
     isSpaceOneUserProtocol: computed<boolean>(() => state.keyListForEdit.includes('users')),
@@ -181,7 +184,7 @@ watch(() => notificationItemState.isEditMode, (mode) => {
                     <p-json-schema-form
                         :form-data.sync="notificationItemState.dataForEdit"
                         :schema="state.schema"
-                        :language="$store.state.user.language"
+                        :language="state.language"
                         class="schema-form"
                         @validate="handleSchemaValidate"
                     />

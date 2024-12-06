@@ -17,9 +17,9 @@ import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner
 import type { DomainConfigGetParameters } from '@/schema/config/domain-config/api-verbs/get';
 import type { DomainConfigSetParameters } from '@/schema/config/domain-config/api-verbs/set';
 import type { DomainConfigModel } from '@/schema/config/domain-config/model';
-import { store } from '@/store';
 
 import { DOMAIN_CONFIG_NAMES } from '@/store/domain/constant';
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import type { MenuId } from '@/lib/menu/config';
@@ -42,8 +42,9 @@ const ALL_VALUE: NotificationVariation[] = ['gte', 'lte'];
 
 const route = useRoute();
 
+const userStore = useUserStore();
 const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive<{
     statusToggle: boolean;

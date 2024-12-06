@@ -11,7 +11,8 @@ import { PHorizontalLayout } from '@cloudforet/mirinae';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { WorkspaceGroupListParameters } from '@/schema/identity/workspace-group/api-verbs/list';
 import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
-import { store } from '@/store';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 
@@ -33,6 +34,7 @@ import type { WorkspaceGroupFetchParameters } from '@/services/advanced/types/ad
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
+const userStore = useUserStore();
 
 const route = useRoute();
 
@@ -42,7 +44,7 @@ const workspaceGroupListApiQueryHelper = new ApiQueryHelper()
 const workspaceGroupListApiQuery = workspaceGroupListApiQueryHelper.data;
 
 const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     selectedMenuId: computed(() => {

@@ -9,15 +9,13 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';
 import type { ProjectModel } from '@/schema/identity/project/model';
 import type { ProjectType } from '@/schema/identity/project/type';
-// eslint-disable-next-line import/no-cycle
-import { store } from '@/store';
 
-// eslint-disable-next-line import/no-cycle
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
+import { useProjectGroupReferenceStore } from '@/store/reference/project-group-reference-store';
 import type {
     ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
+import { useUserStore } from '@/store/user/user-store';
 
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
@@ -39,18 +37,19 @@ const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
 export const useProjectReferenceStore = defineStore('reference-project', () => {
-    const allReferenceStore = useAllReferenceStore();
+    const projectGroupReferenceStore = useProjectGroupReferenceStore();
+    const userStore = useUserStore();
     const state = reactive({
         items: null as ProjectReferenceMap | null,
     });
 
     const _getters = reactive({
-        projectGroup: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
+        projectGroup: computed<ProjectGroupReferenceMap>(() => projectGroupReferenceStore.getters.projectGroupItems),
     });
 
     const getters = reactive({
         projectItems: asyncComputed<ProjectReferenceMap>(async () => {
-            if (store.getters['user/getCurrentGrantInfo'].scope === 'USER') return {};
+            if (!userStore.state.currentGrantInfo?.scope || userStore.state.currentGrantInfo?.scope === 'USER') return {};
             if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),
@@ -76,7 +75,7 @@ export const useProjectReferenceStore = defineStore('reference-project', () => {
                 only: ['project_id', 'name', 'project_group_id', 'users', 'project_type', 'workspace_id'],
             },
         };
-        await allReferenceStore.load('project_group', { force: true });
+        await projectGroupReferenceStore.load({ force: true });
         const res = await SpaceConnector.clientV2.identity.project.list<ProjectListParameters, ListResponse<ProjectModel>>(params);
 
         const projectReferenceMap: ProjectReferenceMap = {};

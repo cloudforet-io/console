@@ -25,12 +25,12 @@ import { useRouter } from 'vue-router/composables';
 import { PSpinner } from '@cloudforet/mirinae';
 
 import { SpaceRouter } from '@/router';
-import { store } from '@/store';
 
 import { ERROR_ROUTE } from '@/router/constant';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -52,9 +52,10 @@ const props = withDefaults(defineProps<Props>(), {
 const router = useRouter();
 const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
+const userStore = useUserStore();
 
 const state = reactive({
-    beforeUser: store.state.user.userId,
+    beforeUser: userStore.state.userId,
     token: '',
 });
 const onSignIn = async (userId:string) => {

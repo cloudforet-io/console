@@ -11,11 +11,11 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleBindingListParameters } from '@/schema/identity/role-binding/api-verbs/list';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import type { RoleDeleteParameters } from '@/schema/identity/role/api-verbs/delete';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -52,8 +52,9 @@ const emit = defineEmits<{(e: ':update:visible'): void,
 }>();
 
 const allReferenceStore = useAllReferenceStore();
+const userStore = useUserStore();
 const storeState = reactive({
-    timezone: computed(() => store.state.user.timezone ?? 'UTC'),
+    timezone: computed<string>(() => userStore.state.timezone ?? 'UTC'),
 });
 const state = reactive({
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),

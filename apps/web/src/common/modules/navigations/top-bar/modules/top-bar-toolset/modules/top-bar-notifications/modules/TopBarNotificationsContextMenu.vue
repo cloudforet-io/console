@@ -23,8 +23,10 @@ import type { NotificationDeleteParameters } from '@/schema/notification/notific
 import type { NotificationListParameters } from '@/schema/notification/notification/api-verbs/list';
 import type { NotificationSetReadParameters } from '@/schema/notification/notification/api-verbs/set-read';
 import type { NotificationModel } from '@/schema/notification/notification/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useDisplayStore } from '@/store/display/display-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
@@ -60,9 +62,13 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
 }>();
 const { i18nDayjs } = useI18nDayjs();
+
+const userStore = useUserStore();
+const displayStore = useDisplayStore();
+
 const state = reactive({
     loading: true,
-    timezone: computed(() => store.state.user.timezone),
+    timezone: computed(() => userStore.state.timezone),
     notificationItemsRef: null as HTMLElement|null,
     items: [] as NotificationItem[],
     proxyCount: useProxyValue('count', props, emit),
@@ -134,7 +140,7 @@ const initApiHelper = (apiHelper: ApiQueryHelper) => {
         .setFilters([
             { k: 'created_at', v: dayjs().subtract(7, 'day').format('YYYY-MM-DD HH:mm:ss'), o: '>=t' },
             { k: 'created_at', v: dayjs().format('YYYY-MM-DD HH:mm:ss'), o: '<t' },
-            { k: 'user_id', v: store.state.user.userId, o: '=' },
+            { k: 'user_id', v: userStore.state.userId, o: '=' },
         ]);
 };
 const notificationApiHelper = new ApiQueryHelper();
@@ -151,7 +157,7 @@ const listNotifications = async () => {
             state.items = state.items.concat(convertNotificationItem(response.results ?? []));
             await setReadNotifications(response.results ?? []);
             // update last read
-            await store.commit('display/setGnbNotificationLastReadTime', dayjs.utc().toISOString(), { root: true });
+            displayStore.updateGnbNotificationLastReadTime(dayjs.utc().toISOString());
         }
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));

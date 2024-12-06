@@ -10,12 +10,12 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { MENU_ID } from '@/lib/menu/config';
 
@@ -36,6 +36,7 @@ import { useProjectTreeStore } from '@/services/project/stores/project-tree-stor
 const gnbStore = useGnbStore();
 // const gnbGetters = gnbStore.getters;
 const allReferenceStore = useAllReferenceStore();
+const userStore = useUserStore();
 const projectTreeStore = useProjectTreeStore();
 const projectPageStore = useProjectPageStore();
 const projectPageState = projectPageStore.state;
@@ -45,7 +46,7 @@ const targetRef = ref<HTMLElement | null>(null);
 const route = useRoute();
 
 const storeState = reactive({
-    userId: computed(() => store.state.user.userId),
+    userId: computed<string|undefined>(() => userStore.state.userId),
     groupName: computed(() => storeState.projectGroups[state.currentProjectGroupId]?.name),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),

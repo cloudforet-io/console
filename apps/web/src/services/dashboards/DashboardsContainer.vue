@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 import CenteredPageLayout from '@/common/modules/page-layouts/CenteredPageLayout.vue';
@@ -30,7 +31,8 @@ const dashboardStore = useDashboardStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
 const dashboardSettings = useDashboardSettingsStore();
-dashboardSettings.initState();
+const userStore = useUserStore();
+dashboardSettings.initState(userStore.state.userId);
 const loadDashboard = async () => {
     await dashboardStore.load();
 };

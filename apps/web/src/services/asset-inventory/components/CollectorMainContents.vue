@@ -20,11 +20,10 @@ import type {
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
 import { SpaceRouter } from '@/router';
-import { store } from '@/store';
-
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
@@ -82,14 +81,15 @@ const makePluginReferenceValueHandler = (distinct: string, plugins: PluginRefere
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.state;
 const allReferenceStore = useAllReferenceStore();
+const userStore = useUserStore();
 const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
 
 const route = useRoute();
 
 const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
-    timezone: computed(() => store.state.user.timezone ?? 'UTC'),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    timezone: computed<string>(() => userStore.state.timezone ?? 'UTC'),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 
 const keyItemSets: KeyItemSet[] = [{

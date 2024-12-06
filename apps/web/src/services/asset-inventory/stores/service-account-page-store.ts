@@ -16,12 +16,12 @@ import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import type { AccountType } from '@/schema/identity/service-account/type';
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
-import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import type { Currency } from '@/store/modules/display/type';
+import type { Currency } from '@/store/display/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderItem } from '@/store/reference/provider-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -71,9 +71,10 @@ const MAIN_PROVIDER = ['aws', 'google_cloud', 'azure'];
 export const useServiceAccountPageStore = defineStore('page-service-account', () => {
     const allReferenceStore = useAllReferenceStore();
     const appContextStore = useAppContextStore();
+    const userStore = useUserStore();
 
     const _storeState = reactive({
-        language: computed(() => store.state.user.language),
+        language: computed(() => userStore.state.language),
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     });
 

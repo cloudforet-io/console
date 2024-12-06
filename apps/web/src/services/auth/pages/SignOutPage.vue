@@ -3,10 +3,10 @@
 </template>
 <script lang="ts">
 import { SpaceRouter } from '@/router';
-import { store } from '@/store';
 
 import { useDomainStore } from '@/store/domain/domain-store';
 import { pinia } from '@/store/pinia';
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -19,8 +19,9 @@ export default {
         (async () => {
             try {
                 const domainStore = useDomainStore(pinia);
+                const userStore = useUserStore(pinia);
                 await loadAuth(domainStore.state.extendedAuthType).signOut();
-                await store.dispatch('user/setIsSessionExpired', true);
+                userStore.setIsSessionExpired(true);
             } catch (e) {
                 ErrorHandler.handleError(e);
             } finally {

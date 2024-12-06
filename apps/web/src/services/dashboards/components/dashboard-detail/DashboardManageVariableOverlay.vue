@@ -12,10 +12,10 @@ import { getClonedName } from '@cloudforet/utils';
 
 import { SpaceRouter } from '@/router';
 import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -52,6 +52,7 @@ const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailGetters = dashboardDetailStore.getters;
+const userStore = useUserStore();
 
 const { getProperRouteLocation } = useProperRouteLocation();
 const state = reactive({
@@ -140,7 +141,7 @@ const cloneDashboardVarsSchema = async (dashboardId: string, variableKey: string
                     [_clonedProperty.key]: {
                         ..._clonedProperty,
                         use: false,
-                        created_by: store.state.user.userId,
+                        created_by: userStore.state.userId,
                     },
                 },
             },

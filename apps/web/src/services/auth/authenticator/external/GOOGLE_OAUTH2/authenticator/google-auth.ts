@@ -1,7 +1,7 @@
-import { store } from '@/store';
-
+import { useDisplayStore } from '@/store/display/display-store';
 import { useDomainStore } from '@/store/domain/domain-store';
 import { pinia } from '@/store/pinia';
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -38,8 +38,10 @@ class GoogleAuth extends Authenticator {
     }
 
     static async onSuccess(accessToken, onErrorCallback) {
+        const userStore = useUserStore(pinia);
+        const displayStore = useDisplayStore(pinia);
         try {
-            store.dispatch('user/startSignIn');
+            userStore.setIsSignInLoading(true);
             GoogleAuth.accessToken = accessToken;
             const credentials = {
                 access_token: accessToken,
@@ -48,10 +50,10 @@ class GoogleAuth extends Authenticator {
         } catch (e: any) {
             if (onErrorCallback) onErrorCallback(e, accessToken);
             await GoogleAuth.signOut();
-            await store.dispatch('display/showSignInErrorMessage');
+            displayStore.setIsSignInFailed(true);
             throw e;
         } finally {
-            store.dispatch('user/finishSignIn');
+            userStore.setIsSignInLoading(false);
         }
     }
 

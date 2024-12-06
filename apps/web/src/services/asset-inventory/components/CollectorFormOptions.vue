@@ -11,7 +11,7 @@
         >
             <p-json-schema-form :schema="state.schema"
                                 :form-data="collectorFormState.options"
-                                :language="$store.state.user.language"
+                                :language="state.language"
                                 use-fixed-menu-style
                                 reset-on-schema-change
                                 uniform-width
@@ -69,12 +69,12 @@ import {
 } from '@cloudforet/mirinae';
 import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-schema-form/type';
 
-
-
 import type {
     GetPluginMetadataParameters,
     GetPluginMetadataResponse,
 } from '@/schema/plugin/plugin/api-verbs/get-plugin-metadata';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -87,6 +87,7 @@ import {
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
+const userStore = useUserStore();
 
 const props = defineProps<{
     hasMetadata?: boolean; // MEMO: if true, use metadata(state.schema) of collectorFormState.originCollector. And if false, call api for get metadata(state.schema).
@@ -101,6 +102,7 @@ const state = reactive({
     isLoadFailed: false,
     pluginId: computed<string|undefined>(() => collectorFormState.repositoryPlugin?.plugin_id),
     schema: null as null|JsonSchema|object,
+    language: computed<string|undefined>(() => userStore.state.language),
 });
 
 const fetchGetPluginMetadata = (provider: string|undefined): Promise<GetPluginMetadataResponse> => {

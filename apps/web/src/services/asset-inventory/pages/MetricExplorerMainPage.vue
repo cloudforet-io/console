@@ -9,11 +9,11 @@ import {
 import MetricImgAlert from '@/assets/images/metric/img_alert.png';
 import MetricImgHowToUse from '@/assets/images/metric/img_how-to-use.png';
 import MetricImgVisualization from '@/assets/images/metric/img_visualization.png';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import type { RecentItem } from '@/common/modules/navigations/type';
@@ -30,9 +30,10 @@ const allReferenceStore = useAllReferenceStore();
 const router = useRouter();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
+const userStore = useUserStore();
 
 const storeState = reactive({
-    language: computed(() => store.state.user.language),
+    language: computed<string|undefined>(() => userStore.state.language),
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
     namespace: computed(() => allReferenceStore.getters.namespace),
     metric: computed(() => allReferenceStore.getters.metric),

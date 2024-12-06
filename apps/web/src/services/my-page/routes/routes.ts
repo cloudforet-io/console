@@ -1,8 +1,9 @@
 import type { RouteConfig } from 'vue-router';
 
-import { store } from '@/store';
-
 import { ROUTE_SCOPE } from '@/router/constant';
+
+import { pinia } from '@/store/pinia';
+import { useUserStore } from '@/store/user/user-store';
 
 import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
@@ -16,6 +17,8 @@ const UserAccountPage = () => import('@/services/my-page/pages/UserAccountPage.v
 const UserNotificationPage = () => import('@/services/my-page/pages/UserNotificationPage.vue');
 const UserNotificationAddPage = () => import('@/services/my-page/pages/UserNotificationAddPage.vue');
 
+
+const userStore = useUserStore(pinia);
 const myPageRoutes: RouteConfig = {
     path: '/my-page',
     name: MY_PAGE_ROUTE._NAME,
@@ -24,7 +27,7 @@ const myPageRoutes: RouteConfig = {
         translationId: MENU_INFO_MAP[MENU_ID.MY_PAGE].translationId,
         scope: ROUTE_SCOPE.USER,
     },
-    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
+    redirect: (to) => getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap),
     component: MyPageContainer,
     children: [
         {

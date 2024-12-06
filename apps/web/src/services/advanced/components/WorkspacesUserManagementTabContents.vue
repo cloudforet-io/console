@@ -12,6 +12,8 @@ import {
     PStatus, PToolboxTable, PHeading, PTooltip, PButton, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
+import { useUserStore } from '@/store/user/user-store';
+
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import { WORKSPACE_STATE, WORKSPACES_USER_SEARCH_HANDLERS } from '@/services/advanced/constants/workspace-constant';
@@ -22,6 +24,8 @@ import {
 import { USER_STATE } from '@/services/iam/constants/user-constant';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 
+
+const userStore = useUserStore();
 const workspacePageStore = useWorkspacePageStore();
 const workspacePageState = workspacePageStore.$state;
 
@@ -42,7 +46,7 @@ const state = reactive({
     refinedUserItems: computed(() => workspacePageState.workspaceUsers.map((user) => ({
         ...user,
         role: workspacePageStore.roleMap[workspacePageStore.roleBindingMap[user.role_binding_info.role_binding_id]?.role_id],
-        last_accessed_at: calculateTime(user?.last_accessed_at, workspacePageStore.timezone),
+        last_accessed_at: calculateTime(user?.last_accessed_at, userStore.state.timezone),
     }))),
 });
 const tableState = reactive({
