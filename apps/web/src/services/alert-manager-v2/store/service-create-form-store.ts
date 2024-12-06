@@ -47,6 +47,15 @@ export const useServiceCreateFormStore = defineStore('service-create-form', () =
         initState() {
             state.currentStep = 1;
             state.currentSubStep = 1;
+            state.step1Form = {
+                name: '',
+                key: '',
+                member: {},
+                description: '',
+            };
+            state.selectedWebhookType = {} as PluginModel;
+            state.webhookName = '';
+            state.selectedProtocol = {};
         },
         initStep1() {
             state.step1Form = {
