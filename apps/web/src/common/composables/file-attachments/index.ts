@@ -3,23 +3,29 @@ import type { ComputedRef, Ref } from 'vue';
 
 import type { FileModel } from '@/schema/file-manager/model';
 
-import { getDownloadUrl } from '@/lib/file-manager';
+import { getUploadedFile } from '@/lib/file-manager';
 
 import type { Attachment } from '@/common/components/editor/extensions/image/type';
 
 export const useFileAttachments = (files: ComputedRef<FileModel[]>| Ref<FileModel[]>) => {
-    const attachments = computedAsync<Attachment[]>(async (): Promise<Attachment[]> => {
+    const noImage = `${window.location.origin}/images/no-image.png`;
+
+    const attachments = computedAsync<Attachment<FileModel>[]>(async (): Promise<Attachment<FileModel>[]> => {
         if (files.value.length === 0) return [];
 
-        let results;
-        if (files.value[0].download_url) {
-            results = files.value.map((file) => file.download_url ?? '');
-            return results.map((result, idx) => ({ downloadUrl: result ?? '', fileId: files.value[idx].file_id }));
-        }
-        results = await Promise.allSettled(files.value.map((file) => getDownloadUrl(file.file_id)));
+        const results = await Promise.allSettled(files.value.map((file) => {
+            if (file.download_url) return Promise.resolve(file);
+            return getUploadedFile(file.file_id);
+        }));
         return results.map((result, idx) => {
-            if (result.status === 'fulfilled') return { downloadUrl: result.value ?? '', fileId: files.value[idx].file_id };
-            return { downloadUrl: '', fileId: files.value[idx].file_id };
+            if (result.status === 'fulfilled') {
+                return {
+                    downloadUrl: result.value.download_url ?? noImage,
+                    fileId: result.value.file_id,
+                    data: result.value,
+                };
+            }
+            return { downloadUrl: noImage, fileId: files.value[idx].file_id, data: files.value[idx] };
         });
     });
 
