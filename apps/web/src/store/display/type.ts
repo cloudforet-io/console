@@ -1,11 +1,12 @@
 import type { TranslateResult } from 'vue-i18n';
 import type { Location } from 'vue-router';
 
-import type { SidebarType, CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import type { SIDEBAR_TYPE, CURRENCY, CURRENCY_SYMBOL } from '@/store/display/constant';
 
 import type { Menu } from '@/lib/menu/config';
 
 
+export type SidebarType = typeof SIDEBAR_TYPE[keyof typeof SIDEBAR_TYPE];
 export type HighlightTagType = 'new' | 'beta' | 'update';
 export type Currency = typeof CURRENCY[keyof typeof CURRENCY];
 export type CurrencySymbol = typeof CURRENCY_SYMBOL[keyof typeof CURRENCY_SYMBOL];
@@ -24,7 +25,7 @@ export interface DisplayState {
     visibleSidebar: boolean;
     sidebarType: SidebarType;
     isInitialized: boolean;
-    uncheckedNotificationCount: number;
+    uncheckedNotificationCount?: number;
     uncheckedNoticeCount: number,
     isSignInFailed: boolean;
     visibleMobileGuideModal: boolean;
