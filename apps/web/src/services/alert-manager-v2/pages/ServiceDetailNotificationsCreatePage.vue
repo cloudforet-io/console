@@ -11,7 +11,7 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import NotificationsCreateTypeSelector
     from '@/services/alert-manager-v2/components/NotificationsCreateTypeSelector.vue';
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
-import { ALERT_MANAGER_V2_ROUTE } from '@/services/alert-manager-v2/routes/route-constant';
+import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
 import { useServiceCreateFormStore } from '@/services/alert-manager-v2/store/service-create-form-store';
 
 interface Props {
@@ -41,7 +41,7 @@ const state = reactive({
 
 const handleClickCancelButton = () => {
     router.push(getProperRouteLocation({
-        name: ALERT_MANAGER_V2_ROUTE.SERVICE.DETAIL._NAME,
+        name: ALERT_MANAGER_ROUTE_V2.SERVICE.DETAIL._NAME,
         params: {
             serviceId: props.serviceId,
         },
