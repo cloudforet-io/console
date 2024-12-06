@@ -8,7 +8,7 @@ import {
     PHeading, PDivider, PButton, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import type { MenuId } from '@/lib/menu/config';
@@ -22,10 +22,11 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 const router = useRouter();
 const route = useRoute();
 
+const userStore = useUserStore();
 const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     selectedMenuId: computed(() => {

@@ -47,7 +47,7 @@ const initQrCodeInfo = async () => {
         const userInfo = await postEnableMfa({
             mfa_type: MULTI_FACTOR_AUTH_TYPE.OTP,
             options: {},
-        }, false);
+        });
         if (!userInfo) return;
         state.qrUri = userInfo?.mfa?.options.otp_qrcode_uri;
         state.passkey = state.qrUri.match(/secret=([^&]*)/)?.[1] || '';

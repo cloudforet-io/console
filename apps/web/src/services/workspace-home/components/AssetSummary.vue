@@ -7,13 +7,13 @@ import {
     PDivider, PFieldTitle, PLink, PSpinner,
 } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CollectorReferenceMap } from '@/store/reference/collector-reference-store';
 import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import { MENU_ID } from '@/lib/menu/config';
@@ -36,13 +36,14 @@ const allReferenceGetters = allReferenceStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
 const workspaceHomePageStore = useWorkspaceHomePageStore();
+const userStore = useUserStore();
 
 const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceGetters.currentWorkspaceId),
     providerMap: computed<ProviderReferenceDataMap>(() => allReferenceGetters.provider),
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceGetters.serviceAccount),
     collectors: computed<CollectorReferenceMap>(() => allReferenceGetters.collector),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     loading: true,

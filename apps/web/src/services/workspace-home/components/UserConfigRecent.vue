@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { PFieldTitle } from '@cloudforet/mirinae';
 
 import type { UserConfigModel } from '@/schema/config/user-config/model';
 import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
-import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+import { useDisplayStore } from '@/store/display/display-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
@@ -34,6 +35,8 @@ import { RECENT_TYPE } from '@/common/modules/navigations/type';
 import UserConfigsItem from '@/services/workspace-home/components/UserConfigsItem.vue';
 import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
 
+const route = useRoute();
+
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceStoreGetters = userWorkspaceStore.getters;
 const gnbStore = useGnbStore();
@@ -44,6 +47,7 @@ const dashboardStore = useDashboardStore();
 const dashboardState = dashboardStore.state;
 const workspaceHomePageStore = useWorkspaceHomePageStore();
 const workspaceHomePageState = workspaceHomePageStore.state;
+const displayStore = useDisplayStore();
 
 const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
@@ -83,7 +87,8 @@ const convertRecentToReferenceData = (recentConfig: ConfigData): ReferenceData =
     if (itemType === RECENT_TYPE.COST_ANALYSIS) {
         return convertCostAnalysisConfigToReferenceData([recentConfig], storeState.costQuerySets, storeState.costDataSource)[0];
     }
-    return convertMenuConfigToReferenceData([recentConfig], store.getters['display/allMenuList'])[0];
+    const allMenuList = displayStore.getAllMenuList(route);
+    return convertMenuConfigToReferenceData([recentConfig], allMenuList)[0];
 };
 </script>
 

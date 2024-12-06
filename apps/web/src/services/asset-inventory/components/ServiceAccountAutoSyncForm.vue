@@ -8,10 +8,10 @@ import {
     PJsonSchemaForm, PFieldTitle, PPaneLayout, PToggleButton, PFieldGroup,
 } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import ServiceAccountAutoSyncMappingMethod
     from '@/services/asset-inventory/components/ServiceAccountAutoSyncMappingMethod.vue';
@@ -24,11 +24,12 @@ const MAX_TIME_COUNT = 2;
 const serviceAccountPageStore = useServiceAccountPageStore();
 const serviceAccountPageFormState = serviceAccountPageStore.formState;
 const appContextStore = useAppContextStore();
-
+const userStore = useUserStore();
 
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    timezone: computed<string>(() => store.state.user.timezone),
+    timezone: computed<string|undefined>(() => userStore.state.timezone),
+    language: computed<string|undefined>(() => userStore.state.language),
     scheduleHelpText: computed(() => i18n.t('INVENTORY.SERVICE_ACCOUNT.CREATE.TIMEZONE', { timezone: state.timezone })),
     isAutoSyncEnabled: computed(() => serviceAccountPageFormState.isAutoSyncEnabled),
     timezoneAppliedHours: computed<number[]>(() => {
@@ -119,7 +120,7 @@ watch(() => state.isAllValid, (isAllValid) => {
                                         class="p-json-schema-form"
                                         :form-data.sync="state.additionalOptions"
                                         :schema="serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema"
-                                        :language="$store.state.user.language"
+                                        :language="state.language"
                                         @validate="handleAdditionalOptionsValidate"
                     />
                 </p-pane-layout>

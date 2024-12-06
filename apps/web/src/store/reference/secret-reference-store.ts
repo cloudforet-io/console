@@ -8,12 +8,11 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { SecretListParameters } from '@/schema/secret/secret/api-verbs/list';
 import type { SecretModel } from '@/schema/secret/secret/model';
-// eslint-disable-next-line import/no-cycle
-import { store } from '@/store';
 
 import type {
     ReferenceItem, ReferenceLoadOptions, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
+import { useUserStore } from '@/store/user/user-store';
 
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
@@ -27,13 +26,14 @@ const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
 export const useSecretReferenceStore = defineStore('reference-secret', () => {
+    const userStore = useUserStore();
     const state = reactive({
         items: null as SecretReferenceMap | null,
     });
 
     const getters = reactive({
         secretItems: asyncComputed<SecretReferenceMap>(async () => {
-            if (store.getters['user/getCurrentGrantInfo'].scope === 'USER') return {};
+            if (!userStore.state.currentGrantInfo?.scope || userStore.state.currentGrantInfo?.scope === 'USER') return {};
             if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),

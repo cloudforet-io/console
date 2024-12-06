@@ -15,7 +15,8 @@ import {
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { AlertListParameters } from '@/schema/monitoring/alert/api-verbs/list';
 import type { AlertModel } from '@/schema/monitoring/alert/model';
-import { store } from '@/store';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -28,11 +29,12 @@ const props = defineProps<{
     period?: string;
 }>();
 
+const userStore = useUserStore();
 const state = reactive({
     totalCount: 0,
     alerts: [] as AlertModel[],
     moreCount: undefined as undefined | number,
-    timezone: computed<string>(() => store.state.user.timezone),
+    timezone: computed<string|undefined>(() => userStore.state.timezone),
 });
 
 /* util */

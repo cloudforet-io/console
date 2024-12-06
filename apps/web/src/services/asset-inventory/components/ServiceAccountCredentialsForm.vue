@@ -23,8 +23,9 @@ import type { SchemaModel } from '@/schema/identity/schema/model';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { TrustedAccountListParameters } from '@/schema/identity/trusted-account/api-verbs/list';
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -44,6 +45,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const serviceAccountPageStore = useServiceAccountPageStore();
+const userStore = useUserStore();
 
 interface State {
     showTrustedAccount: ComputedRef<boolean>;
@@ -58,7 +60,7 @@ interface State {
 }
 
 const storeState = reactive({
-    language: computed(() => store.state.user.language),
+    language: computed<string|undefined>(() => userStore.state.language),
     currentProviderSchemaList: computed<SchemaModel[]>(() => serviceAccountSchemaStore.getters.currentProviderSchemaList),
     trustingSecretSchemaList: computed<SchemaModel|undefined>(() => serviceAccountSchemaStore.getters.trustingSecretSchemaList),
     trustedAccountSchema: computed<SchemaModel|undefined>(() => serviceAccountSchemaStore.getters.trustedAccountSchema),
@@ -372,7 +374,7 @@ watch([() => storeState.secretSchema, () => state.isTrustedAccount], () => {
                 <template #input>
                     <p-json-schema-form :form-data.sync="formState.customSchemaForm"
                                         :schema="state.credentialSchema"
-                                        :language="$store.state.user.language"
+                                        :language="storeState.language"
                                         class="custom-schema-box"
                                         @validate="handleCredentialValidate"
                     />

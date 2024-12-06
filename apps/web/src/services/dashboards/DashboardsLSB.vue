@@ -12,11 +12,11 @@ import {
 
 import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import type { MenuId } from '@/lib/menu/config';
@@ -48,6 +48,7 @@ const favoriteGetters = favoriteStore.getters;
 const dashboardStore = useDashboardStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlGetters = dashboardPageControlStore.getters;
+const userStore = useUserStore();
 
 const { getProperRouteLocation } = useProperRouteLocation();
 
@@ -55,10 +56,10 @@ const router = useRouter();
 const route = useRoute();
 
 const storeState = reactive({
-    isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+    isWorkspaceOwner: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     favoriteItems: computed(() => favoriteGetters.dashboardItems),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     currentPath: computed(() => route.fullPath),

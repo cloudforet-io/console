@@ -90,7 +90,8 @@ import {
 import { durationFormatter } from '@cloudforet/utils';
 
 import type { JobModel } from '@/schema/inventory/job/model';
-import { store } from '@/store';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import { red, green } from '@/styles/colors';
 
@@ -112,6 +113,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const collectorDataModalStore = useCollectorDataModalStore();
 const collectorDataModalState = collectorDataModalStore.$state;
+const userStore = useUserStore();
 
 const definitionFields = computed(() => {
     const defaultField = [
@@ -124,10 +126,6 @@ const definitionFields = computed(() => {
             ...defaultField,
             { label: 'Status', name: 'status' },
         ];
-});
-
-const storeState = reactive({
-    timezone: computed(() => store.state.user.timezone),
 });
 
 const defaultJob: JobModel = {
@@ -145,7 +143,7 @@ const defaultJob: JobModel = {
 
 const state = reactive({
     recentJob: computed<JobModel>(() => collectorDataModalState.recentJob ?? defaultJob),
-    duration: computed(() => durationFormatter(state.recentJob?.created_at, dayjs(), storeState.timezone) || '--'),
+    duration: computed(() => durationFormatter(state.recentJob?.created_at, dayjs(), userStore.state.timezone) || '--'),
     succeededPercentage: computed(() => {
         if (state.recentJob.total_tasks > 0) {
             return (state.recentJob.success_tasks / state.recentJob.total_tasks) * 100;

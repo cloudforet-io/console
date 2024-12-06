@@ -122,7 +122,8 @@ import {
 import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 import { MONITORING_TYPE } from '@/schema/monitoring/data-source/constant';
-import { store } from '@/store';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -180,9 +181,10 @@ export default {
     },
     setup(props) {
         const vm = getCurrentInstance()?.proxy as Vue;
+        const userStore = useUserStore();
         const state = reactive({
             showLoader: computed(() => props.loading || state.metricsLoading),
-            timezone: computed(() => store.state.user.timezone),
+            timezone: computed(() => userStore.state.timezone),
             dataTools: [],
             selectedToolId: '',
             tools: computed<DataToolType[]>(() => state.dataTools.map((d) => ({

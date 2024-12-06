@@ -14,10 +14,11 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import type { MenuId } from '@/lib/menu/config';
@@ -38,6 +39,7 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
 
+const userStore = useUserStore();
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
 const bookmarkPageStore = useBookmarkPageStore();
@@ -54,7 +56,7 @@ const storeState = reactive({
     selectedIndices: computed<number[]>(() => bookmarkPageState.selectedIndices),
     bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
     bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     visibleMenu: false,

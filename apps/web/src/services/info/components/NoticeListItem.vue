@@ -10,11 +10,11 @@ import { PI, PSkeleton, PBadge } from '@cloudforet/mirinae';
 
 import type { PostModel } from '@/schema/board/post/model';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import NewMark from '@/common/components/marks/NewMark.vue';
 import TextHighlighting from '@/common/components/text/text-highlighting/TextHighlighting.vue';
@@ -24,6 +24,7 @@ const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
 const appContextStore = useAppContextStore();
 const appContextGetters = appContextStore.getters;
+const userStore = useUserStore();
 
 const props = withDefaults(defineProps<{
     inputText?: string;
@@ -42,11 +43,11 @@ const props = withDefaults(defineProps<{
 const storeState = reactive({
     isAdminMode: computed(() => appContextGetters.isAdminMode),
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
+    timezone: computed<string>(() => userStore.state.timezone || 'UTC'),
+    hasDomainRoleUser: computed<boolean>(() => userStore.getters.isDomainAdmin),
 });
 const state = reactive({
-    hasDomainRoleUser: computed<boolean>(() => store.getters['user/isDomainAdmin']),
     postDirectionLabel: computed<TranslateResult>(() => ((props.postDirection === 'prev') ? i18n.t('INFO.NOTICE.MAIN.PREV') : i18n.t('INFO.NOTICE.MAIN.NEXT'))),
-    timezone: computed<string>(() => store.state.user.timezone || 'UTC'),
     date: computed<string>(() => dateFormatter(props.post?.created_at)),
     isPinned: computed<boolean>(() => !!props.post?.options?.is_pinned),
     postDirectionIcon: computed<string>(() => ((props.postDirection === 'prev') ? 'ic_arrow-down' : 'ic_arrow-up')),
@@ -63,7 +64,7 @@ const state = reactive({
 
 const dateFormatter = (date?: string): string => {
     if (!date) return '';
-    return dayjs.tz(dayjs.utc(date), state.timezone).format('YYYY-MM-DD');
+    return dayjs.tz(dayjs.utc(date), storeState.timezone).format('YYYY-MM-DD');
 };
 
 </script>
@@ -109,7 +110,7 @@ const dateFormatter = (date?: string): string => {
             </div>
             <div class="info">
                 <span>{{ state.date }}</span>
-                <template v-if="state.hasDomainRoleUser">
+                <template v-if="storeState.hasDomainRoleUser">
                     <p-i v-if="state.writer"
                          width="0.125rem"
                          name="ic_dot"

@@ -1,12 +1,15 @@
 @define-mixin text-style {
     /* normal text */
     p {
-        padding-bottom: 0.75rem;
-        line-height: 1.7;
+        padding-top: 0.25rem;
+        line-height: 1.25rem;
         font-size: 0.875rem;
         font-weight: normal;
         &:focus {
             @apply outline-none;
+        }
+        & + p {
+            padding-top: 0.75rem;
         }
     }
 
@@ -16,6 +19,9 @@
         line-height: 1.25;
         font-size: 1.5rem;
         font-weight: 700;
+        & > p {
+            padding-top: 0.75rem;
+        }
     }
 
     /* heading 2 */
@@ -24,6 +30,9 @@
         line-height: 1.25;
         font-size: 1.125rem;
         font-weight: 700;
+        & > p {
+            padding-top: 0.75rem;
+        }
     }
 
     /* heading 3 */
@@ -32,6 +41,9 @@
         line-height: 1.25;
         font-size: 1rem;
         font-weight: 700;
+        & > p {
+            padding-top: 0.75rem;
+        }
     }
 }
 
@@ -51,6 +63,7 @@
         padding-left: 1rem;
         list-style-type: disc;
         p {
+            padding-top: 0;
             padding-bottom: 0;
         }
         > li {

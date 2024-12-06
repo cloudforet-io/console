@@ -15,8 +15,9 @@ import type { NoticeConfigData } from '@/schema/board/post/type';
 import type { UserConfigListParameters } from '@/schema/config/user-config/api-verbs/list';
 import type { UserConfigSetParameters } from '@/schema/config/user-config/api-verbs/set';
 import type { UserConfigModel } from '@/schema/config/user-config/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -24,6 +25,7 @@ type UserConfig = UserConfigModel<NoticeConfigData>;
 type NoticeConfigMap = Record<string, NoticeConfigData>;
 
 export const useNoticeStore = defineStore('notice', () => {
+    const userStore = useUserStore();
     const state = reactive({
         noticeConfigMap: {} as NoticeConfigMap,
         totalNoticeIdList: [] as string[],
@@ -31,7 +33,6 @@ export const useNoticeStore = defineStore('notice', () => {
     });
 
     const getters = reactive({
-        userId: computed<string>(() => store.state.user.userId),
         isReadMap: computed<{ [key: string]: boolean }>(() => {
             const readMap = {};
             Object.keys(state.noticeConfigMap).forEach((postId) => {
@@ -63,7 +64,7 @@ export const useNoticeStore = defineStore('notice', () => {
             const userConfigApiQuery = new ApiQueryHelper()
                 .setFilters([{
                     k: 'user_id',
-                    v: getters.userId,
+                    v: userStore.state.userId || '',
                     o: '=',
                 },
                 {
