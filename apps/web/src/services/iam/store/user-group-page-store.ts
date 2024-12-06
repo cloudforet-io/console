@@ -9,25 +9,36 @@ import type { UserGroupListItemType } from '@/schema/identity/user-group/type';
 
 import type { ModalState } from '@/services/iam/types/user-group-type';
 
+interface iState {
+    loading: boolean;
+    userGroups: UserGroupListItemType[];
+    selectedUserGroup: UserGroupListItemType;
+    totalCount: number;
+    selectedIndices: number[];
+    pageStart: number;
+    pageLimit: number;
+    searchFilters: ConsoleFilter[];
+    modal: ModalState;
+}
+
 export const useUserGroupPageStore = defineStore('page-user-group', () => {
-    const state = reactive({
+    const state = reactive<iState>({
         loading: true,
-        userGroups: [] as UserGroupListItemType[],
-        selectedUserGroup: {} as UserGroupListItemType,
+        userGroups: [],
+        selectedUserGroup: {},
         totalCount: 0,
         selectedIndices: [],
         pageStart: 1,
         pageLimit: 15,
-        searchFilters: [] as ConsoleFilter[],
+        searchFilters: [],
         modal: {
             type: '',
             title: '',
             themeColor: 'primary',
-            visible: undefined,
-        } as ModalState,
+        },
     });
     const getters = reactive({
-        selectedUserGroups: computed((): UserGroupListItemType[] => {
+        selectedUserGroups: computed<UserGroupListItemType[]>((): UserGroupListItemType[] => {
             if (state.selectedIndices.length === 1 && !isEmpty(state.selectedUserGroup)) return [state.selectedUserGroup];
             const userGroups: UserGroupListItemType[] = [];
             state.selectedIndices.forEach((d:number) => {
@@ -39,32 +50,30 @@ export const useUserGroupPageStore = defineStore('page-user-group', () => {
     const actions = {
         reset() {
             state.loading = true;
-            state.userGroups = [] as UserGroupListItemType[];
-            state.selectedUserGroup = {} as UserGroupListItemType;
+            state.userGroups = [];
+            state.selectedUserGroup = {};
             state.totalCount = 0;
             state.selectedIndices = [];
             state.pageStart = 1;
             state.pageLimit = 15;
-            state.searchFilters = [] as ConsoleFilter[];
+            state.searchFilters = [];
             state.modal = {
                 type: '',
                 title: '',
                 themeColor: 'primary',
-                visiable: undefined,
-            } as ModalState;
+            };
         },
         async listUserGroups() {
             //     TODO: api connect
         },
         updateModalSettings({
-            type, title, themeColor, visible,
+            type, title, themeColor,
         }: ModalState) {
             state.modal = {
                 ...state.modal,
                 type,
                 title,
                 themeColor,
-                visible: visible ?? undefined,
             };
         },
     };
