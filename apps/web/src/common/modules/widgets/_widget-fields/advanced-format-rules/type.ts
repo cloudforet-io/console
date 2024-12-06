@@ -1,5 +1,6 @@
 import type { _FORMAT_RULE_TYPE, ADVANCED_FORMAT_RULE_TYPE } from '@/common/modules/widgets/_constants/widget-field-constant';
 import type { FormatRulesValue } from '@/common/modules/widgets/_widget-fields/format-rules/type';
+import type { FieldDataTargetType } from '@/common/modules/widgets/types/widget-field-type';
 
 export interface AdvancedFormatRulesValue {
     field?: string;
@@ -31,6 +32,7 @@ export interface _FormatRulesValue {
 
 export interface _FormatRulesOptions {
     useField?: boolean;
+    dataTarget?: FieldDataTargetType;
     formatRulesType: _FormatRulesType;
     description?: string;
     baseColor?: string;

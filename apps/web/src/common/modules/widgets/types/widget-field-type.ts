@@ -18,7 +18,6 @@ import type { FormatRulesOptions } from '@/common/modules/widgets/_widget-fields
 import type { GroupByOptions } from '@/common/modules/widgets/_widget-fields/group-by/type';
 import type { IconOptions } from '@/common/modules/widgets/_widget-fields/icon/type';
 import type { LegendOptions } from '@/common/modules/widgets/_widget-fields/legend/type';
-import type { LineByOptions } from '@/common/modules/widgets/_widget-fields/line-by/type';
 import type { MaxOptions } from '@/common/modules/widgets/_widget-fields/max/type';
 import type { MinOptions } from '@/common/modules/widgets/_widget-fields/min/type';
 import type { MissingValueOptions } from '@/common/modules/widgets/_widget-fields/missing-value/type';
@@ -42,7 +41,7 @@ import type {
 
 
 export type WidgetFieldOptions = DataFieldOptions | TableDataFieldOptions | XAxisOptions | YAxisOptions
-    | LineByOptions | StackByOptions | GroupByOptions | CategoryByOptions
+    | StackByOptions | GroupByOptions | CategoryByOptions
     | FormatRulesOptions | AdvancedFormatRulesOptions
     | MinOptions | MaxOptions | LegendOptions | IconOptions | SubTotalOptions | TotalOptions
     | ComparisonOptions | ProgressBarOptions | ColorSchemaOptions | PieChartTypeOptions | DateFormatOptions
@@ -54,8 +53,10 @@ export interface WidgetFieldSchema<FieldOption=WidgetFieldOptions> {
     options?: Partial<FieldOption>;
 }
 
+export type FieldDataTargetType = 'data_info' | 'label_info';
+
 export type WidgetFieldName = 'dataField' | 'tableDataField' | 'xAxis' | 'yAxis'
-    | 'stackBy' | 'lineBy' | 'groupBy' | 'categoryBy'
+    | 'stackBy' | 'groupBy' | 'categoryBy'
     | 'min' | 'max'
     | 'icon' | 'comparison' | 'legend'
     | 'subTotal' | 'total'

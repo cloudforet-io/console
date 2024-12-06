@@ -1,13 +1,14 @@
+import type { FieldDataTargetType } from '@/common/modules/widgets/types/widget-field-type';
+
 export interface YAxisValue {
     value: string;
     count: number;
 }
 
 export interface YAxisOptions {
-    dataTarget: string;
+    dataTarget: FieldDataTargetType;
     max: number;
     defaultMaxCount: number;
-    defaultIndex?: number;
     excludeDateField?: boolean;
 }
 export interface _YAxisValue {

@@ -1,12 +1,13 @@
+import type { FieldDataTargetType } from '@/common/modules/widgets/types/widget-field-type';
+
 export interface XAxisValue {
     value: string;
     count: number;
 }
 export interface XAxisOptions {
-    dataTarget: string;
+    dataTarget: FieldDataTargetType;
     max: number;
     defaultMaxCount: number;
-    defaultIndex?: number;
     excludeDateField?: boolean;
 }
 export interface _XAxisValue {
