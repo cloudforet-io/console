@@ -90,6 +90,11 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
         if (!fieldValue.toggleValue) return true;
         return !!fieldValue.annotation;
     },
+    displaySeriesLabel: (fieldValue) => {
+        if (!fieldValue.toggleValue) return true;
+        if (fieldValue.rotate < -90 || fieldValue.rotate > 90) return false;
+        return true;
+    },
 };
 
 

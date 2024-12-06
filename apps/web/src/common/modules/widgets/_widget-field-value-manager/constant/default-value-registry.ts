@@ -44,7 +44,7 @@ export const widgetFieldDefaultValueMap: DefaultValueRegistry = {
     },
     dateRange: {},
     displayAnnotation: undefined,
-    displaySeriesLabel: {},
+    displaySeriesLabel: undefined,
     granularity: {},
     groupBy: {},
     header: {},
