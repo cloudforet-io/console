@@ -1,8 +1,10 @@
+import { COLOR_SCHEMA } from '@/common/modules/widgets/_constants/widget-field-constant';
 import { integrateFieldsSchema } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { FieldDefaultValueConvertor, WidgetFieldTypeMap } from '@/common/modules/widgets/_widget-field-value-manager/type';
 import type { _FormatRulesOptions } from '@/common/modules/widgets/_widget-fields/advanced-format-rules/type';
 import type { CategoryByOptions } from '@/common/modules/widgets/_widget-fields/category-by/type';
+import type { _ColorSchemaOptions } from '@/common/modules/widgets/_widget-fields/color-schema/type';
 import type { StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
 import type { XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { YAxisOptions } from '@/common/modules/widgets/_widget-fields/y-axis/type';
@@ -21,7 +23,10 @@ export const widgetFieldDefaultValueMap: DefaultValueRegistry = {
     stackBy: {},
     xAxis: {},
     yAxis: {},
-    colorSchema: {},
+    colorSchema: {
+        colorName: 'Coral',
+        colorValue: COLOR_SCHEMA.Coral,
+    },
     comparison: {},
     customTableColumnWidth: {},
     dataFieldHeatmapColor: {},
@@ -132,7 +137,18 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
             count: yAxisOptions.defaultMaxCount,
         };
     },
-    colorSchema: () => widgetFieldDefaultValueMap.colorSchema,
+    colorSchema: (widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const colorSchemaOptions = _fieldsSchema.colorSchema?.options as _ColorSchemaOptions;
+
+        if (colorSchemaOptions.default) {
+            return {
+                colorName: colorSchemaOptions.default,
+                colorValue: COLOR_SCHEMA[colorSchemaOptions.default],
+            };
+        }
+        return widgetFieldDefaultValueMap.colorSchema;
+    },
     comparison: () => widgetFieldDefaultValueMap.comparison,
     customTableColumnWidth: () => widgetFieldDefaultValueMap.customTableColumnWidth,
     dataFieldHeatmapColor: () => widgetFieldDefaultValueMap.dataFieldHeatmapColor,
