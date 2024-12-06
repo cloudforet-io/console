@@ -30,17 +30,13 @@ const queryTagHelper = useQueryTags({ keyItemSets: USER_GROUP_SEARCH_HANDLERS.ke
 const { queryTags } = queryTagHelper;
 
 const tableState = reactive({
-    fields: computed<DataTableFieldType[]>(() => {
-        const baseFields = [
-            { name: 'user_group_id', label: 'User Group ID' },
-            { name: 'description', label: 'Description' },
-            { name: 'notification', label: 'Notification' },
-            { name: 'users', label: 'Users' },
-            { name: 'created', label: 'Created' },
-        ];
-
-        return [...baseFields];
-    }),
+    fields: computed<DataTableFieldType[]>(() => [
+        { name: 'user_group_id', label: 'User Group ID' },
+        { name: 'description', label: 'Description' },
+        { name: 'notification', label: 'Notification' },
+        { name: 'users', label: 'Users' },
+        { name: 'created', label: 'Created' },
+    ]),
     valueHandlerMap: computed(() => ({
         user_group_id: makeDistinctValueHandler('identity.UserGroup', 'user_group_id', 'string'),
         description: makeDistinctValueHandler('identity.UserGroup', 'description', 'string'),
