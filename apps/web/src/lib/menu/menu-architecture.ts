@@ -109,11 +109,11 @@ export const MENU_LIST_FOR_RESOURCE_MANAGER_V2: Menu[] = [
         ],
     },
     {
-
         id: MENU_ID.IAM,
         needPermissionByRole: true,
         subMenuList: [
             { id: MENU_ID.USER, needPermissionByRole: true },
+            { id: MENU_ID.USER_GROUP, needPermissionByRole: true },
             { id: MENU_ID.APP, needPermissionByRole: true },
         ],
     },
@@ -164,6 +164,7 @@ export const ADMIN_MENU_LIST: Menu[] = [
         id: MENU_ID.IAM,
         subMenuList: [
             { id: MENU_ID.USER },
+            { id: MENU_ID.USER_GROUP },
             { id: MENU_ID.APP },
             { id: MENU_ID.ROLE },
         ],

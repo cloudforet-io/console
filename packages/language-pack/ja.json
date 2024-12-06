@@ -3193,6 +3193,64 @@
 			"REMOVE": "削除",
 			"TITLE": "ユーザー"
 		},
+		"USER_GROUP": {
+			"ACTION": {
+				"ADD_NEW_USER": "新規ユーザーを追加",
+				"REMOVE": "削除",
+				"UPDATE": "アップデート"
+			},
+			"CREATE": "生成",
+			"MAIN": {
+				"NOTIFICATIONS_CHANNEL": {
+					"ADD": "追加",
+					"DELETE": "削除",
+					"EDIT": "編集"
+				},
+				"USERS": {
+					"ADD_USER": "ユーザー追加",
+					"REMOVE": "削除"
+				}
+			},
+			"MODAL": {
+				"ADD_NEW_USER": {
+					"CANCEL": "キャンセル",
+					"CONFIRM": "確認",
+					"TITLE": "選択したユーザーグループにユーザーを追加する",
+					"USER": "ユーザー"
+				},
+				"CREATE_USER_GROUP": {
+					"CANCEL": "キャンセル",
+					"CONFIRM": "確認",
+					"CUSTOM": "カスタム",
+					"DESCRIPTION": "説明",
+					"EVERYDAY": "毎日",
+					"GROUP_NAME": "グループ名",
+					"INFO": "選択したスケジュールでのみ通知を受け取ります。",
+					"NOTIFICATION_CHANNEL": "通知チャネル",
+					"PROTOCOL": "プロトコル",
+					"SCHEDULE_SETTING": "スケジュール設定",
+					"TITLE": "ユーザーグループの作成",
+					"TOKEN": "トークン",
+					"UPDATE": "アップデート",
+					"UPDATE_TITLE": "ユーザーグループの更新",
+					"WEEKDAYS": "平日"
+				}
+			},
+			"TAB": {
+				"NOTIFICATION_CHANNEL": {
+					"ADD": "追加",
+					"DELETE": "消去",
+					"EDIT": "編集",
+					"TITLE": "通知チャネル"
+				},
+				"USERS": {
+					"ADD_USER": "ユーザー追加",
+					"REMOVE": "削除",
+					"TITLE": "ユーザー"
+				}
+			},
+			"TITLE": "ユーザーグループ"
+		},
 		"WORKSPACES": {
 			"ACTION": "作業",
 			"ALL": "すべて",
@@ -4249,6 +4307,7 @@
 		"ADMINISTRATION_PREFERENCES": "環境設定",
 		"ADMINISTRATION_ROLE": "役割",
 		"ADMINISTRATION_USER": "ユーザー",
+		"ADMINISTRATION_USER_GROUP": "ユーザーグループ",
 		"ADMINISTRATION_WORKSPACES": "ワークスペース",
 		"ADMINISTRATION_WORKSPACE_GROUP": "ワークスペースグループ",
 		"ALERT_MANAGER": "アラートマネージャー",

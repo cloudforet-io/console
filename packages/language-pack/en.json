@@ -3193,6 +3193,64 @@
 			"REMOVE": "Remove",
 			"TITLE": "User"
 		},
+		"USER_GROUP": {
+			"ACTION": {
+				"ADD_NEW_USER": "Add New User",
+				"REMOVE": "Remove",
+				"UPDATE": "Update"
+			},
+			"CREATE": "Create",
+			"MAIN": {
+				"NOTIFICATIONS_CHANNEL": {
+					"ADD": "Add",
+					"DELETE": "Delete",
+					"EDIT": "Edit"
+				},
+				"USERS": {
+					"ADD_USER": "Add User",
+					"REMOVE": "Remove"
+				}
+			},
+			"MODAL": {
+				"ADD_NEW_USER": {
+					"CANCEL": "Cancel",
+					"CONFIRM": "Confirm",
+					"TITLE": "Add Users to Selected User Group",
+					"USER": "User"
+				},
+				"CREATE_USER_GROUP": {
+					"CANCEL": "Cancel",
+					"CONFIRM": "Confirm",
+					"CUSTOM": "Custom",
+					"DESCRIPTION": "Description",
+					"EVERYDAY": "Every Day",
+					"GROUP_NAME": "Group Name",
+					"INFO": "You will only receive notifications in the schedule you choose.",
+					"NOTIFICATION_CHANNEL": "Notification Channel",
+					"PROTOCOL": "Protocol",
+					"SCHEDULE_SETTING": "Schedule Setting",
+					"TITLE": "Create User Group",
+					"TOKEN": "Token",
+					"UPDATE": "Update",
+					"UPDATE_TITLE": "Update User Group",
+					"WEEKDAYS": "Weekdays"
+				}
+			},
+			"TAB": {
+				"NOTIFICATION_CHANNEL": {
+					"ADD": "Add",
+					"DELETE": "Delete",
+					"EDIT": "Edit",
+					"TITLE": "Notification Channel"
+				},
+				"USERS": {
+					"ADD_USER": "Add User",
+					"REMOVE": "Remove",
+					"TITLE": "Users"
+				}
+			},
+			"TITLE": "User Group"
+		},
 		"WORKSPACES": {
 			"ACTION": "Action",
 			"ALL": "All",
@@ -4249,6 +4307,7 @@
 		"ADMINISTRATION_PREFERENCES": "Preferences",
 		"ADMINISTRATION_ROLE": "Role",
 		"ADMINISTRATION_USER": "User",
+		"ADMINISTRATION_USER_GROUP": "User Group",
 		"ADMINISTRATION_WORKSPACES": "Workspaces",
 		"ADMINISTRATION_WORKSPACE_GROUP": "Workspace Group",
 		"ALERT_MANAGER": "Alert Manager",

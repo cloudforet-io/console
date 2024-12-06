@@ -25,6 +25,7 @@ export const MENU_ID = Object.freeze({
     SERVICE: 'service',
     IAM: 'iam',
     USER: 'user',
+    USER_GROUP: 'user_group',
     ROLE: 'role',
     APP: 'app',
     ADVANCED: 'advanced',
