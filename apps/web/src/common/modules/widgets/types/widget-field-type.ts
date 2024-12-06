@@ -10,7 +10,6 @@ import type { ComparisonOptions } from '@/common/modules/widgets/_widget-fields/
 import type { CustomTableColumnWidthOptions } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
 import type { DataFieldHeatmapColorOptions } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
 import type { DataFieldOptions } from '@/common/modules/widgets/_widget-fields/data-field/type';
-import type { DateAggregationOptionsOptions } from '@/common/modules/widgets/_widget-fields/date-aggregation-options/type';
 import type { DateFormatOptions } from '@/common/modules/widgets/_widget-fields/date-format/type';
 import type { DateRangeOptions } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { DisplaySeriesLabelOptions } from '@/common/modules/widgets/_widget-fields/display-series-label/type';
@@ -47,7 +46,7 @@ export type WidgetFieldOptions = DataFieldOptions | TableDataFieldOptions | XAxi
     | ComparisonOptions | ProgressBarOptions | ColorSchemaOptions | PieChartTypeOptions | DateFormatOptions
     | NumberFormatOptions | DataFieldHeatmapColorOptions | TextWrapOptions | TableColumnWidthOptions | CustomTableColumnWidthOptions
     | MissingValueOptions | WidgetHeightOptions | DisplaySeriesLabelOptions | DateRangeOptions
-    | DateAggregationOptionsOptions | TooltipNumberFormatOptions;
+    | TooltipNumberFormatOptions;
 
 export interface WidgetFieldSchema<FieldOption=WidgetFieldOptions> {
     options?: Partial<FieldOption>;
@@ -62,7 +61,7 @@ export type WidgetFieldName = 'dataField' | 'tableDataField' | 'xAxis' | 'yAxis'
     | 'subTotal' | 'total'
     | 'progressBar'
     | 'formatRules' | 'advancedFormatRules'
-    | 'granularity' | 'dateRange' | 'dateAggregationOptions' | 'colorSchema' | 'pieChartType'
+    | 'granularity' | 'dateRange' | 'colorSchema' | 'pieChartType'
     | 'dateFormat' | 'numberFormat' | 'tooltipNumberFormat' | 'dataFieldHeatmapColor'
     | 'displayAnnotation' | 'displaySeriesLabel' | 'textWrap' | 'tableColumnWidth' | 'customTableColumnWidth'
     | 'missingValue' | 'widgetHeight'

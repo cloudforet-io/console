@@ -6,7 +6,7 @@ import type { _CategoryByValue } from '@/common/modules/widgets/_widget-fields/c
 import type { ColorSchemaValue } from '@/common/modules/widgets/_widget-fields/color-schema/type';
 import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/comparison/type';
 import type { _CustomTableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
-import type { DataFieldHeatmapColorValue } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
+import type { _DataFieldHeatmapColorValue } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
 import type { DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
 import type { DateAggregationOptionsValue } from '@/common/modules/widgets/_widget-fields/date-aggregation-options/type';
 import type { DateFormatValue } from '@/common/modules/widgets/_widget-fields/date-format/type';
@@ -73,7 +73,7 @@ export interface WidgetFieldTypeMap {
     displayAnnotation: WidgetFieldValue<DisplayAnnotationValue>;
     dateRange: WidgetFieldValue<DateRangeValue>;
     dateFormat: WidgetFieldValue<DateFormatValue>;
-    dataFieldHeatmapColor: WidgetFieldValue<DataFieldHeatmapColorValue>;
+    dataFieldHeatmapColor: WidgetFieldValue<_DataFieldHeatmapColorValue>;
     dataField: WidgetFieldValue<DataFieldValue>;
     dateAggregationOptions: WidgetFieldValue<DateAggregationOptionsValue>;
     customTableColumnWidth: WidgetFieldValue<_CustomTableColumnWidthValue>;

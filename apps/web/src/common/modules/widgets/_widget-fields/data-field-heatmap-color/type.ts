@@ -11,3 +11,9 @@ export interface DataFieldHeatmapColorValue {
 export interface DataFieldHeatmapColorOptions {
     default?: DataFieldHeatmapColor;
 }
+
+export interface _DataFieldHeatmapColorValue {
+    [key: string]: {
+        colorInfo: DataFieldHeatmapColor;
+    };
+}
