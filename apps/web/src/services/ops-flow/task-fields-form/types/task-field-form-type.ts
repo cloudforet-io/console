@@ -1,14 +1,14 @@
+import type { FileModel } from '@/schema/file-manager/model';
 import type { TaskField } from '@/schema/opsflow/_types/task-field-type';
-
-import type { Attachment } from '@/common/components/editor/extensions/image/type';
 
 export interface TaskFieldFormProps<TField extends TaskField, TValue> {
   field: TField;
   value: TValue;
   readonly?: boolean;
-  attachments?: Attachment[];
+  files?: FileModel[];
 }
 export interface TaskFieldFormEmits<TValue> {
   (event: 'update:value', value: TValue): void;
+  (event: 'update:files', value: string[]): void;
   (event: 'update:is-valid', value: boolean): void;
 }

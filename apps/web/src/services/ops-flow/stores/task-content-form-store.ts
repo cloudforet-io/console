@@ -3,6 +3,7 @@ import { reactive, computed } from 'vue';
 import { isEmpty } from 'lodash';
 import { defineStore } from 'pinia';
 
+import type { FileModel } from '@/schema/file-manager/model';
 import type { TaskField } from '@/schema/opsflow/_types/task-field-type';
 import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
 import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
@@ -33,6 +34,7 @@ interface UseTaskCreatePageStoreState {
     // task type field form
     data: Record<string, any>;
     dataValidationMap: Record<string, boolean>;
+    files: FileModel[];
     // overall
     mode: 'create-minimal'|'create'|'edit'|'view'; // create-minimal: create task without status and assignee
     hasUnsavedChanges: boolean;
@@ -64,6 +66,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         // task type field form
         data: {},
         dataValidationMap: {},
+        files: [],
         // overall
         mode: 'create',
         hasUnsavedChanges: false,
@@ -101,6 +104,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
             }
             state.data = {};
             state.dataValidationMap = {};
+            state.files = [];
         },
         setStatusId(statusId?: string) {
             state.statusId = statusId;
@@ -127,6 +131,10 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         setFieldValidation(fieldId: string, isValid: boolean) {
             state.dataValidationMap = { ...state.dataValidationMap, [fieldId]: isValid };
         },
+        setFiles(files: FileModel[]) {
+            state.files = files;
+            state.hasUnsavedChanges = true;
+        },
         // overall
         setCurrentTask(task: TaskModel) {
             state.currentCategoryId = task.category_id;
@@ -147,6 +155,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
             state.defaultDataValidationMap = {};
             state.data = {};
             state.dataValidationMap = {};
+            state.files = [];
         },
         setMode(mode: 'create-minimal'|'create'|'edit'|'view') {
             state.mode = mode;
@@ -162,6 +171,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
                     description: state.defaultData.description || undefined,
                     assignee: state.assignee || undefined,
                     data: isEmpty(state.data) ? undefined : state.data,
+                    files: state.files.map((f) => f.file_id),
                     project_id: state.defaultData.project?.[0],
                 });
                 showSuccessMessage('Task created successfully', '');
