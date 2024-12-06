@@ -1,4 +1,3 @@
-/* eslint-disable import/no-cycle */
 import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';

@@ -1,4 +1,3 @@
-/* eslint-disable import/no-cycle */
 import { computed, reactive, watch } from 'vue';
 
 import { jwtDecode } from 'jwt-decode';
@@ -27,7 +26,6 @@ import { setI18nLocale } from '@/translations';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useErrorStore } from '@/store/error/error-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { languages, MANAGED_ROLES, USER_STORAGE_KEY } from '@/store/user/constant';
 import type {
     RoleInfo,
@@ -268,11 +266,15 @@ export const useUserStore = defineStore('user-store', () => {
         state.currentGrantInfo = undefined;
         state.currentRoleInfo = undefined;
     };
-    const grantRoleAndLoadReferenceData = async (grantRequest: Omit<TokenGrantParameters, 'grant_type'>) => {
+    /*
+     * @returns { Promise<boolean> } isGranted
+     */
+    const grantRole = async (grantRequest: Omit<TokenGrantParameters, 'grant_type'>): Promise<boolean> => {
         const appContextStore = useAppContextStore();
         const userWorkspaceStore = useUserWorkspaceStore();
         const errorStore = useErrorStore();
         const fetcher = getCancellableFetcher(SpaceConnector.clientV2.identity.token.grant)<TokenGrantParameters, TokenGrantModel>;
+        let isGranted = false;
 
         try {
             // This is for not-triggered CASE, such as when user use browser back button.
@@ -307,8 +309,7 @@ export const useUserStore = defineStore('user-store', () => {
                 if (grantRequest.scope === 'USER') userWorkspaceStore.setCurrentWorkspace();
 
                 if (currentRoleInfo) {
-                    const allReferenceStore = useAllReferenceStore();
-                    allReferenceStore.flush();
+                    isGranted = true;
                 }
                 errorStore.setGrantAccessFailStatus(false);
             }
@@ -351,6 +352,7 @@ export const useUserStore = defineStore('user-store', () => {
                 appContextStore.setGlobalGrantLoading(false);
             }, 500);
         }
+        return isGranted;
     };
 
     const updateUser = async (userRequest: UserProfileUpdateParameters): Promise<void> => {
@@ -378,7 +380,7 @@ export const useUserStore = defineStore('user-store', () => {
         setUserInfo,
         signIn,
         signOut,
-        grantRoleAndLoadReferenceData,
+        grantRole,
         updateUser,
     };
 
