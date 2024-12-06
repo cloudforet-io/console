@@ -11,9 +11,9 @@ import type { TreeDisplayMap } from '@cloudforet/mirinae/types/data-display/tree
 
 import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
@@ -43,9 +43,11 @@ const { getProperRouteLocation } = useProperRouteLocation();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const appContextStore = useAppContextStore();
+const userStore = useUserStore();
+
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+    isWorkspaceOwner: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
 });
 const { getControlMenuItems } = useDashboardControlMenuItems({
     isAdminMode: computed(() => storeState.isAdminMode),

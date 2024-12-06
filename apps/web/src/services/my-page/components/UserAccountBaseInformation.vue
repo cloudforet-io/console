@@ -11,11 +11,12 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleType } from '@/schema/identity/role/type';
-import { store } from '@/store';
+import type { UserProfileUpdateParameters } from '@/schema/identity/user-profile/api-verbs/update';
 import { i18n } from '@/translations';
 
-import { languages, timezoneList } from '@/store/modules/user/config';
-import type { LanguageCode, UpdateUserRequest } from '@/store/modules/user/type';
+import { languages, timezoneList } from '@/store/user/constant';
+import type { LanguageCode } from '@/store/user/type';
+import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -24,9 +25,11 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import UserAccountModuleContainer
     from '@/services/my-page/components/UserAccountModuleContainer.vue';
 
+
+const userStore = useUserStore();
 const state = reactive({
-    userId: computed(() => store.state.user.userId),
-    userRole: computed<RoleType>(() => store.state.user.roleType),
+    userId: computed<string|undefined>(() => userStore.state.userId),
+    userRole: computed<RoleType|undefined>(() => userStore.state.roleType),
     languages: map(languages, (d, k) => ({
         type: 'item', label: k === 'en' ? `${d} (default)` : d, name: k,
     })) as MenuItem[],
@@ -54,9 +57,9 @@ const validationState = reactive({
 /* Components */
 const getProfile = async () => {
     try {
-        formState.userName = store.state.user.name;
-        formState.language = store.state.user.language;
-        formState.timezone = state.timezones.filter((d) => d.name === store.state.user.timezone);
+        formState.userName = userStore.state.name;
+        formState.language = userStore.state.language;
+        formState.timezone = state.timezones.filter((d) => d.name === userStore.state.timezone);
     } catch (e) {
         ErrorHandler.handleError(e);
     }
@@ -64,7 +67,7 @@ const getProfile = async () => {
 const handleClickProfileConfirm = async () => {
     if (!validationState.showValidation) validationState.showValidation = true;
 
-    const userParam: UpdateUserRequest = {
+    const userParam: UserProfileUpdateParameters = {
         name: formState.userName,
         language: formState.language,
         timezone: formState.timezone[0].name,
@@ -73,16 +76,16 @@ const handleClickProfileConfirm = async () => {
 };
 
 /* API */
-const updateUser = async (userParam: UpdateUserRequest) => {
+const updateUser = async (userParam: UserProfileUpdateParameters) => {
     try {
-        await store.dispatch('user/setUser', userParam);
+        await userStore.updateUser(userParam);
         showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));
     }
 };
 
-watch(() => store.state.user.language, (language) => {
+watch(() => userStore.state.language, (language) => {
     if (language !== formState.language) {
         formState.language = language;
     }

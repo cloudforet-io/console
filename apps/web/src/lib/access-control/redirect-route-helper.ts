@@ -3,6 +3,7 @@ import type { Location } from 'vue-router/types/router';
 
 import { ERROR_ROUTE } from '@/router/constant';
 
+import type { PageAccessMap } from '@/lib/access-control/config';
 import config from '@/lib/config';
 import type { Menu, MenuId } from '@/lib/menu/config';
 import { MENU_LIST, MENU_LIST_FOR_RESOURCE_MANAGER_V2 } from '@/lib/menu/menu-architecture';
@@ -37,7 +38,7 @@ const getSubMenuListByMenuId = (menuId: MenuId): MenuId[] => {
     return [];
 };
 
-export const getRedirectRouteByPagePermission = (route: Route, pagePermissionsMap: Record<string, boolean>): Location => {
+export const getRedirectRouteByPagePermission = (route: Route, pagePermissionsMap: PageAccessMap): Location => {
     const isFlattenedMenuMapEmpty = Object.keys(FLATTENED_MENU_MAP).length === 0;
     if (isFlattenedMenuMapEmpty) makeFlattenedMenuMap();
     const menuId = route.meta?.menuId;

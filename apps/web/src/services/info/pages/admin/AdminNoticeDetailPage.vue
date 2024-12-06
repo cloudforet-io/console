@@ -16,10 +16,10 @@ import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { PostSendParameters } from '@/schema/board/post/api-verbs/send';
 import type { PostModel } from '@/schema/board/post/model';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import {
@@ -53,17 +53,18 @@ const noticeDetailStore = useNoticeDetailStore();
 const noticeDetailState = noticeDetailStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
+const userStore = useUserStore();
 
 const router = useRouter();
 const route = useRoute();
 
 const storeState = reactive({
     post: computed<undefined|PostModel>(() => noticeDetailState.post),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
+    hasPermissionToEditOrDelete: computed<boolean>(() => userStore.getters.isDomainAdmin),
 });
 const state = reactive({
-    hasPermissionToEditOrDelete: computed<boolean>(() => store.getters['user/isDomainAdmin']),
     deleteModalVisible: false,
     allSendingEmailModalVisible: false,
     specificSendingEmailModalVisible: false,
@@ -172,7 +173,7 @@ onBeforeMount(async () => {
             <template v-if="state.hasReadWriteAccess"
                       #extra
             >
-                <div v-if="state.hasPermissionToEditOrDelete"
+                <div v-if="storeState.hasPermissionToEditOrDelete"
                      class="button-group"
                 >
                     <p-button v-if="storeState.post?.resource_group !== RESOURCE_GROUP.SYSTEM"

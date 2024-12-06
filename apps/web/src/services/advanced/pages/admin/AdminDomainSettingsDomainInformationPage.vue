@@ -9,13 +9,13 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useDomainStore } from '@/store/domain/domain-store';
-import { languages, timezoneList } from '@/store/modules/user/config';
-import type { LanguageCode } from '@/store/modules/user/type';
 import { usePreferencesStore } from '@/store/preferences/preferences-store';
+import { languages, timezoneList } from '@/store/user/constant';
+import type { LanguageCode } from '@/store/user/type';
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -30,6 +30,7 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 const domainConfigStore = usePreferencesStore();
 const domainConfigGetters = domainConfigStore.getters;
 const domainStore = useDomainStore();
+const userStore = useUserStore();
 
 const route = useRoute();
 
@@ -37,7 +38,7 @@ const storeState = reactive({
     domainId: computed<string>(() => domainStore.state.domainId),
     domainName: computed<string>(() => domainStore.state.name),
     domainConfig: computed(() => domainStore.state.config),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     isChanged: computed(() => {

@@ -39,8 +39,7 @@ import {
     PI, screens,
 } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
-
+import { useDisplayStore } from '@/store/display/display-store';
 import { useDomainStore } from '@/store/domain/domain-store';
 
 import ConsoleLogo from '@/services/auth/components/ConsoleLogo.vue';
@@ -61,6 +60,7 @@ export default {
     setup() {
         const vm = getCurrentInstance()?.proxy as Vue;
         const domainStore = useDomainStore();
+        const displayStore = useDisplayStore();
         const { width } = useWindowSize();
         const state = reactive({
             symbolImage: computed<string|undefined>(() => domainStore.getters.domainSymbolImage),
@@ -70,7 +70,7 @@ export default {
         /* event */
         const hideErrorMessage = () => {
             if (vm.$route.query.error) vm.$router.replace({ query: { error: null } });
-            store.dispatch('display/hideSignInErrorMessage');
+            displayStore.setIsSignInFailed(false);
         };
 
         return {

@@ -21,11 +21,11 @@ import { iso8601Formatter, numberFormatter } from '@cloudforet/utils';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
-import type { Currency } from '@/store/modules/display/type';
+import { CURRENCY_SYMBOL } from '@/store/display/constant';
+import type { Currency } from '@/store/display/type';
+import { useUserStore } from '@/store/user/user-store';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
@@ -47,6 +47,8 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-c
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
+
+
 interface Props {
     tableHeight?: number;
     hasReadWriteAccess?: boolean;
@@ -58,6 +60,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{(e: 'select-action', value: string): void; }>();
 
+const userStore = useUserStore();
 const workspacePageStore = useWorkspacePageStore();
 const workspacePageState = workspacePageStore.$state;
 
@@ -81,7 +84,7 @@ if (route.query.selectedWorkspaceId) {
 }
 
 const storeState = reactive({
-    timezone: computed(() => store.state.user.timezone ?? 'UTC'),
+    timezone: computed(() => userStore.state.timezone ?? 'UTC'),
     selectedType: computed<string>(() => workspacePageState.selectedType),
     searchFilters: computed<ConsoleFilter[]>(() => workspacePageState.searchFilters),
     currency: computed<Currency|undefined>(() => workspacePageStore.currency),

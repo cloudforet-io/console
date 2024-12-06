@@ -7,11 +7,11 @@ import { isEmpty } from 'lodash';
 import { PI, PTextButton } from '@cloudforet/mirinae';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import { store } from '@/store';
 
-import type { RoleInfo } from '@/store/modules/user/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
+import type { RoleInfo } from '@/store/user/type';
+import { useUserStore } from '@/store/user/user-store';
 
 import {
     green, indigo, peacock, violet,
@@ -38,15 +38,16 @@ const props = withDefaults(defineProps<Props>(), {
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
+const userStore = useUserStore();
 
 const router = useRouter();
 
 const storeState = reactive({
-    getCurrentRoleInfo: computed<RoleInfo>(() => store.getters['user/getCurrentRoleInfo']),
+    getCurrentRoleInfo: computed<RoleInfo|undefined>(() => userStore.state.currentRoleInfo),
     projects: computed<ProjectReferenceMap>(() => allReferenceGetters.project),
 });
 const state = reactive({
-    isWorkspaceMember: computed(() => storeState.getCurrentRoleInfo.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
+    isWorkspaceMember: computed(() => storeState.getCurrentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
     icon: computed<IconInfo>(() => {
         if (props.type === SUMMARY_DATA_TYPE.ASSET) {
             return {

@@ -6,9 +6,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { UserConfigDeleteParameters } from '@/schema/config/user-config/api-verbs/delete';
-import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { RecentItem, RecentType } from '@/common/modules/navigations/type';
@@ -24,9 +24,10 @@ interface RecentState {
 
 export const useRecentStore = defineStore('recent', () => {
     const userWorkspaceStore = useUserWorkspaceStore();
+    const userStore = useUserStore();
 
     const _getters = reactive({
-        userId: computed(() => store.state.user.userId),
+        userId: computed(() => userStore.state.userId),
         currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
     });
 

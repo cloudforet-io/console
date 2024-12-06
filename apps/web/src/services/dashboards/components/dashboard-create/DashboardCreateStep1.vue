@@ -14,10 +14,10 @@ import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
 import type { FolderModel } from '@/schema/dashboard/_types/folder-type';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { DashboardTemplateModel } from '@/schema/repository/dashboard-template/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
@@ -43,9 +43,10 @@ const dashboardCreatePageState = dashboardCreatePageStore.state;
 const dashboardCreatePageGetters = dashboardCreatePageStore.getters;
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlGetters = dashboardPageControlStore.getters;
+const userStore = useUserStore();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    isWorkspaceMember: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
+    isWorkspaceMember: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
 });
 const state = reactive({
     templates: [] as DashboardTemplateModel[],

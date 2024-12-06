@@ -2,7 +2,8 @@ import type { RouteConfig } from 'vue-router';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { store } from '@/store';
+import { pinia } from '@/store/pinia';
+import { useUserStore } from '@/store/user/user-store';
 
 import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
@@ -22,6 +23,8 @@ const BudgetCreatePage = () => import('@/services/cost-explorer/pages/BudgetCrea
 const BudgetDetailPage = () => import('@/services/cost-explorer/pages/BudgetDetailPage.vue');
 const CostReportPage = () => import('@/services/cost-explorer/pages/CostReportPage.vue');
 
+
+const userStore = useUserStore(pinia);
 const costExplorerRoutes: RouteConfig = {
     path: 'cost-explorer',
     name: COST_EXPLORER_ROUTE._NAME,
@@ -29,7 +32,7 @@ const costExplorerRoutes: RouteConfig = {
         menuId: MENU_ID.COST_EXPLORER,
         translationId: MENU_INFO_MAP[MENU_ID.COST_EXPLORER].translationId,
     },
-    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
+    redirect: (to) => getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap),
     component: CostExplorerContainer,
     children: [
         {

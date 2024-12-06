@@ -22,11 +22,12 @@ import { reactive, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import { SpaceRouter } from '@/router';
-import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useDisplayStore } from '@/store/display/display-store';
 import { useDomainStore } from '@/store/domain/domain-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { getLastAccessedWorkspaceId } from '@/lib/site-initializer/last-accessed-workspace';
 
@@ -51,12 +52,14 @@ const props = withDefaults(defineProps<Props>(), {
 const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const domainStore = useDomainStore();
+const userStore = useUserStore();
+const displayStore = useDisplayStore();
 
 const route = useRoute();
 const router = useRouter();
 
 const state = reactive({
-    beforeUser: store.state.user.userId,
+    beforeUser: userStore.state.userId,
     component: computed(() => {
         let component;
         const auth = domainStore.state.extendedAuthType;
@@ -69,7 +72,7 @@ const state = reactive({
         }
         return component;
     }),
-    showErrorMessage: route.query.error === 'error' || computed(() => store.state.display.isSignInFailed),
+    showErrorMessage: route.query.error === 'error' || computed(() => displayStore.state.isSignInFailed),
 });
 
 // Note: 아래 메서드는 모든 LoginPage(e.g. KeycloakPage, SAMLRedirectPage ...)에서 로그인 성공 이후 동일 적용되어야하는 핸들러입니다.
@@ -122,7 +125,7 @@ watch(() => route.query.error, (value) => {
 });
 
 watch(() => route.name, () => {
-    store.dispatch('display/hideSignInErrorMessage');
+    displayStore.setIsSignInFailed(false);
 }, { immediate: true });
 </script>
 

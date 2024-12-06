@@ -8,10 +8,10 @@ import {
 } from '@cloudforet/mirinae';
 
 import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
-import { store } from '@/store';
 import { i18n as _i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -32,6 +32,7 @@ type TitleType = {
 const route = useRoute();
 const router = useRouter();
 const userWorkspaceStore = useUserWorkspaceStore();
+const userStore = useUserStore();
 
 const {
     password, userId, mfaEmail, accessToken, mfaType,
@@ -113,7 +114,7 @@ const handleClickConfirmButton = async () => {
         await loadAuth().signIn(state.credentials, 'MFA', validationState.verificationCode);
         validationState.isVerificationCodeValid = false;
         validationState.verificationCode = '';
-        if (store.state.user.requiredActions?.includes('UPDATE_PASSWORD')) {
+        if (userStore.state.requiredActions?.includes('UPDATE_PASSWORD')) {
             await router.push({ name: AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME });
         } else {
             const hasBoundWorkspace = userWorkspaceStore.getters.workspaceList.length > 0;

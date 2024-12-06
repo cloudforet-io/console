@@ -8,8 +8,8 @@ import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 import { i18n } from '@/translations';
 
-import { CURRENCY } from '@/store/modules/display/config';
-import type { Currency } from '@/store/modules/display/type';
+import { CURRENCY } from '@/store/display/constant';
+import type { Currency } from '@/store/display/type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import getRandomId from '@/lib/random-id-generator';

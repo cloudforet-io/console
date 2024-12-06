@@ -16,13 +16,13 @@ import type { PrivateDashboardCreateParameters } from '@/schema/dashboard/privat
 import type { PrivateWidgetListParameters } from '@/schema/dashboard/private-widget/api-verbs/list';
 import type { PublicDashboardCreateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
 import type { PublicWidgetListParameters } from '@/schema/dashboard/public-widget/api-verbs/list';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -56,6 +56,7 @@ const allReferenceStore = useAllReferenceStore();
 const dashboardStore = useDashboardStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlGetters = dashboardPageControlStore.getters;
+const userStore = useUserStore();
 const {
     forms: {
         name,
@@ -129,7 +130,7 @@ const cloneDashboard = async (): Promise<string|undefined> => {
             layouts: _sharedLayouts,
             options: state.targetDashboard.options || {},
             labels: state.targetDashboard.labels || [],
-            tags: { created_by: store.state.user.userId },
+            tags: { created_by: userStore.state.userId },
             vars: state.targetDashboard.vars,
             vars_schema: state.targetDashboard.vars_schema,
         };

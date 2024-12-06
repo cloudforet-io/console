@@ -23,10 +23,10 @@ import type { PublicWidgetCreateParameters } from '@/schema/dashboard/public-wid
 import type { PublicWidgetDeleteParameters } from '@/schema/dashboard/public-widget/api-verbs/delete';
 import type { PublicWidgetUpdateParameters } from '@/schema/dashboard/public-widget/api-verbs/update';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+import { useDisplayStore } from '@/store/display/display-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
@@ -74,6 +74,7 @@ const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 const allReferenceStore = useAllReferenceStore();
+const displayStore = useDisplayStore();
 
 /* State */
 const containerRef = ref<HTMLElement|null>(null);
@@ -420,7 +421,7 @@ defineExpose({
                                :size="widget.size"
                                :width="widget.width"
                                :widget-options="widget.options"
-                               :mode="store.state.display.visibleSidebar ? 'edit-layout' : 'view'"
+                               :mode="displayStore.state.visibleSidebar ? 'edit-layout' : 'view'"
                                :loading="getWidgetLoading()"
                                :dashboard-options="dashboardDetailState.options"
                                :dashboard-vars="dashboardDetailGetters.refinedVars"

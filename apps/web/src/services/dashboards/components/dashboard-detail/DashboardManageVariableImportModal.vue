@@ -10,10 +10,10 @@ import {
 import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
 import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
 import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -38,6 +38,7 @@ const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailGetters = dashboardDetailStore.getters;
+const userStore = useUserStore();
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;}>();
 
@@ -76,7 +77,7 @@ const updateUseDashboardVarsSchema = async (dashboardId: string) => {
                 _dashboardVarsSchemaProperties[variable.key] = {
                     ...variable,
                     use: false,
-                    created_by: store.state.user.userId,
+                    created_by: userStore.state.userId,
                 };
             });
         await dashboardStore.updateDashboard(dashboardId, {
