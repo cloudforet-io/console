@@ -70,16 +70,16 @@ const dropdownState = reactive({
     selectedAction: '',
     menuItems: computed<MenuItem[]>(() => [
         {
-            name: 'update', label: i18n.t('IAM.USER_GROUP.ACTION.UPDATE'), type: 'item', disabled: !editState.isEditable,
+            name: USER_GROUP_MODAL_TYPE.UPDATE, label: i18n.t('IAM.USER_GROUP.ACTION.UPDATE'), type: 'item', disabled: !editState.isEditable,
         },
         {
-            name: 'remove', label: i18n.t('IAM.USER_GROUP.ACTION.REMOVE'), type: 'item', disabled: !editState.isRemoveAble,
+            name: USER_GROUP_MODAL_TYPE.REMOVE, label: i18n.t('IAM.USER_GROUP.ACTION.REMOVE'), type: 'item', disabled: !editState.isRemoveAble,
         },
         {
             type: 'divider',
         },
         {
-            name: 'add_new_user', label: i18n.t('IAM.USER_GROUP.ACTION.ADD_NEW_USER'), type: 'item',
+            name: USER_GROUP_MODAL_TYPE.ADD_NEW_USER, label: i18n.t('IAM.USER_GROUP.ACTION.ADD_NEW_USER'), type: 'item', disabled: !editState.isEditable,
         },
     ]),
     // selectedMenuItems: [] as SelectDropdownMenuItem[],

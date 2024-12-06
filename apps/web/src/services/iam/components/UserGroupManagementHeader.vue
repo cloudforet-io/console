@@ -3,16 +3,16 @@ import { PHeading, PButton, PHeadingLayout } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 
+import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-constant';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
 const userGroupPageStore = useUserGroupPageStore();
 
 const handleCreateGroup = () => {
     userGroupPageStore.updateModalSettings({
-        type: 'create',
+        type: USER_GROUP_MODAL_TYPE.CREATE,
         title: i18n.t('IAM.USER_GROUP.MODAL.CREATE_USER_GROUP.TITLE'),
         themeColor: 'primary',
-        visible: 'create',
     });
 };
 </script>

@@ -6,6 +6,7 @@ import { PButtonModal } from '@cloudforet/mirinae';
 import UserGroupManagementAddGroupInfo from '@/services/iam/components/UserGroupManagementAddGroupInfo.vue';
 import UserGroupManagementAddNotificationChannelInfo
     from '@/services/iam/components/UserGroupManagementAddNotificationChannelInfo.vue';
+import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-constant';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
 const userGroupPageStore = useUserGroupPageStore();
@@ -38,7 +39,7 @@ const handleClose = () => {
 <template>
     <p-button-modal class="user-group-management-edit-modal"
                     :header-title="userGroupPageState.modal.title"
-                    :visible="userGroupPageState.modal.visible === 'create' || userGroupPageState.modal.visible === 'update'"
+                    :visible="userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.CREATE || userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.UPDATE"
                     size="md"
                     @confirm="handleConfirm"
                     @close="handleClose"
