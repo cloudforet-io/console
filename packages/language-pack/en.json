@@ -637,13 +637,17 @@
 					"MODAL": {
 						"ACTUAL_COST": "Actual Cost",
 						"ADD_CONDITION": "Add Condition",
+						"ALL_MEMBER": "All Members in Service",
 						"BUDGET_NOTI_HELP_TEXT": "When any of the following conditions are met, the notification will be sent.",
 						"BUDGET_USAGE": "{symbol} of Budget",
 						"CRITICAL": "Critical",
-						"SET_BUDGET_NOTIFICATIONS_CONDITION": "Set Budget Notifications Condition",
+						"SET_BUDGET_NOTIFICATIONS": "Set Budget Notifications",
+						"SPECIFIC_USER": "Specific User",
 						"THRESHOLD": "Threshold",
 						"TYPE": "Type",
 						"UNIT": "Unit",
+						"USER": "User",
+						"USER_GROUP": "User Group",
 						"WARNING": "Warning"
 					},
 					"MONTHLY_PLANNING": "Monthly Planning",

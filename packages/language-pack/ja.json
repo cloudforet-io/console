@@ -637,13 +637,17 @@
 					"MODAL": {
 						"ACTUAL_COST": "費用",
 						"ADD_CONDITION": "条件追加",
+						"ALL_MEMBER": "",
 						"BUDGET_NOTI_HELP_TEXT": "次の条件のいずれかが満たされると、通知が送信されます",
 						"BUDGET_USAGE": "予算金額の {symbol} 使用",
 						"CRITICAL": "警告",
-						"SET_BUDGET_NOTIFICATIONS_CONDITION": "予算通知条件の設定",
+						"SET_BUDGET_NOTIFICATIONS": "予算通知の設定",
+						"SPECIFIC_USER": "",
 						"THRESHOLD": "閾値",
 						"TYPE": "タイプ",
 						"UNIT": "ユニット",
+						"USER": "ユーザー",
+						"USER_GROUP": "",
 						"WARNING": "警告"
 					},
 					"MONTHLY_PLANNING": "月別予算計画",

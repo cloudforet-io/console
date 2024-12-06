@@ -637,13 +637,17 @@
 					"MODAL": {
 						"ACTUAL_COST": "실 사용액",
 						"ADD_CONDITION": "알림 기준 추가",
+						"ALL_MEMBER": "",
 						"BUDGET_NOTI_HELP_TEXT": "다음 경우에 알림을 발송합니다.",
 						"BUDGET_USAGE": "예산금액의 {symbol} 사용",
 						"CRITICAL": "위험 경고",
-						"SET_BUDGET_NOTIFICATIONS_CONDITION": "예산 알림 기준 설정",
+						"SET_BUDGET_NOTIFICATIONS": "예산 알림 설정",
+						"SPECIFIC_USER": "",
 						"THRESHOLD": "한계값",
 						"TYPE": "알림선택",
 						"UNIT": "기준",
+						"USER": "사용자",
+						"USER_GROUP": "",
 						"WARNING": "경고"
 					},
 					"MONTHLY_PLANNING": "월별 예산 계획",
