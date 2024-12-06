@@ -7,6 +7,7 @@ import type { CategoryByOptions } from '@/common/modules/widgets/_widget-fields/
 import type { _ColorSchemaOptions } from '@/common/modules/widgets/_widget-fields/color-schema/type';
 import type { ComparisonOptions } from '@/common/modules/widgets/_widget-fields/comparison/type';
 import type { DateFormatOptions } from '@/common/modules/widgets/_widget-fields/date-format/type';
+import type { _GroupByOptions } from '@/common/modules/widgets/_widget-fields/group-by/type';
 import type { StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
 import type { XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { YAxisOptions } from '@/common/modules/widgets/_widget-fields/y-axis/type';
@@ -193,7 +194,22 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
     displayAnnotation: () => widgetFieldDefaultValueMap.displayAnnotation,
     displaySeriesLabel: () => widgetFieldDefaultValueMap.displaySeriesLabel,
     granularity: () => widgetFieldDefaultValueMap.granularity,
-    groupBy: () => widgetFieldDefaultValueMap.groupBy,
+    groupBy: (widgetConfig, dataTable) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const groupByOptions = _fieldsSchema.groupBy?.options as _GroupByOptions;
+
+        const result = widgetFieldDefaultValueMap.categoryBy;
+
+        const fieldKeys = sortWidgetTableFields(Object.keys(dataTable[groupByOptions.dataTarget]));
+
+        result.data = groupByOptions.multiSelectable ? [fieldKeys?.[0]] : fieldKeys?.[0];
+
+        if (!groupByOptions.hideCount) {
+            result.count = groupByOptions.defaultMaxCount ? groupByOptions.defaultMaxCount : 5;
+        }
+
+        return result;
+    },
     header: () => widgetFieldDefaultValueMap.header,
     icon: () => widgetFieldDefaultValueMap.icon,
     legend: () => widgetFieldDefaultValueMap.legend,

@@ -7,8 +7,10 @@ import type { ColorSchemaValue } from '@/common/modules/widgets/_widget-fields/c
 import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/comparison/type';
 import type { _CustomTableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
 import type { DataFieldOptions, DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
+import type { DisplayAnnotationValue } from '@/common/modules/widgets/_widget-fields/display-annotation/type';
 import type { DisplaySeriesLabelValue } from '@/common/modules/widgets/_widget-fields/display-series-label/type';
 import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/granularity/type';
+import type { _GroupByOptions, _GroupByValue } from '@/common/modules/widgets/_widget-fields/group-by/type';
 import type { _StackByValue, StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
 import type { _XAxisValue, XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { _YAxisValue, YAxisOptions } from '@/common/modules/widgets/_widget-fields/y-axis/type';
@@ -88,7 +90,7 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
     },
     dataFieldHeatmapColor: () => true,
     dateFormat: () => true,
-    displayAnnotation: (fieldValue) => {
+    displayAnnotation: (fieldValue: DisplayAnnotationValue) => {
         if (!fieldValue.toggleValue) return true;
         return !!fieldValue.annotation;
     },
@@ -100,6 +102,16 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
     granularity: (fieldValue: GranularityValue) => {
         if (!fieldValue.granularity) return false;
         return true;
+    },
+    groupBy: (fieldValue: _GroupByValue, widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const groupByOptions = _fieldsSchema.groupBy?.options as _GroupByOptions;
+        if (groupByOptions.fixedValue && fieldValue.data !== groupByOptions.fixedValue) return false;
+        if (groupByOptions.hideCount && !!fieldValue.count) return false;
+        if (groupByOptions.multiSelectable && (!Array.isArray(fieldValue.data) || !fieldValue.data.length)) return false;
+        if (groupByOptions.excludeDateField && fieldValue.data === 'date') return false;
+        if (!fieldValue.count || fieldValue.count > groupByOptions.max) return false;
+        return !!fieldValue.data;
     },
 };
 
