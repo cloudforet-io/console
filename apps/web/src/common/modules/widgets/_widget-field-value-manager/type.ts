@@ -5,7 +5,7 @@ import type { _FormatRulesValue } from '@/common/modules/widgets/_widget-fields/
 import type { _CategoryByValue } from '@/common/modules/widgets/_widget-fields/category-by/type';
 import type { ColorSchemaValue } from '@/common/modules/widgets/_widget-fields/color-schema/type';
 import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/comparison/type';
-import type { CustomTableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
+import type { _CustomTableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
 import type { DataFieldHeatmapColorValue } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
 import type { DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
 import type { DateAggregationOptionsValue } from '@/common/modules/widgets/_widget-fields/date-aggregation-options/type';
@@ -76,7 +76,7 @@ export interface WidgetFieldTypeMap {
     dataFieldHeatmapColor: WidgetFieldValue<DataFieldHeatmapColorValue>;
     dataField: WidgetFieldValue<DataFieldValue>;
     dateAggregationOptions: WidgetFieldValue<DateAggregationOptionsValue>;
-    customTableColumnWidth: WidgetFieldValue<CustomTableColumnWidthValue>;
+    customTableColumnWidth: WidgetFieldValue<_CustomTableColumnWidthValue>;
     comparison: WidgetFieldValue<ComparisonValue>;
     colorSchema: WidgetFieldValue<ColorSchemaValue>;
     categoryBy: WidgetFieldValue<_CategoryByValue>;

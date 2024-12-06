@@ -8,3 +8,7 @@ export interface ColorSchemaValue {
 export interface ColorSchemaOptions {
     default?: string;
 }
+
+export interface _ColorSchemaOptions {
+    default?: keyof typeof COLOR_SCHEMA;
+}
