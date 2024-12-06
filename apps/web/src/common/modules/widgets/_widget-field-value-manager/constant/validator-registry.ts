@@ -4,6 +4,7 @@ import type { FieldValueValidator } from '@/common/modules/widgets/_widget-field
 import type { _FormatRulesOptions, _FormatRulesValue } from '@/common/modules/widgets/_widget-fields/advanced-format-rules/type';
 import type { _CategoryByValue, CategoryByOptions } from '@/common/modules/widgets/_widget-fields/category-by/type';
 import type { ColorSchemaValue } from '@/common/modules/widgets/_widget-fields/color-schema/type';
+import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/comparison/type';
 import type { DataFieldOptions, DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
 import type { _StackByValue, StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
 import type { _XAxisValue, XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
@@ -67,6 +68,12 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
     },
     colorSchema: (fieldValue: ColorSchemaValue) => {
         if (!fieldValue.colorName || !fieldValue.colorValue?.length) return false;
+        return true;
+    },
+    comparison: (fieldValue: ComparisonValue) => {
+        if (fieldValue.toggleValue) {
+            return !!fieldValue.decreaseColor && !!fieldValue.increaseColor && !!fieldValue.format;
+        }
         return true;
     },
 };
