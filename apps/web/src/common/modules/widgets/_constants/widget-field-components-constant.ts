@@ -17,7 +17,6 @@ import granularity from '@/common/modules/widgets/_widget-fields/granularity/Wid
 import groupBy from '@/common/modules/widgets/_widget-fields/group-by/WidgetFieldGroupBy.vue';
 import icon from '@/common/modules/widgets/_widget-fields/icon/WidgetFieldIcon.vue';
 import legend from '@/common/modules/widgets/_widget-fields/legend/WidgetFieldLegend.vue';
-import lineBy from '@/common/modules/widgets/_widget-fields/line-by/WidgetFieldLineBy.vue';
 import max from '@/common/modules/widgets/_widget-fields/max/WidgetFieldMax.vue';
 import min from '@/common/modules/widgets/_widget-fields/min/WidgetFieldMin.vue';
 import missingValue from '@/common/modules/widgets/_widget-fields/missing-value/WidgetFieldMissingValue.vue';
@@ -45,7 +44,6 @@ export const WIDGET_FIELD_COMPONENTS: Record<Partial<WidgetFieldName>, Component
     xAxis,
     yAxis,
     stackBy,
-    lineBy,
     groupBy,
     categoryBy,
     min,
