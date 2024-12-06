@@ -24,6 +24,10 @@ export const createImageExtension = (uploadFn: ImageUploader) => Node.create({
         alt: { default: null },
         title: { default: null },
         'file-id': {},
+        'data-loading': { default: false }, // for loading spinner
+        style: { default: null }, // for loading spinner
+        width: { default: 'auto' },
+        height: { default: 'auto' },
     }),
     parseHTML: () => [
         {
@@ -36,6 +40,9 @@ export const createImageExtension = (uploadFn: ImageUploader) => Node.create({
                     title: element.getAttribute('title'),
                     alt: element.getAttribute('alt'),
                     'file-id': element.getAttribute('file-id'),
+                    style: element.getAttribute('style'),
+                    width: element.getAttribute('width'),
+                    height: element.getAttribute('height'),
                 };
             },
         },
