@@ -16,7 +16,7 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import { useServiceCreateFormStore } from '@/services/alert-manager-v2/store/service-create-form-store';
+import { useServiceCreateFormStore } from '@/services/alert-manager-v2/stores/service-create-form-store';
 
 const serviceFormStore = useServiceCreateFormStore();
 const serviceFormState = serviceFormStore.state;

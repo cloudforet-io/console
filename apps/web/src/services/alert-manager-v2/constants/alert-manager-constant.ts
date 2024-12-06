@@ -1,4 +1,9 @@
 import * as styles from '@/styles/colors';
+import {
+    blue, coral, gray, red, violet, yellow,
+} from '@/styles/colors';
+
+import type { AlertSeverity } from '@/services/alert-manager-v2/types/alert-manager-type';
 
 export const SERVICE_DETAIL_TABS = {
     OVERVIEW: 'overview',
@@ -21,7 +26,24 @@ export const ALERT_STATUS_FILTER = {
 export const ALERT_URGENCY_FILTER = {
     HIGH: 'High',
     LOW: 'Low',
+    ERROR: 'ERROR',
 } as const;
+export const ALERT_SEVERITY_LABELS: Record<AlertSeverity, string> = {
+    CRITICAL: 'Critical',
+    ERROR: 'Error',
+    WARNING: 'Warning',
+    INFO: 'Info',
+    NOT_AVAILABLE: 'Not Available',
+    NONE: 'None',
+};
+export const ALERT_SEVERITY_COLORS: Record<AlertSeverity, string> = {
+    CRITICAL: red[600],
+    ERROR: coral[600],
+    WARNING: yellow[600],
+    INFO: blue[600],
+    NOT_AVAILABLE: violet[800],
+    NONE: gray[500],
+};
 
 export const WEBHOOK_DETAIL_TABS = {
     DETAIL: 'detail',

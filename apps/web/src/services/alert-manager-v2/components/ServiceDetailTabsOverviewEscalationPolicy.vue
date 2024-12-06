@@ -7,7 +7,7 @@ import {
 } from '@cloudforet/mirinae';
 
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
-import { useServiceDetailPageStore } from '@/services/alert-manager-v2/store/service-detail-page-store';
+import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
 
 const ITEM_DEFAULT_WIDTH = 184 + 8;
 const DEFAULT_LEFT_PADDING = 16;

@@ -12,7 +12,7 @@ import NotificationsCreateTypeSelector
     from '@/services/alert-manager-v2/components/NotificationsCreateTypeSelector.vue';
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
 import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
-import { useServiceCreateFormStore } from '@/services/alert-manager-v2/store/service-create-form-store';
+import { useServiceCreateFormStore } from '@/services/alert-manager-v2/stores/service-create-form-store';
 
 interface Props {
     serviceId: string;

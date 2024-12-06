@@ -7,7 +7,7 @@ import WebhookCreateSuccessMode
     from '@/services/alert-manager-v2/components/WebhookCreateSuccessMode.vue';
 import WebhookCreateTypeSelector
     from '@/services/alert-manager-v2/components/WebhookCreateTypeSelector.vue';
-import { useServiceCreateFormStore } from '@/services/alert-manager-v2/store/service-create-form-store';
+import { useServiceCreateFormStore } from '@/services/alert-manager-v2/stores/service-create-form-store';
 
 const serviceFormStore = useServiceCreateFormStore();
 const serviceFormState = serviceFormStore.state;

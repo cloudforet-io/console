@@ -4,7 +4,7 @@ import { computed, onUnmounted, reactive } from 'vue';
 import NotificationsCreateTypeSelector
     from '@/services/alert-manager-v2/components/NotificationsCreateTypeSelector.vue';
 import ServiceCreateStepContainer from '@/services/alert-manager-v2/components/ServiceCreateStepContainer.vue';
-import { useServiceCreateFormStore } from '@/services/alert-manager-v2/store/service-create-form-store';
+import { useServiceCreateFormStore } from '@/services/alert-manager-v2/stores/service-create-form-store';
 
 const serviceFormStore = useServiceCreateFormStore();
 const serviceFormState = serviceFormStore.state;
