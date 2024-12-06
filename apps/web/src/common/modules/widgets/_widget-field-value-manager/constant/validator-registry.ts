@@ -4,6 +4,9 @@ import type { FieldValueValidator } from '@/common/modules/widgets/_widget-field
 import type { _FormatRulesOptions, _FormatRulesValue } from '@/common/modules/widgets/_widget-fields/advanced-format-rules/type';
 import type { _CategoryByValue, CategoryByOptions } from '@/common/modules/widgets/_widget-fields/category-by/type';
 import type { DataFieldOptions, DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
+import type { _StackByValue, StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
+import type { _XAxisValue, XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
+import type { _YAxisValue, YAxisOptions } from '@/common/modules/widgets/_widget-fields/y-axis/type';
 
 export interface WidgetValidatorRegistry {
     [fieldKey: string]: FieldValueValidator<any>;
@@ -41,6 +44,24 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const categoryByOptions = _fieldsSchema.categoryBy?.options as CategoryByOptions;
         if (!fieldValue.data || !fieldValue.count || fieldValue.count < 0 || fieldValue.count > categoryByOptions.max) return false;
+        return true;
+    },
+    stackBy: (fieldValue: _StackByValue, widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const stackByOptions = _fieldsSchema.stackBy?.options as StackByOptions;
+        if (!fieldValue.data || !fieldValue.count || fieldValue.count < 0 || fieldValue.count > stackByOptions.max) return false;
+        return true;
+    },
+    xAxis: (fieldValue: _XAxisValue, widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const xAxisOptions = _fieldsSchema.xAxis?.options as XAxisOptions;
+        if (!fieldValue.data || !fieldValue.count || fieldValue.count < 0 || fieldValue.count > xAxisOptions.max) return false;
+        return true;
+    },
+    yAxis: (fieldValue: _YAxisValue, widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const yAxisOptions = _fieldsSchema.yAxis?.options as YAxisOptions;
+        if (!fieldValue.data || !fieldValue.count || fieldValue.count < 0 || fieldValue.count > yAxisOptions.max) return false;
         return true;
     },
 };
