@@ -1,4 +1,3 @@
-/* eslint-disable import/no-cycle */
 import Vue from 'vue';
 import type { RouteConfig } from 'vue-router';
 import VueRouter from 'vue-router';
@@ -25,7 +24,7 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useErrorStore } from '@/store/error/error-store';
 import { pinia } from '@/store/pinia';
-import { useUserStore } from '@/store/user/user-store';
+import type { useUserStore } from '@/store/user/user-store';
 
 import { getRecentConfig } from '@/lib/helper/router-recent-helper';
 import type { MenuId } from '@/lib/menu/config';
@@ -34,17 +33,24 @@ import { GTag } from '@/lib/site-analytics/gtag';
 
 
 const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
-const grantAndLoadByCurrentScope = async (scope: GrantScope, workspaceId?: string): Promise<{ failStatus: boolean }> => {
+const grantAndLoadByCurrentScope = async (
+    scope: GrantScope,
+    afterGrantedCallback: () => void,
+    userStore: ReturnType<typeof useUserStore>,
+    workspaceId?: string,
+): Promise<{ failStatus: boolean }> => {
     const refreshToken = SpaceConnector.getRefreshToken();
     const grantRequest: Omit<TokenGrantParameters, 'grant_type'> = {
         scope,
-        token: refreshToken,
+        token: refreshToken as string,
         workspace_id: workspaceId,
     };
 
     const errorStore = useErrorStore(pinia);
-    const userStore = useUserStore(pinia);
-    await userStore.grantRoleAndLoadReferenceData(grantRequest);
+    const isGranted: boolean = await userStore.grantRole(grantRequest);
+    if (isGranted) {
+        afterGrantedCallback();
+    }
     const grantAccessFailStatus = errorStore.state.grantAccessFailStatus;
     return {
         failStatus: !!grantAccessFailStatus,
@@ -53,7 +59,7 @@ const grantAndLoadByCurrentScope = async (scope: GrantScope, workspaceId?: strin
 export class SpaceRouter {
     static router: VueRouter;
 
-    static init(routes: RouteConfig[]) {
+    static init(routes: RouteConfig[], afterGrantedCallback: () => void, userStore: ReturnType<typeof useUserStore>) {
         if (SpaceRouter.router) throw new Error('Router init failed: Already initiated.');
 
         Vue.use(VueRouter);
@@ -67,7 +73,6 @@ export class SpaceRouter {
         let previousPath: string;
         const appContextStore = useAppContextStore(pinia);
         const userWorkspaceStore = useUserWorkspaceStore(pinia);
-        const userStore = useUserStore(pinia);
 
         SpaceRouter.router.onError((error) => {
             console.error(error);
@@ -106,7 +111,7 @@ export class SpaceRouter {
 
             /* Grant Scope Process */
             if (routeScope !== ROUTE_SCOPE.EXCLUDE_AUTH && shouldUpdateScope(prevRole, routeScope, prevWorkspaceId, to.params.workspaceId)) {
-                const { failStatus } = await grantAndLoadByCurrentScope(routeScope, to.params.workspaceId);
+                const { failStatus } = await grantAndLoadByCurrentScope(routeScope, afterGrantedCallback, userStore, to.params.workspaceId);
 
                 if (failStatus) { // Grant fail
                     await userWorkspaceStore.load();
@@ -129,8 +134,6 @@ export class SpaceRouter {
         SpaceRouter.router.afterEach((to) => {
             // set target page as GTag page view
             if (GTag.gtag) GTag.setPageView(to);
-            const store = SpaceRouter.router.app?.$store;
-            if (!store) return;
             const isAdminMode = appContextStore.getters.isAdminMode;
             const pageAccessPermissionMap = userStore.getters.pageAccessPermissionMap;
             const routeScope = getRouteScope(to);

@@ -1,4 +1,3 @@
-/* eslint-disable import/no-cycle */
 import { asyncComputed } from '@vueuse/core';
 import { computed, reactive } from 'vue';
 
@@ -11,8 +10,8 @@ import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/
 import type { ProjectModel } from '@/schema/identity/project/model';
 import type { ProjectType } from '@/schema/identity/project/type';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
+import { useProjectGroupReferenceStore } from '@/store/reference/project-group-reference-store';
 import type {
     ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
@@ -38,14 +37,14 @@ const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
 export const useProjectReferenceStore = defineStore('reference-project', () => {
-    const allReferenceStore = useAllReferenceStore();
+    const projectGroupReferenceStore = useProjectGroupReferenceStore();
     const userStore = useUserStore();
     const state = reactive({
         items: null as ProjectReferenceMap | null,
     });
 
     const _getters = reactive({
-        projectGroup: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
+        projectGroup: computed<ProjectGroupReferenceMap>(() => projectGroupReferenceStore.getters.projectGroupItems),
     });
 
     const getters = reactive({
@@ -76,7 +75,7 @@ export const useProjectReferenceStore = defineStore('reference-project', () => {
                 only: ['project_id', 'name', 'project_group_id', 'users', 'project_type', 'workspace_id'],
             },
         };
-        await allReferenceStore.load('project_group', { force: true });
+        await projectGroupReferenceStore.load({ force: true });
         const res = await SpaceConnector.clientV2.identity.project.list<ProjectListParameters, ListResponse<ProjectModel>>(params);
 
         const projectReferenceMap: ProjectReferenceMap = {};

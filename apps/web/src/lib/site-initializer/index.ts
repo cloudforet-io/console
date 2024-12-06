@@ -11,6 +11,7 @@ import { integralRoutes } from '@/router/integral-routes';
 
 import { useDisplayStore } from '@/store/display/display-store';
 import { pinia } from '@/store/pinia';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import config from '@/lib/config';
@@ -24,7 +25,6 @@ import { initDomainSettings } from '@/lib/site-initializer/domain-settings';
 import { initEcharts } from '@/lib/site-initializer/echarts';
 import { initErrorHandler } from '@/lib/site-initializer/error-handler';
 import { initModeSetting } from '@/lib/site-initializer/mode-setting';
-// import { prefetchResources } from '@/lib/site-initializer/resource-prefetch';
 import { checkSsoAccessToken } from '@/lib/site-initializer/sso';
 import { initUserAndAuth } from '@/lib/site-initializer/user-auth';
 import { initWorkspace } from '@/lib/site-initializer/workspace';
@@ -41,10 +41,13 @@ const initQueryHelper = () => {
 
 let isRouterInitialized = false;
 const initRouter = (domainId?: string) => {
+    const userStore = useUserStore(pinia);
+    const allReferenceStore = useAllReferenceStore(pinia);
+    const afterGrantedCallback = () => allReferenceStore.flush();
     if (!domainId) {
-        SpaceRouter.init(errorRoutes);
+        SpaceRouter.init(errorRoutes, afterGrantedCallback, userStore);
     } else {
-        SpaceRouter.init(integralRoutes);
+        SpaceRouter.init(integralRoutes, afterGrantedCallback, userStore);
     }
     isRouterInitialized = true;
 };
