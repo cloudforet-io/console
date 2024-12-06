@@ -2,9 +2,8 @@
 import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PLazyImg, PI, PTextHighlighting } from '@cloudforet/mirinae';
+import { PI, PTextHighlighting } from '@cloudforet/mirinae';
 
-import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import type { ReferenceData } from '@/lib/helper/config-data-helper';
 import { getParsedKeysWithManagedCostQueryFavoriteKey } from '@/lib/helper/config-data-helper';
 import type { MenuInfo } from '@/lib/menu/config';
@@ -13,7 +12,6 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
-import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
 import { gray, indigo, peacock } from '@/styles/colors';
 
@@ -72,18 +70,6 @@ const handleClickItem = () => {
         router.push(referenceRouter(itemName, { resource_type: 'identity.ProjectGroup' })).catch(() => {});
         return;
     }
-    if (props.item.itemType === FAVORITE_TYPE.CLOUD_SERVICE || props.item.itemType === RECENT_TYPE.CLOUD_SERVICE_TYPE) {
-        const itemInfo: string[] = itemName.split('.');
-        router.push({
-            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-            params: {
-                provider: itemInfo[0],
-                group: itemInfo[1],
-                name: props.item.label as string,
-            },
-        }).catch(() => {});
-        return;
-    }
     if (props.item.itemType === FAVORITE_TYPE.COST_ANALYSIS) {
         const parsedKeys = getParsedKeysWithManagedCostQueryFavoriteKey(itemName);
         router.push({
@@ -120,16 +106,7 @@ const handleClickItem = () => {
          @click="handleClickItem"
     >
         <span class="image">
-            <p-lazy-img v-if="props.item?.itemType === FAVORITE_TYPE.CLOUD_SERVICE
-                            || props.item?.itemType === FAVORITE_TYPE.SECURITY
-                            || props.item?.itemType === RECENT_TYPE.CLOUD_SERVICE_TYPE
-                        "
-                        :src="assetUrlConverter(props.item?.icon || '')"
-                        width="1rem"
-                        height="1rem"
-            />
-            <p-i v-else
-                 :name="props.item?.icon"
+            <p-i :name="props.item?.icon"
                  width="1rem"
                  height="1rem"
                  :color="state.iconColor"

@@ -11,14 +11,12 @@ import {
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { QueryHelper } from '@cloudforet/core-lib/query';
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PButtonModal,
     PI,
-    PLink,
     PToolboxTable,
     PTextPagination,
     PCollapsibleToggle,
@@ -43,16 +41,9 @@ import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
 import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 import { usageUnitFormatter } from '@/lib/helper/usage-formatter';
-import {
-    arrayToQueryString,
-    objectToQueryString,
-    primitiveToQueryString,
-} from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import type { CloudServiceMainPageUrlQuery } from '@/services/asset-inventory/types/cloud-service-page-type';
 import {
     GRANULARITY,
     GROUP_BY,
@@ -250,85 +241,6 @@ const tableState = reactive({
 });
 
 /* util */
-const getLink = (item: CostAnalyzeRawData, fieldName: string) => {
-    const queryHelper = new QueryHelper();
-    const query: CloudServiceMainPageUrlQuery = {};
-    if (item.region_code) {
-        query.region = arrayToQueryString([item.region_code]);
-    } else if (costAnalysisPageState.filters?.region_code?.length) {
-        query.region = arrayToQueryString(
-            costAnalysisPageState.filters.region_code,
-        );
-    }
-    if (item.provider) {
-        query.provider = primitiveToQueryString(item.provider);
-    } else if (costAnalysisPageState.filters?.provider?.length) {
-        query.provider = primitiveToQueryString(
-            costAnalysisPageState.filters.provider[0],
-        );
-    }
-
-    const dateIndex = Number(fieldName.split('.')[1]);
-    const date = item.value_sum?.[dateIndex].date;
-    if (date) {
-        const _period = { start: date, end: date };
-        if (costAnalysisPageState.granularity === GRANULARITY.MONTHLY) {
-            _period.start = dayjs.utc(date).format('YYYY-MM-01');
-            _period.end = dayjs.utc(date).endOf('month').format('YYYY-MM-DD');
-        }
-        query.period = objectToQueryString(_period);
-    }
-
-    if (typeof item.project_id === 'string') {
-        query.project = arrayToQueryString([item.project_id]);
-    } else if (costAnalysisPageState.filters?.project_id?.length) {
-        query.project = arrayToQueryString([
-            costAnalysisPageState.filters.project_id,
-        ]);
-    }
-
-    if (typeof item.service_account_id === 'string') {
-        query.service_account = arrayToQueryString([item.service_account_id]);
-    } else if (costAnalysisPageState.filters?.service_account_id?.length) {
-        query.service_account = arrayToQueryString([
-            costAnalysisPageState.filters.service_account_id,
-        ]);
-    }
-
-    const filters: ConsoleFilter[] = [];
-    if (typeof item.project_group_id === 'string') {
-        filters.push({ k: 'project_group_id', v: item.project_group_id, o: '=' });
-    } else if (costAnalysisPageState.filters?.project_group_id?.length) {
-        filters.push({
-            k: 'project_group_id',
-            v: costAnalysisPageState.filters.project_group_id,
-            o: '=',
-        });
-    }
-
-    if (typeof item.product === 'string') {
-        filters.push({
-            k: 'ref_cloud_service_type.service_code',
-            v: item.product,
-            o: '=',
-        });
-    } else if (costAnalysisPageState.filters?.product?.length) {
-        filters.push({
-            k: 'ref_cloud_service_type.service_code',
-            v: costAnalysisPageState.filters.product,
-            o: '=',
-        });
-    }
-
-    return {
-        name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
-        params: {},
-        query: {
-            filters: queryHelper.setFilters(filters).rawQueryStrings,
-            ...query,
-        },
-    };
-};
 const isIncreasedByHalfOrMore = (
     item: CostAnalyzeRawData,
     fieldName: string,
@@ -662,42 +574,31 @@ watch(
                 <span v-else-if="typeof value !== 'string'"
                       class="text-center"
                 >
-                    <p-link
-                        :to="
-                            !storeState.isAdminMode && value !== undefined
-                                ? getLink(item, field.name)
-                                : undefined
-                        "
-                        class="!align-middle"
-                        :class="{
-                            'no-link': storeState.isAdminMode || value === undefined,
-                        }"
-                    >
-                        <span class="usage-wrapper">
-                            <span
-                                :class="
-                                    isIncreasedByHalfOrMore(item, field.name)
-                                        ? 'cell-text raised'
-                                        : undefined
-                                "
-                            >
-                                {{
-                                    getTableValue(
-                                        costAnalysisPageState.displayDataType,
-                                        tableState.showFormattedData,
-                                        value,
-                                        item.usage_unit
-                                    )
-                                }}
-                            </span>
-                            <p-i
-                                v-if="isIncreasedByHalfOrMore(item, field.name)"
-                                name="ic_arrow-up-bold-alt"
-                                width="0.75rem"
-                                height="0.75rem"
-                            />
+
+                    <span class="usage-wrapper">
+                        <span
+                            :class="
+                                isIncreasedByHalfOrMore(item, field.name)
+                                    ? 'cell-text raised'
+                                    : undefined
+                            "
+                        >
+                            {{
+                                getTableValue(
+                                    costAnalysisPageState.displayDataType,
+                                    tableState.showFormattedData,
+                                    value,
+                                    item.usage_unit
+                                )
+                            }}
                         </span>
-                    </p-link>
+                        <p-i
+                            v-if="isIncreasedByHalfOrMore(item, field.name)"
+                            name="ic_arrow-up-bold-alt"
+                            width="0.75rem"
+                            height="0.75rem"
+                        />
+                    </span>
                 </span>
             </template>
             <template
