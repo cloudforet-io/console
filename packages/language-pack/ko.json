@@ -3193,6 +3193,64 @@
 			"REMOVE": "제거",
 			"TITLE": "사용자"
 		},
+		"USER_GROUP": {
+			"ACTION": {
+				"ADD_NEW_USER": "새로운 사용자 추가",
+				"REMOVE": "삭제",
+				"UPDATE": "수정"
+			},
+			"CREATE": "생성",
+			"MAIN": {
+				"NOTIFICATIONS_CHANNEL": {
+					"ADD": "추가",
+					"DELETE": "삭제",
+					"EDIT": "편집"
+				},
+				"USERS": {
+					"ADD_USER": "사용자 추가",
+					"REMOVE": "삭제"
+				}
+			},
+			"MODAL": {
+				"ADD_NEW_USER": {
+					"CANCEL": "취소",
+					"CONFIRM": "확인",
+					"TITLE": "선택한 사용자 그룹에 사용자 추가",
+					"USER": "사용자"
+				},
+				"CREATE_USER_GROUP": {
+					"CANCEL": "취소",
+					"CONFIRM": "확인",
+					"CUSTOM": "커스텀",
+					"DESCRIPTION": "설명",
+					"EVERYDAY": "매일",
+					"GROUP_NAME": "그룹 이름",
+					"INFO": "선택한 일정의 알림만 수신됩니다.",
+					"NOTIFICATION_CHANNEL": "알림 채널",
+					"PROTOCOL": "프로토콜",
+					"SCHEDULE_SETTING": "스케줄 설정",
+					"TITLE": "사용자 그룹 생성",
+					"TOKEN": "토큰",
+					"UPDATE": "수정",
+					"UPDATE_TITLE": "사용자 그룹 수정",
+					"WEEKDAYS": "주중"
+				}
+			},
+			"TAB": {
+				"NOTIFICATION_CHANNEL": {
+					"ADD": "추가",
+					"DELETE": "삭제",
+					"EDIT": "편집",
+					"TITLE": "알림 채널"
+				},
+				"USERS": {
+					"ADD_USER": "사용자 추가",
+					"REMOVE": "삭제",
+					"TITLE": "사용자 목"
+				}
+			},
+			"TITLE": "사용자 그룹"
+		},
 		"WORKSPACES": {
 			"ACTION": "작업",
 			"ALL": "전체",
@@ -4249,6 +4307,7 @@
 		"ADMINISTRATION_PREFERENCES": "환경설정",
 		"ADMINISTRATION_ROLE": "역할",
 		"ADMINISTRATION_USER": "사용자",
+		"ADMINISTRATION_USER_GROUP": "사용자 그룹",
 		"ADMINISTRATION_WORKSPACES": "워크스페이스",
 		"ADMINISTRATION_WORKSPACE_GROUP": "워크스페이스 그룹",
 		"ALERT_MANAGER": "얼럿 매니저",
