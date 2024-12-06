@@ -1,81 +1,80 @@
 <script setup lang="ts">
+import { reactive } from 'vue';
+
 import {
     PTextarea, PButton, PTextBeautifier, PCollapsiblePanel,
 } from '@cloudforet/mirinae';
 
-import { useAlertInfoItem } from '@/services/alert-manager-v2/composables/alert-info';
-
-const props = defineProps<{
-    id?: string;
-    alertData?: Record<string, any>;
-    manageDisabled?: boolean;
-}>();
-const {
-    state: alertDetailItemState,
-    cancelEdit,
-    startEdit,
-    onClickSave,
-} = useAlertInfoItem({
-    alertId: props.id ?? '',
+const state = reactive({
     isEditMode: false,
-    dataForUpdate: props.alertData?.description,
+    dataForUpdate: 'dataForUpdate',
 });
+
+const handleClickEditModeButton = (value: boolean) => {
+    state.isEditMode = value;
+};
+const handleClickSaveButton = () => {
+    console.log('TODO: handleClickSaveButton');
+};
 </script>
 
 <template>
-    <p v-if="!alertDetailItemState.isEditMode"
-       class="content-wrapper"
+    <div class="alert-detail-info-table-description"
+         :class="{ 'edit-mode': state.isEditMode }"
     >
-        <p-collapsible-panel :line-clamp="10">
-            <p-text-beautifier class="description"
-                               :value="props.alertData.description"
-            />&zwnj;
-        </p-collapsible-panel>
-        <p-button style-type="tertiary"
-                  size="sm"
-                  :disabled="props.manageDisabled"
-                  @click="startEdit(props.alertData.description)"
+        <div v-if="!state.isEditMode"
+             class="content-wrapper"
         >
-            {{ $t('IDENTITY.USER.NOTIFICATION.EDIT') }}
-        </p-button>
-    </p>
-    <div v-else
-         class="content-wrapper"
-    >
-        <p-textarea v-model="alertDetailItemState.dataForUpdate"
-                    class="textarea"
-        />
-        <div class="button-group">
-            <p-button style-type="secondary"
-                      class="text-button mr-2"
+            <p-collapsible-panel :line-clamp="10"
+                                 class="collapsible-panel"
+            >
+                <p-text-beautifier class="whitespace-pre-line"
+                                   value="description"
+                />&zwnj;
+            </p-collapsible-panel>
+            <p-button style-type="tertiary"
                       size="sm"
-                      @click="cancelEdit(props.alertData.description)"
+                      @click="handleClickEditModeButton(true)"
             >
-                {{ $t('MONITORING.ALERT.DETAIL.INFO.CANCEL') }}
+                {{ $t('ALERT_MANAGER.EDIT') }}
             </p-button>
-            <p-button
-                style-type="primary"
-                size="sm"
-                class="text-button"
-                @click="onClickSave('description')"
-            >
-                {{ $t('MONITORING.ALERT.DETAIL.INFO.SAVE_CHANGES') }}
-            </p-button>
+        </div>
+        <div v-else
+             class="content-wrapper"
+        >
+            <p-textarea v-model="state.dataForUpdate"
+                        class="min-h-60"
+            />
+            <div class="buttons-wrapper flex ml-auto gap-2">
+                <p-button style-type="secondary"
+                          size="sm"
+                          @click="handleClickEditModeButton(false)"
+                >
+                    {{ $t('ALERT_MANAGER.CANCEL') }}
+                </p-button>
+                <p-button style-type="primary"
+                          size="sm"
+                          @click="handleClickSaveButton"
+                >
+                    {{ $t('ALERT_MANAGER.ALERTS.SAVE_CHANGES') }}
+                </p-button>
+            </div>
         </div>
     </div>
 </template>
 
 <style lang="postcss" scoped>
-@import './styles/alertInfoItem.pcss';
-.p-collapsible-panel {
-    padding: 0;
-    margin-right: 0.5rem;
-    line-height: 1.5;
-}
-.description {
-    white-space: pre-line;
-}
-.textarea {
-    min-height: 15rem;
+.alert-detail-info-table-description {
+    .content-wrapper {
+        @apply inline-flex justify-between w-full items-start text-gray-900 text-paragraph-md;
+        .collapsible-panel {
+            @apply mr-2 p-0 leading-6;
+        }
+    }
+    &.edit-mode {
+        .content-wrapper {
+            @apply flex-col gap-2;
+        }
+    }
 }
 </style>
