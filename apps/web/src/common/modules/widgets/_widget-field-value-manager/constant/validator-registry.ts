@@ -5,6 +5,7 @@ import type { _FormatRulesOptions, _FormatRulesValue } from '@/common/modules/wi
 import type { _CategoryByValue, CategoryByOptions } from '@/common/modules/widgets/_widget-fields/category-by/type';
 import type { ColorSchemaValue } from '@/common/modules/widgets/_widget-fields/color-schema/type';
 import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/comparison/type';
+import type { _CustomTableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
 import type { DataFieldOptions, DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
 import type { _StackByValue, StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
 import type { _XAxisValue, XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
@@ -73,6 +74,13 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
     comparison: (fieldValue: ComparisonValue) => {
         if (fieldValue.toggleValue) {
             return !!fieldValue.decreaseColor && !!fieldValue.increaseColor && !!fieldValue.format;
+        }
+        return true;
+    },
+    customTableColumnWidth: (fieldValue: _CustomTableColumnWidthValue) => {
+        if (fieldValue.widthInfos?.length) {
+            return fieldValue.widthInfos.every((d) => !!d.fieldKey && d.width >= 0)
+                || fieldValue.widthInfos.map((d) => d.fieldKey).length === new Set(fieldValue.widthInfos.map((d) => d.fieldKey)).size;
         }
         return true;
     },

@@ -34,7 +34,9 @@ export const widgetFieldDefaultValueMap: DefaultValueRegistry = {
         format: 'all',
         toggleValue: true,
     },
-    customTableColumnWidth: {},
+    customTableColumnWidth: {
+        widthInfos: [],
+    },
     dataFieldHeatmapColor: {},
     dateAggregationOptions: {},
     dateFormat: {},

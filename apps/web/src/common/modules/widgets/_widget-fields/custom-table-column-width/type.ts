@@ -11,3 +11,9 @@ export interface CustomTableColumnWidthValue {
 export interface CustomTableColumnWidthOptions {
     toggle?: boolean;
 }
+
+// export interface _CustomTableColumnWidthOptions {}
+
+export interface _CustomTableColumnWidthValue {
+    widthInfos?: CustomColumnWidthItem[];
+}
