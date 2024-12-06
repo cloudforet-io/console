@@ -67,6 +67,7 @@ const getUserInfo = async (): Promise<Partial<UserStoreState>> => {
         mfa: response.mfa,
     };
 };
+
 const getGrantedRole = async (roleId: string, currentRoleType: RoleType, baseRoleType?: RoleType): Promise<RoleInfo|undefined> => {
     // DOMAIN_ADMIN -> enter workspace case
     if (baseRoleType === ROLE_TYPE.DOMAIN_ADMIN && currentRoleType === ROLE_TYPE.WORKSPACE_OWNER) {
