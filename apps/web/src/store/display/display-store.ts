@@ -30,9 +30,15 @@ import type {
 } from '@/store/display/type';
 import { useUserStore } from '@/store/user/user-store';
 
+import config from '@/lib/config';
 import type { Menu, MenuId, MenuInfo } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
-import { ADMIN_MENU_LIST, MENU_LIST } from '@/lib/menu/menu-architecture';
+import {
+    ADMIN_MENU_LIST,
+    ADMIN_MENU_LIST_FOR_RESOURCE_MANAGER_V2,
+    MENU_LIST,
+    MENU_LIST_FOR_RESOURCE_MANAGER_V2,
+} from '@/lib/menu/menu-architecture';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -303,9 +309,12 @@ export const useDisplayStore = defineStore('display-store', () => {
         const appContextStore = useAppContextStore();
         const appContextState = appContextStore.$state;
         const userWorkspaceStore = useUserWorkspaceStore();
+        const isResourceManagerVersionV2 = config.get('RESOURCE_MANAGER_VERSION') === 'v2';
+        const menuListByVersion = (isResourceManagerVersionV2 ? MENU_LIST_FOR_RESOURCE_MANAGER_V2 : MENU_LIST);
+        const adminMenuListByVersion = (isResourceManagerVersionV2 ? ADMIN_MENU_LIST_FOR_RESOURCE_MANAGER_V2 : ADMIN_MENU_LIST);
         const isAdminMode = appContextState.getters.isAdminMode;
         const currentWorkspaceId = userWorkspaceStore.getters.currentWorkspaceId;
-        const menuList = isAdminMode ? ADMIN_MENU_LIST : MENU_LIST;
+        const menuList = isAdminMode ? adminMenuListByVersion : menuListByVersion;
         let _allGnbMenuList: DisplayMenu[];
 
         _allGnbMenuList = getDisplayMenuList(menuList, isAdminMode, currentWorkspaceId);
