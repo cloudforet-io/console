@@ -4,7 +4,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ResourceGroupType } from '@/schema/_common/type';
 import type { FileAddParameters } from '@/schema/file-manager/api-verbs/add';
-import type { FileGetDownloadUrlParameters } from '@/schema/file-manager/api-verbs/get-download-url';
+import type {
+    FileGetDownloadUrlParameters,
+} from '@/schema/file-manager/api-verbs/get-download-url';
 import type { FileModel } from '@/schema/file-manager/model';
 
 import type { Attachment } from '@/common/components/editor/extensions/image/type';
@@ -38,19 +40,23 @@ const uploadFile = async (uploadUrl: string, options: object, file: File) => {
     await axios.post(uploadUrl, formData);
 };
 
-export const getDownloadUrl = async (fileId: string): Promise<string> => {
+export const getUploadedFile = async (fileId: string): Promise<FileModel> => {
     const result = await SpaceConnector.clientV2.fileManager.file.getDownloadUrl<FileGetDownloadUrlParameters, FileModel>({
         file_id: fileId,
     });
     if (!result.download_url) throw new Error('[File Manager] No download url in response of update file state api');
-    return result.download_url;
+    return result;
 };
-export const uploadFileAndGetFileInfo = async (file: File, resourceGroup: FileManagerResourceGroupType, domainOrWorkspaceId: string): Promise<Attachment> => {
+export const uploadFileAndGetFileInfo = async (file: File, resourceGroup: FileManagerResourceGroupType, domainOrWorkspaceId: string): Promise<Attachment<FileModel>> => {
     try {
-        const fileModel = await getUploadInfo(file, resourceGroup, domainOrWorkspaceId);
-        await uploadFile(fileModel.upload_url, fileModel.upload_options, file);
-        const downloadUrl = await getDownloadUrl(fileModel.file_id);
-        return { downloadUrl, fileId: fileModel.file_id };
+        const uploadInfo = await getUploadInfo(file, resourceGroup, domainOrWorkspaceId);
+        await uploadFile(uploadInfo.upload_url, uploadInfo.upload_options, file);
+        const fileModel = await getUploadedFile(uploadInfo.file_id);
+        return {
+            downloadUrl: fileModel.download_url as string,
+            fileId: fileModel.file_id,
+            data: fileModel,
+        };
     } catch (e) {
         ErrorHandler.handleError(e);
         return {
