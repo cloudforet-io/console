@@ -1,4 +1,4 @@
-import type { Currency } from '@/store/modules/display/type';
+import type { Currency } from '@/store/display/type';
 import type { LanguageCode } from '@/store/user/type';
 
 

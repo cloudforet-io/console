@@ -18,7 +18,7 @@ import type { AccountType } from '@/schema/identity/service-account/type';
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import type { Currency } from '@/store/modules/display/type';
+import type { Currency } from '@/store/display/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderItem } from '@/store/reference/provider-reference-store';
 import { useUserStore } from '@/store/user/user-store';

@@ -1,5 +1,4 @@
-import { store } from '@/store';
-
+import { useDisplayStore } from '@/store/display/display-store';
 import { useDomainStore } from '@/store/domain/domain-store';
 import { pinia } from '@/store/pinia';
 import { useUserStore } from '@/store/user/user-store';
@@ -40,6 +39,7 @@ class GoogleAuth extends Authenticator {
 
     static async onSuccess(accessToken, onErrorCallback) {
         const userStore = useUserStore(pinia);
+        const displayStore = useDisplayStore(pinia);
         try {
             userStore.setIsSignInLoading(true);
             GoogleAuth.accessToken = accessToken;
@@ -50,7 +50,7 @@ class GoogleAuth extends Authenticator {
         } catch (e: any) {
             if (onErrorCallback) onErrorCallback(e, accessToken);
             await GoogleAuth.signOut();
-            await store.dispatch('display/showSignInErrorMessage');
+            displayStore.setIsSignInFailed(true);
             throw e;
         } finally {
             userStore.setIsSignInLoading(false);

@@ -1,5 +1,4 @@
-import { store } from '@/store';
-
+import { useDisplayStore } from '@/store/display/display-store';
 import { pinia } from '@/store/pinia';
 import { useUserStore } from '@/store/user/user-store';
 
@@ -18,6 +17,7 @@ class SamlAuth extends Authenticator {
 
     static async onSuccess(refreshToken:string) {
         const userStore = useUserStore(pinia);
+        const displayStore = useDisplayStore(pinia);
         try {
             userStore.setIsSignInLoading(true);
             const credentials = {
@@ -26,7 +26,7 @@ class SamlAuth extends Authenticator {
             await super.signIn(credentials, 'SAML');
         } catch (e: any) {
             await SamlAuth.signOut();
-            await store.dispatch('display/showSignInErrorMessage');
+            displayStore.setIsSignInFailed(true);
             throw e;
         } finally {
             userStore.setIsSignInLoading(false);
