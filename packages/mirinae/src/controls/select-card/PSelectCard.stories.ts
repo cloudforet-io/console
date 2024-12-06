@@ -97,6 +97,37 @@ export const Basic: Story = {
     }),
 };
 
+export const ShowSelectMarker: Story = {
+    render: () => ({
+        components: { PSelectCard },
+        template: `
+            <div class="w-full overflow p-8 flex flex-wrap">
+                <p-select-card v-for="(value, index) in values" :key="value" 
+                    :tab-index="index"
+                    :value="value"
+                    v-model="selected"
+                    :icon="icons[value]"
+                    :label="icons[value]"
+                    :show-select-marker="index === 1"
+                    style="min-width: 10rem; max-width: 10rem; min-height: 10rem; max-height: 10rem; margin: 1rem;"
+                               
+                />
+            </div>
+        `,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        setup(props) {
+            const state = reactive({
+                selected: undefined,
+                values: range(2),
+                icons: getAllAvailableIcons(),
+            });
+            return {
+                ...toRefs(state),
+            };
+        },
+    }),
+};
+
 export const Block: Story = {
     render: () => ({
         components: { PSelectCard },
