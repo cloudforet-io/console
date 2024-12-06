@@ -9,3 +9,7 @@ export interface DateFormatValue {
 export interface DateFormatOptions {
     default: DateFormat;
 }
+
+export interface _DateFormatValue {
+    format: DateFormat;
+}

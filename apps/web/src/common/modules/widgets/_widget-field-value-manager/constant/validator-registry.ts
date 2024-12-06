@@ -84,6 +84,12 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
         }
         return true;
     },
+    dataFieldHeatmapColor: () => true,
+    dateFormat: () => true,
+    displayAnnotation: (fieldValue) => {
+        if (!fieldValue.toggleValue) return true;
+        return !!fieldValue.annotation;
+    },
 };
 
 

@@ -1,4 +1,4 @@
-import { COLOR_SCHEMA, DEFAULT_COMPARISON_COLOR } from '@/common/modules/widgets/_constants/widget-field-constant';
+import { COLOR_SCHEMA, DATE_FORMAT, DEFAULT_COMPARISON_COLOR } from '@/common/modules/widgets/_constants/widget-field-constant';
 import { integrateFieldsSchema } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { FieldDefaultValueConvertor, WidgetFieldTypeMap } from '@/common/modules/widgets/_widget-field-value-manager/type';
@@ -6,6 +6,7 @@ import type { _FormatRulesOptions } from '@/common/modules/widgets/_widget-field
 import type { CategoryByOptions } from '@/common/modules/widgets/_widget-fields/category-by/type';
 import type { _ColorSchemaOptions } from '@/common/modules/widgets/_widget-fields/color-schema/type';
 import type { ComparisonOptions } from '@/common/modules/widgets/_widget-fields/comparison/type';
+import type { DateFormatOptions } from '@/common/modules/widgets/_widget-fields/date-format/type';
 import type { StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
 import type { XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { YAxisOptions } from '@/common/modules/widgets/_widget-fields/y-axis/type';
@@ -38,10 +39,11 @@ export const widgetFieldDefaultValueMap: DefaultValueRegistry = {
         widthInfos: [],
     },
     dataFieldHeatmapColor: {},
-    dateAggregationOptions: {},
-    dateFormat: {},
+    dateFormat: {
+        format: Object.keys(DATE_FORMAT)[0],
+    },
     dateRange: {},
-    displayAnnotation: {},
+    displayAnnotation: undefined,
     displaySeriesLabel: {},
     granularity: {},
     groupBy: {},
@@ -161,20 +163,30 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const comparisonOptions = _fieldsSchema.comparison?.options as ComparisonOptions;
 
-        const result = widgetFieldDefaultValueMap.comparison;
+        const initialValue = widgetFieldDefaultValueMap.comparison;
 
-        if (comparisonOptions.toggle !== undefined) {
+        if (comparisonOptions.toggle) {
             return {
-                ...result,
-                toggleValue: comparisonOptions.toggle,
+                ...initialValue,
+                toggleValue: true,
             };
         }
-        return result;
+        return undefined;
     },
     customTableColumnWidth: () => widgetFieldDefaultValueMap.customTableColumnWidth,
     dataFieldHeatmapColor: () => widgetFieldDefaultValueMap.dataFieldHeatmapColor,
-    dateAggregationOptions: () => widgetFieldDefaultValueMap.dateAggregationOptions,
-    dateFormat: () => widgetFieldDefaultValueMap.dateFormat,
+    dateFormat: (widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const dateFormatOptions = _fieldsSchema.dateFormat?.options as DateFormatOptions;
+
+        if (dateFormatOptions.default) {
+            return {
+                format: dateFormatOptions.default,
+            };
+        }
+
+        return widgetFieldDefaultValueMap.dateFormat;
+    },
     dateRange: () => widgetFieldDefaultValueMap.dateRange,
     displayAnnotation: () => widgetFieldDefaultValueMap.displayAnnotation,
     displaySeriesLabel: () => widgetFieldDefaultValueMap.displaySeriesLabel,
