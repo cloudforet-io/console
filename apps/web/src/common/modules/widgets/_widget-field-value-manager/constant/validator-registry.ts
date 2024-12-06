@@ -7,6 +7,8 @@ import type { ColorSchemaValue } from '@/common/modules/widgets/_widget-fields/c
 import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/comparison/type';
 import type { _CustomTableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
 import type { DataFieldOptions, DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
+import type { DisplaySeriesLabelValue } from '@/common/modules/widgets/_widget-fields/display-series-label/type';
+import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/granularity/type';
 import type { _StackByValue, StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
 import type { _XAxisValue, XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { _YAxisValue, YAxisOptions } from '@/common/modules/widgets/_widget-fields/y-axis/type';
@@ -90,9 +92,13 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
         if (!fieldValue.toggleValue) return true;
         return !!fieldValue.annotation;
     },
-    displaySeriesLabel: (fieldValue) => {
-        if (!fieldValue.toggleValue) return true;
+    displaySeriesLabel: (fieldValue: DisplaySeriesLabelValue) => {
+        if (!fieldValue.toggleValue || fieldValue.rotate === undefined) return true;
         if (fieldValue.rotate < -90 || fieldValue.rotate > 90) return false;
+        return true;
+    },
+    granularity: (fieldValue: GranularityValue) => {
+        if (!fieldValue.granularity) return false;
         return true;
     },
 };

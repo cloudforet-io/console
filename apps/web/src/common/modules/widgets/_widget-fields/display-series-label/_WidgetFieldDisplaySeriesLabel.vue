@@ -55,7 +55,7 @@ const state = reactive({
         { name: 'percent', label: '%' },
     ]),
     isRotateValid: computed<boolean>(() => {
-        if (!state.fieldValue?.toggleValue || !state.fieldValue?.rotate) return true;
+        if (!state.fieldValue?.toggleValue || state.fieldValue?.rotate === undefined) return true;
         if (state.fieldValue.rotate < ROTATE_MIN || state.fieldValue.rotate > ROTATE_MAX) return false;
         return true;
     }),

@@ -45,7 +45,9 @@ export const widgetFieldDefaultValueMap: DefaultValueRegistry = {
     dateRange: {},
     displayAnnotation: undefined,
     displaySeriesLabel: undefined,
-    granularity: {},
+    granularity: {
+        granularity: 'MONTHLY',
+    },
     groupBy: {},
     header: {},
     icon: {},
