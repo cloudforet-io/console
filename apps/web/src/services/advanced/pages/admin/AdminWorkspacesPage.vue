@@ -12,8 +12,9 @@ import {
     PButton, PHeading, PHorizontalLayout, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import type { MenuId } from '@/lib/menu/config';
@@ -37,11 +38,12 @@ import { useUserPageStore } from '@/services/iam/store/user-page-store';
 const workspacePageStore = useWorkspacePageStore();
 const workspacePageState = workspacePageStore.$state;
 const userPageStore = useUserPageStore();
+const userStore = useUserStore();
 
 const route = useRoute();
 
 const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     selectedMenuId: computed(() => {

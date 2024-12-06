@@ -1,9 +1,8 @@
 import Keycloak from 'keycloak-js';
 
-import { store } from '@/store';
-
 import { useDomainStore } from '@/store/domain/domain-store';
 import { pinia } from '@/store/pinia';
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -52,8 +51,9 @@ class KeycloakAuth extends Authenticator {
     }
 
     private static async keycloakSignIn(auth) {
+        const userStore = useUserStore(pinia);
         try {
-            store.dispatch('user/startSignIn');
+            userStore.setIsSignInLoading(true);
             if (!auth) {
                 await KeycloakAuth.onSignInFail();
                 return;
@@ -66,7 +66,7 @@ class KeycloakAuth extends Authenticator {
                 );
             }
         } catch (e) {
-            store.dispatch('user/finishSignIn');
+            userStore.setIsSignInLoading(false);
             throw e;
         }
     }

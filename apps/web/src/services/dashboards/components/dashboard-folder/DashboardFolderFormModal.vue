@@ -16,11 +16,11 @@ import type { PublicFolderCreateParameters } from '@/schema/dashboard/public-fol
 import type { PublicFolderUpdateParameters } from '@/schema/dashboard/public-folder/api-verbs/update';
 import type { PublicFolderModel } from '@/schema/dashboard/public-folder/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -47,13 +47,14 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 }>();
 
 const appContextStore = useAppContextStore();
+const userStore = useUserStore();
 const dashboardStore = useDashboardStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
 const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    isWorkspaceMember: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
+    isWorkspaceMember: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
 });
 const state = reactive({
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
@@ -104,7 +105,7 @@ const createFolder = async () => {
         const fetcher = _isPrivate ? SpaceConnector.clientV2.dashboard.privateFolder.create : SpaceConnector.clientV2.dashboard.publicFolder.create;
         const params: FolderCreateParams = {
             name: name.value as string,
-            tags: { created_by: store.state.user.userId },
+            tags: { created_by: userStore.state.userId },
         };
         if (!_isPrivate) {
             (params as PublicFolderCreateParameters).resource_group = storeState.isAdminMode ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE;

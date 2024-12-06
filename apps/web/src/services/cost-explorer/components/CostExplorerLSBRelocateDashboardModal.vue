@@ -5,6 +5,8 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { PButton, PDivider } from '@cloudforet/mirinae';
 
 
+import { useUserStore } from '@/store/user/user-store';
+
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { useCostExplorerSettingsStore } from '@/services/cost-explorer/stores/cost-explorer-settings-store';
@@ -19,6 +21,7 @@ withDefaults(defineProps<Props>(), {
     visible: false,
 });
 const { getProperRouteLocation } = useProperRouteLocation();
+const userStore = useUserStore();
 const costExplorerSettingsStore = useCostExplorerSettingsStore();
 const costExplorerSettingsState = costExplorerSettingsStore.$state;
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void}>();
@@ -31,7 +34,7 @@ const handleReject = () => {
     costExplorerSettingsStore.setRelocateDashboardState({
         ...costExplorerSettingsState.relocateDashboardStatus,
         hideModal: true,
-    });
+    }, userStore.state.userId);
     emit('update:visible', false);
 };
 

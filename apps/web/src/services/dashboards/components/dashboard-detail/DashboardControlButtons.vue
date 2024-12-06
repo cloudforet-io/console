@@ -3,12 +3,13 @@ import { reactive } from 'vue';
 
 import { PButton } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
+import { useDisplayStore } from '@/store/display/display-store';
 
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 
 
 const widgetGenerateStore = useWidgetGenerateStore();
+const displayStore = useDisplayStore();
 const state = reactive({
     loading: false,
 });
@@ -21,20 +22,20 @@ const handleAddWidget = async () => {
     state.loading = false;
 };
 const handleClickWidgetReorder = () => {
-    if (store.state.display.visibleSidebar) {
-        store.dispatch('display/hideSidebar');
+    if (displayStore.state.visibleSidebar) {
+        displayStore.setVisibleSidebar(false);
     } else {
-        store.dispatch('display/showWidget');
+        displayStore.showWidget();
     }
 };
 </script>
 
 <template>
     <div class="dashboard-control-buttons">
-        <p-button :icon-left="store.state.display.visibleSidebar ? 'ic_check' : 'ic_edit'"
-                  :style-type="store.state.display.visibleSidebar ? 'substitutive' : 'tertiary'"
+        <p-button :icon-left="displayStore.state.visibleSidebar ? 'ic_check' : 'ic_edit'"
+                  :style-type="displayStore.state.visibleSidebar ? 'substitutive' : 'tertiary'"
                   size="sm"
-                  :disabled="store.state.display.visibleSidebar"
+                  :disabled="displayStore.state.visibleSidebar"
                   @click="handleClickWidgetReorder"
         >
             {{ $t('DASHBOARDS.DETAIL.EDIT_LAYOUT') }}

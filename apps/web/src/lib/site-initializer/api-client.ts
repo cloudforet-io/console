@@ -8,6 +8,7 @@ import type { TokenGrantModel } from '@/schema/identity/token/model';
 import { useErrorStore } from '@/store/error/error-store';
 import { pinia } from '@/store/pinia';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 
 const getAfterCallApiMap = () => ({
@@ -285,9 +286,10 @@ const getAfterCallApiMap = () => ({
     },
 });
 
-const getSessionTimeoutCallback = (store) => () => {
+const getSessionTimeoutCallback = () => () => {
     // Add session expiration process
-    store.dispatch('user/setIsSessionExpired', true);
+    const userStore = useUserStore(pinia);
+    userStore.setIsSessionExpired(true);
 
     const errorStore = useErrorStore(pinia);
     errorStore.showSessionExpiredError();
@@ -315,9 +317,10 @@ const getAuthConfig = (config): AuthConfig => ({
     apiKey: config.get('DEV.AUTH.API_KEY'),
 });
 
-export const initApiClient = async (store, config) => {
+export const initApiClient = async (config) => {
+    const userStore = useUserStore(pinia);
     const endpoints = getApiEndpoints(config);
-    const tokenApi = new TokenAPI(endpoints[1], getSessionTimeoutCallback(store));
+    const tokenApi = new TokenAPI(endpoints[1], getSessionTimeoutCallback());
     const devConfig: DevConfig = {
         enabled: config.get('DEV.ENABLED'),
         mockConfig: getMockConfig(config),
@@ -341,14 +344,9 @@ export const initApiClient = async (store, config) => {
         };
         const response = await SpaceConnector.clientV2.identity.token.grant<TokenGrantParameters, TokenGrantModel>(grantRequest);
         SpaceConnector.setToken(response.access_token);
-        store.commit('user/setCurrentGrantInfo', { scope: 'USER' });
-        store.commit('user/setCurrentRoleInfo', undefined);
+        userStore.setCurrentGrantInfo({ scope: 'USER' });
+        userStore.setCurrentRoleInfo(undefined);
     } catch (e) {
         console.error(e);
     }
-
-    // to be deprecated
-    // const isTokenAlive = SpaceConnector.isTokenAlive;
-    // store.dispatch('user/setIsSessionExpired', !isTokenAlive);
-    // store.dispatch('user/setIsSessionExpired', false);
 };

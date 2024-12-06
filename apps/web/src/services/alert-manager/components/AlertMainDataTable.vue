@@ -22,12 +22,12 @@ import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 import type { AlertListParameters, AlertListResponse } from '@/schema/monitoring/alert/api-verbs/list';
 import { ALERT_STATE, ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
 import type { AlertModel } from '@/schema/monitoring/alert/model';
-import { store } from '@/store';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
@@ -90,12 +90,13 @@ const { getProperRouteLocation } = useProperRouteLocation();
 
 /* Stores */
 const allReferenceStore = useAllReferenceStore();
+const userStore = useUserStore();
 const storeState = reactive({
-    timezone: computed(() => store.state.user.timezone),
+    timezone: computed<string>(() => userStore.state.timezone || ''),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
     webhooks: computed<WebhookReferenceMap>(() => allReferenceStore.getters.webhook),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 
 /* Search Tags */
@@ -236,7 +237,7 @@ const updateBottomFilterQuery = (filters: AlertBottomFilters) => {
     }
 
     if (filters.assigned === ALERT_ASSIGNED_FILTER.ASSIGNED_TO_ME) {
-        bottomFilterQueryHelper.addFilter({ k: 'assignee', v: store.state.user.userId, o: '=' });
+        bottomFilterQueryHelper.addFilter({ k: 'assignee', v: userStore.state.userId || '', o: '=' });
     }
 };
 

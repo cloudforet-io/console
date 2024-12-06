@@ -3,16 +3,17 @@ import { useElementSize } from '@vueuse/core/index';
 import {
     computed, onMounted, reactive, ref, watch,
 } from 'vue';
-import { useRouter } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import { debounce } from 'lodash';
 
 import { getTextHighlightRegex, PDataLoader, PDivider } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useDisplayStore } from '@/store/display/display-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import type { SuggestionMenu } from '@/lib/helper/menu-suggestion-helper';
@@ -48,6 +49,10 @@ const props = withDefaults(defineProps<Props>(), {
 const userWorkspaceStore = useUserWorkspaceStore();
 const topBarSearchStore = useTopBarSearchStore();
 const recentStore = useRecentStore();
+const userStore = useUserStore();
+const displayStore = useDisplayStore();
+
+const route = useRoute();
 const router = useRouter();
 const emit = defineEmits<{(event: 'move-focus-end'): void;
     (event: 'update:contents-size', value: number): void;
@@ -61,11 +66,14 @@ const storeState = reactive({
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
     inputText: computed(() => topBarSearchStore.getters.inputText),
     trimmedInputText: computed(() => topBarSearchStore.getters.trimmedInputText),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 
 const state = reactive({
-    allMenuList: computed<SuggestionMenu[]>(() => getAllSuggestionMenuList(store.getters['display/allMenuList'])),
+    allMenuList: computed<SuggestionMenu[]>(() => {
+        const allMenuList = displayStore.getAllMenuList(route);
+        return getAllSuggestionMenuList(allMenuList);
+    }),
     allMenuMap: computed(() => {
         const allMenuMap = new Map<string, SuggestionMenu>();
         state.allMenuList.forEach((menu) => {

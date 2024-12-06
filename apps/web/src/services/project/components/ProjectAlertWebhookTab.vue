@@ -30,11 +30,11 @@ import type { WebhookDisableParameters } from '@/schema/monitoring/webhook/api-v
 import type { WebhookEnableParameters } from '@/schema/monitoring/webhook/api-verbs/enable';
 import type { WebhookListParameters } from '@/schema/monitoring/webhook/api-verbs/list';
 import type { WebhookModel } from '@/schema/monitoring/webhook/model';
-import { store } from '@/store';
 import { i18n as _i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
@@ -63,6 +63,7 @@ const route = useRoute();
 const router = useRouter();
 const allReferenceStore = useAllReferenceStore();
 const projectDetailPageStore = useProjectDetailPageStore();
+const userStore = useUserStore();
 
 const handlers = {
     keyItemSets: [{
@@ -85,7 +86,7 @@ const webhookListApiQueryHelper = new ApiQueryHelper()
     .setFiltersAsRawQueryString(route.query.filters);
 const state = reactive({
     loading: true,
-    timezone: computed(() => store.state.user.timezone),
+    timezone: computed<string|undefined>(() => userStore.state.timezone),
     plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
     dropdown: computed(() => ([
         {

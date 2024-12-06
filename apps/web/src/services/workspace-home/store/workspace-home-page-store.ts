@@ -21,10 +21,10 @@ import type { AppModel } from '@/schema/identity/app/model';
 import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
 import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 import type { MetricDataAnalyzeParameters } from '@/schema/inventory/metric-data/api-verbs/analyze';
-import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { MENU_ID } from '@/lib/menu/config';
 
@@ -70,6 +70,7 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
     const allReferenceGetters = allReferenceStore.getters;
     const bookmarkStore = useBookmarkStore();
     const bookmarkState = bookmarkStore.state;
+    const userStore = useUserStore();
 
     const state = reactive<WorkspaceHomeState>({
         workspaceUserTotalCount: undefined,
@@ -93,7 +94,7 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
     });
 
     const _getters = reactive({
-        userId: computed<string>(() => store.state.user.userId),
+        userId: computed<string|undefined>(() => userStore.state.userId),
         currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
         providerMap: computed<ProviderReferenceDataMap>(() => allReferenceGetters.provider),
         bookmarkType: computed<BookmarkType|undefined>(() => bookmarkState.bookmarkType),
@@ -233,7 +234,7 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
         },
         fetchRecentList: async (currentWorkspaceId: string) => {
             recentListApiQuery.setFilters([
-                { k: 'user_id', v: _getters.userId, o: '=' },
+                { k: 'user_id', v: _getters.userId || '', o: '=' },
                 { k: 'name', v: 'console:recent:', o: '' },
                 { k: 'data.workspace_id', v: currentWorkspaceId, o: '=' },
                 { k: 'data.type', v: RECENT_TYPE.WORKSPACE, o: '!=' },
@@ -254,7 +255,7 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
         },
         fetchFavoriteList: async (selectedItem?: string) => {
             favoriteListApiQuery.setFilters([
-                { k: 'user_id', v: _getters.userId, o: '=' },
+                { k: 'user_id', v: _getters.userId || '', o: '=' },
                 { k: 'data.workspaceId', v: _getters.currentWorkspaceId || '', o: '=' },
                 { k: 'data.itemType', v: FAVORITE_TYPE.WORKSPACE, o: '!=' },
             ]);

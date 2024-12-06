@@ -1,6 +1,6 @@
 import type { TranslateResult } from 'vue-i18n';
 
-import type { DisplayMenu } from '@/store/modules/display/type';
+import type { DisplayMenu } from '@/store/display/type';
 
 export interface SuggestionMenu {
     id: string;

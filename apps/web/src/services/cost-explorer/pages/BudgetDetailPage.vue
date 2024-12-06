@@ -6,10 +6,11 @@ import { PLink, PScopedNotification } from '@cloudforet/mirinae';
 import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -30,6 +31,7 @@ const props = withDefaults(defineProps<Props>(), {
     budgetId: '',
 });
 
+const userStore = useUserStore();
 const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
 const state = reactive({
@@ -68,7 +70,7 @@ const state = reactive({
                                    :title="i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.PAGE_NOTIFICATION')"
                                    icon="ic_info-circle"
             >
-                <template v-if="store.getters['user/isDomainAdmin']"
+                <template v-if="userStore.getters.isDomainAdmin"
                           #right
                 >
                     <p-link class="notification-link"

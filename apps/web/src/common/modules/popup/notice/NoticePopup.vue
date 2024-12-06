@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import {
     computed, reactive, watch,
 } from 'vue';
@@ -14,17 +13,18 @@ import type { PostModel } from '@/schema/board/post/model';
 import type { NoticeConfigData } from '@/schema/board/post/type';
 import type { UserConfigListParameters } from '@/schema/config/user-config/api-verbs/list';
 import type { UserConfigModel } from '@/schema/config/user-config/model';
-import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import NoticePopupItem from '@/common/modules/popup/notice/modules/NoticePopupItem.vue';
 
 const appContextStore = useAppContextStore();
+const userStore = useUserStore();
 const state = reactive({
-    isSessionExpired: computed<boolean>(() => store.state.user.isSessionExpired),
-    isNoRoleUser: computed<boolean>(() => store.getters['user/isNoRoleUser']),
+    isSessionExpired: computed<boolean>(() => !!userStore.state.isSessionExpired),
+    isNoRoleUser: computed<boolean>(() => userStore.getters.isNoRoleUser),
     popupList: [] as PostModel[],
     hasLoaded: false,
 });
@@ -79,7 +79,7 @@ watch([
     () => state.isSessionExpired,
     () => state.isNoRoleUser,
     () => appContextStore.getters.globalGrantLoading,
-    () => store.getters['user/getCurrentGrantInfo'],
+    () => userStore.state.currentGrantInfo,
 ], async ([hasLoaded, isSessionExpired, isNoRoleUser, globalGrantLoading, grantInfo]) => {
     if (hasLoaded) return;
     if (isNoRoleUser || isSessionExpired) {
@@ -90,7 +90,7 @@ watch([
     }
 }, { immediate: true });
 
-watch(() => store.state.user.userId, async (userId, prevUserId) => {
+watch(() => userStore.state.userId, async (userId, prevUserId) => {
     if (userId !== prevUserId) {
         state.hasLoaded = false;
     }

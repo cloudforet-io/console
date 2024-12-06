@@ -6,14 +6,16 @@ import {
     PLink, PDivider, PCard, PButton, PI, screens,
 } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 const { width } = useWindowSize();
 
+const userStore = useUserStore();
 const storeState = reactive({
-    language: computed(() => store.state.user.language),
-    isDomainAdmin: computed<boolean>(() => store.getters['user/isDomainAdmin']),
+    language: computed<string|undefined>(() => userStore.state.language),
+    isDomainAdmin: computed<boolean>(() => userStore.getters.isDomainAdmin),
 });
 const state = reactive({
     isTabletSize: computed(() => width.value < screens.tablet.max),

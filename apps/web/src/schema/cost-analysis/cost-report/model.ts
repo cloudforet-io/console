@@ -1,6 +1,6 @@
 import type { CostReportStatus } from '@/schema/cost-analysis/cost-report/type';
 
-import type { Currency } from '@/store/modules/display/type';
+import type { Currency } from '@/store/display/type';
 
 
 export interface CostReportModel {

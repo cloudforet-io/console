@@ -20,14 +20,14 @@ import WorkspaceMemberImage from '@/assets/images/role/img_avatar_workspace-memb
 import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDomainStore } from '@/store/domain/domain-store';
-import { languages } from '@/store/modules/user/config';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { RoleReferenceMap } from '@/store/reference/role-reference-store';
+import { languages } from '@/store/user/constant';
+import { useUserStore } from '@/store/user/user-store';
 
 import config from '@/lib/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -48,6 +48,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const appContextStore = useAppContextStore();
 const domainStore = useDomainStore();
+const userStore = useUserStore();
 
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void; }>();
 
@@ -60,15 +61,15 @@ const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     isUserMode: computed(() => appContextStore.getters.isUserMode),
     userIcon: computed<string>(() => {
-        if (store.getters['user/isSystemAdmin']) return SystemAdminImage;
-        if (store.getters['user/isDomainAdmin']) return DomainAdminImage;
+        if (userStore.getters.isSystemAdmin) return SystemAdminImage;
+        if (userStore.getters.isDomainAdmin) return DomainAdminImage;
         const currentRoleType = state.currentRoleType;
         if (currentRoleType === ROLE_TYPE.WORKSPACE_OWNER) return WorkspaceOwnerImage;
         if (currentRoleType === ROLE_TYPE.WORKSPACE_MEMBER) return WorkspaceMemberImage;
         return UserImage;
     }),
-    baseRoleType: computed(() => store.state.user.roleType),
-    currentRoleType: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType),
+    baseRoleType: computed(() => userStore.state.roleType),
+    currentRoleType: computed(() => userStore.state.currentRoleInfo?.roleType),
     visibleRoleType: computed(() => {
         if (state.baseRoleType === ROLE_TYPE.DOMAIN_ADMIN) return 'Admin';
         if (state.currentRoleType === ROLE_TYPE.WORKSPACE_OWNER) return 'Workspace Owner';
@@ -77,17 +78,17 @@ const state = reactive({
     }),
     userRoles: [] as RoleBindingModel[],
     currentWorkspaceRole: computed<RoleBindingModel>(() => state.userRoles?.[0]),
-    name: computed(() => store.state.user.name),
-    email: computed(() => store.state.user.email),
-    language: computed(() => store.getters['user/languageLabel']),
-    timezone: computed(() => store.state.user.timezone),
+    name: computed(() => userStore.state.name),
+    email: computed(() => userStore.state.email),
+    language: computed(() => userStore.getters.languageLabel),
+    timezone: computed(() => userStore.state.timezone),
     domainId: computed(() => domainStore.state.domainId),
-    userId: computed(() => store.state.user.userId),
+    userId: computed(() => userStore.state.userId),
     isMyPage: computed(() => route.matched.some((item) => item.name === MY_PAGE_ROUTE._NAME)),
     languageMenuVisible: false,
     supportedMenu: computed(() => {
         const docsList = config.get('DOCS') ?? [];
-        const data = { lang: store.state.user.language };
+        const data = { lang: userStore.state.language };
         return docsList.map((d) => ({
             label: ejs.render(d?.label ?? '', data),
             link: ejs.render(d?.link ?? '', data),
@@ -165,9 +166,9 @@ const handleClickGoToConsoleHome = () => {
 
 const handleLanguageClick = async (language) => {
     try {
-        if (store.state.user.language === language) return;
+        if (userStore.state.language === language) return;
 
-        await store.dispatch('user/setUser', {
+        await userStore.updateUser({
             language,
             timezone: state.timezone,
         });
@@ -195,7 +196,7 @@ const fetchUserRoles = async () => {
                     {
                         k: 'user_id',
                         o: 'eq',
-                        v: store.state.user.userId,
+                        v: userStore.state.userId,
                     },
                 ],
             },

@@ -18,13 +18,13 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { AlertListParameters } from '@/schema/monitoring/alert/api-verbs/list';
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import type { AlertModel } from '@/schema/monitoring/alert/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -74,6 +74,7 @@ const tabState = reactive({
         },
     },
 });
+const userStore = useUserStore();
 const allReferenceStore = useAllReferenceStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const storeState = reactive({
@@ -137,7 +138,7 @@ const getQuery = () => {
         filters.push({ k: 'state', v: ALERT_STATE.RESOLVED, o: '=' });
     }
     if (state.isAssignedToMe) {
-        filters.push({ k: 'assignee', v: store.state.user.userId, o: '=' });
+        filters.push({ k: 'assignee', v: userStore.state.userId || '', o: '=' });
     }
     apiQuery.setFilters(filters);
     return apiQuery.data;

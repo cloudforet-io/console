@@ -25,9 +25,9 @@ import { SpaceRouter } from '@/router';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { DashboardListParams, DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import type { MenuId } from '@/lib/menu/config';
@@ -52,6 +52,7 @@ const appContextStore = useAppContextStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
 const dashboardPageControlGetters = dashboardPageControlStore.getters;
+const userStore = useUserStore();
 
 const router = useRouter();
 const queryTagsHelper = useQueryTags({
@@ -65,9 +66,9 @@ const queryTagsHelper = useQueryTags({
 const route = useRoute();
 
 const storeState = reactive({
-    isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+    isWorkspaceOwner: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),

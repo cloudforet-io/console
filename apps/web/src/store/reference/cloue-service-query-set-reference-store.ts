@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { asyncComputed } from '@vueuse/core';
 import {
     computed, reactive,
@@ -10,14 +11,13 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CloudServiceQuerySetListParameters } from '@/schema/inventory/cloud-service-query-set/api-verbs/list';
 import type { CloudServiceQuerySetModel } from '@/schema/inventory/cloud-service-query-set/model';
-// eslint-disable-next-line import/no-cycle
-import { store } from '@/store';
 
 import type {
     ReferenceItem,
     ReferenceMap,
     ReferenceLoadOptions, ReferenceTypeInfo,
 } from '@/store/reference/type';
+import { useUserStore } from '@/store/user/user-store';
 
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
@@ -32,13 +32,14 @@ const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
 export const useCloudServiceQuerySetReferenceStore = defineStore('reference-cloud-service-query-set', () => {
+    const userStore = useUserStore();
     const state = reactive({
         items: null as CloudServiceQuerySetReferenceMap|null,
     });
 
     const getters = reactive({
         cloudServiceQuerySetItems: asyncComputed<CloudServiceQuerySetReferenceMap>(async () => {
-            if (store.getters['user/getCurrentGrantInfo'].scope === 'USER') return {};
+            if (!userStore.state.currentGrantInfo?.scope || userStore.state.currentGrantInfo?.scope === 'USER') return {};
             if (state.items === null) await actions.load();
             return state.items ?? {};
         }, {}, { lazy: true }),

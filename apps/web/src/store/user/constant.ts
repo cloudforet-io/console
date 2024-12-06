@@ -2,6 +2,10 @@ import { timeZonesNames } from '@vvo/tzdb';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 
+
+
+export const USER_STORAGE_KEY = 'store/user';
+
 export const timezoneList = ['UTC'].concat(timeZonesNames);
 
 export const languages = {

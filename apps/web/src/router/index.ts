@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import Vue from 'vue';
 import type { RouteConfig } from 'vue-router';
 import VueRouter from 'vue-router';
@@ -7,6 +8,7 @@ import { clone } from 'lodash';
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { TokenGrantParameters } from '@/schema/identity/token/api-verbs/grant';
 import type { GrantScope } from '@/schema/identity/token/type';
 
 import { ERROR_ROUTE, ROUTE_SCOPE } from '@/router/constant';
@@ -23,6 +25,7 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useErrorStore } from '@/store/error/error-store';
 import { pinia } from '@/store/pinia';
+import { useUserStore } from '@/store/user/user-store';
 
 import { getRecentConfig } from '@/lib/helper/router-recent-helper';
 import type { MenuId } from '@/lib/menu/config';
@@ -33,14 +36,15 @@ import { GTag } from '@/lib/site-analytics/gtag';
 const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
 const grantAndLoadByCurrentScope = async (scope: GrantScope, workspaceId?: string): Promise<{ failStatus: boolean }> => {
     const refreshToken = SpaceConnector.getRefreshToken();
-    const grantRequest = {
+    const grantRequest: Omit<TokenGrantParameters, 'grant_type'> = {
         scope,
         token: refreshToken,
         workspace_id: workspaceId,
     };
 
     const errorStore = useErrorStore(pinia);
-    await SpaceRouter.router.app?.$store.dispatch('user/grantRoleAndLoadReferenceData', grantRequest);
+    const userStore = useUserStore(pinia);
+    await userStore.grantRoleAndLoadReferenceData(grantRequest);
     const grantAccessFailStatus = errorStore.state.grantAccessFailStatus;
     return {
         failStatus: !!grantAccessFailStatus,
@@ -63,6 +67,7 @@ export class SpaceRouter {
         let previousPath: string;
         const appContextStore = useAppContextStore(pinia);
         const userWorkspaceStore = useUserWorkspaceStore(pinia);
+        const userStore = useUserStore(pinia);
 
         SpaceRouter.router.onError((error) => {
             console.error(error);
@@ -110,7 +115,7 @@ export class SpaceRouter {
                         params: { statusCode: '404' },
                     });
                 } else if (routeScope === ROUTE_SCOPE.WORKSPACE) { // Grant success - Workspace
-                    verifyPageAccessAndRedirect(to, next, to.params.workspaceId, SpaceRouter.router.app?.$store.getters['user/pageAccessPermissionList']);
+                    verifyPageAccessAndRedirect(to, next, to.params.workspaceId, userStore.getters.pageAccessPermissionList);
                 } else next(); // Grant success - Others (Admin, User)
             } else { // Grant Process Not Needed
                 appContextStore.setGlobalGrantLoading(false);
@@ -127,7 +132,7 @@ export class SpaceRouter {
             const store = SpaceRouter.router.app?.$store;
             if (!store) return;
             const isAdminMode = appContextStore.getters.isAdminMode;
-            const pageAccessPermissionMap = SpaceRouter.router.app?.$store.getters['user/pageAccessPermissionMap'];
+            const pageAccessPermissionMap = userStore.getters.pageAccessPermissionMap;
             const routeScope = getRouteScope(to);
 
             if (!isAdminMode && routeScope === 'WORKSPACE') {

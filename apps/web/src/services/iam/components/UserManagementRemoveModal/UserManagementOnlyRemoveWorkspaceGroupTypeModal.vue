@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed,
-    reactive,
+    computed, reactive,
 } from 'vue';
 
 import { cloneDeep } from 'lodash';
@@ -10,21 +9,24 @@ import {
     PStatus, PButtonModal, PDataTable, PI, PLink, PBadge,
 } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
-
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 import { userStateFormatter } from '@/services/iam/composables/refined-table-data';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 
+
+
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
 const userPageGetters = userPageStore.getters;
+const userStore = useUserStore();
 
 const state = reactive({
     loading: false,
-    isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
+    isDomainAdmin: computed(() => userStore.getters.isDomainAdmin),
     refinedTableData: computed(() => userPageGetters.selectedUsers.map((user) => ({
         ...user,
         type: user?.role_binding_info?.workspace_group_id ? 'Workspace Group' : 'Workspace',

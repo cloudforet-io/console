@@ -1,4 +1,4 @@
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
@@ -8,6 +8,10 @@ import { setI18nLocale } from '@/translations';
 import { ERROR_ROUTE } from '@/router/constant';
 import { errorRoutes } from '@/router/error-routes';
 import { integralRoutes } from '@/router/integral-routes';
+
+import { useDisplayStore } from '@/store/display/display-store';
+import { pinia } from '@/store/pinia';
+import { useUserStore } from '@/store/user/user-store';
 
 import config from '@/lib/config';
 import { initRequestIdleCallback } from '@/lib/request-idle-callback-polyfill';
@@ -30,8 +34,9 @@ const initConfig = async () => {
     await config.init();
 };
 
-const initQueryHelper = (store) => {
-    QueryHelper.init(computed(() => store.state.user.timezone));
+const initQueryHelper = () => {
+    const userStore = useUserStore(pinia);
+    QueryHelper.init(computed(() => userStore.state.timezone));
 };
 
 let isRouterInitialized = false;
@@ -44,8 +49,9 @@ const initRouter = (domainId?: string) => {
     isRouterInitialized = true;
 };
 
-const initI18n = (store) => {
-    setI18nLocale(store.state.user.language);
+const initI18n = () => {
+    const userStore = useUserStore(pinia);
+    setI18nLocale(userStore.state.language || '');
 };
 
 const removeInitializer = () => {
@@ -53,28 +59,28 @@ const removeInitializer = () => {
     if (el?.parentElement) el.parentElement.removeChild(el);
 };
 
-const init = async (store) => {
+const init = async () => {
     /* Init SpaceONE Console */
     try {
         await initConfig();
-        await initApiClient(store, config);
+        await initApiClient(config);
         const domainId = await initDomain(config);
-        const userId = await initUserAndAuth(store, config);
+        const userId = await initUserAndAuth(config);
         initDomainSettings();
         initModeSetting();
         await initWorkspace(userId);
         initRouter(domainId);
         // prefetchResources();
-        initI18n(store);
+        initI18n();
         initDayjs();
-        initQueryHelper(store);
-        initGtag(store, config);
+        initQueryHelper();
+        initGtag(config);
         initGtm(config);
         initAmcharts5(config);
         initEcharts();
-        initErrorHandler(store);
+        initErrorHandler();
         initRequestIdleCallback();
-        await checkSsoAccessToken(store);
+        await checkSsoAccessToken();
     } catch (e) {
         if (!isRouterInitialized) initRouter();
         throw e;
@@ -82,10 +88,11 @@ const init = async (store) => {
 };
 
 const MIN_LOADING_TIME = 1000;
-export const siteInit = async (store) => {
-    store.dispatch('display/startInitializing');
+export const siteInit = async () => {
+    const displayStore = useDisplayStore(pinia);
+    displayStore.setIsInitialized(false);
 
-    store.watch((state) => state.display.isInitialized, (isInitialized) => {
+    watch(() => displayStore.state.isInitialized, (isInitialized) => {
         if (isInitialized) {
             const el = document.getElementById('site-loader-wrapper');
             if (el?.parentElement) el.parentElement.removeChild(el);
@@ -98,16 +105,16 @@ export const siteInit = async (store) => {
     setTimeout(() => {
         isMinTimePassed = true;
         if (isFinishedInitializing) {
-            store.dispatch('display/finishInitializing');
+            displayStore.setIsInitialized(true);
             removeInitializer();
         }
     }, MIN_LOADING_TIME);
 
     try {
-        await init(store);
+        await init();
     } catch (e) {
         console.error(e);
-        store.dispatch('display/finishInitializing');
+        displayStore.setIsInitialized(true);
 
         if (SpaceRouter.router) {
             await SpaceRouter.router.push({ name: ERROR_ROUTE._NAME });
@@ -115,7 +122,7 @@ export const siteInit = async (store) => {
     } finally {
         isFinishedInitializing = true;
         if (isMinTimePassed) {
-            store.dispatch('display/finishInitializing');
+            displayStore.setIsInitialized(true);
             removeInitializer();
         }
     }

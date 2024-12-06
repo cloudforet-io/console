@@ -11,16 +11,13 @@ import {
 } from '@cloudforet/mirinae';
 import type { TreeDisplayMap, TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
 
-
-import { store } from '@/store';
-
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type {
     CloudServiceTypeItem,
     CloudServiceTypeReferenceMap,
 } from '@/store/reference/cloud-service-type-reference-store';
 import type { MetricReferenceItem } from '@/store/reference/metric-reference-store';
-
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import type { MenuId } from '@/lib/menu/config';
@@ -47,6 +44,7 @@ const props = defineProps<Props>();
 const allReferenceStore = useAllReferenceStore();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
+const userStore = useUserStore();
 const { getProperRouteLocation } = useProperRouteLocation();
 const route = useRoute();
 
@@ -60,7 +58,7 @@ const storeState = reactive({
         return res;
     }),
     selectedNamespace: computed<NamespaceSubItemType|undefined>(() => metricExplorerPageState.selectedNamespace),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     selectedMenuId: computed(() => {
