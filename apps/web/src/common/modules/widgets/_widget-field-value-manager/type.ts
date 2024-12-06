@@ -13,7 +13,7 @@ import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/dat
 import type { DisplayAnnotationValue } from '@/common/modules/widgets/_widget-fields/display-annotation/type';
 import type { DisplaySeriesLabelValue } from '@/common/modules/widgets/_widget-fields/display-series-label/type';
 import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/granularity/type';
-import type { GroupByValue } from '@/common/modules/widgets/_widget-fields/group-by/type';
+import type { _GroupByValue } from '@/common/modules/widgets/_widget-fields/group-by/type';
 import type { WidgetHeaderValue } from '@/common/modules/widgets/_widget-fields/header/type';
 import type { IconValue } from '@/common/modules/widgets/_widget-fields/icon/type';
 import type { LegendValue } from '@/common/modules/widgets/_widget-fields/legend/type';
@@ -65,7 +65,7 @@ export interface WidgetFieldTypeMap {
     legend: WidgetFieldValue<LegendValue>;
     icon: WidgetFieldValue<IconValue>;
     header: WidgetFieldValue<WidgetHeaderValue>;
-    groupBy: WidgetFieldValue<GroupByValue>;
+    groupBy: WidgetFieldValue<_GroupByValue>;
     granularity: WidgetFieldValue<GranularityValue>;
     formatRules: WidgetFieldValue<_FormatRulesValue>;
     displaySeriesLabel: WidgetFieldValue<DisplaySeriesLabelValue>;
