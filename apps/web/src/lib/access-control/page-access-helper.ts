@@ -11,8 +11,9 @@ import {
     WORKSPACE_OWNER_DEFAULT_PERMISSIONS,
     WORKSPACE_USER_MINIMAL_PERMISSIONS,
 } from '@/lib/access-control/config';
+import config from '@/lib/config';
 import type { Menu, MenuId } from '@/lib/menu/config';
-import { MENU_LIST } from '@/lib/menu/menu-architecture';
+import { MENU_LIST, MENU_LIST_FOR_RESOURCE_MANAGER_V2 } from '@/lib/menu/menu-architecture';
 
 import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';
 
@@ -39,7 +40,9 @@ export const flattenMenu = (menuList: Menu[]): Menu[] => menuList.flatMap((menu)
 
 export const getPageAccessMapFromRawData = (pageAccessPermissions?: string[]): PageAccessMap => {
     const result: PageAccessMap = {};
-    const flattenedMenuList = flattenMenu(MENU_LIST);
+    const isResourceManagerVersionV2 = config.get('RESOURCE_MANAGER_VERSION') === 'v2';
+    const menuListByVersion = (isResourceManagerVersionV2 ? MENU_LIST_FOR_RESOURCE_MANAGER_V2 : MENU_LIST);
+    const flattenedMenuList = flattenMenu(menuListByVersion);
     const setPermissions = (id: string, read = true, write = true, access = true) => {
         result[id] = { read, write, access };
     };

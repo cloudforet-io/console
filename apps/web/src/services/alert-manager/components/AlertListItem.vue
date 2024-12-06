@@ -75,7 +75,7 @@ const projectNameFormatter = (projectId) => props.projectReference?.label || pro
                      :color="props.item.urgency === ALERT_URGENCY.HIGH ? red[400] : undefined"
                 />
                 <p-link class="title"
-                        :to="{ name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME, params: { id: props.item.alert_id } }"
+                        :to="{ name: ALERT_MANAGER_ROUTE.ALERTS.DETAIL._NAME, params: { id: props.item.alert_id } }"
                 >
                     <span v-tooltip.bottom="props.item.title">{{ props.item.title }}</span>
                 </p-link>

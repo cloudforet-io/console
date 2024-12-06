@@ -28,7 +28,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { webhookStateFormatter } from '@/services/alert-manager-v2/composables/refined-table-data';
 import { NOTIFICATION_STATE } from '@/services/alert-manager-v2/constants/alert-manager-constant';
-import { ALERT_MANAGER_V2_ROUTE } from '@/services/alert-manager-v2/routes/route-constant';
+import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
 
 interface Props {
     // TODO: add type
@@ -114,7 +114,7 @@ const state = reactive({
 
 const handleClickCreateButton = () => {
     router.push(getProperRouteLocation({
-        name: ALERT_MANAGER_V2_ROUTE.SERVICE.DETAIL.NOTIFICATIONS.CREATE._NAME,
+        name: ALERT_MANAGER_ROUTE_V2.SERVICE.DETAIL.NOTIFICATIONS.CREATE._NAME,
     }));
 };
 const handleSelectDropdownItem = (name) => {

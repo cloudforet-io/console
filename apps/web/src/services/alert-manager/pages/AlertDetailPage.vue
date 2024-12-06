@@ -76,7 +76,7 @@ const alertDeleteConfirm = async () => {
             alert_id: props.id,
         });
         showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.ALT_S_DELETE_ALERT'), '');
-        await router.push({ name: ALERT_MANAGER_ROUTE.ALERT._NAME });
+        await router.push({ name: ALERT_MANAGER_ROUTE.ALERTS._NAME });
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.DETAIL.ALT_E_DELETE_ALERT'));
     } finally {
@@ -98,7 +98,7 @@ const alertTitleEditConfirm = async () => {
     try {
         await alertPageStore.getAlertData(props.id);
     } catch (e) {
-        ErrorHandler.handleError(new NoResourceError({ name: ALERT_MANAGER_ROUTE.ALERT._NAME }));
+        ErrorHandler.handleError(new NoResourceError({ name: ALERT_MANAGER_ROUTE.ALERTS._NAME }));
     } finally {
         state.loading = false;
     }

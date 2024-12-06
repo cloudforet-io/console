@@ -5,7 +5,7 @@ import { ERROR_ROUTE } from '@/router/constant';
 
 import config from '@/lib/config';
 import type { Menu, MenuId } from '@/lib/menu/config';
-import { MENU_LIST, MENU_LIST_FOR_RESOURCE_MANAGER } from '@/lib/menu/menu-architecture';
+import { MENU_LIST, MENU_LIST_FOR_RESOURCE_MANAGER_V2 } from '@/lib/menu/menu-architecture';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 type FlattenedMenuMap = Partial<Record<MenuId, MenuId[]>>;
@@ -26,7 +26,7 @@ const getSubMenuIdsToMap = (menu: Menu, flattenedMenuMap: FlattenedMenuMap = {})
 
 const makeFlattenedMenuMap = () => {
     const isResourceManagerVersionV2 = config.get('RESOURCE_MANAGER_VERSION') === 'v2';
-    const menuListByVersion = (isResourceManagerVersionV2 ? MENU_LIST_FOR_RESOURCE_MANAGER : MENU_LIST);
+    const menuListByVersion = (isResourceManagerVersionV2 ? MENU_LIST_FOR_RESOURCE_MANAGER_V2 : MENU_LIST);
     menuListByVersion.forEach((menu) => {
         getSubMenuIdsToMap(menu, FLATTENED_MENU_MAP);
     });

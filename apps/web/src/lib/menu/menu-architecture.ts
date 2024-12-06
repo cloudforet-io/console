@@ -70,7 +70,7 @@ export const MENU_LIST: Menu[] = [
 ];
 
 
-export const MENU_LIST_FOR_RESOURCE_MANAGER: Menu[] = [
+export const MENU_LIST_FOR_RESOURCE_MANAGER_V2: Menu[] = [
     {
         id: MENU_ID.WORKSPACE_HOME,
         needPermissionByRole: true,
@@ -101,10 +101,11 @@ export const MENU_LIST_FOR_RESOURCE_MANAGER: Menu[] = [
         ],
     },
     {
-        id: MENU_ID.ALERT_MANAGER_V2,
+        id: MENU_ID.ALERT_MANAGER,
         needPermissionByRole: true,
         subMenuList: [
             { id: MENU_ID.SERVICE, needPermissionByRole: true },
+            { id: MENU_ID.ALERTS, needPermissionByRole: true },
         ],
     },
     {
@@ -185,7 +186,7 @@ export const ADMIN_MENU_LIST: Menu[] = [
     },
 ];
 
-export const ADMIN_MENU_LIST_FOR_RESOURCE_MANAGER: Menu[] = [
+export const ADMIN_MENU_LIST_FOR_RESOURCE_MANAGER_V2: Menu[] = [
     {
         id: MENU_ID.DASHBOARDS,
     },

@@ -9,7 +9,7 @@ import { i18n } from '@/translations';
 import ServiceCreateStep1 from '@/services/alert-manager-v2/components/ServiceCreateStep1.vue';
 import ServiceCreateStep2 from '@/services/alert-manager-v2/components/ServiceCreateStep2.vue';
 import ServiceCreateStep3 from '@/services/alert-manager-v2/components/ServiceCreateStep3.vue';
-import { ALERT_MANAGER_V2_ROUTE } from '@/services/alert-manager-v2/routes/route-constant';
+import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
 import { useServiceCreateFormStore } from '@/services/alert-manager-v2/store/service-create-form-store';
 import type { createHeaderInfoByStep } from '@/services/alert-manager-v2/types/alert-manager-type';
 
@@ -53,7 +53,7 @@ const state = reactive({
 });
 
 const handleClickClose = () => {
-    router.push({ name: ALERT_MANAGER_V2_ROUTE.SERVICE._NAME });
+    router.push({ name: ALERT_MANAGER_ROUTE_V2.SERVICE._NAME });
 };
 
 onUnmounted(() => {
