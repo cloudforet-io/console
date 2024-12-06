@@ -1,3 +1,5 @@
+import type { TranslateResult } from 'vue-i18n';
+
 import type {
     ALERT_STATUS_FILTER, ALERT_URGENCY_FILTER, WEBHOOK_STATE, SERVICE_DETAIL_TABS,
     WEBHOOK_DETAIL_TABS,
@@ -13,3 +15,8 @@ export type AlertUrgencyFilterType = typeof ALERT_URGENCY_FILTER[keyof typeof AL
 
 export type WebhookDetailTabsType = typeof WEBHOOK_DETAIL_TABS[keyof typeof WEBHOOK_DETAIL_TABS];
 export type WebhookStateType = typeof WEBHOOK_STATE[keyof typeof WEBHOOK_STATE];
+
+export type createHeaderInfoByStep = {
+    title: TranslateResult;
+    desc?: TranslateResult;
+};

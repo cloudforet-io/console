@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, onUnmounted, reactive } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 import { useRouter } from 'vue-router/composables';
 
 import { PCenteredLayoutHeader } from '@cloudforet/mirinae';
@@ -12,11 +11,7 @@ import ServiceCreateStep2 from '@/services/alert-manager-v2/components/ServiceCr
 import ServiceCreateStep3 from '@/services/alert-manager-v2/components/ServiceCreateStep3.vue';
 import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
 import { useServiceCreateFormStore } from '@/services/alert-manager-v2/store/service-create-form-store';
-
-type headerInfoByStep = {
-    title: TranslateResult;
-    desc: TranslateResult;
-};
+import type { createHeaderInfoByStep } from '@/services/alert-manager-v2/types/alert-manager-type';
 
 const serviceFormStore = useServiceCreateFormStore();
 const serviceFormState = serviceFormStore.state;
@@ -28,7 +23,7 @@ const storeState = reactive({
     subStep: computed(() => serviceFormState.currentSubStep),
 });
 const state = reactive({
-    headerInfo: computed<headerInfoByStep>(() => {
+    headerInfo: computed<createHeaderInfoByStep>(() => {
         if (storeState.step === 1) {
             return {
                 title: i18n.t('ALERT_MANAGER.SERVICE.CREATE_SERVICE_TITLE'),

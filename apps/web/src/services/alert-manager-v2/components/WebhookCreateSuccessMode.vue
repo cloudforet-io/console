@@ -63,8 +63,8 @@ const handleCopyWebhookUrl = () => {
     <div class="service-create-step2-created-webhook">
         <div class="webhook-item">
             <p-lazy-img :src="assetUrlConverter(storeState.selectedWebhookType.tags?.icon || '')"
-                        width="2.5rem"
-                        height="2.5rem"
+                        width="4rem"
+                        height="4rem"
                         error-icon="ic_webhook"
             />
             <span class="info">

@@ -4,9 +4,13 @@ import { defineProps } from 'vue';
 import ServiceDetailHeader from '@/services/alert-manager-v2/components/ServiceDetailHeader.vue';
 import ServiceDetailTabs from '@/services/alert-manager-v2/components/ServiceDetailTabs.vue';
 
-const props = defineProps<{
+interface Props {
     serviceId: string;
-}>();
+}
+const props = withDefaults(defineProps<Props>(), {
+    serviceId: '',
+});
+
 </script>
 
 <template>
