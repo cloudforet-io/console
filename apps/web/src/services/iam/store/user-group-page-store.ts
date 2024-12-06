@@ -8,6 +8,7 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import type { UserGroupListItemType } from '@/schema/identity/user-group/type';
 
 import type { ModalState } from '@/services/iam/types/user-group-type';
+import type { UserListItemType } from '@/services/iam/types/user-type';
 
 interface iState {
     loading: boolean;
@@ -45,6 +46,22 @@ export const useUserGroupPageStore = defineStore('page-user-group', () => {
                 userGroups.push(state.userGroups[d]);
             });
             return userGroups ?? [];
+        }),
+        usersPerSelectedUserGroup: computed<UserListItemType[]>((): UserListItemType[] => {
+            if (state.selectedUserGroup.users !== undefined) {
+                return state.selectedUserGroup.users.map((user) => {
+                    const {
+                        user_id, name, auth_type, last_accessed_at,
+                    } = user;
+                    return {
+                        user_id,
+                        name,
+                        auth_type,
+                        last_accessed_at,
+                    };
+                }) ?? [];
+            }
+            return [];
         }),
     });
     const actions = {
