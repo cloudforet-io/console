@@ -11,9 +11,9 @@ import {
 
 import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
-import { store } from '@/store';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+import { useDisplayStore } from '@/store/display/display-store';
 
 import { WIDGET_COMPONENT_ICON_MAP } from '@/common/modules/widgets/_constants/widget-components-constant';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
@@ -22,6 +22,7 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashbo
 
 
 type WidgetModel = PublicWidgetModel | PrivateWidgetModel;
+const displayStore = useDisplayStore();
 const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
@@ -59,11 +60,11 @@ const getWidgetDefaultName = (widgetType: string): string => {
 
 watch(() => dashboardDetailState.dashboardId, (after, before) => {
     if (after !== before) {
-        store.dispatch('display/hideSidebar');
+        displayStore.setVisibleSidebar(false);
     }
 });
 onUnmounted(() => {
-    store.dispatch('display/hideSidebar');
+    displayStore.setVisibleSidebar(false);
 });
 </script>
 
@@ -104,7 +105,7 @@ onUnmounted(() => {
             <div class="footer-wrapper">
                 <p-button style-type="substitutive"
                           icon-left="ic_check"
-                          @click="store.dispatch('display/hideSidebar')"
+                          @click="displayStore.setVisibleSidebar(false);"
                 >
                     {{ $t('DASHBOARDS.DETAIL.DONE_EDITING') }}
                 </p-button>

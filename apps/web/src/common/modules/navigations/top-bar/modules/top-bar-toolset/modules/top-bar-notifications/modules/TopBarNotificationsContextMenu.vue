@@ -23,9 +23,9 @@ import type { NotificationDeleteParameters } from '@/schema/notification/notific
 import type { NotificationListParameters } from '@/schema/notification/notification/api-verbs/list';
 import type { NotificationSetReadParameters } from '@/schema/notification/notification/api-verbs/set-read';
 import type { NotificationModel } from '@/schema/notification/notification/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useDisplayStore } from '@/store/display/display-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -62,7 +62,10 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
 }>();
 const { i18nDayjs } = useI18nDayjs();
+
 const userStore = useUserStore();
+const displayStore = useDisplayStore();
+
 const state = reactive({
     loading: true,
     timezone: computed(() => userStore.state.timezone),
@@ -154,7 +157,7 @@ const listNotifications = async () => {
             state.items = state.items.concat(convertNotificationItem(response.results ?? []));
             await setReadNotifications(response.results ?? []);
             // update last read
-            await store.commit('display/setGnbNotificationLastReadTime', dayjs.utc().toISOString(), { root: true });
+            displayStore.updateGnbNotificationLastReadTime(dayjs.utc().toISOString());
         }
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));

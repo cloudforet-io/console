@@ -16,8 +16,8 @@ import { numberFormatter } from '@cloudforet/utils';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';
 
-import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
-import type { Currency } from '@/store/modules/display/type';
+import { CURRENCY_SYMBOL } from '@/store/display/constant';
+import type { Currency } from '@/store/display/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 import { useUserStore } from '@/store/user/user-store';

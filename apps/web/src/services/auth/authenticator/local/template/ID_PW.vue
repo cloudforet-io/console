@@ -9,9 +9,9 @@ import {
     PButton, PTextInput, PFieldGroup, PTextButton,
 } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useDisplayStore } from '@/store/display/display-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import config from '@/lib/config';
@@ -25,6 +25,7 @@ import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 const router = useRouter();
 
 const userStore = useUserStore();
+const displayStore = useDisplayStore();
 
 const state = reactive({
     userId: '' as string | undefined,
@@ -55,7 +56,9 @@ const checkUserId = () => {
 };
 
 const checkPassword = async () => {
-    if (state.password.length === 1) await store.dispatch('display/hideSignInErrorMessage');
+    if (state.password.length === 1) {
+        displayStore.setIsSignInFailed(false);
+    }
     if ((state.password.replace(/ /g, '').length !== state.password.length)
         || !state.password) {
         validationState.isPasswordValid = false;
@@ -78,7 +81,7 @@ const signIn = async () => {
     };
     try {
         await loadAuth().signIn(credentials, 'LOCAL');
-        await store.dispatch('display/hideSignInErrorMessage');
+        displayStore.setIsSignInFailed(false);
         if (userStore.state.requiredActions?.includes('UPDATE_PASSWORD')) {
             await router.push({ name: AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME });
         } else {
@@ -99,7 +102,7 @@ const signIn = async () => {
             });
         } else {
             ErrorHandler.handleError(e);
-            await store.dispatch('display/showSignInErrorMessage');
+            displayStore.setIsSignInFailed(true);
         }
         state.password = '';
     }

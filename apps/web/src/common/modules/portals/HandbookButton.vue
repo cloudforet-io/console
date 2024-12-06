@@ -56,9 +56,7 @@ import {
     PI, PCheckbox, PTab,
 } from '@cloudforet/mirinae';
 
-
-import { store } from '@/store';
-
+import { useDisplayStore } from '@/store/display/display-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -84,6 +82,8 @@ export default defineComponent({
     },
     setup(props, { emit }: SetupContext) {
         const userStore = useUserStore();
+        const displayStore = useDisplayStore();
+
         const state = reactive({
             proxyActiveTab: useProxyValue('activeTab', props, emit),
             userId: computed<string>(() => userStore.state.userId || ''),
@@ -103,22 +103,27 @@ export default defineComponent({
                     [props.type]: val,
                 },
             });
-            if (val) store.dispatch('display/hideSidebar');
+            if (val) {
+                displayStore.setVisibleSidebar(false);
+            }
         };
 
         const handleHandbookButton = () => {
-            if (store.getters['display/isHandbookVisible']) store.dispatch('display/hideSidebar');
-            else store.dispatch('display/showHandbook');
+            if (displayStore.getters.isHandbookVisible) {
+                displayStore.setVisibleSidebar(false);
+            } else {
+                displayStore.showHandbook();
+            }
         };
 
         onMounted(() => {
-            if (!state.noMore && !store.getters['display/isHandbookVisible']) {
-                store.dispatch('display/showHandbook');
+            if (!state.noMore && !displayStore.getters.isHandbookVisible) {
+                displayStore.showHandbook();
             }
         });
         onUnmounted(() => {
-            if (store.getters['display/isHandbookVisible']) {
-                store.dispatch('display/hideSidebar');
+            if (displayStore.getters.isHandbookVisible) {
+                displayStore.setVisibleSidebar(false);
             }
         });
         return {

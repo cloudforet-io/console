@@ -13,7 +13,7 @@ import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type
 
 import { i18n } from '@/translations';
 
-import type { Currency } from '@/store/modules/display/type';
+import type { Currency } from '@/store/display/type';
 import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';

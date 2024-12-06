@@ -22,9 +22,9 @@ import { i18n as _i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
+import { CURRENCY_SYMBOL } from '@/store/display/constant';
+import type { Currency } from '@/store/display/type';
 import { DOMAIN_CONFIG_NAMES } from '@/store/domain/constant';
-import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
-import type { Currency } from '@/store/modules/display/type';
 import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';

@@ -3,7 +3,7 @@ import {
     computed, reactive,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import { useRouter } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import { isEmpty } from 'lodash';
 
@@ -14,11 +14,11 @@ import type { ContextMenuType, MenuItem } from '@cloudforet/mirinae/types/contro
 
 import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+import { useDisplayStore } from '@/store/display/display-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
@@ -80,7 +80,10 @@ const favoriteGetters = favoriteStore.getters;
 const gnbStore = useGnbStore();
 const gnbStoreGetters = gnbStore.getters;
 const userStore = useUserStore();
+const displayStore = useDisplayStore();
+
 const router = useRouter();
+const route = useRoute();
 
 const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
@@ -186,10 +189,13 @@ const state = reactive({
         ];
     }),
     //
-    favoriteMenuItems: computed<FavoriteItem[]>(() => convertMenuConfigToReferenceData(
-        favoriteGetters.menuItems ?? [],
-        store.getters['display/allMenuList'],
-    )),
+    favoriteMenuItems: computed<FavoriteItem[]>(() => {
+        const allMenuList = displayStore.getAllMenuList(route);
+        return convertMenuConfigToReferenceData(
+            favoriteGetters.menuItems ?? [],
+            allMenuList,
+        );
+    }),
     favoriteCostAnalysisItems: computed<FavoriteItem[]>(() => {
         const isUserAccessible = isUserAccessibleToMenu(MENU_ID.COST_ANALYSIS, userStore.getters.pageAccessPermissionList);
         return isUserAccessible

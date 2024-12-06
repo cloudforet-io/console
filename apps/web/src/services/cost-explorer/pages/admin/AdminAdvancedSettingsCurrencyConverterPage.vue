@@ -12,8 +12,8 @@ import {
 
 import { i18n } from '@/translations';
 
-import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
-import type { Currency } from '@/store/modules/display/type';
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/display/constant';
+import type { Currency } from '@/store/display/type';
 import { usePreferencesStore } from '@/store/preferences/preferences-store';
 
 import config from '@/lib/config';

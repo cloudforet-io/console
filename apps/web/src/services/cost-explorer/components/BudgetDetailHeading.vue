@@ -12,7 +12,7 @@ import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import { CURRENCY_SYMBOL } from '@/store/display/constant';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import { useUserStore } from '@/store/user/user-store';

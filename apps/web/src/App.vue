@@ -11,16 +11,14 @@ import {
     PNoticeAlert, PToastAlert, PIconModal, PSidebar, PDataLoader,
 } from '@cloudforet/mirinae';
 
-
-import { store } from '@/store';
-
 import { EXTERNAL_PAGE_ROUTE } from '@/router/constant';
 import { getRouteScope } from '@/router/helpers/route-helper';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { SIDEBAR_TYPE } from '@/store/display/constant';
+import { useDisplayStore } from '@/store/display/display-store';
 import { useErrorStore } from '@/store/error/error-store';
 import { useGlobalUIStore } from '@/store/global-ui/global-ui-store';
-import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 import { useUserStore } from '@/store/user/user-store';
 
 import config from '@/lib/config';
@@ -62,6 +60,7 @@ const appContextStore = useAppContextStore();
 const errorStore = useErrorStore();
 const globalUIStore = useGlobalUIStore();
 const globalUIGetters = globalUIStore.getters;
+const displayStore = useDisplayStore();
 
 const topNotiRef = ref(null);
 useResizeObserver(topNotiRef, (entries) => {
@@ -96,7 +95,7 @@ watch(() => route.path, () => {
 
 watch(() => state.userId, (userId) => {
     if (userId) {
-        store.dispatch('display/initSettings');
+        displayStore.initSettings();
     }
 }, { immediate: true });
 </script>
@@ -105,7 +104,7 @@ watch(() => state.userId, (userId) => {
     <div v-cloak
          id="app"
     >
-        <template v-if="store.state.display.isInitialized">
+        <template v-if="displayStore.state.isInitialized">
             <p-notice-alert group="noticeTopLeft" />
             <p-notice-alert group="noticeTopRight" />
             <p-notice-alert group="noticeBottomLeft" />
@@ -122,13 +121,13 @@ watch(() => state.userId, (userId) => {
                 >
                     <template #main>
                         <p-sidebar v-if="!state.globalGrantLoading"
-                                   :visible="store.state.display.visibleSidebar"
-                                   :style-type="store.getters['display/sidebarProps'].styleType"
-                                   :size="store.getters['display/sidebarProps'].size"
-                                   :is-fixed-size="store.getters['display/sidebarProps'].isFixedSize"
-                                   :hide-close-button="store.getters['display/sidebarProps'].disableButton"
-                                   :disable-scroll="store.getters['display/sidebarProps'].disableScroll"
-                                   @close="store.dispatch('display/hideSidebar')"
+                                   :visible="displayStore.state.visibleSidebar"
+                                   :style-type="displayStore.getters.sidebarProps.styleType"
+                                   :size="displayStore.getters.sidebarProps.size"
+                                   :is-fixed-size="displayStore.getters.sidebarProps.isFixedSize"
+                                   :hide-close-button="displayStore.getters.sidebarProps.disableButton"
+                                   :disable-scroll="displayStore.getters.sidebarProps.disableScroll"
+                                   @close="displayStore.setVisibleSidebar(false)"
                         >
                             <div class="main-content">
                                 <portal-target ref="topNotiRef"
@@ -138,10 +137,10 @@ watch(() => state.userId, (userId) => {
                                 <router-view />
                             </div>
                             <template #title>
-                                <portal-target v-if="store.state.display.sidebarType === SIDEBAR_TYPE.info"
+                                <portal-target v-if="displayStore.state.sidebarType === SIDEBAR_TYPE.info"
                                                name="info-title"
                                 />
-                                <portal-target v-else-if="store.state.display.sidebarType === SIDEBAR_TYPE.widget"
+                                <portal-target v-else-if="displayStore.state.sidebarType === SIDEBAR_TYPE.widget"
                                                name="widget-title"
                                 />
                                 <portal-target v-else
@@ -149,10 +148,10 @@ watch(() => state.userId, (userId) => {
                                 />
                             </template>
                             <template #sidebar>
-                                <portal-target v-if="store.state.display.sidebarType === SIDEBAR_TYPE.info"
+                                <portal-target v-if="displayStore.state.sidebarType === SIDEBAR_TYPE.info"
                                                name="info-contents"
                                 />
-                                <portal-target v-else-if="store.state.display.sidebarType === SIDEBAR_TYPE.widget"
+                                <portal-target v-else-if="displayStore.state.sidebarType === SIDEBAR_TYPE.widget"
                                                name="widget-contents"
                                 />
                                 <portal-target v-else
@@ -190,7 +189,7 @@ watch(() => state.userId, (userId) => {
         </template>
         <!-- Modal for Cross Browsing -->
         <recommended-browser-modal v-if="showsBrowserRecommendation()" />
-        <mobile-guide-modal v-if="store.state.display.visibleMobileGuideModal" />
+        <mobile-guide-modal v-if="displayStore.state.visibleMobileGuideModal" />
     </div>
 </template>
 

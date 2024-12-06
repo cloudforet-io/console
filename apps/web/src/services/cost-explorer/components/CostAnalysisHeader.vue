@@ -18,7 +18,7 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import { CURRENCY_SYMBOL } from '@/store/display/constant';
 import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
