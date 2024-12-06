@@ -99,7 +99,11 @@ const handleSelectDropdown = async (inputText: string) => {
 
     switch (inputText) {
     case USER_GROUP_MODAL_TYPE.UPDATE:
-        console.log('TODO: Open Update User Group Modal');
+        userGroupPageStore.updateModalSettings({
+            type: USER_GROUP_MODAL_TYPE.UPDATE,
+            title: i18n.t('IAM.USER_GROUP.MODAL.CREATE_USER_GROUP.UPDATE_TITLE'),
+            themeColor: 'primary',
+        });
         dropdownState.loading = false;
         break;
     case USER_GROUP_MODAL_TYPE.REMOVE:
