@@ -1,3 +1,4 @@
+import type { FieldDataTargetType } from '@/common/modules/widgets/types/widget-field-type';
 
 export interface StackByValue {
     value: string;
@@ -5,10 +6,9 @@ export interface StackByValue {
 }
 
 export interface StackByOptions {
-    dataTarget?: string;
+    dataTarget: FieldDataTargetType;
     max: number;
     defaultMaxCount: number;
-    defaultIndex?: number;
     excludeDateField?: boolean;
 }
 
