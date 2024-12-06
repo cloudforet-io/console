@@ -13,11 +13,11 @@ import { SpaceRouter } from '@/router';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { DashboardCreateParams } from '@/schema/dashboard/_types/dashboard-type';
 import type { PublicDashboardCreateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -50,6 +50,7 @@ const dashboardCreatePageState = dashboardCreatePageStore.state;
 const dashboardCreatePageGetters = dashboardCreatePageStore.getters;
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlGetters = dashboardPageControlStore.getters;
+const userStore = useUserStore();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
@@ -106,7 +107,7 @@ const createSingleDashboard = async () => {
     const _dashboardParams: DashboardCreateParams = {
         name: dashboardName.value,
         labels: state.labels.map((item) => item.name),
-        tags: { created_by: store.state.user.userId },
+        tags: { created_by: userStore.state.userId },
         folder_id: state.selectedFolderId,
         vars_schema: DASHBOARD_VARS_SCHEMA_PRESET,
     };

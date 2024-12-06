@@ -4,11 +4,11 @@ import { useRoute } from 'vue-router/composables';
 
 import { PNotificationBar } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useErrorStore } from '@/store/error/error-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
 
@@ -20,11 +20,12 @@ const props = withDefaults(defineProps<{
 });
 const userWorkspaceStore = useUserWorkspaceStore();
 const errorStore = useErrorStore();
+const userStore = useUserStore();
 const route = useRoute();
 
 const storeState = reactive({
-    hasPermission: computed(() => store.getters['user/hasPermission']),
-    isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
+    hasPermission: computed(() => userStore.getters.hasPermission),
+    isDomainAdmin: computed(() => userStore.getters.isDomainAdmin),
     workspaceList: computed(() => userWorkspaceStore.getters.workspaceList),
     visibleAuthorizationError: computed(() => errorStore.state.visibleAuthorizationError),
 });

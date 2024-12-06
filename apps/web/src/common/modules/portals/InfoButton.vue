@@ -3,7 +3,7 @@
         <component :is="tag"
                    v-bind="childProps"
                    class="info-button"
-                   @click.stop="href ? undefined : $store.dispatch('display/showInfo')"
+                   @click.stop="href ? undefined : displayStore.showInfo()"
         >
             <p-i name="ic_info-circle"
                  width="0.875rem"
@@ -30,14 +30,14 @@
 <script lang="ts">
 import {
     computed,
-    getCurrentInstance,
     onBeforeUnmount,
     reactive,
     toRefs, watch,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import { PI, PLink } from '@cloudforet/mirinae';
+
+import { useDisplayStore } from '@/store/display/display-store';
 
 export default {
     name: 'InfoButton',
@@ -59,7 +59,8 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as Vue;
+        const displayStore = useDisplayStore();
+
         const state = reactive({
             tag: computed(() => (props.href ? PLink : 'span')),
             childProps: computed(() => {
@@ -75,17 +76,18 @@ export default {
 
         watch(() => props.visible, (after) => {
             if (after) {
-                vm.$store.dispatch('display/showInfo');
+                displayStore.showInfo();
             } else {
-                vm.$store.dispatch('display/hideSidebar');
+                displayStore.setVisibleSidebar(false);
             }
         }, { immediate: true });
 
         onBeforeUnmount(() => {
-            vm.$store.dispatch('display/hideSidebar');
+            displayStore.setVisibleSidebar(false);
         });
         return {
             ...toRefs(state),
+            displayStore,
         };
     },
 };

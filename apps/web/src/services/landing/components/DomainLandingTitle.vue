@@ -3,16 +3,16 @@ import { computed, reactive } from 'vue';
 
 import { PI, PButton } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
-
 import { useDomainStore } from '@/store/domain/domain-store';
+import { useUserStore } from '@/store/user/user-store';
 
 
 const domainStore = useDomainStore();
+const userStore = useUserStore();
 const storeState = reactive({
     domainName: computed<string>(() => domainStore.state.name),
-    isDomainAdmin: computed<boolean>(() => store.getters['user/isDomainAdmin']),
-    language: computed(() => store.state.user.language),
+    isDomainAdmin: computed<boolean>(() => userStore.getters.isDomainAdmin),
+    language: computed<string|undefined>(() => userStore.state.language),
 });
 
 const handleClickStartButton = () => {

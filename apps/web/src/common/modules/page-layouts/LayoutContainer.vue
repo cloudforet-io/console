@@ -7,7 +7,7 @@ import { useRoute } from 'vue-router/composables';
 
 import { screens } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
+import { useDisplayStore } from '@/store/display/display-store';
 
 import GNBNavigationRail from '@/common/modules/navigations/gnb/GNBNavigationRail.vue';
 import GNBToolbox from '@/common/modules/navigations/gnb/GNBToolbox.vue';
@@ -15,12 +15,13 @@ import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 const gnbStore = useGnbStore();
 const gnbGetters = gnbStore.getters;
+const displayStore = useDisplayStore();
 
 const route = useRoute();
 const { width } = useWindowSize();
 
 const storeState = reactive({
-    visibleSidebar: computed(() => store.state.display.visibleSidebar),
+    visibleSidebar: computed(() => displayStore.state.visibleSidebar),
     isHideNavRail: computed(() => gnbGetters.isHideNavRail),
     isMinimizeNavRail: computed(() => gnbGetters.isMinimizeNavRail),
 });

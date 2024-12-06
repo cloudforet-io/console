@@ -17,7 +17,6 @@ import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { JobTaskListParameters } from '@/schema/inventory/job-task/api-verbs/list';
 import type { JobTaskModel } from '@/schema/inventory/job-task/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { ROOT_ROUTE } from '@/router/constant';
@@ -25,6 +24,7 @@ import { ROOT_ROUTE } from '@/router/constant';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -79,6 +79,7 @@ const statusList = computed(() => [
 const emit = defineEmits<{(e: 'select', array): void}>();
 
 const allReferenceStore = useAllReferenceStore();
+const userStore = useUserStore();
 const storeState = reactive({
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceStore.getters.serviceAccount),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
@@ -87,7 +88,7 @@ const storeState = reactive({
 
 const state = reactive({
     loading: false,
-    timezone: computed(() => store.state.user.timezone),
+    timezone: computed<string|undefined>(() => userStore.state.timezone),
     items: [] as ({duration: string} & JobTaskModel)[],
     selectedStatus: 'ALL',
     //

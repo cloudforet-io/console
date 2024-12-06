@@ -9,8 +9,9 @@ import {
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import RoleManagementTabDetail from '@/services/iam/components/RoleManagementTabDetail.vue';
 import { useRoleFormatter } from '@/services/iam/composables/refined-table-data';
@@ -19,9 +20,10 @@ import { useRolePageStore } from '@/services/iam/store/role-page-store';
 
 const rolePageStore = useRolePageStore();
 const rolePageState = rolePageStore.$state;
+const userStore = useUserStore();
 
 const storeState = reactive({
-    timezone: computed(() => store.state.user.timezone),
+    timezone: computed<string|undefined>(() => userStore.state.timezone),
 });
 const singleItemTabState = reactive({
     tabs: computed<TabItem[]>(() => ([

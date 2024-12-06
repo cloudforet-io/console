@@ -14,10 +14,10 @@ import type { CostReportConfigUpdateParameters } from '@/schema/cost-analysis/co
 import type { CostReportConfigModel } from '@/schema/cost-analysis/cost-report-config/model';
 import { i18n } from '@/translations';
 
-import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
-import type { Currency } from '@/store/modules/display/type';
-import { languages } from '@/store/modules/user/config';
-import type { LanguageCode } from '@/store/modules/user/type';
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/display/constant';
+import type { Currency } from '@/store/display/type';
+import { languages } from '@/store/user/constant';
+import type { LanguageCode } from '@/store/user/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 

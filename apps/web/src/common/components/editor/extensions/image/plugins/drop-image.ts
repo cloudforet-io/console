@@ -2,7 +2,12 @@ import { Plugin } from 'prosemirror-state';
 
 import type { ImageUploader } from '@/common/components/editor/extensions/image/type';
 
-export const dropImagePlugin = (upload: ImageUploader) => new Plugin({
+const LOADING_IMAGE_NODE = {
+    src: '/loading-spinner.gif',
+    'data-loading': true,
+    style: 'max-width: 2rem; max-height: 2rem;',
+};
+export const dropImagePlugin = (upload: ImageUploader<any>, imgFileDataMap: Map<string, any>) => new Plugin({
     props: {
         handleDOMEvents: {
             paste: (view, _event: Event) => {
@@ -18,12 +23,20 @@ export const dropImagePlugin = (upload: ImageUploader) => new Plugin({
                         event.preventDefault();
 
                         if (upload && image) {
-                            upload(image).then(({ downloadUrl, fileId }) => {
+                            // add loading node
+                            const loadingNode = schema.nodes.image.create(LOADING_IMAGE_NODE);
+                            const loadingTransaction = view.state.tr.replaceSelectionWith(loadingNode);
+                            view.dispatch(loadingTransaction);
+
+                            // upload and replace the loading node with the uploaded image node
+                            upload(image).then(({ downloadUrl, fileId, data }) => {
+                                if (data) imgFileDataMap.set(fileId, data);
                                 const node = schema.nodes.image.create({
                                     src: downloadUrl,
                                     'file-id': fileId,
                                 });
-                                const transaction = view.state.tr.replaceSelectionWith(node);
+                                const loadingPos = view.state.selection.anchor - 1; // get the position of the loading node
+                                const transaction = view.state.tr.setNodeMarkup(loadingPos, schema.nodes.image, node.attrs);
                                 view.dispatch(transaction);
                             });
                         }
@@ -69,12 +82,20 @@ export const dropImagePlugin = (upload: ImageUploader) => new Plugin({
                     const reader = new FileReader();
 
                     if (upload) {
-                        const { downloadUrl, fileId } = await upload(image);
+                        // add loading node
+                        const loadingNode = schema.nodes.image.create(LOADING_IMAGE_NODE);
+                        const loadingTransaction = view.state.tr.replaceSelectionWith(loadingNode);
+                        view.dispatch(loadingTransaction);
+
+                        // upload and replace the loading node with the uploaded image node
+                        const { downloadUrl, fileId, data } = await upload(image);
+                        if (data) imgFileDataMap.set(fileId, data);
                         const node = schema.nodes.image.create({
                             src: downloadUrl,
                             'file-id': fileId,
                         });
-                        const transaction = view.state.tr.insert(coordinates.pos, node);
+                        // const transaction = view.state.tr.insert(coordinates.pos, node);
+                        const transaction = view.state.tr.setNodeMarkup(coordinates.pos, schema.nodes.image, node.attrs);
                         view.dispatch(transaction);
                     } else {
                         reader.onload = (readerEvent) => {

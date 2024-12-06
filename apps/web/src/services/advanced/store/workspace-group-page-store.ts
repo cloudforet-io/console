@@ -20,7 +20,7 @@ import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/mode
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
-import type { Currency } from '@/store/modules/display/type';
+import type { Currency } from '@/store/display/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

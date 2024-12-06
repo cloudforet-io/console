@@ -93,7 +93,6 @@
 </template>
 
 <script lang="ts">
-
 import { useInfiniteScroll } from '@vueuse/core';
 import {
     computed, getCurrentInstance, onMounted, reactive, toRefs, watch,
@@ -120,7 +119,8 @@ import type { ChangeHistoryListParameters } from '@/schema/inventory/change-hist
 import type { ChangeHistoryModel } from '@/schema/inventory/change-history/model';
 import type { NoteListParameters } from '@/schema/inventory/note/api-verbs/list';
 import type { NoteModel } from '@/schema/inventory/note/model';
-import { store } from '@/store';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import VerticalTimeline from '@/common/components/vertical-timeline/VerticalTimeline.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -191,10 +191,11 @@ export default {
     },
     setup(props) {
         const vm = getCurrentInstance()?.proxy as Vue;
+        const userStore = useUserStore();
         const state = reactive({
             loading: true,
             timelineWrapperRef: null as null | HTMLElement,
-            timezone: computed(() => store.state.user.timezone),
+            timezone: computed(() => userStore.state.timezone),
             selectedYear: dayjs.utc().format('YYYY'),
             selectedMonth: 'all',
             items: [] as CloudServiceHistoryItem[],

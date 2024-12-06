@@ -21,14 +21,14 @@ import { loadMonospaceFonts } from '@/styles/fonts';
 
 interface Props {
     value?: string;
-    imageUploader?: ImageUploader;
-    attachments?: Attachment[];
+    imageUploader?: ImageUploader<any>;
+    attachments?: Attachment<any>[];
     invalid?: boolean;
     placeholder?: string;
 }
 const props = withDefaults(defineProps<Props>(), {
     value: '',
-    imageUploader: () => Promise.resolve<Attachment>({
+    imageUploader: () => Promise.resolve<Attachment<any>>({
         downloadUrl: '',
         fileId: '',
     }),
@@ -37,7 +37,7 @@ const props = withDefaults(defineProps<Props>(), {
     placeholder: '',
 });
 const emit = defineEmits<{(e: 'update:value', value: string): void;
-    (e: 'update:attachments', attachments: Attachment[]): void;
+    (e: 'update:attachments', attachments: Attachment<any>[]): void;
 }>();
 
 loadMonospaceFonts();
@@ -46,6 +46,7 @@ const state = reactive({
     editor: null as null|Editor,
 });
 
+const imgFileDataMap = new Map();
 onMounted(() => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -72,11 +73,11 @@ onMounted(() => {
             TextAlign.configure({
                 types: ['heading', 'paragraph'],
             }),
-            createImageExtension(props.imageUploader),
+            createImageExtension(props.imageUploader, imgFileDataMap),
         ],
         onUpdate: () => {
             emit('update:value', state.editor?.getHTML() ?? '');
-            emit('update:attachments', state.editor ? getAttachments(state.editor as Editor) : []);
+            emit('update:attachments', state.editor ? getAttachments<any>(state.editor as Editor, imgFileDataMap) : []);
         },
     });
 });

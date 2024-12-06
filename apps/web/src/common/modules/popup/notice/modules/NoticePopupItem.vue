@@ -13,6 +13,7 @@ import type { PostModel } from '@/schema/board/post/model';
 import type { FileModel } from '@/schema/file-manager/model';
 
 import { useNoticeStore } from '@/store/notice';
+import { useUserStore } from '@/store/user/user-store';
 
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
 
@@ -27,6 +28,7 @@ const props = withDefaults(defineProps<{
     item: undefined,
 });
 const noticeStore = useNoticeStore();
+const userStore = useUserStore();
 
 const state = reactive({
     popupVisible: true,
@@ -71,7 +73,7 @@ const handleClose = async (neverShowPopup?: boolean): Promise<void> => {
                 {{ item.title }}
             </h1>
             <div class="notice-popup-info">
-                <span class="notice-popup-author">{{ iso8601Formatter(item.updated_at, $store.state.user.timezone) }} · {{ item.writer }}</span>
+                <span class="notice-popup-author">{{ iso8601Formatter(item.updated_at, userStore.state.timezone) }} · {{ item.writer }}</span>
             </div>
             <p-divider class="!my-4" />
             <text-editor-viewer :contents="item.contents"
