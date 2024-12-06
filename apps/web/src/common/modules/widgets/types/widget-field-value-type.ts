@@ -4,7 +4,6 @@ import type { ColorSchemaValue } from '@/common/modules/widgets/_widget-fields/c
 import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/comparison/type';
 import type { CustomTableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
 import type { DataFieldHeatmapColorValue } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
-import type { DateAggregationOptionsValue } from '@/common/modules/widgets/_widget-fields/date-aggregation-options/type';
 import type { DateFormatValue } from '@/common/modules/widgets/_widget-fields/date-format/type';
 import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { DisplayAnnotationValue } from '@/common/modules/widgets/_widget-fields/display-annotation/type';
@@ -36,4 +35,4 @@ export type WidgetFieldValues = string | string[] | number | boolean | Compariso
     | WidgetHeaderValue | DateFormatValue | NumberFormatValue | DataFieldHeatmapColorValue
     | DisplayAnnotationValue | DisplaySeriesLabelValue | TextWrapValue | TableColumnWidthValue | CustomTableColumnWidthValue
     | LegendValue | WidgetHeightValue | MissingValueValue | AdvancedFormatRulesValue | DateRangeValue
-    | DateAggregationOptionsValue | TooltipNumberFormatValue;
+    | TooltipNumberFormatValue;

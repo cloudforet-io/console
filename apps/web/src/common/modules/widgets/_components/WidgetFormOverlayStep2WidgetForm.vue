@@ -34,7 +34,7 @@ const FORM_TITLE_MAP = {
     REQUIRED_FIELDS: 'REQUIRED_FIELDS',
     OPTIONAL_FIELDS: 'OPTIONAL_FIELDS',
 };
-const DATE_CONFIG_FIELD_KEYS = ['granularity', 'dateRange', 'dateAggregationOptions'];
+const DATE_CONFIG_FIELD_KEYS = ['granularity', 'dateRange'];
 
 interface Props {
     widgetValidationInvalid?: boolean;

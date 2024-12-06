@@ -6,10 +6,9 @@ import type { _CategoryByValue } from '@/common/modules/widgets/_widget-fields/c
 import type { ColorSchemaValue } from '@/common/modules/widgets/_widget-fields/color-schema/type';
 import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/comparison/type';
 import type { _CustomTableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
-import type { DataFieldHeatmapColorValue } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
+import type { _DataFieldHeatmapColorValue } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
 import type { DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
-import type { DateAggregationOptionsValue } from '@/common/modules/widgets/_widget-fields/date-aggregation-options/type';
-import type { DateFormatValue } from '@/common/modules/widgets/_widget-fields/date-format/type';
+import type { _DateFormatValue } from '@/common/modules/widgets/_widget-fields/date-format/type';
 import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { DisplayAnnotationValue } from '@/common/modules/widgets/_widget-fields/display-annotation/type';
 import type { DisplaySeriesLabelValue } from '@/common/modules/widgets/_widget-fields/display-series-label/type';
@@ -72,10 +71,9 @@ export interface WidgetFieldTypeMap {
     displaySeriesLabel: WidgetFieldValue<DisplaySeriesLabelValue>;
     displayAnnotation: WidgetFieldValue<DisplayAnnotationValue>;
     dateRange: WidgetFieldValue<DateRangeValue>;
-    dateFormat: WidgetFieldValue<DateFormatValue>;
-    dataFieldHeatmapColor: WidgetFieldValue<DataFieldHeatmapColorValue>;
+    dateFormat: WidgetFieldValue<_DateFormatValue>;
+    dataFieldHeatmapColor: WidgetFieldValue<_DataFieldHeatmapColorValue>;
     dataField: WidgetFieldValue<DataFieldValue>;
-    dateAggregationOptions: WidgetFieldValue<DateAggregationOptionsValue>;
     customTableColumnWidth: WidgetFieldValue<_CustomTableColumnWidthValue>;
     comparison: WidgetFieldValue<ComparisonValue>;
     colorSchema: WidgetFieldValue<ColorSchemaValue>;
