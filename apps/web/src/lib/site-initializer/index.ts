@@ -1,4 +1,4 @@
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
@@ -9,6 +9,7 @@ import { ERROR_ROUTE } from '@/router/constant';
 import { errorRoutes } from '@/router/error-routes';
 import { integralRoutes } from '@/router/integral-routes';
 
+import { useDisplayStore } from '@/store/display/display-store';
 import { pinia } from '@/store/pinia';
 import { useUserStore } from '@/store/user/user-store';
 
@@ -58,7 +59,7 @@ const removeInitializer = () => {
     if (el?.parentElement) el.parentElement.removeChild(el);
 };
 
-const init = async (store) => {
+const init = async () => {
     /* Init SpaceONE Console */
     try {
         await initConfig();
@@ -79,7 +80,7 @@ const init = async (store) => {
         initEcharts();
         initErrorHandler();
         initRequestIdleCallback();
-        await checkSsoAccessToken(store);
+        await checkSsoAccessToken();
     } catch (e) {
         if (!isRouterInitialized) initRouter();
         throw e;
@@ -87,10 +88,11 @@ const init = async (store) => {
 };
 
 const MIN_LOADING_TIME = 1000;
-export const siteInit = async (store) => {
-    store.dispatch('display/startInitializing');
+export const siteInit = async () => {
+    const displayStore = useDisplayStore(pinia);
+    displayStore.setIsInitialized(false);
 
-    store.watch((state) => state.display.isInitialized, (isInitialized) => {
+    watch(() => displayStore.state.isInitialized, (isInitialized) => {
         if (isInitialized) {
             const el = document.getElementById('site-loader-wrapper');
             if (el?.parentElement) el.parentElement.removeChild(el);
@@ -103,16 +105,16 @@ export const siteInit = async (store) => {
     setTimeout(() => {
         isMinTimePassed = true;
         if (isFinishedInitializing) {
-            store.dispatch('display/finishInitializing');
+            displayStore.setIsInitialized(true);
             removeInitializer();
         }
     }, MIN_LOADING_TIME);
 
     try {
-        await init(store);
+        await init();
     } catch (e) {
         console.error(e);
-        store.dispatch('display/finishInitializing');
+        displayStore.setIsInitialized(true);
 
         if (SpaceRouter.router) {
             await SpaceRouter.router.push({ name: ERROR_ROUTE._NAME });
@@ -120,7 +122,7 @@ export const siteInit = async (store) => {
     } finally {
         isFinishedInitializing = true;
         if (isMinTimePassed) {
-            store.dispatch('display/finishInitializing');
+            displayStore.setIsInitialized(true);
             removeInitializer();
         }
     }
