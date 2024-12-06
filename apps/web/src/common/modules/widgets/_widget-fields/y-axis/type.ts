@@ -4,9 +4,13 @@ export interface YAxisValue {
 }
 
 export interface YAxisOptions {
-    dataTarget?: string;
-    max?: number;
+    dataTarget: string;
+    max: number;
     defaultMaxCount: number;
     defaultIndex?: number;
     excludeDateField?: boolean;
+}
+export interface _YAxisValue {
+    data?: string;
+    count: number;
 }

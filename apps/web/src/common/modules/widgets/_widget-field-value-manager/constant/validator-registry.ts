@@ -1,10 +1,14 @@
 import { _FORMAT_RULE_TYPE } from '@/common/modules/widgets/_constants/widget-field-constant';
+import { integrateFieldsSchema } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import type { FieldValueValidator } from '@/common/modules/widgets/_widget-field-value-manager/type';
 import type { _FormatRulesOptions, _FormatRulesValue } from '@/common/modules/widgets/_widget-fields/advanced-format-rules/type';
+import type { _CategoryByValue, CategoryByOptions } from '@/common/modules/widgets/_widget-fields/category-by/type';
 import type { DataFieldOptions, DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
-import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
+import type { _StackByValue, StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
+import type { _XAxisValue, XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
+import type { _YAxisValue, YAxisOptions } from '@/common/modules/widgets/_widget-fields/y-axis/type';
 
-interface WidgetValidatorRegistry {
+export interface WidgetValidatorRegistry {
     [fieldKey: string]: FieldValueValidator<any>;
 }
 
@@ -36,9 +40,30 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
         }
         return true;
     },
+    categoryBy: (fieldValue: _CategoryByValue, widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const categoryByOptions = _fieldsSchema.categoryBy?.options as CategoryByOptions;
+        if (!fieldValue.data || !fieldValue.count || fieldValue.count < 0 || fieldValue.count > categoryByOptions.max) return false;
+        return true;
+    },
+    stackBy: (fieldValue: _StackByValue, widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const stackByOptions = _fieldsSchema.stackBy?.options as StackByOptions;
+        if (!fieldValue.data || !fieldValue.count || fieldValue.count < 0 || fieldValue.count > stackByOptions.max) return false;
+        return true;
+    },
+    xAxis: (fieldValue: _XAxisValue, widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const xAxisOptions = _fieldsSchema.xAxis?.options as XAxisOptions;
+        if (!fieldValue.data || !fieldValue.count || fieldValue.count < 0 || fieldValue.count > xAxisOptions.max) return false;
+        return true;
+    },
+    yAxis: (fieldValue: _YAxisValue, widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const yAxisOptions = _fieldsSchema.yAxis?.options as YAxisOptions;
+        if (!fieldValue.data || !fieldValue.count || fieldValue.count < 0 || fieldValue.count > yAxisOptions.max) return false;
+        return true;
+    },
 };
 
-const integrateFieldsSchema = (requiredFieldsSchema: WidgetConfig['requiredFieldsSchema'], optionalFieldsSchema: WidgetConfig['optionalFieldsSchema']) => ({
-    ...requiredFieldsSchema,
-    ...optionalFieldsSchema,
-});
+
