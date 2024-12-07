@@ -1,6 +1,8 @@
 import type { Ref, UnwrapRef } from 'vue';
 import { watch } from 'vue';
 
+import { isEqual } from 'lodash';
+
 import type { TaskField, TaskFieldType } from '@/schema/opsflow/_types/task-field-type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -83,6 +85,10 @@ export const useTaskFieldValidation = <TField extends TaskField, TValue>(
         emit('update:value', val);
     };
 
+    watch(() => props.value, (val) => {
+        if (isEqual(val, fieldValue)) return;
+        setFieldValue(val as UnwrapRef<TValue>);
+    });
     watch(validationResult, (val: boolean) => {
         emit('update:is-valid', val);
     }, { immediate: true });
