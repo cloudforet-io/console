@@ -7,9 +7,9 @@ import {
 import type { CollapsibleItem } from '@cloudforet/mirinae/types/data-display/collapsible/collapsible-list/type';
 
 import type { CommentModel } from '@/schema/opsflow/comment/model';
-import { store } from '@/store';
 
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -26,7 +26,8 @@ const props = defineProps<{
 const taskDetailPageStore = useTaskDetailPageStore();
 const commentStore = useCommentStore();
 const userReferenceStore = useUserReferenceStore();
-const userId = computed(() => store.state.user.userId);
+const userStore = useUserStore();
+const userId = computed(() => userStore.state.userId);
 const getAuthor = (item: CommentModel) => {
     const u = item.created_by;
     return userReferenceStore.getters.userItems[u]?.label ?? u ?? 'Unknown';

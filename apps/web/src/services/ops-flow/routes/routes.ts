@@ -1,6 +1,7 @@
 import type { RouteConfig } from 'vue-router';
 
-import { store } from '@/store';
+import { pinia } from '@/store/pinia';
+import { useUserStore } from '@/store/user/user-store';
 
 import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
@@ -15,6 +16,7 @@ const BoardPage = () => import('@/services/ops-flow/pages/BoardPage.vue');
 const TaskDetailPage = () => import('@/services/ops-flow/pages/TaskDetailPage.vue');
 const TaskCreatePage = () => import('@/services/ops-flow/pages/TaskCreatePage.vue');
 
+const userStore = useUserStore(pinia);
 const opsFlowRoutes: RouteConfig = {
     path: 'ops-flow',
     name: OPS_FLOW_ROUTE._NAME,
@@ -22,7 +24,7 @@ const opsFlowRoutes: RouteConfig = {
         menuId: MENU_ID.OPS_FLOW,
         translationId: MENU_INFO_MAP[MENU_ID.OPS_FLOW].translationId,
     },
-    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
+    redirect: (to) => getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap),
     component: OpsFlowContainer,
     children: [
         {

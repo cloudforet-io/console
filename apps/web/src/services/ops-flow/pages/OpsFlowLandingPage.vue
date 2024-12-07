@@ -10,7 +10,8 @@ import {
 
 import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
 import type { TaskModel } from '@/schema/opsflow/task/model';
-import { store } from '@/store';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
@@ -28,6 +29,7 @@ const taskCategoryStore = useTaskCategoryStore();
 const taskTypeStore = useTaskTypeStore();
 const taskTypeState = taskTypeStore.state;
 const taskStore = useTaskStore();
+const userStore = useUserStore();
 
 const { getProperRouteLocation } = useProperRouteLocation();
 
@@ -45,7 +47,7 @@ const { forms: { category, taskType }, setForm, isAllValid } = useFormValidator(
     },
 });
 const tasks = ref<TaskModel[]>([]);
-const userId = computed(() => store.state.user.userId);
+const userId = computed(() => userStore.state.userId ?? '');
 const taskQueryHelper = new QueryHelper();
 const taskQuery = computed<Query>(() => taskQueryHelper.setFilters([
     { k: 'created_by', v: userId.value, o: '=' },
