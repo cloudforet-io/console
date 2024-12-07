@@ -97,13 +97,13 @@ watch(() => taskContentFormGetters.currentCategory, async (currentCategory) => {
         // init selected category
         await setInitialCategory(currentCategory.category_id);
         // init selected task type
-        setInitialTaskType();
+        setInitialTaskType(taskContentFormState.currentTaskType);
         // init selected status
         const defaultStatus = currentCategory.status_options.TODO.find((status) => status.is_default);
         setInitialStatus(defaultStatus);
         taskContentFormStore.setStatusId(defaultStatus?.status_id);
         // init selected assignee
-        assigneeValidator.setValue('');
+        assigneeValidator.setValue(taskContentFormState.assignee ?? '');
     }
     resetValidations();
 }, { immediate: true });
@@ -112,7 +112,7 @@ watch(() => taskContentFormState.currentTaskType, (currentTaskType) => {
         // init selected task type
         setInitialTaskType(currentTaskType);
         // init selected assignee
-        assigneeValidator.setValue('');
+        assigneeValidator.setValue(taskContentFormState.assignee ?? '');
     }
     resetValidations();
 }, { immediate: true });
@@ -134,7 +134,7 @@ watch(() => taskContentFormState.currentTaskType, (currentTaskType) => {
                     <p-select-dropdown :selected="selectedCategoryItems"
                                        :handler="categoryMenuItemsHandler"
                                        :invalid="invalidState.category"
-                                       :disabled="taskContentFormState.mode === 'view'"
+                                       :readonly="taskContentFormState.mode === 'view'"
                                        block
                                        @update:selected="handleUpdateSelectedCategory"
                     />
@@ -150,7 +150,7 @@ watch(() => taskContentFormState.currentTaskType, (currentTaskType) => {
                     <p-select-dropdown :selected="selectedTaskTypeItems"
                                        :handler="taskTypeMenuItemsHandler"
                                        :invalid="invalidState.taskType"
-                                       :disabled="taskContentFormState.mode === 'view' || !taskContentFormGetters.currentCategory"
+                                       :readonly="taskContentFormState.mode === 'view' || !taskContentFormGetters.currentCategory"
                                        block
                                        @update:selected="handleUpdateSelectedTaskType"
                     />
@@ -170,7 +170,7 @@ watch(() => taskContentFormState.currentTaskType, (currentTaskType) => {
                     <p-select-dropdown :selected="selectedStatusItems"
                                        :handler="statusMenuItemsHandler"
                                        :invalid="invalidState.status"
-                                       :disabled="taskContentFormState.mode === 'view' || !taskContentFormGetters.currentCategory"
+                                       :readonly="taskContentFormState.mode === 'view' || !taskContentFormGetters.currentCategory"
                                        block
                                        @update:selected="handleUpdateSelectedStatus"
                     />
@@ -192,7 +192,7 @@ watch(() => taskContentFormState.currentTaskType, (currentTaskType) => {
                 >
                     <user-select-dropdown :user-id="assignee"
                                           :invalid="invalidState.assignee"
-                                          :disabled="taskContentFormState.mode === 'view' || !taskContentFormState.currentTaskType"
+                                          :readonly="taskContentFormState.mode === 'view' || !taskContentFormState.currentTaskType"
                                           :user-pool="taskContentFormState.currentTaskType?.assignee_pool"
                                           @update:user-id="handleUpdateSelectedAssignee"
                     />
