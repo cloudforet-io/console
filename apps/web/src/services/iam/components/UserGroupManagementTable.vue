@@ -107,7 +107,11 @@ const handleSelectDropdown = async (inputText: string) => {
         dropdownState.loading = false;
         break;
     case USER_GROUP_MODAL_TYPE.ADD_NEW_USER:
-        console.log('TODO: Open Add Users to Selected User Group Modal');
+        userGroupPageStore.updateModalSettings({
+            type: USER_GROUP_MODAL_TYPE.ADD_NEW_USER,
+            title: i18n.t('IAM.USER_GROUP.MODAL.ADD_NEW_USER.TITLE'),
+            themeColor: 'primary',
+        });
         dropdownState.loading = false;
         break;
     default:

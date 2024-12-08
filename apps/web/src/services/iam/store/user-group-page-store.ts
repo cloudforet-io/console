@@ -61,7 +61,21 @@ export const useUserGroupPageStore = defineStore('page-user-group', () => {
                     };
                 }) ?? [];
             }
-            return [];
+            // TODO: update after get data (Api Connection)
+            return [
+                {
+                    user_id: 'email1@mz.co.kr',
+                    name: 'ad',
+                    auth_type: 'LOCAL',
+                    last_accessed_at: 'sfdsf',
+                },
+                {
+                    user_id: 'email2@mz.co.kr',
+                    name: 'ad11',
+                    auth_type: 'LOCAL',
+                    last_accessed_at: 'sfdsf',
+                },
+            ];
         }),
     });
     const actions = {
