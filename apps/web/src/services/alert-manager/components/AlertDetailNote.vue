@@ -142,7 +142,7 @@ const handleDeleteNote = async () => {
                             <span class="date">{{ iso8601Formatter(state.noteList[index].created_at, state.timezone) }}</span>
                         </p>
                         <p-select-dropdown style-type="icon-button"
-                                           button-icon="ic_chevron-down"
+                                           button-icon="ic_ellipsis-horizontal"
                                            :menu="state.menuItems"
                                            menu-position="right"
                                            use-fixed-menu-style
