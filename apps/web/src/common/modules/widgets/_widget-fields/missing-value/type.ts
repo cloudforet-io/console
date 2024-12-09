@@ -3,5 +3,9 @@ export interface MissingValueValue {
 }
 
 export interface MissingValueOptions {
-    default?: string;
+    default?: 'lineToZero' | 'lineBreaks';
+}
+
+export interface _MissingValueValue {
+    type: 'lineToZero' | 'lineBreaks';
 }
