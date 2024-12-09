@@ -58,13 +58,15 @@ const time = computed(() => {
             <span> {{ time }}</span>
         </div>
         <div class="vertical-item-detail">
-            <p-collapsible-panel :line-clamp="3">
-                <div @click="emit('click')">
-                    <slot>
-                        {{ props.description }}
-                    </slot>
-                </div>
-            </p-collapsible-panel>
+            <slot name="non-collapsible">
+                <p-collapsible-panel :line-clamp="3">
+                    <div @click="emit('click')">
+                        <slot>
+                            {{ props.description }}
+                        </slot>
+                    </div>
+                </p-collapsible-panel>
+            </slot>
         </div>
         <p-divider class="bottom-divider" />
     </div>
