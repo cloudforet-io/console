@@ -1,11 +1,10 @@
 import type { Tags } from '@/schema/_common/model';
-import type { UserModel } from '@/schema/identity/user/model';
 
 export interface UserGroupModel {
     user_group_id: string;
     name: string;
     description?: string;
-    users: UserModel[];
+    users: string[];
     tags: Tags;
     workspace_id: string;
     domain_id: string;
