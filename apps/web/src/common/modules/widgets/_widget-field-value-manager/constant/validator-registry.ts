@@ -138,6 +138,7 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
         return true;
     },
     missingValue: () => true,
+    numberFormat: () => true,
 };
 
 

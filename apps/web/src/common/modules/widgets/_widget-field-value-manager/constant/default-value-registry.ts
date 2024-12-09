@@ -1,4 +1,6 @@
-import { COLOR_SCHEMA, DATE_FORMAT, DEFAULT_COMPARISON_COLOR } from '@/common/modules/widgets/_constants/widget-field-constant';
+import {
+    COLOR_SCHEMA, DATE_FORMAT, DEFAULT_COMPARISON_COLOR, NUMBER_FORMAT,
+} from '@/common/modules/widgets/_constants/widget-field-constant';
 import { integrateFieldsSchema } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { FieldDefaultValueConvertor, WidgetFieldTypeMap } from '@/common/modules/widgets/_widget-field-value-manager/type';
@@ -14,6 +16,7 @@ import type { _LegendOptions } from '@/common/modules/widgets/_widget-fields/leg
 import type { MaxOptions } from '@/common/modules/widgets/_widget-fields/max/type';
 import type { MinOptions } from '@/common/modules/widgets/_widget-fields/min/type';
 import type { MissingValueOptions } from '@/common/modules/widgets/_widget-fields/missing-value/type';
+import type { NumberFormatOptions, NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type { StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
 import type { XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { YAxisOptions } from '@/common/modules/widgets/_widget-fields/y-axis/type';
@@ -294,7 +297,24 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
         }
         return widgetFieldDefaultValueMap.missingValue;
     },
-    numberFormat: () => widgetFieldDefaultValueMap.numberFormat,
+    numberFormat: (widgetConfig, dataTable) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const numberFormatOptions = _fieldsSchema.numberFormat?.options as NumberFormatOptions;
+
+        const dataKeys = Object.keys(dataTable.data_info ?? {}) as string[];
+
+        if (numberFormatOptions.default) {
+            const result: NumberFormatValue = {};
+            dataKeys.forEach((key) => {
+                result[key] = {
+                    format: numberFormatOptions.default ?? NUMBER_FORMAT.AUTO,
+                };
+            });
+            return result;
+        }
+
+        return widgetFieldDefaultValueMap.numberFormat;
+    },
     pieChartType: () => widgetFieldDefaultValueMap.pieChartType,
     progressBar: () => widgetFieldDefaultValueMap.progressBar,
     subTotal: () => widgetFieldDefaultValueMap.subTotal,
