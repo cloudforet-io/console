@@ -171,7 +171,7 @@
                                     :value="rowIndex"
                                     :selected="proxyState.proxySelectIndex"
                                     :disabled="
-                                        getRowSelectable ? getRowSelectable(item, rowIndex) : false
+                                        getRowSelectable ? !getRowSelectable(item, rowIndex) : false
                                     "
                                     @change="proxyState.proxySelectIndex = $event"
                                 />
@@ -179,7 +179,7 @@
                                     v-else
                                     :selected="proxyState.proxySelectIndex[0]"
                                     :disabled="
-                                        getRowSelectable ? getRowSelectable(item, rowIndex) : false
+                                        getRowSelectable ? !getRowSelectable(item, rowIndex) : false
                                     "
                                     :value="rowIndex"
                                     @change="onChangeRadioSelect"
