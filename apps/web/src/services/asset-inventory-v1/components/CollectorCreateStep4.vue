@@ -76,7 +76,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import CollectorScheduleForm from '@/services/asset-inventory-v1/components/CollectorFormSchedule.vue';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import {
     useCollectorFormStore,
 } from '@/services/asset-inventory-v1/stores/collector-form-store';
@@ -185,7 +185,7 @@ const goToCollectorDetailPage = () => {
     state.visibleCreateCompleteModal = false;
     if (state.createdCollectorId) {
         SpaceRouter.router.push(getProperRouteLocation({
-            name: ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
+            name: ASSET_INVENTORY_ROUTE_V1.COLLECTOR.DETAIL._NAME,
             params: {
                 collectorId: state.createdCollectorId,
             },

@@ -17,7 +17,7 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import CollectorJobStatusIcon
     from '@/services/asset-inventory-v1/components/CollectorJobStatusIcon.vue';
 import { JOB_STATE } from '@/services/asset-inventory-v1/constants/collector-constant';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import type { CollectorLink } from '@/services/asset-inventory-v1/types/collector-main-page-type';
 
 
@@ -110,7 +110,7 @@ watch(() => props.recentJobs, () => {
                                                class="collector-job-status-icon-wrapper"
                                                :status="job.status"
                                                :contents="handleTooltipContent(job)"
-                                               :to="getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: job.job_id} })"
+                                               :to="getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE_V1.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: job.job_id} })"
                                                :style-type="props.fullMode ? 'white' : 'gray'"
                     />
                 </div>

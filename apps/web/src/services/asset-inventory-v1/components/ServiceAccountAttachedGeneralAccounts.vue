@@ -48,7 +48,7 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 import { green, red } from '@/styles/colors';
 
 import { getAccountFields, stateFormatter } from '@/services/asset-inventory-v1/helpers/dynamic-ui-schema-generator';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { useServiceAccountPageStore } from '@/services/asset-inventory-v1/stores/service-account-page-store';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory-v1/stores/service-account-schema-store';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
@@ -333,7 +333,7 @@ watch(() => state.trustedAccountId, async (ta) => {
                     <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
                             new-tab
                             :to="{
-                                name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
+                                name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.DETAIL._NAME,
                                 params: {
                                     serviceAccountId: item.service_account_id,
                                     workspaceId: item.workspace_id

@@ -41,7 +41,7 @@ import {
     ACCOUNT_TYPE_BADGE_OPTION,
     PROVIDER_ACCOUNT_NAME,
 } from '@/services/asset-inventory-v1/constants/service-account-constant';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { useServiceAccountPageStore } from '@/services/asset-inventory-v1/stores/service-account-page-store';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory-v1/stores/service-account-schema-store';
 import type { BaseInformationForm, CredentialForm } from '@/services/asset-inventory-v1/types/service-account-page-type';
@@ -187,10 +187,10 @@ const handleSave = async () => {
         if (state.isTrustedAccount && serviceAccountPageFormState.isAutoSyncEnabled) state.createModal = true;
         else if (props.provider === 'kubernetes') {
             router.push(getProperRouteLocation({
-                name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
+                name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.DETAIL._NAME,
                 params: { serviceAccountId: accountId as string },
             }));
-        } else router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME, query: { provider: props.provider } }));
+        } else router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT._NAME, query: { provider: props.provider } }));
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
         if (accountId) await deleteServiceAccount(accountId);
@@ -214,14 +214,14 @@ const handleSync = async () => {
         });
         state.createModal = false;
         serviceAccountPageStore.initState();
-        router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME, params: { serviceAccountId: state.createdAccountId } }));
+        router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.DETAIL._NAME, params: { serviceAccountId: state.createdAccountId } }));
     } catch (e) {
         ErrorHandler.handleError(e);
     }
 };
 
 const handleRouteToServiceAccountDetailPage = () => {
-    router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME, params: { serviceAccountId: state.createdAccountId } }));
+    router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.DETAIL._NAME, params: { serviceAccountId: state.createdAccountId } }));
 };
 
 /* Init */

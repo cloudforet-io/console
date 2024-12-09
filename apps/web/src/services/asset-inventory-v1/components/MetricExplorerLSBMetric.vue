@@ -28,7 +28,7 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import { gray } from '@/styles/colors';
 
 import MetricExplorerLSBMetricTree from '@/services/asset-inventory-v1/components/MetricExplorerLSBMetricTree.vue';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory-v1/stores/metric-explorer-page-store';
 import type { NamespaceSubItemType } from '@/services/asset-inventory-v1/types/asset-analysis-type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
@@ -72,7 +72,7 @@ const state = reactive({
     }),
     hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
     selectedId: computed<string|undefined>(() => {
-        const routeName = getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME }).name;
+        const routeName = getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL._NAME }).name;
         if (!props.isDetailPage) return undefined;
         if (route.name === routeName) return route.params.metricId;
         return route.params.metricExampleId;
@@ -92,7 +92,7 @@ const state = reactive({
                     type: 'metric',
                     is_managed: metric.data.is_managed,
                     to: getProperRouteLocation({
-                        name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+                        name: ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL._NAME,
                         params: {
                             metricId: metric.key,
                         },
@@ -110,7 +110,7 @@ const state = reactive({
                             ...example,
                             type: 'example',
                             to: getProperRouteLocation({
-                                name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
+                                name: ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
                                 params: {
                                     metricId: metric.key,
                                     metricExampleId: example.example_id,

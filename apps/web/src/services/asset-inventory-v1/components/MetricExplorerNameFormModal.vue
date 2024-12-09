@@ -27,7 +27,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { NAME_FORM_MODAL_TYPE } from '@/services/asset-inventory-v1/constants/asset-analysis-constant';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory-v1/stores/metric-explorer-page-store';
 
 
@@ -118,7 +118,7 @@ const createMetricExample = async () => {
         await metricExplorerPageStore.loadMetricExamples(metricExplorerPageGetters.namespaceId);
         await gnbStore.fetchMetricExample();
         await router.replace(getProperRouteLocation({
-            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
+            name: ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
             params: {
                 metricId: metricExample.metric_id,
                 metricExampleId: metricExample.example_id,

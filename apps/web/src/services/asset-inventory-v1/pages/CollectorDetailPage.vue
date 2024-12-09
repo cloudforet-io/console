@@ -67,7 +67,7 @@ import CollectorScheduleSection from '@/services/asset-inventory-v1/components/C
 import CollectorServiceAccountsSection
     from '@/services/asset-inventory-v1/components/CollectorDetailServiceAccountsSection.vue';
 import { COLLECT_DATA_TYPE } from '@/services/asset-inventory-v1/constants/collector-constant';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory-v1/stores/collector-data-modal-store';
@@ -122,7 +122,7 @@ const state = reactive({
     collector: computed<CollectorModel|null>(() => collectorFormState.originCollector),
     collectorName: computed<string>(() => state.collector?.name ?? ''),
     collectorHistoryLink: computed<Location>(() => ({
-        name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
+        name: ASSET_INVENTORY_ROUTE_V1.COLLECTOR.HISTORY._NAME,
         query: {
             filters: queryHelper.setFilters([
                 {
@@ -138,7 +138,7 @@ const state = reactive({
     editModalVisible: false,
 });
 
-const { setPathFrom, handleClickBackButton } = useGoBack({ name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME });
+const { setPathFrom, handleClickBackButton } = useGoBack({ name: ASSET_INVENTORY_ROUTE_V1.COLLECTOR._NAME });
 
 defineExpose({ setPathFrom });
 
@@ -162,7 +162,7 @@ const fetchDeleteCollector = async () => (collectorFormState.collectorId ? Space
 
 const goBackToMainPage = () => {
     SpaceRouter.router.push({
-        name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME,
+        name: ASSET_INVENTORY_ROUTE_V1.COLLECTOR._NAME,
     });
 };
 

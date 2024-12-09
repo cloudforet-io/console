@@ -67,7 +67,7 @@ import {
 import { convertAgentModeOptions } from '@/services/asset-inventory-v1/helpers/agent-mode-helper';
 import { stateFormatter } from '@/services/asset-inventory-v1/helpers/dynamic-ui-schema-generator';
 import type { QuerySearchTableLayout } from '@/services/asset-inventory-v1/helpers/dynamic-ui-schema-generator/type';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { useServiceAccountPageStore } from '@/services/asset-inventory-v1/stores/service-account-page-store';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory-v1/stores/service-account-schema-store';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
@@ -278,7 +278,7 @@ const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = 
 /** Add & Delete Service Accounts Action (Dropdown) * */
 const clickAddServiceAccount = () => {
     router.push(getProperRouteLocation({
-        name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME,
+        name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.ADD._NAME,
         params: { provider: state.selectedProvider, serviceAccountType: state.isAdminMode ? ACCOUNT_TYPE.TRUSTED : serviceAccountSchemaState.selectedAccountType },
         query: { nextPath: route.fullPath },
     }));
@@ -292,7 +292,7 @@ const handleSelectServiceAccountType = (accountType: AccountType) => { serviceAc
 const handleClickRow = (index) => {
     const item = tableState.items[index];
     router.push(getProperRouteLocation({
-        name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
+        name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.DETAIL._NAME,
         params: { serviceAccountId: tableState.isTrustedAccount ? item.trusted_account_id : item.service_account_id },
     }));
 };

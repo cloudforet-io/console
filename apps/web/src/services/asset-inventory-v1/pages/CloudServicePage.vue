@@ -49,7 +49,7 @@ import CloudServiceListCard
     from '@/services/asset-inventory-v1/components/CloudServiceListCard.vue';
 import CloudServiceToolbox from '@/services/asset-inventory-v1/components/CloudServiceToolbox.vue';
 import { getCloudServiceAnalyzeQuery } from '@/services/asset-inventory-v1/helpers/cloud-service-analyze-query-helper';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { useCloudServiceLSBStore } from '@/services/asset-inventory-v1/stores/cloud-service-l-s-b-store';
 import { useCloudServicePageStore } from '@/services/asset-inventory-v1/stores/cloud-service-page-store';
 import type { CloudServiceAnalyzeResult } from '@/services/asset-inventory-v1/types/cloud-service-card-type';
@@ -129,14 +129,14 @@ const state = reactive({
         let result = {} as EmptyData;
         if (!Object.keys(storeState.serviceAccounts).length) {
             result = {
-                to: state.writableServiceAccount ? { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME } : {},
+                to: state.writableServiceAccount ? { name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT._NAME } : {},
                 buttonText: state.writableServiceAccount ? i18n.t('INVENTORY.ADD_SERVICE_ACCOUNT') : undefined,
                 desc: i18n.t('INVENTORY.EMPTY_CLOUD_SERVICE'),
             };
         } else {
             if (!Object.keys(storeState.collectors).length) {
                 result = {
-                    to: state.writableCollector ? { name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME } : {},
+                    to: state.writableCollector ? { name: ASSET_INVENTORY_ROUTE_V1.COLLECTOR.CREATE._NAME } : {},
                     buttonText: state.writableCollector ? i18n.t('INVENTORY.CREATE_COLLECTOR') : undefined,
                     desc: i18n.t('INVENTORY.EMPTY_CLOUD_SERVICE_RESOURCE'),
                 };

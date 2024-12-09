@@ -7,7 +7,7 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import type { Reference, ResourceType } from '@/lib/reference/type';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 interface LinkFormatter {
@@ -102,7 +102,7 @@ type RouterMap = Record<ResourceType, { name: string; formatter: LinkFormatter}>
 const routerMap: RouterMap = {
     'inventory.Server':
         {
-            name: ASSET_INVENTORY_ROUTE.SERVER._NAME,
+            name: ASSET_INVENTORY_ROUTE_V1.SERVER._NAME,
             formatter: serverLinkFormatter,
         },
     'identity.Project':
@@ -117,27 +117,27 @@ const routerMap: RouterMap = {
         },
     'inventory.Collector':
         {
-            name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME,
+            name: ASSET_INVENTORY_ROUTE_V1.COLLECTOR._NAME,
             formatter: collectorLinkFormatter,
         },
     'identity.ServiceAccount':
         {
-            name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
+            name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.DETAIL._NAME,
             formatter: serviceAccountLinkFormatter,
         },
     'identity.TrustedAccount':
         {
-            name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
+            name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.DETAIL._NAME,
             formatter: serviceAccountLinkFormatter,
         },
     'inventory.CloudService':
         {
-            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.SEARCH._NAME,
+            name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.SEARCH._NAME,
             formatter: cloudServiceLinkFormatter,
         },
     'inventory.CloudServiceType':
         {
-            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.TYPE_SEARCH._NAME,
+            name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.TYPE_SEARCH._NAME,
             formatter: cloudServiceTypeLinkFormatter,
         },
 };

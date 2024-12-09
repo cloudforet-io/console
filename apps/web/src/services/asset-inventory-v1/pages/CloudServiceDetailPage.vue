@@ -58,7 +58,7 @@ import CloudServiceDetailTabs
     from '@/services/asset-inventory-v1/components/CloudServiceDetailTabs.vue';
 import CloudServiceMetricButton from '@/services/asset-inventory-v1/components/CloudServiceMetricButton.vue';
 import CloudServicePeriodFilter from '@/services/asset-inventory-v1/components/CloudServicePeriodFilter.vue';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import {
     TABLE_MIN_HEIGHT, useAssetInventorySettingsStore,
 } from '@/services/asset-inventory-v1/stores/asset-inventory-settings-store';
@@ -274,7 +274,7 @@ const handleClickLinkButton = async (type: string, workspaceId: string, id: stri
                 cloud_service_id: id,
             });
             window.open(router.resolve({
-                name: props.isSecurityPage ? ASSET_INVENTORY_ROUTE.SECURITY.DETAIL._NAME : ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                name: props.isSecurityPage ? ASSET_INVENTORY_ROUTE_V1.SECURITY.DETAIL._NAME : ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME,
                 params: {
                     provider: response.provider,
                     group: response.cloud_service_group,

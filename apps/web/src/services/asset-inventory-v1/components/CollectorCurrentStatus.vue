@@ -51,7 +51,7 @@
         >
             <p-link :text="$t('INVENTORY.COLLECTOR.DETAIL.DETAIL_JOB_LINK')"
                     size="sm"
-                    :to="getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: props.recentJob?.job_id ?? ''} })"
+                    :to="getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE_V1.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: props.recentJob?.job_id ?? ''} })"
                     highlight
                     action-icon="internal-link"
             />
@@ -72,7 +72,7 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import { peacock } from '@/styles/colors';
 
 import { JOB_STATE } from '@/services/asset-inventory-v1/constants/collector-constant';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import type { JobAnalyzeStatus } from '@/services/asset-inventory-v1/types/collector-main-page-type';
 
 

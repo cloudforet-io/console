@@ -45,7 +45,7 @@ import {
     statusTextColorFormatter,
     statusTextFormatter,
 } from '@/services/asset-inventory-v1/helpers/collector-history-formatter-helper';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { JOB_SELECTED_STATUS } from '@/services/asset-inventory-v1/types/collector-history-page-type';
 
 const allReferenceStore = useAllReferenceStore();
@@ -136,7 +136,7 @@ const getQuery = () => {
 /* Components */
 const handleSelect = (item) => {
     SpaceRouter.router.push({
-        name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME,
+        name: ASSET_INVENTORY_ROUTE_V1.COLLECTOR.HISTORY.JOB._NAME,
         params: { jobId: item.job_id },
     }).catch(() => {});
 };
@@ -305,7 +305,7 @@ watch(() => state.selectedStatus, (selectedStatus) => {
             </div>
         </div>
         <no-collector-modal :visible.sync="state.modalVisible"
-                            @confirm="$router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME })"
+                            @confirm="$router.push({ name: ASSET_INVENTORY_ROUTE_V1.COLLECTOR.CREATE._NAME })"
         />
     </div>
 </template>

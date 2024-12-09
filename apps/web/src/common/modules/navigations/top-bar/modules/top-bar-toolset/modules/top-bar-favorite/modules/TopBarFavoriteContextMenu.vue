@@ -48,7 +48,7 @@ import type { FavoriteItem, FavoriteType } from '@/common/modules/favorites/favo
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import TopBarSuggestionList from '@/common/modules/navigations/top-bar/modules/TopBarSuggestionList.vue';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
@@ -255,7 +255,7 @@ const handleSelect = (item: FavoriteMenuItem) => {
         router.push(referenceRouter(itemName, { resource_type: 'identity.ProjectGroup' })).catch(() => {});
     } else if (item.itemType === FAVORITE_TYPE.METRIC) {
         router.push({
-            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+            name: ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL._NAME,
             params: {
                 metricId: item.name || '',
             },
@@ -264,7 +264,7 @@ const handleSelect = (item: FavoriteMenuItem) => {
         const metricId = storeState.metricExamples.find((example) => example.example_id === item.name)?.metric_id;
         if (!metricId) return;
         router.push({
-            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
+            name: ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
             params: {
                 metricId,
                 metricExampleId: item.name || '',

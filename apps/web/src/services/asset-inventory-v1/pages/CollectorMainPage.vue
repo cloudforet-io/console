@@ -28,7 +28,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import CollectorContents from '@/services/asset-inventory-v1/components/CollectorMainContents.vue';
 import CollectorNoData from '@/services/asset-inventory-v1/components/CollectorMainNoData.vue';
 import ProviderList from '@/services/asset-inventory-v1/components/ProviderList.vue';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { useCollectorPageStore } from '@/services/asset-inventory-v1/stores/collector-page-store';
 import type {
     CollectorMainPageQuery,
@@ -121,7 +121,7 @@ onMounted(async () => {
             </template>
             <template #extra>
                 <router-link
-                    :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME }"
+                    :to="{ name: ASSET_INVENTORY_ROUTE_V1.COLLECTOR.HISTORY._NAME }"
                 >
                     <p-button style-type="tertiary"
                               class="history-button"

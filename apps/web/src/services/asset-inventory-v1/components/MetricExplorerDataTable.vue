@@ -35,7 +35,7 @@ import {
     getAssetAnalysisDataTableDateFields,
     getRefinedAssetAnalysisTableData,
 } from '@/services/asset-inventory-v1/helpers/asset-analysis-data-table-helper';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory-v1/stores/metric-explorer-page-store';
 import type { MetricDataAnalyzeResult } from '@/services/asset-inventory-v1/types/asset-analysis-type';
 import type {
@@ -225,7 +225,7 @@ const handleClickRow = (item) => {
             }
         });
 
-    let _routeName = ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME;
+    let _routeName = ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE._NAME;
     let _params = {};
     const _query: CloudServiceMainPageUrlQuery|CloudServiceDetailPageUrlQuery = {
         filters: queryHelper.setFilters(_filters).rawQueryStrings,
@@ -234,7 +234,7 @@ const handleClickRow = (item) => {
     if (state.metricResourceType.startsWith('inventory.CloudService:')) {
         const [provider, group, name] = state.metricResourceType.replace('inventory.CloudService:', '').split('.');
         _params = { provider, group, name };
-        _routeName = ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME;
+        _routeName = ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME;
 
         if (state.metricAdditionalFilter.length) {
             (_query as CloudServiceDetailPageUrlQuery).default_filters = state.metricAdditionalFilter.map((d) => JSON.stringify(d));

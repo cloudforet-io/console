@@ -45,7 +45,7 @@ import ServiceAccountCredentials
 import ServiceAccountDeleteModal
     from '@/services/asset-inventory-v1/components/ServiceAccountDeleteModal.vue';
 import ServiceAccountEditModal from '@/services/asset-inventory-v1/components/ServiceAccountEditModal.vue';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { useServiceAccountPageStore } from '@/services/asset-inventory-v1/stores/service-account-page-store';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory-v1/stores/service-account-schema-store';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
@@ -156,7 +156,7 @@ const handleRefresh = () => {
 };
 const handleClickBackbutton = () => {
     router.push(getProperRouteLocation({
-        name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME, query: { provider: state.providerKey },
+        name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT._NAME, query: { provider: state.providerKey },
     }));
 };
 

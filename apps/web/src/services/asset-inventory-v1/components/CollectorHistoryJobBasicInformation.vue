@@ -61,7 +61,7 @@ import { useUserStore } from '@/store/user/user-store';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 
 
 interface Props {
@@ -89,7 +89,7 @@ const state = reactive({
             id,
             label: storeState.collectors[id]?.label || id,
             linkLocation: {
-                name: ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
+                name: ASSET_INVENTORY_ROUTE_V1.COLLECTOR.DETAIL._NAME,
                 params: {
                     collectorId: id,
                 },

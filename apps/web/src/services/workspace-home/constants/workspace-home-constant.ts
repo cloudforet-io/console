@@ -2,7 +2,7 @@ import { i18n } from '@/translations';
 
 import * as styles from '@/styles/colors';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
@@ -32,7 +32,7 @@ export const STARRED_SERVICE_ITEMS: StarredServiceItem[] = [
     {
         icon: 'ic_service_cloud-service',
         label: i18n.t('MENU.ASSET_INVENTORY_CLOUD_SERVICE'),
-        to: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
+        to: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE._NAME,
     },
     {
         icon: 'ic_service_cost-analysis',

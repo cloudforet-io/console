@@ -20,7 +20,7 @@ import type { RecentItem } from '@/common/modules/navigations/type';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
 import MetricExplorerQueryFormSidebar from '@/services/asset-inventory-v1/components/MetricExplorerQueryFormSidebar.vue';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory-v1/stores/metric-explorer-page-store';
 
 
@@ -77,7 +77,7 @@ const state = reactive({
 
 const handleRouteToMetricDetail = (metricId: string) => {
     router.push({
-        name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+        name: ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL._NAME,
         params: {
             metricId,
         },

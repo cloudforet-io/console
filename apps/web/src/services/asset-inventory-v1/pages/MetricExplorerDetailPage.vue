@@ -27,7 +27,7 @@ import MetricExplorerDataTable from '@/services/asset-inventory-v1/components/Me
 import MetricExplorerGroupBy from '@/services/asset-inventory-v1/components/MetricExplorerGroupBy.vue';
 import MetricExplorerHeader from '@/services/asset-inventory-v1/components/MetricExplorerHeader.vue';
 import MetricExplorerQuerySection from '@/services/asset-inventory-v1/components/MetricExplorerQuerySection.vue';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory-v1/stores/metric-explorer-page-store';
 import type { Granularity } from '@/services/asset-inventory-v1/types/asset-analysis-type';
 import type { MetricExplorerPageUrlQuery } from '@/services/asset-inventory-v1/types/metric-explorer-url-query-type';
@@ -56,7 +56,7 @@ const state = reactive({
             ...(breadcrumbs.value.slice(0, breadcrumbs.value.length - 1)),
             {
                 name: `[${targetNamespace?.name}] ${state.currentMetricExample?.name ?? _targetMetric?.name}`,
-                path: state.currentMetricExampleId ? ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME : ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+                path: state.currentMetricExampleId ? ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME : ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL._NAME,
             },
         ];
     }),
@@ -118,8 +118,8 @@ watch([
     () => state.metricFavoriteOptions,
     () => state.metricExampleFavoriteOptions,
 ], ([metricFavoriteOptions, metricExampleFavoriteOptions]) => {
-    if (route.name === ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME) gnbStore.setFavoriteItemId(metricFavoriteOptions);
-    if (route.name === ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME) gnbStore.setFavoriteItemId(metricExampleFavoriteOptions);
+    if (route.name === ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL._NAME) gnbStore.setFavoriteItemId(metricFavoriteOptions);
+    if (route.name === ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME) gnbStore.setFavoriteItemId(metricExampleFavoriteOptions);
 }, { immediate: true });
 
 onUnmounted(() => {

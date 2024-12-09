@@ -21,7 +21,7 @@ import { arrayToQueryString, objectToQueryString } from '@/lib/router-query-stri
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useTextOverflowState } from '@/common/composables/text-overflow-state';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { useCloudServiceLSBStore } from '@/services/asset-inventory-v1/stores/cloud-service-l-s-b-store';
 import { useCloudServicePageStore } from '@/services/asset-inventory-v1/stores/cloud-service-page-store';
 import type { CloudServiceDetailPageUrlQuery } from '@/services/asset-inventory-v1/types/cloud-service-page-type';
@@ -94,7 +94,7 @@ const getCloudServiceDetailLink = (item: CloudServiceAnalyzeResult, resource?: C
         period: objectToQueryString(cloudServicePageState.period),
     };
     const res: Location = getProperRouteLocation({
-        name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+        name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME,
         params: {
             provider: item.provider,
             group: item.cloud_service_group,

@@ -36,7 +36,7 @@ import CloudServiceLogTab
     from '@/services/asset-inventory-v1/components/CloudServiceLogTab.vue';
 import CloudServiceTagsPanel
     from '@/services/asset-inventory-v1/components/CloudServiceTagsPanel.vue';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 interface Props {
@@ -93,7 +93,7 @@ const handleClickLinkButton = async (type: string, workspaceId: string, id: stri
                 cloud_service_id: id,
             });
             window.open(router.resolve({
-                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME,
                 params: {
                     provider: response.provider,
                     group: response.cloud_service_group,

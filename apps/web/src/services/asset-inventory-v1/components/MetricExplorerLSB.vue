@@ -36,7 +36,7 @@ import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import { gray, yellow } from '@/styles/colors';
 
 import MetricExplorerLSBMetric from '@/services/asset-inventory-v1/components/MetricExplorerLSBMetric.vue';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { useAssetInventorySettingsStore } from '@/services/asset-inventory-v1/stores/asset-inventory-settings-store';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory-v1/stores/metric-explorer-page-store';
 import type { NamespaceSubItemType } from '@/services/asset-inventory-v1/types/asset-analysis-type';
@@ -100,7 +100,7 @@ const state = reactive({
                 color: gray[500],
             },
             to: getProperRouteLocation({
-                name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+                name: ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL._NAME,
                 params: {
                     metricId: metric.key,
                 },
@@ -116,7 +116,7 @@ const state = reactive({
             label: example.name,
             icon: 'ic_example-filled',
             to: getProperRouteLocation({
-                name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
+                name: ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
                 params: {
                     metricId: example.metric_id,
                     metricExampleId: example.example_id,

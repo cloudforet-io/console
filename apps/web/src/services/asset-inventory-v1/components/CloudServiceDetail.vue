@@ -44,7 +44,7 @@ import type { Reference } from '@/lib/reference/type';
 import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory-v1/stores/cloud-service-detail-page-store';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
@@ -130,7 +130,7 @@ const handleClickLinkButton = async (type: string, id: string) => {
                 cloud_service_id: state.data.cloud_service_id,
             });
             window.open(router.resolve({
-                name: props.isSecurityPage ? ASSET_INVENTORY_ROUTE.SECURITY.DETAIL._NAME : ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                name: props.isSecurityPage ? ASSET_INVENTORY_ROUTE_V1.SECURITY.DETAIL._NAME : ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME,
                 params: {
                     provider: response.provider,
                     group: response.cloud_service_group,

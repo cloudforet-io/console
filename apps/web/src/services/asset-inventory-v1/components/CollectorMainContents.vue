@@ -41,7 +41,7 @@ import CollectorContentItem from '@/services/asset-inventory-v1/components/Colle
 import CollectorListNoData from '@/services/asset-inventory-v1/components/CollectorMainListNoData.vue';
 import CollectorScheduleModal
     from '@/services/asset-inventory-v1/components/CollectorMainScheduleModal.vue';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { useCollectorPageStore } from '@/services/asset-inventory-v1/stores/collector-page-store';
 import type { CollectorItemInfo } from '@/services/asset-inventory-v1/types/collector-main-page-type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
@@ -176,10 +176,10 @@ const state = reactive({
                     query: {
                         filters: historyLinkQueryHelper.rawQueryStrings,
                     },
-                    name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
+                    name: ASSET_INVENTORY_ROUTE_V1.COLLECTOR.HISTORY._NAME,
                 },
                 detailLink: {
-                    name: ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
+                    name: ASSET_INVENTORY_ROUTE_V1.COLLECTOR.DETAIL._NAME,
                     params: {
                         collectorId: d.collector_id,
                     },
@@ -212,7 +212,7 @@ const collectorApiQueryHelper = new ApiQueryHelper()
 
 /* Components */
 const routeToCreatePage = () => {
-    SpaceRouter.router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME }));
+    SpaceRouter.router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE_V1.COLLECTOR.CREATE._NAME }));
 };
 const handleChangeToolbox = (options: ToolboxOptions) => {
     if (options.pageStart !== undefined) collectorApiQueryHelper.setPageStart(options.pageStart);

@@ -70,7 +70,7 @@ import CreateCollectorStep3
     from '@/services/asset-inventory-v1/components/CollectorCreateStep3.vue';
 import CreateCollectorStep4
     from '@/services/asset-inventory-v1/components/CollectorCreateStep4.vue';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 
 const state = reactive({
     step: 1,
@@ -82,7 +82,7 @@ const state = reactive({
         4: i18n.t('INVENTORY.COLLECTOR.CREATE.STEP_DESC4'),
     })),
 });
-const { setPathFrom, handleClickBackButton } = useGoBack({ name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME });
+const { setPathFrom, handleClickBackButton } = useGoBack({ name: ASSET_INVENTORY_ROUTE_V1.COLLECTOR._NAME });
 
 const handleClickClose = () => {
     state.deleteModalVisible = true;

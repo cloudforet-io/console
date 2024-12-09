@@ -23,7 +23,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { useServiceAccountPageStore } from '@/services/asset-inventory-v1/stores/service-account-page-store';
 
 interface Props {
@@ -87,7 +87,7 @@ const deleteServiceAccount = async () => {
 /* Event */
 const handleConfirmDelete = async () => {
     await deleteServiceAccount();
-    await SpaceRouter.router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME, query: { provider: serviceAccountPageStore.state.selectedProvider } }));
+    await SpaceRouter.router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT._NAME, query: { provider: serviceAccountPageStore.state.selectedProvider } }));
 };
 </script>
 
@@ -136,7 +136,7 @@ const handleConfirmDelete = async () => {
                         <p-link new-tab
                                 highlight
                                 action-icon="external-link"
-                                :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME, params: { serviceAccountId: state.relatedTrustedAccount.trusted_account_id }}"
+                                :to="{ name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.DETAIL._NAME, params: { serviceAccountId: state.relatedTrustedAccount.trusted_account_id }}"
                         >
                             {{ state.relatedTrustedAccount.name }}
                         </p-link>

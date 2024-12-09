@@ -34,7 +34,7 @@ import {
     CLOUD_SERVICE_FILTER_KEY,
     CLOUD_SERVICE_GLOBAL_FILTER_KEY,
 } from '@/services/asset-inventory-v1/constants/cloud-service-constant';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory-v1/stores/cloud-service-detail-page-store';
 import { useCloudServicePageStore } from '@/services/asset-inventory-v1/stores/cloud-service-page-store';
 import type { CloudServiceDetailPageParams } from '@/services/asset-inventory-v1/types/cloud-service-detail-page-type';
@@ -67,8 +67,8 @@ const storeState = reactive({
 });
 const state = reactive({
     currentPath: computed(() => route.fullPath),
-    isCloudServiceDetailPage: computed(() => route.name === ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME
-        || route.name === makeAdminRouteName(ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME)),
+    isCloudServiceDetailPage: computed(() => route.name === ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME
+        || route.name === makeAdminRouteName(ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME)),
     detailPageParams: computed<CloudServiceDetailPageParams|undefined>(() => {
         if (state.isCloudServiceDetailPage) return route.params as unknown as CloudServiceDetailPageParams;
         return undefined;
@@ -88,7 +88,7 @@ const state = reactive({
             id: d.name,
             imgIcon: d.icon,
             to: getProperRouteLocation({
-                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME,
                 params: {
                     provider: d.provider,
                     group: labelArr[1],
@@ -126,7 +126,7 @@ const state = reactive({
                 label: state.detailPageParams.group,
                 id: selectedItem?.group,
                 isBackLink: true,
-                to: getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME }),
+                to: getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE._NAME }),
                 titleIcon: get(selectedItem, ['tags', 'spaceone:icon'], ''),
             },
         ];
@@ -135,7 +135,7 @@ const state = reactive({
                 type: MENU_ITEM_TYPE.ITEM,
                 label: d.name,
                 id: d.cloud_service_type_key,
-                to: getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME, params: { ...state.detailPageParams, name: d.name } }),
+                to: getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME, params: { ...state.detailPageParams, name: d.name } }),
                 favoriteOptions: {
                     type: FAVORITE_TYPE.CLOUD_SERVICE,
                     id: d.cloud_service_type_key,
@@ -193,7 +193,7 @@ const initCloudServiceDetailLSB = async (params: CloudServiceDetailPageParams) =
 
 const routeToFirstCloudServiceType = async (params: CloudServiceDetailPageParams) => {
     await router.replace(getProperRouteLocation({
-        name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+        name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME,
         params: {
             provider: params.provider,
             group: params.group,

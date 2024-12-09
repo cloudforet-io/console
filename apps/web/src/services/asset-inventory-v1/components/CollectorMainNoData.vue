@@ -5,13 +5,13 @@ import { PEmpty, PButton } from '@cloudforet/mirinae';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 
 const router = useRouter();
 const { getProperRouteLocation } = useProperRouteLocation();
 
 const handleCreate = () => {
-    router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME }));
+    router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE_V1.COLLECTOR.CREATE._NAME }));
 };
 </script>
 

@@ -1,6 +1,6 @@
 import { MENU_ID } from '@/lib/menu/config';
 
-export const ASSET_INVENTORY_ROUTE = Object.freeze({
+export const ASSET_INVENTORY_ROUTE_V1 = Object.freeze({
     _NAME: MENU_ID.ASSET_INVENTORY,
     CLOUD_SERVICE: {
         _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.CLOUD_SERVICE}`,

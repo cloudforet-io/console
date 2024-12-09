@@ -18,7 +18,7 @@ import { locationQueryToString } from '@/lib/router-query-string';
 import { NoSearchResourceError } from '@/common/composables/error/error';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 
 const DEFAULT_URL = '/asset-inventory/cloud-service';
 
@@ -43,7 +43,7 @@ export default {
                 });
                 if (result.url === DEFAULT_URL || userWorkspaceStore.getters.currentWorkspaceId === undefined) {
                     ErrorHandler.handleError(new NoSearchResourceError({
-                        name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.NO_RESOURCE._NAME,
+                        name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.NO_RESOURCE._NAME,
                         params: {
                             workspaceId: currentWorkspaceId,
                         },
@@ -70,7 +70,7 @@ export default {
                 }
             } catch (e) {
                 ErrorHandler.handleError(new NoSearchResourceError({
-                    name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.NO_RESOURCE._NAME,
+                    name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.NO_RESOURCE._NAME,
                     params: {
                         workspaceId: currentWorkspaceId,
                     },

@@ -122,7 +122,7 @@ import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import type {
     CloudServiceDetailPageUrlQuery,
     CloudServiceMainPageUrlQuery,
@@ -185,7 +185,7 @@ export default {
                     query.project = arrayToQueryString([props.projectId]);
                 }
                 return {
-                    name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
+                    name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE._NAME,
                     query,
                 };
             }),
@@ -197,7 +197,7 @@ export default {
                 query.project = arrayToQueryString([projectId]);
             }
             return {
-                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME,
                 params: {
                     provider: data.provider,
                     group: data.cloud_service_group,
