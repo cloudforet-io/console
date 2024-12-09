@@ -15,7 +15,7 @@ import type { DisplaySeriesLabelValue } from '@/common/modules/widgets/_widget-f
 import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/granularity/type';
 import type { _GroupByValue } from '@/common/modules/widgets/_widget-fields/group-by/type';
 import type { WidgetHeaderValue } from '@/common/modules/widgets/_widget-fields/header/type';
-import type { IconValue } from '@/common/modules/widgets/_widget-fields/icon/type';
+import type { _IconValue } from '@/common/modules/widgets/_widget-fields/icon/type';
 import type { LegendValue } from '@/common/modules/widgets/_widget-fields/legend/type';
 import type { MaxValue } from '@/common/modules/widgets/_widget-fields/max/type';
 import type { MinValue } from '@/common/modules/widgets/_widget-fields/min/type';
@@ -63,7 +63,7 @@ export interface WidgetFieldTypeMap {
     min: WidgetFieldValue<MinValue>;
     max: WidgetFieldValue<MaxValue>;
     legend: WidgetFieldValue<LegendValue>;
-    icon: WidgetFieldValue<IconValue>;
+    icon: WidgetFieldValue<_IconValue>;
     header: WidgetFieldValue<WidgetHeaderValue>;
     groupBy: WidgetFieldValue<_GroupByValue>;
     granularity: WidgetFieldValue<GranularityValue>;
