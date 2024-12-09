@@ -28,6 +28,10 @@ interface UseTaskCreatePageStoreState {
     statusId?: string;
     assignee?: string;
     isBaseFormValid: boolean;
+    // assign
+    currentAssignee?: string;
+    currentAssigneePool?: string[];
+    visibleAssignModal: boolean;
     // default field form
     defaultData: Partial<Record<DefaultTaskFieldId, any>>;
     defaultDataValidationMap: Record<string, boolean>;
@@ -36,7 +40,7 @@ interface UseTaskCreatePageStoreState {
     dataValidationMap: Record<string, boolean>;
     files: FileModel[];
     // overall
-    mode: 'create-minimal'|'create'|'edit'|'view'; // create-minimal: create task without status and assignee
+    mode: 'create-minimal'|'create'|'view'; // create-minimal: create task without status and assignee
     hasUnsavedChanges: boolean;
     createTaskLoading: boolean;
 }
@@ -60,6 +64,10 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         statusId: undefined,
         assignee: undefined,
         isBaseFormValid: false,
+        // assignee
+        currentAssignee: undefined,
+        currentAssigneePool: undefined,
+        visibleAssignModal: false,
         // default field form
         defaultData: {},
         defaultDataValidationMap: {},
@@ -115,6 +123,19 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         setIsBaseFormValid(isValid: boolean) {
             state.isBaseFormValid = isValid;
         },
+        // assignee
+        openAssignModal(assignee?: string, assigneePool?: string[]) {
+            state.currentAssignee = assignee;
+            state.currentAssigneePool = assigneePool;
+            state.visibleAssignModal = true;
+        },
+        closeAssignModal() {
+            state.visibleAssignModal = false;
+        },
+        resetAssigneeModal() {
+            state.currentAssignee = undefined;
+            state.currentAssigneePool = undefined;
+        },
         // default field form
         setDefaultFieldData(fieldId: DefaultTaskFieldId, value: any) {
             state.defaultData[fieldId] = value;
@@ -157,7 +178,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
             state.dataValidationMap = {};
             state.files = [];
         },
-        setMode(mode: 'create-minimal'|'create'|'edit'|'view') {
+        setMode(mode: 'create-minimal'|'create'|'view') {
             state.mode = mode;
         },
         async createTask() {

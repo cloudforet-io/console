@@ -44,6 +44,7 @@ export const useTaskDetailPageStore = defineStore('task-detail-page', () => {
         targetComment: undefined,
     });
     const getters: UseTaskDetailPageStoreGetters = {
+        // events
         firstLoadingEvents: computed<boolean>(() => !state.events),
         hasMoreEvents: computed<boolean>(() => {
             if (!state.events) return true;

@@ -2,7 +2,7 @@
 import { computed, watch } from 'vue';
 
 import {
-    PFieldGroup, PSelectDropdown, PPaneLayout,
+    PFieldTitle, PFieldGroup, PSelectDropdown, PPaneLayout, PButton,
 } from '@cloudforet/mirinae';
 
 import { useFieldValidator, useFormValidator } from '@/common/composables/form-validator';
@@ -74,6 +74,9 @@ const handleUpdateSelectedAssignee = (userId?: string) => {
     taskContentFormStore.setAssignee(userId);
     assigneeValidator.setValue(userId ?? '');
 };
+const handleClickAssign = () => {
+    taskContentFormStore.openAssignModal(assignee.value, taskContentFormState.currentTaskType?.assignee_pool);
+};
 
 /* form validator */
 const {
@@ -108,11 +111,17 @@ watch(() => taskContentFormGetters.currentCategory, async (currentCategory) => {
     resetValidations();
 }, { immediate: true });
 watch(() => taskContentFormState.currentTaskType, (currentTaskType) => {
-    if (currentTaskType) {
+    if (currentTaskType && currentTaskType !== taskContentFormState.currentTaskType) {
         // init selected task type
         setInitialTaskType(currentTaskType);
         // init selected assignee
         assigneeValidator.setValue(taskContentFormState.assignee ?? '');
+    }
+    resetValidations();
+}, { immediate: true });
+watch(() => taskContentFormState.assignee, (user) => {
+    if (user && user !== assignee.value) {
+        assigneeValidator.setValue(user ?? '');
     }
     resetValidations();
 }, { immediate: true });
@@ -177,14 +186,26 @@ watch(() => taskContentFormState.currentTaskType, (currentTaskType) => {
                 </p-field-group>
             </div>
             <div class="base-form-field-wrapper">
-                <!--                <div class="flex gap-2">-->
-                <!--                    <p-field-title size="md"-->
-                <!--                                   color="gray"-->
-                <!--                    >-->
-                <!--                        Assign to-->
-                <!--                    </p-field-title>-->
-                <!--                </div>-->
-                <p-field-group label="Assign to"
+                <div v-if="taskContentFormState.mode === 'view'">
+                    <div class="flex gap-2 items-center">
+                        <p-field-title size="sm"
+                                       color="gray"
+                        >
+                            Assign to
+                        </p-field-title>
+                        <p-button size="sm"
+                                  style-type="tertiary"
+                                  @click="handleClickAssign"
+                        >
+                            Assign
+                        </p-button>
+                    </div>
+                    <p class="mt-1 text-label-md text-blue-900">
+                        {{ assignee || '--' }}
+                    </p>
+                </div>
+                <p-field-group v-else
+                               label="Assign to"
                                style-type="secondary"
                                required
                                :invalid="invalidState.assignee"
