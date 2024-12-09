@@ -1,4 +1,6 @@
-import { COLOR_SCHEMA, DATE_FORMAT, DEFAULT_COMPARISON_COLOR } from '@/common/modules/widgets/_constants/widget-field-constant';
+import {
+    COLOR_SCHEMA, DATE_FORMAT, DEFAULT_COMPARISON_COLOR, NUMBER_FORMAT,
+} from '@/common/modules/widgets/_constants/widget-field-constant';
 import { integrateFieldsSchema } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { FieldDefaultValueConvertor, WidgetFieldTypeMap } from '@/common/modules/widgets/_widget-field-value-manager/type';
@@ -11,6 +13,10 @@ import type { _GroupByOptions } from '@/common/modules/widgets/_widget-fields/gr
 import { ICON_FIELD_ITEMS } from '@/common/modules/widgets/_widget-fields/icon/constant';
 import type { IconOptions } from '@/common/modules/widgets/_widget-fields/icon/type';
 import type { _LegendOptions } from '@/common/modules/widgets/_widget-fields/legend/type';
+import type { MaxOptions } from '@/common/modules/widgets/_widget-fields/max/type';
+import type { MinOptions } from '@/common/modules/widgets/_widget-fields/min/type';
+import type { MissingValueOptions } from '@/common/modules/widgets/_widget-fields/missing-value/type';
+import type { NumberFormatOptions, NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type { StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
 import type { XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { YAxisOptions } from '@/common/modules/widgets/_widget-fields/y-axis/type';
@@ -63,9 +69,15 @@ export const widgetFieldDefaultValueMap: DefaultValueRegistry = {
         toggleValue: true,
         position: 'right',
     },
-    max: {},
-    min: {},
-    missingValue: {},
+    max: {
+        max: 0,
+    },
+    min: {
+        min: 0,
+    },
+    missingValue: {
+        type: 'lineToZero',
+    },
     numberFormat: {},
     pieChartType: {},
     progressBar: {},
@@ -252,10 +264,57 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
         }
         return undefined;
     },
-    max: () => widgetFieldDefaultValueMap.max,
-    min: () => widgetFieldDefaultValueMap.min,
-    missingValue: () => widgetFieldDefaultValueMap.missingValue,
-    numberFormat: () => widgetFieldDefaultValueMap.numberFormat,
+    max: (widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const maxOptions = _fieldsSchema.max?.options as MaxOptions;
+
+        if (maxOptions.default !== undefined) {
+            return {
+                max: maxOptions.default,
+            };
+        }
+        return widgetFieldDefaultValueMap.max;
+    },
+    min: (widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const minOptions = _fieldsSchema.min?.options as MinOptions;
+
+        if (minOptions.default !== undefined) {
+            return {
+                min: minOptions.default,
+            };
+        }
+        return widgetFieldDefaultValueMap.min;
+    },
+    missingValue: (widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const missingValueOptions = _fieldsSchema.missingValue?.options as MissingValueOptions;
+
+        if (missingValueOptions.default) {
+            return {
+                type: missingValueOptions.default,
+            };
+        }
+        return widgetFieldDefaultValueMap.missingValue;
+    },
+    numberFormat: (widgetConfig, dataTable) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const numberFormatOptions = _fieldsSchema.numberFormat?.options as NumberFormatOptions;
+
+        const dataKeys = Object.keys(dataTable.data_info ?? {}) as string[];
+
+        if (numberFormatOptions.default) {
+            const result: NumberFormatValue = {};
+            dataKeys.forEach((key) => {
+                result[key] = {
+                    format: numberFormatOptions.default ?? NUMBER_FORMAT.AUTO,
+                };
+            });
+            return result;
+        }
+
+        return widgetFieldDefaultValueMap.numberFormat;
+    },
     pieChartType: () => widgetFieldDefaultValueMap.pieChartType,
     progressBar: () => widgetFieldDefaultValueMap.progressBar,
     subTotal: () => widgetFieldDefaultValueMap.subTotal,
