@@ -12,6 +12,7 @@
                     :hide-header-close-button="hideCloseButton"
                     @confirm="handleConfirm"
                     @close="$emit('close')"
+                    @closed="$emit('closed')"
                     @cancel="$emit('cancel')"
     >
         <template #body>
