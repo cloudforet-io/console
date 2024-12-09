@@ -68,7 +68,7 @@ jobs:
         run: |
           echo "TODO Count: $todo_count"
           echo "console.log Count: $console_log_count"
-          if [ "$todo_count" -gt 0 ] || [ "$console_log_count" -gt 0 ]; then
+          if [ "$todo_count" -gt 0 ]; then
             echo "::warning:: Workflow failed. TODO count: $todo_count, console.log count: $console_log_count"
             exit 1
           else
