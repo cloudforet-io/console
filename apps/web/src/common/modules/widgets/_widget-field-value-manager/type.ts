@@ -42,7 +42,7 @@ export interface WidgetFieldValueMap {
 }
 
 export interface WidgetFieldValue<T = any> {
-    value: T;
+    value?: T;
     meta?: Record<string, any>;
 }
 

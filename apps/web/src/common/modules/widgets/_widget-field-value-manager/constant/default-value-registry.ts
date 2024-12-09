@@ -10,6 +10,7 @@ import type { DateFormatOptions } from '@/common/modules/widgets/_widget-fields/
 import type { _GroupByOptions } from '@/common/modules/widgets/_widget-fields/group-by/type';
 import { ICON_FIELD_ITEMS } from '@/common/modules/widgets/_widget-fields/icon/constant';
 import type { IconOptions } from '@/common/modules/widgets/_widget-fields/icon/type';
+import type { _LegendOptions } from '@/common/modules/widgets/_widget-fields/legend/type';
 import type { StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
 import type { XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { YAxisOptions } from '@/common/modules/widgets/_widget-fields/y-axis/type';
@@ -58,7 +59,10 @@ export const widgetFieldDefaultValueMap: DefaultValueRegistry = {
         icon: { name: 'ic_circle-filled', label: 'Circle' },
         color: gray[900],
     },
-    legend: {},
+    legend: {
+        toggleValue: true,
+        position: 'right',
+    },
     max: {},
     min: {},
     missingValue: {},
@@ -234,7 +238,20 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
         }
         return undefined;
     },
-    legend: () => widgetFieldDefaultValueMap.legend,
+    legend: (widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const legendOptions = _fieldsSchema.legend?.options as _LegendOptions;
+
+        const initialValue = widgetFieldDefaultValueMap.legend;
+
+        if (legendOptions.toggle) {
+            return {
+                toggleValue: true,
+                position: legendOptions.showPositionField ? initialValue.position : undefined,
+            };
+        }
+        return undefined;
+    },
     max: () => widgetFieldDefaultValueMap.max,
     min: () => widgetFieldDefaultValueMap.min,
     missingValue: () => widgetFieldDefaultValueMap.missingValue,

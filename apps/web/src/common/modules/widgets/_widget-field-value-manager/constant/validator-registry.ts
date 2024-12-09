@@ -124,6 +124,7 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
         if (!fieldValue.toggleValue) return true;
         return !!fieldValue.color && !!fieldValue.icon && ICON_FIELD_ITEMS.some((item) => item.name === fieldValue.icon?.name);
     },
+    legend: () => true,
 };
 
 
