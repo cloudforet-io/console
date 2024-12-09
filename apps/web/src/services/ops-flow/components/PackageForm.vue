@@ -191,7 +191,9 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
                                 @update:value="setForm('description', $event)"
                     />
                 </p-field-group>
-                <p-field-group :invalid="invalidState.workspaces"
+                <p-field-group v-if="!taskManagementPageState.targetPackageId
+                                   || taskManagementPageState.targetPackageId !== taskManagementPageGetters.defaultPackage?.package_id"
+                               :invalid="invalidState.workspaces"
                                :invalid-text="invalidTexts.workspaces"
                                label="Workspace"
                 >
@@ -213,7 +215,9 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
                         />
                     </div>
                 </p-field-group>
-                <p-field-group label="Category"
+                <p-field-group v-if="!taskManagementPageState.targetPackageId
+                                   || taskManagementPageState.targetPackageId !== taskManagementPageGetters.defaultPackage?.package_id"
+                               label="Category"
                                :invalid="invalidState.categories"
                                :invalid-text="invalidTexts.categories"
                 >
