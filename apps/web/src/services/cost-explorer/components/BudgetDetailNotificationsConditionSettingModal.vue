@@ -4,22 +4,18 @@ import { computed, reactive } from 'vue';
 import { cloneDeep } from 'lodash';
 
 import {
-    PButtonModal, PTextInput, PLink, PButton, PSelectDropdown, PIconButton,
+    PButtonModal, PTextInput, PButton, PSelectDropdown, PIconButton, PRadioGroup, PRadio,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
-
-
+import type { BudgetNotificationsTargetType } from '@/services/cost-explorer/types/budget-form-type';
 
 type BudgetNotification = BudgetModel['notifications'][number];
 interface ConditionUnitMenuItem extends SelectDropdownMenuItem {
@@ -28,7 +24,6 @@ interface ConditionUnitMenuItem extends SelectDropdownMenuItem {
 interface ConditionTypeMenuItem extends SelectDropdownMenuItem {
     name: BudgetNotification['notification_type'];
 }
-
 interface Props {
     visible?: boolean;
     budgetTargetId?: string;
@@ -40,14 +35,20 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{(e: 'confirm'): void; }>();
+
 const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
-const { getProperRouteLocation } = useProperRouteLocation();
+
+const createDefaultNotification = (unit = 'ACTUAL_COST', threshold = null, notificationType = 'WARNING') => ({
+    unit,
+    threshold,
+    notification_type: notificationType,
+});
 
 const state = reactive({
     loading: true,
     proxyVisible: useProxyValue('visible', props, emit),
-    notifications: (cloneDeep(budgetPageState.budgetData?.notifications) ?? []) as BudgetNotification[],
+    notifications: (cloneDeep(budgetPageState.budgetData?.notifications) ?? Array.from({ length: 2 }, () => createDefaultNotification())) as BudgetNotification[],
     units: computed<ConditionUnitMenuItem[]>(() => ([
         {
             name: 'ACTUAL_COST',
@@ -71,6 +72,22 @@ const state = reactive({
     budgetId: computed(() => budgetPageState.budgetData?.budget_id),
     thresholdValidations: budgetPageState.budgetData?.notifications?.map((d) => !!d) ?? [] as Array<boolean|undefined>,
     isAllValid: computed(() => state.thresholdValidations.every((d) => !!d)),
+    radioMenuList: computed<BudgetNotificationsTargetType[]>(() => ([
+        {
+            label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.ALL_MEMBER'),
+            name: 'ALL',
+        },
+        {
+            label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.USER_GROUP'),
+            name: 'USER_GROUP',
+        },
+
+        {
+            label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.SPECIFIC_USER'),
+            name: 'USER',
+        },
+    ])),
+    proxySelectedRadioIdx: 0,
 });
 
 const handleAddCondition = () => {
@@ -137,7 +154,7 @@ const handleConfirm = async () => {
 
 <template>
     <p-button-modal
-        :header-title="$t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.SET_BUDGET_NOTIFICATIONS_CONDITION')"
+        :header-title="$t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.SET_BUDGET_NOTIFICATIONS')"
         centered
         size="md"
         fade
@@ -148,80 +165,87 @@ const handleConfirm = async () => {
         @confirm="handleConfirm"
     >
         <template #body>
-            <div class="desc">
-                <p>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.BUDGET_NOTI_HELP_TEXT') }}</p>
-                <p-link :text="$t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.SET_NOTIFICATION_CHANNEL')"
-                        :action-icon="ACTION_ICON.INTERNAL_LINK"
-                        new-tab
-                        :to="getProperRouteLocation({
-                            name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
-                            params: {
-                                id: budgetTargetId
-                            }
-                        })"
-                        highlight
-                />
-            </div>
-            <p-button style-type="tertiary"
-                      icon-left="ic_plus_bold"
-                      @click="handleAddCondition"
-            >
-                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.ADD_CONDITION') }}
-            </p-button>
-            <section class="condition-wrapper">
-                <p v-if="state.notifications.length > 0"
-                   class="condition-header"
-                >
-                    <span>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.UNIT') }}</span>
-                    <span>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.THRESHOLD') }}</span>
-                    <span>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.TYPE') }}</span>
-                </p>
-                <template v-for="(condition, idx) of state.notifications">
-                    <div :key="`condition-${idx}`"
-                         class="condition-input-wrapper"
+            <div class="flex flex-col gap-4">
+                <div class="conditions-wrapper">
+                    <p class="desc text-paragraph-lg">
+                        {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.BUDGET_NOTI_HELP_TEXT') }}
+                    </p>
+                    <section class="condition-wrapper flex flex-col gap-2 mt-7">
+                        <p class="condition-header gap-2 pr-10 text-label-md font-bold">
+                            <span>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.UNIT') }}</span>
+                            <span>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.THRESHOLD') }}</span>
+                            <span>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.TYPE') }}</span>
+                        </p>
+                        <template v-for="(condition, idx) of state.notifications">
+                            <div :key="`condition-${idx}`"
+                                 class="condition-input-wrapper inline-flex flex-wrap items-center w-full gap-2"
+                            >
+                                <p-select-dropdown :selected="condition.unit"
+                                                   class="condition"
+                                                   :menu="state.units"
+                                                   use-fixed-menu-style
+                                                   @update:selected="handleUpdateUnit(idx, $event)"
+                                />
+                                <span class="align-middle">&gt;</span>
+                                <p-text-input :value="condition.threshold"
+                                              class="condition"
+                                              type="number"
+                                              :max="condition.unit === 'PERCENT' ? 100 : undefined"
+                                              :min="0"
+                                              :placeholder="condition.unit === 'ACTUAL_COST'
+                                                  ? '$1000' : '50'"
+                                              :invalid="state.thresholdValidations[idx] === false"
+                                              @update:value="handleThresholdInput(idx, $event)"
+                                >
+                                    <template #right-extra>
+                                        <span v-if="condition.unit === 'PERCENT'"
+                                              class="text-gray-400"
+                                        >%</span>
+                                    </template>
+                                </p-text-input>
+                                <p-select-dropdown :selected="condition.notification_type"
+                                                   class="condition"
+                                                   :menu="state.types"
+                                                   use-fixed-menu-style
+                                                   @update:selected="handleUpdateNotificationType(idx, $event)"
+                                >
+                                    <template #dropdown-button>
+                                        <span :class="{'text-alert': condition.notification_type === 'CRITICAL'}">
+                                            {{ state.types.find(d => d.name === condition.notification_type).label }}
+                                        </span>
+                                    </template>
+                                </p-select-dropdown>
+                                <p-icon-button name="ic_delete"
+                                               class="delete-button"
+                                               @click="handleDeleteCondition(idx)"
+                                />
+                            </div>
+                        </template>
+                    </section>
+                    <p-button style-type="secondary"
+                              icon-left="ic_plus_bold"
+                              @click="handleAddCondition"
                     >
-                        <p-select-dropdown :selected="condition.unit"
-                                           class="condition"
-                                           :menu="state.units"
-                                           use-fixed-menu-style
-                                           @update:selected="handleUpdateUnit(idx, $event)"
-                        />
-                        <span class="align-middle">&gt;</span>
-                        <p-text-input :value="condition.threshold"
-                                      class="condition"
-                                      type="number"
-                                      :max="condition.unit === 'PERCENT' ? 100 : undefined"
-                                      :min="0"
-                                      :placeholder="condition.unit === 'ACTUAL_COST'
-                                          ? '$1000' : '50'"
-                                      :invalid="state.thresholdValidations[idx] === false"
-                                      @update:value="handleThresholdInput(idx, $event)"
+                        {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.ADD_CONDITION') }}
+                    </p-button>
+                </div>
+                <div class="user-wrapper">
+                    <p class="condition-header gap-2 mb-1 pr-10 text-label-md font-bold">
+                        <span>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.USER') }}</span>
+                    </p>
+                    <p-radio-group>
+                        <p-radio v-for="(item, idx) in state.radioMenuList"
+                                 :key="`policy-scope-${idx}`"
+                                 v-model="state.proxySelectedRadioIdx"
+                                 :value="idx"
                         >
-                            <template #right-extra>
-                                <span v-if="condition.unit === 'PERCENT'"
-                                      class="text-gray-400"
-                                >%</span>
-                            </template>
-                        </p-text-input>
-                        <p-select-dropdown :selected="condition.notification_type"
-                                           class="condition"
-                                           :menu="state.types"
-                                           use-fixed-menu-style
-                                           @update:selected="handleUpdateNotificationType(idx, $event)"
-                        >
-                            <template #dropdown-button>
-                                <span :class="{'text-alert': condition.notification_type === 'CRITICAL'}">
-                                    {{ state.types.find(d => d.name === condition.notification_type).label }}
-                                </span>
-                            </template>
-                        </p-select-dropdown>
-                        <p-icon-button name="ic_delete"
-                                       class="delete-button"
-                                       @click="handleDeleteCondition(idx)"
-                        />
-                    </div>
-                </template>
-            </section>
+                            <span class="radio-item">
+                                {{ item.label }}
+                            </span>
+                        </p-radio>
+                    </p-radio-group>
+                </div>
+            </div>
         </template>
     </p-button-modal>
 </template>
@@ -235,24 +259,9 @@ const handleConfirm = async () => {
         height: auto;
         min-height: 3.5rem;
     }
-}
-.desc {
-    margin-bottom: 1rem;
-    line-height: 1.6;
-}
-.condition-wrapper {
-    display: flex;
-    flex-direction: column;
-    row-gap: 0.5rem;
-    margin-top: 1rem;
-    margin-bottom: 4rem;
+
     .condition-header {
-        @apply font-bold;
         display: flex;
-        gap: 0.5rem;
-        padding-right: 2.5rem;
-        font-size: 0.875rem;
-        line-height: 140%;
         span {
             width: 12.25rem;
             &:first-of-type {
@@ -260,29 +269,29 @@ const handleConfirm = async () => {
             }
         }
     }
-    .condition-input-wrapper {
-        @apply inline-flex flex-wrap items-center;
-        gap: 0.5rem;
-        width: 100%;
-        padding-right: 1.875rem;
-        .condition {
-            min-width: 7rem;
-            width: 12.125rem;
-            max-width: 12.25rem;
+    .condition-wrapper {
+        margin-bottom: 1rem;
+        .condition-input-wrapper {
+            padding-right: 1.875rem;
+            .condition {
+                min-width: 7rem;
+                width: 12.125rem;
+                max-width: 12.25rem;
 
-            @screen mobile {
-                width: 7rem;
+                @screen mobile {
+                    width: 7rem;
+                }
             }
         }
     }
 }
 
 @screen tablet {
+    .condition-header {
+        @apply hidden;
+    }
     .condition-wrapper {
         margin-bottom: 1rem;
-        .condition-header {
-            @apply hidden;
-        }
         .condition-input-wrapper {
             @apply bg-gray-100 rounded-xs;
             padding: 0.5rem;
