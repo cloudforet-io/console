@@ -60,10 +60,10 @@ const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const serviceAccountPageStore = useServiceAccountPageStore();
 const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
-const userStore = useUserStore();
 const { getProperRouteLocation } = useProperRouteLocation();
 
 const route = useRoute();
+const userStore = useUserStore();
 
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),

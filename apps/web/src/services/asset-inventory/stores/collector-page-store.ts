@@ -73,7 +73,7 @@ export const useCollectorPageStore = defineStore('page-collector', () => {
         async getCollectorList(queryData: Query) {
             state.loading.collectorList = true;
             try {
-                const res = await SpaceConnector.clientV2.inventory.collector.list<CollectorListParameters, ListResponse<CollectorModel>>({
+                const res = await SpaceConnector.clientV2.inventoryV2.collector.list<CollectorListParameters, ListResponse<CollectorModel>>({
                     query: queryData,
                 });
                 state.collectors = res.results ?? [];

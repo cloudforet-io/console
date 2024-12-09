@@ -54,10 +54,10 @@ const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
-const userStore = useUserStore();
 
 const router = useRouter();
 const route = useRoute();
+const userStore = useUserStore();
 
 const storeState = reactive({
     namespaces: computed(() => allReferenceStore.getters.namespace),

@@ -9,7 +9,7 @@ import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
 
 import { gray, indigo } from '@/styles/colors';
 
-import CloudServices from '@/services/asset-inventory/components/CloudServices.vue';
+import CloudServices from '@/services/asset-inventory-v1/components/CloudServices.vue';
 import ProjectSummaryAllSummaryWidget from '@/services/project-v2/components/ProjectSummaryAllSummaryWidget.vue';
 import ProjectSummaryBillingWidget from '@/services/project-v2/components/ProjectSummaryBillingWidget.vue';
 import ProjectSummaryPersonalHealthDashboardWidget from '@/services/project-v2/components/ProjectSummaryPersonalHealthDashboardWidget.vue';

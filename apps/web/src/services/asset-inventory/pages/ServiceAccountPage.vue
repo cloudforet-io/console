@@ -191,7 +191,7 @@ const { keyItemSets, valueHandlerMap } = useQuerySearchPropsWithSearchSchema(
         { k: 'provider', v: state.selectedProvider, o: '=' },
     ]).apiQuery.filter),
 );
-    /** Handling API with SpaceConnector * */
+/** Handling API with SpaceConnector * */
 
 const apiQuery = new ApiQueryHelper();
 const getQuery = () => {

@@ -55,10 +55,10 @@ const cloudServiceDetailPageState = cloudServiceDetailPageStore.$state;
 const allReferenceStore = useAllReferenceStore();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
-const userStore = useUserStore();
 
 const route = useRoute();
 const router = useRouter();
+const userStore = useUserStore();
 
 const storeState = reactive({
     currentGrantInfo: computed(() => userStore.state.currentGrantInfo),
@@ -209,7 +209,7 @@ const handleSelectProvider = (selected: string) => {
 };
 
 /* Watchers */
-watch([() => state.detailPageParams, () => storeState.currentGrantInfo.scope], async ([params, scope]) => {
+watch([() => state.detailPageParams, () => storeState.currentGrantInfo?.scope], async ([params, scope]) => {
     if (scope === 'USER') return;
     if (!params) return;
     await initCloudServiceDetailLSB(params);

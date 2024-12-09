@@ -32,6 +32,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 
+
 interface Props {
     recordId: string;
     manageDisabled: boolean;
@@ -45,8 +46,8 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'refresh-note-count'): void}>();
 
 const route = useRoute();
-
 const userStore = useUserStore();
+
 const storeState = reactive({
     pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
@@ -55,7 +56,8 @@ const state = reactive({
     noteInput: '',
     noteList: [] as NoteModel[],
     loading: true,
-    timezone: computed<string|undefined>(() => userStore.state.timezone),
+    timezone: computed(() => userStore.state.timezone),
+    userId: computed(() => userStore.state.userId),
     menuItems: computed(() => [
         {
             label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE_TAB.DELETE'), name: 'delete',

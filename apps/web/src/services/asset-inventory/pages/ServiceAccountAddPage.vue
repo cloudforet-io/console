@@ -24,7 +24,6 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { TrustedAccountReferenceMap } from '@/store/reference/trusted-account-reference-store';
-import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -51,7 +50,6 @@ const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const serviceAccountPageStore = useServiceAccountPageStore();
 const serviceAccountPageFormState = serviceAccountPageStore.formState;
 const appContextStore = useAppContextStore();
-const userStore = useUserStore();
 
 const props = defineProps<{
     provider?: string;
@@ -63,7 +61,6 @@ const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     trustedAccounts: computed<TrustedAccountReferenceMap>(() => allReferenceStore.getters.trustedAccount),
-    language: computed<string|undefined>(() => userStore.state.language),
 });
 
 const state = reactive({
@@ -264,7 +261,7 @@ const handleRouteToServiceAccountDetailPage = () => {
                         <template #contents>
                             <p-markdown :markdown="state.description"
                                         :data="state.description"
-                                        :language="storeState.language"
+                                        :language="$store.state.user.language"
                                         class="!p-0"
                             />
                         </template>

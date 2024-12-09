@@ -171,9 +171,8 @@ const collectorJobState = collectorJobStore.$state;
 const collectorDataModalStore = useCollectorDataModalStore();
 const collectorDetailPageStore = useCollectorDetailPageStore();
 
-const userStore = useUserStore();
-
 const route = useRoute();
+const userStore = useUserStore();
 
 watch(() => collectorFormState.originCollector, async (collector) => {
     if (collector) {

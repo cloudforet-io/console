@@ -14,7 +14,7 @@ import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type { WidgetType } from '@/common/modules/widgets/types/widget-model';
 
-import { SIZE_UNITS } from '@/services/asset-inventory/constants/asset-analysis-constant';
+import { SIZE_UNITS } from '@/services/asset-inventory-v1/constants/asset-analysis-constant';
 
 
 export const getWidgetDataTable = async (dataTableId: string): Promise<PrivateDataTableModel|PublicDataTableModel|undefined> => {
