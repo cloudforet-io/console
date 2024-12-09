@@ -19,6 +19,8 @@ import type { MissingValueOptions } from '@/common/modules/widgets/_widget-field
 import type { NumberFormatOptions, NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type { PieChartTypeOptions } from '@/common/modules/widgets/_widget-fields/pie-chart-type/type';
 import type { StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
+import type { SubTotalOptions } from '@/common/modules/widgets/_widget-fields/sub-total/type';
+import type { TotalOptions } from '@/common/modules/widgets/_widget-fields/total/type';
 import type { XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { YAxisOptions } from '@/common/modules/widgets/_widget-fields/y-axis/type';
 
@@ -83,12 +85,11 @@ export const widgetFieldDefaultValueMap: DefaultValueRegistry = {
     pieChartType: {
         type: 'pie',
     },
-    progressBar: {},
-    subTotal: {},
+    subTotal: undefined,
+    total: undefined,
     tableColumnWidth: {},
     textWrap: {},
     tooltipNumberFormat: {},
-    total: {},
     widgetHeight: {},
 } as const;
 
@@ -330,11 +331,34 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
 
         return widgetFieldDefaultValueMap.pieChartType;
     },
-    progressBar: () => widgetFieldDefaultValueMap.progressBar,
-    subTotal: () => widgetFieldDefaultValueMap.subTotal,
+    subTotal: (widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const subTotalOptions = _fieldsSchema.subTotal?.options as SubTotalOptions;
+
+        if (subTotalOptions.toggle) {
+            return {
+                toggleValue: true,
+                freeze: subTotalOptions.default ?? false,
+            };
+        }
+
+        return widgetFieldDefaultValueMap.subTotal;
+    },
+    total: (widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const totalOptions = _fieldsSchema.total?.options as TotalOptions;
+
+        if (totalOptions.toggle) {
+            return {
+                toggleValue: true,
+                freeze: totalOptions.default ?? false,
+            };
+        }
+
+        return widgetFieldDefaultValueMap.total;
+    },
     tableColumnWidth: () => widgetFieldDefaultValueMap.tableColumnWidth,
     textWrap: () => widgetFieldDefaultValueMap.textWrap,
     tooltipNumberFormat: () => widgetFieldDefaultValueMap.tooltipNumberFormat,
-    total: () => widgetFieldDefaultValueMap.total,
     widgetHeight: () => widgetFieldDefaultValueMap.widgetHeight,
 };

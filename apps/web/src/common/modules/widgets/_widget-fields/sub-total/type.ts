@@ -7,5 +7,5 @@ export interface SubTotalOptions {
 
 export interface SubTotalValue {
     toggleValue: boolean;
-    freeze: boolean;
+    freeze?: boolean;
 }

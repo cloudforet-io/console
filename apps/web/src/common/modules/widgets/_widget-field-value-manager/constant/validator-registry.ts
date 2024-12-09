@@ -140,6 +140,8 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
     missingValue: () => true,
     numberFormat: () => true,
     pieChartType: () => true,
+    subTotal: () => true,
+    total: () => true,
 };
 
 
