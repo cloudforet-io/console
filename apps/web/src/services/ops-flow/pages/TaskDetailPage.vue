@@ -3,7 +3,8 @@
 import { defineComponent, type ComponentPublicInstance } from 'vue';
 
 interface IInstance extends ComponentPublicInstance {
-    setPathFrom(from: any): void
+    setPathFrom(from: any): void;
+    checkTaskExist(): Promise<boolean>;
 }
 
 export default defineComponent({
@@ -11,6 +12,7 @@ export default defineComponent({
         next((vm) => {
             const instance = vm as unknown as IInstance;
             instance.setPathFrom(from);
+            instance.checkTaskExist();
         });
     },
 });
@@ -20,7 +22,7 @@ export default defineComponent({
 /* eslint-disable import/first */
 // eslint-disable-next-line import/no-duplicates,import/order
 import {
-    computed, onBeforeMount, onUnmounted, defineAsyncComponent, ref,
+    computed, watch, onUnmounted, defineAsyncComponent, ref,
     // eslint-disable-next-line import/no-duplicates
 } from 'vue';
 import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router/composables';
@@ -36,6 +38,7 @@ import { queryStringToString } from '@/lib/router-query-string';
 
 import ConfirmBackModal from '@/common/components/modals/ConfirmBackModal.vue';
 import { useConfirmRouteLeave } from '@/common/composables/confirm-route-leave';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGoBack } from '@/common/composables/go-back';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
@@ -49,6 +52,7 @@ import { useTaskDetailPageStore } from '@/services/ops-flow/stores/task-detail-p
 import { useTaskStore } from '@/services/ops-flow/stores/task-store';
 import type { BoardPageQuery } from '@/services/ops-flow/types/board-page-type';
 import type { TaskCreatePageQueryValue } from '@/services/ops-flow/types/task-create-page-type';
+
 
 const TaskContentTab = defineAsyncComponent(() => import('@/services/ops-flow/components/TaskContentTab.vue'));
 const TaskProgressTab = defineAsyncComponent(() => import('@/services/ops-flow/components/TaskProgressTab.vue'));
@@ -72,11 +76,6 @@ const router = useRouter();
 const route = useRoute();
 const categoryId = computed<TaskCreatePageQueryValue['categoryId']>(() => queryStringToString(route.query.categoryId));
 const { getProperRouteLocation } = useProperRouteLocation();
-
-
-/* header and back button */
-const loading = false; // computed<boolean>(() => taskCategoryStore.getters.loading);
-const headerTitle = computed<string>(() => task?.value?.name ?? 'Inquiry Service Request'); // TODO: i18n
 const {
     setPathFrom,
     goBack,
@@ -84,6 +83,25 @@ const {
     name: OPS_FLOW_ROUTE.BOARD._NAME,
     query: { categoryId: categoryId.value } as BoardPageQuery,
 }));
+const checkTaskExist = async () => {
+    try {
+        loading.value = true;
+        const taskId = props.taskId;
+        task.value = await taskStore.get(taskId);
+        loading.value = false;
+        return true;
+    } catch (e: unknown) {
+        goBack();
+        ErrorHandler.handleRequestError(e, 'Failed to get task');
+        return false;
+    }
+};
+
+
+/* header and back button */
+const loading = ref<boolean>(true);
+const headerTitle = computed<string>(() => task?.value?.name ?? 'Inquiry Service Request'); // TODO: i18n
+
 
 /* confirm leave modal */
 const {
@@ -125,22 +143,22 @@ const handleSaveChanges = async () => {
 };
 
 /* lifecycle */
-onBeforeMount(async () => {
+onUnmounted(() => {
+    taskContentFormStore.$reset();
+    taskContentFormStore.$dispose();
+});
+watch(task, (t) => {
+    if (!t) return; // route guard will get task and go back if task is not found
     taskDetailPageStore.setCurrentTaskId(props.taskId);
     if (route.hash === '#progress') {
         activeTab.value = 'progress';
     }
     taskContentFormStore.setMode('view'); // TODO: differentiate by user permission
-    task.value = await taskStore.get(props.taskId);
-    taskContentFormStore.setCurrentTask(task.value);
-});
-onUnmounted(() => {
-    taskContentFormStore.$reset();
-    taskContentFormStore.$dispose();
+    if (task.value) taskContentFormStore.setCurrentTask(task.value);
 });
 
 /* expose */
-defineExpose({ setPathFrom });
+defineExpose({ setPathFrom, checkTaskExist });
 </script>
 
 <template>
@@ -160,7 +178,9 @@ defineExpose({ setPathFrom });
                 </p-heading>
             </template>
             <template #extra>
-                <p-button style-type="negative-secondary">
+                <p-button style-type="negative-secondary"
+                          @click="taskDetailPageStore.openTaskDeleteModal()"
+                >
                     Delete
                 </p-button>
             </template>

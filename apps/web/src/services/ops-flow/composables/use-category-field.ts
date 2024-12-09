@@ -22,7 +22,7 @@ export const useCategoryField = ({
     const taskCategoryStore = useTaskCategoryStore();
     const taskTypeStore = useTaskTypeStore();
 
-    const categoryValidator = useFieldValidator<CategoryItem[]>(
+    const categoryValidator = useFieldValidator<SelectDropdownMenuItem[]|CategoryItem[]>(
         [],
         isRequired ? (val) => {
             if (val.length === 0) return 'Please select a category';

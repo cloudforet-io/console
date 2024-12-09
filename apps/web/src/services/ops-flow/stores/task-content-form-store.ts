@@ -1,6 +1,6 @@
 import { reactive, computed, watch } from 'vue';
 
-import { isEmpty } from 'lodash';
+import { isEmpty, isEqual } from 'lodash';
 import { defineStore } from 'pinia';
 
 import type { FileModel } from '@/schema/file-manager/model';
@@ -90,7 +90,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         isAllValid: computed<boolean>(() => state.isBaseFormValid && getters.isDefaultFieldValid && getters.isFieldValid),
     } as unknown as UseTaskContentFormStoreGetters; // HACK: to avoid type error
     const actions = {
-        setCurrentCategoryId(categoryId?: string) {
+        async setCurrentCategoryId(categoryId?: string) {
             if (state.currentCategoryId === categoryId) return;
             state.currentCategoryId = categoryId;
             state.currentTaskType = undefined;
@@ -132,23 +132,23 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         },
         // default field form
         setDefaultFieldData(fieldId: DefaultTaskFieldId, value: any) {
+            state.hasUnsavedChanges = state.defaultData[fieldId] !== value;
             state.defaultData[fieldId] = value;
-            state.hasUnsavedChanges = true;
         },
         setDefaultFieldValidation(fieldId: DefaultTaskFieldId, isValid: boolean) {
             state.defaultDataValidationMap = { ...state.defaultDataValidationMap, [fieldId]: isValid };
         },
         // task type field form
         setFieldData(fieldId: string, value: any) {
+            state.hasUnsavedChanges = state.data[fieldId] !== value;
             state.data[fieldId] = value;
-            state.hasUnsavedChanges = true;
         },
         setFieldValidation(fieldId: string, isValid: boolean) {
             state.dataValidationMap = { ...state.dataValidationMap, [fieldId]: isValid };
         },
         setFiles(files: FileModel[]) {
+            state.hasUnsavedChanges = !isEqual(state.files, files);
             state.files = files;
-            state.hasUnsavedChanges = true;
         },
         // overall
         setCurrentTask(task: TaskModel) {
@@ -201,6 +201,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         },
     };
 
+    // watch assignee change
     watch([() => taskAssignStore.state.currentAssignee, () => taskAssignStore.state.visibleAssignModal], ([user, visible]) => {
         if (!state.originTask) return;
         if (!visible && user && user !== state.originTask.assignee) {

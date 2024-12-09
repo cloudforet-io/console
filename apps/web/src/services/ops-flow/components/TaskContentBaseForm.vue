@@ -4,7 +4,12 @@ import { computed, watch } from 'vue';
 import {
     PFieldTitle, PFieldGroup, PSelectDropdown, PPaneLayout, PButton,
 } from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
+import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
+import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFieldValidator, useFormValidator } from '@/common/composables/form-validator';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
@@ -17,6 +22,7 @@ const taskContentFormStore = useTaskContentFormStore();
 const taskContentFormState = taskContentFormStore.state;
 const taskContentFormGetters = taskContentFormStore.getters;
 
+
 /* category */
 const {
     selectedCategoryItems,
@@ -27,9 +33,15 @@ const {
     isRequired: true,
     hasTaskTypeOnly: true,
 });
-const handleUpdateSelectedCategory = (items) => {
-    taskContentFormStore.setCurrentCategoryId(items[0].name);
-    // watcher automatically updates forms
+const handleUpdateSelectedCategory = (items: SelectDropdownMenuItem[]) => {
+    setForm('category', items); // set form for validation
+    taskContentFormStore.setCurrentCategoryId(items[0].name); // set current category id to store for other fields
+    const category = taskContentFormGetters.currentCategory;
+    if (!category) {
+        ErrorHandler.handleError(new Error('Failed to get category'));
+        return;
+    }
+    initRelatedFieldsByCategorySelection(category);
 };
 
 /* task type */
@@ -42,9 +54,16 @@ const {
     categoryId: computed(() => taskContentFormGetters.currentCategory?.category_id),
     isRequired: true,
 });
-const handleUpdateSelectedTaskType = async (items) => {
-    await taskContentFormStore.setCurrentTaskType(items[0].name);
-    // watcher automatically updates forms
+const handleUpdateSelectedTaskType = async (items: SelectDropdownMenuItem[]) => {
+    setForm('taskType', items); // set form for validation
+    await taskContentFormStore.setCurrentTaskType(items[0].name); // set current task type to store for other fields
+    const taskType = taskContentFormState.currentTaskType;
+    const category = taskContentFormGetters.currentCategory;
+    if (!category || !taskType) {
+        ErrorHandler.handleError(new Error('Failed to get category or task type'));
+        return;
+    }
+    initRelatedFieldsByTaskTypeSelection(category, taskType);
 };
 
 /* status */
@@ -83,7 +102,8 @@ const {
     invalidState,
     invalidTexts,
     isAllValid,
-    resetValidations,
+    resetValidation,
+    setForm,
 } = useFormValidator({
     category: categoryValidator,
     taskType: taskTypeValidator,
@@ -94,30 +114,46 @@ watch(isAllValid, (isValid) => {
     taskContentFormStore.setIsBaseFormValid(isValid);
 }, { immediate: true });
 
-/* automatically initiate and update form */
-watch(() => taskContentFormGetters.currentCategory, async (currentCategory) => {
-    if (currentCategory) {
-        // init selected category
-        await setInitialCategory(currentCategory.category_id);
-        // init selected task type
-        setInitialTaskType(taskContentFormState.currentTaskType);
-        // init selected status
-        const defaultStatus = currentCategory.status_options.TODO.find((status) => status.is_default);
-        setInitialStatus(defaultStatus);
-        taskContentFormStore.setStatusId(defaultStatus?.status_id);
-        // init selected assignee
-        assigneeValidator.setValue(taskContentFormState.assignee ?? '');
-    }
-    resetValidations();
-}, { immediate: true });
-watch(() => taskContentFormState.currentTaskType, (currentTaskType) => {
-    if (currentTaskType && currentTaskType !== taskContentFormState.currentTaskType) {
-        // init selected task type
-        setInitialTaskType(currentTaskType);
-        // init selected assignee
-        assigneeValidator.setValue(taskContentFormState.assignee ?? '');
-    }
-    resetValidations();
+
+/* form initiation */
+const initRelatedFieldsByCategorySelection = (category: TaskCategoryModel) => {
+    // init selected task type
+    setInitialTaskType();
+    // init selected status
+    const defaultStatus = category.status_options.TODO.find((status) => status.is_default);
+    setInitialStatus(defaultStatus);
+    taskContentFormStore.setStatusId(defaultStatus?.status_id);
+    // init selected assignee
+    assigneeValidator.setValue('');
+    // reset validations
+    resetValidation('taskType');
+    resetValidation('assignee');
+};
+const initRelatedFieldsByTaskTypeSelection = (category: TaskCategoryModel, taskType: TaskTypeModel) => {
+    // init selected task type
+    setInitialTaskType(taskType);
+    // init selected status
+    const defaultStatus = category.status_options.TODO.find((status) => status.is_default);
+    setInitialStatus(defaultStatus);
+    taskContentFormStore.setStatusId(defaultStatus?.status_id);
+    // init selected assignee
+    assigneeValidator.setValue('');
+    // reset validations
+    resetValidation('assignee');
+};
+
+/* initiation for 'view' mode */
+watch([() => taskContentFormState.originTask, () => taskContentFormGetters.currentCategory, () => taskContentFormState.currentTaskType], async ([task, category, taskType]) => {
+    if (taskContentFormState.mode !== 'view' || !task || !category || !taskType) return;
+    // set category
+    setInitialCategory(task.category_id);
+    // set task type
+    setInitialTaskType(taskType);
+    // set status
+    const statusOption = category.status_options[task.status_type]?.find((status) => status.status_id === task.status_id);
+    setInitialStatus(statusOption);
+
+    // setting assignee is not required because it uses the origin task's assignee directly
 }, { immediate: true });
 </script>
 

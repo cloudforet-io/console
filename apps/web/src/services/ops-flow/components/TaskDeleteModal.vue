@@ -15,23 +15,24 @@ const taskDetailPageStore = useTaskDetailPageStore();
 const taskStore = useTaskStore();
 const loading = ref<boolean>(false);
 
+let hasDeleted = false;
 const deleteTask = async () => {
     try {
         if (!taskDetailPageStore.state.taskId) throw new Error('taskId is not defined');
         loading.value = true;
         await taskStore.delete(taskDetailPageStore.state.taskId);
-        showSuccessMessage('Comment deleted successfully', '');
+        hasDeleted = true;
+        showSuccessMessage('Task deleted successfully', '');
     } catch (e) {
-        ErrorHandler.handleRequestError(e, 'Failed to delete comment');
+        ErrorHandler.handleRequestError(e, 'Failed to delete task');
     } finally {
         loading.value = false;
         taskDetailPageStore.closeTaskDeleteModal();
     }
 };
-let hasDeleted = false;
+
 const handleConfirm = async () => {
     await deleteTask();
-    hasDeleted = true;
 };
 const handleClosed = () => {
     if (hasDeleted) {

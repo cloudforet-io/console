@@ -6,6 +6,7 @@ import {
 import type { TaskFieldType } from '@/schema/opsflow/_types/task-field-type';
 
 import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
+import { DEFAULT_FIELD_ID_MAP } from '@/services/ops-flow/task-fields-configuration/constants/default-field-constant';
 import {
     useTaskFieldMetadataStore,
 } from '@/services/ops-flow/task-fields-configuration/stores/use-task-field-metadata-store';
@@ -42,7 +43,7 @@ onUnmounted(() => {
                    :key="field.field_id"
                    :field="field"
                    :value="taskContentFormState.defaultData[field.field_id]"
-                   :readonly="taskContentFormState.mode === 'view'"
+                   :readonly="taskContentFormState.mode === 'view' && field.field_id !== DEFAULT_FIELD_ID_MAP.title"
                    :files="taskContentFormState.files"
                    @update:value="taskContentFormStore.setDefaultFieldData(field.field_id, $event)"
                    @update:files="taskContentFormStore.setFiles"
