@@ -36,7 +36,7 @@ const state = reactive({
     ]),
 });
 
-const handleChangeWidgetHeight = (value: boolean) => {
+const handleChangeWidgetHeight = (value: _WidgetHeightValue['type']) => {
     props.fieldManager.setFieldValue(FIELD_KEY, {
         type: value,
     });
