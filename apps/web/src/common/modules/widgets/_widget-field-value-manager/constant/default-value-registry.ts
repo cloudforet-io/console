@@ -22,6 +22,7 @@ import type { StackByOptions } from '@/common/modules/widgets/_widget-fields/sta
 import type { SubTotalOptions } from '@/common/modules/widgets/_widget-fields/sub-total/type';
 import type { TableColumnWidthOptions } from '@/common/modules/widgets/_widget-fields/table-column-width/type';
 import type { TextWrapOptions } from '@/common/modules/widgets/_widget-fields/text-wrap/type';
+import type { TooltipNumberFormatOptions } from '@/common/modules/widgets/_widget-fields/tooltip-number-format/type';
 import type { TotalOptions } from '@/common/modules/widgets/_widget-fields/total/type';
 import type { XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { YAxisOptions } from '@/common/modules/widgets/_widget-fields/y-axis/type';
@@ -97,7 +98,9 @@ export const widgetFieldDefaultValueMap: DefaultValueRegistry = {
     textWrap: {
         toggleValue: false,
     },
-    tooltipNumberFormat: {},
+    tooltipNumberFormat: {
+        toggleValue: false,
+    },
     widgetHeight: {},
 } as const;
 
@@ -391,6 +394,16 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
         }
         return widgetFieldDefaultValueMap.textWrap;
     },
-    tooltipNumberFormat: () => widgetFieldDefaultValueMap.tooltipNumberFormat,
+    tooltipNumberFormat: (widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const tooltipNumberFormatOptions = _fieldsSchema.tooltipNumberFormat?.options as TooltipNumberFormatOptions;
+
+        if (tooltipNumberFormatOptions.default) {
+            return {
+                toggleValue: true,
+            };
+        }
+        return widgetFieldDefaultValueMap.tooltipNumberFormat;
+    },
     widgetHeight: () => widgetFieldDefaultValueMap.widgetHeight,
 };

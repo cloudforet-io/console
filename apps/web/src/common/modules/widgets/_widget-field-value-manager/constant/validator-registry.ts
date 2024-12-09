@@ -152,6 +152,7 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
         return true;
     },
     textWrap: () => true,
+    tooltipNumberFormat: () => true,
 };
 
 
