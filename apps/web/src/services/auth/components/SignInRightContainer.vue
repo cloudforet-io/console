@@ -31,9 +31,9 @@
 <script lang="ts">
 import { useWindowSize } from '@vueuse/core/index';
 import {
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, reactive, toRefs,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
     PI, screens,
@@ -58,7 +58,9 @@ export default {
         },
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as Vue;
+        const router = useRouter();
+        const route = useRoute();
+
         const domainStore = useDomainStore();
         const displayStore = useDisplayStore();
         const { width } = useWindowSize();
@@ -69,7 +71,7 @@ export default {
 
         /* event */
         const hideErrorMessage = () => {
-            if (vm.$route.query.error) vm.$router.replace({ query: { error: null } });
+            if (route.query.error) router.replace({ query: { error: null } });
             displayStore.setIsSignInFailed(false);
         };
 
