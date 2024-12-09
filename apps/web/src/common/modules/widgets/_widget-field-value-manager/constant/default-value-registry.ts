@@ -1,5 +1,5 @@
 import {
-    COLOR_SCHEMA, DATE_FORMAT, DEFAULT_COMPARISON_COLOR, NUMBER_FORMAT, TABLE_DEFAULT_MINIMUM_WIDTH,
+    COLOR_SCHEMA, DATE_FORMAT, DEFAULT_COMPARISON_COLOR, NUMBER_FORMAT, TABLE_DEFAULT_MINIMUM_WIDTH, WIDGET_HEIGHT,
 } from '@/common/modules/widgets/_constants/widget-field-constant';
 import { integrateFieldsSchema } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
@@ -21,7 +21,10 @@ import type { PieChartTypeOptions } from '@/common/modules/widgets/_widget-field
 import type { StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
 import type { SubTotalOptions } from '@/common/modules/widgets/_widget-fields/sub-total/type';
 import type { TableColumnWidthOptions } from '@/common/modules/widgets/_widget-fields/table-column-width/type';
+import type { TextWrapOptions } from '@/common/modules/widgets/_widget-fields/text-wrap/type';
+import type { TooltipNumberFormatOptions } from '@/common/modules/widgets/_widget-fields/tooltip-number-format/type';
 import type { TotalOptions } from '@/common/modules/widgets/_widget-fields/total/type';
+import type { WidgetHeightOptions } from '@/common/modules/widgets/_widget-fields/widget-height/type';
 import type { XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { YAxisOptions } from '@/common/modules/widgets/_widget-fields/y-axis/type';
 
@@ -93,9 +96,15 @@ export const widgetFieldDefaultValueMap: DefaultValueRegistry = {
         widthType: 'auto',
         fixedWidth: undefined,
     },
-    textWrap: {},
-    tooltipNumberFormat: {},
-    widgetHeight: {},
+    textWrap: {
+        toggleValue: false,
+    },
+    tooltipNumberFormat: {
+        toggleValue: false,
+    },
+    widgetHeight: {
+        type: WIDGET_HEIGHT.default,
+    },
 } as const;
 
 export type WidgetFieldDefaultValueSetterRegistry = {
@@ -377,7 +386,37 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
         }
         return initalValue;
     },
-    textWrap: () => widgetFieldDefaultValueMap.textWrap,
-    tooltipNumberFormat: () => widgetFieldDefaultValueMap.tooltipNumberFormat,
-    widgetHeight: () => widgetFieldDefaultValueMap.widgetHeight,
+    textWrap: (widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const textWrapWidthOptions = _fieldsSchema.textWrap?.options as TextWrapOptions;
+
+        if (textWrapWidthOptions.toggle) {
+            return {
+                toggleValue: true,
+            };
+        }
+        return widgetFieldDefaultValueMap.textWrap;
+    },
+    tooltipNumberFormat: (widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const tooltipNumberFormatOptions = _fieldsSchema.tooltipNumberFormat?.options as TooltipNumberFormatOptions;
+
+        if (tooltipNumberFormatOptions.default) {
+            return {
+                toggleValue: true,
+            };
+        }
+        return widgetFieldDefaultValueMap.tooltipNumberFormat;
+    },
+    widgetHeight: (widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const widgetHeightOptions = _fieldsSchema.widgetHeight?.options as WidgetHeightOptions;
+
+        if (widgetHeightOptions.default) {
+            return {
+                type: widgetHeightOptions.default,
+            };
+        }
+        return widgetFieldDefaultValueMap.widgetHeight;
+    },
 };

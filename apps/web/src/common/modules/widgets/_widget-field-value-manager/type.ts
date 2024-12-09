@@ -28,7 +28,7 @@ import type { TableColumnWidthValue } from '@/common/modules/widgets/_widget-fie
 import type { TextWrapValue } from '@/common/modules/widgets/_widget-fields/text-wrap/type';
 import type { TooltipNumberFormatValue } from '@/common/modules/widgets/_widget-fields/tooltip-number-format/type';
 import type { TotalValue } from '@/common/modules/widgets/_widget-fields/total/type';
-import type { WidgetHeightValue } from '@/common/modules/widgets/_widget-fields/widget-height/type';
+import type { _WidgetHeightValue } from '@/common/modules/widgets/_widget-fields/widget-height/type';
 import type { _XAxisValue } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { _YAxisValue } from '@/common/modules/widgets/_widget-fields/y-axis/type';
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
@@ -48,7 +48,7 @@ export interface WidgetFieldValue<T = any> {
 export interface WidgetFieldTypeMap {
     xAxis: WidgetFieldValue<_XAxisValue>;
     yAxis: WidgetFieldValue<_YAxisValue>;
-    widgetHeight: WidgetFieldValue<WidgetHeightValue>;
+    widgetHeight: WidgetFieldValue<_WidgetHeightValue>;
     total: WidgetFieldValue<TotalValue>;
     tooltipNumberFormat: WidgetFieldValue<TooltipNumberFormatValue>;
     textWrap: WidgetFieldValue<TextWrapValue>;

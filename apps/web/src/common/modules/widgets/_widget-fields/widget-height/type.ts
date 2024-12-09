@@ -10,3 +10,7 @@ export interface WidgetHeightValue {
 export interface WidgetHeightOptions {
     default?: WidgetHeightType;
 }
+
+export interface _WidgetHeightValue {
+    type: WidgetHeightType;
+}
