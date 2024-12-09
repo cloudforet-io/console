@@ -17,6 +17,7 @@ import type { MaxOptions } from '@/common/modules/widgets/_widget-fields/max/typ
 import type { MinOptions } from '@/common/modules/widgets/_widget-fields/min/type';
 import type { MissingValueOptions } from '@/common/modules/widgets/_widget-fields/missing-value/type';
 import type { NumberFormatOptions, NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
+import type { PieChartTypeOptions } from '@/common/modules/widgets/_widget-fields/pie-chart-type/type';
 import type { StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
 import type { XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { YAxisOptions } from '@/common/modules/widgets/_widget-fields/y-axis/type';
@@ -79,7 +80,9 @@ export const widgetFieldDefaultValueMap: DefaultValueRegistry = {
         type: 'lineToZero',
     },
     numberFormat: {},
-    pieChartType: {},
+    pieChartType: {
+        type: 'pie',
+    },
     progressBar: {},
     subTotal: {},
     tableColumnWidth: {},
@@ -315,7 +318,18 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
 
         return widgetFieldDefaultValueMap.numberFormat;
     },
-    pieChartType: () => widgetFieldDefaultValueMap.pieChartType,
+    pieChartType: (widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const pieChartTypeOptions = _fieldsSchema.pieChartType?.options as PieChartTypeOptions;
+
+        if (pieChartTypeOptions.default) {
+            return {
+                type: pieChartTypeOptions.default,
+            };
+        }
+
+        return widgetFieldDefaultValueMap.pieChartType;
+    },
     progressBar: () => widgetFieldDefaultValueMap.progressBar,
     subTotal: () => widgetFieldDefaultValueMap.subTotal,
     tableColumnWidth: () => widgetFieldDefaultValueMap.tableColumnWidth,

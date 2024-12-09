@@ -139,6 +139,7 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
     },
     missingValue: () => true,
     numberFormat: () => true,
+    pieChartType: () => true,
 };
 
 
