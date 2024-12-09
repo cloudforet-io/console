@@ -5,9 +5,12 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { AxiosError } from 'axios';
 import { debounce } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { APIError } from '@cloudforet/core-lib/space-connector/error';
+import { RESPONSE } from '@cloudforet/core-lib/space-connector/type';
 import {
     PContextMenu, PEmpty, PFieldGroup, PIconButton, PSelectDropdown, PBadge,
 } from '@cloudforet/mirinae';
@@ -21,6 +24,8 @@ import type { SummaryWorkspaceUserModel, WorkspaceUserModel } from '@/schema/ide
 import { i18n } from '@/translations';
 
 import { useDomainStore } from '@/store/domain/domain-store';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { checkEmailFormat } from '@/services/iam/helpers/user-management-form-validations';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
@@ -95,6 +100,8 @@ const handleSelectDropdownItem = (selected: AuthType|LocalType) => {
     validationState.userIdInvalid = false;
     validationState.userIdInvalidText = '';
 };
+// FIXME: 404error는 무시하고, 200이면 사용자가 존재하는 것으로 판단
+// admin이 아닌 일반모드에서는 쓸때마다 data를 가져오는데 왜그런지 살펴보기.
 const getUserList = async (isFocusOut?: boolean) => {
     let isNew = userPageState.isAdminMode || userPageState.afterWorkspaceCreated;
     try {
@@ -208,15 +215,26 @@ const fetchGetWorkspaceUsers = async (userId: string) => {
     validationState.userIdInvalid = true;
     validationState.userIdInvalidText = i18n.t('IAM.USER.FORM.USER_ID_INVALID_WORKSPACE', { userId });
 };
-const fetchGetUsers = async (userId: string) => {
-    await SpaceConnector.clientV2.identity.user.get<UserGetParameters, UserModel>({
-        user_id: userId,
-    });
-    if (userPageState.afterWorkspaceCreated) {
-        addSelectedItem(false);
-    } else {
-        validationState.userIdInvalid = true;
-        validationState.userIdInvalidText = i18n.t('IAM.USER.FORM.USER_ID_INVALID_DOMAIN', { userId });
+const fetchGetUsers = async (userId: string) : Promise<any> => {
+    try {
+        await SpaceConnector.clientV2.identity.user.get<UserGetParameters, UserModel>({
+            user_id: userId,
+        });
+        // APIError 생성해서 ErrorHandle로 넘기기
+        ErrorHandler.handleError(new APIError(new AxiosError()));
+        // return new Promise.reject(new APIError(new AxiosError()));
+    } catch (e : any) {
+        // 404아니면 error throw
+        if (e.name !== RESPONSE.NOT_FOUND_ERROR) {
+            throw e;
+        }
+    } finally {
+        if (userPageState.afterWorkspaceCreated) {
+            addSelectedItem(false);
+        } else {
+            validationState.userIdInvalid = true;
+            validationState.userIdInvalidText = i18n.t('IAM.USER.FORM.USER_ID_INVALID_DOMAIN', { userId });
+        }
     }
 };
 
