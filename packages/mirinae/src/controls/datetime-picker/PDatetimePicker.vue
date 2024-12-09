@@ -12,7 +12,7 @@
     >
         <div class="input-sizer">
             <input type="text"
-                   :placeholder="dataType === DATA_TYPE.time ? $t('COMPONENT.DATETIME_PICKER.SELECT_TIME') : $t('COMPONENT.DATETIME_PICKER.SELECT_DATE')"
+                   :placeholder="placeholder ? placeholder : dataType === DATA_TYPE.time ? $t('COMPONENT.DATETIME_PICKER.SELECT_TIME') : $t('COMPONENT.DATETIME_PICKER.SELECT_DATE')"
                    data-input
                    :disabled="disabled"
                    :readonly="readonly"
@@ -112,6 +112,10 @@ export default {
             type: String,
             default: DATA_TYPE.yearToDate,
             validator: (dataType: any) => Object.values(DATA_TYPE).includes(dataType),
+        },
+        placeholder: {
+            type: String,
+            default: undefined,
         },
     },
     setup(props: DatetimePickerProps, { emit }) {
