@@ -1,5 +1,5 @@
 import {
-    COLOR_SCHEMA, DATE_FORMAT, DEFAULT_COMPARISON_COLOR, NUMBER_FORMAT, TABLE_DEFAULT_MINIMUM_WIDTH,
+    COLOR_SCHEMA, DATE_FORMAT, DEFAULT_COMPARISON_COLOR, NUMBER_FORMAT, TABLE_DEFAULT_MINIMUM_WIDTH, WIDGET_HEIGHT,
 } from '@/common/modules/widgets/_constants/widget-field-constant';
 import { integrateFieldsSchema } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
@@ -24,6 +24,7 @@ import type { TableColumnWidthOptions } from '@/common/modules/widgets/_widget-f
 import type { TextWrapOptions } from '@/common/modules/widgets/_widget-fields/text-wrap/type';
 import type { TooltipNumberFormatOptions } from '@/common/modules/widgets/_widget-fields/tooltip-number-format/type';
 import type { TotalOptions } from '@/common/modules/widgets/_widget-fields/total/type';
+import type { WidgetHeightOptions } from '@/common/modules/widgets/_widget-fields/widget-height/type';
 import type { XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { YAxisOptions } from '@/common/modules/widgets/_widget-fields/y-axis/type';
 
@@ -101,7 +102,9 @@ export const widgetFieldDefaultValueMap: DefaultValueRegistry = {
     tooltipNumberFormat: {
         toggleValue: false,
     },
-    widgetHeight: {},
+    widgetHeight: {
+        type: WIDGET_HEIGHT.default,
+    },
 } as const;
 
 export type WidgetFieldDefaultValueSetterRegistry = {
@@ -405,5 +408,15 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
         }
         return widgetFieldDefaultValueMap.tooltipNumberFormat;
     },
-    widgetHeight: () => widgetFieldDefaultValueMap.widgetHeight,
+    widgetHeight: (widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const widgetHeightOptions = _fieldsSchema.widgetHeight?.options as WidgetHeightOptions;
+
+        if (widgetHeightOptions.default) {
+            return {
+                type: widgetHeightOptions.default,
+            };
+        }
+        return widgetFieldDefaultValueMap.widgetHeight;
+    },
 };

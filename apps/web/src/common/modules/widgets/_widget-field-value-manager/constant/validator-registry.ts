@@ -153,6 +153,7 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
     },
     textWrap: () => true,
     tooltipNumberFormat: () => true,
+    widgetHeight: () => true,
 };
 
 
