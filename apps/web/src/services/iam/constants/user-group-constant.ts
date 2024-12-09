@@ -7,7 +7,7 @@ export const USER_GROUP_SEARCH_HANDLERS: UserGroupSearchHandlers[] = [
     {
         title: 'Properties',
         items: [
-            { name: 'user_group_name', label: 'User Group Name' },
+            { name: 'user_group_id', label: 'User Group ID' },
             { name: 'description', label: 'Description' },
             { name: 'notification', label: 'Notification' },
             { name: 'users', label: 'Users' },
