@@ -8,19 +8,19 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import type { ToolboxTableOptions } from '@cloudforet/mirinae/types/data-display/tables/toolbox-table/type';
 
+import type { TaskModel } from '@/schema/opsflow/task/model';
+
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
-import { useTaskDetailPageStore } from '@/services/ops-flow/stores/task-detail-page-store';
+import { useTaskAssignStore } from '@/services/ops-flow/stores/task-assign-store';
 import { useTaskStore } from '@/services/ops-flow/stores/task-store';
 
 const userReferenceStore = useUserReferenceStore();
-const taskDetailPageStore = useTaskDetailPageStore();
-const taskContentFormStore = useTaskContentFormStore();
+const taskAssignStore = useTaskAssignStore();
 const taskStore = useTaskStore();
 
 const fields: DataTableField[] = [
@@ -30,7 +30,7 @@ const fields: DataTableField[] = [
 
 const allUserReferenceItems = computed<SelectDropdownMenuItem[]>(() => Object.values(userReferenceStore.getters.userItems.map((u) => ({ name: u.key, label: u.label || u.name }))));
 const allUserItems = computed<SelectDropdownMenuItem[]>(() => {
-    const assigneePool = taskContentFormStore.state.currentAssigneePool;
+    const assigneePool = taskAssignStore.state.currentAssigneePool;
     if (assigneePool && assigneePool.length > 0) {
         return assigneePool.map((d) => (userReferenceStore.getters.userItems[d]
             ? { name: d, label: userReferenceStore.getters.userItems[d].label || userReferenceStore.getters.userItems[d].name }
@@ -45,7 +45,7 @@ const pageLimit = ref<number>(15);
 const refinedUserItems = computed<SelectDropdownMenuItem[]>(() => {
     const filtered = allUserItems.value.filter((item) => getTextHighlightRegex(searchText.value).test(item.label as string));
     const sliced = filtered.slice(pageStart.value - 1, pageStart.value + pageLimit.value - 1);
-    return sliced.map((s) => (s.name === taskContentFormStore.state.currentAssignee
+    return sliced.map((s) => (s.name === taskAssignStore.state.currentAssignee
         ? { ...s, disabled: true } : s));
 });
 const getRowSelectable = (item: SelectDropdownMenuItem) => !item.disabled;
@@ -58,36 +58,33 @@ const handleChangeTable = async (options: ToolboxTableOptions = {}) => {
 const selectIndex = ref<number[]>([]);
 
 const handleCancelOrClose = () => {
-    taskContentFormStore.closeAssignModal();
-};
-const handleClosed = () => {
-    taskContentFormStore.resetAssigneeModal();
+    taskAssignStore.closeAssignModal();
 };
 
 const updating = ref<boolean>(false);
-const updateTaskAssignee = async () => {
+const updateTaskAssignee = async (): Promise<TaskModel|undefined> => {
     try {
-        if (!taskDetailPageStore.state.taskId) throw new Error('task id is not defined');
+        if (!taskAssignStore.state.taskId) throw new Error('task id is not defined');
         if (selectIndex.value.length === 0) throw new Error('assignee is not selected');
-        updating.value = true;
         const newTask = await taskStore.update({
-            task_id: taskDetailPageStore.state.taskId,
+            task_id: taskAssignStore.state.taskId,
             assignee: refinedUserItems.value[selectIndex.value[0]].name,
         });
-        taskContentFormStore.setAssignee(newTask.assignee);
         showSuccessMessage('Task assigned successfully', '');
+        return newTask;
     } catch (e) {
         ErrorHandler.handleRequestError(e, 'Failed to assign task');
-    } finally {
-        updating.value = false;
+        return undefined;
     }
 };
 const handleConfirm = async () => {
-    await updateTaskAssignee();
-    taskContentFormStore.closeAssignModal();
+    updating.value = true;
+    const task = await updateTaskAssignee();
+    taskAssignStore.closeAssignModal(task?.assignee);
+    updating.value = false;
 };
 
-watch(() => taskContentFormStore.state.visibleAssignModal, (visible) => {
+watch(() => taskAssignStore.state.visibleAssignModal, (visible) => {
     if (!visible) {
         selectIndex.value = [];
         searchText.value = '';
@@ -99,14 +96,13 @@ watch(() => taskContentFormStore.state.visibleAssignModal, (visible) => {
 </script>
 
 <template>
-    <p-button-modal :visible="taskContentFormStore.state.visibleAssignModal"
+    <p-button-modal :visible="taskAssignStore.state.visibleAssignModal"
                     header-title="Assign Member"
                     size="md"
                     :loading="loading || updating"
                     :disabled="selectIndex.length === 0"
                     @cancel="handleCancelOrClose"
                     @close="handleCancelOrClose"
-                    @closed="handleClosed"
                     @confirm="handleConfirm"
     >
         <template #body>

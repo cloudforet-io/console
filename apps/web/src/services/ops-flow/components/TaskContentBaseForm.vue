@@ -75,7 +75,7 @@ const handleUpdateSelectedAssignee = (userId?: string) => {
     assigneeValidator.setValue(userId ?? '');
 };
 const handleClickAssign = () => {
-    taskContentFormStore.openAssignModal(assignee.value, taskContentFormState.currentTaskType?.assignee_pool);
+    taskContentFormStore.openAssignModal();
 };
 
 /* form validator */
@@ -116,12 +116,6 @@ watch(() => taskContentFormState.currentTaskType, (currentTaskType) => {
         setInitialTaskType(currentTaskType);
         // init selected assignee
         assigneeValidator.setValue(taskContentFormState.assignee ?? '');
-    }
-    resetValidations();
-}, { immediate: true });
-watch(() => taskContentFormState.assignee, (user) => {
-    if (user && user !== assignee.value) {
-        assigneeValidator.setValue(user ?? '');
     }
     resetValidations();
 }, { immediate: true });
@@ -201,7 +195,7 @@ watch(() => taskContentFormState.assignee, (user) => {
                         </p-button>
                     </div>
                     <p class="mt-1 text-label-md text-blue-900">
-                        {{ assignee || '--' }}
+                        {{ taskContentFormState.originTask?.assignee || '--' }}
                     </p>
                 </div>
                 <p-field-group v-else

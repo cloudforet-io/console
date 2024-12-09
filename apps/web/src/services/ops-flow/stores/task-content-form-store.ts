@@ -1,4 +1,4 @@
-import { reactive, computed } from 'vue';
+import { reactive, computed, watch } from 'vue';
 
 import { isEmpty } from 'lodash';
 import { defineStore } from 'pinia';
@@ -14,6 +14,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
+import { useTaskAssignStore } from '@/services/ops-flow/stores/task-assign-store';
 import { useTaskStore } from '@/services/ops-flow/stores/task-store';
 import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 import {
@@ -21,17 +22,14 @@ import {
 } from '@/services/ops-flow/task-fields-configuration/stores/use-task-field-metadata-store';
 import type { DefaultTaskFieldId } from '@/services/ops-flow/task-fields-configuration/types/task-field-type-metadata-type';
 
-interface UseTaskCreatePageStoreState {
+interface UseTaskContentFormStoreState {
+    originTask?: TaskModel;
     // base form
     currentCategoryId?: string;
     currentTaskType?: TaskTypeModel;
     statusId?: string;
     assignee?: string;
     isBaseFormValid: boolean;
-    // assign
-    currentAssignee?: string;
-    currentAssigneePool?: string[];
-    visibleAssignModal: boolean;
     // default field form
     defaultData: Partial<Record<DefaultTaskFieldId, any>>;
     defaultDataValidationMap: Record<string, boolean>;
@@ -44,7 +42,7 @@ interface UseTaskCreatePageStoreState {
     hasUnsavedChanges: boolean;
     createTaskLoading: boolean;
 }
-interface UseTaskCreatePageStoreGetters {
+interface UseTaskContentFormStoreGetters {
     currentCategory: TaskCategoryModel|undefined;
     currentFields: TaskField[];
     isDefaultFieldValid: boolean;
@@ -56,18 +54,16 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
     const taskTypeStore = useTaskTypeStore();
     const taskStore = useTaskStore();
     const taskFieldMetadataStore = useTaskFieldMetadataStore();
+    const taskAssignStore = useTaskAssignStore();
 
-    const state = reactive<UseTaskCreatePageStoreState>({
+    const state = reactive<UseTaskContentFormStoreState>({
+        originTask: undefined,
         // base form
         currentCategoryId: undefined,
         currentTaskType: undefined,
         statusId: undefined,
         assignee: undefined,
         isBaseFormValid: false,
-        // assignee
-        currentAssignee: undefined,
-        currentAssigneePool: undefined,
-        visibleAssignModal: false,
         // default field form
         defaultData: {},
         defaultDataValidationMap: {},
@@ -92,7 +88,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         isFieldValid: computed<boolean>(() => getters.currentFields?.every((field) => state.dataValidationMap[field.field_id]) ?? true),
         // overall
         isAllValid: computed<boolean>(() => state.isBaseFormValid && getters.isDefaultFieldValid && getters.isFieldValid),
-    } as unknown as UseTaskCreatePageStoreGetters; // HACK: to avoid type error
+    } as unknown as UseTaskContentFormStoreGetters; // HACK: to avoid type error
     const actions = {
         setCurrentCategoryId(categoryId?: string) {
             if (state.currentCategoryId === categoryId) return;
@@ -123,18 +119,16 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         setIsBaseFormValid(isValid: boolean) {
             state.isBaseFormValid = isValid;
         },
-        // assignee
-        openAssignModal(assignee?: string, assigneePool?: string[]) {
-            state.currentAssignee = assignee;
-            state.currentAssigneePool = assigneePool;
-            state.visibleAssignModal = true;
-        },
-        closeAssignModal() {
-            state.visibleAssignModal = false;
-        },
-        resetAssigneeModal() {
-            state.currentAssignee = undefined;
-            state.currentAssigneePool = undefined;
+        openAssignModal() {
+            if (!state.currentTaskType) {
+                ErrorHandler.handleError(new Error('Task type is not selected'));
+                return;
+            }
+            if (!state.originTask) {
+                ErrorHandler.handleError(new Error('Origin task is not defined'));
+                return;
+            }
+            taskAssignStore.openAssignModal(state.originTask.task_id, state.originTask.assignee, state.currentTaskType.assignee_pool);
         },
         // default field form
         setDefaultFieldData(fieldId: DefaultTaskFieldId, value: any) {
@@ -158,6 +152,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         },
         // overall
         setCurrentTask(task: TaskModel) {
+            state.originTask = task;
             state.currentCategoryId = task.category_id;
             actions.setCurrentTaskType(task.task_type_id);
             state.statusId = task.status_id;
@@ -185,7 +180,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
             try {
                 if (!state.currentTaskType) throw new Error('Task type is not selected');
                 state.createTaskLoading = true;
-                await taskStore.create({
+                state.originTask = await taskStore.create({
                     task_type_id: state.currentTaskType.task_type_id,
                     name: state.defaultData.title,
                     status_id: state.statusId as string,
@@ -205,6 +200,14 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
             }
         },
     };
+
+    watch([() => taskAssignStore.state.currentAssignee, () => taskAssignStore.state.visibleAssignModal], ([user, visible]) => {
+        if (!state.originTask) return;
+        if (!visible && user && user !== state.originTask.assignee) {
+            state.originTask.assignee = user;
+        }
+    }, { immediate: true });
+
     return {
         state,
         getters,

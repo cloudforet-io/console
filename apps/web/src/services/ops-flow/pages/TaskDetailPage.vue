@@ -42,6 +42,7 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import BoardTaskComment from '@/services/ops-flow/components/BoardTaskComment.vue';
 import CommentDeleteModal from '@/services/ops-flow/components/CommentDeleteModal.vue';
 import TaskAssignModal from '@/services/ops-flow/components/TaskAssignModal.vue';
+import TaskDeleteModal from '@/services/ops-flow/components/TaskDeleteModal.vue';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
 import { useTaskDetailPageStore } from '@/services/ops-flow/stores/task-detail-page-store';
@@ -205,6 +206,7 @@ defineExpose({ setPathFrom });
         />
         <comment-delete-modal />
         <task-assign-modal />
+        <task-delete-modal @deleted="goBack()" />
     </div>
 </template>
 

@@ -15,7 +15,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const EVENT_PAGE_SIZE = 3;
 interface UseTaskDetailPageStoreState {
+    // task
     taskId?: string;
+    visibleTaskDeleteModal: boolean;
     // events
     page: number;
     loadingEvents: boolean;
@@ -33,7 +35,9 @@ interface UseTaskDetailPageStoreGetters {
 
 export const useTaskDetailPageStore = defineStore('task-detail-page', () => {
     const state = reactive<UseTaskDetailPageStoreState>({
+        // task
         taskId: undefined,
+        visibleTaskDeleteModal: false,
         // events
         page: 1,
         loadingEvents: true,
@@ -60,8 +64,15 @@ export const useTaskDetailPageStore = defineStore('task-detail-page', () => {
 
     const fetchEventList = getCancellableFetcher<EventListParameters, ListResponse<EventModel>>(SpaceConnector.clientV2.opsflow.event.list);
     const actions = {
+        // task
         setCurrentTaskId(taskId: string) {
             state.taskId = taskId;
+        },
+        openTaskDeleteModal() {
+            state.visibleTaskDeleteModal = true;
+        },
+        closeTaskDeleteModal() {
+            state.visibleTaskDeleteModal = false;
         },
         // events
         async loadNewEvents() {
