@@ -267,30 +267,18 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.OPS_FLOW_LANDING,
         routeName: OPS_FLOW_ROUTE.LANDING._NAME,
         translationId: 'Support Center', // TODO: change translation id
-        icon: 'ic_gnb_bell', // TODO: change icon
+        icon: 'ic_support-center',
     },
     [MENU_ID.BOARD]: {
         menuId: MENU_ID.BOARD,
         routeName: OPS_FLOW_ROUTE.BOARD._NAME,
         translationId: 'Board', // TODO: change translation id
-        icon: 'ic_gnb_bell', // TODO: change icon
-    },
-    [MENU_ID.BOARD]: {
-        menuId: MENU_ID.BOARD,
-        routeName: OPS_FLOW_ROUTE.BOARD._NAME,
-        translationId: 'Board', // TODO: change translation id
-        icon: 'ic_gnb_bell', // TODO: change icon
-    },
-    [MENU_ID.WORKFLOW]: {
-        menuId: MENU_ID.WORKFLOW,
-        routeName: OPS_FLOW_ROUTE.WORKFLOW._NAME,
-        translationId: 'Workflow', // TODO: change translation id
-        icon: 'ic_gnb_bell', // TODO: change icon
+        icon: 'ic_workflow-board',
     },
     [MENU_ID.TASK_MANAGEMENT]: {
         menuId: MENU_ID.TASK_MANAGEMENT,
         routeName: OPS_FLOW_ROUTE.TASK_MANAGEMENT._NAME,
         translationId: 'Task Management', // TODO: change translation id
-        icon: 'ic_gnb_bell', // TODO: change icon
+        icon: 'ic_service_administration',
     },
 });

@@ -13,7 +13,6 @@ const AdminTaskManagementPage = () => import('@/services/ops-flow/pages/admin/Ad
 const AdminTaskCategoryDetailPage = () => import('@/services/ops-flow/pages/admin/AdminTaskCategoryDetailPage.vue');
 const AdminTaskCategoryDetailPageStatusTab = () => import('@/services/ops-flow/pages/admin/AdminTaskCategoryDetailPageStatusTab.vue');
 const AdminTaskCategoryDetailPageTaskTypeTab = () => import('@/services/ops-flow/pages/admin/AdminTaskCategoryDetailPageTaskTypeTab.vue');
-const AdminWorkflowPage = () => import('@/services/ops-flow/pages/admin/AdminWorkflowPage.vue');
 
 const adminOpsFlowRoutes: RouteConfig = {
     path: 'ops-flow',
@@ -60,15 +59,6 @@ const adminOpsFlowRoutes: RouteConfig = {
                     ],
                 },
             ],
-        },
-        {
-            path: 'workflow/:workflowId?',
-            name: makeAdminRouteName(OPS_FLOW_ROUTE.WORKFLOW._NAME),
-            meta: {
-                menuId: MENU_ID.WORKFLOW,
-                translationId: MENU_INFO_MAP[MENU_ID.WORKFLOW].translationId,
-            },
-            component: AdminWorkflowPage as any,
         },
     ],
 };

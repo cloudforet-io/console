@@ -110,7 +110,6 @@ export const ADMIN_MENU_LIST: Menu[] = [
         id: MENU_ID.OPS_FLOW,
         subMenuList: [
             { id: MENU_ID.TASK_MANAGEMENT },
-            { id: MENU_ID.WORKFLOW },
         ],
     },
     {
