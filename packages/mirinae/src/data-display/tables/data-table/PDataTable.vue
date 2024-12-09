@@ -557,7 +557,7 @@ export default defineComponent<DataTableProps, any>({
         /* Event Handlers */
         const onRowLeftClick = (item, index, event) => {
             const disabled = props.getRowSelectable
-                ? props.getRowSelectable(item, index)
+                ? !props.getRowSelectable(item, index)
                 : false;
             if (disabled) return;
             emit('rowLeftClick', item, index, event);
