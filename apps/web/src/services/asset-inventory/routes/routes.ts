@@ -2,72 +2,77 @@ import type { RouteConfig } from 'vue-router';
 
 import { upperCase } from 'lodash';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
+import { pinia } from '@/store/pinia';
+import { useUserStore } from '@/store/user/user-store';
 
+import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
-import { ACCOUNT_TYPE_BADGE_OPTION } from '@/services/asset-inventory-v2/constants/service-account-constant';
-import { ASSET_INVENTORY_ROUTE_V2 } from '@/services/asset-inventory-v2/routes/route-constant';
+import { ACCOUNT_TYPE_BADGE_OPTION } from '@/services/asset-inventory/constants/service-account-constant';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 
-const AssetInventoryContainer = () => import('@/services/asset-inventory-v2/AssetInventoryContainer.vue');
+const AssetInventoryContainer = () => import('@/services/asset-inventory/AssetInventoryContainer.vue');
 
-const CloudServiceDetailPage = () => import('@/services/asset-inventory-v2/pages/CloudServiceDetailPage.vue');
-const CloudServiceSearch = () => import('@/services/asset-inventory-v2/pages/CloudServiceSearchPage.vue');
-const CloudServiceTypeSearch = () => import('@/services/asset-inventory-v2/pages/CloudServiceTypeSearchPage.vue');
-const CloudServicePage = () => import('@/services/asset-inventory-v2/pages/CloudServicePage.vue');
+const CloudServiceDetailPage = () => import('@/services/asset-inventory/pages/CloudServiceDetailPage.vue');
+const CloudServiceSearch = () => import('@/services/asset-inventory/pages/CloudServiceSearchPage.vue');
+const CloudServiceTypeSearch = () => import('@/services/asset-inventory/pages/CloudServiceTypeSearchPage.vue');
+
+const CloudServicePage = () => import('@/services/asset-inventory/pages/CloudServicePage.vue');
 const NoResourcePage = () => import('@/common/pages/NoResourcePage.vue');
 
-const MetricExplorerMainPage = () => import('@/services/asset-inventory-v2/pages/MetricExplorerMainPage.vue');
-const MetricExplorerDetailPage = () => import('@/services/asset-inventory-v2/pages/MetricExplorerDetailPage.vue');
+const MetricExplorerMainPage = () => import('@/services/asset-inventory/pages/MetricExplorerMainPage.vue');
+const MetricExplorerDetailPage = () => import('@/services/asset-inventory/pages/MetricExplorerDetailPage.vue');
 
-const AdminCollectorMainPage = () => import('@/services/asset-inventory-v2/pages/admin/AdminCollectorMainPage.vue');
-const AdminCollectorCreatePage = () => import('@/services/asset-inventory-v2/pages/admin/AdminCollectorCreatePage.vue');
-const AdminCollectorHistoryPage = () => import('@/services/asset-inventory-v2/pages/admin/AdminCollectorHistoryPage.vue');
-const AdminCollectHistoryJobPage = () => import('@/services/asset-inventory-v2/pages/admin/AdminCollectHistoryJobPage.vue');
-const AdminCollectorDetailPage = () => import('@/services/asset-inventory-v2/pages/admin/AdminCollectorDetailPage.vue');
+const CollectorMainPage = () => import('@/services/asset-inventory/pages/CollectorMainPage.vue');
+const CreateCollectorPage = () => import('@/services/asset-inventory/pages/CollectorCreatePage.vue');
 
-const ServiceAccountPage = () => import('@/services/asset-inventory-v2/pages/ServiceAccountPage.vue');
-const ServiceAccountDetailPage = () => import('@/services/asset-inventory-v2/pages/ServiceAccountDetailPage.vue');
-const ServiceAccountAddPage = () => import('@/services/asset-inventory-v2/pages/ServiceAccountAddPage.vue');
+const ServiceAccountPage = () => import('@/services/asset-inventory/pages/ServiceAccountPage.vue');
+const ServiceAccountDetailPage = () => import('@/services/asset-inventory/pages/ServiceAccountDetailPage.vue');
+const ServiceAccountAddPage = () => import('@/services/asset-inventory/pages/ServiceAccountAddPage.vue');
 
+const CollectorHistoryPage = () => import('@/services/asset-inventory/pages/CollectorHistoryPage.vue');
+const CollectJobPage = () => import('@/services/asset-inventory/pages/CollectHistoryJobPage.vue');
+const CollectorDetailPage = () => import('@/services/asset-inventory/pages/CollectorDetailPage.vue');
 
-const adminAssetInventoryRoute: RouteConfig = {
+const userStore = useUserStore(pinia);
+
+const assetInventoryRoute: RouteConfig = {
     path: 'asset-inventory',
-    name: makeAdminRouteName(ASSET_INVENTORY_ROUTE_V2._NAME),
-    meta: { menuId: MENU_ID.ASSET_INVENTORY, translationId: MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY].translationId },
-    redirect: () => ({ name: makeAdminRouteName(ASSET_INVENTORY_ROUTE_V2.CLOUD_SERVICE._NAME) }),
+    name: ASSET_INVENTORY_ROUTE._NAME,
+    meta: {
+        menuId: MENU_ID.ASSET_INVENTORY,
+        translationId: MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY].translationId,
+    },
+    redirect: (to) => getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap),
     component: AssetInventoryContainer,
     children: [
         {
             path: 'cloud-service',
-            meta: {
-                menuId: MENU_ID.CLOUD_SERVICE,
-                translationId: MENU_INFO_MAP[MENU_ID.CLOUD_SERVICE].translationId,
-            },
+            meta: { menuId: MENU_ID.CLOUD_SERVICE, translationId: MENU_INFO_MAP[MENU_ID.CLOUD_SERVICE].translationId },
             component: { template: '<router-view />' },
             children: [
                 {
                     path: '/',
-                    name: makeAdminRouteName(ASSET_INVENTORY_ROUTE_V2.CLOUD_SERVICE._NAME),
-                    meta: { lsbVisible: true },
+                    name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
+                    meta: { lsbVisible: true, menuId: MENU_ID.CLOUD_SERVICE },
                     component: CloudServicePage as any,
                 },
                 {
                     path: 'search/:searchKey/:id',
-                    name: makeAdminRouteName(ASSET_INVENTORY_ROUTE_V2.CLOUD_SERVICE.SEARCH._NAME),
+                    name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.SEARCH._NAME,
                     props: true,
                     component: CloudServiceSearch,
                 },
                 {
                     path: 'type/search/:id',
-                    name: makeAdminRouteName(ASSET_INVENTORY_ROUTE_V2.CLOUD_SERVICE.TYPE_SEARCH._NAME),
+                    name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.TYPE_SEARCH._NAME,
                     props: true,
                     component: CloudServiceTypeSearch,
                 },
                 {
                     path: 'no-resource',
-                    name: makeAdminRouteName(ASSET_INVENTORY_ROUTE_V2.CLOUD_SERVICE.NO_RESOURCE._NAME),
+                    name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.NO_RESOURCE._NAME,
                     meta: { lsbVisible: true, translationId: 'COMMON.ERROR.NO_RESOURCE_TITLE' },
                     component: NoResourcePage as any,
                 },
@@ -78,7 +83,7 @@ const adminAssetInventoryRoute: RouteConfig = {
                     children: [
                         {
                             path: ':name?',
-                            name: makeAdminRouteName(ASSET_INVENTORY_ROUTE_V2.CLOUD_SERVICE.DETAIL._NAME),
+                            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                             meta: { lsbVisible: true, label: ({ params }) => params.name },
                             props: true,
                             component: CloudServiceDetailPage as any,
@@ -94,15 +99,16 @@ const adminAssetInventoryRoute: RouteConfig = {
             children: [
                 {
                     path: '/',
-                    name: makeAdminRouteName(ASSET_INVENTORY_ROUTE_V2.COLLECTOR._NAME),
+                    name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME,
+                    meta: { menuId: MENU_ID.COLLECTOR },
                     props: true,
-                    component: AdminCollectorMainPage as any,
+                    component: CollectorMainPage as any,
                 },
                 {
                     path: 'create',
-                    name: makeAdminRouteName(ASSET_INVENTORY_ROUTE_V2.COLLECTOR.CREATE._NAME),
+                    name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME,
                     meta: { translationId: 'PLUGIN.COLLECTOR.CREATE.TITLE', centeredLayout: true },
-                    component: AdminCollectorCreatePage as any,
+                    component: CreateCollectorPage as any,
                 },
                 {
                     path: 'history',
@@ -111,24 +117,24 @@ const adminAssetInventoryRoute: RouteConfig = {
                     children: [
                         {
                             path: '/',
-                            name: makeAdminRouteName(ASSET_INVENTORY_ROUTE_V2.COLLECTOR.HISTORY._NAME),
-                            component: AdminCollectorHistoryPage as any,
+                            name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
+                            component: CollectorHistoryPage as any,
                         },
                         {
                             path: ':jobId',
-                            name: makeAdminRouteName(ASSET_INVENTORY_ROUTE_V2.COLLECTOR.HISTORY.JOB._NAME),
+                            name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME,
                             meta: { label: ({ params }) => params.jobId, copiable: true },
                             props: true,
-                            component: AdminCollectHistoryJobPage as any,
+                            component: CollectJobPage as any,
                         },
                     ],
                 },
                 {
                     path: ':collectorId',
-                    name: makeAdminRouteName(ASSET_INVENTORY_ROUTE_V2.COLLECTOR.DETAIL._NAME),
+                    name: ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
                     props: true,
                     meta: { label: ({ params }) => params.collectorId, copiable: true },
-                    component: AdminCollectorDetailPage as any,
+                    component: CollectorDetailPage as any,
                 },
             ],
         },
@@ -139,27 +145,27 @@ const adminAssetInventoryRoute: RouteConfig = {
             children: [
                 {
                     path: '/',
-                    name: makeAdminRouteName(ASSET_INVENTORY_ROUTE_V2.SERVICE_ACCOUNT._NAME),
+                    name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
                     meta: { menuId: MENU_ID.SERVICE_ACCOUNT },
                     props: true,
                     component: ServiceAccountPage as any,
                 },
                 {
                     path: 'no-resource',
-                    name: makeAdminRouteName(ASSET_INVENTORY_ROUTE_V2.SERVICE_ACCOUNT.NO_RESOURCE._NAME),
+                    name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.NO_RESOURCE._NAME,
                     meta: { translationId: 'COMMON.ERROR.NO_RESOURCE_TITLE' },
                     component: NoResourcePage as any,
                 },
                 {
                     path: ':serviceAccountId',
-                    name: makeAdminRouteName(ASSET_INVENTORY_ROUTE_V2.SERVICE_ACCOUNT.DETAIL._NAME),
+                    name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
                     meta: { label: ({ params }) => params.serviceAccountId, copiable: true },
                     props: true,
                     component: ServiceAccountDetailPage,
                 },
                 {
                     path: 'add/:provider/:serviceAccountType',
-                    name: makeAdminRouteName(ASSET_INVENTORY_ROUTE_V2.SERVICE_ACCOUNT.ADD._NAME),
+                    name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME,
                     meta: {
                         translationId: ({ params }) => (['IDENTITY.SERVICE_ACCOUNT.ADD.TITLE', {
                             type: ACCOUNT_TYPE_BADGE_OPTION[params.serviceAccountType].label,
@@ -177,20 +183,27 @@ const adminAssetInventoryRoute: RouteConfig = {
             children: [
                 {
                     path: '/',
-                    name: makeAdminRouteName(ASSET_INVENTORY_ROUTE_V2.METRIC_EXPLORER._NAME),
+                    name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER._NAME,
                     meta: { menuId: MENU_ID.METRIC_EXPLORER, lsbVisible: true },
                     component: MetricExplorerMainPage as any,
                 },
                 {
                     path: ':metricId',
-                    name: makeAdminRouteName(ASSET_INVENTORY_ROUTE_V2.METRIC_EXPLORER.DETAIL._NAME),
+                    name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
                     meta: { label: ({ params }) => params.metricId, lsbVisible: true },
                     props: true,
                     component: { template: '<router-view />' },
                     children: [
                         {
                             path: '/',
-                            name: makeAdminRouteName(ASSET_INVENTORY_ROUTE_V2.METRIC_EXPLORER.DETAIL._NAME),
+                            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+                            meta: { label: ({ params }) => params.metricExampleId, lsbVisible: true },
+                            props: true,
+                            component: MetricExplorerDetailPage as any,
+                        },
+                        {
+                            path: ':metricExampleId',
+                            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
                             meta: { label: ({ params }) => params.metricExampleId, lsbVisible: true },
                             props: true,
                             component: MetricExplorerDetailPage as any,
@@ -201,5 +214,4 @@ const adminAssetInventoryRoute: RouteConfig = {
         },
     ],
 };
-
-export default adminAssetInventoryRoute;
+export default assetInventoryRoute;
