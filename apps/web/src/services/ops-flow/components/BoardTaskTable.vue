@@ -16,9 +16,13 @@ import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
 import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
 import type { TaskModel } from '@/schema/opsflow/task/model';
 
+import { useUserReferenceStore } from '@/store/reference/user-reference-store';
+
 import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import { useTimezoneDate } from '@/common/composables/timezone-date';
+import ProjectLinkButton from '@/common/modules/project/ProjectLinkButton.vue';
 
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
@@ -31,6 +35,7 @@ const boardPageState = boardPageStore.state;
 const taskStore = useTaskStore();
 const taskTypeStore = useTaskTypeStore();
 const taskCategoryStore = useTaskCategoryStore();
+const userReferenceStore = useUserReferenceStore();
 
 const loading = ref<boolean>(false);
 const tasks = ref<TaskModel[]|undefined>(undefined);
@@ -65,6 +70,7 @@ const getStatusStyleType = (category: TaskCategoryModel|undefined, statusId: str
     }
     return statusOption.color;
 };
+const { getTimezoneDate } = useTimezoneDate();
 
 /* query */
 const search = ref<string>('');
@@ -158,37 +164,36 @@ const fields: DataTableField[] = [
     {
         name: 'name',
         label: 'Title',
-        width: '10%',
+        width: '13rem',
     },
     {
         name: 'description',
         label: 'Description',
-        width: '15%',
+        width: '15rem',
     },
     {
         name: 'task_type_id',
         label: 'Topic',
-        width: '10%',
     },
     {
         name: 'status_id',
         label: 'Status',
-        width: '10%',
     },
     {
         name: 'project_id',
         label: 'Project',
-        width: '10%',
     },
     {
         name: 'assignee',
         label: 'Assignee',
-        width: '10%',
+    },
+    {
+        name: 'created_by',
+        label: 'Created By',
     },
     {
         name: 'created_at',
         label: 'Created At',
-        width: '10%',
     },
 ];
 const { getProperRouteLocation } = useProperRouteLocation();
@@ -211,15 +216,18 @@ const { getProperRouteLocation } = useProperRouteLocation();
         </div>
         <p-data-table :fields="fields"
                       :items="tasks"
+                      class="w-auto"
         >
             <template #col-name-format="{item}">
-                <p-link :text="item.name"
-                        :to="getProperRouteLocation({
-                            name: OPS_FLOW_ROUTE.BOARD.TASK_DETAIL._NAME,
-                            params: {taskId: item.task_id},
-                        })"
-                        highlight
-                />
+                <p-collapsible-panel :line-clamp="1">
+                    <p-link :text="item.name"
+                            :to="getProperRouteLocation({
+                                name: OPS_FLOW_ROUTE.BOARD.TASK_DETAIL._NAME,
+                                params: {taskId: item.task_id},
+                            })"
+                            highlight
+                    />
+                </p-collapsible-panel>
             </template>
             <template #col-description-format="{item}">
                 <p-collapsible-panel :line-clamp="1">
@@ -239,6 +247,18 @@ const { getProperRouteLocation } = useProperRouteLocation();
                 >
                     {{ getStatusName(categoriesById[item.category_id], item.status_id, item.status_type) }}
                 </p-badge>
+            </template>
+            <template #col-project_id-format="{value}">
+                <project-link-button :project-id="value" />
+            </template>
+            <template #col-assignee-format="{value}">
+                {{ userReferenceStore.getters.userItems[value]?.label || userReferenceStore.getters.userItems[value]?.name || value }}
+            </template>
+            <template #col-created_by-format="{value}">
+                {{ userReferenceStore.getters.userItems[value]?.label || userReferenceStore.getters.userItems[value]?.name || value }}
+            </template>
+            <template #col-created_at-format="{value}">
+                {{ getTimezoneDate(value) }}
             </template>
         </p-data-table>
     </p-pane-layout>
