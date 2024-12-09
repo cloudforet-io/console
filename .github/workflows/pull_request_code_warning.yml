@@ -36,7 +36,7 @@ jobs:
         id: check_todo
         run: |
           echo "Checking for TODOs..."
-          TODO_FILES=$(grep -rl "TODO" . --exclude-dir={node_modules,.git,apps/web/public/lottie.js,.github} || true)
+          TODO_FILES=$(grep -rl "TODO" . --exclude-dir={node_modules,.git,./apps/web/public/lottie.js,.github} || true)
           TODO_COUNT=0
           if [ -n "$TODO_FILES" ]; then
             echo "The following files contain TODO:"
