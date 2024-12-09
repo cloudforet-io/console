@@ -1,5 +1,5 @@
 import type { Ref } from 'vue';
-import { reactive, toRef } from 'vue';
+import { reactive, toRef, computed } from 'vue';
 
 import { defineStore } from 'pinia';
 
@@ -23,7 +23,10 @@ import ko from '../translations/ko.json';
 interface TaskManagementTemplate {
     templateName: string;
     taskCategory: string;
+    allTaskCategories: string;
     taskType: string;
+    createTaskType: string;
+    editTaskType: string;
     createTask: string;
     taskProgress: string;
     landingTitle?: string;
@@ -55,11 +58,18 @@ export const useTaskManagementTemplateStore = defineStore('task-management-templ
         templateId: 'default',
     });
 
-    const translate = (code: keyof TaskManagementTemplate, type?: TaskManagementTemplateType) => {
+    const translate = (code: keyof TaskManagementTemplate, type?: TaskManagementTemplateType) => computed(() => {
         const lang = i18n.locale as SupportLanguage;
         const _type = type ?? state.templateId;
-        return messages[lang][_type][code] || messages.en[_type][code];
-    };
+        const msg = messages[lang][_type][code] || messages.en[_type][code];
+        console.debug('translate', lang, _type, code, 'msg', msg, typeof msg);
+        return msg;
+    });
+    const templates = computed<TaskManagementTemplate>(() => {
+        const lang = i18n.locale as SupportLanguage;
+        const type = state.templateId;
+        return messages[lang][type] || messages.en[type];
+    });
     const setInitialTemplateId = async () => {
         if (templateData.value?.template_id) {
             state.templateId = templateData.value.template_id;
@@ -83,9 +93,12 @@ export const useTaskManagementTemplateStore = defineStore('task-management-templ
             state.templateId = prev;
         }
     };
+
+    setInitialTemplateId();
     return {
         state,
         translate,
+        templates,
         setInitialTemplateId,
         updateTemplateId,
     };

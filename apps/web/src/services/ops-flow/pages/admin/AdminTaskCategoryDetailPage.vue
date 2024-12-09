@@ -39,6 +39,9 @@ import TaskTypeForm from '@/services/ops-flow/components/TaskTypeForm.vue';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
+import {
+    useTaskManagementTemplateStore,
+} from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
 const props = defineProps<{
     taskCategoryId: string;
@@ -48,7 +51,7 @@ const route = useRoute();
 
 const taskCategoryPageStore = useTaskCategoryPageStore();
 const taskCategoryStore = useTaskCategoryStore();
-
+const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
 /* header and back button */
 const loading = computed<boolean>(() => taskCategoryStore.getters.loading);
@@ -69,7 +72,7 @@ const tabs = computed<TabItem<object>[]>(() => [
     },
     {
         name: 'taskType',
-        label: 'Ticket Topic', // TODO: i18n & template
+        label: taskManagementTemplateStore.templates.taskType,
         keepAlive: true,
     },
 ]);

@@ -23,12 +23,16 @@ import {
     useTaskFieldsConfiguration,
 } from '@/services/ops-flow/task-fields-configuration/composables/use-task-fields-configuration';
 import TaskFieldsConfiguration from '@/services/ops-flow/task-fields-configuration/TaskFieldsConfiguration.vue';
+import {
+    useTaskManagementTemplateStore,
+} from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
 
 const taskCategoryPageStore = useTaskCategoryPageStore();
 const taskCategoryPageState = taskCategoryPageStore.state;
 const taskCategoryPageGetters = taskCategoryPageStore.getters;
 const taskTypeStore = useTaskTypeStore();
+const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
 
 /* task field configuration */
@@ -178,7 +182,8 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
 </script>
 
 <template>
-    <p-overlay-layout :title="taskCategoryPageGetters.targetTaskType ? 'Edit Ticket Topic' : 'Add Ticket Topic'"
+    <p-overlay-layout :title="taskCategoryPageGetters.targetTaskType ?
+                          taskManagementTemplateStore.templates.editTaskType : taskManagementTemplateStore.templates.createTaskType"
                       :visible="taskCategoryPageState.visibleTaskTypeForm"
                       size="lg"
                       @close="handleCancelOrClose"

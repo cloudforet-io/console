@@ -1,6 +1,8 @@
 {
 	"default": {
 		"createTask": "Create Task",
+		"createTaskType": "Add Task Type",
+		"editTaskType": "Edit Task Type",
 		"taskCategory": "Task Category",
 		"taskProgress": "Task Progress",
 		"taskType": "Task Type",
@@ -8,6 +10,8 @@
 	},
 	"service-desk": {
 		"createTask": "Create Ticket",
+		"createTaskType": "Add Request Type",
+		"editTaskType": "Edit Request Type",
 		"taskCategory": "Support Category",
 		"taskProgress": "Ticket Progress",
 		"taskType": "Request Type",

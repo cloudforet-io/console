@@ -11,6 +11,9 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import BoardTaskTable from '@/services/ops-flow/components/BoardTaskTable.vue';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useBoardPageStore } from '@/services/ops-flow/stores/board-page-store';
+import {
+    useTaskManagementTemplateStore,
+} from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 import type { TaskCreatePageQuery } from '@/services/ops-flow/types/task-create-page-type';
 
 const route = useRoute();
@@ -18,6 +21,7 @@ const route = useRoute();
 const { getProperRouteLocation } = useProperRouteLocation();
 
 const boardPageStore = useBoardPageStore();
+const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
 const taskCreatePageLink = computed(() => getProperRouteLocation({
     name: OPS_FLOW_ROUTE.BOARD.TASK_CREATE._NAME,
@@ -44,7 +48,7 @@ watch(() => route.query.categoryId, (categoryId) => {
                     <p-button icon-left="ic_plus_bold"
                               @click="navigate"
                     >
-                        Create Ticket
+                        {{ taskManagementTemplateStore.templates.createTask }}
                     </p-button>
                 </router-link>
             </template>

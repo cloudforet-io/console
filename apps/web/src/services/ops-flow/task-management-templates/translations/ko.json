@@ -1,6 +1,8 @@
 {
 	"default": {
 		"createTask": "",
+		"createTaskType": "",
+		"editTaskType": "",
 		"taskCategory": "",
 		"taskProgress": "",
 		"taskType": "",
@@ -8,6 +10,8 @@
 	},
 	"service-desk": {
 		"createTask": "",
+		"createTaskType": "",
+		"editTaskType": "",
 		"taskCategory": "",
 		"taskProgress": "",
 		"taskType": "",

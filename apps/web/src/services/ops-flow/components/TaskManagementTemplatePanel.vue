@@ -22,7 +22,7 @@ const taskManagementTemplateState = taskManagementTemplateStore.state;
 const state = reactive({
     templateMenuItems: computed<SelectDropdownMenuItem[]>(() => TASK_MANAGEMENT_TEMPLATE_TYPES.map((templateType) => ({
         name: templateType,
-        label: taskManagementTemplateStore.translate('templateName', templateType),
+        label: taskManagementTemplateStore.translate('templateName', templateType).value,
     }))),
 });
 
@@ -30,8 +30,6 @@ const handleSelectTemplate = async (templateId: TaskManagementTemplateType) => {
     if (templateId === taskManagementTemplateState.templateId) return;
     await taskManagementTemplateStore.updateTemplateId(templateId);
 };
-
-taskManagementTemplateStore.setInitialTemplateId();
 </script>
 
 <template>

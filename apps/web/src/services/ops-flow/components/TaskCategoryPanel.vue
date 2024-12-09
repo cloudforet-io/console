@@ -62,7 +62,7 @@ const state = reactive({
     <p-pane-layout>
         <p-heading-layout class="pt-6 px-4 mb-2">
             <template #heading>
-                <p-heading :title="taskManagementTemplateStore.translate('taskCategory')"
+                <p-heading :title="taskManagementTemplateStore.templates.taskCategory"
                            heading-type="sub"
                 />
             </template>

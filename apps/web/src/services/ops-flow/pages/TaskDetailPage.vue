@@ -50,6 +50,9 @@ import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
 import { useTaskDetailPageStore } from '@/services/ops-flow/stores/task-detail-page-store';
 import { useTaskStore } from '@/services/ops-flow/stores/task-store';
+import {
+    useTaskManagementTemplateStore,
+} from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 import type { BoardPageQuery } from '@/services/ops-flow/types/board-page-type';
 import type { TaskCreatePageQueryValue } from '@/services/ops-flow/types/task-create-page-type';
 
@@ -67,6 +70,7 @@ const taskContentFormStore = useTaskContentFormStore();
 const taskContentFormState = taskContentFormStore.state;
 const taskContentFormGetters = taskContentFormStore.getters;
 const taskStore = useTaskStore();
+const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
 /* task */
 const task = ref<TaskModel|undefined>();
@@ -123,7 +127,7 @@ const tabs = computed<TabItem<object>[]>(() => [
     },
     {
         name: 'progress',
-        label: 'Progress', // TODO: i18n & template
+        label: taskManagementTemplateStore.templates.taskProgress,
         keepAlive: true,
     },
 ]);

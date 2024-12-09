@@ -9,10 +9,14 @@ import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tabl
 import ActionMenuButton from '@/common/components/buttons/ActionMenuButton.vue';
 
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
+import {
+    useTaskManagementTemplateStore,
+} from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
 
 const taskCategoryPageStore = useTaskCategoryPageStore();
 const taskCategoryPageGetters = taskCategoryPageStore.getters;
+const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
 const taskTypeFields = computed<DataTableField[]>(() => [
     {
@@ -37,7 +41,7 @@ const taskTypeFields = computed<DataTableField[]>(() => [
         <p-heading-layout>
             <template #heading>
                 <p-heading heading-type="sub">
-                    Ticket Topic
+                    {{ taskManagementTemplateStore.templates.taskType }}
                 </p-heading>
             </template>
             <template #extra>
@@ -48,7 +52,7 @@ const taskTypeFields = computed<DataTableField[]>(() => [
                           icon-left="ic_plus_bold"
                           @click="taskCategoryPageStore.openAddTaskTypeForm()"
                 >
-                    Add Ticket Topic
+                    {{ taskManagementTemplateStore.templates.createTaskType }}
                 </p-button>
             </template>
         </p-heading-layout>

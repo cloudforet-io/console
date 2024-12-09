@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    reactive, ref, watch, toRaw,
+    reactive, ref, watch, toRaw, computed,
 } from 'vue';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -29,6 +29,9 @@ import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-cate
 import { useBoardPageStore } from '@/services/ops-flow/stores/board-page-store';
 import { useTaskStore } from '@/services/ops-flow/stores/task-store';
 import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
+import {
+    useTaskManagementTemplateStore,
+} from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
 const boardPageStore = useBoardPageStore();
 const boardPageState = boardPageStore.state;
@@ -36,6 +39,7 @@ const taskStore = useTaskStore();
 const taskTypeStore = useTaskTypeStore();
 const taskCategoryStore = useTaskCategoryStore();
 const userReferenceStore = useUserReferenceStore();
+const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
 const loading = ref<boolean>(false);
 const tasks = ref<TaskModel[]|undefined>(undefined);
@@ -160,7 +164,7 @@ const handleChange = (options: ToolboxOptions) => {
 };
 
 /* table */
-const fields: DataTableField[] = [
+const fields = computed<DataTableField[] >(() => [
     {
         name: 'name',
         label: 'Title',
@@ -173,7 +177,7 @@ const fields: DataTableField[] = [
     },
     {
         name: 'task_type_id',
-        label: 'Topic',
+        label: taskManagementTemplateStore.templates.taskType,
     },
     {
         name: 'status_id',
@@ -195,7 +199,7 @@ const fields: DataTableField[] = [
         name: 'created_at',
         label: 'Created At',
     },
-];
+]);
 const { getProperRouteLocation } = useProperRouteLocation();
 </script>
 
