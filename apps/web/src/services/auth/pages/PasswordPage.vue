@@ -86,11 +86,9 @@
 <script setup lang="ts">
 import type { ComponentPublicInstance, ComputedRef } from 'vue';
 import {
-    computed,
-    getCurrentInstance, onMounted, reactive, ref,
+    computed, onMounted, reactive, ref,
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
-import type { Vue } from 'vue/types/vue';
 
 import dayjs from 'dayjs';
 import type { JwtPayload } from 'jwt-decode';
@@ -135,7 +133,6 @@ const props = withDefaults(defineProps<Props>(), {
 
 const passwordFormEl = ref<ComponentPublicInstance<PasswordFormExpose>>();
 
-const vm = getCurrentInstance()?.proxy as Vue;
 const router = useRouter();
 const route = useRoute();
 
@@ -195,7 +192,7 @@ const handleClickButton = () => {
     resetInputs();
 };
 const getSSOTokenFromUrl = (): string|undefined => {
-    const query = vm.$router.currentRoute.query;
+    const query = router.currentRoute.query;
     return query.sso_access_token as string;
 };
 const getUserIdFromToken = (ssoAccessToken: string): string | undefined => {

@@ -95,9 +95,9 @@
 <script lang="ts">
 import { useInfiniteScroll } from '@vueuse/core';
 import {
-    computed, getCurrentInstance, onMounted, reactive, toRefs, watch,
+    computed, onMounted, reactive, toRefs, watch,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
+import { useRoute } from 'vue-router/composables';
 
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
@@ -190,7 +190,7 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as Vue;
+        const route = useRoute();
         const userStore = useUserStore();
         const state = reactive({
             loading: true,
@@ -202,7 +202,7 @@ export default {
             noteItemMap: {} as { [key: string]: NoteModel[] },
             selectedHistoryItem: undefined as undefined | CloudServiceHistoryItem,
             selectedKeyName: undefined as undefined | string,
-            showDetailOverlay: computed(() => vm.$route.hash === `#${HISTORY_OVERLAY_HASH_NAME}`),
+            showDetailOverlay: computed(() => route.hash === `#${HISTORY_OVERLAY_HASH_NAME}`),
             totalCount: 0,
             pageStart: 1,
             searchText: '',
