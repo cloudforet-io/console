@@ -11,6 +11,8 @@ import type { _GroupByOptions } from '@/common/modules/widgets/_widget-fields/gr
 import { ICON_FIELD_ITEMS } from '@/common/modules/widgets/_widget-fields/icon/constant';
 import type { IconOptions } from '@/common/modules/widgets/_widget-fields/icon/type';
 import type { _LegendOptions } from '@/common/modules/widgets/_widget-fields/legend/type';
+import type { MaxOptions } from '@/common/modules/widgets/_widget-fields/max/type';
+import type { MinOptions } from '@/common/modules/widgets/_widget-fields/min/type';
 import type { StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
 import type { XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { YAxisOptions } from '@/common/modules/widgets/_widget-fields/y-axis/type';
@@ -63,8 +65,12 @@ export const widgetFieldDefaultValueMap: DefaultValueRegistry = {
         toggleValue: true,
         position: 'right',
     },
-    max: {},
-    min: {},
+    max: {
+        max: 0,
+    },
+    min: {
+        min: 0,
+    },
     missingValue: {},
     numberFormat: {},
     pieChartType: {},
@@ -252,8 +258,28 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
         }
         return undefined;
     },
-    max: () => widgetFieldDefaultValueMap.max,
-    min: () => widgetFieldDefaultValueMap.min,
+    max: (widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const maxOptions = _fieldsSchema.max?.options as MaxOptions;
+
+        if (maxOptions.default !== undefined) {
+            return {
+                max: maxOptions.default,
+            };
+        }
+        return widgetFieldDefaultValueMap.max;
+    },
+    min: (widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const minOptions = _fieldsSchema.min?.options as MinOptions;
+
+        if (minOptions.default !== undefined) {
+            return {
+                min: minOptions.default,
+            };
+        }
+        return widgetFieldDefaultValueMap.min;
+    },
     missingValue: () => widgetFieldDefaultValueMap.missingValue,
     numberFormat: () => widgetFieldDefaultValueMap.numberFormat,
     pieChartType: () => widgetFieldDefaultValueMap.pieChartType,

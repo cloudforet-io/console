@@ -14,6 +14,8 @@ import type { _GroupByOptions, _GroupByValue } from '@/common/modules/widgets/_w
 import type { WidgetHeaderValue } from '@/common/modules/widgets/_widget-fields/header/type';
 import { ICON_FIELD_ITEMS } from '@/common/modules/widgets/_widget-fields/icon/constant';
 import type { _IconValue } from '@/common/modules/widgets/_widget-fields/icon/type';
+import type { MaxValue } from '@/common/modules/widgets/_widget-fields/max/type';
+import type { MinValue } from '@/common/modules/widgets/_widget-fields/min/type';
 import type { _StackByValue, StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
 import type { _XAxisValue, XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { _YAxisValue, YAxisOptions } from '@/common/modules/widgets/_widget-fields/y-axis/type';
@@ -125,6 +127,16 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
         return !!fieldValue.color && !!fieldValue.icon && ICON_FIELD_ITEMS.some((item) => item.name === fieldValue.icon?.name);
     },
     legend: () => true,
+    max: (fieldValue: MaxValue) => {
+        if (typeof fieldValue.max !== 'number') return false;
+        if (fieldValue.max < 0) return false;
+        return true;
+    },
+    min: (fieldValue: MinValue) => {
+        if (typeof fieldValue.min !== 'number') return false;
+        if (fieldValue.min < 0) return false;
+        return true;
+    },
 };
 
 
