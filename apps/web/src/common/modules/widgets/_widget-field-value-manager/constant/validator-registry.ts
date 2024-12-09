@@ -137,6 +137,7 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
         if (fieldValue.min < 0) return false;
         return true;
     },
+    missingValue: () => true,
 };
 
 

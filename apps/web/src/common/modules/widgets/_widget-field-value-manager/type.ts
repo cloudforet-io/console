@@ -19,7 +19,7 @@ import type { _IconValue } from '@/common/modules/widgets/_widget-fields/icon/ty
 import type { LegendValue } from '@/common/modules/widgets/_widget-fields/legend/type';
 import type { MaxValue } from '@/common/modules/widgets/_widget-fields/max/type';
 import type { MinValue } from '@/common/modules/widgets/_widget-fields/min/type';
-import type { MissingValueValue } from '@/common/modules/widgets/_widget-fields/missing-value/type';
+import type { _MissingValueValue } from '@/common/modules/widgets/_widget-fields/missing-value/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type { PieChartTypeValue } from '@/common/modules/widgets/_widget-fields/pie-chart-type/type';
 import type { ProgressBarValue } from '@/common/modules/widgets/_widget-fields/progress-bar/type';
@@ -59,7 +59,7 @@ export interface WidgetFieldTypeMap {
     progressBar: WidgetFieldValue<ProgressBarValue>;
     pieChartType: WidgetFieldValue<PieChartTypeValue>;
     numberFormat: WidgetFieldValue<NumberFormatValue>;
-    missingValue: WidgetFieldValue<MissingValueValue>;
+    missingValue: WidgetFieldValue<_MissingValueValue>;
     min: WidgetFieldValue<MinValue>;
     max: WidgetFieldValue<MaxValue>;
     legend: WidgetFieldValue<LegendValue>;

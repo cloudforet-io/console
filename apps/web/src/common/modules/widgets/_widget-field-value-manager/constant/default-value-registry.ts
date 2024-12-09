@@ -13,6 +13,7 @@ import type { IconOptions } from '@/common/modules/widgets/_widget-fields/icon/t
 import type { _LegendOptions } from '@/common/modules/widgets/_widget-fields/legend/type';
 import type { MaxOptions } from '@/common/modules/widgets/_widget-fields/max/type';
 import type { MinOptions } from '@/common/modules/widgets/_widget-fields/min/type';
+import type { MissingValueOptions } from '@/common/modules/widgets/_widget-fields/missing-value/type';
 import type { StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
 import type { XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { YAxisOptions } from '@/common/modules/widgets/_widget-fields/y-axis/type';
@@ -71,7 +72,9 @@ export const widgetFieldDefaultValueMap: DefaultValueRegistry = {
     min: {
         min: 0,
     },
-    missingValue: {},
+    missingValue: {
+        type: 'lineToZero',
+    },
     numberFormat: {},
     pieChartType: {},
     progressBar: {},
@@ -280,7 +283,17 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
         }
         return widgetFieldDefaultValueMap.min;
     },
-    missingValue: () => widgetFieldDefaultValueMap.missingValue,
+    missingValue: (widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const missingValueOptions = _fieldsSchema.missingValue?.options as MissingValueOptions;
+
+        if (missingValueOptions.default) {
+            return {
+                type: missingValueOptions.default,
+            };
+        }
+        return widgetFieldDefaultValueMap.missingValue;
+    },
     numberFormat: () => widgetFieldDefaultValueMap.numberFormat,
     pieChartType: () => widgetFieldDefaultValueMap.pieChartType,
     progressBar: () => widgetFieldDefaultValueMap.progressBar,
