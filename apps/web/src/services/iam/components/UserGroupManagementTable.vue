@@ -1,11 +1,16 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import {
+    computed, onMounted, reactive,
+} from 'vue';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
+import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PToolboxTable, PSelectDropdown } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
+import type { UserGroupListItemType } from '@/schema/identity/user-group/type';
 import { i18n } from '@/translations';
 
 import { useQueryTags } from '@/common/composables/query-tags';
@@ -26,8 +31,17 @@ const props = withDefaults(defineProps<Props>(), {
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 
+const userGroupListApiQueryHelper = new ApiQueryHelper()
+    .setPageStart(userGroupPageState.pageStart)
+    .setPageLimit(userGroupPageState.pageLimit)
+    .setSort('name', true);
+let userGroupListApiQuery = userGroupListApiQueryHelper.data;
 const queryTagHelper = useQueryTags({ keyItemSets: USER_GROUP_SEARCH_HANDLERS.keyItemSets });
 const { queryTags } = queryTagHelper;
+
+const state = reactive({
+    userGroupItems: computed<UserGroupListItemType[]>(() => userGroupPageState.userGroups),
+});
 
 const tableState = reactive({
     fields: computed<DataTableFieldType[]>(() => [
@@ -85,11 +99,38 @@ const dropdownState = reactive({
 const handleSelect = async (index) => {
     userGroupPageState.selectedIndices = index;
 };
-const handleChange = () => {
-    console.log('TODO: handleChange');
+
+// watch(() => userGroupPageGetters.selectedUserGroups, async (nv) => {
+//     if (nv.length === 1) {
+//         const usersIdList: string[] | undefined = nv[0].users;
+//         await userGroupPageStore.listUsersPerGroup({});
+//
+//         if (userGroupPageState.users.list.length > 0 && usersIdList && usersIdList.length > 0) {
+//             userGroupPageState.users.list = userGroupPageState.users.list.filter((user) => usersIdList.includes(user.user_id));
+//         }
+//     }
+// }, { deep: true, immediate: true });
+
+const handleChange = (options: any = {}) => {
+    userGroupListApiQuery = getApiQueryWithToolboxOptions(userGroupListApiQueryHelper, options) ?? userGroupListApiQuery;
+    if (options.queryTags !== undefined) {
+        userGroupPageState.searchFilters = userGroupListApiQueryHelper.filters;
+    }
+    if (options.pageStart !== undefined) userGroupPageState.pageStart = options.pageStart;
+    if (options.pageLimit !== undefined) userGroupPageState.pageLimit = options.pageLimit;
+    fetchUserGroupList();
 };
 
 /* API */
+const fetchUserGroupList = async () => {
+    userGroupPageState.loading = true;
+    try {
+        await userGroupPageStore.listUserGroups({ query: userGroupListApiQuery });
+    } finally {
+        userGroupPageState.loading = false;
+    }
+};
+
 const handleSelectDropdown = async (inputText: string) => {
     dropdownState.loading = true;
 
@@ -119,6 +160,11 @@ const handleSelectDropdown = async (inputText: string) => {
         break;
     }
 };
+
+/* Mounted */
+onMounted(async () => {
+    await fetchUserGroupList();
+});
 </script>
 
 <template>
@@ -130,24 +176,28 @@ const handleSelectDropdown = async (inputText: string) => {
                          multi-select
                          sort-desc
                          :fields="tableState.fields"
-                         :items="tableState.items"
+                         :items="state.userGroupItems"
                          :select-index="userGroupPageState.selectedIndices"
-                         :key-item-sets="USER_GROUP_SEARCH_HANDLERS.keyItemSets"
+                         :key-item-sets="USER_GROUP_SEARCH_HANDLERS"
                          :value-handler-map="tableState.valueHandlerMap"
                          :query-tags="queryTags"
                          :style="{height: `${props.tableHeight}px}`}"
                          @select="handleSelect"
                          @change="handleChange"
-                         @refresh="handleChange"
+                         @refresh="handleChange()"
         >
             <template v-if="props.hasReadWriteAccess"
                       #toolbox-left
             >
                 <p-select-dropdown
                     :menu="dropdownState.menuItems"
+                    :loading="dropdownState.loading"
                     placeholder="Action"
                     @select="handleSelectDropdown"
                 />
+            </template>
+            <template #col-users-format="{value}">
+                {{ Array.isArray(value) && value.length > 0 ? value.length : 0 }}
             </template>
         </p-toolbox-table>
     </section>

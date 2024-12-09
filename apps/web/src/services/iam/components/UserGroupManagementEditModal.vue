@@ -1,12 +1,18 @@
 <script lang="ts" setup>
 import { reactive } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal, PButton } from '@cloudforet/mirinae';
 
+import type { UserGroupCreateParameters } from '@/schema/identity/user-group/api-verbs/create';
+import type { UserGroupModel } from '@/schema/identity/user-group/model';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import UserGroupManagementAddGroupInfo from '@/services/iam/components/UserGroupManagementAddGroupInfo.vue';
-import UserGroupManagementScheduleSetting from '@/services/iam/components/UserGroupManagementScheduleSetting.vue';
 import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-constant';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
+
 
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
@@ -15,12 +21,15 @@ const emit = defineEmits<{(e: 'confirm'): void; }>();
 
 const state = reactive({
     loading: false,
+    groupName: '',
+    description: '',
 });
 
 /* Component */
-const handleConfirm = () => {
+const handleConfirm = async () => {
     state.loading = true;
     try {
+        fetchCreateUserGroup();
         emit('confirm');
     } catch (e: any) {
         console.error(e);
@@ -31,8 +40,12 @@ const handleConfirm = () => {
 };
 
 const handleClose = () => {
-    console.log('TODO: handleClose');
     userGroupPageState.modal.type = '';
+};
+
+const handleUpdateValues = (data) => {
+    state.groupName = data.groupName;
+    state.description = data.description;
 };
 
 /* API */
@@ -43,6 +56,17 @@ const handleCreate = () => {
 const handleUpdate = () => {
     console.log('TODO: Update API');
 };
+
+const fetchCreateUserGroup = async () => {
+    try {
+        await SpaceConnector.clientV2.identity.userGroup.create<UserGroupCreateParameters, UserGroupModel>({
+            name: state.groupName,
+            description: state?.description,
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
 </script>
 
 <template>
@@ -50,14 +74,14 @@ const handleUpdate = () => {
                     :header-title="userGroupPageState.modal.title"
                     :visible="userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.CREATE || userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.UPDATE"
                     size="md"
+                    :loading="state.loading"
                     @confirm="handleConfirm"
                     @cancel="handleClose"
                     @close="handleClose"
     >
         <template #body>
             <div class="modal-contents">
-                <user-group-management-add-group-info />
-                <user-group-management-schedule-setting />
+                <user-group-management-add-group-info @update:values="handleUpdateValues" />
             </div>
         </template>
         <template #confirm-button>
@@ -82,7 +106,6 @@ const handleUpdate = () => {
     min-height: 34.875rem;
     .modal-contents {
         @apply flex flex-col bg-primary-4 rounded-md;
-        margin-bottom: 9rem;
         padding: 1rem;
         gap: 1rem;
     }

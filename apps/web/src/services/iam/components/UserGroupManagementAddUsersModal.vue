@@ -9,18 +9,25 @@ import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-stor
 
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
-const userGroupPageGetters = userGroupPageStore.getters;
 
 const storeState = reactive({
-    emailList: computed<MenuItem[]>(() => userGroupPageGetters.usersPerSelectedUserGroup.map((user) => ({
+    emailList: computed<MenuItem[]>(() => userGroupPageState.users.list.map((user) => ({
+        name: user.user_id,
         label: user.user_id,
-        name: user.name,
     }))),
 });
 
-const handleConfirm = () => {};
+const state = reactive({
+    loading: false,
+});
 
-const handleClose = () => {};
+const handleConfirm = () => {
+
+};
+
+const handleClose = () => {
+    userGroupPageState.modal.type = '';
+};
 </script>
 
 <template>
@@ -28,16 +35,18 @@ const handleClose = () => {};
                     :header-title="userGroupPageState.modal.title"
                     :visible="userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.ADD_NEW_USER"
                     size="md"
+                    :loading="state.loading"
                     @confirm="handleConfirm"
                     @cancel="handleClose"
                     @close="handleClose"
     >
         <template #body>
             <div class="modal-contents">
-                <p>User</p>
+                <p>{{ $t('IAM.USER_GROUP.MODAL.ADD_NEW_USER.USER') }}</p>
                 <p-select-dropdown :menu="storeState.emailList"
                                    multi-selectable
                                    is-filterable
+                                   appearance-type="stack"
                 />
             </div>
         </template>
