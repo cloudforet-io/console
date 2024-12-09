@@ -228,7 +228,7 @@ defineExpose({ setPathFrom });
 const getCollector = async (): Promise<CollectorModel|null> => {
     state.loading = true;
     try {
-        return await SpaceConnector.clientV2.inventory.collector.get<CollectorGetParameters, CollectorModel>({
+        return await SpaceConnector.clientV2.inventoryV2.collector.get<CollectorGetParameters, CollectorModel>({
             collector_id: props.collectorId,
         });
     } catch (e) {
@@ -239,7 +239,7 @@ const getCollector = async (): Promise<CollectorModel|null> => {
     }
 };
 
-const fetchDeleteCollector = async () => (collectorFormState.collectorId ? SpaceConnector.clientV2.inventory.collector.delete<CollectorDeleteParameters>({
+const fetchDeleteCollector = async () => (collectorFormState.collectorId ? SpaceConnector.clientV2.inventoryV2.collector.delete<CollectorDeleteParameters>({
     collector_id: collectorFormState.collectorId,
 }) : undefined);
 
