@@ -1,5 +1,5 @@
 import {
-    COLOR_SCHEMA, DATE_FORMAT, DEFAULT_COMPARISON_COLOR, NUMBER_FORMAT,
+    COLOR_SCHEMA, DATE_FORMAT, DEFAULT_COMPARISON_COLOR, NUMBER_FORMAT, TABLE_DEFAULT_MINIMUM_WIDTH,
 } from '@/common/modules/widgets/_constants/widget-field-constant';
 import { integrateFieldsSchema } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
@@ -17,7 +17,11 @@ import type { MaxOptions } from '@/common/modules/widgets/_widget-fields/max/typ
 import type { MinOptions } from '@/common/modules/widgets/_widget-fields/min/type';
 import type { MissingValueOptions } from '@/common/modules/widgets/_widget-fields/missing-value/type';
 import type { NumberFormatOptions, NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
+import type { PieChartTypeOptions } from '@/common/modules/widgets/_widget-fields/pie-chart-type/type';
 import type { StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
+import type { SubTotalOptions } from '@/common/modules/widgets/_widget-fields/sub-total/type';
+import type { TableColumnWidthOptions } from '@/common/modules/widgets/_widget-fields/table-column-width/type';
+import type { TotalOptions } from '@/common/modules/widgets/_widget-fields/total/type';
 import type { XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { YAxisOptions } from '@/common/modules/widgets/_widget-fields/y-axis/type';
 
@@ -79,13 +83,18 @@ export const widgetFieldDefaultValueMap: DefaultValueRegistry = {
         type: 'lineToZero',
     },
     numberFormat: {},
-    pieChartType: {},
-    progressBar: {},
-    subTotal: {},
-    tableColumnWidth: {},
+    pieChartType: {
+        type: 'pie',
+    },
+    subTotal: undefined,
+    total: undefined,
+    tableColumnWidth: {
+        minimumWidth: TABLE_DEFAULT_MINIMUM_WIDTH,
+        widthType: 'auto',
+        fixedWidth: undefined,
+    },
     textWrap: {},
     tooltipNumberFormat: {},
-    total: {},
     widgetHeight: {},
 } as const;
 
@@ -315,12 +324,60 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
 
         return widgetFieldDefaultValueMap.numberFormat;
     },
-    pieChartType: () => widgetFieldDefaultValueMap.pieChartType,
-    progressBar: () => widgetFieldDefaultValueMap.progressBar,
-    subTotal: () => widgetFieldDefaultValueMap.subTotal,
-    tableColumnWidth: () => widgetFieldDefaultValueMap.tableColumnWidth,
+    pieChartType: (widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const pieChartTypeOptions = _fieldsSchema.pieChartType?.options as PieChartTypeOptions;
+
+        if (pieChartTypeOptions.default) {
+            return {
+                type: pieChartTypeOptions.default,
+            };
+        }
+
+        return widgetFieldDefaultValueMap.pieChartType;
+    },
+    subTotal: (widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const subTotalOptions = _fieldsSchema.subTotal?.options as SubTotalOptions;
+
+        if (subTotalOptions.toggle) {
+            return {
+                toggleValue: true,
+                freeze: subTotalOptions.default ?? false,
+            };
+        }
+
+        return widgetFieldDefaultValueMap.subTotal;
+    },
+    total: (widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const totalOptions = _fieldsSchema.total?.options as TotalOptions;
+
+        if (totalOptions.toggle) {
+            return {
+                toggleValue: true,
+                freeze: totalOptions.default ?? false,
+            };
+        }
+
+        return widgetFieldDefaultValueMap.total;
+    },
+    tableColumnWidth: (widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const tableColumnWidthOptions = _fieldsSchema.tableColumnWidth?.options as TableColumnWidthOptions;
+
+        const initalValue = widgetFieldDefaultValueMap.tableColumnWidth;
+
+        if (tableColumnWidthOptions.defaultMinimumWidth || tableColumnWidthOptions.defaultFixedWidth) {
+            return {
+                minimumWidth: tableColumnWidthOptions.defaultMinimumWidth ? tableColumnWidthOptions.defaultMinimumWidth : initalValue.minimumWidth,
+                widthType: tableColumnWidthOptions?.defaultFixedWidth ? 'fixed' : 'auto',
+                fixedWidth: tableColumnWidthOptions?.defaultFixedWidth,
+            };
+        }
+        return initalValue;
+    },
     textWrap: () => widgetFieldDefaultValueMap.textWrap,
     tooltipNumberFormat: () => widgetFieldDefaultValueMap.tooltipNumberFormat,
-    total: () => widgetFieldDefaultValueMap.total,
     widgetHeight: () => widgetFieldDefaultValueMap.widgetHeight,
 };

@@ -1,6 +1,6 @@
 export interface TotalValue {
     toggleValue: boolean;
-    freeze: boolean;
+    freeze?: boolean;
 }
 
 export interface TotalOptions {

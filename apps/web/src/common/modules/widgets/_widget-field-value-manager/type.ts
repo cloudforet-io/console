@@ -22,7 +22,6 @@ import type { MinValue } from '@/common/modules/widgets/_widget-fields/min/type'
 import type { _MissingValueValue } from '@/common/modules/widgets/_widget-fields/missing-value/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type { PieChartTypeValue } from '@/common/modules/widgets/_widget-fields/pie-chart-type/type';
-import type { ProgressBarValue } from '@/common/modules/widgets/_widget-fields/progress-bar/type';
 import type { _StackByValue } from '@/common/modules/widgets/_widget-fields/stack-by/type';
 import type { SubTotalValue } from '@/common/modules/widgets/_widget-fields/sub-total/type';
 import type { TableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/table-column-width/type';
@@ -56,7 +55,6 @@ export interface WidgetFieldTypeMap {
     tableColumnWidth: WidgetFieldValue<TableColumnWidthValue>;
     subTotal: WidgetFieldValue<SubTotalValue>;
     stackBy: WidgetFieldValue<_StackByValue>;
-    progressBar: WidgetFieldValue<ProgressBarValue>;
     pieChartType: WidgetFieldValue<PieChartTypeValue>;
     numberFormat: WidgetFieldValue<NumberFormatValue>;
     missingValue: WidgetFieldValue<_MissingValueValue>;
