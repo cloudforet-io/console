@@ -115,7 +115,7 @@ const dropdownMenu = computed<MenuItem[]>(() => ([
 ]));
 
 /* Component */
-const getRowSelectable = (item) => item.role_type === ROLE_TYPE.SYSTEM_ADMIN;
+const getRowSelectable = (item) => item.role_type !== ROLE_TYPE.SYSTEM_ADMIN;
 const handleEditRole = (id: string) => {
     router.push(getProperRouteLocation({ name: IAM_ROUTE.ROLE.EDIT._NAME, params: { id } }));
 };
