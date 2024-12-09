@@ -38,6 +38,21 @@ export const useTaskTypeStore = defineStore('task-type', () => {
     const fetchList = getCancellableFetcher<TaskTypeListParameters, ListResponse<TaskTypeModel>>(SpaceConnector.clientV2.opsflow.taskType.list);
     const fetchGet = getCancellableFetcher<TaskTypeGetParameters, TaskTypeModel>(SpaceConnector.clientV2.opsflow.taskType.get);
     const actions = {
+        async list(params: TaskTypeListParameters): Promise<TaskTypeModel[]|undefined> {
+            try {
+                state.loading = true;
+                const result = await fetchList(params);
+                if (result.status === 'succeed') {
+                    state.loading = false;
+                    return result.response.results ?? [];
+                }
+                return undefined;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.loading = false;
+                return undefined;
+            }
+        },
         async listByCategoryIds(categoryIds: string[]): Promise<Record<string, TaskTypeModel[]>> {
             const _categoryIds = categoryIds.filter((categoryId) => !state.itemsByCategoryId[categoryId]);
             if (_categoryIds.length === 0) {

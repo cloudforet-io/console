@@ -7,25 +7,64 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 import {
     PPaneLayout, PToolbox, PDataTable, PDivider, PLink,
+    PCollapsiblePanel, PBadge,
 } from '@cloudforet/mirinae';
 import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
+import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
+import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
 import type { TaskModel } from '@/schema/opsflow/task/model';
 
+import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
 import { useBoardPageStore } from '@/services/ops-flow/stores/board-page-store';
 import { useTaskStore } from '@/services/ops-flow/stores/task-store';
+import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 
 const boardPageStore = useBoardPageStore();
 const boardPageState = boardPageStore.state;
 const taskStore = useTaskStore();
+const taskTypeStore = useTaskTypeStore();
+const taskCategoryStore = useTaskCategoryStore();
 
 const loading = ref<boolean>(false);
 const tasks = ref<TaskModel[]|undefined>(undefined);
+const categoriesById = ref<Record<string, TaskCategoryModel>>({});
+const taskTypesById = ref<Record<string, TaskTypeModel>>({});
+
+
+/* table view formatter */
+const getTaskTypeName = (taskTypeId: string) => {
+    const taskType = taskTypesById.value[taskTypeId];
+    return taskType ? taskType.name : taskTypeId;
+};
+const getStatusName = (category: TaskCategoryModel|undefined, statusId: string, statusType: string) => {
+    const statusOptions = category?.status_options[statusType];
+    if (!statusOptions) return statusId;
+    const statusOption = statusOptions.find((option) => option.status_id === statusId);
+    if (!statusOption) {
+        const defaultOption = statusOptions.find((option) => option.is_default);
+        if (defaultOption) return defaultOption.name;
+        return statusId;
+    }
+    return statusOption.name;
+};
+const getStatusStyleType = (category: TaskCategoryModel|undefined, statusId: string, statusType: string) => {
+    const statusOptions = category?.status_options[statusType];
+    if (!statusOptions) return '';
+    const statusOption = statusOptions.find((option) => option.status_id === statusId);
+    if (!statusOption) {
+        const defaultOption = statusOptions.find((option) => option.is_default);
+        if (defaultOption) return defaultOption.color;
+        return '';
+    }
+    return statusOption.color;
+};
 
 /* query */
 const search = ref<string>('');
@@ -66,7 +105,40 @@ const listTask = async (query: Query) => {
         tasks.value = undefined;
     }
 };
+let hasCategoriesAndTypesLoaded = false;
+const listCategoriesAndTaskTypes = async () => {
+    if (hasCategoriesAndTypesLoaded) return;
+    const results = await Promise.allSettled([
+        taskCategoryStore.list(),
+        taskTypeStore.list({
+            query: { only: ['task_type_id', 'name'] },
+        }),
+    ]);
+    results.forEach((result, idx) => {
+        if (result.status === 'fulfilled') {
+            if (idx === 0) { // category case
+                const categories = result.value;
+                if (categories) {
+                    categories.forEach((category) => {
+                        categoriesById.value[category.category_id] = category;
+                    });
+                }
+            } else { // type case
+                const taskTypes = result.value;
+                if (taskTypes) {
+                    taskTypes.forEach((taskType) => {
+                        taskTypesById.value[taskType.task_type_id] = taskType;
+                    });
+                }
+            }
+        }
+    });
+    categoriesById.value = { ...categoriesById.value };
+    taskTypesById.value = { ...taskTypesById.value };
+    hasCategoriesAndTypesLoaded = true;
+};
 
+listCategoriesAndTaskTypes();
 watch(() => boardPageState.currentCategoryId, () => {
     listTask(getQuery());
 }, { immediate: true });
@@ -86,30 +158,37 @@ const fields: DataTableField[] = [
     {
         name: 'name',
         label: 'Title',
+        width: '10%',
     },
     {
         name: 'description',
         label: 'Description',
+        width: '15%',
     },
     {
         name: 'task_type_id',
         label: 'Topic',
+        width: '10%',
     },
     {
         name: 'status_id',
         label: 'Status',
+        width: '10%',
     },
     {
         name: 'project_id',
         label: 'Project',
+        width: '10%',
     },
     {
         name: 'assignee',
         label: 'Assignee',
+        width: '10%',
     },
     {
         name: 'created_at',
         label: 'Created At',
+        width: '10%',
     },
 ];
 const { getProperRouteLocation } = useProperRouteLocation();
@@ -141,6 +220,25 @@ const { getProperRouteLocation } = useProperRouteLocation();
                         })"
                         highlight
                 />
+            </template>
+            <template #col-description-format="{item}">
+                <p-collapsible-panel :line-clamp="1">
+                    <text-editor-viewer :contents="item.description"
+                                        :attachments="item.files.map(d => ({ fileId: d.file_id, downloadUrl: d.download_url}))"
+                    />
+                </p-collapsible-panel>
+            </template>
+            <template #col-task_type_id-format="{value}">
+                {{ getTaskTypeName(value) }}
+            </template>
+            <template #col-status_id-format="{item}">
+                <p-badge class="ml-2"
+                         badge-type="subtle"
+                         shape="square"
+                         :style-type="getStatusStyleType(categoriesById[item.category_id], item.status_id, item.status_type)"
+                >
+                    {{ getStatusName(categoriesById[item.category_id], item.status_id, item.status_type) }}
+                </p-badge>
             </template>
         </p-data-table>
     </p-pane-layout>
