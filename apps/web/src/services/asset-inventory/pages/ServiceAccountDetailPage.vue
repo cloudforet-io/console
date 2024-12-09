@@ -251,7 +251,7 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
                                        :editable="state.isEditable"
                                        @refresh="handleRefresh"
             />
-            <!--            TODO: To be implemented after further discussion-->
+            <!--            HACK: To be implemented after further discussion-->
             <!--            <service-account-usage-overview v-if="!state.isTrustedAccount"-->
             <!--                                            :service-account-loading="state.loading"-->
             <!--                                            :service-account-id="props.serviceAccountId"-->

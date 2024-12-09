@@ -209,13 +209,6 @@ onMounted(async () => {
                             </span>
                         </div>
                     </div>
-                    <!--            TODO: low priority -->
-                    <!--            <favorite-button v-if="item.subMenuList?.length === 0"-->
-                    <!--                             class="favorite-button"-->
-                    <!--                             :item-id="item.id"-->
-                    <!--                             :favorite-type="FAVORITE_TYPE.MENU"-->
-                    <!--                             scale="0.65"-->
-                    <!--            />-->
                 </router-link>
                 <div v-else>
                     <div v-if="state.isMenuDescription"

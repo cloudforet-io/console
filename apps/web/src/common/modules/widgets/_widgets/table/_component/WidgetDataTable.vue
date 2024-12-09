@@ -148,7 +148,7 @@ const getField = (field: TableWidgetField): string => {
 };
 
 const valueFormatter = (value: TableDataValue, field: TableWidgetField) => {
-    // TODO: handle missing value after applying table missing value
+    // HACK: handle missing value after applying table missing value
     // // handle missing value
     // const isMissingValue = value === null || value === undefined;
     // if (isMissingValue && props.missingValueInfo?.value === 'lineBreaks') return TABLE_MISSING_VALUE_SYMBOL;

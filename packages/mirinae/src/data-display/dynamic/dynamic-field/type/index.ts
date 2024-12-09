@@ -25,7 +25,6 @@ export interface DynamicFieldHandler<
     (props: DynamicFieldProps<Options, TypeOptions, ExtraData>): Partial<DynamicFieldProps>;
 }
 
-// TODO
 /*
 export interface DynamicFieldEventListeners {
     copy(): void;
