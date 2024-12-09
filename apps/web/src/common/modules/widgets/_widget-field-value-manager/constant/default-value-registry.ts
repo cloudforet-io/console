@@ -50,7 +50,7 @@ export const widgetFieldDefaultValueMap: DefaultValueRegistry = {
         granularity: 'MONTHLY',
     },
     groupBy: {},
-    header: {},
+    header: undefined,
     icon: {},
     legend: {},
     max: {},

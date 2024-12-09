@@ -11,6 +11,7 @@ import type { DisplayAnnotationValue } from '@/common/modules/widgets/_widget-fi
 import type { DisplaySeriesLabelValue } from '@/common/modules/widgets/_widget-fields/display-series-label/type';
 import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/granularity/type';
 import type { _GroupByOptions, _GroupByValue } from '@/common/modules/widgets/_widget-fields/group-by/type';
+import type { WidgetHeaderValue } from '@/common/modules/widgets/_widget-fields/header/type';
 import type { _StackByValue, StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
 import type { _XAxisValue, XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { _YAxisValue, YAxisOptions } from '@/common/modules/widgets/_widget-fields/y-axis/type';
@@ -112,6 +113,10 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
         if (groupByOptions.excludeDateField && fieldValue.data === 'date') return false;
         if (!fieldValue.count || fieldValue.count > groupByOptions.max) return false;
         return !!fieldValue.data;
+    },
+    header: (fieldValue: WidgetHeaderValue) => {
+        if (!fieldValue.toggleValue) return true;
+        return !!fieldValue.title?.trim();
     },
 };
 
