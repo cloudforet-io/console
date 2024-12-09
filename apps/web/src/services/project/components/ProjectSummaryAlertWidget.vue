@@ -19,11 +19,11 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { AlertListParameters } from '@/schema/monitoring/alert/api-verbs/list';
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import type { AlertModel } from '@/schema/monitoring/alert/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -47,6 +47,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const allReferenceStore = useAllReferenceStore();
+const userStore = useUserStore();
 const state = reactive({
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
     alertStates: computed<AlertState[]>(() => ([
@@ -106,7 +107,7 @@ const getQuery = () => {
         .setSort('created_at', true)
         .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
     if (state.selectedAssignedState === ALERT_ASSIGNED_FILTER.ASSIGNED_TO_ME) {
-        apiQuery.setFilters([{ k: 'assignee', v: store.state.user.userId, o: '=' }]);
+        apiQuery.setFilters([{ k: 'assignee', v: userStore.state.userId || '', o: '=' }]);
     } else {
         apiQuery.setFilters([
             { k: 'state', v: [ALERT_STATE.TRIGGERED, ALERT_STATE.ACKNOWLEDGED], o: '=' },

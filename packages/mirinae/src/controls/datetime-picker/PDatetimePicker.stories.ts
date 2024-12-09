@@ -49,6 +49,9 @@ const Template: Story = {
                 :select-mode="selectMode"
                 :data-type="dataType"
                 :invalid="invalid"
+                :disabled="disabled"
+                :readonly="readonly"
+                :placeholder="placeholder"
                 @update:selectedDates="onUpdateSelectedDates"
                 @close="onClose"
             />
@@ -77,6 +80,23 @@ export const DefaultDatetimePicker: Story = {
     }),
 };
 
+export const PlaceholderDatetimePicker: Story = {
+    render: () => ({
+        components: { PDatetimePicker },
+        i18n: I18nConnector.i18n,
+        template: `
+            <div>
+                <p>Default placeholder</p>
+                <p-datetime-picker />
+                <br/>
+                <br/>
+                <p>Custom placeholder</p>
+                <p-datetime-picker placeholder="Please select a date" />
+            </div>
+        `,
+    }),
+};
+
 export const InvalidDatetimePicker: Story = {
     render: () => ({
         components: { PDatetimePicker },
@@ -94,6 +114,68 @@ export const InvalidDatetimePicker: Story = {
             <tr>
                 <td><p-datetime-picker invalid data-type="time" /></td>
                 <td><p-datetime-picker invalid data-type="time" style-type="text" /></td>
+            </tr>
+            </table>
+        `,
+        setup() {
+            const state = reactive({
+                selectedDates: ['2021-10-01T00:00:00+09:00'],
+            });
+            return {
+                ...toRefs(state),
+            };
+        },
+    }),
+};
+
+export const DisabledDatetimePicker: Story = {
+    render: () => ({
+        components: { PDatetimePicker },
+        i18n: I18nConnector.i18n,
+        template: `
+            <table style="border-collapse: separate; border-spacing: 16px;">
+            <tr>
+                <td><p-datetime-picker disabled :selected-dates.sync="selectedDates" /></td>
+                <td><p-datetime-picker disabled style-type="text" :selected-dates.sync="selectedDates" /></td>
+            </tr>
+            <tr>
+                <td><p-datetime-picker disabled data-type="yearToTime" :selected-dates.sync="selectedDates" /></td>
+                <td><p-datetime-picker disabled data-type="yearToTime" style-type="text" :selected-dates.sync="selectedDates" /></td>
+            </tr>
+            <tr>
+                <td><p-datetime-picker disabled data-type="time" /></td>
+                <td><p-datetime-picker disabled data-type="time" style-type="text" /></td>
+            </tr>
+            </table>
+        `,
+        setup() {
+            const state = reactive({
+                selectedDates: ['2021-10-01T00:00:00+09:00'],
+            });
+            return {
+                ...toRefs(state),
+            };
+        },
+    }),
+};
+
+export const ReadonlyDatetimePicker: Story = {
+    render: () => ({
+        components: { PDatetimePicker },
+        i18n: I18nConnector.i18n,
+        template: `
+            <table style="border-collapse: separate; border-spacing: 16px;">
+            <tr>
+                <td><p-datetime-picker readonly :selected-dates.sync="selectedDates" /></td>
+                <td><p-datetime-picker readonly style-type="text" :selected-dates.sync="selectedDates" /></td>
+            </tr>
+            <tr>
+                <td><p-datetime-picker readonly data-type="yearToTime" :selected-dates.sync="selectedDates" /></td>
+                <td><p-datetime-picker readonly data-type="yearToTime" style-type="text" :selected-dates.sync="selectedDates" /></td>
+            </tr>
+            <tr>
+                <td><p-datetime-picker readonly data-type="time" /></td>
+                <td><p-datetime-picker readonly data-type="time" style-type="text" /></td>
             </tr>
             </table>
         `,

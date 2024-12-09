@@ -8,9 +8,8 @@ import {
     PI, PTooltip,
 } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
-
 import { useNoticeStore } from '@/store/notice';
+import { useUserStore } from '@/store/user/user-store';
 
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 import TopBarNoticeContextMenu
@@ -30,11 +29,11 @@ const emit = defineEmits<{(e: 'update:visible', value: boolean): void}>();
 
 const noticeStore = useNoticeStore();
 const noticeGetters = noticeStore.getters;
-
+const userStore = useUserStore();
 
 const state = reactive({
     hasNotice: computed(() => noticeGetters.unreadNoticeCount > 0),
-    isNoRoleUser: computed<boolean>(() => store.getters['user/isNoRoleUser']),
+    isNoRoleUser: computed<boolean>(() => userStore.getters.isNoRoleUser),
     iconColor: computed<string>(() => {
         if (props.visible) return blue[600];
         return 'inherit';
@@ -65,7 +64,7 @@ onMounted(() => {
 const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE'], noticeStore.fetchNoticeCount);
 callApiWithGrantGuard();
 
-watch(() => store.state.user.isSessionExpired, (isSessionExpired) => {
+watch(() => userStore.state.isSessionExpired, (isSessionExpired) => {
     if (isSessionExpired) {
         noticeStore.reset();
     }

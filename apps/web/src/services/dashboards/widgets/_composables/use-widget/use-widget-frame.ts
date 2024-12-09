@@ -6,7 +6,7 @@ import { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
 import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
-import type { Currency } from '@/store/modules/display/type';
+import type { Currency } from '@/store/display/type';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -35,7 +35,6 @@ export const useWidgetFrame = (
         const nonInheritOptions = getNonInheritedWidgetOptionNamesAmongUsedVariables(props.dashboardVariablesSchema, widgetState.inheritOptions, widgetState.schemaProperties);
         if (!nonInheritOptions.length) return undefined;
 
-        // TODO: widget option name must be changed to readable name.
         // const tooltipText = nonInheritOptions.map((d) => `<p>• ${getWidgetOptionsSchemaPropertyName(d)}</p>`).join('\n');
         const tooltipText = nonInheritOptions.map((d) => `<p>• ${d}</p>`).join('\n');
         return `${i18n.t('DASHBOARDS.WIDGET.INHERIT_OPTIONS_TOOLTIP_TEXT_1')}</br></br>

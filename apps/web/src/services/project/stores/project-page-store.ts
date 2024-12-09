@@ -13,7 +13,8 @@ import type { ProjectCreateParameters } from '@/schema/identity/project/api-verb
 import type { ProjectUpdateParameters } from '@/schema/identity/project/api-verbs/udpate';
 import type { ProjectUpdateProjectTypeParameters } from '@/schema/identity/project/api-verbs/update-project-type';
 import type { ProjectModel } from '@/schema/identity/project/model';
-import { store } from '@/store';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import getRandomId from '@/lib/random-id-generator';
 
@@ -27,8 +28,10 @@ import type {
 
 const projectTreeHelper = useProjectTree();
 export const useProjectPageStore = defineStore('page-project', () => {
+    const userStore = useUserStore();
+
     const _state = reactive({
-        currentRoleType: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType),
+        currentRoleType: computed(() => userStore.state.currentRoleInfo?.roleType),
     });
     const state = reactive({
         projectTreeKey: getRandomId(),

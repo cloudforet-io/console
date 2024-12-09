@@ -122,7 +122,7 @@ test.describe('Custom Dashboard Variables', () => {
         });
 
         await test.step('7. Save Dashboard', async () => {
-            await page.getByRole('button', { name: 'Cancel' }).click(); // TODO: change to save after fix bug
+            await page.getByRole('button', { name: 'Cancel' }).click(); // HACK: change to save after fix bug
             // await page.getByRole('button', { name: 'Save' }).click();
             await expect(page).toHaveURL(/dashboards\/workspace\/detail\/domain-.*/);
         });

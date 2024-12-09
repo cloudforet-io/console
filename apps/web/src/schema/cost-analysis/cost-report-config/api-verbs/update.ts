@@ -1,5 +1,5 @@
-import type { Currency } from '@/store/modules/display/type';
-import type { LanguageCode } from '@/store/modules/user/type';
+import type { Currency } from '@/store/display/type';
+import type { LanguageCode } from '@/store/user/type';
 
 
 export interface CostReportConfigUpdateParameters {

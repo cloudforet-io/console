@@ -3,7 +3,6 @@ export const SIDEBAR_TYPE = {
     handbook: 'secondary',
     widget: 'widget',
 } as const;
-export type SidebarType = typeof SIDEBAR_TYPE[keyof typeof SIDEBAR_TYPE];
 
 export const CURRENCY = {
     USD: 'USD',

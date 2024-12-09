@@ -11,10 +11,10 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 import type { QueryTag } from '@cloudforet/mirinae/types/controls/search/query-search-tags/type';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import NewMark from '@/common/components/marks/NewMark.vue';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
@@ -46,6 +46,8 @@ const appContextStore = useAppContextStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
 const dashboardPageControlGetters = dashboardPageControlStore.getters;
+const userStore = useUserStore();
+
 const { getControlMenuItems } = useDashboardControlMenuItems({
     isAdminMode: computed(() => storeState.isAdminMode),
     isWorkspaceOwner: computed(() => storeState.isWorkspaceOwner),
@@ -54,7 +56,7 @@ const { getControlMenuItems } = useDashboardControlMenuItems({
 });
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+    isWorkspaceOwner: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
 });
 const state = reactive({
     slicedLabels: computed(() => props.treeData.data?.labels?.slice(0, LABELS_LIMIT) || []),

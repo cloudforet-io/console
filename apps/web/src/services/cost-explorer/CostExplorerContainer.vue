@@ -9,6 +9,7 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
@@ -26,6 +27,7 @@ const costQuerySetStore = useCostQuerySetStore();
 const costQuerySetState = costQuerySetStore.state;
 const costExplorerSettingsStore = useCostExplorerSettingsStore();
 const appContextStore = useAppContextStore();
+const userStore = useUserStore();
 
 const route = useRoute();
 const setCostParams = async () => {
@@ -75,7 +77,7 @@ watch(() => route.params, async (after, before) => {
     await callApiWithGrantGuard();
 }, { immediate: true });
 
-costExplorerSettingsStore.initState();
+costExplorerSettingsStore.initState(userStore.state.userId);
 onUnmounted(() => {
     costQuerySetStore.reset();
     costExplorerSettingsStore.$dispose();

@@ -1,4 +1,4 @@
-import { CURRENCY } from '@/store/modules/display/config';
+import { CURRENCY } from '@/store/display/constant';
 
 export const GRANULARITY = {
     DAILY: 'DAILY',

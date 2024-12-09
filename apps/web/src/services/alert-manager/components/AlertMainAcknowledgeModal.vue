@@ -6,8 +6,9 @@ import {
 import { PButtonModal, PCheckbox } from '@cloudforet/mirinae';
 
 import type { AlertModel } from '@/schema/monitoring/alert/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -25,6 +26,7 @@ const emit = defineEmits<{(event: 'update:visible', value: boolean): void;
 
 const alertAssignUserStore = useAlertAssignUserStore();
 const alertAssignUserState = alertAssignUserStore.state;
+const userStore = useUserStore();
 
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
@@ -33,7 +35,7 @@ const state = reactive({
 
 /* api */
 const updateToAcknowledge = async () => {
-    const promises = props.alerts?.map((d) => alertAssignUserStore.updateToAcknowledgeAndAssignUser(d.alert_id, state.isAssignedToMe ? store.state.user.userId : undefined));
+    const promises = props.alerts?.map((d) => alertAssignUserStore.updateToAcknowledgeAndAssignUser(d.alert_id, state.isAssignedToMe ? userStore.state.userId : undefined));
     const results = await Promise.allSettled(promises);
     const rejected = results.filter((d) => d.status === 'rejected');
     if (rejected.length > 0) {
@@ -78,7 +80,7 @@ watch(() => props.visible, async (visible) => {
             <div class="body-inner">
                 <p>{{ $t('MONITORING.ALERT.ALERT_LIST.UPDATE_ACKNOWLEDGE_MODAL.ASSIGN_TO_YOU') }}</p>
                 <p-checkbox v-model="state.isAssignedToMe"
-                            :disabled="alertAssignUserState.loading || !alertAssignUserState.userIds.includes(store.state.user.userId)"
+                            :disabled="alertAssignUserState.loading || !alertAssignUserState.userIds.includes(userStore.state.userId)"
                 >
                     <span> {{ $t('MONITORING.ALERT.ALERT_LIST.UPDATE_ACKNOWLEDGE_MODAL.ASSIGN_TO_ME_YES') }}</span>
                 </p-checkbox>

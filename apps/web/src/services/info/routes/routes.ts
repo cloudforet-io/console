@@ -1,6 +1,7 @@
 import type { RouteConfig } from 'vue-router';
 
-import { store } from '@/store';
+import { pinia } from '@/store/pinia';
+import { useUserStore } from '@/store/user/user-store';
 
 import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
@@ -13,6 +14,7 @@ const InfoContainer = () => import('@/services/info/InfoContainer.vue');
 const NoticeMainPage = () => import('@/services/info/pages/NoticeMainPage.vue');
 const NoticeDetailPage = () => import('@/services/info/pages/NoticeDetailPage.vue');
 
+
 const infoRoute: RouteConfig = {
     path: 'info',
     name: INFO_ROUTE._NAME,
@@ -20,7 +22,10 @@ const infoRoute: RouteConfig = {
         menuId: MENU_ID.INFO,
         translationId: MENU_INFO_MAP[MENU_ID.INFO].translationId,
     },
-    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
+    redirect: (to) => {
+        const userStore = useUserStore(pinia);
+        return getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap);
+    },
     component: InfoContainer,
     children: [
         {

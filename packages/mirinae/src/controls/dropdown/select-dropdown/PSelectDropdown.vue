@@ -149,7 +149,7 @@ const hideMenu = () => {
     }
 };
 const showMenu = () => {
-    if (props.readonly || props.disabled || state.proxyVisibleMenu) return;
+    if (props.disabled || state.proxyVisibleMenu) return;
     if (!props.disableHandler) {
         initiateMenu();
     }
@@ -196,7 +196,11 @@ const focusDropdownButton = () => {
 
 /* event handler */
 const handleClickDropdownButton = () => {
-    if (props.readonly || props.disabled) return;
+    if (props.disabled) return;
+    if (props.readonly) {
+        if (props.appearanceType !== 'badge') return;
+        if (state.selectedItems.length <= 1) return;
+    }
     if (state.proxyVisibleMenu) hideMenu();
     else showMenu();
 };
@@ -336,7 +340,7 @@ defineExpose({ reloadMenu });
                          :show-delete-all-button="showDeleteAllButton"
                          :is-fixed-width="props.isFixedWidth"
                          :selection-highlight="props.selectionHighlight"
-                         :is-visible-menu="state.proxyVisibleMenu"
+                         :is-visible-menu="props.readonly ? state.selectedItems.length > 0 && state.proxyVisibleMenu : state.proxyVisibleMenu"
                          :readonly="props.readonly"
                          :multi-selectable="props.multiSelectable"
                          :selected-items="state.selectedItems"
@@ -355,17 +359,17 @@ defineExpose({ reloadMenu });
                 <slot name="dropdown-left-area" />
             </template>
         </dropdown-button>
-        <p-context-menu v-if="state.proxyVisibleMenu"
+        <p-context-menu v-if="props.readonly ? state.selectedItems.length > 0 && state.proxyVisibleMenu : state.proxyVisibleMenu"
                         ref="menuRef"
                         :class="{
                             'dropdown-context-menu': true,
                             default: !props.showSelectMarker,
                         }"
-                        :menu="props.disableHandler ? props.menu : refinedMenu"
+                        :menu="props.readonly ? state.selectedItems : (props.disableHandler ? props.menu : refinedMenu)"
                         :loading="props.loading || loading"
                         :readonly="props.readonly"
                         :item-height-fixed="!props.isFilterable"
-                        :selected="state.selectedItems"
+                        :selected="props.readonly ? [] : state.selectedItems"
                         :multi-selectable="props.multiSelectable"
                         :search-text="state.proxySearchText"
                         :searchable="props.isFilterable"

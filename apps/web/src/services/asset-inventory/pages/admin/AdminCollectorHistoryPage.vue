@@ -9,7 +9,6 @@ import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import {
     makeEnumValueHandler, makeDistinctValueHandler, makeReferenceValueHandler,
 } from '@cloudforet/core-lib/component-util/query-search';
-import type { KeyItemSet } from '@cloudforet/core-lib/component-util/query-search/type';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -17,6 +16,7 @@ import {
     PHeading, PPagination, PLazyImg, PLink,
     PSelectButtonGroup, PStatus, PToolboxTable,
 } from '@cloudforet/mirinae';
+import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
@@ -25,7 +25,6 @@ import { SpaceRouter } from '@/router';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { JobListParameters } from '@/schema/inventory/job/api-verbs/list';
 import type { JobModel } from '@/schema/inventory/job/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { ROOT_ROUTE } from '@/router/constant';
@@ -34,6 +33,7 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CollectorReferenceMap } from '@/store/reference/collector-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
@@ -56,6 +56,7 @@ import { JOB_SELECTED_STATUS } from '@/services/asset-inventory/types/collector-
 const COLLECTOR_DETAIL_ROUTE = ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME;
 const WORKSPACE_HOME_ROUTE = ROOT_ROUTE.WORKSPACE._NAME;
 const allReferenceStore = useAllReferenceStore();
+const userStore = useUserStore();
 
 const fields: DataTableField[] = [
     { label: 'Job ID', name: 'job_id' },
@@ -93,7 +94,7 @@ const handlers = reactive({
     },
 });
 const storeState = reactive({
-    timezone: computed(() => store.state.user.timezone),
+    timezone: computed<string|undefined>(() => userStore.state.timezone),
     collectors: computed<CollectorReferenceMap>(() => allReferenceStore.getters.collector),
     plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
     workspaces: computed(() => allReferenceStore.getters.workspace),

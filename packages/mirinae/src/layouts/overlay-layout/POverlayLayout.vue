@@ -8,7 +8,7 @@ interface Props {
     visible: boolean;
     title?: string;
     styleType?: 'primary' | 'secondary';
-    size?: 'md' | 'lg' | 'full';
+    size?: 'sm' | 'md' | 'lg' | 'full';
     isFixedSize?: boolean;
     hideHeader?: boolean;
 }
@@ -123,8 +123,11 @@ const handleClose = () => {
             height: 3.5rem;
         }
 
-        &.md {
+        &.sm {
             width: 30%;
+        }
+        &.md {
+            width: 50%;
         }
         &.lg {
             width: 90%;
@@ -142,6 +145,9 @@ const handleClose = () => {
         }
 
         @screen tablet {
+            &.sm {
+                width: 100%;
+            }
             &.md {
                 width: 100%;
             }

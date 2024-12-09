@@ -281,7 +281,7 @@ export const useQuerySearch = (stateArgs: QuerySearchStateArgs, options: QuerySe
         else await updateMenuItems(val);
     };
 
-    // TODO: need to refactor
+    // HACK: need to refactor
     const onKeyupEnter = async (): Promise<QueryItem | undefined> => {
         if (strict) {
             const res = find(state.handlerResp.results, (item: ValueMenuItem) => item.label === state.searchText || item.name === state.searchText);

@@ -67,7 +67,6 @@ const state = reactive({
     customModalVisible: false as boolean,
     customTargetDataField: '' as string,
     customNumberFormat: '#,##0' as string,
-    numberFormatHelpLink: computed<string>(() => ''), // TODO: add link
 });
 
 /* Util */
@@ -215,7 +214,7 @@ watch(() => state.customModalVisible, (modalVisible) => {
                         <p class="sample-text">
                             {{ $t('COMMON.WIDGETS.NUMBER_FORMAT.SAMPLE') }}: {{ getFormattedNumber(state.customNumberFormat) }}
                         </p>
-                        <!--                        TODO: To be activated after guide completion-->
+                        <!--HACK: To be activated after guide completion-->
                         <!--                        <p-link :href="state.numberFormatHelpLink"-->
                         <!--                                :action-icon="ACTION_ICON.EXTERNAL_LINK"-->
                         <!--                                highlight-->

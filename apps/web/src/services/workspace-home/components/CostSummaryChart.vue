@@ -13,7 +13,7 @@ import { throttle } from 'lodash';
 import { numberFormatter } from '@cloudforet/utils';
 
 
-import type { Currency } from '@/store/modules/display/type';
+import type { Currency } from '@/store/display/type';
 
 import { green, blue, coral } from '@/styles/colors';
 

@@ -14,11 +14,11 @@ import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/g
 import type { ProjectModel } from '@/schema/identity/project/model';
 import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
 import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
-import { store } from '@/store';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -40,10 +40,11 @@ const { top } = useElementBounding(dropdownRef);
 const emit = defineEmits<{(e: 'change', member: string[]): void; }>();
 
 const allReferenceStore = useAllReferenceStore();
+const userStore = useUserStore();
 const storeState = reactive({
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
-    userId: computed<string>(() => store.state.user.userId),
+    userId: computed<string|undefined>(() => userStore.state.userId),
 });
 const state = reactive({
     loading: true,

@@ -19,8 +19,9 @@ import type { RoleModel } from '@/schema/identity/role/model';
 import type { RoleType } from '@/schema/identity/role/type';
 import type { WorkspaceGroupUpdateRoleParameters } from '@/schema/identity/workspace-group/api-verbs/update-role';
 import type { WorkspaceUser } from '@/schema/identity/workspace-group/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -36,13 +37,14 @@ const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
 const userTabState = workspaceGroupPageStore.userTabState;
 const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
+const userStore = useUserStore();
 
 const route = useRoute();
 
 const emit = defineEmits<{(e: 'refresh', payload: { isGroupUser?: boolean, isWorkspace?: boolean }): void; }>();
 
 const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     selectedMenuId: computed(() => {

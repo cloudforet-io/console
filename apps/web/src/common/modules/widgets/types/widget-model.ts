@@ -5,7 +5,7 @@ import type {
     EVAL_EXPRESSION_TYPE,
 } from '@/common/modules/widgets/_constants/data-table-constant';
 
-export type WidgetType = string; // TODO: make this widget type enum
+export type WidgetType = string; // HACK: make this widget type enum
 
 export type DataTableState = 'AVAILABLE' | 'UNAVAILABLE';
 

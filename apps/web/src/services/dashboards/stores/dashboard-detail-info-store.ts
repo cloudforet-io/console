@@ -28,10 +28,10 @@ import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/m
 import type { PublicWidgetListParameters } from '@/schema/dashboard/public-widget/api-verbs/list';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import getRandomId from '@/lib/random-id-generator';
 import WorkspaceVariableModel from '@/lib/variable-models/managed-model/resource-model/workspace-variable-model';
@@ -90,9 +90,10 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const dashboardStore = useDashboardStore();
     const dashboardState = dashboardStore.state;
     const appContextStore = useAppContextStore();
+    const userStore = useUserStore();
     const storeState = reactive({
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-        isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+        isWorkspaceOwner: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     });
     const state = reactive({
         loadingDashboard: false,

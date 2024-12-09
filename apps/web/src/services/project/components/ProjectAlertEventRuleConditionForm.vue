@@ -31,7 +31,7 @@ const OPERATOR = Object.freeze({
 
 interface Props {
     conditionsPolicy?: string;
-    conditions?: any[]; // TODO: set type
+    conditions?: any[]; // HACK: set type
     projectId?: string;
 }
 const props = withDefaults(defineProps<Props>(), {

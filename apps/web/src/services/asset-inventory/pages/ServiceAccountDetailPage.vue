@@ -20,12 +20,12 @@ import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import type { TrustedAccountGetParameters } from '@/schema/identity/trusted-account/api-verbs/get';
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
-import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import type { MenuId } from '@/lib/menu/config';
@@ -60,6 +60,7 @@ const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const serviceAccountPageStore = useServiceAccountPageStore();
 const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
+const userStore = useUserStore();
 const { getProperRouteLocation } = useProperRouteLocation();
 
 const route = useRoute();
@@ -71,8 +72,8 @@ const storeState = reactive({
         ? serviceAccountSchemaStore.getters.trustedAccountSchema?.options?.external_link
         : serviceAccountSchemaStore.getters.generalAccountSchema?.options?.external_link)),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    isWorkspaceMember: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    isWorkspaceMember: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     loading: true,
@@ -250,7 +251,7 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
                                        :editable="state.isEditable"
                                        @refresh="handleRefresh"
             />
-            <!--            TODO: To be implemented after further discussion-->
+            <!--            HACK: To be implemented after further discussion-->
             <!--            <service-account-usage-overview v-if="!state.isTrustedAccount"-->
             <!--                                            :service-account-loading="state.loading"-->
             <!--                                            :service-account-id="props.serviceAccountId"-->

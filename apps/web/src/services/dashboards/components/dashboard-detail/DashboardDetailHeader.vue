@@ -9,10 +9,10 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 
 import type { DashboardScope } from '@/schema/dashboard/_types/dashboard-type';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { gray } from '@/styles/colors';
 
@@ -35,9 +35,10 @@ const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const appContextStore = useAppContextStore();
+const userStore = useUserStore();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+    isWorkspaceOwner: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
 });
 const { getControlMenuItems } = useDashboardControlMenuItems({
     isAdminMode: computed(() => storeState.isAdminMode),
@@ -50,15 +51,12 @@ const state = reactive({
     selectedSharedScope: 'WORKSPACE' as DashboardScope,
     showBadge: computed<boolean>(() => {
         if (dashboardDetailGetters.dashboardInfo?.user_id) return true;
-        // TODO: is admin type dashboard, return true
         return state.isSharedDashboard;
     }),
-    // TODO: is admin type dashboard, return 'solid-outline'
     badgeType: computed<BadgeType>(() => 'subtle'),
     badgeStyleType: computed<BadgeStyleType>(() => {
         if (dashboardDetailGetters.isPrivate) return 'gray150';
         if (state.sharedScope === 'PROJECT') return 'primary3';
-        // TODO: is admin type dashboard, return 'indigo500'
         return 'indigo100';
     }),
     badgeText: computed(() => {

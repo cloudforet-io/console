@@ -9,7 +9,8 @@ import {
     PI, PTooltip,
 } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
+import { useDisplayStore } from '@/store/display/display-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import TopBarNotificationsContextMenu
     from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-notifications/modules/TopBarNotificationsContextMenu.vue';
@@ -25,9 +26,12 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void}>();
 
+const userStore = useUserStore();
+const displayStore = useDisplayStore();
+
 const state = reactive({
-    hasNotifications: computed(() => store.getters['display/hasUncheckedNotifications']),
-    isNoRoleUser: computed<boolean>(() => store.getters['user/isNoRoleUser']),
+    hasNotifications: computed(() => displayStore.getters.hasUncheckedNotifications),
+    isNoRoleUser: computed<boolean>(() => userStore.getters.isNoRoleUser),
     notificationCount: 0,
     iconColor: computed<string>(() => {
         if (props.visible) return blue[600];
@@ -39,9 +43,9 @@ const state = reactive({
 const setVisible = (visible: boolean) => {
     emit('update:visible', visible);
     if (visible) {
-        store.dispatch('display/stopCheckNotification');
+        displayStore.stopCheckNotification();
     } else {
-        store.dispatch('display/startCheckNotification');
+        displayStore.startCheckNotification();
     }
 };
 const showNotiMenu = () => {
@@ -54,9 +58,9 @@ const hideNotiMenu = () => {
 const documentVisibility = useDocumentVisibility();
 watch(documentVisibility, (visibility) => {
     if (visibility === 'hidden') {
-        store.dispatch('display/stopCheckNotification');
+        displayStore.stopCheckNotification();
     } else {
-        store.dispatch('display/startCheckNotification');
+        displayStore.startCheckNotification();
     }
 }, { immediate: true });
 
@@ -67,16 +71,16 @@ const handleNotiButtonClick = () => {
 };
 
 onMounted(() => {
-    store.dispatch('display/startCheckNotification');
+    displayStore.startCheckNotification();
 });
 
 onUnmounted(() => {
-    store.dispatch('display/stopCheckNotification');
+    displayStore.stopCheckNotification();
 });
 
-watch(() => store.state.user.isSessionExpired, (isSessionExpired) => {
+watch(() => userStore.state.isSessionExpired, (isSessionExpired) => {
     if (isSessionExpired) {
-        store.dispatch('display/stopCheckNotification');
+        displayStore.stopCheckNotification();
     }
 });
 
