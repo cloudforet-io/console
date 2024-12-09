@@ -21,7 +21,6 @@ import min from '@/common/modules/widgets/_widget-fields/min/WidgetFieldMin.vue'
 import missingValue from '@/common/modules/widgets/_widget-fields/missing-value/WidgetFieldMissingValue.vue';
 import numberFormat from '@/common/modules/widgets/_widget-fields/number-format/WidgetFieldNumberFormat.vue';
 import pieChartType from '@/common/modules/widgets/_widget-fields/pie-chart-type/WidgetFieldPieChartType.vue';
-import progressBar from '@/common/modules/widgets/_widget-fields/progress-bar/WidgetFieldProgressBar.vue';
 import stackBy from '@/common/modules/widgets/_widget-fields/stack-by/WidgetFieldStackBy.vue';
 import subTotal from '@/common/modules/widgets/_widget-fields/sub-total/WidgetFieldSubTotal.vue';
 import tableColumnWidth from '@/common/modules/widgets/_widget-fields/table-column-width/WidgetFieldTableColumnWidth.vue';
@@ -49,7 +48,6 @@ export const WIDGET_FIELD_COMPONENTS: Record<Partial<WidgetFieldName>, Component
     formatRules,
     advancedFormatRules,
     legend,
-    progressBar,
     icon,
     subTotal,
     total,
