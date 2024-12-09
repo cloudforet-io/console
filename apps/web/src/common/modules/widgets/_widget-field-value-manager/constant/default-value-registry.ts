@@ -21,6 +21,7 @@ import type { PieChartTypeOptions } from '@/common/modules/widgets/_widget-field
 import type { StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
 import type { SubTotalOptions } from '@/common/modules/widgets/_widget-fields/sub-total/type';
 import type { TableColumnWidthOptions } from '@/common/modules/widgets/_widget-fields/table-column-width/type';
+import type { TextWrapOptions } from '@/common/modules/widgets/_widget-fields/text-wrap/type';
 import type { TotalOptions } from '@/common/modules/widgets/_widget-fields/total/type';
 import type { XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { YAxisOptions } from '@/common/modules/widgets/_widget-fields/y-axis/type';
@@ -93,7 +94,9 @@ export const widgetFieldDefaultValueMap: DefaultValueRegistry = {
         widthType: 'auto',
         fixedWidth: undefined,
     },
-    textWrap: {},
+    textWrap: {
+        toggleValue: false,
+    },
     tooltipNumberFormat: {},
     widgetHeight: {},
 } as const;
@@ -377,7 +380,17 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
         }
         return initalValue;
     },
-    textWrap: () => widgetFieldDefaultValueMap.textWrap,
+    textWrap: (widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const textWrapWidthOptions = _fieldsSchema.textWrap?.options as TextWrapOptions;
+
+        if (textWrapWidthOptions.toggle) {
+            return {
+                toggleValue: true,
+            };
+        }
+        return widgetFieldDefaultValueMap.textWrap;
+    },
     tooltipNumberFormat: () => widgetFieldDefaultValueMap.tooltipNumberFormat,
     widgetHeight: () => widgetFieldDefaultValueMap.widgetHeight,
 };
