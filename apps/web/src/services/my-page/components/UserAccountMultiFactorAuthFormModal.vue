@@ -114,6 +114,9 @@ const handleClickVerifyButton = async () => {
         }) as UserInfoType;
         if (storeState.userId === state.userInfo.user_id) {
             await userStore.updateUser(state.userInfo);
+            if (state.userInfo.mfa) {
+                userStore.setMfa(state.userInfo.mfa);
+            }
         }
         resetFormData();
         if (storeState.isReSyncModal || storeState.isSwitchModal) {
