@@ -87,7 +87,7 @@ const formState = reactive({
     commonValidForDelay: false,
     isValid: computed(() => {
         if (state.step === 1) return formState.firstStepValid;
-        // TODO: apply loading state
+        // HACK: apply loading state
         return true;
     }),
 });

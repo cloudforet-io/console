@@ -76,7 +76,7 @@ const filterToApiQueryFilter = (_filters: ConsoleFilter[], timezone = 'UTC') => 
             let op: ConsoleFilterOperator;
             let value = f.v;
             /* null case */
-            // TODO: remove checking string 'null' case. This is defense code for v1.10.4.2
+            // HACK: remove checking string 'null' case. This is defense code for v1.10.4.2
             if (value === 'null' || value === null || value === undefined) {
                 op = f.o?.startsWith('!') ? '!=' : '=';
                 value = null;
@@ -87,7 +87,7 @@ const filterToApiQueryFilter = (_filters: ConsoleFilter[], timezone = 'UTC') => 
                 const datetimeFilters = convertDatetimeQueryStoreFilterToFilters(f, timezone);
                 if (datetimeFilters) filter = filter.concat(datetimeFilters);
             } else if (Array.isArray(value)) {
-                // TODO: remove checking string 'null' case. This is defense code for v1.10.4.2
+                // HACK: remove checking string 'null' case. This is defense code for v1.10.4.2
                 if (f.k.startsWith('tags.')) {
                     value = value.map((d) => {
                         if (d === 'null') return null;

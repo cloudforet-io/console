@@ -12,7 +12,7 @@ import {
 // const costPieSchema = costPieWidgetConfig.options_schema;
 
 describe('[Widget Config Helper] getWidgetConfig', () => {
-    // TODO: SpaceConnector must be initialized before testing
+    // NOTE: SpaceConnector must be initialized before testing
     it('dummy test', () => {
         expect(true).toBeTruthy();
     });

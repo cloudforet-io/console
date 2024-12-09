@@ -100,7 +100,7 @@ watch(() => state.data?.email_verified, (value) => {
         >
             <template #default="{invalid}">
                 <div class="input-form">
-                    <!-- TODO: need to apply placeholder changes based on the distinction between open source and SaaS. -->
+                    <!-- HACK: need to apply placeholder changes based on the distinction between open source and SaaS. -->
                     <p-text-input :value="email"
                                   :invalid="invalid"
                                   placeholder="user@spaceone.io"

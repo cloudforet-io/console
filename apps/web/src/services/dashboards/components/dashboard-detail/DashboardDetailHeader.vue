@@ -51,15 +51,12 @@ const state = reactive({
     selectedSharedScope: 'WORKSPACE' as DashboardScope,
     showBadge: computed<boolean>(() => {
         if (dashboardDetailGetters.dashboardInfo?.user_id) return true;
-        // TODO: is admin type dashboard, return true
         return state.isSharedDashboard;
     }),
-    // TODO: is admin type dashboard, return 'solid-outline'
     badgeType: computed<BadgeType>(() => 'subtle'),
     badgeStyleType: computed<BadgeStyleType>(() => {
         if (dashboardDetailGetters.isPrivate) return 'gray150';
         if (state.sharedScope === 'PROJECT') return 'primary3';
-        // TODO: is admin type dashboard, return 'indigo500'
         return 'indigo100';
     }),
     badgeText: computed(() => {

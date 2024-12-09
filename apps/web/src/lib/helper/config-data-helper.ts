@@ -30,7 +30,7 @@ export const convertMenuConfigToReferenceData = (config: ConfigData[]|null, menu
     const convertMenuList = cloneDeep(menuList);
     // const costIdx = convertMenuList.findIndex((i) => i.id === MENU_ID.COST_EXPLORER);
 
-    // TODO: will be applied after the cost explorer menu is updated
+    // NOTE: will be applied after the cost explorer menu is updated
     // if (convertMenuList[costIdx].subMenuList?.length === 4) {
     //     convertMenuList[costIdx].subMenuList?.push(
     //         {
