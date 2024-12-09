@@ -8,6 +8,9 @@ import type { _ColorSchemaOptions } from '@/common/modules/widgets/_widget-field
 import type { ComparisonOptions } from '@/common/modules/widgets/_widget-fields/comparison/type';
 import type { DateFormatOptions } from '@/common/modules/widgets/_widget-fields/date-format/type';
 import type { _GroupByOptions } from '@/common/modules/widgets/_widget-fields/group-by/type';
+import { ICON_FIELD_ITEMS } from '@/common/modules/widgets/_widget-fields/icon/constant';
+import type { IconOptions } from '@/common/modules/widgets/_widget-fields/icon/type';
+import type { _LegendOptions } from '@/common/modules/widgets/_widget-fields/legend/type';
 import type { StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
 import type { XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { YAxisOptions } from '@/common/modules/widgets/_widget-fields/y-axis/type';
@@ -50,9 +53,16 @@ export const widgetFieldDefaultValueMap: DefaultValueRegistry = {
         granularity: 'MONTHLY',
     },
     groupBy: {},
-    header: {},
-    icon: {},
-    legend: {},
+    header: undefined,
+    icon: {
+        toggleValue: true,
+        icon: { name: 'ic_circle-filled', label: 'Circle' },
+        color: gray[900],
+    },
+    legend: {
+        toggleValue: true,
+        position: 'right',
+    },
     max: {},
     min: {},
     missingValue: {},
@@ -211,8 +221,37 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
         return result;
     },
     header: () => widgetFieldDefaultValueMap.header,
-    icon: () => widgetFieldDefaultValueMap.icon,
-    legend: () => widgetFieldDefaultValueMap.legend,
+    icon: (widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const iconOptions = _fieldsSchema.icon?.options as IconOptions;
+
+        const initialValue = widgetFieldDefaultValueMap.icon;
+
+        if (iconOptions.toggle) {
+            const defaultIcon = ICON_FIELD_ITEMS.find((item) => item.name === iconOptions.default);
+
+            return {
+                ...initialValue,
+                toggleValue: true,
+                icon: iconOptions.default ? defaultIcon : initialValue.icon,
+            };
+        }
+        return undefined;
+    },
+    legend: (widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const legendOptions = _fieldsSchema.legend?.options as _LegendOptions;
+
+        const initialValue = widgetFieldDefaultValueMap.legend;
+
+        if (legendOptions.toggle) {
+            return {
+                toggleValue: true,
+                position: legendOptions.showPositionField ? initialValue.position : undefined,
+            };
+        }
+        return undefined;
+    },
     max: () => widgetFieldDefaultValueMap.max,
     min: () => widgetFieldDefaultValueMap.min,
     missingValue: () => widgetFieldDefaultValueMap.missingValue,
