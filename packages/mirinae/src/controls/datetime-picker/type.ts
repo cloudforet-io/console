@@ -33,4 +33,5 @@ export interface DatetimePickerProps {
     maxDate?: DateOption;
     selectMode: SELECT_MODE;
     dataType: DATA_TYPE;
+    placeholder?: string;
 }

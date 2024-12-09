@@ -163,7 +163,7 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
                 </slot>
             </div>
             <div class="extra-button-wrapper">
-                <span v-if="props.showDeleteAllButton && props.selectedItems.length > 0"
+                <span v-if="!props.readonly && !props.disabled && props.showDeleteAllButton && props.selectedItems.length > 0"
                       :class="{'delete-all-button': true, 'disabled': props.disabled}"
                       @click.stop="handleClickDeleteAll"
                 >

@@ -128,7 +128,7 @@ const dropdownMenu = computed<MenuItem[]>(() => ([
     },
 ]));
 
-const getRowSelectable = (item) => item.role_type === ROLE_TYPE.SYSTEM_ADMIN;
+const getRowSelectable = (item) => item.role_type !== ROLE_TYPE.SYSTEM_ADMIN;
 
 const handleSelectDropdown = (name: string) => {
     emit('select-action', name);
