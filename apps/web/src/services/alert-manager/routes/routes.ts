@@ -16,7 +16,7 @@ const AlertMainPage = () => import('@/services/alert-manager/pages/AlertMainPage
 const EscalationPolicyPage = () => import('@/services/alert-manager/pages/EscalationPolicyPage.vue');
 const AlertDetailPage = () => import('@/services/alert-manager/pages/AlertDetailPage.vue');
 
-const userStore = useUserStore(pinia);
+
 const alertManagerRoutes: RouteConfig = {
     path: 'alert-manager',
     name: ALERT_MANAGER_ROUTE._NAME,
@@ -24,7 +24,10 @@ const alertManagerRoutes: RouteConfig = {
         menuId: MENU_ID.ALERT_MANAGER,
         translationId: MENU_INFO_MAP[MENU_ID.ALERT_MANAGER].translationId,
     },
-    redirect: (to) => getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap),
+    redirect: (to) => {
+        const userStore = useUserStore(pinia);
+        return getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap);
+    },
     component: AlertManagerContainer,
     children: [
         {

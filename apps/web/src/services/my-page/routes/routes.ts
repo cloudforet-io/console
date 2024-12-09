@@ -18,7 +18,6 @@ const UserNotificationPage = () => import('@/services/my-page/pages/UserNotifica
 const UserNotificationAddPage = () => import('@/services/my-page/pages/UserNotificationAddPage.vue');
 
 
-const userStore = useUserStore(pinia);
 const myPageRoutes: RouteConfig = {
     path: '/my-page',
     name: MY_PAGE_ROUTE._NAME,
@@ -27,7 +26,10 @@ const myPageRoutes: RouteConfig = {
         translationId: MENU_INFO_MAP[MENU_ID.MY_PAGE].translationId,
         scope: ROUTE_SCOPE.USER,
     },
-    redirect: (to) => getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap),
+    redirect: (to) => {
+        const userStore = useUserStore(pinia);
+        return getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap);
+    },
     component: MyPageContainer,
     children: [
         {
