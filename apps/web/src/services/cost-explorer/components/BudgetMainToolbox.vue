@@ -11,13 +11,13 @@ import {
     makeDistinctValueHandler,
     makeReferenceValueHandler,
 } from '@cloudforet/core-lib/component-util/query-search';
-import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import type { Sort } from '@cloudforet/core-lib/space-connector/type';
 import {
     PToolbox, PSelectStatus, PButton, PSelectDropdown, PDivider, PTextPagination,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
+import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
 import { i18n } from '@/translations';
