@@ -17,6 +17,7 @@ import type { _IconValue } from '@/common/modules/widgets/_widget-fields/icon/ty
 import type { MaxValue } from '@/common/modules/widgets/_widget-fields/max/type';
 import type { MinValue } from '@/common/modules/widgets/_widget-fields/min/type';
 import type { _StackByValue, StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
+import type { TableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/table-column-width/type';
 import type { _XAxisValue, XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { _YAxisValue, YAxisOptions } from '@/common/modules/widgets/_widget-fields/y-axis/type';
 
@@ -142,6 +143,14 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
     pieChartType: () => true,
     subTotal: () => true,
     total: () => true,
+    tableColumnWidth: (fieldValue: TableColumnWidthValue) => {
+        if (!fieldValue.minimumWidth) return false;
+        if (fieldValue.widthType === 'fixed') {
+            if (!fieldValue.fixedWidth) return false;
+            if (fieldValue.fixedWidth < fieldValue.minimumWidth) return false;
+        }
+        return true;
+    },
 };
 
 

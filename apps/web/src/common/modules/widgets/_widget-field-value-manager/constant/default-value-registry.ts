@@ -1,5 +1,5 @@
 import {
-    COLOR_SCHEMA, DATE_FORMAT, DEFAULT_COMPARISON_COLOR, NUMBER_FORMAT,
+    COLOR_SCHEMA, DATE_FORMAT, DEFAULT_COMPARISON_COLOR, NUMBER_FORMAT, TABLE_DEFAULT_MINIMUM_WIDTH,
 } from '@/common/modules/widgets/_constants/widget-field-constant';
 import { integrateFieldsSchema } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
@@ -20,6 +20,7 @@ import type { NumberFormatOptions, NumberFormatValue } from '@/common/modules/wi
 import type { PieChartTypeOptions } from '@/common/modules/widgets/_widget-fields/pie-chart-type/type';
 import type { StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
 import type { SubTotalOptions } from '@/common/modules/widgets/_widget-fields/sub-total/type';
+import type { TableColumnWidthOptions } from '@/common/modules/widgets/_widget-fields/table-column-width/type';
 import type { TotalOptions } from '@/common/modules/widgets/_widget-fields/total/type';
 import type { XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { YAxisOptions } from '@/common/modules/widgets/_widget-fields/y-axis/type';
@@ -87,7 +88,11 @@ export const widgetFieldDefaultValueMap: DefaultValueRegistry = {
     },
     subTotal: undefined,
     total: undefined,
-    tableColumnWidth: {},
+    tableColumnWidth: {
+        minimumWidth: TABLE_DEFAULT_MINIMUM_WIDTH,
+        widthType: 'auto',
+        fixedWidth: undefined,
+    },
     textWrap: {},
     tooltipNumberFormat: {},
     widgetHeight: {},
@@ -357,7 +362,21 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
 
         return widgetFieldDefaultValueMap.total;
     },
-    tableColumnWidth: () => widgetFieldDefaultValueMap.tableColumnWidth,
+    tableColumnWidth: (widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const tableColumnWidthOptions = _fieldsSchema.tableColumnWidth?.options as TableColumnWidthOptions;
+
+        const initalValue = widgetFieldDefaultValueMap.tableColumnWidth;
+
+        if (tableColumnWidthOptions.defaultMinimumWidth || tableColumnWidthOptions.defaultFixedWidth) {
+            return {
+                minimumWidth: tableColumnWidthOptions.defaultMinimumWidth ? tableColumnWidthOptions.defaultMinimumWidth : initalValue.minimumWidth,
+                widthType: tableColumnWidthOptions?.defaultFixedWidth ? 'fixed' : 'auto',
+                fixedWidth: tableColumnWidthOptions?.defaultFixedWidth,
+            };
+        }
+        return initalValue;
+    },
     textWrap: () => widgetFieldDefaultValueMap.textWrap,
     tooltipNumberFormat: () => widgetFieldDefaultValueMap.tooltipNumberFormat,
     widgetHeight: () => widgetFieldDefaultValueMap.widgetHeight,
