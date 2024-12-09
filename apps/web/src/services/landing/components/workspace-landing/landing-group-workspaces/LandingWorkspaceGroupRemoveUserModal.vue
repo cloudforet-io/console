@@ -20,7 +20,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { workspaceStateFormatter, groupUserStateFormatter } from '@/services/advanced/composables/refined-table-data';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
 

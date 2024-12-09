@@ -21,8 +21,8 @@ import { arrayToQueryString, primitiveToQueryString } from '@/lib/router-query-s
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import type { CloudServiceMainPageUrlQuery } from '@/services/asset-inventory/types/cloud-service-page-type';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import type { CloudServiceMainPageUrlQuery } from '@/services/asset-inventory-v1/types/cloud-service-page-type';
 
 
 const DATA_TYPE = {

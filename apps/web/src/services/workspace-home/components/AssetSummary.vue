@@ -18,7 +18,7 @@ import { useUserStore } from '@/store/user/user-store';
 import type { PageAccessMap } from '@/lib/access-control/config';
 import { MENU_ID } from '@/lib/menu/config';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
 import AssetSummaryDailyUpdates from '@/services/workspace-home/components/AssetSummaryDailyUpdates.vue';
 import AssetSummaryProvider from '@/services/workspace-home/components/AssetSummaryProvider.vue';
 import EmptySummaryData from '@/services/workspace-home/components/EmptySummaryData.vue';

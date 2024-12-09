@@ -35,11 +35,11 @@ import {
     primary,
 } from '@/styles/colors';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
 import type {
     CloudServiceDetailPageUrlQuery,
     CloudServiceMainPageUrlQuery,
-} from '@/services/asset-inventory/types/cloud-service-page-type';
+} from '@/services/asset-inventory-v1/types/cloud-service-page-type';
 import ProjectSummaryAllSummaryWidgetRegionService
     from '@/services/project-v2/components/ProjectSummaryAllSummaryWidgetRegionService.vue';
 import { SERVICE_CATEGORY } from '@/services/project-v2/constants/project-summary-constant';

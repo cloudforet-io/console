@@ -31,7 +31,7 @@ import { MENU_ID } from '@/lib/menu/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
 import EmptySummaryData from '@/services/workspace-home/components/EmptySummaryData.vue';
 import { serviceAccountStateSummaryFormatter } from '@/services/workspace-home/composables/use-workspace-home';
 import { SUMMARY_DATA_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';

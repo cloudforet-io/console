@@ -26,8 +26,8 @@ import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-fiel
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { FullDataLink, WidgetFrameProps } from '@/common/modules/widgets/types/widget-frame-type';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import type { MetricFilter } from '@/services/asset-inventory/types/asset-analysis-type';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import type { MetricFilter } from '@/services/asset-inventory-v1/types/asset-analysis-type';
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 

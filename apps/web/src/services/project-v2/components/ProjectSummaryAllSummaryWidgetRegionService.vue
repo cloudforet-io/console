@@ -27,8 +27,8 @@ import {
     gray, coral, yellow, secondary1,
 } from '@/styles/colors';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import type { CloudServiceMainPageUrlQuery } from '@/services/asset-inventory/types/cloud-service-page-type';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
+import type { CloudServiceMainPageUrlQuery } from '@/services/asset-inventory-v1/types/cloud-service-page-type';
 
 
 interface Data {

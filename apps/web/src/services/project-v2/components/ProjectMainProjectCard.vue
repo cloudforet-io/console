@@ -21,7 +21,7 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { peacock } from '@/styles/colors';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
 import { PROJECT_ROUTE_V2 } from '@/services/project-v2/routes/route-constant';
 import { useProjectPageStore } from '@/services/project-v2/stores/project-page-store';
 import type { ProjectCardItemType } from '@/services/project-v2/types/project-type';

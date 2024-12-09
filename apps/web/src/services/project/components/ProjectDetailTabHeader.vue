@@ -46,7 +46,7 @@ import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { gray, peacock } from '@/styles/colors';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory-v1/routes/route-constant';
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import ProjectFormModal from '@/services/project/components/ProjectFormModal.vue';
