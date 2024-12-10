@@ -11,15 +11,15 @@ import {
 
 import { i18n } from '@/translations';
 
+import { blue } from '@/styles/colors';
+
 import type {
     ScheduleDayButtonType,
     ScheduleRadioType,
     ScheduleType,
     ScheduleDayType,
     ScheduleForm,
-} from '@/common/components/forms/schedule-setting/type';
-
-import { blue } from '@/styles/colors';
+} from '@/services/alert-manager-v2/types/schedule-setting-form';
 
 const emit = defineEmits<{(e: 'schedule-form', form: ScheduleForm): void; }>();
 
