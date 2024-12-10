@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
 import { computed, reactive } from 'vue';
-import { useRoute, useRouter } from 'vue-router/composables';
-
-import { clone } from 'lodash';
+import { useRouter } from 'vue-router/composables';
 
 import { screens, PTextButton } from '@cloudforet/mirinae';
 
@@ -13,10 +11,7 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
-import type { MenuId } from '@/lib/menu/config';
-import { MENU_ID } from '@/lib/menu/config';
 
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 
 const userWorkspaceStore = useUserWorkspaceStore();
@@ -24,7 +19,6 @@ const userWorkspaceGetters = userWorkspaceStore.getters;
 const userStore = useUserStore();
 
 const router = useRouter();
-const route = useRoute();
 
 const { width } = useWindowSize();
 
@@ -35,15 +29,6 @@ const storeState = reactive({
 const state = reactive({
     isTabletSize: computed(() => width.value < screens.tablet.max),
     isMobileSize: computed(() => width.value < screens.mobile.max),
-    selectedMenuId: computed(() => {
-        const reversedMatched = clone(route.matched).reverse();
-        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
-        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
-            return '';
-        }
-        return targetMenuId;
-    }),
 });
 </script>
 

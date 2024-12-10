@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { clone, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 
 import {
     PDataLoader, PIconButton, PLazyImg, PSearch, PEmpty, PTooltip,
@@ -17,12 +17,8 @@ import type {
     CloudServiceTypeReferenceMap,
 } from '@/store/reference/cloud-service-type-reference-store';
 import type { MetricReferenceItem } from '@/store/reference/metric-reference-store';
-import { useUserStore } from '@/store/user/user-store';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
-import type { MenuId } from '@/lib/menu/config';
-import { MENU_ID } from '@/lib/menu/config';
-
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { gray } from '@/styles/colors';
@@ -31,8 +27,6 @@ import MetricExplorerLSBMetricTree from '@/services/asset-inventory/components/M
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { NamespaceSubItemType } from '@/services/asset-inventory/types/asset-analysis-type';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
-
 
 interface Props {
     isDetailPage?: boolean;
@@ -44,7 +38,6 @@ const props = defineProps<Props>();
 const allReferenceStore = useAllReferenceStore();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
-const userStore = useUserStore();
 const { getProperRouteLocation } = useProperRouteLocation();
 const route = useRoute();
 
@@ -58,19 +51,9 @@ const storeState = reactive({
         return res;
     }),
     selectedNamespace: computed<NamespaceSubItemType|undefined>(() => metricExplorerPageState.selectedNamespace),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
-    selectedMenuId: computed(() => {
-        const reversedMatched = clone(route.matched).reverse();
-        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
-        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
-            return '';
-        }
-        return targetMenuId;
-    }),
-    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
+    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
     selectedId: computed<string|undefined>(() => {
         const routeName = getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME }).name;
         if (!props.isDetailPage) return undefined;

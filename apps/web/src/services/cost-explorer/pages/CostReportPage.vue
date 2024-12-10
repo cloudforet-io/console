@@ -2,9 +2,6 @@
 import {
     computed, onMounted, reactive, watch,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
-
-import { clone } from 'lodash';
 
 import {
     PHeading, PTab, PEmpty, PDataLoader,
@@ -14,11 +11,8 @@ import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type
 import { i18n } from '@/translations';
 
 import type { Currency } from '@/store/display/type';
-import { useUserStore } from '@/store/user/user-store';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
-import type { MenuId } from '@/lib/menu/config';
-import { MENU_ID } from '@/lib/menu/config';
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
 import CostReportMonthlyTotalAmountSummaryCard
     from '@/services/cost-explorer/components/CostReportMonthlyTotalAmountSummaryCard.vue';
@@ -26,20 +20,11 @@ import CostReportOverviewCostTrendCard from '@/services/cost-explorer/components
 import CostReportRecipientsCard from '@/services/cost-explorer/components/CostReportRecipientsCard.vue';
 import CostReportReportsTab from '@/services/cost-explorer/components/CostReportReportsTab.vue';
 import CostReportUpcomingReportCard from '@/services/cost-explorer/components/CostReportUpcomingReportCard.vue';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
-
-
 
 const costReportPageStore = useCostReportPageStore();
 const costReportPageState = costReportPageStore.state;
-const userStore = useUserStore();
 
-const route = useRoute();
-
-const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
-});
 const state = reactive({
     loading: true,
     tabs: computed<TabItem[]>(() => [
@@ -56,16 +41,7 @@ const state = reactive({
     ]),
     activeTab: 'overview',
     currency: 'KRW' as Currency,
-    selectedMenuId: computed(() => {
-        const reversedMatched = clone(route.matched).reverse();
-        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
-        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
-            return '';
-        }
-        return targetMenuId;
-    }),
-    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
+    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
 });
 
 /* Watcher */

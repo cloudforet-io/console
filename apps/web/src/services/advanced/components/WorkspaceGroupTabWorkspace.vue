@@ -2,10 +2,8 @@
 import {
     computed, onMounted, reactive, watch,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
 
 import dayjs from 'dayjs';
-import { clone } from 'lodash';
 
 import {
     PButton, PHeading, PI, PLink, PStatus, PToolboxTable, PTooltip, PHeadingLayout,
@@ -22,8 +20,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
-
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { gray } from '@/styles/colors';
@@ -35,7 +32,6 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-c
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
-
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
 const workspaceTabState = workspaceGroupPageStore.workspaceTabState;
@@ -43,23 +39,12 @@ const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
 const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
 
-const route = useRoute();
-
-const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
-});
-
 interface WorkspaceTableItem extends WorkspaceModel {
     remove_button: WorkspaceModel;
 }
 
 const state = reactive({
-    selectedMenuId: computed(() => {
-        const reversedMatched = clone(route.matched).reverse();
-        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-        return closestRoute?.meta?.menuId;
-    }),
-    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
+    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
     currency: computed<Currency|undefined>(() => workspaceGroupPageGetters.currency),
 });
 const tableState = reactive({
