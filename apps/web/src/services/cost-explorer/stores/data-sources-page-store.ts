@@ -24,9 +24,9 @@ import type { CostDataSourceModel } from '@/schema/cost-analysis/data-source/mod
 import type { CostJobCancelParameters } from '@/schema/cost-analysis/job/api-verbs/cancel';
 import type { CostJobListParameters } from '@/schema/cost-analysis/job/api-verbs/list';
 import type { CostJobModel } from '@/schema/cost-analysis/job/model';
-import { store } from '@/store';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
@@ -41,6 +41,7 @@ import type {
 export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
     const allReferenceStore = useAllReferenceStore();
     const allReferenceGetters = allReferenceStore.getters;
+    const userStore = useUserStore();
 
     const state = reactive({
         activeTab: 'detail',
@@ -73,7 +74,7 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
 
     const _getters = reactive({
         plugin: computed(() => allReferenceGetters.plugin),
-        timezone: computed(() => store.state.user.timezone),
+        timezone: computed<string|undefined>(() => userStore.state.timezone),
     });
 
     const getters = reactive({

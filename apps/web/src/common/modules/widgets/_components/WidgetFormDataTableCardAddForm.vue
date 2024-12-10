@@ -94,8 +94,6 @@ const advancedOptionsState = reactive({
         { label: 'None', name: 'none' },
         { label: 'Year', name: 'years' },
         { label: 'Month', name: 'months' },
-        // TODO: to be deprecated
-        // { label: 'Day', name: 'days' },
     ]),
     timeDiffDateMap: computed<Record<string, SelectDropdownMenuItem[]>>(() => ({
         years: range(2).map((i) => ({
@@ -106,11 +104,6 @@ const advancedOptionsState = reactive({
             label: i === 0 ? 'Last 1 Month' : `Last ${i + 1} Months`,
             name: String(i + 1),
         })),
-        // TODO: to be deprecated
-        // days: range(31).map((i) => ({
-        //     label: i === 0 ? 'Last 1 Day' : `Last ${i + 1} Days`,
-        //     name: String(i + 1),
-        // })),
     })),
 });
 

@@ -6,14 +6,12 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal, PDefinitionTable, PLink } from '@cloudforet/mirinae';
 
-
-
 import type { CostReportSendParameters } from '@/schema/cost-analysis/cost-report/api-verbs/send';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleType } from '@/schema/identity/role/type';
 import { i18n } from '@/translations';
 
-import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import { CURRENCY_SYMBOL } from '@/store/display/constant';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

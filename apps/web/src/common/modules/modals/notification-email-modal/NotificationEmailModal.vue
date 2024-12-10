@@ -113,9 +113,9 @@ import {
     PTextInput,
 } from '@cloudforet/mirinae';
 
-
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import { postValidationCode, postUserProfileValidationEmail } from '@/lib/helper/verify-email-helper';
 
@@ -139,10 +139,11 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits(['visible', 'refresh-user']);
 
+const userStore = useUserStore();
 const state = reactive({
     loading: false,
     isCollapsed: true,
-    loginUserId: computed(() => store.state.user.userId),
+    loginUserId: computed<string|undefined>(() => userStore.state.userId),
     proxyVisible: useProxyValue('visible', props, emit),
     proxyModalType: '',
 });
@@ -178,7 +179,8 @@ const handleClickSendEmailButton = async () => {
             email: formState.newNotificationEmail,
         });
         if (state.loginUserId === props.userId) {
-            await store.dispatch('user/setUser', { email: formState.newNotificationEmail, email_verified: false });
+            await userStore.updateUser({ email: formState.newNotificationEmail });
+            userStore.setEmailVerified(false);
         }
         state.proxyModalType = MODAL_TYPE.VERIFY;
     } catch (error: any) {
@@ -193,7 +195,7 @@ const handleClickConfirmButton = async () => {
     try {
         await postValidationCode({
             verify_code: formState.verificationCode,
-        });
+        }, userStore);
         emit('refresh-user');
         state.proxyVisible = false;
         resetFormData();

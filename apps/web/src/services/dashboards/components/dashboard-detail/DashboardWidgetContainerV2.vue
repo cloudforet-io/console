@@ -23,10 +23,10 @@ import type { PublicWidgetCreateParameters } from '@/schema/dashboard/public-wid
 import type { PublicWidgetDeleteParameters } from '@/schema/dashboard/public-widget/api-verbs/delete';
 import type { PublicWidgetUpdateParameters } from '@/schema/dashboard/public-widget/api-verbs/update';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+import { useDisplayStore } from '@/store/display/display-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
@@ -74,6 +74,7 @@ const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 const allReferenceStore = useAllReferenceStore();
+const displayStore = useDisplayStore();
 
 /* State */
 const containerRef = ref<HTMLElement|null>(null);
@@ -103,8 +104,7 @@ const getRefinedWidgetInfoList = (dashboardWidgets: Array<PublicWidgetModel|Priv
     if (!dashboardWidgets.length) {
         return [];
     }
-    const _refinedWidgets: RefinedWidgetInfo[] = [];
-    const _widgetSizeList: WidgetSize[] = [];
+    let _refinedWidgets: RefinedWidgetInfo[] = [];
     dashboardDetailGetters.dashboardLayouts.forEach((d) => {
         const _widgetIdList = d.widgets;
         _widgetIdList?.forEach((widgetId) => {
@@ -120,15 +120,11 @@ const getRefinedWidgetInfoList = (dashboardWidgets: Array<PublicWidgetModel|Priv
                 size: _size,
                 component: _component,
             });
-            _widgetSizeList.push(_size);
         });
     });
 
     // width
-    const _widths = flattenDeep(widgetWidthAssigner(_widgetSizeList, containerWidth.value));
-    _refinedWidgets.forEach((widget, idx) => {
-        widget.width = _widths[idx];
-    });
+    _refinedWidgets = getResizedWidgetInfoList(_refinedWidgets, containerWidth.value);
 
     return _refinedWidgets;
 };
@@ -159,6 +155,15 @@ const loadAWidget = async (widgetId: string) => {
         if (typeof comp.loadWidget !== 'function') return;
         comp.loadWidget();
     });
+};
+const getResizedWidgetInfoList = (widgetInfoList: RefinedWidgetInfo[], _containerWidth: number): RefinedWidgetInfo[] => {
+    const _refinedWidgetInfoList = cloneDeep(widgetInfoList);
+    const _widgetSizeList: WidgetSize[] = widgetInfoList.map((widget) => widget.size);
+    const _widths: number[] = flattenDeep(widgetWidthAssigner(_widgetSizeList, _containerWidth));
+    _refinedWidgetInfoList.forEach((widget, idx) => {
+        widget.width = _widths[idx];
+    });
+    return _refinedWidgetInfoList;
 };
 
 
@@ -228,8 +233,8 @@ const getRefinedDataTables = (dataTableList: DataTableModel[]) => {
         };
         if (dt.data_type === DATA_TABLE_TYPE.TRANSFORMED) {
             if (dt.operator === 'JOIN' || dt.operator === 'CONCAT') {
-                const _dataTableIds = dt.options[dt.operator].data_tables;
-                const _dataTableIndices = _dataTableIds.map((dtId) => dataTableList.findIndex((d) => d.data_table_id === dtId));
+                const _dataTableIds = dt.options[dt.operator]?.data_tables;
+                const _dataTableIndices = _dataTableIds?.map((dtId) => dataTableList.findIndex((d) => d.data_table_id === dtId));
                 _sharedDataTable.options = {
                     [dt.operator]: {
                         ...dt.options[dt.operator],
@@ -237,7 +242,7 @@ const getRefinedDataTables = (dataTableList: DataTableModel[]) => {
                     },
                 };
             } else if (dt.operator === 'EVAL' || dt.operator === 'QUERY') {
-                const _dataTableId = dt.options[dt.operator].data_table_id;
+                const _dataTableId = dt.options[dt.operator]?.data_table_id;
                 const _dataTableIdx = dataTableList.findIndex((d) => d.data_table_id === _dataTableId);
                 _sharedDataTable.options = {
                     [dt.operator]: {
@@ -317,16 +322,6 @@ const handleWidgetMounted = (widgetId: string) => {
         [widgetId]: true,
     };
 };
-// eslint-disable-next-line no-undef
-const handleIntersectionObserver: IntersectionObserverCallback = async ([{ isIntersecting, target }], observer) => {
-    if (isIntersecting) {
-        if (state.isAllWidgetsMounted) {
-            state.intersectedWidgetMap[target.id] = true;
-            state.intersectedWidgetMap = { ...state.intersectedWidgetMap };
-            observer.unobserve(target);
-        }
-    }
-};
 const handleDeleteModalConfirm = async () => {
     const _targetWidgetId = widgetDeleteState.targetWidget?.widget_id as string;
     // 1. remove from dashboard layouts
@@ -368,6 +363,22 @@ watch(() => dashboardDetailState.dashboardWidgets, (dashboardWidgets) => {
         });
     }
 }, { immediate: true });
+watch(() => containerWidth.value, (_containerWidth) => {
+    if (!state.refinedWidgetInfoList?.length) return;
+    state.refinedWidgetInfoList = getResizedWidgetInfoList(state.refinedWidgetInfoList, _containerWidth);
+});
+
+/* Widget Intersection Observer */
+// eslint-disable-next-line no-undef
+const handleIntersectionObserver: IntersectionObserverCallback = async ([{ isIntersecting, target }], observer) => {
+    if (isIntersecting) {
+        if (state.isAllWidgetsMounted) {
+            state.intersectedWidgetMap[target.id] = true;
+            state.intersectedWidgetMap = { ...state.intersectedWidgetMap };
+            observer.unobserve(target);
+        }
+    }
+};
 let widgetObserverMap: Record<string, IntersectionObserver> = {};
 const stopWidgetRefWatch = watch([widgetRef, () => state.isAllWidgetsMounted], ([widgetRefs, allMounted]) => {
     if (widgetObserverMap) {
@@ -420,7 +431,7 @@ defineExpose({
                                :size="widget.size"
                                :width="widget.width"
                                :widget-options="widget.options"
-                               :mode="store.state.display.visibleSidebar ? 'edit-layout' : 'view'"
+                               :mode="displayStore.state.visibleSidebar ? 'edit-layout' : 'view'"
                                :loading="getWidgetLoading()"
                                :dashboard-options="dashboardDetailState.options"
                                :dashboard-vars="dashboardDetailGetters.refinedVars"

@@ -11,7 +11,7 @@ import { computed, onUnmounted } from 'vue';
 
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 
-import { store } from '@/store';
+import { useUserStore } from '@/store/user/user-store';
 
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 
@@ -23,9 +23,10 @@ export default {
         GeneralPageLayout,
     },
     setup() {
-        const userId = computed(() => store.state.user.userId);
+        const userStore = useUserStore();
+        const userId = computed(() => userStore.state.userId || '');
         const alertManagerSettings = useAlertManagerSettingsStore();
-        alertManagerSettings.initState();
+        alertManagerSettings.initState(userId.value);
         alertManagerSettings.$onAction((action) => {
             action.after(() => {
                 if (window) {

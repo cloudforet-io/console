@@ -1,4 +1,3 @@
-/* eslint-disable import/no-cycle */
 import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
@@ -96,7 +95,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const roleReferenceStore = useRoleReferenceStore();
 
     const getters = reactive({
-        // TODO: unify into one case (serviceAccount or service_account)
+        // REFACTOR: unify into one case (serviceAccount or service_account)
         cloudServiceType: computed<CloudServiceTypeReferenceMap>(() => cloudServiceTypeReferenceStore.getters.cloudServiceTypeItems),
         cloud_service_type: computed<CloudServiceTypeReferenceMap>(() => cloudServiceTypeReferenceStore.getters.cloudServiceTypeItems),
         collector: computed<CollectorReferenceMap>(() => collectorReferenceStore.getters.collectorItems),

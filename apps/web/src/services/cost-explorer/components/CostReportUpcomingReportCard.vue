@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 import { PButton, PSkeleton, PDivider } from '@cloudforet/mirinae';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { languages } from '@/store/modules/user/config';
+import { languages } from '@/store/user/constant';
 
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
 import CostReportSettingsModal from '@/services/cost-explorer/components/CostReportSettingsModal.vue';

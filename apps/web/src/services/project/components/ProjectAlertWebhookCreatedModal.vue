@@ -11,11 +11,11 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { WebhookModel } from '@/schema/monitoring/webhook/model';
-import { store } from '@/store';
 import { i18n as _i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { copyAnyData } from '@/lib/helper/copy-helper';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -38,13 +38,14 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const allReferenceStore = useAllReferenceStore();
+const userStore = useUserStore();
 const router = useRouter();
 
 const emit = defineEmits<{(e: 'confirm'): void}>();
 
 const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
-    language: computed(() => store.state.user.language),
+    language: computed<string|undefined>(() => userStore.state.language),
 });
 
 const state = reactive({
@@ -85,7 +86,7 @@ const handleCopyWebhookUrl = () => {
                   class="project-alert-webhook-created-modal"
                   @update:visible="handleCloseSucceedModal"
     >
-        <!-- TODO: will be updated field name -->
+        <!-- HACK: will be updated field name -->
         <!--        <template #header-desc>-->
         <!--            <i18n path="PROJECT.DETAIL.ALERT.WEB_HOOK.SUCCEED_MODAL.DESC">-->
         <!--                <template #guide>-->

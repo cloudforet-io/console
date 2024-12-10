@@ -17,8 +17,9 @@ import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { UserUpdateParameters } from '@/schema/identity/user/api-verbs/update';
 import type { UserMfa, UserModel } from '@/schema/identity/user/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import config from '@/lib/config';
 import { postUserDisableMfa } from '@/lib/helper/multi-factor-auth-helper';
@@ -52,6 +53,7 @@ interface UserManagementData {
 
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
+const userStore = useUserStore();
 
 const emit = defineEmits<{(e: 'confirm'): void; }>();
 
@@ -60,8 +62,8 @@ const state = reactive({
     mfaLoading: false,
     data: computed<UserListItemType>(() => userPageStore.getters.selectedUsers[0]),
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
-    mfa: computed<UserMfa>(() => store.state.user.mfa),
-    loginUserId: computed(() => store.state.user.userId),
+    mfa: computed<UserMfa|undefined>(() => userStore.state.mfa),
+    loginUserId: computed<string|undefined>(() => userStore.state.userId),
     isChangedMfaToggle: false,
     isChangedRoleToggle: false,
     roleBindingList: [] as RoleBindingModel[],
@@ -117,7 +119,10 @@ const handleConfirm = async () => {
             await updateUserEmail();
             await verifyUserEmail();
             if (state.loginUserId === state.data.user_id) {
-                await store.dispatch('user/setUser', { email: state.data.email, email_verified: true });
+                await userStore.updateUser({
+                    email: state.data.email,
+                });
+                userStore.setEmailVerified(true);
             }
             userPageStore.setUserEmail(state.data.user_id, state.data.email);
         }
@@ -144,7 +149,7 @@ const handleConfirm = async () => {
     }
 };
 const fetchRoleBinding = async (item?: AddModalMenuItem) => {
-    if (state.data.user_id === store.state.user.userId) return;
+    if (state.data.user_id === userStore.state.userId) return;
     if (isEmpty(formState.role)) return;
 
     const roleParams = {
@@ -189,11 +194,9 @@ const fetchPostDisableMfa = async () => {
             user_id: state.data.user_id || '',
         });
         if (state.loginUserId === state.data.user_id) {
-            await store.dispatch('user/setUser', {
-                mfa: {
-                    ...state.data?.mfa,
-                    state: 'DISABLED',
-                },
+            userStore.setMfa({
+                ...state.data.mfa as UserMfa,
+                state: 'DISABLED',
             });
         }
     } catch (e: any) {

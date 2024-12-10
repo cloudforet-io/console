@@ -15,7 +15,6 @@ import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-us
 import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
-import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -64,7 +63,6 @@ export const useWorkspacePageStore = defineStore('page-workspace', {
         roles: [],
     }),
     getters: {
-        timezone: () => store.state.user.timezone,
         selectedWorkspaces: (state) => state.selectedIndices.reduce((refined: WorkspaceModel[], idx: number) : WorkspaceModel[] => {
             refined.push(state.workspaces[idx]);
             return refined;

@@ -17,10 +17,10 @@ import type { ResourceGroupType } from '@/schema/_common/type';
 import type { PostUpdateParameters } from '@/schema/board/post/api-verbs/update';
 import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -49,13 +49,14 @@ const noticeDetailStore = useNoticeDetailStore();
 const noticeDetailState = noticeDetailStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
+const userStore = useUserStore();
 
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
     postResourceGroup: computed<ResourceGroupType|undefined>(() => noticeDetailState.post?.resource_group),
+    userName: computed<string|undefined>(() => userStore.state.name),
 });
 const state = reactive({
-    userName: computed<string>(() => store.state.user.name),
     isPinned: false,
     isPopup: false,
     attachments: [] as Attachment[],
@@ -81,7 +82,7 @@ const {
     isAllValid,
 } = useFormValidator({
     noticeTitle: noticeDetailState.post?.title ?? '',
-    writerName: noticeDetailState.post?.writer || state.userName || '',
+    writerName: noticeDetailState.post?.writer || storeState.userName || '',
     contents: noticeDetailState.post?.contents || '',
 }, {
     noticeTitle(value: string) { return value.trim().length ? '' : i18n.t('INFO.NOTICE.FORM.TITLE_REQUIRED'); },
@@ -153,7 +154,7 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
     state.isPinned = notice?.options?.is_pinned ?? false;
     state.isPopup = notice?.options?.is_popup ?? false;
     state.attachments = notice?.files?.map((file) => ({ fileId: file.file_id, downloadUrl: file.download_url ?? '' })) ?? [];
-    setForm('writerName', notice?.writer ?? store.state.user.name);
+    setForm('writerName', notice?.writer ?? storeState.userName);
     setForm('noticeTitle', notice?.title ?? '');
     setForm('contents', notice?.contents ?? '');
 
@@ -190,7 +191,7 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
                             <p-text-input :value="writerName"
                                           block
                                           :invalid="invalid"
-                                          :placeholder="$store.state.user.name || $t('INFO.NOTICE.FORM.PLACEHOLDER_REQUIRED')"
+                                          :placeholder="storeState.userName || $t('INFO.NOTICE.FORM.PLACEHOLDER_REQUIRED')"
                                           @update:value="setForm('writerName', $event)"
                             />
                         </div>

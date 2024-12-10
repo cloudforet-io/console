@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import { computed, reactive, watch } from 'vue';
 import draggable from 'vuedraggable';
 
@@ -9,12 +8,11 @@ import {
 } from '@cloudforet/mirinae';
 import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
 
-
-import { store } from '@/store';
+import type { UserType } from '@/schema/identity/user/type';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import type { UserState } from '@/store/modules/user/type';
+import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -75,10 +73,14 @@ const emit = defineEmits<{(e: 'complete'): void;
 
 const appContextStore = useAppContextStore();
 const appContextGetters = appContextStore.getters;
+const userStore = useUserStore();
 
 let schema: any = {};
-const _userConfigMap = computed<UserState>(() => store.state.user);
 
+const storeState = reactive({
+    userId: computed<string|undefined>(() => userStore.state.userId),
+    userType: computed<UserType|undefined>(() => userStore.state.userType),
+});
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     search: '',
@@ -166,8 +168,8 @@ const getColumns = async (includeOptionalFields = false): Promise<DynamicField[]
         if (state.isServiceAccountTable && props.resourceType) {
             res = await getServiceAccountTableSchema({
                 userData: {
-                    userType: _userConfigMap.value.userType ?? 'USER',
-                    userId: _userConfigMap.value.userId ?? '',
+                    userType: storeState.userType ?? 'USER',
+                    userId: storeState.userId ?? '',
                 },
                 resourceType: props.resourceType,
                 options,
@@ -222,8 +224,8 @@ const updatePageSchema = async () => {
         if (state.isServiceAccountTable && props.resourceType) {
             await updateCustomTableSchema(
                 {
-                    userType: _userConfigMap.value.userType ?? 'USER',
-                    userId: _userConfigMap.value.userId ?? '',
+                    userType: storeState.userType ?? 'USER',
+                    userId: storeState.userId ?? '',
                 },
                 props.resourceType,
                 props.options.provider ?? '',

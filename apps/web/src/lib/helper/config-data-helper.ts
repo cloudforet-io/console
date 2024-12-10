@@ -5,7 +5,7 @@ import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
 
-import type { DisplayMenu } from '@/store/modules/display/type';
+import type { DisplayMenu } from '@/store/display/type';
 import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { MetricReferenceMap, MetricReferenceItem } from '@/store/reference/metric-reference-store';
@@ -30,7 +30,7 @@ export const convertMenuConfigToReferenceData = (config: ConfigData[]|null, menu
     const convertMenuList = cloneDeep(menuList);
     // const costIdx = convertMenuList.findIndex((i) => i.id === MENU_ID.COST_EXPLORER);
 
-    // TODO: will be applied after the cost explorer menu is updated
+    // NOTE: will be applied after the cost explorer menu is updated
     // if (convertMenuList[costIdx].subMenuList?.length === 4) {
     //     convertMenuList[costIdx].subMenuList?.push(
     //         {

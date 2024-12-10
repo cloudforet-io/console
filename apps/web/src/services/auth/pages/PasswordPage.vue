@@ -15,7 +15,7 @@
                         >
                             {{ $t('AUTH.PASSWORD.RESET.HELP_TEXT') }}
                             <span class="emphasis">
-                                {{ state.userInfo.userId }}
+                                {{ userStore.state.userId }}
                             </span>
                         </p>
                         <p v-if="props.status === PASSWORD_STATUS.FIND"
@@ -86,11 +86,9 @@
 <script setup lang="ts">
 import type { ComponentPublicInstance, ComputedRef } from 'vue';
 import {
-    computed,
-    getCurrentInstance, onMounted, reactive, ref,
+    computed, onMounted, reactive, ref,
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
-import type { Vue } from 'vue/types/vue';
 
 import dayjs from 'dayjs';
 import type { JwtPayload } from 'jwt-decode';
@@ -102,13 +100,12 @@ import { PButton, PDataLoader, PIconButton } from '@cloudforet/mirinae';
 import { SpaceRouter } from '@/router';
 import type { UserProfileResetPasswordParameters } from '@/schema/identity/user-profile/api-verbs/reset-password';
 import type { UserProfileUpdateParameters } from '@/schema/identity/user-profile/api-verbs/update';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { ERROR_ROUTE, ROOT_ROUTE } from '@/router/constant';
 
 import { useDomainStore } from '@/store/domain/domain-store';
-import type { UserState } from '@/store/modules/user/type';
+import { useUserStore } from '@/store/user/user-store';
 
 import { emailValidator } from '@/lib/helper/user-validation-helper';
 
@@ -136,11 +133,11 @@ const props = withDefaults(defineProps<Props>(), {
 
 const passwordFormEl = ref<ComponentPublicInstance<PasswordFormExpose>>();
 
-const vm = getCurrentInstance()?.proxy as Vue;
 const router = useRouter();
 const route = useRoute();
 
 const domainStore = useDomainStore();
+const userStore = useUserStore();
 const state = reactive({
     loading: false,
     userType: '',
@@ -154,7 +151,6 @@ const state = reactive({
         return i18n.t('AUTH.PASSWORD.RESET.TITLE');
     }),
     domainId: computed<string>(() => domainStore.state.domainId),
-    userInfo: computed<UserState>(() => store.state.user),
     tags: {},
 });
 const {
@@ -196,7 +192,7 @@ const handleClickButton = () => {
     resetInputs();
 };
 const getSSOTokenFromUrl = (): string|undefined => {
-    const query = vm.$router.currentRoute.query;
+    const query = router.currentRoute.query;
     return query.sso_access_token as string;
 };
 const getUserIdFromToken = (ssoAccessToken: string): string | undefined => {
@@ -244,7 +240,7 @@ const postResetPassword = async (request) => {
     state.loading = true;
     try {
         const userInfo = await SpaceConnector.clientV2.identity.userProfile.update<UserProfileUpdateParameters>(request);
-        await store.commit('user/setUser', userInfo);
+        await userStore.setUserInfo(userInfo);
         SpaceConnector.flushToken();
         await SpaceRouter.router.replace({ name: AUTH_ROUTE.EMAIL._NAME, query: { status: 'done' } }).catch(() => {});
     } catch (e: any) {
@@ -266,10 +262,8 @@ const initStatesByUrlSSOToken = async () => {
         const userId = getUserIdFromToken(ssoAccessToken);
         if (!userId) return;
 
-        state.userInfo.userId = userId;
-        state.userInfo.email = userId;
-
-        await store.commit('user/setUser', state.userInfo);
+        userStore.setEmail(userId);
+        userStore.setUserId(userId);
     } catch (e: any) {
         if (e.message.includes('Invalid token')) {
             ErrorHandler.handleError('Invalid token.');
@@ -289,7 +283,7 @@ onMounted(() => {
     if (ssoAccessToken) return;
 
     const isResetPasswordPage = route.name === AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME;
-    const hasRequiredUpdatePassword = store.state.user.requiredActions?.includes('UPDATE_PASSWORD');
+    const hasRequiredUpdatePassword = userStore.state.requiredActions?.includes('UPDATE_PASSWORD');
     // Access by normal sign in
     if (isResetPasswordPage && !hasRequiredUpdatePassword) router.push(ROOT_ROUTE._NAME);
 });

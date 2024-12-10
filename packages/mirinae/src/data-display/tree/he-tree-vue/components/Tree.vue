@@ -76,7 +76,7 @@ const props = withDefaults(defineProps<Props>(), {
     foldAllAfterMounted: undefined,
 });
 
-// TODO: add events from composables
+// HACK: add events from composables
 const emit = defineEmits<{(event: 'input', value: any[]): void;
     (event: 'update:value', value: any[]): void;
     (event: 'update:root-node', value: any[]): void;

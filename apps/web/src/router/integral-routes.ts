@@ -1,13 +1,14 @@
 import type { RouteConfig } from 'vue-router';
 
-import { store } from '@/store';
-
 import { adminRoutes } from '@/router/admin-routes';
 import { ROOT_ROUTE, ROUTE_SCOPE } from '@/router/constant';
 import { errorRoutes } from '@/router/error-routes';
 import { externalRoutes } from '@/router/external-routes';
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 import { workspaceRoutes } from '@/router/workspace-routes';
+
+import { pinia } from '@/store/pinia';
+import { useUserStore } from '@/store/user/user-store';
 
 import authRoutes from '@/services/auth/routes/routes';
 import landingPageRoutes from '@/services/landing/routes/routes';
@@ -35,7 +36,8 @@ export const integralRoutes: RouteConfig[] = [
                 name: ROOT_ROUTE.ADMIN._NAME,
                 meta: { scope: ROUTE_SCOPE.DOMAIN },
                 redirect: () => {
-                    if (!store.getters['user/isDomainAdmin']) return { name: ROOT_ROUTE.WORKSPACE._NAME };
+                    const userStore = useUserStore(pinia);
+                    if (!userStore.getters.isDomainAdmin) return { name: ROOT_ROUTE.WORKSPACE._NAME };
                     return ({ name: makeAdminRouteName(WORKSPACE_HOME_ROUTE._NAME) });
                 },
                 component: { template: '<router-view />' },

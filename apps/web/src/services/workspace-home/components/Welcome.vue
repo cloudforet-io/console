@@ -3,11 +3,13 @@ import { computed, reactive } from 'vue';
 
 import { PButton } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
+import { useUserStore } from '@/store/user/user-store';
 
+
+const userStore = useUserStore();
 const storeState = reactive({
-    language: computed<string>(() => store.state.user.language),
-    userName: computed<string>(() => store.state.user.name),
+    language: computed<string|undefined>(() => userStore.state.language),
+    userName: computed<string|undefined>(() => userStore.state.name),
 });
 
 const handleClickButton = () => {

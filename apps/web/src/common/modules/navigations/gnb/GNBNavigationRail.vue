@@ -12,10 +12,9 @@ import {
 } from '@cloudforet/mirinae';
 import type { ContextMenuType } from '@cloudforet/mirinae/src/controls/context-menu/type';
 
-import { store } from '@/store';
-
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import type { DisplayMenu } from '@/store/modules/display/type';
+import { useDisplayStore } from '@/store/display/display-store';
+import type { DisplayMenu } from '@/store/display/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
@@ -43,6 +42,7 @@ const gnbStore = useGnbStore();
 const gnbGetters = gnbStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
+const displayStore = useDisplayStore();
 
 const route = useRoute();
 const router = useRouter();
@@ -64,7 +64,8 @@ const state = reactive({
     isMenuDescription: undefined as boolean | undefined,
     gnbMenuList: computed<GNBMenuType[]|undefined>(() => {
         let results = [] as GNBMenuType[];
-        const menuList = [...store.getters['display/GNBMenuList']];
+        const allMenuList = displayStore.getAllMenuList(route);
+        const menuList = allMenuList.filter((d) => !d.hideOnGNB);
         if (state.isInit && isEmpty(storeState.costDataSource)) {
             results = refinedMenuList(menuList, MENU_ID.COST_EXPLORER);
         } else results = menuList;
@@ -208,13 +209,6 @@ onMounted(async () => {
                             </span>
                         </div>
                     </div>
-                    <!--            TODO: low priority -->
-                    <!--            <favorite-button v-if="item.subMenuList?.length === 0"-->
-                    <!--                             class="favorite-button"-->
-                    <!--                             :item-id="item.id"-->
-                    <!--                             :favorite-type="FAVORITE_TYPE.MENU"-->
-                    <!--                             scale="0.65"-->
-                    <!--            />-->
                 </router-link>
                 <div v-else>
                     <div v-if="state.isMenuDescription"

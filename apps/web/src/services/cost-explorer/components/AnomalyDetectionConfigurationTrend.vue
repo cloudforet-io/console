@@ -74,7 +74,7 @@ const handleSelectPeriod = (periodMenuName: string) => {
                 temp chart area
             </div>
             <div class="legend-wrapper">
-                <!-- TODO: temp data -->
+                <!-- HACK: temp data -->
                 <div class="legend">
                     <span>2023-01-01</span>
                     <span class="count">8</span>

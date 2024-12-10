@@ -14,13 +14,15 @@
 
 <script lang="ts">
 import {
-    defineComponent, getCurrentInstance, reactive, toRefs,
+    defineComponent, reactive, toRefs,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
+import { useRouter } from 'vue-router/composables';
 
 import { PButton } from '@cloudforet/mirinae';
 
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
+
+
 
 export default defineComponent({
     name: 'KEYCLOAKODIC',
@@ -28,13 +30,13 @@ export default defineComponent({
         PButton,
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as Vue;
+        const router = useRouter();
         const state = reactive({
             keycloakVisible: false,
         });
 
         const openKeycloakSignIn = () => {
-            vm.$router.push({ name: AUTH_ROUTE.SIGN_IN.KEYCLOAK._NAME });
+            router.push({ name: AUTH_ROUTE.SIGN_IN.KEYCLOAK._NAME });
         };
         return {
             openKeycloakSignIn,

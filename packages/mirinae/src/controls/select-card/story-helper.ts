@@ -207,6 +207,21 @@ export const getSelectCardArgTypes = (): ArgTypes => ({
         },
         control: 'number',
     },
+    showSelectMarker: {
+        name: 'showSelectMarker',
+        type: { name: 'boolean' },
+        description: 'Whether to display the select marker or not.',
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: 'boolean',
+    },
     /* slot */
     defaultSlot: {
         name: 'default',

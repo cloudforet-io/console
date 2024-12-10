@@ -11,7 +11,10 @@ import SystemAdminImage from '@/assets/images/role/img_avatar_system-admin.png';
 import WorkspaceMemberImage from '@/assets/images/role/img_avatar_workspace-member.png';
 import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import { store } from '@/store';
+import type { RoleType } from '@/schema/identity/role/type';
+import type { AuthType } from '@/schema/identity/user/type';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import config from '@/lib/config';
 
@@ -21,17 +24,18 @@ import UserAccountMultiFactorAuth from '@/services/my-page/components/UserAccoun
 import UserAccountNotificationEmail from '@/services/my-page/components/UserAccountNotificationEmail.vue';
 
 
+const userStore = useUserStore();
 const storeState = reactive({
-    authType: computed(() => store.state.user.authType),
-    baseRoleType: computed(() => store.state.user.roleType),
-    currentRoleType: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType),
-    userId: computed(() => store.state.user.userId),
+    authType: computed<AuthType|undefined>(() => userStore.state.authType),
+    baseRoleType: computed<RoleType|undefined>(() => userStore.state.roleType),
+    currentRoleType: computed(() => userStore.state.currentRoleInfo?.roleType),
+    userId: computed<string|undefined>(() => userStore.state.userId),
 });
 const state = reactive({
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
     icon: computed<string>(() => {
-        if (store.getters['user/isSystemAdmin']) return SystemAdminImage;
-        if (store.getters['user/isDomainAdmin']) return DomainAdminImage;
+        if (userStore.getters.isSystemAdmin) return SystemAdminImage;
+        if (userStore.getters.isDomainAdmin) return DomainAdminImage;
         const currentRoleType = storeState.currentRoleType;
         if (currentRoleType === ROLE_TYPE.WORKSPACE_OWNER) return WorkspaceOwnerImage;
         if (currentRoleType === ROLE_TYPE.WORKSPACE_MEMBER) return WorkspaceMemberImage;
@@ -54,7 +58,6 @@ const state = reactive({
         <div class="contents-wrapper">
             <p-pane-layout class="role-card-content">
                 <div class="icon-wrapper">
-                    <!-- TODO: Will add user image src -->
                     <p-avatar size="xl" />
                     <p-lazy-img v-if="state.roleType === 'Admin'"
                                 :src="state.icon"

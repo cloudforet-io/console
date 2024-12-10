@@ -4,16 +4,21 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { cloneDeep } from 'lodash';
+
 import {
     PButtonModal, PFieldGroup, PTextInput,
 } from '@cloudforet/mirinae';
 
 import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
 import type { UserMfa } from '@/schema/identity/user/model';
-import { store } from '@/store';
 import { i18n as _i18n } from '@/translations';
 
+import { useUserStore } from '@/store/user/user-store';
+
 import { postValidationMfaCode } from '@/lib/helper/multi-factor-auth-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import UserAccountMultiFactorAuthModalEmailInfo from '@/services/my-page/components/UserAccountMultiFactorAuthModalEmailInfo.vue';
 import UserAccountMultiFactorAuthModalFolding from '@/services/my-page/components/UserAccountMultiFactorAuthModalFolding.vue';
@@ -26,12 +31,13 @@ import type {
 
 const multiFactorAuthStore = useMultiFactorAuthStore();
 const multiFactorAuthState = multiFactorAuthStore.state;
+const userStore = useUserStore();
 
 const emit = defineEmits<{(e: 'refresh'): void }>();
 
 const storeState = reactive({
-    userId: computed<string>(() => store.state.user.userId),
-    mfa: computed<UserMfa|undefined>(() => store.state.user.mfa || undefined),
+    userId: computed<string|undefined>(() => userStore.state.userId),
+    mfa: computed<UserMfa|undefined>(() => userStore.state.mfa || undefined),
     selectedType: computed<string>(() => multiFactorAuthState.selectedType),
     isReSyncModal: computed<boolean>(() => multiFactorAuthState.modalType === 'RE_SYNC'),
     isDisabledModal: computed<boolean>(() => multiFactorAuthState.modalType === 'DISABLED'),
@@ -83,9 +89,13 @@ const handleChangeInput = (value: string) => {
     validationState.validationCodeInvalidText = '';
 };
 const handleClickCancel = async () => {
-    await resetFormData();
+    resetFormData();
     if (storeState.userId === state.userInfo.user_id) {
-        await store.dispatch('user/setUser', state.userInfo);
+        try {
+            await userStore.updateUser(state.userInfo);
+        } catch (e: any) {
+            ErrorHandler.handleError(e);
+        }
     }
     if (storeState.isSwitchModal && state.otherType) {
         multiFactorAuthStore.setEnableMfaMap({
@@ -103,7 +113,10 @@ const handleClickVerifyButton = async () => {
             verify_code: validationState.verificationCode,
         }) as UserInfoType;
         if (storeState.userId === state.userInfo.user_id) {
-            await store.dispatch('user/setUser', state.userInfo);
+            await userStore.updateUser(state.userInfo);
+            if (state.userInfo.mfa) {
+                userStore.setMfa(state.userInfo.mfa);
+            }
         }
         resetFormData();
         if (storeState.isReSyncModal || storeState.isSwitchModal) {
@@ -130,7 +143,7 @@ const handleClickVerifyButton = async () => {
 
 watch(() => storeState.userId, (userId) => {
     if (userId) {
-        state.userInfo = store.state.user;
+        state.userInfo = cloneDeep(userStore.state);
     }
 }, { immediate: true });
 watch(() => multiFactorAuthState.modalType, () => {

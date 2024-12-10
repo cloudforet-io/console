@@ -58,7 +58,7 @@ export const DETECTION_CONFIGURATION_HANDLERS = {
                 },
             ],
         }] as KeyItemSet[],
-    // TODO: temp code
+    // HACK: temp code
     valueHandlerMap: {
         name: makeDistinctValueHandler('cost_analysis.AnomalyDetectionConfiguration', 'name', 'string', [{ k: 'name', v: '', o: 'not' }]),
         policy: makeDistinctValueHandler('cost_analysis.AnomalyDetectionConfiguration', 'policy'),
@@ -138,7 +138,7 @@ export const DETECTION_HISTORY_HANDLERS = {
                 },
             ],
         }] as KeyItemSet[],
-    // TODO: temp code
+    // HACK: temp code
     valueHandlerMap: {
         name: makeDistinctValueHandler('cost_analysis.AnomalyDetectionConfiguration', 'name', 'string', [{ k: 'name', v: '', o: 'not' }]),
         config_id: makeDistinctValueHandler('cost_analysis.AnomalyDetectionConfiguration', 'config_id'),

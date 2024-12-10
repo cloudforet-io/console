@@ -53,7 +53,7 @@ const {
         if (props.variableNames.includes(value)) {
             return i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.VALIDATION_NAME_REQUIRED');
         }
-        // TODO: add invalid text about name length
+        // HACK: add invalid text about name length
         return value.trim().length > 0;
     },
 });
@@ -83,7 +83,7 @@ const state = reactive({
     options: [
         { draggableItemId: getRandomId(), key: '', label: '' },
     ] as ManageVariableFormOption[],
-    resourceKey: '', // TODO: setting resource key in 'SEARCH_RESOURCE' option type
+    resourceKey: '', // HACK: setting resource key in 'SEARCH_RESOURCE' option type
     selectionMenu: computed(() => [
         { name: 'MULTI', label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.MULTI_SELECT') },
         { name: 'SINGLE', label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.SINGLE_SELECT') },

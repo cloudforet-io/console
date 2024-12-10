@@ -93,8 +93,9 @@ import type { DataSourceListParameters } from '@/schema/monitoring/data-source/a
 import type { DataSourceModel } from '@/schema/monitoring/data-source/model';
 import type { MonitoringLogListParameters } from '@/schema/monitoring/log/api-verbs/list';
 import type { LogDataModel } from '@/schema/monitoring/log/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
@@ -142,8 +143,9 @@ export default defineComponent<Props>({
         },
     },
     setup(props) {
+        const userStore = useUserStore();
         const state = reactive({
-            timezone: computed(() => store.state.user.timezone ?? 'UTC'),
+            timezone: computed<string>(() => userStore.state.timezone ?? 'UTC'),
             schemaLoading: true,
             loading: true,
             searchText: '',

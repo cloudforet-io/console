@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { reactive, computed } from 'vue';
+import type { Location } from 'vue-router';
 import { useRouter } from 'vue-router/composables';
 
 import dayjs from 'dayjs';
@@ -52,6 +53,15 @@ const router = useRouter();
 const state = reactive({
     popoverVisible: false,
     selectedPopoverItem: '',
+    redirectLocation: computed<Location|undefined>(() => {
+        if (!landingPageStore.state.redirectPath) return undefined;
+        const resolvedRoute = router.resolve(landingPageStore.state.redirectPath).resolved;
+        return {
+            name: resolvedRoute.name as string,
+            params: resolvedRoute.params,
+            query: resolvedRoute.query,
+        };
+    }),
 });
 
 const roleTypeImageFormatter = (roleType: RoleType): string => {
@@ -73,7 +83,14 @@ const handleClickBoardItem = (item: WorkspaceBoardSet) => {
     }
     landingPageStore.setLoading(true);
     userWorkspaceStore.setCurrentWorkspace(item.workspace_id);
-    router.replace({ name: WORKSPACE_HOME_ROUTE._NAME, params: { workspaceId: item.workspace_id } });
+    if (state.redirectLocation) {
+        router.replace({
+            ...state.redirectLocation,
+            params: { ...state.redirectLocation.params, workspaceId: item.workspace_id },
+        });
+    } else {
+        router.replace({ name: WORKSPACE_HOME_ROUTE._NAME, params: { workspaceId: item.workspace_id } });
+    }
 };
 </script>
 

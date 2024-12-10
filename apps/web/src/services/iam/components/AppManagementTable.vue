@@ -19,13 +19,13 @@ import { iso8601Formatter } from '@cloudforet/utils';
 import { APP_STATUS_TYPE } from '@/schema/identity/app/constant';
 import type { AppModel } from '@/schema/identity/app/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import UserAPIKeyModal from '@/common/components/modals/UserAPIKeyModal.vue';
 import { useQueryTags } from '@/common/composables/query-tags';
@@ -60,11 +60,12 @@ const appPageStore = useAppPageStore();
 const appPageState = appPageStore.$state;
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
+const userStore = useUserStore();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    timezone: computed(() => store.state.user.timezone ?? 'UTC'),
-    userId: computed(() => store.state.user.userId),
+    timezone: computed<string>(() => userStore.state.timezone ?? 'UTC'),
+    userId: computed<string|undefined>(() => userStore.state.userId),
     projects: computed<ProjectReferenceMap>(() => allReferenceGetters.project),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceGetters.projectGroup),
 });

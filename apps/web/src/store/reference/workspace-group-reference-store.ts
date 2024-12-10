@@ -8,13 +8,12 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { WorkspaceGroupListParameters } from '@/schema/identity/workspace-group/api-verbs/list';
 import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
-// eslint-disable-next-line import/no-cycle
-import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type {
     ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
+import { useUserStore } from '@/store/user/user-store';
 
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
@@ -30,6 +29,7 @@ let lastLoadedTime = 0;
 
 export const useWorkspaceGroupReferenceStore = defineStore('reference-workspace-group', () => {
     const appContextStore = useAppContextStore();
+    const userStore = useUserStore();
     const _state = reactive({
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     });
@@ -39,7 +39,7 @@ export const useWorkspaceGroupReferenceStore = defineStore('reference-workspace-
 
     const getters = reactive({
         workspaceGroupItems: asyncComputed<WorkspaceGroupReferenceMap>(async () => {
-            if (store.getters['user/getCurrentGrantInfo'].scope === 'USER') return {};
+            if (!userStore.state.currentGrantInfo?.scope || userStore.state.currentGrantInfo?.scope === 'USER') return {};
             if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),

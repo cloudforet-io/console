@@ -1,4 +1,6 @@
-import { store } from '@/store';
+import { useDisplayStore } from '@/store/display/display-store';
+import { pinia } from '@/store/pinia';
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -14,18 +16,20 @@ class SamlAuth extends Authenticator {
     }
 
     static async onSuccess(refreshToken:string) {
+        const userStore = useUserStore(pinia);
+        const displayStore = useDisplayStore(pinia);
         try {
-            store.dispatch('user/startSignIn');
+            userStore.setIsSignInLoading(true);
             const credentials = {
                 refreshToken,
             };
             await super.signIn(credentials, 'SAML');
         } catch (e: any) {
             await SamlAuth.signOut();
-            await store.dispatch('display/showSignInErrorMessage');
+            displayStore.setIsSignInFailed(true);
             throw e;
         } finally {
-            store.dispatch('user/finishSignIn');
+            userStore.setIsSignInLoading(false);
         }
     }
 }

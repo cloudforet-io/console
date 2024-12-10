@@ -16,13 +16,13 @@ import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model
 import type { DataTableAddParameters } from '@/schema/dashboard/public-data-table/api-verbs/add';
 import type { PublicWidgetCreateParameters } from '@/schema/dashboard/public-widget/api-verbs/create';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
 import type { NamespaceReferenceMap } from '@/store/reference/namespace-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFormAssetSecurityDataSourcePopper
@@ -47,6 +47,7 @@ const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceStore = useAllReferenceStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const userStore = useUserStore();
 
 const storeState = reactive({
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
@@ -147,7 +148,7 @@ const createWidget = async (): Promise<PublicWidgetModel|PrivateWidgetModel|null
     try {
         return await fetcher({
             dashboard_id: dashboardDetailState.dashboardId as string,
-            tags: { created_by: store.state.user.userId },
+            tags: { created_by: userStore.state.userId },
             widget_type: 'table',
         });
     } catch (e) {

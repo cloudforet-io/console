@@ -6,8 +6,9 @@ import {
 } from '@cloudforet/mirinae';
 
 import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import { postEnableMfa, postUserProfileDisableMfa } from '@/lib/helper/multi-factor-auth-helper';
 import { emailValidator } from '@/lib/helper/user-validation-helper';
@@ -27,11 +28,12 @@ const props = withDefaults(defineProps<Props>(), {
 
 const multiFactorAuthStore = useMultiFactorAuthStore();
 const multiFactorAuthState = multiFactorAuthStore.state;
+const userStore = useUserStore();
 
 const emit = defineEmits<{(e: 'update:is-sent-code'): void }>();
 
 const storeState = reactive({
-    email: computed<string>(() => store.state.user.mfa?.options?.email || undefined),
+    email: computed<string|undefined>(() => userStore.state.mfa?.options?.email),
     isFormModal: computed(() => multiFactorAuthState.modalType === 'FORM'),
 });
 const state = reactive({
@@ -62,8 +64,12 @@ const handleClickSendCodeButton = async () => {
                 options: {
                     email: email.value,
                 },
-            }, false);
-            await store.dispatch('user/setUser', { mfa: { options: { email: email.value } } });
+            });
+            userStore.setMfa({
+                options: {
+                    email: email.value,
+                },
+            });
         } else {
             await postUserProfileDisableMfa();
         }

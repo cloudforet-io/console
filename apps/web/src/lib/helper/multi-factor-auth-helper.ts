@@ -6,21 +6,18 @@ import type { UserProfileConfirmMfaParameters } from '@/schema/identity/user-pro
 import type { UserProfileEnableMfaParameters } from '@/schema/identity/user-profile/api-verbs/enable-mfa';
 import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
 import type { UserDisableMfaParameters } from '@/schema/identity/user/api-verbs/disable-mfa';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { UserState } from '@/store/modules/user/type';
+import type { UserStoreState } from '@/store/user/type';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-export const postEnableMfa = async (body: UserProfileEnableMfaParameters, setUser?: boolean): Promise<void|Error> => {
+
+export const postEnableMfa = async (body: UserProfileEnableMfaParameters): Promise<void|Error> => {
     try {
         const response = await SpaceConnector.clientV2.identity.userProfile.enableMfa<UserProfileEnableMfaParameters>(body);
-        if (setUser) {
-            await store.dispatch('user/setUser', response);
-        }
         if (response.mfa.mfa_type === MULTI_FACTOR_AUTH_TYPE.EMAIL) {
             showSuccessMessage(i18n.t('COMMON.MFA_MODAL.ALT_S_SENT_EMAIL'), '');
         }
@@ -32,10 +29,10 @@ export const postEnableMfa = async (body: UserProfileEnableMfaParameters, setUse
     }
 };
 
-export const postUserProfileDisableMfa = async (): Promise<UserState|Error> => {
+export const postUserProfileDisableMfa = async (): Promise<UserStoreState|Error> => {
     try {
-        const response = await SpaceConnector.clientV2.identity.userProfile.disableMfa<undefined, UserState>();
-        if (response.mfa.mfa_type === MULTI_FACTOR_AUTH_TYPE.EMAIL) {
+        const response = await SpaceConnector.clientV2.identity.userProfile.disableMfa<undefined, UserStoreState>();
+        if (response.mfa?.mfa_type === MULTI_FACTOR_AUTH_TYPE.EMAIL) {
             showSuccessMessage(i18n.t('COMMON.MFA_MODAL.ALT_S_SENT_EMAIL'), '');
         }
         return response;
@@ -64,7 +61,7 @@ export const postValidationMfaCode = async (body: UserProfileConfirmMfaParameter
 };
 
 
-export const postUserDisableMfa = async (params: UserDisableMfaParameters): Promise<UserState|Error> => {
+export const postUserDisableMfa = async (params: UserDisableMfaParameters): Promise<UserStoreState|Error> => {
     try {
         return await SpaceConnector.clientV2.identity.user.disableMfa<UserDisableMfaParameters>(params);
     } catch (e: any) {
