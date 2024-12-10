@@ -3,9 +3,8 @@ import type { ComputedRef } from 'vue';
 import {
     computed, onMounted, reactive, watch,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
 
-import { clone, cloneDeep } from 'lodash';
+import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -19,16 +18,11 @@ import type { DomainConfigSetParameters } from '@/schema/config/domain-config/ap
 import type { DomainConfigModel } from '@/schema/config/domain-config/model';
 
 import { DOMAIN_CONFIG_NAMES } from '@/store/domain/constant';
-import { useUserStore } from '@/store/user/user-store';
-
-import type { PageAccessMap } from '@/lib/access-control/config';
-import type { MenuId } from '@/lib/menu/config';
-import { MENU_ID } from '@/lib/menu/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
 import { NOTIFY_LEVEL_MAP } from '@/services/cost-explorer/constants/anomaly-detection-constant';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import type {
     NotificationRule,
     NotificationUnit,
@@ -36,55 +30,39 @@ import type {
     NotifyLevel,
 } from '@/services/cost-explorer/types/anomaly-detection-type';
 
-
-
-const ALL_VALUE: NotificationVariation[] = ['gte', 'lte'];
-
-const route = useRoute();
-
-const userStore = useUserStore();
-const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
-});
-const state = reactive<{
+interface State {
     statusToggle: boolean;
     notificationRules:Partial<NotificationRule>[];
     unitMenu: ComputedRef<MenuItem[]>;
     variationMenu: ComputedRef<MenuItem[]>;
     notifyLevelMenu: ComputedRef<MenuItem[]>;
     recipients: boolean;
-    selectedMenuId: ComputedRef<string>;
     hasReadWriteAccess?: ComputedRef<boolean|undefined>;
-        }>({
-            statusToggle: false,
-            notificationRules: [{ variation: ALL_VALUE }],
-            unitMenu: computed(() => [
-                { label: 'Percentage (%)', name: 'PERCENTAGE' },
-                { label: 'Fixed Amount', name: 'FIXED_AMOUNT' },
-            ]),
-            variationMenu: computed(() => [
-                { label: 'All', name: 'all' },
-                { label: 'Increase (>=)', name: JSON.stringify(['gte']) },
-                { label: 'Decrease (<=)', name: JSON.stringify(['lte']) },
-            ]),
-            notifyLevelMenu: computed(() => Object.values(NOTIFY_LEVEL_MAP).map((level) => ({
-                label: level.label,
-                name: level.name,
-                icon: level.icon,
-                iconColor: level.color,
-            }))),
-            recipients: false,
-            selectedMenuId: computed(() => {
-                const reversedMatched = clone(route.matched).reverse();
-                const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-                const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
-                if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
-                    return '';
-                }
-                return targetMenuId;
-            }),
-            hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
-        });
+}
+
+const ALL_VALUE: NotificationVariation[] = ['gte', 'lte'];
+
+const state = reactive<State>({
+    statusToggle: false,
+    notificationRules: [{ variation: ALL_VALUE }],
+    unitMenu: computed(() => [
+        { label: 'Percentage (%)', name: 'PERCENTAGE' },
+        { label: 'Fixed Amount', name: 'FIXED_AMOUNT' },
+    ]),
+    variationMenu: computed(() => [
+        { label: 'All', name: 'all' },
+        { label: 'Increase (>=)', name: JSON.stringify(['gte']) },
+        { label: 'Decrease (<=)', name: JSON.stringify(['lte']) },
+    ]),
+    notifyLevelMenu: computed(() => Object.values(NOTIFY_LEVEL_MAP).map((level) => ({
+        label: level.label,
+        name: level.name,
+        icon: level.icon,
+        iconColor: level.color,
+    }))),
+    recipients: false,
+    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
+});
 
 
 const handleUpdateNotificationRules = (key: keyof NotificationRule, value: NotificationRule[keyof NotificationRule]|'all', index: number) => {

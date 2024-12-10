@@ -1,8 +1,6 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router/composables';
-
-import { clone } from 'lodash';
+import { useRouter } from 'vue-router/composables';
 
 import {
     PPaneLayout, PFieldTitle, PTextInput, PButton,
@@ -11,27 +9,14 @@ import {
 import { i18n } from '@/translations';
 
 import { usePreferencesStore } from '@/store/preferences/preferences-store';
-import { useUserStore } from '@/store/user/user-store';
-
-import type { PageAccessMap } from '@/lib/access-control/config';
-import type { MenuId } from '@/lib/menu/config';
-import { MENU_ID } from '@/lib/menu/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
-
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
 const router = useRouter();
 const domainConfigStore = usePreferencesStore();
 const domainConfigGetters = domainConfigStore.getters;
-const userStore = useUserStore();
 
-const route = useRoute();
-
-const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
-});
 const state = reactive({
     isChanged: computed<boolean>(() => {
         if ([state.wordtypeLogoUrl, state.symbolFaviconUrl, state.loginPageImageUrl, state.displayName,
@@ -46,16 +31,7 @@ const state = reactive({
     wordtypeLogoUrl: undefined as string | undefined,
     symbolFaviconUrl: undefined as string | undefined,
     loginPageImageUrl: undefined as string | undefined,
-    selectedMenuId: computed(() => {
-        const reversedMatched = clone(route.matched).reverse();
-        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
-        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
-            return '';
-        }
-        return targetMenuId;
-    }),
-    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
+    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
 });
 
 /* Event */

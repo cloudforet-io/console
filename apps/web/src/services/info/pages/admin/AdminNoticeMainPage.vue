@@ -22,9 +22,7 @@
 
 <script lang="ts">
 import { computed, reactive } from 'vue';
-import { useRoute, useRouter } from 'vue-router/composables';
-
-import { clone } from 'lodash';
+import { useRouter } from 'vue-router/composables';
 
 import {
     PButton, PHeading, PHeadingLayout,
@@ -34,11 +32,8 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useUserStore } from '@/store/user/user-store';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
-import type { MenuId } from '@/lib/menu/config';
-import { MENU_ID } from '@/lib/menu/config';
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import NoticeList from '@/services/info/components/NoticeList.vue';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 
@@ -52,25 +47,14 @@ export default {
     },
     setup() {
         const router = useRouter();
-        const route = useRoute();
 
         const userStore = useUserStore();
 
         const storeState = reactive({
             hasDomainRoleUser: computed(() => userStore.getters.isDomainAdmin),
-            pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
         });
         const state = reactive({
-            selectedMenuId: computed(() => {
-                const reversedMatched = clone(route.matched).reverse();
-                const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-                const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
-                if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
-                    return '';
-                }
-                return targetMenuId;
-            }),
-            hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
+            hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
         });
         const handleCreateNotice = () => {
             router.push({ name: makeAdminRouteName(INFO_ROUTE.NOTICE.CREATE._NAME) });

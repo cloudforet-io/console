@@ -5,9 +5,6 @@ import {
 import {
     computed, onMounted, reactive, ref, watch,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
-
-import { clone } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -21,14 +18,11 @@ import type { CostQuerySetUpdateParameters } from '@/schema/cost-analysis/cost-q
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useUserStore } from '@/store/user/user-store';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import type { MenuId } from '@/lib/menu/config';
-import { MENU_ID } from '@/lib/menu/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
@@ -45,17 +39,12 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
 import type { Granularity } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
-
-
 const CostAnalysisQueryFormModal = () => import('@/services/cost-explorer/components/CostAnalysisQueryFormModal.vue');
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
 const appContextStore = useAppContextStore();
-const userStore = useUserStore();
-
-const route = useRoute();
 
 const filtersPopperRef = ref<any|null>(null);
 const rightPartRef = ref<HTMLElement|null>(null);
@@ -66,21 +55,11 @@ const { getProperRouteLocation } = useProperRouteLocation();
 const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
 
 const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 const state = reactive({
     queryFormModalVisible: false,
-    selectedMenuId: computed(() => {
-        const reversedMatched = clone(route.matched).reverse();
-        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
-        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
-            return '';
-        }
-        return targetMenuId;
-    }),
-    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
+    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
     saveDropdownMenuItems: computed<MenuItem[]>(() => ([
         {
             type: 'item',

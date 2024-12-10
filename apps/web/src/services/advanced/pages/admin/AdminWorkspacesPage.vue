@@ -5,7 +5,7 @@ import Vue, {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { clone, cloneDeep } from 'lodash';
+import { cloneDeep } from 'lodash';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
@@ -14,13 +14,8 @@ import {
 
 import { i18n } from '@/translations';
 
-import { useUserStore } from '@/store/user/user-store';
-
-import type { PageAccessMap } from '@/lib/access-control/config';
-import type { MenuId } from '@/lib/menu/config';
-import { MENU_ID } from '@/lib/menu/config';
-
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
 import WorkspaceManagementTable from '@/services/advanced/components/WorkspaceManagementTable.vue';
 import WorkspacesCreateModal from '@/services/advanced/components/WorkspacesCreateModal.vue';
@@ -29,33 +24,18 @@ import WorkspacesSetEnableModal from '@/services/advanced/components/WorkspacesS
 import WorkspacesUserManagementTab from '@/services/advanced/components/WorkspacesUserManagementTab.vue';
 import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
 import { useWorkspacePageStore } from '@/services/advanced/store/workspace-page-store';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import UserManagementAddModal from '@/services/iam/components/UserManagementAddModal.vue';
 import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 
-
 const workspacePageStore = useWorkspacePageStore();
 const workspacePageState = workspacePageStore.$state;
 const userPageStore = useUserPageStore();
-const userStore = useUserStore();
 
 const route = useRoute();
 
-const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
-});
 const state = reactive({
-    selectedMenuId: computed(() => {
-        const reversedMatched = clone(route.matched).reverse();
-        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
-        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
-            return '';
-        }
-        return targetMenuId;
-    }),
-    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
+    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
 });
 const modalState = reactive({
     createType: '' as 'CREATE'|'EDIT',

@@ -5,8 +5,6 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { clone } from 'lodash';
-
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -41,12 +39,9 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap, ProviderItem } from '@/store/reference/provider-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
 import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
-import type { MenuId } from '@/lib/menu/config';
-import { MENU_ID } from '@/lib/menu/config';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import type { Reference } from '@/lib/reference/type';
 import { replaceUrlQuery } from '@/lib/router-query-string';
@@ -54,6 +49,7 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 import AutoSyncState from '@/common/components/badge/AutoSyncState.vue';
 import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import CustomFieldModalForDynamicLayout from '@/common/modules/custom-table/custom-field-modal/CustomFieldModalForDynamicLayout.vue';
 
@@ -70,7 +66,6 @@ import type { QuerySearchTableLayout } from '@/services/asset-inventory/helpers/
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 const { width } = useWindowSize();
 
@@ -90,20 +85,10 @@ const userStore = useUserStore();
 const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
     currency: computed<Currency|undefined>(() => serviceAccountPageGetters.currency),
 });
 const state = reactive({
-    selectedMenuId: computed(() => {
-        const reversedMatched = clone(route.matched).reverse();
-        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
-        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
-            return '';
-        }
-        return targetMenuId;
-    }),
-    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
+    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     trustedAccounts: computed(() => allReferenceStore.getters.trustedAccount),
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),

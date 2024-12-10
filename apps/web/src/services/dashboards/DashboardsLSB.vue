@@ -4,8 +4,6 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { clone } from 'lodash';
-
 import {
     PIconButton,
 } from '@cloudforet/mirinae';
@@ -18,11 +16,10 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
-import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
@@ -39,8 +36,6 @@ import { gray } from '@/styles/colors';
 import DashboardLSBTree from '@/services/dashboards/components/dashboard-main/DashboardLSBTree.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
-
-
 
 const appContextStore = useAppContextStore();
 const favoriteStore = useFavoriteStore();
@@ -59,20 +54,13 @@ const storeState = reactive({
     isWorkspaceOwner: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     favoriteItems: computed(() => favoriteGetters.dashboardItems),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     loading: true,
     currentPath: computed(() => route.fullPath),
     publicV2DashboardMenuSet: computed(() => getDashboardMenuSet(dashboardPageControlGetters.publicDashboardItems)),
     privateV2DashboardMenuSet: computed(() => getDashboardMenuSet(dashboardPageControlGetters.privateDashboardItems)),
-    selectedMenuId: computed(() => {
-        const reversedMatched = clone(route.matched).reverse();
-        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
-        return targetMenuId;
-    }),
-    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
+    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
     favoriteItemMap: computed(() => {
         const result: Record<string, FavoriteConfig> = {};
         storeState.favoriteItems?.forEach((d) => {

@@ -5,7 +5,7 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { clone, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 
 import {
     PI, screens, PButton, PTextButton, PTooltip,
@@ -24,6 +24,7 @@ import { MENU_ID } from '@/lib/menu/config';
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
 import UpdateMark from '@/common/components/marks/UpdateMark.vue';
+import { useCurrentMenuId } from '@/common/composables/current-menu-id';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
@@ -87,15 +88,6 @@ const state = reactive({
             }
         });
         return result;
-    }),
-    selectedMenuId: computed(() => {
-        const reversedMatched = clone(route.matched).reverse();
-        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-        const targetMenuId: string = closestRoute?.name || closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
-        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
-            return '';
-        }
-        return targetMenuId;
     }),
 });
 
@@ -165,7 +157,7 @@ onMounted(async () => {
                              :to="(item.type === 'header' && item.subMenuList?.length > 0) ? '' : item.to"
                              class="service-menu"
                              :class="{
-                                 'is-selected': state.selectedMenuId.split('.').includes(item.id) && item.type !== 'header',
+                                 'is-selected': useCurrentMenuId().split('.').includes(item.id) && item.type !== 'header',
                                  'is-only-label': item.type === 'header' && item.subMenuList?.length > 0
                              }"
                 >

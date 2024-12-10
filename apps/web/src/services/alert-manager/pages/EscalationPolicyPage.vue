@@ -2,9 +2,7 @@
 import {
     reactive, computed,
 } from 'vue';
-import { useRoute, useRouter } from 'vue-router/composables';
-
-import { clone } from 'lodash';
+import { useRouter } from 'vue-router/composables';
 
 import {
     makeDistinctValueHandler, makeEnumValueHandler, makeReferenceValueHandler,
@@ -35,21 +33,18 @@ import { i18n } from '@/translations';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import type { MenuId } from '@/lib/menu/config';
-import { MENU_ID } from '@/lib/menu/config';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import EscalationPolicyDataTable from '@/services/alert-manager/components/EscalationPolicyDataTable.vue';
 import EscalationPolicyFormModal from '@/services/alert-manager/components/EscalationPolicyFormModal.vue';
 import { ACTION } from '@/services/alert-manager/constants/alert-constant';
 import type { ActionMode } from '@/services/alert-manager/types/alert-type';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 interface Item extends Omit<EscalationPolicyModel, 'name'> {
     name: {
@@ -60,16 +55,11 @@ interface Item extends Omit<EscalationPolicyModel, 'name'> {
 }
 
 const router = useRouter();
-const route = useRoute();
 
 const { query } = router.currentRoute;
 
 const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
-
-const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
-});
 
 /* Search Tag */
 const queryTagsHelper = useQueryTags({
@@ -138,16 +128,7 @@ const state = reactive({
     deleteModalVisible: false,
     formModalVisible: false,
     formMode: undefined as ActionMode|undefined,
-    selectedMenuId: computed(() => {
-        const reversedMatched = clone(route.matched).reverse();
-        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
-        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
-            return '';
-        }
-        return targetMenuId;
-    }),
-    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
+    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
 });
 
 /* api */

@@ -2,9 +2,6 @@
 import {
     onMounted, computed, reactive, watch,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
-
-import { clone } from 'lodash';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -25,14 +22,12 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
 import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
-import type { MenuId } from '@/lib/menu/config';
-import { MENU_ID } from '@/lib/menu/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import CollectorDataModal
@@ -44,8 +39,6 @@ import CollectorScheduleModal
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useCollectorPageStore } from '@/services/asset-inventory/stores/collector-page-store';
 import type { CollectorItemInfo } from '@/services/asset-inventory/types/collector-main-page-type';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
-
 
 /** * @function
  *   @name makePluginReferenceValueHandler
@@ -84,12 +77,9 @@ const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
 const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
 
-const route = useRoute();
-
 const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
     timezone: computed<string>(() => userStore.state.timezone ?? 'UTC'),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 
 const keyItemSets: KeyItemSet[] = [{
@@ -127,16 +117,7 @@ const historyLinkQueryHelper = new QueryHelper();
 
 const state = reactive({
     loading: computed(() => collectorPageState.loading.collectorList),
-    selectedMenuId: computed(() => {
-        const reversedMatched = clone(route.matched).reverse();
-        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
-        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
-            return '';
-        }
-        return targetMenuId;
-    }),
-    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
+    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
     searchTags: computed(() => {
         const tags = searchQueryHelper.setFilters(collectorPageState.searchFilters).queryTags;
         return tags.reduce((r: QueryItem[], d: any): QueryItem[] => {

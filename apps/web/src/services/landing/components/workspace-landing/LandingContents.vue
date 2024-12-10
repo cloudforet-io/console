@@ -3,9 +3,9 @@ import { useWindowSize } from '@vueuse/core';
 import {
     computed, onMounted, onUnmounted, reactive,
 } from 'vue';
-import { useRoute, useRouter } from 'vue-router/composables';
+import { useRouter } from 'vue-router/composables';
 
-import { clone, sortBy } from 'lodash';
+import { sortBy } from 'lodash';
 
 import {
     PButton, PDataLoader, PDivider, screens,
@@ -18,10 +18,7 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
-import type { MenuId } from '@/lib/menu/config';
-import { MENU_ID } from '@/lib/menu/config';
-
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
@@ -31,14 +28,12 @@ import { RECENT_TYPE } from '@/common/modules/navigations/type';
 import { gray } from '@/styles/colors';
 
 import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import LandingGroupWorkspaces from '@/services/landing/components/workspace-landing/landing-group-workspaces/LandingGroupWorkspaces.vue';
 import LandingAllWorkspaces from '@/services/landing/components/workspace-landing/LandingAllWorkspaces.vue';
 import LandingEmptyContents from '@/services/landing/components/workspace-landing/LandingEmptyContents.vue';
 import LandingRecentVisits from '@/services/landing/components/workspace-landing/LandingRecentVisits.vue';
 import LandingSearch from '@/services/landing/components/workspace-landing/LandingSearch.vue';
 import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
-
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetters = userWorkspaceStore.getters;
@@ -50,7 +45,6 @@ const landingPageStore = useLandingPageStore();
 const landingPageStoreGetters = landingPageStore.getters;
 
 const router = useRouter();
-const route = useRoute();
 const { width } = useWindowSize();
 
 const userStore = useUserStore();
@@ -65,7 +59,6 @@ const storeState = reactive({
         workspaceId: i.data.workspace_id,
         itemId: i.data.id,
     }))),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     searchText: '',
@@ -75,16 +68,7 @@ const state = reactive({
         ? storeState.workspaceList.filter((item) => item.name.toLowerCase()?.includes(state.searchText.toLowerCase()))
         : storeState.workspaceList)),
     refinedWorkspaceList: computed<WorkspaceModel[]>(() => (state.searchText ? state.searchedWorkspaceList : storeState.workspaceList)),
-    selectedMenuId: computed(() => {
-        const reversedMatched = clone(route.matched).reverse();
-        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
-        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
-            return '';
-        }
-        return targetMenuId;
-    }),
-    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
+    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
 });
 
 const handleSearch = (value: string) => {

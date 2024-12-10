@@ -4,14 +4,11 @@ import { computed, reactive, ref } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { clone } from 'lodash';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     useContextMenuController, PHeading, PIconButton, PButton, PContextMenu, PI, PHeadingLayout,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
-
 
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { MetricExampleDeleteParameters } from '@/schema/inventory/metric-example/api-verbs/delete';
@@ -24,15 +21,12 @@ import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import { useUserStore } from '@/store/user/user-store';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import type { MenuId } from '@/lib/menu/config';
-import { MENU_ID } from '@/lib/menu/config';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { gray } from '@/styles/colors';
@@ -42,7 +36,6 @@ import MetricExplorerQueryFormSidebar from '@/services/asset-inventory/component
 import { NAME_FORM_MODAL_TYPE } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 const contextMenuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement | null>(null);
@@ -54,7 +47,6 @@ const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
-const userStore = useUserStore();
 
 const router = useRouter();
 const route = useRoute();
@@ -63,19 +55,9 @@ const storeState = reactive({
     namespaces: computed(() => allReferenceStore.getters.namespace),
     currentMetric: computed(() => metricExplorerPageState.metric),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
-    selectedMenuId: computed(() => {
-        const reversedMatched = clone(route.matched).reverse();
-        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
-        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
-            return '';
-        }
-        return targetMenuId;
-    }),
-    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
+    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
     currentMetricId: computed<string>(() => route.params.metricId),
     isDuplicateEnabled: computed<boolean>(() => Object.values(storeState.namespaces).find((d) => d.key === storeState.currentMetric?.namespace_id)?.data.group !== 'common'),
     currentMetricExampleId: computed<string|undefined>(() => route.params.metricExampleId),
