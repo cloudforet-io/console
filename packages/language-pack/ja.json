@@ -3249,8 +3249,11 @@
 				},
 				"USERS": {
 					"ADD_USER": "ユーザー追加",
+					"DAYS": "日前",
 					"REMOVE": "削除",
-					"TITLE": "ユーザー"
+					"TITLE": "ユーザー",
+					"TODAY": "今日",
+					"YESTERDAY": "昨日"
 				}
 			},
 			"TITLE": "ユーザーグループ"

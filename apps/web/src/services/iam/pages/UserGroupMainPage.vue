@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { PHorizontalLayout } from '@cloudforet/mirinae';
 
+import UserGroupManagementAddUsersModal from '@/services/iam/components/UserGroupManagementAddUsersModal.vue';
 import UserGroupManagementEditModal from '@/services/iam/components/UserGroupManagementEditModal.vue';
 import UserGroupManagementHeader from '@/services/iam/components/UserGroupManagementHeader.vue';
 import UserGroupManagementTab from '@/services/iam/components/UserGroupManagementTab.vue';
@@ -31,6 +32,7 @@ const refreshUserGroupList = () => {
         </p-horizontal-layout>
         <user-group-management-tab />
         <user-group-management-edit-modal @confirm="refreshUserGroupList" />
+        <user-group-management-add-users-modal />
     </section>
 </template>
 

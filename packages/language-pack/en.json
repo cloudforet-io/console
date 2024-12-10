@@ -3249,8 +3249,11 @@
 				},
 				"USERS": {
 					"ADD_USER": "Add User",
+					"DAYS": "days",
 					"REMOVE": "Remove",
-					"TITLE": "Users"
+					"TITLE": "Users",
+					"TODAY": "Today",
+					"YESTERDAY": "Yesterday"
 				}
 			},
 			"TITLE": "User Group"

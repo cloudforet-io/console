@@ -30,17 +30,13 @@ const queryTagHelper = useQueryTags({ keyItemSets: USER_GROUP_SEARCH_HANDLERS.ke
 const { queryTags } = queryTagHelper;
 
 const tableState = reactive({
-    fields: computed<DataTableFieldType[]>(() => {
-        const baseFields = [
-            { name: 'user_group_id', label: 'User Group ID' },
-            { name: 'description', label: 'Description' },
-            { name: 'notification', label: 'Notification' },
-            { name: 'users', label: 'Users' },
-            { name: 'created', label: 'Created' },
-        ];
-
-        return [...baseFields];
-    }),
+    fields: computed<DataTableFieldType[]>(() => [
+        { name: 'user_group_id', label: 'User Group ID' },
+        { name: 'description', label: 'Description' },
+        { name: 'notification', label: 'Notification' },
+        { name: 'users', label: 'Users' },
+        { name: 'created', label: 'Created' },
+    ]),
     valueHandlerMap: computed(() => ({
         user_group_id: makeDistinctValueHandler('identity.UserGroup', 'user_group_id', 'string'),
         description: makeDistinctValueHandler('identity.UserGroup', 'description', 'string'),
@@ -70,16 +66,16 @@ const dropdownState = reactive({
     selectedAction: '',
     menuItems: computed<MenuItem[]>(() => [
         {
-            name: 'update', label: i18n.t('IAM.USER_GROUP.ACTION.UPDATE'), type: 'item', disabled: !editState.isEditable,
+            name: USER_GROUP_MODAL_TYPE.UPDATE, label: i18n.t('IAM.USER_GROUP.ACTION.UPDATE'), type: 'item', disabled: !editState.isEditable,
         },
         {
-            name: 'remove', label: i18n.t('IAM.USER_GROUP.ACTION.REMOVE'), type: 'item', disabled: !editState.isRemoveAble,
+            name: USER_GROUP_MODAL_TYPE.REMOVE, label: i18n.t('IAM.USER_GROUP.ACTION.REMOVE'), type: 'item', disabled: !editState.isRemoveAble,
         },
         {
             type: 'divider',
         },
         {
-            name: 'add_new_user', label: i18n.t('IAM.USER_GROUP.ACTION.ADD_NEW_USER'), type: 'item',
+            name: USER_GROUP_MODAL_TYPE.ADD_NEW_USER, label: i18n.t('IAM.USER_GROUP.ACTION.ADD_NEW_USER'), type: 'item', disabled: !editState.isEditable,
         },
     ]),
     // selectedMenuItems: [] as SelectDropdownMenuItem[],
@@ -99,7 +95,11 @@ const handleSelectDropdown = async (inputText: string) => {
 
     switch (inputText) {
     case USER_GROUP_MODAL_TYPE.UPDATE:
-        console.log('TODO: Open Update User Group Modal');
+        userGroupPageStore.updateModalSettings({
+            type: USER_GROUP_MODAL_TYPE.UPDATE,
+            title: i18n.t('IAM.USER_GROUP.MODAL.CREATE_USER_GROUP.UPDATE_TITLE'),
+            themeColor: 'primary',
+        });
         dropdownState.loading = false;
         break;
     case USER_GROUP_MODAL_TYPE.REMOVE:
@@ -107,7 +107,11 @@ const handleSelectDropdown = async (inputText: string) => {
         dropdownState.loading = false;
         break;
     case USER_GROUP_MODAL_TYPE.ADD_NEW_USER:
-        console.log('TODO: Open Add Users to Selected User Group Modal');
+        userGroupPageStore.updateModalSettings({
+            type: USER_GROUP_MODAL_TYPE.ADD_NEW_USER,
+            title: i18n.t('IAM.USER_GROUP.MODAL.ADD_NEW_USER.TITLE'),
+            themeColor: 'primary',
+        });
         dropdownState.loading = false;
         break;
     default:

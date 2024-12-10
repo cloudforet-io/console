@@ -11,7 +11,9 @@ import { PFieldGroup, PTextInput } from '@cloudforet/mirinae';
                 <p-text-input :placeholder="$t('IAM.USER_GROUP.MODAL.CREATE_USER_GROUP.GROUP_NAME')" />
             </template>
         </p-field-group>
-        <p-field-group :label="$t('IAM.USER_GROUP.MODAL.CREATE_USER_GROUP.DESCRIPTION')">
+        <p-field-group
+            :label="$t('IAM.USER_GROUP.MODAL.CREATE_USER_GROUP.DESCRIPTION')"
+        >
             <template #default>
                 <p-text-input :placeholder="$t('IAM.USER_GROUP.MODAL.CREATE_USER_GROUP.DESCRIPTION')" />
             </template>
