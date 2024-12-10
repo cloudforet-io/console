@@ -87,7 +87,7 @@ export const useCollectorPageStore = defineStore('page-collector', () => {
         },
         async getCollectorJobs(ids) {
             try {
-                const { results } = await SpaceConnector.clientV2.inventory.job.analyze({
+                const { results } = await SpaceConnector.clientV2.inventoryV2.job.analyze({
                     query: {
                         filter: [
                             {
@@ -123,7 +123,7 @@ export const useCollectorPageStore = defineStore('page-collector', () => {
         },
         async getJobs() {
             try {
-                const res = await SpaceConnector.clientV2.inventory.job.list();
+                const res = await SpaceConnector.clientV2.inventoryV2.job.list();
                 state.recentJobs = res.results;
             } catch (e) {
                 ErrorHandler.handleError(e);
