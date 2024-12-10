@@ -4,7 +4,6 @@ import { reactive } from 'vue';
 import { PButtonModal, PButton } from '@cloudforet/mirinae';
 
 import UserGroupManagementAddGroupInfo from '@/services/iam/components/UserGroupManagementAddGroupInfo.vue';
-import UserGroupManagementScheduleSetting from '@/services/iam/components/UserGroupManagementScheduleSetting.vue';
 import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-constant';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
@@ -57,7 +56,6 @@ const handleUpdate = () => {
         <template #body>
             <div class="modal-contents">
                 <user-group-management-add-group-info />
-                <user-group-management-schedule-setting />
             </div>
         </template>
         <template #confirm-button>

@@ -1508,6 +1508,21 @@
 			"PLACEHOLDER": "프로젝트 선택",
 			"RELOAD_PROJECT": "새로고침"
 		},
+		"SCHEDULE_SETTING": {
+			"CUSTOM": "커스텀",
+			"EVERYDAY": "매일",
+			"FRI": "",
+			"INFO": "선택한 일정의 알림만 수신됩니다.",
+			"MON": "",
+			"SAT": "",
+			"SCHEDULE_SETTING": "스케줄 설정",
+			"SUN": "",
+			"THU": "",
+			"TO": "",
+			"TUE": "",
+			"WED": "",
+			"WEEKDAYS": "주중"
+		},
 		"SESSION_MODAL": {
 			"SESSION_EXPIRED": "세션이 만료되었습니다. ",
 			"SIGNIN": "로그인 "
@@ -3225,19 +3240,14 @@
 				"CREATE_USER_GROUP": {
 					"CANCEL": "취소",
 					"CONFIRM": "확인",
-					"CUSTOM": "커스텀",
 					"DESCRIPTION": "설명",
-					"EVERYDAY": "매일",
 					"GROUP_NAME": "그룹 이름",
-					"INFO": "선택한 일정의 알림만 수신됩니다.",
 					"NOTIFICATION_CHANNEL": "알림 채널",
 					"PROTOCOL": "프로토콜",
-					"SCHEDULE_SETTING": "스케줄 설정",
 					"TITLE": "사용자 그룹 생성",
 					"TOKEN": "토큰",
 					"UPDATE": "수정",
-					"UPDATE_TITLE": "사용자 그룹 수정",
-					"WEEKDAYS": "주중"
+					"UPDATE_TITLE": "사용자 그룹 수정"
 				}
 			},
 			"TAB": {
