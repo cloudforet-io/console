@@ -101,6 +101,7 @@ export const useUserGroupPageStore = defineStore('page-user-group', () => {
             try {
                 const response = await SpaceConnector.clientV2.identity.userGroup.list<UserGroupListParameters, ListResponse<UserGroupModel>>(params);
                 state.userGroups = response.results || [];
+                state.totalCount = response.total_count ?? 0;
                 state.selectedIndices = [];
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -120,7 +121,7 @@ export const useUserGroupPageStore = defineStore('page-user-group', () => {
                 throw e;
             }
         },
-        async listUsersPerGroup(params: WorkspaceUserListParameters) {
+        async listUsers(params: WorkspaceUserListParameters) {
             try {
                 const response = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>(params);
                 state.users.list = response.results || [];
