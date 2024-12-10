@@ -126,6 +126,7 @@
 			"TOTAL_ALERTS": "",
 			"USER": "사용자",
 			"USER_GROUP": "",
+			"VALIDATION_KEY_UNIQUE": "",
 			"VALIDATION_NAME_UNIQUE": "",
 			"WEBHOOK": "웹훅 ({cnt})"
 		},

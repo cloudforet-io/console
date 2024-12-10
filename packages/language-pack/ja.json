@@ -126,6 +126,7 @@
 			"TOTAL_ALERTS": "",
 			"USER": "ユーザー",
 			"USER_GROUP": "",
+			"VALIDATION_KEY_UNIQUE": "",
 			"VALIDATION_NAME_UNIQUE": "",
 			"WEBHOOK": "ウェプフク ({cnt})"
 		},
