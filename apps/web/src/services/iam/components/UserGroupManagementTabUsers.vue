@@ -4,12 +4,17 @@ import {
 } from 'vue';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PHeadingLayout, PHeading, PButton, PToolboxTable,
 } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
+import type { UserGroupRemoveUsersParameters } from '@/schema/identity/user-group/api-verbs/remove-users';
+import type { UserGroupModel } from '@/schema/identity/user-group/model';
 import { i18n } from '@/translations';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { calculateTime } from '@/services/iam/composables/refined-table-data';
 import { USER_GROUP_MODAL_TYPE, USER_GROUP_USERS_SEARCH_HANDLERS } from '@/services/iam/constants/user-group-constant';
@@ -28,6 +33,7 @@ const state = reactive({
         last_accessed_at: user.last_accessed_at,
         timezone: user.timezone,
     }))),
+    userItemTotalCount: computed<number>(() => userGroupPageState.users.totalCount),
 });
 
 const tableState = reactive({
@@ -47,7 +53,7 @@ const tableState = reactive({
     })),
 });
 
-const isUserSelected = computed<boolean>(() => userGroupPageState.selectedIndices.length === 1);
+const isUserSelected = computed<boolean>(() => userGroupPageState.users.selectedIndices.length > 0);
 
 /* Component */
 const handleSelect = async (index) => {
@@ -62,20 +68,47 @@ const handleAddUser = () => {
     });
 };
 
-/* Watch */
+const handleRemoveUser = () => {
+    try {
+        const users: string[] = [];
+        userGroupPageState.users.selectedIndices.forEach((d) => {
+            users.push(userGroupPageState.users.list[d].user_id);
+        });
+        fetchRemoveUser({
+            user_group_id: userGroupPageGetters.selectedUserGroups[0].user_group_id,
+            users,
+        });
+    } finally {
+    //   TODO: after remove user
+    }
+};
+
+/* Watcher */
 watch(() => userGroupPageGetters.selectedUserGroups, async (nv) => {
     if (nv.length === 1) {
         const usersIdList: string[] | undefined = nv[0].users;
-        await userGroupPageStore.listUsersPerGroup({});
+        await userGroupPageStore.listUsers({});
 
         if (userGroupPageState.users.list.length > 0 && usersIdList && usersIdList.length > 0) {
             userGroupPageState.users.list = userGroupPageState.users.list.filter((user) => usersIdList.includes(user.user_id));
-            console.log(userGroupPageState.users.list);
         } else if (typeof usersIdList !== 'object') {
             userGroupPageState.users.list = [];
         }
     }
 }, { deep: true, immediate: true });
+
+watch(() => userGroupPageState.users, (nv) => {
+    nv.totalCount = nv.list.length;
+}, { deep: true, immediate: true });
+
+/* API */
+const fetchRemoveUser = async (params: UserGroupRemoveUsersParameters) => {
+    try {
+        await SpaceConnector.clientV2.identity.userGroup.removeUsers<UserGroupRemoveUsersParameters, UserGroupModel>(params);
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
 </script>
 
 <template>
@@ -85,7 +118,7 @@ watch(() => userGroupPageGetters.selectedUserGroups, async (nv) => {
                 <p-heading heading-type="sub"
                            use-selected-count
                            use-total-count
-                           :total-count="0"
+                           :total-count="state.userItemTotalCount"
                            :title="`${i18n.t('IAM.USER_GROUP.TAB.USERS.TITLE')}`"
                 />
             </template>
@@ -94,13 +127,13 @@ watch(() => userGroupPageGetters.selectedUserGroups, async (nv) => {
                     <div class="toolbox">
                         <p-button style-type="tertiary"
                                   icon-left="ic_plus"
-                                  :disabled="!isUserSelected"
                                   @click="handleAddUser"
                         >
                             {{ $t('IAM.USER_GROUP.TAB.USERS.ADD_USER') }}
                         </p-button>
                         <p-button style-type="tertiary"
                                   :disabled="!isUserSelected"
+                                  @click="handleRemoveUser"
                         >
                             {{ $t('IAM.USER_GROUP.TAB.USERS.REMOVE') }}
                         </p-button>
