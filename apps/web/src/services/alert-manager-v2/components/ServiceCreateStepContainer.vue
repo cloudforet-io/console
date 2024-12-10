@@ -14,9 +14,8 @@ import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route
 import { useServiceCreateFormStore } from '@/services/alert-manager-v2/stores/service-create-form-store';
 
 type actionButtonType = {
-    label: TranslateResult,
-    hasIcon?: boolean,
-    isLast?: boolean,
+    label: TranslateResult;
+    type: 'create' | 'select' | 'continue' | 'set_up';
 };
 
 interface Props {
@@ -41,6 +40,7 @@ const { getProperRouteLocation } = useProperRouteLocation();
 const storeState = reactive({
     currentStep: computed<number>(() => serviceFormState.currentStep),
     currentSubStep: computed<number>(() => serviceFormState.currentSubStep),
+    createdServiceId: computed<string>(() => serviceFormState.createdServiceId),
 });
 const state = reactive({
     previousStep: computed<number>(() => serviceFormState.currentStep - 1),
@@ -49,25 +49,28 @@ const state = reactive({
     nextSubStep: computed<number>(() => serviceFormState.currentSubStep + 1),
     actionButtonInfoMap: computed<Record<string, actionButtonType>>(() => ({
         1: {
-            label: i18n.t('ALERT_MANAGER.CONTINUE'),
-            hasIcon: true,
+            label: i18n.t('ALERT_MANAGER.CREATE'),
+            type: 'create',
         },
         '2-1': {
             label: i18n.t('ALERT_MANAGER.SERVICE.SELECT'),
+            type: 'select',
         },
         '2-2': {
             label: i18n.t('ALERT_MANAGER.CREATE'),
+            type: 'create',
         },
         '2-3': {
             label: i18n.t('ALERT_MANAGER.CONTINUE'),
-            hasIcon: true,
+            type: 'continue',
         },
         '3-1': {
             label: i18n.t('ALERT_MANAGER.SERVICE.SELECT'),
+            type: 'select',
         },
         '3-2': {
             label: i18n.t('ALERT_MANAGER.SET_UP'),
-            isLast: true,
+            type: 'set_up',
         },
     })),
     actionButtonInfo: computed<actionButtonType>(() => {
@@ -79,6 +82,9 @@ const state = reactive({
     }),
 });
 
+const handleCancel = () => {
+    router.push(getProperRouteLocation({ name: ALERT_MANAGER_ROUTE_V2.SERVICE._NAME }));
+};
 const handleNavigation = (direction: 'prev' | 'next') => {
     if (direction === 'prev') {
         handlePrevNavigation();
@@ -94,7 +100,7 @@ const handlePrevNavigation = () => {
     if (storeState.currentStep === 2) {
         if (props.selectedItemId) {
             if (storeState.currentSubStep === 3) {
-                router.push({ name: ALERT_MANAGER_ROUTE_V2.SERVICE._NAME });
+                router.push(getProperRouteLocation({ name: ALERT_MANAGER_ROUTE_V2.SERVICE._NAME }));
                 return;
             }
             serviceFormStore.setCurrentSubStep(state.previousSubStep);
@@ -115,14 +121,9 @@ const handleNextNavigation = () => {
 };
 
 const handleActionButton = () => {
-    if (storeState.currentStep === 1) {
-        emit('create');
-        return;
-    }
-
-    if (state.actionButtonInfo.hasIcon) {
+    if (state.actionButtonInfo.type === 'continue') {
         handleNavigation('next');
-    } else if (storeState.currentSubStep === 1) {
+    } else if (state.actionButtonInfo.type === 'select') {
         handleClickSelectButton();
     } else {
         emit('create');
@@ -138,7 +139,7 @@ const handleClickSkipButton = () => {
     router.push(getProperRouteLocation({
         name: ALERT_MANAGER_ROUTE_V2.SERVICE.DETAIL._NAME,
         params: {
-            serviceId: 'temp id',
+            serviceId: storeState.createdServiceId,
         },
         query: {
             tab: SERVICE_DETAIL_TABS.SETTINGS,
@@ -155,11 +156,11 @@ const handleClickSkipButton = () => {
                 <p-button v-if="storeState.currentStep === 1 || storeState.currentSubStep === 3"
                           style-type="transparent"
                           size="lg"
-                          @click="handleNavigation('prev')"
+                          @click="handleCancel"
                 >
                     {{ $t('ALERT_MANAGER.CANCEL') }}
                 </p-button>
-                <p-button v-else
+                <p-button v-else-if="storeState.currentSubStep === 2"
                           style-type="transparent"
                           size="lg"
                           icon-left="ic_arrow-left"
@@ -178,8 +179,8 @@ const handleClickSkipButton = () => {
             </p-button>
             <p-button :disabled="!props.isAllFormValid"
                       class="step-right-button"
-                      :style-type="state.actionButtonInfo?.isLast ? 'primary' : 'substitutive'"
-                      :icon-right="state.actionButtonInfo?.hasIcon ? 'ic_arrow-right' : undefined"
+                      :style-type="state.actionButtonInfo?.type === 'set_up' ? 'primary' : 'substitutive'"
+                      :icon-right="state.actionButtonInfo?.type === 'continue' ? 'ic_arrow-right' : undefined"
                       size="lg"
                       @click="handleActionButton"
             >
