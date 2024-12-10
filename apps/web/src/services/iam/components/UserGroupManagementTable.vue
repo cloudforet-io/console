@@ -5,14 +5,18 @@ import {
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PToolboxTable, PSelectDropdown } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
+import type { UserGroupDeleteUserGroupParameters } from '@/schema/identity/user-group/api-verbs/delete';
+import type { UserGroupModel } from '@/schema/identity/user-group/model';
 import type { UserGroupListItemType } from '@/schema/identity/user-group/type';
 import { i18n } from '@/translations';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import { USER_GROUP_MODAL_TYPE, USER_GROUP_SEARCH_HANDLERS } from '@/services/iam/constants/user-group-constant';
@@ -30,14 +34,19 @@ const props = withDefaults(defineProps<Props>(), {
 
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
+const userGroupPageGetters = userGroupPageStore.getters;
 
 const userGroupListApiQueryHelper = new ApiQueryHelper()
     .setPageStart(userGroupPageState.pageStart)
     .setPageLimit(userGroupPageState.pageLimit)
     .setSort('name', true);
 let userGroupListApiQuery = userGroupListApiQueryHelper.data;
-const queryTagHelper = useQueryTags({ keyItemSets: USER_GROUP_SEARCH_HANDLERS.keyItemSets });
+const queryTagHelper = useQueryTags({ keyItemSets: USER_GROUP_SEARCH_HANDLERS });
 const { queryTags } = queryTagHelper;
+
+const storeState = reactive({
+    loading: computed<boolean>(() => userGroupPageState.loading),
+});
 
 const state = reactive({
     userGroupItems: computed<UserGroupListItemType[]>(() => userGroupPageState.userGroups),
@@ -121,18 +130,10 @@ const handleChange = (options: any = {}) => {
     fetchUserGroupList();
 };
 
-/* API */
-const fetchUserGroupList = async () => {
-    userGroupPageState.loading = true;
-    try {
-        await userGroupPageStore.listUserGroups({ query: userGroupListApiQuery });
-    } finally {
-        userGroupPageState.loading = false;
-    }
-};
-
 const handleSelectDropdown = async (inputText: string) => {
     dropdownState.loading = true;
+
+    const selectedUserGroupIds = userGroupPageGetters.selectedUserGroups.map((userGroup) => userGroup.user_group_id);
 
     switch (inputText) {
     case USER_GROUP_MODAL_TYPE.UPDATE:
@@ -144,7 +145,11 @@ const handleSelectDropdown = async (inputText: string) => {
         dropdownState.loading = false;
         break;
     case USER_GROUP_MODAL_TYPE.REMOVE:
-        console.log('TODO: Remove API');
+        selectedUserGroupIds.forEach(async (userGroupId) => {
+            await fetchDeleteUserGroup({
+                user_group_id: userGroupId,
+            });
+        });
         dropdownState.loading = false;
         break;
     case USER_GROUP_MODAL_TYPE.ADD_NEW_USER:
@@ -158,6 +163,24 @@ const handleSelectDropdown = async (inputText: string) => {
     default:
         dropdownState.loading = false;
         break;
+    }
+};
+
+/* API */
+const fetchUserGroupList = async () => {
+    userGroupPageState.loading = true;
+    try {
+        await userGroupPageStore.listUserGroups({ query: userGroupListApiQuery });
+    } finally {
+        userGroupPageState.loading = false;
+    }
+};
+
+const fetchDeleteUserGroup = async (params: UserGroupDeleteUserGroupParameters) => {
+    try {
+        await SpaceConnector.clientV2.identity.userGroup.delete<UserGroupDeleteUserGroupParameters, UserGroupModel>(params);
+    } catch (e) {
+        ErrorHandler.handleError(e);
     }
 };
 
@@ -181,6 +204,7 @@ onMounted(async () => {
                          :key-item-sets="USER_GROUP_SEARCH_HANDLERS"
                          :value-handler-map="tableState.valueHandlerMap"
                          :query-tags="queryTags"
+                         :loading="storeState.loading"
                          :style="{height: `${props.tableHeight}px}`}"
                          @select="handleSelect"
                          @change="handleChange"
