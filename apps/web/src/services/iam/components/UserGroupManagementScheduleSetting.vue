@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import {
     PFieldGroup, PRadioGroup, PRadio, PI, PSelectButton, PSelectDropdown,
@@ -8,44 +9,62 @@ import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/typ
 
 import { i18n } from '@/translations';
 
-const SCHEDULE_SETTING_LIST = [
-    i18n.t('IAM.USER_GROUP.MODAL.CREATE_USER_GROUP.WEEKDAYS'),
-    i18n.t('IAM.USER_GROUP.MODAL.CREATE_USER_GROUP.EVERYDAY'),
-    i18n.t('IAM.USER_GROUP.MODAL.CREATE_USER_GROUP.CUSTOM'),
-];
+interface ScheduleRadioType {
+  key: string;
+  name: TranslateResult | string;
+}
 
-const DAYS: MenuItem[] = [
-    {
-        name: 'Monday',
-        label: 'Mon',
-    },
-    {
-        name: 'Tuesday',
-        label: 'Tue',
-    },
-    {
-        name: 'Wednesday',
-        label: 'Wed',
-    },
-    {
-        name: 'Thursday',
-        label: 'Thu',
-    },
-    {
-        name: 'Friday',
-        label: 'Fri',
-    },
-    {
-        name: 'Saturday',
-        label: 'Sat',
-    },
-    {
-        name: 'Sunday',
-        label: 'Sun',
-    },
-];
+const state = {
+    scheduleSettingList: computed<ScheduleRadioType[]>(() => [
+        {
+            key: 'weekdays',
+            name: i18n.t('IAM.USER_GROUP.MODAL.CREATE_USER_GROUP.WEEKDAYS'),
+        },
+        {
+            key: 'everyday',
+            name: i18n.t('IAM.USER_GROUP.MODAL.CREATE_USER_GROUP.EVERYDAY'),
+        },
+        {
+            key: 'custom',
+            name: i18n.t('IAM.USER_GROUP.MODAL.CREATE_USER_GROUP.CUSTOM'),
+        },
+    ]),
+    selectedScheduleRadioType: computed<undefined>(() => undefined),
+    days: computed<MenuItem[]>(() => [
+        {
+            name: 'Monday',
+            label: 'Mon',
+        },
+        {
+            name: 'Tuesday',
+            label: 'Tue',
+        },
+        {
+            name: 'Wednesday',
+            label: 'Wed',
+        },
+        {
+            name: 'Thursday',
+            label: 'Thu',
+        },
+        {
+            name: 'Friday',
+            label: 'Fri',
+        },
+        {
+            name: 'Saturday',
+            label: 'Sat',
+        },
+        {
+            name: 'Sunday',
+            label: 'Sun',
+        },
+    ]),
+};
+
 
 const selectedDays = ref<string[]>([]);
+const selectedTime = ref<ScheduleRadioType>();
 </script>
 
 <template>
@@ -54,10 +73,12 @@ const selectedDays = ref<string[]>([]);
                        required
         >
             <p-radio-group direction="horizontal">
-                <p-radio v-for="(schedule_setting, i) in SCHEDULE_SETTING_LIST"
-                         :key="i"
+                <p-radio v-for="schedule_setting in state.scheduleSettingList.value"
+                         :key="schedule_setting.key"
+                         v-model="selectedTime"
+                         :value="schedule_setting"
                 >
-                    {{ schedule_setting }}
+                    {{ schedule_setting.name }}
                 </p-radio>
             </p-radio-group>
             <div class="flex gap-1 py-2 px-0.5">
@@ -71,8 +92,8 @@ const selectedDays = ref<string[]>([]);
                 </p>
             </div>
             <div class="w-full overflow py-4 flex flex-wrap gap-2">
-                <p-select-button v-for="(selectedDay, i) in DAYS"
-                                 :key="`${selectedDay}-${i}`"
+                <p-select-button v-for="selectedDay in state.days.value"
+                                 :key="selectedDay.name"
                                  v-model="selectedDays"
                                  multi-selectable
                                  :value="selectedDay.name"
