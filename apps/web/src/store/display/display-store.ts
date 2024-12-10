@@ -38,7 +38,7 @@ import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-
+const verbose = false;
 const filterMenuByRoute = (menuList: DisplayMenu[], router: VueRouter): DisplayMenu[] => menuList.reduce((results, _menu) => {
     const userWorkspaceStore = useUserWorkspaceStore();
     const targetWorkspaceId = userWorkspaceStore.getters.currentWorkspaceId;
@@ -217,9 +217,11 @@ export const useDisplayStore = defineStore('display-store', () => {
     let notificationListApiToken: CancelTokenSource | undefined;
     const checkNotification = async (): Promise<void> => {
         if (notificationListApiToken) {
+            if (verbose) console.debug('[CHECK NOTI]', ' pending...');
             return;
         }
         try {
+            if (verbose) console.debug('[CHECK NOTI]', ' start');
             notificationListApiToken = axios.CancelToken.source();
 
             const currentTime = dayjs.tz(dayjs.utc(), userStore.state.timezone);
@@ -230,6 +232,7 @@ export const useDisplayStore = defineStore('display-store', () => {
                 currentTime,
                 lastNotificationReadTime,
             );
+            if (verbose) console.debug('[NOTI QUERY.FILTER]', param.query.filter);
             const { total_count } = await SpaceConnector.clientV2.notification.notification.list<NotificationListParameters, ListResponse<NotificationModel>>(param, {
                 cancelToken: notificationListApiToken.token,
             });
@@ -243,17 +246,20 @@ export const useDisplayStore = defineStore('display-store', () => {
             }
         } finally {
             notificationListApiToken = undefined;
+            if (verbose) console.debug('[CHECK NOTI]', ' finished');
         }
     };
 
     let checkNotificationInterval: undefined|ReturnType<typeof setTimeout>;
     const stopCheckNotification = (): void => {
         if (notificationListApiToken) {
+            if (verbose)console.debug('[NOTI API]', 'canceled');
             notificationListApiToken.cancel();
             notificationListApiToken = undefined;
         }
 
         if (checkNotificationInterval) {
+            if (verbose)console.debug('[NOTI INTERVAL]', 'stopped');
             clearInterval(checkNotificationInterval);
             checkNotificationInterval = undefined;
         }
@@ -261,12 +267,15 @@ export const useDisplayStore = defineStore('display-store', () => {
 
     const startCheckNotification = (): void => {
         if (notificationListApiToken) {
+            if (verbose)console.debug('[NOTI API]', 'previous canceled');
             notificationListApiToken.cancel();
             notificationListApiToken = undefined;
         }
         if (checkNotificationInterval) {
+            if (verbose)console.debug('[NOTI INTERVAL]', 'previous stopped');
             clearInterval(checkNotificationInterval);
         } else {
+            if (verbose) console.debug('[NOTI INTERVAL]', 'start');
             checkNotification();
         }
 

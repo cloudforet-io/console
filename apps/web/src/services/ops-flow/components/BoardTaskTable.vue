@@ -3,6 +3,8 @@ import {
     reactive, ref, watch, toRaw, computed,
 } from 'vue';
 
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 import {
@@ -24,6 +26,7 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import { useTimezoneDate } from '@/common/composables/timezone-date';
 import ProjectLinkButton from '@/common/modules/project/ProjectLinkButton.vue';
 
+import BoardTaskFilters from '@/services/ops-flow/components/BoardTaskFilters.vue';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
 import { useBoardPageStore } from '@/services/ops-flow/stores/board-page-store';
@@ -32,6 +35,7 @@ import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
+import type { TaskFilters } from '@/services/ops-flow/types/task-filters-type';
 
 const boardPageStore = useBoardPageStore();
 const boardPageState = boardPageStore.state;
@@ -88,8 +92,8 @@ const sort = reactive({
     desc: true,
 });
 const queryHelper = new ApiQueryHelper();
-const getQuery = () => {
-    queryHelper.setFilters([])
+const getQuery = (filters?: ConsoleFilter[]) => {
+    queryHelper.setFilters(filters ?? [])
         .setMultiSortV2([toRaw(sort)])
         .setPage(pagination.page, pagination.size);
     if (search.value) queryHelper.addFilter({ v: search.value });
@@ -163,6 +167,18 @@ const handleChange = (options: ToolboxOptions) => {
     listTask(getQuery());
 };
 
+/* filters */
+const taskFilterHelper = new QueryHelper();
+const handleUpdateFilters = (values: TaskFilters) => {
+    taskFilterHelper.setFilters([]);
+    if (values.taskType.length) taskFilterHelper.addFilter({ k: 'task_type_id', v: values.taskType, o: '=' });
+    if (values.status.length) taskFilterHelper.addFilter({ k: 'status_id', v: values.status, o: '=' });
+    if (values.project.length) taskFilterHelper.addFilter({ k: 'project_id', v: values.project, o: '=' });
+    if (values.createdBy.length) taskFilterHelper.addFilter({ k: 'created_by', v: values.createdBy, o: '=' });
+    if (values.assignee.length) taskFilterHelper.addFilter({ k: 'assignee', v: values.assignee, o: '=' });
+    listTask(getQuery(taskFilterHelper.filters));
+};
+
 /* table */
 const fields = computed<DataTableField[] >(() => [
     {
@@ -215,7 +231,9 @@ const { getProperRouteLocation } = useProperRouteLocation();
             />
             <p-divider />
             <div class="mt-6">
-                filters
+                <board-task-filters :category-id="boardPageState.currentCategoryId"
+                                    @update="handleUpdateFilters"
+                />
             </div>
         </div>
         <p-data-table :fields="fields"

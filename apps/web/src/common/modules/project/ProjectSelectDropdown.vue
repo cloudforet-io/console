@@ -47,6 +47,9 @@ interface Props {
     workspaceId?: string;
     isInitSelectedItem?: boolean;
     block?: boolean;
+    styleType?: string;
+    appearanceType?: 'stack';
+    showDeleteAllButton?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -64,6 +67,9 @@ const props = withDefaults(defineProps<Props>(), {
     hideCreateButton: false,
     workspaceId: undefined,
     isInitSelectedItem: false,
+    styleType: undefined,
+    appearanceType: undefined,
+    showDeleteAllButton: undefined,
 });
 
 const emit = defineEmits<{(e: 'select', value: ProjectTreeNodeData[]): void;
@@ -303,8 +309,10 @@ watch(() => state._selectedProjectIds, (selectedProjectIds) => {
                            :readonly="props.readonly"
                            :menu-position="props.position"
                            disable-handler
+                           :show-delete-all-button="props.showDeleteAllButton"
+                           :style-type="props.styleType"
                            :block="props.block"
-                           appearance-type="stack"
+                           :appearance-type="props.appearanceType"
                            :is-filterable="!props.readonly"
                            @update:visible-menu="handleUpdateVisibleMenu"
                            @delete-tag="handleDeleteTag"

@@ -28,6 +28,10 @@ const props = withDefaults(defineProps<{
      disabled?: boolean;
      readonly?: boolean;
      userPool?: string[];
+     selectionLabel?: string;
+     appearanceType?: string;
+     styleType?: string;
+     block?: boolean;
 }>(), {
     userId: '',
     userIds: () => [],
@@ -36,6 +40,10 @@ const props = withDefaults(defineProps<{
     invalid: false,
     disabled: false,
     userPool: undefined,
+    selectionLabel: undefined,
+    appearanceType: 'badge',
+    styleType: undefined,
+    block: undefined,
 });
 
 const emit = defineEmits<{(event: 'update:user-ids', value: string[]): void;
@@ -122,7 +130,8 @@ watch([loading, () => props.userId, () => props.userIds], ([_loading, newUserId,
 </script>
 
 <template>
-    <p-select-dropdown show-select-marker
+    <p-select-dropdown class="user-select-dropdown"
+                       show-select-marker
                        :selected="selectedUserItems"
                        :handler="userMenuItemsHandler"
                        :page-size="10"
@@ -133,7 +142,16 @@ watch([loading, () => props.userId, () => props.userIds], ([_loading, newUserId,
                        :use-fixed-menu-style="useFixedMenuStyle"
                        show-delete-all-button
                        :multi-selectable="props.selectionType === 'multiple'"
-                       appearance-type="badge"
+                       :selection-label="props.selectionLabel"
+                       :appearance-type="props.appearanceType"
+                       :style-type="props.styleType"
+                       :block="props.block"
                        @update:selected="handleUpdateSelectedUserItems"
     />
 </template>
+
+<style scoped lang="postcss">
+.user-select-dropdown {
+    width: fit-content;
+}
+</style>
