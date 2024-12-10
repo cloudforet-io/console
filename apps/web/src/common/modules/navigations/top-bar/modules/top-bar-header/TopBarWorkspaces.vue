@@ -5,7 +5,7 @@ import {
 import type { Location } from 'vue-router';
 import { useRouter } from 'vue-router/composables';
 
-import { clone, sortBy } from 'lodash';
+import { sortBy } from 'lodash';
 
 import {
     PSelectDropdown, PTooltip, PI, PButton, PTextHighlighting, PEmpty,
@@ -21,10 +21,9 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 
 import type { ReferenceData } from '@/lib/helper/config-data-helper';
 import { convertWorkspaceConfigToReferenceData } from '@/lib/helper/config-data-helper';
-import type { MenuId } from '@/lib/menu/config';
-import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
+import { useCurrentMenuId } from '@/common/composables/current-menu-id';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
@@ -80,9 +79,7 @@ const selectWorkspace = (name: string): void => {
     if (!workspaceId || workspaceId === storeState.currentWorkspaceId) return;
 
     appContextStore.setGlobalGrantLoading(true);
-    const reversedMatched = clone(router.currentRoute.matched).reverse();
-    const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-    const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
+    const targetMenuId: string = useCurrentMenuId();
     userWorkspaceStore.setCurrentWorkspace(workspaceId);
     router.push({ name: MENU_INFO_MAP[targetMenuId].routeName, params: { workspaceId } }).catch(() => {});
 };
