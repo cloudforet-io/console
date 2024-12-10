@@ -82,8 +82,8 @@ onMounted(async () => {
              class="webhook-item"
         >
             <p-lazy-img :src="assetUrlConverter(storeState.selectedWebhookType.tags?.icon || '')"
-                        width="2.5rem"
-                        height="2.5rem"
+                        width="4rem"
+                        height="4rem"
                         error-icon="ic_webhook"
             />
             <div class="info">
@@ -126,7 +126,7 @@ onMounted(async () => {
 <style lang="postcss" scoped>
 .service-create-step2-webhook-form {
     .webhook-item {
-        @apply flex w-full;
+        @apply flex items-center w-full;
         margin-bottom: 1.5rem;
         gap: 1rem;
         .info {

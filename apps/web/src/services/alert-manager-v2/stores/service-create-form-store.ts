@@ -2,14 +2,16 @@ import { reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
+import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
 import type { PluginModel } from '@/schema/repository/plugin/model';
 
 interface ServiceFormStoreState {
     currentStep: number;
     currentSubStep: number;
     createdServiceId: string;
-    selectedWebhookType: PluginModel;
+    selectedWebhookType?: PluginModel;
     webhookName: string;
+    createdWebhookInfo?: WebhookModel;
     // TODO: add type
     selectedProtocol: any;
 }
@@ -20,8 +22,9 @@ export const useServiceCreateFormStore = defineStore('service-create-form', () =
         currentSubStep: 1,
         createdServiceId: '',
         // webhook
-        selectedWebhookType: {} as PluginModel,
+        selectedWebhookType: undefined,
         webhookName: '',
+        createdWebhookInfo: undefined,
         // notification
         selectedProtocol: {},
     });
@@ -31,29 +34,36 @@ export const useServiceCreateFormStore = defineStore('service-create-form', () =
             state.currentStep = 1;
             state.currentSubStep = 1;
             state.createdServiceId = '';
-            state.selectedWebhookType = {} as PluginModel;
+            state.selectedWebhookType = undefined;
             state.webhookName = '';
+            state.createdWebhookInfo = undefined;
             state.selectedProtocol = {};
         },
         initStep2() {
             state.currentSubStep = 1;
-            state.selectedWebhookType = {} as PluginModel;
+            state.selectedWebhookType = undefined;
             state.webhookName = '';
         },
-        setCreatedServiceId(id: string) {
-            state.createdServiceId = id;
-        },
+
         setCurrentStep(step: number) {
             state.currentStep = step;
         },
         setCurrentSubStep(step: number) {
             state.currentSubStep = step;
         },
+
+        setCreatedServiceId(id: string) {
+            state.createdServiceId = id;
+        },
+
         setSelectedWebhookType(webhookType: PluginModel) {
             state.selectedWebhookType = webhookType;
         },
         setWebhookName(name: string) {
             state.webhookName = name;
+        },
+        setCreatedWebhookInfo(webhook: WebhookModel) {
+            state.createdWebhookInfo = webhook;
         },
         // TODO: add type
         setSelectedProtocol(protocol: any) {
