@@ -10,7 +10,7 @@ import type { UserGroupListItemType } from '@/schema/identity/user-group/type';
 import type { ModalState } from '@/services/iam/types/user-group-type';
 import type { UserListItemType } from '@/services/iam/types/user-type';
 
-interface iState {
+interface UserGroupPageState {
     loading: boolean;
     userGroups: UserGroupListItemType[];
     selectedUserGroup: UserGroupListItemType;
@@ -23,7 +23,7 @@ interface iState {
 }
 
 export const useUserGroupPageStore = defineStore('page-user-group', () => {
-    const state = reactive<iState>({
+    const state = reactive<UserGroupPageState>({
         loading: true,
         userGroups: [],
         selectedUserGroup: {},
