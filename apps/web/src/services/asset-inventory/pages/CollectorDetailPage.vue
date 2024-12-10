@@ -81,6 +81,8 @@ const collectorJobState = collectorJobStore.$state;
 const collectorDataModalStore = useCollectorDataModalStore();
 const collectorDetailPageStore = useCollectorDetailPageStore();
 
+const { hasReadWriteAccess } = usePageEditableStatus();
+
 const userStore = useUserStore();
 
 watch(() => collectorFormState.originCollector, async (collector) => {
@@ -94,7 +96,6 @@ watch(() => collectorFormState.originCollector, async (collector) => {
 const queryHelper = new QueryHelper();
 
 const state = reactive({
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
     isNotiVisible: computed(() => !collectorDetailPageStore.getters.isEditableCollector),
     isDomainAdmin: computed(() => userStore.getters.isDomainAdmin),
     loading: true,
@@ -299,21 +300,21 @@ onUnmounted(() => {
 
         <collector-base-info-section class="section"
                                      :history-link="state.collectorHistoryLink"
-                                     :has-read-write-access="state.hasReadWriteAccess"
+                                     :has-read-write-access="hasReadWriteAccess"
         />
         <collector-schedule-section class="section"
-                                    :has-read-write-access="state.hasReadWriteAccess"
+                                    :has-read-write-access="hasReadWriteAccess"
         />
         <collector-options-section class="section"
                                    data-test-id="collector-options-section"
-                                   :has-read-write-access="state.hasReadWriteAccess"
+                                   :has-read-write-access="hasReadWriteAccess"
         />
         <collector-additional-rule class="section"
                                    :collector-id="props.collectorId"
-                                   :has-read-write-access="state.hasReadWriteAccess"
+                                   :has-read-write-access="hasReadWriteAccess"
         />
         <collector-service-accounts-section class="section"
-                                            :has-read-write-access="state.hasReadWriteAccess"
+                                            :has-read-write-access="hasReadWriteAccess"
         />
 
         <p-double-check-modal :visible.sync="state.deleteModalVisible"

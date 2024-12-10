@@ -27,6 +27,8 @@ const bookmarkPageStore = useBookmarkPageStore();
 const bookmarkPageState = bookmarkPageStore.state;
 const bookmarkPageGetters = bookmarkPageStore.getters;
 
+const { hasReadWriteAccess } = usePageEditableStatus();
+
 const storeState = reactive({
     modalType: computed<BookmarkModalType|undefined>(() => bookmarkState.modal.type),
 
@@ -46,7 +48,6 @@ const state = reactive({
             name: BOOKMARK_MODAL_TYPE.FOLDER,
         },
     ])),
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
 });
 
 const hideMenu = () => {
@@ -76,7 +77,7 @@ const handleClickDeleteButton = () => {
             <template #heading>
                 <p-heading :title="$t('IAM.BOOKMARK.ALL_BOOKMARK')" />
             </template>
-            <template v-if="state.hasReadWriteAccess"
+            <template v-if="hasReadWriteAccess"
                       #extra
             >
                 <p-button style-type="tertiary"
@@ -105,7 +106,7 @@ const handleClickDeleteButton = () => {
                 </div>
             </template>
         </p-heading-layout>
-        <bookmark-management-table :has-read-write-access="state.hasReadWriteAccess" />
+        <bookmark-management-table :has-read-write-access="hasReadWriteAccess" />
     </div>
 </template>
 

@@ -35,6 +35,8 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 
 const router = useRouter();
 
+const { hasReadWriteAccess } = usePageEditableStatus();
+
 const state = reactive({
     currency: undefined as Currency|undefined,
     toggleText: computed<string>(() => (state.statusToggle
@@ -51,7 +53,6 @@ const state = reactive({
     }),
     statusToggle: false,
     checkbox: false,
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
 });
 
 const {
@@ -168,7 +169,7 @@ onMounted(async () => {
             <div class="toggle-wrapper">
                 <p-toggle-button :value.sync="state.statusToggle"
                                  class="toggle-button"
-                                 :disabled="!state.hasReadWriteAccess"
+                                 :disabled="!hasReadWriteAccess"
                                  @change-toggle="handleChangeToggleButton"
                 />
                 <p class="toggle-text">
@@ -222,7 +223,7 @@ onMounted(async () => {
                             <div class="cost-input">
                                 <p-text-input :value="state.statusToggle ? cost : undefined"
                                               :invalid="invalid"
-                                              :disabled="!state.hasReadWriteAccess || !state.statusToggle"
+                                              :disabled="!hasReadWriteAccess || !state.statusToggle"
                                               masking-mode
                                               class="cost-input"
                                               @update:value="handleUpdateCost"
@@ -233,7 +234,7 @@ onMounted(async () => {
                     </p-field-group>
                     <p-divider class="divider" />
                     <p-checkbox v-model="state.checkbox"
-                                :disabled="!state.hasReadWriteAccess || !state.statusToggle"
+                                :disabled="!hasReadWriteAccess || !state.statusToggle"
                     >
                         <span>{{ $t('IAM.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION_CHECKBOX') }}</span>
                     </p-checkbox>
@@ -247,7 +248,7 @@ onMounted(async () => {
                 </div>
             </div>
             <p-button v-if="state.statusToggle"
-                      :disabled="!state.hasReadWriteAccess || !isAllValid || !state.isChanged"
+                      :disabled="!hasReadWriteAccess || !isAllValid || !state.isChanged"
                       class="save-button"
                       @click="handleSaveConfig"
             >

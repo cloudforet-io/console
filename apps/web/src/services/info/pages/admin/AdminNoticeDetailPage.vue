@@ -42,12 +42,14 @@ const props = defineProps<{
     postId: string;
 }>();
 
-const { getProperRouteLocation } = useProperRouteLocation();
 const noticeDetailStore = useNoticeDetailStore();
 const noticeDetailState = noticeDetailStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
 const userStore = useUserStore();
+
+const { hasReadWriteAccess } = usePageEditableStatus();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const router = useRouter();
 
@@ -61,7 +63,6 @@ const state = reactive({
     allSendingEmailModalVisible: false,
     specificSendingEmailModalVisible: false,
     sendLoading: false,
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
     isAllWorkspace: computed<boolean>(() => (!storeState.post?.workspaces || storeState.post?.workspaces?.includes('*')) ?? true),
     scopedWorkspaceList: computed<WorkspaceModel[]|undefined>(() => {
         if (state.isAllWorkspace) return undefined;
@@ -153,7 +154,7 @@ onBeforeMount(async () => {
                            @click-back-button="$router.go(-1)"
                 />
             </template>
-            <template v-if="state.hasReadWriteAccess"
+            <template v-if="hasReadWriteAccess"
                       #extra
             >
                 <div v-if="storeState.hasPermissionToEditOrDelete"

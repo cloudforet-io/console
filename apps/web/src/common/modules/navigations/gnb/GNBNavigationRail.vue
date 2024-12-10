@@ -49,6 +49,8 @@ const route = useRoute();
 const router = useRouter();
 const { width } = useWindowSize();
 
+const { currentMenuId } = useCurrentMenuId();
+
 const storeState = reactive({
     isHideNavRail: computed(() => gnbGetters.isHideNavRail),
     isMinimizeNavRail: computed(() => gnbGetters.isMinimizeNavRail),
@@ -88,6 +90,12 @@ const state = reactive({
             }
         });
         return result;
+    }),
+    selectedMenuId: computed<string>(() => {
+        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
+            return '';
+        }
+        return currentMenuId.value;
     }),
 });
 
@@ -157,7 +165,7 @@ onMounted(async () => {
                              :to="(item.type === 'header' && item.subMenuList?.length > 0) ? '' : item.to"
                              class="service-menu"
                              :class="{
-                                 'is-selected': useCurrentMenuId().split('.').includes(item.id) && item.type !== 'header',
+                                 'is-selected': state.selectedMenuId.split('.').includes(item.id) && item.type !== 'header',
                                  'is-only-label': item.type === 'header' && item.subMenuList?.length > 0
                              }"
                 >

@@ -82,13 +82,14 @@ const userWorkspaceStore = useUserWorkspaceStore();
 const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
+
 const { getProperRouteLocation } = useProperRouteLocation();
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const storeState = reactive({
     currency: computed<Currency|undefined>(() => serviceAccountPageGetters.currency),
 });
 const state = reactive({
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     trustedAccounts: computed(() => allReferenceStore.getters.trustedAccount),
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
@@ -386,7 +387,7 @@ onMounted(async () => {
                     </p-heading>
                 </template>
                 <template #extra>
-                    <p-button v-if="state.hasReadWriteAccess"
+                    <p-button v-if="hasReadWriteAccess"
                               style-type="primary"
                               icon-left="ic_plus_bold"
                               :disabled="tableState.isTrustedAccount && tableState.isWorkspaceMember"

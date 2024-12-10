@@ -55,7 +55,9 @@ const serviceAccountPageStore = useServiceAccountPageStore();
 const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
 const userStore = useUserStore();
+
 const { getProperRouteLocation } = useProperRouteLocation();
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
@@ -68,7 +70,6 @@ const storeState = reactive({
 });
 const state = reactive({
     loading: true,
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
     originServiceAccountItem: computed(() => serviceAccountPageStore.state.originServiceAccountItem),
     serviceAccountType: computed(() => serviceAccountPageStore.state.serviceAccountType),
     isTrustedAccount: computed(() => state.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
@@ -95,7 +96,7 @@ const state = reactive({
     deleteModalVisible: false,
     editModalVisible: false,
     isManagedTrustedAccount: computed(() => state.originServiceAccountItem.workspace_id === '*'),
-    isEditable: computed<boolean>(() => state.hasReadWriteAccess && (!state.isManagedTrustedAccount || storeState.isAdminMode)),
+    isEditable: computed<boolean>(() => (hasReadWriteAccess.value || false) && (!state.isManagedTrustedAccount || storeState.isAdminMode)),
 });
 
 /* Api */
@@ -218,7 +219,7 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
             <service-account-attached-general-accounts v-if="state.isTrustedAccount && props.serviceAccountId"
                                                        :service-account-id="props.serviceAccountId"
                                                        :attached-general-accounts.sync="state.attachedGeneralAccounts"
-                                                       :has-read-write-access="state.hasReadWriteAccess"
+                                                       :has-read-write-access="hasReadWriteAccess"
             />
             <service-account-cluster v-if="state.isKubernetesAgentMode"
                                      :service-account-id="props.serviceAccountId"

@@ -61,6 +61,8 @@ const { query } = router.currentRoute;
 const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
 
+const { hasReadWriteAccess } = usePageEditableStatus();
+
 /* Search Tag */
 const queryTagsHelper = useQueryTags({
     keyItemSets: computed<KeyItemSet[]>(() => [{
@@ -128,7 +130,6 @@ const state = reactive({
     deleteModalVisible: false,
     formModalVisible: false,
     formMode: undefined as ActionMode|undefined,
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
 });
 
 /* api */
@@ -234,7 +235,7 @@ const onChange = async (options: ToolboxOptions = {}) => {
                 @change="onChange"
                 @refresh="onChange()"
             >
-                <template v-if="state.hasReadWriteAccess"
+                <template v-if="hasReadWriteAccess"
                           #left-area
                 >
                     <p-button class="create-button"
@@ -258,7 +259,7 @@ const onChange = async (options: ToolboxOptions = {}) => {
             <escalation-policy-data-table
                 :items="state.items"
                 :loading="tableState.loading"
-                :has-read-write-access="state.hasReadWriteAccess"
+                :has-read-write-access="hasReadWriteAccess"
                 :select-index.sync="state.selectIndex"
                 @change="onChange"
             />

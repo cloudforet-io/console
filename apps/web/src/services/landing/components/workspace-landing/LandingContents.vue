@@ -48,6 +48,9 @@ const router = useRouter();
 const { width } = useWindowSize();
 
 const userStore = useUserStore();
+
+const { hasReadWriteAccess } = usePageEditableStatus();
+
 const storeState = reactive({
     userId: computed<string|undefined>(() => userStore.state.userId),
     loading: computed<boolean>(() => landingPageStoreGetters.loading),
@@ -68,7 +71,6 @@ const state = reactive({
         ? storeState.workspaceList.filter((item) => item.name.toLowerCase()?.includes(state.searchText.toLowerCase()))
         : storeState.workspaceList)),
     refinedWorkspaceList: computed<WorkspaceModel[]>(() => (state.searchText ? state.searchedWorkspaceList : storeState.workspaceList)),
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
 });
 
 const handleSearch = (value: string) => {
@@ -137,7 +139,7 @@ onUnmounted(() => {
                 <landing-group-workspaces v-if="!state.isSearchMode"
                                           :favorite-list="storeState.favoriteList"
                                           :is-domain-admin="storeState.isDomainAdmin"
-                                          :has-read-write-access="state.hasReadWriteAccess"
+                                          :has-read-write-access="hasReadWriteAccess"
                                           @create="handleClickButton"
                 />
             </div>
@@ -145,7 +147,7 @@ onUnmounted(() => {
                 <landing-empty-contents :is-domain-admin="storeState.isDomainAdmin" />
             </template>
         </p-data-loader>
-        <div v-if="state.hasReadWriteAccess && storeState.isDomainAdmin && storeState.workspaceList.length > 0"
+        <div v-if="hasReadWriteAccess && storeState.isDomainAdmin && storeState.workspaceList.length > 0"
              class="banner-wrapper"
         >
             <p-divider />

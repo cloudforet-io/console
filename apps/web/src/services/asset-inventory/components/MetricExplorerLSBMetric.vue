@@ -38,7 +38,10 @@ const props = defineProps<Props>();
 const allReferenceStore = useAllReferenceStore();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
+
 const { getProperRouteLocation } = useProperRouteLocation();
+const { hasReadWriteAccess } = usePageEditableStatus();
+
 const route = useRoute();
 
 const storeState = reactive({
@@ -53,7 +56,6 @@ const storeState = reactive({
     selectedNamespace: computed<NamespaceSubItemType|undefined>(() => metricExplorerPageState.selectedNamespace),
 });
 const state = reactive({
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
     selectedId: computed<string|undefined>(() => {
         const routeName = getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME }).name;
         if (!props.isDetailPage) return undefined;
@@ -187,7 +189,7 @@ watch(() => storeState.selectedNamespace, async (selectedNamespace) => {
                         <span class="type">{{ storeState.selectedNamespace?.label.split('/')[1] }}</span>
                     </p-tooltip>
                 </div>
-                <p-icon-button v-if="state.hasReadWriteAccess && storeState.selectedNamespace?.group !== 'common'"
+                <p-icon-button v-if="hasReadWriteAccess && storeState.selectedNamespace?.group !== 'common'"
                                style-type="tertiary"
                                name="ic_plus"
                                shape="square"

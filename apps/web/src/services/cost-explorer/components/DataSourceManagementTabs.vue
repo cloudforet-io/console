@@ -19,11 +19,10 @@ import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-so
 const dataSourcesPageStore = useDataSourcesPageStore();
 const dataSourcesPageState = dataSourcesPageStore.state;
 
+const { hasReadWriteAccess } = usePageEditableStatus();
+
 const storeState = reactive({
     activeTab: computed<string>(() => dataSourcesPageState.activeTab),
-});
-const state = reactive({
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
 });
 const tabState = reactive({
     tabs: computed(() => [
@@ -54,7 +53,7 @@ const handleChangeTab = (tab: string) => {
         <template v-else-if="storeState.activeTab === 'linked_account'"
                   #linked_account
         >
-            <data-source-management-tab-linked-account :has-read-write-access="state.hasReadWriteAccess" />
+            <data-source-management-tab-linked-account :has-read-write-access="hasReadWriteAccess" />
         </template>
         <template v-else-if="storeState.activeTab === 'data_collection_history'"
                   #data_collection_history
@@ -64,7 +63,7 @@ const handleChangeTab = (tab: string) => {
         <template v-else-if="storeState.activeTab === 'access_restriction'"
                   #access_restriction
         >
-            <data-source-management-tab-access-restriction :has-read-write-access="state.hasReadWriteAccess" />
+            <data-source-management-tab-access-restriction :has-read-write-access="hasReadWriteAccess" />
         </template>
     </p-tab>
 </template>

@@ -46,6 +46,7 @@ const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const userStore = useUserStore();
 
 const { getProperRouteLocation } = useProperRouteLocation();
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const router = useRouter();
 const route = useRoute();
@@ -60,7 +61,6 @@ const state = reactive({
     currentPath: computed(() => route.fullPath),
     publicV2DashboardMenuSet: computed(() => getDashboardMenuSet(dashboardPageControlGetters.publicDashboardItems)),
     privateV2DashboardMenuSet: computed(() => getDashboardMenuSet(dashboardPageControlGetters.privateDashboardItems)),
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
     favoriteItemMap: computed(() => {
         const result: Record<string, FavoriteConfig> = {};
         storeState.favoriteItems?.forEach((d) => {
@@ -206,7 +206,7 @@ callApiWithGrantGuard();
             <l-s-b-router-menu-item :current-path="state.currentPath"
                                     :item="item"
             >
-                <template v-if="state.hasReadWriteAccess"
+                <template v-if="hasReadWriteAccess"
                           #right-extra
                 >
                     <p-icon-button name="ic_plus"

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onUnmounted, reactive } from 'vue';
+import { onUnmounted } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import {
@@ -16,13 +16,11 @@ import { useRolePageStore } from '@/services/iam/store/role-page-store';
 
 const rolePageStore = useRolePageStore();
 const rolePageState = rolePageStore.$state;
+
 const { getProperRouteLocation } = useProperRouteLocation();
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const router = useRouter();
-
-const state = reactive({
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
-});
 
 /* Component */
 const handleCreateRole = () => {
@@ -46,7 +44,7 @@ onUnmounted(() => {
                            :selected-count="rolePageState.selectedIndices.length"
                 />
             </template>
-            <template v-if="state.hasReadWriteAccess"
+            <template v-if="hasReadWriteAccess"
                       #extra
             >
                 <p-button style-type="primary"
@@ -60,7 +58,7 @@ onUnmounted(() => {
         <p-horizontal-layout class="role-toolbox-layout">
             <template #container="{ height }">
                 <role-management-table :table-height="height"
-                                       :has-read-write-access="state.hasReadWriteAccess"
+                                       :has-read-write-access="hasReadWriteAccess"
                 />
             </template>
         </p-horizontal-layout>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -34,12 +34,13 @@ const props = defineProps({
 const alertPageStore = useAlertPageStore();
 const alertPageState = alertPageStore.state;
 
+const { hasReadWriteAccess } = usePageEditableStatus();
+
 const router = useRouter();
 
 const state = reactive({
     loading: true,
     alertTitleEditFormVisible: false,
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
 });
 
 const checkDeleteState = reactive({
@@ -97,7 +98,7 @@ const alertTitleEditConfirm = async () => {
         >
             <template #title-right-extra>
                 <span class="alert-number">#{{ alertPageState.alertData?.alert_number }}</span>
-                <span v-if="state.hasReadWriteAccess"
+                <span v-if="hasReadWriteAccess"
                       class="title-btn"
                 >
                     <p-icon-button name="ic_edit-text"
@@ -116,13 +117,13 @@ const alertTitleEditConfirm = async () => {
                 <div class="main-contents">
                     <alert-detail-summary
                         :id="props.id"
-                        :has-read-write-access="state.hasReadWriteAccess"
+                        :has-read-write-access="hasReadWriteAccess"
                         class="header"
                     />
 
                     <alert-detail-info-table
                         :id="props.id"
-                        :has-read-write-access="state.hasReadWriteAccess"
+                        :has-read-write-access="hasReadWriteAccess"
                         class="info"
                     />
                     <alert-detail-tabs
@@ -138,7 +139,7 @@ const alertTitleEditConfirm = async () => {
                                      :alert-data="alertPageState.alertData"
                     />
                     <alert-detail-note
-                        v-if="state.hasReadWriteAccess"
+                        v-if="hasReadWriteAccess"
                         :id="props.id"
                         class="note"
                     />

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import Vue, {
-    computed,
     onMounted, onUnmounted, reactive,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
@@ -32,11 +31,10 @@ const workspacePageStore = useWorkspacePageStore();
 const workspacePageState = workspacePageStore.$state;
 const userPageStore = useUserPageStore();
 
+const { hasReadWriteAccess } = usePageEditableStatus();
+
 const route = useRoute();
 
-const state = reactive({
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
-});
 const modalState = reactive({
     createType: '' as 'CREATE'|'EDIT',
     createModalVisible: false,
@@ -146,7 +144,7 @@ onUnmounted(() => {
                            use-total-count
                 />
             </template>
-            <template v-if="state.hasReadWriteAccess"
+            <template v-if="hasReadWriteAccess"
                       #extra
             >
                 <p-button style-type="primary"
@@ -160,29 +158,29 @@ onUnmounted(() => {
         <p-horizontal-layout class="workspace-toolbox-layout">
             <template #container="{ height }">
                 <workspace-management-table :table-height="height"
-                                            :has-read-write-access="state.hasReadWriteAccess"
+                                            :has-read-write-access="hasReadWriteAccess"
                                             @select-action="handleSelectAction"
                 />
             </template>
         </p-horizontal-layout>
-        <workspaces-user-management-tab :has-read-write-access="state.hasReadWriteAccess" />
+        <workspaces-user-management-tab :has-read-write-access="hasReadWriteAccess" />
         <workspaces-create-modal
-            v-if="state.hasReadWriteAccess"
+            v-if="hasReadWriteAccess"
             :visible.sync="modalState.createModalVisible"
             :create-type="modalState.createType"
             @confirm="handleConfirm"
             @refresh="refreshWorkspaceList"
         />
-        <workspaces-delete-modal v-if="state.hasReadWriteAccess"
+        <workspaces-delete-modal v-if="hasReadWriteAccess"
                                  :visible.sync="modalState.deleteModalVisible"
                                  @refresh="refreshWorkspaceList"
         />
-        <workspaces-set-enable-modal v-if="state.hasReadWriteAccess"
+        <workspaces-set-enable-modal v-if="hasReadWriteAccess"
                                      :visible.sync="modalState.setEnableModalVisible"
                                      :enable-modal-type="modalState.enableState"
                                      @refresh="refreshWorkspaceList"
         />
-        <user-management-add-modal v-if="state.hasReadWriteAccess"
+        <user-management-add-modal v-if="hasReadWriteAccess"
                                    @confirm="refreshWorkspaceList"
         />
     </section>

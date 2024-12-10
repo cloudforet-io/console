@@ -28,6 +28,8 @@ const appPageState = appPageStore.$state;
 
 const userStore = useUserStore();
 
+const { hasReadWriteAccess } = usePageEditableStatus();
+
 const storeState = reactive({
     roleType: computed<RoleType|undefined>(() => userStore.state.roleType),
 });
@@ -42,7 +44,6 @@ const tabs = [{
 const state = reactive({
     activeTab: 'rest',
     userId: computed<string|undefined>(() => userStore.state.userId),
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
 });
 
 /* Component */
@@ -76,7 +77,7 @@ onUnmounted(() => {
                 />
             </template>
             <template #extra>
-                <p-button v-if="state.hasReadWriteAccess && storeState.roleType !== ROLE_TYPE.WORKSPACE_MEMBER"
+                <p-button v-if="hasReadWriteAccess && storeState.roleType !== ROLE_TYPE.WORKSPACE_MEMBER"
                           style-type="primary"
                           icon-left="ic_plus_bold"
                           @click="handleCreateApp"
@@ -88,7 +89,7 @@ onUnmounted(() => {
         <p-horizontal-layout class="role-toolbox-layout">
             <template #container="{ height }">
                 <app-management-table :table-height="height"
-                                      :has-read-write-access="state.hasReadWriteAccess"
+                                      :has-read-write-access="hasReadWriteAccess"
                 />
             </template>
         </p-horizontal-layout>

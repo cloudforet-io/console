@@ -39,12 +39,13 @@ const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
 const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
 
+const { hasReadWriteAccess } = usePageEditableStatus();
+
 interface WorkspaceTableItem extends WorkspaceModel {
     remove_button: WorkspaceModel;
 }
 
 const state = reactive({
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
     currency: computed<Currency|undefined>(() => workspaceGroupPageGetters.currency),
 });
 const tableState = reactive({
@@ -63,7 +64,7 @@ const tableState = reactive({
             { name: 'cost_info', label: 'Cost' },
             { name: 'created_at', label: 'Created' },
         ];
-        if (state.hasReadWriteAccess) {
+        if (hasReadWriteAccess.value) {
             defaultFields.push({ name: 'remove_button', label: ' ', sortable: false });
         }
         return defaultFields;
@@ -190,7 +191,7 @@ const costInfoReduce = (arr: (number | {month: any})[] | any) => {
                            heading-type="sub"
                 />
             </template>
-            <template v-if="state.hasReadWriteAccess"
+            <template v-if="hasReadWriteAccess"
                       #extra
             >
                 <p-button style-type="negative-primary"
@@ -219,7 +220,7 @@ const costInfoReduce = (arr: (number | {month: any})[] | any) => {
                          :sort-desc="workspaceTabState.sortDesc"
                          :this-page.sync="workspaceTabState.thisPage"
                          :search-text.sync="workspaceTabState.searchText"
-                         :selectable="state.hasReadWriteAccess"
+                         :selectable="hasReadWriteAccess"
                          sortable
                          searchable
                          @select="handleSelect"

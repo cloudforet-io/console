@@ -33,11 +33,10 @@ const workspaceGroupPageState = workspaceGroupPageStore.state;
 const userTabState = workspaceGroupPageStore.userTabState;
 const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
 
+const { hasReadWriteAccess } = usePageEditableStatus();
+
 const emit = defineEmits<{(e: 'refresh', payload: { isGroupUser?: boolean, isWorkspace?: boolean }): void; }>();
 
-const state = reactive({
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
-});
 const tableState = reactive({
     fields: computed<DataTableFieldType[]>(() => {
         const defaultFields: DataTableFieldType[] = [
@@ -46,7 +45,7 @@ const tableState = reactive({
             { name: 'state', label: 'State' },
             { name: 'role', label: 'Role' },
         ];
-        if (state.hasReadWriteAccess) {
+        if (hasReadWriteAccess.value) {
             defaultFields.push({ name: 'remove_button', label: ' ', sortable: false });
         }
         return defaultFields;
@@ -195,7 +194,7 @@ onUnmounted(() => {
                            heading-type="sub"
                 />
             </template>
-            <template v-if="state.hasReadWriteAccess"
+            <template v-if="hasReadWriteAccess"
                       #extra
             >
                 <p-button style-type="negative-primary"
@@ -223,7 +222,7 @@ onUnmounted(() => {
                          :sort-desc="userTabState.sortDesc"
                          :this-page.sync="userTabState.thisPage"
                          :search-text.sync="userTabState.searchText"
-                         :selectable="state.hasReadWriteAccess"
+                         :selectable="hasReadWriteAccess"
                          sortable
                          searchable
                          @select="handleSelect"
@@ -243,7 +242,7 @@ onUnmounted(() => {
                         use-fixed-menu-style
                         style-type="transparent"
                         class="role-select-dropdown"
-                        :disabled="!state.hasReadWriteAccess"
+                        :disabled="!hasReadWriteAccess"
                         :menu="menuList"
                         :selected.sync="selectedItems"
                         :search-text.sync="searchText"

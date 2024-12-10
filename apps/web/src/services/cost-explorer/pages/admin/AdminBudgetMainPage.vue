@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import {
@@ -15,10 +14,7 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 const router = useRouter();
 
 const { getProperRouteLocation } = useProperRouteLocation();
-
-const state = reactive({
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
-});
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const handleCreateBudgetSelect = () => {
     router.push(getProperRouteLocation({ name: COST_EXPLORER_ROUTE.BUDGET.CREATE._NAME }));
@@ -31,7 +27,7 @@ const handleCreateBudgetSelect = () => {
             <template #heading>
                 <p-heading :title="$t('BILLING.COST_MANAGEMENT.MAIN.BUDGET')" />
             </template>
-            <template v-if="state.hasReadWriteAccess"
+            <template v-if="hasReadWriteAccess"
                       #extra
             >
                 <p-button style-type="primary"

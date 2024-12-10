@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onUnmounted, reactive } from 'vue';
+import { onUnmounted } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -29,14 +29,12 @@ import type { WorkspaceGroupFetchParameters } from '@/services/advanced/types/ad
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
 
+const { hasReadWriteAccess } = usePageEditableStatus();
+
 const workspaceGroupListApiQueryHelper = new ApiQueryHelper()
     .setPageStart(workspaceGroupPageState.pageStart).setPageLimit(workspaceGroupPageState.pageLimit)
     .setSort('name', true);
 const workspaceGroupListApiQuery = workspaceGroupListApiQueryHelper.data;
-
-const state = reactive({
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
-});
 
 const fetchWorkspaceGroups = async (tabRefresh:WorkspaceGroupFetchParameters = { isGroupUser: false, isWorkspace: false }) => {
     workspaceGroupPageState.loading = true;
@@ -89,11 +87,11 @@ onUnmounted(() => {
 
 <template>
     <section class="workspace-group-page">
-        <workspace-group-header :has-read-write-access="state.hasReadWriteAccess" />
+        <workspace-group-header :has-read-write-access="hasReadWriteAccess" />
         <p-horizontal-layout class="user-group-toolbox-layout">
             <template #container="{ height }">
                 <workspace-group-table :table-height="height"
-                                       :has-read-write-access="state.hasReadWriteAccess"
+                                       :has-read-write-access="hasReadWriteAccess"
                                        @confirm="fetchWorkspaceGroups"
                 />
             </template>

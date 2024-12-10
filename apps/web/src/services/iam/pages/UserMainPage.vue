@@ -29,13 +29,12 @@ const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
 const userStore = useUserStore();
 
+const { hasReadWriteAccess } = usePageEditableStatus();
+
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     globalGrantLoading: computed(() => appContextStore.getters.globalGrantLoading),
     grantInfo: computed(() => userStore.state.currentGrantInfo),
-});
-const state = reactive({
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
 });
 
 const userListApiQueryHelper = new ApiQueryHelper()
@@ -79,25 +78,25 @@ onUnmounted(() => {
 
 <template>
     <section class="user-page">
-        <user-management-header :has-read-write-access="state.hasReadWriteAccess" />
+        <user-management-header :has-read-write-access="hasReadWriteAccess" />
         <p-horizontal-layout class="user-toolbox-layout">
             <template #container="{ height }">
                 <user-management-table :table-height="height"
-                                       :has-read-write-access="state.hasReadWriteAccess"
+                                       :has-read-write-access="hasReadWriteAccess"
                                        @confirm="refreshUserList"
                 />
             </template>
         </p-horizontal-layout>
-        <user-management-tab :has-read-write-access="state.hasReadWriteAccess" />
-        <user-management-add-modal v-if="state.hasReadWriteAccess"
+        <user-management-tab :has-read-write-access="hasReadWriteAccess" />
+        <user-management-add-modal v-if="hasReadWriteAccess"
                                    @confirm="refreshUserList"
         />
-        <user-management-only-remove-workspace-group-type-modal v-if="state.hasReadWriteAccess" />
-        <user-management-remove-mixed-type-modal v-if="state.hasReadWriteAccess" />
-        <user-management-status-modal v-if="state.hasReadWriteAccess"
+        <user-management-only-remove-workspace-group-type-modal v-if="hasReadWriteAccess" />
+        <user-management-remove-mixed-type-modal v-if="hasReadWriteAccess" />
+        <user-management-status-modal v-if="hasReadWriteAccess"
                                       @confirm="refreshUserList"
         />
-        <user-management-form-modal v-if="state.hasReadWriteAccess"
+        <user-management-form-modal v-if="hasReadWriteAccess"
                                     @confirm="refreshUserList"
         />
     </section>

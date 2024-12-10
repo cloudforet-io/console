@@ -53,6 +53,8 @@ const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
 const recentStore = useRecentStore();
 
+const { currentMenuId } = useCurrentMenuId();
+
 const router = useRouter();
 
 const selectDropdownRef = ref<PSelectDropdown|null>(null);
@@ -79,9 +81,8 @@ const selectWorkspace = (name: string): void => {
     if (!workspaceId || workspaceId === storeState.currentWorkspaceId) return;
 
     appContextStore.setGlobalGrantLoading(true);
-    const targetMenuId: string = useCurrentMenuId();
     userWorkspaceStore.setCurrentWorkspace(workspaceId);
-    router.push({ name: MENU_INFO_MAP[targetMenuId].routeName, params: { workspaceId } }).catch(() => {});
+    router.push({ name: MENU_INFO_MAP[currentMenuId.value].routeName, params: { workspaceId } }).catch(() => {});
 };
 const formatMenuItems = (menuItems: WorkspaceModel[] = []): MenuItem[] => {
     const result = menuItems.length > 0 ? [

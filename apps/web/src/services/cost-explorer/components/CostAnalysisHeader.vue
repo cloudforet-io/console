@@ -50,6 +50,8 @@ const favoriteGetters = favoriteStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
 const appContextStore = useAppContextStore();
 
+const { hasReadWriteAccess } = usePageEditableStatus();
+
 const router = useRouter();
 
 const storeState = reactive({
@@ -57,7 +59,6 @@ const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 const state = reactive({
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
     defaultTitle: computed<TranslateResult>(() => i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.COST_ANALYSIS')),
     title: computed<string>(() => costAnalysisPageGetters.selectedQuerySet?.name ?? state.defaultTitle),
     dataSourceImage: computed(() => costAnalysisPageGetters.dataSourceImageUrl),
@@ -69,7 +70,7 @@ const state = reactive({
     selectedQuerySetId: undefined as string|undefined,
     queryFormModalVisible: false,
     queryDeleteModalVisible: false,
-    isEditableQuerySet: computed<boolean>(() => state.hasReadWriteAccess && costAnalysisPageGetters.selectedQueryId !== DYNAMIC_COST_QUERY_SET_PARAMS),
+    isEditableQuerySet: computed<boolean>(() => (hasReadWriteAccess.value || false) && costAnalysisPageGetters.selectedQueryId !== DYNAMIC_COST_QUERY_SET_PARAMS),
     favoriteOptions: computed<FavoriteOptions>(() => ({
         type: FAVORITE_TYPE.COST_ANALYSIS,
         id: state.isManagedCostQuerySet

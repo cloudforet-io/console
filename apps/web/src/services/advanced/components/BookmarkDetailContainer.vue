@@ -38,6 +38,8 @@ const bookmarkPageStore = useBookmarkPageStore();
 const bookmarkPageState = bookmarkPageStore.state;
 const bookmarkPageGetters = bookmarkPageStore.getters;
 
+const { hasReadWriteAccess } = usePageEditableStatus();
+
 const route = useRoute();
 const router = useRouter();
 
@@ -74,7 +76,6 @@ const state = reactive({
         return state.workspaceInfo?.name || '';
     }),
     workspaceInfo: computed<WorkspaceModel|undefined>(() => getWorkspaceInfo(state.group, storeState.workspaceList)),
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
 });
 
 const hideMenu = () => {
@@ -186,7 +187,7 @@ onUnmounted(() => {
                                   v-bind="workspaceStateFormatter( WORKSPACE_STATE.DORMANT)"
                                   class="capitalize state"
                         />
-                        <template v-if="state.folder && state.group === 'global'">
+                        <template v-if="hasReadWriteAccess && state.folder && state.group === 'global'">
                             <div class="title-right-extra-wrapper">
                                 <p-icon-button name="ic_edit-text"
                                                style-type="transparent"
@@ -201,7 +202,7 @@ onUnmounted(() => {
                     </template>
                 </p-heading>
             </template>
-            <template v-if="state.hasReadWriteAccess"
+            <template v-if="hasReadWriteAccess"
                       #extra
             >
                 <template v-if="state.group === 'global'">

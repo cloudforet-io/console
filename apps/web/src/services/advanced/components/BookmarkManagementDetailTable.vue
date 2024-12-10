@@ -35,6 +35,8 @@ const bookmarkPageStore = useBookmarkPageStore();
 const bookmarkPageState = bookmarkPageStore.state;
 const bookmarkPageGetters = bookmarkPageStore.getters;
 
+const { hasReadWriteAccess } = usePageEditableStatus();
+
 const route = useRoute();
 const router = useRouter();
 
@@ -52,7 +54,6 @@ const storeState = reactive({
 const state = reactive({
     group: computed<string>(() => route.params.group),
     folder: computed<string>(() => route.params.folder),
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
 });
 const tableState = reactive({
     fields: computed(() => [
@@ -260,7 +261,7 @@ watch([() => route.params, () => storeState.bookmarkFolderList], async ([params,
                     <span class="col-link">{{ value ?? '--' }}</span>
                 </template>
                 <template #col-action_button-format="{item}">
-                    <p-select-dropdown v-if="state.hasReadWriteAccess && item.isGlobal"
+                    <p-select-dropdown v-if="hasReadWriteAccess && item.isGlobal"
                                        :menu="getDropdownMenu(item)"
                                        style-type="icon-button"
                                        button-icon="ic_ellipsis-horizontal"

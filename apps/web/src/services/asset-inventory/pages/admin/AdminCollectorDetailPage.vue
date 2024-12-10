@@ -11,7 +11,7 @@
                                 width="20rem"
                                 height="1.5rem"
                     />
-                    <template v-if="state.hasReadWriteAccess && state.collectorName && collectorDetailPageStore.getters.isEditableCollector"
+                    <template v-if="hasReadWriteAccess && state.collectorName && collectorDetailPageStore.getters.isEditableCollector"
                               #title-right-extra
                     >
                         <span class="title-right-button-wrapper">
@@ -34,7 +34,7 @@
                 <div v-if="collectorJobStore.AllJobsInfoLoaded"
                      class="collector-button-box"
                 >
-                    <collect-data-button-group v-if="state.hasReadWriteAccess"
+                    <collect-data-button-group v-if="hasReadWriteAccess"
                                                @collect="handleCollectData"
                     />
                     <router-link v-if="collectorJobStore.hasJobs"
@@ -52,14 +52,14 @@
 
         <collector-base-info-section class="section"
                                      :history-link="state.collectorHistoryLink"
-                                     :has-read-write-access="state.hasReadWriteAccess"
+                                     :has-read-write-access="hasReadWriteAccess"
         />
         <collector-schedule-section class="section"
-                                    :has-read-write-access="state.hasReadWriteAccess"
+                                    :has-read-write-access="hasReadWriteAccess"
         />
         <collector-options-section class="section"
                                    data-test-id="collector-options-section"
-                                   :has-read-write-access="state.hasReadWriteAccess"
+                                   :has-read-write-access="hasReadWriteAccess"
         />
         <collector-additional-rule class="section"
                                    :collector-id="props.collectorId"
@@ -168,11 +168,11 @@ watch(() => collectorFormState.originCollector, async (collector) => {
 });
 
 const { getProperRouteLocation } = useProperRouteLocation();
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const queryHelper = new QueryHelper();
 
 const state = reactive({
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
     isNotiVisible: computed(() => !collectorDetailPageStore.getters.isEditableCollector),
     loading: true,
     collector: computed<CollectorModel|null>(() => collectorFormState.originCollector),

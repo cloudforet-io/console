@@ -42,6 +42,8 @@ interface State {
 
 const ALL_VALUE: NotificationVariation[] = ['gte', 'lte'];
 
+const { hasReadWriteAccess } = usePageEditableStatus();
+
 const state = reactive<State>({
     statusToggle: false,
     notificationRules: [{ variation: ALL_VALUE }],
@@ -61,7 +63,6 @@ const state = reactive<State>({
         iconColor: level.color,
     }))),
     recipients: false,
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
 });
 
 
@@ -166,7 +167,7 @@ onMounted(async () => {
         <div class="content-wrapper">
             <div class="toggle-wrapper">
                 <p-toggle-button :value.sync="state.statusToggle"
-                                 :disabled="!state.hasReadWriteAccess"
+                                 :disabled="!hasReadWriteAccess"
                                  class="toggle-button"
                 />
                 <div class="toggle-text">
@@ -200,20 +201,20 @@ onMounted(async () => {
                         >
                             <p-text-input :value="rule.threshold"
                                           :placeholder="$t('COST_EXPLORER.ANOMALY_DETECTION.NOTIFICATION_RULES.AMOUNT')"
-                                          :disabled="!state.hasReadWriteAccess"
+                                          :disabled="!hasReadWriteAccess"
                                           block
                                           @update:value="handleUpdateNotificationRules('threshold', $event, index)"
                             />
                             <p-select-dropdown :selected="rule.unit"
                                                :menu="state.unitMenu"
                                                :placeholder="$t('COST_EXPLORER.ANOMALY_DETECTION.NOTIFICATION_RULES.SELECT_UNIT')"
-                                               :disabled="!state.hasReadWriteAccess"
+                                               :disabled="!hasReadWriteAccess"
                                                block
                                                use-fixed-menu-style
                                                @select="handleUpdateNotificationRules('unit', $event, index)"
                             />
                             <p-select-dropdown :selected="rule.variation.length === 2 ? 'all': JSON.stringify(rule.variation)"
-                                               :disabled="!state.hasReadWriteAccess"
+                                               :disabled="!hasReadWriteAccess"
                                                :menu="state.variationMenu"
                                                block
                                                use-fixed-menu-style
@@ -222,7 +223,7 @@ onMounted(async () => {
                             <p-select-dropdown :selected="rule.notifyLevel"
                                                :menu="state.notifyLevelMenu"
                                                use-fixed-menu-style
-                                               :disabled="!state.hasReadWriteAccess"
+                                               :disabled="!hasReadWriteAccess"
                                                block
                                                @select="handleUpdateNotificationRules('notifyLevel', $event, index)"
                             >
@@ -248,14 +249,14 @@ onMounted(async () => {
                             <p-icon-button name="ic_delete"
                                            size="sm"
                                            class="self-center"
-                                           :disabled="!state.hasReadWriteAccess"
+                                           :disabled="!hasReadWriteAccess"
                                            @click="handleDeleteRule(index)"
                             />
                         </div>
                         <p-button icon-left="ic_plus"
                                   class="add-btn"
                                   style-type="secondary"
-                                  :disabled="!state.hasReadWriteAccess"
+                                  :disabled="!hasReadWriteAccess"
                                   @click="handleAddNotificationRule"
                         >
                             {{ $t('COMMON.BUTTONS.ADD') }}
@@ -280,7 +281,7 @@ onMounted(async () => {
                 </div>
                 <div class="check-role">
                     <p-checkbox v-model="state.recipients"
-                                :disabled="!state.hasReadWriteAccess"
+                                :disabled="!hasReadWriteAccess"
                     /><span class="owner-img"><p-lazy-img :src="WorkspaceOwnerImage"
                                                           width="1.25rem"
                                                           height="1.25rem"

@@ -52,6 +52,7 @@ const contextMenuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement | null>(null);
 
 const { getProperRouteLocation } = useProperRouteLocation();
+const { hasReadWriteAccess } = usePageEditableStatus();
 const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
 
 const storeState = reactive({
@@ -59,7 +60,6 @@ const storeState = reactive({
 });
 const state = reactive({
     queryFormModalVisible: false,
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
     saveDropdownMenuItems: computed<MenuItem[]>(() => ([
         {
             type: 'item',
@@ -268,7 +268,7 @@ onMounted(async () => {
                     </template>
                 </p-popover>
             </div>
-            <div v-if="state.hasReadWriteAccess"
+            <div v-if="hasReadWriteAccess"
                  ref="rightPartRef"
                  class="right-part"
             >

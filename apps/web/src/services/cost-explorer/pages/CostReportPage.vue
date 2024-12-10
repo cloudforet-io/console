@@ -25,6 +25,8 @@ import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-rep
 const costReportPageStore = useCostReportPageStore();
 const costReportPageState = costReportPageStore.state;
 
+const { hasReadWriteAccess } = usePageEditableStatus();
+
 const state = reactive({
     loading: true,
     tabs: computed<TabItem[]>(() => [
@@ -41,7 +43,6 @@ const state = reactive({
     ]),
     activeTab: 'overview',
     currency: 'KRW' as Currency,
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
 });
 
 /* Watcher */
@@ -84,10 +85,10 @@ onMounted(async () => {
                         />
                         <div class="xl:col-span-4 lg:col-span-6 col-span-12 grid gap-4">
                             <cost-report-upcoming-report-card class="col-span-12"
-                                                              :has-read-write-access="state.hasReadWriteAccess"
+                                                              :has-read-write-access="hasReadWriteAccess"
                             />
                             <cost-report-recipients-card class="col-span-12"
-                                                         :has-read-write-access="state.hasReadWriteAccess"
+                                                         :has-read-write-access="hasReadWriteAccess"
                             />
                         </div>
                     </div>

@@ -48,6 +48,8 @@ const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
 
+const { hasReadWriteAccess } = usePageEditableStatus();
+
 const router = useRouter();
 const route = useRoute();
 
@@ -57,7 +59,6 @@ const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 const state = reactive({
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
     currentMetricId: computed<string>(() => route.params.metricId),
     isDuplicateEnabled: computed<boolean>(() => Object.values(storeState.namespaces).find((d) => d.key === storeState.currentMetric?.namespace_id)?.data.group !== 'common'),
     currentMetricExampleId: computed<string|undefined>(() => route.params.metricExampleId),
@@ -67,7 +68,7 @@ const state = reactive({
     metricDeleteModalVisible: false,
     loadingDuplicate: false,
     selectedNameFormModalType: undefined as string|undefined,
-    saveDropdownMenuItems: computed<MenuItem[]>(() => (state.hasReadWriteAccess ? [
+    saveDropdownMenuItems: computed<MenuItem[]>(() => (hasReadWriteAccess.value ? [
         {
             type: 'item',
             name: 'saveAs',
@@ -89,13 +90,13 @@ const state = reactive({
         return i18n.t('INVENTORY.METRIC_EXPLORER.DELETE_CUSTOM_METRIC');
     }),
     editQueryTitle: computed<TranslateResult>(() => {
-        if (!state.hasReadWriteAccess || state.isManagedMetric || state.currentMetricExampleId) {
+        if (!hasReadWriteAccess.value || state.isManagedMetric || state.currentMetricExampleId) {
             return i18n.t('INVENTORY.METRIC_EXPLORER.VIEW_QUERY');
         }
         return i18n.t('INVENTORY.METRIC_EXPLORER.EDIT_QUERY');
     }),
     editQueryButtonIcon: computed<string>(() => {
-        if (!state.hasReadWriteAccess || state.isManagedMetric || state.currentMetricExampleId) {
+        if (!hasReadWriteAccess.value || state.isManagedMetric || state.currentMetricExampleId) {
             return 'ic_editor-code';
         }
         return 'ic_edit';
@@ -252,7 +253,7 @@ const handleClickMoreMenuButton = () => {
     else showContextMenu();
 };
 const handleOpenEditQuery = () => {
-    if (!state.hasReadWriteAccess || state.isManagedMetric || state.currentMetricExampleId) {
+    if (!hasReadWriteAccess.value || state.isManagedMetric || state.currentMetricExampleId) {
         metricExplorerPageStore.openMetricQueryFormSidebar('VIEW');
     } else {
         metricExplorerPageStore.openMetricQueryFormSidebar('UPDATE');
@@ -287,12 +288,12 @@ const handleOpenEditQuery = () => {
                         <div v-if="!state.isManagedMetric"
                              class="title-right-extra icon-wrapper"
                         >
-                            <p-icon-button v-if="state.hasReadWriteAccess"
+                            <p-icon-button v-if="hasReadWriteAccess"
                                            name="ic_edit-text"
                                            size="md"
                                            @click.stop="handleClickEditName"
                             />
-                            <p-icon-button v-if="state.hasReadWriteAccess"
+                            <p-icon-button v-if="hasReadWriteAccess"
                                            name="ic_delete"
                                            size="md"
                                            style-type="negative-transparent"
@@ -312,7 +313,7 @@ const handleOpenEditQuery = () => {
                 >
                     {{ state.editQueryTitle }}
                 </p-button>
-                <template v-if="state.hasReadWriteAccess">
+                <template v-if="hasReadWriteAccess">
                     <template v-if="!state.currentMetricExampleId">
                         <p-button v-if="state.isDuplicateEnabled"
                                   style-type="tertiary"

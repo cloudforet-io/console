@@ -24,6 +24,8 @@ const domainConfigStore = usePreferencesStore();
 const domainConfigGetters = domainConfigStore.getters;
 const domainStore = useDomainStore();
 
+const { hasReadWriteAccess } = usePageEditableStatus();
+
 const storeState = reactive({
     domainId: computed<string>(() => domainStore.state.domainId),
     domainName: computed<string>(() => domainStore.state.name),
@@ -45,7 +47,6 @@ const state = reactive({
     timezoneMenuList: computed<SelectDropdownMenuItem[]>(() => map(timezoneList, (d) => ({
         type: 'item', label: d === 'UTC' ? `${d} (default)` : d, name: d,
     }))),
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
 });
 
 /* Event */
@@ -92,7 +93,7 @@ watch(() => domainConfigGetters.language, (val) => {
                 <p-select-dropdown :menu="state.timezoneMenuList"
                                    :selected.sync="state.selectedTimezone"
                                    :page-size="10"
-                                   :disabled="!state.hasReadWriteAccess"
+                                   :disabled="!hasReadWriteAccess"
                                    is-fixed-width
                                    is-filterable
                 />
@@ -102,12 +103,12 @@ watch(() => domainConfigGetters.language, (val) => {
                 <p-select-dropdown :menu="state.languageMenuList"
                                    :selected.sync="state.selectedLanguage"
                                    :page-size="10"
-                                   :disabled="!state.hasReadWriteAccess"
+                                   :disabled="!hasReadWriteAccess"
                                    is-filterable
                 />
             </div>
         </div>
-        <p-button :disabled="!state.hasReadWriteAccess || !state.isChanged"
+        <p-button :disabled="!hasReadWriteAccess || !state.isChanged"
                   class="save-button"
                   @click="handleSaveChanges"
         >

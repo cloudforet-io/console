@@ -37,6 +37,8 @@ const emit = defineEmits<{(e: 'refresh-note-count'): void}>();
 
 const userStore = useUserStore();
 
+const { hasReadWriteAccess } = usePageEditableStatus();
+
 const state = reactive({
     id: '',
     noteInput: '',
@@ -50,7 +52,6 @@ const state = reactive({
     ]),
     selectedNoteIdForDelete: '',
     totalCount: 0,
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
 });
 
 const handleChangeNoteInput = (e) => {
@@ -159,7 +160,7 @@ watch(() => state.id, () => {
                             <span class="author">{{ title }}</span>
                             <span class="date">{{ iso8601Formatter(state.noteList[index].created_at, state.timezone) }}</span>
                         </p>
-                        <p-select-dropdown v-if="state.hasReadWriteAccess"
+                        <p-select-dropdown v-if="hasReadWriteAccess"
                                            style-type="icon-button"
                                            button-icon="ic_ellipsis-horizontal"
                                            :menu="state.menuItems"
@@ -176,7 +177,7 @@ watch(() => state.id, () => {
                 </template>
             </p-collapsible-list>
         </article>
-        <article v-if="state.hasReadWriteAccess"
+        <article v-if="hasReadWriteAccess"
                  class="add-note-wrapper"
         >
             <p-textarea :value="state.noteInput"

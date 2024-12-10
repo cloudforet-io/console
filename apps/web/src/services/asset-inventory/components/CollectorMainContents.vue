@@ -75,7 +75,9 @@ const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.state;
 const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
+
 const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
@@ -117,7 +119,6 @@ const historyLinkQueryHelper = new QueryHelper();
 
 const state = reactive({
     loading: computed(() => collectorPageState.loading.collectorList),
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
     searchTags: computed(() => {
         const tags = searchQueryHelper.setFilters(collectorPageState.searchFilters).queryTags;
         return tags.reduce((r: QueryItem[], d: any): QueryItem[] => {
@@ -265,7 +266,7 @@ onMounted(async () => {
             @refresh="fetchCollectorList"
             @export="handleExportExcel"
         >
-            <template v-if="state.hasReadWriteAccess"
+            <template v-if="hasReadWriteAccess"
                       #left-area
             >
                 <p-button
@@ -287,7 +288,7 @@ onMounted(async () => {
                      @click="handleClickListItem(item.detailLink)"
                 >
                     <collector-content-item :item="item"
-                                            :has-read-write-access="state.hasReadWriteAccess"
+                                            :has-read-write-access="hasReadWriteAccess"
                     />
                 </div>
             </div>

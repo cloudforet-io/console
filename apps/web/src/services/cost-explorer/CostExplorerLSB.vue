@@ -8,18 +8,25 @@ import { useCurrentMenuId } from '@/common/composables/current-menu-id';
 
 import CostAdvancedSettingsLSB from '@/services/cost-explorer/components/CostAdvancedSettingsLSB.vue';
 import CostAnalysisLSB from '@/services/cost-explorer/components/CostAnalysisLSB.vue';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 const route = useRoute();
 
-const state = reactive({
-    selectedMenuId: computed<string>(() => useCurrentMenuId()),
+const { currentMenuId } = useCurrentMenuId();
 
+const state = reactive({
+    menuId: computed<string>(() => {
+        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
+            return '';
+        }
+        return currentMenuId.value;
+    }),
 });
 </script>
 
 <template>
     <aside class="sidebar-menu">
-        <cost-analysis-l-s-b v-if="state.selectedMenuId === MENU_ID.COST_ANALYSIS" />
+        <cost-analysis-l-s-b v-if="state.menuId === MENU_ID.COST_ANALYSIS" />
         <cost-advanced-settings-l-s-b v-if="route.name.includes(MENU_ID.COST_ADVANCED_SETTINGS)" />
     </aside>
 </template>

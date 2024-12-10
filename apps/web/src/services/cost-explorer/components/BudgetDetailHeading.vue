@@ -36,6 +36,8 @@ const budgetPageState = budgetPageStore.$state;
 const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
 
+const { hasReadWriteAccess } = usePageEditableStatus();
+
 const router = useRouter();
 
 const storeState = reactive({
@@ -44,7 +46,6 @@ const storeState = reactive({
     dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
 });
 const state = reactive({
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
     budgetData: computed<BudgetModel|null>(() => budgetPageState.budgetData),
     isProjectTarget: computed(() => state.budgetData?.resource_group === 'PROJECT'),
     dataSourceName: computed(() => {
@@ -80,7 +81,7 @@ const handleClickBackButton = () => {
                     <template v-if="!props.loading"
                               #title-right-extra
                     >
-                        <p-icon-button v-if="state.hasReadWriteAccess && (storeState.isAdminMode || (state.isProjectTarget && storeState.isWorkspaceOwner))"
+                        <p-icon-button v-if="hasReadWriteAccess && (storeState.isAdminMode || (state.isProjectTarget && storeState.isWorkspaceOwner))"
                                        name="ic_delete"
                                        @click="handleClickDelete"
                         />

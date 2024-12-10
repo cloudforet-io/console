@@ -17,6 +17,8 @@ const router = useRouter();
 const domainConfigStore = usePreferencesStore();
 const domainConfigGetters = domainConfigStore.getters;
 
+const { hasReadWriteAccess } = usePageEditableStatus();
+
 const state = reactive({
     isChanged: computed<boolean>(() => {
         if ([state.wordtypeLogoUrl, state.symbolFaviconUrl, state.loginPageImageUrl, state.displayName,
@@ -31,7 +33,6 @@ const state = reactive({
     wordtypeLogoUrl: undefined as string | undefined,
     symbolFaviconUrl: undefined as string | undefined,
     loginPageImageUrl: undefined as string | undefined,
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
 });
 
 /* Event */
@@ -72,7 +73,7 @@ watch(() => domainConfigGetters.loginPageImageUrl, (val) => {
                     <p-field-title label="Display Name" />
                     <p-text-input :value.sync="state.displayName"
                                   :placeholder="domainConfigGetters.displayName"
-                                  :disabled="!state.hasReadWriteAccess"
+                                  :disabled="!hasReadWriteAccess"
                     />
                     <div class="description">
                         {{ $t('IAM.DOMAIN_SETTINGS.DOMAIN_NAME_IMAGE_DESCRIPTION') }}
@@ -88,7 +89,7 @@ watch(() => domainConfigGetters.loginPageImageUrl, (val) => {
                 <div class="left-part">
                     <p-field-title label="Wordtype Logo URL" />
                     <p-text-input :value.sync="state.wordtypeLogoUrl"
-                                  :disabled="!state.hasReadWriteAccess"
+                                  :disabled="!hasReadWriteAccess"
                     />
                     <div class="description">
                         {{ $t('IAM.DOMAIN_SETTINGS.WORDTYPE_LOGO_DESCRIPTION') }}
@@ -104,7 +105,7 @@ watch(() => domainConfigGetters.loginPageImageUrl, (val) => {
                 <div class="left-part">
                     <p-field-title label="Symbol & Favicon URL" />
                     <p-text-input :value.sync="state.symbolFaviconUrl"
-                                  :disabled="!state.hasReadWriteAccess"
+                                  :disabled="!hasReadWriteAccess"
                     />
                     <div class="description">
                         {{ $t('IAM.DOMAIN_SETTINGS.SYMBOL_FAVICON_DESCRIPTION') }}
@@ -120,7 +121,7 @@ watch(() => domainConfigGetters.loginPageImageUrl, (val) => {
                 <div class="left-part">
                     <p-field-title label="Sign In Page Main Image URL" />
                     <p-text-input :value.sync="state.loginPageImageUrl"
-                                  :disabled="!state.hasReadWriteAccess"
+                                  :disabled="!hasReadWriteAccess"
                     />
                     <div class="description">
                         {{ $t('IAM.DOMAIN_SETTINGS.SIGN_IN_PAGE_MAIN_IMAGE_DESCRIPTION') }}
@@ -133,7 +134,7 @@ watch(() => domainConfigGetters.loginPageImageUrl, (val) => {
                 </div>
             </div>
         </div>
-        <p-button :disabled="!state.hasReadWriteAccess || !state.isChanged"
+        <p-button :disabled="!hasReadWriteAccess || !state.isChanged"
                   class="save-button"
                   @click="handleSaveChanges"
         >

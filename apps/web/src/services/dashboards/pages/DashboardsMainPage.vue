@@ -43,12 +43,14 @@ import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
 
-const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
 const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const userStore = useUserStore();
+
+const { hasReadWriteAccess } = usePageEditableStatus();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const router = useRouter();
 const queryTagsHelper = useQueryTags({
@@ -96,7 +98,6 @@ const state = reactive({
         if (storeState.isAdminMode) return dashboardPageControlGetters.adminTreeControlButtonDisableMap;
         return dashboardPageControlGetters.publicTreeControlButtonDisableMap;
     }),
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
     // search
     isSearching: {
         PUBLIC: false,
@@ -269,7 +270,7 @@ onUnmounted(() => {
             <template #heading>
                 <p-heading :title="$t('DASHBOARDS.ALL_DASHBOARDS.DASHBOARDS_TITLE')" />
             </template>
-            <template v-if="state.hasReadWriteAccess"
+            <template v-if="hasReadWriteAccess"
                       #extra
             >
                 <p-button icon-left="ic_plus_bold"
@@ -304,14 +305,14 @@ onUnmounted(() => {
             <template #no-data>
                 <p-empty
                     show-image
-                    :show-button="state.hasReadWriteAccess"
+                    :show-button="hasReadWriteAccess"
                 >
                     <template #image>
                         <img alt="empty-default-image"
                              src="@/assets/images/illust_jellyocto-with-a-telescope.svg"
                         >
                     </template>
-                    <template v-if="state.hasReadWriteAccess"
+                    <template v-if="hasReadWriteAccess"
                               #button
                     >
                         <p-button icon-left="ic_plus_bold"

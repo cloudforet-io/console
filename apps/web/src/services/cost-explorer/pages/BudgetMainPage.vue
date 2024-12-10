@@ -16,11 +16,11 @@ import BudgetMainList from '@/services/cost-explorer/components/BudgetMainList.v
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 const userStore = useUserStore();
+
+const { hasReadWriteAccess } = usePageEditableStatus();
+
 const storeState = reactive({
     isWorkspaceOwner: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
-});
-const state = reactive({
-    hasReadWriteAccess: computed<boolean|undefined>(() => usePageEditableStatus()),
 });
 
 const handleCreateBudgetSelect = () => {
@@ -34,7 +34,7 @@ const handleCreateBudgetSelect = () => {
             <template #heading>
                 <p-heading :title="$t('BILLING.COST_MANAGEMENT.MAIN.BUDGET')" />
             </template>
-            <template v-if="state.hasReadWriteAccess && storeState.isWorkspaceOwner"
+            <template v-if="hasReadWriteAccess && storeState.isWorkspaceOwner"
                       #extra
             >
                 <p-button style-type="primary"
