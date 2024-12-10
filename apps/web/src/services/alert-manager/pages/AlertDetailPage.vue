@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
-import { useRoute, useRouter } from 'vue-router/composables';
-
-import { clone } from 'lodash';
+import { reactive } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PIconButton, PHeading } from '@cloudforet/mirinae';
@@ -11,16 +9,12 @@ import { PIconButton, PHeading } from '@cloudforet/mirinae';
 import type { AlertDeleteParameters } from '@/schema/monitoring/alert/api-verbs/delete';
 import { i18n } from '@/translations';
 
-import { useUserStore } from '@/store/user/user-store';
-
-import type { PageAccessMap } from '@/lib/access-control/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import type { MenuId } from '@/lib/menu/config';
-import { MENU_ID } from '@/lib/menu/config';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { NoResourceError } from '@/common/composables/error/error';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
 import AlertDetailInfoTable from '@/services/alert-manager/components/AlertDetailInfoTable.vue';
 import AlertDetailNote from '@/services/alert-manager/components/AlertDetailNote.vue';
@@ -30,7 +24,6 @@ import AlertDetailTabs from '@/services/alert-manager/components/AlertDetailTabs
 import AlertDetailTitleEditModal from '@/services/alert-manager/components/AlertDetailTitleEditModal.vue';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { useAlertPageStore } from '@/services/alert-manager/stores/alert-page-store';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 const props = defineProps({
     id: {
@@ -40,27 +33,14 @@ const props = defineProps({
 });
 const alertPageStore = useAlertPageStore();
 const alertPageState = alertPageStore.state;
-const userStore = useUserStore();
+
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const router = useRouter();
-const route = useRoute();
 
-const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
-});
 const state = reactive({
     loading: true,
     alertTitleEditFormVisible: false,
-    selectedMenuId: computed(() => {
-        const reversedMatched = clone(route.matched).reverse();
-        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
-        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
-            return '';
-        }
-        return targetMenuId;
-    }),
-    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
 });
 
 const checkDeleteState = reactive({
@@ -118,7 +98,7 @@ const alertTitleEditConfirm = async () => {
         >
             <template #title-right-extra>
                 <span class="alert-number">#{{ alertPageState.alertData?.alert_number }}</span>
-                <span v-if="state.hasReadWriteAccess"
+                <span v-if="hasReadWriteAccess"
                       class="title-btn"
                 >
                     <p-icon-button name="ic_edit-text"
@@ -137,13 +117,13 @@ const alertTitleEditConfirm = async () => {
                 <div class="main-contents">
                     <alert-detail-summary
                         :id="props.id"
-                        :has-read-write-access="state.hasReadWriteAccess"
+                        :has-read-write-access="hasReadWriteAccess"
                         class="header"
                     />
 
                     <alert-detail-info-table
                         :id="props.id"
-                        :has-read-write-access="state.hasReadWriteAccess"
+                        :has-read-write-access="hasReadWriteAccess"
                         class="info"
                     />
                     <alert-detail-tabs
@@ -159,7 +139,7 @@ const alertTitleEditConfirm = async () => {
                                      :alert-data="alertPageState.alertData"
                     />
                     <alert-detail-note
-                        v-if="state.hasReadWriteAccess"
+                        v-if="hasReadWriteAccess"
                         :id="props.id"
                         class="note"
                     />
