@@ -15,7 +15,7 @@ import getRandomId from '@/lib/random-id-generator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import WidgetFormDataTableGlobalVariableViewButton
     from '@/common/modules/widgets/_components/WidgetFormDataTableGlobalVariableViewButton.vue';
-import { EVAL_EXPRESSION_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
+import { DATA_TABLE_FIELD_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import type { EvalExpressions } from '@/common/modules/widgets/types/widget-data-table-type';
 
 
@@ -35,11 +35,11 @@ const state = reactive({
     proxyExpressions: useProxyValue<EvalExpressions[]>('expressions', props, emit),
     fieldTypeMenuItems: computed<MenuItem[]>(() => [
         {
-            name: EVAL_EXPRESSION_TYPE.LABEL,
+            name: DATA_TABLE_FIELD_TYPE.LABEL,
             label: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.TYPE_LABEL_FIELD'),
         },
         {
-            name: EVAL_EXPRESSION_TYPE.DATA,
+            name: DATA_TABLE_FIELD_TYPE.DATA,
             label: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.TYPE_DATA_FIELD'),
         },
     ]),
@@ -103,7 +103,7 @@ const handleClickAddLabel = () => {
         ...state.proxyExpressions,
         {
             key: getRandomId(),
-            fieldType: EVAL_EXPRESSION_TYPE.DATA,
+            fieldType: DATA_TABLE_FIELD_TYPE.DATA,
             name: '',
             expression: '',
             isCollapsed: false,

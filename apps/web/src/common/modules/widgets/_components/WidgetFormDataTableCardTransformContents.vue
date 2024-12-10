@@ -20,7 +20,7 @@ import WidgetFormDataTableCardHeaderTitle
 import WidgetFormDataTableCardTransformForm
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformForm.vue';
 import {
-    DATA_TABLE_TYPE, EVAL_EXPRESSION_TYPE,
+    DATA_TABLE_TYPE, DATA_TABLE_FIELD_TYPE,
 } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type {
@@ -119,7 +119,7 @@ const queryState = reactive({
 
 const evalState = reactive({
     expressions: [{
-        key: getRandomId(), fieldType: EVAL_EXPRESSION_TYPE.DATA, name: '', expression: '', isCollapsed: false,
+        key: getRandomId(), fieldType: DATA_TABLE_FIELD_TYPE.DATA, name: '', expression: '', isCollapsed: false,
     }] as EvalExpressions[],
 });
 
@@ -288,7 +288,7 @@ const setInitialDataTableForm = () => {
         fieldType: expression.field_type,
         key: getRandomId(),
     })) : [{
-        key: getRandomId(), name: '', fieldType: EVAL_EXPRESSION_TYPE.DATA, expression: '', isCollapsed: false,
+        key: getRandomId(), name: '', fieldType: DATA_TABLE_FIELD_TYPE.DATA, expression: '', isCollapsed: false,
     }];
 };
 

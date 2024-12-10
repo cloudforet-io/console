@@ -1,6 +1,6 @@
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import type { EvaluateExpressionType, DataTableQueryFilter } from '@/common/modules/widgets/types/widget-model';
+import type { DataTableQueryFilter, DataTableFieldType } from '@/common/modules/widgets/types/widget-model';
 
 type Handler = (item:any) => string;
 
@@ -35,7 +35,7 @@ export interface EvalExpressions {
     key: string;
     isCollapsed: boolean;
     name: string;
-    fieldType: EvaluateExpressionType;
+    fieldType: DataTableFieldType;
     expression: string;
     condition?: string;
     else?: string;
