@@ -135,7 +135,12 @@ const state = reactive({
             description: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.QUERY_DESC'),
             icon: 'ic_db-where',
         },
-
+        {
+            key: DATA_TABLE_OPERATOR.PIVOT,
+            name: 'Pivot',
+            description: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.PIVOT_DESC'),
+            icon: 'ic_db-pivot',
+        },
     ]),
 });
 

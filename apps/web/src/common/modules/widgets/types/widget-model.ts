@@ -1,8 +1,7 @@
 import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 
 import type {
-    DATA_TABLE_TYPE, DATA_SOURCE_DOMAIN, DATA_TABLE_OPERATOR, JOIN_TYPE,
-    EVAL_EXPRESSION_TYPE,
+    DATA_TABLE_TYPE, DATA_SOURCE_DOMAIN, DATA_TABLE_OPERATOR, JOIN_TYPE, DATA_TABLE_FIELD_TYPE,
 } from '@/common/modules/widgets/_constants/data-table-constant';
 
 export type WidgetType = string; // TODO: make this widget type enum
@@ -53,6 +52,9 @@ export interface DataTableTransformOptions {
     AGGREGATE?: AggregateOptions;
     QUERY?: QueryOptions;
     EVAL?: EvalOptions;
+    PIVOT?: PivotOptions;
+    ADD_LABELS?: AddLabelsOptions;
+    VALUE_MAPPING?: ValueMappingOptions;
 }
 export interface ConcatOptions {
     data_tables: string[];
@@ -81,8 +83,47 @@ export interface EvalOptions {
 
 export interface EvaluateExpression {
     name: string;
-    field_type: EvaluateExpressionType;
+    field_type: DataTableFieldType;
     expression: string;
 }
 
-export type EvaluateExpressionType = keyof typeof EVAL_EXPRESSION_TYPE;
+export interface PivotOptions {
+    data_table_id: string;
+    fields?: PivotFieldOptions;
+    select: string[];
+    limit: number;
+    functions: 'sum' | 'min' | 'max' | 'mean'; // default key
+    oeder_by: {
+        type: 'key' | 'value';
+        desc: boolean; // default false
+    }
+}
+
+export interface PivotFieldOptions {
+    labels: string[];
+    data: string;
+    column: string;
+}
+
+export interface AddLabelsOptions {
+    data_table_id: string;
+    labels: Record<string, string>;
+}
+
+export interface ValueMappingOptions {
+    data_table_id: string;
+    name: string;
+    field_type: DataTableFieldType; // defualt LABEL
+    cases: ValueMappingCase[];
+    else: string;
+    condition: string;
+}
+
+export interface ValueMappingCase {
+    key: string;
+    value: string;
+    operator: 'eq' | 'regex';
+    match: string;
+}
+
+export type DataTableFieldType = keyof typeof DATA_TABLE_FIELD_TYPE;
