@@ -59,7 +59,7 @@ export const useWorkspaceField = () => {
         };
     };
 
-    const handleUpdateSelectedWorkspaces = (selectedWorkspaces: SelectDropdownMenuItem[]) => {
+    const setSelectedWorkspaces = (selectedWorkspaces: SelectDropdownMenuItem[]) => {
         workspaceValidator.setValue(selectedWorkspaces);
     };
 
@@ -129,7 +129,7 @@ export const useWorkspaceField = () => {
         selectedWorkspaceIds,
         workspaceValidator,
         workspaceMenuItemsHandler,
-        handleUpdateSelectedWorkspaces,
+        setSelectedWorkspaces,
         setInitialWorkspaces,
         applyPackageToWorkspaces,
     };

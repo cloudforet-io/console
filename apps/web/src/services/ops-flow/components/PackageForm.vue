@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    POverlayLayout, PFieldGroup, PTextInput, PTextarea, PSelectDropdown, PButton,
+    POverlayLayout, PFieldGroup, PTextInput, PTextarea, PSelectDropdown, PButton, PRadioGroup, PRadio,
 } from '@cloudforet/mirinae';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -29,10 +29,15 @@ const {
     selectedWorkspaceItems,
     workspaceMenuItemsHandler,
     workspaceValidator,
-    handleUpdateSelectedWorkspaces,
+    setSelectedWorkspaces,
     setInitialWorkspaces,
     applyPackageToWorkspaces,
 } = useWorkspaceField();
+const workspaceType = ref<'unset'|'specific'>('unset');
+const handleSelectUnsetWorkspace = () => {
+    workspaceType.value = 'unset';
+    setSelectedWorkspaces([]);
+};
 
 /* category */
 const {
@@ -143,6 +148,7 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
             name: '',
             description: '',
         });
+        workspaceType.value = 'unset';
         setInitialWorkspaces();
         await setInitialCategoriesByPackageId();
         resetValidations();
@@ -154,6 +160,11 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
             description: targetPackage.description,
         });
         setInitialWorkspaces(targetPackage.package_id);
+        if (selectedWorkspaceItems.value.length > 0) {
+            workspaceType.value = 'specific';
+        } else {
+            workspaceType.value = 'unset';
+        }
         await setInitialCategoriesByPackageId(targetPackage.package_id);
     }
 });
@@ -198,7 +209,23 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
                                label="Workspace"
                 >
                     <div class="mt-2">
-                        <p-select-dropdown :selected="selectedWorkspaceItems"
+                        <p-radio-group>
+                            <p-radio :selected="workspaceType"
+                                     value="unset"
+                                     @change="handleSelectUnsetWorkspace"
+                            >
+                                Unset
+                            </p-radio>
+                            <p-radio :selected="workspaceType"
+                                     value="specific"
+                                     @change="workspaceType = $event"
+                            >
+                                Specific Workspaces
+                            </p-radio>
+                        </p-radio-group>
+                        <p-select-dropdown v-if="workspaceType === 'specific'"
+                                           class="mt-2"
+                                           :selected="selectedWorkspaceItems"
                                            :invalid="invalidState.workspaces"
                                            :handler="workspaceMenuItemsHandler"
                                            :page-size="10"
@@ -211,7 +238,7 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
                                            show-clear-selection
                                            is-filterable
                                            init-selected-with-handler
-                                           @update:selected="handleUpdateSelectedWorkspaces"
+                                           @update:selected="setSelectedWorkspaces"
                         />
                     </div>
                 </p-field-group>
@@ -224,6 +251,7 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
                     <p-select-dropdown :selected="selectedCategoryItems"
                                        :handler="categoryMenuItemsHandler"
                                        :invalid="invalidState.categories"
+                                       :page-size="10"
                                        appearance-type="badge"
                                        show-select-marker
                                        multi-selectable
