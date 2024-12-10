@@ -32,7 +32,7 @@ const storeState = reactive({
 const state = reactive({
     visible: computed({
         get() {
-            // TODO: this (my-page guard) is a temporary solution. It should be refactored.
+            // REFACTOR: this (my-page guard) is a temporary solution. It should be refactored.
             let result: boolean;
 
             if (storeState.hasPermission || storeState.workspaceList.length > 0) {

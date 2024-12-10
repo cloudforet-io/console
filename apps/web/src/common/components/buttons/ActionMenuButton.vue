@@ -8,10 +8,16 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 interface ActionMenuItem extends MenuItem {
     name: string;
 }
+
+type SupportMenu = 'edit' | 'delete';
 const props = withDefaults(defineProps<{
-    menu?: ActionMenuItem[];
+    menu?: Array<SupportMenu|ActionMenuItem>;
+    styleType?: string;
+    size?: string;
 }>(), {
     menu: undefined,
+    styleType: 'transparent',
+    size: 'md',
 });
 const emit = defineEmits<{(event: 'edit'): void;
     (event: 'delete'): void;
@@ -28,12 +34,26 @@ useContextMenuStyle({
     visibleMenu,
     useFixedMenuStyle: true,
     position: 'right',
-    menuWidth: '192px',
+    menuWidth: props.size === 'sm' ? '113px' : '192px',
 });
-const menu = computed<ActionMenuItem[]>(() => props.menu ?? [
-    { name: 'edit', icon: 'ic_edit', label: 'Edit' },
-    { name: 'delete', icon: 'ic_delete', label: 'Delete' },
-]);
+const menuMap = computed<Record<SupportMenu, ActionMenuItem>>(() => ({
+    edit: { name: 'edit', icon: 'ic_edit', label: 'Edit' },
+    delete: { name: 'delete', icon: 'ic_delete', label: 'Delete' },
+}));
+const menu = computed<ActionMenuItem[]>(() => {
+    if (props.menu) {
+        return props.menu.map((item) => {
+            if (typeof item === 'string') {
+                return menuMap.value[item];
+            }
+            return item;
+        });
+    }
+    return [
+        { name: 'edit', icon: 'ic_edit', label: 'Edit' },
+        { name: 'delete', icon: 'ic_delete', label: 'Delete' },
+    ];
+});
 const toggleMenu = () => {
     visibleMenu.value = !visibleMenu.value;
 };
@@ -50,10 +70,12 @@ const handleSelectMenu = (item: ActionMenuItem) => {
 
 <template>
     <span ref="containerRef"
-          class="relative"
+          class="action-menu-button"
     >
         <p-icon-button ref="targetRef"
                        name="ic_ellipsis-horizontal"
+                       :style-type="props.styleType"
+                       :size="props.size"
                        @click="toggleMenu"
         />
         <p-context-menu v-show="visibleMenu"
@@ -67,8 +89,10 @@ const handleSelectMenu = (item: ActionMenuItem) => {
 </template>
 
 <style scoped lang="postcss">
-.action-menu {
-    @apply bg-white;
-    z-index: 1;
+.action-menu-button {
+    >.action-menu {
+        @apply bg-white;
+        z-index: 1;
+    }
 }
 </style>

@@ -78,7 +78,7 @@ export const WORKSPACE_MEMBER_DEFAULT_PERMISSIONS: MenuId[] = [
     MENU_ID.BOARD,
 ];
 
-// TODO: this need to be changed with new SYSTEM domain planning
+// HACK: this need to be changed with new SYSTEM domain planning
 export const SYSTEM_USER_DEFAULT_PERMISSIONS: MenuId[] = [
     MENU_ID.IAM,
     MENU_ID.ROLE,

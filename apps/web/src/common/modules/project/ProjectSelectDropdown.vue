@@ -255,6 +255,17 @@ const handleClickCreateButton = () => {
 /* Watchers */
 watch(() => props.selectedProjectIds, async (after, before) => {
     if (after !== state._selectedProjectIds) {
+        if (props.readonly) {
+            state._selectedProjectIds = after;
+            state.selectedProjectItems = after.map((p) => {
+                const reference = storeState.projects[p] || storeState.projectGroups[p];
+                return {
+                    name: p,
+                    label: reference?.label ?? p,
+                };
+            });
+            return;
+        }
         await findNodes();
 
         /* when findNodes() has node delete function, this will be deprecated */

@@ -58,7 +58,6 @@ const state = reactive({
         <div class="contents-wrapper">
             <p-pane-layout class="role-card-content">
                 <div class="icon-wrapper">
-                    <!-- TODO: Will add user image src -->
                     <p-avatar size="xl" />
                     <p-lazy-img v-if="state.roleType === 'Admin'"
                                 :src="state.icon"

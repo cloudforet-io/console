@@ -159,6 +159,20 @@ export const getDatetimePickerArgTypes = (): ArgTypes => ({
         control: 'select',
         options: Object.values(DATA_TYPE),
     },
+    placeholder: {
+        name: 'placeholder',
+        type: { name: 'string' },
+        description: 'Placeholder text for datetime picker.',
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'undefined',
+            },
+        },
+    },
     //
     'v-model': {
         name: 'v-model',

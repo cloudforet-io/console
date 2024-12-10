@@ -195,7 +195,7 @@ const handleClickConfirmButton = async () => {
     try {
         await postValidationCode({
             verify_code: formState.verificationCode,
-        });
+        }, userStore);
         emit('refresh-user');
         state.proxyVisible = false;
         resetFormData();

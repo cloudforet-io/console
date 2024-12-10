@@ -7,5 +7,5 @@ export interface Breadcrumb {
     name: TranslateResult|string;
     to?: Location;
     copiable?: boolean;
-    data?: ProjectGroupTreeNodeData // TODO: refactor this with renewaled project tree
+    data?: ProjectGroupTreeNodeData // REFACTOR: refactor this with renewaled project tree
 }

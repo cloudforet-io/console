@@ -22,8 +22,6 @@ export const getWidgetComponent = (widgetConfigId: string): AsyncComponent|undef
 
 export const getWidgetFieldComponent = (fieldName: WidgetFieldName): AsyncComponent => {
     const widgetFieldComponent = WIDGET_FIELD_COMPONENTS[fieldName];
-    // TODO: Uncomment this line after all widget field components are implemented
-    // if (!widgetFieldComponent) throw new Error(`No matching widget component found. ${widgetFieldComponent} does not exist.`);
 
     return widgetFieldComponent;
 };

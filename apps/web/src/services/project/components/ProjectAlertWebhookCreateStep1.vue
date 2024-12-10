@@ -74,7 +74,7 @@ onMounted(async () => {
                     <div class="info">
                         <p>{{ item.name }}</p>
                     </div>
-                    <!-- TODO: will be updated field name -->
+                    <!-- HACK: will be updated field name -->
                     <p-link v-if="item.tags.url"
                             new-tab
                             highlight

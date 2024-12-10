@@ -51,6 +51,7 @@ const Template: Story = {
                 :invalid="invalid"
                 :disabled="disabled"
                 :readonly="readonly"
+                :placeholder="placeholder"
                 @update:selectedDates="onUpdateSelectedDates"
                 @close="onClose"
             />
@@ -75,6 +76,23 @@ export const DefaultDatetimePicker: Story = {
         i18n: I18nConnector.i18n,
         template: `
             <p-datetime-picker />
+        `,
+    }),
+};
+
+export const PlaceholderDatetimePicker: Story = {
+    render: () => ({
+        components: { PDatetimePicker },
+        i18n: I18nConnector.i18n,
+        template: `
+            <div>
+                <p>Default placeholder</p>
+                <p-datetime-picker />
+                <br/>
+                <br/>
+                <p>Custom placeholder</p>
+                <p-datetime-picker placeholder="Please select a date" />
+            </div>
         `,
     }),
 };
