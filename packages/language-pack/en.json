@@ -1508,6 +1508,21 @@
 			"PLACEHOLDER": "Select Project",
 			"RELOAD_PROJECT": "Reload"
 		},
+		"SCHEDULE_SETTING": {
+			"CUSTOM": "Custom",
+			"EVERYDAY": "Everyday",
+			"FRI": "Fri",
+			"INFO": "You will only receive notifications in the schedule you choose.",
+			"MON": "Mon",
+			"SAT": "Sat",
+			"SCHEDULE_SETTING": "Schedule Setting",
+			"SUN": "Sun",
+			"THU": "Thu",
+			"TO": "to",
+			"TUE": "Tue",
+			"WED": "Wed",
+			"WEEKDAYS": "Weekdays"
+		},
 		"SESSION_MODAL": {
 			"SESSION_EXPIRED": "Your session has expired.",
 			"SIGNIN": "Sign In"
@@ -3225,19 +3240,14 @@
 				"CREATE_USER_GROUP": {
 					"CANCEL": "Cancel",
 					"CONFIRM": "Confirm",
-					"CUSTOM": "Custom",
 					"DESCRIPTION": "Description",
-					"EVERYDAY": "Every Day",
 					"GROUP_NAME": "Group Name",
-					"INFO": "You will only receive notifications in the schedule you choose.",
 					"NOTIFICATION_CHANNEL": "Notification Channel",
 					"PROTOCOL": "Protocol",
-					"SCHEDULE_SETTING": "Schedule Setting",
 					"TITLE": "Create User Group",
 					"TOKEN": "Token",
 					"UPDATE": "Update",
-					"UPDATE_TITLE": "Update User Group",
-					"WEEKDAYS": "Weekdays"
+					"UPDATE_TITLE": "Update User Group"
 				}
 			},
 			"TAB": {

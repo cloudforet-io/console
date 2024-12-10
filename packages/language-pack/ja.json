@@ -1508,6 +1508,21 @@
 			"PLACEHOLDER": "プロジェクト選択",
 			"RELOAD_PROJECT": "リロード"
 		},
+		"SCHEDULE_SETTING": {
+			"CUSTOM": "カスタム",
+			"EVERYDAY": "毎日",
+			"FRI": "",
+			"INFO": "選択したスケジュールでのみ通知を受け取ります。",
+			"MON": "",
+			"SAT": "",
+			"SCHEDULE_SETTING": "スケジュール設定",
+			"SUN": "",
+			"THU": "",
+			"TO": "",
+			"TUE": "",
+			"WED": "",
+			"WEEKDAYS": "平日"
+		},
 		"SESSION_MODAL": {
 			"SESSION_EXPIRED": "セッションが期限切れされました",
 			"SIGNIN": "ログイン"
@@ -3225,19 +3240,14 @@
 				"CREATE_USER_GROUP": {
 					"CANCEL": "キャンセル",
 					"CONFIRM": "確認",
-					"CUSTOM": "カスタム",
 					"DESCRIPTION": "説明",
-					"EVERYDAY": "毎日",
 					"GROUP_NAME": "グループ名",
-					"INFO": "選択したスケジュールでのみ通知を受け取ります。",
 					"NOTIFICATION_CHANNEL": "通知チャネル",
 					"PROTOCOL": "プロトコル",
-					"SCHEDULE_SETTING": "スケジュール設定",
 					"TITLE": "ユーザーグループの作成",
 					"TOKEN": "トークン",
 					"UPDATE": "アップデート",
-					"UPDATE_TITLE": "ユーザーグループの更新",
-					"WEEKDAYS": "平日"
+					"UPDATE_TITLE": "ユーザーグループの更新"
 				}
 			},
 			"TAB": {
