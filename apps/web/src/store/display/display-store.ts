@@ -284,7 +284,7 @@ export const useDisplayStore = defineStore('display-store', () => {
                 state.gnbNotificationLastReadTime = settings.global.gnbNotificationLastReadTime;
             }
         } catch (e) {
-            console.error(e);
+            ErrorHandler.handleError(e);
             LocalStorageAccessor.removeItem(userId);
         }
     };
