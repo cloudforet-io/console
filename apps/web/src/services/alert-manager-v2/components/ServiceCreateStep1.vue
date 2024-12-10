@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, onUnmounted, reactive, watch,
+    computed, onMounted, reactive, watch,
 } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -10,6 +10,9 @@ import {
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ServiceCreateParameters } from '@/schema/alert-manager/service/api-verbs/create';
+import type { ServiceListParameters } from '@/schema/alert-manager/service/api-verbs/list';
+import type { ServiceModel } from '@/schema/alert-manager/service/model';
 import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
 import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 import { i18n } from '@/translations';
@@ -17,28 +20,38 @@ import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import { indigo } from '@/styles/colors';
+
 import ServiceCreateStepContainer from '@/services/alert-manager-v2/components/ServiceCreateStepContainer.vue';
 import { useServiceCreateFormStore } from '@/services/alert-manager-v2/stores/service-create-form-store';
 
 const serviceFormStore = useServiceCreateFormStore();
-const serviceFormState = serviceFormStore.state;
 
-const formDataState = reactive({
-    workspaceUserLoading: false,
+const dropdownState = reactive({
+    loading: false,
     workspaceUsersData: [] as WorkspaceUserModel[],
-    workspaceUsers: computed<SelectDropdownMenuItem[]>(() => [
+    // TODO: Add user group model type
+    userGroupData: [] as any[],
+    userDropdownData: computed<SelectDropdownMenuItem[]>(() => [
         { type: 'header', label: i18n.t('ALERT_MANAGER.SERVICE.USER') },
-        ...formDataState.workspaceUsersData.map((i) => ({
+        ...dropdownState.workspaceUsersData.map((i) => ({
             label: i.user_id,
             name: i.user_id,
         })),
+        { type: 'header', label: i18n.t('ALERT_MANAGER.SERVICE.USER_GROUP') },
+        ...dropdownState.userGroupData.map((i) => ({
+            label: i.name,
+            name: i.user_group_id,
+        })),
     ]),
-    // TODO: Add user group data
     selectedMemberItems: [] as SelectDropdownMenuItem[],
 });
 const state = reactive({
     isFocusedKey: false,
     isAllFormValid: computed<boolean>(() => (isAllValid && (name && name.value !== '') && (key && key.value !== ''))),
+    selectedWorkspaceMemberList: computed<string[]>(() => dropdownState.selectedMemberItems.filter((i) => !checkUserGroup(i.name)).map((i) => i.name)),
+    selectedUserGroupList: computed<string[]>(() => dropdownState.selectedMemberItems.filter((i) => checkUserGroup(i.name)).map((i) => i.name)),
+    serviceList: [] as ServiceModel[],
 });
 
 const {
@@ -52,73 +65,116 @@ const {
     invalidTexts,
     isAllValid,
 } = useFormValidator({
-    name: serviceFormState.step1Form.name,
-    key: serviceFormState.step1Form.key,
-    description: serviceFormState.step1Form.description,
+    name: '',
+    key: '',
+    description: '',
 }, {
-    name() {
-        // TODO: Implement validation logic
+    name(value: string) {
+        const duplicatedName = state.serviceList?.find((item) => item.name === value);
+        if (duplicatedName) {
+            return i18n.t('ALERT_MANAGER.SERVICE.VALIDATION_NAME_UNIQUE');
+        }
         return '';
     },
-    key() {
-        // TODO: Implement validation logic
+    key(value: string) {
+        const duplicatedName = state.serviceList?.find((item) => item.service_key === value);
+        if (duplicatedName) {
+            return i18n.t('ALERT_MANAGER.SERVICE.VALIDATION_KEY_UNIQUE');
+        }
         return '';
     },
 });
 
-const convertToSnakeCase = (str) => str
-    .replace(/([a-zA-Z0-9가-힣]+)(?=[^a-zA-Z0-9가-힣]|$)/g, '$1_')
-    .replace(/\s+/g, '_')
-    .replace(/_+/g, '_')
-    .replace(/_$/g, '')
-    .toLowerCase();
-const getUserName = (id: string): string => formDataState.workspaceUsersData.find((i) => i.user_id === id)?.name;
-const handleChangeInput = (label: 'name'|'key'|'member'|'description', value?: string) => {
-    if (label !== 'member') setForm(label, value);
-    // TODO: Add logic to separate user group data
-    serviceFormStore.setFormStep1({
-        name: name.value,
-        key: key.value,
-        member: {
-            USER: formDataState.selectedMemberItems.map((i) => i.name),
-        },
-        description: description.value,
-    });
+const convertToSnakeCase = (str) => {
+    const cleanedInput = str.replace(/[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/g, '');
+    return cleanedInput
+        .toLowerCase()
+        .split(' ')
+        .filter((word) => word.trim() !== '')
+        .join('_');
 };
+const getUserName = (id: string): string => dropdownState.workspaceUsersData.find((i) => i.user_id === id)?.name;
+const checkUserGroup = (id: string): boolean => dropdownState.userGroupData.some((i) => i.user_group_id === id);
 
-const listWorkspaceUsers = async () => {
-    formDataState.workspaceUserLoading = true;
+const handleChangeInput = (label: 'name'|'key'|'description', value?: string) => {
+    setForm(label, value);
+};
+const getUserDropdownData = async () => {
+    dropdownState.loading = true;
     try {
-        const { results } = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>();
-        formDataState.workspaceUsersData = results || [];
+        await fetchWorkspaceUsersList();
+        await fetchUserGroupList();
     } catch (e) {
         ErrorHandler.handleError(e);
-        formDataState.workspaceUsersData = [];
     } finally {
-        formDataState.workspaceUserLoading = false;
+        dropdownState.loading = false;
+    }
+};
+
+const fetchWorkspaceUsersList = async () => {
+    try {
+        const { results } = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>();
+        dropdownState.workspaceUsersData = results || [];
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        dropdownState.workspaceUsersData = [];
+    }
+};
+const fetchUserGroupList = async () => {
+    try {
+        // TODO: Add user group params type
+        const { results } = await SpaceConnector.clientV2.identity.userGroup.list();
+        dropdownState.userGroupData = results || [];
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        dropdownState.userGroupData = [];
+    }
+};
+const fetchServiceList = async () => {
+    try {
+        const { results } = await SpaceConnector.clientV2.alertManager.service.list<ServiceListParameters, ListResponse<ServiceModel>>();
+        state.serviceList = results || [];
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.serviceList = [];
+    }
+};
+const handleCreateService = async () => {
+    try {
+        const createdServiceInfo = await SpaceConnector.clientV2.alertManager.service.create<ServiceCreateParameters, ServiceModel>({
+            name: name.value,
+            service_key: key.value,
+            members: {
+                USER: state.selectedWorkspaceMemberList,
+                USER_GROUP: state.selectedUserGroupList,
+            },
+            description: description.value,
+        });
+        serviceFormStore.setCreatedServiceId(createdServiceInfo.service_id);
+        serviceFormStore.setCurrentStep(2);
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
     }
 };
 
 watch(() => state.isFocusedKey, (isFocusedKey) => {
-    if (isFocusedKey && !serviceFormState.step1Form.key) {
-        handleChangeInput('key', convertToSnakeCase(serviceFormState.step1Form.name));
+    if (isFocusedKey && !key.value) {
+        handleChangeInput('key', convertToSnakeCase(name.value));
     }
 });
 
 onMounted(async () => {
-    await listWorkspaceUsers();
-});
-
-onUnmounted(() => {
-    serviceFormStore.initStep1();
+    await getUserDropdownData();
+    await fetchServiceList();
 });
 </script>
 
 <template>
     <service-create-step-container class="service-create-step1"
                                    :is-all-form-valid="state.isAllFormValid"
+                                   @create="handleCreateService"
     >
-        <form>
+        <div>
             <p-field-group :label="$t('ALERT_MANAGER.SERVICE.LABEL_NAME')"
                            :invalid-text="invalidTexts.name"
                            :invalid="invalidState.name"
@@ -157,22 +213,27 @@ onUnmounted(() => {
                 </template>
             </p-field-group>
             <p-field-group :label="$t('ALERT_MANAGER.SERVICE.MEMBER')">
-                <!-- TODO: Add user group data-->
-                <p-select-dropdown :loading="formDataState.workspaceUserLoading"
-                                   :menu="formDataState.workspaceUsers"
-                                   :selected.sync="formDataState.selectedMemberItems"
+                <p-select-dropdown :loading="dropdownState.loading"
+                                   :menu="dropdownState.userDropdownData"
+                                   :selected.sync="dropdownState.selectedMemberItems"
                                    multi-selectable
                                    appearance-type="stack"
                                    use-fixed-menu-style
                                    is-filterable
                                    show-delete-all-button
                                    show-select-marker
-                                   @update:selected="handleChangeInput('member', $event)"
                 >
                     <template #menu-item--format="{ item }">
                         <div class="member-menu-item">
-                            <p-avatar class="menu-icon"
-                                      size="sm"
+                            <p-avatar v-if="checkUserGroup(item.name)"
+                                      class="menu-icon"
+                                      icon="ic_member"
+                                      :color="indigo[300]"
+                                      size="xs"
+                            />
+                            <p-avatar v-else
+                                      class="menu-icon"
+                                      size="xs"
                             />
                             <span>{{ item.label }}</span>
                             <span v-if="getUserName(item.name)">({{ getUserName(item.name) }})</span>
@@ -186,7 +247,7 @@ onUnmounted(() => {
                               @update:value="handleChangeInput('description', $event)"
                 />
             </p-field-group>
-        </form>
+        </div>
     </service-create-step-container>
 </template>
 
