@@ -173,7 +173,7 @@ const handleChange = async (options: any = {}) => {
 const getJobTasks = async () => {
     state.loading = true;
     try {
-        const res = await SpaceConnector.clientV2.inventory.jobTask.list<JobTaskListParameters, ListResponse<JobTaskModel>>({
+        const res = await SpaceConnector.clientV2.inventoryV2.jobTask.list<JobTaskListParameters, ListResponse<JobTaskModel>>({
             query: getQuery(),
             job_id: props.jobId,
         });
