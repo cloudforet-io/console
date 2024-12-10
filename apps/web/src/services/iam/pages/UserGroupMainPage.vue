@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { PHorizontalLayout } from '@cloudforet/mirinae';
 
+import UserGroupDeleteDoubleCheckModal from '@/services/iam/components/UserGroupDeleteDoubleCheckModal.vue';
 import UserGroupManagementAddUsersModal from '@/services/iam/components/UserGroupManagementAddUsersModal.vue';
 import UserGroupManagementEditModal from '@/services/iam/components/UserGroupManagementEditModal.vue';
 import UserGroupManagementHeader from '@/services/iam/components/UserGroupManagementHeader.vue';
@@ -33,6 +34,7 @@ const refreshUserGroupList = () => {
         <user-group-management-tab />
         <user-group-management-edit-modal @confirm="refreshUserGroupList" />
         <user-group-management-add-users-modal />
+        <user-group-delete-double-check-modal />
     </section>
 </template>
 

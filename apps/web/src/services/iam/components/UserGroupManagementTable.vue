@@ -5,18 +5,14 @@ import {
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PToolboxTable, PSelectDropdown } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
-import type { UserGroupDeleteUserGroupParameters } from '@/schema/identity/user-group/api-verbs/delete';
-import type { UserGroupModel } from '@/schema/identity/user-group/model';
 import type { UserGroupListItemType } from '@/schema/identity/user-group/type';
 import { i18n } from '@/translations';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import { USER_GROUP_MODAL_TYPE, USER_GROUP_SEARCH_HANDLERS } from '@/services/iam/constants/user-group-constant';
@@ -34,7 +30,6 @@ const props = withDefaults(defineProps<Props>(), {
 
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
-const userGroupPageGetters = userGroupPageStore.getters;
 
 const userGroupListApiQueryHelper = new ApiQueryHelper()
     .setPageStart(userGroupPageState.pageStart)
@@ -92,7 +87,7 @@ const dropdownState = reactive({
             name: USER_GROUP_MODAL_TYPE.UPDATE, label: i18n.t('IAM.USER_GROUP.ACTION.UPDATE'), type: 'item', disabled: !editState.isEditable,
         },
         {
-            name: USER_GROUP_MODAL_TYPE.REMOVE, label: i18n.t('IAM.USER_GROUP.ACTION.REMOVE'), type: 'item', disabled: !editState.isRemoveAble,
+            name: USER_GROUP_MODAL_TYPE.DELETE, label: i18n.t('IAM.USER_GROUP.ACTION.REMOVE'), type: 'item', disabled: !editState.isRemoveAble,
         },
         {
             type: 'divider',
@@ -133,8 +128,6 @@ const handleChange = (options: any = {}) => {
 const handleSelectDropdown = async (inputText: string) => {
     dropdownState.loading = true;
 
-    const selectedUserGroupIds = userGroupPageGetters.selectedUserGroups.map((userGroup) => userGroup.user_group_id);
-
     switch (inputText) {
     case USER_GROUP_MODAL_TYPE.UPDATE:
         userGroupPageStore.updateModalSettings({
@@ -144,11 +137,11 @@ const handleSelectDropdown = async (inputText: string) => {
         });
         dropdownState.loading = false;
         break;
-    case USER_GROUP_MODAL_TYPE.REMOVE:
-        selectedUserGroupIds.forEach(async (userGroupId) => {
-            await fetchDeleteUserGroup({
-                user_group_id: userGroupId,
-            });
+    case USER_GROUP_MODAL_TYPE.DELETE:
+        userGroupPageStore.updateModalSettings({
+            type: USER_GROUP_MODAL_TYPE.DELETE,
+            title: 'Are you sure you want to Delete User Group?',
+            themeColor: 'danger',
         });
         dropdownState.loading = false;
         break;
@@ -173,14 +166,6 @@ const fetchUserGroupList = async () => {
         await userGroupPageStore.listUserGroups({ query: userGroupListApiQuery });
     } finally {
         userGroupPageState.loading = false;
-    }
-};
-
-const fetchDeleteUserGroup = async (params: UserGroupDeleteUserGroupParameters) => {
-    try {
-        await SpaceConnector.clientV2.identity.userGroup.delete<UserGroupDeleteUserGroupParameters, UserGroupModel>(params);
-    } catch (e) {
-        ErrorHandler.handleError(e);
     }
 };
 
