@@ -1,19 +1,16 @@
 <script setup lang="ts">
 import { useElementSize } from '@vueuse/core/index';
 import {
-    computed, onMounted, reactive, ref,
+    computed, reactive, ref,
 } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PBadge, PDivider, PFieldTitle, PIconButton, PTextButton, PDataLoader,
 } from '@cloudforet/mirinae';
 
-import type { EscalationPolicyGetParameters } from '@/schema/alert-manager/escalation-policy/api-verbs/get';
 import type { EscalationPolicyModel } from '@/schema/alert-manager/escalation-policy/model';
 import type { EscalationPolicyRulesType } from '@/schema/alert-manager/escalation-policy/type';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
@@ -25,13 +22,13 @@ const rowItemsWrapperRef = ref<null | HTMLElement>(null);
 const itemEl = ref<null | HTMLElement>(null);
 
 const serviceDetailPageStore = useServiceDetailPageStore();
-const serviceDetailPageGetters = serviceDetailPageStore.getters;
+// const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const { width: rowItemsWrapperWidth } = useElementSize(rowItemsWrapperRef);
 
-const storeState = reactive({
-    escalationPolicyId: computed<string>(() => serviceDetailPageGetters.serviceInfo.escalation_policy_id),
-});
+// const storeState = reactive({
+//     escalationPolicyId: computed<string>(() => serviceDetailPageGetters.serviceInfo.escalation_policy_id),
+// });
 const state = reactive({
     loading: false,
     pageStart: 0,
@@ -58,24 +55,25 @@ const handleRouteDetail = () => (
     serviceDetailPageStore.setCurrentTab(SERVICE_DETAIL_TABS.SETTINGS)
 );
 
-const fetchEscalationPolicy = async () => {
-    if (!storeState.escalationPolicyId) return;
-    state.loading = true;
-    try {
-        state.item = await SpaceConnector.clientV2.alertManager.escalationPolicy.get<EscalationPolicyGetParameters, EscalationPolicyModel>({
-            escalation_policy_id: storeState.escalationPolicyId,
-        });
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-        state.item = {};
-    } finally {
-        state.loading = false;
-    }
-};
-
-onMounted(() => {
-    fetchEscalationPolicy();
-});
+// TODO: API incomplete
+// const fetchEscalationPolicy = async () => {
+//     if (!storeState.escalationPolicyId) return;
+//     state.loading = true;
+//     try {
+//         state.item = await SpaceConnector.clientV2.alertManager.escalationPolicy.get<EscalationPolicyGetParameters, EscalationPolicyModel>({
+//             escalation_policy_id: storeState.escalationPolicyId,
+//         });
+//     } catch (e) {
+//         ErrorHandler.handleError(e, true);
+//         state.item = {};
+//     } finally {
+//         state.loading = false;
+//     }
+// };
+//
+// onMounted(() => {
+//     fetchEscalationPolicy();
+// });
 </script>
 
 <template>
