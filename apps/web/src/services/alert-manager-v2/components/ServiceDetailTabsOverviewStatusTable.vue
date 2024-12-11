@@ -9,22 +9,18 @@ import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/ta
 import type { ValueItem } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
 import type { Tags } from '@/schema/_common/model';
+import { ALERT_STATE, ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
+import type { AlertStateType, AlertUrgencyType } from '@/schema/alert-manager/alert/type';
 import { i18n } from '@/translations';
 
 import { red } from '@/styles/colors';
-
-import {
-    ALERT_STATUS_FILTER,
-    ALERT_URGENCY_FILTER,
-} from '@/services/alert-manager-v2/constants/alert-manager-constant';
-import type { AlertStatusFilterType, AlertUrgencyFilterType } from '@/services/alert-manager-v2/types/alert-manager-type';
 
 type AlertStatusInfoType = {
     status: TranslateResult,
     total: number,
     high?: number,
     low?: number,
-    name: AlertStatusFilterType
+    name: AlertStateType,
 };
 const state = reactive({
     alertStatusInfo: computed<AlertStatusInfoType[]>(() => [
@@ -33,28 +29,28 @@ const state = reactive({
             total: 300,
             high: 40,
             low: 40,
-            name: ALERT_STATUS_FILTER.TRIGGERED,
+            name: ALERT_STATE.TRIGGERED,
         },
         {
             status: i18n.t('ALERT_MANAGER.ALERTS.ACKNOWLEDGED'),
             total: 200,
             high: 10,
             low: 60,
-            name: ALERT_STATUS_FILTER.ACKNOWLEDGED,
+            name: ALERT_STATE.ACKNOWLEDGED,
         },
         {
             status: i18n.t('ALERT_MANAGER.ALERTS.RESOLVED'),
             total: 800,
             high: 300,
             low: 400,
-            name: ALERT_STATUS_FILTER.RESOLVED,
+            name: ALERT_STATE.RESOLVED,
         },
     ]),
-    selectedStatus: ALERT_STATUS_FILTER.TRIGGERED as AlertStatusFilterType,
+    selectedStatus: ALERT_STATE.TRIGGERED as AlertStateType,
     urgencyField: computed<ValueItem[]>(() => ([
         { label: i18n.t('ALERT_MANAGER.ALERTS.ALL') as string, name: 'ALL' },
-        { label: i18n.t('ALERT_MANAGER.ALERTS.HIGH') as string, name: ALERT_URGENCY_FILTER.HIGH },
-        { label: i18n.t('ALERT_MANAGER.ALERTS.LOW') as string, name: ALERT_URGENCY_FILTER.LOW },
+        { label: i18n.t('ALERT_MANAGER.ALERTS.HIGH') as string, name: ALERT_URGENCY.HIGH },
+        { label: i18n.t('ALERT_MANAGER.ALERTS.LOW') as string, name: ALERT_URGENCY.LOW },
     ])),
     selectedUrgency: 'ALL',
 });
@@ -85,10 +81,10 @@ const tableState = reactive({
     tagEditPageVisible: false,
 });
 
-const handleClickStatus = (name: AlertStatusFilterType) => {
+const handleClickStatus = (name: AlertStateType) => {
     state.selectedStatus = name;
 };
-const handleSelectUrgency = (value: AlertUrgencyFilterType) => {
+const handleSelectUrgency = (value: AlertUrgencyType) => {
     state.selectedUrgency = value;
 };
 const handleClickRefresh = () => {
