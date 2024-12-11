@@ -3,7 +3,7 @@ import {
     computed, defineExpose, onMounted, reactive, watch,
 } from 'vue';
 
-import { intersection, isEqual } from 'lodash';
+import { cloneDeep, intersection, isEqual } from 'lodash';
 
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
@@ -29,7 +29,7 @@ import type {
 import type {
     DataTableOperator, JoinType, ConcatOptions, JoinOptions, QueryOptions, EvalOptions,
     DataTableTransformOptions,
-    EvaluateExpression,
+    EvaluateExpression, AddLabelsOptions, AdditionalLabels,
 } from '@/common/modules/widgets/types/widget-model';
 
 
@@ -62,10 +62,12 @@ const state = reactive({
         const haveRequiredJoinOptions = haveSavedName && state.dataTableInfo.dataTables.length === 2 && !state.dataTableInfo.dataTables.includes(undefined) && joinState.joinType;
         const haveRequiredQueryOptions = haveSavedName && !!state.dataTableInfo.dataTableId && queryState.conditions.filter((cond) => !!cond.value.trim()).length > 0;
         const haveRequiredEvalOptions = haveSavedName && !!state.dataTableInfo.dataTableId && evalState.expressions.filter((expression) => !!expression.name && !!expression.expression).length > 0;
+        const haveRequiredAddLabels = haveSavedName && addLabelsState.labels.every((label) => !!label.name && !!label.value);
         if (state.operator === 'CONCAT') return !haveRequiredConcatOptions;
         if (state.operator === 'JOIN') return !haveRequiredJoinOptions;
         if (state.operator === 'QUERY') return !haveRequiredQueryOptions;
         if (state.operator === 'EVAL') return !haveRequiredEvalOptions;
+        if (state.operator === 'ADD_LABELS') return !haveRequiredAddLabels;
         return true;
     }),
     optionsChanged: computed(() => {
@@ -80,10 +82,12 @@ const state = reactive({
             ...(expression?.condition ? { condition: expression?.condition } : {}),
             ...(expression?.else ? { else: expression?.else } : {}),
         })).filter((expression) => !!expression.name && !!expression.expression), originState.expressions);
+        const addLabelsChanged = !isEqual(addLabelsState.labels, originState.labels);
         if (state.operator === 'CONCAT') return dataTablesChanged;
         if (state.operator === 'JOIN') return dataTablesChanged || joinTypeChanged;
         if (state.operator === 'QUERY') return dataTableIdChanged || conditionsChanged;
         if (state.operator === 'EVAL') return dataTableIdChanged || expressionsChanged;
+        if (state.operator === 'ADD_LABELS') return addLabelsChanged;
         return false;
     }),
     isUnsaved: computed(() => state.dataTableId.startsWith('UNSAVED-')),
@@ -140,6 +144,10 @@ const originState = reactive({
         value: condition,
     }))),
     expressions: computed<EvaluateExpression[]|string[]>(() => (props.item.options as DataTableTransformOptions).EVAL?.expressions ?? []),
+    labels: computed<AdditionalLabel[]>(() => {
+        const _labels = (props.item.options as DataTableTransformOptions).ADD_LABELS?.labels ?? {};
+        return Object.entries(_labels).map(([name, value]) => ({ name, value }));
+    }),
 });
 
 const setFailStatus = (status: boolean) => {
@@ -196,6 +204,16 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
             ...(expressionInfo.else && { else: expressionInfo.else }) || {},
         })).filter((expressionInfo) => !!expressionInfo.name && !!expressionInfo.expression),
     };
+    const _labels: AdditionalLabels = addLabelsState.labels.reduce((acc, label) => {
+        if (label.name && label.value) {
+            acc[label.name] = label.value;
+        }
+        return acc;
+    }, {});
+    const addLabelsOptions: AddLabelsOptions = {
+        data_table_id: state.dataTableInfo.dataTableId,
+        labels: _labels,
+    };
     const options = () => {
         switch (state.operator) {
         case 'CONCAT':
@@ -206,6 +224,8 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
             return queryOptions;
         case 'EVAL':
             return evalOptions;
+        case 'ADD_LABELS':
+            return addLabelsOptions;
         default:
             return {};
         }
@@ -296,6 +316,7 @@ const setInitialDataTableForm = () => {
     })) : [{
         key: getRandomId(), name: '', fieldType: DATA_TABLE_FIELD_TYPE.DATA, expression: '', isCollapsed: false,
     }];
+    addLabelsState.labels = originState.labels.length ? cloneDeep(originState.labels) : [{ name: '', value: '' }];
 };
 
 onMounted(() => {
