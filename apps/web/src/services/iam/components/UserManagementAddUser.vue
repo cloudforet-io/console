@@ -60,8 +60,6 @@ const validationState = reactive({
 const hideMenu = () => {
     emit('change-input', { userList: state.selectedItems });
     state.menuVisible = false;
-    formState.searchText = '';
-    resetValidationState();
 };
 const handleClickTextInput = async () => {
     state.menuVisible = true;
@@ -104,6 +102,8 @@ const getUserList = async () => {
     } catch (e) {
         addSelectedItem(isNew);
         await hideMenu();
+        formState.searchText = '';
+        resetValidationState();
     }
 };
 const checkEmailValidation = () => {
@@ -131,7 +131,6 @@ const updateValidationState = (invalidText: TranslateResult = '', isInvalid = tr
     validationState.userIdInvalid = isInvalid;
     validationState.userIdInvalidText = invalidText;
 };
-
 const validateUserId = () => {
     if (formState.searchText === '') {
         updateValidationState(i18n.t('IAM.USER.FORM.ALT_E_INVALID_FULL_NAME'));
@@ -169,8 +168,6 @@ const addSelectedItem = (isNew: boolean) => {
         isNew,
         auth_type: formState.selectedMenuItem,
     });
-    formState.searchText = '';
-    resetValidationState();
 };
 
 /* API */
