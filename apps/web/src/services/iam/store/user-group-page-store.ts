@@ -105,7 +105,7 @@ export const useUserGroupPageStore = defineStore('page-user-group', () => {
                 state.totalCount = response.total_count ?? 0;
                 state.selectedIndices = [];
             } catch (e) {
-                ErrorHandler.handleError(e);
+                ErrorHandler.handleError(e, true);
                 state.userGroups = [];
                 state.totalCount = 0;
                 throw e;
@@ -116,7 +116,7 @@ export const useUserGroupPageStore = defineStore('page-user-group', () => {
                 const response = await SpaceConnector.clientV2.identity.userGroup.get<UserGroupGetParameters, UserGroupModel>(params);
                 state.selectedUserGroup = response;
             } catch (e) {
-                ErrorHandler.handleError(e);
+                ErrorHandler.handleError(e, true);
                 state.userGroups = [];
                 state.totalCount = 0;
                 throw e;
@@ -127,7 +127,7 @@ export const useUserGroupPageStore = defineStore('page-user-group', () => {
                 const response = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>(params);
                 state.users.list = response.results || [];
             } catch (e) {
-                ErrorHandler.handleError(e);
+                ErrorHandler.handleError(e, true);
             }
         },
         updateModalSettings({
