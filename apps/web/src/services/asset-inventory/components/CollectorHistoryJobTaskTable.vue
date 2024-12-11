@@ -5,13 +5,13 @@ import {
 
 
 import { makeEnumValueHandler, makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import type { KeyItemSet } from '@cloudforet/core-lib/component-util/query-search/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PLink, PSelectButtonGroup, PStatus, PToolboxTable,
 } from '@cloudforet/mirinae';
 import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
+import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -173,7 +173,7 @@ const handleChange = async (options: any = {}) => {
 const getJobTasks = async () => {
     state.loading = true;
     try {
-        const res = await SpaceConnector.clientV2.inventory.jobTask.list<JobTaskListParameters, ListResponse<JobTaskModel>>({
+        const res = await SpaceConnector.clientV2.inventoryV2.jobTask.list<JobTaskListParameters, ListResponse<JobTaskModel>>({
             query: getQuery(),
             job_id: props.jobId,
         });

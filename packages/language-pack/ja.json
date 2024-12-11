@@ -126,6 +126,7 @@
 			"TOTAL_ALERTS": "",
 			"USER": "ユーザー",
 			"USER_GROUP": "",
+			"VALIDATION_KEY_UNIQUE": "",
 			"VALIDATION_NAME_UNIQUE": "",
 			"WEBHOOK": "ウェプフク ({cnt})"
 		},
@@ -260,295 +261,6 @@
 				"NOT_MATCHING": "一致しません。",
 				"RESET_PASSWORD": "パスワード再設定",
 				"TITLE": "パスワード再設定"
-			}
-		}
-	},
-	"AUTOMATION": {
-		"POWER_SCHEDULER": {
-			"DETAILS": {
-				"ADD": "追加",
-				"ADD_PRIORITY": "優先順位グループを追加",
-				"ADD_RESOURCE_GROUP": "リソースグループを追加",
-				"ALT_E_CREATE_SCHEDULER": "スケジューラ作成に失敗",
-				"ALT_E_DELETE_SCHEDULER": "スケジューラ削除に失敗",
-				"ALT_E_EDIT_NAME": "スケジューラ編集に失敗",
-				"ALT_E_EDIT_RESOURCE_GROUP": "リソースグループ編集に失敗",
-				"ALT_E_EDIT_SCHEDULER": "スケジューラの時間設定に失敗",
-				"ALT_E_PROJECT_INVALID_DESC": "プロジェクトリストを確認してください",
-				"ALT_E_PROJECT_INVALID_TITLE": "該当するプロジェクトがありません",
-				"ALT_E_SCHEDULE_INVALID_DESC": "スケジュールリストを確認してください",
-				"ALT_E_SCHEDULE_INVALID_TITLE": "該当するスケジュールがありません",
-				"ALT_S_CREATE_SCHEDULER": "スケジューラ作成完了",
-				"ALT_S_DELETE_SCHEDULER": "スケジューラ削除完了",
-				"ALT_S_EDIT_NAME": "スケジューラ編集完了",
-				"ALT_S_EDIT_RESOURCE_GROUP": "リソースグループの編集完了",
-				"ALT_S_EDIT_SCHEDULER": "スケジューラ時間設定完了",
-				"CANCEL": "キャンセル",
-				"CHECK_DELETE_MODAL_DESC": "スケジュールを削除しますか？",
-				"CHECK_DELETE_MODAL_TITLE": "スケジュール削除",
-				"CHECK_TIME_SET_MODAL_DESC_1": "時間を設定しなければ、直ちにリソースが停止されます",
-				"CHECK_TIME_SET_MODAL_DESC_2": "リソースがすべて停止されても大丈夫ですか？",
-				"CHECK_TIME_SET_MODAL_TITLE": "スケジューラの時間設定を確認",
-				"CHECK_TIME_SET_NO_TEXT": "いいえ、時間を設定します",
-				"CHECK_TIME_SET_YES_TEXT": "はい、すべて停止します",
-				"CREATE_SCHEDULER": "新しいスケジューラ作成",
-				"CURRENT_STATE": "進行状況",
-				"DAY_FRI": "金",
-				"DAY_MON": "月",
-				"DAY_SAT": "土",
-				"DAY_SUN": "日",
-				"DAY_THU": "木",
-				"DAY_TODAY": "今日",
-				"DAY_TUE": "火",
-				"DAY_WED": "水",
-				"DELETE_ALL": "全てオフにする",
-				"EDIT": "編集",
-				"EDIT_NAME_MODAL_TITLE": "スケジューラ名編集",
-				"FIVE_SECONDS_MESSAGE": "ステータスは５秒ごとに自動的にアップデートされます",
-				"HIGH": "優先順位が高い",
-				"KANBAN_HINT_TEXT_1": "マウスでリソースグループの位置を変更する",
-				"KANBAN_HINT_TEXT_2": "優先順位を決めてください",
-				"LOW": "優先順位が低い",
-				"NO_DATA": "スケジューラがありません",
-				"OFF": "オフ",
-				"ON": "オン",
-				"ONE_TIME_SCHEDULE": "ワンタイムスケジュール",
-				"PRIORITY": "優先順位",
-				"RECOMMENDED": "おすすめ",
-				"RESOURCE_GROUP_DESC": "スケジューラを適用するリソースグループ",
-				"RESOURCE_GROUP_TITLE": "リソースグループ",
-				"ROUTINE_ON": "繰り返しをオンにする",
-				"ROUTINE_SCHEDULE": "繰り返しスケジュール",
-				"SAVE": "保存",
-				"SCHEDULER_LIST": "スケジューラリスト",
-				"SETTING": "目標設定",
-				"SET_NAME_DESC": "スケジューラ名を設定します（スペース不可）",
-				"SET_NAME_TITLE": "名前設定",
-				"SET_TIME_DESC": "スケジューラの適用時間を設定します。",
-				"SET_TIME_TITLE": "時間設定",
-				"STATUS_OFF": "オフ",
-				"STATUS_ON": "オン",
-				"STATUS_STARTING": "開始中",
-				"STATUS_STOPPING": "停止中",
-				"THIS_WEEK": "今週",
-				"TIMEZONE": "タイムゾーン",
-				"TIME_TABLE_HINT_TEXT_1": "マウスを利用して時間を設定してください",
-				"TIME_TABLE_HINT_TEXT_2": "*注意：時間が設定されていなければ、リソースが直ちに停止されます。"
-			},
-			"LANDING": {
-				"ABOUT": "約",
-				"APPLICABLE_RESOURCE": "適用できるリソース数",
-				"APPLIED_RESOURCE": "適用されたリソース数",
-				"ESTIMATED_SAVING": "予想される節減費用",
-				"GO_TO_PROJECT_BTN_TEXT": "プロジェクトページへショートカット",
-				"GO_TO_PROJECT_HINT_TEXT": "パワースケジューラを設定するために、先にプロジェクトを登録してください",
-				"LEGEND_GREATER_THEN_12": "12時間以上",
-				"LEGEND_LESS_THEN_12": "12時間未満",
-				"LEGEND_TITLE": "繰り返しスケジュール時間",
-				"LEGEND_UNSET": "未設定",
-				"NEED_SCHEDULER_HINT_TEXT": "スケジュールを登録してください。",
-				"SCHEDULE": "スケジュール",
-				"TITLE": "パワースケジューラ",
-				"TOOLTIP_COST_1": "パワースケジューラを通して節減した今月の費用",
-				"TOOLTIP_COST_2": "【基準：今月1日〜現在】",
-				"TOOLTIP_RESOURCE": "適用できるリソースの種類"
-			},
-			"RESOURCE": {
-				"ALT_E_ID_INVALID_DESC": "リソースグループリストを確認してください",
-				"ALT_E_ID_INVALID_TITLE": "該当するリソースグループがありません",
-				"BASE_INFO_TITLE": "基本情報",
-				"CHECK_LIST_MODAL_DESC": "リソースグループリストを確認してください",
-				"CHECK_LIST_MODAL_TITLE": "リソースグループリストの確認",
-				"NAME": "グループ名",
-				"NAME_DESC_1": "最大128字/文字で、英字、数字、ハイフンのみ使用できます。",
-				"NAME_DESC_2": "（リソースグループカードに16文字までの表記）",
-				"NAME_INVALID": "不正な形式の名前です。",
-				"NAME_REQUIRED": "必須入力項目です。",
-				"RESOURCE_LIST": "リソース一覧",
-				"RESOURCE_SEARCH": "リソース検索",
-				"RESOURCE_SEARCH_INVALID": "リストがなければ、リソースグループが作成できません。",
-				"RESOURCE_TYPE": "リソースタイプ",
-				"RESOURCE_TYPE_DESC": "リソースタイプを選択してください。",
-				"RESOURCE_TYPE_SELECT": "リソースタイプを選択",
-				"STANDARD": "グループ基準",
-				"TITLE": "リソースグループの作成"
-			}
-		},
-		"SPOT_AUTOMATION": {
-			"ADD": {
-				"ALT_E_CREATE_SPOT_GROUP": "スポットグルーブ作成に失敗",
-				"ALT_S_CREATE_SPOT_GROUP": "スポットグルーブ作成に成功",
-				"BASE_INFO": {
-					"LABEL": "基本情報",
-					"NAME_DESC_1": "空白は使えず、最大56文字 / 英字で始まり、英字、数字及びハイフンのみ利用できます。",
-					"NAME_DESC_2": "スポットグループカードに最大16文字まで表示",
-					"NAME_LABEL": "名前",
-					"NAME_PLACEHOLDER": "スポットグループ名",
-					"NAME_REQUIRED": "必須項目です",
-					"TAG_ADD": "タグ追加",
-					"TAG_DESC_1": "関連するタグを追加します",
-					"TAG_DESC_2": "下のボタンを押してタグを追加してください",
-					"TAG_LABEL": "タグ"
-				},
-				"CANCEL": "チャンセル",
-				"CHECK_MODAL": {
-					"BACK": "戻る",
-					"CLOUD_SERVICE_CATEGORY_LABEL": "クラウドサービスカテゴリ",
-					"DESC": "すべてのインスタンスはSpotで運用されます",
-					"RESOURCE_ID_LABEL": "リソースID",
-					"RESOURCE_NAME_LABEL": "リソース名",
-					"SPOT_GROUP_LABEL": "スポットグループ名",
-					"TITLE": "詳細事項確認"
-				},
-				"CLOUD_SERVICE": {
-					"LABEL": "クラウドサービスカテゴリ"
-				},
-				"CREATE": "作成",
-				"CREATE_TITLE": "新しいスポットグループ作成",
-				"INSTANCE_TYPE": {
-					"DESC": "パフォーマンスとコストに最適化されたインスタンスです",
-					"LABEL": "インスタンスタイプ",
-					"ONE_MORE_REQUIRED": "一つ以上のインスタンスタイプが必要です",
-					"OPTIMIZED_TYPE": "最適化されたインスタンスタイプのおすすめ"
-				},
-				"LOAD_FAILED": "問題が生じてデータがインポートできません",
-				"RESOURCE": {
-					"LABEL": "リソース",
-					"RESOURCE_DESC": "スポットグループに指定されてないリソースのみ表示されます",
-					"RESOURCE_REQUIRED": "リソースを選択してください"
-				},
-				"SCHEDULE_POLICY": {
-					"DESC": "インスタンス数に変更があったら、スポットインスタンス数が変更されます（オンディマンド設定数は固定値）",
-					"LABEL": "スケジュール政策",
-					"SETTING_LABEL": "設定",
-					"SETTING_ONDEMAND": "オンディマンド",
-					"SETTING_SPOT_INSTANCE": "スポットインスタンス",
-					"SETTING_TYPE_COUNT": "個数",
-					"SETTING_TYPE_LABEL": "設定方法",
-					"SETTING_TYPE_RATIO": "比率",
-					"UNIT_COUNT": "個"
-				},
-				"SELECT_RESOURCE": "リソースを選択したら設定できます",
-				"TRY_AGAIN": "もう一度やり直し",
-				"TRY_AGAIN_DESC": "リソース情報の取得に失敗しました。ドメインアドミンにお問い合わせください"
-			},
-			"DASHBOARD": {
-				"ACCUMULATE_COST": "累積節減費用",
-				"ALL_INSTANCE": "全インスタンス",
-				"ALL_INSTANCE_DESC": "（オンディマンド＋スポット）",
-				"CARD": {
-					"ADD_SPOT_GROUP": "スポットグループ作成",
-					"INSTANCE": "インスタンス",
-					"NO_SPOT_GROUP": "スポットグループ作成"
-				},
-				"LAST_MONTH": "前月",
-				"LAST_SIX_MONTHS": "過去６ヶ月間",
-				"NO_PROJECT": "プロジェクト単位でスポットグループを管理してください",
-				"PAGE_TITLE": "ダッシュボード",
-				"SAVING_COST": "削減費用",
-				"SPOT_GROUP_BY_PROJECT": "プロジェクト別スポットグループ管理",
-				"SPOT_INSTANCE": "スポットインスタンス",
-				"USED_SPOT_GROUP": "使用しているスポットグループ"
-			},
-			"DETAIL": {
-				"ALT_E_DELETE_SPOT_GROUP": "スポットグループ削除に失敗",
-				"ALT_S_DELETE_SPOT_GROUP": "スポットグループ削除完了",
-				"BASE_INFO": {
-					"EDIT": "編集",
-					"ON_DEMAND": "オンディマンド",
-					"ON_DEMAND_TOTAL_COST": "オンディマンドの全体費用",
-					"PROJECT": "プロジェクト",
-					"SPOT": "スポット",
-					"SPOT_TOTAL_COST": "実際のスポット全体の費用",
-					"TITLE": "基本情報",
-					"USING_INSTANCE_TYPE": "使用しているインスタンスタイプ",
-					"VIEW_DETAIL": "詳細を見る"
-				},
-				"BILLING": {
-					"BILLING_DETAIL": "費用内訳",
-					"COST": "費用",
-					"CUMULATIVE_SAVINGS_COST": "累積削減費用",
-					"INSTANCE": "インスタンス",
-					"INSTANCE_COUNT": "インスタンス数",
-					"LAST_MONTH": "前月",
-					"ON_DEMAND_ESTIMATED_COST": "オンディマンドで利用した場合の予想費用",
-					"SAVINGS_COST": "削減費用",
-					"SAVING_COST": "최대 128자 / 문자로 시작해야 하고, 문자, 숫자 및 하이픈만 포함할 수 있습니다.費用",
-					"SPOT_SAVINGS_COST": "スポットで削減した費用",
-					"TITLE": "費用",
-					"TOOLTIP_ON_DEMAND_ESTIMATED_COST": "オンディマンド予想費用",
-					"TOOLTIP_SAVING_COST": "削減費用"
-				},
-				"EDIT": {
-					"ALT_E_EDIT_SPOT_GROUP": "スポットグループ編集に失敗",
-					"ALT_S_EDIT_SPOT_GROUP": "スポットグループ編集完了",
-					"SAVE": "保存",
-					"TITLE": "スポットグループ"
-				},
-				"INTERRUPT": {
-					"AZ": "アベイラビリティーゾーン（AZ）",
-					"DAY": "日",
-					"INSTANCE_TYPE": "インスタンスタイプ",
-					"INTERRUPT_COUNT": "割り込み数",
-					"INTERRUPT_DETAIL": "割り込み内訳",
-					"LAST_TWO_WEEKS": "過去14日間",
-					"LATEST_DATE": "最近の日付",
-					"MONTH": "月",
-					"ON_DEMAND": "オンデマンド",
-					"SPOT": "スポット"
-				},
-				"MODAL_DELETE_SPOT_GROUP_CONTENT": "このスポットグループを削除しますか？",
-				"MODAL_DELETE_SPOT_GROUP_TITLE": "スポットグループ削除",
-				"MODAL_UPDATE_SPOT_GROUP_LABEL": "名前",
-				"MODAL_UPDATE_SPOT_GROUP_NAME_DESC": "空白は使えず、最大56文字 / 英字で始まり、英字、数字及びハイフンのみ利用できます。",
-				"MODAL_UPDATE_SPOT_GROUP_PLACEHOLDER": "スポットグループ名",
-				"MODAL_UPDATE_SPOT_GROUP_TITLE": "スポットグループ変更",
-				"MONITORING": {
-					"CPU_USAGE_RAGE": "CPU使用率",
-					"DISK_USAGE_RATE": "ディスク使用率",
-					"HAS_PROBLEM": "問題あり",
-					"INSTANCE": "インスタンス",
-					"LOAD_BALANCER": "ロードバランサ",
-					"NORMAL": "正常",
-					"TITLE": "モニタリング",
-					"TITLE_HELP_TEXT": "データ基準：1日平均値"
-				},
-				"TAB_HISTORY": "履歴",
-				"TAB_MEMBER": "構成員",
-				"TAB_SUMMARY": "概要情報",
-				"TAB_TAG": "タグ"
-			},
-			"LIST": {
-				"ADD_SPOT_GROUP": "スポットグループ作成",
-				"CARD": {
-					"ACTIVITY_TIME_RANGE": "グラフ期間：",
-					"COST_TIME_RANGE": "今月1日〜昨日",
-					"CPU_UTILIZATION": "一日平均CPU使用率",
-					"CREATED_AT": "作成",
-					"DISK_USAGE": "一日平均ディスク使用率",
-					"HEALTHY": "正常",
-					"INSTANCE": "インスタンス",
-					"INSTANCE_STATE": "インスタンスステータス",
-					"IOPS_DESC": "（読み取り+書き込み）",
-					"LAST_1_DAY": "Last 1 day",
-					"LAST_7_DAYS": "Last 7 days",
-					"LOAD_BALANCER": "ロードバランサ",
-					"NUMBER_UNIT": "個",
-					"REGION": "リージョン",
-					"SAVING_COST": "削減費用",
-					"SERVICE_TYPE": "サービスタイプ",
-					"SPOT_INTERRUPT": "スポット割り込み",
-					"UNHEALTHY": "問題あり"
-				},
-				"COST_INSTANCE_DATE_1": "費用、インスタンス期間：",
-				"COST_INSTANCE_DATE_2": "今月",
-				"NO_DATA": "スポット自動化を利用するためにはスポットグループの作成が必要です",
-				"SHOW_FAVORITES": "お気に入りのみを表示"
-			},
-			"MAIN": {
-				"DASHBOARD": "ダッシュボード",
-				"FAVORITES": "お気に入り",
-				"SPOT_GROUP": "スポットグループ"
 			}
 		}
 	},
@@ -1508,6 +1220,21 @@
 			"PLACEHOLDER": "プロジェクト選択",
 			"RELOAD_PROJECT": "リロード"
 		},
+		"SCHEDULE_SETTING": {
+			"CUSTOM": "カスタム",
+			"EVERYDAY": "毎日",
+			"FRI": "",
+			"INFO": "選択したスケジュールでのみ通知を受け取ります。",
+			"MON": "",
+			"SAT": "",
+			"SCHEDULE_SETTING": "スケジュール設定",
+			"SUN": "",
+			"THU": "",
+			"TO": "",
+			"TUE": "",
+			"WED": "",
+			"WEEKDAYS": "平日"
+		},
 		"SESSION_MODAL": {
 			"SESSION_EXPIRED": "セッションが期限切れされました",
 			"SIGNIN": "ログイン"
@@ -2399,15 +2126,9 @@
 			"VALIDATION_DASHBOARD_NAME_UNIQUE": "この名前のダッシュボードはすでに存在します。"
 		},
 		"FULL_SCREEN_VIEW": {
-			"APPLY_NON_INHERITED_OPTION_HELP_TEXT": "このウィジェットは、ダッシュボードのフィルターの影響を受けない非継承オプションで保存されます。",
 			"BACK_TO_DASHBOARD": "ダッシュボードに戻る",
-			"CANCEL": "取消",
-			"EDIT_OPTION": "オプション編集",
-			"EDIT_WIDGET_OPTION": "ウィジェット編集",
 			"FULL_SCREEN_VIEW": "フルスクリーン表示",
-			"NON_INHERITED_OPTIONS_INCLUDED": "非継承オプションが含まれています",
-			"NON_INHERIT_OPTION_APPLIED": "非継承オプションが含まれています",
-			"SAVE": "保存"
+			"NON_INHERIT_OPTION_APPLIED": "非継承オプションが含まれています"
 		},
 		"LNB": {
 			"DEPRECATED": "サポート終了",
@@ -3225,19 +2946,14 @@
 				"CREATE_USER_GROUP": {
 					"CANCEL": "キャンセル",
 					"CONFIRM": "確認",
-					"CUSTOM": "カスタム",
 					"DESCRIPTION": "説明",
-					"EVERYDAY": "毎日",
 					"GROUP_NAME": "グループ名",
-					"INFO": "選択したスケジュールでのみ通知を受け取ります。",
 					"NOTIFICATION_CHANNEL": "通知チャネル",
 					"PROTOCOL": "プロトコル",
-					"SCHEDULE_SETTING": "スケジュール設定",
 					"TITLE": "ユーザーグループの作成",
 					"TOKEN": "トークン",
 					"UPDATE": "アップデート",
-					"UPDATE_TITLE": "ユーザーグループの更新",
-					"WEEKDAYS": "平日"
+					"UPDATE_TITLE": "ユーザーグループの更新"
 				}
 			},
 			"TAB": {
@@ -4299,9 +4015,6 @@
 			}
 		}
 	},
-	"MANAGE_PROJECT_GROUP_MEMBER": "プロジェクトグループのメンバ管理",
-	"MEMBER": "構成員",
-	"MEMBER_TITLE": "メンバー",
 	"MENU": {
 		"ADDITIONAL_SETTINGS": "追加設定",
 		"ADMINISTRATION": "管理",
@@ -4355,9 +4068,6 @@
 		"PROVIDER": "プロバイダー",
 		"WORKSPACE_HOME": "ホーム"
 	},
-	"MODAL_DELETE_MEMBER_CONTENT": "選択したメンバーをプロジェクトから削除しますか？",
-	"MODAL_DELETE_MEMBER_TITLE": "メンバー削除",
-	"MODAL_UPDATE_MEMBER_TITLE": "メンバー情報の更新",
 	"MONITORING": {
 		"ALERT": {
 			"ALERT_LIST": {
@@ -4694,7 +4404,6 @@
 		},
 		"SPACEONE_USER": "SpaceONEユーザー"
 	},
-	"No Data": "",
 	"PAGE_SCHEMA": {
 		"ACCOUNT": "アカウントID",
 		"BASE_INFO": "基本情報",
@@ -5251,9 +4960,5 @@
 			"SHOW_ALL_TOOLTIP": "プロジェクトグループのすべてのサブプロジェクトを見る",
 			"STORAGE": "ストレージ"
 		}
-	},
-	"SHARE_TO_ALL_WORKSPACES": "すべてのワークスペースに共有する",
-	"SHARE_TO_ALL_WORKSPACES (2)": "すべてのワークスペースに共有する",
-	"SPACEONE_USER_DESC": "プロジェクトメンバーの個人チャンネルに送信します。",
-	"TAB_MEMBER": "メンバー"
+	}
 }

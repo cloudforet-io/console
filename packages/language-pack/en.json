@@ -126,6 +126,7 @@
 			"TOTAL_ALERTS": "Total Alerts",
 			"USER": "User",
 			"USER_GROUP": "User Group",
+			"VALIDATION_KEY_UNIQUE": "A service with this key name already exists.",
 			"VALIDATION_NAME_UNIQUE": "A service with this name already exists.",
 			"WEBHOOK": "Webhook ({cnt})"
 		},
@@ -260,295 +261,6 @@
 				"NOT_MATCHING": "Not matching.",
 				"RESET_PASSWORD": "Reset Password",
 				"TITLE": "Reset Password"
-			}
-		}
-	},
-	"AUTOMATION": {
-		"POWER_SCHEDULER": {
-			"DETAILS": {
-				"ADD": "Add",
-				"ADD_PRIORITY": "Add priority group",
-				"ADD_RESOURCE_GROUP": "Add resource group",
-				"ALT_E_CREATE_SCHEDULER": "Failed to Create Scheduler",
-				"ALT_E_DELETE_SCHEDULER": "Failed to Delete Scheduler",
-				"ALT_E_EDIT_NAME": "Failed to Edit Scheduler Name",
-				"ALT_E_EDIT_RESOURCE_GROUP": "Failed to Edit Resource Group",
-				"ALT_E_EDIT_SCHEDULER": "Failed to Edit Scheduler Time",
-				"ALT_E_PROJECT_INVALID_DESC": "Please check the list.",
-				"ALT_E_PROJECT_INVALID_TITLE": "There is no matching project.",
-				"ALT_E_SCHEDULE_INVALID_DESC": "Please check the scheduler list.",
-				"ALT_E_SCHEDULE_INVALID_TITLE": "There is no matching schedule.",
-				"ALT_S_CREATE_SCHEDULER": "Scheduler successfully created",
-				"ALT_S_DELETE_SCHEDULER": "Scheduler successfully deleted",
-				"ALT_S_EDIT_NAME": "Scheduler successfully edited",
-				"ALT_S_EDIT_RESOURCE_GROUP": "Resource group successfully edited",
-				"ALT_S_EDIT_SCHEDULER": "Scheduler time successfully edited ",
-				"CANCEL": "Cancel",
-				"CHECK_DELETE_MODAL_DESC": "Are you sure you want to delete a schedule?",
-				"CHECK_DELETE_MODAL_TITLE": "Delete schedule",
-				"CHECK_TIME_SET_MODAL_DESC_1": "All resource is immediately stopped if you don't set the time.",
-				"CHECK_TIME_SET_MODAL_DESC_2": "Are you absolutely sure?",
-				"CHECK_TIME_SET_MODAL_TITLE": "Confirm Scheduler Time",
-				"CHECK_TIME_SET_NO_TEXT": "No, I will set the time.",
-				"CHECK_TIME_SET_YES_TEXT": "Yes, I will stop every items.",
-				"CREATE_SCHEDULER": "New Scheduler",
-				"CURRENT_STATE": "Current status",
-				"DAY_FRI": "FRI",
-				"DAY_MON": "MON",
-				"DAY_SAT": "SAT",
-				"DAY_SUN": "SUN",
-				"DAY_THU": "THR",
-				"DAY_TODAY": "TODAY",
-				"DAY_TUE": "TUE",
-				"DAY_WED": "WED",
-				"DELETE_ALL": "Turn Off All",
-				"EDIT": "Edit",
-				"EDIT_NAME_MODAL_TITLE": "Edit scheduler name",
-				"FIVE_SECONDS_MESSAGE": "Status auto refresh every 5 seconds.",
-				"HIGH": "High Priority",
-				"KANBAN_HINT_TEXT_1": "Reorder resource group through mouse as you like to",
-				"KANBAN_HINT_TEXT_2": "Please, set group's priority",
-				"LOW": "Low Priority",
-				"NO_DATA": "There is no scheduler.",
-				"OFF": "Turn Off",
-				"ON": "Turn On",
-				"ONE_TIME_SCHEDULE": "One time schedule",
-				"PRIORITY": "Priority",
-				"RECOMMENDED": "Recommend",
-				"RESOURCE_GROUP_DESC": "Resource group to apply the scheduler",
-				"RESOURCE_GROUP_TITLE": "Resource group",
-				"ROUTINE_ON": "Repeat: Turn on",
-				"ROUTINE_SCHEDULE": "Repeat: Schedule",
-				"SAVE": "Save",
-				"SCHEDULER_LIST": "Scheduler List",
-				"SETTING": "Scheduled Set",
-				"SET_NAME_DESC": "Set the scheduler name. (no spaces)",
-				"SET_NAME_TITLE": "Scheduler Name",
-				"SET_TIME_DESC": "Set the scheduler applying time.",
-				"SET_TIME_TITLE": "Scheduler Time",
-				"STATUS_OFF": "Off",
-				"STATUS_ON": "On",
-				"STATUS_STARTING": "Starting",
-				"STATUS_STOPPING": "Stopping",
-				"THIS_WEEK": "This week",
-				"TIMEZONE": "Time Zone",
-				"TIME_TABLE_HINT_TEXT_1": "Set the time schedule by click-drag.",
-				"TIME_TABLE_HINT_TEXT_2": "*note:  All resources are inactive without setting."
-			},
-			"LANDING": {
-				"ABOUT": "approx.",
-				"APPLICABLE_RESOURCE": "Number of applicable resources",
-				"APPLIED_RESOURCE": "Applied resources",
-				"ESTIMATED_SAVING": "Estimated cost savings",
-				"GO_TO_PROJECT_BTN_TEXT": "Go to the project page",
-				"GO_TO_PROJECT_HINT_TEXT": "Please register the project first to set up the power scheduler.",
-				"LEGEND_GREATER_THEN_12": "Over 12 hours",
-				"LEGEND_LESS_THEN_12": "Less 12 hours",
-				"LEGEND_TITLE": "Repeat schedule setting time",
-				"LEGEND_UNSET": "Unset",
-				"NEED_SCHEDULER_HINT_TEXT": "Please register a schedule.",
-				"SCHEDULE": "Schedule",
-				"TITLE": "Power Scheduler",
-				"TOOLTIP_COST_1": "Saved cost by Power Scheduler (this month)",
-				"TOOLTIP_COST_2": "(Month to date cost)",
-				"TOOLTIP_RESOURCE": "Applicable Resource Types"
-			},
-			"RESOURCE": {
-				"ALT_E_ID_INVALID_DESC": "Please confirm the resource group list.",
-				"ALT_E_ID_INVALID_TITLE": "No resource group you are looking for.",
-				"BASE_INFO_TITLE": "Base Information",
-				"CHECK_LIST_MODAL_DESC": "Please confirm the resouce group list.",
-				"CHECK_LIST_MODAL_TITLE": "Confirm resource group list",
-				"NAME": "Group Name",
-				"NAME_DESC_1": "Name must start with letter / maximum of 128 characters / only letters, numbers and hyphens.",
-				"NAME_DESC_2": "16 characters display only on resource group card",
-				"NAME_INVALID": "The name has invalid characters.",
-				"NAME_REQUIRED": "Required field",
-				"RESOURCE_LIST": "Resource List",
-				"RESOURCE_SEARCH": "Resource Search",
-				"RESOURCE_SEARCH_INVALID": "Cannot create a resource group If there is no items. ",
-				"RESOURCE_TYPE": "Resource type",
-				"RESOURCE_TYPE_DESC": "Please, select a resource type. ",
-				"RESOURCE_TYPE_SELECT": "Resource Type",
-				"STANDARD": "Group Category",
-				"TITLE": "Create Resource Group"
-			}
-		},
-		"SPOT_AUTOMATION": {
-			"ADD": {
-				"ALT_E_CREATE_SPOT_GROUP": "Failed to Create Spot Group",
-				"ALT_S_CREATE_SPOT_GROUP": "Spot group successfully created ",
-				"BASE_INFO": {
-					"LABEL": "Base Information",
-					"NAME_DESC_1": "Name must start with letter / maximum of 56 characters / only letters, numbers and hyphens.",
-					"NAME_DESC_2": "Display up to 16 characters on Spot Group Card.",
-					"NAME_LABEL": "Name",
-					"NAME_PLACEHOLDER": "Spot Group Name",
-					"NAME_REQUIRED": "Required field",
-					"TAG_ADD": "Add tags",
-					"TAG_DESC_1": "Click a button to add tags.",
-					"TAG_DESC_2": "Click a button below to add tags.",
-					"TAG_LABEL": "Tag"
-				},
-				"CANCEL": "Cancel",
-				"CHECK_MODAL": {
-					"BACK": "Back",
-					"CLOUD_SERVICE_CATEGORY_LABEL": "Cloud Service Category",
-					"DESC": "All instances runs by Spot Automation. ",
-					"RESOURCE_ID_LABEL": "Resource ID",
-					"RESOURCE_NAME_LABEL": "Resource Name",
-					"SPOT_GROUP_LABEL": "Spot Group Name",
-					"TITLE": "Confirm Details"
-				},
-				"CLOUD_SERVICE": {
-					"LABEL": "Cloud Service Category"
-				},
-				"CREATE": "Create",
-				"CREATE_TITLE": "Create Spot Group",
-				"INSTANCE_TYPE": {
-					"DESC": "Recommended instance between performance and cost",
-					"LABEL": "Instance Type",
-					"ONE_MORE_REQUIRED": "At least one instance type is required.",
-					"OPTIMIZED_TYPE": "Recommend Optimized Instance Type"
-				},
-				"LOAD_FAILED": "Oops, Looks like something went wrong.",
-				"RESOURCE": {
-					"LABEL": "Resource",
-					"RESOURCE_DESC": "Show only resources of not belonging to Spot Group",
-					"RESOURCE_REQUIRED": "Please select a resource"
-				},
-				"SCHEDULE_POLICY": {
-					"DESC": "Number of spot instance changes based on Instance number. (On-Demend is fixed value.) ",
-					"LABEL": "Instance Distribution",
-					"SETTING_LABEL": "Capacity Settings",
-					"SETTING_ONDEMAND": "On-Demand",
-					"SETTING_SPOT_INSTANCE": "Spot Instance",
-					"SETTING_TYPE_COUNT": "Count",
-					"SETTING_TYPE_LABEL": "Capacity Unit",
-					"SETTING_TYPE_RATIO": "Percentage",
-					"UNIT_COUNT": "Count"
-				},
-				"SELECT_RESOURCE": "Select resource first and set the other options",
-				"TRY_AGAIN": "Try again",
-				"TRY_AGAIN_DESC": "Cannot read resource information. Please contact to domain admin. "
-			},
-			"DASHBOARD": {
-				"ACCUMULATE_COST": "Total Savings",
-				"ALL_INSTANCE": "All Instances",
-				"ALL_INSTANCE_DESC": "(On-Demand+Spot)",
-				"CARD": {
-					"ADD_SPOT_GROUP": "Create Spot Group",
-					"INSTANCE": "Instance",
-					"NO_SPOT_GROUP": "Create Spot Group"
-				},
-				"LAST_MONTH": "Last month",
-				"LAST_SIX_MONTHS": "Last 6 months",
-				"NO_PROJECT": "Please manage Spot Group based on project",
-				"PAGE_TITLE": "Dashboard",
-				"SAVING_COST": "Savings",
-				"SPOT_GROUP_BY_PROJECT": "Spot Group on Project",
-				"SPOT_INSTANCE": "Spot Instance",
-				"USED_SPOT_GROUP": "Running Spot Group"
-			},
-			"DETAIL": {
-				"ALT_E_DELETE_SPOT_GROUP": "Failed to delete Spot Group",
-				"ALT_S_DELETE_SPOT_GROUP": "Spot group successfully deleted",
-				"BASE_INFO": {
-					"EDIT": "Edit",
-					"ON_DEMAND": "On-Demand",
-					"ON_DEMAND_TOTAL_COST": "On-Demand Total Savings",
-					"PROJECT": "Project",
-					"SPOT": "Spot",
-					"SPOT_TOTAL_COST": "Actual All Spot Cost",
-					"TITLE": "Base Information",
-					"USING_INSTANCE_TYPE": "Running Instance Type",
-					"VIEW_DETAIL": "view detail"
-				},
-				"BILLING": {
-					"BILLING_DETAIL": "Billing Detail",
-					"COST": "Billing",
-					"CUMULATIVE_SAVINGS_COST": "Total Savings",
-					"INSTANCE": "Instance",
-					"INSTANCE_COUNT": "Instance Count",
-					"LAST_MONTH": "Last Month",
-					"ON_DEMAND_ESTIMATED_COST": "Projected Cost by On-Demand",
-					"SAVINGS_COST": "Savings",
-					"SAVING_COST": "Savings",
-					"SPOT_SAVINGS_COST": "Savings by Spot",
-					"TITLE": "Cost",
-					"TOOLTIP_ON_DEMAND_ESTIMATED_COST": "Projected Cost by On-Demand",
-					"TOOLTIP_SAVING_COST": "Savings"
-				},
-				"EDIT": {
-					"ALT_E_EDIT_SPOT_GROUP": "Failed to Edit Spot Group",
-					"ALT_S_EDIT_SPOT_GROUP": "Spot group successfully edited",
-					"SAVE": "Save",
-					"TITLE": "Spot Group"
-				},
-				"INTERRUPT": {
-					"AZ": "Available Zone",
-					"DAY": "Day",
-					"INSTANCE_TYPE": "Instance Type",
-					"INTERRUPT_COUNT": "Interrupt Count",
-					"INTERRUPT_DETAIL": "Interrupt Detail",
-					"LAST_TWO_WEEKS": "Last 14 days",
-					"LATEST_DATE": "Latest",
-					"MONTH": "Month",
-					"ON_DEMAND": "On-Demand",
-					"SPOT": "Spot"
-				},
-				"MODAL_DELETE_SPOT_GROUP_CONTENT": "Are you sure you want to delete this Spot Group?",
-				"MODAL_DELETE_SPOT_GROUP_TITLE": "Delete Spot Group",
-				"MODAL_UPDATE_SPOT_GROUP_LABEL": "Name",
-				"MODAL_UPDATE_SPOT_GROUP_NAME_DESC": "Name must start with letter / maximum of 56 characters / only letters, numbers and hyphens.",
-				"MODAL_UPDATE_SPOT_GROUP_PLACEHOLDER": "Spot Group Name",
-				"MODAL_UPDATE_SPOT_GROUP_TITLE": "Change Spot Group",
-				"MONITORING": {
-					"CPU_USAGE_RAGE": "CPU Usage",
-					"DISK_USAGE_RATE": "Disk Usage",
-					"HAS_PROBLEM": "Problem",
-					"INSTANCE": "Instance",
-					"LOAD_BALANCER": "Load Balancer",
-					"NORMAL": "Healthy",
-					"TITLE": "Monitoring",
-					"TITLE_HELP_TEXT": "1 day Average Date"
-				},
-				"TAB_HISTORY": "History",
-				"TAB_MEMBER": "Member",
-				"TAB_SUMMARY": "Summary",
-				"TAB_TAG": "Tag"
-			},
-			"LIST": {
-				"ADD_SPOT_GROUP": "Add Spot Group",
-				"CARD": {
-					"ACTIVITY_TIME_RANGE": "Activity graph time range:",
-					"COST_TIME_RANGE": "Month to yesterday",
-					"CPU_UTILIZATION": "CPU Usage per day",
-					"CREATED_AT": "Create",
-					"DISK_USAGE": "Disk Usage per day",
-					"HEALTHY": "Healthy",
-					"INSTANCE": "Instance",
-					"INSTANCE_STATE": "Instance State",
-					"IOPS_DESC": "(Read+Write)",
-					"LAST_1_DAY": "Last 1 day",
-					"LAST_7_DAYS": "Last 7 days",
-					"LOAD_BALANCER": "Load Balancer",
-					"NUMBER_UNIT": "Count",
-					"REGION": "Region",
-					"SAVING_COST": "Savings",
-					"SERVICE_TYPE": "Service Type",
-					"SPOT_INTERRUPT": "Spot Interrupt",
-					"UNHEALTHY": "Unhealthy"
-				},
-				"COST_INSTANCE_DATE_1": "Period(cost, instance):",
-				"COST_INSTANCE_DATE_2": "This month",
-				"NO_DATA": "Create Spot Group to use spot automation system.",
-				"SHOW_FAVORITES": "Show favorites"
-			},
-			"MAIN": {
-				"DASHBOARD": "Dashboard",
-				"FAVORITES": "Favorites",
-				"SPOT_GROUP": "Spot Group"
 			}
 		}
 	},
@@ -1508,6 +1220,21 @@
 			"PLACEHOLDER": "Select Project",
 			"RELOAD_PROJECT": "Reload"
 		},
+		"SCHEDULE_SETTING": {
+			"CUSTOM": "Custom",
+			"EVERYDAY": "Everyday",
+			"FRI": "Fri",
+			"INFO": "You will only receive notifications in the schedule you choose.",
+			"MON": "Mon",
+			"SAT": "Sat",
+			"SCHEDULE_SETTING": "Schedule Setting",
+			"SUN": "Sun",
+			"THU": "Thu",
+			"TO": "to",
+			"TUE": "Tue",
+			"WED": "Wed",
+			"WEEKDAYS": "Weekdays"
+		},
 		"SESSION_MODAL": {
 			"SESSION_EXPIRED": "Your session has expired.",
 			"SIGNIN": "Sign In"
@@ -2399,15 +2126,9 @@
 			"VALIDATION_DASHBOARD_NAME_UNIQUE": "A dashboard with this name already exists."
 		},
 		"FULL_SCREEN_VIEW": {
-			"APPLY_NON_INHERITED_OPTION_HELP_TEXT": "This widget will be saved with non-inherited options which won't be affected by dashboard's filters.",
 			"BACK_TO_DASHBOARD": "Back to dashboard",
-			"CANCEL": "Cancel",
-			"EDIT_OPTION": "Edit Option",
-			"EDIT_WIDGET_OPTION": "Edit Widget Option",
 			"FULL_SCREEN_VIEW": "Full Screen View",
-			"NON_INHERITED_OPTIONS_INCLUDED": "Non-inherited Options Included",
-			"NON_INHERIT_OPTION_APPLIED": "Non-inherited option applied",
-			"SAVE": "Save"
+			"NON_INHERIT_OPTION_APPLIED": "Non-inherited option applied"
 		},
 		"LNB": {
 			"DEPRECATED": "Deprecated",
@@ -3225,19 +2946,14 @@
 				"CREATE_USER_GROUP": {
 					"CANCEL": "Cancel",
 					"CONFIRM": "Confirm",
-					"CUSTOM": "Custom",
 					"DESCRIPTION": "Description",
-					"EVERYDAY": "Every Day",
 					"GROUP_NAME": "Group Name",
-					"INFO": "You will only receive notifications in the schedule you choose.",
 					"NOTIFICATION_CHANNEL": "Notification Channel",
 					"PROTOCOL": "Protocol",
-					"SCHEDULE_SETTING": "Schedule Setting",
 					"TITLE": "Create User Group",
 					"TOKEN": "Token",
 					"UPDATE": "Update",
-					"UPDATE_TITLE": "Update User Group",
-					"WEEKDAYS": "Weekdays"
+					"UPDATE_TITLE": "Update User Group"
 				}
 			},
 			"TAB": {
@@ -4299,9 +4015,6 @@
 			}
 		}
 	},
-	"MANAGE_PROJECT_GROUP_MEMBER": "Manage Project Group Member",
-	"MEMBER": "Member",
-	"MEMBER_TITLE": "Member",
 	"MENU": {
 		"ADDITIONAL_SETTINGS": "Additional Settings",
 		"ADMINISTRATION": "Administration",
@@ -4355,9 +4068,6 @@
 		"PROVIDER": "Provider",
 		"WORKSPACE_HOME": "Home"
 	},
-	"MODAL_DELETE_MEMBER_CONTENT": "Are you sure remove following member from project? ",
-	"MODAL_DELETE_MEMBER_TITLE": "Delete Member",
-	"MODAL_UPDATE_MEMBER_TITLE": "Update Member Information",
 	"MONITORING": {
 		"ALERT": {
 			"ALERT_LIST": {
@@ -4694,7 +4404,6 @@
 		},
 		"SPACEONE_USER": "SpaceONE User "
 	},
-	"No Data": "",
 	"PAGE_SCHEMA": {
 		"ACCOUNT": "Account ID",
 		"BASE_INFO": "Base Information",
@@ -5251,9 +4960,5 @@
 			"SHOW_ALL_TOOLTIP": "Show all projects of sub project groups",
 			"STORAGE": "Storage"
 		}
-	},
-	"SHARE_TO_ALL_WORKSPACES": "Share to All Workspaces",
-	"SHARE_TO_ALL_WORKSPACES (2)": "Share to All Workspaces",
-	"SPACEONE_USER_DESC": "Forward to the project members' personal notification channel",
-	"TAB_MEMBER": "Member"
+	}
 }

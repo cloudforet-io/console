@@ -299,7 +299,7 @@ const init = async () => {
         gnbStore.fetchMetricExample(),
         gnbStore.fetchCostQuerySet(),
         dashboardStore.load(),
-        // TODO: If GNBDashboardMenu is deprecated, you need to add a request to receive a dashboard list here.
+        // HACK: If GNBDashboardMenu is deprecated, you need to add a request to receive a dashboard list here.
     ]);
     state.loading = false;
 };

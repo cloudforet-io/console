@@ -55,7 +55,6 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
             values: this.stat(options.key as string, options.presetValues),
         };
 
-        // TODO: keys method binding
         return propertyObject;
     }
 

@@ -15,7 +15,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const state = reactive({
-    notifyLevelList: [ // TODO: Remove this dummy data
+    notifyLevelList: [ // HACK: Remove this dummy data
         { threshold: { upDown: 'increase', value: 5 }, notifyLevel: NOTIFY_LEVEL.INFO },
         { threshold: { upDown: 'increase', value: 10 }, notifyLevel: NOTIFY_LEVEL.MINOR },
         { threshold: { upDown: 'decrease', value: 5 }, notifyLevel: NOTIFY_LEVEL.MODERATE },

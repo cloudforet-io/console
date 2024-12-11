@@ -88,7 +88,7 @@ const handleNavigation = (direction: 'prev' | 'next') => {
 };
 const handlePrevNavigation = () => {
     if (storeState.currentStep === 1) {
-        router.push({ name: ALERT_MANAGER_ROUTE_V2.SERVICE._NAME });
+        router.push(getProperRouteLocation({ name: ALERT_MANAGER_ROUTE_V2.SERVICE._NAME }));
         return;
     }
     if (storeState.currentStep === 2) {
@@ -115,6 +115,11 @@ const handleNextNavigation = () => {
 };
 
 const handleActionButton = () => {
+    if (storeState.currentStep === 1) {
+        emit('create');
+        return;
+    }
+
     if (state.actionButtonInfo.hasIcon) {
         handleNavigation('next');
     } else if (storeState.currentSubStep === 1) {

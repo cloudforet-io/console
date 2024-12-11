@@ -14,6 +14,7 @@ import type {
 } from '@/store/reference/type';
 import { useUserStore } from '@/store/user/user-store';
 
+import config from '@/lib/config';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
@@ -58,7 +59,10 @@ export const useCollectorReferenceStore = defineStore('reference-collector', () 
 
         const referenceMap: CollectorReferenceMap = {};
         try {
-            const response = await SpaceConnector.clientV2.inventory.collector.list<CollectorListParameters, ListResponse<CollectorModel>>({
+            const isResourceManagerVersionV2 = config.get('RESOURCE_MANAGER_VERSION') === 'v2';
+            const collectorFetcher = isResourceManagerVersionV2 ? SpaceConnector.clientV2.inventoryV2.collector.list : SpaceConnector.clientV2.inventory.collector.list;
+
+            const response = await collectorFetcher<CollectorListParameters, ListResponse<CollectorModel>>({
                 query: {
                     only: ['collector_id', 'name', 'tags'],
                 },

@@ -1,5 +1,6 @@
 <template>
-    <component :is="tag" v-tooltip="tooltipOptions"
+    <component :is="tag"
+               v-tooltip="tooltipOptions"
                v-on="$listeners"
     >
         <slot />
@@ -33,7 +34,7 @@ export default {
             default: () => ({}),
             validator() {
                 /**
-                 * TODO: ADD VALIDATOR FUNCTION TO TOOLTIPMAP AND USE THAT HERE.
+                 * HACK: ADD VALIDATOR FUNCTION TO TOOLTIPMAP AND USE THAT HERE.
                  */
                 return true;
             },

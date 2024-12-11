@@ -28,28 +28,6 @@ export interface ReferenceData extends Omit<FavoriteItem, 'itemType'> {
 
 export const convertMenuConfigToReferenceData = (config: ConfigData[]|null, menuList: DisplayMenu[]): ReferenceData[] => {
     const convertMenuList = cloneDeep(menuList);
-    // const costIdx = convertMenuList.findIndex((i) => i.id === MENU_ID.COST_EXPLORER);
-
-    // TODO: will be applied after the cost explorer menu is updated
-    // if (convertMenuList[costIdx].subMenuList?.length === 4) {
-    //     convertMenuList[costIdx].subMenuList?.push(
-    //         {
-    //             id: MENU_ID.ANOMALY_DETECTION_CONFIGURATION,
-    //             to: { name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.CONFIGURATION._NAME },
-    //             label: i18n.t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.TITLE'),
-    //         },
-    //         {
-    //             id: MENU_ID.ANOMALY_DETECTION_POLICY,
-    //             to: { name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.POLICY._NAME },
-    //             label: i18n.t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.POLICY.TITLE'),
-    //         },
-    //         {
-    //             id: MENU_ID.ANOMALY_DETECTION_HISTORY,
-    //             to: { name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.HISTORY._NAME },
-    //             label: i18n.t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.HISTORY.TITLE'),
-    //         },
-    //     );
-    // }
 
     const allMenuList = getAllSuggestionMenuList(convertMenuList);
     const results: ReferenceData[] = [];

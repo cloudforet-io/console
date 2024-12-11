@@ -4,21 +4,10 @@ import { defineStore } from 'pinia';
 
 import type { PluginModel } from '@/schema/repository/plugin/model';
 
-type ServiceMemberType = {
-    USER?: string[],
-    USER_GROUP?: string[],
-};
-interface ServiceStep1FormState {
-    name: string;
-    key: string;
-    member: ServiceMemberType;
-    description: string;
-}
-
 interface ServiceFormStoreState {
-    step1Form: ServiceStep1FormState;
     currentStep: number;
     currentSubStep: number;
+    createdServiceId: string;
     selectedWebhookType: PluginModel;
     webhookName: string;
     // TODO: add type
@@ -29,13 +18,7 @@ export const useServiceCreateFormStore = defineStore('service-create-form', () =
     const state = reactive<ServiceFormStoreState>({
         currentStep: 1,
         currentSubStep: 1,
-        // service
-        step1Form: {
-            name: '',
-            key: '',
-            member: {},
-            description: '',
-        },
+        createdServiceId: '',
         // webhook
         selectedWebhookType: {} as PluginModel,
         webhookName: '',
@@ -47,37 +30,24 @@ export const useServiceCreateFormStore = defineStore('service-create-form', () =
         initState() {
             state.currentStep = 1;
             state.currentSubStep = 1;
-            state.step1Form = {
-                name: '',
-                key: '',
-                member: {},
-                description: '',
-            };
+            state.createdServiceId = '';
             state.selectedWebhookType = {} as PluginModel;
             state.webhookName = '';
             state.selectedProtocol = {};
-        },
-        initStep1() {
-            state.step1Form = {
-                name: '',
-                key: '',
-                member: {},
-                description: '',
-            };
         },
         initStep2() {
             state.currentSubStep = 1;
             state.selectedWebhookType = {} as PluginModel;
             state.webhookName = '';
         },
+        setCreatedServiceId(id: string) {
+            state.createdServiceId = id;
+        },
         setCurrentStep(step: number) {
             state.currentStep = step;
         },
         setCurrentSubStep(step: number) {
             state.currentSubStep = step;
-        },
-        setFormStep1(form: ServiceStep1FormState) {
-            state.step1Form = form;
         },
         setSelectedWebhookType(webhookType: PluginModel) {
             state.selectedWebhookType = webhookType;

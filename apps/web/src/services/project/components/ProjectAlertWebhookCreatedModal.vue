@@ -86,7 +86,7 @@ const handleCopyWebhookUrl = () => {
                   class="project-alert-webhook-created-modal"
                   @update:visible="handleCloseSucceedModal"
     >
-        <!-- TODO: will be updated field name -->
+        <!-- HACK: will be updated field name -->
         <!--        <template #header-desc>-->
         <!--            <i18n path="PROJECT.DETAIL.ALERT.WEB_HOOK.SUCCEED_MODAL.DESC">-->
         <!--                <template #guide>-->
