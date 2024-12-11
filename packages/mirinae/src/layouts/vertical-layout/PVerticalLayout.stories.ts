@@ -32,7 +32,7 @@ const Template: Story = {
             PVerticalLayout,
         },
         template: `
-            <div style="width: 100vw; height: 10rem; border: 1px solid gray;">
+            <div style="width: 100vw; height: 20rem; border: 1px solid gray;">
                 <p-vertical-layout>
                     <template #sidebar>
                         Left Layout
