@@ -32,7 +32,7 @@ const state = reactive({
 });
 
 /* Component */
-const handleConfirm = async () => {
+const handleConfirm = () => {
     switch (storeState.modalType) {
     case USER_GROUP_MODAL_TYPE.CREATE:
         state.loading = true;
