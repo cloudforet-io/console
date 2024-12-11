@@ -63,7 +63,6 @@ const handleUpdateCreatedBy = (userIds: string[]) => {
 /* assignee */
 const selectedAssignee = ref<string[]>([]);
 const handleUpdateAssignee = (userIds: string[]) => {
-    console.debug('handleUpdateSelectedAssignee', userIds);
     selectedAssignee.value = userIds;
 };
 

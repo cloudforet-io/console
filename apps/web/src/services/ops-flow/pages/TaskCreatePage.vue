@@ -89,11 +89,7 @@ const handleConfirm = async () => {
 onBeforeMount(() => {
     taskContentFormStore.setCurrentCategoryId(categoryId.value);
     taskContentFormStore.setCurrentTaskType(taskTypeId.value);
-    if (taskTypeId.value) {
-        taskContentFormStore.setMode('create-minimal');
-    } else {
-        taskContentFormStore.setMode('create');
-    }
+    taskContentFormStore.setMode('create');
 });
 onUnmounted(() => {
     taskContentFormStore.$reset();

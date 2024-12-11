@@ -62,7 +62,6 @@ export const useTaskManagementTemplateStore = defineStore('task-management-templ
         const lang = i18n.locale as SupportLanguage;
         const _type = type ?? state.templateId;
         const msg = messages[lang][_type][code] || messages.en[_type][code];
-        console.debug('translate', lang, _type, code, 'msg', msg, typeof msg);
         return msg;
     });
     const templates = computed<TaskManagementTemplate>(() => {

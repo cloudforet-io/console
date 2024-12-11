@@ -75,7 +75,6 @@ const {
     setInitialStatus,
 } = useTaskStatusField({
     categoryId: computed(() => taskContentFormGetters.currentCategory?.category_id),
-    isRequired: true,
 });
 const handleUpdateSelectedStatus = (items) => {
     taskContentFormStore.setStatusId(items[0].name);
@@ -83,11 +82,7 @@ const handleUpdateSelectedStatus = (items) => {
 };
 
 /* assignee */
-const assigneeValidator = useFieldValidator('', (value) => {
-    if (!taskContentFormGetters.currentCategory || !taskContentFormState.currentTaskType) return true;
-    if (!value) return 'Assignee is required';
-    return true;
-});
+const assigneeValidator = useFieldValidator('');
 const assignee = assigneeValidator.value;
 const handleUpdateSelectedAssignee = (userId?: string) => {
     taskContentFormStore.setAssignee(userId);
@@ -155,17 +150,41 @@ watch([() => taskContentFormState.originTask, () => taskContentFormGetters.curre
 
     // setting assignee is not required because it uses the origin task's assignee directly
 }, { immediate: true });
+
+/* initiation for 'create' mode with initial category, task type */
+const stopInitCreateWatch = watch([() => taskContentFormState.currentCategoryId, () => taskContentFormState.currentTaskType], ([categoryId, taskType]) => {
+    if (taskContentFormState.mode === 'create' && categoryId) {
+        setInitialCategory(categoryId);
+        // init selected status
+        const category = taskContentFormGetters.currentCategory;
+        if (category) {
+            const defaultStatus = category.status_options.TODO.find((status) => status.is_default);
+            setInitialStatus(defaultStatus);
+            taskContentFormStore.setStatusId(defaultStatus?.status_id);
+        } else {
+            ErrorHandler.handleError(new Error('Failed to get category'));
+        }
+        // init task type
+        if (taskType) setInitialTaskType(taskType);
+
+        // stop watching
+        stopInitCreateWatch();
+        return;
+    }
+
+    if (taskContentFormState.mode !== 'create') stopInitCreateWatch();
+}, { immediate: true });
 </script>
 
 <template>
-    <component :is="taskContentFormState.mode === 'create-minimal' ? 'div' : PPaneLayout"
+    <component :is="taskContentFormState.mode === 'create' ? 'div' : PPaneLayout"
                class="flex flex-wrap gap-4"
-               :class="taskContentFormState.mode === 'create-minimal' ? '' : 'py-6 px-4'"
+               :class="taskContentFormState.mode === 'create' ? '' : 'py-6 px-4'"
     >
         <div class="base-form-top-wrapper">
             <div class="base-form-field-wrapper">
                 <p-field-group label="Category"
-                               :style-type="taskContentFormState.mode === 'create-minimal' ? 'primary' : 'secondary'"
+                               :style-type="taskContentFormState.mode === 'create' ? 'primary' : 'secondary'"
                                required
                                :invalid="invalidState.category"
                                :invalid-text="invalidTexts.category"
@@ -181,7 +200,7 @@ watch([() => taskContentFormState.originTask, () => taskContentFormGetters.curre
             </div>
             <div class="base-form-field-wrapper">
                 <p-field-group label="Type"
-                               :style-type="taskContentFormState.mode === 'create-minimal' ? 'primary' : 'secondary'"
+                               :style-type="taskContentFormState.mode === 'create' ? 'primary' : 'secondary'"
                                required
                                :invalid="invalidState.taskType"
                                :invalid-text="invalidTexts.taskType"
@@ -196,7 +215,7 @@ watch([() => taskContentFormState.originTask, () => taskContentFormGetters.curre
                 </p-field-group>
             </div>
         </div>
-        <div v-if="taskContentFormState.mode !== 'create-minimal'"
+        <div v-if="taskContentFormState.mode !== 'create'"
              class="base-form-top-wrapper"
         >
             <div class="base-form-field-wrapper">

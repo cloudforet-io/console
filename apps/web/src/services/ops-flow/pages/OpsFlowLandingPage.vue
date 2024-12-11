@@ -71,7 +71,7 @@ const goToTaskCreatePage = () => {
 
 onMounted(async () => {
     loading.value = true;
-    const allCategories = await taskCategoryStore.list();
+    const allCategories = await taskCategoryStore.list(true);
     if (!allCategories || !allCategories.length) {
         loading.value = false;
         return;
@@ -87,7 +87,7 @@ onMounted(async () => {
 <template>
     <div class="ops-flow-landing-page">
         <div class="mb-6 text-center text-display-md font-bold">
-            Support Center
+            Service Desk
         </div>
         <p-data-loader :loading="loading"
                        :data="availableCategories"
@@ -100,7 +100,7 @@ onMounted(async () => {
                     <router-link custom
                                  :to="getProperRouteLocation({
                                      name: OPS_FLOW_ROUTE.BOARD._NAME,
-                                     query: {categoryId: category.value }
+                                     query: {categoryId: category }
                                  })"
                     >
                         <template #default="{navigate}">

@@ -253,13 +253,13 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
     [MENU_ID.OPS_FLOW]: {
         menuId: MENU_ID.OPS_FLOW,
         routeName: OPS_FLOW_ROUTE._NAME,
-        translationId: 'Ops Flow', // TODO: change translation id
+        translationId: 'OpsFlow', // TODO: change translation id
         icon: 'ic_gnb_bell', // TODO: change icon
     },
     [MENU_ID.OPS_FLOW_LANDING]: {
         menuId: MENU_ID.OPS_FLOW_LANDING,
         routeName: OPS_FLOW_ROUTE.LANDING._NAME,
-        translationId: 'Support Center', // TODO: change translation id
+        translationId: 'Service Desk', // TODO: change translation id
         icon: 'ic_support-center',
     },
     [MENU_ID.BOARD]: {

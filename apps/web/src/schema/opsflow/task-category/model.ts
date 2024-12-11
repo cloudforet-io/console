@@ -9,8 +9,10 @@ export interface TaskCategoryModel {
     status_options: TaskStatusOptions;
     fields:TaskField[];
     tags: Tags;
+    state: string;
     package_id: string;
     domain_id: string;
     created_at: string;
     updated_at: string;
+    deleted_at: string;
 }

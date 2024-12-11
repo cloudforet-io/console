@@ -217,6 +217,8 @@ const fields = computed<DataTableField[] >(() => [
     },
 ]);
 const { getProperRouteLocation } = useProperRouteLocation();
+
+const getAttachments = (item: TaskModel) => item.files?.map((d) => ({ fileId: d.file_id, downloadUrl: d.download_url }));
 </script>
 
 <template>
@@ -254,7 +256,7 @@ const { getProperRouteLocation } = useProperRouteLocation();
             <template #col-description-format="{item}">
                 <p-collapsible-panel :line-clamp="1">
                     <text-editor-viewer :contents="item.description"
-                                        :attachments="item.files.map(d => ({ fileId: d.file_id, downloadUrl: d.download_url}))"
+                                        :attachments="getAttachments(item)"
                     />
                 </p-collapsible-panel>
             </template>

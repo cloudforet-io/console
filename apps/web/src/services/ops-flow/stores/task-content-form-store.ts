@@ -38,7 +38,7 @@ interface UseTaskContentFormStoreState {
     dataValidationMap: Record<string, boolean>;
     files: FileModel[];
     // overall
-    mode: 'create-minimal'|'create'|'view'; // create-minimal: create task without status and assignee
+    mode: 'create'|'view';
     hasUnsavedChanges: boolean;
     createTaskLoading: boolean;
 }
@@ -173,7 +173,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
             state.dataValidationMap = {};
             state.files = [];
         },
-        setMode(mode: 'create-minimal'|'create'|'view') {
+        setMode(mode: 'create'|'view') {
             state.mode = mode;
         },
         async createTask() {

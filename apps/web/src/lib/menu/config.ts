@@ -43,7 +43,6 @@ export const MENU_ID = Object.freeze({
     METRIC_EXPLORER: 'metric_explorer',
     OPS_FLOW: 'ops_flow',
     OPS_FLOW_LANDING: 'ops_flow_landing',
-    WORKFLOW: 'workflow',
     BOARD: 'board',
     TASK_MANAGEMENT: 'task_management',
 } as const);

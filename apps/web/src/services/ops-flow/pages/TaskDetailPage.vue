@@ -203,9 +203,7 @@ defineExpose({ setPathFrom, checkTaskExist });
                         <task-progress-tab />
                     </template>
                 </p-tab>
-                <div v-if="taskContentFormState.mode === 'edit'"
-                     class="py-3 flex flex-wrap gap-1 justify-end"
-                >
+                <div class="py-3 flex flex-wrap gap-1 justify-end">
                     <p-button style-type="transparent"
                               @click="goBack()"
                     >
