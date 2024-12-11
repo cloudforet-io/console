@@ -21,13 +21,13 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
+import { NOTIFICATION_PROTOCOL_STATE } from '@/schema/alert-manager/notification-protocol/constants';
 import { i18n as _i18n } from '@/translations';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { webhookStateFormatter } from '@/services/alert-manager-v2/composables/refined-table-data';
-import { NOTIFICATION_STATE } from '@/services/alert-manager-v2/constants/alert-manager-constant';
 import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
 
 interface Props {
@@ -61,7 +61,7 @@ const querySearchHandlers = reactive({
     // TODO: change API
     valueHandlerMap: {
         name: makeDistinctValueHandler('monitoring.Webhook', 'name'),
-        state: makeEnumValueHandler(NOTIFICATION_STATE),
+        state: makeEnumValueHandler(NOTIFICATION_PROTOCOL_STATE),
     },
 });
 const tableState = reactive({
@@ -70,13 +70,13 @@ const tableState = reactive({
             type: 'item',
             name: 'enable',
             label: _i18n.t('ALERT_MANAGER.ENABLE'),
-            disabled: state.proxySelectedItem[0]?.state === NOTIFICATION_STATE.ENABLED,
+            disabled: state.proxySelectedItem[0]?.state === NOTIFICATION_PROTOCOL_STATE.ENABLED,
         },
         {
             type: 'item',
             name: 'disable',
             label: _i18n.t('ALERT_MANAGER.DISABLED'),
-            disabled: state.proxySelectedItem[0]?.state === NOTIFICATION_STATE.DISABLED,
+            disabled: state.proxySelectedItem[0]?.state === NOTIFICATION_PROTOCOL_STATE.DISABLED,
         },
         { type: 'divider' },
         {
