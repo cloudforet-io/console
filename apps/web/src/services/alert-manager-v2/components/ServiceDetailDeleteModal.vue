@@ -31,11 +31,11 @@ const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
 });
 
-const handleConfirm = () => {
+const handleConfirm = async () => {
     state.loading = true;
     try {
-        serviceDetailPageStore.deleteServiceDetailData();
-        router.push(getProperRouteLocation({ name: ALERT_MANAGER_ROUTE_V2.SERVICE._NAME }));
+        await serviceDetailPageStore.deleteServiceDetailData();
+        await router.push(getProperRouteLocation({ name: ALERT_MANAGER_ROUTE_V2.SERVICE._NAME }));
     } finally {
         state.loading = false;
         handleClose();
