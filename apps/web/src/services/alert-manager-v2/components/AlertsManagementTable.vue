@@ -12,6 +12,8 @@ import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/ta
 import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
+import { ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
+
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
@@ -20,7 +22,6 @@ import { red } from '@/styles/colors';
 
 import { useAlertStateI18n } from '@/services/alert-manager-v2/composables/alert-state-i18n';
 import { useAlertUrgencyI18n } from '@/services/alert-manager-v2/composables/alert-urgency-i18n';
-import { ALERT_URGENCY_FILTER } from '@/services/alert-manager-v2/constants/alert-manager-constant';
 import { alertStateBadgeStyleTypeFormatter } from '@/services/alert-manager-v2/helpers/alert-badge-helper';
 import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
 
@@ -54,7 +55,7 @@ const tableState = reactive({
     valueHandlerMap: computed<ValueHandlerMap>(() => ({
         alert_id: makeDistinctValueHandler('monitoring.Alert', 'alert_id'),
         title: makeDistinctValueHandler('monitoring.Alert', 'title'),
-        state: makeEnumValueHandler(ALERT_URGENCY_FILTER),
+        state: makeEnumValueHandler(ALERT_URGENCY),
         service: makeDistinctValueHandler('monitoring.Alert', 'service_id'),
         category: makeDistinctValueHandler('monitoring.Alert', 'category'),
         'resource.resource_type': makeDistinctValueHandler('monitoring.Alert', 'resource.resource_type'),
@@ -140,17 +141,17 @@ const handleExportToExcel = () => {
             </template>
             <template #col-state-format="{ value }">
                 <p-badge :style-type="alertStateBadgeStyleTypeFormatter(value)"
-                         :badge-type="value === ALERT_URGENCY_FILTER.ERROR ? 'solid-outline' : 'subtle'"
+                         badge-type="'subtle'"
                 >
                     {{ state.alertStateLabels[value] }}
                 </p-badge>
             </template>
             <template #col-urgency-format="{ value }">
-                <p-i :name="value === ALERT_URGENCY_FILTER.HIGH ? 'ic_error-filled' : 'ic_warning-filled'"
+                <p-i :name="value === ALERT_URGENCY.HIGH ? 'ic_error-filled' : 'ic_warning-filled'"
                      width="1em"
                      height="1em"
                      class="mr-1"
-                     :color="value === ALERT_URGENCY_FILTER.HIGH ? red[400] : red[200]"
+                     :color="value === ALERT_URGENCY.HIGH ? red[400] : red[200]"
                 />
                 <span>{{ state.urgencyLabels[value] }}</span>
             </template>

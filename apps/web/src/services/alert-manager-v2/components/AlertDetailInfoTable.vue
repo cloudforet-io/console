@@ -1,19 +1,20 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
+
 import {
     PBadge, PDefinitionTable, PPaneLayout,
 } from '@cloudforet/mirinae';
 import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
+import { ALERT_SEVERITY } from '@/schema/alert-manager/alert/constants';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
 
-
 import AlertDetailInfoTableDescription from '@/services/alert-manager-v2/components/AlertDetailInfoTableDescription.vue';
-import { ALERT_SEVERITY_COLORS, ALERT_SEVERITY_LABELS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
+import { ALERT_SEVERITY_COLORS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
 
 const userStore = useUserStore();
 
@@ -73,7 +74,7 @@ const state = reactive({
                          :text-color="ALERT_SEVERITY_COLORS[value]"
                          :outline-color="ALERT_SEVERITY_COLORS[value]"
                 >
-                    {{ ALERT_SEVERITY_LABELS[value] || value }}
+                    {{ ALERT_SEVERITY[value] || value }}
                 </p-badge>
             </template>
             <template #data-resources="{ value }">

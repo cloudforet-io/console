@@ -21,6 +21,7 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
+import { WEBHOOK_STATE } from '@/schema/alert-manager/webhook/constants';
 import { i18n as _i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -30,7 +31,6 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { webhookStateFormatter } from '@/services/alert-manager-v2/composables/refined-table-data';
-import { WEBHOOK_STATE } from '@/services/alert-manager-v2/constants/alert-manager-constant';
 import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
 
 interface Props {
