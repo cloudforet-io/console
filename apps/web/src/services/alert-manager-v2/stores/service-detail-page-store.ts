@@ -44,9 +44,10 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
                 recovery_mode: state.serviceInfo.options?.recovery_mode || RECOVERY_MODE.MANUAL,
             },
             alerts: {
-                TRIGGERRED: state.serviceInfo.alerts?.TRIGGERRED || { high: 0, low: 0 },
-                ACKNOWLEDGED: state.serviceInfo.alerts?.ACKNOWLEDGED || { high: 0, low: 0 },
-                TOTAL: state.serviceInfo.alerts?.TOTAL || { high: 0, low: 0 },
+                TRIGGERED: state.serviceInfo.alerts?.TRIGGERED,
+                ACKNOWLEDGED: state.serviceInfo.alerts?.ACKNOWLEDGED,
+                RESOLVED: state.serviceInfo.alerts?.RESOLVED,
+                TOTAL: state.serviceInfo.alerts?.TOTAL,
             },
         })),
     });

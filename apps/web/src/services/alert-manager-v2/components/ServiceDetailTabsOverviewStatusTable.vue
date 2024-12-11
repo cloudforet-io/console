@@ -1,52 +1,69 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PI, PPaneLayout, PTooltip, PFieldTitle, PSelectStatus, PIconButton, PDataTable, PBadge,
 } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 import type { ValueItem } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
-import type { Tags } from '@/schema/_common/model';
-import { ALERT_STATE, ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { AlertListParameters } from '@/schema/alert-manager/alert/api-verbs/list';
+import { ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
+import type { AlertModel } from '@/schema/alert-manager/alert/model';
 import type { AlertStateType, AlertUrgencyType } from '@/schema/alert-manager/alert/type';
+import { SERVICE_ALERTS_TYPE } from '@/schema/alert-manager/service/constants';
 import { i18n } from '@/translations';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import { red } from '@/styles/colors';
+
+import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
+import type { Service } from '@/services/alert-manager-v2/types/alert-manager-type';
+
 
 type AlertStatusInfoType = {
     status: TranslateResult,
     total: number,
     high?: number,
     low?: number,
-    name: AlertStateType,
+    name: AlertStateType
 };
+
+const serviceDetailPageStore = useServiceDetailPageStore();
+const serviceDetailPageGetters = serviceDetailPageStore.getters;
+
+const storeState = reactive({
+    serviceInfo: computed<Service>(() => serviceDetailPageGetters.serviceInfo),
+});
 const state = reactive({
     alertStatusInfo: computed<AlertStatusInfoType[]>(() => [
         {
             status: i18n.t('ALERT_MANAGER.ALERTS.TRIGGERED'),
-            total: 300,
-            high: 40,
-            low: 40,
-            name: ALERT_STATE.TRIGGERED,
+            total: (storeState.serviceInfo.alerts.TRIGGERED?.high || 0) + (storeState.serviceInfo.alerts.TRIGGERED?.low || 0),
+            high: storeState.serviceInfo.alerts.TRIGGERED?.high || 0,
+            low: storeState.serviceInfo.alerts.TRIGGERED?.low || 0,
+            name: SERVICE_ALERTS_TYPE.TRIGGERED,
         },
         {
             status: i18n.t('ALERT_MANAGER.ALERTS.ACKNOWLEDGED'),
-            total: 200,
-            high: 10,
-            low: 60,
-            name: ALERT_STATE.ACKNOWLEDGED,
+            total: (storeState.serviceInfo.alerts.ACKNOWLEDGED?.high || 0) + (storeState.serviceInfo.alerts.ACKNOWLEDGED?.low || 0),
+            high: storeState.serviceInfo.alerts.ACKNOWLEDGED?.high || 0,
+            low: storeState.serviceInfo.alerts.ACKNOWLEDGED?.low || 0,
+            name: SERVICE_ALERTS_TYPE.ACKNOWLEDGED,
         },
         {
             status: i18n.t('ALERT_MANAGER.ALERTS.RESOLVED'),
-            total: 800,
-            high: 300,
-            low: 400,
-            name: ALERT_STATE.RESOLVED,
+            total: (storeState.serviceInfo.alerts.RESOLVED?.high || 0) + (storeState.serviceInfo.alerts.RESOLVED?.low || 0),
+            high: storeState.serviceInfo.alerts.RESOLVED?.high || 0,
+            low: storeState.serviceInfo.alerts.RESOLVED?.low || 0,
+            name: SERVICE_ALERTS_TYPE.RESOLVED,
         },
     ]),
-    selectedStatus: ALERT_STATE.TRIGGERED as AlertStateType,
+    selectedStatus: SERVICE_ALERTS_TYPE.TRIGGERED as AlertStateType,
     urgencyField: computed<ValueItem[]>(() => ([
         { label: i18n.t('ALERT_MANAGER.ALERTS.ALL') as string, name: 'ALL' },
         { label: i18n.t('ALERT_MANAGER.ALERTS.HIGH') as string, name: ALERT_URGENCY.HIGH },
@@ -55,13 +72,8 @@ const state = reactive({
     selectedUrgency: 'ALL',
 });
 const tableState = reactive({
-    // TODO: temp data
-    items: [{
-        name: 'Node Ready False Count alert',
-        status: 'TRIGGERED',
-        urgency: 'High',
-        created_at: '2024-12-03 01:07:57',
-    }],
+    loading: false,
+    alertsList: [] as AlertModel[],
     fields: computed<DataTableFieldType[]>(() => [
         {
             name: 'name', label: i18n.t('ALERT_MANAGER.ALERTS.LABEL_TITLE') as string, width: '50%', sortable: false,
@@ -76,9 +88,6 @@ const tableState = reactive({
             name: 'created_at', label: i18n.t('ALERT_MANAGER.ALERTS.CREATED') as string, width: '20%', sortable: false,
         },
     ]),
-    loading: false,
-    tags: {} as Tags,
-    tagEditPageVisible: false,
 });
 
 const handleClickStatus = (name: AlertStateType) => {
@@ -87,9 +96,26 @@ const handleClickStatus = (name: AlertStateType) => {
 const handleSelectUrgency = (value: AlertUrgencyType) => {
     state.selectedUrgency = value;
 };
-const handleClickRefresh = () => {
-    console.log('TODO: handleClickRefresh');
+
+const fetchAlertsList = async () => {
+    tableState.loading = true;
+    try {
+        const { results } = await SpaceConnector.clientV2.alertManager.alert.list<AlertListParameters, ListResponse<AlertModel>>({
+            service_id: storeState.serviceInfo.service_id,
+            state: state.selectedStatus,
+        });
+        tableState.alertsList = results || [];
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
+        tableState.alertsList = [];
+    } finally {
+        tableState.loading = false;
+    }
 };
+
+watch(() => state.selectedStatus, () => {
+    fetchAlertsList();
+}, { immediate: true });
 </script>
 
 <template>
@@ -166,11 +192,12 @@ const handleClickRefresh = () => {
                     </p-select-status>
                     <p-icon-button class="ml-auto"
                                    name="ic_refresh"
-                                   @click="handleClickRefresh"
+                                   @click="fetchAlertsList"
                     />
                 </div>
                 <p-data-table :fields="tableState.fields"
-                              :items="tableState.items"
+                              :items="tableState.alertsList"
+                              :loading="tableState.loading"
                               striped
                               no-border
                               sort-by="created_at"
@@ -183,10 +210,10 @@ const handleClickRefresh = () => {
                     </template>
                     <template #col-urgency-format="{value}">
                         <div class="flex items-center gap-2">
-                            <p-i :name="value === ALERT_URGENCY_FILTER.HIGH ? 'ic_error-filled' : 'ic_warning-filled'"
+                            <p-i :name="value === ALERT_URGENCY.HIGH ? 'ic_error-filled' : 'ic_warning-filled'"
                                  width="1rem"
                                  height="1rem"
-                                 :color="value === ALERT_URGENCY_FILTER.HIGH ? red[400] : red[200]"
+                                 :color="value === ALERT_URGENCY.HIGH ? red[400] : red[200]"
                             />
                             <span class="text">{{ value }}</span>
                         </div>
