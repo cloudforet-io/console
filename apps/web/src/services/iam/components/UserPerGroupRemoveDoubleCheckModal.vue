@@ -23,9 +23,9 @@ const state = reactive({
 /* Component */
 const handleConfirm = () => {
     try {
-        const users: string[] = [];
-        userGroupPageState.users.selectedIndices.forEach((d) => {
-            users.push(userGroupPageState.users.list[d].user_id);
+        const users: (string | undefined)[] = [];
+        userGroupPageState.users.selectedIndices.forEach((d: number) => {
+            if (userGroupPageState.users.list) users.push(userGroupPageState.users.list[d]?.user_id);
         });
         fetchRemoveUser({
             user_group_id: userGroupPageGetters.selectedUserGroups[0].user_group_id,

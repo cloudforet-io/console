@@ -21,13 +21,18 @@ const userGroupPageState = userGroupPageStore.state;
 const userGroupPageGetters = userGroupPageStore.getters;
 
 const state = reactive({
-    userItems: computed<UserListItemType[]>(() => userGroupPageState.users.list.map((user) => ({
-        user_id: user.user_id,
-        name: user.name,
-        auth_type: user.auth_type,
-        last_accessed_at: user.last_accessed_at,
-        timezone: user.timezone,
-    }))),
+    userItems: computed<UserListItemType[]>(() => {
+        if (userGroupPageState.users.list) {
+            return userGroupPageState.users.list.map((user) => ({
+                user_id: user.user_id,
+                name: user.name,
+                auth_type: user.auth_type,
+                last_accessed_at: user.last_accessed_at,
+                timezone: user.timezone,
+            }));
+        }
+        return [];
+    }),
     userItemTotalCount: computed<number>(() => userGroupPageState.users.totalCount),
 });
 
@@ -77,8 +82,11 @@ watch(() => userGroupPageGetters.selectedUserGroups, async (nv) => {
         const usersIdList: string[] | undefined = nv[0].users;
         await userGroupPageStore.listUsers({});
 
-        if (userGroupPageState.users.list.length > 0 && usersIdList && usersIdList.length > 0) {
-            userGroupPageState.users.list = userGroupPageState.users.list.filter((user) => usersIdList.includes(user.user_id));
+        if (userGroupPageState.users.list && userGroupPageState.users.list.length > 0 && usersIdList && usersIdList.length > 0) {
+            userGroupPageState.users.list = userGroupPageState.users.list.filter((user) => {
+                if (user.user_id) return usersIdList.includes(user.user_id);
+                return false;
+            });
         } else if (typeof usersIdList !== 'object') {
             userGroupPageState.users.list = [];
         }
@@ -86,7 +94,7 @@ watch(() => userGroupPageGetters.selectedUserGroups, async (nv) => {
 }, { deep: true, immediate: true });
 
 watch(() => userGroupPageState.users, (nv) => {
-    nv.totalCount = nv.list.length;
+    if (nv.list && nv.list.length) nv.totalCount = nv.list.length;
 }, { deep: true, immediate: true });
 </script>
 
