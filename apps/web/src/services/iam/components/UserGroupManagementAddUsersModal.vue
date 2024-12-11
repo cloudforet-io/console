@@ -68,8 +68,6 @@ const handleConfirm = () => {
             });
             emit('confirm');
         }
-    } catch (e) {
-        console.error(e);
     } finally {
         state.loading = false;
         handleClose();
@@ -87,8 +85,7 @@ const handleSelectedUserList = () => {
 /* API */
 const fetchAddUsers = async (params: UserGroupAddUsersParameters) => {
     try {
-        const response = await SpaceConnector.clientV2.identity.userGroup.addUsers<UserGroupAddUsersParameters, UserGroupModel>(params);
-        console.log(response);
+        await SpaceConnector.clientV2.identity.userGroup.addUsers<UserGroupAddUsersParameters, UserGroupModel>(params);
     } catch (e) {
         ErrorHandler.handleError(e);
     }
