@@ -62,7 +62,7 @@ const state = reactive({
         const haveRequiredJoinOptions = haveSavedName && state.dataTableInfo.dataTables.length === 2 && !state.dataTableInfo.dataTables.includes(undefined) && joinState.joinType;
         const haveRequiredQueryOptions = haveSavedName && !!state.dataTableInfo.dataTableId && queryState.conditions.filter((cond) => !!cond.value.trim()).length > 0;
         const haveRequiredEvalOptions = haveSavedName && !!state.dataTableInfo.dataTableId && evalState.expressions.filter((expression) => !!expression.name && !!expression.expression).length > 0;
-        const haveRequiredAddLabels = haveSavedName && addLabelsState.labels.every((label) => !!label.name && !!label.value);
+        const haveRequiredAddLabels = haveSavedName && !!state.dataTableInfo.dataTableId && addLabelsState.labels.every((label) => !!label.name && !!label.value);
         if (state.operator === 'CONCAT') return !haveRequiredConcatOptions;
         if (state.operator === 'JOIN') return !haveRequiredJoinOptions;
         if (state.operator === 'QUERY') return !haveRequiredQueryOptions;
