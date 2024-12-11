@@ -10,6 +10,7 @@ import type { ToolboxTableOptions } from '@cloudforet/mirinae/types/data-display
 
 import type { TaskModel } from '@/schema/opsflow/task/model';
 
+import type { UserReferenceItem } from '@/store/reference/user-reference-store';
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -17,18 +18,23 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useTaskAssignStore } from '@/services/ops-flow/stores/task-assign-store';
+import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
 import { useTaskStore } from '@/services/ops-flow/stores/task-store';
 
 const userReferenceStore = useUserReferenceStore();
 const taskAssignStore = useTaskAssignStore();
 const taskStore = useTaskStore();
+const taskContentFormStore = useTaskContentFormStore();
 
 const fields: DataTableField[] = [
     { label: 'User ID', name: 'name' },
     { label: 'Name', name: 'label' },
 ];
 
-const allUserReferenceItems = computed<SelectDropdownMenuItem[]>(() => Object.values(userReferenceStore.getters.userItems.map((u) => ({ name: u.key, label: u.label || u.name }))));
+const allUserReferenceItems = computed<SelectDropdownMenuItem[]>(() => Object.values<UserReferenceItem>(userReferenceStore.getters.userItems).map((u) => ({
+    name: u.key,
+    label: u.label || u.name,
+})));
 const allUserItems = computed<SelectDropdownMenuItem[]>(() => {
     const assigneePool = taskAssignStore.state.currentAssigneePool;
     if (assigneePool && assigneePool.length > 0) {
@@ -70,6 +76,7 @@ const updateTaskAssignee = async (): Promise<TaskModel|undefined> => {
             task_id: taskAssignStore.state.taskId,
             assignee: refinedUserItems.value[selectIndex.value[0]].name,
         });
+        taskContentFormStore.setAssigneeToOriginTask(newTask.assignee);
         showSuccessMessage('Task assigned successfully', '');
         return newTask;
     } catch (e) {

@@ -9,19 +9,22 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
 import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
 
+import { useUserReferenceStore } from '@/store/reference/user-reference-store';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useFieldValidator, useFormValidator } from '@/common/composables/form-validator';
-import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
+import { useFormValidator } from '@/common/composables/form-validator';
 
 import { useCategoryField } from '@/services/ops-flow/composables/use-category-field';
 import { useTaskStatusField } from '@/services/ops-flow/composables/use-task-status-field';
 import { useTaskTypeField } from '@/services/ops-flow/composables/use-task-type-field';
+import { useTaskAssignStore } from '@/services/ops-flow/stores/task-assign-store';
 import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
 
 const taskContentFormStore = useTaskContentFormStore();
 const taskContentFormState = taskContentFormStore.state;
 const taskContentFormGetters = taskContentFormStore.getters;
-
+const userReferenceStore = useUserReferenceStore();
+const taskAssignStore = useTaskAssignStore();
 
 /* category */
 const {
@@ -82,15 +85,23 @@ const handleUpdateSelectedStatus = (items) => {
 };
 
 /* assignee */
-const assigneeValidator = useFieldValidator('');
-const assignee = assigneeValidator.value;
-const handleUpdateSelectedAssignee = (userId?: string) => {
-    taskContentFormStore.setAssignee(userId);
-    assigneeValidator.setValue(userId ?? '');
-};
 const handleClickAssign = () => {
-    taskContentFormStore.openAssignModal();
+    if (!taskContentFormState.currentTaskType) {
+        ErrorHandler.handleError(new Error('Task type is not selected'));
+        return;
+    }
+    if (!taskContentFormState.originTask) {
+        ErrorHandler.handleError(new Error('Origin task is not defined'));
+        return;
+    }
+    taskAssignStore.openAssignModal(taskContentFormState.originTask.task_id, taskContentFormState.originTask.assignee, taskContentFormState.currentTaskType.assignee_pool);
 };
+const assigneeName = computed<string>(() => {
+    const userId = taskContentFormState.originTask?.assignee;
+    if (!userId) return '--';
+    const user = userReferenceStore.getters.userItems[userId];
+    return user?.label || user?.name || '--';
+});
 
 /* form validator */
 const {
@@ -103,7 +114,6 @@ const {
     category: categoryValidator,
     taskType: taskTypeValidator,
     status: taskStatusValidator,
-    assignee: assigneeValidator,
 });
 watch(isAllValid, (isValid) => {
     taskContentFormStore.setIsBaseFormValid(isValid);
@@ -118,11 +128,8 @@ const initRelatedFieldsByCategorySelection = (category: TaskCategoryModel) => {
     const defaultStatus = category.status_options.TODO.find((status) => status.is_default);
     setInitialStatus(defaultStatus);
     taskContentFormStore.setStatusId(defaultStatus?.status_id);
-    // init selected assignee
-    assigneeValidator.setValue('');
     // reset validations
     resetValidation('taskType');
-    resetValidation('assignee');
 };
 const initRelatedFieldsByTaskTypeSelection = (category: TaskCategoryModel, taskType: TaskTypeModel) => {
     // init selected task type
@@ -131,10 +138,6 @@ const initRelatedFieldsByTaskTypeSelection = (category: TaskCategoryModel, taskT
     const defaultStatus = category.status_options.TODO.find((status) => status.is_default);
     setInitialStatus(defaultStatus);
     taskContentFormStore.setStatusId(defaultStatus?.status_id);
-    // init selected assignee
-    assigneeValidator.setValue('');
-    // reset validations
-    resetValidation('assignee');
 };
 
 /* initiation for 'view' mode */
@@ -147,8 +150,6 @@ watch([() => taskContentFormState.originTask, () => taskContentFormGetters.curre
     // set status
     const statusOption = category.status_options[task.status_type]?.find((status) => status.status_id === task.status_id);
     setInitialStatus(statusOption);
-
-    // setting assignee is not required because it uses the origin task's assignee directly
 }, { immediate: true });
 
 /* initiation for 'create' mode with initial category, task type */
@@ -250,23 +251,9 @@ const stopInitCreateWatch = watch([() => taskContentFormState.currentCategoryId,
                         </p-button>
                     </div>
                     <p class="mt-1 text-label-md text-blue-900">
-                        {{ taskContentFormState.originTask?.assignee || '--' }}
+                        {{ assigneeName }}
                     </p>
                 </div>
-                <p-field-group v-else
-                               label="Assign to"
-                               style-type="secondary"
-                               required
-                               :invalid="invalidState.assignee"
-                               :invalid-text="invalidTexts.assignee"
-                >
-                    <user-select-dropdown :user-id="assignee"
-                                          :invalid="invalidState.assignee"
-                                          :readonly="taskContentFormState.mode === 'view' || !taskContentFormState.currentTaskType"
-                                          :user-pool="taskContentFormState.currentTaskType?.assignee_pool"
-                                          @update:user-id="handleUpdateSelectedAssignee"
-                    />
-                </p-field-group>
             </div>
         </div>
     </component>

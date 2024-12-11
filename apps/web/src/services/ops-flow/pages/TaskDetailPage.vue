@@ -108,13 +108,14 @@ const headerTitle = computed<string>(() => task?.value?.name ?? 'Inquiry Service
 
 
 /* confirm leave modal */
+const hasUpdated = ref(false);
 const {
     isConfirmLeaveModalVisible,
     handleBeforeRouteLeave,
     confirmRouteLeave,
     stopRouteLeave,
 } = useConfirmRouteLeave({
-    passConfirmation: computed(() => !taskContentFormState.hasUnsavedChanges),
+    passConfirmation: computed(() => !taskContentFormState.hasUnsavedChanges || hasUpdated.value),
 });
 onBeforeRouteLeave(handleBeforeRouteLeave);
 
@@ -142,8 +143,8 @@ const handleUpdateActiveTab = (tab: 'content'|'progress') => {
 /* form button handling */
 const handleSaveChanges = async () => {
     if (!taskContentFormGetters.isAllValid) return;
-    const result = await taskContentFormStore.createTask();
-    if (result) goBack();
+    hasUpdated.value = await taskContentFormStore.updateTask();
+    if (hasUpdated.value) goBack();
 };
 
 /* lifecycle */
@@ -210,7 +211,7 @@ defineExpose({ setPathFrom, checkTaskExist });
                         Cancel
                     </p-button>
                     <p-button style-type="primary"
-                              :disabled="!taskContentFormGetters.isAllValid"
+                              :disabled="!taskContentFormState.hasUnsavedChanges || !taskContentFormGetters.isAllValid"
                               @click="handleSaveChanges"
                     >
                         Confirm
