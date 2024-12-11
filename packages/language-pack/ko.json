@@ -264,295 +264,6 @@
 			}
 		}
 	},
-	"AUTOMATION": {
-		"POWER_SCHEDULER": {
-			"DETAILS": {
-				"ADD": "추가",
-				"ADD_PRIORITY": "우선순위 그룹 추가",
-				"ADD_RESOURCE_GROUP": "리소스 그룹 추가",
-				"ALT_E_CREATE_SCHEDULER": "스케줄러 생성 실패",
-				"ALT_E_DELETE_SCHEDULER": "스케줄러 삭제 실패",
-				"ALT_E_EDIT_NAME": "스케줄러 편집 실패",
-				"ALT_E_EDIT_RESOURCE_GROUP": "리소스 그룹 편집 실패",
-				"ALT_E_EDIT_SCHEDULER": "스케줄러 시간 설정 실패",
-				"ALT_E_PROJECT_INVALID_DESC": "프로젝트 목록을 확인해주세요.",
-				"ALT_E_PROJECT_INVALID_TITLE": "해당 프로젝트가 없습니다.",
-				"ALT_E_SCHEDULE_INVALID_DESC": "스케줄 목록을 확인해주세요.",
-				"ALT_E_SCHEDULE_INVALID_TITLE": "해당 스케줄이 없습니다.",
-				"ALT_S_CREATE_SCHEDULER": "스케줄러 생성 완료",
-				"ALT_S_DELETE_SCHEDULER": "스케줄러 삭제 완료",
-				"ALT_S_EDIT_NAME": "스케줄러 수정 완료",
-				"ALT_S_EDIT_RESOURCE_GROUP": "리소스 그룹 수정 완료",
-				"ALT_S_EDIT_SCHEDULER": "스케줄러 시간 수정 완료",
-				"CANCEL": "취소",
-				"CHECK_DELETE_MODAL_DESC": "스케줄을 삭제하시겠습니까?",
-				"CHECK_DELETE_MODAL_TITLE": "스케줄 삭제",
-				"CHECK_TIME_SET_MODAL_DESC_1": "시간 설정을 하지 않으면 리소스가 즉시 작동을 멈추게 됩니다.",
-				"CHECK_TIME_SET_MODAL_DESC_2": "해당 리소스가 모두 정지되어도 괜찮습니까?",
-				"CHECK_TIME_SET_MODAL_TITLE": "스케줄러 시간 설정 확인",
-				"CHECK_TIME_SET_NO_TEXT": "아니오, 시간을 설정하겠습니다.",
-				"CHECK_TIME_SET_YES_TEXT": "네, 모두 정지하겠습니다.",
-				"CREATE_SCHEDULER": "새 스케줄러 만들기",
-				"CURRENT_STATE": "진행 상태",
-				"DAY_FRI": "금",
-				"DAY_MON": "월",
-				"DAY_SAT": "토",
-				"DAY_SUN": "일",
-				"DAY_THU": "목",
-				"DAY_TODAY": "오늘",
-				"DAY_TUE": "화",
-				"DAY_WED": "수",
-				"DELETE_ALL": "모두 끄기",
-				"EDIT": "편집하기",
-				"EDIT_NAME_MODAL_TITLE": "스케줄러 이름 편집",
-				"FIVE_SECONDS_MESSAGE": "상태는 5초마다 자동 업데이트됩니다.",
-				"HIGH": "우선순위 높음",
-				"KANBAN_HINT_TEXT_1": "마우스로 리소스 그룹의 위치를 바꾸고",
-				"KANBAN_HINT_TEXT_2": "우선순위를 정하세요.",
-				"LOW": "우선순위 낮음",
-				"NO_DATA": "스케줄러가 없습니다.",
-				"OFF": "끄기",
-				"ON": "켜기",
-				"ONE_TIME_SCHEDULE": "1회성 스케줄",
-				"PRIORITY": "우선순위",
-				"RECOMMENDED": "추천",
-				"RESOURCE_GROUP_DESC": "스케줄러를 적용할 리소스 그룹",
-				"RESOURCE_GROUP_TITLE": "리소스 그룹",
-				"ROUTINE_ON": "반복 켜기",
-				"ROUTINE_SCHEDULE": "반복 스케줄",
-				"SAVE": "저장",
-				"SCHEDULER_LIST": "스케줄러 목록",
-				"SETTING": "목표 설정",
-				"SET_NAME_DESC": "스케줄러 이름을 설정합니다. (띄어쓰기 불가)",
-				"SET_NAME_TITLE": "이름 설정",
-				"SET_TIME_DESC": "스케줄러 적용 시간을 설정합니다.",
-				"SET_TIME_TITLE": "시간 설정",
-				"STATUS_OFF": "꺼짐",
-				"STATUS_ON": "켜짐",
-				"STATUS_STARTING": "켜지는 중",
-				"STATUS_STOPPING": "꺼지는 중",
-				"THIS_WEEK": "이번주",
-				"TIMEZONE": "타임존",
-				"TIME_TABLE_HINT_TEXT_1": "마우스를 이용해 시간을 설정하세요.",
-				"TIME_TABLE_HINT_TEXT_2": "*주의: 시간이 설정되지 않으면 모든 리소스의 작동이 멈추게 됩니다."
-			},
-			"LANDING": {
-				"ABOUT": "약",
-				"APPLICABLE_RESOURCE": "적용 가능한 자원 수",
-				"APPLIED_RESOURCE": "적용된 자원 수",
-				"ESTIMATED_SAVING": "예상 절감 비용",
-				"GO_TO_PROJECT_BTN_TEXT": "프로젝트 페이지 바로가기",
-				"GO_TO_PROJECT_HINT_TEXT": "파워스케줄러 설정을 위해서 프로젝트를 먼저 등록해주세요.",
-				"LEGEND_GREATER_THEN_12": "12시간 이상",
-				"LEGEND_LESS_THEN_12": "12시간 미만",
-				"LEGEND_TITLE": "반복 스케줄 시간",
-				"LEGEND_UNSET": "미설정",
-				"NEED_SCHEDULER_HINT_TEXT": "스케줄을 등록해주세요.",
-				"SCHEDULE": "스케줄",
-				"TITLE": "파워 스케줄러",
-				"TOOLTIP_COST_1": "파워 스케줄러를 통해 절감된 이 달의 비용",
-				"TOOLTIP_COST_2": "(기준: 이번 달 1일 ~ 현재)",
-				"TOOLTIP_RESOURCE": "적용 가능한 자원 종류"
-			},
-			"RESOURCE": {
-				"ALT_E_ID_INVALID_DESC": "리소스 그룹 목록을 확인해주세요.",
-				"ALT_E_ID_INVALID_TITLE": "해당 리소스 그룹이 없습니다.",
-				"BASE_INFO_TITLE": "기본 정보",
-				"CHECK_LIST_MODAL_DESC": "리소스 그룹 목록을 확인해주세요.",
-				"CHECK_LIST_MODAL_TITLE": "리소스 그룹 목록 확인",
-				"NAME": "그룹 이름",
-				"NAME_DESC_1": "최대 128자 / 문자로 시작해야 하고, 문자, 숫자 및 하이픈만 포함할 수 있습니다.",
-				"NAME_DESC_2": "(리소스 그룹 카드에 16자까지 표기)",
-				"NAME_INVALID": "잘못된 형식의 이름입니다.",
-				"NAME_REQUIRED": "필수 입력 항목입니다.",
-				"RESOURCE_LIST": "리소스 목록",
-				"RESOURCE_SEARCH": "리소스 검색",
-				"RESOURCE_SEARCH_INVALID": "목록이 없으면, 리소스 그룹을 만들 수 없습니다.",
-				"RESOURCE_TYPE": "리소스 타입",
-				"RESOURCE_TYPE_DESC": "리소스 타입을 선택해주세요.",
-				"RESOURCE_TYPE_SELECT": "리소스 타입 선택",
-				"STANDARD": "그룹 기준",
-				"TITLE": "리소스 그룹 만들기"
-			}
-		},
-		"SPOT_AUTOMATION": {
-			"ADD": {
-				"ALT_E_CREATE_SPOT_GROUP": "스팟그룹 생성 실패",
-				"ALT_S_CREATE_SPOT_GROUP": "스팟그룹 생성 완료",
-				"BASE_INFO": {
-					"LABEL": "기본 정보",
-					"NAME_DESC_1": "공백 없이 최대 56자 / 문자로 시작해야 하고, 문자, 숫자 및 하이픈만 포함할 수 있습니다. ",
-					"NAME_DESC_2": "(스팟그룹 카드에 16자까지 표기)",
-					"NAME_LABEL": "이름",
-					"NAME_PLACEHOLDER": "스팟그룹 이름",
-					"NAME_REQUIRED": "필수 항목 입니다.",
-					"TAG_ADD": "태그 추가",
-					"TAG_DESC_1": "관련된 태그를 추가합니다.",
-					"TAG_DESC_2": "아래 버튼을 눌러 태그를 추가해주세요.",
-					"TAG_LABEL": "태그"
-				},
-				"CANCEL": "취소",
-				"CHECK_MODAL": {
-					"BACK": "돌아가기",
-					"CLOUD_SERVICE_CATEGORY_LABEL": "클라우드 서비스 카테고리",
-					"DESC": "모든 인스턴스는 스팟으로 운영됩니다.",
-					"RESOURCE_ID_LABEL": "리소스 아이디",
-					"RESOURCE_NAME_LABEL": "리소스 이름",
-					"SPOT_GROUP_LABEL": "스팟그룹 이름",
-					"TITLE": "세부사항 확인"
-				},
-				"CLOUD_SERVICE": {
-					"LABEL": "클라우드 서비스 카테고리"
-				},
-				"CREATE": "생성",
-				"CREATE_TITLE": "새 스팟그룹 만들기",
-				"INSTANCE_TYPE": {
-					"DESC": "성능과 비용에 가장 최적화된 추천 인스턴스 입니다.",
-					"LABEL": "인스턴스 타입",
-					"ONE_MORE_REQUIRED": "하나 이상의 인스턴스 타입이 필요합니다.",
-					"OPTIMIZED_TYPE": "최적화 추천받기"
-				},
-				"LOAD_FAILED": "문제가 발생하여 데이터를 가져오지 못했습니다.",
-				"RESOURCE": {
-					"LABEL": "리소스",
-					"RESOURCE_DESC": "스팟그룹으로 지정되지 않은 리소스만을 보여줍니다.",
-					"RESOURCE_REQUIRED": "리소스를 선택해주세요."
-				},
-				"SCHEDULE_POLICY": {
-					"DESC": "인스턴스 개수에 변화가 생기면, 스팟 인스턴스의 개수가 변화합니다. (온디맨드 설정 개수는 고정값) ",
-					"LABEL": "스케줄 정책",
-					"SETTING_LABEL": "설정",
-					"SETTING_ONDEMAND": "온디맨드",
-					"SETTING_SPOT_INSTANCE": "스팟 인스턴스",
-					"SETTING_TYPE_COUNT": "개수",
-					"SETTING_TYPE_LABEL": "설정 방식",
-					"SETTING_TYPE_RATIO": "비율",
-					"UNIT_COUNT": "개"
-				},
-				"SELECT_RESOURCE": "리소스를 선택하면 설정이 가능합니다.",
-				"TRY_AGAIN": "다시 시도",
-				"TRY_AGAIN_DESC": "리소스 정보를 불러오지 못했습니다. 도메인 Admin에게 문의해주세요."
-			},
-			"DASHBOARD": {
-				"ACCUMULATE_COST": "누적 절감 비용",
-				"ALL_INSTANCE": "전체 인스턴스",
-				"ALL_INSTANCE_DESC": "(온디맨드+스팟)",
-				"CARD": {
-					"ADD_SPOT_GROUP": "스팟그룹 만들기",
-					"INSTANCE": "인스턴스",
-					"NO_SPOT_GROUP": "스팟그룹 만들기 "
-				},
-				"LAST_MONTH": "지난달",
-				"LAST_SIX_MONTHS": "지난 6개월간",
-				"NO_PROJECT": "프로젝트 단위로 스팟그룹을 관리해보세요.",
-				"PAGE_TITLE": "대시보드",
-				"SAVING_COST": "절감 비용",
-				"SPOT_GROUP_BY_PROJECT": "프로젝트 별 스팟그룹 관리",
-				"SPOT_INSTANCE": "스팟 인스턴스",
-				"USED_SPOT_GROUP": "사용중인 스팟그룹"
-			},
-			"DETAIL": {
-				"ALT_E_DELETE_SPOT_GROUP": "스팟그룹 삭제 실패",
-				"ALT_S_DELETE_SPOT_GROUP": "스팟그룹 삭제 완료",
-				"BASE_INFO": {
-					"EDIT": "편집",
-					"ON_DEMAND": "온디맨드",
-					"ON_DEMAND_TOTAL_COST": "온디맨드 전체 비용",
-					"PROJECT": "프로젝트",
-					"SPOT": "스팟",
-					"SPOT_TOTAL_COST": "실제 스팟 전체 비용",
-					"TITLE": "기본정보",
-					"USING_INSTANCE_TYPE": "사용중인 인스턴스 타입",
-					"VIEW_DETAIL": "상세 보기"
-				},
-				"BILLING": {
-					"BILLING_DETAIL": "비용 내역",
-					"COST": "비용",
-					"CUMULATIVE_SAVINGS_COST": "누적 절감 비용",
-					"INSTANCE": "인스턴스",
-					"INSTANCE_COUNT": "인스턴스 개수",
-					"LAST_MONTH": "지난달",
-					"ON_DEMAND_ESTIMATED_COST": "온디맨드 사용시 예상비용",
-					"SAVINGS_COST": "절감 비용",
-					"SAVING_COST": "절감 비용",
-					"SPOT_SAVINGS_COST": "스팟으로 절감한 비용",
-					"TITLE": "비용",
-					"TOOLTIP_ON_DEMAND_ESTIMATED_COST": "온디맨드 예상비용",
-					"TOOLTIP_SAVING_COST": "절감비용"
-				},
-				"EDIT": {
-					"ALT_E_EDIT_SPOT_GROUP": "스팟그룹 편집 실패",
-					"ALT_S_EDIT_SPOT_GROUP": "스팟그룹 수정 완료",
-					"SAVE": "저장",
-					"TITLE": "스팟그룹"
-				},
-				"INTERRUPT": {
-					"AZ": "가용 영역(AZ)",
-					"DAY": "일",
-					"INSTANCE_TYPE": "인스턴스 타입",
-					"INTERRUPT_COUNT": "인터럽트 개수",
-					"INTERRUPT_DETAIL": "인터럽트 내역",
-					"LAST_TWO_WEEKS": "지난 14일",
-					"LATEST_DATE": "최근 날짜",
-					"MONTH": "월",
-					"ON_DEMAND": "온디맨드",
-					"SPOT": "스팟"
-				},
-				"MODAL_DELETE_SPOT_GROUP_CONTENT": "이 스팟그룹을 삭제하시겠습니까?",
-				"MODAL_DELETE_SPOT_GROUP_TITLE": "스팟그룹 삭제",
-				"MODAL_UPDATE_SPOT_GROUP_LABEL": "이름",
-				"MODAL_UPDATE_SPOT_GROUP_NAME_DESC": "공백 없이 최대 56자 / 문자로 시작해야 하고, 문자, 숫자 및 하이픈만 포함할 수 있습니다. ",
-				"MODAL_UPDATE_SPOT_GROUP_PLACEHOLDER": "스팟그룹 이름",
-				"MODAL_UPDATE_SPOT_GROUP_TITLE": "스팟그룹 변경",
-				"MONITORING": {
-					"CPU_USAGE_RAGE": "CPU 사용률",
-					"DISK_USAGE_RATE": "디스크 사용률",
-					"HAS_PROBLEM": "문제있음",
-					"INSTANCE": "인스턴스",
-					"LOAD_BALANCER": "로드밸런서",
-					"NORMAL": "정상",
-					"TITLE": "모니터링",
-					"TITLE_HELP_TEXT": "데이터 기준: 1일 평균값최근 검색 [메뉴]"
-				},
-				"TAB_HISTORY": "히스토리",
-				"TAB_MEMBER": "멤버",
-				"TAB_SUMMARY": "요약정보",
-				"TAB_TAG": "태그"
-			},
-			"LIST": {
-				"ADD_SPOT_GROUP": "스팟그룹 생성  ",
-				"CARD": {
-					"ACTIVITY_TIME_RANGE": "그래프 기간: ",
-					"COST_TIME_RANGE": "이번달 1일 ~ 어제",
-					"CPU_UTILIZATION": "일 평균 CPU 사용률",
-					"CREATED_AT": "생성",
-					"DISK_USAGE": "일 평균 디스크 사용률",
-					"HEALTHY": "정상",
-					"INSTANCE": "인스턴스 ",
-					"INSTANCE_STATE": "인스턴스 상태",
-					"IOPS_DESC": "(읽기+쓰기)",
-					"LAST_1_DAY": "Last 1 day",
-					"LAST_7_DAYS": "Last 7 days",
-					"LOAD_BALANCER": "로드밸런서",
-					"NUMBER_UNIT": "개",
-					"REGION": "지역",
-					"SAVING_COST": "절감비용 ",
-					"SERVICE_TYPE": "서비스 타입",
-					"SPOT_INTERRUPT": "스팟 인터럽트 ",
-					"UNHEALTHY": "문제있음"
-				},
-				"COST_INSTANCE_DATE_1": "비용, 인스턴스 기간:",
-				"COST_INSTANCE_DATE_2": "이번달",
-				"NO_DATA": "스팟 자동화를 이용하려면, 스팟그룹을 생성해주세요.",
-				"SHOW_FAVORITES": "즐겨찾기만 보기"
-			},
-			"MAIN": {
-				"DASHBOARD": "대시보드 ",
-				"FAVORITES": "즐겨찾기 ",
-				"SPOT_GROUP": "스팟그룹"
-			}
-		}
-	},
 	"BILLING": {
 		"COST_MANAGEMENT": {
 			"ANOMALY_DETECTION": {
@@ -2415,15 +2126,9 @@
 			"VALIDATION_DASHBOARD_NAME_UNIQUE": "동일한 이름의 대시보드가 이미 존재합니다. "
 		},
 		"FULL_SCREEN_VIEW": {
-			"APPLY_NON_INHERITED_OPTION_HELP_TEXT": "대시보드의 특정 필터 변경에 영향을 받지 않는 비상속 옵션이 포함되어 있습니다.",
 			"BACK_TO_DASHBOARD": "대시보드로 돌아가기",
-			"CANCEL": "취소",
-			"EDIT_OPTION": "옵션 편집",
-			"EDIT_WIDGET_OPTION": "위젯 옵션 편집",
 			"FULL_SCREEN_VIEW": "전체화면",
-			"NON_INHERITED_OPTIONS_INCLUDED": "비상속 옵션 포함됨",
-			"NON_INHERIT_OPTION_APPLIED": "비상속 옵션 포함됨",
-			"SAVE": "저장"
+			"NON_INHERIT_OPTION_APPLIED": "비상속 옵션 포함됨"
 		},
 		"LNB": {
 			"DEPRECATED": "지원 중지된",
@@ -4310,9 +4015,6 @@
 			}
 		}
 	},
-	"MANAGE_PROJECT_GROUP_MEMBER": "프로젝트 그룹 멤버 관리",
-	"MEMBER": "멤버",
-	"MEMBER_TITLE": "멤버",
 	"MENU": {
 		"ADDITIONAL_SETTINGS": "추가 설정",
 		"ADMINISTRATION": "관리",
@@ -4366,9 +4068,6 @@
 		"PROVIDER": "프로바이더",
 		"WORKSPACE_HOME": "홈"
 	},
-	"MODAL_DELETE_MEMBER_CONTENT": "선택한 멤버를 프로젝트에서 제거하시겠습니까?",
-	"MODAL_DELETE_MEMBER_TITLE": "멤버 제거 ",
-	"MODAL_UPDATE_MEMBER_TITLE": "멤버 정보 변경 ",
 	"MONITORING": {
 		"ALERT": {
 			"ALERT_LIST": {
@@ -4705,7 +4404,6 @@
 		},
 		"SPACEONE_USER": "스페이스원 사용자 "
 	},
-	"No Data": "",
 	"PAGE_SCHEMA": {
 		"ACCOUNT": "어카운트",
 		"BASE_INFO": "기본 정보",
@@ -5262,9 +4960,5 @@
 			"SHOW_ALL_TOOLTIP": "프로젝트 그룹 하위의 모든 프로젝트 보기",
 			"STORAGE": "저장소"
 		}
-	},
-	"SHARE_TO_ALL_WORKSPACES": "전체 워크스페이스에 공유",
-	"SHARE_TO_ALL_WORKSPACES (2)": "전체 워크스페이스에 공유",
-	"SPACEONE_USER_DESC": "프로젝트 멤버들의 개인 채널로 전파합니다.",
-	"TAB_MEMBER": "멤버"
+	}
 }
