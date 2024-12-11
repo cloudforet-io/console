@@ -51,7 +51,7 @@ const fetchRemoveUser = async (params: UserGroupRemoveUsersParameters) => {
     try {
         await SpaceConnector.clientV2.identity.userGroup.removeUsers<UserGroupRemoveUsersParameters, UserGroupModel>(params);
     } catch (e) {
-        ErrorHandler.handleError(e);
+        ErrorHandler.handleError(e, true);
     }
 };
 </script>
