@@ -13,5 +13,4 @@ export interface ModalState {
     type: string;
     title: string | TranslateResult;
     themeColor: string;
-    visible?: UserGroupPageModalType;
 }
