@@ -1,15 +1,21 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, onMounted, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PDivider, PSelectCard, PToolbox, PI, PTextButton,
 } from '@cloudforet/mirinae';
 import type { ToolboxOptions } from '@cloudforet/mirinae/src/controls/toolbox/type';
 import type { QueryTag } from '@cloudforet/mirinae/types/controls/search/query-search-tags/type';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ServiceListParameters } from '@/schema/alert-manager/service/api-verbs/list';
+import type { ServiceModel } from '@/schema/alert-manager/service/model';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useQueryTags } from '@/common/composables/query-tags';
 
@@ -35,9 +41,11 @@ const handlerState = reactive({
         name: makeDistinctValueHandler('alert_manager.Service', 'name'),
     } as ValueHandlerMap,
 });
+
 const state = reactive({
     pageStart: 1,
     pageLimit: 15,
+    serviceList: [] as ServiceModel[],
     queryTags: computed<QueryTag[]>(() => queryTagsHelper.queryTags.value),
 });
 
@@ -77,13 +85,7 @@ const handleClickEscalationPolicy = (id: string) => {
         },
     }));
 };
-const handleClickWebhookItem = (item: string, id: string) => {
-    if (item === 'chevron') {
-        console.log('TODO: route to webhook main page');
-    } else {
-        console.log('TODO: route to webhook detail page');
-    }
-
+const handleClickWebhookItem = (id: string, webhookId?: string) => {
     router.push(getProperRouteLocation({
         name: ALERT_MANAGER_ROUTE_V2.SERVICE.DETAIL._NAME,
         params: {
@@ -91,13 +93,24 @@ const handleClickWebhookItem = (item: string, id: string) => {
         },
         query: {
             tab: SERVICE_DETAIL_TABS.WEBHOOK,
+            webhookId,
         },
     }));
 };
 
-const fetchServiceList = () => {
-    console.log('TODO: fetchServiceList');
+const fetchServiceList = async () => {
+    try {
+        const { results } = await SpaceConnector.clientV2.alertManager.service.list<ServiceListParameters, ListResponse<ServiceModel>>();
+        state.serviceList = results || [];
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
+        state.serviceList = [];
+    }
 };
+
+onMounted(() => {
+    fetchServiceList();
+});
 </script>
 
 <template>
@@ -114,12 +127,14 @@ const fetchServiceList = () => {
                    @refresh="fetchServiceList"
         />
         <div class="list-card-wrapper">
-            <p-select-card class="card"
-                           @change="handleClickServiceItem('temp id')"
+            <p-select-card v-for="(item, idx) in state.serviceList"
+                           :key="`service-item-${idx}`"
+                           class="card"
+                           @change="handleClickServiceItem(item.service_id)"
             >
                 <div class="card-inner-wrapper">
                     <p class="text-label-xl font-bold">
-                        temp name
+                        {{ item.name }}
                     </p>
                     <div class="contents">
                         <div class="alerts-wrapper">
@@ -128,7 +143,7 @@ const fetchServiceList = () => {
                                     {{ $t('ALERT_MANAGER.SERVICE.OPEN_ALERTS') }}
                                 </p>
                                 <p class="count font-medium">
-                                    725
+                                    {{ item?.alerts ? (item?.alerts.TOTAL.high + item?.alerts.TOTAL.low) : 0 }}
                                 </p>
                             </div>
                             <p-divider />
@@ -138,7 +153,7 @@ const fetchServiceList = () => {
                                 </p>
                                 <div class="triggered-info">
                                     <p class="count">
-                                        50
+                                        {{ item?.alerts?.TRIGGERRED ? (item?.alerts.TRIGGERRED.high + item?.alerts.TRIGGERRED.low) : 0 }}
                                     </p>
                                     <div class="ml-2">
                                         <p-i name="ic_error-filled"
@@ -147,7 +162,7 @@ const fetchServiceList = () => {
                                              height="1rem"
                                         />
                                         <span class="text-gray-900 pl-1">{{ $t('ALERT_MANAGER.ALERTS.HIGH') }}:</span>
-                                        <span> 4</span>
+                                        <span> {{ item?.alerts?.TRIGGERRED ? item?.alerts.TRIGGERRED.high : 0 }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -155,12 +170,14 @@ const fetchServiceList = () => {
                         <div class="additional-info-wrapper">
                             <div>
                                 <p class="title">
-                                    {{ $t('ALERT_MANAGER.SERVICE.WEBHOOK', { cnt: 11 }) }}
+                                    {{ $t('ALERT_MANAGER.SERVICE.WEBHOOK', { cnt: item?.webhooks?.length || 0 }) }}
                                 </p>
                                 <div class="webhook-list">
                                     <!-- TODO: check the link & icon -->
-                                    <span class="webhook"
-                                          @click.stop="handleClickWebhookItem('item', 'temp id')"
+                                    <span v-for="(webhook, webhookIdx) in item.webhooks"
+                                          :key="`webhook-item-${webhookIdx}`"
+                                          class="webhook"
+                                          @click.stop="handleClickWebhookItem(item.service_id, webhook)"
                                     >
                                         <p-i name="ic_check"
                                              class="icon success"
@@ -170,7 +187,7 @@ const fetchServiceList = () => {
                                         />
                                     </span>
                                     <span class="webhook chevron"
-                                          @click.stop="handleClickWebhookItem('chevron', 'temp id')"
+                                          @click.stop="handleClickWebhookItem(item.service_id)"
                                     >
                                         <p-i
                                             name="ic_chevron-right"
@@ -185,8 +202,8 @@ const fetchServiceList = () => {
                                 <p class="title">
                                     {{ $t('ALERT_MANAGER.ESCALATION_POLICY.TITLE', { cnt: 11 }) }}
                                 </p>
-                                <p-text-button @click.stop="handleClickEscalationPolicy('temp id')">
-                                    temp default policy
+                                <p-text-button @click.stop="handleClickEscalationPolicy(item.service_id)">
+                                    {{ item.escalation_policy_id }}
                                 </p-text-button>
                             </div>
                         </div>
@@ -205,7 +222,8 @@ const fetchServiceList = () => {
         @apply flex flex-wrap;
         gap: 1rem;
         .card {
-            min-width: 30rem;
+            min-width: 22.125rem;
+            width: 28rem;
             max-width: 28rem;
             padding: 1.25rem 1.5rem 1.5rem;
             .card-inner-wrapper {
