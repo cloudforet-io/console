@@ -1,10 +1,11 @@
 <script lang="ts" setup>
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal, PButton } from '@cloudforet/mirinae';
 
 import type { UserGroupCreateParameters } from '@/schema/identity/user-group/api-verbs/create';
+import type { UserGroupUpdateParameters } from '@/schema/identity/user-group/api-verbs/update';
 import type { UserGroupModel } from '@/schema/identity/user-group/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -16,8 +17,13 @@ import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-stor
 
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
+const userGroupPageGetters = userGroupPageStore.getters;
 
 const emit = defineEmits<{(e: 'confirm'): void; }>();
+
+const storeState = reactive({
+    modalType: computed<string>(() => userGroupPageState.modal.type),
+});
 
 const state = reactive({
     loading: false,
@@ -27,15 +33,42 @@ const state = reactive({
 
 /* Component */
 const handleConfirm = async () => {
-    state.loading = true;
-    try {
-        fetchCreateUserGroup();
-        emit('confirm');
-    } catch (e: any) {
-        console.error(e);
-    } finally {
-        state.loading = false;
-        handleClose();
+    switch (storeState.modalType) {
+    case USER_GROUP_MODAL_TYPE.CREATE:
+        state.loading = true;
+        try {
+            fetchCreateUserGroup({
+                name: state.groupName,
+                description: state?.description,
+                tags: {
+                    key: '',
+                },
+            });
+            emit('confirm');
+        } finally {
+            state.loading = false;
+            handleClose();
+        }
+        break;
+    case USER_GROUP_MODAL_TYPE.UPDATE:
+        state.loading = true;
+        try {
+            fetchUpdateUserGroup({
+                user_group_id: userGroupPageGetters.selectedUserGroups[0].user_group_id,
+                name: state.groupName,
+                description: state?.description,
+                tags: {
+                    key: '',
+                },
+            });
+            emit('confirm');
+        } finally {
+            state.loading = false;
+            handleClose();
+        }
+        break;
+    default:
+        break;
     }
 };
 
@@ -49,20 +82,17 @@ const handleUpdateValues = (data) => {
 };
 
 /* API */
-const handleCreate = () => {
-    console.log('TODO: Create API');
-};
-
-const handleUpdate = () => {
-    console.log('TODO: Update API');
-};
-
-const fetchCreateUserGroup = async () => {
+const fetchCreateUserGroup = async (params: UserGroupCreateParameters) => {
     try {
-        await SpaceConnector.clientV2.identity.userGroup.create<UserGroupCreateParameters, UserGroupModel>({
-            name: state.groupName,
-            description: state?.description,
-        });
+        await SpaceConnector.clientV2.identity.userGroup.create<UserGroupCreateParameters, UserGroupModel>(params);
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
+
+const fetchUpdateUserGroup = async (params: UserGroupUpdateParameters) => {
+    try {
+        await SpaceConnector.clientV2.identity.userGroup.update<UserGroupUpdateParameters, UserGroupModel>(params);
     } catch (e) {
         ErrorHandler.handleError(e);
     }
@@ -75,7 +105,6 @@ const fetchCreateUserGroup = async () => {
                     :visible="userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.CREATE || userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.UPDATE"
                     size="md"
                     :loading="state.loading"
-                    @confirm="handleConfirm"
                     @cancel="handleClose"
                     @close="handleClose"
     >
@@ -87,13 +116,13 @@ const fetchCreateUserGroup = async () => {
         <template #confirm-button>
             <p-button v-if="userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.CREATE"
                       theme="primary"
-                      @click="handleCreate"
+                      @click="handleConfirm"
             >
                 {{ $t('IAM.USER_GROUP.MODAL.CREATE_USER_GROUP.CONFIRM') }}
             </p-button>
             <p-button v-else-if="userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.UPDATE"
                       theme="primary"
-                      @click="handleUpdate"
+                      @click="handleConfirm"
             >
                 {{ $t('IAM.USER_GROUP.MODAL.CREATE_USER_GROUP.UPDATE') }}
             </p-button>
