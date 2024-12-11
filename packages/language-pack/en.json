@@ -1235,6 +1235,15 @@
 					"ADD_CONDITION": "Add Condition",
 					"ADD_FILTER": "Add Filter",
 					"ADD_LABEL": "Add Label",
+					"ADD_LABELS": {
+						"ADD_LABEL": "Add Label",
+						"DATE_FIELD_INVALID": "Date cannot be used as field names.",
+						"DUPLICATED_LABEL": "This name is already being used.",
+						"GROUP_BY_KEY_INVALID": "Group by names cannot be used as field names.",
+						"NAME": "Name",
+						"VALUE": "Value"
+					},
+					"ADD_LABELS_DESC": "Add labels to enhance data clarity.",
 					"ADVANCED_OPTIONS": "Advanced Options",
 					"ALT_E_ADD_GROUP_BY": "There can be a maximum of 3 group-by options.",
 					"CONCAT_DESC": "Combines multiple tables into one by stacking them.",

@@ -1235,6 +1235,15 @@
 					"ADD_CONDITION": "",
 					"ADD_FILTER": "フィルターを追加",
 					"ADD_LABEL": "追加",
+					"ADD_LABELS": {
+						"ADD_LABEL": "",
+						"DATE_FIELD_INVALID": "Dateはフィールド名として使用できません。",
+						"DUPLICATED_LABEL": "この名前はすでに使用されています。",
+						"GROUP_BY_KEY_INVALID": "グループ名はフィールド名として使用できません。",
+						"NAME": "名前",
+						"VALUE": "値"
+					},
+					"ADD_LABELS_DESC": "",
 					"ADVANCED_OPTIONS": "詳細オプション",
 					"ALT_E_ADD_GROUP_BY": "最大で3つのグループ化オプションを選択できます。",
 					"CONCAT_DESC": "複数のテーブルを1つに結合します。",
