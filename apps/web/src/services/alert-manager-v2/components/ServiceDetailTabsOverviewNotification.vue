@@ -1,12 +1,25 @@
 <script setup lang="ts">
 import { useElementSize } from '@vueuse/core/index';
-import { computed, reactive, ref } from 'vue';
-
 import {
-    PFieldTitle, PIconButton, PLazyImg, PDivider, PTextButton,
+    computed, onMounted, reactive, ref,
+} from 'vue';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PFieldTitle, PIconButton, PLazyImg, PDivider, PTextButton, PDataLoader,
 } from '@cloudforet/mirinae';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
+import type { ServiceChannelListParameters } from '@/schema/alert-manager/service-channel/api-verbs/list';
+import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
+
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
@@ -17,38 +30,23 @@ const DEFAULT_LEFT_PADDING = 16;
 const rowItemsWrapperRef = ref<null | HTMLElement>(null);
 const itemEl = ref<null | HTMLElement>(null);
 
+const allReferenceStore = useAllReferenceStore();
+const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
+const serviceDetailPageState = serviceDetailPageStore.state;
+const serviceDetailPageGetters = serviceDetailPageStore.getters;
+
 const { width: rowItemsWrapperWidth } = useElementSize(rowItemsWrapperRef);
 
+const storeState = reactive({
+    plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
+    serviceId: computed<string>(() => serviceDetailPageGetters.serviceInfo.service_id),
+    notificationProtocolList: computed<NotificationProtocolModel[]>(() => serviceDetailPageState.notificationProtocolList),
+});
 const state = reactive({
+    loading: false,
     pageStart: 0,
-    // TODO: temp data
-    items: [
-        {
-            title: 'title',
-            icon: 'ic_notification-protocol_envelope',
-        },
-        {
-            title: 'title1',
-            icon: 'ic_notification-protocol_envelope',
-        },
-        {
-            title: 'title2',
-            icon: 'ic_notification-protocol_envelope',
-        },
-        {
-            title: 'title3',
-            icon: 'ic_notification-protocol_envelope',
-        },
-        {
-            title: 'title4',
-            icon: 'ic_notification-protocol_envelope',
-        },
-        {
-            title: 'title1',
-            icon: 'ic_notification-protocol_envelope',
-        },
-    ],
+    items: [] as ServiceChannelModel[],
     visibleCount: computed<number>(() => Math.floor((rowItemsWrapperWidth.value - DEFAULT_LEFT_PADDING) / ITEM_DEFAULT_WIDTH)),
     pageMax: computed<number>(() => Math.max(state.items.length - state.visibleCount, 0)),
 });
@@ -65,10 +63,36 @@ const handleClickArrowButton = (increment: number) => {
     const marginLeft = increment * state.pageStart * element.defaultWidth;
     element.el.style.marginLeft = increment === 1 ? `-${marginLeft}px` : `${marginLeft}px`;
 };
+const getPluginIcon = (protocolId: string): string => {
+    const notificationProtocol = storeState.notificationProtocolList.find((item) => item.protocol_id === protocolId);
+    if (!notificationProtocol) return '';
+
+    const plugin = storeState.plugins[notificationProtocol.plugin_info.plugin_id];
+    return assetUrlConverter(plugin?.icon || '');
+};
 
 const handleRouteDetail = () => (
     serviceDetailPageStore.setCurrentTab(SERVICE_DETAIL_TABS.NOTIFICATIONS)
 );
+
+const fetchServiceChannelList = async () => {
+    state.loading = true;
+    try {
+        const { results } = await SpaceConnector.clientV2.alertManager.serviceChannel.list<ServiceChannelListParameters, ListResponse<ServiceChannelModel>>({
+            service_id: storeState.serviceId,
+        });
+        state.items = results || [];
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
+        state.items = [];
+    } finally {
+        state.loading = false;
+    }
+};
+
+onMounted(() => {
+    fetchServiceChannelList();
+});
 </script>
 
 <template>
@@ -78,7 +102,11 @@ const handleRouteDetail = () => (
                        size="lg"
                        font-weight="regular"
         />
-        <div class="flex-1 pt-2">
+        <p-data-loader :loading="state.loading"
+                       :data="state.items"
+                       class="content flex-1 pt-2"
+                       :class="{ 'empty': !state.items.length }"
+        >
             <div ref="rowItemsWrapperRef"
                  class="row-items-wrapper"
             >
@@ -90,7 +118,7 @@ const handleRouteDetail = () => (
                          class="item"
                     >
                         <div class="image-wrapper">
-                            <p-lazy-img :src="assetUrlConverter(item.icon)"
+                            <p-lazy-img :src="getPluginIcon(item.protocol_id)"
                                         width="1.25rem"
                                         height="1.25rem"
                                         error-icon="ic_notification-protocol_envelope"
@@ -98,7 +126,7 @@ const handleRouteDetail = () => (
                             />
                         </div>
                         <p class="text-label-md leading-8 flex-1">
-                            {{ item.title }}
+                            {{ item.name }}
                         </p>
                     </div>
                 </div>
@@ -119,7 +147,7 @@ const handleRouteDetail = () => (
                                @click="handleClickArrowButton(1)"
                 />
             </div>
-        </div>
+        </p-data-loader>
         <div>
             <p-divider class="bg-gray-150" />
             <div class="link-wrapper">
@@ -139,53 +167,59 @@ const handleRouteDetail = () => (
     .field-title {
         padding: 1.375rem 1rem;
     }
-    .row-items-wrapper {
-        @apply relative overflow-hidden;
-        .row-items-container {
-            @apply flex overflow-hidden;
-            gap: 0.5rem;
-            padding-left: 1rem;
-            transition: margin-left 0.3s ease;
-            .image-wrapper {
-                @apply flex items-center justify-center;
+    .content {
+        &.empty {
+            padding-top: 0;
+            margin-top: -1.5rem;
+        }
+        .row-items-wrapper {
+            @apply relative overflow-hidden;
+            .row-items-container {
+                @apply flex overflow-hidden;
+                gap: 0.5rem;
+                padding-left: 1rem;
+                transition: margin-left 0.3s ease;
+                .image-wrapper {
+                    @apply flex items-center justify-center;
+                    width: 2rem;
+                    height: 2rem;
+                    padding: 0.375rem;
+                }
+                .item {
+                    @apply flex items-start bg-gray-100;
+                    width: 7.5rem;
+                    min-width: 7.5rem;
+                    padding: 0.375rem 0.5rem;
+                    border-radius: 0.75rem;
+                }
+            }
+            &::after {
+                @apply absolute;
+                content: '';
+                top: 0;
+                right: 0;
+                width: 2rem;
+                height: 100%;
+                background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, theme('colors.white') 50%);
+            }
+            .arrow-button {
+                @apply absolute bg-white border border-gray-300 rounded-full;
+                top: calc(50% - 1rem);
                 width: 2rem;
                 height: 2rem;
-                padding: 0.375rem;
-            }
-            .item {
-                @apply flex items-start bg-gray-100;
-                width: 7.5rem;
-                min-width: 7.5rem;
-                padding: 0.375rem 0.5rem;
-                border-radius: 0.75rem;
-            }
-        }
-        &::after {
-            @apply absolute;
-            content: '';
-            top: 0;
-            right: 0;
-            width: 2rem;
-            height: 100%;
-            background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, theme('colors.white') 50%);
-        }
-        .arrow-button {
-            @apply absolute bg-white border border-gray-300 rounded-full;
-            top: calc(50% - 1rem);
-            width: 2rem;
-            height: 2rem;
-            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
-            z-index: 10;
-            &.left {
-                margin-right: auto;
-                left: 0.5rem;
-            }
-            &.right {
-                margin-left: auto;
-                right: 0.75rem;
-            }
-            &:hover, &:focus {
-                @apply text-gray-900;
+                box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+                z-index: 10;
+                &.left {
+                    margin-right: auto;
+                    left: 0.5rem;
+                }
+                &.right {
+                    margin-left: auto;
+                    right: 0.75rem;
+                }
+                &:hover, &:focus {
+                    @apply text-gray-900;
+                }
             }
         }
     }

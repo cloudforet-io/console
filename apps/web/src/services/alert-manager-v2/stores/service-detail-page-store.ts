@@ -5,6 +5,8 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { NotificationProtocolListParameters } from '@/schema/alert-manager/notification-protocol/api-verbs/list';
+import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
 import type { ServiceDeleteParameters } from '@/schema/alert-manager/service/api-verbs/delete';
 import type { ServiceGetParameters } from '@/schema/alert-manager/service/api-verbs/get';
 import type { ServiceListParameters } from '@/schema/alert-manager/service/api-verbs/list';
@@ -22,6 +24,7 @@ interface ServiceFormStoreState {
     currentTab: ServiceDetailTabsType;
     serviceInfo: ServiceModel;
     serviceList: ServiceModel[];
+    notificationProtocolList: NotificationProtocolModel[];
 }
 
 export const useServiceDetailPageStore = defineStore('page-service-detail', () => {
@@ -30,6 +33,7 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
         currentTab: SERVICE_DETAIL_TABS.OVERVIEW,
         serviceInfo: {} as ServiceModel,
         serviceList: [] as ServiceModel[],
+        notificationProtocolList: [] as NotificationProtocolModel[],
     });
 
     const getters = reactive({
@@ -102,6 +106,15 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.serviceList = [];
+            }
+        },
+        async fetchNotificationProtocolList() {
+            try {
+                const { results } = await SpaceConnector.clientV2.alertManager.notificationProtocol.list<NotificationProtocolListParameters, ListResponse<NotificationProtocolModel>>();
+                state.notificationProtocolList = results || [];
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.notificationProtocolList = [];
             }
         },
     };
