@@ -71,7 +71,7 @@ const handleAddUser = () => {
 const handleRemoveUser = () => {
     userGroupPageStore.updateModalSettings({
         type: USER_GROUP_MODAL_TYPE.REMOVE_USER,
-        title: 'Are you sure you want to Remove User from the selected user group?',
+        title: i18n.t('IAM.USER_GROUP.MODAL.REMOVE_USER.TITLE'),
         themeColor: 'alert',
     });
 };

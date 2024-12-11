@@ -126,8 +126,6 @@ const handleChange = (options: any = {}) => {
 };
 
 const handleSelectDropdown = async (inputText: string) => {
-    dropdownState.loading = true;
-
     switch (inputText) {
     case USER_GROUP_MODAL_TYPE.UPDATE:
         userGroupPageStore.updateModalSettings({
@@ -135,15 +133,13 @@ const handleSelectDropdown = async (inputText: string) => {
             title: i18n.t('IAM.USER_GROUP.MODAL.CREATE_USER_GROUP.UPDATE_TITLE'),
             themeColor: 'primary',
         });
-        dropdownState.loading = false;
         break;
     case USER_GROUP_MODAL_TYPE.DELETE:
         userGroupPageStore.updateModalSettings({
             type: USER_GROUP_MODAL_TYPE.DELETE,
-            title: 'Are you sure you want to Delete User Group?',
-            themeColor: 'danger',
+            title: i18n.t('IAM.USER_GROUP.MODAL.DELETE.TITLE'),
+            themeColor: 'alert',
         });
-        dropdownState.loading = false;
         break;
     case USER_GROUP_MODAL_TYPE.ADD_NEW_USER:
         userGroupPageStore.updateModalSettings({
@@ -151,10 +147,8 @@ const handleSelectDropdown = async (inputText: string) => {
             title: i18n.t('IAM.USER_GROUP.MODAL.ADD_NEW_USER.TITLE'),
             themeColor: 'primary',
         });
-        dropdownState.loading = false;
         break;
     default:
-        dropdownState.loading = false;
         break;
     }
 };
