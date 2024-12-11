@@ -141,6 +141,12 @@ const state = reactive({
             description: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.PIVOT_DESC'),
             icon: 'ic_db-pivot',
         },
+        {
+            key: DATA_TABLE_OPERATOR.ADD_LABELS,
+            name: 'Additional Labels',
+            description: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.ADD_LABELS_DESC'),
+            icon: '', // TODO: Add icon
+        },
     ]),
 });
 

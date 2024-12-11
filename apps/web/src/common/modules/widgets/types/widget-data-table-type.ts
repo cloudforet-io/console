@@ -21,7 +21,7 @@ interface TableFieldInfo {
 }
 
 export interface AdditionalLabel {
-    key: string;
+    // key: string;
     name: string;
     value: string;
 }

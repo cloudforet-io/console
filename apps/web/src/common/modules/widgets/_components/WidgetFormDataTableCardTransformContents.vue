@@ -24,7 +24,7 @@ import {
 } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type {
-    DataTableAlertModalMode, QueryCondition, EvalExpressions, TransformDataTableInfo,
+    DataTableAlertModalMode, QueryCondition, EvalExpressions, TransformDataTableInfo, AdditionalLabel,
 } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
     DataTableOperator, JoinType, ConcatOptions, JoinOptions, QueryOptions, EvalOptions,
@@ -121,6 +121,10 @@ const evalState = reactive({
     expressions: [{
         key: getRandomId(), fieldType: DATA_TABLE_FIELD_TYPE.DATA, name: '', expression: '', isCollapsed: false,
     }] as EvalExpressions[],
+});
+
+const addLabelsState = reactive({
+    labels: [] as AdditionalLabel[],
 });
 
 const originState = reactive({
@@ -331,6 +335,7 @@ defineExpose({
                                                     :join-type.sync="joinState.joinType"
                                                     :conditions.sync="queryState.conditions"
                                                     :expressions.sync="evalState.expressions"
+                                                    :labels.sync="addLabelsState.labels"
                                                     :is-legacy-data-table="state.isLegacyDataTable"
         />
         <widget-form-data-table-card-footer :disabled="state.applyDisabled"
