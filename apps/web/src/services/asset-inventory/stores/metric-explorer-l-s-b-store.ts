@@ -16,31 +16,35 @@ import type { MetricModel } from '@/schema/inventory/metric/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 interface MetricExplorerLSBPageStoreState {
-    groupLoading: boolean;
+    loading: boolean;
     namespaceLoadingMap: Record<string, boolean>;
     metricLoading: boolean;
     namespaceGroupList: NamespaceGroupModel[];
     namespaceMap: Record<string, NamespaceModel[]>
+    namespaceMapByKeywordSearch: Record<string, NamespaceModel[]>
     metricList: MetricModel[];
     selectedNamespace?: NamespaceModel;
 }
 
-export const useMetricExplorerLSBPageStore = defineStore('metric-explorer-l-s-b', () => {
+export const useMetricExplorerLSBStore = defineStore('metric-explorer-l-s-b', () => {
     const appContextStore = useAppContextStore();
 
-    const _state = reactive({
+    const _getters = reactive({
         isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
     });
 
     const state = reactive<MetricExplorerLSBPageStoreState>({
         // loading
-        groupLoading: false,
+        loading: false,
         namespaceLoadingMap: {},
         metricLoading: false,
         // data
         namespaceGroupList: [],
         namespaceMap: {},
+        namespaceMapByKeywordSearch: {},
         metricList: [],
         selectedNamespace: undefined,
     });
@@ -55,7 +59,7 @@ export const useMetricExplorerLSBPageStore = defineStore('metric-explorer-l-s-b'
 
     /* Actions */
     const reset = () => {
-        state.groupLoading = false;
+        state.loading = false;
         state.namespaceLoadingMap = {};
         state.metricLoading = false;
         state.namespaceGroupList = [];
@@ -65,23 +69,23 @@ export const useMetricExplorerLSBPageStore = defineStore('metric-explorer-l-s-b'
     const loadNamespaceGroupListFetcher = getCancellableFetcher<NamespaceGroupListParameters, ListResponse<NamespaceGroupModel>>(SpaceConnector.clientV2.inventoryV2.namespaceGroup.list);
     const loadNamespaceGroupList = async () => {
         try {
-            state.groupLoading = true;
+            state.loading = true;
             const { status, response } = await loadNamespaceGroupListFetcher({});
             if (status === 'succeed') {
                 state.namespaceGroupList = response.results || [];
             }
         } catch (e) {
             state.namespaceGroupList = [];
-            console.error(e);
+            ErrorHandler.handleError(e);
         } finally {
-            state.groupLoading = false;
+            state.loading = false;
         }
     };
     const loadNamespaceListFetcher = getCancellableFetcher<NamespaceListParameters, ListResponse<NamespaceModel>>(SpaceConnector.clientV2.inventoryV2.namespace.list);
     const loadNamespaceListByNamespaceGroupId = async (namespaceGroupId: string) => {
         const listParams: NamespaceListParameters = {
             namespace_group_id: namespaceGroupId,
-            resource_group: _state.isAdminMode ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE,
+            resource_group: _getters.isAdminMode ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE,
         };
         try {
             state.namespaceLoadingMap = {
@@ -100,12 +104,48 @@ export const useMetricExplorerLSBPageStore = defineStore('metric-explorer-l-s-b'
                 ...state.namespaceMap,
                 [namespaceGroupId]: [],
             };
-            console.error(e);
+            ErrorHandler.handleError(e);
         } finally {
             state.namespaceLoadingMap = {
                 ...state.namespaceLoadingMap,
                 [namespaceGroupId]: false,
             };
+        }
+    };
+    const loadNamespaceListByKeywordSearch = async (keyword: string) => {
+        const listParams: NamespaceListParameters = {
+            resource_group: _getters.isAdminMode ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE,
+            query: {
+                filter: [{ k: 'name', v: keyword, o: 'contain' }],
+            },
+        };
+        try {
+            state.loading = true;
+            const { status, response } = await loadNamespaceListFetcher(listParams);
+            if (status === 'succeed') {
+                const namespaceList = response.results || [];
+                namespaceList.forEach((namespace) => {
+                    if (state.namespaceMapByKeywordSearch[namespace.namespace_id]) {
+                        state.namespaceMapByKeywordSearch = {
+                            ...state.namespaceMapByKeywordSearch,
+                            [namespace.namespace_id]: [
+                                ...state.namespaceMapByKeywordSearch[namespace.namespace_id],
+                                namespace,
+                            ],
+                        };
+                    } else {
+                        state.namespaceMapByKeywordSearch = {
+                            ...state.namespaceMapByKeywordSearch,
+                            [namespace.namespace_id]: [namespace],
+                        };
+                    }
+                });
+            }
+        } catch (e) {
+            state.namespaceMapByKeywordSearch = {};
+            ErrorHandler.handleError(e);
+        } finally {
+            state.loading = false;
         }
     };
     const loadMetricListFetcher = getCancellableFetcher<MetricListParameters, ListResponse<MetricModel>>(SpaceConnector.clientV2.inventoryV2.metric.list);
@@ -121,7 +161,7 @@ export const useMetricExplorerLSBPageStore = defineStore('metric-explorer-l-s-b'
             }
         } catch (e) {
             state.metricList = [];
-            console.error(e);
+            ErrorHandler.handleError(e);
         } finally {
             state.metricLoading = false;
         }
@@ -131,6 +171,7 @@ export const useMetricExplorerLSBPageStore = defineStore('metric-explorer-l-s-b'
         reset,
         loadNamespaceGroupList,
         loadNamespaceListByNamespaceGroupId,
+        loadNamespaceListByKeywordSearch,
         loadMetricList,
     };
     const mutations = {
