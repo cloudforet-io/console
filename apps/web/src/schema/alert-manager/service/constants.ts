@@ -12,8 +12,10 @@ export const MEMBERS_TYPE = {
     USER: 'USER',
     USER_GROUP: 'USER_GROUP',
 } as const;
-export const ALERTS_TYPE = {
+
+export const SERVICE_ALERTS_TYPE = {
     TOTAL: 'TOTAL',
-    TRIGGERRED: 'TRIGGERRED',
+    TRIGGERED: 'TRIGGERED',
     ACKNOWLEDGED: 'ACKNOWLEDGED',
+    RESOLVED: 'RESOLVED',
 } as const;

@@ -16,6 +16,7 @@ const serviceDetailPageStore = useServiceDetailPageStore();
 
 onMounted(() => {
     serviceDetailPageStore.fetchServiceDetailData(props.serviceId);
+    serviceDetailPageStore.fetchNotificationProtocolList();
 });
 </script>
 
