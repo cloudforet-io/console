@@ -16,7 +16,6 @@ import myPageRoutes from '@/services/my-page/routes/routes';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
 
-const userStore = useUserStore(pinia);
 export const integralRoutes: RouteConfig[] = [
     {
         path: '/',
@@ -37,6 +36,7 @@ export const integralRoutes: RouteConfig[] = [
                 name: ROOT_ROUTE.ADMIN._NAME,
                 meta: { scope: ROUTE_SCOPE.DOMAIN },
                 redirect: () => {
+                    const userStore = useUserStore(pinia);
                     if (!userStore.getters.isDomainAdmin) return { name: ROOT_ROUTE.WORKSPACE._NAME };
                     return ({ name: makeAdminRouteName(WORKSPACE_HOME_ROUTE._NAME) });
                 },

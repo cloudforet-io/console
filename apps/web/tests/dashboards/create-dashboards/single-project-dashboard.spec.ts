@@ -22,7 +22,7 @@ test.describe('Single Project Dashboard', () => {
         const selectedTemplateName = await page.locator('.default-dashboard-board .p-board-item').first().locator('.dashboard-name').innerText();
 
         await test.step('3. Select Template (Default Dashboard)', async () => {
-            // Todo: to be added
+            // HACK: to be added
             // await expect('').not.toContainText(' Workspace ');
             await page.locator('.default-dashboard-board .p-board-item').first().click();
             await page.getByRole('button', { name: 'Create New Dashboard' }).click();
@@ -43,7 +43,7 @@ test.describe('Single Project Dashboard', () => {
             await expect(locatorScope).toContainText(' Project ');
             await expect(locatorName).toContainText(dashboardName);
 
-            // Todo: to be added
+            // HACK: to be added
             // await expect(locatorName).toContainText('public');
         });
     });

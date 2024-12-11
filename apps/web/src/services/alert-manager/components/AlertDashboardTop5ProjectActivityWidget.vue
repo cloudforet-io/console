@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import {
-    computed, getCurrentInstance, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
+import { useRouter } from 'vue-router/composables';
 
 import dayjs from 'dayjs';
 import { find } from 'lodash';
@@ -55,7 +55,7 @@ interface Activity {
     status?: string;
 }
 
-const vm = getCurrentInstance()?.proxy as Vue;
+const router = useRouter();
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const storeState = reactive({
@@ -155,7 +155,7 @@ const onClickBox = (projectId, date) => {
         { k: 'project_id', v: projectId, o: '=' },
         { k: 'created_at', v: date.split(' ')[0], o: '=t' },
     ]);
-    vm.$router.replace({
+    router.replace({
         name: ALERT_MANAGER_ROUTE.ALERT._NAME,
         query: {
             filters: urlQueryHelper.rawQueryStrings,

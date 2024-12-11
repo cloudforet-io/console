@@ -69,6 +69,10 @@ const state = reactive({
     .icon-wrapper {
         @apply text-white;
 
+        &.avatar-xs {
+            padding: 0.125rem;
+        }
+
         &.avatar-sm, &.avatar-md {
             padding: 0.25rem;
         }

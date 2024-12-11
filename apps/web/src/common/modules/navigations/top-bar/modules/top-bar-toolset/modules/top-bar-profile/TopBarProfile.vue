@@ -229,7 +229,6 @@ watch(() => props.visible, (value) => {
                   @click.stop="handleProfileButtonClick"
                   @keydown.enter="openProfileMenu"
             >
-                <!-- TODO: Will add user image src -->
                 <p-avatar v-if="state.visibleRoleType !== 'Admin' && state.visibleAvatar"
                           class="menu-icon"
                           size="md"
@@ -246,7 +245,6 @@ watch(() => props.visible, (value) => {
              class="profile-menu-wrapper"
         >
             <div class="user-info">
-                <!-- TODO: Will add user image src -->
                 <p-avatar v-if="state.visibleRoleType !== 'Admin' && state.visibleAvatar"
                           size="sm"
                 />
@@ -305,7 +303,7 @@ watch(() => props.visible, (value) => {
                          height="1rem"
                     />
                 </div>
-                <!-- TODO: This code might need recovery in version 1.13.-->
+                <!-- HACK: This code might need recovery in version 1.13.-->
                 <!--                <div v-on-click-outside="handleClickOutsideCurrencyMenu"-->
                 <!--                     class="info-menu currency"-->
                 <!--                     @click.stop="handleCurrencyDropdownClick"-->

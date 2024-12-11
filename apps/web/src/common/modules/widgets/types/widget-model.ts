@@ -4,7 +4,7 @@ import type {
     DATA_TABLE_TYPE, DATA_SOURCE_DOMAIN, DATA_TABLE_OPERATOR, JOIN_TYPE, DATA_TABLE_FIELD_TYPE,
 } from '@/common/modules/widgets/_constants/data-table-constant';
 
-export type WidgetType = string; // TODO: make this widget type enum
+export type WidgetType = string; // HACK: make this widget type enum
 
 export type DataTableState = 'AVAILABLE' | 'UNAVAILABLE';
 

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import {
-    computed, getCurrentInstance, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
+import { useRouter } from 'vue-router/composables';
 
 
 import { makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/query-search';
@@ -29,7 +29,8 @@ import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 const props = defineProps<{
     activatedProjects: string[];
 }>();
-const vm = getCurrentInstance()?.proxy as Vue;
+const router = useRouter();
+
 const allReferenceStore = useAllReferenceStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const storeState = reactive({
@@ -98,7 +99,7 @@ const onChange = async (options?: any) => {
     await listAlertByProject();
 };
 const onClickProjectBox = (item) => {
-    vm.$router.push({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME, params: { id: item.project_id } });
+    router.push({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME, params: { id: item.project_id } });
 };
 
 /* init */

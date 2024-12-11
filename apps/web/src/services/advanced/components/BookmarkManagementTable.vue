@@ -161,7 +161,7 @@ const handleUpdateVisibleMenu = (item: BookmarkItem, visibleMenu: boolean) => {
         bookmarkStore.setSelectedBookmark(item);
     }
 };
-const getRowSelectable = (item) => !item.isGlobal;
+const getRowSelectable = (item) => item.isGlobal;
 const handleClickName = (item: BookmarkItem) => {
     if (item.link) {
         window.open(item.link, '_blank');

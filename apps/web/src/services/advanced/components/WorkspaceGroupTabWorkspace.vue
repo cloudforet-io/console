@@ -2,10 +2,8 @@
 import {
     computed, onMounted, reactive, watch,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
 
 import dayjs from 'dayjs';
-import { clone } from 'lodash';
 
 import {
     PButton, PHeading, PI, PLink, PStatus, PToolboxTable, PTooltip, PHeadingLayout,
@@ -22,8 +20,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
-
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { gray } from '@/styles/colors';
@@ -35,7 +32,6 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-c
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
-
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
 const workspaceTabState = workspaceGroupPageStore.workspaceTabState;
@@ -43,23 +39,13 @@ const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
 const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
 
-const route = useRoute();
-
-const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
-});
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 interface WorkspaceTableItem extends WorkspaceModel {
     remove_button: WorkspaceModel;
 }
 
 const state = reactive({
-    selectedMenuId: computed(() => {
-        const reversedMatched = clone(route.matched).reverse();
-        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-        return closestRoute?.meta?.menuId;
-    }),
-    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
     currency: computed<Currency|undefined>(() => workspaceGroupPageGetters.currency),
 });
 const tableState = reactive({
@@ -78,7 +64,7 @@ const tableState = reactive({
             { name: 'cost_info', label: 'Cost' },
             { name: 'created_at', label: 'Created' },
         ];
-        if (state.hasReadWriteAccess) {
+        if (hasReadWriteAccess.value) {
             defaultFields.push({ name: 'remove_button', label: ' ', sortable: false });
         }
         return defaultFields;
@@ -205,7 +191,7 @@ const costInfoReduce = (arr: (number | {month: any})[] | any) => {
                            heading-type="sub"
                 />
             </template>
-            <template v-if="state.hasReadWriteAccess"
+            <template v-if="hasReadWriteAccess"
                       #extra
             >
                 <p-button style-type="negative-primary"
@@ -234,7 +220,7 @@ const costInfoReduce = (arr: (number | {month: any})[] | any) => {
                          :sort-desc="workspaceTabState.sortDesc"
                          :this-page.sync="workspaceTabState.thisPage"
                          :search-text.sync="workspaceTabState.searchText"
-                         :selectable="state.hasReadWriteAccess"
+                         :selectable="hasReadWriteAccess"
                          sortable
                          searchable
                          @select="handleSelect"

@@ -5,7 +5,7 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { clone, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 
 import {
     PI, screens, PButton, PTextButton, PTooltip,
@@ -24,6 +24,7 @@ import { MENU_ID } from '@/lib/menu/config';
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
 import UpdateMark from '@/common/components/marks/UpdateMark.vue';
+import { useCurrentMenuId } from '@/common/composables/current-menu-id';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
@@ -47,6 +48,8 @@ const displayStore = useDisplayStore();
 const route = useRoute();
 const router = useRouter();
 const { width } = useWindowSize();
+
+const { currentMenuId } = useCurrentMenuId();
 
 const storeState = reactive({
     isHideNavRail: computed(() => gnbGetters.isHideNavRail),
@@ -88,14 +91,11 @@ const state = reactive({
         });
         return result;
     }),
-    selectedMenuId: computed(() => {
-        const reversedMatched = clone(route.matched).reverse();
-        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-        const targetMenuId: string = closestRoute?.name || closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
+    selectedMenuId: computed<string>(() => {
         if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
             return '';
         }
-        return targetMenuId;
+        return currentMenuId.value;
     }),
 });
 
@@ -209,13 +209,6 @@ onMounted(async () => {
                             </span>
                         </div>
                     </div>
-                    <!--            TODO: low priority -->
-                    <!--            <favorite-button v-if="item.subMenuList?.length === 0"-->
-                    <!--                             class="favorite-button"-->
-                    <!--                             :item-id="item.id"-->
-                    <!--                             :favorite-type="FAVORITE_TYPE.MENU"-->
-                    <!--                             scale="0.65"-->
-                    <!--            />-->
                 </router-link>
                 <div v-else>
                     <div v-if="state.isMenuDescription"

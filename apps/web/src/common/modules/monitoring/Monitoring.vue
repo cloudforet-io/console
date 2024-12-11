@@ -104,9 +104,9 @@
 
 <script lang="ts">
 import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
+import { useRouter } from 'vue-router/composables';
 
 import dayjs from 'dayjs';
 import {
@@ -180,7 +180,7 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as Vue;
+        const router = useRouter();
         const userStore = useUserStore();
         const state = reactive({
             showLoader: computed(() => props.loading || state.metricsLoading),
@@ -213,7 +213,7 @@ export default {
             resources = resources.map((resource, idx) => ({
                 ...resource,
                 color: COLORS[idx],
-                link: vm.$router.resolve(referenceRouter(resource.id, { resource_type: 'inventory.Server' })).href,
+                link: router.resolve(referenceRouter(resource.id, { resource_type: 'inventory.Server' })).href,
             }));
             state.availableResources = sortBy(resources, (m) => m.name);
         };

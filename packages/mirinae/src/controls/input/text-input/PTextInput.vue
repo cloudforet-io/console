@@ -332,7 +332,6 @@ export default defineComponent<TextInputProps>({
 
         /* query input mode */
         const proxyVisibleMenu = useProxyValue<boolean>('visibleMenu', props, emit);
-        // TODO
 
         /* menu visibility */
         const hideMenu = (focusInput?: boolean) => {

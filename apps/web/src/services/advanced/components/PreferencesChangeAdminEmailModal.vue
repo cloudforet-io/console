@@ -48,7 +48,7 @@ const {
 });
 
 const handleClickSendCode = () => {
-    // TODO: send verification code to admin email
+    // HACK: send verification code to admin email
     state.isCodeSent = true;
 };
 const confirm = async () => {

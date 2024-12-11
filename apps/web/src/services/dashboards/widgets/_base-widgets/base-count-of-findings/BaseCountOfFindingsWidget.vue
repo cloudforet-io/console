@@ -91,7 +91,7 @@ const fetchData = async (): Promise<Data[]> => {
         apiQueryHelper.setFilters(widgetState.consoleFilters);
         if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
 
-        // TODO: temp code
+        // NOTE: temp code
         let _dataField = widgetState.dataField;
         if (widgetState.dataField === 'additional_info.service') _dataField = 'data.service';
         if (widgetState.dataField === 'additional_info.status') _dataField = 'data.status';

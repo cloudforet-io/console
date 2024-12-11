@@ -64,7 +64,7 @@ const {
     },
 });
 
-// TODO: type check
+// HACK: type check
 const handleClickBoardItem = (item) => {
     state.selectedRules = item;
 };
