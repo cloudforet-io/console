@@ -107,7 +107,7 @@ export interface PivotFieldOptions {
 
 export interface AddLabelsOptions {
     data_table_id: string;
-    labels: Record<string, string>;
+    labels: AdditionalLabels;
 }
 
 export interface ValueMappingOptions {

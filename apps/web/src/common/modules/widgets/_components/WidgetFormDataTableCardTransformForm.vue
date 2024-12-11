@@ -12,12 +12,16 @@ import getRandomId from '@/lib/random-id-generator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import WidgetFormDataTableCardTransformDataTableDropdown
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformDataTableDropdown.vue';
+import WidgetFormDataTableCardTransformFormAddLabels
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformFormAddLabels.vue';
 import WidgetFormDataTableCardTransformFormEvaluate
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformFormEvaluate.vue';
 import WidgetFormDataTableGlobalVariableViewButton
     from '@/common/modules/widgets/_components/WidgetFormDataTableGlobalVariableViewButton.vue';
 import { DATA_TABLE_OPERATOR, JOIN_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
-import type { QueryCondition, TransformDataTableInfo, EvalExpressions } from '@/common/modules/widgets/types/widget-data-table-type';
+import type {
+    QueryCondition, TransformDataTableInfo, EvalExpressions, AdditionalLabel,
+} from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
     DataTableOperator, JoinType,
 } from '@/common/modules/widgets/types/widget-model';
@@ -31,9 +35,10 @@ interface Props {
     dataTableId: string;
     operator: DataTableOperator;
     dataTableInfo: TransformDataTableInfo;
-    joinType: JoinType|undefined;
-    conditions: QueryCondition[];
-    expressions: EvalExpressions[];
+    joinType: JoinType|undefined; // Join
+    conditions: QueryCondition[]; // Query
+    expressions: EvalExpressions[]; // Eval
+    labels: AdditionalLabel[]; // Add Labels
     isLegacyDataTable?: boolean;
 }
 
@@ -51,6 +56,7 @@ const state = reactive({
         if (props.operator === 'JOIN') return { name: 'Join', icon: 'ic_join' };
         if (props.operator === 'QUERY') return { name: 'Query', icon: 'ic_db-where' };
         if (props.operator === 'EVAL') return { name: 'Evaluate', icon: 'ic_db-evaluation' };
+        if (props.operator === 'ADD_LABELS') return { name: 'Add Labels', icon: '' }; // TODO: Add icon
         return { name: '', icon: '' };
     }),
     proxyDataTableInfo: useProxyValue('dataTableInfo', props, emit),
@@ -58,7 +64,7 @@ const state = reactive({
 
 const joinState = reactive({
     proxyJoinType: useProxyValue('joinType', props, emit),
-    joinTypeitems: computed<SelectDropdownMenuItem[]>(() => [
+    joinTypeItems: computed<SelectDropdownMenuItem[]>(() => [
         { label: 'Left Join', name: JOIN_TYPE.LEFT, icon: 'ic_join-left' },
         { label: 'Right Join', name: JOIN_TYPE.RIGHT, icon: 'ic_join-right' },
         { label: 'Outer Join', name: JOIN_TYPE.OUTER, icon: 'ic_join-outer' },
@@ -72,6 +78,10 @@ const queryState = reactive({
 
 const evalState = reactive({
     proxyExpressions: useProxyValue('expressions', props, emit),
+});
+
+const addLabelsState = reactive({
+    proxyLabels: useProxyValue('labels', props, emit),
 });
 
 /* Events */
@@ -149,6 +159,7 @@ const handleClickAddCondition = () => {
                     </i18n>
                 </p>
             </div>
+            <!-- Default Dropdown -->
             <div class="data-table-dropdown-wrapper">
                 <widget-form-data-table-card-transform-data-table-dropdown :data-table-id="props.dataTableId"
                                                                            :operator="props.operator"
@@ -156,12 +167,13 @@ const handleClickAddCondition = () => {
                                                                            :is-legacy-data-table="props.isLegacyDataTable"
                 />
             </div>
+            <!-- Join -->
             <p-field-group v-if="props.operator === DATA_TABLE_OPERATOR.JOIN"
                            :label="'How'"
                            required
             >
                 <p-select-dropdown class="join-type-dropdown"
-                                   :menu="joinState.joinTypeitems"
+                                   :menu="joinState.joinTypeItems"
                                    :selected.sync="joinState.proxyJoinType"
                                    block
                 >
@@ -169,7 +181,7 @@ const handleClickAddCondition = () => {
                               #dropdown-left-area
                     >
                         <p-i class="selected-join-type-icon"
-                             :name="joinState.joinTypeitems.find((item) => item.name === joinState.proxyJoinType)?.icon"
+                             :name="joinState.joinTypeItems.find((item) => item.name === joinState.proxyJoinType)?.icon"
                              width="1rem"
                              height="1rem"
                         />
@@ -228,9 +240,14 @@ const handleClickAddCondition = () => {
                     </div>
                 </div>
             </div>
+            <!-- Eval -->
             <widget-form-data-table-card-transform-form-evaluate v-if="props.operator === DATA_TABLE_OPERATOR.EVAL"
                                                                  :expressions.sync="evalState.proxyExpressions"
                                                                  :is-legacy-data-table="props.isLegacyDataTable"
+            />
+            <!-- Add Label -->
+            <widget-form-data-table-card-transform-form-add-labels v-if="props.operator === DATA_TABLE_OPERATOR.ADD_LABELS"
+                                                                   :labels.sync="addLabelsState.proxyLabels"
             />
         </div>
     </div>
