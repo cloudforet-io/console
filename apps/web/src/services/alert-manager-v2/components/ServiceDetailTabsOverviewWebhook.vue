@@ -1,15 +1,26 @@
 <script setup lang="ts">
 import { useElementSize } from '@vueuse/core/index';
-import { computed, reactive, ref } from 'vue';
-
 import {
-    PFieldTitle, PIconButton, PLazyImg, PDivider, PTextButton,
+    computed, onMounted, reactive, ref,
+} from 'vue';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PFieldTitle, PIconButton, PLazyImg, PDivider, PTextButton, PDataLoader,
 } from '@cloudforet/mirinae';
 
-import { assetUrlConverter } from '@/lib/helper/asset-helper';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { WebhookListParameters } from '@/schema/alert-manager/webhook/api-verbs/list';
+import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
+
 
 const ITEM_DEFAULT_WIDTH = 184 + 8;
 const DEFAULT_LEFT_PADDING = 16;
@@ -17,44 +28,19 @@ const DEFAULT_LEFT_PADDING = 16;
 const rowItemsWrapperRef = ref<null | HTMLElement>(null);
 const itemEl = ref<null | HTMLElement>(null);
 
+const allReferenceStore = useAllReferenceStore();
+const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
+
 const { width: rowItemsWrapperWidth } = useElementSize(rowItemsWrapperRef);
 
+const storeState = reactive({
+    plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
+});
 const state = reactive({
+    loading: false,
     pageStart: 0,
-    // TODO: temp data
-    items: [
-        {
-            title: 'title',
-            requests: 12,
-            icon: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/aws-cloudtrail.svg',
-        },
-        {
-            title: 'title1',
-            requests: 12,
-            icon: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/aws-cloudtrail.svg',
-        },
-        {
-            title: 'title2',
-            requests: 12,
-            icon: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/aws-cloudtrail.svg',
-        },
-        {
-            title: 'title3',
-            requests: 12,
-            icon: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/aws-cloudtrail.svg',
-        },
-        {
-            title: 'title4',
-            requests: 12,
-            icon: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/aws-cloudtrail.svg',
-        },
-        {
-            title: 'title1',
-            requests: 12,
-            icon: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/aws-cloudtrail.svg',
-        },
-    ],
+    items: [] as WebhookModel[],
     visibleCount: computed<number>(() => Math.floor((rowItemsWrapperWidth.value - DEFAULT_LEFT_PADDING) / ITEM_DEFAULT_WIDTH)),
     pageMax: computed<number>(() => Math.max(state.items.length - state.visibleCount, 0)),
 });
@@ -75,6 +61,23 @@ const handleClickArrowButton = (increment: number) => {
 const handleRouteDetail = () => (
     serviceDetailPageStore.setCurrentTab(SERVICE_DETAIL_TABS.WEBHOOK)
 );
+
+const fetchWebhookList = async () => {
+    state.loading = true;
+    try {
+        const { results } = await SpaceConnector.clientV2.alertManager.webhook.list<WebhookListParameters, ListResponse<WebhookModel>>();
+        state.items = results || [];
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
+        state.items = [];
+    } finally {
+        state.loading = false;
+    }
+};
+
+onMounted(() => {
+    fetchWebhookList();
+});
 </script>
 
 <template>
@@ -86,48 +89,53 @@ const handleRouteDetail = () => (
         />
         <div ref="rowItemsWrapperRef"
              class="row-items-wrapper"
+             :class="{'empty': !state.items.length}"
         >
-            <div ref="itemEl"
-                 class="row-items-container"
+            <p-data-loader :loading="state.loading"
+                           :data="state.items"
             >
-                <div v-for="(item, idx) in state.items"
-                     :key="`service-detail-webhook-item-${idx}`"
-                     class="item"
+                <div ref="itemEl"
+                     class="row-items-container"
                 >
-                    <div class="image-wrapper">
-                        <p-lazy-img :src="assetUrlConverter(item.icon)"
-                                    width="1.25rem"
-                                    height="1.25rem"
-                                    error-icon="ic_webhook"
-                                    class="image"
-                        />
-                    </div>
-                    <div>
-                        <p class="text-label-md leading-8">
-                            {{ item.title }}
-                        </p>
-                        <p class="text-label-sm text-gray-700">
-                            {{ $t('ALERT_MANAGER.WEBHOOK.REQUEST', { cnt: item.requests}) }}
-                        </p>
+                    <div v-for="(item, idx) in state.items"
+                         :key="`service-detail-webhook-item-${idx}`"
+                         class="item"
+                    >
+                        <div class="image-wrapper">
+                            <p-lazy-img :src="storeState.plugins[item.plugin_info.plugin_id] ? storeState.plugins[item.plugin_info.plugin_id].icon : 'ic_webhook'"
+                                        width="1.25rem"
+                                        height="1.25rem"
+                                        error-icon="ic_webhook"
+                                        class="image"
+                            />
+                        </div>
+                        <div>
+                            <p class="text-label-md leading-8">
+                                {{ item.name }}
+                            </p>
+                            <p class="text-label-sm text-gray-700">
+                                {{ $t('ALERT_MANAGER.WEBHOOK.REQUEST', { cnt: item.requests.total }) }}
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <p-icon-button v-if="state.pageStart !== 0"
-                           class="arrow-button left"
-                           name="ic_chevron-left"
-                           color="inherit transparent"
-                           width="1.5rem"
-                           height="1.5rem"
-                           @click="handleClickArrowButton(-1)"
-            />
-            <p-icon-button v-if="state.pageStart !== Number(state.pageMax)"
-                           class="arrow-button right"
-                           name="ic_chevron-right"
-                           color="inherit transparent"
-                           width="1.5rem"
-                           height="1.5rem"
-                           @click="handleClickArrowButton(1)"
-            />
+                <p-icon-button v-if="state.pageStart !== 0"
+                               class="arrow-button left"
+                               name="ic_chevron-left"
+                               color="inherit transparent"
+                               width="1.5rem"
+                               height="1.5rem"
+                               @click="handleClickArrowButton(-1)"
+                />
+                <p-icon-button v-if="state.pageStart !== Number(state.pageMax)"
+                               class="arrow-button right"
+                               name="ic_chevron-right"
+                               color="inherit transparent"
+                               width="1.5rem"
+                               height="1.5rem"
+                               @click="handleClickArrowButton(1)"
+                />
+            </p-data-loader>
         </div>
         <p-divider class="bg-gray-150" />
         <div class="link-wrapper">
@@ -149,6 +157,9 @@ const handleRouteDetail = () => (
         @apply relative overflow-hidden;
         padding-top: 0.75rem;
         padding-bottom: 1.75rem;
+        &.empty {
+            padding-top: 0;
+        }
         .row-items-container {
             @apply flex overflow-hidden;
             gap: 0.5rem;
