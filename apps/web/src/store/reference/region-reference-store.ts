@@ -14,6 +14,7 @@ import type {
 } from '@/store/reference/type';
 import { useUserStore } from '@/store/user/user-store';
 
+import config from '@/lib/config';
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -66,7 +67,10 @@ export const useRegionReferenceStore = defineStore('reference-region', () => {
 
         const referenceMap: RegionReferenceMap = {};
         try {
-            const response = await SpaceConnector.clientV2.inventory.region.list<RegionListParameters, ListResponse<RegionModel>>({
+            const isResourceManagerVersionV2 = config.get('RESOURCE_MANAGER_VERSION') === 'v2';
+            const regionFetcher = isResourceManagerVersionV2 ? SpaceConnector.clientV2.inventoryV2.region.list : SpaceConnector.clientV2.inventory.region.list;
+
+            const response = await regionFetcher<RegionListParameters, ListResponse<RegionModel>>({
                 query: {
                     only: ['name', 'region_code', 'tags', 'provider'],
                 },
