@@ -24,7 +24,6 @@ import { checkEmailFormat } from '@/services/iam/helpers/user-management-form-va
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { AddModalMenuItem, LocalType } from '@/services/iam/types/user-type';
 
-
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
 const domainStore = useDomainStore();
