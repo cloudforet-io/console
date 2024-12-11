@@ -175,7 +175,7 @@ const migrateTable = (widget: PublicWidgetModel|PrivateWidgetModel): PublicWidge
     // Comparison version migration
     _options = {
         ..._options,
-        comparison: migrateComparison(_options.comparison),
+        comparison: migrateComparison(_options?.comparison),
     };
     return {
         ...widget,
