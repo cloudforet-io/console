@@ -99,6 +99,7 @@ const handleRemoveLabel = (idx: number) => {
                         />
                         <p-icon-button name="ic_delete"
                                        size="sm"
+                                       :disabled="state.proxyLabels.length === 1"
                                        @click="handleRemoveLabel(idx)"
                         />
                     </div>

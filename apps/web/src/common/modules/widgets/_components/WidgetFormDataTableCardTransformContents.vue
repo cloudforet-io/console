@@ -124,7 +124,9 @@ const evalState = reactive({
 });
 
 const addLabelsState = reactive({
-    labels: [] as AdditionalLabel[],
+    labels: [{
+        name: '', value: '',
+    }] as AdditionalLabel[],
 });
 
 const originState = reactive({
