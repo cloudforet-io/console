@@ -4,17 +4,12 @@ import {
 } from 'vue';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PHeadingLayout, PHeading, PButton, PToolboxTable,
 } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
-import type { UserGroupRemoveUsersParameters } from '@/schema/identity/user-group/api-verbs/remove-users';
-import type { UserGroupModel } from '@/schema/identity/user-group/model';
 import { i18n } from '@/translations';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { calculateTime } from '@/services/iam/composables/refined-table-data';
 import { USER_GROUP_MODAL_TYPE, USER_GROUP_USERS_SEARCH_HANDLERS } from '@/services/iam/constants/user-group-constant';
@@ -69,18 +64,11 @@ const handleAddUser = () => {
 };
 
 const handleRemoveUser = () => {
-    try {
-        const users: string[] = [];
-        userGroupPageState.users.selectedIndices.forEach((d) => {
-            users.push(userGroupPageState.users.list[d].user_id);
-        });
-        fetchRemoveUser({
-            user_group_id: userGroupPageGetters.selectedUserGroups[0].user_group_id,
-            users,
-        });
-    } finally {
-    //   TODO: after remove user
-    }
+    userGroupPageStore.updateModalSettings({
+        type: USER_GROUP_MODAL_TYPE.REMOVE_USER,
+        title: 'Are you sure you want to Remove User from the selected user group?',
+        themeColor: 'alert',
+    });
 };
 
 /* Watcher */
@@ -100,15 +88,6 @@ watch(() => userGroupPageGetters.selectedUserGroups, async (nv) => {
 watch(() => userGroupPageState.users, (nv) => {
     nv.totalCount = nv.list.length;
 }, { deep: true, immediate: true });
-
-/* API */
-const fetchRemoveUser = async (params: UserGroupRemoveUsersParameters) => {
-    try {
-        await SpaceConnector.clientV2.identity.userGroup.removeUsers<UserGroupRemoveUsersParameters, UserGroupModel>(params);
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
 </script>
 
 <template>

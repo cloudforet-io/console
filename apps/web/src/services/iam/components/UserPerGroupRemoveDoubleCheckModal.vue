@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { reactive } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal } from '@cloudforet/mirinae';
 
-import type { UserGroupDeleteUserGroupParameters } from '@/schema/identity/user-group/api-verbs/delete';
+import type { UserGroupRemoveUsersParameters } from '@/schema/identity/user-group/api-verbs/remove-users';
 import type { UserGroupModel } from '@/schema/identity/user-group/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -16,11 +16,6 @@ const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 const userGroupPageGetters = userGroupPageStore.getters;
 
-const storeState = reactive({
-    selectedUserGroupIds: computed(() => userGroupPageGetters.selectedUserGroups.map((userGroup) => userGroup.user_group_id)),
-    selectedUserGroupNames: computed(() => userGroupPageGetters.selectedUserGroups.map((userGroup) => userGroup.name)),
-});
-
 const state = reactive({
     loading: false,
 });
@@ -28,11 +23,13 @@ const state = reactive({
 /* Component */
 const handleConfirm = () => {
     try {
-        state.loading = true;
-        storeState.selectedUserGroupIds.forEach((userGroupId) => {
-            fetchDeleteUserGroup({
-                user_group_id: userGroupId,
-            });
+        const users: string[] = [];
+        userGroupPageState.users.selectedIndices.forEach((d) => {
+            users.push(userGroupPageState.users.list[d].user_id);
+        });
+        fetchRemoveUser({
+            user_group_id: userGroupPageGetters.selectedUserGroups[0].user_group_id,
+            users,
         });
     } finally {
         state.loading = false;
@@ -50,9 +47,9 @@ const handleCancel = () => {
 };
 
 /* API */
-const fetchDeleteUserGroup = async (params: UserGroupDeleteUserGroupParameters) => {
+const fetchRemoveUser = async (params: UserGroupRemoveUsersParameters) => {
     try {
-        await SpaceConnector.clientV2.identity.userGroup.delete<UserGroupDeleteUserGroupParameters, UserGroupModel>(params);
+        await SpaceConnector.clientV2.identity.userGroup.removeUsers<UserGroupRemoveUsersParameters, UserGroupModel>(params);
     } catch (e) {
         ErrorHandler.handleError(e);
     }
@@ -63,9 +60,13 @@ const fetchDeleteUserGroup = async (params: UserGroupDeleteUserGroupParameters) 
     <p-button-modal size="sm"
                     :header-title="userGroupPageState.modal.title"
                     :loading="state.loading"
-                    :visible="userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.DELETE"
+                    :visible="userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.REMOVE_USER"
                     :theme-color="userGroupPageState.modal.themeColor"
                     @confirm="handleConfirm"
                     @cancel="handleCancel"
-    />
+    >
+        <template #confirm-button>
+            <span>{{ $t('IAM.USER_GROUP.TAB.USERS.REMOVE') }}</span>
+        </template>
+    </p-button-modal>
 </template>

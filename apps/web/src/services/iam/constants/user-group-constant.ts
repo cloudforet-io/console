@@ -42,5 +42,6 @@ export const USER_GROUP_MODAL_TYPE = {
     UPDATE: 'update',
     DELETE: 'delete',
     ADD_NEW_USER: 'add_new_user',
+    REMOVE_USER: 'remove_user',
     CREATE: 'create',
 };
