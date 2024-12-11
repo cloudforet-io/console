@@ -1,23 +1,37 @@
 <script setup lang="ts">
-import { computed, defineProps, reactive } from 'vue';
+import { computed, reactive } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import {
     PHeading, PHeadingLayout, PSelectDropdown, PLink, PI,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
 
+import { MEMBERS_TYPE } from '@/schema/alert-manager/service/constants';
 import { i18n } from '@/translations';
+
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { gray } from '@/styles/colors';
 
-interface Props {
-    serviceId: string;
-}
+import ServiceDetailDeleteModal from '@/services/alert-manager-v2/components/ServiceDetailDeleteModal.vue';
+import ServiceDetailEditModal from '@/services/alert-manager-v2/components/ServiceDetailEditModal.vue';
+import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
+import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
+import type { Service } from '@/services/alert-manager-v2/types/alert-manager-type';
 
-const props = withDefaults(defineProps<Props>(), {
-    serviceId: '',
+type ModalType = 'edit' | 'delete';
+
+const serviceDetailPageStore = useServiceDetailPageStore();
+const serviceDetailPageGetters = serviceDetailPageStore.getters;
+
+const router = useRouter();
+
+const { getProperRouteLocation } = useProperRouteLocation();
+
+const storeState = reactive({
+    serviceInfo: computed<Service>(() => serviceDetailPageGetters.serviceInfo),
 });
-
 const state = reactive({
     menuItems: computed<MenuItem[]>(() => [
         {
@@ -32,9 +46,17 @@ const state = reactive({
         },
     ]),
 });
+const modalState = reactive({
+    modalVisible: false,
+    type: '' as ModalType,
+});
 
-const handleSelectDropdownMenu = () => {
-    console.log('TODO: handleSelectDropdownMenu');
+const handleSelectDropdownMenu = (type: ModalType) => {
+    modalState.modalVisible = true;
+    modalState.type = type;
+};
+const handleGoBackButton = () => {
+    router.push(getProperRouteLocation({ name: ALERT_MANAGER_ROUTE_V2.SERVICE._NAME }));
 };
 </script>
 
@@ -42,8 +64,9 @@ const handleSelectDropdownMenu = () => {
     <div class="service-detail-header">
         <p-heading-layout>
             <template #heading>
-                <p-heading :title="props.serviceId"
+                <p-heading :title="storeState.serviceInfo.name"
                            show-back-button
+                           @click-back-button="handleGoBackButton"
                 >
                     <template #title-right-extra>
                         <p-select-dropdown :menu="state.menuItems"
@@ -59,7 +82,7 @@ const handleSelectDropdownMenu = () => {
                 </p-heading>
             </template>
             <template #extra>
-                <p-link :to="undefined"
+                <p-link :to="getProperRouteLocation({ name: ALERT_MANAGER_ROUTE_V2.ALERTS._NAME })"
                         action-icon="internal-link"
                         new-tab
                         class="text-label-md"
@@ -69,41 +92,35 @@ const handleSelectDropdownMenu = () => {
             </template>
         </p-heading-layout>
         <div class="service-info-wrapper">
-            <div class="info">
+            <div class="flex items-center text-gray-700 gap-0.5">
                 <p-i class="select-marker"
                      name="ic_member"
                      width="0.75rem"
                      height="0.75rem"
                 />
-                <span>3</span>
+                <span>{{ storeState.serviceInfo.members[MEMBERS_TYPE.USER_GROUP]?.length }}</span>
                 <span>{{ $t('ALERT_MANAGER.SERVICE.USER_GROUP') }}</span>
-            </div>
-            <p-i name="ic_dot"
-                 width="0.125rem"
-                 height="0.125rem"
-                 :color="gray[500]"
-                 class="dot"
-            />
-            <div class="info">
-                <p-i class="select-marker"
-                     name="ic_member"
-                     width="0.75rem"
-                     height="0.75rem"
-                />
-                <span>3</span>
+                <span> / </span>
+                <span>{{ storeState.serviceInfo.members[MEMBERS_TYPE.USER]?.length }}</span>
                 <span>{{ $t('ALERT_MANAGER.SERVICE.MEMBERS') }}</span>
             </div>
-            <!-- TODO: apply visibility only when desc data is available-->
-            <p-i name="ic_dot"
+            <p-i v-if="storeState.serviceInfo?.description"
+                 name="ic_dot"
                  width="0.125rem"
                  height="0.125rem"
                  :color="gray[500]"
                  class="dot"
             />
-            <p class="truncate">
-                temp desc
+            <p class="truncate flex-1">
+                {{ storeState.serviceInfo?.description }}
             </p>
         </div>
+        <service-detail-edit-modal v-if="modalState.type === 'edit'"
+                                   :visible.sync="modalState.modalVisible"
+        />
+        <service-detail-delete-modal v-if="modalState.type === 'delete'"
+                                     :visible.sync="modalState.modalVisible"
+        />
     </div>
 </template>
 
@@ -116,10 +133,6 @@ const handleSelectDropdownMenu = () => {
         @apply flex items-center text-label-sm;
         padding-left: 2.5rem;
         gap: 0.5rem;
-        .info {
-            @apply flex items-center text-gray-700;
-            gap: 0.125rem;
-        }
     }
 }
 </style>
