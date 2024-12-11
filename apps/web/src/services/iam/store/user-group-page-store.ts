@@ -17,6 +17,7 @@ import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model'
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { ModalState } from '@/services/iam/types/user-group-type';
+import type { UserListItemType } from '@/services/iam/types/user-type';
 
 interface UserGroupPageState {
     loading: boolean;
@@ -28,7 +29,7 @@ interface UserGroupPageState {
     pageLimit: number;
     searchFilters: ConsoleFilter[];
     users: {
-        list: any;
+        list: UserListItemType[];
         pageStart: number;
         pageLimit: number;
         totalCount: number;
