@@ -1,5 +1,8 @@
 import type { TranslateResult } from 'vue-i18n';
 
+import type { ServiceModel } from '@/schema/alert-manager/service/model';
+import type { AlertsInfoType, AlertsType } from '@/schema/alert-manager/service/type';
+
 import type {
     SERVICE_DETAIL_TABS,
     WEBHOOK_DETAIL_TABS,
@@ -15,3 +18,7 @@ export type createHeaderInfoByStep = {
     title: TranslateResult;
     desc?: TranslateResult;
 };
+
+export interface Service extends ServiceModel {
+    alerts: Record<AlertsType, AlertsInfoType>;
+}
