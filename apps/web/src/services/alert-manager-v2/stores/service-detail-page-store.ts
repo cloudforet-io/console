@@ -4,7 +4,11 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ServiceDeleteParameters } from '@/schema/alert-manager/service/api-verbs/delete';
 import type { ServiceGetParameters } from '@/schema/alert-manager/service/api-verbs/get';
+import type { ServiceListParameters } from '@/schema/alert-manager/service/api-verbs/list';
+import type { ServiceUpdateParameters } from '@/schema/alert-manager/service/api-verbs/update';
 import { NOTIFICATION_URGENCY, RECOVERY_MODE } from '@/schema/alert-manager/service/constants';
 import type { ServiceModel } from '@/schema/alert-manager/service/model';
 
@@ -17,6 +21,7 @@ interface ServiceFormStoreState {
     loading: boolean;
     currentTab: ServiceDetailTabsType;
     serviceInfo: ServiceModel;
+    serviceList: ServiceModel[];
 }
 
 export const useServiceDetailPageStore = defineStore('page-service-detail', () => {
@@ -24,6 +29,7 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
         loading: false,
         currentTab: SERVICE_DETAIL_TABS.OVERVIEW,
         serviceInfo: {} as ServiceModel,
+        serviceList: [] as ServiceModel[],
     });
 
     const getters = reactive({
@@ -66,6 +72,35 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
                 state.serviceInfo = {} as ServiceModel;
             } finally {
                 state.loading = false;
+            }
+        },
+        async updateServiceDetailData(name: string) {
+            try {
+                state.serviceInfo = await SpaceConnector.clientV2.alertManager.service.update<ServiceUpdateParameters, ServiceModel>({
+                    service_id: getters.serviceInfo.service_id,
+                    name,
+                });
+            } catch (e) {
+                ErrorHandler.handleError(e, true);
+                state.serviceInfo = {} as ServiceModel;
+            }
+        },
+        async deleteServiceDetailData() {
+            try {
+                await SpaceConnector.clientV2.alertManager.service.delete<ServiceDeleteParameters>({
+                    service_id: getters.serviceInfo.service_id,
+                });
+            } catch (e) {
+                ErrorHandler.handleError(e, true);
+            }
+        },
+        async fetchServiceList() {
+            try {
+                const { results } = await SpaceConnector.clientV2.alertManager.service.list<ServiceListParameters, ListResponse<ServiceModel>>();
+                state.serviceList = results || [];
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.serviceList = [];
             }
         },
     };
