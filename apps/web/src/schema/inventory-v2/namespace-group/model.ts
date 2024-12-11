@@ -1,6 +1,6 @@
 import type { Tags } from '@/schema/_common/model';
 
-export interface NameSpaceGroupModel {
+export interface NamespaceGroupModel {
     namespace_group_id: string;
     name: string; // 'Common' | 'Etc' | 'AWS' | 'Azure' | 'Google Cloud'
     icon: string;
