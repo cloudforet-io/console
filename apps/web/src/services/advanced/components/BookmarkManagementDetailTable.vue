@@ -2,8 +2,6 @@
 import { computed, reactive, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { clone } from 'lodash';
-
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import {
     PToolboxTable, PLazyImg, PI, PDataLoader, PSelectStatus, PSelectDropdown,
@@ -20,15 +18,10 @@ import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
-import { useUserStore } from '@/store/user/user-store';
-
-import type { PageAccessMap } from '@/lib/access-control/config';
-import type { MenuId } from '@/lib/menu/config';
-import { MENU_ID } from '@/lib/menu/config';
-
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
 import { gray } from '@/styles/colors';
 
@@ -36,13 +29,13 @@ import { makeSearchQueryTagsHandler, makeValueHandler } from '@/services/advance
 import { BOOKMARK_TYPE, PageSizeOptions } from '@/services/advanced/constants/bookmark-constant';
 import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 import { useBookmarkPageStore } from '@/services/advanced/store/bookmark-page-store';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 const bookmarkStore = useBookmarkStore();
 const bookmarkPageStore = useBookmarkPageStore();
 const bookmarkPageState = bookmarkPageStore.state;
 const bookmarkPageGetters = bookmarkPageStore.getters;
-const userStore = useUserStore();
+
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const route = useRoute();
 const router = useRouter();
@@ -57,21 +50,10 @@ const storeState = reactive({
     loading: computed<boolean>(() => bookmarkPageState.loading),
     selectedType: computed<string>(() => bookmarkPageState.selectedType),
     searchFilter: computed<ConsoleFilter[]>(() => bookmarkPageState.searchFilter),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     group: computed<string>(() => route.params.group),
     folder: computed<string>(() => route.params.folder),
-    selectedMenuId: computed(() => {
-        const reversedMatched = clone(route.matched).reverse();
-        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
-        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
-            return '';
-        }
-        return targetMenuId;
-    }),
-    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
 });
 const tableState = reactive({
     fields: computed(() => [
@@ -279,7 +261,7 @@ watch([() => route.params, () => storeState.bookmarkFolderList], async ([params,
                     <span class="col-link">{{ value ?? '--' }}</span>
                 </template>
                 <template #col-action_button-format="{item}">
-                    <p-select-dropdown v-if="state.hasReadWriteAccess && item.isGlobal"
+                    <p-select-dropdown v-if="hasReadWriteAccess && item.isGlobal"
                                        :menu="getDropdownMenu(item)"
                                        style-type="icon-button"
                                        button-icon="ic_ellipsis-horizontal"

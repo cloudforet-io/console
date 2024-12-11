@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
-import { useRoute } from 'vue-router/composables';
 
-import { clone, map } from 'lodash';
+import { map } from 'lodash';
 
 import {
     PPaneLayout, PFieldTitle, PButton, PSelectDropdown, PCopyButton,
@@ -15,30 +14,22 @@ import { useDomainStore } from '@/store/domain/domain-store';
 import { usePreferencesStore } from '@/store/preferences/preferences-store';
 import { languages, timezoneList } from '@/store/user/constant';
 import type { LanguageCode } from '@/store/user/type';
-import { useUserStore } from '@/store/user/user-store';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import type { MenuId } from '@/lib/menu/config';
-import { MENU_ID } from '@/lib/menu/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
-
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
 const domainConfigStore = usePreferencesStore();
 const domainConfigGetters = domainConfigStore.getters;
 const domainStore = useDomainStore();
-const userStore = useUserStore();
 
-const route = useRoute();
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const storeState = reactive({
     domainId: computed<string>(() => domainStore.state.domainId),
     domainName: computed<string>(() => domainStore.state.name),
     domainConfig: computed(() => domainStore.state.config),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     isChanged: computed(() => {
@@ -56,16 +47,6 @@ const state = reactive({
     timezoneMenuList: computed<SelectDropdownMenuItem[]>(() => map(timezoneList, (d) => ({
         type: 'item', label: d === 'UTC' ? `${d} (default)` : d, name: d,
     }))),
-    selectedMenuId: computed(() => {
-        const reversedMatched = clone(route.matched).reverse();
-        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
-        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
-            return '';
-        }
-        return targetMenuId;
-    }),
-    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
 });
 
 /* Event */
@@ -112,7 +93,7 @@ watch(() => domainConfigGetters.language, (val) => {
                 <p-select-dropdown :menu="state.timezoneMenuList"
                                    :selected.sync="state.selectedTimezone"
                                    :page-size="10"
-                                   :disabled="!state.hasReadWriteAccess"
+                                   :disabled="!hasReadWriteAccess"
                                    is-fixed-width
                                    is-filterable
                 />
@@ -122,12 +103,12 @@ watch(() => domainConfigGetters.language, (val) => {
                 <p-select-dropdown :menu="state.languageMenuList"
                                    :selected.sync="state.selectedLanguage"
                                    :page-size="10"
-                                   :disabled="!state.hasReadWriteAccess"
+                                   :disabled="!hasReadWriteAccess"
                                    is-filterable
                 />
             </div>
         </div>
-        <p-button :disabled="!state.hasReadWriteAccess || !state.isChanged"
+        <p-button :disabled="!hasReadWriteAccess || !state.isChanged"
                   class="save-button"
                   @click="handleSaveChanges"
         >

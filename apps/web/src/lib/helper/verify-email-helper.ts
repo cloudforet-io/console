@@ -5,14 +5,12 @@ import type { UserProfileVerifyEmailParameters } from '@/schema/identity/user-pr
 import type { UserVerifyEmailParameters } from '@/schema/identity/user/api-verbs/verify-email';
 import { i18n } from '@/translations';
 
-import { useUserStore } from '@/store/user/user-store';
+import type { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-
-const userStore = useUserStore();
 
 export const postUserProfileValidationEmail = async (params: UserProfileVerifyEmailParameters): Promise<void|Error> => {
     try {
@@ -25,7 +23,7 @@ export const postUserProfileValidationEmail = async (params: UserProfileVerifyEm
     }
 };
 
-export const postValidationCode = async (params: UserProfileConfirmEmailParameters): Promise<void|Error> => {
+export const postValidationCode = async (params: UserProfileConfirmEmailParameters, userStore: ReturnType<typeof useUserStore>): Promise<void|Error> => {
     try {
         const response = await SpaceConnector.clientV2.identity.userProfile.confirmEmail<UserProfileConfirmEmailParameters>(params);
         await userStore.updateUser({

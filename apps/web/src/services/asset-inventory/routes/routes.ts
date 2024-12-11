@@ -35,7 +35,6 @@ const CollectorHistoryPage = () => import('@/services/asset-inventory/pages/Coll
 const CollectJobPage = () => import('@/services/asset-inventory/pages/CollectHistoryJobPage.vue');
 const CollectorDetailPage = () => import('@/services/asset-inventory/pages/CollectorDetailPage.vue');
 
-const userStore = useUserStore(pinia);
 
 const assetInventoryRoute: RouteConfig = {
     path: 'asset-inventory',
@@ -44,7 +43,10 @@ const assetInventoryRoute: RouteConfig = {
         menuId: MENU_ID.ASSET_INVENTORY,
         translationId: MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY].translationId,
     },
-    redirect: (to) => getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap),
+    redirect: (to) => {
+        const userStore = useUserStore(pinia);
+        return getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap);
+    },
     component: AssetInventoryContainer,
     children: [
         {

@@ -1,9 +1,7 @@
 <script lang="ts" setup>
 import {
-    computed,
-    getCurrentInstance, reactive,
+    computed, reactive,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import { cloneDeep, map } from 'lodash';
 
@@ -16,6 +14,7 @@ import type { RoleBindingDeleteParameters } from '@/schema/identity/role-binding
 import type { UserDeleteParameters } from '@/schema/identity/user/api-verbs/delete';
 import type { UserDisableParameters } from '@/schema/identity/user/api-verbs/disable';
 import type { UserEnableParameters } from '@/schema/identity/user/api-verbs/enable';
+import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -25,7 +24,6 @@ import { useRoleFormatter, userStateFormatter } from '@/services/iam/composables
 import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 
-const vm = getCurrentInstance()?.proxy as Vue;
 
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
@@ -78,11 +76,11 @@ const checkModalConfirm = async () => {
         const failCount = responses.length - successCount;
         if (successCount > 0) {
             const languageCode = `IAM.USER.MAIN.MODAL.ALT_S_${languagePrefix}_USER`;
-            showSuccessMessage(vm.$tc(languageCode, successCount), '');
+            showSuccessMessage(i18n.t(languageCode), '');
             emit('confirm');
         } if (failCount > 0) {
             const languageCode = `IAM.USER.MAIN.MODAL.ALT_E_${languagePrefix}_USER`;
-            ErrorHandler.handleRequestError(new Error(''), vm.$tc(languageCode, failCount));
+            ErrorHandler.handleRequestError(new Error(''), i18n.t(languageCode));
         }
     } catch (e: any) {
         ErrorHandler.handleError(e, true);

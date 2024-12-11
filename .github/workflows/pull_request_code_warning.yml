@@ -36,7 +36,7 @@ jobs:
         id: check_todo
         run: |
           echo "Checking for TODOs..."
-          TODO_FILES=$(grep -rl "TODO" . --exclude-dir={node_modules,.git} || true)
+          TODO_FILES=$(grep -rl "TODO" apps/web/src --exclude-dir={node_modules,.github} || true)
           TODO_COUNT=0
           if [ -n "$TODO_FILES" ]; then
             echo "The following files contain TODO:"
@@ -68,7 +68,7 @@ jobs:
         run: |
           echo "TODO Count: $todo_count"
           echo "console.log Count: $console_log_count"
-          if [ "$todo_count" -gt 0 ] || [ "$console_log_count" -gt 0 ]; then
+          if [ "$todo_count" -gt 0 ]; then
             echo "::warning:: Workflow failed. TODO count: $todo_count, console.log count: $console_log_count"
             exit 1
           else

@@ -1,18 +1,11 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
-import { useRoute } from 'vue-router/composables';
-
-import { clone } from 'lodash';
 
 import { PTab } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 
-import { useUserStore } from '@/store/user/user-store';
-
-import type { PageAccessMap } from '@/lib/access-control/config';
-import type { MenuId } from '@/lib/menu/config';
-import { MENU_ID } from '@/lib/menu/config';
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
 import DataSourceManagementTabAccessRestriction
     from '@/services/cost-explorer/components/DataSourceManagementTabAccessRestriction.vue';
@@ -21,30 +14,15 @@ import DataSourceManagementTabDetailBaseInformation
     from '@/services/cost-explorer/components/DataSourceManagementTabDetailBaseInformation.vue';
 import DataSourceManagementTabLinkedAccount
     from '@/services/cost-explorer/components/DataSourceManagementTabLinkedAccount.vue';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
 
 const dataSourcesPageStore = useDataSourcesPageStore();
 const dataSourcesPageState = dataSourcesPageStore.state;
-const userStore = useUserStore();
 
-const route = useRoute();
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const storeState = reactive({
     activeTab: computed<string>(() => dataSourcesPageState.activeTab),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
-});
-const state = reactive({
-    selectedMenuId: computed(() => {
-        const reversedMatched = clone(route.matched).reverse();
-        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
-        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
-            return '';
-        }
-        return targetMenuId;
-    }),
-    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
 });
 const tabState = reactive({
     tabs: computed(() => [
@@ -75,7 +53,7 @@ const handleChangeTab = (tab: string) => {
         <template v-else-if="storeState.activeTab === 'linked_account'"
                   #linked_account
         >
-            <data-source-management-tab-linked-account :has-read-write-access="state.hasReadWriteAccess" />
+            <data-source-management-tab-linked-account :has-read-write-access="hasReadWriteAccess" />
         </template>
         <template v-else-if="storeState.activeTab === 'data_collection_history'"
                   #data_collection_history
@@ -85,7 +63,7 @@ const handleChangeTab = (tab: string) => {
         <template v-else-if="storeState.activeTab === 'access_restriction'"
                   #access_restriction
         >
-            <data-source-management-tab-access-restriction :has-read-write-access="state.hasReadWriteAccess" />
+            <data-source-management-tab-access-restriction :has-read-write-access="hasReadWriteAccess" />
         </template>
     </p-tab>
 </template>

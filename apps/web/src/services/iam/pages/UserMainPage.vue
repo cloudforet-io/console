@@ -2,9 +2,6 @@
 import {
     computed, onUnmounted, reactive, watch,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
-
-import { clone } from 'lodash';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PHorizontalLayout } from '@cloudforet/mirinae';
@@ -12,13 +9,9 @@ import { PHorizontalLayout } from '@cloudforet/mirinae';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
-import type { MenuId } from '@/lib/menu/config';
-import { MENU_ID } from '@/lib/menu/config';
-
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import UserManagementAddModal from '@/services/iam/components/UserManagementAddModal.vue';
 import UserManagementFormModal from '@/services/iam/components/UserManagementFormModal.vue';
 import UserManagementHeader from '@/services/iam/components/UserManagementHeader.vue';
@@ -36,25 +29,12 @@ const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
 const userStore = useUserStore();
 
-const route = useRoute();
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     globalGrantLoading: computed(() => appContextStore.getters.globalGrantLoading),
     grantInfo: computed(() => userStore.state.currentGrantInfo),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
-});
-const state = reactive({
-    selectedMenuId: computed(() => {
-        const reversedMatched = clone(route.matched).reverse();
-        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
-        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
-            return '';
-        }
-        return targetMenuId;
-    }),
-    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
 });
 
 const userListApiQueryHelper = new ApiQueryHelper()
@@ -98,25 +78,25 @@ onUnmounted(() => {
 
 <template>
     <section class="user-page">
-        <user-management-header :has-read-write-access="state.hasReadWriteAccess" />
+        <user-management-header :has-read-write-access="hasReadWriteAccess" />
         <p-horizontal-layout class="user-toolbox-layout">
             <template #container="{ height }">
                 <user-management-table :table-height="height"
-                                       :has-read-write-access="state.hasReadWriteAccess"
+                                       :has-read-write-access="hasReadWriteAccess"
                                        @confirm="refreshUserList"
                 />
             </template>
         </p-horizontal-layout>
-        <user-management-tab :has-read-write-access="state.hasReadWriteAccess" />
-        <user-management-add-modal v-if="state.hasReadWriteAccess"
+        <user-management-tab :has-read-write-access="hasReadWriteAccess" />
+        <user-management-add-modal v-if="hasReadWriteAccess"
                                    @confirm="refreshUserList"
         />
-        <user-management-only-remove-workspace-group-type-modal v-if="state.hasReadWriteAccess" />
-        <user-management-remove-mixed-type-modal v-if="state.hasReadWriteAccess" />
-        <user-management-status-modal v-if="state.hasReadWriteAccess"
+        <user-management-only-remove-workspace-group-type-modal v-if="hasReadWriteAccess" />
+        <user-management-remove-mixed-type-modal v-if="hasReadWriteAccess" />
+        <user-management-status-modal v-if="hasReadWriteAccess"
                                       @confirm="refreshUserList"
         />
-        <user-management-form-modal v-if="state.hasReadWriteAccess"
+        <user-management-form-modal v-if="hasReadWriteAccess"
                                     @confirm="refreshUserList"
         />
     </section>

@@ -24,7 +24,6 @@ const BudgetDetailPage = () => import('@/services/cost-explorer/pages/BudgetDeta
 const CostReportPage = () => import('@/services/cost-explorer/pages/CostReportPage.vue');
 
 
-const userStore = useUserStore(pinia);
 const costExplorerRoutes: RouteConfig = {
     path: 'cost-explorer',
     name: COST_EXPLORER_ROUTE._NAME,
@@ -32,7 +31,10 @@ const costExplorerRoutes: RouteConfig = {
         menuId: MENU_ID.COST_EXPLORER,
         translationId: MENU_INFO_MAP[MENU_ID.COST_EXPLORER].translationId,
     },
-    redirect: (to) => getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap),
+    redirect: (to) => {
+        const userStore = useUserStore(pinia);
+        return getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap);
+    },
     component: CostExplorerContainer,
     children: [
         {

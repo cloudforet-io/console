@@ -58,7 +58,6 @@ describe('Date Range Formatter Composable', () => {
 
     it('Should be displayed in the format of "Sep 11, YYYY" when the start and end dates are in the same year and month, and end month is this month.', async () => {
         const _currentDate = dayjs.utc().set('date', 11);
-        console.log(_currentDate.format('YYYY-MM-DD'));
         await wrapper.setProps({
             dateRange: {
                 start: _currentDate.format('YYYY-MM-DD'),

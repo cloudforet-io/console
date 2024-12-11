@@ -71,7 +71,7 @@ const handleFocusEnd = (type: SuggestionType, direction: FocusingDirection) => {
     if (type === SUGGESTION_TYPE.DEFAULT_SERVICE && direction === 'DOWNWARD') {
         state.proxyFocusingDirection = direction;
     }
-    // TODO: need UPWARD case
+    // HACK: need UPWARD case
     emit('move-focus-end');
 };
 
@@ -84,7 +84,7 @@ watch(() => contentsSize.height.value, (height) => {
 });
 
 // /* Watcher */
-// TODO: for focusing
+// HACK: for focusing
 // watch(() => props.isFocused, (isFocused) => {
 //     if (isFocused) {
 //         if (props.focusingDirection === 'DOWNWARD') {

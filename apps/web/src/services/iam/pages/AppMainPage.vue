@@ -2,9 +2,8 @@
 import {
     computed, onMounted, onUnmounted, reactive,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
 
-import { clone, cloneDeep } from 'lodash';
+import { cloneDeep } from 'lodash';
 
 import {
     PHorizontalLayout, PHeading, PButton, PTab, PHeadingLayout,
@@ -16,27 +15,23 @@ import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
-import type { MenuId } from '@/lib/menu/config';
-import { MENU_ID } from '@/lib/menu/config';
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import AppAPIKeyGRPCEndpointsTab from '@/services/iam/components/AppAPIKeyGRPCEndpointsTab.vue';
 import AppAPIKeyRestEndpointsTab from '@/services/iam/components/AppAPIKeyRestEndpointsTab.vue';
 import AppManagementTable from '@/services/iam/components/AppManagementTable.vue';
 import { APP_DROPDOWN_MODAL_TYPE } from '@/services/iam/constants/app-constant';
 import { useAppPageStore } from '@/services/iam/store/app-page-store';
 
-
 const appPageStore = useAppPageStore();
 const appPageState = appPageStore.$state;
+
 const userStore = useUserStore();
 
-const route = useRoute();
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const storeState = reactive({
     roleType: computed<RoleType|undefined>(() => userStore.state.roleType),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 
 const tabs = [{
@@ -49,16 +44,6 @@ const tabs = [{
 const state = reactive({
     activeTab: 'rest',
     userId: computed<string|undefined>(() => userStore.state.userId),
-    selectedMenuId: computed(() => {
-        const reversedMatched = clone(route.matched).reverse();
-        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
-        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
-            return '';
-        }
-        return targetMenuId;
-    }),
-    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
 });
 
 /* Component */
@@ -92,7 +77,7 @@ onUnmounted(() => {
                 />
             </template>
             <template #extra>
-                <p-button v-if="state.hasReadWriteAccess && storeState.roleType !== ROLE_TYPE.WORKSPACE_MEMBER"
+                <p-button v-if="hasReadWriteAccess && storeState.roleType !== ROLE_TYPE.WORKSPACE_MEMBER"
                           style-type="primary"
                           icon-left="ic_plus_bold"
                           @click="handleCreateApp"
@@ -104,7 +89,7 @@ onUnmounted(() => {
         <p-horizontal-layout class="role-toolbox-layout">
             <template #container="{ height }">
                 <app-management-table :table-height="height"
-                                      :has-read-write-access="state.hasReadWriteAccess"
+                                      :has-read-write-access="hasReadWriteAccess"
                 />
             </template>
         </p-horizontal-layout>

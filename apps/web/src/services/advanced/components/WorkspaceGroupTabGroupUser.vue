@@ -2,9 +2,6 @@
 import {
     reactive, watch, onUnmounted, computed,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
-
-import { clone } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -21,12 +18,10 @@ import type { WorkspaceGroupUpdateRoleParameters } from '@/schema/identity/works
 import type { WorkspaceUser } from '@/schema/identity/workspace-group/model';
 import { i18n } from '@/translations';
 
-import { useUserStore } from '@/store/user/user-store';
-
-import type { PageAccessMap } from '@/lib/access-control/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
 import { useRoleFormatter, groupUserStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { useSelectDropDownList } from '@/services/advanced/composables/use-select-drop-down-list';
@@ -37,23 +32,11 @@ const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
 const userTabState = workspaceGroupPageStore.userTabState;
 const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
-const userStore = useUserStore();
 
-const route = useRoute();
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const emit = defineEmits<{(e: 'refresh', payload: { isGroupUser?: boolean, isWorkspace?: boolean }): void; }>();
 
-const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
-});
-const state = reactive({
-    selectedMenuId: computed(() => {
-        const reversedMatched = clone(route.matched).reverse();
-        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-        return closestRoute?.meta?.menuId;
-    }),
-    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
-});
 const tableState = reactive({
     fields: computed<DataTableFieldType[]>(() => {
         const defaultFields: DataTableFieldType[] = [
@@ -62,7 +45,7 @@ const tableState = reactive({
             { name: 'state', label: 'State' },
             { name: 'role', label: 'Role' },
         ];
-        if (state.hasReadWriteAccess) {
+        if (hasReadWriteAccess.value) {
             defaultFields.push({ name: 'remove_button', label: ' ', sortable: false });
         }
         return defaultFields;
@@ -211,7 +194,7 @@ onUnmounted(() => {
                            heading-type="sub"
                 />
             </template>
-            <template v-if="state.hasReadWriteAccess"
+            <template v-if="hasReadWriteAccess"
                       #extra
             >
                 <p-button style-type="negative-primary"
@@ -239,7 +222,7 @@ onUnmounted(() => {
                          :sort-desc="userTabState.sortDesc"
                          :this-page.sync="userTabState.thisPage"
                          :search-text.sync="userTabState.searchText"
-                         :selectable="state.hasReadWriteAccess"
+                         :selectable="hasReadWriteAccess"
                          sortable
                          searchable
                          @select="handleSelect"
@@ -259,7 +242,7 @@ onUnmounted(() => {
                         use-fixed-menu-style
                         style-type="transparent"
                         class="role-select-dropdown"
-                        :disabled="!state.hasReadWriteAccess"
+                        :disabled="!hasReadWriteAccess"
                         :menu="menuList"
                         :selected.sync="selectedItems"
                         :search-text.sync="searchText"

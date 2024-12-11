@@ -57,15 +57,17 @@ const time = computed(() => {
             <span> {{ date }}</span>
             <span> {{ time }}</span>
         </div>
-        <p-collapsible-panel class="vertical-item-detail"
-                             :line-clamp="8"
-        >
-            <div @click="emit('click')">
-                <slot>
-                    {{ props.description }}
-                </slot>
-            </div>
-        </p-collapsible-panel>
+        <div class="vertical-item-detail">
+            <slot name="non-collapsible">
+                <p-collapsible-panel :line-clamp="3">
+                    <div @click="emit('click')">
+                        <slot>
+                            {{ props.description }}
+                        </slot>
+                    </div>
+                </p-collapsible-panel>
+            </slot>
+        </div>
         <p-divider class="bottom-divider" />
     </div>
 </template>
@@ -140,6 +142,9 @@ const time = computed(() => {
     .vertical-item-detail {
         @apply text-paragraph-md;
         padding: 0.75rem 1rem;
+        >.p-collapsible-panel {
+            padding: 0;
+        }
     }
 }
 </style>

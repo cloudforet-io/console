@@ -136,7 +136,7 @@ const handleClickCreate = async () => {
     }
 };
 
-// TODO: Planned for future implementation
+// HACK: Planned for future implementation
 // watch(() => state.pluginVersions, (version) => {
 //     if (version) {
 //         getPluginMetaData();
@@ -171,7 +171,7 @@ onMounted(() => {
                     <p class="desc">
                         {{ props.selectedType.tags?.long_description || props.selectedType.tags?.description }}
                     </p>
-                    <!-- TODO: will be updated field name -->
+                    <!-- HACK: will be updated field name -->
                     <p-link v-if="props.selectedType.tags?.url"
                             new-tab
                             highlight

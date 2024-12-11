@@ -15,8 +15,6 @@ const NoticeMainPage = () => import('@/services/info/pages/NoticeMainPage.vue');
 const NoticeDetailPage = () => import('@/services/info/pages/NoticeDetailPage.vue');
 
 
-const userStore = useUserStore(pinia);
-
 const infoRoute: RouteConfig = {
     path: 'info',
     name: INFO_ROUTE._NAME,
@@ -24,7 +22,10 @@ const infoRoute: RouteConfig = {
         menuId: MENU_ID.INFO,
         translationId: MENU_INFO_MAP[MENU_ID.INFO].translationId,
     },
-    redirect: (to) => getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap),
+    redirect: (to) => {
+        const userStore = useUserStore(pinia);
+        return getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap);
+    },
     component: InfoContainer,
     children: [
         {
