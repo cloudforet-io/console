@@ -77,9 +77,9 @@ const handleRemoveUser = () => {
 };
 
 /* Watcher */
-watch(() => userGroupPageGetters.selectedUserGroups, async (nv) => {
-    if (nv.length === 1) {
-        const usersIdList: string[] | undefined = nv[0].users;
+watch(() => userGroupPageGetters.selectedUserGroups, async (nv_selectedUserGroups) => {
+    if (nv_selectedUserGroups.length === 1) {
+        const usersIdList: string[] | undefined = nv_selectedUserGroups[0].users;
         await userGroupPageStore.listUsers({});
 
         if (userGroupPageState.users.list && userGroupPageState.users.list.length > 0 && usersIdList && usersIdList.length > 0) {
@@ -93,8 +93,8 @@ watch(() => userGroupPageGetters.selectedUserGroups, async (nv) => {
     }
 }, { deep: true, immediate: true });
 
-watch(() => userGroupPageState.users, (nv) => {
-    if (nv.list && nv.list.length) nv.totalCount = nv.list.length;
+watch(() => userGroupPageState.users, (nv_users) => {
+    if (nv_users.list && nv_users.list.length) nv_users.totalCount = nv_users.list.length;
 }, { deep: true, immediate: true });
 </script>
 
