@@ -2957,6 +2957,12 @@
 					"TOKEN": "토큰",
 					"UPDATE": "수정",
 					"UPDATE_TITLE": "사용자 그룹 수정"
+				},
+				"DELETE": {
+					"TITLE": ""
+				},
+				"REMOVE_USER": {
+					"TITLE": ""
 				}
 			},
 			"TAB": {

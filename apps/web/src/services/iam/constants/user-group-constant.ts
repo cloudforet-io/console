@@ -1,13 +1,10 @@
-interface UserGroupSearchHandlers {
-    title: string;
-    items: {name: string; label: string; dataType?: string;}[]
-}
+import type { KeyItemSet } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
 
-export const USER_GROUP_SEARCH_HANDLERS: UserGroupSearchHandlers[] = [
+export const USER_GROUP_SEARCH_HANDLERS: KeyItemSet[] = [
     {
         title: 'Properties',
         items: [
-            { name: 'user_group_name', label: 'User Group Name' },
+            { name: 'user_group_id', label: 'User Group ID' },
             { name: 'description', label: 'Description' },
             { name: 'notification', label: 'Notification' },
             { name: 'users', label: 'Users' },
@@ -29,7 +26,7 @@ export const USER_GROUP_TABS = {
     NOTIFICATION_CHANNEL: 'notification_channel',
 };
 
-export const USER_GROUP_USERS_SEARCH_HANDLERS: UserGroupSearchHandlers[] = [
+export const USER_GROUP_USERS_SEARCH_HANDLERS: KeyItemSet[] = [
     {
         title: 'Properties',
         items: [
@@ -43,7 +40,8 @@ export const USER_GROUP_USERS_SEARCH_HANDLERS: UserGroupSearchHandlers[] = [
 
 export const USER_GROUP_MODAL_TYPE = {
     UPDATE: 'update',
-    REMOVE: 'remove',
+    DELETE: 'delete',
     ADD_NEW_USER: 'add_new_user',
+    REMOVE_USER: 'remove_user',
     CREATE: 'create',
 };

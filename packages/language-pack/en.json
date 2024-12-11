@@ -2957,6 +2957,12 @@
 					"TOKEN": "Token",
 					"UPDATE": "Update",
 					"UPDATE_TITLE": "Update User Group"
+				},
+				"DELETE": {
+					"TITLE": "Are you sure you want to Delete User Group?"
+				},
+				"REMOVE_USER": {
+					"TITLE": "Are you sure you want to Remove User from the selected user group?"
 				}
 			},
 			"TAB": {

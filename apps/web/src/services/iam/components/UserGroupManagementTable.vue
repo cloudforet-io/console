@@ -1,11 +1,16 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import {
+    computed, onMounted, reactive,
+} from 'vue';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
+import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PToolboxTable, PSelectDropdown } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
+import type { UserGroupListItemType } from '@/schema/identity/user-group/type';
 import { i18n } from '@/translations';
 
 import { useQueryTags } from '@/common/composables/query-tags';
@@ -26,8 +31,21 @@ const props = withDefaults(defineProps<Props>(), {
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 
-const queryTagHelper = useQueryTags({ keyItemSets: USER_GROUP_SEARCH_HANDLERS.keyItemSets });
+const userGroupListApiQueryHelper = new ApiQueryHelper()
+    .setPageStart(userGroupPageState.pageStart)
+    .setPageLimit(userGroupPageState.pageLimit)
+    .setSort('name', true);
+let userGroupListApiQuery = userGroupListApiQueryHelper.data;
+const queryTagHelper = useQueryTags({ keyItemSets: USER_GROUP_SEARCH_HANDLERS });
 const { queryTags } = queryTagHelper;
+
+const storeState = reactive({
+    loading: computed<boolean>(() => userGroupPageState.loading),
+});
+
+const state = reactive({
+    userGroupItems: computed<UserGroupListItemType[]>(() => userGroupPageState.userGroups),
+});
 
 const tableState = reactive({
     fields: computed<DataTableFieldType[]>(() => [
@@ -69,7 +87,7 @@ const dropdownState = reactive({
             name: USER_GROUP_MODAL_TYPE.UPDATE, label: i18n.t('IAM.USER_GROUP.ACTION.UPDATE'), type: 'item', disabled: !editState.isEditable,
         },
         {
-            name: USER_GROUP_MODAL_TYPE.REMOVE, label: i18n.t('IAM.USER_GROUP.ACTION.REMOVE'), type: 'item', disabled: !editState.isRemoveAble,
+            name: USER_GROUP_MODAL_TYPE.DELETE, label: i18n.t('IAM.USER_GROUP.ACTION.REMOVE'), type: 'item', disabled: !editState.isRemoveAble,
         },
         {
             type: 'divider',
@@ -85,14 +103,29 @@ const dropdownState = reactive({
 const handleSelect = async (index) => {
     userGroupPageState.selectedIndices = index;
 };
-const handleChange = () => {
-    console.log('TODO: handleChange');
+
+// watch(() => userGroupPageGetters.selectedUserGroups, async (nv) => {
+//     if (nv.length === 1) {
+//         const usersIdList: string[] | undefined = nv[0].users;
+//         await userGroupPageStore.listUsersPerGroup({});
+//
+//         if (userGroupPageState.users.list.length > 0 && usersIdList && usersIdList.length > 0) {
+//             userGroupPageState.users.list = userGroupPageState.users.list.filter((user) => usersIdList.includes(user.user_id));
+//         }
+//     }
+// }, { deep: true, immediate: true });
+
+const handleChange = (options: any = {}) => {
+    userGroupListApiQuery = getApiQueryWithToolboxOptions(userGroupListApiQueryHelper, options) ?? userGroupListApiQuery;
+    if (options.queryTags !== undefined) {
+        userGroupPageState.searchFilters = userGroupListApiQueryHelper.filters;
+    }
+    if (options.pageStart !== undefined) userGroupPageState.pageStart = options.pageStart;
+    if (options.pageLimit !== undefined) userGroupPageState.pageLimit = options.pageLimit;
+    fetchUserGroupList();
 };
 
-/* API */
 const handleSelectDropdown = async (inputText: string) => {
-    dropdownState.loading = true;
-
     switch (inputText) {
     case USER_GROUP_MODAL_TYPE.UPDATE:
         userGroupPageStore.updateModalSettings({
@@ -100,11 +133,13 @@ const handleSelectDropdown = async (inputText: string) => {
             title: i18n.t('IAM.USER_GROUP.MODAL.CREATE_USER_GROUP.UPDATE_TITLE'),
             themeColor: 'primary',
         });
-        dropdownState.loading = false;
         break;
-    case USER_GROUP_MODAL_TYPE.REMOVE:
-        console.log('TODO: Remove API');
-        dropdownState.loading = false;
+    case USER_GROUP_MODAL_TYPE.DELETE:
+        userGroupPageStore.updateModalSettings({
+            type: USER_GROUP_MODAL_TYPE.DELETE,
+            title: i18n.t('IAM.USER_GROUP.MODAL.DELETE.TITLE'),
+            themeColor: 'alert',
+        });
         break;
     case USER_GROUP_MODAL_TYPE.ADD_NEW_USER:
         userGroupPageStore.updateModalSettings({
@@ -112,13 +147,26 @@ const handleSelectDropdown = async (inputText: string) => {
             title: i18n.t('IAM.USER_GROUP.MODAL.ADD_NEW_USER.TITLE'),
             themeColor: 'primary',
         });
-        dropdownState.loading = false;
         break;
     default:
-        dropdownState.loading = false;
         break;
     }
 };
+
+/* API */
+const fetchUserGroupList = async () => {
+    userGroupPageState.loading = true;
+    try {
+        await userGroupPageStore.listUserGroups({ query: userGroupListApiQuery });
+    } finally {
+        userGroupPageState.loading = false;
+    }
+};
+
+/* Mounted */
+onMounted(async () => {
+    await fetchUserGroupList();
+});
 </script>
 
 <template>
@@ -130,24 +178,29 @@ const handleSelectDropdown = async (inputText: string) => {
                          multi-select
                          sort-desc
                          :fields="tableState.fields"
-                         :items="tableState.items"
+                         :items="state.userGroupItems"
                          :select-index="userGroupPageState.selectedIndices"
-                         :key-item-sets="USER_GROUP_SEARCH_HANDLERS.keyItemSets"
+                         :key-item-sets="USER_GROUP_SEARCH_HANDLERS"
                          :value-handler-map="tableState.valueHandlerMap"
                          :query-tags="queryTags"
+                         :loading="storeState.loading"
                          :style="{height: `${props.tableHeight}px}`}"
                          @select="handleSelect"
                          @change="handleChange"
-                         @refresh="handleChange"
+                         @refresh="handleChange()"
         >
             <template v-if="props.hasReadWriteAccess"
                       #toolbox-left
             >
                 <p-select-dropdown
                     :menu="dropdownState.menuItems"
+                    :loading="dropdownState.loading"
                     placeholder="Action"
                     @select="handleSelectDropdown"
                 />
+            </template>
+            <template #col-users-format="{value}">
+                {{ Array.isArray(value) && value.length > 0 ? value.length : 0 }}
             </template>
         </p-toolbox-table>
     </section>

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, reactive,
+    computed, reactive, watch,
 } from 'vue';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
@@ -11,40 +11,91 @@ import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/
 
 import { i18n } from '@/translations';
 
-import { USER_GROUP_USERS_SEARCH_HANDLERS } from '@/services/iam/constants/user-group-constant';
-import { useUserGroupUsersPageStore } from '@/services/iam/store/user-group-users-page-store';
+import { calculateTime } from '@/services/iam/composables/refined-table-data';
+import { USER_GROUP_MODAL_TYPE, USER_GROUP_USERS_SEARCH_HANDLERS } from '@/services/iam/constants/user-group-constant';
+import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
+import type { UserListItemType } from '@/services/iam/types/user-type';
 
-const userGroupUsersPageStore = useUserGroupUsersPageStore();
-const userGroupUsersPageState = userGroupUsersPageStore.state;
+const userGroupPageStore = useUserGroupPageStore();
+const userGroupPageState = userGroupPageStore.state;
+const userGroupPageGetters = userGroupPageStore.getters;
+
+const state = reactive({
+    userItems: computed<UserListItemType[]>(() => {
+        if (userGroupPageState.users.list) {
+            return userGroupPageState.users.list.map((user) => ({
+                user_id: user.user_id,
+                name: user.name,
+                auth_type: user.auth_type,
+                last_accessed_at: user.last_accessed_at,
+                timezone: user.timezone,
+            }));
+        }
+        return [];
+    }),
+    userItemTotalCount: computed<number>(() => userGroupPageState.users.totalCount),
+});
 
 const tableState = reactive({
     fields: computed<DataTableFieldType[]>(() => [
         { name: 'user_id', label: 'User ID' },
         { name: 'name', label: 'Name' },
         { name: 'auth_type', label: 'Auth Type' },
-        { name: 'last_activity', label: 'Last Activity' },
+        { name: 'last_accessed_at', label: 'Last Activity' },
     ]),
+    // TODO: Need to modify.
     valueHandlerMap: computed(() => ({
         user_id: makeDistinctValueHandler('identity.UserGroup', 'user_id', 'string'),
         name: makeDistinctValueHandler('identity.UserGroup', 'name', 'string'),
         auth_type: makeDistinctValueHandler('identity.UserGroup', 'auth_type', 'string'),
-        last_activity: makeDistinctValueHandler('identity.UserGroup', 'last_activity', 'string'),
+        last_activity: makeDistinctValueHandler('identity.UserGroup', 'last_accessed_at', 'string'),
         tags: makeDistinctValueHandler('identity.UserGroup', 'tags', 'string'),
     })),
-    items: computed(() => ([
-        {
-            user_id: 'userid@mz.co.kr', name: 'username', auth_type: 'LOCAL', last_activity: 'No Activity',
-        },
-        { user_id: 'userid2@mz.co.kr', name: 'username2', last_activity: '2 days' },
-    ])),
 });
 
-const isUserSelected = computed<boolean>(() => userGroupUsersPageState.selectedIndices.length === 1);
+const isUserSelected = computed<boolean>(() => userGroupPageState.users.selectedIndices.length > 0);
 
 /* Component */
 const handleSelect = async (index) => {
-    userGroupUsersPageState.selectedIndices = index;
+    userGroupPageState.users.selectedIndices = index;
 };
+
+const handleAddUser = () => {
+    userGroupPageStore.updateModalSettings({
+        type: USER_GROUP_MODAL_TYPE.ADD_NEW_USER,
+        title: i18n.t('IAM.USER_GROUP.MODAL.ADD_NEW_USER.TITLE'),
+        themeColor: 'primary',
+    });
+};
+
+const handleRemoveUser = () => {
+    userGroupPageStore.updateModalSettings({
+        type: USER_GROUP_MODAL_TYPE.REMOVE_USER,
+        title: i18n.t('IAM.USER_GROUP.MODAL.REMOVE_USER.TITLE'),
+        themeColor: 'alert',
+    });
+};
+
+/* Watcher */
+watch(() => userGroupPageGetters.selectedUserGroups, async (nv_selectedUserGroups) => {
+    if (nv_selectedUserGroups.length === 1) {
+        const usersIdList: string[] | undefined = nv_selectedUserGroups[0].users;
+        await userGroupPageStore.listUsers({});
+
+        if (userGroupPageState.users.list && userGroupPageState.users.list.length > 0 && usersIdList && usersIdList.length > 0) {
+            userGroupPageState.users.list = userGroupPageState.users.list.filter((user) => {
+                if (user.user_id) return usersIdList.includes(user.user_id);
+                return false;
+            });
+        } else if (typeof usersIdList !== 'object') {
+            userGroupPageState.users.list = [];
+        }
+    }
+}, { deep: true, immediate: true });
+
+watch(() => userGroupPageState.users, (nv_users) => {
+    if (nv_users.list && nv_users.list.length) nv_users.totalCount = nv_users.list.length;
+}, { deep: true, immediate: true });
 </script>
 
 <template>
@@ -54,7 +105,7 @@ const handleSelect = async (index) => {
                 <p-heading heading-type="sub"
                            use-selected-count
                            use-total-count
-                           :total-count="userGroupUsersPageState.totalCount"
+                           :total-count="state.userItemTotalCount"
                            :title="`${i18n.t('IAM.USER_GROUP.TAB.USERS.TITLE')}`"
                 />
             </template>
@@ -63,12 +114,13 @@ const handleSelect = async (index) => {
                     <div class="toolbox">
                         <p-button style-type="tertiary"
                                   icon-left="ic_plus"
-                                  :disabled="!isUserSelected"
+                                  @click="handleAddUser"
                         >
                             {{ $t('IAM.USER_GROUP.TAB.USERS.ADD_USER') }}
                         </p-button>
                         <p-button style-type="tertiary"
                                   :disabled="!isUserSelected"
+                                  @click="handleRemoveUser"
                         >
                             {{ $t('IAM.USER_GROUP.TAB.USERS.REMOVE') }}
                         </p-button>
@@ -82,11 +134,23 @@ const handleSelect = async (index) => {
                          multi-select
                          sort-desc
                          :fields="tableState.fields"
-                         :items="tableState.items"
-                         :select-index="userGroupUsersPageState.selectedIndices"
-                         :key-item-sets="USER_GROUP_USERS_SEARCH_HANDLERS.keyItemSets"
+                         :items="state.userItems"
+                         :select-index="userGroupPageState.users.selectedIndices"
+                         :key-item-sets="USER_GROUP_USERS_SEARCH_HANDLERS"
                          @select="handleSelect"
-        />
+        >
+            <template #col-last_accessed_at-format="{value, item}">
+                <span v-if="calculateTime(value, item.timezone) === -1">
+                    {{ $t('IAM.USER_GROUP.TAB.USERS.TODAY') }}
+                </span>
+                <span v-else-if="calculateTime(value, item.timezone) === 0">
+                    {{ $t('IAM.USER_GROUP.TAB.USERS.YESTERDAY') }}
+                </span>
+                <span v-else>
+                    {{ calculateTime(value, item.timezone) }} {{ $t('IAM.USER_GROUP.TAB.USERS.DAYS') }}
+                </span>
+            </template>
+        </p-toolbox-table>
     </div>
 </template>
 

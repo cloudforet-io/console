@@ -2957,6 +2957,12 @@
 					"TOKEN": "トークン",
 					"UPDATE": "アップデート",
 					"UPDATE_TITLE": "ユーザーグループの更新"
+				},
+				"DELETE": {
+					"TITLE": ""
+				},
+				"REMOVE_USER": {
+					"TITLE": ""
 				}
 			},
 			"TAB": {
