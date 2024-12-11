@@ -204,7 +204,9 @@ defineExpose({ setPathFrom, checkTaskExist });
                         <task-progress-tab />
                     </template>
                 </p-tab>
-                <div class="py-3 flex flex-wrap gap-1 justify-end">
+                <div v-if="activeTab === 'content'"
+                     class="py-3 flex flex-wrap gap-1 justify-end"
+                >
                     <p-button style-type="transparent"
                               @click="goBack()"
                     >
