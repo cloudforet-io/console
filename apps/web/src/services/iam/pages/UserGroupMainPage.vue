@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PHorizontalLayout } from '@cloudforet/mirinae';
 
 import UserGroupDeleteDoubleCheckModal from '@/services/iam/components/UserGroupDeleteDoubleCheckModal.vue';
@@ -13,11 +14,17 @@ import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-stor
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 
+const userGrouplistApiQueryHelper = new ApiQueryHelper()
+    .setSort('name', true);
+
 /* API */
-const refreshUserGroupList = () => {
+const refreshUserGroupList = async () => {
     userGroupPageState.loading = true;
+    userGrouplistApiQueryHelper
+        .setPageStart(userGroupPageState.pageStart).setPageLimit(userGroupPageState.pageLimit)
+        .setFilters(userGroupPageState.searchFilters);
     try {
-        console.log('TODO: Refresh User Group List');
+        await userGroupPageStore.listUserGroups({ query: userGrouplistApiQueryHelper.data });
     } finally {
         userGroupPageState.loading = false;
     }
@@ -34,9 +41,9 @@ const refreshUserGroupList = () => {
         </p-horizontal-layout>
         <user-group-management-tab />
         <user-group-management-edit-modal @confirm="refreshUserGroupList" />
-        <user-group-management-add-users-modal />
-        <user-group-delete-double-check-modal />
-        <user-per-group-remove-double-check-modal />
+        <user-group-management-add-users-modal @confirm="refreshUserGroupList" />
+        <user-group-delete-double-check-modal @confirm="refreshUserGroupList" />
+        <user-per-group-remove-double-check-modal @confirm="refreshUserGroupList" />
     </section>
 </template>
 

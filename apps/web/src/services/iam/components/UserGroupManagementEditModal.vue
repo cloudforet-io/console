@@ -32,12 +32,12 @@ const state = reactive({
 });
 
 /* Component */
-const handleConfirm = () => {
+const handleConfirm = async () => {
     switch (storeState.modalType) {
     case USER_GROUP_MODAL_TYPE.CREATE:
         state.loading = true;
         try {
-            fetchCreateUserGroup({
+            await fetchCreateUserGroup({
                 name: state.groupName,
                 description: state?.description,
                 tags: {
@@ -53,7 +53,7 @@ const handleConfirm = () => {
     case USER_GROUP_MODAL_TYPE.UPDATE:
         state.loading = true;
         try {
-            fetchUpdateUserGroup({
+            await fetchUpdateUserGroup({
                 user_group_id: userGroupPageGetters.selectedUserGroups[0].user_group_id,
                 name: state.groupName,
                 description: state?.description,
@@ -73,7 +73,11 @@ const handleConfirm = () => {
 };
 
 const handleClose = () => {
-    userGroupPageState.modal.type = '';
+    userGroupPageState.modal = {
+        type: '',
+        title: '',
+        themeColor: 'primary',
+    };
 };
 
 const handleUpdateValues = (data) => {

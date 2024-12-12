@@ -108,7 +108,7 @@ const handleChange = async (options: any = {}) => {
     }
     if (options.pageStart !== undefined) userGroupPageState.pageStart = options.pageStart;
     if (options.pageLimit !== undefined) userGroupPageState.pageLimit = options.pageLimit;
-    fetchUserGroupList();
+    await fetchUserGroupList();
 };
 
 const handleSelectDropdown = async (inputText: string) => {

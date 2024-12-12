@@ -12,6 +12,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-constant';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
+const emit = defineEmits<{(e: 'confirm'): void; }>();
+
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 const userGroupPageGetters = userGroupPageStore.getters;
@@ -29,11 +31,12 @@ const state = reactive({
 const handleConfirm = () => {
     try {
         state.loading = true;
-        storeState.selectedUserGroupIds.forEach((userGroupId) => {
-            fetchDeleteUserGroup({
+        storeState.selectedUserGroupIds.forEach(async (userGroupId) => {
+            await fetchDeleteUserGroup({
                 user_group_id: userGroupId,
             });
         });
+        emit('confirm');
     } finally {
         state.loading = false;
         handleCancel();
