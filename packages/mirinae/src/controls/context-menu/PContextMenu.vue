@@ -143,8 +143,9 @@ const onClickMenu = (item: MenuItem, index) => {
     if (props.multiSelectable) {
         if (state.selectedNameMap[item.name ?? ''] !== undefined) {
             const indexOfSelected = state.selectedNameMap[item.name ?? ''];
-            state.proxySelected.splice(indexOfSelected, 1);
-            state.proxySelected = [...state.proxySelected];
+            const newSelected = [...state.proxySelected];
+            newSelected.splice(indexOfSelected, 1);
+            state.proxySelected = newSelected;
         } else {
             state.proxySelected = [...state.proxySelected, item];
         }
@@ -274,8 +275,8 @@ defineExpose({
                                              :ellipsis="props.itemHeightFixed"
                                              :highlight-term="state.proxySearchText || props.highlightTerm"
                                              :tabindex="readonly ? -1 : index"
-                                             @click.stop.prevent="readonly ? undefined : onClickMenu(item, index, $event)"
-                                             @keyup.enter="readonly ? undefined : onClickMenu(item, index, $event)"
+                                             @click.stop.prevent="onClickMenu(item, index, $event)"
+                                             @keyup.enter="onClickMenu(item, index, $event)"
                                              @keydown.up="onKeyUp(index)"
                                              @keydown.down="onKeyDown(index)"
                         >

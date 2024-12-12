@@ -5,10 +5,18 @@
                     @after-leave="onModalLeave"
         >
             <div class="modal-mask"
-                 :class="[{'no-backdrop':!backdrop}, {'absolute': !!absolute}]"
+                 :class="[{'no-backdrop':!backdrop}, {
+                     'absolute': !!absolute,
+                     'loading-backdrop': loadingBackdrop
+                 }]"
                  :style="absolute ? [{'top': `${absolute}rem`}, {'left': `${absolute}rem`}] : {}"
             >
-                <div class="modal-wrapper"
+                <p-spinner v-if="loadingBackdrop"
+                           size="xl"
+                           style-type="white"
+                />
+                <div v-if="!loadingBackdrop"
+                     class="modal-wrapper"
                      :class="dialogClassObject"
                      role="dialog"
                      aria-modal="true"
@@ -115,6 +123,7 @@ import type { TranslateResult } from 'vue-i18n';
 import PButton from '@/controls/buttons/button/PButton.vue';
 import { BUTTON_STYLE } from '@/controls/buttons/button/type';
 import PIconButton from '@/controls/buttons/icon-button/PIconButton.vue';
+import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
 import type { ButtonModalProps } from '@/feedbacks/modals/button-modal/type';
 import { THEME_COLORS } from '@/feedbacks/modals/button-modal/type';
 import { SizeMapping } from '@/feedbacks/modals/type';
@@ -127,6 +136,7 @@ import { useProxyValue } from '@/hooks';
 export default defineComponent<ButtonModalProps>({
     name: 'PButtonModal',
     components: {
+        PSpinner,
         PI,
         PIconButton,
         PButton,
@@ -203,6 +213,10 @@ export default defineComponent<ButtonModalProps>({
         modalBodyId: {
             type: String,
             default: undefined,
+        },
+        loadingBackdrop: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props, { emit }) {

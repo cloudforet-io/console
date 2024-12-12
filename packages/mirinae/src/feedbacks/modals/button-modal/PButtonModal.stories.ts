@@ -8,6 +8,7 @@ import type { ComponentProps } from 'vue-component-type-helpers';
 
 import PButton from '@/controls/buttons/button/PButton.vue';
 import PSelectDropdown from '@/controls/dropdown/select-dropdown/PSelectDropdown.vue';
+import { getMenuItems } from '@/feedbacks/modals/button-modal/mock';
 import PButtonModal from '@/feedbacks/modals/button-modal/PButtonModal.vue';
 import { getButtonModalArgs, getButtonModalArgTypes, getButtonModalParameters } from '@/feedbacks/modals/button-modal/story-helper';
 
@@ -54,6 +55,7 @@ const Template: Story = {
                                 :hide-footer-confirm-button="hideFooterConfirmButton"
                                 :footer-reset-button-visible="footerResetButtonVisible"
                                 :loading="loading"
+                                :loading-backdrop="loadingBackdrop"
                                 :disabled="disabled"
                                 :absolute="absolute"
                                 :modal-body-id="modalBodyId"
@@ -75,62 +77,7 @@ const Template: Story = {
             const state = reactive({
                 modalVisible: props.visible,
                 contents: computed(() => faker.lorem.lines(props.contentsHeight)),
-                menu: [
-                    {
-                        type: 'item', label: 'Add', name: 'add', disabled: false,
-                    },
-                    {
-                        type: 'item', label: 'Hello', name: 'hello', disabled: false,
-                    },
-                    { type: 'divider' },
-                    { type: 'header', label: 'this is header' },
-                    {
-                        type: 'item', label: 'Update', name: 'update', disabled: false,
-                    },
-                    {
-                        type: 'item', label: 'Delete', name: 'delete', disabled: false,
-                    },
-                    { type: 'divider' },
-                    {
-                        type: 'item', label: 'Collect', name: 'collect', disabled: false,
-                    },
-                    { type: 'divider' },
-                    {
-                        type: 'item', label: 'Remove', name: 'remove', disabled: true,
-                    },
-                ],
-                items: [
-                    { type: 'item', label: 'one', name: 'one' },
-                    { type: 'item', label: 'two', name: 'two' },
-                    { type: 'item', label: 'three', name: 'three' },
-                    { type: 'item', label: 'four', name: 'four' },
-                    { type: 'item', label: 'five', name: 'five' },
-                    { type: 'item', label: 'six', name: 'six' },
-                    { type: 'item', label: 'one', name: 'one' },
-                    { type: 'item', label: 'two', name: 'two' },
-                    { type: 'item', label: 'three', name: 'three' },
-                    { type: 'item', label: 'four', name: 'four' },
-                    { type: 'item', label: 'five', name: 'five' },
-                    { type: 'item', label: 'six', name: 'six' },
-                    { type: 'item', label: 'one', name: 'one' },
-                    { type: 'item', label: 'two', name: 'two' },
-                    { type: 'item', label: 'three', name: 'three' },
-                    { type: 'item', label: 'four', name: 'four' },
-                    { type: 'item', label: 'five', name: 'five' },
-                    { type: 'item', label: 'six', name: 'six' },
-                    { type: 'item', label: 'one', name: 'one' },
-                    { type: 'item', label: 'two', name: 'two' },
-                    { type: 'item', label: 'three', name: 'three' },
-                    { type: 'item', label: 'four', name: 'four' },
-                    { type: 'item', label: 'five', name: 'five' },
-                    { type: 'item', label: 'six', name: 'six' },
-                    { type: 'item', label: 'one', name: 'one' },
-                    { type: 'item', label: 'two', name: 'two' },
-                    { type: 'item', label: 'three', name: 'three' },
-                    { type: 'item', label: 'four', name: 'four' },
-                    { type: 'item', label: 'five', name: 'five' },
-                    { type: 'item', label: 'six', name: 'six' },
-                ],
+                items: getMenuItems(),
             });
             const launchModal = () => {
                 state.modalVisible = true;
@@ -143,6 +90,80 @@ const Template: Story = {
                 ...toRefs(state),
                 launchModal,
                 closeModal,
+            };
+        },
+    }),
+};
+
+
+export const Basic: Story = {
+    render: () => ({
+        components: { PButtonModal, PButton },
+        template: `
+            <div>
+                <p-button @click="modalVisible = true">Launch a modal</p-button>
+                <p-button-modal :visible.sync="modalVisible"
+                                @confirm="handleConfirm"
+                >
+                    <template #body>
+                        <p>{{ contents }}</p>
+                    </template>
+                </p-button-modal>
+            </div>
+        `,
+        setup() {
+            const state = reactive({
+                modalVisible: false,
+                contents: computed(() => faker.lorem.lines(5)),
+            });
+            const handleConfirm = () => {
+                state.modalVisible = false;
+            };
+            return {
+                ...toRefs(state),
+                handleConfirm,
+            };
+        },
+    }),
+};
+
+export const LoadingBackdrop: Story = {
+    render: () => ({
+        components: { PButtonModal, PButton },
+        template: `
+            <div>
+                <p-button @click="launchModal">Launch a modal</p-button>
+                <p-button-modal :visible.sync="modalVisible"
+                                :loading-backdrop="loadingBackdrop"
+                                @confirm="handleConfirm"
+                >
+                    <template #body>
+                        <p>{{ contents }}</p>
+                    </template>
+                </p-button-modal>
+            </div>
+        `,
+        setup() {
+            const state = reactive({
+                modalVisible: false,
+                contents: computed(() => faker.lorem.lines(5)),
+                loadingBackdrop: true,
+            });
+
+            const launchModal = () => {
+                state.loadingBackdrop = true;
+                state.modalVisible = true;
+                setTimeout(() => {
+                    state.loadingBackdrop = false;
+                }, 3000);
+            };
+            const handleConfirm = () => {
+                state.modalVisible = false;
+            };
+            return {
+                ...toRefs(state),
+                launchModal,
+                handleConfirm,
             };
         },
     }),

@@ -240,6 +240,21 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
         },
         control: 'boolean',
     },
+    loadingBackdrop: {
+        name: 'loadingBackdrop',
+        type: { name: 'boolean' },
+        description: 'Show Loading in backdrop',
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: 'boolean',
+    },
     disabled: {
         name: 'disabled',
         type: { name: 'boolean' },
