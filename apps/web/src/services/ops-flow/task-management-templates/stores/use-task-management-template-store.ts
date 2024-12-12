@@ -45,18 +45,23 @@ const messages: Record<SupportLanguage, TaskManagementTemplate> = {
 interface DomainConfigTemplateData {
     template_id: TaskManagementTemplateType;
 }
-
+interface DomainConfigLandingData {
+    enabled: boolean;
+}
 interface UseTaskManagementTemplateStoreState {
-    templateId: TaskManagementTemplateType
+    templateId: TaskManagementTemplateType;
+    enableLanding: boolean;
 }
 export const useTaskManagementTemplateStore = defineStore('task-management-template', () => {
     const domainConfigStore = useDomainConfigStore();
     const domainConfigStoreGetters = domainConfigStore.getters;
 
     const templateData = toRef(domainConfigStoreGetters, 'TASK_TEMPLATE') as unknown as Ref<DomainConfigTemplateData|undefined>;
+    const landingData = toRef(domainConfigStoreGetters, 'TASK_LANDING') as unknown as Ref<DomainConfigLandingData|undefined>;
 
     const state = reactive<UseTaskManagementTemplateStoreState>({
         templateId: 'default',
+        enableLanding: true,
     });
 
     const translate = (code: keyof TaskManagementTemplate, type?: TaskManagementTemplateType) => computed(() => {
@@ -93,6 +98,30 @@ export const useTaskManagementTemplateStore = defineStore('task-management-templ
             state.templateId = prev;
         }
     };
+    const setInitialLandingData = async () => {
+        if (landingData.value?.enabled) {
+            state.enableLanding = landingData.value.enabled;
+            return;
+        }
+        try {
+            const res = await domainConfigStore.get<DomainConfigLandingData>('TASK_LANDING');
+            state.enableLanding = res.data.enabled ?? false;
+        } catch (e) {
+            if (e instanceof APIError && e.status === 404) return;
+            ErrorHandler.handleError(e);
+        }
+    };
+
+    const updateLandingData = async (enabled: boolean) => {
+        const prev = state.enableLanding;
+        state.enableLanding = enabled;
+        try {
+            await domainConfigStore.set<DomainConfigLandingData>('TASK_LANDING', { enabled });
+        } catch (e) {
+            ErrorHandler.handleError(e);
+            state.enableLanding = prev;
+        }
+    };
 
     setInitialTemplateId();
     return {
@@ -100,6 +129,8 @@ export const useTaskManagementTemplateStore = defineStore('task-management-templ
         translate,
         templates,
         setInitialTemplateId,
+        setInitialLandingData,
         updateTemplateId,
+        updateLandingData,
     };
 });

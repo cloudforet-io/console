@@ -89,8 +89,8 @@ const getDisplayMenuList = (menuList: Menu[], isAdminMode?: boolean, currentWork
     let hideOnSiteMap = d.hideOnSiteMap;
     if (d.id === MENU_ID.OPS_FLOW_LANDING) {
         label = taskManagementTemplateStore.templates.templateName;
-        hideOnGNB = taskManagementTemplateStore.state.templateId === 'default';
-        hideOnSiteMap = taskManagementTemplateStore.state.templateId === 'default';
+        hideOnGNB = taskManagementTemplateStore.state.templateId === 'default' || !taskManagementTemplateStore.state.enableLanding;
+        hideOnSiteMap = taskManagementTemplateStore.state.templateId === 'default' || !taskManagementTemplateStore.state.enableLanding;
     } else if (d.id === MENU_ID.TASK_BOARD) {
         label = taskManagementTemplateStore.templates.taskBoard;
     }

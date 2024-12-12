@@ -6,5 +6,8 @@ import {
 
 export const initTaskManagementTemplate = async () => {
     const taskManagementTemplateStore = useTaskManagementTemplateStore(pinia);
-    await taskManagementTemplateStore.setInitialTemplateId();
+    await Promise.allSettled([
+        taskManagementTemplateStore.setInitialTemplateId(),
+        taskManagementTemplateStore.setInitialLandingData(),
+    ]);
 };
