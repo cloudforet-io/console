@@ -68,3 +68,19 @@ export const DATA_TABLE_QUERY_OPERATOR = {
 } as const;
 
 export const KEYWORD_FILTER_DISABLED_KEYS = [GROUP_BY.PROJECT, GROUP_BY.WORKSPACE, GROUP_BY.SERVICE_ACCOUNT];
+
+export const DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP = {
+    PIVOT: {
+        fields: {
+            labels: [],
+            data: undefined,
+            column: undefined,
+        },
+        limit: 5,
+        functions: 'sum',
+        order_by: {
+            type: 'key',
+            desc: false,
+        },
+    },
+};
