@@ -384,6 +384,7 @@ watch([
         .desc-item {
             @apply inline-flex items-center;
             gap: 0.0625rem;
+            padding-left: 0.25rem;
         }
     }
 }
