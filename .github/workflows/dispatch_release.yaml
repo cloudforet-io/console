@@ -114,7 +114,7 @@ jobs:
         if: steps.check_changes.outputs.changed == 'true'
         id: get_sha
         run: |
-          git commit -am "chore: version ${{ env.VERSION }}"
+          git commit -s -am "chore: version ${{ env.VERSION }}"
           echo "NEW_COMMIT_SHA=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
         env:
           GIT_AUTHOR_NAME: ${{ steps.import-gpg.outputs.name }}
