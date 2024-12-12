@@ -6,13 +6,14 @@ import {
 } from '@cloudforet/mirinae';
 import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
+import { i18n as _i18n } from '@/translations';
+
 import ActionMenuButton from '@/common/components/buttons/ActionMenuButton.vue';
 
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
-
 
 const taskCategoryPageStore = useTaskCategoryPageStore();
 const taskCategoryPageGetters = taskCategoryPageStore.getters;
@@ -21,12 +22,12 @@ const taskManagementTemplateStore = useTaskManagementTemplateStore();
 const taskTypeFields = computed<DataTableField[]>(() => [
     {
         name: 'name',
-        label: 'Name',
+        label: _i18n.t('OPSFLOW.NAME') as string,
         width: '20%',
     },
     {
         name: 'description',
-        label: 'Description',
+        label: _i18n.t('OPSFLOW.DESCRIPTION') as string,
         width: '70%',
     },
     {

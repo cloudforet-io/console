@@ -81,7 +81,9 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         // task type field form
         currentFields: computed<TaskField[]>(() => {
             const taskType = state.currentTaskType;
-            return taskType ? taskType.fields : [];
+            const fields = taskType ? taskType.fields : [];
+            const isViewMode = state.mode === 'view';
+            return isViewMode ? fields : fields.filter((f) => f.is_primary || f.is_required);
         }),
         isDefaultFieldValid: computed<boolean>(() => {
             if (state.mode === 'view') return state.defaultDataValidationMap[DEFAULT_FIELD_ID_MAP.title] ?? true;

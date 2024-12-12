@@ -217,7 +217,7 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
                 </p-field-group>
                 <p-field-group :label="$t('OPSFLOW.DESCRIPTION')">
                     <p-textarea :value="description"
-                                :placeholder="$t('OPSFLOW.FIELD_DESCRIPTION', { field: taskManagementTemplateStore.templates.taskType })"
+                                :placeholder="String($t('OPSFLOW.FIELD_DESCRIPTION', { field: taskManagementTemplateStore.templates.taskType }))"
                                 @update:value="setForm('description', $event)"
                     />
                 </p-field-group>
@@ -226,6 +226,7 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
                 >
                     <task-fields-configuration class="mt-2"
                                                :fields="fields"
+                                               :origin-fields="taskCategoryPageGetters.targetTaskType?.fields"
                                                @update:fields="setFields"
                                                @add-field="addField"
                                                @remove-field="removeField"

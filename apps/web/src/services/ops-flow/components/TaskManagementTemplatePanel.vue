@@ -22,7 +22,7 @@ const taskManagementTemplateState = taskManagementTemplateStore.state;
 const state = reactive({
     templateMenuItems: computed<SelectDropdownMenuItem[]>(() => TASK_MANAGEMENT_TEMPLATE_TYPES.map((templateType) => ({
         name: templateType,
-        label: taskManagementTemplateStore.translate('templateName', templateType).value,
+        label: taskManagementTemplateStore.translate('TemplateName', templateType).value,
     }))),
 });
 

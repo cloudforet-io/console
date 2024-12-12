@@ -6,6 +6,7 @@
 		"TaskType": "태스크 타입",
 		"TemplateName": "기본",
 		"task": "태스크",
+		"taskType": "태스크 타입",
 		"taskTypes": "태스크 타입",
 		"tasks": "태스크"
 	},
@@ -16,6 +17,7 @@
 		"TaskType": "요청 타입",
 		"TemplateName": "서비스 데스크",
 		"task": "티켓",
+		"taskType": "요청 타입",
 		"taskTypes": "요청 타입",
 		"tasks": "티켓"
 	}

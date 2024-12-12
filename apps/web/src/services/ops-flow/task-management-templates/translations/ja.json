@@ -6,6 +6,7 @@
 		"TaskType": "",
 		"TemplateName": "",
 		"task": "",
+		"taskType": "",
 		"taskTypes": "",
 		"tasks": ""
 	},
@@ -16,6 +17,7 @@
 		"TaskType": "",
 		"TemplateName": "",
 		"task": "",
+		"taskType": "",
 		"taskTypes": "",
 		"tasks": ""
 	}

@@ -38,7 +38,7 @@ const emit = defineEmits<{(event: 'update:is-folded', value: boolean): void
                  badge-type="subtle"
                  style-type="gray100"
         >
-            Required
+            {{ $t('OPSFLOW.FIELD_GENERATOR.REQUIRED') }}
         </p-badge>
         <p-icon-button v-if="!isDefaultField"
                        shape="square"

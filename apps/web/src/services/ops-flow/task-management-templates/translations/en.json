@@ -6,6 +6,7 @@
 		"TaskType": "Task Type",
 		"TemplateName": "Default",
 		"task": "task",
+		"taskType": "task type",
 		"taskTypes": "task types",
 		"tasks": "tasks"
 	},
@@ -16,6 +17,7 @@
 		"TaskType": "Request Type",
 		"TemplateName": "Service Desk",
 		"task": "ticket",
+		"taskType": "request type",
 		"taskTypes": "request types",
 		"tasks": "tickets"
 	}

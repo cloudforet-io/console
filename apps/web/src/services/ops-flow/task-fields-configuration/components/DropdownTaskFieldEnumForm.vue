@@ -63,7 +63,7 @@ onBeforeMount(() => {
         <p-text-input class="flex-grow"
                       :value="name"
                       :invalid="invalidState.name"
-                      placeholder="Name"
+                      :placeholder="$t('OPSFLOW.NAME')"
                       block
                       @update:value="handleUpdateName"
         />
@@ -71,7 +71,7 @@ onBeforeMount(() => {
         <p-text-input class="flex-grow"
                       :value="value"
                       :invalid="invalidState.value"
-                      placeholder="Key"
+                      :placeholder="$t('OPSFLOW.KEY')"
                       block
                       @update:value="handleUpdateValue"
         />

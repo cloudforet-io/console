@@ -38,7 +38,7 @@ watch(() => route.query.categoryId, (categoryId) => {
     <div>
         <p-heading-layout class="mb-6">
             <template #heading>
-                <p-heading>Board</p-heading>
+                <p-heading>{{ taskManagementTemplateStore.templates.TaskBoard }}</p-heading>
             </template>
             <template #extra>
                 <router-link v-slot="{ navigate }"
@@ -48,7 +48,7 @@ watch(() => route.query.categoryId, (categoryId) => {
                     <p-button icon-left="ic_plus_bold"
                               @click="navigate"
                     >
-                        {{ taskManagementTemplateStore.templates.createTask }}
+                        {{ $t('OPSFLOW.ADD_TARGET', {target: taskManagementTemplateStore.templates.Task}) }}
                     </p-button>
                 </router-link>
             </template>
