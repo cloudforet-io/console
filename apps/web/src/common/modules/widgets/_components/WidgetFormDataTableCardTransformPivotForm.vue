@@ -186,12 +186,12 @@ const fetchAndExtractDynamicField = async () => {
     if (!state.proxyDataTableInfo.dataTableId || !state.proxyFormData.fields?.column) return;
     const _isPrivate = state.proxyDataTableInfo.dataTableId.startsWith('private');
     const _fetcher = _isPrivate
-        ? SpaceConnector.clientV2.dashboard.dataTable.load<DataTableLoadParameters, ListResponse<Record<string, string>>>
-        : SpaceConnector.clientV2.dashboard.dataTable.load<DataTableLoadParameters, ListResponse<Record<string, string>>>;
+        ? SpaceConnector.clientV2.dashboard.privateDataTable.load<DataTableLoadParameters, ListResponse<Record<string, string>>>
+        : SpaceConnector.clientV2.dashboard.publicDataTable.load<DataTableLoadParameters, ListResponse<Record<string, string>>>;
     try {
         state.dynamicFieldLoading = true;
         const res = await _fetcher({
-            widget_id: state.proxyDataTableInfo.dataTableId,
+            data_table_id: state.proxyDataTableInfo.dataTableId,
             granularity: GRANULARITY.YEARLY,
         });
         const dynamicFields = getUniqueValues(res.results || [], state.proxyFormData.fields.column);
