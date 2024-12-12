@@ -253,25 +253,25 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
     [MENU_ID.OPS_FLOW]: {
         menuId: MENU_ID.OPS_FLOW,
         routeName: OPS_FLOW_ROUTE._NAME,
-        translationId: 'OpsFlow', // TODO: change translation id
+        translationId: 'MENU.OPS_FLOW',
         icon: 'ic_gnb_bell', // TODO: change icon
     },
     [MENU_ID.OPS_FLOW_LANDING]: {
         menuId: MENU_ID.OPS_FLOW_LANDING,
         routeName: OPS_FLOW_ROUTE.LANDING._NAME,
-        translationId: 'Service Desk', // TODO: change translation id
-        icon: 'ic_support-center',
+        translationId: 'OpsFlow Landing', // It will be replaced by task management template
+        icon: 'ic_service_service-desk',
     },
-    [MENU_ID.BOARD]: {
-        menuId: MENU_ID.BOARD,
+    [MENU_ID.TASK_BOARD]: {
+        menuId: MENU_ID.TASK_BOARD,
         routeName: OPS_FLOW_ROUTE.BOARD._NAME,
-        translationId: 'Board', // TODO: change translation id
-        icon: 'ic_workflow-board',
+        translationId: 'Board', // It will be replaced by task management template
+        icon: 'ic_service_board',
     },
     [MENU_ID.TASK_MANAGEMENT]: {
         menuId: MENU_ID.TASK_MANAGEMENT,
         routeName: OPS_FLOW_ROUTE.TASK_MANAGEMENT._NAME,
-        translationId: 'Task Management', // TODO: change translation id
-        icon: 'ic_service_administration',
+        translationId: 'MENU.TASK_MANAGEMENT',
+        icon: 'ic_service_task-management',
     },
 });

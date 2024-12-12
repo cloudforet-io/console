@@ -1,20 +1,22 @@
 {
 	"default": {
-		"createTask": "",
-		"createTaskType": "",
-		"editTaskType": "",
-		"taskCategory": "",
-		"taskProgress": "",
-		"taskType": "",
+		"createTask": "태스크 생성",
+		"createTaskType": "태스크 타입 추가",
+		"editTaskType": "태스크 타입 변경",
+		"taskBoard": "태스크 보드",
+		"taskCategory": "태스크 카테고리",
+		"taskProgress": "태스크 진행상황",
+		"taskType": "태스크 타입",
 		"templateName": "기본"
 	},
 	"service-desk": {
-		"createTask": "",
-		"createTaskType": "",
-		"editTaskType": "",
-		"taskCategory": "",
-		"taskProgress": "",
-		"taskType": "",
+		"createTask": "티켓 생성",
+		"createTaskType": "요청 타입 추가",
+		"editTaskType": "요청 타입 변경",
+		"taskBoard": "요청 보드",
+		"taskCategory": "지원 카테고리",
+		"taskProgress": "티켓 진행상황",
+		"taskType": "요청 타입",
 		"templateName": "서비스 데스크"
 	}
 }

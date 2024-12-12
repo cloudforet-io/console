@@ -46,7 +46,7 @@ export const MENU_LIST: Menu[] = [
         needPermissionByRole: true,
         subMenuList: [
             { id: MENU_ID.OPS_FLOW_LANDING },
-            { id: MENU_ID.BOARD },
+            { id: MENU_ID.TASK_BOARD },
         ],
     },
     {

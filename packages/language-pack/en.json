@@ -3830,8 +3830,11 @@
 		"MY_PAGE_ACCOUNT_PROFILE": "Account & Profile",
 		"MY_PAGE_API_KEY": "Access with API & CLI",
 		"MY_PAGE_NOTIFICATIONS": "Notifications Channel",
+		"OPS_FLOW": "OpsFlow",
 		"PROJECT": "Project",
 		"PROVIDER": "Provider",
+		"TASK_BOARD": "{task} Board",
+		"TASK_MANAGEMENT": "Task Management",
 		"WORKSPACE_HOME": "Home"
 	},
 	"MONITORING": {

@@ -3830,8 +3830,11 @@
 		"MY_PAGE_ACCOUNT_PROFILE": "계정 & 프로필",
 		"MY_PAGE_API_KEY": "API & CLI 설정",
 		"MY_PAGE_NOTIFICATIONS": "알림 채널",
+		"OPS_FLOW": "옵스플로우",
 		"PROJECT": "프로젝트",
 		"PROVIDER": "프로바이더",
+		"TASK_BOARD": "{task} 보드",
+		"TASK_MANAGEMENT": "태스크 관리",
 		"WORKSPACE_HOME": "홈"
 	},
 	"MONITORING": {
@@ -4173,9 +4176,9 @@
 	"OPSFLOW": {
 		"TASK_MANAGEMENT": {
 			"TASK_TYPE_DELETE": {
-				"CHECK_TITLE": "",
-				"DELETE_UNAVAILABLE": "",
-				"TITLE": ""
+				"CHECK_TITLE": "정말 {taskType}을(를) 삭제하시겠습니까?",
+				"DELETE_UNAVAILABLE": "하위 태스크가 존재하므로 {taskType} 삭제가 불가합니다.",
+				"TITLE": "{taskType} 삭제"
 			}
 		}
 	},

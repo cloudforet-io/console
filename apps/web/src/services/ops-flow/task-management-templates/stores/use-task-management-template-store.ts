@@ -22,6 +22,7 @@ import ko from '../translations/ko.json';
 
 interface TaskManagementTemplate {
     templateName: string;
+    taskBoard: string;
     taskCategory: string;
     allTaskCategories: string;
     taskType: string;

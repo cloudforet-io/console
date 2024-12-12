@@ -25,6 +25,6 @@ const state = reactive({
 
 <template>
     <aside class="sidebar-menu">
-        <board-l-s-b v-if="state.selectedMenuId === MENU_ID.BOARD" />
+        <board-l-s-b v-if="state.selectedMenuId === MENU_ID.TASK_BOARD" />
     </aside>
 </template>

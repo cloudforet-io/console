@@ -3830,8 +3830,11 @@
 		"MY_PAGE_ACCOUNT_PROFILE": "アカウント&プロフィール",
 		"MY_PAGE_API_KEY": "アクセス設定(API&CLI)",
 		"MY_PAGE_NOTIFICATIONS": "お知らせチャンネル",
+		"OPS_FLOW": "",
 		"PROJECT": "プロジェクト",
 		"PROVIDER": "プロバイダー",
+		"TASK_BOARD": "",
+		"TASK_MANAGEMENT": "",
 		"WORKSPACE_HOME": "ホーム"
 	},
 	"MONITORING": {
@@ -4174,7 +4177,7 @@
 		"TASK_MANAGEMENT": {
 			"TASK_TYPE_DELETE": {
 				"CHECK_TITLE": "",
-				"DELETE_UNAVAILABLE": "하위 태스크가 존재하므로 {taskType} 삭제가 불가합니다.",
+				"DELETE_UNAVAILABLE": "",
 				"TITLE": ""
 			}
 		}

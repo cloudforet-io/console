@@ -40,8 +40,8 @@ const opsFlowRoutes: RouteConfig = {
             path: 'board',
             name: OPS_FLOW_ROUTE.BOARD._NAME,
             meta: {
-                menuId: MENU_ID.BOARD,
-                translationId: MENU_INFO_MAP[MENU_ID.BOARD].translationId,
+                menuId: MENU_ID.TASK_BOARD,
+                translationId: MENU_INFO_MAP[MENU_ID.TASK_BOARD].translationId,
                 lsbVisible: true,
             },
             component: BoardPage as any,
