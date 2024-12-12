@@ -33,9 +33,14 @@ const Template: Story = {
         },
         template: `
             <div style="width: 100vw; height: 20rem; border: 1px solid gray;">
-                <p-vertical-layout>
+                <p-vertical-layout 
+                    :height="height"
+                    :initWidth="initWidth"
+                    :minWidth="minWidth"
+                    :maxWidth="maxWidth"
+                    :disableDoubleClickResize="disableDoubleClickResize">
                     <template #sidebar>
-                        Left Layout
+                      <div style="width: 400px; background-color: red">Left Layout</div>
                     </template>
                     <template #default>
                         Right Layout

@@ -75,6 +75,21 @@ export const getVerticalLayoutArgTypes = (): ArgTypes => ({
         },
         control: 'number',
     },
+    disableDoubleClickResize: {
+        name: 'disableDoubleClickResize',
+        type: { name: 'boolean' },
+        description: 'Whether to disable resizing the sidebar with a double-click on the controller.',
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: 'boolean',
+    },
     // default
     sidebar: { table: { disable: true } },
     'resizer-button': { table: { disable: true } },

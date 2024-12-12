@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    reactive, computed, onMounted, onUnmounted, onBeforeMount,
+    reactive, computed, onMounted, onUnmounted, onBeforeMount, ref,
 } from 'vue';
 
 import PTooltip from '@/data-display/tooltips/PTooltip.vue';
@@ -15,6 +15,7 @@ interface Props {
     initWidth?: number;
     minWidth?: number;
     maxWidth?: number;
+    disableDoubleClickResize? : boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -22,6 +23,7 @@ const props = withDefaults(defineProps<Props>(), {
     initWidth: 240,
     minWidth: 100,
     maxWidth: 500,
+    disableDoubleClickResize: false,
 });
 
 const documentEventMount = (eventName: string, func: any) => {
@@ -66,6 +68,12 @@ const state = reactive({
     })),
 });
 
+const leftLayoutContentBox = ref<null|HTMLElement>(null);
+
+const resize = (delta : number) => {
+    state.width = delta;
+};
+
 /* Resizing */
 const isResizing = (event) => {
     if (state.resizing) {
@@ -76,7 +84,7 @@ const isResizing = (event) => {
         const delta = state.clientX - event.clientX;
         const width = (state.isMobileSize ? MOBILE_WIDTH : state.width) - delta;
         if (!(width <= props.minWidth || width > props.maxWidth)) {
-            state.width = width;
+            resize(width);
         }
         state.clientX = event.clientX;
         state.isHover = true;
@@ -121,6 +129,47 @@ const detectWindowResizing = () => {
     }
 };
 
+// TODO mobile size 고려
+const handleControllerDoubleClick = () => {
+    const childElementRects = leftLayoutContentBox.value?.children[0].getClientRects()[0];
+
+    console.log(childElementRects);
+
+    if (childElementRects) {
+        const contentWidth = childElementRects.width;
+        const minimumWidth = props.minWidth;
+        const maximumWidth = props.maxWidth;
+        const maximumPossibleWidth = contentWidth > props.maxWidth ? props.maxWidth : contentWidth;
+
+        console.log(state.width, 'state.width');
+        console.log(`${contentWidth}contentWidth`);
+        console.log(minimumWidth, 'minimumWidth');
+        console.log(maximumPossibleWidth, 'maximumPossibleWidth');
+
+        if (state.width === minimumWidth) {
+            if (state.width === maximumPossibleWidth) {
+                resize(maximumWidth);
+            } else {
+                resize(maximumPossibleWidth);
+            }
+            return;
+        }
+
+        if (state.width === maximumWidth) {
+            resize(minimumWidth);
+            return;
+        }
+
+        if (state.width > contentWidth) {
+            resize(minimumWidth);
+        } else if (state.width < contentWidth) {
+            resize(maximumPossibleWidth);
+        } else {
+            resize(maximumWidth);
+        }
+    }
+};
+
 documentEventMount('mousemove', isResizing);
 documentEventMount('mouseup', endResizing);
 documentEventMount('resize', detectWindowResizing);
@@ -128,9 +177,7 @@ documentEventMount('resize', detectWindowResizing);
 onBeforeMount(() => {
     detectWindowResizing();
 });
-const handleControllerDbclick = () => {
-    console.log('test');
-};
+
 </script>
 
 <template>
@@ -141,9 +188,13 @@ const handleControllerDbclick = () => {
              :style="state.sidebarContainerStyle"
              :class="{transition: state.transition}"
         >
-            <div :style="state.sidebarStyle">
-                <slot name="sidebar"
-                      v-bind="{width: state.width, hide: state.hide, transition: state.transition, height: props.height}"
+            <div
+                ref="leftLayoutContentBox"
+                :style="state.sidebarStyle"
+            >
+                <slot
+                    name="sidebar"
+                    v-bind="{width: state.width, hide: state.hide, transition: state.transition, height: props.height}"
                 />
             </div>
         </div>
@@ -172,14 +223,17 @@ const handleControllerDbclick = () => {
                     </slot>
                 </span>
             </p-tooltip>
-            <div class="controller"
-                 :class="{hover: state.isHover && !state.hide}"
-                 @dblclick="handleControllerDbclick"
+            <div
+                v-if="!disableDoubleClickResize"
+                class="controller"
+                :class="{hover: state.isHover && !state.hide}"
+                @dblclick="handleControllerDoubleClick"
             />
         </div>
-        <div class="main"
-             :class="{transition: state.transition}"
-             :style="state.mainStyle"
+        <div
+            class="main"
+            :class="{transition: state.transition}"
+            :style="state.mainStyle"
         >
             <slot />
         </div>
@@ -273,13 +327,13 @@ const handleControllerDbclick = () => {
             opacity: 0;
 
             &.hover {
-                opacity: 1;
-
                 @apply border-blue-500;
+                opacity: 1;
             }
             &:hover {
                 @apply bg-blue-200;
-                cursor: pointer;
+                opacity: 1;
+                cursor: col-resize;
             }
         }
     }
