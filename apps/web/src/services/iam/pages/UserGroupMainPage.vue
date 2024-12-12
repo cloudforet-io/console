@@ -45,4 +45,10 @@ const refreshUserGroupList = () => {
     @apply mx-0;
     max-width: 100%;
 }
+
+:deep(.user-group-toolbox-layout) {
+    .horizontal-contents {
+        overflow: unset;
+    }
+}
 </style>
