@@ -13,7 +13,7 @@ import type { EventModel } from '@/schema/opsflow/event/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-const EVENT_PAGE_SIZE = 3;
+const EVENT_PAGE_SIZE = 10;
 interface UseTaskDetailPageStoreState {
     // task
     taskId?: string;

@@ -7,6 +7,9 @@ import EnableLandingPanel from '@/services/ops-flow/components/EnableLandingPane
 import PackagePanel from '@/services/ops-flow/components/PackagePanel.vue';
 import TaskCategoryPanel from '@/services/ops-flow/components/TaskCategoryPanel.vue';
 import TaskManagementTemplatePanel from '@/services/ops-flow/components/TaskManagementTemplatePanel.vue';
+import {
+    useTaskManagementTemplateStore,
+} from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
 const PackageForm = defineAsyncComponent(() => import('@/services/ops-flow/components/PackageForm.vue'));
 const PackageSetDefaultModal = defineAsyncComponent(() => import('@/services/ops-flow/components/PackageSetDefaultModal.vue'));
@@ -14,6 +17,8 @@ const PackageDeleteModal = defineAsyncComponent(() => import('@/services/ops-flo
 
 const TaskCategoryForm = defineAsyncComponent(() => import('@/services/ops-flow/components/TaskCategoryForm.vue'));
 const TaskCategoryDeleteModal = defineAsyncComponent(() => import('@/services/ops-flow/components/TaskCategoryDeleteModal.vue'));
+
+const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
 </script>
 
@@ -25,7 +30,7 @@ const TaskCategoryDeleteModal = defineAsyncComponent(() => import('@/services/op
         <task-management-template-panel class="mb-4" />
         <package-panel class="mb-4" />
         <task-category-panel class="mb-4" />
-        <enable-landing-panel />
+        <enable-landing-panel v-if="taskManagementTemplateStore.state.templateId !== 'default'" />
 
         <!-- package modals -->
         <package-form />

@@ -120,7 +120,7 @@ const assigneeName = computed<string>(() => {
     const userId = taskContentFormState.originTask?.assignee;
     if (!userId) return '--';
     const user = userReferenceStore.getters.userItems[userId];
-    return user?.label || user?.name || '--';
+    return user?.label || user?.name || userId;
 });
 
 /* form validator */

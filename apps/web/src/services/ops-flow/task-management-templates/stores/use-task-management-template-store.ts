@@ -122,8 +122,6 @@ export const useTaskManagementTemplateStore = defineStore('task-management-templ
             state.enableLanding = prev;
         }
     };
-
-    setInitialTemplateId();
     return {
         state,
         translate,
