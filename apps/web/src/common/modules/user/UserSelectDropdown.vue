@@ -49,13 +49,13 @@ const allUserItems = computed<UserDropdownItem[]>(() => {
     if (props.userPool && props.userPool.length > 0) {
         return props.userPool.map((userId) => ({
             name: userId,
-            label: userReferenceMap.value[userId]?.label ?? userId,
+            label: userReferenceMap.value[userId]?.label || userReferenceMap.value[userId]?.name || userId,
         }));
     }
     return Object.values(userReferenceMap.value).map((u: UserReferenceMap[string]) => ({
         name: u.key,
-        label: u.label,
-    }));
+        label: u.label || u.name || u.key,
+    })).sort((a, b) => a.label.localeCompare(b.label));
 });
 const selectedUserItems = ref<SelectDropdownMenuItem[]>([]);
 const userMenuItemsHandler: AutocompleteHandler = async (keyword: string, pageStart = 1, pageLimit = 10) => {
@@ -125,6 +125,7 @@ watch([loading, () => props.userId, () => props.userIds], ([_loading, newUserId,
     <p-select-dropdown show-select-marker
                        :selected="selectedUserItems"
                        :handler="userMenuItemsHandler"
+                       :page-size="10"
                        is-filterable
                        :invalid="props.invalid"
                        :disabled="props.disabled"
