@@ -3,12 +3,18 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PDivider, PFieldGroup, PSelectButton, PTextInput, PSelectDropdown,
+    PDivider, PFieldGroup, PSelectButton, PTextInput, PSelectDropdown, PRadioGroup, PRadio, PI,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
+import type { DataTableLoadParameters } from '@/schema/dashboard/public-data-table/api-verbs/load';
 import { i18n } from '@/translations';
+
+import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import WidgetFormDataTableCardTransformFormWrapper
@@ -19,6 +25,7 @@ import {
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { TransformDataTableInfo } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { PivotOptions } from '@/common/modules/widgets/types/widget-model';
+
 
 
 
@@ -75,8 +82,29 @@ const state = reactive({
         },
     ]),
     selectedValueType: 'auto',
-    selectedDynamicFieldMenuItems: computed(() => []),
+    dynamicFieldItems: [] as MenuItem[],
+    selectedDynamicFieldMenuItems: computed(() => {
+        if (!state.proxyFormData.select) return [];
+        return state.proxyFormData.select.map((item) => ({
+            name: item,
+            label: item,
+        }));
+    }),
     dynamicFieldLoading: false,
+    operatorItems: computed<MenuItem[]>(() => [
+        { name: 'sum', label: i18n.t('Sum') },
+        { name: 'min', label: i18n.t('Min') },
+        { name: 'max', label: i18n.t('Max') },
+    ]),
+    orderByTypeItems: computed<MenuItem[]>(() => [
+        { name: 'key', label: i18n.t('Key') },
+        { name: 'value', label: i18n.t('Value') },
+    ]),
+    orderByDescItems: computed(() => [
+        { label: i18n.t('Ascending'), value: 'asc', icon: 'ic_sort-ascending' },
+        { label: i18n.t('Descending'), value: 'desc', icon: 'ic_sort-descending' },
+    ]),
+    selectedOrderByDesc: computed(() => (state.proxyFormData.order_by?.desc ? 'desc' : 'asc')),
 });
 /* Events */
 const handleUpdateCriteria = (value: string) => {
@@ -127,6 +155,61 @@ const handleUpdateLimit = (value: string) => {
         limit: value,
     };
 };
+const handleUpdateOperator = (value: PivotOptions['functions']) => {
+    state.proxyFormData = {
+        ...state.proxyFormData,
+        functions: value,
+    };
+};
+const handleUpdateOrderByType = (value: PivotOptions['order_by']['type']) => {
+    state.proxyFormData = {
+        ...state.proxyFormData,
+        order_by: {
+            ...state.proxyFormData.order_by,
+            type: value,
+        },
+    };
+};
+const handleUpdateOrderByDesc = (value: 'asc' | 'desc') => {
+    const desc = value === 'desc';
+    state.proxyFormData = {
+        ...state.proxyFormData,
+        order_by: {
+            ...state.proxyFormData.order_by,
+            desc,
+        },
+    };
+};
+
+/* Dynamic Field Fetching */
+const fetchAndExtractDynamicField = async () => {
+    if (!state.proxyDataTableInfo.dataTableId || !state.proxyFormData.fields?.column) return;
+    const _isPrivate = state.proxyDataTableInfo.dataTableId.startsWith('private');
+    const _fetcher = _isPrivate
+        ? SpaceConnector.clientV2.dashboard.dataTable.load<DataTableLoadParameters, ListResponse<Record<string, string>>>
+        : SpaceConnector.clientV2.dashboard.dataTable.load<DataTableLoadParameters, ListResponse<Record<string, string>>>;
+    try {
+        state.dynamicFieldLoading = true;
+        const res = await _fetcher({
+            widget_id: state.proxyDataTableInfo.dataTableId,
+            granularity: GRANULARITY.YEARLY,
+        });
+        const dynamicFields = getUniqueValues(res.results || [], state.proxyFormData.fields.column);
+        state.dynamicFieldItems = dynamicFields.map((field) => ({
+            name: field,
+            label: field,
+        }));
+    } catch (e) {
+        showErrorMessage(e, '');
+    } finally {
+        state.dynamicFieldLoading = false;
+    }
+};
+
+const getUniqueValues = (data: Record<string, string>[], key: string): string[] => {
+    const values = data.map((item) => item[key]);
+    return Array.from(new Set(values));
+};
 
 watch(() => props.formData, (formData) => {
     if (state.isInitiated) {
@@ -140,6 +223,16 @@ watch(() => state.proxyDataTableInfo, (dataTableInfo) => {
     if (dataTableId) {
         state.selectedValueType = 'auto';
         state.proxyFormData = DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT;
+    }
+});
+
+// Fetching dynamic data for fixed column
+watch([
+    () => state.proxyFormData.fields?.column,
+    () => state.selectedValueType,
+], ([column, valueType]) => {
+    if (!!column && valueType === 'fixed') {
+        fetchAndExtractDynamicField();
     }
 });
 
@@ -196,7 +289,7 @@ watch(() => state.proxyDataTableInfo, (dataTableInfo) => {
                     <div class="dynamic-field-value-contents-wrapper">
                         <p-select-dropdown v-if="state.selectedValueType === 'fixed'"
                                            class="dynamic-field-select-dropdown"
-                                           :menu="[]"
+                                           :menu="state.dynamicFieldItems"
                                            :selected="state.selectedDynamicFieldMenuItems"
                                            :loading="state.dynamicFieldLoading"
                                            use-fixed-menu-style
@@ -221,6 +314,48 @@ watch(() => state.proxyDataTableInfo, (dataTableInfo) => {
                         />
                     </div>
                 </p-field-group>
+                <p-field-group :label="$t('Operator')"
+                               style-type="secondary"
+                               required
+                               class="operator-field"
+                >
+                    <p-select-dropdown :menu="state.operatorItems"
+                                       :selected="state.proxyFormData.functions"
+                                       appearance-type="badge"
+                                       block
+                                       @update:selected="handleUpdateOperator"
+                    />
+                </p-field-group>
+                <p-field-group :label="$t('Order by')"
+                               style-type="secondary"
+                               required
+                               class="order-by-field  flex flex-col gap-2"
+                >
+                    <p-select-dropdown :menu="state.orderByTypeItems"
+                                       :selected="state.proxyFormData.order_by?.type"
+                                       appearance-type="badge"
+                                       block
+                                       @update:selected="handleUpdateOrderByType"
+                    />
+                    <p-radio-group direction="horizontal">
+                        <p-radio v-for="(item) in state.orderByDescItems"
+                                 :key="`order-by-${item.value}`"
+                                 :value="item.value"
+                                 :selected="state.selectedOrderByDesc"
+                                 @change="handleUpdateOrderByDesc"
+                        >
+                            <div class="desc-item">
+                                <p-i :name="item.icon"
+                                     width="1.25rem"
+                                     height="1.25rem"
+                                />
+                                <span>
+                                    {{ item.label }}
+                                </span>
+                            </div>
+                        </p-radio>
+                    </p-radio-group>
+                </p-field-group>
             </div>
         </widget-form-data-table-card-transform-form-wrapper>
     </div>
@@ -244,6 +379,11 @@ watch(() => state.proxyDataTableInfo, (dataTableInfo) => {
             .dynamic-field-auto-count {
                 height: 2rem;
             }
+        }
+
+        .desc-item {
+            @apply inline-flex items-center;
+            gap: 0.0625rem;
         }
     }
 }
