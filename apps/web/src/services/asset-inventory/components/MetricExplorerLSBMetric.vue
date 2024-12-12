@@ -78,7 +78,6 @@ const state = reactive({
                 data: {
                     ...metric,
                     type: 'metric',
-                    is_managed: metric.is_managed,
                     to: getProperRouteLocation({
                         name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
                         params: {
@@ -126,6 +125,7 @@ const state = reactive({
         });
         return displayMap;
     }),
+    metricLSBLoading: false,
 });
 
 /* Event */
@@ -152,15 +152,19 @@ watch(() => route.params, () => {
 /* Watcher */
 watch(() => metricExplorerLSBState.selectedNamespaceId, async (selectedNamespaceId) => {
     if (selectedNamespaceId) {
-        await metricExplorerLSBStore.loadNamespace(selectedNamespaceId);
-        await metricExplorerLSBStore.loadMetricList(selectedNamespaceId);
-        await metricExplorerLSBStore.loadMetricExampleList(selectedNamespaceId);
+        state.metricLSBLoading = true;
+        await Promise.allSettled([
+            await metricExplorerLSBStore.loadNamespace(selectedNamespaceId),
+            await metricExplorerLSBStore.loadMetricList(selectedNamespaceId),
+            await metricExplorerLSBStore.loadMetricExampleList(selectedNamespaceId),
+        ]);
+        state.metricLSBLoading = false;
     }
 }, { immediate: true });
 </script>
 
 <template>
-    <p-data-loader :loading="false"
+    <p-data-loader :loading="state.metricLSBLoading"
                    :loader-backdrop-opacity="0.5"
                    :loader-backdrop-color="gray[100]"
                    class="metric-explorer-l-s-b-metric-menu"
