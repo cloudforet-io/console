@@ -38,5 +38,6 @@ export interface ButtonModalProps {
     footerResetButtonVisible: boolean;
 
     loading: boolean;
+    loadingBackdrop: boolean;
     disabled: boolean;
 }
