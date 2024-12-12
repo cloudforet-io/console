@@ -74,20 +74,6 @@ export const useCategoryField = ({
         const filteredItems = allCategoryItems.value.filter((item) => getTextHighlightRegex(keyword).test(item.label as string));
         const _totalCount = pageStart - 1 + Number(pageLimit);
         const _slicedResults = filteredItems.slice(pageStart - 1, _totalCount);
-        console.debug(
-            'filteredItems',
-            filteredItems,
-            '\n_slicedResults',
-            _slicedResults,
-            '\n_totalCount',
-            _totalCount,
-            '\nmore',
-            _totalCount < filteredItems.length,
-            '\npageStart',
-            pageStart,
-            '\npageLimit',
-            pageLimit,
-        );
         return {
             results: _slicedResults,
             more: _totalCount < filteredItems.length,

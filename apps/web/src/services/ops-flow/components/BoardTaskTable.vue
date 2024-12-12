@@ -8,8 +8,7 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 import {
-    PPaneLayout, PToolbox, PDataTable, PDivider, PLink,
-    PCollapsiblePanel, PBadge,
+    PPaneLayout, PToolbox, PDataTable, PDivider, PBadge,
 } from '@cloudforet/mirinae';
 import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
@@ -20,14 +19,13 @@ import type { TaskModel } from '@/schema/opsflow/task/model';
 
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 
-import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useTimezoneDate } from '@/common/composables/timezone-date';
 import ProjectLinkButton from '@/common/modules/project/ProjectLinkButton.vue';
 
+import BoardTaskDescriptionField from '@/services/ops-flow/components/BoardTaskDescriptionField.vue';
 import BoardTaskFilters from '@/services/ops-flow/components/BoardTaskFilters.vue';
-import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
+import BoardTaskNameField from '@/services/ops-flow/components/BoardTaskNameField.vue';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
 import { useBoardPageStore } from '@/services/ops-flow/stores/board-page-store';
 import { useTaskStore } from '@/services/ops-flow/stores/task-store';
@@ -216,9 +214,7 @@ const fields = computed<DataTableField[] >(() => [
         label: 'Created At',
     },
 ]);
-const { getProperRouteLocation } = useProperRouteLocation();
 
-const getAttachments = (item: TaskModel) => item.files?.map((d) => ({ fileId: d.file_id, downloadUrl: d.download_url }));
 </script>
 
 <template>
@@ -243,22 +239,14 @@ const getAttachments = (item: TaskModel) => item.files?.map((d) => ({ fileId: d.
                       class="w-auto"
         >
             <template #col-name-format="{item}">
-                <p-collapsible-panel :line-clamp="1">
-                    <p-link :text="item.name"
-                            :to="getProperRouteLocation({
-                                name: OPS_FLOW_ROUTE.BOARD.TASK_DETAIL._NAME,
-                                params: {taskId: item.task_id},
-                            })"
-                            highlight
-                    />
-                </p-collapsible-panel>
+                <board-task-name-field :task-id="item.task_id"
+                                       :name="item.name"
+                />
             </template>
             <template #col-description-format="{item}">
-                <p-collapsible-panel :line-clamp="1">
-                    <text-editor-viewer :contents="item.description"
-                                        :attachments="getAttachments(item)"
-                    />
-                </p-collapsible-panel>
+                <board-task-description-field :description="item.description"
+                                              :files="item.files"
+                />
             </template>
             <template #col-task_type_id-format="{value}">
                 {{ getTaskTypeName(value) }}

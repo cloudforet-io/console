@@ -104,7 +104,7 @@ watch([() => taskManagementPageState.visibleCategoryForm, () => taskManagementPa
 </script>
 
 <template>
-    <p-overlay-layout title="Add Category"
+    <p-overlay-layout :title="taskManagementPageState.targetCategoryId ? 'Edit Category' : 'Add Category'"
                       :visible="taskManagementPageState.visibleCategoryForm"
                       @close="handleCancelOrClose"
                       @closed="handleClosed"

@@ -4170,6 +4170,15 @@
 		},
 		"SPACEONE_USER": "SpaceONEユーザー"
 	},
+	"OPSFLOW": {
+		"TASK_MANAGEMENT": {
+			"TASK_TYPE_DELETE": {
+				"CHECK_TITLE": "",
+				"DELETE_UNAVAILABLE": "하위 태스크가 존재하므로 {taskType} 삭제가 불가합니다.",
+				"TITLE": ""
+			}
+		}
+	},
 	"PAGE_SCHEMA": {
 		"ACCOUNT": "アカウントID",
 		"BASE_INFO": "基本情報",

@@ -4170,6 +4170,15 @@
 		},
 		"SPACEONE_USER": "스페이스원 사용자 "
 	},
+	"OPSFLOW": {
+		"TASK_MANAGEMENT": {
+			"TASK_TYPE_DELETE": {
+				"CHECK_TITLE": "",
+				"DELETE_UNAVAILABLE": "",
+				"TITLE": ""
+			}
+		}
+	},
 	"PAGE_SCHEMA": {
 		"ACCOUNT": "어카운트",
 		"BASE_INFO": "기본 정보",

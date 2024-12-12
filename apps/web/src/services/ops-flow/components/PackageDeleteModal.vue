@@ -8,7 +8,6 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AssociatedCategories from '@/services/ops-flow/components/AssociatedCategories.vue';
-import AssociatedWorkspaces from '@/services/ops-flow/components/AssociatedWorkspaces.vue';
 import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
@@ -54,13 +53,14 @@ const handleClosed = () => {
                     @closed="handleClosed"
     >
         <template #body>
-            <p v-if="!deletable"
-               class="text-paragraph-lg font-bold mb-4"
-            >
-                To reassign them to a different package, update the associations before deleting.
-            </p>
-            <associated-categories v-if="!!taskManagementPageStore.getters.associatedCategoriesToPackage.length" />
-            <associated-workspaces v-if="!!taskManagementPageStore.getters.associatedWorkspacesToPackage.length" />
+            <div v-if="!deletable">
+                <div class="mb-4 flex items-end justify-between">
+                    <p class="text-paragraph-lg font-bold ">
+                        연결된 카테고리가 존재하므로 패키지 삭제가 불가합니다.
+                    </p>
+                </div>
+                <associated-categories v-if="!!taskManagementPageStore.getters.associatedCategoriesToPackage.length" />
+            </div>
         </template>
     </p-button-modal>
 </template>
