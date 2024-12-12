@@ -9,6 +9,7 @@ import type { TaskStatusType } from '@/schema/opsflow/task/type';
 
 import ActionMenuButton from '@/common/components/buttons/ActionMenuButton.vue';
 
+import TaskStatusBadge from '@/services/ops-flow/components/TaskStatusBadge.vue';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
 
 const props = defineProps<{
@@ -57,13 +58,10 @@ const handleSetDefault = () => {
              class="drag-handle"
         />
         <div class="flex-grow">
-            <p-badge class="ml-2"
-                     badge-type="subtle"
-                     shape="square"
-                     :style-type="props.color"
-            >
-                {{ props.name }}
-            </p-badge>
+            <task-status-badge class="ml-2"
+                               :name="props.name"
+                               :color="props.color"
+            />
             <p-badge v-if="props.isDefault"
                      class="ml-1"
                      badge-type="solid-outline"

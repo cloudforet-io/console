@@ -20,7 +20,7 @@
                 <name>default</name>
                 <children>
                     <concept_node>
-                        <name>createTask</name>
+                        <name>Task</name>
                         <definition_loaded>false</definition_loaded>
                         <description/>
                         <comment/>
@@ -41,7 +41,7 @@
                         </translations>
                     </concept_node>
                     <concept_node>
-                        <name>createTaskType</name>
+                        <name>TaskBoard</name>
                         <definition_loaded>false</definition_loaded>
                         <description/>
                         <comment/>
@@ -62,7 +62,7 @@
                         </translations>
                     </concept_node>
                     <concept_node>
-                        <name>editTaskType</name>
+                        <name>TaskCategory</name>
                         <definition_loaded>false</definition_loaded>
                         <description/>
                         <comment/>
@@ -83,7 +83,7 @@
                         </translations>
                     </concept_node>
                     <concept_node>
-                        <name>taskBoard</name>
+                        <name>TaskType</name>
                         <definition_loaded>false</definition_loaded>
                         <description/>
                         <comment/>
@@ -104,7 +104,7 @@
                         </translations>
                     </concept_node>
                     <concept_node>
-                        <name>taskCategory</name>
+                        <name>TemplateName</name>
                         <definition_loaded>false</definition_loaded>
                         <description/>
                         <comment/>
@@ -125,7 +125,7 @@
                         </translations>
                     </concept_node>
                     <concept_node>
-                        <name>taskProgress</name>
+                        <name>task</name>
                         <definition_loaded>false</definition_loaded>
                         <description/>
                         <comment/>
@@ -146,7 +146,7 @@
                         </translations>
                     </concept_node>
                     <concept_node>
-                        <name>taskType</name>
+                        <name>taskTypes</name>
                         <definition_loaded>false</definition_loaded>
                         <description/>
                         <comment/>
@@ -167,7 +167,7 @@
                         </translations>
                     </concept_node>
                     <concept_node>
-                        <name>templateName</name>
+                        <name>tasks</name>
                         <definition_loaded>false</definition_loaded>
                         <description/>
                         <comment/>
@@ -193,7 +193,7 @@
                 <name>service-desk</name>
                 <children>
                     <concept_node>
-                        <name>createTask</name>
+                        <name>Task</name>
                         <definition_loaded>false</definition_loaded>
                         <description/>
                         <comment/>
@@ -214,7 +214,7 @@
                         </translations>
                     </concept_node>
                     <concept_node>
-                        <name>createTaskType</name>
+                        <name>TaskBoard</name>
                         <definition_loaded>false</definition_loaded>
                         <description/>
                         <comment/>
@@ -235,7 +235,7 @@
                         </translations>
                     </concept_node>
                     <concept_node>
-                        <name>editTaskType</name>
+                        <name>TaskCategory</name>
                         <definition_loaded>false</definition_loaded>
                         <description/>
                         <comment/>
@@ -256,7 +256,7 @@
                         </translations>
                     </concept_node>
                     <concept_node>
-                        <name>taskBoard</name>
+                        <name>TaskType</name>
                         <definition_loaded>false</definition_loaded>
                         <description/>
                         <comment/>
@@ -277,7 +277,7 @@
                         </translations>
                     </concept_node>
                     <concept_node>
-                        <name>taskCategory</name>
+                        <name>TemplateName</name>
                         <definition_loaded>false</definition_loaded>
                         <description/>
                         <comment/>
@@ -298,7 +298,7 @@
                         </translations>
                     </concept_node>
                     <concept_node>
-                        <name>taskProgress</name>
+                        <name>task</name>
                         <definition_loaded>false</definition_loaded>
                         <description/>
                         <comment/>
@@ -319,7 +319,7 @@
                         </translations>
                     </concept_node>
                     <concept_node>
-                        <name>taskType</name>
+                        <name>taskTypes</name>
                         <definition_loaded>false</definition_loaded>
                         <description/>
                         <comment/>
@@ -340,7 +340,7 @@
                         </translations>
                     </concept_node>
                     <concept_node>
-                        <name>templateName</name>
+                        <name>tasks</name>
                         <definition_loaded>false</definition_loaded>
                         <description/>
                         <comment/>

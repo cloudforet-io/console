@@ -191,7 +191,7 @@ const fields = computed<DataTableField[] >(() => [
     },
     {
         name: 'task_type_id',
-        label: taskManagementTemplateStore.templates.taskType,
+        label: taskManagementTemplateStore.templates.TaskType,
     },
     {
         name: 'status_id',

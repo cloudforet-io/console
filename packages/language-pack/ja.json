@@ -4174,12 +4174,37 @@
 		"SPACEONE_USER": "SpaceONEユーザー"
 	},
 	"OPSFLOW": {
+		"ASSIGNEE_POOL": "",
+		"DESCRIPTION": "",
+		"DESCRIPTION_PLACEHOLDER": "",
+		"FIELDS_CONFIG": "",
+		"NAME": "",
+		"TASK_BOARD": {
+			"TASK_PROGRESS": ""
+		},
 		"TASK_MANAGEMENT": {
-			"TASK_TYPE_DELETE": {
-				"CHECK_TITLE": "",
+			"STATUS": {
+				"DELETE_CONFIRMATION": ""
+			},
+			"TASK_TYPE": {
+				"ADD": "",
+				"ALT_E_ADD": "",
+				"ALT_E_DELETE": "",
+				"ALT_E_EDIT": "",
+				"ALT_S_ADD": "",
+				"ALT_S_DELETE": "",
+				"ALT_S_EDIT": "",
+				"DELETE": "",
+				"DELETE_CONFIRMATION": "",
 				"DELETE_UNAVAILABLE": "",
-				"TITLE": ""
+				"DESC": "",
+				"EDIT": ""
 			}
+		},
+		"VALIDATION": {
+			"DUPLICATED": "",
+			"LENGTH_MAX": "",
+			"REQUIRED": ""
 		}
 	},
 	"PAGE_SCHEMA": {

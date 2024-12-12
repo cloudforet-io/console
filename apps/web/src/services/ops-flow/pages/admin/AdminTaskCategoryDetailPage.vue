@@ -72,7 +72,7 @@ const tabs = computed<TabItem<object>[]>(() => [
     },
     {
         name: 'taskType',
-        label: taskManagementTemplateStore.templates.taskType,
+        label: taskManagementTemplateStore.templates.TaskType,
         keepAlive: true,
     },
 ]);

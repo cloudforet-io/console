@@ -33,6 +33,7 @@ import {
 import type { TabItem } from '@cloudforet/mirinae/types/hooks/use-tab/type';
 
 import type { TaskModel } from '@/schema/opsflow/task/model';
+import { i18n as _i18n } from '@/translations';
 
 import { queryStringToString } from '@/lib/router-query-string';
 
@@ -55,7 +56,6 @@ import {
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 import type { BoardPageQuery } from '@/services/ops-flow/types/board-page-type';
 import type { TaskCreatePageQueryValue } from '@/services/ops-flow/types/task-create-page-type';
-
 
 const TaskContentTab = defineAsyncComponent(() => import('@/services/ops-flow/components/TaskContentTab.vue'));
 const TaskProgressTab = defineAsyncComponent(() => import('@/services/ops-flow/components/TaskProgressTab.vue'));
@@ -128,7 +128,7 @@ const tabs = computed<TabItem<object>[]>(() => [
     },
     {
         name: 'progress',
-        label: taskManagementTemplateStore.templates.taskProgress,
+        label: _i18n.t('OPSFLOW.TASK_BOARD.TASK_PROGRESS', { task: taskManagementTemplateStore.templates.Task }),
         keepAlive: true,
     },
 ]);

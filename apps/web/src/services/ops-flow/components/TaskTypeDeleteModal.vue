@@ -5,6 +5,8 @@ import { PButtonModal, PIconButton } from '@cloudforet/mirinae';
 
 import { i18n as _i18n } from '@/translations';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AssociatedTasks from '@/services/ops-flow/components/AssociatedTasks.vue';
@@ -25,8 +27,8 @@ const headerTitle = computed(() => {
         return ' ';
     }
     return deletable.value
-        ? _i18n.t('OPSFLOW.TASK_MANAGEMENT.TASK_TYPE_DELETE.CHECK_TITLE', { taskType: taskManagementTemplateStore.templates.taskType })
-        : _i18n.t('OPSFLOW.TASK_MANAGEMENT.TASK_TYPE_DELETE.TITLE', { taskType: taskManagementTemplateStore.templates.taskType });
+        ? _i18n.t('OPSFLOW.TASK_MANAGEMENT.TASK_TYPE.DELETE_CONFIRMATION', { taskType: taskManagementTemplateStore.templates.TaskType })
+        : _i18n.t('OPSFLOW.TASK_MANAGEMENT.TASK_TYPE.DELETE', { taskType: taskManagementTemplateStore.templates.TaskType });
 });
 const loading = ref<boolean>(false);
 const handleConfirm = async () => {
@@ -36,8 +38,9 @@ const handleConfirm = async () => {
             throw new Error('[Console Error] Cannot delete task type without a target task type');
         }
         await taskTypeStore.delete(taskCategoryPageState.targetTaskTypeId, taskCategoryPageStore.getters.targetTaskType?.category_id);
+        showSuccessMessage(_i18n.t('OPSFLOW.TASK_MANAGEMENT.TASK_TYPE.ALT_S_DELETE', { taskType: taskManagementTemplateStore.templates.TaskType }), '');
     } catch (e) {
-        ErrorHandler.handleRequestError(e, 'Failed to delete task type');
+        ErrorHandler.handleRequestError(e, _i18n.t('OPSFLOW.TASK_MANAGEMENT.TASK_TYPE.ALT_E_DELETE', { taskType: taskManagementTemplateStore.templates.TaskType }));
     } finally {
         taskCategoryPageStore.closeDeleteTaskTypeModal();
         loading.value = false;
@@ -85,7 +88,7 @@ watch(() => taskCategoryPageState.visibleTaskTypeDeleteModal, (visible) => {
             <div v-if="!deletable">
                 <div class="mb-4 flex items-end justify-between">
                     <p class="text-paragraph-lg font-bold">
-                        {{ $t('OPSFLOW.TASK_MANAGEMENT.TASK_TYPE_DELETE.DELETE_UNAVAILABLE', { taskType: taskManagementTemplateStore.templates.taskType }) }}
+                        {{ $t('OPSFLOW.TASK_MANAGEMENT.TASK_TYPE.DELETE_UNAVAILABLE', { taskType: taskManagementTemplateStore.templates.TaskType }) }}
                     </p>
                     <p-icon-button name="ic_refresh"
                                    @click="handleRefresh"

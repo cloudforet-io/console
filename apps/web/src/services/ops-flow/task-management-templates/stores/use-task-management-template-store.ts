@@ -21,20 +21,13 @@ import ko from '../translations/ko.json';
 
 
 interface TaskManagementTemplate {
-    templateName: string;
-    taskBoard: string;
-    taskCategory: string;
-    allTaskCategories: string;
-    taskType: string;
-    createTaskType: string;
-    editTaskType: string;
-    createTask: string;
-    taskProgress: string;
-    landingTitle?: string;
-    landingDescription?: string;
-    activeTasks?: string;
-    viewAllTasks?: string;
-    noActiveTasks?: string;
+    TemplateName: string;
+    Task: string;
+    TaskType: string;
+    TaskBoard: string;
+    TaskCategory: string;
+    taskTypes: string;
+    task: string;
 }
 const messages: Record<SupportLanguage, TaskManagementTemplate> = {
     en: en as unknown as TaskManagementTemplate,
