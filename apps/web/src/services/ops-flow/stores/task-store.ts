@@ -6,6 +6,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { TaskChangeStatusParameters } from '@/schema/opsflow/task/api-verbs/change-status';
 import type { TaskCreateParameters } from '@/schema/opsflow/task/api-verbs/create';
 import type { TaskDeleteParameters } from '@/schema/opsflow/task/api-verbs/delete';
 import type { TaskGetParameters } from '@/schema/opsflow/task/api-verbs/get';
@@ -60,6 +61,13 @@ export const useTaskStore = defineStore('task', () => {
                 task_id: taskId,
             });
             delete state.itemsByTaskId[taskId];
+        },
+        async changeStatus(taskId: string, statusId: string) {
+            const response = await SpaceConnector.clientV2.opsflow.task.changeStatus<TaskChangeStatusParameters, TaskModel>({
+                task_id: taskId,
+                status_id: statusId,
+            });
+            state.itemsByTaskId = { ...state.itemsByTaskId, [taskId]: response };
         },
         reset() {
             state.itemsByTaskId = {};

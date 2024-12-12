@@ -1,6 +1,5 @@
 export interface TaskChangeStatusParameters {
     task_id: string;
-    status: string;
+    status_id: string;
     assignee?: string;
-    comment?: string;
 }

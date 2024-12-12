@@ -11,6 +11,8 @@ import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
 
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
@@ -19,12 +21,14 @@ import { useTaskStatusField } from '@/services/ops-flow/composables/use-task-sta
 import { useTaskTypeField } from '@/services/ops-flow/composables/use-task-type-field';
 import { useTaskAssignStore } from '@/services/ops-flow/stores/task-assign-store';
 import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
+import { useTaskStore } from '@/services/ops-flow/stores/task-store';
 
 const taskContentFormStore = useTaskContentFormStore();
 const taskContentFormState = taskContentFormStore.state;
 const taskContentFormGetters = taskContentFormStore.getters;
 const userReferenceStore = useUserReferenceStore();
 const taskAssignStore = useTaskAssignStore();
+const taskStore = useTaskStore();
 
 /* category */
 const {
@@ -79,9 +83,25 @@ const {
 } = useTaskStatusField({
     categoryId: computed(() => taskContentFormGetters.currentCategory?.category_id),
 });
+const changeStatus = async (statusId: string) => {
+    try {
+        if (!taskContentFormState.originTask) {
+            throw new Error('Origin task is not defined');
+        }
+        await taskStore.changeStatus(taskContentFormState.originTask.task_id, statusId);
+        showSuccessMessage('Status changed successfully', '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, 'Failed to change status');
+    }
+};
 const handleUpdateSelectedStatus = (items) => {
-    taskContentFormStore.setStatusId(items[0].name);
+    const statusId = items[0].name;
+    if (taskContentFormState.statusId === statusId) return;
+    taskContentFormStore.setStatusId(statusId);
     setSelectedStatusItems(items);
+    if (taskContentFormState.mode === 'view') {
+        changeStatus(statusId);
+    }
 };
 
 /* assignee */
@@ -229,7 +249,7 @@ const stopInitCreateWatch = watch([() => taskContentFormState.currentCategoryId,
                     <p-select-dropdown :selected="selectedStatusItems"
                                        :handler="statusMenuItemsHandler"
                                        :invalid="invalidState.status"
-                                       :readonly="taskContentFormState.mode === 'view' || !taskContentFormGetters.currentCategory"
+                                       :readonly="!taskContentFormGetters.currentCategory"
                                        block
                                        @update:selected="handleUpdateSelectedStatus"
                     />
