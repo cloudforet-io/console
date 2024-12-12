@@ -4174,31 +4174,39 @@
 		"SPACEONE_USER": "SpaceONE User "
 	},
 	"OPSFLOW": {
+		"ADD_TARGET": "Add {target}",
+		"ALT_E_ADD_TARGET": "Failed to add {target}",
+		"ALT_E_DELETE_TARGET": "Failed to delete {target}",
+		"ALT_E_EDIT_TARGET": "Failed to edit {target}",
+		"ALT_S_ADD_TARGET": "{target} successfully added",
+		"ALT_S_DELETE_TARGET": "{target} successfully deleted",
+		"ALT_S_EDIT_TARGET": "{target} successfully edited",
 		"ASSIGNEE_POOL": "Assignee Pool",
+		"DEFAULT": "Default",
+		"DELETE_TARGET": "Delete {target}",
+		"DELETE_TARGET_CONFIRMATION": "Are you sure you want to delete this {target}?",
+		"DELETE_TARGET_CONFIRMATION2": "Are you sure you want to delete this {target}?",
 		"DESCRIPTION": "Description",
-		"DESCRIPTION_PLACEHOLDER": "Description this {field} in a few words.",
+		"EDIT_TARGET": "Edit {target}",
 		"FIELDS_CONFIG": "Fields Configuration",
+		"FIELD_DESCRIPTION": "Description this {field} in a few words.",
 		"NAME": "Name",
+		"SET_AS_DEFAULT": "Set as Default",
+		"STATUS": "Status",
+		"STATUS_COMPLETED": "Completed",
+		"STATUS_IN_PROGRESS": "In Progress",
+		"STATUS_TODO": "To-do",
 		"TASK_BOARD": {
 			"TASK_PROGRESS": "{task} Progress"
 		},
 		"TASK_MANAGEMENT": {
 			"STATUS": {
-				"DELETE_CONFIRMATION": "Are you sure you want to delete this status?"
+				"DELETE_CONTINUE": "Deleting this status will automatically change the status of all associated {task} to {default}. Do you want to proceed?",
+				"DESC": "Manage and configure the list of statuses for {tasks}."
 			},
 			"TASK_TYPE": {
-				"ADD": "Add {taskType}",
-				"ALT_E_ADD": "Failed to add {taskType}",
-				"ALT_E_DELETE": "Failed to delete {taskType}",
-				"ALT_E_EDIT": "Failed to edit {taskType}",
-				"ALT_S_ADD": "{taskType} successfully added",
-				"ALT_S_DELETE": "{taskType} successfully deleted",
-				"ALT_S_EDIT": "{taskType} successfully edited",
-				"DELETE": "Delete {taskType}",
-				"DELETE_CONFIRMATION": "Are you sure you want to delete this {taskType}?",
 				"DELETE_UNAVAILABLE": "This {taskType} cannot be deleted because there are tasks below it.",
-				"DESC": "{taskTypes} define the fields and data included in a {task}.{br}\nYou can create multiple {taskTypes}, allowing users to select the most suitable one when submitting their {tasks}.",
-				"EDIT": "Edit {taskType}"
+				"DESC": "{taskTypes} define the fields and data included in a {task}.{br}\nYou can create multiple {taskTypes}, allowing users to select the most suitable one when submitting their {tasks}."
 			}
 		},
 		"VALIDATION": {

@@ -4174,31 +4174,39 @@
 		"SPACEONE_USER": "SpaceONEユーザー"
 	},
 	"OPSFLOW": {
+		"ADD_TARGET": "",
+		"ALT_E_ADD_TARGET": "",
+		"ALT_E_DELETE_TARGET": "",
+		"ALT_E_EDIT_TARGET": "",
+		"ALT_S_ADD_TARGET": "",
+		"ALT_S_DELETE_TARGET": "",
+		"ALT_S_EDIT_TARGET": "",
 		"ASSIGNEE_POOL": "",
+		"DEFAULT": "",
+		"DELETE_TARGET": "",
+		"DELETE_TARGET_CONFIRMATION": "",
+		"DELETE_TARGET_CONFIRMATION2": "",
 		"DESCRIPTION": "",
-		"DESCRIPTION_PLACEHOLDER": "",
+		"EDIT_TARGET": "",
 		"FIELDS_CONFIG": "",
+		"FIELD_DESCRIPTION": "",
 		"NAME": "",
+		"SET_AS_DEFAULT": "",
+		"STATUS": "",
+		"STATUS_COMPLETED": "",
+		"STATUS_IN_PROGRESS": "",
+		"STATUS_TODO": "",
 		"TASK_BOARD": {
 			"TASK_PROGRESS": ""
 		},
 		"TASK_MANAGEMENT": {
 			"STATUS": {
-				"DELETE_CONFIRMATION": ""
+				"DELETE_CONTINUE": "",
+				"DESC": ""
 			},
 			"TASK_TYPE": {
-				"ADD": "",
-				"ALT_E_ADD": "",
-				"ALT_E_DELETE": "",
-				"ALT_E_EDIT": "",
-				"ALT_S_ADD": "",
-				"ALT_S_DELETE": "",
-				"ALT_S_EDIT": "",
-				"DELETE": "",
-				"DELETE_CONFIRMATION": "",
 				"DELETE_UNAVAILABLE": "",
-				"DESC": "",
-				"EDIT": ""
+				"DESC": ""
 			}
 		},
 		"VALIDATION": {
