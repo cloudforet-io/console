@@ -36,9 +36,9 @@ const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
 const title = computed(() => {
     if (taskCategoryPageGetters.targetTaskType) {
-        return _i18n.t('OPSFLOW.TASK_MANAGEMENT.TASK_TYPE.EDIT', { taskType: taskManagementTemplateStore.templates.TaskType });
+        return _i18n.t('OPSFLOW.EDIT_TARGET', { target: taskManagementTemplateStore.templates.TaskType });
     }
-    return _i18n.t('OPSFLOW.TASK_MANAGEMENT.TASK_TYPE.ADD', { taskType: taskManagementTemplateStore.templates.TaskType });
+    return _i18n.t('OPSFLOW.ADD_TARGET', { target: taskManagementTemplateStore.templates.TaskType });
 });
 
 /* task field configuration */
@@ -102,9 +102,9 @@ const createTaskType = async (categoryId: string) => {
             category_id: categoryId,
             fields: fields.value,
         });
-        showSuccessMessage(_i18n.t('OPSFLOW.TASK_MANAGEMENT.TASK_TYPE.ALT_S_ADD'), '');
+        showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_ADD_TARGET', { target: taskManagementTemplateStore.templates.TaskType }), '');
     } catch (e) {
-        ErrorHandler.handleRequestError(e, _i18n.t('OPSFLOW.TASK_MANAGEMENT.TASK_TYPE.ALT_E_ADD'));
+        ErrorHandler.handleRequestError(e, _i18n.t('OPSFLOW.ALT_E_ADD_TARGET', { target: taskManagementTemplateStore.templates.TaskType }));
     }
 };
 
@@ -135,9 +135,9 @@ const updateTaskType = async (target: TaskTypeModel) => {
         if (errorMessages.length) {
             throw new Error(errorMessages.join('\n'));
         }
-        showSuccessMessage(_i18n.t('OPSFLOW.TASK_MANAGEMENT.TASK_TYPE.ALT_S_EDIT'), '');
+        showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_EDIT_TARGET', { target: taskManagementTemplateStore.templates.TaskType }), '');
     } catch (e) {
-        ErrorHandler.handleRequestError(e, _i18n.t('OPSFLOW.TASK_MANAGEMENT.TASK_TYPE.ALT_E_EDIT'));
+        ErrorHandler.handleRequestError(e, _i18n.t('OPSFLOW.ALT_E_EDIT_TARGET', { target: taskManagementTemplateStore.templates.TaskType }));
     }
 };
 
@@ -217,7 +217,7 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
                 </p-field-group>
                 <p-field-group :label="$t('OPSFLOW.DESCRIPTION')">
                     <p-textarea :value="description"
-                                :placeholder="$t('OPSFLOW.DESCRIPTION_PLACEHOLDER', { field: taskManagementTemplateStore.templates.taskType })"
+                                :placeholder="$t('OPSFLOW.FIELD_DESCRIPTION', { field: taskManagementTemplateStore.templates.taskType })"
                                 @update:value="setForm('description', $event)"
                     />
                 </p-field-group>

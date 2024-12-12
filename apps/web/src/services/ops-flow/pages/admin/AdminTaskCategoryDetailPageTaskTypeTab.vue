@@ -52,7 +52,7 @@ const taskTypeFields = computed<DataTableField[]>(() => [
                           icon-left="ic_plus_bold"
                           @click="taskCategoryPageStore.openAddTaskTypeForm()"
                 >
-                    {{ $t('OPSFLOW.TASK_MANAGEMENT.TASK_TYPE.ADD', { taskType: taskManagementTemplateStore.templates.TaskType }) }}
+                    {{ $t('OPSFLOW.ADD_TARGET', { target: taskManagementTemplateStore.templates.TaskType }) }}
                 </p-button>
             </template>
         </p-heading-layout>

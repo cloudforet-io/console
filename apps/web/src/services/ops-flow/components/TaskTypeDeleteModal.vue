@@ -27,8 +27,8 @@ const headerTitle = computed(() => {
         return ' ';
     }
     return deletable.value
-        ? _i18n.t('OPSFLOW.TASK_MANAGEMENT.TASK_TYPE.DELETE_CONFIRMATION', { taskType: taskManagementTemplateStore.templates.TaskType })
-        : _i18n.t('OPSFLOW.TASK_MANAGEMENT.TASK_TYPE.DELETE', { taskType: taskManagementTemplateStore.templates.TaskType });
+        ? _i18n.t('OPSFLOW.DELETE_TARGET_CONFIRMATION', { target: taskManagementTemplateStore.templates.TaskType })
+        : _i18n.t('OPSFLOW.DELETE_TARGET', { target: taskManagementTemplateStore.templates.TaskType });
 });
 const loading = ref<boolean>(false);
 const handleConfirm = async () => {
@@ -38,9 +38,9 @@ const handleConfirm = async () => {
             throw new Error('[Console Error] Cannot delete task type without a target task type');
         }
         await taskTypeStore.delete(taskCategoryPageState.targetTaskTypeId, taskCategoryPageStore.getters.targetTaskType?.category_id);
-        showSuccessMessage(_i18n.t('OPSFLOW.TASK_MANAGEMENT.TASK_TYPE.ALT_S_DELETE', { taskType: taskManagementTemplateStore.templates.TaskType }), '');
+        showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_DELETE_TARGET', { target: taskManagementTemplateStore.templates.TaskType }), '');
     } catch (e) {
-        ErrorHandler.handleRequestError(e, _i18n.t('OPSFLOW.TASK_MANAGEMENT.TASK_TYPE.ALT_E_DELETE', { taskType: taskManagementTemplateStore.templates.TaskType }));
+        ErrorHandler.handleRequestError(e, _i18n.t('OPSFLOW.ALT_E_DELETE_TARGET', { target: taskManagementTemplateStore.templates.TaskType }));
     } finally {
         taskCategoryPageStore.closeDeleteTaskTypeModal();
         loading.value = false;

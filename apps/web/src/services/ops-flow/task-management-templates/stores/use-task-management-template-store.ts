@@ -28,6 +28,7 @@ interface TaskManagementTemplate {
     TaskCategory: string;
     taskTypes: string;
     task: string;
+    tasks: string;
 }
 const messages: Record<SupportLanguage, TaskManagementTemplate> = {
     en: en as unknown as TaskManagementTemplate,

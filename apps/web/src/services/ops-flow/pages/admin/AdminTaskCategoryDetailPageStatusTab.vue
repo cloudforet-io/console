@@ -3,8 +3,12 @@ import { PHeadingLayout, PHeading, PButton } from '@cloudforet/mirinae';
 
 import TaskStatusTree from '@/services/ops-flow/components/TaskStatusTree.vue';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
+import {
+    useTaskManagementTemplateStore,
+} from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
 const taskCategoryPageStore = useTaskCategoryPageStore();
+const taskManagementTemplateStore = useTaskManagementTemplateStore();
 </script>
 
 <template>
@@ -12,7 +16,7 @@ const taskCategoryPageStore = useTaskCategoryPageStore();
         <p-heading-layout>
             <template #heading>
                 <p-heading heading-type="sub">
-                    Status
+                    {{ $t('OPSFLOW.STATUS') }}
                 </p-heading>
             </template>
             <template #extra>
@@ -20,12 +24,12 @@ const taskCategoryPageStore = useTaskCategoryPageStore();
                           icon-left="ic_plus_bold"
                           @click="taskCategoryPageStore.openAddStatusForm()"
                 >
-                    Add Status
+                    {{ $t('OPSFLOW.ADD_TARGET', { target: $t('OPSFLOW.STATUS') }) }}
                 </p-button>
             </template>
         </p-heading-layout>
         <p class="mt-2 text-label-md text-gray-600">
-            티켓 상태를 보고 사용자 지정 티켓 상태를 만들어 워크플로우 배치를 향상시키고 고객과의 커뮤니케이션을 개선하세요.
+            {{ $t('OPSFLOW.TASK_MANAGEMENT.STATUS.DESC', { tasks: taskManagementTemplateStore.templates.tasks }) }}
         </p>
         <task-status-tree class="mt-4" />
     </div>
