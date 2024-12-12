@@ -19,8 +19,10 @@ import WidgetFormDataTableCardHeaderTitle
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardHeaderTitle.vue';
 import WidgetFormDataTableCardTransformForm
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformForm.vue';
+import WidgetFormDataTableCardTransformPivotForm
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformPivotForm.vue';
 import {
-    DATA_TABLE_TYPE, DATA_TABLE_FIELD_TYPE,
+    DATA_TABLE_TYPE, DATA_TABLE_FIELD_TYPE, type DATA_TABLE_OPERATOR, DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP,
 } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type {
@@ -29,7 +31,7 @@ import type {
 import type {
     DataTableOperator, JoinType, ConcatOptions, JoinOptions, QueryOptions, EvalOptions,
     DataTableTransformOptions,
-    EvaluateExpression, AddLabelsOptions, AdditionalLabels,
+    EvaluateExpression, AddLabelsOptions, AdditionalLabels, PivotOptions,
 } from '@/common/modules/widgets/types/widget-model';
 
 
@@ -127,6 +129,10 @@ const evalState = reactive({
     }] as EvalExpressions[],
 });
 
+const valueState = reactive({
+    pivot: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT as Omit<PivotOptions, 'data_table_id'>,
+});
+
 const addLabelsState = reactive({
     labels: [{
         name: '', value: '',
@@ -147,6 +153,17 @@ const originState = reactive({
     labels: computed<AdditionalLabel[]>(() => {
         const _labels = (props.item.options as DataTableTransformOptions).ADD_LABELS?.labels ?? {};
         return Object.entries(_labels).map(([name, value]) => ({ name, value }));
+    }),
+    pivot: computed<Omit<PivotOptions, 'data_table_id'>|undefined>(() => {
+        const _pivot = (props.item.options as DataTableTransformOptions).PIVOT as PivotOptions|undefined;
+        if (!_pivot) return undefined;
+        return {
+            fields: _pivot.fields,
+            select: _pivot.select,
+            limit: _pivot.limit,
+            functions: _pivot.functions,
+            order_by: _pivot.order_by,
+        };
     }),
 });
 
@@ -317,6 +334,7 @@ const setInitialDataTableForm = () => {
         key: getRandomId(), name: '', fieldType: DATA_TABLE_FIELD_TYPE.DATA, expression: '', isCollapsed: false,
     }];
     addLabelsState.labels = originState.labels.length ? cloneDeep(originState.labels) : [{ name: '', value: '' }];
+    valueState.pivot = originState.pivot ? cloneDeep(originState.pivot) : DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT;
 };
 
 onMounted(() => {
@@ -351,8 +369,13 @@ defineExpose({
                                                       :is-legacy-data-table="state.isLegacyDataTable"
             />
         </div>
-
-        <widget-form-data-table-card-transform-form :data-table-id="state.dataTableId"
+        <widget-form-data-table-card-transform-pivot-form v-if="state.operator === DATA_TABLE_OPERATOR.PIVOT"
+                                                          :data-table-id="state.dataTableId"
+                                                          :data-table-info.sync="state.dataTableInfo"
+                                                          :form-data.sync="valueState.pivot"
+        />
+        <widget-form-data-table-card-transform-form v-else
+                                                    :data-table-id="state.dataTableId"
                                                     :operator="state.operator"
                                                     :data-table-info.sync="state.dataTableInfo"
                                                     :join-type.sync="joinState.joinType"
