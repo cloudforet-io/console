@@ -1,51 +1,26 @@
 <script lang="ts" setup>
-import { computed, onUnmounted, reactive } from 'vue';
-import { useRoute, useRouter } from 'vue-router/composables';
-
-import { clone } from 'lodash';
+import { onUnmounted } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import {
     PHorizontalLayout, PHeading, PButton, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
-import { useUserStore } from '@/store/user/user-store';
-
-import type { PageAccessMap } from '@/lib/access-control/config';
-import type { MenuId } from '@/lib/menu/config';
-import { MENU_ID } from '@/lib/menu/config';
-
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import RoleManagementTab from '@/services/iam/components/RoleManagementTab.vue';
 import RoleManagementTable from '@/services/iam/components/RoleManagementTable.vue';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { useRolePageStore } from '@/services/iam/store/role-page-store';
 
-
 const rolePageStore = useRolePageStore();
 const rolePageState = rolePageStore.$state;
-const userStore = useUserStore();
+
 const { getProperRouteLocation } = useProperRouteLocation();
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const router = useRouter();
-const route = useRoute();
-
-const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
-});
-const state = reactive({
-    selectedMenuId: computed(() => {
-        const reversedMatched = clone(route.matched).reverse();
-        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
-        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
-            return '';
-        }
-        return targetMenuId;
-    }),
-    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
-});
 
 /* Component */
 const handleCreateRole = () => {
@@ -69,7 +44,7 @@ onUnmounted(() => {
                            :selected-count="rolePageState.selectedIndices.length"
                 />
             </template>
-            <template v-if="state.hasReadWriteAccess"
+            <template v-if="hasReadWriteAccess"
                       #extra
             >
                 <p-button style-type="primary"
@@ -83,7 +58,7 @@ onUnmounted(() => {
         <p-horizontal-layout class="role-toolbox-layout">
             <template #container="{ height }">
                 <role-management-table :table-height="height"
-                                       :has-read-write-access="state.hasReadWriteAccess"
+                                       :has-read-write-access="hasReadWriteAccess"
                 />
             </template>
         </p-horizontal-layout>

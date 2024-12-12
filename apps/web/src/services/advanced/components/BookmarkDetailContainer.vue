@@ -6,7 +6,7 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { at, clone } from 'lodash';
+import { at } from 'lodash';
 
 import {
     PHeading, PButton, PContextMenu, PI, PIconButton, PStatus, PHeadingLayout,
@@ -18,15 +18,10 @@ import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
-import { useUserStore } from '@/store/user/user-store';
-
-import type { PageAccessMap } from '@/lib/access-control/config';
-import type { MenuId } from '@/lib/menu/config';
-import { MENU_ID } from '@/lib/menu/config';
-
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkModalType, BookmarkItem } from '@/common/components/bookmark/type/type';
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { gray } from '@/styles/colors';
@@ -35,16 +30,15 @@ import { getWorkspaceInfo, workspaceStateFormatter } from '@/services/advanced/c
 import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
 import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 import { useBookmarkPageStore } from '@/services/advanced/store/bookmark-page-store';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
-
-const userStore = useUserStore();
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
 const bookmarkPageStore = useBookmarkPageStore();
 const bookmarkPageState = bookmarkPageStore.state;
 const bookmarkPageGetters = bookmarkPageStore.getters;
+
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const route = useRoute();
 const router = useRouter();
@@ -56,7 +50,6 @@ const storeState = reactive({
     selectedIndices: computed<number[]>(() => bookmarkPageState.selectedIndices),
     bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
     bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     visibleMenu: false,
@@ -83,16 +76,6 @@ const state = reactive({
         return state.workspaceInfo?.name || '';
     }),
     workspaceInfo: computed<WorkspaceModel|undefined>(() => getWorkspaceInfo(state.group, storeState.workspaceList)),
-    selectedMenuId: computed(() => {
-        const reversedMatched = clone(route.matched).reverse();
-        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
-        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
-            return '';
-        }
-        return targetMenuId;
-    }),
-    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
 });
 
 const hideMenu = () => {
@@ -204,7 +187,7 @@ onUnmounted(() => {
                                   v-bind="workspaceStateFormatter( WORKSPACE_STATE.DORMANT)"
                                   class="capitalize state"
                         />
-                        <template v-if="state.folder && state.group === 'global'">
+                        <template v-if="hasReadWriteAccess && state.folder && state.group === 'global'">
                             <div class="title-right-extra-wrapper">
                                 <p-icon-button name="ic_edit-text"
                                                style-type="transparent"
@@ -219,7 +202,7 @@ onUnmounted(() => {
                     </template>
                 </p-heading>
             </template>
-            <template v-if="state.hasReadWriteAccess"
+            <template v-if="hasReadWriteAccess"
                       #extra
             >
                 <template v-if="state.group === 'global'">
