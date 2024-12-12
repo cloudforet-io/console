@@ -131,7 +131,6 @@ const handleUpdateLimit = (value: string) => {
 };
 
 watch(() => props.formData, (formData) => {
-    console.debug('watch props.formData', formData);
     if (state.isInitiated) {
         state.selectedValueType = formData.limit !== undefined ? 'auto' : 'fixed';
         state.isInitiated = false;
