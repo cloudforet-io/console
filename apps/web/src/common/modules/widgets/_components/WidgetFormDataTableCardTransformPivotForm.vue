@@ -11,8 +11,6 @@ import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/typ
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
-import WidgetFormDataTableCardTransformDataTableDropdown
-    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformDataTableDropdown.vue';
 import WidgetFormDataTableCardTransformFormWrapper
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformFormWrapper.vue';
 import {
@@ -149,85 +147,80 @@ watch(() => state.proxyDataTableInfo, (dataTableInfo) => {
 
 <template>
     <div class="widget-form-data-table-card-transform-pivot-form">
-        <widget-form-data-table-card-transform-form-wrapper :operator="DATA_TABLE_OPERATOR.PIVOT">
-            <div>
-                <div class="data-table-dropdown-wrapper">
-                    <widget-form-data-table-card-transform-data-table-dropdown :data-table-id="props.dataTableId"
-                                                                               :operator="DATA_TABLE_OPERATOR.PIVOT"
-                                                                               :data-table-info.sync="state.proxyDataTableInfo"
+        <widget-form-data-table-card-transform-form-wrapper :data-table-id="props.dataTableId"
+                                                            :operator="DATA_TABLE_OPERATOR.PIVOT"
+                                                            :data-table-info.sync="state.proxyDataTableInfo"
+        >
+            <div class="pivot-form">
+                <p-field-group :label="$t('COMMON.WIDGETS.CRITERIA')"
+                               style-type="secondary"
+                               required
+                               class="criteria-field"
+                >
+                    <p-select-dropdown :menu="state.dataFieldItems"
+                                       :selected="state.proxyFormData.fields?.data"
+                                       appearance-type="badge"
+                                       block
+                                       @update:selected="handleUpdateCriteria"
                     />
-                </div>
-                <div class="pivot-form">
-                    <p-field-group :label="$t('COMMON.WIDGETS.CRITERIA')"
-                                   style-type="secondary"
-                                   required
-                                   class="criteria-field"
-                    >
-                        <p-select-dropdown :menu="state.dataFieldItems"
-                                           :selected="state.proxyFormData.fields?.data"
+                </p-field-group>
+                <p-field-group :label="$t('COMMON.WIDGETS.FIELD')"
+                               style-type="secondary"
+                               required
+                               class="w-full"
+                >
+                    <div class="field-contents-wrapper">
+                        <p-select-dropdown :menu="state.labelFieldItems"
+                                           :selected="state.proxyFormData.fields?.column"
                                            appearance-type="badge"
+                                           :invalid="state.columnFieldInvalid"
+                                           :disabled="state.columnFieldInvalid"
                                            block
-                                           @update:selected="handleUpdateCriteria"
+                                           @update:selected="handleUpdateColumn"
                         />
-                    </p-field-group>
-                    <p-field-group :label="$t('COMMON.WIDGETS.FIELD')"
-                                   style-type="secondary"
-                                   required
-                                   class="w-full"
-                    >
-                        <div class="field-contents-wrapper">
-                            <p-select-dropdown :menu="state.labelFieldItems"
-                                               :selected="state.proxyFormData.fields?.column"
-                                               appearance-type="badge"
-                                               :invalid="state.columnFieldInvalid"
-                                               :disabled="state.columnFieldInvalid"
-                                               block
-                                               @update:selected="handleUpdateColumn"
-                            />
-                            <p-divider vertical />
-                            <p-select-button v-for="selectItem in state.valueTypeItems"
-                                             :key="`select-button-${selectItem.name}`"
-                                             class="value-type-button"
-                                             :value="selectItem.name"
-                                             style-type="secondary"
-                                             :selected="state.selectedValueType"
-                                             block
-                                             @change="handleChangeValueType"
-                            >
-                                {{ selectItem.label }}
-                            </p-select-button>
-                        </div>
-                    </p-field-group>
-                    <p-field-group required>
-                        <div class="dynamic-field-value-contents-wrapper">
-                            <p-select-dropdown v-if="state.selectedValueType === 'fixed'"
-                                               class="dynamic-field-select-dropdown"
-                                               :menu="[]"
-                                               :selected="state.selectedDynamicFieldMenuItems"
-                                               :loading="state.dynamicFieldLoading"
-                                               use-fixed-menu-style
-                                               multi-selectable
-                                               appearance-type="badge"
-                                               show-select-marker
-                                               show-clear-selection
-                                               block
-                                               @select="handleSelectDynamicFields"
-                                               @clear-selection="handleSelectDynamicFields([])"
-                            />
-                            <p-text-input v-else
-                                          type="number"
-                                          class="dynamic-field-auto-count"
-                                          :min="1"
-                                          :max="15"
-                                          :placeholder="$t('COMMON.WIDGETS.MAX_ITEMS')"
-                                          :invalid="!state.proxyFormData.limit"
-                                          :value="state.proxyFormData.limit"
-                                          block
-                                          @update:value="handleUpdateLimit"
-                            />
-                        </div>
-                    </p-field-group>
-                </div>
+                        <p-divider vertical />
+                        <p-select-button v-for="selectItem in state.valueTypeItems"
+                                         :key="`select-button-${selectItem.name}`"
+                                         class="value-type-button"
+                                         :value="selectItem.name"
+                                         style-type="secondary"
+                                         :selected="state.selectedValueType"
+                                         block
+                                         @change="handleChangeValueType"
+                        >
+                            {{ selectItem.label }}
+                        </p-select-button>
+                    </div>
+                </p-field-group>
+                <p-field-group required>
+                    <div class="dynamic-field-value-contents-wrapper">
+                        <p-select-dropdown v-if="state.selectedValueType === 'fixed'"
+                                           class="dynamic-field-select-dropdown"
+                                           :menu="[]"
+                                           :selected="state.selectedDynamicFieldMenuItems"
+                                           :loading="state.dynamicFieldLoading"
+                                           use-fixed-menu-style
+                                           multi-selectable
+                                           appearance-type="badge"
+                                           show-select-marker
+                                           show-clear-selection
+                                           block
+                                           @select="handleSelectDynamicFields"
+                                           @clear-selection="handleSelectDynamicFields([])"
+                        />
+                        <p-text-input v-else
+                                      type="number"
+                                      class="dynamic-field-auto-count"
+                                      :min="1"
+                                      :max="15"
+                                      :placeholder="$t('COMMON.WIDGETS.MAX_ITEMS')"
+                                      :invalid="!state.proxyFormData.limit"
+                                      :value="state.proxyFormData.limit"
+                                      block
+                                      @update:value="handleUpdateLimit"
+                        />
+                    </div>
+                </p-field-group>
             </div>
         </widget-form-data-table-card-transform-form-wrapper>
     </div>
@@ -235,9 +228,6 @@ watch(() => state.proxyDataTableInfo, (dataTableInfo) => {
 
 <style scoped lang="postcss">
 .widget-form-data-table-card-transform-pivot-form {
-    .data-table-dropdown-wrapper {
-        margin-bottom: 1rem;
-    }
 
     .pivot-form {
         .field-contents-wrapper {
