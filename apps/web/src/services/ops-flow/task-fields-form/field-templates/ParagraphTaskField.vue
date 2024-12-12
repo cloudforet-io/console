@@ -47,7 +47,7 @@ const handleUpdateAttachments = (newAttachments: Attachment<FileModel>[]) => {
 
 <template>
     <p-field-group :label="field.name"
-                   :required="field.is_required"
+                   :required="props.readonly ||field.is_required"
                    :invalid="isInvalid"
                    :invalid-text="invalidText"
                    no-spacing

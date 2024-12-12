@@ -25,15 +25,15 @@ const {
 
 <template>
     <p-field-group :label="field.name"
-                   :required="field.is_required"
+                   :required="props.readonly || field.is_required"
                    :invalid="isInvalid"
                    :invalid-text="invalidText"
                    no-spacing
     >
         <labels-input class="my-1"
                       :labels="fieldValue"
-                      :editable="!props.disabled"
-                      @update:value="updateFieldValue"
+                      :editable="!props.readonly"
+                      @update:labels="updateFieldValue"
         />
     </p-field-group>
 </template>
