@@ -37,6 +37,10 @@ import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import {
+    useTaskManagementTemplateStore,
+} from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
+
 
 const verbose = false;
 const filterMenuByRoute = (menuList: DisplayMenu[], router: VueRouter): DisplayMenu[] => menuList.reduce((results, _menu) => {
@@ -75,16 +79,30 @@ const filterMenuByAccessPermission = (menuList: DisplayMenu[], pagePermissionLis
 
     return results;
 }, [] as DisplayMenu[]);
+
+const taskManagementTemplateStore = useTaskManagementTemplateStore();
 const getDisplayMenuList = (menuList: Menu[], isAdminMode?: boolean, currentWorkspaceId?: string): DisplayMenu[] => menuList.map((d) => {
     const menuInfo: MenuInfo = MENU_INFO_MAP[d.id];
     const routeName = isAdminMode ? makeAdminRouteName(MENU_INFO_MAP[d.id].routeName) : MENU_INFO_MAP[d.id].routeName;
+    let label = i18n.t(menuInfo.translationId);
+    let hideOnGNB = d.hideOnGNB;
+    let hideOnSiteMap = d.hideOnSiteMap;
+    if (d.id === MENU_ID.OPS_FLOW_LANDING) {
+        label = taskManagementTemplateStore.templates.templateName;
+        hideOnGNB = taskManagementTemplateStore.state.templateId === 'default';
+        hideOnSiteMap = taskManagementTemplateStore.state.templateId === 'default';
+    } else if (d.id === MENU_ID.TASK_BOARD) {
+        label = taskManagementTemplateStore.templates.taskBoard;
+    }
     return {
         ...d,
         id: d.id,
-        label: i18n.t(menuInfo.translationId),
+        label,
         icon: menuInfo.icon,
         highlightTag: menuInfo.highlightTag,
         to: { name: routeName, params: { workspaceId: currentWorkspaceId } },
+        hideOnGNB,
+        hideOnSiteMap,
         subMenuList: d.subMenuList ? getDisplayMenuList(d.subMenuList, isAdminMode, currentWorkspaceId) : [],
     } as DisplayMenu;
 });
