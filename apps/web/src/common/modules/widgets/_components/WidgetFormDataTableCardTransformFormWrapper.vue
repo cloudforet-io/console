@@ -6,7 +6,6 @@ import { PI } from '@cloudforet/mirinae';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import WidgetFormDataTableCardTransformDataTableDropdown
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformDataTableDropdown.vue';
-import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import type { TransformDataTableInfo } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
     DataTableOperator,
@@ -49,7 +48,7 @@ const state = reactive({
             </div>
             <div class="data-table-dropdown-wrapper">
                 <widget-form-data-table-card-transform-data-table-dropdown :data-table-id="props.dataTableId"
-                                                                           :operator="DATA_TABLE_OPERATOR.PIVOT"
+                                                                           :operator="props.operator"
                                                                            :data-table-info.sync="state.proxyDataTableInfo"
                 />
             </div>
