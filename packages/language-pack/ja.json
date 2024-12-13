@@ -2923,40 +2923,76 @@
 		},
 		"USER_GROUP": {
 			"ACTION": {
-				"ADD_NEW_USER": "新規ユーザーを追加",
-				"REMOVE": "削除",
-				"UPDATE": "アップデート"
+				"ADD_NEW_USER": "",
+				"DELETE": "",
+				"UPDATE": ""
 			},
 			"CREATE": "生成",
 			"MAIN": {
 				"NOTIFICATIONS_CHANNEL": {
-					"ADD": "追加",
-					"DELETE": "削除",
-					"EDIT": "編集"
+					"ADD": "",
+					"DELETE": "",
+					"EDIT": ""
 				},
 				"USERS": {
-					"ADD_USER": "ユーザー追加",
-					"REMOVE": "削除"
+					"ADD_USER": "",
+					"REMOVE": ""
 				}
 			},
 			"MODAL": {
 				"ADD_NEW_USER": {
-					"CANCEL": "キャンセル",
-					"CONFIRM": "確認",
-					"TITLE": "選択したユーザーグループにユーザーを追加する",
-					"USER": "ユーザー"
+					"CANCEL": "",
+					"CONFIRM": "",
+					"TITLE": "",
+					"USER": ""
+				},
+				"CREATE_CHANNEL": {
+					"CANCEL": "",
+					"CONTINUE": "",
+					"CREATE": "",
+					"DESC": {
+						"CHANNEL_NAME": "",
+						"INFO": "",
+						"NOTIFY_TO_MEMBER_INFO": "",
+						"SCHEDULE": {
+							"CUSTOM": "",
+							"EVERYDAY": "",
+							"INFO": "",
+							"SETTING_MODE": "",
+							"TITLE": "",
+							"WEEKDAYS": ""
+						},
+						"USER_MODE": {
+							"ALL_MEMBERS": "",
+							"SPECIFIC_USER": "",
+							"TITLE": "",
+							"USER_GROUP": ""
+						}
+					},
+					"GO_BACK": "",
+					"LIST": {
+						"EMAIL": "",
+						"KAKAOTALK": "",
+						"MS_TEAMS": "",
+						"NOTIFY_TO_MEMBER": "",
+						"SLACK": "",
+						"SMS": "",
+						"TELEGRAM": ""
+					},
+					"TITLE": "",
+					"UPDATE_TITLE": ""
 				},
 				"CREATE_USER_GROUP": {
-					"CANCEL": "キャンセル",
-					"CONFIRM": "確認",
-					"DESCRIPTION": "説明",
-					"GROUP_NAME": "グループ名",
-					"NOTIFICATION_CHANNEL": "通知チャネル",
-					"PROTOCOL": "プロトコル",
-					"TITLE": "ユーザーグループの作成",
-					"TOKEN": "トークン",
-					"UPDATE": "アップデート",
-					"UPDATE_TITLE": "ユーザーグループの更新"
+					"CANCEL": "",
+					"CONFIRM": "",
+					"DESCRIPTION": "",
+					"GROUP_NAME": "",
+					"NOTIFICATION_CHANNEL": "",
+					"PROTOCOL": "",
+					"TITLE": "",
+					"TOKEN": "",
+					"UPDATE": "",
+					"UPDATE_TITLE": ""
 				},
 				"DELETE": {
 					"TITLE": ""
@@ -2967,21 +3003,21 @@
 			},
 			"TAB": {
 				"NOTIFICATION_CHANNEL": {
-					"ADD": "追加",
-					"DELETE": "消去",
-					"EDIT": "編集",
-					"TITLE": "通知チャネル"
+					"ADD": "",
+					"DELETE": "",
+					"EDIT": "",
+					"TITLE": ""
 				},
 				"USERS": {
-					"ADD_USER": "ユーザー追加",
+					"ADD_USER": "",
 					"DAYS": "日前",
-					"REMOVE": "削除",
-					"TITLE": "ユーザー",
-					"TODAY": "今日",
-					"YESTERDAY": "昨日"
+					"REMOVE": "",
+					"TITLE": "",
+					"TODAY": "",
+					"YESTERDAY": ""
 				}
 			},
-			"TITLE": "ユーザーグループ"
+			"TITLE": ""
 		},
 		"WORKSPACES": {
 			"ACTION": "作業",

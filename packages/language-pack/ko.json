@@ -2923,40 +2923,76 @@
 		},
 		"USER_GROUP": {
 			"ACTION": {
-				"ADD_NEW_USER": "새로운 사용자 추가",
-				"REMOVE": "삭제",
-				"UPDATE": "수정"
+				"ADD_NEW_USER": "",
+				"DELETE": "",
+				"UPDATE": ""
 			},
 			"CREATE": "생성",
 			"MAIN": {
 				"NOTIFICATIONS_CHANNEL": {
-					"ADD": "추가",
-					"DELETE": "삭제",
-					"EDIT": "편집"
+					"ADD": "",
+					"DELETE": "",
+					"EDIT": ""
 				},
 				"USERS": {
-					"ADD_USER": "사용자 추가",
-					"REMOVE": "삭제"
+					"ADD_USER": "",
+					"REMOVE": ""
 				}
 			},
 			"MODAL": {
 				"ADD_NEW_USER": {
-					"CANCEL": "취소",
-					"CONFIRM": "확인",
-					"TITLE": "선택한 사용자 그룹에 사용자 추가",
-					"USER": "사용자"
+					"CANCEL": "",
+					"CONFIRM": "",
+					"TITLE": "",
+					"USER": ""
+				},
+				"CREATE_CHANNEL": {
+					"CANCEL": "",
+					"CONTINUE": "",
+					"CREATE": "",
+					"DESC": {
+						"CHANNEL_NAME": "",
+						"INFO": "",
+						"NOTIFY_TO_MEMBER_INFO": "",
+						"SCHEDULE": {
+							"CUSTOM": "",
+							"EVERYDAY": "",
+							"INFO": "",
+							"SETTING_MODE": "",
+							"TITLE": "",
+							"WEEKDAYS": ""
+						},
+						"USER_MODE": {
+							"ALL_MEMBERS": "",
+							"SPECIFIC_USER": "",
+							"TITLE": "",
+							"USER_GROUP": ""
+						}
+					},
+					"GO_BACK": "",
+					"LIST": {
+						"EMAIL": "",
+						"KAKAOTALK": "",
+						"MS_TEAMS": "",
+						"NOTIFY_TO_MEMBER": "",
+						"SLACK": "",
+						"SMS": "",
+						"TELEGRAM": ""
+					},
+					"TITLE": "",
+					"UPDATE_TITLE": ""
 				},
 				"CREATE_USER_GROUP": {
-					"CANCEL": "취소",
-					"CONFIRM": "확인",
-					"DESCRIPTION": "설명",
-					"GROUP_NAME": "그룹 이름",
-					"NOTIFICATION_CHANNEL": "알림 채널",
-					"PROTOCOL": "프로토콜",
-					"TITLE": "사용자 그룹 생성",
-					"TOKEN": "토큰",
-					"UPDATE": "수정",
-					"UPDATE_TITLE": "사용자 그룹 수정"
+					"CANCEL": "",
+					"CONFIRM": "",
+					"DESCRIPTION": "",
+					"GROUP_NAME": "",
+					"NOTIFICATION_CHANNEL": "",
+					"PROTOCOL": "",
+					"TITLE": "",
+					"TOKEN": "",
+					"UPDATE": "",
+					"UPDATE_TITLE": ""
 				},
 				"DELETE": {
 					"TITLE": ""
@@ -2967,21 +3003,21 @@
 			},
 			"TAB": {
 				"NOTIFICATION_CHANNEL": {
-					"ADD": "추가",
-					"DELETE": "삭제",
-					"EDIT": "편집",
-					"TITLE": "알림 채널"
+					"ADD": "",
+					"DELETE": "",
+					"EDIT": "",
+					"TITLE": ""
 				},
 				"USERS": {
-					"ADD_USER": "사용자 추가",
+					"ADD_USER": "",
 					"DAYS": "일 전",
-					"REMOVE": "삭제",
-					"TITLE": "사용자 목록",
-					"TODAY": "오늘",
-					"YESTERDAY": "어제"
+					"REMOVE": "",
+					"TITLE": "",
+					"TODAY": "",
+					"YESTERDAY": ""
 				}
 			},
-			"TITLE": "사용자 그룹"
+			"TITLE": ""
 		},
 		"WORKSPACES": {
 			"ACTION": "작업",

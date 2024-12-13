@@ -2924,7 +2924,7 @@
 		"USER_GROUP": {
 			"ACTION": {
 				"ADD_NEW_USER": "Add New User",
-				"REMOVE": "Remove",
+				"DELETE": "Delete",
 				"UPDATE": "Update"
 			},
 			"CREATE": "Create",
@@ -2945,6 +2945,42 @@
 					"CONFIRM": "Confirm",
 					"TITLE": "Add Users to Selected User Group",
 					"USER": "User"
+				},
+				"CREATE_CHANNEL": {
+					"CANCEL": "Cancel",
+					"CONTINUE": "Continue",
+					"CREATE": "Create",
+					"DESC": {
+						"CHANNEL_NAME": "Channel Name",
+						"INFO": "Configure the notifications to ensure you are promptly informed of any alerts or incidents as they occur.",
+						"NOTIFY_TO_MEMBER_INFO": "We are preparing for the migration from v1 to v2, and new services will be added to the v2 collector.",
+						"SCHEDULE": {
+							"CUSTOM": "Custom",
+							"EVERYDAY": "Everyday",
+							"INFO": "You will only receive notifications in the schedule you choose.",
+							"SETTING_MODE": "Setting Mode",
+							"TITLE": "Schedule",
+							"WEEKDAYS": "Weekdays"
+						},
+						"USER_MODE": {
+							"ALL_MEMBERS": "All Members in Service",
+							"SPECIFIC_USER": "Specific User",
+							"TITLE": "User",
+							"USER_GROUP": "User Group"
+						}
+					},
+					"GO_BACK": "Go Back",
+					"LIST": {
+						"EMAIL": "Email",
+						"KAKAOTALK": "Kakaotalk",
+						"MS_TEAMS": "MS Teams",
+						"NOTIFY_TO_MEMBER": "Notify to Member",
+						"SLACK": "Slack",
+						"SMS": "SMS",
+						"TELEGRAM": "Telegram"
+					},
+					"TITLE": "Create Notification",
+					"UPDATE_TITLE": "Update Notification"
 				},
 				"CREATE_USER_GROUP": {
 					"CANCEL": "Cancel",
