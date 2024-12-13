@@ -71,13 +71,14 @@ export const KEYWORD_FILTER_DISABLED_KEYS = [GROUP_BY.PROJECT, GROUP_BY.WORKSPAC
 
 export const DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP = {
     PIVOT: {
+        data_table_id: undefined,
         fields: {
             labels: [],
             data: undefined,
             column: undefined,
         },
         limit: 5,
-        functions: 'sum',
+        function: 'sum',
         order_by: {
             type: 'key',
             desc: false,

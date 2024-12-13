@@ -92,7 +92,7 @@ export interface PivotOptions {
     fields?: PivotFieldOptions;
     select?: string[];
     limit?: number;
-    functions?: 'sum' | 'min' | 'max' | 'mean'; // default -> "sum"
+    function?: 'sum' | 'min' | 'max' | 'mean'; // default -> "sum"
     order_by?: {
         type: 'key' | 'value'; // default -> "key"
         desc: boolean; // default false
