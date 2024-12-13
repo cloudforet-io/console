@@ -41,6 +41,11 @@ import { useAssetInventorySettingsStore } from '@/services/asset-inventory/store
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { NamespaceSubItemType } from '@/services/asset-inventory/types/asset-analysis-type';
 
+interface props {
+  width : number
+}
+const props = defineProps<props>();
+
 const lsbRef = ref<HTMLElement|null>(null);
 const { width: lsbWidth } = useElementSize(lsbRef);
 
@@ -305,6 +310,7 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
         >
             <l-s-b ref="lsbRef"
                    :menu-set="state.menuSet"
+                   :style="{width:props.width + 'px'}"
             >
                 <template #collapsible-contents-starred>
                     <div v-if="state.starredMenuSet.length > 0">
@@ -418,6 +424,7 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
                     />
                 </template>
             </l-s-b>
+
             <template #content>
                 <div class="metric-select-guide-content">
                     <p class="title">
