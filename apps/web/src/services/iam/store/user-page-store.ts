@@ -10,6 +10,8 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
+import type { UserGroupListParameters } from '@/schema/identity/user-group/api-verbs/list';
+import type { UserGroupModel } from '@/schema/identity/user-group/model';
 import type { UserGetParameters } from '@/schema/identity/user/api-verbs/get';
 import type { UserListParameters } from '@/schema/identity/user/api-verbs/list';
 import type { UserModel } from '@/schema/identity/user/model';
@@ -114,6 +116,11 @@ export const useUserPageStore = defineStore('page-user', () => {
         async listWorkspaceUsers(params: WorkspaceUserListParameters) {
             try {
                 const { results, total_count } = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>(params);
+                // TODO: here
+                // if (results && results.length > 0) {
+                //     const userIdList = results.map(result => result.user_id)
+                //     userIdList.forEach()
+                // }
                 state.users = (results ?? [])?.map((item) => ({
                     ...item,
                     role_type: item.role_type,
@@ -130,6 +137,24 @@ export const useUserPageStore = defineStore('page-user', () => {
                 state.totalCount = 0;
                 throw e;
             }
+        },
+        async listUserGroupPerUser() {
+            const userIdList = state.users.map((user) => user.user_id);
+            userIdList.forEach(async (userId) => {
+                const res = await SpaceConnector.clientV2.identity.userGroup.list<UserGroupListParameters, ListResponse<UserGroupModel>>({
+                    user_id: userId,
+                });
+                if (res.results && res.results.length > 0) {
+                    const userGroupList = res.results.map((userGroup) => userGroup.name);
+                    state.users.forEach((user) => {
+                        if (user.user_id === userId) {
+                            user.user_group = userGroupList;
+                        } else if (user.user_id !== userId) {
+                            user.user_group = [];
+                        }
+                    });
+                }
+            });
         },
         async getWorkspaceUser(params: WorkspaceUserGetParameters) {
             try {

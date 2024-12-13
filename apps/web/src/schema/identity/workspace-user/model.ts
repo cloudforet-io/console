@@ -18,6 +18,7 @@ export interface WorkspaceUserModel {
     domain_id: string;
     created_at: string;
     last_accessed_at: string;
+    user_group?: string[];
 }
 
 export interface SummaryWorkspaceUserModel {

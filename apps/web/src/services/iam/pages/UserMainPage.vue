@@ -51,6 +51,7 @@ const refreshUserList = async () => {
             await userPageStore.listUsers({ query: userListApiQueryHelper.data });
         } else if (storeState.grantInfo.scope === 'WORKSPACE') {
             await userPageStore.listWorkspaceUsers({ query: userListApiQueryHelper.data });
+            await userPageStore.listUserGroupPerUser();
         }
     } finally {
         userPageState.loading = false;

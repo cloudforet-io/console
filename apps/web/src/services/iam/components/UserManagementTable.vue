@@ -67,12 +67,16 @@ const storeState = reactive({
 });
 const state = reactive({
     selectedRemoveItem: '',
-    refinedUserItems: computed<ExtendUserListItemType[]>(() => userPageState.users.map((user) => ({
-        ...user,
-        type: user?.role_binding_info?.workspace_group_id ? 'Workspace Group' : 'Workspace',
-        mfa_state: user?.mfa?.state === 'ENABLED' ? 'ON' : 'OFF',
-        last_accessed_at: user?.last_accessed_at,
-    }))),
+    refinedUserItems: computed<ExtendUserListItemType[]>(() => userPageState.users.map((user) => {
+        console.log(user);
+        return {
+            ...user,
+            type: user?.role_binding_info?.workspace_group_id ? 'Workspace Group' : 'Workspace',
+            mfa_state: user?.mfa?.state === 'ENABLED' ? 'ON' : 'OFF',
+            last_accessed_at: user?.last_accessed_at,
+        };
+    })),
+    // refinedUserItems: computed<ExtendUserListItemType[]>(() => userPageState.users.map)
 });
 const tableState = reactive({
     userTableFields: computed<DataTableFieldType[]>(() => {
@@ -88,6 +92,7 @@ const tableState = reactive({
             additionalFields.push(
                 { name: 'type', label: 'Type', sortable: false },
                 { name: 'role_binding', label: 'Role', sortable: false },
+                // { name: 'user_group', label: 'User Group', sortable: false },
             );
         }
         const baseFields = [
@@ -95,6 +100,7 @@ const tableState = reactive({
             { name: 'name', label: 'Name' },
             { name: 'state', label: 'State' },
             ...additionalFields,
+            { name: 'user_group', label: 'User Group', sortable: false },
             { name: 'tags', label: 'Tags', sortable: false },
             { name: 'auth_type', label: 'Auth Type' },
             { name: 'last_accessed_at', label: 'Last Activity' },
@@ -151,6 +157,7 @@ const handleChange = (options: any = {}) => {
     if (options.pageStart !== undefined) userPageState.pageStart = options.pageStart;
     if (options.pageLimit !== undefined) userPageState.pageLimit = options.pageLimit;
     fetchUserList();
+    userPageStore.listUserGroupPerUser();
 };
 const closeRemoveModal = () => {
     modalState.visible = false;
@@ -234,6 +241,7 @@ const handleRemoveButton = async () => {
         showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_REMOVE_USER'), '');
         closeRemoveModal();
         await fetchUserList();
+        await userPageStore.listUserGroupPerUser();
     } catch (e) {
         showErrorMessage(i18n.t('IDENTITY.USER.MAIN.ALT_E_REMOVE_USER'), '');
         ErrorHandler.handleError(e);
