@@ -65,10 +65,13 @@ const state = reactive({
         const haveRequiredQueryOptions = haveSavedName && !!state.dataTableInfo.dataTableId && queryState.conditions.filter((cond) => !!cond.value.trim()).length > 0;
         const haveRequiredEvalOptions = haveSavedName && !!state.dataTableInfo.dataTableId && evalState.expressions.filter((expression) => !!expression.name && !!expression.expression).length > 0;
         const haveRequiredAddLabels = haveSavedName && !!state.dataTableInfo.dataTableId && addLabelsState.labels.every((label) => !!label.name && !!label.value);
+        const haveRequiredPivotOptions = haveSavedName && !!valueState.PIVOT.data_table_id && valueState.PIVOT.fields?.labels?.length > 0 && !!valueState.PIVOT.fields.column
+            && !!valueState.PIVOT.fields.data && (!!valueState.PIVOT.select?.length || !!valueState.PIVOT.limit);
         if (state.operator === 'CONCAT') return !haveRequiredConcatOptions;
         if (state.operator === 'JOIN') return !haveRequiredJoinOptions;
         if (state.operator === 'QUERY') return !haveRequiredQueryOptions;
         if (state.operator === 'EVAL') return !haveRequiredEvalOptions;
+        if (state.operator === 'PIVOT') return !haveRequiredPivotOptions;
         if (state.operator === 'ADD_LABELS') return !haveRequiredAddLabels;
         return true;
     }),
@@ -130,7 +133,7 @@ const evalState = reactive({
 });
 
 const valueState = reactive({
-    pivot: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT as Omit<PivotOptions, 'data_table_id'>,
+    PIVOT: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT as PivotOptions,
 });
 
 const addLabelsState = reactive({
@@ -154,14 +157,15 @@ const originState = reactive({
         const _labels = (props.item.options as DataTableTransformOptions).ADD_LABELS?.labels ?? {};
         return Object.entries(_labels).map(([name, value]) => ({ name, value }));
     }),
-    pivot: computed<Omit<PivotOptions, 'data_table_id'>|undefined>(() => {
+    pivot: computed<PivotOptions|undefined>(() => {
         const _pivot = (props.item.options as DataTableTransformOptions).PIVOT as PivotOptions|undefined;
-        if (!_pivot) return undefined;
+        if (!_pivot) return cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT);
         return {
+            data_table_id: _pivot.data_table_id,
             fields: _pivot.fields,
             select: _pivot.select,
             limit: _pivot.limit,
-            functions: _pivot.functions,
+            function: _pivot.function,
             order_by: _pivot.order_by,
         };
     }),
@@ -171,7 +175,7 @@ const setFailStatus = (status: boolean) => {
     state.failStatus = status;
 };
 const updateDataTable = async (): Promise<DataTableModel|undefined> => {
-    const isValidDataTableId = state.dataTableInfo.dataTableId && storeState.dataTables.some((dataTable) => dataTable.data_table_id === state.dataTableInfo.dataTableId);
+    const isValidDataTableId = valueState[state.operator].data_table_id && storeState.dataTables.some((dataTable) => dataTable.data_table_id === valueState[state.operator].data_table_id);
     const isValidDataTables = state.dataTableInfo.dataTables.length === 2
         && !state.dataTableInfo.dataTables.includes(undefined)
         && storeState.dataTables.some((dataTable) => dataTable.data_table_id === state.dataTableInfo.dataTables[0])
@@ -221,6 +225,14 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
             ...(expressionInfo.else && { else: expressionInfo.else }) || {},
         })).filter((expressionInfo) => !!expressionInfo.name && !!expressionInfo.expression),
     };
+    const pivotOptions: PivotOptions = {
+        data_table_id: valueState.PIVOT.data_table_id,
+        fields: valueState.PIVOT.fields,
+        select: valueState.PIVOT.select,
+        limit: valueState.PIVOT.limit,
+        function: valueState.PIVOT.function,
+        order_by: valueState.PIVOT.order_by,
+    };
     const _labels: AdditionalLabels = addLabelsState.labels.reduce((acc, label) => {
         if (label.name && label.value) {
             acc[label.name] = label.value;
@@ -241,6 +253,8 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
             return queryOptions;
         case 'EVAL':
             return evalOptions;
+        case 'PIVOT':
+            return pivotOptions;
         case 'ADD_LABELS':
             return addLabelsOptions;
         default:
@@ -334,7 +348,7 @@ const setInitialDataTableForm = () => {
         key: getRandomId(), name: '', fieldType: DATA_TABLE_FIELD_TYPE.DATA, expression: '', isCollapsed: false,
     }];
     addLabelsState.labels = originState.labels.length ? cloneDeep(originState.labels) : [{ name: '', value: '' }];
-    valueState.pivot = originState.pivot ? cloneDeep(originState.pivot) : DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT;
+    valueState.PIVOT = originState.pivot ? cloneDeep(originState.pivot) : cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT);
 };
 
 onMounted(() => {
@@ -370,9 +384,9 @@ defineExpose({
             />
         </div>
         <widget-form-data-table-card-transform-pivot-form v-if="state.operator === DATA_TABLE_OPERATOR.PIVOT"
-                                                          :data-table-id="state.dataTableId"
-                                                          :data-table-info.sync="state.dataTableInfo"
-                                                          :form-data.sync="valueState.pivot"
+                                                          :base-data-table-id="state.dataTableId"
+                                                          :operator-options.sync="valueState.PIVOT"
+                                                          :origin-data="props.item.options[state.operator] ?? cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT)"
         />
         <widget-form-data-table-card-transform-form v-else
                                                     :data-table-id="state.dataTableId"
