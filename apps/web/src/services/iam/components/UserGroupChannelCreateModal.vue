@@ -13,7 +13,7 @@ const handleConfirm = () => {
 //   TODO: store
     userGroupPageState.modal = {
         type: USER_GROUP_MODAL_TYPE.CREATE_NOTIFICATIONS_SECOND,
-        title: 'Create Notifications',
+        title: userGroupPageState.modal.title,
         themeColor: 'primary',
     };
 };
@@ -48,7 +48,7 @@ const handleCancel = () => {
             <select-channel-card />
         </template>
         <template #confirm-button>
-            <span>Continue</span>
+            <span>{{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.CONTINUE') }}</span>
         </template>
     </p-button-modal>
 </template>

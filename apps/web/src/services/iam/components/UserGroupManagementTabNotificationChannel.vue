@@ -55,7 +55,7 @@ const handleUpdateModal = (modalType: string) => {
     case 'add':
         userGroupPageStore.updateModalSettings({
             type: USER_GROUP_MODAL_TYPE.CREATE_NOTIFICATIONS_FIRST,
-            title: 'Create Notification',
+            title: i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE'),
             themeColor: 'primary1',
         });
         break;
@@ -63,7 +63,7 @@ const handleUpdateModal = (modalType: string) => {
     case 'edit':
         userGroupPageStore.updateModalSettings({
             type: USER_GROUP_MODAL_TYPE.CREATE_NOTIFICATIONS_FIRST,
-            title: 'Edit Notification',
+            title: i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.UPDATE_TITLE'),
             themeColor: 'primary1',
         });
         break;
