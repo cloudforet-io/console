@@ -31,7 +31,7 @@ const widgetGenerateState = widgetGenerateStore.state;
 
 const storeState = reactive({
     dataTables: computed(() => widgetGenerateState.dataTables),
-    isJoinRestriced: computed<boolean|undefined>(() => widgetGenerateState.joinRestrictedMap[props.dataTableId]),
+    isJoinRestricted: computed<boolean|undefined>(() => widgetGenerateState.joinRestrictedMap[props.dataTableId]),
 });
 
 
@@ -191,7 +191,7 @@ watch(() => props.dataTableInfo, (newVal) => {
                      :class="{'select-button': true,
                               selected: !!state.secondarySelected,
                               error: (state.secondarySelected && !storeState.dataTables.some((dataTable) => dataTable.data_table_id === state.secondarySelected?.[0]?.name))
-                                  || storeState.isJoinRestriced
+                                  || storeState.isJoinRestricted
                      }"
                      @click="handleClickSelectButton(true)"
                 >
