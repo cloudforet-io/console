@@ -90,19 +90,19 @@ export interface EvaluateExpression {
 export interface PivotOptions {
     data_table_id: string;
     fields?: PivotFieldOptions;
-    select: string[];
-    limit: number;
-    functions: 'sum' | 'min' | 'max' | 'mean'; // default key
-    oeder_by: {
-        type: 'key' | 'value';
+    select?: string[];
+    limit?: number;
+    functions?: 'sum' | 'min' | 'max' | 'mean'; // default -> "sum"
+    order_by?: {
+        type: 'key' | 'value'; // default -> "key"
         desc: boolean; // default false
     }
 }
 
 export interface PivotFieldOptions {
     labels: string[];
-    data: string;
-    column: string;
+    data?: string;
+    column?: string;
 }
 
 export interface AddLabelsOptions {
