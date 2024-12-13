@@ -15,6 +15,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     item: () => ({}) as LSBCollapsibleItem,
 });
+const emit = defineEmits<{(e: 'change-collapesd', collapsed: boolean, item: LSBCollapsibleItem): void}>();
 
 
 const state = reactive({
@@ -31,6 +32,11 @@ const updateCollapsedByForced = (collapsed: boolean) => {
 watch(() => props.overrideCollapsed, (changedCollapsed) => {
     updateCollapsedByForced(!!changedCollapsed);
 }, { immediate: true });
+
+watch(() => state.isCollapsed, (changedCollapsed) => {
+    emit('change-collapesd', changedCollapsed, props.item);
+}, { immediate: true });
+
 </script>
 
 <template>

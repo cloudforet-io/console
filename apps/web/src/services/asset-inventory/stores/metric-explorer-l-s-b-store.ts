@@ -9,8 +9,11 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { NamespaceGroupListParameters } from '@/schema/inventory-v2/namespace-group/api-verbs/list';
 import type { NamespaceGroupModel } from '@/schema/inventory-v2/namespace-group/model';
+import type { NamespaceGetParameters } from '@/schema/inventory-v2/namespace/api-verbs/get';
 import type { NamespaceListParameters } from '@/schema/inventory-v2/namespace/api-verbs/list';
 import type { NamespaceModel } from '@/schema/inventory-v2/namespace/model';
+import type { MetricExampleListParameters } from '@/schema/inventory/metric-example/api-verbs/list';
+import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
 import type { MetricListParameters } from '@/schema/inventory/metric/api-verbs/list';
 import type { MetricModel } from '@/schema/inventory/metric/model';
 
@@ -23,10 +26,12 @@ interface MetricExplorerLSBPageStoreState {
     namespaceLoadingMap: Record<string, boolean>;
     metricLoading: boolean;
     namespaceGroupList: NamespaceGroupModel[];
+    currentNamespace?: NamespaceModel;
     namespaceMap: Record<string, NamespaceModel[]>
     namespaceMapByKeywordSearch: Record<string, NamespaceModel[]>
     metricList: MetricModel[];
-    selectedNamespace?: NamespaceModel;
+    metricExampleList: MetricExampleModel[];
+    selectedNamespaceId?: string;
 }
 
 export const useMetricExplorerLSBStore = defineStore('metric-explorer-l-s-b', () => {
@@ -43,18 +48,20 @@ export const useMetricExplorerLSBStore = defineStore('metric-explorer-l-s-b', ()
         metricLoading: false,
         // data
         namespaceGroupList: [],
+        currentNamespace: undefined,
         namespaceMap: {},
         namespaceMapByKeywordSearch: {},
         metricList: [],
-        selectedNamespace: undefined,
+        metricExampleList: [],
+        selectedNamespaceId: undefined,
     });
     const getters = reactive({
         selectedNamespaceId: computed<string|undefined>(() => state.selectedNamespace?.namespace_id),
     });
 
     /* Mutations */
-    const setSelectedNamespace = (namespace: NamespaceModel) => {
-        state.selectedNamespace = namespace;
+    const setSelectedNamespaceId = (namespaceId: string) => {
+        state.selectedNamespaceId = namespaceId;
     };
 
     /* Actions */
@@ -79,6 +86,21 @@ export const useMetricExplorerLSBStore = defineStore('metric-explorer-l-s-b', ()
             ErrorHandler.handleError(e);
         } finally {
             state.loading = false;
+        }
+    };
+    const loadNamespaceGetFetcher = getCancellableFetcher<NamespaceGetParameters, NamespaceModel>(SpaceConnector.clientV2.inventoryV2.namespace.get);
+    const loadNamespace = async (namespaceId: string) => {
+        const getParams: NamespaceGetParameters = {
+            namespace_id: namespaceId,
+        };
+        try {
+            const { status, response } = await loadNamespaceGetFetcher(getParams);
+            if (status === 'succeed') {
+                state.currentNamespace = response;
+            }
+        } catch (e) {
+            state.currentNamespace = undefined;
+            ErrorHandler.handleError(e);
         }
     };
     const loadNamespaceListFetcher = getCancellableFetcher<NamespaceListParameters, ListResponse<NamespaceModel>>(SpaceConnector.clientV2.inventoryV2.namespace.list);
@@ -113,6 +135,8 @@ export const useMetricExplorerLSBStore = defineStore('metric-explorer-l-s-b', ()
         }
     };
     const loadNamespaceListByKeywordSearch = async (keyword: string) => {
+        state.namespaceMapByKeywordSearch = {}; // initialize
+        if (!keyword) return;
         const listParams: NamespaceListParameters = {
             resource_group: _getters.isAdminMode ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE,
             query: {
@@ -125,18 +149,18 @@ export const useMetricExplorerLSBStore = defineStore('metric-explorer-l-s-b', ()
             if (status === 'succeed') {
                 const namespaceList = response.results || [];
                 namespaceList.forEach((namespace) => {
-                    if (state.namespaceMapByKeywordSearch[namespace.namespace_id]) {
+                    if (state.namespaceMapByKeywordSearch[namespace.namespace_group_id]) {
                         state.namespaceMapByKeywordSearch = {
                             ...state.namespaceMapByKeywordSearch,
-                            [namespace.namespace_id]: [
-                                ...state.namespaceMapByKeywordSearch[namespace.namespace_id],
+                            [namespace.namespace_group_id]: [
+                                ...state.namespaceMapByKeywordSearch[namespace.namespace_group_id],
                                 namespace,
                             ],
                         };
                     } else {
                         state.namespaceMapByKeywordSearch = {
                             ...state.namespaceMapByKeywordSearch,
-                            [namespace.namespace_id]: [namespace],
+                            [namespace.namespace_group_id]: [namespace],
                         };
                     }
                 });
@@ -166,16 +190,33 @@ export const useMetricExplorerLSBStore = defineStore('metric-explorer-l-s-b', ()
             state.metricLoading = false;
         }
     };
+    const loadMetricExampleListFetcher = getCancellableFetcher<MetricExampleListParameters, ListResponse<MetricExampleModel>>(SpaceConnector.clientV2.inventoryV2.metricExample.list);
+    const loadMetricExampleList = async (namespaceId: string) => {
+        const listParams: MetricExampleListParameters = {
+            namespace_id: namespaceId,
+        };
+        try {
+            const { status, response } = await loadMetricExampleListFetcher(listParams);
+            if (status === 'succeed') {
+                state.metricExampleList = response.results || [];
+            }
+        } catch (e) {
+            state.metricExampleList = [];
+            ErrorHandler.handleError(e);
+        }
+    };
 
     const actions = {
         reset,
         loadNamespaceGroupList,
+        loadNamespace,
         loadNamespaceListByNamespaceGroupId,
         loadNamespaceListByKeywordSearch,
         loadMetricList,
+        loadMetricExampleList,
     };
     const mutations = {
-        setSelectedNamespace,
+        setSelectedNamespaceId,
     };
 
     return {

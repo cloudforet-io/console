@@ -4,19 +4,20 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { isEmpty } from 'lodash';
-
 import {
     PDataLoader, PIconButton, PLazyImg, PSearch, PEmpty, PTooltip,
 } from '@cloudforet/mirinae';
 import type { TreeDisplayMap, TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
+
+import type { NamespaceModel } from '@/schema/inventory-v2/namespace/model';
+import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
+import type { MetricModel } from '@/schema/inventory/metric/model';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type {
     CloudServiceTypeItem,
     CloudServiceTypeReferenceMap,
 } from '@/store/reference/cloud-service-type-reference-store';
-import type { MetricReferenceItem } from '@/store/reference/metric-reference-store';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
@@ -25,19 +26,19 @@ import { gray } from '@/styles/colors';
 
 import MetricExplorerLSBMetricTree from '@/services/asset-inventory/components/MetricExplorerLSBMetricTree.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { useMetricExplorerLSBStore } from '@/services/asset-inventory/stores/metric-explorer-l-s-b-store';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
-import type { NamespaceSubItemType } from '@/services/asset-inventory/types/asset-analysis-type';
 
 interface Props {
     isDetailPage?: boolean;
-    metrics: MetricReferenceItem[];
 }
 
 const props = defineProps<Props>();
 
 const allReferenceStore = useAllReferenceStore();
 const metricExplorerPageStore = useMetricExplorerPageStore();
-const metricExplorerPageState = metricExplorerPageStore.state;
+const metricExplorerLSBStore = useMetricExplorerLSBStore();
+const metricExplorerLSBState = metricExplorerLSBStore.state;
 
 const { getProperRouteLocation } = useProperRouteLocation();
 const { hasReadWriteAccess } = usePageEditableStatus();
@@ -53,7 +54,9 @@ const storeState = reactive({
         });
         return res;
     }),
-    selectedNamespace: computed<NamespaceSubItemType|undefined>(() => metricExplorerPageState.selectedNamespace),
+    currentNamespace: computed<NamespaceModel|undefined>(() => metricExplorerLSBState.currentNamespace),
+    metricList: computed<MetricModel[]>(() => metricExplorerLSBState.metricList),
+    metricExampleList: computed<MetricExampleModel[]>(() => metricExplorerLSBState.metricExampleList),
 });
 const state = reactive({
     selectedId: computed<string|undefined>(() => {
@@ -64,27 +67,26 @@ const state = reactive({
     }),
     inputValue: '',
     metricItems: computed<TreeNode[]>(() => {
-        const sortedMetrics = [
-            ...props.metrics.filter((metric) => metric.key.startsWith('metric-managed-')),
-            ...props.metrics.filter((metric) => !metric.key.startsWith('metric-managed-')),
+        const sortedMetrics: MetricModel[] = [
+            ...storeState.metricList.filter((metric) => metric.is_managed),
+            ...storeState.metricList.filter((metric) => !metric.is_managed),
         ];
         return sortedMetrics.map((metric) => {
             const metricTreeNode = {
-                id: metric.key,
+                id: metric.metric_id,
                 depth: 0,
                 data: {
                     ...metric,
                     type: 'metric',
-                    is_managed: metric.data.is_managed,
                     to: getProperRouteLocation({
                         name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
                         params: {
-                            metricId: metric.key,
+                            metricId: metric.metric_id,
                         },
                     }),
                 },
             };
-            const examples = state.metricExamples.filter((example) => example.metric_id === metric.key);
+            const examples: MetricExampleModel[] = storeState.metricExampleList.filter((example) => example.metric_id === metric.metric_id);
             if (examples.length) {
                 return {
                     ...metricTreeNode,
@@ -97,7 +99,7 @@ const state = reactive({
                             to: getProperRouteLocation({
                                 name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
                                 params: {
-                                    metricId: metric.key,
+                                    metricId: metric.metric_id,
                                     metricExampleId: example.example_id,
                                 },
                             }),
@@ -112,7 +114,6 @@ const state = reactive({
         const keyword = state.inputValue.toLowerCase();
         return state.metricItems.filter((metric) => metric.data.name.toLowerCase().includes(keyword) || metric.children?.some((example) => example.data.name.toLowerCase().includes(keyword)));
     }),
-    metricExamples: computed(() => metricExplorerPageState.metricExamples),
     metricTreeDisplayMap: undefined,
     metricTreeDisplayMapWithSearchKeyword: computed<TreeDisplayMap|undefined>(() => {
         if (!state.inputValue) return undefined;
@@ -124,11 +125,12 @@ const state = reactive({
         });
         return displayMap;
     }),
+    metricLSBLoading: false,
 });
 
 /* Event */
 const handleClickBackToNamespace = () => {
-    metricExplorerPageStore.setSelectedNamespace(undefined);
+    metricExplorerLSBStore.setSelectedNamespaceId(undefined);
 };
 const handleOpenAddCustomMetricModal = () => {
     metricExplorerPageStore.openMetricQueryFormSidebar('CREATE');
@@ -148,16 +150,21 @@ watch(() => route.params, () => {
 }, { immediate: true });
 
 /* Watcher */
-watch(() => storeState.selectedNamespace, async (selectedNamespace) => {
-    if (!isEmpty(selectedNamespace)) {
-        await allReferenceStore.load('metric', { force: true });
-        await metricExplorerPageStore.loadMetricExamples(selectedNamespace?.name);
+watch(() => metricExplorerLSBState.selectedNamespaceId, async (selectedNamespaceId) => {
+    if (selectedNamespaceId) {
+        state.metricLSBLoading = true;
+        await Promise.allSettled([
+            await metricExplorerLSBStore.loadNamespace(selectedNamespaceId),
+            await metricExplorerLSBStore.loadMetricList(selectedNamespaceId),
+            await metricExplorerLSBStore.loadMetricExampleList(selectedNamespaceId),
+        ]);
+        state.metricLSBLoading = false;
     }
 }, { immediate: true });
 </script>
 
 <template>
-    <p-data-loader :loading="false"
+    <p-data-loader :loading="state.metricLSBLoading"
                    :loader-backdrop-opacity="0.5"
                    :loader-backdrop-color="gray[100]"
                    class="metric-explorer-l-s-b-metric-menu"
@@ -170,26 +177,22 @@ watch(() => storeState.selectedNamespace, async (selectedNamespace) => {
                                    size="sm"
                                    @click="handleClickBackToNamespace"
                     />
-                    <img v-if="storeState.selectedNamespace?.group === 'common'"
-                         class="namespace-image"
-                         src="@/assets/images/img_common-asset@2x.png"
-                         alt="common-namespace-image"
-                    >
-                    <p-lazy-img v-else
-                                class="namespace-image"
-                                :src="storeState.selectedNamespace?.icon"
+                    <p-lazy-img class="namespace-image"
+                                :src="storeState.currentNamespace?.icon"
                                 width="1.25rem"
                                 height="1.25rem"
                     />
                     <p-tooltip class="title"
-                               :contents="storeState.selectedNamespace?.label || ''"
+                               :contents="storeState.currentNamespace?.name || ''"
                     >
-                        <span>{{ storeState.selectedNamespace?.label.split('/')[0] }}</span>
-                        <span class="divider">/</span>
-                        <span class="type">{{ storeState.selectedNamespace?.label.split('/')[1] }}</span>
+                        <span>{{ storeState.currentNamespace?.name }}</span>
+                        <!--                        TODO: Check namespace naming convention-->
+                        <!--                        <span>{{ storeState.currentNamespace?.name.split('/')[0] }}</span>-->
+                        <!--                        <span class="divider">/</span>-->
+                        <!--                        <span class="type">{{ storeState.currentNamespace?.name.split('/')[1] }}</span>-->
                     </p-tooltip>
                 </div>
-                <p-icon-button v-if="hasReadWriteAccess && storeState.selectedNamespace?.group !== 'common'"
+                <p-icon-button v-if="hasReadWriteAccess"
                                style-type="tertiary"
                                name="ic_plus"
                                shape="square"
