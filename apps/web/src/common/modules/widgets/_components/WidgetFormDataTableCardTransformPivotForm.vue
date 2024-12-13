@@ -3,6 +3,8 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
+import { cloneDeep } from 'lodash';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PDivider, PFieldGroup, PSelectButton, PTextInput, PSelectDropdown, PRadioGroup, PRadio, PI,
@@ -222,7 +224,7 @@ watch(() => state.proxyDataTableInfo, (dataTableInfo) => {
     const dataTableId = dataTableInfo.dataTableId;
     if (dataTableId) {
         state.selectedValueType = 'auto';
-        state.proxyFormData = DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT;
+        state.proxyFormData = cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT);
     }
 });
 
