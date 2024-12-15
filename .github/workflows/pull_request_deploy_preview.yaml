@@ -35,7 +35,7 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            echo "${{ toJSON(context) }}"
+            console.log(JSON.stringify(context));
             const prNumber = context.issue.number;
             const { data: pullRequest } = await github.rest.pulls.get({
               owner: context.repo.owner,
