@@ -25,23 +25,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Convert object to JSON
-        run: |
-          echo ">>>>>>>>>>>>>>>"
-          echo "${{ toJSON(github) }}"
-
       - name: Get PR information
         id: pr_info
         uses: actions/github-script@v6
         with:
           script: |
-            console.log(JSON.stringify(context));
             const prNumber = context.issue.number;
             const { data: pullRequest } = await github.rest.pulls.get({
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: prNumber
             });
+            console.log(JSON.stringify(context));
             core.setOutput('branch', pullRequest.head.ref);
 
       - name: Checkout repository
