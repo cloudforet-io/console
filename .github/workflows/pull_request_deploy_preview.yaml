@@ -5,7 +5,7 @@ on:
     types: [created]
 
 env:
-  TEAM_NAME: ${{ vars.VERCEL_TEAM_NAME }}
+  TEAM_NAME: "sulmo's projects"
   PROJECT_NAME: console
   VERCEL_TOKEN: ${{ secrets.VERCEL_CLOUDFORET_TOKEN }}
 
