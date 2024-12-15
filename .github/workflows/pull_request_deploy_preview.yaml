@@ -36,7 +36,8 @@ jobs:
               repo: context.repo.repo,
               pull_number: prNumber
             });
-            console.log(JSON.stringify(context));
+            console.log('>context>>>>',JSON.stringify(context));
+            console.log('>PR>>>>>',JSON.stringify(pullRequest));
             core.setOutput('branch', pullRequest.head.ref);
 
       - name: Checkout repository
