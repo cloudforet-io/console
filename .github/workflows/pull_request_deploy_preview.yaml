@@ -27,7 +27,6 @@ jobs:
 
       - name: Convert object to JSON
         run: |
-          echo "${{ toJSON(context) }}"
           echo ">>>>>>>>>>>>>>>"
           echo "${{ toJSON(github) }}"
 
@@ -36,6 +35,7 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
+            echo "${{ toJSON(context) }}"
             const prNumber = context.issue.number;
             const { data: pullRequest } = await github.rest.pulls.get({
               owner: context.repo.owner,
