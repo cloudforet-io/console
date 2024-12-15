@@ -76,6 +76,12 @@ const handleClickButton = (type: string) => {
         themeColor: 'primary',
         modalVisibleType: 'add',
     }); break;
+    case USER_MODAL_TYPE.ASSIGN: userPageStore.updateModalSettings({
+        type,
+        title: 'Add Selected Users to User Groups',
+        themeColor: 'primary',
+        modalVisibleType: 'assignToUserGroup',
+    }); break;
     default: break;
     }
 };
@@ -120,6 +126,7 @@ watch(() => route.query, (query) => {
                     >
                         <p-button style-type="negative-secondary"
                                   :disabled="userPageGetters.selectedUsers.length === 0 || userPageGetters.selectedUsers.length > 1"
+                                  @click="handleClickButton(USER_MODAL_TYPE.ASSIGN)"
                         >
                             {{ $t('IAM.USER.ASSIGN_TO_USER_GROUP') }}
                         </p-button>

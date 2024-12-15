@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import {
-    computed, reactive,
+    computed, reactive, watchEffect,
 } from 'vue';
+
+import { storeToRefs } from 'pinia';
 
 import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
@@ -53,6 +55,8 @@ const userPageState = userPageStore.state;
 const userPageGetters = userPageStore.getters;
 const userStore = useUserStore();
 
+const userState = storeToRefs(userPageStore).state;
+
 const roleListApiQueryHelper = new ApiQueryHelper();
 const userListApiQueryHelper = new ApiQueryHelper()
     .setPageStart(userPageState.pageStart).setPageLimit(userPageState.pageLimit)
@@ -67,16 +71,18 @@ const storeState = reactive({
 });
 const state = reactive({
     selectedRemoveItem: '',
-    refinedUserItems: computed<ExtendUserListItemType[]>(() => userPageState.users.map((user) => {
-        console.log(user);
-        return {
-            ...user,
-            type: user?.role_binding_info?.workspace_group_id ? 'Workspace Group' : 'Workspace',
-            mfa_state: user?.mfa?.state === 'ENABLED' ? 'ON' : 'OFF',
-            last_accessed_at: user?.last_accessed_at,
-        };
-    })),
+    refinedUserItems: computed<ExtendUserListItemType[]>(() => userPageState.users.map((user) => ({
+        ...user,
+        type: user?.role_binding_info?.workspace_group_id ? 'Workspace Group' : 'Workspace',
+        mfa_state: user?.mfa?.state === 'ENABLED' ? 'ON' : 'OFF',
+        last_accessed_at: user?.last_accessed_at,
+    }))),
     // refinedUserItems: computed<ExtendUserListItemType[]>(() => userPageState.users.map)
+});
+watchEffect(() => {
+    userState.value.users.forEach((user) => {
+        console.log(user.user_group);
+    });
 });
 const tableState = reactive({
     userTableFields: computed<DataTableFieldType[]>(() => {
@@ -157,7 +163,6 @@ const handleChange = (options: any = {}) => {
     if (options.pageStart !== undefined) userPageState.pageStart = options.pageStart;
     if (options.pageLimit !== undefined) userPageState.pageLimit = options.pageLimit;
     fetchUserList();
-    userPageStore.listUserGroupPerUser();
 };
 const closeRemoveModal = () => {
     modalState.visible = false;
@@ -241,7 +246,6 @@ const handleRemoveButton = async () => {
         showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_REMOVE_USER'), '');
         closeRemoveModal();
         await fetchUserList();
-        await userPageStore.listUserGroupPerUser();
     } catch (e) {
         showErrorMessage(i18n.t('IDENTITY.USER.MAIN.ALT_E_REMOVE_USER'), '');
         ErrorHandler.handleError(e);
@@ -397,6 +401,47 @@ const isWorkspaceGroupUser = (item: ExtendUserListItemType) => !!item?.role_bind
                 >
                     {{ $t('IAM.USER.REMOVE') }}
                 </p-button>
+            </template>
+            <template #col-user_group-format="{value}">
+                <div v-if="value.length > 0 && value.length < 3">
+                    <p-badge v-for="(val, idx) in value"
+                             :key="`${val}-${idx}`"
+                             badge-type="subtle"
+                             shape="square"
+                             style-type="gray200"
+                             class="mr-2"
+                    >
+                        {{ val }}
+                    </p-badge>
+                </div>
+                <div v-else-if="value.length > 3"
+                     class="flex"
+                >
+                    <div v-for="(val, idx) in value"
+                         :key="`${val}-${idx}`"
+                    >
+                        <p-badge
+                            v-if="idx < 3"
+                            badge-type="subtle"
+                            shape="square"
+                            style-type="gray200"
+                            class="mr-2"
+                        >
+                            {{ val }}
+                        </p-badge>
+                        <p-badge
+                            v-if="idx === 3"
+                            badge-type="subtle"
+                            shape="square"
+                            style-type="blue300"
+                            class="mr-2"
+                        >
+                            + {{ value.length - 3 }}
+                        </p-badge>
+                        <div v-else-if="idx > 3" />
+                    </div>
+                </div>
+                <div v-else />
             </template>
         </p-toolbox-table>
         <user-management-remove-modal v-if="modalState.visible"

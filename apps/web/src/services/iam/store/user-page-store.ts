@@ -115,21 +115,18 @@ export const useUserPageStore = defineStore('page-user', () => {
         // Workspace User
         async listWorkspaceUsers(params: WorkspaceUserListParameters) {
             try {
-                const { results, total_count } = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>(params);
-                // TODO: here
-                // if (results && results.length > 0) {
-                //     const userIdList = results.map(result => result.user_id)
-                //     userIdList.forEach()
-                // }
-                state.users = (results ?? [])?.map((item) => ({
+                const { results = [], total_count = 0 } = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>(params);
+
+                const userIdToGroupMap = await this.fetchUserGroups(results.map((result) => result.user_id));
+
+                state.users = results.map((item) => ({
                     ...item,
                     role_type: item.role_type,
-                    role_binding: {
-                        type: item.role_binding_info?.role_type ?? ROLE_TYPE.USER,
-                        name: state.roles?.find((role) => role.role_id === item.role_binding_info?.role_id)?.name ?? '',
-                    },
+                    role_binding: this.getRoleBinding(item),
+                    user_group: userIdToGroupMap[item.user_id] || [],
                 }));
-                state.totalCount = total_count ?? 0;
+
+                state.totalCount = total_count;
                 state.selectedIndices = [];
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -138,24 +135,27 @@ export const useUserPageStore = defineStore('page-user', () => {
                 throw e;
             }
         },
-        async listUserGroupPerUser() {
-            const userIdList = state.users.map((user) => user.user_id);
-            userIdList.forEach(async (userId) => {
-                const res = await SpaceConnector.clientV2.identity.userGroup.list<UserGroupListParameters, ListResponse<UserGroupModel>>({
-                    user_id: userId,
-                });
-                if (res.results && res.results.length > 0) {
-                    const userGroupList = res.results.map((userGroup) => userGroup.name);
-                    state.users.forEach((user) => {
-                        if (user.user_id === userId) {
-                            user.user_group = userGroupList;
-                        } else if (user.user_id !== userId) {
-                            user.user_group = [];
-                        }
-                    });
-                }
+
+        async fetchUserGroups(userIds: string[]): Promise<Record<string, string[]>> {
+            const userGroupPromises = userIds.map(async (userId) => {
+                const { results = [] } = await SpaceConnector.clientV2.identity.userGroup.list<UserGroupListParameters, ListResponse<UserGroupModel>>({ user_id: userId });
+                return { userId, userGroups: results.map((group) => group.name) };
             });
+
+            const results = await Promise.all(userGroupPromises);
+            return results.reduce((acc, { userId, userGroups }) => {
+                acc[userId] = userGroups;
+                return acc;
+            }, {} as Record<string, string[]>);
         },
+
+        getRoleBinding(item: WorkspaceUserModel) {
+            return {
+                type: item.role_binding_info?.role_type ?? ROLE_TYPE.USER,
+                name: state.roles?.find((role) => role.role_id === item.role_binding_info?.role_id)?.name ?? '',
+            };
+        },
+
         async getWorkspaceUser(params: WorkspaceUserGetParameters) {
             try {
                 const res = await SpaceConnector.clientV2.identity.workspaceUser.get<WorkspaceUserGetParameters, WorkspaceUserModel>(params);

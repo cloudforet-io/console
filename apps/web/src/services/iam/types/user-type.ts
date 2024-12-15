@@ -17,6 +17,7 @@ interface RoleBindingState {
 }
 
 export type UserListItemType = Partial<WorkspaceUserModel> & Partial<UserModel> & {
+    user_group: string[];
     role_binding?: RoleBindingState
 };
 
@@ -24,7 +25,7 @@ export interface ExtendUserListItemType extends UserListItemType {
     mfa_state?: 'ON'|'OFF'
 }
 
-export type UserPageModalType = 'removeMixed' | 'removeOnlyWorkspaceGroup' | 'removeOnlyWorkspace' | 'add' | 'form' | 'status';
+export type UserPageModalType = 'removeMixed' | 'removeOnlyWorkspaceGroup' | 'removeOnlyWorkspace' | 'add' | 'form' | 'status' | 'assignToUserGroup';
 
 export interface ModalSettingState {
     type: string;
