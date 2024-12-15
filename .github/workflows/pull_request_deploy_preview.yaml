@@ -5,7 +5,7 @@ on:
     types: [created]
 
 env:
-  TEAM_NAME: "sulmos projects"
+  TEAM_NAME: "sulmos-projects"
   PROJECT_NAME: console
   VERCEL_TOKEN: ${{ secrets.SULMO_VERCEL_TOKEN }}
 
