@@ -43,7 +43,7 @@ jobs:
             });
             console.log('>context>>>>',JSON.stringify(context));
             console.log('>PR>>>>>',JSON.stringify(pullRequest));
-            core.setOutput('owner', pullRequest.repo.full_name);
+            core.setOutput('owner', pullRequest.head.repo.full_name);
             core.setOutput('branch', pullRequest.head.ref);
 
       - name: Checkout repository
