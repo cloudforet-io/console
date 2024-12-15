@@ -25,6 +25,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Convert object to JSON
+        run: |
+          echo '${{ toJSON(context)
+          echo '>>>>>>>>>>>>>>>'
+          echo '${{ toJSON(github)
+
       - name: Get PR information
         id: pr_info
         uses: actions/github-script@v6
