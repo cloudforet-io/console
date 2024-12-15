@@ -73,7 +73,7 @@ jobs:
           echo "DEPLOY_URL=$DEPLOY_URL" >> $GITHUB_ENV
 
       - name: Checkout Vercel Target Project
-        run: vercel link --yes --scope=${{ env.TEAM_NAME }} --project=${{ env.PROJECT_NAME }} --token=${{ env.VERCEL_TOKEN }}
+        run: vercel link --yes --scope=\"${{ env.TEAM_NAME }}\" --project=${{ env.PROJECT_NAME }} --token=${{ env.VERCEL_TOKEN }}
 
       - name: Pull Vercel Environment Information
         run: vercel pull --yes --token=${{ env.VERCEL_TOKEN }}
