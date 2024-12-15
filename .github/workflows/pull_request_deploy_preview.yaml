@@ -51,7 +51,7 @@ jobs:
         with:
           submodules: true
           fetch-depth: 0
-          repository: ${{ step.pr_info.outputs.owner }}
+          repository: ${{ steps.pr_info.outputs.owner }}
           ref: ${{ steps.pr_info.outputs.branch }}
 
       - name: Setup Node.js
