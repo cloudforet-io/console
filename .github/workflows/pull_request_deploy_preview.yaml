@@ -7,7 +7,7 @@ on:
 env:
   TEAM_NAME: "sulmo's projects"
   PROJECT_NAME: console
-  VERCEL_TOKEN: ${{ secrets.VERCEL_CLOUDFORET_TOKEN }}
+  VERCEL_TOKEN: ${{ secrets.SULMO_VERCEL_TOKEN }}
 
 jobs:
   deploy-preview:
