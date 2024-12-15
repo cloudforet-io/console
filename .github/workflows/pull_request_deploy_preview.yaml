@@ -4,6 +4,11 @@ on:
   issue_comment:
     types: [created]
 
+env:
+  TEAM_NAME: ${{ vars.VERCEL_TEAM_NAME }}
+  PROJECT_NAME: console
+  VERCEL_TOKEN: ${{ secrets.VERCEL_CLOUDFORET_TOKEN }}
+
 jobs:
   deploy-preview:
     if: startsWith(github.event.comment.body, '/preview')
@@ -38,6 +43,7 @@ jobs:
             });
             console.log('>context>>>>',JSON.stringify(context));
             console.log('>PR>>>>>',JSON.stringify(pullRequest));
+            core.setOutput('owner', pullRequest.user.login);
             core.setOutput('branch', pullRequest.head.ref);
 
       - name: Checkout repository
@@ -45,6 +51,7 @@ jobs:
         with:
           submodules: true
           fetch-depth: 0
+          repository: ${{ step.pr_info.outputs.owner }}
           ref: ${{ steps.pr_info.outputs.branch }}
 
       - name: Setup Node.js
@@ -55,22 +62,37 @@ jobs:
       - name: Install Vercel CLI
         run: npm install -g vercel
 
+      - name: Set up environment
+        run: sudo apt-get install jq
+
       - name: Deploy to Vercel
         id: deploy
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_CLOUDFORET_TOKEN }}
         run: |
           BRANCH_NAME=${{ steps.pr_info.outputs.result }}
           echo "Deploying preview for branch $BRANCH_NAME"
-          DEPLOY_URL=$(vercel --token $VERCEL_TOKEN --yes --env GITHUB_BRANCH=$BRANCH_NAME)
           echo "DEPLOY_URL=$DEPLOY_URL" >> $GITHUB_ENV
+
+      - name: Checkout Vercel Target Project
+        run: vercel link --yes --scope=${{ env.TEAM_NAME }} --project=${{ env.PROJECT_NAME }} --token=${{ env.VERCEL_TOKEN }}
+
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --token=${{ env.VERCEL_TOKEN }}
+
+      - name: Pull Vercel Edge Config
+        run: vercel env pull ./apps/web/.env --yes --token=${{ env.VERCEL_TOKEN }}
+
+      - name: Build Project Artifacts
+        run: vercel build --yes --token=${{ env.VERCEL_TOKEN }}
+
+      - name: Deploy Project Artifacts to Vercel
+        run: DEPLOY_URL=$(vercel deploy --prebuilt --token=${{ env.VERCEL_TOKEN }})
 
       - name: Comment on PR
         uses: actions/github-script@v6
         with:
           script: |
             const url = process.env.DEPLOY_URL;
-            const commentBody = `🚀 Preview deployed for branch \`${{ github.head_ref }}\`: [View Preview](${url})`;
+            const commentBody = `🚀 Preview deployed for branch \`${{ steps.pr_info.outputs.owner }}:${{ steps.pr_info.outputs.branch }}\`: [View Preview](${url})`;
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
