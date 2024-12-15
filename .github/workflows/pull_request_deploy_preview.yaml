@@ -43,7 +43,7 @@ jobs:
             });
             console.log('>context>>>>',JSON.stringify(context));
             console.log('>PR>>>>>',JSON.stringify(pullRequest));
-            core.setOutput('owner', pullRequest.head.repo.full_name);
+            core.setOutput('reponame', pullRequest.head.repo.full_name);
             core.setOutput('branch', pullRequest.head.ref);
 
       - name: Checkout repository
@@ -51,7 +51,7 @@ jobs:
         with:
           submodules: true
           fetch-depth: 0
-          repository: ${{ steps.pr_info.outputs.owner }}
+          repository: ${{ steps.pr_info.outputs.reponame }}
           ref: ${{ steps.pr_info.outputs.branch }}
 
       - name: Setup Node.js
@@ -68,12 +68,12 @@ jobs:
       - name: Deploy to Vercel
         id: deploy
         run: |
-          BRANCH_NAME=${{ steps.pr_info.outputs.result }}
+          BRANCH_NAME=${{ steps.pr_info.outputs.branch }}
           echo "Deploying preview for branch $BRANCH_NAME"
           echo "DEPLOY_URL=$DEPLOY_URL" >> $GITHUB_ENV
 
       - name: Checkout Vercel Target Project
-        run: vercel link --yes --scope="${{ env.TEAM_NAME }}" --project=${{ env.PROJECT_NAME }} --token=${{ env.VERCEL_TOKEN }}
+        run: vercel link --yes --scope=${{ env.TEAM_NAME }} --project=${{ env.PROJECT_NAME }} --token=${{ env.VERCEL_TOKEN }}
 
       - name: Pull Vercel Environment Information
         run: vercel pull --yes --token=${{ env.VERCEL_TOKEN }}
@@ -85,14 +85,16 @@ jobs:
         run: vercel build --yes --token=${{ env.VERCEL_TOKEN }}
 
       - name: Deploy Project Artifacts to Vercel
-        run: DEPLOY_URL=$(vercel deploy --prebuilt --token=${{ env.VERCEL_TOKEN }})
+        run: |
+          DEPLOY_URL=$(vercel deploy --prebuilt --token=${{ env.VERCEL_TOKEN }})
+          echo "DEPLOY_URL=$DEPLOY_URL" >> $GITHUB_ENV
 
       - name: Comment on PR
         uses: actions/github-script@v6
         with:
           script: |
             const url = process.env.DEPLOY_URL;
-            const commentBody = `🚀 Preview deployed for branch \`${{ steps.pr_info.outputs.owner }}:${{ steps.pr_info.outputs.branch }}\`: [View Preview](${url})`;
+            const commentBody = `🚀 Preview deployed for branch \`${{ steps.pr_info.outputs.reponame }}:${{ steps.pr_info.outputs.branch }}\`: [View Preview](${url})`;
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
