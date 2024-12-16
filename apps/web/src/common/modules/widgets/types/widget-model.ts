@@ -63,7 +63,7 @@ export interface ConcatOptions {
 
 export interface JoinOptions {
     data_tables: string[];
-    how: JoinType;
+    how?: JoinType;
 }
 
 export interface QueryOptions {

@@ -21,6 +21,8 @@ import WidgetFormDataTableCardTransformConcatenate
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformConcatenate.vue';
 import WidgetFormDataTableCardTransformForm
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformForm.vue';
+import WidgetFormDataTableCardTransformJoin
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformJoin.vue';
 import WidgetFormDataTableCardTransformPivotForm
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformPivotForm.vue';
 import {
@@ -31,7 +33,7 @@ import type {
     DataTableAlertModalMode, QueryCondition, EvalExpressions, TransformDataTableInfo, AdditionalLabel,
 } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
-    DataTableOperator, JoinType, ConcatOptions, JoinOptions, QueryOptions, EvalOptions,
+    DataTableOperator, JoinType, QueryOptions, EvalOptions,
     DataTableTransformOptions,
     EvaluateExpression, AddLabelsOptions, AdditionalLabels, PivotOptions,
 } from '@/common/modules/widgets/types/widget-model';
@@ -63,7 +65,7 @@ const state = reactive({
     applyDisabled: computed(() => {
         const haveSavedName = !!originState.name;
         const haveRequiredConcatOptions = haveSavedName && valueState.CONCAT.data_tables.length === 2 && !valueState.CONCAT.data_tables.includes(undefined);
-        const haveRequiredJoinOptions = haveSavedName && state.dataTableInfo.dataTables.length === 2 && !state.dataTableInfo.dataTables.includes(undefined) && joinState.joinType;
+        const haveRequiredJoinOptions = haveSavedName && valueState.JOIN.data_tables.length === 2 && valueState.JOIN.how;
         const haveRequiredQueryOptions = haveSavedName && !!state.dataTableInfo.dataTableId && queryState.conditions.filter((cond) => !!cond.value.trim()).length > 0;
         const haveRequiredEvalOptions = haveSavedName && !!state.dataTableInfo.dataTableId && evalState.expressions.filter((expression) => !!expression.name && !!expression.expression).length > 0;
         const haveRequiredAddLabels = haveSavedName && !!state.dataTableInfo.dataTableId && addLabelsState.labels.every((label) => !!label.name && !!label.value);
@@ -78,10 +80,10 @@ const state = reactive({
         return true;
     }),
     optionsChanged: computed(() => {
-        const dataTablesChanged = !isEqual(state.dataTableInfo.dataTables, originState.dataTableInfo.dataTables);
         const concatDataTablesChanged = !isEqual(valueState.CONCAT.data_tables, originState.dataTableInfo.dataTables);
         const dataTableIdChanged = state.dataTableInfo.dataTableId !== originState.dataTableInfo.dataTableId;
-        const joinTypeChanged = joinState.joinType !== originState.joinType;
+        const joinDataTablesChanged = !isEqual(valueState.JOIN.data_tables, originState.dataTableInfo.dataTables);
+        const joinTypeChanged = valueState.JOIN.how !== originState.joinType;
         const conditionsChanged = !isEqual(queryState.conditions.map((cond) => ({ value: cond.value })).filter((cond) => !!cond.value.trim().length), originState.conditions);
         const expressionsChanged = !isEqual(evalState.expressions.map((expression) => ({
             name: expression.name,
@@ -92,7 +94,7 @@ const state = reactive({
         })).filter((expression) => !!expression.name && !!expression.expression), originState.expressions);
         const addLabelsChanged = !isEqual(addLabelsState.labels, originState.labels);
         if (state.operator === 'CONCAT') return concatDataTablesChanged;
-        if (state.operator === 'JOIN') return dataTablesChanged || joinTypeChanged;
+        if (state.operator === 'JOIN') return joinDataTablesChanged || joinTypeChanged;
         if (state.operator === 'QUERY') return dataTableIdChanged || conditionsChanged;
         if (state.operator === 'EVAL') return dataTableIdChanged || expressionsChanged;
         if (state.operator === 'ADD_LABELS') return addLabelsChanged;
@@ -138,6 +140,7 @@ const evalState = reactive({
 const valueState = reactive({
     PIVOT: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT,
     CONCAT: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.CONCAT,
+    JOIN: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.JOIN,
 });
 
 const addLabelsState = reactive({
@@ -193,8 +196,8 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
 
     // Duplicated Data Field Handling in 'JOIN'
     if (state.operator === 'JOIN') {
-        const firstDataTable = storeState.dataTables.find((dataTable) => dataTable.data_table_id === state.dataTableInfo.dataTables[0]);
-        const secondDataTable = storeState.dataTables.find((dataTable) => dataTable.data_table_id === state.dataTableInfo.dataTables[1]);
+        const firstDataTable = storeState.dataTables.find((dataTable) => dataTable.data_table_id === valueState.JOIN.data_tables[0]);
+        const secondDataTable = storeState.dataTables.find((dataTable) => dataTable.data_table_id === valueState.JOIN.data_tables[1]);
         const firstDataFields = Object.keys(firstDataTable?.data_info ?? {});
         const secondDataFields = Object.keys(secondDataTable?.data_info ?? {});
         const duplicatedDataFields = intersection(firstDataFields, secondDataFields);
@@ -209,13 +212,8 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
         }
     }
     const firstUpdating = state.isUnsaved;
-    const concatOptions: ConcatOptions = {
-        data_tables: valueState.CONCAT.data_tables,
-    };
-    const joinOptions: JoinOptions = {
-        data_tables: state.dataTableInfo.dataTables,
-        how: joinState.joinType as JoinType,
-    };
+    const concatOptions = cloneDeep(valueState.CONCAT);
+    const joinOptions = cloneDeep(valueState.JOIN);
     const queryOptions: QueryOptions = {
         data_table_id: state.dataTableInfo.dataTableId,
         conditions: queryState.conditions.map((conditionInfo) => conditionInfo.value),
@@ -398,11 +396,15 @@ defineExpose({
                                                            :operator-options.sync="valueState.CONCAT"
                                                            :origin-data="props.item.options[state.operator] ?? cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.CONCAT)"
         />
+        <widget-form-data-table-card-transform-join v-else-if="state.operator === DATA_TABLE_OPERATOR.JOIN"
+                                                    :base-data-table-id="state.dataTableId"
+                                                    :operator-options.sync="valueState.JOIN"
+                                                    :origin-data="props.item.options[state.operator] ?? cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.JOIN)"
+        />
         <widget-form-data-table-card-transform-form v-else
                                                     :data-table-id="state.dataTableId"
                                                     :operator="state.operator"
                                                     :data-table-info.sync="state.dataTableInfo"
-                                                    :join-type.sync="joinState.joinType"
                                                     :conditions.sync="queryState.conditions"
                                                     :expressions.sync="evalState.expressions"
                                                     :labels.sync="addLabelsState.labels"
