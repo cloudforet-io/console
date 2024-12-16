@@ -12,14 +12,16 @@ export type DataTableSourceType = typeof DATA_SOURCE_DOMAIN[keyof typeof DATA_SO
 export type DataTableOperator = typeof DATA_TABLE_OPERATOR[keyof typeof DATA_TABLE_OPERATOR];
 export type DataTableDataType = keyof typeof DATA_TABLE_TYPE;
 export type AdditionalLabels = Record<string, string>;
-export type DateFormat = 'SINGLE' | 'SEPARATE';
-export type TimeDiff = Record<TimeDiffItem, number>; // years|months|days
+export interface TimeDiff {
+    years?: number;
+    months?: number;
+    data_name: string;
+}
 export type LabelsInfo = Record<string, object>;
 export type DataInfo = Record<string, { unit?: string, timediff?: TimeDiff }>;
 export type DataTableOptions = DataTableAddOptions & DataTableTransformOptions;
 export type JoinType = typeof JOIN_TYPE[keyof typeof JOIN_TYPE];
 export type WidgetState = 'CREATING' | 'INACTIVE' | 'ACTIVE';
-export type TimeDiffItem = 'years' | 'months';
 /* ADD Data Type Options */
 export interface DataTableAddOptions {
     'ASSET'?: AssetOptions;
@@ -27,8 +29,6 @@ export interface DataTableAddOptions {
     group_by?: {key:string; name: string; reference?: object; search_key?: string }[];
     data_name: string;
     data_unit?: string;
-    date_format?: DateFormat;
-    additional_labels?: AdditionalLabels;
     timediff?: TimeDiff;
     filter?: DataTableQueryFilter[];
     filter_or?: DataTableQueryFilter[];
