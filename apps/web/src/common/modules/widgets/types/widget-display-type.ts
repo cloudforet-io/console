@@ -5,6 +5,7 @@ import type {
 
 import type { APIErrorToast } from '@/common/composables/error/errorHandler';
 import type { WIDGET_SIZE } from '@/common/modules/widgets/_constants/widget-display-constant';
+import type { WidgetFieldValue } from '@/common/modules/widgets/_widget-field-value-manager/type';
 import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-field-type';
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { WidgetState } from '@/common/modules/widgets/types/widget-model';
@@ -23,7 +24,7 @@ export interface WidgetProps {
     description?: string;
     size?: WidgetSize;
     width?: number;
-    widgetOptions?: Record<WidgetFieldName, WidgetFieldValues>;
+    widgetOptions?: Record<WidgetFieldName, WidgetFieldValue<WidgetFieldValues>>;
     //
     mode?: 'overlay'|'view';
     // from dashboard
