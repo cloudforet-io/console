@@ -2,6 +2,7 @@
 import { reactive } from 'vue';
 
 import { PButtonModal, PI, PButton } from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import { i18n } from '@/translations';
 
@@ -13,8 +14,35 @@ import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-stor
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 
-const state = reactive({
+interface ChannelSetModalState {
+  loading: boolean;
+  userInfo: {
+    userMode: MenuItem;
+    users: MenuItem[];
+  };
+  scheduleInfo: {
+    days: string[];
+    start: number;
+    end: number;
+    type: string;
+  }
+}
+
+const state = reactive<ChannelSetModalState>({
     loading: false,
+    userInfo: {
+        userMode: {
+            label: '',
+            name: '',
+        },
+        users: [],
+    },
+    scheduleInfo: {
+        days: [],
+        start: 0,
+        end: 0,
+        type: '',
+    },
 });
 
 /* Component */
@@ -40,6 +68,14 @@ const handleCancel = () => {
     };
 };
 
+const handleUpdateUser = (value) => {
+    state.userInfo = value;
+};
+
+const handleScheduleForm = (value) => {
+    state.scheduleInfo = value;
+};
+
 /* API */
 const fetchCreateUserGroupChannel = async () => {};
 </script>
@@ -55,7 +91,6 @@ const fetchCreateUserGroupChannel = async () => {};
         >
             <template #body>
                 <div class="flex flex-col gap-1 mb-8">
-                    <!--              TODO: need to modify-->
                     <p class="text-xs">
                         <span>Step 2</span>
                         <span class="text-gray-500">/2</span>
@@ -72,8 +107,8 @@ const fetchCreateUserGroupChannel = async () => {};
                         </p>
                     </div>
                 </div>
-                <user-group-channel-set-input-form />
-                <user-group-channel-schedule-set-form />
+                <user-group-channel-set-input-form @update-user="handleUpdateUser" />
+                <user-group-channel-schedule-set-form @schedule-form="handleScheduleForm" />
             </template>
             <template #close-button>
                 <p-button icon-left="ic_arrow-left"
