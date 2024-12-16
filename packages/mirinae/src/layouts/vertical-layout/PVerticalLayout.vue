@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    reactive, computed, onMounted, onUnmounted,
+    reactive, computed, onMounted, onUnmounted, onBeforeMount, ref,
 } from 'vue';
 
 import PTooltip from '@/data-display/tooltips/PTooltip.vue';
@@ -15,6 +15,7 @@ interface Props {
     initWidth?: number;
     minWidth?: number;
     maxWidth?: number;
+    enableDoubleClickResize? : boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -22,6 +23,7 @@ const props = withDefaults(defineProps<Props>(), {
     initWidth: 240,
     minWidth: 100,
     maxWidth: 500,
+    enableDoubleClickResize: false,
 });
 
 const documentEventMount = (eventName: string, func: any) => {
@@ -36,6 +38,8 @@ const state = reactive({
     clientX: null,
     hide: false,
     transition: false,
+    isHover: false,
+    isMaximized: props.initWidth === props.maxWidth,
     sidebarContainerStyle: computed(() => ({
         width: `${state.width}px`,
         height: '100%',
@@ -65,6 +69,12 @@ const state = reactive({
     })),
 });
 
+const leftLayoutContentBox = ref<null|HTMLElement>(null);
+
+const resize = (delta : number) => {
+    state.width = delta;
+};
+
 /* Resizing */
 const isResizing = (event) => {
     if (state.resizing) {
@@ -75,17 +85,20 @@ const isResizing = (event) => {
         const delta = state.clientX - event.clientX;
         const width = (state.isMobileSize ? MOBILE_WIDTH : state.width) - delta;
         if (!(width <= props.minWidth || width > props.maxWidth)) {
-            state.width = width;
+            resize(width);
         }
         state.clientX = event.clientX;
+        state.isHover = true;
     }
 };
 const endResizing = () => {
     state.resizing = false;
     state.clientX = null;
+    state.isHover = false;
 };
 const startResizing = () => {
     state.resizing = true;
+    state.isHover = true;
 };
 
 /* Toggle hide Sidebar */
@@ -103,8 +116,6 @@ const handleSidebarToggle = () => {
         setTimeout(offTransition, 500);
     }
 };
-documentEventMount('mousemove', isResizing);
-documentEventMount('mouseup', endResizing);
 
 const detectWindowResizing = () => {
     state.isMobileSize = window.innerWidth <= screens.mobile.max;
@@ -119,8 +130,25 @@ const detectWindowResizing = () => {
     }
 };
 
-detectWindowResizing();
-window.addEventListener('resize', detectWindowResizing);
+const handleControllerDoubleClick = () => {
+    const minimumWidth = props.minWidth;
+    const maximumWidth = props.maxWidth;
+
+    if (state.width <= minimumWidth + (maximumWidth - minimumWidth) / 2) {
+        resize(maximumWidth);
+    } else {
+        resize(minimumWidth);
+    }
+};
+
+documentEventMount('mousemove', isResizing);
+documentEventMount('mouseup', endResizing);
+documentEventMount('resize', detectWindowResizing);
+
+onBeforeMount(() => {
+    detectWindowResizing();
+});
+
 </script>
 
 <template>
@@ -131,18 +159,24 @@ window.addEventListener('resize', detectWindowResizing);
              :style="state.sidebarContainerStyle"
              :class="{transition: state.transition}"
         >
-            <div :style="state.sidebarStyle">
-                <slot name="sidebar"
-                      v-bind="{width: state.width, hide: state.hide, transition: state.transition, height: props.height}"
+            <div
+                ref="leftLayoutContentBox"
+                :style="state.sidebarStyle"
+            >
+                <slot
+                    name="sidebar"
+                    v-bind="{width: state.width, hide: state.hide, transition: state.transition, height: props.height}"
                 />
             </div>
         </div>
         <div class="resizer-container line"
-             :class="{transition: state.transition}"
+             :class="{transition: state.transition, hover: state.isHover}"
              :style="state.resizerStyle"
              @mousedown="startResizing"
              @mousemove="isResizing"
              @mouseup="endResizing"
+             @mouseenter="state.isHover = true"
+             @mouseleave="state.isHover = false"
         >
             <p-tooltip :contents="state.hide ? $t('COMPONENT.VERTICAL_LAYOUT.EXPAND') : $t('COMPONENT.VERTICAL_LAYOUT.COLLAPSE')"
                        position="right"
@@ -160,10 +194,17 @@ window.addEventListener('resize', detectWindowResizing);
                     </slot>
                 </span>
             </p-tooltip>
+            <div
+                v-if="enableDoubleClickResize"
+                class="controller"
+                :class="{hover: state.isHover && !state.hide}"
+                @dblclick="handleControllerDoubleClick"
+            />
         </div>
-        <div class="main"
-             :class="{transition: state.transition}"
-             :style="state.mainStyle"
+        <div
+            class="main"
+            :class="{transition: state.transition}"
+            :style="state.mainStyle"
         >
             <slot />
         </div>
@@ -173,6 +214,7 @@ window.addEventListener('resize', detectWindowResizing);
 <style lang="postcss">
 .p-vertical-layout {
     display: flex;
+    position: relative;
     width: 100%;
     flex-direction: row;
     padding: 0;
@@ -200,7 +242,7 @@ window.addEventListener('resize', detectWindowResizing);
         display: flex;
         align-items: flex-start;
         justify-content: center;
-        position: sticky;
+        position: absolute;
         top: 0;
         height: 100%;
         width: 0;
@@ -211,7 +253,7 @@ window.addEventListener('resize', detectWindowResizing);
         &.line {
             @apply border-gray-200;
             background-color: transparent;
-            &:hover {
+            &.hover {
                 @apply border-blue-500;
                 cursor: ew-resize;
             }
@@ -236,7 +278,7 @@ window.addEventListener('resize', detectWindowResizing);
                 .resizer-button > svg {
                     margin-right: -0.125rem;
                 }
-                &:hover {
+                &.hover {
                     @apply text-secondary;
                     width: 2.5rem;
                     .resizer-button > svg {
@@ -246,6 +288,23 @@ window.addEventListener('resize', detectWindowResizing);
             }
             &:hover {
                 @apply bg-blue-200 cursor-pointer;
+            }
+        }
+        .controller {
+            @apply absolute border border-gray-300 rounded-md bg-white;
+            width: 0.4rem;
+            height: 1.5rem;
+            top: calc(50% - 1.5rem / 2);
+            opacity: 0;
+
+            &.hover {
+                @apply border-blue-500;
+                opacity: 1;
+            }
+            &:hover {
+                @apply bg-blue-200;
+                opacity: 1;
+                cursor: col-resize;
             }
         }
     }
