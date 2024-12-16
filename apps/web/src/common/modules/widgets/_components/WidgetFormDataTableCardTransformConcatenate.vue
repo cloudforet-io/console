@@ -25,9 +25,9 @@ const state = reactive({
 });
 
 // Update operator options
-watch(() => dataTableInfo, (_dataTableInfo) => {
+watch(dataTableInfo, (_dataTableInfo) => {
     state.proxyOperatorOptions = {
-        data_tables: _dataTableInfo.value.dataTables || [],
+        data_tables: _dataTableInfo.dataTables || [],
     };
 }, { deep: true, immediate: true });
 </script>
