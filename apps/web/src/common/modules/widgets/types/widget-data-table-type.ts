@@ -42,8 +42,8 @@ export interface EvalExpressions {
 }
 
 export interface TransformDataTableInfo {
-    dataTables: string[];
-    dataTableId: string|undefined;
+    dataTables?: string[];
+    dataTableId?: string;
 }
 
 export type DataTableAlertModalMode = 'DELETE'|'DELETE_UNABLED'|'RESET';
@@ -51,3 +51,9 @@ export type DataTableAlertModalMode = 'DELETE'|'DELETE_UNABLED'|'RESET';
 export type JoinRestrictedMap = Record<string, boolean>; // { {id}: true }
 
 export type DataTableQueryFilterForDropdown = Omit<DataTableQueryFilter, 'v'> & { v: MenuItem[]|string };
+
+export interface TransformDataTableProps<OperatorOptions> {
+    baseDataTableId: string;
+    operatorOptions: OperatorOptions;
+    originData: OperatorOptions;
+}

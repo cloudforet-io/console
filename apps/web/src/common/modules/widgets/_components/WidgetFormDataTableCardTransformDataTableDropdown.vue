@@ -57,7 +57,7 @@ const state = reactive({
         }
         return state.baseMenuItems;
     }),
-    selected: props.operator === 'JOIN' || props.operator === 'CONCAT' ? props.dataTableInfo?.dataTables?.[0] : props.dataTableInfo?.dataTableId ?? undefined as string|MenuItem[]|undefined,
+    selected: undefined as string|MenuItem[]|undefined,
     secondaryDataTableMenuItems: computed<MenuItem[]>(() => {
         const alreadySelected = state.selected && state.selected.length ? [{ ...state.selected[0], disabled: true, iconColor: gray[300] }] : [];
         if (alreadySelected.length) {
@@ -68,7 +68,7 @@ const state = reactive({
         }
         return state.baseMenuItems;
     }),
-    secondarySelected: props.dataTableInfo?.dataTables?.[1] ?? undefined as string|MenuItem[]|undefined,
+    secondarySelected: undefined as string|MenuItem[]|undefined,
 });
 const containerRef = ref<HTMLElement|null>(null);
 const secondContainerRef = ref<HTMLElement|null>(null);
@@ -135,10 +135,11 @@ watch(() => props.dataTableInfo, (newVal) => {
             state.secondarySelected = _secondarySelected ? [_secondarySelected] : undefined;
             return;
         }
+
         const _selected = state.dataTableMenuItems.find((item) => item.name === newVal.dataTableId);
         state.selected = _selected ? [_selected] : undefined;
     }
-});
+}, { immediate: true });
 
 </script>
 

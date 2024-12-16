@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, reactive, watch,
+    computed, onMounted, reactive, ref, watch,
 } from 'vue';
 
 import { cloneDeep } from 'lodash';
@@ -25,34 +25,34 @@ import {
     type DATA_TABLE_OPERATOR, DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP,
 } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
-import type { TransformDataTableInfo } from '@/common/modules/widgets/types/widget-data-table-type';
+import type { TransformDataTableInfo, TransformDataTableProps } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { PivotOptions } from '@/common/modules/widgets/types/widget-model';
 
+const props = defineProps<TransformDataTableProps<PivotOptions>>();
 
-
-
-interface Props {
-    dataTableId: string;
-    dataTableInfo: TransformDataTableInfo;
-    formData: Omit<PivotOptions, 'dataTableId'>;
-}
-
-const props = defineProps<Props>();
-
-const emit = defineEmits<{(e: 'update:form-data', value: Omit<PivotOptions, 'dataTableId'>): void;
+const emit = defineEmits<{(e: 'update:operator-options', value: PivotOptions): void;
+    (e: 'update:form-data', value: Omit<PivotOptions, 'dataTableId'>): void;
     (e: 'update:data-table-info', value: TransformDataTableInfo): void;
 }>();
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
+
+const dataTableInfo = ref<TransformDataTableInfo>({
+    dataTableId: props.originData?.data_table_id,
+});
+const fieldsInfo = ref<PivotOptions['fields']>(props.originData.fields);
+const selectInfo = ref<PivotOptions['select']>(props.originData.select);
+const limitInfo = ref<PivotOptions['limit']>(props.originData.limit);
+const functionInfo = ref<PivotOptions['function']>(props.originData.function);
+const orderByInfo = ref<PivotOptions['order_by']>(props.originData.order_by);
 
 const storeState = reactive({
     dataTables: computed(() => widgetGenerateState.dataTables),
 });
 const state = reactive({
     isInitiated: true,
-    proxyDataTableInfo: useProxyValue<TransformDataTableInfo>('dataTableInfo', props, emit),
-    proxyFormData: useProxyValue<Omit<PivotOptions, 'dataTableId'>>('formData', props, emit),
-    selectedDataTable: computed(() => storeState.dataTables.find((dataTable) => dataTable.data_table_id === state.proxyDataTableInfo.dataTableId)),
+    proxyOperatorOptions: useProxyValue<PivotOptions>('operatorOptions', props, emit),
+    selectedDataTable: computed(() => storeState.dataTables.find((dataTable) => dataTable.data_table_id === dataTableInfo.value.dataTableId)),
     labelFieldItems: computed<MenuItem[]>(() => {
         if (!state.selectedDataTable) return [];
         const labelsInfo = state.selectedDataTable.labels_info;
@@ -86,8 +86,8 @@ const state = reactive({
     selectedValueType: 'auto',
     dynamicFieldItems: [] as MenuItem[],
     selectedDynamicFieldMenuItems: computed(() => {
-        if (!state.proxyFormData.select) return [];
-        return state.proxyFormData.select.map((item) => ({
+        if (!selectInfo.value) return [];
+        return selectInfo.value.map((item) => ({
             name: item,
             label: item,
         }));
@@ -106,97 +106,85 @@ const state = reactive({
         { label: i18n.t('Ascending'), value: 'asc', icon: 'ic_sort-ascending' },
         { label: i18n.t('Descending'), value: 'desc', icon: 'ic_sort-descending' },
     ]),
-    selectedOrderByDesc: computed(() => (state.proxyFormData.order_by?.desc ? 'desc' : 'asc')),
+    selectedOrderByDesc: computed(() => (orderByInfo.value?.desc ? 'desc' : 'asc')),
 });
 /* Events */
 const handleUpdateCriteria = (value: string) => {
-    state.proxyFormData = {
-        ...state.proxyFormData,
-        fields: {
-            ...state.proxyFormData.fields,
-            data: value,
-        },
+    fieldsInfo.value = {
+        ...fieldsInfo.value,
+        data: value,
     };
 };
 const handleUpdateColumn = (value: string) => {
-    state.proxyFormData = {
-        ...state.proxyFormData,
-        fields: {
-            ...state.proxyFormData.fields,
-            column: value,
-        },
+    const labelKeys = Object.keys(state.selectedDataTable.labels_info ?? {});
+    fieldsInfo.value = {
+        ...fieldsInfo.value,
+        column: value,
+        labels: labelKeys.filter((key) => key !== value),
     };
-};
-
-const handleChangeValueType = (value: string) => {
-    state.selectedValueType = value;
-    if (value === 'auto') {
-        state.proxyFormData = {
-            ...state.proxyFormData,
-            select: undefined,
-            limit: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT.limit,
-        };
-    } else {
-        state.proxyFormData = {
-            ...state.proxyFormData,
-            select: [],
-            limit: undefined,
-        };
+    if (value === 'Date') {
+        state.selectedValueType = 'auto';
+        selectInfo.value = undefined;
+        limitInfo.value = DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT.limit;
     }
 };
 
-const handleSelectDynamicFields = (value: MenuItem[]) => {
-    state.proxyFormData = {
-        ...state.proxyFormData,
-        select: value.map((item) => item.name),
-    };
+const handleChangeValueType = (value: string) => {
+    if (value === state.selectedValueType) return;
+    state.selectedValueType = value;
+    if (value === 'auto') {
+        selectInfo.value = undefined;
+        limitInfo.value = DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT.limit;
+    } else {
+        selectInfo.value = [];
+        limitInfo.value = undefined;
+    }
+};
+
+const handleSelectDynamicFields = (value?: MenuItem) => {
+    if (!value || !value.name) {
+        selectInfo.value = [];
+        return;
+    }
+    selectInfo.value = [
+        ...(selectInfo.value ?? []),
+        value.name,
+    ];
 };
 const handleUpdateLimit = (value: string) => {
-    state.proxyFormData = {
-        ...state.proxyFormData,
-        limit: value,
-    };
+    limitInfo.value = parseInt(value);
 };
-const handleUpdateOperator = (value: PivotOptions['functions']) => {
-    state.proxyFormData = {
-        ...state.proxyFormData,
-        functions: value,
-    };
+const handleUpdateOperator = (value: PivotOptions['function']) => {
+    functionInfo.value = value;
 };
-const handleUpdateOrderByType = (value: PivotOptions['order_by']['type']) => {
-    state.proxyFormData = {
-        ...state.proxyFormData,
-        order_by: {
-            ...state.proxyFormData.order_by,
-            type: value,
-        },
+const handleUpdateOrderByType = (value: 'key' | 'value') => {
+    orderByInfo.value = {
+        ...(orderByInfo.value ?? {}),
+        type: value,
     };
 };
 const handleUpdateOrderByDesc = (value: 'asc' | 'desc') => {
     const desc = value === 'desc';
-    state.proxyFormData = {
-        ...state.proxyFormData,
-        order_by: {
-            ...state.proxyFormData.order_by,
-            desc,
-        },
+    orderByInfo.value = {
+        ...(orderByInfo.value ?? {}),
+        desc,
     };
 };
 
 /* Dynamic Field Fetching */
 const fetchAndExtractDynamicField = async () => {
-    if (!state.proxyDataTableInfo.dataTableId || !state.proxyFormData.fields?.column) return;
-    const _isPrivate = state.proxyDataTableInfo.dataTableId.startsWith('private');
+    if (!dataTableInfo.value?.dataTableId || !fieldsInfo.value?.column) return;
+    const _isPrivate = dataTableInfo.value?.dataTableId.startsWith('private');
     const _fetcher = _isPrivate
         ? SpaceConnector.clientV2.dashboard.privateDataTable.load<DataTableLoadParameters, ListResponse<Record<string, string>>>
         : SpaceConnector.clientV2.dashboard.publicDataTable.load<DataTableLoadParameters, ListResponse<Record<string, string>>>;
     try {
         state.dynamicFieldLoading = true;
         const res = await _fetcher({
-            data_table_id: state.proxyDataTableInfo.dataTableId,
+            data_table_id: dataTableInfo.value?.dataTableId,
             granularity: GRANULARITY.YEARLY,
         });
-        const dynamicFields = getUniqueValues(res.results || [], state.proxyFormData.fields.column);
+        const dynamicFields = getUniqueValues(res.results || [], fieldsInfo.value?.column);
         state.dynamicFieldItems = dynamicFields.map((field) => ({
             name: field,
             label: field,
@@ -213,38 +201,55 @@ const getUniqueValues = (data: Record<string, string>[], key: string): string[] 
     return Array.from(new Set(values));
 };
 
-watch(() => props.formData, (formData) => {
-    if (state.isInitiated) {
-        state.selectedValueType = formData.limit !== undefined ? 'auto' : 'fixed';
-        state.isInitiated = false;
-    }
-});
-
-watch(() => state.proxyDataTableInfo, (dataTableInfo) => {
-    const dataTableId = dataTableInfo.dataTableId;
-    if (dataTableId) {
+// Reset with changing data table
+watch(dataTableInfo, (_dataTableInfo) => {
+    if (_dataTableInfo.dataTableId) {
+        const defaultData = cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT);
         state.selectedValueType = 'auto';
-        state.proxyFormData = cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT);
+        fieldsInfo.value = defaultData.fields;
+        selectInfo.value = defaultData.select;
+        limitInfo.value = defaultData.limit;
+        functionInfo.value = defaultData.function as PivotOptions['function'];
+        orderByInfo.value = defaultData.order_by as PivotOptions['order_by'];
     }
 });
 
 // Fetching dynamic data for fixed column
 watch([
-    () => state.proxyFormData.fields?.column,
+    fieldsInfo,
     () => state.selectedValueType,
-], ([column, valueType]) => {
-    if (!!column && valueType === 'fixed') {
+], ([fields, valueType]) => {
+    if (!!fields?.column && valueType === 'fixed') {
         fetchAndExtractDynamicField();
     }
+});
+
+// Update operator options
+watch([
+    dataTableInfo, fieldsInfo, selectInfo,
+    limitInfo, functionInfo, orderByInfo,
+], ([_dataTableInfo, _fields, _select, _limit, _function, _orderBy]) => {
+    state.proxyOperatorOptions = {
+        data_table_id: _dataTableInfo.dataTableId,
+        fields: _fields,
+        select: _select,
+        limit: _limit,
+        function: _function,
+        order_by: _orderBy,
+    };
+});
+
+onMounted(() => {
+    state.selectedValueType = props.originData.limit !== undefined ? 'auto' : 'fixed';
 });
 
 </script>
 
 <template>
     <div class="widget-form-data-table-card-transform-pivot-form">
-        <widget-form-data-table-card-transform-form-wrapper :data-table-id="props.dataTableId"
+        <widget-form-data-table-card-transform-form-wrapper :data-table-id="props.baseDataTableId"
                                                             :operator="DATA_TABLE_OPERATOR.PIVOT"
-                                                            :data-table-info.sync="state.proxyDataTableInfo"
+                                                            :data-table-info.sync="dataTableInfo"
         >
             <div class="pivot-form">
                 <p-field-group :label="$t('COMMON.WIDGETS.CRITERIA')"
@@ -253,7 +258,7 @@ watch([
                                class="criteria-field"
                 >
                     <p-select-dropdown :menu="state.dataFieldItems"
-                                       :selected="state.proxyFormData.fields?.data"
+                                       :selected="fieldsInfo?.data"
                                        appearance-type="badge"
                                        block
                                        @update:selected="handleUpdateCriteria"
@@ -266,7 +271,7 @@ watch([
                 >
                     <div class="field-contents-wrapper">
                         <p-select-dropdown :menu="state.labelFieldItems"
-                                           :selected="state.proxyFormData.fields?.column"
+                                           :selected="fieldsInfo?.column"
                                            appearance-type="badge"
                                            :invalid="state.columnFieldInvalid"
                                            :disabled="state.columnFieldInvalid"
@@ -278,6 +283,7 @@ watch([
                                          :key="`select-button-${selectItem.name}`"
                                          class="value-type-button"
                                          :value="selectItem.name"
+                                         :disabled="selectItem.name === 'fixed' && fieldsInfo?.column === 'Date'"
                                          style-type="secondary"
                                          :selected="state.selectedValueType"
                                          block
@@ -301,7 +307,7 @@ watch([
                                            show-clear-selection
                                            block
                                            @select="handleSelectDynamicFields"
-                                           @clear-selection="handleSelectDynamicFields([])"
+                                           @clear-selection="handleSelectDynamicFields()"
                         />
                         <p-text-input v-else
                                       type="number"
@@ -309,8 +315,8 @@ watch([
                                       :min="1"
                                       :max="15"
                                       :placeholder="$t('COMMON.WIDGETS.MAX_ITEMS')"
-                                      :invalid="!state.proxyFormData.limit"
-                                      :value="state.proxyFormData.limit"
+                                      :invalid="!limitInfo"
+                                      :value="limitInfo"
                                       block
                                       @update:value="handleUpdateLimit"
                         />
@@ -322,7 +328,7 @@ watch([
                                class="operator-field"
                 >
                     <p-select-dropdown :menu="state.operatorItems"
-                                       :selected="state.proxyFormData.functions"
+                                       :selected="functionInfo"
                                        appearance-type="badge"
                                        block
                                        @update:selected="handleUpdateOperator"
@@ -334,7 +340,7 @@ watch([
                                class="order-by-field  flex flex-col gap-2"
                 >
                     <p-select-dropdown :menu="state.orderByTypeItems"
-                                       :selected="state.proxyFormData.order_by?.type"
+                                       :selected="orderByInfo?.type"
                                        appearance-type="badge"
                                        block
                                        @update:selected="handleUpdateOrderByType"

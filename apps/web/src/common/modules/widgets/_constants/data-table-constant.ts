@@ -1,4 +1,6 @@
 
+import type { PivotOptions } from '@/common/modules/widgets/types/widget-model';
+
 import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 
 
@@ -71,16 +73,18 @@ export const KEYWORD_FILTER_DISABLED_KEYS = [GROUP_BY.PROJECT, GROUP_BY.WORKSPAC
 
 export const DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP = {
     PIVOT: {
+        data_table_id: undefined,
         fields: {
             labels: [],
             data: undefined,
             column: undefined,
         },
+        select: undefined,
         limit: 5,
-        functions: 'sum',
+        function: 'sum',
         order_by: {
             type: 'key',
             desc: false,
         },
-    },
-} as const;
+    } as PivotOptions,
+};
