@@ -1,5 +1,6 @@
 import { computed, reactive } from 'vue';
 
+import { cloneDeep } from 'lodash';
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -24,7 +25,10 @@ import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import getRandomId from '@/lib/random-id-generator';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
+import {
+    DATA_TABLE_TYPE,
+    DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP,
+} from '@/common/modules/widgets/_constants/data-table-constant';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import { getDuplicatedDataTableName } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import { sanitizeWidgetOptions } from '@/common/modules/widgets/_helpers/widget-helper';
@@ -211,26 +215,13 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         },
         createUnsavedTransformDataTable: (operatorType: DataTableOperator) => {
             const options = {
-                JOIN: {
-                    data_tables: [],
-                    how: undefined,
-                },
-                CONCAT: {
-                    data_tables: [],
-                },
-                AGGREGATE: {
-                    data_table_id: undefined,
-                    group_by: [],
-                },
-                QUERY: {
-                    data_table_id: undefined,
-                    conditions: [],
-                },
-                // EVAL: {
-                //     data_table_id: undefined,
-                //     formulas: [],
-                // },
-                // TODO: PIVOT, ADD_LABELS, VALUE_MAPPING
+                JOIN: cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.JOIN),
+                CONCAT: cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.CONCAT),
+                QUERY: cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.QUERY),
+                EVAL: cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.EVAL),
+                PIVOT: cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT),
+                ADD_LABELS: cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.ADD_LABELS),
+                // TODO: VALUE_MAPPING
             };
             const unsavedTransformData = {
                 data_table_id: `UNSAVED-${getRandomId()}`,
