@@ -33,7 +33,7 @@ import type { _XAxisValue } from '@/common/modules/widgets/_widget-fields/x-axis
 import type { _YAxisValue } from '@/common/modules/widgets/_widget-fields/y-axis/type';
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 
-export type FieldValueValidator<T extends WidgetFieldValue> = (fieldValue: T, widgetConfig: WidgetConfig) => boolean;
+export type FieldValueValidator<T extends WidgetFieldValue> = (fieldValue: T, widgetConfig: WidgetConfig, allValueMap: WidgetFieldValueMap) => boolean;
 export type FieldDefaultValueConvertor<T extends keyof WidgetFieldTypeMap> = (widgetConfig: WidgetConfig, dataTable: PublicDataTableModel|PrivateDataTableModel) => WidgetFieldTypeMap[T]['value'];
 
 export interface WidgetFieldValueMap {

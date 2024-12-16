@@ -30,10 +30,7 @@ import type { PivotOptions } from '@/common/modules/widgets/types/widget-model';
 
 const props = defineProps<TransformDataTableProps<PivotOptions>>();
 
-const emit = defineEmits<{(e: 'update:operator-options', value: PivotOptions): void;
-    (e: 'update:form-data', value: Omit<PivotOptions, 'dataTableId'>): void;
-    (e: 'update:data-table-info', value: TransformDataTableInfo): void;
-}>();
+const emit = defineEmits<{(e: 'update:operator-options', value: PivotOptions): void; }>();
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 

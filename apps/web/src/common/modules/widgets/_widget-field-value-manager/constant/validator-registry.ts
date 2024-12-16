@@ -7,6 +7,9 @@ import type { ColorSchemaValue } from '@/common/modules/widgets/_widget-fields/c
 import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/comparison/type';
 import type { _CustomTableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
 import type { DataFieldOptions, DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
+import { DAILY_ENABLED_VALUES, MONTHLY_ENABLED_VALUES, YEARLY_ENABLED_VALUES } from '@/common/modules/widgets/_widget-fields/date-range/constant';
+import { checkInvalidCustomValue } from '@/common/modules/widgets/_widget-fields/date-range/helper';
+import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { DisplayAnnotationValue } from '@/common/modules/widgets/_widget-fields/display-annotation/type';
 import type { DisplaySeriesLabelValue } from '@/common/modules/widgets/_widget-fields/display-series-label/type';
 import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/granularity/type';
@@ -26,6 +29,17 @@ export interface WidgetValidatorRegistry {
 }
 
 export const widgetValidatorRegistry: WidgetValidatorRegistry = {
+    dateRange: (fieldValue: DateRangeValue, widgetConfig, allValueMap) => {
+        const _dateRangeType = fieldValue.options.value;
+        const _granularity = allValueMap.granularity?.value?.granularity;
+        if (!_dateRangeType || !_granularity) return false;
+        if (checkInvalidCustomValue(fieldValue, _granularity).invalid) return false;
+        if (_granularity === 'MONTHLY' && !MONTHLY_ENABLED_VALUES.includes(_dateRangeType)) return false;
+        if (_granularity === 'DAILY' && !DAILY_ENABLED_VALUES.includes(_dateRangeType)) return false;
+        if (_granularity === 'YEARLY' && !YEARLY_ENABLED_VALUES.includes(_dateRangeType)) return false;
+
+        return true;
+    },
     dataField: (fieldValue: DataFieldValue, widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const dataFieldOptions = _fieldsSchema.dataField?.options as DataFieldOptions;
