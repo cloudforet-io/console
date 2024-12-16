@@ -10,7 +10,7 @@ COPY . .
 RUN npm ci
 
 # Build the project
-ENV NODE_ENV development
+ENV NODE_ENV production
 
 # Use build args to enable remote caching
 ARG TURBO_TEAM
