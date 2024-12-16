@@ -3,6 +3,8 @@ import { reactive } from 'vue';
 
 import { PButtonModal, PI, PButton } from '@cloudforet/mirinae';
 
+import { i18n } from '@/translations';
+
 import UserGroupChannelScheduleSetForm from '@/services/iam/components/UserGroupChannelScheduleSetForm.vue';
 import UserGroupChannelSetInputForm from '@/services/iam/components/UserGroupChannelSetInputForm.vue';
 import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-constant';
@@ -33,7 +35,7 @@ const handleConfirm = async () => {
 const handleCancel = () => {
     userGroupPageState.modal = {
         type: USER_GROUP_MODAL_TYPE.CREATE_NOTIFICATIONS_FIRST,
-        title: 'Create Notifications',
+        title: i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE'),
         themeColor: 'primary1',
     };
 };
