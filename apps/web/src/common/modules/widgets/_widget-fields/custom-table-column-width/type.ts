@@ -3,17 +3,12 @@ export type CustomColumnWidthItem = {
     width: number;
 };
 
-export interface CustomTableColumnWidthValue {
-    toggleValue: boolean;
-    value?: CustomColumnWidthItem[];
-}
-
 export interface CustomTableColumnWidthOptions {
     toggle?: boolean;
 }
 
 // export interface _CustomTableColumnWidthOptions {}
 
-export interface _CustomTableColumnWidthValue {
+export interface CustomTableColumnWidthValue {
     widthInfos?: CustomColumnWidthItem[];
 }

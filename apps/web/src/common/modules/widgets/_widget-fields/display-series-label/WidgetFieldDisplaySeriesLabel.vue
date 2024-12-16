@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive,
 } from 'vue';
 
 import {
@@ -10,21 +10,20 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 
 import { i18n } from '@/translations';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
 import type { DisplaySeriesLabelValue, DisplaySeriesLabelOptions } from '@/common/modules/widgets/_widget-fields/display-series-label/type';
 import type {
-    WidgetFieldComponentProps,
-    WidgetFieldComponentEmit,
+    _WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 
 
 const ROTATE_MIN = -90;
 const ROTATE_MAX = 90;
-const emit = defineEmits<WidgetFieldComponentEmit<DisplaySeriesLabelValue>>();
-const props = defineProps<WidgetFieldComponentProps<DisplaySeriesLabelOptions, DisplaySeriesLabelValue>>();
+const FIELD_KEY = 'displaySeriesLabel';
+
+const props = defineProps<_WidgetFieldComponentProps<DisplaySeriesLabelOptions>>();
 const state = reactive({
-    proxyValue: useProxyValue<DisplaySeriesLabelValue|undefined>('value', props, emit),
+    fieldValue: computed<DisplaySeriesLabelValue>(() => props.fieldManager.data[FIELD_KEY].value),
     menuItems: computed<SelectDropdownMenuItem[]>(() => {
         const _widgetName = props.widgetConfig?.widgetName;
         if (!_widgetName) return [];
@@ -56,19 +55,17 @@ const state = reactive({
         { name: 'percent', label: '%' },
     ]),
     isRotateValid: computed<boolean>(() => {
-        if (!state.proxyValue?.toggleValue) return true;
-        if (state.proxyValue?.rotate === undefined) return false;
-        if (state.proxyValue.rotate < ROTATE_MIN || state.proxyValue.rotate > ROTATE_MAX) return false;
+        if (!state.fieldValue?.toggleValue || state.fieldValue?.rotate === undefined) return true;
+        if (state.fieldValue.rotate < ROTATE_MIN || state.fieldValue.rotate > ROTATE_MAX) return false;
         return true;
     }),
     rotateInvalidText: computed(() => {
-        if (!state.proxyValue?.toggleValue) return '';
-        if (state.proxyValue?.rotate === undefined) return '';
-        if (state.proxyValue.rotate < ROTATE_MIN) return i18n.t('COMMON.WIDGETS.DISPLAY_SERIES_LABEL.ROTATE_MIN_INVALID_TEXT');
-        if (state.proxyValue.rotate > ROTATE_MAX) return i18n.t('COMMON.WIDGETS.DISPLAY_SERIES_LABEL.ROTATE_MAX_INVALID_TEXT');
+        if (!state.fieldValue?.toggleValue) return '';
+        if (state.fieldValue?.rotate === undefined) return '';
+        if (state.fieldValue.rotate < ROTATE_MIN) return i18n.t('COMMON.WIDGETS.DISPLAY_SERIES_LABEL.ROTATE_MIN_INVALID_TEXT');
+        if (state.fieldValue.rotate > ROTATE_MAX) return i18n.t('COMMON.WIDGETS.DISPLAY_SERIES_LABEL.ROTATE_MAX_INVALID_TEXT');
         return '';
     }),
-    isAllValid: computed(() => state.isRotateValid),
 });
 
 /* Util */
@@ -76,60 +73,46 @@ const state = reactive({
 /* Event */
 const handleUpdateToggle = (value: boolean) => {
     if (!value) {
-        state.proxyValue = undefined;
+        props.fieldManager.setFieldValue(FIELD_KEY, { toggleValue: false });
         return;
     }
-    state.proxyValue = {
-        toggleValue: value,
+    props.fieldManager.setFieldValue(FIELD_KEY, {
+        toggleValue: true,
         position: state.menuItems[0].name,
         rotate: 0,
-    };
+        format: props.widgetFieldSchema?.options?.showFormatField ? state.formatMenuItems[0].name : undefined,
+    });
 };
-const handleSelectMenuItem = (selected: string) => {
-    state.proxyValue = {
-        ...state.proxyValue,
+const handleSelectMenuItem = (selected: DisplaySeriesLabelValue['position']) => {
+    props.fieldManager.setFieldValue(FIELD_KEY, {
+        ...state.fieldValue,
         position: selected,
-    };
+    });
 };
 const handleUpdateRotate = (value: number) => {
-    state.proxyValue = {
-        ...state.proxyValue,
+    props.fieldManager.setFieldValue(FIELD_KEY, {
+        ...state.fieldValue,
         rotate: value,
-    };
+    });
 };
 const handleSelectFormatMenuItem = (selected: string) => {
-    state.proxyValue = {
-        ...state.proxyValue,
+    props.fieldManager.setFieldValue(FIELD_KEY, {
+        ...state.fieldValue,
         format: selected,
-    };
+    });
 };
 
-/* Watcher */
-watch(() => state.isAllValid, (_isAllValid) => {
-    emit('update:is-valid', _isAllValid);
-}, { immediate: true });
-
-onMounted(() => {
-    if (!props.value) return;
-    const _format = props.value?.format || 'numeric';
-    state.proxyValue = {
-        toggleValue: props.value?.toggleValue ?? false,
-        position: props.value?.position ?? state.menuItems[0].name,
-        rotate: props.value?.rotate ?? 0,
-        format: props.widgetFieldSchema?.options?.showFormatField ? _format : undefined,
-    };
-});
 </script>
 
 <template>
     <div class="widget-field-display-series-label">
         <div class="field-header">
             <p-field-title>{{ $t('COMMON.WIDGETS.DISPLAY_SERIES_LABEL.DISPLAY_SERIES_LABEL') }}</p-field-title>
-            <p-toggle-button :value="state.proxyValue?.toggleValue"
+            <p-toggle-button :value="state.fieldValue?.toggleValue"
                              @update:value="handleUpdateToggle"
             />
         </div>
-        <div v-if="state.proxyValue?.toggleValue"
+        <div v-if="state.fieldValue?.toggleValue"
              class="contents"
         >
             <p-field-group :label="$t('COMMON.WIDGETS.DISPLAY_SERIES_LABEL.POSITION')"
@@ -138,7 +121,7 @@ onMounted(() => {
                 <p-select-dropdown use-fixed-menu-style
                                    reset-selection-on-menu-close
                                    :menu="state.menuItems"
-                                   :selected="state.proxyValue?.position"
+                                   :selected="state.fieldValue?.position"
                                    block
                                    @select="handleSelectMenuItem"
                 />
@@ -148,7 +131,7 @@ onMounted(() => {
                            :invalid="!state.isRotateValid"
                            :invalid-text="state.rotateInvalidText"
             >
-                <p-slider :value="state.proxyValue?.rotate"
+                <p-slider :value="state.fieldValue?.rotate"
                           :min="-90"
                           :max="90"
                           show-input
@@ -162,7 +145,7 @@ onMounted(() => {
                 <p-select-dropdown use-fixed-menu-style
                                    reset-selection-on-menu-close
                                    :menu="state.formatMenuItems"
-                                   :selected="state.proxyValue?.format"
+                                   :selected="state.fieldValue?.format"
                                    block
                                    @select="handleSelectFormatMenuItem"
                 />

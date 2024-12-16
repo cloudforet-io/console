@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { asyncComputed } from '@vueuse/core/index';
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive,
 } from 'vue';
 
 import { PSelectDropdown, PFieldGroup } from '@cloudforet/mirinae';
@@ -9,43 +9,29 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 
 import { VariableModelFactory } from '@/lib/variable-models';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
+import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/granularity/type';
 import type {
-    WidgetFieldComponentProps,
-    WidgetFieldComponentEmit,
+    _WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
+const FIELD_KEY = 'granularity';
 
-const props = defineProps<WidgetFieldComponentProps<undefined, string>>();
-const emit = defineEmits<WidgetFieldComponentEmit<string>>();
+const props = defineProps<_WidgetFieldComponentProps<undefined>>();
 const state = reactive({
-    proxyValue: useProxyValue('value', props, emit),
+    fieldValue: computed<GranularityValue>(() => props.fieldManager.data[FIELD_KEY].value),
     granularityMenuItems: asyncComputed<MenuItem[]>(async () => {
         const model = new VariableModelFactory({ type: 'MANAGED', managedModelKey: 'granularity' });
         const { results } = await model.list();
         return results.map((d) => ({ name: d.key, label: d.name }));
     }),
-    isValid: computed<boolean>(() => ((state.granularityMenuItems?.length) ? !!state.proxyValue?.length : false)),
 });
 
 /* Event */
-const handleUpdateSelect = (val: string) => {
-    if (val === state.proxyValue) return;
-    state.proxyValue = val;
+const handleUpdateSelect = (val: GranularityValue['granularity']) => {
+    if (val === state.fieldValue.granularity) return;
+    props.fieldManager.setFieldValue(FIELD_KEY, { granularity: val });
 };
 
-/* Watcher */
-watch(() => state.isValid, (isValid) => {
-    emit('update:is-valid', isValid);
-});
-
-onMounted(() => {
-    if (props.value) {
-        state.proxyValue = props.value;
-    } else {
-        state.proxyValue = 'MONTHLY';
-    }
-});
 </script>
 
 <template>
@@ -54,7 +40,7 @@ onMounted(() => {
                        required
         >
             <p-select-dropdown :menu="state.granularityMenuItems"
-                               :selected="state.proxyValue"
+                               :selected="state.fieldValue.granularity"
                                block
                                @update:selected="handleUpdateSelect"
             />

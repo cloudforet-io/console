@@ -1,71 +1,50 @@
 <script lang="ts" setup>
-import { computed, onMounted, reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import {
     PFieldTitle, PToggleButton, PCheckbox, PI, PTooltip,
 } from '@cloudforet/mirinae';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
-import type { TableDataFieldValue } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
-import type { TotalValue, TotalOptions } from '@/common/modules/widgets/_widget-fields/total/type';
-import type { WidgetFieldComponentProps, WidgetFieldComponentEmit } from '@/common/modules/widgets/types/widget-field-type';
+import type { SubTotalOptions, SubTotalValue } from '@/common/modules/widgets/_widget-fields/sub-total/type';
+import type {
+    _WidgetFieldComponentProps,
+} from '@/common/modules/widgets/types/widget-field-type';
 
 
-const emit = defineEmits<WidgetFieldComponentEmit<TotalValue|undefined>>();
+const FIELD_KEY = 'subTotal';
 
-const props = withDefaults(defineProps<WidgetFieldComponentProps<TotalOptions, TotalValue>>(), {
-    widgetFieldSchema: () => ({
-        options: {
-            toggle: false,
-            default: false,
-        },
-    }),
-});
+const props = defineProps<_WidgetFieldComponentProps<SubTotalOptions>>();
 
 const state = reactive({
-    proxyValue: useProxyValue('value', props, emit),
+    fieldValue: computed<SubTotalValue>(() => props.fieldManager.data[FIELD_KEY].value),
     disabled: computed(() => {
-        const tableDataField = props.allValueMap?.tableDataField as TableDataFieldValue;
-        if (!tableDataField) return false;
-        if (tableDataField.fieldType === 'staticField') return true;
+        console.debug('TODO: refactoring after subTotal planning');
+        // const tableDataField = props.allValueMap?.tableDataField as TableDataFieldValue;
+        // if (!tableDataField) return false;
+        // if (tableDataField.fieldType === 'staticField') return true;
         return false;
     }),
 });
 
 const handleUpdateValue = (value: boolean) => {
-    if (!state.proxyValue?.toggleValue) {
-        state.proxyValue = undefined;
-    } else {
-        state.proxyValue = {
-            ...state.proxyValue,
-            freeze: value,
-        };
-    }
-    emit('update:value', state.proxyValue);
+    props.fieldManager.setFieldValue(FIELD_KEY, {
+        ...state.fieldValue,
+        freeze: value,
+    });
 };
 const handleUpdateToggle = (value: boolean) => {
-    state.proxyValue = {
-        toggleValue: value,
-        freeze: props.widgetFieldSchema.options?.default ?? false,
-    };
-    if (value) emit('update:value', state.proxyValue);
-    else {
-        state.proxyValue = undefined;
-        emit('update:value', state.proxyValue);
+    if (value) {
+        props.fieldManager.setFieldValue(FIELD_KEY, {
+            toggleValue: true,
+            freeze: true,
+        });
+    } else {
+        props.fieldManager.setFieldValue(FIELD_KEY, {
+            toggleValue: false,
+        });
     }
 };
 
-onMounted(() => {
-    emit('update:is-valid', true);
-    if (!props.value) {
-        state.proxyValue = undefined;
-        return;
-    }
-    state.proxyValue = {
-        toggleValue: props.value.toggleValue ?? props.widgetFieldSchema.options?.toggle ?? false,
-        freeze: props.value.freeze ?? props.widgetFieldSchema.options?.default ?? false,
-    };
-});
 </script>
 
 <template>
@@ -80,15 +59,15 @@ onMounted(() => {
                     />
                 </p-tooltip>
             </p-field-title>
-            <p-toggle-button :value="state.proxyValue?.toggleValue"
+            <p-toggle-button :value="state.fieldValue?.toggleValue"
                              :disabled="state.disabled"
                              @update:value="handleUpdateToggle"
             />
         </div>
-        <div v-if="state.proxyValue?.toggleValue"
+        <div v-if="state.fieldValue?.toggleValue"
              class="contents"
         >
-            <p-checkbox :selected="state.proxyValue?.freeze"
+            <p-checkbox :selected="state.fieldValue?.freeze"
                         @change="handleUpdateValue"
             >
                 {{ $t('COMMON.WIDGETS.TOTAL.SUB_TOTAL_DESC') }}

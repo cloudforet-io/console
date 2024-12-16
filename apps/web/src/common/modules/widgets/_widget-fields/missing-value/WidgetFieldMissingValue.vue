@@ -1,24 +1,25 @@
 <script lang="ts" setup>
-import { computed, onMounted, reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { PFieldGroup, PSelectButton } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import { i18n } from '@/translations';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
-import type { MissingValueValue, MissingValueOptions } from '@/common/modules/widgets/_widget-fields/missing-value/type';
 import type {
-    WidgetFieldComponentProps,
-    WidgetFieldComponentEmit,
+    MissingValueOptions,
+    _MissingValueValue,
+} from '@/common/modules/widgets/_widget-fields/missing-value/type';
+import type {
+    _WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
+const FIELD_KEY = 'missingValue';
 
-const emit = defineEmits<WidgetFieldComponentEmit<MissingValueValue>>();
-const props = defineProps<WidgetFieldComponentProps<MissingValueOptions, MissingValueValue>>();
+const props = defineProps<_WidgetFieldComponentProps<MissingValueOptions>>();
 
 const state = reactive({
-    proxyValue: useProxyValue<MissingValueValue>('value', props, emit),
+    fieldValue: computed<_MissingValueValue>(() => props.fieldManager.data[FIELD_KEY].value),
     missingValueMenuItems: computed<MenuItem[]>(() => [
         {
             name: 'lineToZero',
@@ -29,24 +30,15 @@ const state = reactive({
             label: i18n.t('COMMON.WIDGETS.MISSING_VALUE.LINE_BREAKS'),
         },
     ]),
-    selected: 'lineToZero',
 });
 
 /* Event */
-const handleChangeMissingValue = (value: string) => {
-    state.selected = value;
-    state.proxyValue = {
-        value,
-    };
+const handleChangeMissingValue = (value: _MissingValueValue['type']) => {
+    props.fieldManager.setFieldValue(FIELD_KEY, {
+        type: value,
+    });
 };
 
-onMounted(() => {
-    emit('update:is-valid', true);
-    state.proxyValue = {
-        value: props.value?.value ?? props.widgetFieldSchema?.options?.default ?? 'lineToZero',
-    };
-    state.selected = state.proxyValue.value;
-});
 </script>
 
 <template>
@@ -58,7 +50,7 @@ onMounted(() => {
                              :key="`select-button-${selectItem.name}`"
                              :value="selectItem.name"
                              style-type="secondary"
-                             :selected="state.selected"
+                             :selected="state.fieldValue.type"
                              class="mr-2"
                              @change="handleChangeMissingValue"
             >

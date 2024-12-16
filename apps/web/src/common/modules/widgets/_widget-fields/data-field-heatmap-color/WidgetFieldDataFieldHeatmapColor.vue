@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, reactive, watch,
+    computed, reactive,
 } from 'vue';
 
 import {
@@ -11,21 +11,26 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 
 import { i18n } from '@/translations';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
 import { DATA_FIELD_HEATMAP_COLOR } from '@/common/modules/widgets/_constants/widget-field-constant';
-import type { DataFieldHeatmapColor, DataFieldHeatmapColorValue, DataFieldHeatmapColorOptions } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
+import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type {
-    WidgetFieldComponentProps,
-    WidgetFieldComponentEmit,
+    DataFieldHeatmapColor,
+    DataFieldHeatmapColorOptions,
+    _DataFieldHeatmapColorValue,
+} from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
+import type {
+    _WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
+const FIELD_KEY = 'dataFieldHeatmapColor';
 
-const emit = defineEmits<WidgetFieldComponentEmit<DataFieldHeatmapColorValue>>();
-const props = defineProps<WidgetFieldComponentProps<DataFieldHeatmapColorOptions, DataFieldHeatmapColorValue>>();
+const props = defineProps<_WidgetFieldComponentProps<DataFieldHeatmapColorOptions>>();
+const widgetGenerateStore = useWidgetGenerateStore();
+const widgetGenerateGetters = widgetGenerateStore.getters;
 const state = reactive({
     isInitiated: false,
-    proxyValue: useProxyValue<DataFieldHeatmapColorValue|undefined>('value', props, emit),
-    dataFieldList: computed<string[]>(() => Object.keys(props.dataTable?.data_info ?? {}) ?? []),
+    fieldValue: computed<_DataFieldHeatmapColorValue>(() => props.fieldManager.data[FIELD_KEY].value),
+    dataFieldList: computed<string[]>(() => Object.keys(widgetGenerateGetters.selectedDataTable?.data_info ?? {}) ?? []),
     menuItems: computed<SelectDropdownMenuItem[]>(() => Object.entries(DATA_FIELD_HEATMAP_COLOR).map(([key, value]) => {
         if (key === DATA_FIELD_HEATMAP_COLOR.NONE.key) {
             return {
@@ -41,32 +46,20 @@ const state = reactive({
 });
 
 /* Util */
-const getDataFieldHeatmapColor = (colorKey: DataFieldHeatmapColor) => DATA_FIELD_HEATMAP_COLOR[colorKey].key.toLowerCase();
+const getDataFieldHeatmapColor = (colorKey: DataFieldHeatmapColor): string => {
+    if (!colorKey) return '';
+    return DATA_FIELD_HEATMAP_COLOR[colorKey].key.toLowerCase();
+};
 
 /* Event */
 const handleSelectMenuItem = (dataField: string, selected: DataFieldHeatmapColor) => {
-    state.proxyValue = {
-        ...state.proxyValue,
+    props.fieldManager.setFieldValue(FIELD_KEY, {
+        ...state.fieldValue,
         [dataField]: {
-            value: selected,
+            colorInfo: selected,
         },
-    };
-};
-
-/* Watcher */
-watch(() => state.proxyValue, () => {
-    emit('update:is-valid', true);
-}, { immediate: true });
-watch(() => state.dataFieldList, (dataFieldList) => {
-    if (!dataFieldList.length) return;
-    const _proxyValue: DataFieldHeatmapColorValue = {};
-    dataFieldList.forEach((d) => {
-        _proxyValue[d] = {
-            value: state.proxyValue?.[d]?.value ?? props.widgetConfig?.optionalFieldsSchema.dataFieldHeatmapColor?.options?.default ?? DATA_FIELD_HEATMAP_COLOR.NONE.key,
-        };
     });
-    state.proxyValue = _proxyValue;
-}, { immediate: true });
+};
 
 </script>
 
@@ -86,7 +79,7 @@ watch(() => state.dataFieldList, (dataFieldList) => {
                         <p-select-dropdown use-fixed-menu-style
                                            reset-selection-on-menu-close
                                            :menu="state.menuItems"
-                                           :selected="state.proxyValue?.[dataField]?.value"
+                                           :selected="state.fieldValue?.[dataField]?.colorInfo"
                                            block
                                            @select="handleSelectMenuItem(dataField, $event)"
                         >
@@ -116,7 +109,7 @@ watch(() => state.dataFieldList, (dataFieldList) => {
                                    use-fixed-menu-style
                                    reset-selection-on-menu-close
                                    :menu="state.menuItems"
-                                   :selected="state.proxyValue?.[dataField]?.value"
+                                   :selected="state.fieldValue?.[dataField]?.colorInfo"
                                    block
                                    @select="handleSelectMenuItem(dataField, $event)"
                 >

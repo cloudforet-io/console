@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { onMounted, reactive, watch } from 'vue';
+import {
+    computed, reactive,
+} from 'vue';
 
 import {
     PFieldTitle, PToggleButton, PTextInput, PFieldGroup,
@@ -7,85 +9,64 @@ import {
 
 import { i18n } from '@/translations';
 
-import { useFormValidator } from '@/common/composables/form-validator';
-import { useProxyValue } from '@/common/composables/proxy-state';
+import {
+    widgetValidatorRegistry,
+} from '@/common/modules/widgets/_widget-field-value-manager/constant/validator-registry';
 import type { DisplayAnnotationValue } from '@/common/modules/widgets/_widget-fields/display-annotation/type';
-import type { WidgetFieldComponentProps, WidgetFieldComponentEmit } from '@/common/modules/widgets/types/widget-field-type';
+import type {
+    _WidgetFieldComponentProps,
+} from '@/common/modules/widgets/types/widget-field-type';
 
 
+const FIELD_KEY = 'displayAnnotation';
+const validator = widgetValidatorRegistry[FIELD_KEY];
 
-const emit = defineEmits<WidgetFieldComponentEmit<DisplayAnnotationValue|undefined>>();
-const props = defineProps<WidgetFieldComponentProps<undefined, DisplayAnnotationValue>>();
+const props = defineProps<_WidgetFieldComponentProps<undefined>>();
 const state = reactive({
-    proxyValue: useProxyValue('value', props, emit),
-});
-const {
-    forms: {
-        annotation,
-    },
-    setForm,
-    invalidState,
-    invalidTexts,
-    isAllValid,
-} = useFormValidator({
-    annotation: '',
-}, {
-    annotation(value: string) {
-        if (!state.proxyValue?.toggleValue) return true;
-        if (!value.length) return i18n.t('COMMON.WIDGETS.DISPLAY_ANNOTATION.INVALID_VALUE');
-        return true;
-    },
+    fieldValue: computed<DisplayAnnotationValue>(() => props.fieldManager.data[FIELD_KEY].value),
+    invalid: computed(() => validator(state.fieldValue, props.widgetConfig)),
+    invalidText: computed(() => {
+        if (state.invalid) return i18n.t('COMMON.WIDGETS.DISPLAY_ANNOTATION.INVALID_VALUE');
+        return '';
+    }),
 });
 
 /* Event */
 const handleUpdateToggle = (value: boolean) => {
     if (!value) {
-        setForm('annotation', '');
-        state.proxyValue = undefined;
+        props.fieldManager.setFieldValue(FIELD_KEY, { toggleValue: false });
         return;
     }
-    state.proxyValue = {
-        toggleValue: value,
+    props.fieldManager.setFieldValue(FIELD_KEY, {
+        toggleValue: true,
         annotation: '',
-    };
+    });
 };
 const handleUpdateAnnotation = (value: string) => {
-    setForm('annotation', value);
-    state.proxyValue = {
+    props.fieldManager.setFieldValue(FIELD_KEY, {
         toggleValue: true,
         annotation: value,
-    };
+    });
 };
 
-/* Watcher */
-watch(() => isAllValid.value, (_isAllValid) => {
-    emit('update:is-valid', _isAllValid);
-});
-
-onMounted(() => {
-    emit('update:is-valid', true);
-    if (props.value?.annotation) {
-        setForm('annotation', props.value.annotation);
-    }
-});
 </script>
 
 <template>
     <div class="widget-field-display-annotation">
         <div class="field-header">
             <p-field-title>{{ $t('COMMON.WIDGETS.DISPLAY_ANNOTATION.DISPLAY_ANNOTATION') }}</p-field-title>
-            <p-toggle-button :value="state.proxyValue?.toggleValue"
+            <p-toggle-button :value="state.fieldValue?.toggleValue"
                              @update:value="handleUpdateToggle"
             />
         </div>
-        <div v-if="state.proxyValue?.toggleValue"
+        <div v-if="state.fieldValue?.toggleValue"
              class="contents"
         >
-            <p-field-group :invalid-text="invalidTexts.annotation"
-                           :invalid="invalidState.annotation"
+            <p-field-group :invalid-text="state.invalidText"
+                           :invalid="state.invalid"
             >
                 <template #default="{invalid}">
-                    <p-text-input :value="annotation"
+                    <p-text-input :value="state.fieldValue.annotation"
                                   type="text"
                                   :placeholder="$t('COMMON.WIDGETS.DISPLAY_ANNOTATION.PLACEHOLDER')"
                                   :invalid="invalid"

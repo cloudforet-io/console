@@ -1,143 +1,66 @@
 <script lang="ts" setup>
-import { onMounted, reactive, watch } from 'vue';
+import {
+    computed, reactive,
+} from 'vue';
 
 import {
     PFieldTitle, PSelectDropdown, PToggleButton, PI, PTooltip,
 } from '@cloudforet/mirinae';
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
-import { useProxyValue } from '@/common/composables/proxy-state';
-import type { Icon, IconValue, IconOptions } from '@/common/modules/widgets/_widget-fields/icon/type';
+import {
+    widgetFieldDefaultValueMap,
+} from '@/common/modules/widgets/_widget-field-value-manager/constant/default-value-registry';
+import {
+    widgetValidatorRegistry,
+} from '@/common/modules/widgets/_widget-field-value-manager/constant/validator-registry';
+import { ICON_FIELD_ITEMS } from '@/common/modules/widgets/_widget-fields/icon/constant';
+import type { Icon, IconOptions, _IconValue } from '@/common/modules/widgets/_widget-fields/icon/type';
 import type {
-    WidgetFieldComponentProps,
-    WidgetFieldComponentEmit,
+    _WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
-import { gray } from '@/styles/colors';
 
 
-const emit = defineEmits<WidgetFieldComponentEmit<IconValue>>();
+const FIELD_KEY = 'icon';
 
-const props = withDefaults(defineProps<WidgetFieldComponentProps<IconOptions, IconValue>>(), {
-    widgetFieldSchema: () => ({
-        options: {
-            default: 'ic_circle-filled',
-        },
-    }),
-});
-
-const DEFAULT_ICON:Icon = { name: 'ic_circle-filled', label: 'Circle' };
-const DEFAULT_COLOR:string = gray[900];
+const props = defineProps<_WidgetFieldComponentProps<IconOptions>>();
+const validator = widgetValidatorRegistry[FIELD_KEY];
 
 const state = reactive({
-    proxyValue: useProxyValue<IconValue|undefined>('value', props, emit),
-    toggleValue: !!props.widgetFieldSchema?.options?.toggle,
+    fieldValue: computed<_IconValue>(() => props.fieldManager.data[FIELD_KEY].value),
     visibleMenu: false,
-    selectedIcon: DEFAULT_ICON as Icon,
-    iconList: [
-        { name: 'ic_circle-filled', label: 'Circle' },
-        { name: 'ic_coin-filled', label: 'Coin' },
-        { name: 'ic_yen-filled', label: 'Yen' },
-        { name: 'ic_won-filled', label: 'Won' },
-        { name: 'ic_lock-filled', label: 'Lock' },
-        { name: 'ic_spanner-filled', label: 'Spanner' },
-        { name: 'ic_home-filled', label: 'Home' },
-        { name: 'ic_rocket-filled', label: 'Rocket' },
-        { name: 'ic_error-filled', label: 'Error' },
-        { name: 'ic_limit-filled', label: 'Limit' },
-        { name: 'ic_megaphone-filled', label: 'Megaphone' },
-        { name: 'ic_warning-filled', label: 'Warning' },
-        { name: 'ic_sparkle-filled', label: 'Sparkle' },
-        { name: 'ic_arrow-right-up-with-sparkles', label: 'Arrow Right-up with sparkles' },
-        { name: 'ic_service_metric-explorer', label: 'Gauge' },
-        { name: 'ic_service_cloud-service', label: 'Cloud' },
-        { name: 'ic_service_project', label: 'Planet' },
-        { name: 'ic_service_budget', label: 'Budget' },
-        { name: 'ic_service_cost-report', label: 'Budget Report' },
-        { name: 'ic_service_server', label: 'Server' },
-        { name: 'ic_private-repository', label: 'Private Repository' },
-        { name: 'ic_service_data-sources', label: 'Data Source' },
-        { name: 'ic_service_alert-dashboard', label: 'Monitor' },
-        { name: 'ic_service_alert', label: 'Notice' },
-        { name: 'ic_service_user', label: 'User' },
-        { name: 'ic_service_escalation-policy', label: 'Escalation' },
-        { name: 'ic_service_workspaces', label: 'Cube' },
-        { name: 'ic_service_domain-settings', label: 'Settings' },
-        { name: 'ic_service_security', label: 'Security Lock' },
-        { name: 'ic_my-page_account-and-profile', label: 'Authorization' },
-        { name: 'ic_service_service-account', label: 'Security key' },
-    ] as Icon[],
+    invalid: computed(() => validator(state.fieldValue, props.widgetConfig)),
+    iconList: ICON_FIELD_ITEMS,
+    defaultColor: widgetFieldDefaultValueMap.icon.color,
 });
 
 const handleUpdateValue = (value: boolean) => {
-    state.toggleValue = value;
     if (!value) {
-        state.proxyValue = undefined;
+        props.fieldManager.setFieldValue(FIELD_KEY, {
+            toggleValue: false,
+        });
     } else {
-        initValue();
+        props.fieldManager.setFieldValue(FIELD_KEY, {
+            ...widgetFieldDefaultValueMap.icon,
+        });
     }
 };
 
 const handleClickIcon = (icon: Icon) => {
-    state.selectedIcon = icon;
     state.visibleMenu = false;
-    if (!state.proxyValue) {
-        state.proxyValue = {
-            icon,
-            color: DEFAULT_COLOR,
-        };
-    } else {
-        state.proxyValue = {
-            ...state.proxyValue,
-            icon,
-        };
-    }
+    props.fieldManager.setFieldValue(FIELD_KEY, {
+        ...state.fieldValue,
+        icon,
+    });
 };
 
 const handleUpdateColor = (color: string) => {
-    if (!state.proxyValue?.icon) {
-        state.proxyValue = {
-            icon: DEFAULT_ICON,
-            color,
-        };
-    } else {
-        state.proxyValue = {
-            ...state.proxyValue,
-            color,
-        };
-    }
-    emit('update:value', state.proxyValue);
+    props.fieldManager.setFieldValue(FIELD_KEY, {
+        ...state.fieldValue,
+        color,
+    });
 };
-
-const checkValue = ():boolean => {
-    if (state.toggleValue) {
-        return !!(state.proxyValue?.color && state.iconList.find((icon) => icon.name === state.proxyValue?.icon?.name));
-    }
-    return true;
-};
-
-watch(() => state.proxyValue, () => {
-    emit('update:is-valid', checkValue());
-}, { immediate: true });
-
-const initValue = () => {
-    if (props.value !== undefined) {
-        state.proxyValue = props.value;
-    } else {
-        state.proxyValue = {
-            icon: state.iconList.find((icon) => icon.name === props.widgetFieldSchema?.options?.default) ?? DEFAULT_ICON,
-            color: gray[900],
-        };
-    }
-    state.selectedIcon = state.iconList.find((icon) => icon.name === state.proxyValue?.icon?.name) ?? DEFAULT_ICON;
-};
-
-onMounted(() => {
-    if (!state.toggleValue) state.proxyValue = undefined;
-    else {
-        initValue();
-    }
-});
 
 </script>
 
@@ -145,11 +68,11 @@ onMounted(() => {
     <div class="widget-field-icon">
         <div class="field-header">
             <p-field-title>{{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.ICON') }}</p-field-title>
-            <p-toggle-button :value="state.toggleValue"
+            <p-toggle-button :value="state.fieldValue?.toggleValue"
                              @update:value="handleUpdateValue"
             />
         </div>
-        <div v-if="state.toggleValue"
+        <div v-if="state.fieldValue?.toggleValue"
              class="contents"
         >
             <p-select-dropdown :visible-menu.sync="state.visibleMenu"
@@ -159,12 +82,12 @@ onMounted(() => {
             >
                 <template #dropdown-button>
                     <div class="button-label">
-                        <p-i :name="state.selectedIcon?.name"
-                             :color="state.proxyValue?.color ?? DEFAULT_COLOR"
+                        <p-i :name="state.fieldValue?.icon?.name"
+                             :color="state.fieldValue?.color ?? state.defaultColor"
                              width="1rem"
                              height="1rem"
                         />
-                        <span>{{ state.selectedIcon.label ?? 'Select' }}</span>
+                        <span>{{ state.fieldValue?.icon?.label ?? 'Select' }}</span>
                     </div>
                 </template>
                 <template #menu-menu>
@@ -172,12 +95,12 @@ onMounted(() => {
                         <div v-for="icon in state.iconList"
                              :key="icon.name"
                              class="icon-card"
-                             :class="icon.name === state.selectedIcon?.name ? 'selected' : ''"
+                             :class="icon.name === state.fieldValue?.icon?.name ? 'selected' : ''"
                              @click="handleClickIcon(icon)"
                         >
                             <div class="icon-box">
                                 <p-i :name="icon.name"
-                                     :color="state.proxyValue?.color ?? DEFAULT_COLOR"
+                                     :color="state.fieldValue?.color ?? state.defaultColor"
                                      width="1.5rem"
                                      height="1.5rem"
                                 />
@@ -193,7 +116,7 @@ onMounted(() => {
                     </div>
                 </template>
             </p-select-dropdown>
-            <color-input :value="state.proxyValue?.color ?? DEFAULT_COLOR"
+            <color-input :value="state.fieldValue?.color ?? state.defaultColor"
                          @update:value="handleUpdateColor"
             />
         </div>

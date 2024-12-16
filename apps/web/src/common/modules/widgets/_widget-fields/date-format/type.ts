@@ -7,7 +7,7 @@ export interface DateFormatValue {
 }
 
 export interface DateFormatOptions {
-    default: DateFormat;
+    default?: DateFormat;
 }
 
 export interface _DateFormatValue {

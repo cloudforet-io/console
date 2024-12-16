@@ -1,76 +1,50 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive,
 } from 'vue';
 
 import {
     PSelectDropdown, PFieldGroup,
 } from '@cloudforet/mirinae';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
 import { COLOR_SCHEMA } from '@/common/modules/widgets/_constants/widget-field-constant';
-import type { ColorSchemaValue, ColorSchemaOptions } from '@/common/modules/widgets/_widget-fields/color-schema/type';
+import {
+    widgetValidatorRegistry,
+} from '@/common/modules/widgets/_widget-field-value-manager/constant/validator-registry';
 import type {
-    WidgetFieldComponentProps,
-    WidgetFieldComponentEmit,
+    ColorSchemaValue,
+    _ColorSchemaOptions as ColorSchemaOptions,
+} from '@/common/modules/widgets/_widget-fields/color-schema/type';
+import type {
+    _WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
-const DEFAULT_COLOR = 'Coral';
-const emit = defineEmits<WidgetFieldComponentEmit<ColorSchemaValue>>();
+const FIELD_KEY = 'colorSchema';
 
-const props = withDefaults(defineProps<WidgetFieldComponentProps<ColorSchemaOptions, ColorSchemaValue>>(), {
-    widgetFieldSchema: () => ({
-        options: {
-            default: 'ic_circle-filled',
-        },
-    }),
-});
+const props = defineProps<_WidgetFieldComponentProps<ColorSchemaOptions>>();
 type ColorSchemaMenuItem = {
     name: ColorSchemaValue['colorName'],
     label: ColorSchemaValue['colorName']
 };
+const validator = widgetValidatorRegistry[FIELD_KEY];
+
 const state = reactive({
-    proxyValue: useProxyValue<ColorSchemaValue|undefined>('value', props, emit),
+    fieldValue: computed<ColorSchemaValue>(() => props.fieldManager.data[FIELD_KEY].value),
     visibleMenu: false,
-    selectedColor: DEFAULT_COLOR,
     colorSchemaList: computed<ColorSchemaMenuItem[]>(() => (Object.keys(COLOR_SCHEMA) as ColorSchemaValue['colorName'][]).map((key) => ({
         name: key,
         label: key,
     }))),
-    isValid: computed<boolean>(() => !!state.proxyValue?.colorValue?.length && !!state.proxyValue?.colorName),
+    invalid: computed(() => validator(state.fieldValue, props.widgetConfig)),
 });
 
 const handleClickColor = (color: ColorSchemaMenuItem) => {
-    state.selectedColor = color.name;
     state.visibleMenu = false;
-    state.proxyValue = {
+    props.fieldManager.setFieldValue(FIELD_KEY, {
         colorName: color.name,
         colorValue: COLOR_SCHEMA[color.name],
-    };
+    });
 };
-
-watch(() => state.proxyValue, () => {
-}, { immediate: true });
-watch(() => state.isValid, (isValid) => {
-    emit('update:is-valid', isValid);
-}, { immediate: true });
-
-const initValue = () => {
-    if (props.value !== undefined) {
-        state.proxyValue = props.value;
-    } else {
-        state.proxyValue = {
-            colorName: DEFAULT_COLOR,
-            colorValue: COLOR_SCHEMA.Coral,
-        };
-    }
-    state.selectedColor = state.colorSchemaList.find((color) => color.name === state.proxyValue?.colorName)?.name ?? DEFAULT_COLOR;
-};
-
-onMounted(() => {
-    initValue();
-});
-
 const gradientGenerator = (color: string) => `linear-gradient(90deg, ${COLOR_SCHEMA[color].join(', ')})`;
 
 </script>
@@ -84,21 +58,22 @@ const gradientGenerator = (color: string) => `linear-gradient(90deg, ${COLOR_SCH
                 <p-select-dropdown :visible-menu.sync="state.visibleMenu"
                                    use-fixed-menu-style
                                    :menu="state.colorSchemaList"
-                                   :selected="state.selectedColor"
+                                   :selected="state.fieldValue.colorName"
+                                   :invalid="state.invalid"
                                    block
                 >
                     <template #dropdown-button>
                         <span class="color-circle"
-                              :class="state.selectedColor"
+                              :class="state.fieldValue.colorName"
                         />
-                        <span>{{ state.selectedColor }}</span>
+                        <span>{{ state.fieldValue.colorName }}</span>
                     </template>
                     <template #menu-menu>
                         <div class="menu-container">
                             <div v-for="colorSchema in state.colorSchemaList"
                                  :key="colorSchema.name"
                                  class="color-card"
-                                 :class="colorSchema.name === state.selectedColor ? 'selected' : ''"
+                                 :class="colorSchema.name === state.fieldValue.colorName ? 'selected' : ''"
                                  @click="handleClickColor(colorSchema)"
                             >
                                 <div class="color-label">
