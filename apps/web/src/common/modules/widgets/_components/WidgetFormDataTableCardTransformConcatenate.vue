@@ -29,7 +29,6 @@ watch(() => dataTableInfo, (_dataTableInfo) => {
     state.proxyOperatorOptions = {
         data_tables: _dataTableInfo.value.dataTables || [],
     };
-    console.log('??', state.proxyOperatorOptions);
 }, { deep: true, immediate: true });
 </script>
 
