@@ -73,16 +73,16 @@ const handleSelectDropdown = (value: { label: string | TranslateResult; name: st
 /* Watcher */
 watch(() => state.selectedUserModeIdx, async (selectedIdx) => {
     switch (state.userMode[selectedIdx].name) {
-    case 'allMembers':
+    case USER_MODE.ALL_MEMBERS:
         dropdownState.menuItems = [];
         break;
-    case 'selectedUserGroup':
+    case USER_MODE.SELECTED_USER_GROUP:
         dropdownState.menuItems = userGroupPageState.userGroups.map((userGroup) => ({
             label: userGroup.name,
             name: userGroup.user_group_id,
         }));
         break;
-    case 'specificUser':
+    case USER_MODE.SPECIFIC_USER:
         dropdownState.menuItems = (await fetchUserList({})).map((user) => ({
             label: user.user_id,
             name: user.user_id,
