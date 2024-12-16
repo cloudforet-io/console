@@ -300,17 +300,18 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
 <template>
     <div class="metric-explorer-l-s-b">
         <p-popover class="metric-select-guide-popover"
-                   :is-visible="guidePopoverState.metricGuideVisible"
+                   :is-visible.sync="guidePopoverState.metricGuideVisible"
                    position="right"
                    ignore-outside-click
                    ignore-target-click
                    boundary=".metric-explorer-l-s-b"
                    :trigger="POPOVER_TRIGGER.NONE"
+                   min-width="21.5rem"
                    :style="{ left: `${lsbWidth}px`}"
         >
             <l-s-b ref="lsbRef"
                    :menu-set="state.menuSet"
-                   :style="{width:props.width + 'px'}"
+                   :style="{ width: `${props.width}px` }"
             >
                 <template #collapsible-contents-starred>
                     <div v-if="state.starredMenuSet.length > 0">
