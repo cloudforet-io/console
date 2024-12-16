@@ -22,11 +22,11 @@ import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-stor
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 
-// interface Props {
-//
-// }
-//
-// const props = defineProps<Props>();
+const USER_MODE = {
+    ALL_MEMBERS: 'allMembers',
+    SELECTED_USER_GROUP: 'selectedUserGroup',
+    SPECIFIC_USER: 'specificUser',
+};
 
 const emit = defineEmits<{(e: 'update-user', form: {
   userMode: MenuItem;
@@ -43,13 +43,13 @@ interface DropdownState {
 const state = reactive({
     userMode: computed<MenuItem[]>(() => [{
         label: i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.USER_MODE.ALL_MEMBERS'),
-        name: 'allMembers',
+        name: USER_MODE.ALL_MEMBERS,
     }, {
         label: i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.USER_MODE.USER_GROUP'),
-        name: 'selectedUserGroup',
+        name: USER_MODE.SELECTED_USER_GROUP,
     }, {
         label: i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.USER_MODE.SPECIFIC_USER'),
-        name: 'specificUser',
+        name: USER_MODE.SPECIFIC_USER,
     }]),
     selectedUserModeIdx: 0,
 });
