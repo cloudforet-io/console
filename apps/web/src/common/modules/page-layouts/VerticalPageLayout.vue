@@ -4,10 +4,15 @@ import { useWindowSize } from '@vueuse/core/index';
 import {
     computed, reactive, ref, watch,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
+
+import { clone } from 'lodash';
 
 import { PVerticalLayout } from '@cloudforet/mirinae';
 
 import { useGlobalUIStore } from '@/store/global-ui/global-ui-store';
+
+import { MENU_ID } from '@/lib/menu/config';
 
 import FNB from '@/common/modules/navigations/FNB.vue';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
@@ -35,11 +40,19 @@ const { width: contentsWidth } = useElementSize(contentRef);
 const storeState = reactive({
     isMinimizeNavRail: computed(() => gnbGetters.isMinimizeNavRail),
 });
+
+const route = useRoute();
+
 const state = reactive({
     padding: computed(() => {
         if (contentsWidth.value <= 1920) return '0';
         if (storeState.isMinimizeNavRail) return width.value - 1980;
         return width.value - 2180;
+    }),
+    menuId: computed<string>(() => {
+        const reversedMatched = clone(route.matched).reverse();
+        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+        return closestRoute?.meta?.menuId;
     }),
 });
 
@@ -52,10 +65,13 @@ watch(() => props.breadcrumbs, () => {
 </script>
 
 <template>
-    <p-vertical-layout v-bind="$props"
-                       ref="contentRef"
-                       class="vertical-page-layout"
-                       v-on="$listeners"
+    <p-vertical-layout
+        v-bind="$props"
+        ref="contentRef"
+        class="vertical-page-layout"
+        :width="width"
+        :enable-double-click-resize="state.menuId === MENU_ID.METRIC_EXPLORER"
+        v-on="$listeners"
     >
         <template #sidebar="prop">
             <slot name="sidebar"
