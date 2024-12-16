@@ -411,14 +411,14 @@ const isWorkspaceGroupUser = (item: ExtendUserListItemType) => !!item?.role_bind
                              style-type="gray200"
                              class="mr-2"
                     >
-                        {{ val }}
+                        {{ val.name }}
                     </p-badge>
                 </div>
                 <div v-else-if="value.length > 3"
                      class="flex"
                 >
                     <div v-for="(val, idx) in value"
-                         :key="`${val}-${idx}`"
+                         :key="`${val.id}-${idx}`"
                     >
                         <p-badge
                             v-if="idx < 3"
@@ -427,7 +427,7 @@ const isWorkspaceGroupUser = (item: ExtendUserListItemType) => !!item?.role_bind
                             style-type="gray200"
                             class="mr-2"
                         >
-                            {{ val }}
+                            {{ val.name }}
                         </p-badge>
                         <p-badge
                             v-if="idx === 3"

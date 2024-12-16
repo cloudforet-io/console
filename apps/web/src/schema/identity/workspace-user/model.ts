@@ -1,6 +1,7 @@
 import type { Tags } from '@/schema/_common/model';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import type { RoleType } from '@/schema/identity/role/type';
+import type { UserGroupPerUserModel } from '@/schema/identity/user/model';
 import type { AuthType, UserState } from '@/schema/identity/user/type';
 
 export interface WorkspaceUserModel {
@@ -18,7 +19,7 @@ export interface WorkspaceUserModel {
     domain_id: string;
     created_at: string;
     last_accessed_at: string;
-    user_group: string[];
+    user_group: UserGroupPerUserModel[];
 }
 
 export interface SummaryWorkspaceUserModel {

@@ -17,7 +17,6 @@ interface RoleBindingState {
 }
 
 export type UserListItemType = Partial<WorkspaceUserModel> & Partial<UserModel> & {
-    user_group: string[];
     role_binding?: RoleBindingState
 };
 
