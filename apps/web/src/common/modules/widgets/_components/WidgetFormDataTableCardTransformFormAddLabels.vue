@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import {
+    computed, onMounted, reactive, ref, watch,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { random } from 'lodash';
@@ -11,27 +13,37 @@ import {
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
-import type { AdditionalLabel } from '@/common/modules/widgets/types/widget-data-table-type';
+import WidgetFormDataTableCardTransformFormWrapper
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformFormWrapper.vue';
+import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
+import type { TransformDataTableProps, TransformDataTableInfo } from '@/common/modules/widgets/types/widget-data-table-type';
+import type { AddLabelsOptions } from '@/common/modules/widgets/types/widget-model';
 
 
+
+interface AdditionalLabel {
+    name: string;
+    value: string;
+}
 
 const DATE_FIELD = 'Date';
 const COMPONENT_RANDOM_KEY = `add-labels-${random()}`;
-interface Props {
-    labels: (AdditionalLabel[]|string[]);
-}
+const props = defineProps<TransformDataTableProps<AddLabelsOptions>>();
+const emit = defineEmits<{(e: 'update:operator-options', value: AddLabelsOptions): void; }>();
 
-const props = defineProps<Props>();
-
-const emit = defineEmits<{ e: 'update:labels'; value: AdditionalLabel[]}>();
+const dataTableInfo = ref<TransformDataTableInfo>({
+    dataTableId: props.originData?.data_table_id,
+});
+const labelsInfo = ref<AddLabelsOptions['labels']>(props.originData.labels);
 const state = reactive({
-    proxyLabels: useProxyValue<AdditionalLabel[]>('labels', props, emit),
+    proxyOperatorOptions: useProxyValue<AddLabelsOptions>('operator-options', props, emit),
+    refinedLabels: [] as AdditionalLabel[],
     groupByKeys: computed<string[]>(() => []),
 });
 
 /* Helper */
 const getInvalidText = (idx: number): TranslateResult|undefined => {
-    const targetName = state.proxyLabels[idx]?.name;
+    const targetName = state.refinedLabels[idx]?.name;
     if (!targetName) {
         return undefined;
     }
@@ -41,7 +53,7 @@ const getInvalidText = (idx: number): TranslateResult|undefined => {
     if (targetName === DATE_FIELD) {
         return i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.ADD_LABELS.DATE_FIELD_INVALID');
     }
-    if (state.proxyLabels.some((label, lIdx) => lIdx !== idx && label.name === targetName)) {
+    if (state.refinedLabels.some((label, lIdx) => lIdx !== idx && label.name === targetName)) {
         return i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.ADD_LABELS.DUPLICATED_LABEL');
     }
     return undefined;
@@ -49,8 +61,8 @@ const getInvalidText = (idx: number): TranslateResult|undefined => {
 
 /* Events */
 const handleClickAddLabel = () => {
-    state.proxyLabels = [
-        ...state.proxyLabels,
+    state.refinedLabels = [
+        ...state.refinedLabels,
         {
             name: '',
             value: '',
@@ -58,17 +70,38 @@ const handleClickAddLabel = () => {
     ];
 };
 const handleRemoveLabel = (idx: number) => {
-    state.proxyLabels = state.proxyLabels.filter((_, index) => index !== idx);
+    state.refinedLabels = state.refinedLabels.filter((_, index) => index !== idx);
 };
+
+/* Watcher */
+watch(() => state.refinedLabels, (_refinedLabels) => {
+    state.proxyOperatorOptions = {
+        ...state.proxyOperatorOptions,
+        labels: _refinedLabels.reduce((acc, label) => {
+            if (label.name && label.value) {
+                acc[label.name] = label.value;
+            }
+            return acc;
+        }, {}),
+    };
+});
+
+onMounted(() => {
+    state.refinedLabels = Object.entries(labelsInfo.value).map(([name, value]) => ({ name, value }));
+});
 </script>
 
 <template>
-    <div class="widget-form-data-table-card-transform-form-add-labels">
+    <widget-form-data-table-card-transform-form-wrapper :data-table-id="props.baseDataTableId"
+                                                        :operator="DATA_TABLE_OPERATOR.ADD_LABELS"
+                                                        :data-table-info.sync="dataTableInfo"
+                                                        class="widget-form-data-table-card-transform-form-add-labels"
+    >
         <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.ADDITIONAL_LABELS')"
                        required
         >
             <div class="additional-labels-wrapper">
-                <div v-if="state.proxyLabels.length"
+                <div v-if="state.refinedLabels.length"
                      class="field-title-wrapper"
                 >
                     <p-field-title class="field-title"
@@ -84,7 +117,7 @@ const handleRemoveLabel = (idx: number) => {
                                    inline
                     />
                 </div>
-                <div v-for="(labelInfo, idx) in state.proxyLabels"
+                <div v-for="(labelInfo, idx) in state.refinedLabels"
                      :key="`${COMPONENT_RANDOM_KEY}-${idx}`"
                      class="label-wrapper"
                 >
@@ -99,7 +132,7 @@ const handleRemoveLabel = (idx: number) => {
                         />
                         <p-icon-button name="ic_delete"
                                        size="sm"
-                                       :disabled="state.proxyLabels.length === 1"
+                                       :disabled="state.refinedLabels.length === 1"
                                        @click="handleRemoveLabel(idx)"
                         />
                     </div>
@@ -118,7 +151,7 @@ const handleRemoveLabel = (idx: number) => {
                 </p-button>
             </div>
         </p-field-group>
-    </div>
+    </widget-form-data-table-card-transform-form-wrapper>
 </template>
 
 <style scoped lang="postcss">

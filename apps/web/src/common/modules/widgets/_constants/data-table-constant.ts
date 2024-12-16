@@ -1,4 +1,5 @@
 import type {
+    AddLabelsOptions,
     ConcatOptions, EvalOptions, JoinOptions, PivotOptions, QueryOptions,
 } from '@/common/modules/widgets/types/widget-model';
 
@@ -110,4 +111,8 @@ export const DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP = {
         conditions: [''],
         // operator: 'AND',
     } as QueryOptions,
+    ADD_LABELS: {
+        data_table_id: undefined,
+        labels: { '': '' },
+    } as AddLabelsOptions,
 };

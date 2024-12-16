@@ -18,8 +18,8 @@ import WidgetFormDataTableCardHeaderTitle
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardHeaderTitle.vue';
 import WidgetFormDataTableCardTransformConcatenate
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformConcatenate.vue';
-import WidgetFormDataTableCardTransformForm
-    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformForm.vue';
+import WidgetFormDataTableCardTransformFormAddLabels
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformFormAddLabels.vue';
 import WidgetFormDataTableCardTransformFormEvaluate
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformFormEvaluate.vue';
 import WidgetFormDataTableCardTransformJoin
@@ -33,12 +33,12 @@ import {
 } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type {
-    DataTableAlertModalMode, TransformDataTableInfo, AdditionalLabel,
+    DataTableAlertModalMode, TransformDataTableInfo,
 } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
     DataTableOperator, JoinType, QueryOptions, EvalOptions,
     DataTableTransformOptions,
-    EvaluateExpression, AddLabelsOptions, AdditionalLabels, PivotOptions,
+    EvaluateExpression, AddLabelsOptions, PivotOptions,
 } from '@/common/modules/widgets/types/widget-model';
 
 
@@ -71,7 +71,7 @@ const state = reactive({
         const haveRequiredJoinOptions = haveSavedName && valueState.JOIN.data_tables.length === 2 && valueState.JOIN.how;
         const haveRequiredQueryOptions = haveSavedName && !!valueState.QUERY.data_table_id && valueState.QUERY.conditions.filter((cond) => !!cond.trim()).length > 0;
         const haveRequiredEvalOptions = haveSavedName && !!valueState.EVAL.data_table_id && valueState.EVAL.expressions.every((expression) => !!expression.name && !!expression.expression);
-        const haveRequiredAddLabels = haveSavedName && !!state.dataTableInfo.dataTableId && addLabelsState.labels.every((label) => !!label.name && !!label.value);
+        const haveRequiredAddLabels = haveSavedName && !!valueState.ADD_LABELS.data_table_id && Object.entries(valueState.ADD_LABELS.labels).every(([name, value]) => !!name && !!value);
         const haveRequiredPivotOptions = haveSavedName && !!valueState.PIVOT.data_table_id && !!valueState.PIVOT.fields?.labels && valueState.PIVOT.fields?.labels?.length > 0
             && !!valueState.PIVOT.fields?.column && !!valueState.PIVOT.fields?.data && (!!valueState.PIVOT.select || !!valueState.PIVOT.limit);
         if (state.operator === 'CONCAT') return !haveRequiredConcatOptions;
@@ -93,7 +93,7 @@ const state = reactive({
             ...expression,
             ...(expression?.condition ? { condition: expression?.condition } : {}),
         })).filter((expression) => !!expression.name && !!expression.expression), originState.expressions);
-        const addLabelsChanged = !isEqual(addLabelsState.labels, originState.labels);
+        const addLabelsChanged = !isEqual(valueState.ADD_LABELS.labels, originState.labels);
         if (state.operator === 'CONCAT') return concatDataTablesChanged;
         if (state.operator === 'JOIN') return joinDataTablesChanged || joinTypeChanged;
         if (state.operator === 'QUERY') return queryDataTableIdChanged || queryConditionsChanged;
@@ -122,12 +122,7 @@ const valueState = reactive({
     JOIN: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.JOIN,
     EVAL: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.EVAL,
     QUERY: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.QUERY,
-});
-
-const addLabelsState = reactive({
-    labels: [{
-        name: '', value: '',
-    }] as AdditionalLabel[],
+    ADD_LABELS: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.ADD_LABELS,
 });
 
 const originState = reactive({
@@ -140,10 +135,7 @@ const originState = reactive({
     queryConditions: computed<QueryOptions['conditions']>(() => (props.item.options as DataTableTransformOptions).QUERY?.conditions ?? []),
     // queryOperator: computed<QueryOptions['operator']|undefined>(() => (props.item.options as DataTableTransformOptions).QUERY?.operator),
     expressions: computed<EvaluateExpression[]|string[]>(() => (props.item.options as DataTableTransformOptions).EVAL?.expressions ?? []),
-    labels: computed<AdditionalLabel[]>(() => {
-        const _labels = (props.item.options as DataTableTransformOptions).ADD_LABELS?.labels ?? {};
-        return Object.entries(_labels).map(([name, value]) => ({ name, value }));
-    }),
+    labels: computed<AddLabelsOptions['labels']>(() => (props.item.options as DataTableTransformOptions).ADD_LABELS?.labels ?? {}),
     pivot: computed<PivotOptions|undefined>(() => {
         const _pivot = (props.item.options as DataTableTransformOptions).PIVOT as PivotOptions|undefined;
         if (!_pivot) return cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT);
@@ -210,16 +202,7 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
         function: valueState.PIVOT.function,
         order_by: valueState.PIVOT.order_by,
     };
-    const _labels: AdditionalLabels = addLabelsState.labels.reduce((acc, label) => {
-        if (label.name && label.value) {
-            acc[label.name] = label.value;
-        }
-        return acc;
-    }, {});
-    const addLabelsOptions: AddLabelsOptions = {
-        data_table_id: state.dataTableInfo.dataTableId,
-        labels: _labels,
-    };
+    const addLabelsOptions = cloneDeep(valueState.ADD_LABELS);
     const options = () => {
         switch (state.operator) {
         case 'CONCAT':
@@ -314,7 +297,7 @@ const handleUpdateDataTable = async () => {
 const setInitialDataTableForm = () => {
     // TODO!
     // Initial Form Setting
-    state.dataTableInfo = originState.dataTableInfo;
+    // state.dataTableInfo = originState.dataTableInfo;
     // joinState.joinType = originState.joinType;
     // queryState.conditions = originState.conditions.length ? originState.conditions.map((cond) => ({ ...cond, key: getRandomId() })) : [{ key: getRandomId(), value: '' }];
     // evalState.expressions = originState.expressions.length ? originState.expressions.map((expression) => ({
@@ -325,7 +308,8 @@ const setInitialDataTableForm = () => {
     // })) : [{
     //     key: getRandomId(), name: '', fieldType: DATA_TABLE_FIELD_TYPE.DATA, expression: '', isCollapsed: false,
     // }];
-    addLabelsState.labels = originState.labels.length ? cloneDeep(originState.labels) : [{ name: '', value: '' }];
+    // addLabelsState.labels = originState.labels.length ? cloneDeep(originState.labels) : [{ name: '', value: '' }];
+    valueState.ADD_LABELS.labels = originState.labels.length ? cloneDeep(originState.labels) : cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.ADD_LABELS.labels);
     valueState.PIVOT = originState.pivot ? cloneDeep(originState.pivot) : cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT);
 };
 
@@ -385,11 +369,10 @@ defineExpose({
                                                      :operator-options.sync="valueState.QUERY"
                                                      :origin-data="props.item.options[state.operator]"
         />
-        <widget-form-data-table-card-transform-form v-else
-                                                    :data-table-id="state.dataTableId"
-                                                    :operator="state.operator"
-                                                    :data-table-info.sync="state.dataTableInfo"
-                                                    :labels.sync="addLabelsState.labels"
+        <widget-form-data-table-card-transform-form-add-labels v-if="state.operator === DATA_TABLE_OPERATOR.ADD_LABELS"
+                                                               :base-data-table-id="state.dataTableId"
+                                                               :operator-options.sync="valueState.ADD_LABELS"
+                                                               :origin-data="props.item.options[state.operator]"
         />
         <widget-form-data-table-card-footer :disabled="state.applyDisabled"
                                             :changed="state.optionsChanged"

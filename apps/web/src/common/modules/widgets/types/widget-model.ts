@@ -108,7 +108,7 @@ export interface PivotFieldOptions {
 }
 
 export interface AddLabelsOptions {
-    data_table_id: string;
+    data_table_id?: string;
     labels: AdditionalLabels;
 }
 
