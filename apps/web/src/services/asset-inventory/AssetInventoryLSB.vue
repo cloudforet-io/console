@@ -10,6 +10,13 @@ import CloudServiceLSB from '@/services/asset-inventory/components/CloudServiceL
 import MetricExplorerLSB from '@/services/asset-inventory/components/MetricExplorerLSB.vue';
 import SecurityLSB from '@/services/asset-inventory/components/SecurityLSB.vue';
 
+
+interface props {
+  width: number;
+}
+
+const props = defineProps<props>();
+
 const route = useRoute();
 
 const state = reactive({
@@ -19,12 +26,15 @@ const state = reactive({
         return closestRoute?.meta?.menuId;
     }),
 });
+
 </script>
 
 <template>
     <fragment>
         <cloud-service-l-s-b v-if="state.menuId === MENU_ID.CLOUD_SERVICE" />
-        <metric-explorer-l-s-b v-else-if="state.menuId === MENU_ID.METRIC_EXPLORER" />
+        <metric-explorer-l-s-b v-else-if="state.menuId === MENU_ID.METRIC_EXPLORER"
+                               :width="width"
+        />
         <security-l-s-b v-else-if="state.menuId === MENU_ID.SECURITY" />
     </fragment>
 </template>
