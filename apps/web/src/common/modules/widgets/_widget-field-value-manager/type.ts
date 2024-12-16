@@ -1,8 +1,8 @@
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 
-import type { _FormatRulesValue } from '@/common/modules/widgets/_widget-fields/advanced-format-rules/type';
-import type { _CategoryByValue } from '@/common/modules/widgets/_widget-fields/category-by/type';
+import type { FormatRulesValue } from '@/common/modules/widgets/_widget-fields/advanced-format-rules/type';
+import type { _CategoryByValue as CategoryByValue } from '@/common/modules/widgets/_widget-fields/category-by/type';
 import type { ColorSchemaValue } from '@/common/modules/widgets/_widget-fields/color-schema/type';
 import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/comparison/type';
 import type { _CustomTableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
@@ -33,7 +33,7 @@ import type { _XAxisValue } from '@/common/modules/widgets/_widget-fields/x-axis
 import type { _YAxisValue } from '@/common/modules/widgets/_widget-fields/y-axis/type';
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 
-export type FieldValueValidator<T extends WidgetFieldValue> = (fieldValue: T, widgetConfig: WidgetConfig, allValueMap: WidgetFieldValueMap) => boolean;
+export type FieldValueValidator<T extends WidgetFieldValue> = (fieldValue: T, widgetConfig: WidgetConfig, allValueMap?: WidgetFieldValueMap) => boolean;
 export type FieldDefaultValueConvertor<T extends keyof WidgetFieldTypeMap> = (widgetConfig: WidgetConfig, dataTable: PublicDataTableModel|PrivateDataTableModel) => WidgetFieldTypeMap[T]['value'];
 
 export interface WidgetFieldValueMap {
@@ -65,7 +65,7 @@ export interface WidgetFieldTypeMap {
     header: WidgetFieldValue<WidgetHeaderValue>;
     groupBy: WidgetFieldValue<_GroupByValue>;
     granularity: WidgetFieldValue<GranularityValue>;
-    formatRules: WidgetFieldValue<_FormatRulesValue>;
+    formatRules: WidgetFieldValue<FormatRulesValue>;
     displaySeriesLabel: WidgetFieldValue<DisplaySeriesLabelValue>;
     displayAnnotation: WidgetFieldValue<DisplayAnnotationValue>;
     dateRange: WidgetFieldValue<DateRangeValue>;
@@ -75,5 +75,5 @@ export interface WidgetFieldTypeMap {
     customTableColumnWidth: WidgetFieldValue<_CustomTableColumnWidthValue>;
     comparison: WidgetFieldValue<ComparisonValue>;
     colorSchema: WidgetFieldValue<ColorSchemaValue>;
-    categoryBy: WidgetFieldValue<_CategoryByValue>;
+    categoryBy: WidgetFieldValue<CategoryByValue>;
 }

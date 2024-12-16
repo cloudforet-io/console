@@ -4,10 +4,11 @@ import {
 import { integrateFieldsSchema } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { FieldDefaultValueConvertor, WidgetFieldTypeMap } from '@/common/modules/widgets/_widget-field-value-manager/type';
-import type { _FormatRulesOptions } from '@/common/modules/widgets/_widget-fields/advanced-format-rules/type';
+import type { FormatRulesOptions } from '@/common/modules/widgets/_widget-fields/advanced-format-rules/type';
 import type { CategoryByOptions } from '@/common/modules/widgets/_widget-fields/category-by/type';
-import type { _ColorSchemaOptions } from '@/common/modules/widgets/_widget-fields/color-schema/type';
+import type { _ColorSchemaOptions as ColorSchemaOptions } from '@/common/modules/widgets/_widget-fields/color-schema/type';
 import type { ComparisonOptions } from '@/common/modules/widgets/_widget-fields/comparison/type';
+import type { DataFieldOptions } from '@/common/modules/widgets/_widget-fields/data-field/type';
 import type { DateFormatOptions } from '@/common/modules/widgets/_widget-fields/date-format/type';
 import type { _GroupByOptions } from '@/common/modules/widgets/_widget-fields/group-by/type';
 import { ICON_FIELD_ITEMS } from '@/common/modules/widgets/_widget-fields/icon/constant';
@@ -65,13 +66,19 @@ export const widgetFieldDefaultValueMap: DefaultValueRegistry = {
             value: 'auto',
         },
     },
-    displayAnnotation: undefined,
-    displaySeriesLabel: undefined,
+    displayAnnotation: {
+        toggleValue: false,
+    },
+    displaySeriesLabel: {
+        toggleValue: false,
+    },
     granularity: {
         granularity: 'MONTHLY',
     },
     groupBy: {},
-    header: undefined,
+    header: {
+        toggleValue: false,
+    },
     icon: {
         toggleValue: true,
         icon: { name: 'ic_circle-filled', label: 'Circle' },
@@ -94,8 +101,12 @@ export const widgetFieldDefaultValueMap: DefaultValueRegistry = {
     pieChartType: {
         type: 'pie',
     },
-    subTotal: undefined,
-    total: undefined,
+    subTotal: {
+        toggleValue: false,
+    },
+    total: {
+        toggleValue: false,
+    },
     tableColumnWidth: {
         minimumWidth: TABLE_DEFAULT_MINIMUM_WIDTH,
         widthType: 'auto',
@@ -117,9 +128,21 @@ export type WidgetFieldDefaultValueSetterRegistry = {
 };
 
 export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSetterRegistry = {
+    dataField: (widgetConfig, dataTable) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const dataFieldOptions = (_fieldsSchema.dataField?.options ?? {}) as DataFieldOptions;
+
+        const result = widgetFieldDefaultValueMap.dataField;
+
+        const fieldKeys = sortWidgetTableFields(Object.keys(dataTable.data_info ?? {}));
+
+        result.data = dataFieldOptions.multiSelectable ? [fieldKeys?.[0]] : fieldKeys?.[0];
+
+        return result;
+    },
     formatRules: (widgetConfig, dataTable) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const formatRulesOptions = _fieldsSchema.formatRules?.options as _FormatRulesOptions;
+        const formatRulesOptions = (_fieldsSchema.formatRules?.options ?? {}) as FormatRulesOptions;
 
         let result = widgetFieldDefaultValueMap.formatRules;
 
@@ -141,7 +164,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
     },
     categoryBy: (widgetConfig, dataTable) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const categoryByOptions = _fieldsSchema.categoryBy?.options as CategoryByOptions;
+        const categoryByOptions = (_fieldsSchema.categoryBy?.options ?? {}) as CategoryByOptions;
 
         const result = widgetFieldDefaultValueMap.categoryBy;
 
@@ -155,7 +178,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
     },
     stackBy: (widgetConfig, dataTable) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const stackByOptions = _fieldsSchema.stackBy?.options as StackByOptions;
+        const stackByOptions = (_fieldsSchema.stackBy?.options ?? {}) as StackByOptions;
 
         const result = widgetFieldDefaultValueMap.categoryBy;
 
@@ -169,7 +192,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
     },
     xAxis: (widgetConfig, dataTable) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const xAxisOptions = _fieldsSchema.xAxis?.options as XAxisOptions;
+        const xAxisOptions = (_fieldsSchema.xAxis?.options ?? {}) as XAxisOptions;
 
         const result = widgetFieldDefaultValueMap.categoryBy;
 
@@ -183,7 +206,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
     },
     yAxis: (widgetConfig, dataTable) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const yAxisOptions = _fieldsSchema.yAxis?.options as YAxisOptions;
+        const yAxisOptions = (_fieldsSchema.yAxis?.options ?? {}) as YAxisOptions;
 
         const result = widgetFieldDefaultValueMap.categoryBy;
 
@@ -197,7 +220,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
     },
     colorSchema: (widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const colorSchemaOptions = _fieldsSchema.colorSchema?.options as _ColorSchemaOptions;
+        const colorSchemaOptions = (_fieldsSchema.colorSchema?.options ?? {}) as ColorSchemaOptions;
 
         if (colorSchemaOptions.default) {
             return {
@@ -209,25 +232,24 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
     },
     comparison: (widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const comparisonOptions = _fieldsSchema.comparison?.options as ComparisonOptions;
-
-        const initialValue = widgetFieldDefaultValueMap.comparison;
+        const comparisonOptions = (_fieldsSchema.comparison?.options ?? {}) as ComparisonOptions;
 
         if (comparisonOptions.toggle) {
-            return {
-                ...initialValue,
-                toggleValue: true,
-            };
+            return widgetFieldDefaultValueMap.comparison;
         }
-        return undefined;
+
+        return {
+            toggleValue: false,
+        };
     },
     customTableColumnWidth: () => widgetFieldDefaultValueMap.customTableColumnWidth,
     dataFieldHeatmapColor: () => widgetFieldDefaultValueMap.dataFieldHeatmapColor,
     dateFormat: (widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const dateFormatOptions = _fieldsSchema.dateFormat?.options as DateFormatOptions;
+        const dateFormatOptions = (_fieldsSchema.dateFormat?.options ?? {}) as DateFormatOptions;
 
-        if (dateFormatOptions.default) {
+
+        if (dateFormatOptions?.default) {
             return {
                 format: dateFormatOptions.default,
             };
@@ -241,7 +263,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
     granularity: () => widgetFieldDefaultValueMap.granularity,
     groupBy: (widgetConfig, dataTable) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const groupByOptions = _fieldsSchema.groupBy?.options as _GroupByOptions;
+        const groupByOptions = (_fieldsSchema.groupBy?.options ?? {}) as _GroupByOptions;
 
         const result = widgetFieldDefaultValueMap.categoryBy;
 
@@ -253,12 +275,13 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
             result.count = groupByOptions.defaultMaxCount ? groupByOptions.defaultMaxCount : 5;
         }
 
+        console.debug('[DEFAULT_GROUP', result);
         return result;
     },
     header: () => widgetFieldDefaultValueMap.header,
     icon: (widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const iconOptions = _fieldsSchema.icon?.options as IconOptions;
+        const iconOptions = (_fieldsSchema.icon?.options ?? {}) as IconOptions;
 
         const initialValue = widgetFieldDefaultValueMap.icon;
 
@@ -275,7 +298,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
     },
     legend: (widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const legendOptions = _fieldsSchema.legend?.options as _LegendOptions;
+        const legendOptions = (_fieldsSchema.legend?.options ?? {}) as _LegendOptions;
 
         const initialValue = widgetFieldDefaultValueMap.legend;
 
@@ -289,7 +312,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
     },
     max: (widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const maxOptions = _fieldsSchema.max?.options as MaxOptions;
+        const maxOptions = (_fieldsSchema.max?.options ?? {}) as MaxOptions;
 
         if (maxOptions.default !== undefined) {
             return {
@@ -300,7 +323,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
     },
     min: (widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const minOptions = _fieldsSchema.min?.options as MinOptions;
+        const minOptions = (_fieldsSchema.min?.options ?? {}) as MinOptions;
 
         if (minOptions.default !== undefined) {
             return {
@@ -311,7 +334,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
     },
     missingValue: (widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const missingValueOptions = _fieldsSchema.missingValue?.options as MissingValueOptions;
+        const missingValueOptions = (_fieldsSchema.missingValue?.options ?? {}) as MissingValueOptions;
 
         if (missingValueOptions.default) {
             return {
@@ -322,7 +345,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
     },
     numberFormat: (widgetConfig, dataTable) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const numberFormatOptions = _fieldsSchema.numberFormat?.options as NumberFormatOptions;
+        const numberFormatOptions = (_fieldsSchema.numberFormat?.options ?? {}) as NumberFormatOptions;
 
         const dataKeys = Object.keys(dataTable.data_info ?? {}) as string[];
 
@@ -340,7 +363,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
     },
     pieChartType: (widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const pieChartTypeOptions = _fieldsSchema.pieChartType?.options as PieChartTypeOptions;
+        const pieChartTypeOptions = (_fieldsSchema.pieChartType?.options ?? {}) as PieChartTypeOptions;
 
         if (pieChartTypeOptions.default) {
             return {
@@ -352,7 +375,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
     },
     subTotal: (widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const subTotalOptions = _fieldsSchema.subTotal?.options as SubTotalOptions;
+        const subTotalOptions = (_fieldsSchema.subTotal?.options ?? {}) as SubTotalOptions;
 
         if (subTotalOptions.toggle) {
             return {
@@ -365,7 +388,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
     },
     total: (widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const totalOptions = _fieldsSchema.total?.options as TotalOptions;
+        const totalOptions = (_fieldsSchema.total?.options ?? {}) as TotalOptions;
 
         if (totalOptions.toggle) {
             return {
@@ -378,7 +401,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
     },
     tableColumnWidth: (widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const tableColumnWidthOptions = _fieldsSchema.tableColumnWidth?.options as TableColumnWidthOptions;
+        const tableColumnWidthOptions = (_fieldsSchema.tableColumnWidth?.options ?? {}) as TableColumnWidthOptions;
 
         const initalValue = widgetFieldDefaultValueMap.tableColumnWidth;
 
@@ -393,7 +416,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
     },
     textWrap: (widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const textWrapWidthOptions = _fieldsSchema.textWrap?.options as TextWrapOptions;
+        const textWrapWidthOptions = (_fieldsSchema.textWrap?.options ?? {}) as TextWrapOptions;
 
         if (textWrapWidthOptions.toggle) {
             return {
@@ -404,7 +427,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
     },
     tooltipNumberFormat: (widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const tooltipNumberFormatOptions = _fieldsSchema.tooltipNumberFormat?.options as TooltipNumberFormatOptions;
+        const tooltipNumberFormatOptions = (_fieldsSchema.tooltipNumberFormat?.options ?? {}) as TooltipNumberFormatOptions;
 
         if (tooltipNumberFormatOptions.default) {
             return {
@@ -415,7 +438,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
     },
     widgetHeight: (widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const widgetHeightOptions = _fieldsSchema.widgetHeight?.options as WidgetHeightOptions;
+        const widgetHeightOptions = (_fieldsSchema.widgetHeight?.options ?? {}) as WidgetHeightOptions;
 
         if (widgetHeightOptions.default) {
             return {

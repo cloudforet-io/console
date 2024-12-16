@@ -1,8 +1,8 @@
 import { _FORMAT_RULE_TYPE } from '@/common/modules/widgets/_constants/widget-field-constant';
 import { integrateFieldsSchema } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import type { FieldValueValidator } from '@/common/modules/widgets/_widget-field-value-manager/type';
-import type { _FormatRulesOptions, _FormatRulesValue } from '@/common/modules/widgets/_widget-fields/advanced-format-rules/type';
-import type { _CategoryByValue, CategoryByOptions } from '@/common/modules/widgets/_widget-fields/category-by/type';
+import type { FormatRulesOptions, FormatRulesValue } from '@/common/modules/widgets/_widget-fields/advanced-format-rules/type';
+import type { _CategoryByValue as CategoryByValue, CategoryByOptions } from '@/common/modules/widgets/_widget-fields/category-by/type';
 import type { ColorSchemaValue } from '@/common/modules/widgets/_widget-fields/color-schema/type';
 import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/comparison/type';
 import type { _CustomTableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
@@ -30,8 +30,8 @@ export interface WidgetValidatorRegistry {
 
 export const widgetValidatorRegistry: WidgetValidatorRegistry = {
     dateRange: (fieldValue: DateRangeValue, widgetConfig, allValueMap) => {
-        const _dateRangeType = fieldValue.options.value;
-        const _granularity = allValueMap.granularity?.value?.granularity;
+        const _dateRangeType = fieldValue.options?.value;
+        const _granularity = allValueMap?.granularity?.value?.granularity;
         if (!_dateRangeType || !_granularity) return false;
         if (checkInvalidCustomValue(fieldValue, _granularity).invalid) return false;
         if (_granularity === 'MONTHLY' && !MONTHLY_ENABLED_VALUES.includes(_dateRangeType)) return false;
@@ -42,15 +42,15 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
     },
     dataField: (fieldValue: DataFieldValue, widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const dataFieldOptions = _fieldsSchema.dataField?.options as DataFieldOptions;
+        const dataFieldOptions = (_fieldsSchema.dataField?.options ?? {}) as DataFieldOptions;
         if (dataFieldOptions.multiSelectable) {
             return Array.isArray(fieldValue.data) && !!fieldValue.data.length;
         }
         return !!fieldValue.data;
     },
-    formatRules: (fieldValue: _FormatRulesValue, widgetConfig) => {
+    formatRules: (fieldValue: FormatRulesValue, widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const formatRulesOptions = _fieldsSchema.formatRules?.options as _FormatRulesOptions;
+        const formatRulesOptions = (_fieldsSchema.formatRules?.options ?? {}) as FormatRulesOptions;
         const type = formatRulesOptions.formatRulesType;
 
         if (type === _FORMAT_RULE_TYPE.textThreshold) {
@@ -67,27 +67,27 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
         }
         return true;
     },
-    categoryBy: (fieldValue: _CategoryByValue, widgetConfig) => {
+    categoryBy: (fieldValue: CategoryByValue, widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const categoryByOptions = _fieldsSchema.categoryBy?.options as CategoryByOptions;
+        const categoryByOptions = (_fieldsSchema.categoryBy?.options ?? {}) as CategoryByOptions;
         if (!fieldValue.data || !fieldValue.count || fieldValue.count < 0 || fieldValue.count > categoryByOptions.max) return false;
         return true;
     },
     stackBy: (fieldValue: _StackByValue, widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const stackByOptions = _fieldsSchema.stackBy?.options as StackByOptions;
+        const stackByOptions = (_fieldsSchema.stackBy?.options ?? {}) as StackByOptions;
         if (!fieldValue.data || !fieldValue.count || fieldValue.count < 0 || fieldValue.count > stackByOptions.max) return false;
         return true;
     },
     xAxis: (fieldValue: _XAxisValue, widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const xAxisOptions = _fieldsSchema.xAxis?.options as XAxisOptions;
+        const xAxisOptions = (_fieldsSchema.xAxis?.options ?? {}) as XAxisOptions;
         if (!fieldValue.data || !fieldValue.count || fieldValue.count < 0 || fieldValue.count > xAxisOptions.max) return false;
         return true;
     },
     yAxis: (fieldValue: _YAxisValue, widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const yAxisOptions = _fieldsSchema.yAxis?.options as YAxisOptions;
+        const yAxisOptions = (_fieldsSchema.yAxis?.options ?? {}) as YAxisOptions;
         if (!fieldValue.data || !fieldValue.count || fieldValue.count < 0 || fieldValue.count > yAxisOptions.max) return false;
         return true;
     },
@@ -125,12 +125,12 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
     },
     groupBy: (fieldValue: _GroupByValue, widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const groupByOptions = _fieldsSchema.groupBy?.options as _GroupByOptions;
+        const groupByOptions = (_fieldsSchema.groupBy?.options ?? {}) as _GroupByOptions;
         if (groupByOptions.fixedValue && fieldValue.data !== groupByOptions.fixedValue) return false;
         if (groupByOptions.hideCount && !!fieldValue.count) return false;
+        if (!groupByOptions.hideCount && groupByOptions.max && groupByOptions.defaultMaxCount && (!fieldValue.count || fieldValue.count > groupByOptions.max)) return false;
         if (groupByOptions.multiSelectable && (!Array.isArray(fieldValue.data) || !fieldValue.data.length)) return false;
-        if (groupByOptions.excludeDateField && fieldValue.data === 'date') return false;
-        if (!fieldValue.count || fieldValue.count > groupByOptions.max) return false;
+        if (groupByOptions.excludeDateField && fieldValue.data === 'Date') return false;
         return !!fieldValue.data;
     },
     header: (fieldValue: WidgetHeaderValue) => {
