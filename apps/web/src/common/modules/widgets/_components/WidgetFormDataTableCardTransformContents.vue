@@ -103,10 +103,6 @@ const state = reactive({
     }),
     isUnsaved: computed(() => state.dataTableId.startsWith('UNSAVED-')),
     operator: computed(() => props.item.operator as DataTableOperator),
-    dataTableInfo: {
-        dataTables: [] as string[],
-        dataTableId: undefined,
-    } as TransformDataTableInfo,
     failStatus: false,
     isUnavailable: computed<boolean>(() => props.item.state === 'UNAVAILABLE'),
 });
@@ -131,7 +127,7 @@ const originState = reactive({
         dataTables: props.item.options[state.operator]?.data_tables ?? [] as string[],
         dataTableId: props.item.options[state.operator]?.data_table_id as string,
     })),
-    joinType: computed(() => (props.item.options as DataTableTransformOptions).JOIN?.how as JoinType),
+    joinType: computed<JoinType|undefined>(() => (props.item.options as DataTableTransformOptions).JOIN?.how),
     queryConditions: computed<QueryOptions['conditions']>(() => (props.item.options as DataTableTransformOptions).QUERY?.conditions ?? []),
     // queryOperator: computed<QueryOptions['operator']|undefined>(() => (props.item.options as DataTableTransformOptions).QUERY?.operator),
     expressions: computed<EvaluateExpression[]|string[]>(() => (props.item.options as DataTableTransformOptions).EVAL?.expressions ?? []),
@@ -154,17 +150,17 @@ const setFailStatus = (status: boolean) => {
     state.failStatus = status;
 };
 const updateDataTable = async (): Promise<DataTableModel|undefined> => {
-    // TODO: 개별 validation으로 교체
-    // const isValidDataTableId = valueState[state.operator].data_table_id && storeState.dataTables.some((dataTable) => dataTable.data_table_id === valueState[state.operator].data_table_id);
-    // const isValidDataTables = state.dataTableInfo.dataTables.length === 2
-    //     && !state.dataTableInfo.dataTables.includes(undefined)
-    //     && storeState.dataTables.some((dataTable) => dataTable.data_table_id === state.dataTableInfo.dataTables[0])
-    //     && storeState.dataTables.some((dataTable) => dataTable.data_table_id === state.dataTableInfo.dataTables[1]);
-    // if (!isValidDataTableId && !isValidDataTables) {
-    //     showErrorMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_WARNING'), '');
-    //     setFailStatus(true);
-    //     return undefined;
-    // }
+    const _targetDataTableId: string|undefined = valueState[state.operator].data_table_id;
+    const _targetDataTables: string[]|undefined = valueState[state.operator].data_tables;
+    const isValidDataTableId = _targetDataTableId && storeState.dataTables.some((dataTable) => dataTable.data_table_id === _targetDataTableId);
+    const isValidDataTables = _targetDataTables?.length === 2
+        && storeState.dataTables.some((dataTable) => dataTable.data_table_id === _targetDataTables[0])
+        && storeState.dataTables.some((dataTable) => dataTable.data_table_id === _targetDataTables[1]);
+    if (!isValidDataTableId && !isValidDataTables) {
+        showErrorMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_WARNING'), '');
+        setFailStatus(true);
+        return undefined;
+    }
 
     // Duplicated Data Field Handling in 'JOIN'
     if (state.operator === 'JOIN') {
@@ -295,21 +291,25 @@ const handleUpdateDataTable = async () => {
 
 /* Utils */
 const setInitialDataTableForm = () => {
-    // TODO!
-    // Initial Form Setting
-    // state.dataTableInfo = originState.dataTableInfo;
-    // joinState.joinType = originState.joinType;
-    // queryState.conditions = originState.conditions.length ? originState.conditions.map((cond) => ({ ...cond, key: getRandomId() })) : [{ key: getRandomId(), value: '' }];
-    // evalState.expressions = originState.expressions.length ? originState.expressions.map((expression) => ({
-    //     ...expression,
-    //     isCollapsed: false,
-    //     fieldType: expression.field_type,
-    //     key: getRandomId(),
-    // })) : [{
-    //     key: getRandomId(), name: '', fieldType: DATA_TABLE_FIELD_TYPE.DATA, expression: '', isCollapsed: false,
-    // }];
-    // addLabelsState.labels = originState.labels.length ? cloneDeep(originState.labels) : [{ name: '', value: '' }];
+    // TODO: check reset
+    const _originDataTables = originState.dataTableInfo.dataTables.length ? cloneDeep(originState.dataTableInfo.dataTables) : [];
+    const _originDataTableId = originState.dataTableInfo.dataTableId;
+    // CONCAT
+    valueState.CONCAT = {
+        data_tables: _originDataTables,
+    };
+    // JOIN
+    valueState.JOIN.data_tables = _originDataTables;
+    valueState.JOIN.how = originState.joinType;
+    // QUERY
+    valueState.QUERY.data_table_id = _originDataTableId;
+    valueState.QUERY.conditions = originState.queryConditions.length ? cloneDeep(originState.queryConditions) : cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.QUERY.conditions);
+    // EVAL
+    valueState.EVAL.data_table_id = _originDataTableId;
+    valueState.EVAL.expressions = originState.expressions.length ? cloneDeep(originState.expressions) : cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.EVAL.expressions);
+    // ADD_LABELS
     valueState.ADD_LABELS.labels = originState.labels.length ? cloneDeep(originState.labels) : cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.ADD_LABELS.labels);
+    // PIVOT
     valueState.PIVOT = originState.pivot ? cloneDeep(originState.pivot) : cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT);
 };
 
