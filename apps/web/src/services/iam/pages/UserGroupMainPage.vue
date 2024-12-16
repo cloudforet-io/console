@@ -16,17 +16,17 @@ import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-stor
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 
-const userGrouplistApiQueryHelper = new ApiQueryHelper()
+const userGroupListApiQueryHelper = new ApiQueryHelper()
     .setSort('name', true);
 
 /* API */
 const refreshUserGroupList = async () => {
     userGroupPageState.loading = true;
-    userGrouplistApiQueryHelper
+    userGroupListApiQueryHelper
         .setPageStart(userGroupPageState.pageStart).setPageLimit(userGroupPageState.pageLimit)
         .setFilters(userGroupPageState.searchFilters);
     try {
-        await userGroupPageStore.listUserGroups({ query: userGrouplistApiQueryHelper.data });
+        await userGroupPageStore.listUserGroups({ query: userGroupListApiQueryHelper.data });
     } finally {
         userGroupPageState.loading = false;
     }
