@@ -106,18 +106,22 @@ const fetchUserList = async (params: WorkspaceUserListParameters) => {
         <p-field-group :label="$t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.CHANNEL_NAME')"
                        required
         >
-            <p-text-input />
+            <p-text-input block />
         </p-field-group>
         <!--        TODO: channel token & Protocol input (possible to update later) -->
         <p-field-group label="Channel Token"
                        required
         >
-            <p-text-input placeholder="xoxb-123456789012-0987654321098-ABCDEFG" />
+            <p-text-input placeholder="xoxb-123456789012-0987654321098-ABCDEFG"
+                          block
+            />
         </p-field-group>
         <p-field-group label="Channel Protocol"
                        required
         >
-            <p-text-input placeholder="xoxb-123456789012-0987654321098-ABCDEFG" />
+            <p-text-input placeholder="xoxb-123456789012-0987654321098-ABCDEFG"
+                          block
+            />
         </p-field-group>
         <p-field-group :label="$t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.USER_MODE.TITLE')"
                        required
@@ -138,19 +142,10 @@ const fetchUserList = async (params: WorkspaceUserListParameters) => {
                                multi-selectable
                                appearance-type="stack"
                                selection-highlight
+                               is-fixed-width
                                :selected="dropdownState.selectedAction"
                                @select="handleSelectDropdown"
             />
         </p-field-group>
     </div>
 </template>
-
-<style scoped lang="postcss">
-:deep(.p-text-input) {
-    width: 100%;
-}
-
-:deep(.p-select-dropdown) {
-    width: 100%;
-}
-</style>
