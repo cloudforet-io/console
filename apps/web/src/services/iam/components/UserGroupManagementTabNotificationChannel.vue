@@ -7,10 +7,14 @@ import {
 
 import { i18n } from '@/translations';
 
+import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-constant';
 import { useUserGroupNotificationChannelPageStore } from '@/services/iam/store/user-group-notification-channel-page-store';
+import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
 const userGroupNotificationChannelPageStore = useUserGroupNotificationChannelPageStore();
 const userGroupNotificationChannelPageState = userGroupNotificationChannelPageStore.state;
+
+const userGroupPageStore = useUserGroupPageStore();
 
 const tableState = reactive({
     fields: computed(() => [
@@ -42,8 +46,30 @@ const tableState = reactive({
 });
 
 /* Component */
-const handleSelect = async (index) => {
-    userGroupNotificationChannelPageState.selectedIndices = index;
+const handleSelect = async (index: number) => {
+    console.log('TODO: add selection', index);
+};
+
+const handleUpdateModal = (modalType: string) => {
+    switch (modalType) {
+    case 'add':
+        userGroupPageStore.updateModalSettings({
+            type: USER_GROUP_MODAL_TYPE.CREATE_NOTIFICATIONS_FIRST,
+            title: i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE'),
+            themeColor: 'primary1',
+        });
+        break;
+    //     TODO: Update with stored values
+    case 'edit':
+        userGroupPageStore.updateModalSettings({
+            type: USER_GROUP_MODAL_TYPE.CREATE_NOTIFICATIONS_FIRST,
+            title: i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.UPDATE_TITLE'),
+            themeColor: 'primary1',
+        });
+        break;
+    default:
+        break;
+    }
 };
 </script>
 
@@ -62,11 +88,13 @@ const handleSelect = async (index) => {
                     <div class="toolbox">
                         <p-button style-type="tertiary"
                                   icon-left="ic_plus"
+                                  @click="handleUpdateModal('add')"
                         >
                             {{ $t('IAM.USER_GROUP.TAB.NOTIFICATION_CHANNEL.ADD') }}
                         </p-button>
                         <p-button style-type="tertiary"
                                   icon-left="ic_edit-text"
+                                  @click="handleUpdateModal('edit')"
                         >
                             {{ $t('IAM.USER_GROUP.TAB.NOTIFICATION_CHANNEL.EDIT') }}
                         </p-button>

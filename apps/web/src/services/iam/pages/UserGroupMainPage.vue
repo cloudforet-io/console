@@ -1,6 +1,9 @@
 <script lang="ts" setup>
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PHorizontalLayout } from '@cloudforet/mirinae';
 
+import UserGroupChannelCreateModal from '@/services/iam/components/UserGroupChannelCreateModal.vue';
+import UserGroupChannelSetModal from '@/services/iam/components/UserGroupChannelSetModal.vue';
 import UserGroupDeleteDoubleCheckModal from '@/services/iam/components/UserGroupDeleteDoubleCheckModal.vue';
 import UserGroupManagementAddUsersModal from '@/services/iam/components/UserGroupManagementAddUsersModal.vue';
 import UserGroupManagementEditModal from '@/services/iam/components/UserGroupManagementEditModal.vue';
@@ -13,11 +16,17 @@ import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-stor
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 
+const userGroupListApiQueryHelper = new ApiQueryHelper()
+    .setSort('name', true);
+
 /* API */
-const refreshUserGroupList = () => {
+const refreshUserGroupList = async () => {
     userGroupPageState.loading = true;
+    userGroupListApiQueryHelper
+        .setPageStart(userGroupPageState.pageStart).setPageLimit(userGroupPageState.pageLimit)
+        .setFilters(userGroupPageState.searchFilters);
     try {
-        console.log('TODO: Refresh User Group List');
+        await userGroupPageStore.listUserGroups({ query: userGroupListApiQueryHelper.data });
     } finally {
         userGroupPageState.loading = false;
     }
@@ -34,9 +43,11 @@ const refreshUserGroupList = () => {
         </p-horizontal-layout>
         <user-group-management-tab />
         <user-group-management-edit-modal @confirm="refreshUserGroupList" />
-        <user-group-management-add-users-modal />
-        <user-group-delete-double-check-modal />
-        <user-per-group-remove-double-check-modal />
+        <user-group-management-add-users-modal @confirm="refreshUserGroupList" />
+        <user-group-delete-double-check-modal @confirm="refreshUserGroupList" />
+        <user-per-group-remove-double-check-modal @confirm="refreshUserGroupList" />
+        <user-group-channel-create-modal />
+        <user-group-channel-set-modal />
     </section>
 </template>
 
@@ -44,5 +55,11 @@ const refreshUserGroupList = () => {
 .user-group-page {
     @apply mx-0;
     max-width: 100%;
+}
+
+:deep(.user-group-toolbox-layout) {
+    .horizontal-contents {
+        overflow: unset;
+    }
 }
 </style>

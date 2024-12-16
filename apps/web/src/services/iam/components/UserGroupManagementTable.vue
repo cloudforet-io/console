@@ -3,6 +3,8 @@ import {
     computed, onMounted, reactive,
 } from 'vue';
 
+import dayjs from 'dayjs';
+
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -50,10 +52,11 @@ const state = reactive({
 const tableState = reactive({
     fields: computed<DataTableFieldType[]>(() => [
         { name: 'user_group_id', label: 'User Group ID' },
+        { name: 'name', label: 'User Group Name' },
         { name: 'description', label: 'Description' },
-        { name: 'notification', label: 'Notification' },
+        { name: 'notification_channel', label: 'Notification Channel' }, // TODO: get from other api
         { name: 'users', label: 'Users' },
-        { name: 'created', label: 'Created' },
+        { name: 'created_at', label: 'Created' },
     ]),
     valueHandlerMap: computed(() => ({
         user_group_id: makeDistinctValueHandler('identity.UserGroup', 'user_group_id', 'string'),
@@ -63,14 +66,6 @@ const tableState = reactive({
         created: makeDistinctValueHandler('identity.UserGroup', 'created', 'datetime'),
         tags: makeDistinctValueHandler('identity.UserGroup', 'tags', 'object'),
     })),
-    items: computed(() => [
-        {
-            user_group_id: 'Group01', description: 'description', notification: 2, users: 100, created: '2024-01-01 11:22:30',
-        },
-        {
-            user_group_id: 'Group02', description: 'description', notification: 22, users: 30, created: '2024-11-21 02:22:30',
-        },
-    ]),
 });
 
 const editState = reactive({
@@ -87,7 +82,7 @@ const dropdownState = reactive({
             name: USER_GROUP_MODAL_TYPE.UPDATE, label: i18n.t('IAM.USER_GROUP.ACTION.UPDATE'), type: 'item', disabled: !editState.isEditable,
         },
         {
-            name: USER_GROUP_MODAL_TYPE.DELETE, label: i18n.t('IAM.USER_GROUP.ACTION.REMOVE'), type: 'item', disabled: !editState.isRemoveAble,
+            name: USER_GROUP_MODAL_TYPE.DELETE, label: i18n.t('IAM.USER_GROUP.ACTION.DELETE'), type: 'item', disabled: !editState.isRemoveAble,
         },
         {
             type: 'divider',
@@ -104,25 +99,16 @@ const handleSelect = async (index) => {
     userGroupPageState.selectedIndices = index;
 };
 
-// watch(() => userGroupPageGetters.selectedUserGroups, async (nv) => {
-//     if (nv.length === 1) {
-//         const usersIdList: string[] | undefined = nv[0].users;
-//         await userGroupPageStore.listUsersPerGroup({});
-//
-//         if (userGroupPageState.users.list.length > 0 && usersIdList && usersIdList.length > 0) {
-//             userGroupPageState.users.list = userGroupPageState.users.list.filter((user) => usersIdList.includes(user.user_id));
-//         }
-//     }
-// }, { deep: true, immediate: true });
-
-const handleChange = (options: any = {}) => {
+const handleChange = async (options: any = {}) => {
     userGroupListApiQuery = getApiQueryWithToolboxOptions(userGroupListApiQueryHelper, options) ?? userGroupListApiQuery;
     if (options.queryTags !== undefined) {
-        userGroupPageState.searchFilters = userGroupListApiQueryHelper.filters;
+        userGroupPageStore.$patch((_state) => {
+            _state.state.searchFilters = userGroupListApiQueryHelper.filters;
+        });
     }
     if (options.pageStart !== undefined) userGroupPageState.pageStart = options.pageStart;
     if (options.pageLimit !== undefined) userGroupPageState.pageLimit = options.pageLimit;
-    fetchUserGroupList();
+    await fetchUserGroupList();
 };
 
 const handleSelectDropdown = async (inputText: string) => {
@@ -177,6 +163,8 @@ onMounted(async () => {
                          sortable
                          multi-select
                          sort-desc
+                         sort-by="name"
+                         :total-count="userGroupPageState.totalCount"
                          :fields="tableState.fields"
                          :items="state.userGroupItems"
                          :select-index="userGroupPageState.selectedIndices"
@@ -184,7 +172,7 @@ onMounted(async () => {
                          :value-handler-map="tableState.valueHandlerMap"
                          :query-tags="queryTags"
                          :loading="storeState.loading"
-                         :style="{height: `${props.tableHeight}px}`}"
+                         :style="{height: `${props.tableHeight}px`}"
                          @select="handleSelect"
                          @change="handleChange"
                          @refresh="handleChange()"
@@ -194,13 +182,16 @@ onMounted(async () => {
             >
                 <p-select-dropdown
                     :menu="dropdownState.menuItems"
-                    :loading="dropdownState.loading"
                     placeholder="Action"
+                    reset-selection-on-menu-close
                     @select="handleSelectDropdown"
                 />
             </template>
             <template #col-users-format="{value}">
                 {{ Array.isArray(value) && value.length > 0 ? value.length : 0 }}
+            </template>
+            <template #col-created_at-format="{value}">
+                {{ dayjs(value).format('YYYY-MM-DD HH:mm:ss') }}
             </template>
         </p-toolbox-table>
     </section>

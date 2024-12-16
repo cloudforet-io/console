@@ -82,13 +82,14 @@ watch(() => userGroupPageGetters.selectedUserGroups, async (nv_selectedUserGroup
         const usersIdList: string[] | undefined = nv_selectedUserGroups[0].users;
         await userGroupPageStore.listUsers({});
 
-        if (userGroupPageState.users.list && userGroupPageState.users.list.length > 0 && usersIdList && usersIdList.length > 0) {
+        if (usersIdList && usersIdList.length > 0 && userGroupPageState.users.list && userGroupPageState.users.list.length > 0 && usersIdList && usersIdList.length > 0) {
             userGroupPageState.users.list = userGroupPageState.users.list.filter((user) => {
                 if (user.user_id) return usersIdList.includes(user.user_id);
                 return false;
             });
-        } else if (typeof usersIdList !== 'object') {
+        } else if (usersIdList === undefined) {
             userGroupPageState.users.list = [];
+            userGroupPageState.users.totalCount = 0;
         }
     }
 }, { deep: true, immediate: true });
@@ -137,6 +138,7 @@ watch(() => userGroupPageState.users, (nv_users) => {
                          :items="state.userItems"
                          :select-index="userGroupPageState.users.selectedIndices"
                          :key-item-sets="USER_GROUP_USERS_SEARCH_HANDLERS"
+                         :total-count="state.userItemTotalCount"
                          @select="handleSelect"
         >
             <template #col-last_accessed_at-format="{value, item}">

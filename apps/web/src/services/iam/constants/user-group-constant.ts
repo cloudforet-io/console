@@ -44,4 +44,7 @@ export const USER_GROUP_MODAL_TYPE = {
     ADD_NEW_USER: 'add_new_user',
     REMOVE_USER: 'remove_user',
     CREATE: 'create',
+    CREATE_NOTIFICATIONS_FIRST: 'create_notifications_step1',
+    CREATE_NOTIFICATIONS_SECOND: 'create_notifications_step2',
+
 };

@@ -57,12 +57,12 @@ watch(() => [emailList, allUsersList], ([nv_emailList, nv_allUsersList]) => {
 }, { deep: true, immediate: true });
 
 /* Component */
-const handleConfirm = () => {
+const handleConfirm = async () => {
     state.loading = true;
     try {
         if (selectedUserList.value && selectedUserList.value.length > 0) {
             const addedUsers = selectedUserList.value.slice(userGroupPageState.users.totalCount, selectedUserList.value.length);
-            fetchAddUsers({
+            await fetchAddUsers({
                 user_group_id: userGroupPageGetters.selectedUserGroups[0].user_group_id,
                 users: addedUsers.map((user) => user.name),
             });
