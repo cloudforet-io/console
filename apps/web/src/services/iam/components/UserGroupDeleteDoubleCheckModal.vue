@@ -28,14 +28,13 @@ const state = reactive({
 });
 
 /* Component */
-const handleConfirm = () => {
+const handleConfirm = async () => {
+    const deletePromises = storeState.selectedUserGroupIds.map((userGroupId) => fetchDeleteUserGroup({
+        user_group_id: userGroupId,
+    }));
     try {
         state.loading = true;
-        storeState.selectedUserGroupIds.forEach(async (userGroupId) => {
-            await fetchDeleteUserGroup({
-                user_group_id: userGroupId,
-            });
-        });
+        await Promise.all(deletePromises);
         emit('confirm');
     } finally {
         state.loading = false;
