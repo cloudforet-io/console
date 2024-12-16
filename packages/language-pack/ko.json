@@ -4183,16 +4183,17 @@
 		"ALT_S_EDIT_TARGET": "{target} 변경 완료",
 		"ASSIGNEE": "담당자",
 		"ASSIGNEE_POOL": "담당자 풀",
+		"CATEGORY": "카테고리",
 		"CREATED_AT": "생성일",
 		"CREATED_BY": "생성자",
 		"DEFAULT": "기본",
 		"DELETE_TARGET": "{target} 삭제",
-		"DELETE_TARGET_CONFIRMATION": "정말 이 {target}을 삭제하시겠습니까?",
-		"DELETE_TARGET_CONFIRMATION2": "정말 이 {target}를 삭제하시겠습니까?",
+		"DELETE_TARGET_CONFIRMATION": "정말 이 {object}{particle} 삭제하시겠습니까?",
+		"DESCRBE_FIELD": "이 {field}를 간단히 설명해주세요.",
 		"DESCRIPTION": "설명",
 		"EDIT_TARGET": "{target} 변경",
 		"FIELDS_CONFIG": "필드 설정",
-		"FIELD_DESCRIPTION": "이 {field}를 간단히 설명해주세요.",
+		"FIELD_DESCRIPTION": "{field} 설명",
 		"FIELD_GENERATOR": {
 			"ASSET": "자산",
 			"DATE": "날짜",
@@ -4216,8 +4217,10 @@
 			"USER": "사용자",
 			"VALUE": "값"
 		},
+		"FIELD_NAME": "{field} 이름",
 		"KEY": "키",
 		"NAME": "이름",
+		"PACKAGE": "패키지",
 		"SET_AS_DEFAULT": "기본으로 설정",
 		"STATUS": "상태",
 		"STATUS_COMPLETED": "완료됨",
@@ -4227,20 +4230,26 @@
 			"TASK_PROGRESS": "태스크 진행상황"
 		},
 		"TASK_MANAGEMENT": {
+			"CATEGORY": {
+				"DELETE_CONFIRMATION_DESC": "이 카테고리 하위에 {tasks}{particle} 존재합니다. 삭제 시엔 {tasks} 수정이 불가합니다. 그래도 정말 삭제하시겠습니까?",
+				"DESC": "이는 {tasks}의 유형을 그룹화한 것입니다. 사용자는 {task}{taskObjectParticle} 제출할 때 적절한 카테고리를 선택하여 담당자가 {tasks}{tasksObjectParticle} 더 효율적으로 관리할 수 있도록 돕습니다."
+			},
 			"STATUS": {
 				"DELETE_CONTINUE": "이 상태를 삭제하면 연결된 모든 {task}의 상태가 {default}로 일괄 변경됩니다. 계속 하시겠습니까?",
-				"DESC": "{tasks}에 사용할 상태 목록을 설정하고 관리합니다."
+				"DESC": "{tasks}에 사용할 상태 목록을 설정하고 관리합니다.",
+				"SET_AS_DEFAULT": "{status}를 기본으로 설정",
+				"SET_DEFAULT_DESC": "이 상태가 관련 {tasks}의 기본 상태로 설정됩니다."
 			},
 			"TASK_TYPE": {
-				"DELETE_UNAVAILABLE": "하위 태스크가 존재하므로 {taskType} 삭제가 불가합니다.",
+				"DELETE_UNAVAILABLE": "하위 {tasks}{particle} 존재하므로 {taskType} 삭제가 불가합니다.",
 				"DESC": "{taskTypes}은(는) {task}에 포함되는 필드와 데이터를 정의합니다.{br}\n여러 {taskTypes}를 생성할 수 있으며, 사용자는 요청을 제출할 때 가장 적합한 {taskTypes}를 선택할 수 있습니다."
 			}
 		},
 		"TITLE": "제목",
 		"VALIDATION": {
 			"DUPLICATED": "이미 존재하는 {field}입니다",
-			"LENGTH_MAX": "{field}은(는) {length}자 미만이어야 합니다",
-			"REQUIRED": "{field} 는 필수입니다"
+			"LENGTH_MAX": "{topic}{particle} {length}자 미만이어야 합니다",
+			"REQUIRED": "{topic}{particle} 필수입니다"
 		}
 	},
 	"PAGE_SCHEMA": {

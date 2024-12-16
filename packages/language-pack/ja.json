@@ -4183,12 +4183,13 @@
 		"ALT_S_EDIT_TARGET": "",
 		"ASSIGNEE": "",
 		"ASSIGNEE_POOL": "",
+		"CATEGORY": "",
 		"CREATED_AT": "",
 		"CREATED_BY": "",
 		"DEFAULT": "",
 		"DELETE_TARGET": "",
 		"DELETE_TARGET_CONFIRMATION": "",
-		"DELETE_TARGET_CONFIRMATION2": "",
+		"DESCRBE_FIELD": "",
 		"DESCRIPTION": "",
 		"EDIT_TARGET": "",
 		"FIELDS_CONFIG": "",
@@ -4216,8 +4217,10 @@
 			"USER": "",
 			"VALUE": ""
 		},
+		"FIELD_NAME": "",
 		"KEY": "",
 		"NAME": "",
+		"PACKAGE": "",
 		"SET_AS_DEFAULT": "",
 		"STATUS": "",
 		"STATUS_COMPLETED": "",
@@ -4227,9 +4230,15 @@
 			"TASK_PROGRESS": ""
 		},
 		"TASK_MANAGEMENT": {
+			"CATEGORY": {
+				"DELETE_CONFIRMATION_DESC": "",
+				"DESC": ""
+			},
 			"STATUS": {
 				"DELETE_CONTINUE": "",
-				"DESC": ""
+				"DESC": "",
+				"SET_AS_DEFAULT": "",
+				"SET_DEFAULT_DESC": ""
 			},
 			"TASK_TYPE": {
 				"DELETE_UNAVAILABLE": "",
