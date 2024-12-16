@@ -42,8 +42,8 @@ export interface EvalExpressions {
 }
 
 export interface TransformDataTableInfo {
-    dataTables: string[];
-    dataTableId: string|undefined;
+    dataTables?: string[];
+    dataTableId?: string;
 }
 
 export type DataTableAlertModalMode = 'DELETE'|'DELETE_UNABLED'|'RESET';

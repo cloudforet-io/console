@@ -1,4 +1,6 @@
 
+import type { PivotOptions } from '@/common/modules/widgets/types/widget-model';
+
 import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 
 
@@ -77,11 +79,12 @@ export const DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP = {
             data: undefined,
             column: undefined,
         },
+        select: undefined,
         limit: 5,
         function: 'sum',
         order_by: {
             type: 'key',
             desc: false,
         },
-    },
-} as const;
+    } as PivotOptions,
+};

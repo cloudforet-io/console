@@ -141,28 +141,32 @@ const handleChangeValueType = (value: string) => {
     }
 };
 
-const handleSelectDynamicFields = (value: MenuItem) => {
+const handleSelectDynamicFields = (value?: MenuItem) => {
+    if (!value || !value.name) {
+        selectInfo.value = [];
+        return;
+    }
     selectInfo.value = [
-        ...(selectInfo.value || []),
+        ...(selectInfo.value ?? []),
         value.name,
     ];
 };
 const handleUpdateLimit = (value: string) => {
-    limitInfo.value = value;
+    limitInfo.value = parseInt(value);
 };
 const handleUpdateOperator = (value: PivotOptions['function']) => {
     functionInfo.value = value;
 };
-const handleUpdateOrderByType = (value: PivotOptions['order_by']['type']) => {
+const handleUpdateOrderByType = (value: 'key' | 'value') => {
     orderByInfo.value = {
-        ...orderByInfo.value,
+        ...(orderByInfo.value ?? {}),
         type: value,
     };
 };
 const handleUpdateOrderByDesc = (value: 'asc' | 'desc') => {
     const desc = value === 'desc';
     orderByInfo.value = {
-        ...orderByInfo.value,
+        ...(orderByInfo.value ?? {}),
         desc,
     };
 };
@@ -205,8 +209,8 @@ watch(dataTableInfo, (_dataTableInfo) => {
         fieldsInfo.value = defaultData.fields;
         selectInfo.value = defaultData.select;
         limitInfo.value = defaultData.limit;
-        functionInfo.value = defaultData.function;
-        orderByInfo.value = defaultData.order_by;
+        functionInfo.value = defaultData.function as PivotOptions['function'];
+        orderByInfo.value = defaultData.order_by as PivotOptions['order_by'];
     }
 });
 
@@ -215,7 +219,7 @@ watch([
     fieldsInfo,
     () => state.selectedValueType,
 ], ([fields, valueType]) => {
-    if (!!fields.column && valueType === 'fixed') {
+    if (!!fields?.column && valueType === 'fixed') {
         fetchAndExtractDynamicField();
     }
 });
@@ -254,7 +258,7 @@ onMounted(() => {
                                class="criteria-field"
                 >
                     <p-select-dropdown :menu="state.dataFieldItems"
-                                       :selected="fieldsInfo.data"
+                                       :selected="fieldsInfo?.data"
                                        appearance-type="badge"
                                        block
                                        @update:selected="handleUpdateCriteria"
@@ -267,7 +271,7 @@ onMounted(() => {
                 >
                     <div class="field-contents-wrapper">
                         <p-select-dropdown :menu="state.labelFieldItems"
-                                           :selected="fieldsInfo.column"
+                                           :selected="fieldsInfo?.column"
                                            appearance-type="badge"
                                            :invalid="state.columnFieldInvalid"
                                            :disabled="state.columnFieldInvalid"
@@ -303,7 +307,7 @@ onMounted(() => {
                                            show-clear-selection
                                            block
                                            @select="handleSelectDynamicFields"
-                                           @clear-selection="handleSelectDynamicFields([])"
+                                           @clear-selection="handleSelectDynamicFields()"
                         />
                         <p-text-input v-else
                                       type="number"
@@ -336,7 +340,7 @@ onMounted(() => {
                                class="order-by-field  flex flex-col gap-2"
                 >
                     <p-select-dropdown :menu="state.orderByTypeItems"
-                                       :selected="orderByInfo.type"
+                                       :selected="orderByInfo?.type"
                                        appearance-type="badge"
                                        block
                                        @update:selected="handleUpdateOrderByType"

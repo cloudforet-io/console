@@ -65,8 +65,8 @@ const state = reactive({
         const haveRequiredQueryOptions = haveSavedName && !!state.dataTableInfo.dataTableId && queryState.conditions.filter((cond) => !!cond.value.trim()).length > 0;
         const haveRequiredEvalOptions = haveSavedName && !!state.dataTableInfo.dataTableId && evalState.expressions.filter((expression) => !!expression.name && !!expression.expression).length > 0;
         const haveRequiredAddLabels = haveSavedName && !!state.dataTableInfo.dataTableId && addLabelsState.labels.every((label) => !!label.name && !!label.value);
-        const haveRequiredPivotOptions = haveSavedName && !!valueState.PIVOT.data_table_id && valueState.PIVOT.fields?.labels?.length > 0 && !!valueState.PIVOT.fields.column
-            && !!valueState.PIVOT.fields.data && (!!valueState.PIVOT.select?.length || !!valueState.PIVOT.limit);
+        const haveRequiredPivotOptions = haveSavedName && !!valueState.PIVOT.data_table_id && !!valueState.PIVOT.fields?.labels && valueState.PIVOT.fields?.labels?.length > 0
+            && !!valueState.PIVOT.fields?.column && !!valueState.PIVOT.fields?.data && (!!valueState.PIVOT.select || !!valueState.PIVOT.limit);
         if (state.operator === 'CONCAT') return !haveRequiredConcatOptions;
         if (state.operator === 'JOIN') return !haveRequiredJoinOptions;
         if (state.operator === 'QUERY') return !haveRequiredQueryOptions;
@@ -133,7 +133,7 @@ const evalState = reactive({
 });
 
 const valueState = reactive({
-    PIVOT: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT as PivotOptions,
+    PIVOT: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT,
 });
 
 const addLabelsState = reactive({
@@ -226,7 +226,7 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
         })).filter((expressionInfo) => !!expressionInfo.name && !!expressionInfo.expression),
     };
     const pivotOptions: PivotOptions = {
-        data_table_id: valueState.PIVOT.data_table_id,
+        data_table_id: valueState.PIVOT.data_table_id ?? '',
         fields: valueState.PIVOT.fields,
         select: valueState.PIVOT.select,
         limit: valueState.PIVOT.limit,

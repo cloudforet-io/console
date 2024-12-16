@@ -88,8 +88,8 @@ export interface EvaluateExpression {
 }
 
 export interface PivotOptions {
-    data_table_id: string;
-    fields?: PivotFieldOptions;
+    data_table_id?: string; // required in params
+    fields?: PivotFieldOptions; // required in params
     select?: string[];
     limit?: number;
     function?: 'sum' | 'min' | 'max' | 'mean'; // default -> "sum"
