@@ -22,7 +22,6 @@ import type { MinOptions } from '@/common/modules/widgets/_widget-fields/min/typ
 import type { MissingValueOptions } from '@/common/modules/widgets/_widget-fields/missing-value/type';
 import type { NumberFormatOptions } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type { PieChartTypeOptions } from '@/common/modules/widgets/_widget-fields/pie-chart-type/type';
-import type { ProgressBarOptions } from '@/common/modules/widgets/_widget-fields/progress-bar/type';
 import type { StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
 import type { SubTotalOptions } from '@/common/modules/widgets/_widget-fields/sub-total/type';
 import type { TableColumnWidthOptions } from '@/common/modules/widgets/_widget-fields/table-column-width/type';
@@ -43,7 +42,7 @@ export type WidgetFieldOptions = DataFieldOptions | TableDataFieldOptions | XAxi
     | StackByOptions | GroupByOptions | CategoryByOptions
     | FormatRulesOptions | AdvancedFormatRulesOptions
     | MinOptions | MaxOptions | LegendOptions | IconOptions | SubTotalOptions | TotalOptions
-    | ComparisonOptions | ProgressBarOptions | ColorSchemaOptions | PieChartTypeOptions | DateFormatOptions
+    | ComparisonOptions | ColorSchemaOptions | PieChartTypeOptions | DateFormatOptions
     | NumberFormatOptions | DataFieldHeatmapColorOptions | TextWrapOptions | TableColumnWidthOptions | CustomTableColumnWidthOptions
     | MissingValueOptions | WidgetHeightOptions | DisplaySeriesLabelOptions | DateRangeOptions
     | TooltipNumberFormatOptions;

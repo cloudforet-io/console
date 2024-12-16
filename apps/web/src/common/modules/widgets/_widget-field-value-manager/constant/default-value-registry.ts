@@ -59,7 +59,12 @@ export const widgetFieldDefaultValueMap: DefaultValueRegistry = {
     dateFormat: {
         format: Object.keys(DATE_FORMAT)[0],
     },
-    dateRange: {},
+    dateRange: {
+        inherit: true,
+        options: {
+            value: 'auto',
+        },
+    },
     displayAnnotation: undefined,
     displaySeriesLabel: undefined,
     granularity: {

@@ -61,7 +61,7 @@ export default class WidgetFieldValueManager {
 
         const validator = widgetValidatorRegistry[key];
         if (validator) {
-            const isValid = validator(this.modifiedData[key], this.widgetConfig);
+            const isValid = validator(this.modifiedData[key], this.widgetConfig, this.modifiedData);
             if (!isValid) {
                 this.validationErrors[key as string] = `Invalid value for field "${key}"`;
                 return false;
