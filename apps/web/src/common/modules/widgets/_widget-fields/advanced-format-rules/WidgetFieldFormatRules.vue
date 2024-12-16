@@ -18,7 +18,7 @@ import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import { widgetValidatorRegistry } from '@/common/modules/widgets/_widget-field-value-manager/constant/validator-registry';
 import type {
-    _FormatRulesValue, _FormatRulesOptions, ThresholdValue, _FormatRulesType,
+    FormatRulesValue, FormatRulesOptions, ThresholdValue, FormatRulesType,
 
 } from '@/common/modules/widgets/_widget-fields/advanced-format-rules/type';
 import type {
@@ -28,17 +28,17 @@ import type {
 
 const FIELD_KEY = 'formatRules';
 
-const props = defineProps<_WidgetFieldComponentProps<_FormatRulesOptions>>();
+const props = defineProps<_WidgetFieldComponentProps<FormatRulesOptions>>();
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
 
 const validator = widgetValidatorRegistry[FIELD_KEY];
 
 const state = reactive({
-    fieldValue: computed<_FormatRulesValue>(() => props.fieldManager.data[FIELD_KEY].value),
+    fieldValue: computed<FormatRulesValue>(() => props.fieldManager.data[FIELD_KEY].value),
     // TODO: remove options type assertion
-    type: computed<_FormatRulesType>(() => props.widgetFieldSchema?.options?.formatRulesType as _FormatRulesType),
-    invalid: computed(() => validator(state.fieldValue, props.widgetConfig)),
+    type: computed<FormatRulesType>(() => props.widgetFieldSchema?.options?.formatRulesType as FormatRulesType),
+    invalid: computed(() => !validator(state.fieldValue, props.widgetConfig)),
     selectedField: computed<string|undefined>(() => {
         if (props.widgetFieldSchema?.options?.useField) {
             return state.fieldValue.field;

@@ -87,7 +87,7 @@ const state = reactive({
 const { dateRange } = useWidgetDateRange({
     dateRangeFieldValue: computed(() => state.fieldValue),
     baseOnDate: computed(() => (state.fieldValue?.inherit ? state.baseDateRange?.end : undefined)),
-    granularity: computed(() => state.granularity),
+    granularity: computed(() => props.fieldManager.data.granularity?.value),
     usePreviewFormat: true,
 });
 

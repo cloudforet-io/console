@@ -30,7 +30,7 @@ const validator = widgetValidatorRegistry[FIELD_KEY];
 const state = reactive({
     fieldValue: computed<_IconValue>(() => props.fieldManager.data[FIELD_KEY].value),
     visibleMenu: false,
-    invalid: computed(() => validator(state.fieldValue, props.widgetConfig)),
+    invalid: computed(() => !validator(state.fieldValue, props.widgetConfig)),
     iconList: ICON_FIELD_ITEMS,
     defaultColor: widgetFieldDefaultValueMap.icon.color,
 });

@@ -2,7 +2,7 @@
 
 <script lang="ts" setup>
 import {
-    computed, reactive, watch,
+    computed, reactive,
 } from 'vue';
 
 import { PSelectDropdown, PFieldGroup } from '@cloudforet/mirinae';
@@ -25,7 +25,7 @@ const widgetGenerateGetters = widgetGenerateStore.getters;
 const validator = widgetValidatorRegistry[FIELD_KEY];
 
 const state = reactive({
-    fieldValue: computed<DataFieldValue>(() => props.fieldManager.data?.[FIELD_KEY]?.value),
+    fieldValue: computed<DataFieldValue>(() => props.fieldManager.data[FIELD_KEY]?.value),
     multiselectable: computed(() => props.widgetFieldSchema?.options?.multiSelectable),
     menuItems: computed<MenuItem[]>(() => {
         const dataInfoList = Object.keys(widgetGenerateGetters.selectedDataTable?.data_info ?? {}) ?? [];
@@ -34,7 +34,7 @@ const state = reactive({
             label: d,
         }));
     }),
-    invalid: computed<boolean>(() => validator(state.fieldValue, props.widgetConfig)),
+    invalid: computed<boolean>(() => !validator(state.fieldValue, props.widgetConfig)),
     selectedItem: computed<MenuItem[]|string|undefined>(() => {
         if (!state.menuItems.length) return undefined;
         if (state.multiselectable) {
@@ -54,22 +54,6 @@ const convertToMenuItem = (data: string[]) => data.map((d) => ({
     name: d,
     label: d,
 }));
-
-/* Watcher */
-// initial field value
-watch(() => state.selectedItem, (menuItem) => {
-    if (menuItem?.length && !state.fieldValue.data) {
-        if (state.multiselectable) {
-            props.fieldManager.setFieldValue(FIELD_KEY, { ...state.fieldValue, data: [menuItem[0]] });
-        } else {
-            props.fieldManager.setFieldValue(FIELD_KEY, { ...state.fieldValue, field: menuItem[0].name });
-        }
-    }
-}, { immediate: true });
-
-watch(() => state.fieldValue, (newValue) => {
-    console.debug('DataField - fieldValue', newValue);
-});
 
 </script>
 

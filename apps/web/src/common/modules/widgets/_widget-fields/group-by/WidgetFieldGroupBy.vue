@@ -59,20 +59,11 @@ const state = reactive({
         }
         if (state.fixedValue) return state.menuItems.find((d) => d.name === state.fixedValue);
         if (state.multiselectable) {
-            return state.menuItems.filter((d) => state.fieldValue.value?.includes(d.name));
+            return state.menuItems.filter((d) => state.fieldValue.data?.includes(d.name));
         }
-        return state.fieldValue.value;
+        return state.fieldValue.data;
     }),
-    invalid: computed(() => validator(state.fieldValue, props.widgetConfig)),
-    isValid: computed<boolean>(() => {
-        if (!state.hideCount && !state.proxyValue?.count) return false;
-        if (state.multiselectable && !state.selectedItem?.length) return false;
-        if (state.fixedValue) {
-            if (Array.isArray(state.selectedItem)) return state.selectedItem?.map((d) => d.name).include(state.fixedValue);
-            return state.selectedItem === state.fixedValue;
-        }
-        return !!state.selectedItem;
-    }),
+    isValid: computed(() => validator(state.fieldValue, props.widgetConfig)),
     max: computed(() => props.widgetFieldSchema?.options?.max),
     isMaxValid: computed<boolean>(() => (state.max ? ((state.fieldValue?.count ?? DEFAULT_COUNT) <= state.max) : true)),
     tooltipDesc: computed(() => i18n.t('COMMON.WIDGETS.MAX_ITEMS_DESC', {
@@ -83,16 +74,16 @@ const state = reactive({
 
 /* Event */
 const handleUpdateSelect = (val: string|MenuItem[]) => {
-    state.selectedItem = val;
-    if (Array.isArray(val)) {
-        props.fieldManager.setFieldValue(FIELD_KEY, { ...state.proxyValue, value: val.map((item) => item.name) });
+    if (!val) return;
+    if (state.multiselectable && Array.isArray(val)) {
+        props.fieldManager.setFieldValue(FIELD_KEY, { ...state.fieldValue, data: val.map((item) => item.name) });
     } else {
-        props.fieldManager.setFieldValue(FIELD_KEY, { ...state.proxyValue, value: val });
+        props.fieldManager.setFieldValue(FIELD_KEY, { ...state.fieldValue, data: val });
     }
 };
 const handleUpdateCount = (val: number) => {
     if (val === state.fieldValue.count) return;
-    props.fieldManager.setFieldValue(FIELD_KEY, { ...state.proxyValue, count: val });
+    props.fieldManager.setFieldValue(FIELD_KEY, { ...state.fieldValue, count: val });
 };
 
 </script>
@@ -112,7 +103,7 @@ const handleUpdateCount = (val: number) => {
                                        :selected="state.selectedItem"
                                        :multi-selectable="state.multiselectable"
                                        :show-select-marker="state.multiselectable"
-                                       :invalid="state.invalid"
+                                       :invalid="!state.isValid"
                                        :disabled="!!state.fixedValue"
                                        appearance-type="badge"
                                        block

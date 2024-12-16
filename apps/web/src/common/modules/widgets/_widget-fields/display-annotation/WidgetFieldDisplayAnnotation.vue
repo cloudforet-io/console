@@ -24,7 +24,7 @@ const validator = widgetValidatorRegistry[FIELD_KEY];
 const props = defineProps<_WidgetFieldComponentProps<undefined>>();
 const state = reactive({
     fieldValue: computed<DisplayAnnotationValue>(() => props.fieldManager.data[FIELD_KEY].value),
-    invalid: computed(() => validator(state.fieldValue, props.widgetConfig)),
+    invalid: computed(() => !validator(state.fieldValue, props.widgetConfig)),
     invalidText: computed(() => {
         if (state.invalid) return i18n.t('COMMON.WIDGETS.DISPLAY_ANNOTATION.INVALID_VALUE');
         return '';

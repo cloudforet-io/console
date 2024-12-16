@@ -25,7 +25,7 @@ const validator = widgetValidatorRegistry[FIELD_KEY];
 
 const state = reactive({
     fieldValue: computed<WidgetHeaderValue>(() => props.fieldManager.data[FIELD_KEY].value),
-    invalid: computed(() => validator(state.fieldValue, props.widgetConfig)),
+    invalid: computed(() => !validator(state.fieldValue, props.widgetConfig)),
     titleInvalidText: computed(() => {
         if (state.invalid) {
             return i18n.t('COMMON.WIDGETS.WIDGET_TITLE_REQUIRED');
@@ -36,6 +36,7 @@ const state = reactive({
 
 /* Event */
 const handleToggleWidgetHeader = (value: boolean) => {
+    console.debug('[[HEADER]] - toggle', value);
     if (value) {
         props.fieldManager.setFieldValue(FIELD_KEY, {
             toggleValue: true,
@@ -51,6 +52,8 @@ const handleToggleWidgetHeader = (value: boolean) => {
     }
 };
 const handleUpdateValue = (key: string, value: string) => {
+    console.debug('[[HEADER]] - value', key, value);
+
     props.fieldManager.setFieldValue(FIELD_KEY, {
         ...state.fieldValue,
         [key]: value?.trim() || '',

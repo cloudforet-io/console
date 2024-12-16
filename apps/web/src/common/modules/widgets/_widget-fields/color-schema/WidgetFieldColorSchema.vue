@@ -35,7 +35,7 @@ const state = reactive({
         name: key,
         label: key,
     }))),
-    invalid: computed(() => validator(state.fieldValue, props.widgetConfig)),
+    invalid: computed(() => !validator(state.fieldValue, props.widgetConfig)),
 });
 
 const handleClickColor = (color: ColorSchemaMenuItem) => {
