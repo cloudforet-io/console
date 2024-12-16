@@ -1,99 +1,60 @@
+<!-- TODO: Edit component file name -->
+
 <script lang="ts" setup>
 import {
-    computed, reactive, watch,
+    computed, reactive,
 } from 'vue';
 
 import { PSelectDropdown, PFieldGroup } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
-import { getInitialSelectedMenuItem } from '@/common/modules/widgets/_helpers/widget-field-helper';
-import type { DataFieldOptions } from '@/common/modules/widgets/_widget-fields/data-field/type';
+import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
+import { widgetValidatorRegistry } from '@/common/modules/widgets/_widget-field-value-manager/constant/validator-registry';
+import type { DataFieldOptions, DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
 import type {
-    WidgetFieldComponentProps,
-    WidgetFieldComponentEmit,
+    _WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
-
-const props = withDefaults(defineProps<WidgetFieldComponentProps<DataFieldOptions, string|string[]>>(), {
+const FIELD_KEY = 'dataField';
+const props = withDefaults(defineProps<_WidgetFieldComponentProps<DataFieldOptions>>(), {
     widgetFieldSchema: () => ({}),
 });
-const emit = defineEmits<WidgetFieldComponentEmit<string | string[]>>();
+const widgetGenerateStore = useWidgetGenerateStore();
+const widgetGenerateGetters = widgetGenerateStore.getters;
+
+const validator = widgetValidatorRegistry[FIELD_KEY];
+
 const state = reactive({
-    isInitiated: false,
-    proxyValue: useProxyValue('value', props, emit),
+    fieldValue: computed<DataFieldValue>(() => props.fieldManager.data[FIELD_KEY]?.value),
     multiselectable: computed(() => props.widgetFieldSchema?.options?.multiSelectable),
     menuItems: computed<MenuItem[]>(() => {
-        const dataInfoList = Object.keys(props.dataTable?.data_info ?? {}) ?? [];
+        const dataInfoList = Object.keys(widgetGenerateGetters.selectedDataTable?.data_info ?? {}) ?? [];
         return dataInfoList.map((d) => ({
             name: d,
             label: d,
         }));
     }),
-    selectedItem: undefined as undefined | MenuItem[] | string,
-    isValid: computed<boolean>(() => {
-        if (state.menuItems.length === 0) return false;
-        if (props.widgetFieldSchema?.options?.multiSelectable) {
-            return Array.isArray(state.selectedItem) && !!state.selectedItem?.length;
+    invalid: computed<boolean>(() => !validator(state.fieldValue, props.widgetConfig)),
+    selectedItem: computed<MenuItem[]|string|undefined>(() => {
+        if (!state.menuItems.length) return undefined;
+        if (state.multiselectable) {
+            return convertToMenuItem((state.fieldValue.data ?? []) as string[]);
         }
-        return !!state.selectedItem;
+        return (state.fieldValue.data as string) ?? state.menuItems[0]?.name;
     }),
 });
 
 /* Event */
-const handleUpdateSelect = (val: string|MenuItem[]) => {
-    state.selectedItem = val;
-    if (Array.isArray(val)) {
-        state.proxyValue = val.map((item) => item.name);
-    } else {
-        state.proxyValue = val;
-    }
+const handleChangeValue = (val: string|MenuItem[]) => {
+    const newValue = Array.isArray(val) ? val.map((item) => item.name as string) : val;
+    props.fieldManager.setFieldValue(FIELD_KEY, { data: newValue });
 };
 
-/* Watcher */
-watch(() => state.isValid, (isValid) => {
-    emit('update:is-valid', isValid);
-}, { immediate: true });
+const convertToMenuItem = (data: string[]) => data.map((d) => ({
+    name: d,
+    label: d,
+}));
 
-
-const convertToMenuItem = (data: string[]|string) => {
-    if (Array.isArray(data)) {
-        return data.map((d) => ({
-            name: d,
-            label: d,
-        }));
-    }
-    return {
-        name: data,
-        label: data,
-    };
-};
-
-const initValue = () => {
-    if (state.multiselectable) {
-        if (state.proxyValue && !Array.isArray(state.proxyValue)) state.proxyValue = [state.proxyValue];
-        state.selectedItem = convertToMenuItem(state.proxyValue ?? []);
-    } else {
-        state.selectedItem = state.proxyValue;
-    }
-};
-watch(() => state.menuItems, (menuItems) => {
-    if (!state.isInitiated) {
-        initValue();
-        state.isInitiated = true;
-    }
-
-    if (!menuItems?.length) return;
-
-    if (state.multiselectable) {
-        if (state.proxyValue && !Array.isArray(state.proxyValue)) state.proxyValue = [state.proxyValue];
-        state.proxyValue = getInitialSelectedMenuItem(menuItems, state.proxyValue ?? []);
-        state.selectedItem = convertToMenuItem(state.proxyValue ?? []);
-    } else {
-        state.proxyValue = getInitialSelectedMenuItem(menuItems, state.proxyValue);
-        state.selectedItem = state.proxyValue ?? state.menuItems[0]?.name;
-    }
-}, { immediate: true });
 </script>
 
 <template>
@@ -105,10 +66,10 @@ watch(() => state.menuItems, (menuItems) => {
                                :selected="state.selectedItem"
                                :multi-selectable="state.multiselectable"
                                :show-select-marker="state.multiselectable"
-                               :invalid="!state.isValid"
+                               :invalid="state.invalid"
                                appearance-type="badge"
                                block
-                               @update:selected="handleUpdateSelect"
+                               @update:selected="handleChangeValue"
             />
         </p-field-group>
     </div>

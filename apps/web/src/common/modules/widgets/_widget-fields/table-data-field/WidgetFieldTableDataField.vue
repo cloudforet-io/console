@@ -33,6 +33,7 @@ import {
 import { getInitialSelectedMenuItem, isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
+import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/granularity/type';
 import type { GroupByValue } from '@/common/modules/widgets/_widget-fields/group-by/type';
 import type {
     TableDataFieldOptions,
@@ -78,9 +79,9 @@ const {
     widgetConfig: toRef(props, 'widgetConfig') as Ref<WidgetConfig>,
 });
 const { dateRange } = useWidgetDateRange({
-    dateRangeFieldValue: computed(() => (props.allValueMap?.dateRange as DateRangeValue)),
+    dateRangeFieldValue: computed(() => (props.allValueMap?.dateRange?.value as DateRangeValue)),
     baseOnDate: computed(() => props.dateRange?.end),
-    granularity: computed<string>(() => props.allValueMap?.granularity as string),
+    granularity: computed<GranularityValue>(() => props.allValueMap?.granularity?.value),
 });
 
 const state = reactive({

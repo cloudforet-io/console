@@ -1,6 +1,7 @@
 import type { Tags } from '@/schema/_common/model';
 import type { ResourceGroupType } from '@/schema/_common/type';
 
+import type { WidgetFieldValue } from '@/common/modules/widgets/_widget-field-value-manager/type';
 import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
 import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-field-type';
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
@@ -15,7 +16,7 @@ export interface PublicWidgetModel {
     size: WidgetSize;
     data_table_id: string;
     widget_type: WidgetType;
-    options: Record<WidgetFieldName, WidgetFieldValues>;
+    options: Record<WidgetFieldName, WidgetFieldValue<WidgetFieldValues>>;
     tags: Tags;
     workspace_id?: string;
     domain_id?: string;

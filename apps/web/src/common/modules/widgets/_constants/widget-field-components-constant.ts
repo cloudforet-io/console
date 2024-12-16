@@ -1,6 +1,6 @@
 import type { Component } from 'vue';
 
-import advancedFormatRules from '@/common/modules/widgets/_widget-fields/advanced-format-rules/WidgetFieldAdvancedFormatRules.vue';
+import formatRules from '@/common/modules/widgets/_widget-fields/advanced-format-rules/WidgetFieldFormatRules.vue';
 import categoryBy from '@/common/modules/widgets/_widget-fields/category-by/WidgetFieldCategoryBy.vue';
 import colorSchema from '@/common/modules/widgets/_widget-fields/color-schema/WidgetFieldColorSchema.vue';
 import comparison from '@/common/modules/widgets/_widget-fields/comparison/WidgetFieldComparison.vue';
@@ -11,7 +11,6 @@ import dateFormat from '@/common/modules/widgets/_widget-fields/date-format/Widg
 import dateRange from '@/common/modules/widgets/_widget-fields/date-range/WidgetFieldDateRange.vue';
 import displayAnnotation from '@/common/modules/widgets/_widget-fields/display-annotation/WidgetFieldDisplayAnnotation.vue';
 import displaySeriesLabel from '@/common/modules/widgets/_widget-fields/display-series-label/WidgetFieldDisplaySeriesLabel.vue';
-import formatRules from '@/common/modules/widgets/_widget-fields/format-rules/WidgetFieldFormatRules.vue';
 import granularity from '@/common/modules/widgets/_widget-fields/granularity/WidgetFieldGranularity.vue';
 import groupBy from '@/common/modules/widgets/_widget-fields/group-by/WidgetFieldGroupBy.vue';
 import icon from '@/common/modules/widgets/_widget-fields/icon/WidgetFieldIcon.vue';
@@ -24,7 +23,6 @@ import pieChartType from '@/common/modules/widgets/_widget-fields/pie-chart-type
 import stackBy from '@/common/modules/widgets/_widget-fields/stack-by/WidgetFieldStackBy.vue';
 import subTotal from '@/common/modules/widgets/_widget-fields/sub-total/WidgetFieldSubTotal.vue';
 import tableColumnWidth from '@/common/modules/widgets/_widget-fields/table-column-width/WidgetFieldTableColumnWidth.vue';
-import tableDataField from '@/common/modules/widgets/_widget-fields/table-data-field/WidgetFieldTableDataField.vue';
 import textWrap from '@/common/modules/widgets/_widget-fields/text-wrap/WidgetFieldTextWrap.vue';
 import tooltipNumberFormat from '@/common/modules/widgets/_widget-fields/tooltip-number-format/WidgetFieldTooltipNumberFormat.vue';
 import total from '@/common/modules/widgets/_widget-fields/total/WidgetFieldTotal.vue';
@@ -37,7 +35,6 @@ import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-fiel
 export const WIDGET_FIELD_COMPONENTS: Record<Partial<WidgetFieldName>, Component> = {
     dateRange,
     dataField,
-    tableDataField,
     xAxis,
     yAxis,
     stackBy,
@@ -46,7 +43,6 @@ export const WIDGET_FIELD_COMPONENTS: Record<Partial<WidgetFieldName>, Component
     min,
     max,
     formatRules,
-    advancedFormatRules,
     legend,
     icon,
     subTotal,

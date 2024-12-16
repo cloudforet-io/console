@@ -1,26 +1,25 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { computed, onMounted, reactive } from 'vue';
 
 import { PFieldGroup, PSelectButton } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import { i18n } from '@/translations';
 
+import { useProxyValue } from '@/common/composables/proxy-state';
+import type { PieChartTypeOptions } from '@/common/modules/widgets/_widget-fields/pie-chart-type/type';
 import type {
-    PieChartTypeOptions,
-    PieChartTypeValue,
-} from '@/common/modules/widgets/_widget-fields/pie-chart-type/type';
-import type {
-    _WidgetFieldComponentProps,
+    WidgetFieldComponentProps,
+    WidgetFieldComponentEmit,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 
-const FIELD_KEY = 'pieChartType';
+const emit = defineEmits<WidgetFieldComponentEmit<string>>();
 
-const props = defineProps<_WidgetFieldComponentProps<PieChartTypeOptions>>();
+const props = defineProps<WidgetFieldComponentProps<PieChartTypeOptions, string>>();
 
 const state = reactive({
-    fieldValue: computed<PieChartTypeValue>(() => props.fieldManager.data[FIELD_KEY].value),
+    proxyValue: useProxyValue<string>('value', props, emit),
     pieChartTypeMenuItems: computed<MenuItem[]>(() => [
         {
             name: 'pie',
@@ -31,19 +30,23 @@ const state = reactive({
             label: i18n.t('COMMON.WIDGETS.DONUT'),
         },
     ]),
+    selectedPieChartType: 'pie',
 });
 
 /* Event */
-const handleChangePieChartType = (value: PieChartTypeValue['type']) => {
-    props.fieldManager.setFieldValue(FIELD_KEY, {
-        type: value,
-    });
+const handleChangePieChartType = (value: string) => {
+    state.selectedPieChartType = value;
+    state.proxyValue = value;
 };
 
+onMounted(() => {
+    emit('update:is-valid', true);
+    state.proxyValue = props.value ?? 'pie';
+});
 </script>
 
 <template>
-    <div class="widget-field-pie-chart-type">
+    <div class="widget-field-max">
         <p-field-group :label="$t('COMMON.WIDGETS.PIE_CHART_TYPE')"
                        required
         >
@@ -51,7 +54,7 @@ const handleChangePieChartType = (value: PieChartTypeValue['type']) => {
                              :key="`select-button-${selectItem.name}`"
                              :value="selectItem.name"
                              style-type="secondary"
-                             :selected="state.fieldValue.type"
+                             :selected="state.selectedPieChartType"
                              class="mr-2"
                              @change="handleChangePieChartType"
             >

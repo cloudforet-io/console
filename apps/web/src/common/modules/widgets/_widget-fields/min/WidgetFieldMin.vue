@@ -1,55 +1,40 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive,
 } from 'vue';
 
 import { PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
-import type { MinOptions } from '@/common/modules/widgets/_widget-fields/min/type';
+import type { MinOptions, MinValue } from '@/common/modules/widgets/_widget-fields/min/type';
 import type {
-    WidgetFieldComponentProps,
-    WidgetFieldComponentEmit,
+    _WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
+const FIELD_KEY = 'min';
 
-const emit = defineEmits<WidgetFieldComponentEmit<number>>();
-const props = withDefaults(defineProps<WidgetFieldComponentProps<MinOptions, number>>(), {
-    widgetFieldSchema: () => ({
-        options: {
-            default: 0,
-        },
-    }),
-});
+const props = defineProps<_WidgetFieldComponentProps<MinOptions>>();
 
 const state = reactive({
-    proxyValue: useProxyValue<number>('value', props, emit),
-    isValid: computed<boolean>(() => typeof state.proxyValue === 'number'),
+    fieldValue: computed<MinValue>(() => props.fieldManager.data[FIELD_KEY].value),
 });
 
 const handleUpdateValue = (value: string|'') => {
     const parsedValue = value === '' ? 0 : parseInt(value);
-    state.proxyValue = (parsedValue < 0) ? 0 : parsedValue;
+    props.fieldManager.setFieldValue(FIELD_KEY, {
+        min: (parsedValue < 0) ? 0 : parsedValue,
+    });
 };
 
-watch(() => state.isValid, (isValid) => {
-    emit('update:is-valid', isValid);
-}, { immediate: true });
-
-onMounted(() => {
-    emit('update:is-valid', true);
-    state.proxyValue = props.value ?? props.widgetFieldSchema.options?.default ?? 0;
-});
 </script>
 
 <template>
-    <div class="widget-field-max">
+    <div class="widget-field-min">
         <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.MIN')"
                        required
         >
             <p-text-input type="number"
                           :min="0"
-                          :value="state.proxyValue"
+                          :value="state.fieldValue.min"
                           @update:value="handleUpdateValue"
             />
         </p-field-group>
