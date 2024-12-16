@@ -1282,6 +1282,7 @@
 					"JOIN_DESC": "共通の列に基づいて、異なるテーブルの行を結合します。",
 					"LEGACY_WARNING_DESC": "この「{operator}」形式はサポートされなくなりました。削除して、新しいデータ変換を実装してください。",
 					"LEGACY_WARNING_TITLE": "サポートされていない「{operator}」形式",
+					"PIVOT_DESC": "",
 					"QUERY_DESC": "特定の条件を満たすデータをフィルタリングして抽出します。",
 					"SELECT_DATA_SOURCE_SUCCESS": "データが正常に変更されました。",
 					"SELECT_DATA_TABLE_WARNING": "先にデータテーブルを保存してください。",
