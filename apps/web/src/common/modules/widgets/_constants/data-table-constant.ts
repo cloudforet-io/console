@@ -1,5 +1,6 @@
-
-import type { ConcatOptions, JoinOptions, PivotOptions } from '@/common/modules/widgets/types/widget-model';
+import type {
+    ConcatOptions, EvalOptions, JoinOptions, PivotOptions,
+} from '@/common/modules/widgets/types/widget-model';
 
 import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 
@@ -94,4 +95,14 @@ export const DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP = {
         data_tables: [],
         how: undefined,
     } as JoinOptions,
+    EVAL: {
+        data_table_id: undefined,
+        expressions: [
+            {
+                name: '',
+                field_type: DATA_TABLE_FIELD_TYPE.DATA,
+                expression: '',
+            },
+        ],
+    } as EvalOptions,
 };

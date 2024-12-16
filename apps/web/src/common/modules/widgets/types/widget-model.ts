@@ -77,7 +77,7 @@ export interface AggregateOptions {
 }
 
 export interface EvalOptions {
-    data_table_id: string;
+    data_table_id?: string;
     expressions: EvaluateExpression[];
 }
 
@@ -85,6 +85,7 @@ export interface EvaluateExpression {
     name: string;
     field_type: DataTableFieldType;
     expression: string;
+    condition?: string;
 }
 
 export interface PivotOptions {

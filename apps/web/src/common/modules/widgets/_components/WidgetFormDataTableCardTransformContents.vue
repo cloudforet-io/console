@@ -21,6 +21,8 @@ import WidgetFormDataTableCardTransformConcatenate
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformConcatenate.vue';
 import WidgetFormDataTableCardTransformForm
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformForm.vue';
+import WidgetFormDataTableCardTransformFormEvaluate
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformFormEvaluate.vue';
 import WidgetFormDataTableCardTransformJoin
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformJoin.vue';
 import WidgetFormDataTableCardTransformPivotForm
@@ -67,7 +69,7 @@ const state = reactive({
         const haveRequiredConcatOptions = haveSavedName && valueState.CONCAT.data_tables.length === 2 && !valueState.CONCAT.data_tables.includes(undefined);
         const haveRequiredJoinOptions = haveSavedName && valueState.JOIN.data_tables.length === 2 && valueState.JOIN.how;
         const haveRequiredQueryOptions = haveSavedName && !!state.dataTableInfo.dataTableId && queryState.conditions.filter((cond) => !!cond.value.trim()).length > 0;
-        const haveRequiredEvalOptions = haveSavedName && !!state.dataTableInfo.dataTableId && evalState.expressions.filter((expression) => !!expression.name && !!expression.expression).length > 0;
+        const haveRequiredEvalOptions = haveSavedName && !!valueState.EVAL.data_table_id && valueState.EVAL.expressions.every((expression) => !!expression.name && !!expression.expression);
         const haveRequiredAddLabels = haveSavedName && !!state.dataTableInfo.dataTableId && addLabelsState.labels.every((label) => !!label.name && !!label.value);
         const haveRequiredPivotOptions = haveSavedName && !!valueState.PIVOT.data_table_id && !!valueState.PIVOT.fields?.labels && valueState.PIVOT.fields?.labels?.length > 0
             && !!valueState.PIVOT.fields?.column && !!valueState.PIVOT.fields?.data && (!!valueState.PIVOT.select || !!valueState.PIVOT.limit);
@@ -85,18 +87,16 @@ const state = reactive({
         const joinDataTablesChanged = !isEqual(valueState.JOIN.data_tables, originState.dataTableInfo.dataTables);
         const joinTypeChanged = valueState.JOIN.how !== originState.joinType;
         const conditionsChanged = !isEqual(queryState.conditions.map((cond) => ({ value: cond.value })).filter((cond) => !!cond.value.trim().length), originState.conditions);
-        const expressionsChanged = !isEqual(evalState.expressions.map((expression) => ({
-            name: expression.name,
-            field_type: expression.fieldType,
-            expression: expression.expression,
+        const evalDataTableIdChanged = valueState.EVAL.data_table_id !== originState.dataTableInfo.dataTableId;
+        const evalChanged = !isEqual(valueState.EVAL.expressions.map((expression) => ({
+            ...expression,
             ...(expression?.condition ? { condition: expression?.condition } : {}),
-            ...(expression?.else ? { else: expression?.else } : {}),
         })).filter((expression) => !!expression.name && !!expression.expression), originState.expressions);
         const addLabelsChanged = !isEqual(addLabelsState.labels, originState.labels);
         if (state.operator === 'CONCAT') return concatDataTablesChanged;
         if (state.operator === 'JOIN') return joinDataTablesChanged || joinTypeChanged;
         if (state.operator === 'QUERY') return dataTableIdChanged || conditionsChanged;
-        if (state.operator === 'EVAL') return dataTableIdChanged || expressionsChanged;
+        if (state.operator === 'EVAL') return evalDataTableIdChanged || evalChanged;
         if (state.operator === 'ADD_LABELS') return addLabelsChanged;
         return false;
     }),
@@ -107,14 +107,6 @@ const state = reactive({
         dataTableId: undefined,
     } as TransformDataTableInfo,
     failStatus: false,
-    isLegacyDataTable: computed(() => {
-        if (state.operator === 'EVAL') return false;
-        const evalExpressions = (props.item.options as DataTableTransformOptions).EVAL?.expressions;
-        if (!evalExpressions?.length) return false;
-        const isLegacyEval = typeof evalExpressions[0] === 'string';
-        if (isLegacyEval) return true;
-        return false;
-    }),
     isUnavailable: computed<boolean>(() => props.item.state === 'UNAVAILABLE'),
 });
 
@@ -141,6 +133,7 @@ const valueState = reactive({
     PIVOT: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT,
     CONCAT: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.CONCAT,
     JOIN: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.JOIN,
+    EVAL: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.EVAL,
 });
 
 const addLabelsState = reactive({
@@ -219,13 +212,10 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
         conditions: queryState.conditions.map((conditionInfo) => conditionInfo.value),
     };
     const evalOptions: EvalOptions = {
-        data_table_id: state.dataTableInfo.dataTableId,
-        expressions: evalState.expressions.map((expressionInfo) => ({
-            name: expressionInfo.name,
-            field_type: expressionInfo.fieldType,
-            expression: expressionInfo.expression,
+        data_table_id: valueState.EVAL.data_table_id,
+        expressions: valueState.EVAL.expressions.map((expressionInfo) => ({
+            ...expressionInfo,
             ...(expressionInfo.condition && { condition: expressionInfo.condition }) || {},
-            ...(expressionInfo.else && { else: expressionInfo.else }) || {},
         })).filter((expressionInfo) => !!expressionInfo.name && !!expressionInfo.expression),
     };
     const pivotOptions: PivotOptions = {
@@ -338,6 +328,7 @@ const handleUpdateDataTable = async () => {
 
 /* Utils */
 const setInitialDataTableForm = () => {
+    // TODO!
     // Initial Form Setting
     state.dataTableInfo = originState.dataTableInfo;
     joinState.joinType = originState.joinType;
@@ -383,7 +374,6 @@ defineExpose({
                                                       :data-type="DATA_TABLE_TYPE.TRANSFORMED"
                                                       :selected="props.selected"
                                                       :data-table-name.sync="state.dataTableName"
-                                                      :is-legacy-data-table="state.isLegacyDataTable"
             />
         </div>
         <widget-form-data-table-card-transform-pivot-form v-if="state.operator === DATA_TABLE_OPERATOR.PIVOT"
@@ -401,17 +391,19 @@ defineExpose({
                                                     :operator-options.sync="valueState.JOIN"
                                                     :origin-data="props.item.options[state.operator] ?? cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.JOIN)"
         />
+        <widget-form-data-table-card-transform-form-evaluate v-else-if="state.operator === DATA_TABLE_OPERATOR.EVAL"
+                                                             :base-data-table-id="state.dataTableId"
+                                                             :operator-options.sync="valueState.EVAL"
+                                                             :origin-data="props.item.options[state.operator] ?? cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.EVAL)"
+        />
         <widget-form-data-table-card-transform-form v-else
                                                     :data-table-id="state.dataTableId"
                                                     :operator="state.operator"
                                                     :data-table-info.sync="state.dataTableInfo"
                                                     :conditions.sync="queryState.conditions"
-                                                    :expressions.sync="evalState.expressions"
                                                     :labels.sync="addLabelsState.labels"
-                                                    :is-legacy-data-table="state.isLegacyDataTable"
         />
         <widget-form-data-table-card-footer :disabled="state.applyDisabled"
-                                            :is-legacy-data-table="state.isLegacyDataTable"
                                             :changed="state.optionsChanged"
                                             :loading="state.loading"
                                             @delete="handleClickDeleteDataTable"

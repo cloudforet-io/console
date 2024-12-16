@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import {
+    computed, reactive, ref, watch,
+} from 'vue';
 
 import {
     PIconButton, PI, PFieldGroup, PSelectButton, PTextInput, PButton, PTextarea, PButtonModal, PToggleButton, PLink, PFieldTitle,
@@ -10,29 +12,32 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import getRandomId from '@/lib/random-id-generator';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
+import WidgetFormDataTableCardTransformFormWrapper
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformFormWrapper.vue';
 import WidgetFormDataTableGlobalVariableViewButton
     from '@/common/modules/widgets/_components/WidgetFormDataTableGlobalVariableViewButton.vue';
-import { DATA_TABLE_FIELD_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
-import type { EvalExpressions } from '@/common/modules/widgets/types/widget-data-table-type';
+import { DATA_TABLE_FIELD_TYPE, DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
+import type { TransformDataTableInfo, TransformDataTableProps } from '@/common/modules/widgets/types/widget-data-table-type';
+import type { EvalOptions } from '@/common/modules/widgets/types/widget-model';
 
 
 
-interface Props {
-    expressions: (EvalExpressions[]|string[]);
-    isLegacyDataTable?: boolean;
-}
+const props = defineProps<TransformDataTableProps<EvalOptions>>();
+const emit = defineEmits<{(e: 'update:operator-options', value: EvalOptions): void; }>();
+
+const dataTableInfo = ref<TransformDataTableInfo>({
+    dataTableId: props.originData?.data_table_id,
+});
+const expressionsInfo = ref<EvalOptions['expressions']>(props.originData.expressions || []);
 
 const CONDITION_PLACEHOLDER = '{{ Product }} == \'A\' & {{ Provider }} == \'B\'';
 const FORMULA_PLACEHOLDER = '{{ Product }}';
-const props = defineProps<Props>();
-
-const emit = defineEmits<{ e: 'update:expressions'; value: EvalExpressions[]}>();
 
 const state = reactive({
-    proxyExpressions: useProxyValue<EvalExpressions[]>('expressions', props, emit),
+    proxyOperatorOptions: useProxyValue<EvalOptions>('operator-options', props, emit),
+    collapsedIndexList: [] as number[],
     fieldTypeMenuItems: computed<MenuItem[]>(() => [
         {
             name: DATA_TABLE_FIELD_TYPE.LABEL,
@@ -48,48 +53,42 @@ const state = reactive({
 
 const modalState = reactive({
     visible: false,
-    currentSelectionKey: undefined as string|undefined,
     currentSelectionName: undefined as string|undefined,
 });
 
 /* Events */
-const handleToggleExpressionCard = (key: string) => {
-    state.proxyExpressions = state.proxyExpressions.map((expression) => {
-        if (expression.key === key) {
-            return {
-                ...expression,
-                isCollapsed: !expression.isCollapsed,
-            };
-        }
-        return expression;
-    });
+const handleToggleExpressionCard = (idx: number) => {
+    if (state.collapsedIndexList.includes(idx)) {
+        state.collapsedIndexList = state.collapsedIndexList.filter((d) => d !== idx);
+    } else {
+        state.collapsedIndexList.push(idx);
+    }
 };
-const handleClickDeleteExpression = (key: string) => {
-    const targetExpression = state.proxyExpressions.find((d) => d.key === key);
+const handleClickDeleteExpression = (idx: number) => {
+    const targetExpression = expressionsInfo.value[idx];
     if (!targetExpression?.name && !targetExpression?.expression) {
-        state.proxyExpressions = state.proxyExpressions.filter((expression) => expression.key !== key);
+        expressionsInfo.value = expressionsInfo.value.filter((d, i) => i !== idx);
         return;
     }
     modalState.visible = true;
-    modalState.currentSelectionKey = key;
     modalState.currentSelectionName = targetExpression?.name;
 };
 const handleConfirmDeleteExpression = () => {
-    if (!modalState.currentSelectionKey) return;
-    state.proxyExpressions = state.proxyExpressions.filter((expression) => expression.key !== modalState.currentSelectionKey);
+    if (!modalState.currentSelectionName) return;
+    expressionsInfo.value = expressionsInfo.value.filter((expression) => expression.name !== modalState.currentSelectionName);
     showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.DELETE_SUCCESS_TOOLTIP', { field_name: modalState.currentSelectionName }), '');
     modalState.visible = false;
-    modalState.currentSelectionKey = undefined;
     modalState.currentSelectionName = undefined;
 };
 const handleCancelModal = () => {
     modalState.visible = false;
-    modalState.currentSelectionKey = undefined;
     modalState.currentSelectionName = undefined;
 };
-const handleChangeFieldValue = (key: string, fieldName: string, value) => {
-    state.proxyExpressions = state.proxyExpressions.map((expression) => {
-        if (expression.key === key) {
+const handleChangeFieldValue = (idx: number, fieldName: string, value: string) => {
+    const targetExpression = expressionsInfo.value[idx];
+    if (!targetExpression) return;
+    expressionsInfo.value = expressionsInfo.value.map((expression, i) => {
+        if (i === idx) {
             return {
                 ...expression,
                 [fieldName]: value,
@@ -98,41 +97,48 @@ const handleChangeFieldValue = (key: string, fieldName: string, value) => {
         return expression;
     });
 };
-const handleClickAddLabel = () => {
-    state.proxyExpressions = [
-        ...state.proxyExpressions,
+const handleClickAddField = () => {
+    expressionsInfo.value = [
+        ...expressionsInfo.value,
         {
-            key: getRandomId(),
-            fieldType: DATA_TABLE_FIELD_TYPE.DATA,
+            field_type: DATA_TABLE_FIELD_TYPE.DATA,
             name: '',
             expression: '',
-            isCollapsed: false,
         },
     ];
 };
-const handleToggleCondition = (key: string) => {
-    const targetExpression = state.proxyExpressions.find((d) => d.key === key);
-    if (!targetExpression) return;
+const handleToggleCondition = (idx: number) => {
+    const targetExpression = expressionsInfo.value[idx];
     if ('condition' in targetExpression) {
         delete targetExpression.condition;
-        delete targetExpression.else;
     } else {
         targetExpression.condition = '';
-        targetExpression.else = '';
     }
-    state.proxyExpressions = [...state.proxyExpressions];
+    expressionsInfo.value = [...expressionsInfo.value];
 };
+
+/* Watcher */
+watch([dataTableInfo, expressionsInfo], ([_dataTableInfo, _expressionsInfo]) => {
+    state.proxyOperatorOptions = {
+        data_table_id: _dataTableInfo.dataTableId,
+        expressions: _expressionsInfo,
+    };
+    console.log(_expressionsInfo, state.proxyOperatorOptions);
+}, { deep: true, immediate: true });
 </script>
 
 <template>
     <div class="widget-form-data-table-card-transform-form-evaluate">
-        <template v-if="!props.isLegacyDataTable">
-            <div v-for="(expression) in state.proxyExpressions"
-                 :key="expression.key"
-                 :class="{'expression-form-card': true, collapsed: expression.isCollapsed}"
+        <widget-form-data-table-card-transform-form-wrapper :data-table-id="props.baseDataTableId"
+                                                            :operator="DATA_TABLE_OPERATOR.EVAL"
+                                                            :data-table-info.sync="dataTableInfo"
+        >
+            <div v-for="(expression, eIdx) in expressionsInfo"
+                 :key="`expression-${eIdx}`"
+                 :class="{'expression-form-card': true, collapsed: state.collapsedIndexList.includes(eIdx)}"
             >
                 <div class="form-header"
-                     @click="handleToggleExpressionCard(expression.key)"
+                     @click="handleToggleExpressionCard(eIdx)"
                 >
                     <div class="title">
                         <p-i name="ic_chevron-down"
@@ -151,8 +157,8 @@ const handleToggleCondition = (key: string) => {
                     </div>
                     <p-icon-button name="ic_delete"
                                    size="sm"
-                                   :disabled="state.proxyExpressions.length === 1"
-                                   @click.stop="handleClickDeleteExpression(expression.key)"
+                                   :disabled="expressionsInfo.length === 1"
+                                   @click.stop="handleClickDeleteExpression(eIdx)"
                     />
                 </div>
                 <div class="form-body">
@@ -165,8 +171,8 @@ const handleToggleCondition = (key: string) => {
                                              :key="`select-button-${selectItem.name}`"
                                              :value="selectItem.name"
                                              style-type="secondary"
-                                             :selected="expression.fieldType"
-                                             @change="handleChangeFieldValue(expression.key, 'fieldType', $event)"
+                                             :selected="expression.field_type"
+                                             @change="handleChangeFieldValue(eIdx, 'field_type', $event)"
                             >
                                 {{ selectItem.label }}
                             </p-select-button>
@@ -204,7 +210,7 @@ const handleToggleCondition = (key: string) => {
                                 <template #right>
                                     <p-toggle-button :value="'condition' in expression"
                                                      class="condition-toggle-button"
-                                                     @change-toggle="handleToggleCondition(expression.key)"
+                                                     @change-toggle="handleToggleCondition(eIdx)"
                                     />
                                 </template>
                             </p-field-title>
@@ -227,7 +233,7 @@ const handleToggleCondition = (key: string) => {
                                 </template>
                                 <p-textarea :value.sync="expression.condition"
                                             :placeholder="CONDITION_PLACEHOLDER"
-                                            @update:value="handleChangeFieldValue(expression.key, 'condition', $event)"
+                                            @update:value="handleChangeFieldValue(eIdx, 'condition', $event)"
                                 />
                             </p-field-group>
                             <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.FORMULA')"
@@ -248,61 +254,18 @@ const handleToggleCondition = (key: string) => {
                                             :placeholder="FORMULA_PLACEHOLDER"
                                 />
                             </p-field-group>
-                            <p-field-group v-if="'condition' in expression"
-                                           :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.ELSE')"
-                                           style-type="secondary"
-                                           required
-                                           class="expression-form"
-                            >
-                                <template #label-extra>
-                                    <p-link href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.eval.html"
-                                            :action-icon="ACTION_ICON.EXTERNAL_LINK"
-                                            highlight
-                                            class="external-link"
-                                    >
-                                        Pandas Eval
-                                    </p-link>
-                                </template>
-                                <p-textarea :value="expression.else"
-                                            placeholder="'-'"
-                                            @update:value="handleChangeFieldValue(expression.key, 'else', $event)"
-                                />
-                            </p-field-group>
                         </div>
                     </div>
                 </div>
             </div>
-        </template>
-        <p-field-group v-else
-                       :label="'Expression'"
-                       required
-        >
-            <div class="legacy-expression-wrapper">
-                <div v-for="(expression) in props.expressions"
-                     :key="expression"
-                     class="expressions-wrapper"
-                >
-                    <p-text-input class="label-input"
-                                  block
-                                  :value="expression"
-                                  disabled
-                    />
-                    <p-icon-button name="ic_delete"
-                                   size="sm"
-                                   disabled
-                    />
-                </div>
-            </div>
-        </p-field-group>
-
-        <p-button v-if="!props.isLegacyDataTable"
-                  class="add-field-button"
-                  style-type="tertiary"
-                  icon-left="ic_plus_bold"
-                  @click="handleClickAddLabel"
-        >
-            {{ $t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.ADD_FIELD') }}
-        </p-button>
+            <p-button class="add-field-button"
+                      style-type="tertiary"
+                      icon-left="ic_plus_bold"
+                      @click="handleClickAddField"
+            >
+                {{ $t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.ADD_FIELD') }}
+            </p-button>
+        </widget-form-data-table-card-transform-form-wrapper>
         <p-button-modal :header-title="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.DELETE_MODAL_TITLE', { field_name: modalState.currentSelectionName })"
                         :visible.sync="modalState.visible"
                         size="sm"
@@ -321,10 +284,10 @@ const handleToggleCondition = (key: string) => {
 
 <style scoped lang="postcss">
 .widget-form-data-table-card-transform-form-evaluate {
-    @apply flex flex-col gap-2;
     .expression-form-card {
         @apply border border-gray-200 rounded-lg;
         padding: 0.625rem 0.5rem;
+        margin-bottom: 0.5rem;
 
         .form-header {
             @apply w-full flex items-center justify-between cursor-pointer;
@@ -399,15 +362,6 @@ const handleToggleCondition = (key: string) => {
     .add-field-button {
         margin-top: 0.5rem;
         width: 6.8125rem;
-    }
-    .legacy-expression-wrapper {
-        @apply bg-gray-100 rounded-lg;
-        padding: 0.5rem;
-        margin-top: 0.25rem;
-        .expressions-wrapper {
-            @apply flex gap-1 items-center;
-            margin-bottom: 0.5rem;
-        }
     }
 }
 

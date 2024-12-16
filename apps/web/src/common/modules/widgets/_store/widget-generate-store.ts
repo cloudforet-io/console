@@ -226,10 +226,10 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                     data_table_id: undefined,
                     conditions: [],
                 },
-                EVAL: {
-                    data_table_id: undefined,
-                    formulas: [],
-                },
+                // EVAL: {
+                //     data_table_id: undefined,
+                //     formulas: [],
+                // },
                 // TODO: PIVOT, ADD_LABELS, VALUE_MAPPING
             };
             const unsavedTransformData = {
