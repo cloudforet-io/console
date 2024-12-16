@@ -67,8 +67,9 @@ export interface JoinOptions {
 }
 
 export interface QueryOptions {
-    data_table_id: string;
+    data_table_id?: string;
     conditions: string[];
+    // operator: 'AND'|'OR';
 }
 
 export interface AggregateOptions {

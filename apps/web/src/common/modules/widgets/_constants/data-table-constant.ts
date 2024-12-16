@@ -1,5 +1,5 @@
 import type {
-    ConcatOptions, EvalOptions, JoinOptions, PivotOptions,
+    ConcatOptions, EvalOptions, JoinOptions, PivotOptions, QueryOptions,
 } from '@/common/modules/widgets/types/widget-model';
 
 import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
@@ -105,4 +105,9 @@ export const DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP = {
             },
         ],
     } as EvalOptions,
+    QUERY: {
+        data_table_id: undefined,
+        conditions: [''],
+        // operator: 'AND',
+    } as QueryOptions,
 };
