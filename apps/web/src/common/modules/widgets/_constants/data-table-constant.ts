@@ -1,5 +1,5 @@
 
-import type { PivotOptions } from '@/common/modules/widgets/types/widget-model';
+import type { ConcatOptions, PivotOptions } from '@/common/modules/widgets/types/widget-model';
 
 import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 
@@ -87,4 +87,7 @@ export const DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP = {
             desc: false,
         },
     } as PivotOptions,
+    CONCAT: {
+        data_tables: [],
+    } as ConcatOptions,
 };
