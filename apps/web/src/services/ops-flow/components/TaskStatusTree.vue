@@ -35,6 +35,7 @@ const handleUpdateItems = async (statusType: TaskStatusType, items: TaskStatusOp
                 ...taskCategoryPageStore.getters.statusOptions,
                 [statusType]: items,
             },
+            force: true,
         });
         showSuccessMessage(i18n.t('OPSFLOW.ALT_S_EDIT_TARGET', { target: i18n.t('OPSFLOW.STATUS') }), '');
     } catch (e) {

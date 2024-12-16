@@ -6,7 +6,7 @@ import { cloneDeep } from 'lodash';
 import { PButtonModal } from '@cloudforet/mirinae';
 
 import type { TaskStatusOption, TaskStatusOptions, TaskStatusType } from '@/schema/opsflow/task/type';
-import { i18n as _i18n } from '@/translations';
+import { getParticle, i18n as _i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -83,7 +83,10 @@ const handleClosed = () => {
 <template>
     <p-button-modal :visible="taskCategoryPageState.visibleStatusDeleteModal"
                     theme-color="alert"
-                    :header-title="$t('OPSFLOW.DELETE_TARGET_CONFIRMATION2', { target: $t('OPSFLOW.STATUS') })"
+                    :header-title="$t('OPSFLOW.DELETE_TARGET_CONFIRMATION', {
+                        object: $t('OPSFLOW.STATUS'),
+                        particle: getParticle($t('OPSFLOW.STATUS'), 'object'),
+                    })"
                     size="md"
                     :loading="loading"
                     @confirm="handleConfirm"

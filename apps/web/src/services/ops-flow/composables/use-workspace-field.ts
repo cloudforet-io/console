@@ -65,7 +65,8 @@ export const useWorkspaceField = () => {
 
     const prevSelectedWorkspaceItems = ref<SelectDropdownMenuItem[]>([]);
     const prevSelectedWorkspaceIds = computed<string[]>(() => prevSelectedWorkspaceItems.value.map((w) => w.name));
-    const setInitialWorkspaces = (packageId?: string) => {
+    const setInitialWorkspaces = async (packageId?: string) => {
+        await workspaceReferenceStore.load();
         prevSelectedWorkspaceItems.value = packageId ? workspaceItemsByPackage.value[packageId] ?? [] : [];
         workspaceValidator.setValue(prevSelectedWorkspaceItems.value);
     };

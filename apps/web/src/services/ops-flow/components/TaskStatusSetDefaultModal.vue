@@ -6,6 +6,7 @@ import { cloneDeep } from 'lodash';
 import { PButtonModal } from '@cloudforet/mirinae';
 
 import type { TaskStatusOption, TaskStatusOptions, TaskStatusType } from '@/schema/opsflow/task/type';
+import { i18n as _i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -13,9 +14,13 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
+import {
+    useTaskManagementTemplateStore,
+} from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
 const taskCategoryPageStore = useTaskCategoryPageStore();
 const taskCategoryStore = useTaskCategoryStore();
+const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
 const loading = ref<boolean>(false);
 const name = computed(() => taskCategoryPageStore.getters.targetStatusOption?.data?.name ?? '');
@@ -38,9 +43,9 @@ const setAsDefaultStatus = async (categoryId: string, allStatusOptions: TaskStat
             status_options: newStatusOptions,
             force: true,
         });
-        showSuccessMessage('Task status set as default successfully', '');
+        showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_EDIT_TARGET', { target: _i18n.t('OPSFLOW.STATUS') }), '');
     } catch (e) {
-        ErrorHandler.handleRequestError(e, 'Failed to set task status as default');
+        ErrorHandler.handleRequestError(e, _i18n.t('OPSFLOW.ALT_S_EDIT_TARGET', { target: _i18n.t('OPSFLOW.STATUS') }));
     }
 };
 const handleConfirm = async () => {
@@ -78,10 +83,14 @@ const handleClosed = () => {
                     @closed="handleClosed"
     >
         <template #header-title>
-            Set <strong>{{ name }}</strong> as the default status.
+            <i18n path="OPSFLOW.TASK_MANAGEMENT.STATUS.SET_AS_DEFAULT">
+                Set <template #status>
+                    <strong>{{ name }}</strong>
+                </template> as the default status.
+            </i18n>
         </template>
         <template #body>
-            This will make it the primary status for related operations.
+            {{ $t('OPSFLOW.TASK_MANAGEMENT.STATUS.SET_DEFAULT_DESC', {tasks: taskManagementTemplateStore.templates.tasks}) }}
         </template>
     </p-button-modal>
 </template>

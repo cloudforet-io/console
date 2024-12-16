@@ -156,6 +156,9 @@ watch(() => boardPageState.currentCategoryId, () => {
 }, { immediate: true });
 
 /* toolbox */
+const handleRefresh = () => {
+    listTask(getQuery());
+};
 const handleChange = (options: ToolboxOptions) => {
     if (options.searchText !== undefined) search.value = options.searchText;
     if (options.pageStart !== undefined) pagination.page = options.pageStart;
@@ -225,6 +228,7 @@ const fields = computed<DataTableField[] >(() => [
                        :this-page="pagination.page"
                        :page-size="pagination.size"
                        :total-count="pagination.total"
+                       @refresh="handleRefresh"
                        @change="handleChange"
             />
             <p-divider />
@@ -236,6 +240,7 @@ const fields = computed<DataTableField[] >(() => [
         </div>
         <p-data-table :fields="fields"
                       :items="tasks"
+                      :loading="loading"
                       class="w-auto"
         >
             <template #col-name-format="{item}">

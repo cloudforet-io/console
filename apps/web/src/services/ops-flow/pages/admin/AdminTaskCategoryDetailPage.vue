@@ -27,6 +27,8 @@ import { PHeading, PTab, PSkeleton } from '@cloudforet/mirinae';
 import type { TabItem } from '@cloudforet/mirinae/types/hooks/use-tab/type';
 
 
+import { i18n } from '@/translations';
+
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useGoBack } from '@/common/composables/go-back';
@@ -67,7 +69,7 @@ const {
 const tabs = computed<TabItem<object>[]>(() => [
     {
         name: 'status',
-        label: 'Status', // TODO: i18n
+        label: i18n.t('OPSFLOW.STATUS'),
         keepAlive: true,
     },
     {

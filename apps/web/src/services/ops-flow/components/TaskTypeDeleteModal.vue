@@ -3,7 +3,7 @@ import { ref, computed, watch } from 'vue';
 
 import { PButtonModal, PIconButton } from '@cloudforet/mirinae';
 
-import { i18n as _i18n } from '@/translations';
+import { getParticle, i18n as _i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -27,7 +27,10 @@ const headerTitle = computed(() => {
         return ' ';
     }
     return deletable.value
-        ? _i18n.t('OPSFLOW.DELETE_TARGET_CONFIRMATION', { target: taskManagementTemplateStore.templates.TaskType })
+        ? _i18n.t('OPSFLOW.DELETE_TARGET_CONFIRMATION', {
+            object: taskManagementTemplateStore.templates.TaskType,
+            particle: getParticle(taskManagementTemplateStore.templates.TaskType, 'object'),
+        })
         : _i18n.t('OPSFLOW.DELETE_TARGET', { target: taskManagementTemplateStore.templates.TaskType });
 });
 const loading = ref<boolean>(false);
@@ -88,7 +91,11 @@ watch(() => taskCategoryPageState.visibleTaskTypeDeleteModal, (visible) => {
             <div v-if="!deletable">
                 <div class="mb-4 flex items-end justify-between">
                     <p class="text-paragraph-lg font-bold">
-                        {{ $t('OPSFLOW.TASK_MANAGEMENT.TASK_TYPE.DELETE_UNAVAILABLE', { taskType: taskManagementTemplateStore.templates.TaskType }) }}
+                        {{ $t('OPSFLOW.TASK_MANAGEMENT.TASK_TYPE.DELETE_UNAVAILABLE', {
+                            taskType: taskManagementTemplateStore.templates.TaskType,
+                            tasks: taskManagementTemplateStore.templates.tasks,
+                            particle: getParticle(taskManagementTemplateStore.templates.tasks, 'subject')
+                        }) }}
                     </p>
                     <p-icon-button name="ic_refresh"
                                    @click="handleRefresh"

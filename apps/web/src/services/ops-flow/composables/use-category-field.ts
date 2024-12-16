@@ -50,7 +50,8 @@ export const useCategoryField = ({
     });
 
     const loadAllCategoryItems = async (): Promise<CategoryItem[]> => {
-        const taskCategories = await taskCategoryStore.list() ?? [];
+        let taskCategories = await taskCategoryStore.list() ?? [];
+        taskCategories = taskCategories.filter((c) => c.state !== 'DELETED');
 
         if (hasTaskTypeOnly) {
             await taskTypeStore.listByCategoryIds(taskCategories.map((c) => c.category_id));

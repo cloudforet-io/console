@@ -1,27 +1,56 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 
 import { PButtonModal } from '@cloudforet/mirinae/';
+
+import { getParticle, i18n as _i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AssociatedTasks from '@/services/ops-flow/components/AssociatedTasks.vue';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
+import {
+    useTaskManagementTemplateStore,
+} from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
 const taskManagementPageStore = useTaskManagementPageStore();
+const taskManagementPageState = taskManagementPageStore.state;
 const taskCategoryStore = useTaskCategoryStore();
+const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
 
 const deletable = computed(() => !taskManagementPageStore.getters.associatedTasksToCategory.length);
+const headerTitle = computed(() => {
+    if (taskManagementPageStore.state.loadingAssociatedTasksToCategory) {
+        return ' ';
+    }
+    return deletable.value
+        ? _i18n.t('OPSFLOW.DELETE_TARGET_CONFIRMATION', {
+            object: _i18n.t('OPSFLOW.CATEGORY'),
+            particle: getParticle(_i18n.t('OPSFLOW.CATEGORY') as string, 'object'),
+        })
+        : _i18n.t('OPSFLOW.DELETE_TARGET', { target: _i18n.t('OPSFLOW.CATEGORY') });
+});
+
 const loading = ref<boolean>(false);
+const deleteCategory = async (categoryId: string) => {
+    try {
+        await taskCategoryStore.delete(categoryId);
+        showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_DELETE_TARGET', { target: _i18n.t('OPSFLOW.CATEGORY') }), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, _i18n.t('OPSFLOW.ALT_E_DELETE_TARGET', { target: _i18n.t('OPSFLOW.CATEGORY') }));
+    }
+};
 const handleConfirm = async () => {
     try {
         loading.value = true;
-        if (!taskManagementPageStore.state.targetCategoryId) {
+        if (!taskManagementPageState.targetCategoryId) {
             throw new Error('[Console Error] Cannot delete category without a target category');
         }
-        await taskCategoryStore.delete(taskManagementPageStore.state.targetCategoryId);
+        await deleteCategory(taskManagementPageState.targetCategoryId);
     } catch (e) {
         ErrorHandler.handleRequestError(e, 'Failed to delete category');
     } finally {
@@ -35,15 +64,24 @@ const handleCloseOrCancel = () => {
 const handleClosed = () => {
     taskManagementPageStore.resetTargetCategoryId();
 };
+watch(() => taskManagementPageState.visibleDeleteCategoryModal, (visible) => {
+    if (visible) {
+        if (!taskManagementPageState.targetCategoryId) {
+            ErrorHandler.handleError(new Error('[Console Error] Cannot delete category without a target category'));
+            return;
+        }
+        taskManagementPageStore.loadAssociatedTasksToCategory(taskManagementPageState.targetCategoryId);
+    }
+});
 </script>
 
 <template>
-    <p-button-modal :visible="taskManagementPageStore.state.visibleDeleteCategoryModal"
+    <p-button-modal :visible="taskManagementPageState.visibleDeleteCategoryModal"
                     theme-color="alert"
-                    :header-title="deletable ? 'Are you sure you want to delete this category?' : 'Delete Category'"
+                    :header-title="headerTitle"
                     :size="deletable ? 'sm' : 'md'"
                     :loading="loading"
-                    :disabled="!deletable"
+                    :loading-backdrop="taskManagementPageState.loadingAssociatedTasksToCategory"
                     @confirm="handleConfirm"
                     @close="handleCloseOrCancel"
                     @cancel="handleCloseOrCancel"
@@ -53,11 +91,14 @@ const handleClosed = () => {
             <p v-if="!deletable"
                class="text-paragraph-lg font-bold mb-4"
             >
-                하위 태스크가 존재하므로 카테고리 삭제가 불가합니다.
+                {{ $t('OPSFLOW.TASK_MANAGEMENT.CATEGORY.DELETE_CONFIRMATION_DESC', {
+                    tasks: taskManagementTemplateStore.templates.tasks,
+                    particle: getParticle(taskManagementTemplateStore.templates.tasks, 'subject')
+                }) }}
             </p>
+            <associated-tasks v-if="!deletable"
+                              :tasks="taskManagementPageStore.getters.associatedTasksToCategory"
+            />
         </template>
-        <associated-tasks v-if="!!taskManagementPageStore.getters.associatedTasksToCategory.length"
-                          :tasks="taskManagementPageStore.getters.associatedTasksToCategory"
-        />
     </p-button-modal>
 </template>

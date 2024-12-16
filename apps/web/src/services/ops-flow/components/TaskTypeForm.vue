@@ -10,7 +10,7 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
-import { i18n as _i18n } from '@/translations';
+import { getParticle, i18n as _i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -67,11 +67,22 @@ const {
     fields: taskFieldsValidator,
 }, {
     name(value: string) {
-        if (!value.trim().length) return _i18n.t('OPSFLOW.VALIDATION.REQUIRED', { field: _i18n.t('OPSFLOW.NAME') });
-        if (value.length > 50) return _i18n.t('OPSFLOW.VALIDATION.LENGTH_MAX', { field: _i18n.t('OPSFLOW.NAME'), length: 50 });
+        if (!value.trim().length) {
+            return _i18n.t('OPSFLOW.VALIDATION.REQUIRED', {
+                topic: _i18n.t('OPSFLOW.NAME'),
+                particle: getParticle(_i18n.t('OPSFLOW.NAME') as string, 'topic'),
+            });
+        }
+        if (value.length > 50) {
+            return _i18n.t('OPSFLOW.VALIDATION.LENGTH_MAX', {
+                topic: _i18n.t('OPSFLOW.NAME'),
+                particle: getParticle(_i18n.t('OPSFLOW.NAME') as string, 'topic'),
+                length: 50,
+            });
+        }
         if (!taskCategoryPageGetters.taskTypes) return true;
         const isDuplicated = taskCategoryPageGetters.taskTypes.some((taskType) => taskType.name === value && taskType.task_type_id !== taskCategoryPageGetters.targetTaskType?.task_type_id);
-        if (isDuplicated) return _i18n.t('OPSFLOW.VALIDATION.DUPLICATED', { field: _i18n.t('OPSFLOW.NAME') });
+        if (isDuplicated) return _i18n.t('OPSFLOW.VALIDATION.DUPLICATED', { topic: _i18n.t('OPSFLOW.NAME') });
         return true;
     },
 });
@@ -217,7 +228,7 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
                 </p-field-group>
                 <p-field-group :label="$t('OPSFLOW.DESCRIPTION')">
                     <p-textarea :value="description"
-                                :placeholder="String($t('OPSFLOW.FIELD_DESCRIPTION', { field: taskManagementTemplateStore.templates.taskType }))"
+                                :placeholder="String($t('OPSFLOW.DESCRBE_FIELD', { field: taskManagementTemplateStore.templates.taskType }))"
                                 @update:value="setForm('description', $event)"
                     />
                 </p-field-group>

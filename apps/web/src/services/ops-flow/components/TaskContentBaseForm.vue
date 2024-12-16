@@ -21,6 +21,7 @@ import { useTaskStatusField } from '@/services/ops-flow/composables/use-task-sta
 import { useTaskTypeField } from '@/services/ops-flow/composables/use-task-type-field';
 import { useTaskAssignStore } from '@/services/ops-flow/stores/task-assign-store';
 import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
+import { useTaskDetailPageStore } from '@/services/ops-flow/stores/task-detail-page-store';
 import { useTaskStore } from '@/services/ops-flow/stores/task-store';
 
 const taskContentFormStore = useTaskContentFormStore();
@@ -29,6 +30,7 @@ const taskContentFormGetters = taskContentFormStore.getters;
 const userReferenceStore = useUserReferenceStore();
 const taskAssignStore = useTaskAssignStore();
 const taskStore = useTaskStore();
+const taskDetailPageStore = useTaskDetailPageStore();
 
 /* category */
 const {
@@ -101,6 +103,7 @@ const handleUpdateSelectedStatus = (items) => {
     setSelectedStatusItems(items);
     if (taskContentFormState.mode === 'view') {
         changeStatus(statusId);
+        taskDetailPageStore.loadNewEvents();
     }
 };
 

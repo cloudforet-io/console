@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { PButtonModal } from '@cloudforet/mirinae';
 
+import { getParticle } from '@/translations';
+
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
@@ -25,7 +27,10 @@ const handleCloseOrCancel = () => {
 <template>
     <p-button-modal :visible="props.visible"
                     theme-color="alert"
-                    :header-title="$t('OPSFLOW.DELETE_TARGET_CONFIRMATION2', { target: $t('OPSFLOW.FIELD_GENERATOR.FIELD') })"
+                    :header-title="$t('OPSFLOW.DELETE_TARGET_CONFIRMATION', {
+                        object: $t('OPSFLOW.FIELD_GENERATOR.FIELD'),
+                        particle: getParticle($t('OPSFLOW.FIELD_GENERATOR.FIELD'), 'object')
+                    })"
                     size="md"
                     @confirm="handleConfirm"
                     @close="handleCloseOrCancel"

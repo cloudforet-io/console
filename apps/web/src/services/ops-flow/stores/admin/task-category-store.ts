@@ -49,24 +49,25 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
             if (state.items === undefined) {
                 actions.list();
             }
+            return state.items?.filter((item) => item.state !== 'DELETED') ?? [];
+        }),
+        taskCategoriesIncludingDeleted: computed<TaskCategoryModel[]>(() => {
+            if (state.items === undefined) {
+                actions.list();
+            }
             return state.items ?? [];
         }),
     } as unknown as UseTaskCategoryStoreGetters; // HACK: to avoid type error
 
     const fetchList = getCancellableFetcher<TaskCategoryListParameters, ListResponse<TaskCategoryModel>>(SpaceConnector.clientV2.opsflow.taskCategory.list);
     const actions = {
-        async list(paramsOrForce?: TaskCategoryListParameters|true): Promise<TaskCategoryModel[]|undefined> {
-            const force = paramsOrForce === true;
+        async list(force?: true): Promise<TaskCategoryModel[]|undefined> {
             if (!force && state.items) return state.items;
-            const params = force ? undefined : paramsOrForce;
             try {
                 state.loading = true;
-                const result = await fetchList(params ?? {});
+                const result = await fetchList({ include_deleted: true });
                 if (result.status === 'succeed') {
                     state.loading = false;
-                    if (params) {
-                        return result.response.results ?? [];
-                    }
                     state.items = result.response.results ?? [];
                     return result.response.results ?? [];
                 }

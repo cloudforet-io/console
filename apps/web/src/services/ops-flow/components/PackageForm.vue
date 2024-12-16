@@ -3,9 +3,12 @@ import {
     ref, watch, nextTick,
 } from 'vue';
 
+import { isEqual } from 'lodash';
+
 import {
     POverlayLayout, PFieldGroup, PTextInput, PTextarea, PSelectDropdown, PButton, PRadioGroup, PRadio,
 } from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/src/controls/dropdown/select-dropdown/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -37,6 +40,10 @@ const workspaceType = ref<'unset'|'specific'>('unset');
 const handleSelectUnsetWorkspace = () => {
     workspaceType.value = 'unset';
     setSelectedWorkspaces([]);
+};
+const handleUpdateWorkspaces = (items: SelectDropdownMenuItem[]) => {
+    if (isEqual(items, selectedWorkspaceItems.value)) return;
+    setSelectedWorkspaces(items);
 };
 
 /* category */
@@ -90,12 +97,11 @@ const handleConfirm = async () => {
                 package_id: taskManagementPageState.targetPackageId,
                 name: name.value,
                 description: description.value,
-                tags: {},
             });
             // bind workspaces and categories
             const errorMessages: string[] = [];
             const responses = await Promise.allSettled([
-                applyPackageToWorkspaces(updatedPackage.package_id),
+                applyPackageToWorkspaces(updatedPackage.package_id, workspaceType.value === 'unset'),
                 applyPackageToCategories(updatedPackage.package_id),
             ]);
             responses.forEach((response) => {
@@ -120,7 +126,7 @@ const handleConfirm = async () => {
             // bind workspaces and categories
             const errorMessages: string[] = [];
             const responses = await Promise.allSettled([
-                applyPackageToWorkspaces(createdPackage.package_id),
+                applyPackageToWorkspaces(createdPackage.package_id, workspaceType.value === 'unset'),
                 applyPackageToCategories(createdPackage.package_id),
             ]);
             responses.forEach((response) => {
@@ -149,7 +155,7 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
             description: '',
         });
         workspaceType.value = 'unset';
-        setInitialWorkspaces();
+        await setInitialWorkspaces();
         await setInitialCategoriesByPackageId();
         resetValidations();
         return;
@@ -159,7 +165,7 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
             name: targetPackage.name,
             description: targetPackage.description,
         });
-        setInitialWorkspaces(targetPackage.package_id);
+        await setInitialWorkspaces(targetPackage.package_id);
         if (selectedWorkspaceItems.value.length > 0) {
             workspaceType.value = 'specific';
         } else {
@@ -238,7 +244,7 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
                                            show-clear-selection
                                            is-filterable
                                            init-selected-with-handler
-                                           @update:selected="setSelectedWorkspaces"
+                                           @update:selected="handleUpdateWorkspaces"
                         />
                     </div>
                 </p-field-group>

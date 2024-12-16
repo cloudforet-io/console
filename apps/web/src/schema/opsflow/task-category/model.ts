@@ -5,11 +5,11 @@ import type { TaskStatusOptions } from '@/schema/opsflow/task/type';
 export interface TaskCategoryModel {
     category_id: string;
     name: string;
+    state: 'ACTIVE' | 'DELETED';
     description: string;
     status_options: TaskStatusOptions;
     fields:TaskField[];
     tags: Tags;
-    state: string;
     package_id: string;
     domain_id: string;
     created_at: string;

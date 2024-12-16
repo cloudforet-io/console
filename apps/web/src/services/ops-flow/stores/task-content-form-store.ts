@@ -81,7 +81,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         // task type field form
         currentFields: computed<TaskField[]>(() => {
             const taskType = state.currentTaskType;
-            const fields = taskType ? taskType.fields : [];
+            const fields = taskType?.fields ?? [];
             const isViewMode = state.mode === 'view';
             return isViewMode ? fields : fields.filter((f) => f.is_primary || f.is_required);
         }),
