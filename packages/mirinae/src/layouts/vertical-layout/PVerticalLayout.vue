@@ -15,7 +15,7 @@ interface Props {
     initWidth?: number;
     minWidth?: number;
     maxWidth?: number;
-    disableDoubleClickResize? : boolean;
+    enableDoubleClickResize? : boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -23,7 +23,7 @@ const props = withDefaults(defineProps<Props>(), {
     initWidth: 240,
     minWidth: 100,
     maxWidth: 500,
-    disableDoubleClickResize: false,
+    enableDoubleClickResize: false,
 });
 
 const documentEventMount = (eventName: string, func: any) => {
@@ -39,6 +39,7 @@ const state = reactive({
     hide: false,
     transition: false,
     isHover: false,
+    isMaximized: props.initWidth === props.maxWidth,
     sidebarContainerStyle: computed(() => ({
         width: `${state.width}px`,
         height: '100%',
@@ -129,44 +130,14 @@ const detectWindowResizing = () => {
     }
 };
 
-// TODO mobile size 고려
 const handleControllerDoubleClick = () => {
-    const childElementRects = leftLayoutContentBox.value?.children[0].getClientRects()[0];
+    const minimumWidth = props.minWidth;
+    const maximumWidth = props.maxWidth;
 
-    console.log(childElementRects);
-
-    if (childElementRects) {
-        const contentWidth = childElementRects.width;
-        const minimumWidth = props.minWidth;
-        const maximumWidth = props.maxWidth;
-        const maximumPossibleWidth = contentWidth > props.maxWidth ? props.maxWidth : contentWidth;
-
-        console.log(state.width, 'state.width');
-        console.log(`${contentWidth}contentWidth`);
-        console.log(minimumWidth, 'minimumWidth');
-        console.log(maximumPossibleWidth, 'maximumPossibleWidth');
-
-        if (state.width === minimumWidth) {
-            if (state.width === maximumPossibleWidth) {
-                resize(maximumWidth);
-            } else {
-                resize(maximumPossibleWidth);
-            }
-            return;
-        }
-
-        if (state.width === maximumWidth) {
-            resize(minimumWidth);
-            return;
-        }
-
-        if (state.width > contentWidth) {
-            resize(minimumWidth);
-        } else if (state.width < contentWidth) {
-            resize(maximumPossibleWidth);
-        } else {
-            resize(maximumWidth);
-        }
+    if (state.width <= minimumWidth + (maximumWidth - minimumWidth) / 2) {
+        resize(maximumWidth);
+    } else {
+        resize(minimumWidth);
     }
 };
 
@@ -224,7 +195,7 @@ onBeforeMount(() => {
                 </span>
             </p-tooltip>
             <div
-                v-if="!disableDoubleClickResize"
+                v-if="enableDoubleClickResize"
                 class="controller"
                 :class="{hover: state.isHover && !state.hide}"
                 @dblclick="handleControllerDoubleClick"

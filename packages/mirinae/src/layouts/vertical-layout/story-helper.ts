@@ -5,6 +5,7 @@ export const getVerticalLayoutArgs = (): Args => ({
     initWidth: 300,
     minWidth: 100,
     maxWidth: 500,
+    enableDoubleClickResize: false,
 });
 
 export const getVerticalLayoutParameters = (): Parameters => ({
@@ -75,10 +76,10 @@ export const getVerticalLayoutArgTypes = (): ArgTypes => ({
         },
         control: 'number',
     },
-    disableDoubleClickResize: {
-        name: 'disableDoubleClickResize',
+    enableDoubleClickResize: {
+        name: 'enableDoubleClickResize',
         type: { name: 'boolean' },
-        description: 'Whether to disable resizing the sidebar with a double-click on the controller.',
+        description: 'Whether to enable resizing the sidebar with a double-click on the controller.',
         table: {
             type: {
                 summary: 'boolean',

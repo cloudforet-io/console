@@ -38,9 +38,9 @@ const Template: Story = {
                     :initWidth="initWidth"
                     :minWidth="minWidth"
                     :maxWidth="maxWidth"
-                    :disableDoubleClickResize="disableDoubleClickResize">
+                    :enableDoubleClickResize="enableDoubleClickResize">
                     <template #sidebar>
-                      <div style="width: 400px; background-color: red">Left Layout</div>
+                      Left LayoutLeft
                     </template>
                     <template #default>
                         Right Layout
