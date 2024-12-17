@@ -37,5 +37,5 @@ export interface TransformDataTableProps<OperatorOptions> {
     baseDataTableId: string;
     operatorOptions: OperatorOptions;
     originData: OperatorOptions;
-    // invalid: boolean;
+    invalid?: boolean;
 }

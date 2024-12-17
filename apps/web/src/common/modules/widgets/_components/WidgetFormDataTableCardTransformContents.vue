@@ -68,19 +68,15 @@ const state = reactive({
     dataTableName: props.item.name ? props.item.name : `${props.item.operator} Data`,
     applyDisabled: computed(() => {
         const haveSavedName = !!originState.name;
-        const haveRequiredConcatOptions = haveSavedName && valueState.CONCAT.data_tables.length === 2 && !valueState.CONCAT.data_tables.includes(undefined);
-        const haveRequiredJoinOptions = haveSavedName && valueState.JOIN.data_tables.length === 2 && valueState.JOIN.how;
-        const haveRequiredQueryOptions = haveSavedName && !!valueState.QUERY.data_table_id && valueState.QUERY.conditions.filter((cond) => !!cond.trim()).length > 0;
-        const haveRequiredEvalOptions = haveSavedName && !!valueState.EVAL.data_table_id && valueState.EVAL.expressions.every((expression) => !!expression.name && !!expression.expression);
-        const haveRequiredAddLabels = haveSavedName && !!valueState.ADD_LABELS.data_table_id && Object.entries(valueState.ADD_LABELS.labels).every(([name, value]) => !!name && !!value);
-        const haveRequiredPivotOptions = haveSavedName && !!valueState.PIVOT.data_table_id && !!valueState.PIVOT.fields?.labels && valueState.PIVOT.fields?.labels?.length > 0
-            && !!valueState.PIVOT.fields?.column && !!valueState.PIVOT.fields?.data && (!!valueState.PIVOT.select || !!valueState.PIVOT.limit);
-        if (state.operator === 'CONCAT') return !haveRequiredConcatOptions;
-        if (state.operator === 'JOIN') return !haveRequiredJoinOptions;
-        if (state.operator === 'QUERY') return !haveRequiredQueryOptions;
-        if (state.operator === 'EVAL') return !haveRequiredEvalOptions;
-        if (state.operator === 'PIVOT') return !haveRequiredPivotOptions;
-        if (state.operator === 'ADD_LABELS') return !haveRequiredAddLabels;
+        if (!haveSavedName) return true;
+        // const haveRequiredPivotOptions = haveSavedName && !!valueState.PIVOT.data_table_id && !!valueState.PIVOT.fields?.labels && valueState.PIVOT.fields?.labels?.length > 0
+        //     && !!valueState.PIVOT.fields?.column && !!valueState.PIVOT.fields?.data && (!!valueState.PIVOT.select || !!valueState.PIVOT.limit);
+        if (state.operator === 'CONCAT') return invalidState.CONCAT;
+        if (state.operator === 'JOIN') return invalidState.JOIN;
+        if (state.operator === 'QUERY') return invalidState.QUERY;
+        if (state.operator === 'EVAL') return invalidState.EVAL;
+        if (state.operator === 'PIVOT') return invalidState.PIVOT;
+        if (state.operator === 'ADD_LABELS') return invalidState.ADD_LABELS;
         return true;
     }),
     optionsChanged: computed(() => {
@@ -120,6 +116,14 @@ const valueState = reactive({
     EVAL: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.EVAL,
     QUERY: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.QUERY,
     ADD_LABELS: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.ADD_LABELS,
+});
+const invalidState = reactive({
+    PIVOT: false,
+    CONCAT: false,
+    JOIN: false,
+    EVAL: false,
+    QUERY: false,
+    ADD_LABELS: false,
 });
 
 const originState = reactive({
@@ -350,36 +354,42 @@ defineExpose({
                                                           :key="`pivot-${state.resetKey}`"
                                                           :base-data-table-id="state.dataTableId"
                                                           :operator-options.sync="valueState.PIVOT"
+                                                          :invalid.sync="invalidState.PIVOT"
                                                           :origin-data="props.item.options[state.operator]"
         />
         <widget-form-data-table-card-transform-concatenate v-if="state.operator === DATA_TABLE_OPERATOR.CONCAT"
                                                            :key="`concat-${state.resetKey}`"
                                                            :base-data-table-id="state.dataTableId"
                                                            :operator-options.sync="valueState.CONCAT"
+                                                           :invalid.sync="invalidState.CONCAT"
                                                            :origin-data="props.item.options[state.operator]"
         />
         <widget-form-data-table-card-transform-join v-else-if="state.operator === DATA_TABLE_OPERATOR.JOIN"
                                                     :key="`join-${state.resetKey}`"
                                                     :base-data-table-id="state.dataTableId"
                                                     :operator-options.sync="valueState.JOIN"
+                                                    :invalid.sync="invalidState.JOIN"
                                                     :origin-data="props.item.options[state.operator]"
         />
         <widget-form-data-table-card-transform-evaluate v-else-if="state.operator === DATA_TABLE_OPERATOR.EVAL"
                                                         :key="`eval-${state.resetKey}`"
                                                         :base-data-table-id="state.dataTableId"
                                                         :operator-options.sync="valueState.EVAL"
+                                                        :invalid.sync="invalidState.EVAL"
                                                         :origin-data="props.item.options[state.operator]"
         />
         <widget-form-data-table-card-transform-query v-else-if="state.operator === DATA_TABLE_OPERATOR.QUERY"
                                                      :key="`query-${state.resetKey}`"
                                                      :base-data-table-id="state.dataTableId"
                                                      :operator-options.sync="valueState.QUERY"
+                                                     :invalid.sync="invalidState.QUERY"
                                                      :origin-data="props.item.options[state.operator]"
         />
         <widget-form-data-table-card-transform-add-labels v-if="state.operator === DATA_TABLE_OPERATOR.ADD_LABELS"
                                                           :key="`add-labels-${state.resetKey}`"
                                                           :base-data-table-id="state.dataTableId"
                                                           :operator-options.sync="valueState.ADD_LABELS"
+                                                          :invalid.sync="invalidState.ADD_LABELS"
                                                           :origin-data="props.item.options[state.operator]"
         />
         <widget-form-data-table-card-footer :disabled="state.applyDisabled"

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    reactive, ref, watch,
+    computed, reactive, ref, watch,
 } from 'vue';
 
 import { cloneDeep } from 'lodash';
@@ -16,7 +16,7 @@ import WidgetFormDataTableCardTransformFormWrapper
 import WidgetFormDataTableGlobalVariableViewButton
     from '@/common/modules/widgets/_components/WidgetFormDataTableGlobalVariableViewButton.vue';
 import {
-    type DATA_TABLE_OPERATOR,
+    DATA_TABLE_OPERATOR,
 } from '@/common/modules/widgets/_constants/data-table-constant';
 import type { TransformDataTableInfo, TransformDataTableProps } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { QueryOptions } from '@/common/modules/widgets/types/widget-model';
@@ -27,7 +27,9 @@ const CONDITION_PLACEHOLDER = '{{ Product }} == \'A\'';
 const RANDOM_KEY = Math.random();
 
 const props = defineProps<TransformDataTableProps<QueryOptions>>();
-const emit = defineEmits<{(e: 'update:operator-options', value: QueryOptions): void; }>();
+const emit = defineEmits<{(e: 'update:operator-options', value: QueryOptions): void;
+    (e: 'update:invalid', value: boolean): void;
+}>();
 
 const dataTableInfo = ref<TransformDataTableInfo>({
     dataTableId: props.originData?.data_table_id,
@@ -37,6 +39,11 @@ const conditionsInfo = ref<QueryOptions['conditions']>(cloneDeep(props.originDat
 // const operatorInfo = ref<QueryOptions['operator']>(props.originData.operator);
 const state = reactive({
     proxyOperatorOptions: useProxyValue<QueryOptions>('operator-options', props, emit),
+    invalid: computed<boolean>(() => {
+        if (!state.proxyOperatorOptions?.data_table_id) return true;
+        if (state.proxyOperatorOptions.conditions.some((condition) => !condition)) return true;
+        return false;
+    }),
     // queryOperatorItems: computed<SelectDropdownMenuItem[]>(() => [
     //     { label: 'And', name: 'AND' },
     //     { label: 'Or', name: 'OR' },
@@ -66,6 +73,9 @@ watch([dataTableInfo, conditionsInfo], ([_dataTableInfo, _conditionsInfo]) => {
         conditions: _conditionsInfo,
     };
 }, { deep: true, immediate: true });
+watch(() => state.invalid, (_invalid) => {
+    emit('update:invalid', _invalid);
+}, { immediate: true });
 </script>
 
 <template>
