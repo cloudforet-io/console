@@ -5,7 +5,7 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { random } from 'lodash';
+import { cloneDeep, random } from 'lodash';
 
 import {
     PIconButton, PFieldGroup, PTextInput, PButton, PFieldTitle,
@@ -49,7 +49,7 @@ const storeState = reactive({
 const dataTableInfo = ref<TransformDataTableInfo>({
     dataTableId: props.originData?.data_table_id,
 });
-const labelsInfo = ref<AddLabelsOptions['labels']>(props.originData.labels);
+const labelsInfo = ref<AddLabelsOptions['labels']>(cloneDeep(props.originData.labels));
 const state = reactive({
     proxyOperatorOptions: useProxyValue<AddLabelsOptions>('operator-options', props, emit),
     refinedLabels: [] as AdditionalLabel[],
@@ -60,7 +60,7 @@ const state = reactive({
         const fieldNames = state.refinedLabels.map((label) => label.name);
         if (fieldNames.includes(DATE_FIELD)) return true;
         if (fieldNames.length !== new Set(fieldNames).size) return true;
-        if (Object.keys(labelsInfo.value).some((d) => !isFieldNameValid(d, storeState.currentDataTable))) return true;
+        if (state.refinedLabels.some((d) => !isFieldNameValid(d.name, storeState.currentDataTable))) return true;
         return false;
     }),
 });
@@ -151,7 +151,7 @@ onMounted(() => {
                     <div class="label-set">
                         <p-text-input class="label-input"
                                       block
-                                      :invalid="getInvalidText(idx)"
+                                      :invalid="!!getInvalidText(idx)"
                                       :value.sync="labelInfo.name"
                         />
                         <p-text-input class="label-input"
