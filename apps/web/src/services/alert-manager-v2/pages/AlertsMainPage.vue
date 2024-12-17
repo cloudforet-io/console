@@ -1,10 +1,17 @@
 <script setup lang="ts">
+import { reactive } from 'vue';
+
 import { PHeadingLayout, PHeading, PButton } from '@cloudforet/mirinae';
 
+import AlertCreateModal from '@/services/alert-manager-v2/components/AlertCreateModal.vue';
 import AlertsManagementTable from '@/services/alert-manager-v2/components/AlertsManagementTable.vue';
 
+const state = reactive({
+    createModalVisible: false,
+});
+
 const handleClickCreateButton = () => {
-    console.log('TODO: handleClickCreateButton');
+    state.createModalVisible = true;
 };
 </script>
 
@@ -26,5 +33,8 @@ const handleClickCreateButton = () => {
         <div class="mt-6">
             <alerts-management-table />
         </div>
+        <alert-create-modal v-if="state.createModalVisible"
+                            :visible.sync="state.createModalVisible"
+        />
     </div>
 </template>
