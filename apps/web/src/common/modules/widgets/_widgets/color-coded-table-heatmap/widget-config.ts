@@ -24,7 +24,7 @@ const colorCodedTableHeatmap: WidgetConfig = {
         dataField: {},
         formatRules: {
             options: {
-                formatRulesType: _FORMAT_RULE_TYPE.textNumberTreshold,
+                formatRulesType: _FORMAT_RULE_TYPE.textNumberThreshold,
                 description: 'COMMON.WIDGETS.ADVANCED_FORMAT_RULES.COLOR_CODED_TABLE_HEATMAP_DESC',
             },
         },

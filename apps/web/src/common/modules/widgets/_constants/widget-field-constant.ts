@@ -5,7 +5,7 @@ export const _FORMAT_RULE_TYPE = {
     numberThreshold: 'numberThreshold',
     percentThreshold: 'percentThreshold',
     textThreshold: 'textThreshold',
-    textNumberTreshold: 'textNumberTreshold',
+    textNumberThreshold: 'textNumberThreshold',
 } as const;
 
 export const FORMAT_RULE_TYPE = {
