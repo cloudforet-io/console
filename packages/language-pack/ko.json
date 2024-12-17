@@ -1287,6 +1287,10 @@
 			"SELECT_PROJECT": "프로젝트 선택",
 			"TITLE": "프로젝트 변경"
 		},
+		"USER_SELECT_DROPDOWN": {
+			"USER": "사용자",
+			"USER_GROUP": ""
+		},
 		"WIDGETS": {
 			"ACTUAL": "실제 크기",
 			"ADD_WIDGET": "위젯 추가",

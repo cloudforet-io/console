@@ -1287,6 +1287,10 @@
 			"SELECT_PROJECT": "プロジェクト選択",
 			"TITLE": "プロジェクト変更"
 		},
+		"USER_SELECT_DROPDOWN": {
+			"USER": "ユーザー",
+			"USER_GROUP": ""
+		},
 		"WIDGETS": {
 			"ACTUAL": "実際のサイズ",
 			"ADD_WIDGET": "ウィジェットを追加する",

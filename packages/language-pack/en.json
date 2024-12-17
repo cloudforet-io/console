@@ -1287,6 +1287,10 @@
 			"SELECT_PROJECT": "Select Project",
 			"TITLE": "Change Project"
 		},
+		"USER_SELECT_DROPDOWN": {
+			"USER": "User",
+			"USER_GROUP": "User Group"
+		},
 		"WIDGETS": {
 			"ACTUAL": "Actual",
 			"ADD_WIDGET": "Add Widget",
