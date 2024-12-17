@@ -41,6 +41,7 @@ import {
 import type { ColorSchemaValue, ColorValue } from '@/common/modules/widgets/_widget-fields/color-schema/type';
 import type { DateFormatValue } from '@/common/modules/widgets/_widget-fields/date-format/type';
 import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
+import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/granularity/type';
 import type { LegendValue } from '@/common/modules/widgets/_widget-fields/legend/type';
 import type { TableDataFieldValue } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
 import type { XAxisValue } from '@/common/modules/widgets/_widget-fields/x-axis/type';
@@ -57,9 +58,9 @@ const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
 const { dateRange } = useWidgetDateRange({
-    dateRangeFieldValue: computed(() => (props.widgetOptions?.dateRange as DateRangeValue)),
+    dateRangeFieldValue: computed(() => (props.widgetOptions?.dateRange?.value as DateRangeValue)),
     baseOnDate: computed(() => props.dashboardOptions?.date_range?.end),
-    granularity: computed<string>(() => props.widgetOptions?.granularity as string),
+    granularity: computed<GranularityValue>(() => props.widgetOptions?.granularity?.value as GranularityValue),
 });
 const chartContext = ref<HTMLElement|null>(null);
 const state = reactive({

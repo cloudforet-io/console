@@ -22,7 +22,7 @@ const stackedHorizontalBarChart: WidgetConfig = {
                 excludeDateField: true,
             },
         },
-        tableDataField: {},
+        dataField: {},
     },
     optionalFieldsSchema: {
         legend: {

@@ -29,6 +29,7 @@ import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-wi
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
+import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/granularity/type';
 import type { LegendValue } from '@/common/modules/widgets/_widget-fields/legend/type';
 import type { WidgetLoadData } from '@/common/modules/widgets/types/widget-data-type';
 import type {
@@ -44,9 +45,9 @@ const emit = defineEmits<WidgetEmit>();
 const REGION_FIELD = 'Region';
 
 const { dateRange } = useWidgetDateRange({
-    dateRangeFieldValue: computed(() => (props.widgetOptions?.dateRange as DateRangeValue)),
+    dateRangeFieldValue: computed(() => (props.widgetOptions?.dateRange?.value as DateRangeValue)),
     baseOnDate: computed(() => props.dashboardOptions?.date_range?.end),
-    granularity: computed<string>(() => props.widgetOptions?.granularity as string),
+    granularity: computed<GranularityValue>(() => props.widgetOptions?.granularity?.value as GranularityValue),
 });
 const chartContext = ref<HTMLElement|null>(null);
 const allReferenceStore = useAllReferenceStore();

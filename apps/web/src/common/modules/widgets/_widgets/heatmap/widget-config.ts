@@ -21,7 +21,7 @@ const heatmap: WidgetConfig = {
                 defaultIndex: 0,
             },
         },
-        tableDataField: {},
+        dataField: {},
         colorSchema: {},
     },
     optionalFieldsSchema: {

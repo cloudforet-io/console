@@ -27,6 +27,7 @@ import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/u
 import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { FormatRulesValue } from '@/common/modules/widgets/_widget-fields/format-rules/type';
+import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/granularity/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type {
     WidgetProps, WidgetEmit,
@@ -44,9 +45,9 @@ const emit = defineEmits<WidgetEmit>();
 
 const chartContext = ref<HTMLElement|null>(null);
 const { dateRange } = useWidgetDateRange({
-    dateRangeFieldValue: computed(() => (props.widgetOptions?.dateRange as DateRangeValue)),
+    dateRangeFieldValue: computed(() => (props.widgetOptions?.dateRange?.value as DateRangeValue)),
     baseOnDate: computed(() => props.dashboardOptions?.date_range?.end),
-    granularity: computed<string>(() => props.widgetOptions?.granularity as string),
+    granularity: computed<GranularityValue>(() => props.widgetOptions?.granularity?.value as GranularityValue),
 });
 const state = reactive({
     loading: false,

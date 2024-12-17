@@ -17,7 +17,7 @@ const stackedAreaChart: WidgetConfig = {
                 max: 31,
             },
         },
-        tableDataField: {},
+        dataField: {},
     },
     optionalFieldsSchema: {
         legend: {

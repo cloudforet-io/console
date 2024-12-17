@@ -29,6 +29,7 @@ import {
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import type { AdvancedFormatRulesValue } from '@/common/modules/widgets/_widget-fields/advanced-format-rules/type';
 import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
+import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/granularity/type';
 import type { GroupByValue } from '@/common/modules/widgets/_widget-fields/group-by/type';
 import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/common/modules/widgets/types/widget-display-type';
 import type { WidgetLegend } from '@/common/modules/widgets/types/widget-legend-typs';
@@ -44,9 +45,9 @@ const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
 const { dateRange } = useWidgetDateRange({
-    dateRangeFieldValue: computed(() => (props.widgetOptions?.dateRange as DateRangeValue)),
+    dateRangeFieldValue: computed(() => (props.widgetOptions?.dateRange?.value as DateRangeValue)),
     baseOnDate: computed(() => props.dashboardOptions?.date_range?.end),
-    granularity: computed<string>(() => props.widgetOptions?.granularity as string),
+    granularity: computed<GranularityValue>(() => props.widgetOptions?.granularity?.value as GranularityValue),
 });
 const state = reactive({
     loading: false,

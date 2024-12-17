@@ -13,13 +13,16 @@ const table: WidgetConfig = {
     requiredFieldsSchema: {
         granularity: {},
         dateRange: {},
-        tableDataField: {},
+        dataField: {
+            options: {
+                multiSelectable: true,
+            },
+        },
         groupBy: {
             options: {
                 dataTarget: 'labels_info',
                 multiSelectable: true,
                 hideCount: true,
-                defaultIndex: 0,
             },
         },
     },
