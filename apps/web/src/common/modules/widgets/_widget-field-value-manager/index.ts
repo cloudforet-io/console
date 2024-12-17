@@ -26,15 +26,15 @@ export default class WidgetFieldValueManager {
     static applyDefaultValue(
         originData: WidgetFieldValueMap,
         widgetConfig: WidgetConfig,
-        dataTable: PublicDataTableModel|PrivateDataTableModel,
+        dataTable?: PublicDataTableModel|PrivateDataTableModel,
     ): WidgetFieldValueMap {
         const result: WidgetFieldValueMap = { ...originData };
 
         const integratedFieldSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const widgetFieldKeys = ['header', ...Object.keys(integratedFieldSchema)];
-        Object.entries(widgetFieldDefaultValueSetterRegistry).forEach(([key, setter]) => {
+        Object.entries(widgetFieldDefaultValueSetterRegistry).forEach(([key, defaultValueSetter]) => {
             if (widgetFieldKeys.includes(key) && !result[key]) {
-                result[key] = { value: setter(widgetConfig, dataTable) };
+                result[key] = { value: defaultValueSetter(widgetConfig, dataTable) };
             }
         });
 
