@@ -3,6 +3,7 @@ import { reactive } from 'vue';
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { AlertGetParameters } from '@/schema/alert-manager/alert/api-verbs/get';
@@ -14,10 +15,8 @@ import type { ServiceModel } from '@/schema/alert-manager/service/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-
-
 interface AlertPageStoreState {
-    serviceList: ServiceModel[];
+    serviceList: SelectDropdownMenuItem[];
     alertData: Partial<AlertModel>|null;
 }
 interface UpdateAlertPayload {
@@ -43,7 +42,10 @@ export const useAlertPageStore = defineStore('page-alert', () => {
         async fetchServiceList() {
             try {
                 const { results } = await SpaceConnector.clientV2.alertManager.service.list<ServiceListParameters, ListResponse<ServiceModel>>();
-                state.serviceList = results || [];
+                state.serviceList = (results || []).map((i) => ({
+                    name: i.service_id,
+                    label: i.name,
+                }));
             } catch (e) {
                 state.serviceList = [];
                 ErrorHandler.handleError(e, true);

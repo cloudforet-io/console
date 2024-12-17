@@ -17,7 +17,6 @@ import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/cont
 
 import { ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
-import type { ServiceModel } from '@/schema/alert-manager/service/model';
 import { i18n } from '@/translations';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
@@ -73,7 +72,7 @@ const tableState = reactive({
     })),
 });
 const storeState = reactive({
-    serviceList: computed<ServiceModel[]>(() => alertPageState.serviceList),
+    serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => alertPageState.serviceList),
 });
 const state = reactive({
     loading: false,
@@ -82,10 +81,6 @@ const state = reactive({
     urgencyLabels: getAlertUrgencyI18n(),
 });
 const filterState = reactive({
-    serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => storeState.serviceList.map((i) => ({
-        name: i.service_id,
-        label: i.name,
-    }))),
     selectedServiceId: '',
     statusFields: computed<AlertFilterType[]>(() => ([
         { label: i18n.t('ALERT_MANAGER.ALERTS.ALL'), name: 'ALL' },
@@ -191,7 +186,7 @@ onMounted(async () => {
                          @export="handleExportToExcel"
         >
             <template #toolbox-top>
-                <p-select-dropdown :menu="filterState.serviceDropdownList"
+                <p-select-dropdown :menu="storeState.serviceDropdownList"
                                    :selection-label="$t('ALERT_MANAGER.ALERTS.SERVICE')"
                                    style-type="rounded"
                                    use-fixed-menu-style
