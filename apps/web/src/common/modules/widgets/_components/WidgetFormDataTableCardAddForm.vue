@@ -44,6 +44,7 @@ interface Props {
     /* Advanced Options */
     selectedTimeDiff: string;
     selectedTimeDiffDate?: string;
+    timeDiffDataName: string;
 
     /* Validation */
     formInvalid: boolean;
@@ -56,6 +57,7 @@ const emit = defineEmits<{(e: 'update:filter', value: Record<string, string[]>):
     (e: 'update:data-unit', value: string): void;
     (e: 'update:selected-time-diff', value: string): void;
     (e: 'update:selected-time-diff-date', value: string): void;
+    (e: 'update:time-diff-data-name', value: string): void;
     (e: 'update:form-invalid', value: boolean): void;
 }>();
 
@@ -83,6 +85,7 @@ const advancedOptionsState = reactive({
     advancedOptionsCollapsed: false,
     proxySelectedTimeDiff: useProxyValue('selectedTimeDiff', props, emit),
     proxySelectedTimeDiffDate: useProxyValue('selectedTimeDiffDate', props, emit),
+    proxyTimeDiffDataName: useProxyValue('timeDiffDataName', props, emit),
     timeDiffList: computed<SelectDropdownMenuItem[]>(() => [
         { label: 'None', name: 'none' },
         { label: 'Year', name: 'years' },
@@ -148,18 +151,19 @@ const assetFilterState = reactive({
 const handleClickTimeDiff = (timeDiff: string) => {
     advancedOptionsState.proxySelectedTimeDiff = timeDiff;
     advancedOptionsState.proxySelectedTimeDiffDate = undefined;
+    if (timeDiff === 'none') advancedOptionsState.proxyTimeDiffDataName = '';
 };
 
 const handleClickTimeDiffDate = (timeDiffDate: string) => {
     advancedOptionsState.proxySelectedTimeDiffDate = timeDiffDate;
 
-    // const defaultFieldName = props.sourceItems.find((source) => source.name === props.sourceKey)?.label || '';
-    // const timeDiffOptions = {
-    //     none: '',
-    //     months: 'month',
-    //     years: 'year',
-    // };
-    // state.proxyDataFieldName = `${defaultFieldName} (- ${timeDiffDate} ${timeDiffOptions[advancedOptionsState.proxySelectedTimeDiff]})`;
+    const defaultFieldName = props.sourceItems.find((source) => source.name === props.sourceKey)?.label || '';
+    const timeDiffOptions = {
+        none: '',
+        months: 'month',
+        years: 'year',
+    };
+    advancedOptionsState.proxyTimeDiffDataName = `${defaultFieldName} (- ${timeDiffDate} ${timeDiffOptions[advancedOptionsState.proxySelectedTimeDiff]})`;
 };
 const handleUpdateSelectedGroupBy = (selectedItem: SelectDropdownMenuItem, isSelected: boolean) => {
     if (isSelected && (state.proxySelectedGroupByItems.length > MAX_GROUP_BY_COUNT)) {
@@ -240,6 +244,11 @@ watch([
                                    @update:selected="handleClickTimeDiffDate"
                 />
             </div>
+            <p-text-input v-if="advancedOptionsState.proxySelectedTimeDiff !== 'none'"
+                          v-model="advancedOptionsState.proxyTimeDiffDataName"
+                          class="timediff-name-text-input"
+                          placeholder="Field Name"
+            />
         </p-field-group>
     </div>
 </template>
@@ -260,6 +269,10 @@ watch([
         .time-diff-date-dropdown {
             width: 75%;
         }
+    }
+    .timediff-name-text-input {
+        width: 100%;
+        margin-top: 0.5rem;
     }
 }
 
