@@ -1,6 +1,8 @@
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import type { DataTableQueryFilter, DataTableFieldType } from '@/common/modules/widgets/types/widget-model';
+import type { DataTableQueryFilter } from '@/common/modules/widgets/types/widget-model';
+
+
 
 type Handler = (item:any) => string;
 
@@ -20,27 +22,6 @@ interface TableFieldInfo {
     unit?: string;
 }
 
-export interface AdditionalLabel {
-    // key: string;
-    name: string;
-    value: string;
-}
-
-export interface QueryCondition {
-    key: string;
-    value: string;
-}
-
-export interface EvalExpressions {
-    key: string;
-    isCollapsed: boolean;
-    name: string;
-    fieldType: DataTableFieldType;
-    expression: string;
-    condition?: string;
-    else?: string;
-}
-
 export interface TransformDataTableInfo {
     dataTables?: string[];
     dataTableId?: string;
@@ -56,4 +37,5 @@ export interface TransformDataTableProps<OperatorOptions> {
     baseDataTableId: string;
     operatorOptions: OperatorOptions;
     originData: OperatorOptions;
+    // invalid: boolean;
 }
