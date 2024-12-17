@@ -1,6 +1,9 @@
+import { ref } from 'vue';
+
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 
+import { integrateFieldsSchema } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { widgetFieldDefaultValueSetterRegistry } from '@/common/modules/widgets/_widget-field-value-manager/constant/default-value-registry';
 import { widgetValidatorRegistry } from '@/common/modules/widgets/_widget-field-value-manager/constant/validator-registry';
 import type { WidgetFieldTypeMap, WidgetFieldValueMap } from '@/common/modules/widgets/_widget-field-value-manager/type';
@@ -12,22 +15,26 @@ export default class WidgetFieldValueManager {
 
     private dataTable: PublicDataTableModel|PrivateDataTableModel;
 
-    private originData: WidgetFieldValueMap;
-
-    private modifiedData: WidgetFieldValueMap;
+    private originData = ref<WidgetFieldValueMap>({});
 
     private validationErrors: Record<string, string> = {};
+
+    private modifiedData = ref<WidgetFieldValueMap>({});
+
+    private widgetInvalid: boolean;
 
     static applyDefaultValue(
         originData: WidgetFieldValueMap,
         widgetConfig: WidgetConfig,
-        dataTable: PublicDataTableModel|PrivateDataTableModel,
+        dataTable?: PublicDataTableModel|PrivateDataTableModel,
     ): WidgetFieldValueMap {
         const result: WidgetFieldValueMap = { ...originData };
 
-        Object.entries(widgetFieldDefaultValueSetterRegistry).forEach(([key, setter]) => {
-            if (!result[key]) {
-                result[key] = { value: setter(widgetConfig, dataTable) };
+        const integratedFieldSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const widgetFieldKeys = ['header', ...Object.keys(integratedFieldSchema)];
+        Object.entries(widgetFieldDefaultValueSetterRegistry).forEach(([key, defaultValueSetter]) => {
+            if (widgetFieldKeys.includes(key) && !result[key]) {
+                result[key] = { value: defaultValueSetter(widgetConfig, dataTable) };
             }
         });
 
@@ -39,29 +46,29 @@ export default class WidgetFieldValueManager {
         dataTable: PublicDataTableModel|PrivateDataTableModel,
         originData: WidgetFieldValueMap,
     ) {
+        console.debug('WidgetFieldValueManager.constructor()', widgetConfig, dataTable, originData);
         this.widgetConfig = widgetConfig;
         this.dataTable = dataTable;
-        this.originData = originData;
-        this.modifiedData = WidgetFieldValueManager.applyDefaultValue(originData, widgetConfig, dataTable);
+        this.widgetInvalid = !dataTable;
+        this.originData.value = originData;
+        this.modifiedData.value = WidgetFieldValueManager.applyDefaultValue(originData, widgetConfig, dataTable);
     }
 
     get data(): WidgetFieldValueMap {
-        return new Proxy(this.modifiedData, {
-            get: (target, key) => target[key as keyof WidgetFieldValueMap],
-        });
+        return this.modifiedData.value;
     }
 
     setFieldValue<Key extends keyof WidgetFieldTypeMap>(key: Key, value: WidgetFieldTypeMap[Key]['value']): boolean {
-        const field = this.modifiedData[key] || this.originData[key];
+        const field = this.modifiedData.value[key] || this.originData.value[key];
         if (!field) {
             throw new Error(`Field "${key}" does not exist.`);
         }
 
-        this.modifiedData[key] = { ...field, value };
+        this.modifiedData.value[key].value = value;
 
         const validator = widgetValidatorRegistry[key];
         if (validator) {
-            const isValid = validator(this.modifiedData[key], this.widgetConfig, this.modifiedData);
+            const isValid = validator(this.modifiedData.value[key].value, this.widgetConfig, this.modifiedData.value);
             if (!isValid) {
                 this.validationErrors[key as string] = `Invalid value for field "${key}"`;
                 return false;
@@ -72,17 +79,13 @@ export default class WidgetFieldValueManager {
         return true;
     }
 
-    updateWidgetConfig(widgetConfig: WidgetConfig): void {
-        this.widgetConfig = widgetConfig;
-    }
-
     validateAll(): boolean {
         this.validationErrors = {};
         let isValid = true;
 
-        Object.entries(this.modifiedData).forEach(([key, field]) => {
+        Object.entries(this.modifiedData.value ?? {}).forEach(([key, field]) => {
             const validator = widgetValidatorRegistry[key];
-            if (validator && !validator(field, this.widgetConfig)) {
+            if (validator && !validator(field.value, this.widgetConfig, this.modifiedData.value)) {
                 this.validationErrors[key] = `Invalid value for field "${key}"`;
                 isValid = false;
             }
@@ -96,25 +99,34 @@ export default class WidgetFieldValueManager {
     }
 
     resetToOrigin(): void {
-        this.modifiedData = { ...this.originData };
+        this.modifiedData.value = { ...this.originData };
         this.validationErrors = {};
     }
 
     updateOriginData(data: WidgetFieldValueMap): void {
-        this.originData = { ...data };
-        this.modifiedData = { ...WidgetFieldValueManager.applyDefaultValue(data, this.widgetConfig, this.dataTable) };
+        this.originData.value = { ...data };
+        this.modifiedData.value = { ...WidgetFieldValueManager.applyDefaultValue(data, this.widgetConfig, this.dataTable) };
         this.validationErrors = {};
     }
 
-    updateModifiedData(data: WidgetFieldValueMap): void {
-        this.modifiedData = { ...data };
+    private updateWidgetConfig(widgetConfig: WidgetConfig): void {
+        this.widgetConfig = widgetConfig;
+    }
+
+    private updateModifiedData(data: WidgetFieldValueMap): void {
+        this.modifiedData.value = { ...data };
     }
 
     updateWidgetType(newWidgetConfig: WidgetConfig): void {
         this.updateWidgetConfig(newWidgetConfig);
-
         this.updateModifiedData(WidgetFieldValueManager.applyDefaultValue({}, newWidgetConfig, this.dataTable));
+        this.validationErrors = {};
+    }
 
+    updateDataTableAndOriginData(dataTable: PublicDataTableModel|PrivateDataTableModel, data: WidgetFieldValueMap): void {
+        this.dataTable = dataTable;
+        this.originData.value = { ...data };
+        this.updateModifiedData(WidgetFieldValueManager.applyDefaultValue(data, this.widgetConfig, dataTable));
         this.validationErrors = {};
     }
 }

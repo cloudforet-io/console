@@ -264,9 +264,10 @@ const handleClickDeleteWidget = (widget: RefinedWidgetInfo) => {
     widgetDeleteState.targetWidget = widget;
     widgetDeleteState.visibleModal = true;
 };
-const handleOpenWidgetOverlay = (widget: RefinedWidgetInfo, overlayType: WidgetOverlayType) => {
+const handleOpenWidgetOverlay = async (widget: RefinedWidgetInfo, overlayType: WidgetOverlayType) => {
     widgetGenerateStore.setOverlayType(overlayType);
     widgetGenerateStore.setWidgetForm(widget);
+    await widgetGenerateStore.listDataTable();
     widgetGenerateStore.setOverlayStep(2);
     widgetGenerateStore.setShowOverlay(true);
 };

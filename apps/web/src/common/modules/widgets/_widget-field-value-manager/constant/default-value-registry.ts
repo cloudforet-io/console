@@ -134,7 +134,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
 
         const result = widgetFieldDefaultValueMap.dataField;
 
-        const fieldKeys = sortWidgetTableFields(Object.keys(dataTable.data_info ?? {}));
+        const fieldKeys = sortWidgetTableFields(Object.keys(dataTable?.data_info ?? {}));
 
         result.data = dataFieldOptions.multiSelectable ? [fieldKeys?.[0]] : fieldKeys?.[0];
 
@@ -154,7 +154,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
             };
         }
         if (formatRulesOptions.useField && formatRulesOptions.dataTarget) {
-            const fieldKeys = sortWidgetTableFields(Object.keys(dataTable[formatRulesOptions.dataTarget]));
+            const fieldKeys = sortWidgetTableFields(Object.keys(dataTable?.[formatRulesOptions.dataTarget] ?? {}));
             result = {
                 ...result,
                 field: fieldKeys?.[0],
@@ -168,7 +168,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
 
         const result = widgetFieldDefaultValueMap.categoryBy;
 
-        const fieldKeys = sortWidgetTableFields(Object.keys(dataTable[categoryByOptions.dataTarget]));
+        const fieldKeys = sortWidgetTableFields(Object.keys(dataTable?.[categoryByOptions.dataTarget] ?? {}));
 
         return {
             ...result,
@@ -182,7 +182,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
 
         const result = widgetFieldDefaultValueMap.categoryBy;
 
-        const fieldKeys = sortWidgetTableFields(Object.keys(dataTable[stackByOptions.dataTarget]));
+        const fieldKeys = sortWidgetTableFields(Object.keys(dataTable?.[stackByOptions.dataTarget] ?? {}));
 
         return {
             ...result,
@@ -196,7 +196,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
 
         const result = widgetFieldDefaultValueMap.categoryBy;
 
-        const fieldKeys = sortWidgetTableFields(Object.keys(dataTable[xAxisOptions.dataTarget]));
+        const fieldKeys = sortWidgetTableFields(Object.keys(dataTable?.[xAxisOptions.dataTarget] ?? {}));
 
         return {
             ...result,
@@ -210,7 +210,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
 
         const result = widgetFieldDefaultValueMap.categoryBy;
 
-        const fieldKeys = sortWidgetTableFields(Object.keys(dataTable[yAxisOptions.dataTarget]));
+        const fieldKeys = sortWidgetTableFields(Object.keys(dataTable?.[yAxisOptions.dataTarget] ?? {}));
 
         return {
             ...result,
@@ -267,7 +267,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
 
         const result = widgetFieldDefaultValueMap.categoryBy;
 
-        const fieldKeys = sortWidgetTableFields(Object.keys(dataTable[groupByOptions.dataTarget]));
+        const fieldKeys = sortWidgetTableFields(Object.keys(dataTable?.[groupByOptions.dataTarget] ?? {}));
 
         result.data = groupByOptions.multiSelectable ? [fieldKeys?.[0]] : fieldKeys?.[0];
 
@@ -347,7 +347,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const numberFormatOptions = (_fieldsSchema.numberFormat?.options ?? {}) as NumberFormatOptions;
 
-        const dataKeys = Object.keys(dataTable.data_info ?? {}) as string[];
+        const dataKeys = Object.keys(dataTable?.data_info ?? {}) as string[];
 
         if (numberFormatOptions.default) {
             const result: NumberFormatValue = {};

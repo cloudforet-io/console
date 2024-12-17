@@ -336,9 +336,6 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 if (!_sort || (_sort && _sort.length === 0)) {
                     const labelsInfoList = Object.keys(dataTable?.labels_info ?? {});
                     if (labelsInfoList.includes('Date')) _sort = [{ key: 'Date', desc: false }];
-                    else if (_granularity === 'DAILY') _sort = [{ key: 'Day', desc: false }];
-                    else if (_granularity === 'MONTHLY') _sort = [{ key: 'Month', desc: false }];
-                    else if (_granularity === 'YEARLY') _sort = [{ key: 'Year', desc: false }];
                 }
                 const { results, total_count } = await fetcher({
                     granularity: _granularity,
@@ -362,21 +359,24 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 state.dataTableLoadLoading = false;
             }
         },
-        updateWidget: async (updateParams: Partial<WidgetUpdateParameters>) => {
+        updateWidget: async (updateParams: Partial<WidgetUpdateParameters>): Promise<WidgetModel|undefined> => {
             const isPrivate = state.widgetId.startsWith('private');
             const fetcher = isPrivate
                 ? SpaceConnector.clientV2.dashboard.privateWidget.update<PrivateWidgetUpdateParameters, PrivateWidgetModel>
                 : SpaceConnector.clientV2.dashboard.publicWidget.update<PublicWidgetUpdateParameters, PublicWidgetModel>;
             const sanitizedOptions = sanitizeWidgetOptions(updateParams.options ?? {}, updateParams.widget_type ?? 'table');
             try {
-                state.widget = await fetcher({
+                const result = await fetcher({
                     widget_id: state.widgetId,
                     ...updateParams,
                     options: sanitizedOptions, // Sanitize Wrong Options
                 });
+                state.widget = result;
+                return result;
             } catch (e: any) {
                 showErrorMessage(e.message, e);
                 ErrorHandler.handleError(e);
+                return undefined;
             }
         },
         /* Step 2 */
@@ -392,13 +392,13 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             state.widgetFormValueMap = {};
             state.allDataTableInvalidMap = {};
         },
-        setWidgetForm: (widgetInfo?: WidgetModel) => {
+        setWidgetForm: (widgetInfo: WidgetModel) => {
             state.selectedWidgetName = widgetInfo?.widget_type || 'table';
-            const _widgetConfig = getWidgetConfig(widgetInfo?.widget_type || 'table');
+            const _widgetConfig = getWidgetConfig(widgetInfo.widget_type || 'table');
             state.widget = widgetInfo;
-            state.widgetId = widgetInfo?.widget_id || '';
+            state.widgetId = widgetInfo.widget_id;
             state.size = widgetInfo?.size || _widgetConfig?.meta?.sizes[0] || 'full';
-            state.selectedDataTableId = widgetInfo?.data_table_id || undefined;
+            state.selectedDataTableId = widgetInfo?.data_table_id;
             state.widgetFormValueMap = widgetInfo?.options || {};
         },
     };

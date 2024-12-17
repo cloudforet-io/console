@@ -16,16 +16,16 @@ import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-
 import { WIDGET_COMPONENT_ICON_MAP } from '@/common/modules/widgets/_constants/widget-components-constant';
 import { CONSOLE_WIDGET_CONFIG } from '@/common/modules/widgets/_constants/widget-config-list-constant';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
-import { getWidgetFieldComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
+import {
+    getWidgetFieldComponent,
+} from '@/common/modules/widgets/_helpers/widget-component-helper';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
+import type WidgetFieldValueManager from '@/common/modules/widgets/_widget-field-value-manager';
 import WidgetHeaderField from '@/common/modules/widgets/_widget-fields/header/WidgetHeaderField.vue';
-import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { DataTableAddOptions } from '@/common/modules/widgets/types/widget-model';
 
 import { red } from '@/styles/colors';
-
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
 const FORM_TITLE_MAP = {
@@ -39,6 +39,7 @@ const DATE_CONFIG_FIELD_KEYS = ['granularity', 'dateRange'];
 interface Props {
     widgetValidationInvalid?: boolean;
     widgetValidationInvalidText?: string|TranslateResult;
+    fieldManager: WidgetFieldValueManager;
 }
 
 const props = defineProps<Props>();
@@ -46,8 +47,6 @@ const props = defineProps<Props>();
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 const widgetGenerateGetters = widgetGenerateStore.getters;
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
 const state = reactive({
     chartTypeMenuItems: computed<MenuItem[]>(() => Object.values(CONSOLE_WIDGET_CONFIG).map((d) => ({
         name: d.widgetName,
@@ -81,11 +80,15 @@ const state = reactive({
 
 /* Event */
 const handleSelectDataTable = async (dataTableId: string) => {
+    const selectedDataTable = widgetGenerateState.dataTables.find((d) => d.data_table_id === dataTableId);
+    if (!selectedDataTable) return;
     widgetGenerateStore.setSelectedDataTableId(dataTableId);
     await widgetGenerateStore.updateWidget({
         data_table_id: dataTableId,
         state: 'INACTIVE',
     });
+
+    props.fieldManager.updateDataTableAndOriginData(selectedDataTable, {});
 };
 
 const checkDefaultValidation = () => {
@@ -122,19 +125,16 @@ const checkDefaultValidation = () => {
     }
 };
 
-const handleShowErrorModal = (value:number|undefined) => {
-    state.widgetDefaultValidationModalVisible = true;
-    state.formErrorModalValue = value;
-};
-
 const handleSelectWidgetName = (widgetName: string) => {
-    if (widgetName === widgetGenerateState.selectedWidgetName) return;
+    const _config = getWidgetConfig(widgetName);
+    if (widgetName === widgetGenerateState.selectedWidgetName || !_config) return;
     widgetGenerateStore.setSelectedWidgetName(widgetName);
 
-    const _config = getWidgetConfig(widgetName);
     widgetGenerateStore.setSize(_config.meta.sizes[0]);
     widgetGenerateStore.setWidgetFormValueMap({});
     widgetGenerateStore.setWidgetValidMap({});
+
+    props.fieldManager.updateWidgetType(_config);
     checkDefaultValidation();
 };
 const handleClickEditDataTable = () => {
@@ -145,24 +145,7 @@ const handleClickCollapsibleTitle = (collapsedTitle: string) => {
     state.collapsedTitleMap[collapsedTitle] = !state.collapsedTitleMap[collapsedTitle];
 };
 
-const checkFormDependencies = (changedFieldName: string):string[] => state.widgetConfigDependencies[changedFieldName] || [];
-const handleUpdateFieldValue = (fieldName: string, value: WidgetFieldValues) => {
-    const _valueMap = cloneDeep(widgetGenerateState.widgetFormValueMap);
-    _valueMap[fieldName] = value;
-    const changedOptions = checkFormDependencies(fieldName);
-    const isValueChanged = (JSON.stringify(value) !== JSON.stringify(widgetGenerateState.widgetFormValueMap[fieldName]));
-    if (changedOptions.length && isValueChanged) {
-        changedOptions.forEach((option) => {
-            _valueMap[option] = undefined;
-        });
-    }
-    widgetGenerateStore.setWidgetFormValueMap(_valueMap);
-};
-const handleUpdateFieldValidation = (fieldName: string, isValid: boolean) => {
-    const _validMap = cloneDeep(widgetGenerateState.widgetValidMap);
-    _validMap[fieldName] = isValid;
-    widgetGenerateStore.setWidgetValidMap(_validMap);
-};
+// const checkFormDependencies = (changedFieldName: string):string[] => state.widgetConfigDependencies[changedFieldName] || [];
 
 onMounted(() => {
     checkDefaultValidation();
@@ -221,12 +204,9 @@ onMounted(() => {
             </p-field-group>
         </div>
         <!-- widget header -->
-        <widget-header-field :key="`widget-header-${widgetGenerateState.selectedWidgetName}`"
-                             :value="widgetGenerateState.widgetFormValueMap.widgetHeader"
-                             :widget-config="state.widgetConfig"
-                             :is-valid="widgetGenerateState.widgetValidMap.widgetHeader"
-                             @update:value="handleUpdateFieldValue('widgetHeader', $event)"
-                             @update:is-valid="handleUpdateFieldValidation('widgetHeader', $event)"
+        <widget-header-field :widget-config="state.widgetConfig"
+                             :widget-id="widgetGenerateState.widgetId"
+                             :field-manager="props.fieldManager"
         />
         <!-- Date Config -->
         <div class="form-group-wrapper"
@@ -249,16 +229,9 @@ onMounted(() => {
                     <component :is="getWidgetFieldComponent(fieldName)"
                                :key="`${fieldName}-${widgetGenerateState.selectedWidgetName}`"
                                :widget-field-schema="fieldSchema"
-                               :data-table="widgetGenerateGetters.selectedDataTable"
-                               :widget-id="widgetGenerateState.widgetId"
-                               :date-range="dashboardDetailState.options.date_range"
-                               :all-value-map="widgetGenerateState.widgetFormValueMap"
-                               :value="widgetGenerateState.widgetFormValueMap[fieldName]"
-                               :is-valid="widgetGenerateState.widgetValidMap[fieldName]"
                                :widget-config="state.widgetConfig"
-                               @update:value="handleUpdateFieldValue(fieldName, $event)"
-                               @update:is-valid="handleUpdateFieldValidation(fieldName, $event)"
-                               @show-error-modal="handleShowErrorModal"
+                               :widget-id="widgetGenerateState.widgetId"
+                               :field-manager="props.fieldManager"
                     />
                 </template>
             </div>
@@ -299,16 +272,9 @@ onMounted(() => {
                     <component :is="getWidgetFieldComponent(fieldName)"
                                :key="`${fieldName}-${widgetGenerateState.selectedWidgetName}`"
                                :widget-field-schema="fieldSchema"
-                               :data-table="widgetGenerateGetters.selectedDataTable"
-                               :widget-id="widgetGenerateState.widgetId"
-                               :date-range="dashboardDetailState.options.date_range"
-                               :all-value-map="widgetGenerateState.widgetFormValueMap"
-                               :value="widgetGenerateState.widgetFormValueMap[fieldName]"
-                               :is-valid="widgetGenerateState.widgetValidMap[fieldName]"
                                :widget-config="state.widgetConfig"
-                               @update:value="handleUpdateFieldValue(fieldName, $event)"
-                               @update:is-valid="handleUpdateFieldValidation(fieldName, $event)"
-                               @show-error-modal="handleShowErrorModal"
+                               :widget-id="widgetGenerateState.widgetId"
+                               :field-manager="props.fieldManager"
                     />
                 </template>
             </div>
@@ -334,13 +300,9 @@ onMounted(() => {
                     <component :is="getWidgetFieldComponent(fieldName)"
                                :key="`${fieldName}-${widgetGenerateState.selectedWidgetName}`"
                                :widget-field-schema="fieldSchema"
-                               :data-table="widgetGenerateGetters.selectedDataTable"
-                               :all-value-map="widgetGenerateState.widgetFormValueMap"
-                               :value="widgetGenerateState.widgetFormValueMap[fieldName]"
-                               :is-valid="widgetGenerateState.widgetValidMap[fieldName]"
                                :widget-config="state.widgetConfig"
-                               @update:value="handleUpdateFieldValue(fieldName, $event)"
-                               @update:is-valid="handleUpdateFieldValidation(fieldName, $event)"
+                               :widget-id="widgetGenerateState.widgetId"
+                               :field-manager="props.fieldManager"
                     />
                 </template>
             </div>

@@ -39,7 +39,6 @@ import WorkspaceVariableModel from '@/lib/variable-models/managed-model/resource
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { MANAGED_DASHBOARD_VARIABLES_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
-import { migrateLegacyWidgetOptions } from '@/services/dashboards/helpers/widget-migration-helper';
 
 
 
@@ -361,7 +360,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             const res = await fetcher<PublicWidgetListParameters|PrivateWidgetListParameters, ListResponse<WidgetModel>>({
                 dashboard_id: state.dashboardId,
             });
-            state.dashboardWidgets = migrateLegacyWidgetOptions(res.results || []);
+            // state.dashboardWidgets = migrateLegacyWidgetOptions(res.results || []);
+            state.dashboardWidgets = res.results || [];
             return;
         } catch (e) {
             ErrorHandler.handleError(e);
