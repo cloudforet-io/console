@@ -1,5 +1,6 @@
 import type { TranslateResult } from 'vue-i18n';
 
+import type { AlertUrgencyType } from '@/schema/alert-manager/alert/type';
 import type { ServiceModel } from '@/schema/alert-manager/service/model';
 import type { AlertsInfoType, AlertsType } from '@/schema/alert-manager/service/type';
 
@@ -17,6 +18,10 @@ export type WebhookDetailTabsType = typeof WEBHOOK_DETAIL_TABS[keyof typeof WEBH
 export type AlertFilterType = {
     label: TranslateResult;
     name: string;
+};
+export type RadioType = {
+    label: TranslateResult,
+    name: AlertUrgencyType
 };
 
 export type createHeaderInfoByStep = {
