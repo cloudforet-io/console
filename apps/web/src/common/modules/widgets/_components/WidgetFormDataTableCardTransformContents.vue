@@ -69,8 +69,6 @@ const state = reactive({
     applyDisabled: computed(() => {
         const haveSavedName = !!originState.name;
         if (!haveSavedName) return true;
-        // const haveRequiredPivotOptions = haveSavedName && !!valueState.PIVOT.data_table_id && !!valueState.PIVOT.fields?.labels && valueState.PIVOT.fields?.labels?.length > 0
-        //     && !!valueState.PIVOT.fields?.column && !!valueState.PIVOT.fields?.data && (!!valueState.PIVOT.select || !!valueState.PIVOT.limit);
         if (state.operator === 'CONCAT') return invalidState.CONCAT;
         if (state.operator === 'JOIN') return invalidState.JOIN;
         if (state.operator === 'QUERY') return invalidState.QUERY;
