@@ -45,6 +45,7 @@
 			"RESPONDER": "Responder",
 			"RULE": "Rule",
 			"SAVE_CHANGES": "Save Changes",
+			"SERVICE": "Service",
 			"SET_AUTO_RECOVERY_NO": "No, do it Manually",
 			"SET_AUTO_RECOVERY_YES": "Yes, Automatically resolve alerts",
 			"SEVERITY": "Severity",

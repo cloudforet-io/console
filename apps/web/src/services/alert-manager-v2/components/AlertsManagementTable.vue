@@ -1,29 +1,41 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, onMounted, reactive } from 'vue';
 
 import {
     makeDistinctValueHandler,
     makeEnumValueHandler,
 } from '@cloudforet/core-lib/component-util/query-search';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PToolboxTable, PButton, PLink, PBadge, PI,
+    PToolboxTable, PSelectDropdown, PLink, PBadge, PI, PSelectStatus,
 } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { AlertListParameters } from '@/schema/alert-manager/alert/api-verbs/list';
 import { ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
+import type { AlertModel } from '@/schema/alert-manager/alert/model';
+import type { ServiceListParameters } from '@/schema/alert-manager/service/api-verbs/list';
+import type { ServiceModel } from '@/schema/alert-manager/service/model';
+import { i18n } from '@/translations';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { red } from '@/styles/colors';
 
-import { useAlertStateI18n } from '@/services/alert-manager-v2/composables/alert-state-i18n';
-import { useAlertUrgencyI18n } from '@/services/alert-manager-v2/composables/alert-urgency-i18n';
+import { getAlertStateI18n, getAlertUrgencyI18n } from '@/services/alert-manager-v2/composables/alert-table-data';
+import { ALERT_STATUS_FILTERS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
 import { alertStateBadgeStyleTypeFormatter } from '@/services/alert-manager-v2/helpers/alert-badge-helper';
 import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
+import type { AlertFilterType } from '@/services/alert-manager-v2/types/alert-manager-type';
 
 const { getProperRouteLocation } = useProperRouteLocation();
 
@@ -31,7 +43,7 @@ const tableState = reactive({
     fields: computed<DataTableFieldType[]>(() => ([
         { name: 'alert_number', label: 'No' },
         { name: 'title', label: 'Title', width: '20rem' },
-        { name: 'state', label: 'State' },
+        { name: 'state', label: 'Status' },
         { name: 'service_id', label: 'Service' },
         { name: 'urgency', label: 'Urgency' },
         { name: 'category', label: 'Category' },
@@ -45,44 +57,58 @@ const tableState = reactive({
         items: [
             { name: 'alert_id', label: 'Alert ID' },
             { name: 'title', label: 'Title' },
-            { name: 'state', label: 'State' },
+            { name: 'state', label: 'Status' },
             { name: 'service_id', label: 'Service' },
             { name: 'category', label: 'Category' },
             { name: 'resource.resource_type', label: 'Resource Name' },
         ],
     }]),
-    // TODO: API check
     valueHandlerMap: computed<ValueHandlerMap>(() => ({
-        alert_id: makeDistinctValueHandler('monitoring.Alert', 'alert_id'),
-        title: makeDistinctValueHandler('monitoring.Alert', 'title'),
+        alert_id: makeDistinctValueHandler('alertManager.Alert', 'alert_id'),
+        title: makeDistinctValueHandler('alertManager.Alert', 'title'),
         state: makeEnumValueHandler(ALERT_URGENCY),
-        service: makeDistinctValueHandler('monitoring.Alert', 'service_id'),
-        category: makeDistinctValueHandler('monitoring.Alert', 'category'),
-        'resource.resource_type': makeDistinctValueHandler('monitoring.Alert', 'resource.resource_type'),
+        service: makeDistinctValueHandler('alertManager.Alert', 'service_id'),
+        category: makeDistinctValueHandler('alertManager.Alert', 'category'),
+        'resource.resource_type': makeDistinctValueHandler('alertManager.Alert', 'resource.resource_type'),
     })),
 });
 const state = reactive({
     loading: false,
-    items: [{
-        alert_number: 1,
-        alert_id: 'temp alert id',
-        title: 'temp alert',
-        state: 'ENABLED',
-        service_id: 'temp id',
-        urgency: 'LOW',
-        category: 'DISCOVERY',
-        resources: 'ecommerce-vm-02/spaceone',
-        updated_by: '나다',
-        resolved_by: '나다',
-        acknowledged: '나다',
-    }],
-
-    alertStateLabels: useAlertStateI18n(),
-    urgencyLabels: useAlertUrgencyI18n(),
+    items: [] as AlertModel[],
+    alertStateLabels: getAlertStateI18n(),
+    urgencyLabels: getAlertUrgencyI18n(),
+});
+const filterState = reactive({
+    serviceDropdownList: [] as SelectDropdownMenuItem[],
+    selectedServiceId: '',
+    statusFields: computed<AlertFilterType[]>(() => ([
+        { label: i18n.t('ALERT_MANAGER.ALERTS.ALL'), name: 'ALL' },
+        { label: i18n.t('ALERT_MANAGER.ALERTS.OPEN'), name: ALERT_STATUS_FILTERS.OPEN },
+        { label: i18n.t('ALERT_MANAGER.ALERTS.TRIGGERED'), name: ALERT_STATUS_FILTERS.TRIGGERED },
+        { label: i18n.t('ALERT_MANAGER.ALERTS.ACKNOWLEDGED'), name: ALERT_STATUS_FILTERS.ACKNOWLEDGED },
+        { label: i18n.t('ALERT_MANAGER.ALERTS.RESOLVED'), name: ALERT_STATUS_FILTERS.RESOLVED },
+        { label: i18n.t('ALERT_MANAGER.ALERTS.ERROR'), name: ALERT_STATUS_FILTERS.ERROR },
+    ])),
+    selectedStatusFilter: 'ALL',
+    urgencyFields: computed<AlertFilterType[]>(() => ([
+        { label: i18n.t('ALERT_MANAGER.ALERTS.ALL'), name: 'ALL' },
+        { label: i18n.t('ALERT_MANAGER.ALERTS.HIGH'), name: ALERT_URGENCY.HIGH },
+        { label: i18n.t('ALERT_MANAGER.ALERTS.LOW'), name: ALERT_URGENCY.LOW },
+    ])),
+    selectedUrgencyFilter: 'ALL',
 });
 
-const handleClickCreateButton = () => {
-    console.log('TODO: handleClickCreateButton');
+const handleSelectServiceDropdownItem = (id: string) => {
+    filterState.selectedServiceId = id;
+    fetchServiceList();
+};
+const handleSelectFilter = (type: 'status' | 'urgency', value: string) => {
+    if (type === 'status') {
+        filterState.selectedStatusFilter = value;
+    } else {
+        filterState.selectedUrgencyFilter = value;
+    }
+    fetchAlertsList();
 };
 const handleChange = () => {
     console.log('TODO: handleChange');
@@ -90,42 +116,126 @@ const handleChange = () => {
 const handleClickSettings = () => {
     console.log('TODO: handleClickSettings');
 };
-const fetchAlertsList = () => {
-    console.log('TODO: fetchAlertsList');
-};
 const handleExportToExcel = () => {
     console.log('TODO: handleExportToExcel');
 };
+
+const fetchServiceList = async () => {
+    try {
+        const { results } = await SpaceConnector.clientV2.alertManager.service.list<ServiceListParameters, ListResponse<ServiceModel>>({
+            service_id: filterState.selectedServiceId === '' ? undefined : filterState.selectedServiceId,
+        });
+        filterState.serviceDropdownList = (results || []).map((i) => ({
+            name: i.service_id,
+            label: i.name,
+        }));
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
+        filterState.serviceDropdownList = [];
+    }
+};
+
+const alertListApiQuery = new ApiQueryHelper().setSort('created_at', true);
+const fetchAlertsList = async () => {
+    try {
+        let stateFilter: ConsoleFilter[] = [];
+        if (filterState.selectedStatusFilter !== 'ALL' && filterState.selectedStatusFilter !== ALERT_STATUS_FILTERS.OPEN) {
+            stateFilter = [{ k: 'state', v: filterState.selectedStatusFilter, o: '=' }];
+        }
+        let urgencyFilter: ConsoleFilter[] = [];
+        if (filterState.selectedUrgencyFilter !== 'ALL') {
+            urgencyFilter = [{ k: 'urgency', v: filterState.selectedUrgencyFilter, o: '=' }];
+        }
+        alertListApiQuery.setFilters([
+            ...stateFilter,
+            ...urgencyFilter,
+        ]);
+        if (filterState.selectedStatusFilter === ALERT_STATUS_FILTERS.OPEN) {
+            alertListApiQuery.setOrFilters([
+                { k: 'state', v: ALERT_STATUS_FILTERS.ACKNOWLEDGED, o: '=' },
+                { k: 'state', v: ALERT_STATUS_FILTERS.TRIGGERED, o: '=' },
+            ]);
+        } else {
+            alertListApiQuery.setOrFilters([]);
+        }
+        const { results } = await SpaceConnector.clientV2.alertManager.alert.list<AlertListParameters, ListResponse<AlertModel>>({
+            query: alertListApiQuery.data,
+        });
+        state.items = results || [];
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
+        state.items = [];
+    }
+};
+
+onMounted(async () => {
+    try {
+        state.loading = true;
+        await fetchServiceList();
+        await fetchAlertsList();
+    } finally {
+        state.loading = false;
+    }
+});
 </script>
 
 <template>
     <div class="alert-data-table">
-        <p-toolbox-table
-            searchable
-            selectable
-            sortable
-            exportable
-            search-type="query"
-            sort-by="created_at"
-            :sort-desc="true"
-            :loading="state.loading"
-            :fields="tableState.fields"
-            :items="state.items"
-            :key-item-sets="tableState.keyItemSets"
-            :value-handler-map="tableState.valueHandlerMap"
-            settings-visible
-            @change="handleChange"
-            @click-settings="handleClickSettings"
-            @refresh="fetchAlertsList"
-            @export="handleExportToExcel"
+        <p-toolbox-table searchable
+                         selectable
+                         sortable
+                         exportable
+                         search-type="query"
+                         sort-by="created_at"
+                         :sort-desc="true"
+                         :loading="state.loading"
+                         :fields="tableState.fields"
+                         :items="state.items"
+                         :key-item-sets="tableState.keyItemSets"
+                         :value-handler-map="tableState.valueHandlerMap"
+                         settings-visible
+                         @change="handleChange"
+                         @click-settings="handleClickSettings"
+                         @refresh="fetchAlertsList"
+                         @export="handleExportToExcel"
         >
-            <template #toolbox-left>
-                <p-button style-type="primary"
-                          icon-left="ic_plus_bold"
-                          @click="handleClickCreateButton"
-                >
-                    {{ $t('MONITORING.ALERT.ALERT_LIST.CREATE') }}
-                </p-button>
+            <template #toolbox-top>
+                <p-select-dropdown :menu="filterState.serviceDropdownList"
+                                   :selection-label="$t('ALERT_MANAGER.ALERTS.SERVICE')"
+                                   style-type="rounded"
+                                   use-fixed-menu-style
+                                   :selected="filterState.selectedServiceId"
+                                   class="service-dropdown pt-6 pl-4"
+                                   @select="handleSelectServiceDropdownItem"
+                />
+            </template>
+            <template #toolbox-bottom>
+                <div class="flex justify-between mr-4 mb-4 ml-4">
+                    <div class="status-filter-wrapper">
+                        <span class="mr-2">{{ $t('ALERT_MANAGER.STATUS') }}</span>
+                        <p-select-status v-for="(item, idx) in filterState.statusFields"
+                                         :key="idx"
+                                         :selected="filterState.selectedStatusFilter"
+                                         class="mr-2"
+                                         :value="item.name"
+                                         @change="handleSelectFilter('status', item.name)"
+                        >
+                            {{ item.label }}
+                        </p-select-status>
+                    </div>
+                    <div class="status-filter-wrapper">
+                        <span class="mr-2">{{ $t('ALERT_MANAGER.ALERTS.LABEL_URGENCY') }}</span>
+                        <p-select-status v-for="(item, idx) in filterState.urgencyFields"
+                                         :key="idx"
+                                         :selected="filterState.selectedUrgencyFilter"
+                                         class="mr-2"
+                                         :value="item.name"
+                                         @change="handleSelectFilter('urgency', item.name)"
+                        >
+                            {{ item.label }}
+                        </p-select-status>
+                    </div>
+                </div>
             </template>
             <template #col-title-format="{ value, item }">
                 <template v-if="value">
@@ -178,3 +288,17 @@ const handleExportToExcel = () => {
         </p-toolbox-table>
     </div>
 </template>
+
+<style scoped lang="postcss">
+.alert-data-table {
+    .service-dropdown {
+        margin-bottom: -0.5rem;
+        width: max-content;
+    }
+    .status-filter-wrapper {
+        @apply flex items-center text-label-md text-gray-600;
+        gap: 0.5rem;
+        margin-top: -0.5rem;
+    }
+}
+</style>
