@@ -294,7 +294,6 @@ const handleUpdateDataTable = async () => {
 
 /* Utils */
 const setInitialDataTableForm = () => {
-    // TODO: check reset
     const _originDataTables = originState.dataTableInfo.dataTables.length ? cloneDeep(originState.dataTableInfo.dataTables) : [];
     const _originDataTableId = originState.dataTableInfo.dataTableId;
     // CONCAT
