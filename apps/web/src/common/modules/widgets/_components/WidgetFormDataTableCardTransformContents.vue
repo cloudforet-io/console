@@ -52,6 +52,7 @@ const storeState = reactive({
     allDataTableInvalidMap: computed(() => widgetGenerateState.allDataTableInvalidMap),
 });
 
+
 const state = reactive({
     loading: false,
     dataTableId: computed(() => props.item.data_table_id),
