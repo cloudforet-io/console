@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive } from 'vue';
 
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import { QueryHelper } from '@cloudforet/core-lib/query';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PToolboxTable, PSelectDropdown, PLink, PBadge, PI, PSelectStatus,
@@ -22,6 +22,7 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import { useQueryTags } from '@/common/composables/query-tags';
 import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
 
 import { red } from '@/styles/colors';
@@ -77,9 +78,13 @@ const filterState = reactive({
     selectedUrgencyFilter: 'ALL',
 });
 
-const alertListApiQuery = new ApiQueryHelper()
+const alertListApiQueryHelper = new ApiQueryHelper()
     .setOnly(...state.fields.map((d) => d.name).filter((name) => name !== 'duration'), 'alert_id')
     .setSort('created_at', true);
+
+const filterQueryHelper = new QueryHelper();
+const queryTagHelper = useQueryTags({ keyItemSets: ALERT_MANAGEMENT_TABLE_HANDLER.keyItemSets });
+const { queryTags } = queryTagHelper;
 
 const handleSelectServiceDropdownItem = (id: string) => {
     filterState.selectedServiceId = id;
@@ -93,8 +98,11 @@ const handleSelectFilter = (type: 'status' | 'urgency', value: string) => {
     }
     fetchAlertsList();
 };
-const handleChange = () => {
-    console.log('TODO: handleChange');
+const handleChange = async (options: any = {}) => {
+    if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
+    if (options.pageStart !== undefined) alertListApiQueryHelper.setPageStart(options.pageStart);
+    if (options.pageLimit !== undefined) alertListApiQueryHelper.setPageLimit(options.pageLimit);
+    await fetchAlertsList();
 };
 const handleClickSettings = () => {
     state.visibleCustomFieldModal = true;
@@ -109,7 +117,7 @@ const handleExportToExcel = async () => {
     await downloadExcel({
         url: '/alertManager/alert/list',
         param: {
-            query: { ...alertListApiQuery, only: ALERT_EXCEL_FIELDS.map((d) => d.key) },
+            query: { ...alertListApiQueryHelper.data, only: ALERT_EXCEL_FIELDS.map((d) => d.key) },
         },
         fields: ALERT_EXCEL_FIELDS,
         file_name_prefix: FILE_NAME_PREFIX.alert,
@@ -119,29 +127,26 @@ const handleExportToExcel = async () => {
 
 const fetchAlertsList = async () => {
     try {
-        let stateFilter: ConsoleFilter[] = [];
-        if (filterState.selectedStatusFilter !== 'ALL' && filterState.selectedStatusFilter !== ALERT_STATUS_FILTERS.OPEN) {
-            stateFilter = [{ k: 'state', v: filterState.selectedStatusFilter, o: '=' }];
-        }
-        let urgencyFilter: ConsoleFilter[] = [];
-        if (filterState.selectedUrgencyFilter !== 'ALL') {
-            urgencyFilter = [{ k: 'urgency', v: filterState.selectedUrgencyFilter, o: '=' }];
-        }
-        alertListApiQuery.setFilters([
-            ...stateFilter,
-            ...urgencyFilter,
-            { k: 'service_id', v: filterState.selectedServiceId, o: '=' },
-        ]);
+        filterQueryHelper.setFilters([]);
         if (filterState.selectedStatusFilter === ALERT_STATUS_FILTERS.OPEN) {
-            alertListApiQuery.setOrFilters([
-                { k: 'state', v: ALERT_STATUS_FILTERS.ACKNOWLEDGED, o: '=' },
-                { k: 'state', v: ALERT_STATUS_FILTERS.TRIGGERED, o: '=' },
-            ]);
-        } else {
-            alertListApiQuery.setOrFilters([]);
+            filterQueryHelper.addFilter({ k: 'state', v: [ALERT_STATUS_FILTERS.TRIGGERED, ALERT_STATUS_FILTERS.ACKNOWLEDGED], o: '=' });
+        } else if (filterState.selectedStatusFilter !== 'ALL') {
+            filterQueryHelper.addFilter({ k: 'state', v: filterState.selectedStatusFilter, o: '=' });
         }
+        if (filterState.selectedUrgencyFilter !== 'ALL') {
+            filterQueryHelper.addFilter({ k: 'urgency', v: filterState.selectedUrgencyFilter, o: '=' });
+        }
+        if (filterState.selectedServiceId) {
+            filterQueryHelper.addFilter({ k: 'service_id', v: filterState.selectedServiceId, o: '=' });
+        }
+
+        alertListApiQueryHelper.setFilters([
+            ...queryTagHelper.filters.value,
+            ...filterQueryHelper.filters,
+        ]);
+
         state.alertList = await alertPageStore.fetchAlertsList({
-            query: alertListApiQuery.data,
+            query: alertListApiQueryHelper.data,
         });
     } catch (e) {
         ErrorHandler.handleError(e, true);
@@ -169,6 +174,7 @@ onMounted(async () => {
                          search-type="query"
                          sort-by="created_at"
                          :sort-desc="true"
+                         :query-tags="queryTags"
                          :loading="state.loading"
                          :fields="state.fields"
                          :items="state.alertList"
