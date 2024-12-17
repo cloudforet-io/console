@@ -127,6 +127,7 @@ const dataTableNameState = reactive({
 const advancedOptionsState = reactive({
     selectedTimeDiff: 'none',
     selectedTimeDiffDate: undefined as string|undefined,
+    timeDiffDataName: '' as string,
 });
 
 const validationState = reactive({
@@ -158,6 +159,10 @@ const originDataState = reactive({
         const timeDiffKeys = Object.keys(timeDiff || {});
         return timeDiffKeys.length ? `${-timeDiff[timeDiffKeys[0]]}` : undefined;
     }),
+    timeDiffDataName: computed<string>(() => {
+        const timeDiff = (props.item.options as DataTableAddOptions).timediff;
+        return timeDiff?.data_name || '';
+    }),
 });
 
 const modalState = reactive({
@@ -179,7 +184,7 @@ const getTimeDiffValue = (): TimeDiff|undefined => {
     };
     return {
         [advancedOptionsState.selectedTimeDiff]: -Number(advancedOptionsState.selectedTimeDiffDate),
-        data_name: `${defaultFieldName} (- ${advancedOptionsState.selectedTimeDiffDate} ${timeDiffOptions[advancedOptionsState.selectedTimeDiff]})`,
+        data_name: advancedOptionsState.timeDiffDataName || `${defaultFieldName} (- ${advancedOptionsState.selectedTimeDiffDate} ${timeDiffOptions[advancedOptionsState.selectedTimeDiff]})`,
     };
 };
 const updateDataTable = async (): Promise<DataTableModel|undefined> => {
@@ -315,6 +320,7 @@ const setInitialDataTableForm = () => {
     // Advanced Options
     advancedOptionsState.selectedTimeDiff = originDataState.timeDiff;
     advancedOptionsState.selectedTimeDiffDate = originDataState.timeDiffDate;
+    advancedOptionsState.timeDiffDataName = '';
 };
 
 onMounted(() => {
@@ -332,6 +338,8 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
 
     // Advanced Options
     advancedOptionsState.selectedTimeDiff = 'none';
+    advancedOptionsState.selectedTimeDiffDate = undefined;
+    advancedOptionsState.timeDiffDataName = '';
 });
 
 // Validation
@@ -378,6 +386,7 @@ defineExpose({
                                               :data-unit.sync="state.dataUnit"
                                               :selected-time-diff.sync="advancedOptionsState.selectedTimeDiff"
                                               :selected-time-diff-date.sync="advancedOptionsState.selectedTimeDiffDate"
+                                              :time-diff-data-name.sync="advancedOptionsState.timeDiffDataName"
                                               :form-invalid.sync="validationState.dataTableApplyInvalid"
         />
         <widget-form-data-table-card-footer :disabled="validationState.dataTableApplyInvalid"
