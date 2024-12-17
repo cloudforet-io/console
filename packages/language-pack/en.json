@@ -53,7 +53,7 @@
 			"TOOLTIP": "This is the data from the past year.",
 			"TRIGGERED": "Triggered",
 			"TRIGGERED_BY": "Triggered By",
-			"VALIDATION_NAME_REQUIRED": "Please enter title",
+			"VALIDATION_NAME_UNIQUE": "An Alert with this name already exists.",
 			"VIEW_RESOURCE": "View resource",
 			"WARNING": "Warning"
 		},

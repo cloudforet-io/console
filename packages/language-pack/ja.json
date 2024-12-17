@@ -53,7 +53,7 @@
 			"TOOLTIP": "",
 			"TRIGGERED": "生成",
 			"TRIGGERED_BY": "生成",
-			"VALIDATION_NAME_REQUIRED": "タイトルを入力してください",
+			"VALIDATION_NAME_UNIQUE": "",
 			"VIEW_RESOURCE": "",
 			"WARNING": "警告"
 		},

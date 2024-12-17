@@ -53,7 +53,7 @@
 			"TOOLTIP": "",
 			"TRIGGERED": "생성",
 			"TRIGGERED_BY": "생성",
-			"VALIDATION_NAME_REQUIRED": "제목을 입력해주세요.",
+			"VALIDATION_NAME_UNIQUE": "",
 			"VIEW_RESOURCE": "",
 			"WARNING": "경고"
 		},
