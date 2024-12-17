@@ -11,17 +11,22 @@ import {
     PIconButton, PFieldGroup, PTextInput, PButton, PFieldTitle,
 } from '@cloudforet/mirinae';
 
+import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
+import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import WidgetFormDataTableCardTransformFormWrapper
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformFormWrapper.vue';
 import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
+import { isFieldNameValid } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
+import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { TransformDataTableProps, TransformDataTableInfo } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { AddLabelsOptions } from '@/common/modules/widgets/types/widget-model';
 
 
 
+type DataTableModel = PublicDataTableModel|PrivateDataTableModel;
 interface AdditionalLabel {
     name: string;
     value: string;
@@ -33,6 +38,13 @@ const props = defineProps<TransformDataTableProps<AddLabelsOptions>>();
 const emit = defineEmits<{(e: 'update:operator-options', value: AddLabelsOptions): void;
     (e: 'update:invalid', value: boolean): void;
 }>();
+
+const widgetGenerateStore = useWidgetGenerateStore();
+const widgetGenerateState = widgetGenerateStore.state;
+const storeState = reactive({
+    dataTables: computed<Partial<DataTableModel>[]>(() => widgetGenerateState.dataTables),
+    currentDataTable: computed<Partial<DataTableModel>|undefined>(() => storeState.dataTables.find((d) => d.data_table_id === dataTableInfo.value.dataTableId)),
+});
 
 const dataTableInfo = ref<TransformDataTableInfo>({
     dataTableId: props.originData?.data_table_id,
@@ -48,9 +60,9 @@ const state = reactive({
         const fieldNames = state.refinedLabels.map((label) => label.name);
         if (fieldNames.includes(DATE_FIELD)) return true;
         if (fieldNames.length !== new Set(fieldNames).size) return true;
+        if (Object.keys(labelsInfo.value).some((d) => !isFieldNameValid(d, storeState.currentDataTable))) return true;
         return false;
     }),
-    // groupByKeys: computed<string[]>(() => []),
 });
 
 /* Helper */
@@ -59,14 +71,14 @@ const getInvalidText = (idx: number): TranslateResult|undefined => {
     if (!targetName) {
         return undefined;
     }
-    // if (state.groupByKeys.includes(targetName)) {
-    //     return i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.ADD_LABELS.GROUP_BY_KEY_INVALID');
-    // }
     if (targetName === DATE_FIELD) {
         return i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.ADD_LABELS.DATE_FIELD_INVALID');
     }
     if (state.refinedLabels.some((label, lIdx) => lIdx !== idx && label.name === targetName)) {
         return i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.ADD_LABELS.DUPLICATED_LABEL');
+    }
+    if (!isFieldNameValid(targetName, storeState.currentDataTable)) {
+        return i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.DUPLICATED_FIELD_NAME');
     }
     return undefined;
 };
@@ -139,6 +151,7 @@ onMounted(() => {
                     <div class="label-set">
                         <p-text-input class="label-input"
                                       block
+                                      :invalid="getInvalidText(idx)"
                                       :value.sync="labelInfo.name"
                         />
                         <p-text-input class="label-input"

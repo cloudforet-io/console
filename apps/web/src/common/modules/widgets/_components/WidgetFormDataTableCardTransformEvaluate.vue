@@ -2,6 +2,7 @@
 import {
     computed, reactive, ref, watch,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import { cloneDeep } from 'lodash';
 
@@ -11,6 +12,8 @@ import {
 import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
+import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
+import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -21,10 +24,14 @@ import WidgetFormDataTableCardTransformFormWrapper
 import WidgetFormDataTableGlobalVariableViewButton
     from '@/common/modules/widgets/_components/WidgetFormDataTableGlobalVariableViewButton.vue';
 import { DATA_TABLE_FIELD_TYPE, DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
+import { isFieldNameValid } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
+import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { TransformDataTableInfo, TransformDataTableProps } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { EvalOptions } from '@/common/modules/widgets/types/widget-model';
 
 
+
+type DataTableModel = PublicDataTableModel|PrivateDataTableModel;
 
 const props = defineProps<TransformDataTableProps<EvalOptions>>();
 const emit = defineEmits<{(e: 'update:operator-options', value: EvalOptions): void;
@@ -39,6 +46,12 @@ const expressionsInfo = ref<EvalOptions['expressions']>(cloneDeep(props.originDa
 const CONDITION_PLACEHOLDER = '{{ Product }} == \'A\' & {{ Provider }} == \'B\'';
 const FORMULA_PLACEHOLDER = '{{ Product }}';
 
+const widgetGenerateStore = useWidgetGenerateStore();
+const widgetGenerateState = widgetGenerateStore.state;
+const storeState = reactive({
+    dataTables: computed<Partial<DataTableModel>[]>(() => widgetGenerateState.dataTables),
+    currentDataTable: computed<Partial<DataTableModel>|undefined>(() => storeState.dataTables.find((d) => d.data_table_id === dataTableInfo.value.dataTableId)),
+});
 const state = reactive({
     proxyOperatorOptions: useProxyValue<EvalOptions>('operator-options', props, emit),
     collapsedIndexList: [] as number[],
@@ -55,9 +68,11 @@ const state = reactive({
     globalVariablePopperVisible: false,
     invalid: computed<boolean>(() => {
         if (!state.proxyOperatorOptions.data_table_id) return true;
-        const fieldNames = expressionsInfo.value.map((expression) => expression.name);
+        const fieldNames = expressionsInfo.value.map((d) => d.name);
         if (fieldNames.length !== new Set(fieldNames).size) return true;
-        return !expressionsInfo.value.every((expression) => !!expression.name && !!expression.expression);
+        if (!expressionsInfo.value.every((d) => !!d.name && !!d.expression)) return true;
+        if (expressionsInfo.value.some((d) => !isFieldNameValid(d.name, storeState.currentDataTable))) return true;
+        return false;
     }),
 });
 
@@ -65,6 +80,13 @@ const modalState = reactive({
     visible: false,
     currentSelectionName: undefined as string|undefined,
 });
+
+/* Helper */
+const getInvalidFieldNameText = (fieldName?: string): TranslateResult|undefined => {
+    if (!fieldName) return undefined;
+    if (!isFieldNameValid(fieldName, storeState.currentDataTable)) return i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.DUPLICATED_FIELD_NAME');
+    return undefined;
+};
 
 /* Events */
 const handleToggleExpressionCard = (idx: number) => {
@@ -193,10 +215,15 @@ watch(() => state.invalid, (_invalid) => {
                     <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.FIELD_NAME')"
                                    required
                                    style-type="secondary"
+                                   :invalid-text="getInvalidFieldNameText(expression.name)"
+                                   :invalid="!!getInvalidFieldNameText(expression.name)"
                     >
-                        <p-text-input v-model="expression.name"
-                                      block
-                        />
+                        <template #default="{invalid}">
+                            <p-text-input v-model="expression.name"
+                                          block
+                                          :invalid="invalid"
+                            />
+                        </template>
                     </p-field-group>
                     <div>
                         <div class="field-expression-title-wrapper">

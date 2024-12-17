@@ -19,3 +19,11 @@ export const getDuplicatedDataTableName = (name: string, dataTables: Partial<Pub
     }
     return _name;
 };
+
+export const isFieldNameValid = (fieldName: string, dataTable?: PublicDataTableModel|PrivateDataTableModel): boolean => {
+    if (!dataTable) return true;
+    const _dataInfoKeys = Object.keys(dataTable.data_info || {});
+    const _labelsInfoKeys = Object.keys(dataTable.labels_info || {});
+    const _keys = _dataInfoKeys.concat(_labelsInfoKeys);
+    return !_keys.includes(fieldName);
+};
