@@ -34,8 +34,16 @@ const props = withDefaults(defineProps<Props>(), {
 
 const state = reactive({
     layoutName: computed(() => (props.options.translation_id ? I18nConnector.i18n.t(props.options.translation_id) : props.name)),
+    isFieldEmpty: computed<boolean>(() => !props.options.fields || props.options.fields.length === 0),
+    isRootDataEmpty: computed<boolean>(() => !state.rootData || Object.keys(state.rootData).length === 0),
     fields: computed<DefinitionField[]>(() => {
-        if (!props.options.fields) return [];
+        if (state.isFieldEmpty) {
+            if (state.isRootDataEmpty) return [];
+            return Object.keys(state.rootData).map((key) => ({
+                label: key,
+                name: key,
+            }));
+        }
         const locale = I18nConnector.i18n.locale;
         return props.options.fields.map((d) => ({
             label: d.options?.translation_id ? I18nConnector.i18n.t(d.options.translation_id as string, locale) : d.name,
