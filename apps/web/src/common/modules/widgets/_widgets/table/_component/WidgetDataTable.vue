@@ -27,11 +27,10 @@ import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-hel
 import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/comparison/type';
 import type { CustomTableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
 import type { DataFieldHeatmapColorValue } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
-import type { DateFormatValue } from '@/common/modules/widgets/_widget-fields/date-format/type';
-import type { MissingValueValue } from '@/common/modules/widgets/_widget-fields/missing-value/type';
+import type { _DateFormatValue as DateFormatValue } from '@/common/modules/widgets/_widget-fields/date-format/type';
+import type { _MissingValueValue as MissingValueValue } from '@/common/modules/widgets/_widget-fields/missing-value/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type { TableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/table-column-width/type';
-import type { TableDataFieldValue } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
 import type { TextWrapValue } from '@/common/modules/widgets/_widget-fields/text-wrap/type';
 import type { TotalValue } from '@/common/modules/widgets/_widget-fields/total/type';
 import type { TableWidgetField } from '@/common/modules/widgets/types/widget-data-table-type';
@@ -63,9 +62,7 @@ interface Props {
   dataInfo?: DataInfo;
   sortBy: Query['sort'];
   thisPage: number;
-  fieldType: TableDataFieldValue['fieldType'];
-  criteria?: string;
-  dataField?: string|string[];
+  dataField?: string[];
   granularity?: string;
   // optional field info
   comparisonInfo?: ComparisonValue;
@@ -98,35 +95,20 @@ const state = reactive({
     proxyThisPage: useProxyValue('thisPage', props, emit),
     refinedDateFormat: computed<string|undefined>(() => {
         if (!props.granularity || !props.dateFormatInfo) return undefined;
-        return getRefinedDateFormatByGranularity(props.granularity, props.dateFormatInfo.value);
+        return getRefinedDateFormatByGranularity(props.granularity, props.dateFormatInfo.format);
     }),
     linearInterpolationValueMap: computed<Record<string, { min: number, max: number }>>(() => {
         if (!props.items || !props.items.length) return {};
         const dataItems = props.totalInfo?.toggleValue ? props.items.slice(0, -1) : props.items;
-        if (props.fieldType === 'staticField') {
-            return props.fields.reduce((acc, field) => {
-                if (field.fieldInfo?.type === 'dataField') {
-                    const dataField = field.name;
-                    const maxValue = Math.max(...dataItems.map((item) => item[dataField] || 0));
-                    const minValue = Math.min(...dataItems.map((item) => item[dataField] || 0));
-                    return { ...acc, [dataField]: { min: minValue, max: maxValue } };
-                }
-                return acc;
-            }, {});
-        }
-        if (props.fieldType === 'dynamicField') {
-            return props.fields.reduce((acc, field) => {
-                if (field.fieldInfo?.type === 'dataField') {
-                    const dataField = field.name;
-                    if (field.name === 'Total') return acc;
-                    const maxValue = Math.max(...dataItems.map((item) => item[props.criteria || '']?.find((data) => data[props.dataField as string] === dataField)?.value || 0));
-                    const minValue = Math.min(...dataItems.map((item) => item[props.criteria || '']?.find((data) => data[props.dataField as string] === dataField)?.value || 0));
-                    return { ...acc, [dataField]: { min: minValue, max: maxValue } };
-                }
-                return acc;
-            }, {});
-        }
-        return {};
+        return props.fields.reduce((acc, field) => {
+            if (field.fieldInfo?.type === 'dataField') {
+                const dataField = field.name;
+                const maxValue = Math.max(...dataItems.map((item) => item[dataField] || 0));
+                const minValue = Math.min(...dataItems.map((item) => item[dataField] || 0));
+                return { ...acc, [dataField]: { min: minValue, max: maxValue } };
+            }
+            return acc;
+        }, {});
     }),
     textWrapStyle: computed(() => {
         if (!props.textWrapInfo?.toggleValue) return {};
@@ -151,15 +133,11 @@ const valueFormatter = (value: TableDataValue, field: TableWidgetField) => {
     // HACK: handle missing value after applying table missing value
     // // handle missing value
     // const isMissingValue = value === null || value === undefined;
-    // if (isMissingValue && props.missingValueInfo?.value === 'lineBreaks') return TABLE_MISSING_VALUE_SYMBOL;
+    // if (isMissingValue && props.missingValueInfo?.type === 'lineBreaks') return TABLE_MISSING_VALUE_SYMBOL;
 
     const _value = value || 0;
-    let _unit = field.fieldInfo?.unit;
-    let dataField = field.name?.replace('comparison_', '');
-    if (props.fieldType === 'dynamicField') {
-        dataField = props.criteria as string;
-        _unit = props.dataInfo?.[dataField]?.unit;
-    }
+    const _unit = field.fieldInfo?.unit;
+    const dataField = field.name?.replace('comparison_', '');
     return getFormattedNumber(_value, dataField, props.numberFormatInfo, _unit);
 };
 
@@ -175,97 +153,54 @@ const getValue = (item: TableDataItem, field: TableWidgetField) => {
         }
         return item[field.name] || '-';
     }
-    if (props.fieldType === 'staticField') {
-        const itemValue = item[field.name];
-        if (field.fieldInfo?.additionalType === 'comparison') {
-            const targetValue = itemValue?.target ?? 0;
-            const subjectValue = itemValue?.subject ?? 0;
-            const fixedValue = Math.abs(targetValue - subjectValue);
-            const percentageValue = fixedValue / (targetValue || 1) * 100;
-            if (!fixedValue || fixedValue === 0) return '-';
-            if (item[props.fields[0].name] === 'Total') return valueFormatter(fixedValue, field);
-            if (props.comparisonInfo?.format === 'fixed') return valueFormatter(fixedValue, field);
-            if (props.comparisonInfo?.format === 'percent') return `${numberFormatter(percentageValue)}%`;
-            if (props.comparisonInfo?.format === 'all') return `${valueFormatter(fixedValue, field)} (${numberFormatter(percentageValue)}%)`;
-            return '-';
-        }
-        return itemValue ? valueFormatter(itemValue, field) : '-';
+    const itemValue = item[field.name];
+    if (field.fieldInfo?.additionalType === 'comparison') {
+        const targetValue = itemValue?.target ?? 0;
+        const subjectValue = itemValue?.subject ?? 0;
+        const fixedValue = Math.abs(targetValue - subjectValue);
+        const percentageValue = fixedValue / (targetValue || 1) * 100;
+        if (!fixedValue || fixedValue === 0) return '-';
+        if (item[props.fields[0].name] === 'Total') return valueFormatter(fixedValue, field);
+        if (props.comparisonInfo?.format === 'fixed') return valueFormatter(fixedValue, field);
+        if (props.comparisonInfo?.format === 'percent') return `${numberFormatter(percentageValue)}%`;
+        if (props.comparisonInfo?.format === 'all') return `${valueFormatter(fixedValue, field)} (${numberFormatter(percentageValue)}%)`;
+        return '-';
     }
-    if (props.fieldType === 'dynamicField') {
-        const dynamicData = item[props.criteria || ''] ?? [];
-        const dynamicDataItem = dynamicData.find((data) => data[props.dataField as string] === field.name);
-        if (field.fieldInfo?.additionalType === 'comparison') {
-            const targetValue = dynamicDataItem?.value?.target ?? 0;
-            const subjectValue = dynamicDataItem?.value?.subject ?? 0;
-            const fixedValue = Math.abs(targetValue - subjectValue);
-            const percentageValue = fixedValue / (targetValue || 1) * 100;
-            if (!fixedValue || fixedValue === 0) return '-';
-            if (item[props.fields[0].name] === 'Total') return valueFormatter(fixedValue, field);
-            if (props.comparisonInfo?.format === 'fixed') return valueFormatter(fixedValue, field);
-            if (props.comparisonInfo?.format === 'percent') return `${numberFormatter(percentageValue)}%`;
-            if (props.comparisonInfo?.format === 'all') return `${valueFormatter(fixedValue, field)} (${numberFormatter(percentageValue)}%)`;
-            return '-';
-        }
-        return dynamicDataItem?.value ? valueFormatter(dynamicDataItem?.value, field) : '-';
-    }
-    return '-';
+    return itemValue ? valueFormatter(itemValue, field) : '-';
 };
 const getComparisonValueIcon = (item: TableDataItem, field: TableWidgetField): { icon: string; color: string; }|undefined => {
-    if (props.fieldType === 'staticField') {
-        const subtraction = (item?.[field.name]?.target ?? 0) - (item?.[field.name]?.subject ?? 0);
-        if (subtraction > 0) return { icon: 'ic_arrow-up-bold-alt', color: props.comparisonInfo?.increaseColor || DEFAULT_COMPARISON_COLOR.INCREASE };
-        if (subtraction < 0) return { icon: 'ic_arrow-down-bold-alt', color: props.comparisonInfo?.decreaseColor || DEFAULT_COMPARISON_COLOR.DECREASE };
-    } else {
-        const dynamicData = item[props.criteria || ''] ?? [];
-        const dynamicDataItem = dynamicData.find((data) => data[props.dataField as string] === field.name);
-        const subtraction = (dynamicDataItem?.value?.target ?? 0) - (dynamicDataItem?.value?.subject ?? 0);
-        if (subtraction > 0) return { icon: 'ic_arrow-up-bold-alt', color: props.comparisonInfo?.increaseColor || DEFAULT_COMPARISON_COLOR.INCREASE };
-        if (subtraction < 0) return { icon: 'ic_arrow-down-bold-alt', color: props.comparisonInfo?.decreaseColor || DEFAULT_COMPARISON_COLOR.DECREASE };
-    }
+    const subtraction = (item?.[field.name]?.target ?? 0) - (item?.[field.name]?.subject ?? 0);
+    if (subtraction > 0) return { icon: 'ic_arrow-up-bold-alt', color: props.comparisonInfo?.increaseColor || DEFAULT_COMPARISON_COLOR.INCREASE };
+    if (subtraction < 0) return { icon: 'ic_arrow-down-bold-alt', color: props.comparisonInfo?.decreaseColor || DEFAULT_COMPARISON_COLOR.DECREASE };
     return undefined;
 };
 const getValueTooltipText = (item: TableDataItem, field: TableWidgetField) => {
     if (field.fieldInfo?.type === 'labelField' || field.fieldInfo?.additionalType === 'comparison') return '';
-    if (props.fieldType === 'staticField') {
-        let _unit;
-        if (field.name === 'sub_total') {
-            const filteredFieldWithUnit = (props.dataField as string[])?.filter((_field) => props.dataInfo?.[_field]?.unit);
-            _unit = filteredFieldWithUnit?.map((_field) => (props.dataInfo ?? {})[_field]?.unit).join(', ');
-        } else _unit = props.dataInfo?.[field.name || '']?.unit;
-        return `• Unit: ${_unit ?? '-'} \n• ${field.name}: ${numberFormatter(item[field.name])}`;
-    }
-    const dataInfo = props.dataInfo?.[props.criteria || ''];
-    const dynamicData = item[props.criteria || ''] ?? [];
-    const dynamicDataItem = dynamicData.find((data) => data[props.dataField as string] === field.name);
-    return `• Unit: ${dataInfo?.unit ?? '-'} \n• ${props.criteria}: ${numberFormatter(dynamicDataItem?.value) || 0}`;
+    let _unit;
+    if (field.name === 'sub_total') {
+        const filteredFieldWithUnit = (props.dataField as string[])?.filter((_field) => props.dataInfo?.[_field]?.unit);
+        _unit = filteredFieldWithUnit?.map((_field) => (props.dataInfo ?? {})[_field]?.unit).join(', ');
+    } else _unit = props.dataInfo?.[field.name || '']?.unit;
+    return `• Unit: ${_unit ?? '-'} \n• ${field.name}: ${numberFormatter(item[field.name])}`;
 };
 
 const getSortIcon = (field: TableWidgetField) => {
-    let _fieldName = field.name;
-    if (field.name === 'sub_total' && props.criteria) _fieldName = `_total_${props.criteria}`;
-    if (!state.proxySortBy.some((d) => d.key === _fieldName)) {
+    if (!state.proxySortBy.some((d) => d.key === field.name)) {
         return 'ic_caret-down';
     }
     return state.proxySortBy[0]?.desc ? 'ic_caret-down-filled' : 'ic_caret-up-filled';
 };
 
 const handleClickSort = async (sortKey: string) => {
-    let _sortKey = sortKey;
-    if (sortKey === 'sub_total' && props.criteria) _sortKey = `_total_${props.criteria}`;
     let resultSortBy: { key: string; desc: boolean }[];
-    if (state.proxySortBy.length && state.proxySortBy[0].key === _sortKey) {
-        resultSortBy = [{ key: _sortKey, desc: !state.proxySortBy[0].desc }];
+    if (state.proxySortBy.length && state.proxySortBy[0].key === sortKey) {
+        resultSortBy = [{ key: sortKey, desc: !state.proxySortBy[0].desc }];
     } else {
-        resultSortBy = [{ key: _sortKey, desc: true }];
+        resultSortBy = [{ key: sortKey, desc: true }];
     }
     state.proxySortBy = resultSortBy;
     state.proxyThisPage = 1;
     emit('load');
-};
-const isSortable = (field: TableWidgetField) => {
-    const isDynamicDataField = props.fieldType === 'dynamicField' && field.fieldInfo?.type === 'dataField' && field.name !== 'sub_total';
-    const isStaticSubTotal = props.fieldType === 'staticField' && field.name === 'sub_total';
-    return !isDynamicDataField && !isStaticSubTotal;
 };
 
 const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
@@ -280,16 +215,12 @@ const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
     const minValue = state.linearInterpolationValueMap[field.name].min;
     const maxValue = state.linearInterpolationValueMap[field.name].max;
     const absGapValue = maxValue - minValue;
-    if (props.fieldType === 'staticField') {
-        _value = item[field.name] || 0;
-        _dataField = field.name;
-    } else if (props.fieldType === 'dynamicField') {
-        _value = item[props.criteria || '']?.find((data) => data[props.dataField as string] === field.name)?.value || 0;
-        _dataField = props.criteria as string;
-    }
+    _value = item[field.name] || 0;
+    _dataField = field.name;
+
 
     const opacity = absGapValue !== 0 ? (BASE_OPACITY + (0.9 * ((_value - minValue) / absGapValue))) : BASE_OPACITY;
-    const _colorInfo = props.dataFieldHeatmapColorInfo?.[_dataField]?.value;
+    const _colorInfo = props.dataFieldHeatmapColorInfo?.[_dataField]?.colorInfo;
     if (_colorInfo && _colorInfo !== 'NONE') {
         const rgbaString = hexToRgba(HEATMAP_COLOR_HEX_MAP[_colorInfo], opacity);
         if (rgbaString) _style.backgroundColor = rgbaString;
@@ -307,14 +238,9 @@ const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
 // };
 
 const getFieldMinWidth = (field: TableWidgetField): string|undefined => {
-    let customWidth: string|number|undefined = props.customTableColumnWidthInfo?.value?.find((item) => item.fieldKey === field?.name)?.width;
-    if (props.fieldType === 'staticField') {
-        if (field?.fieldInfo?.additionalType === 'comparison') customWidth = props.customTableColumnWidthInfo?.value?.find((item) => item.fieldKey === field?.name.replace('comparison_', ''))?.width;
-    } else if (props.fieldType === 'dynamicField') {
-        if (field?.fieldInfo?.type === 'dataField' && field?.fieldInfo?.additionalType !== 'subTotal') {
-            customWidth = props.customTableColumnWidthInfo?.value?.find((item) => item.fieldKey === props.dataField as string)?.width;
-        }
-    }
+    let customWidth: string|number|undefined = props.customTableColumnWidthInfo?.widthInfos?.find((item) => item.fieldKey === field?.name)?.width;
+    if (field?.fieldInfo?.additionalType === 'comparison') customWidth = props.customTableColumnWidthInfo?.widthInfos?.find((item) => item.fieldKey === field?.name.replace('comparison_', ''))?.width;
+
     const minimumWidth = props.tableColumnWidthInfo?.minimumWidth ?? TABLE_DEFAULT_MINIMUM_WIDTH;
     const fixedWidth = props.tableColumnWidthInfo?.widthType === 'fixed' ? props.tableColumnWidthInfo?.fixedWidth : undefined;
     const calculatedWidth = (customWidth ?? 0) < minimumWidth
@@ -322,14 +248,9 @@ const getFieldMinWidth = (field: TableWidgetField): string|undefined => {
     return calculatedWidth ? `${calculatedWidth}px` : undefined;
 };
 const getFieldWidth = (field: TableWidgetField): string|undefined => {
-    let customWidth: string|number|undefined = props.customTableColumnWidthInfo?.value?.find((item) => item.fieldKey === field?.name)?.width;
-    if (props.fieldType === 'staticField') {
-        if (field?.fieldInfo?.additionalType === 'comparison') customWidth = props.customTableColumnWidthInfo?.value?.find((item) => item.fieldKey === field?.name.replace('comparison_', ''))?.width;
-    } else if (props.fieldType === 'dynamicField') {
-        if (field?.fieldInfo?.type === 'dataField' && field?.fieldInfo?.additionalType !== 'subTotal') {
-            customWidth = props.customTableColumnWidthInfo?.value?.find((item) => item.fieldKey === props.dataField as string)?.width;
-        }
-    }
+    let customWidth: string|number|undefined = props.customTableColumnWidthInfo?.widthInfos?.find((item) => item.fieldKey === field?.name)?.width;
+    if (field?.fieldInfo?.additionalType === 'comparison') customWidth = props.customTableColumnWidthInfo?.widthInfos?.find((item) => item.fieldKey === field?.name.replace('comparison_', ''))?.width;
+
     const fixedWidth = props.tableColumnWidthInfo?.widthType === 'fixed' ? props.tableColumnWidthInfo?.fixedWidth : undefined;
     const calculatedWidth = customWidth || fixedWidth;
 
@@ -379,7 +300,7 @@ const getFieldWidth = (field: TableWidgetField): string|undefined => {
                                      height="0.875rem"
                                 />
                             </p-tooltip>
-                            <p-i v-else-if="isSortable(field)"
+                            <p-i v-else-if="true"
                                  :name="getSortIcon(field)"
                                  class="sort-icon"
                                  @click="handleClickSort(field.name)"
