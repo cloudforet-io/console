@@ -53,6 +53,7 @@
     "diff-match-patch": "^1.0.5",
     "echarts": "^5.5.0",
     "ejs": "^3.1.10",
+    "hangul-js": "^0.2.6",
     "hashids": "^2.2.1",
     "highlight.js": "^11.5.1",
     "html-to-image": "^1.9.0",

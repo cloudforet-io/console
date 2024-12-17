@@ -133,6 +133,7 @@ const state = reactive({
     @mixin subtle peacock200, theme('colors.peacock.200'), theme('colors.peacock.700');
     @mixin subtle coral200, theme('colors.coral.200'), theme('colors.coral.700');
     @mixin subtle red200, theme('colors.red.200'), theme('colors.red.700');
+    @mixin subtle violet200, theme('colors.violet.200'), theme('colors.violet.700');
 }
 
 </style>
