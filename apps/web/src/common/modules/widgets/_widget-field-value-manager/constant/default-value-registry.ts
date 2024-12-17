@@ -1,5 +1,5 @@
 import {
-    COLOR_SCHEMA, DATE_FORMAT, DEFAULT_COMPARISON_COLOR, NUMBER_FORMAT, TABLE_DEFAULT_MINIMUM_WIDTH, WIDGET_HEIGHT,
+    COLOR_SCHEMA, DATA_FIELD_HEATMAP_COLOR, DATE_FORMAT, DEFAULT_COMPARISON_COLOR, NUMBER_FORMAT, TABLE_DEFAULT_MINIMUM_WIDTH, WIDGET_HEIGHT,
 } from '@/common/modules/widgets/_constants/widget-field-constant';
 import { integrateFieldsSchema } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
@@ -8,6 +8,7 @@ import type { FormatRulesOptions } from '@/common/modules/widgets/_widget-fields
 import type { CategoryByOptions } from '@/common/modules/widgets/_widget-fields/category-by/type';
 import type { _ColorSchemaOptions as ColorSchemaOptions } from '@/common/modules/widgets/_widget-fields/color-schema/type';
 import type { ComparisonOptions } from '@/common/modules/widgets/_widget-fields/comparison/type';
+import type { DataFieldHeatmapColorOptions, DataFieldHeatmapColorValue } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
 import type { DataFieldOptions } from '@/common/modules/widgets/_widget-fields/data-field/type';
 import type { DateFormatOptions } from '@/common/modules/widgets/_widget-fields/date-format/type';
 import type { _GroupByOptions } from '@/common/modules/widgets/_widget-fields/group-by/type';
@@ -243,7 +244,20 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
         };
     },
     customTableColumnWidth: () => widgetFieldDefaultValueMap.customTableColumnWidth,
-    dataFieldHeatmapColor: () => widgetFieldDefaultValueMap.dataFieldHeatmapColor,
+    dataFieldHeatmapColor: (widgetConfig, dataTable) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const dataFieldheatmapColorOptions = (_fieldsSchema.dataFieldHeatmapColor?.options ?? {}) as DataFieldHeatmapColorOptions;
+
+        const dataKeys = Object.keys(dataTable?.data_info ?? {}) as string[];
+
+        const result: DataFieldHeatmapColorValue = widgetFieldDefaultValueMap.dataFieldHeatmapColor;
+        dataKeys.forEach((key) => {
+            result[key] = {
+                colorInfo: dataFieldheatmapColorOptions?.default ?? DATA_FIELD_HEATMAP_COLOR.NONE.key,
+            };
+        });
+        return result;
+    },
     dateFormat: (widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const dateFormatOptions = (_fieldsSchema.dateFormat?.options ?? {}) as DateFormatOptions;
@@ -275,7 +289,6 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
             result.count = groupByOptions.defaultMaxCount ? groupByOptions.defaultMaxCount : 5;
         }
 
-        console.debug('[DEFAULT_GROUP', result);
         return result;
     },
     header: () => widgetFieldDefaultValueMap.header,
@@ -349,17 +362,13 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
 
         const dataKeys = Object.keys(dataTable?.data_info ?? {}) as string[];
 
-        if (numberFormatOptions.default) {
-            const result: NumberFormatValue = {};
-            dataKeys.forEach((key) => {
-                result[key] = {
-                    format: numberFormatOptions.default ?? NUMBER_FORMAT.AUTO,
-                };
-            });
-            return result;
-        }
-
-        return widgetFieldDefaultValueMap.numberFormat;
+        const result: NumberFormatValue = widgetFieldDefaultValueMap.numberFormat;
+        dataKeys.forEach((key) => {
+            result[key] = {
+                format: numberFormatOptions.default ?? NUMBER_FORMAT.AUTO,
+            };
+        });
+        return result;
     },
     pieChartType: (widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
