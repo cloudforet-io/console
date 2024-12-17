@@ -14,11 +14,14 @@ import type { ToolboxOptions } from '@cloudforet/mirinae/src/controls/toolbox/ty
 import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
 import type { Page } from '@/schema/_common/type';
+import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
+import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
+import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { REFERENCE_FIELD_MAP } from '@/common/modules/widgets/_constants/widget-constant';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
@@ -30,11 +33,14 @@ import { SIZE_UNITS } from '@/services/asset-inventory/constants/asset-analysis-
 import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import type { Granularity } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
+
 interface PreviewTableField {
     type: 'LABEL' | 'DATA' | 'DIVIDER';
     name: string;
     sortKey?: string;
 }
+
+type DataTableModel = PublicDataTableModel|PrivateDataTableModel;
 
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
@@ -43,11 +49,11 @@ const allReferenceStore = useAllReferenceStore();
 
 const storeState = reactive({
     previewData: computed(() => widgetGenerateState.previewData),
-    selectedDataTableId: computed(() => widgetGenerateState.selectedDataTableId),
-    selectedDataTable: computed(() => widgetGenerateGetters.selectedDataTable),
-    loading: computed(() => widgetGenerateState.dataTableLoadLoading),
+    selectedDataTableId: computed<string|undefined>(() => widgetGenerateState.selectedDataTableId),
+    selectedDataTable: computed<DataTableModel|undefined>(() => widgetGenerateGetters.selectedDataTable),
+    loading: computed<boolean>(() => widgetGenerateState.dataTableLoadLoading),
     dataTableUpdating: computed(() => widgetGenerateState.dataTableUpdating),
-    selectedGranularity: computed(() => widgetGenerateState.selectedPreviewGranularity),
+    selectedGranularity: computed<string>(() => widgetGenerateState.selectedPreviewGranularity),
     dataTableLoadFailed: computed(() => widgetGenerateState.dataTableLoadFailed),
     // reference
     project: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
@@ -61,6 +67,8 @@ const state = reactive({
     labelFields: computed<string[]>(() => (storeState.loading ? [] : sortWidgetTableFields(Object.keys(storeState.selectedDataTable?.labels_info ?? {})))),
     dataFields: computed<string[]>(() => (storeState.loading ? [] : sortWidgetTableFields(Object.keys(storeState.selectedDataTable?.data_info ?? {})))),
     dataInfo: computed<DataInfo|undefined>(() => storeState.selectedDataTable?.data_info),
+    isPivot: computed<boolean>(() => storeState.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
+    isAutoTypeColumnPivot: computed<boolean>(() => state.isPivot && !!storeState.selectedDataTable?.options?.[DATA_TABLE_OPERATOR.PIVOT]?.limit),
     fields: computed<PreviewTableField[]>(() => {
         if (!storeState.selectedDataTableId || !storeState.previewData?.results?.length) {
             return [{
@@ -120,6 +128,7 @@ const state = reactive({
         backgroundColor: storeState.selectedDataTableId && storeState.previewData?.results?.length && !storeState.loading ? gray[900] : white,
     })),
     thisPage: 1,
+    pageSize: 15,
 });
 
 const emptyState = reactive({
@@ -148,8 +157,8 @@ const handleSelectGranularity = async (granularity: Granularity) => {
 const handleChangeToolbox = async (options: ToolboxOptions) => {
     if (!storeState.selectedDataTableId) return;
     let page = undefined as Page|undefined;
-    if (options.pageStart) page = { start: options.pageStart, limit: state.thisPage * 15 };
-    if (options.pageLimit) page = { start: 1, limit: options.pageLimit };
+    if (options.pageStart) page = { start: options.pageStart, limit: state.pageSize };
+    if (options.pageLimit) page = { start: 1, limit: state.pageSize };
     await widgetGenerateStore.loadDataTable({
         data_table_id: storeState.selectedDataTableId,
         page,
@@ -241,7 +250,7 @@ onUnmounted(() => {
                    :searchable="false"
                    :refreshable="false"
                    :page-size-options="[15, 30, 45]"
-                   :page-size="15"
+                   :page-size.sync="state.pageSize"
                    :this-page.sync="state.thisPage"
                    :total-count="storeState.previewData.total_count"
                    @change="handleChangeToolbox"
