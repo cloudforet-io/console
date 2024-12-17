@@ -4239,12 +4239,18 @@
 				"DESC": "이는 {tasks}의 유형을 그룹화한 것입니다. 사용자는 {task}{taskObjectParticle} 제출할 때 적절한 카테고리를 선택하여 담당자가 {tasks}{tasksObjectParticle} 더 효율적으로 관리할 수 있도록 돕습니다."
 			},
 			"PACKAGE": {
+				"ADDED": "추가됨",
+				"AFFECTED_DESC": "영향 받는 {workspace}와 {category}는 다음과 같습니다.",
+				"CHANGE_STATUS": "변경 여부",
 				"DELETE_UNAVAILABLE": "연결된 카테고리가 존재하므로 패키지 삭제가 불가합니다.",
 				"DESC": "계약에 따라 사용자에게 제공되는 기능의 집합으로, 전체 서비스의 범위를 나타냅니다.",
+				"REMOVED": "삭제됨",
 				"SET_DEFAULT_DESC": "이 패키지를 관련 작업에 사용할 기본 패키지로 변경합니다.",
 				"SET_TARGET_AS_DEFAULT": "{target} 패키지를 기본으로 설정",
 				"SPECIFIC_WORKSPACE": "워크스페이스 선택",
-				"UNSET": "설정하지 않음"
+				"UNCHANGED": "변경 없음",
+				"UNSET": "설정하지 않음",
+				"UPDATE_CONFIRMATION": "패키지 변경사항 확인"
 			},
 			"STATUS": {
 				"DELETE_CONTINUE": "이 상태를 삭제하면 연결된 모든 {task}의 상태가 {default}로 일괄 변경됩니다. 계속 하시겠습니까?",

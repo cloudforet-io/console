@@ -4239,12 +4239,18 @@
 				"DESC": "This groups types of {tasks}. Users select the appropriate category when submitting a {task}, helping the assignee manage {tasks} more efficiently."
 			},
 			"PACKAGE": {
+				"ADDED": "Added",
+				"AFFECTED_DESC": "The affected {workspace} and {category} are as follows.",
+				"CHANGE_STATUS": "Change Status",
 				"DELETE_UNAVAILABLE": "The package cannot be deleted because there are linked categories.",
 				"DESC": "A set of features provided to users based on their contract, representing the full scope of the service.",
+				"REMOVED": "Removed",
 				"SET_DEFAULT_DESC": "This will make it the primary package for related operations.",
 				"SET_TARGET_AS_DEFAULT": "Set {target} as the default package",
 				"SPECIFIC_WORKSPACE": "Specific Workspaces",
-				"UNSET": "Unset"
+				"UNCHANGED": "Unchanged",
+				"UNSET": "Unset",
+				"UPDATE_CONFIRMATION": "Package Update Confirmation"
 			},
 			"STATUS": {
 				"DELETE_CONTINUE": "Deleting this status will automatically change the status of all associated {task} to {default}. Do you want to proceed?",

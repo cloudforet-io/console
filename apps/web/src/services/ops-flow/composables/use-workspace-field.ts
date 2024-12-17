@@ -64,7 +64,6 @@ export const useWorkspaceField = () => {
     };
 
     const prevSelectedWorkspaceItems = ref<SelectDropdownMenuItem[]>([]);
-    const prevSelectedWorkspaceIds = computed<string[]>(() => prevSelectedWorkspaceItems.value.map((w) => w.name));
     const setInitialWorkspaces = async (packageId?: string) => {
         await workspaceReferenceStore.load();
         prevSelectedWorkspaceItems.value = packageId ? workspaceItemsByPackage.value[packageId] ?? [] : [];
@@ -106,9 +105,11 @@ export const useWorkspaceField = () => {
             throw new Error(`Failed to remove package from workspaces:\n${errorMessages.join('\n')}`);
         }
     };
+    const addedWorkspaceItems = computed(() => selectedWorkspaceItems.value.filter((item) => !prevSelectedWorkspaceItems.value.some((w) => w.name === item.name)));
+    const removedWorkspaceItems = computed(() => prevSelectedWorkspaceItems.value.filter((item) => !selectedWorkspaceItems.value.some((w) => w.name === item.name)));
     const applyPackageToWorkspaces = async (packageId: string) => {
-        const addedWorkspaces = selectedWorkspaceIds.value.filter((id) => !prevSelectedWorkspaceIds.value.includes(id));
-        const removedWorkspaces = prevSelectedWorkspaceIds.value.filter((id) => !selectedWorkspaceIds.value.includes(id));
+        const addedWorkspaces = addedWorkspaceItems.value.map((item) => item.name);
+        const removedWorkspaces = removedWorkspaceItems.value.map((item) => item.name);
         const responses = await Promise.allSettled([
             addPackageToWorkspaces(packageId, addedWorkspaces),
             removePackageFromWorkspaces(packageId, removedWorkspaces),
@@ -133,5 +134,7 @@ export const useWorkspaceField = () => {
         setSelectedWorkspaces,
         setInitialWorkspaces,
         applyPackageToWorkspaces,
+        addedWorkspaceItems,
+        removedWorkspaceItems,
     };
 };

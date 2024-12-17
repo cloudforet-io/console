@@ -4239,12 +4239,18 @@
 				"DESC": ""
 			},
 			"PACKAGE": {
+				"ADDED": "",
+				"AFFECTED_DESC": "",
+				"CHANGE_STATUS": "",
 				"DELETE_UNAVAILABLE": "",
 				"DESC": "",
+				"REMOVED": "",
 				"SET_DEFAULT_DESC": "",
 				"SET_TARGET_AS_DEFAULT": "",
 				"SPECIFIC_WORKSPACE": "",
-				"UNSET": ""
+				"UNCHANGED": "",
+				"UNSET": "",
+				"UPDATE_CONFIRMATION": ""
 			},
 			"STATUS": {
 				"DELETE_CONTINUE": "",

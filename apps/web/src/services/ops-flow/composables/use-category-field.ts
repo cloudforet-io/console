@@ -90,7 +90,6 @@ export const useCategoryField = ({
     };
 
     const prevSelectedCategoryItems = ref<CategoryItem[]>([]);
-    const prevSelectedCategoryIds = computed<string[]>(() => prevSelectedCategoryItems.value.map((c) => c.name));
     const setInitialCategoriesByPackageId = async (packageId?: string) => {
         allCategoryItems.value = await loadAllCategoryItems();
         prevSelectedCategoryItems.value = packageId ? categoryItemsByPackage.value[packageId] ?? [] : [];
@@ -139,9 +138,11 @@ export const useCategoryField = ({
             throw new Error(`Failed to bind default package to categories:\n${errorMessages.join('\n')}`);
         }
     };
+    const addedCategoryItems = computed(() => selectedCategoryItems.value.filter((item) => !prevSelectedCategoryItems.value.some((c) => c.name === item.name)));
+    const removedCategoryItems = computed(() => prevSelectedCategoryItems.value.filter((item) => !selectedCategoryItems.value.some((c) => c.name === item.name)));
     const applyPackageToCategories = async (packageId: string) => {
-        const addedCategories = selectedCategoryIds.value.filter((id) => !prevSelectedCategoryIds.value.includes(id));
-        const removedCategories = prevSelectedCategoryIds.value.filter((id) => !selectedCategoryIds.value.includes(id));
+        const addedCategories = addedCategoryItems.value.map((item) => item.name);
+        const removedCategories = removedCategoryItems.value.map((item) => item.name);
         const responses = await Promise.allSettled([
             addPackageToCategories(packageId, addedCategories),
             bindDefaultPackageToCategories(removedCategories),
@@ -166,5 +167,7 @@ export const useCategoryField = ({
         setInitialCategoriesByPackageId,
         setInitialCategory,
         applyPackageToCategories,
+        addedCategoryItems,
+        removedCategoryItems,
     };
 };
