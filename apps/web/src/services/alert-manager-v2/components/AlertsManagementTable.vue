@@ -6,6 +6,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PToolboxTable, PSelectDropdown, PLink, PBadge, PI, PSelectStatus,
 } from '@cloudforet/mirinae';
+import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
@@ -17,6 +18,7 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
 
 import { red } from '@/styles/colors';
 
@@ -41,9 +43,12 @@ const storeState = reactive({
 });
 const state = reactive({
     loading: false,
+    visibleCustomFieldModal: false,
+
     alertList: [] as AlertModel[],
     alertStateLabels: getAlertStateI18n(),
     urgencyLabels: getAlertUrgencyI18n(),
+    fields: ALERT_MANAGEMENT_TABLE_FIELDS,
 });
 const filterState = reactive({
     selectedServiceId: '',
@@ -80,13 +85,21 @@ const handleChange = () => {
     console.log('TODO: handleChange');
 };
 const handleClickSettings = () => {
-    console.log('TODO: handleClickSettings');
+    state.visibleCustomFieldModal = true;
+};
+const handleVisibleCustomFieldModal = (visible) => {
+    state.visibleCustomFieldModal = visible;
+};
+const handleCustomFieldUpdate = (fields: DataTableFieldType[]) => {
+    state.fields = fields;
 };
 const handleExportToExcel = () => {
     console.log('TODO: handleExportToExcel');
 };
 
-const alertListApiQuery = new ApiQueryHelper().setSort('created_at', true);
+const alertListApiQuery = new ApiQueryHelper()
+    .setOnly(...state.fields.map((d) => d.name).filter((name) => name !== 'duration'), 'alert_id')
+    .setSort('created_at', true);
 const fetchAlertsList = async () => {
     try {
         let stateFilter: ConsoleFilter[] = [];
@@ -140,7 +153,7 @@ onMounted(async () => {
                          sort-by="created_at"
                          :sort-desc="true"
                          :loading="state.loading"
-                         :fields="ALERT_MANAGEMENT_TABLE_FIELDS"
+                         :fields="state.fields"
                          :items="state.alertList"
                          :key-item-sets="ALERT_MANAGEMENT_TABLE_HANDLER.keyItemSets"
                          :value-handler-map="ALERT_MANAGEMENT_TABLE_HANDLER.valueHandlerMap"
@@ -237,6 +250,13 @@ onMounted(async () => {
                 </template>
             </template>
         </p-toolbox-table>
+        <custom-field-modal :visible="state.visibleCustomFieldModal"
+                            resource-type="alertManager.alert"
+                            :default-field="ALERT_MANAGEMENT_TABLE_FIELDS"
+                            @update:visible="handleVisibleCustomFieldModal"
+                            @complete="fetchAlertsList"
+                            @custom-field-loaded="handleCustomFieldUpdate"
+        />
     </div>
 </template>
 
