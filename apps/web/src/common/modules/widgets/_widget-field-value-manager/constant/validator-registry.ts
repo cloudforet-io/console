@@ -59,7 +59,7 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
         if (type === _FORMAT_RULE_TYPE.numberThreshold || type === _FORMAT_RULE_TYPE.percentThreshold) {
             return fieldValue.rules.every((d) => !!d.number && !!d.color);
         }
-        if (type === _FORMAT_RULE_TYPE.textNumberTreshold) {
+        if (type === _FORMAT_RULE_TYPE.textNumberThreshold) {
             return fieldValue.rules.every((d) => !!d.text && !!d.number && !!d.color);
         }
         if (formatRulesOptions.useField) {

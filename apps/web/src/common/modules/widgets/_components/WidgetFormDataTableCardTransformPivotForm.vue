@@ -22,7 +22,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import WidgetFormDataTableCardTransformFormWrapper
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformFormWrapper.vue';
 import {
-    type DATA_TABLE_OPERATOR, DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP,
+    DATA_TABLE_OPERATOR, DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP,
 } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { TransformDataTableInfo, TransformDataTableProps } from '@/common/modules/widgets/types/widget-data-table-type';
@@ -30,7 +30,9 @@ import type { PivotOptions } from '@/common/modules/widgets/types/widget-model';
 
 const props = defineProps<TransformDataTableProps<PivotOptions>>();
 
-const emit = defineEmits<{(e: 'update:operator-options', value: PivotOptions): void; }>();
+const emit = defineEmits<{(e: 'update:operator-options', value: PivotOptions): void;
+    (e: 'update:invalid', value: boolean): void;
+}>();
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 
@@ -65,6 +67,14 @@ const state = reactive({
             name: key,
             label: key,
         }));
+    }),
+    invalid: computed<boolean>(() => {
+        if (!state.proxyOperatorOptions.data_table_id) return true;
+        if (!state.proxyOperatorOptions.fields?.labels?.length) return true;
+        if (!state.proxyOperatorOptions.fields?.column) return true;
+        if (!state.proxyOperatorOptions.fields?.data) return true;
+        if (!state.proxyOperatorOptions.select && !state.proxyOperatorOptions.limit) return true;
+        return false;
     }),
     columnFieldInvalid: computed<boolean>(() => {
         if (state.labelFieldItems.length === 1) return true;
@@ -235,6 +245,9 @@ watch([
         order_by: _orderBy,
     };
 });
+watch(() => state.invalid, (_invalid) => {
+    emit('update:invalid', _invalid);
+}, { immediate: true });
 
 onMounted(() => {
     state.selectedValueType = props.originData.limit !== undefined ? 'auto' : 'fixed';

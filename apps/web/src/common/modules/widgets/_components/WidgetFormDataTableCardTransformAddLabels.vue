@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+    computed,
     onMounted, reactive, ref, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
@@ -29,7 +30,9 @@ interface AdditionalLabel {
 const DATE_FIELD = 'Date';
 const COMPONENT_RANDOM_KEY = `add-labels-${random()}`;
 const props = defineProps<TransformDataTableProps<AddLabelsOptions>>();
-const emit = defineEmits<{(e: 'update:operator-options', value: AddLabelsOptions): void; }>();
+const emit = defineEmits<{(e: 'update:operator-options', value: AddLabelsOptions): void;
+    (e: 'update:invalid', value: boolean): void;
+}>();
 
 const dataTableInfo = ref<TransformDataTableInfo>({
     dataTableId: props.originData?.data_table_id,
@@ -38,6 +41,15 @@ const labelsInfo = ref<AddLabelsOptions['labels']>(props.originData.labels);
 const state = reactive({
     proxyOperatorOptions: useProxyValue<AddLabelsOptions>('operator-options', props, emit),
     refinedLabels: [] as AdditionalLabel[],
+    invalid: computed<boolean>(() => {
+        if (!state.proxyOperatorOptions?.data_table_id) return true;
+        if (!state.refinedLabels.length) return true;
+        if (state.refinedLabels.some((label) => !label.name || !label.value)) return true;
+        const fieldNames = state.refinedLabels.map((label) => label.name);
+        if (fieldNames.includes(DATE_FIELD)) return true;
+        if (fieldNames.length !== new Set(fieldNames).size) return true;
+        return false;
+    }),
     // groupByKeys: computed<string[]>(() => []),
 });
 
@@ -74,9 +86,9 @@ const handleRemoveLabel = (idx: number) => {
 };
 
 /* Watcher */
-watch(() => state.refinedLabels, (_refinedLabels) => {
+watch([dataTableInfo, () => state.refinedLabels], ([_dataTableInfo, _refinedLabels]) => {
     state.proxyOperatorOptions = {
-        ...state.proxyOperatorOptions,
+        data_table_id: _dataTableInfo.dataTableId,
         labels: _refinedLabels.reduce((acc, label) => {
             if (label.name && label.value) {
                 acc[label.name] = label.value;
@@ -85,6 +97,9 @@ watch(() => state.refinedLabels, (_refinedLabels) => {
         }, {}),
     };
 }, { deep: true });
+watch(() => state.invalid, (_invalid) => {
+    emit('update:invalid', _invalid);
+}, { immediate: true });
 
 onMounted(() => {
     state.refinedLabels = Object.entries(labelsInfo.value).map(([name, value]) => ({ name, value }));

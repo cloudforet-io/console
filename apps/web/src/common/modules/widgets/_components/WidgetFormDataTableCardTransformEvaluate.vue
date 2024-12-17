@@ -27,7 +27,9 @@ import type { EvalOptions } from '@/common/modules/widgets/types/widget-model';
 
 
 const props = defineProps<TransformDataTableProps<EvalOptions>>();
-const emit = defineEmits<{(e: 'update:operator-options', value: EvalOptions): void; }>();
+const emit = defineEmits<{(e: 'update:operator-options', value: EvalOptions): void;
+    (e: 'update:invalid', value: boolean): void;
+}>();
 
 const dataTableInfo = ref<TransformDataTableInfo>({
     dataTableId: props.originData?.data_table_id,
@@ -51,6 +53,12 @@ const state = reactive({
         },
     ]),
     globalVariablePopperVisible: false,
+    invalid: computed<boolean>(() => {
+        if (!state.proxyOperatorOptions.data_table_id) return true;
+        const fieldNames = expressionsInfo.value.map((expression) => expression.name);
+        if (fieldNames.length !== new Set(fieldNames).size) return true;
+        return !expressionsInfo.value.every((expression) => !!expression.name && !!expression.expression);
+    }),
 });
 
 const modalState = reactive({
@@ -126,6 +134,9 @@ watch([dataTableInfo, expressionsInfo], ([_dataTableInfo, _expressionsInfo]) => 
         expressions: _expressionsInfo,
     };
 }, { deep: true, immediate: true });
+watch(() => state.invalid, (_invalid) => {
+    emit('update:invalid', _invalid);
+}, { immediate: true });
 </script>
 
 <template>

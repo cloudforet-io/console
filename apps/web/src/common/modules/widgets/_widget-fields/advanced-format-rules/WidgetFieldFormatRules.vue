@@ -120,7 +120,7 @@ const handleUpdateField = (val: string) => {
                         <div class="left-part"
                              :class="[state.type === _FORMAT_RULE_TYPE.textThreshold ? 'grid-cols-2' : 'grid-cols-1']"
                         >
-                            <p-field-group v-if="state.type === _FORMAT_RULE_TYPE.textNumberTreshold || state.type === _FORMAT_RULE_TYPE.textThreshold"
+                            <p-field-group v-if="state.type === _FORMAT_RULE_TYPE.textNumberThreshold || state.type === _FORMAT_RULE_TYPE.textThreshold"
                                            required
                             >
                                 <p-text-input :value="rule.text"
@@ -129,7 +129,7 @@ const handleUpdateField = (val: string) => {
                                               @update:value="handleFormatRuleInput(idx, 'text', $event)"
                                 />
                             </p-field-group>
-                            <p-field-group v-if="state.type === _FORMAT_RULE_TYPE.textNumberTreshold
+                            <p-field-group v-if="state.type === _FORMAT_RULE_TYPE.textNumberThreshold
                                                || state.type === _FORMAT_RULE_TYPE.numberThreshold
                                                || state.type === _FORMAT_RULE_TYPE.percentThreshold"
                                            required

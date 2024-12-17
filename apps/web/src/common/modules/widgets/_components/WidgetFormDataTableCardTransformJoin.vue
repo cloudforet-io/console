@@ -10,7 +10,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import WidgetFormDataTableCardTransformFormWrapper
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformFormWrapper.vue';
 import {
-    type DATA_TABLE_OPERATOR, JOIN_TYPE,
+    DATA_TABLE_OPERATOR, JOIN_TYPE,
 } from '@/common/modules/widgets/_constants/data-table-constant';
 import type { TransformDataTableInfo, TransformDataTableProps } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { JoinOptions, JoinType } from '@/common/modules/widgets/types/widget-model';
@@ -18,7 +18,9 @@ import type { JoinOptions, JoinType } from '@/common/modules/widgets/types/widge
 
 
 const props = defineProps<TransformDataTableProps<JoinOptions>>();
-const emit = defineEmits<{(e: 'update:operator-options', value: JoinOptions): void; }>();
+const emit = defineEmits<{(e: 'update:operator-options', value: JoinOptions): void;
+    (e: 'update:invalid', value: boolean): void;
+}>();
 
 const dataTableInfo = ref<TransformDataTableInfo>({
     dataTables: props.originData?.data_tables,
@@ -32,6 +34,11 @@ const state = reactive({
         { label: 'Outer Join', name: JOIN_TYPE.OUTER, icon: 'ic_join-outer' },
         { label: 'Inner Join', name: JOIN_TYPE.INNER, icon: 'ic_join-inner' },
     ]),
+    invalid: computed<boolean>(() => {
+        if (state.proxyOperatorOptions.data_tables.length < 2) return true;
+        if (!state.proxyOperatorOptions.data_tables.every((d) => !!d)) return true;
+        return !howInfo.value;
+    }),
 });
 
 /* Event */
@@ -46,6 +53,9 @@ watch([dataTableInfo, howInfo], ([_dataTableInfo, _howInfo]) => {
         how: _howInfo,
     };
 }, { deep: true, immediate: true });
+watch(() => state.invalid, (_invalid) => {
+    emit('update:invalid', _invalid);
+}, { immediate: true });
 </script>
 
 <template>
