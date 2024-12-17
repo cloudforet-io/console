@@ -14,6 +14,10 @@ import { ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
 import { i18n } from '@/translations';
 
+import { useUserStore } from '@/store/user/user-store';
+
+import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
+import { downloadExcel } from '@/lib/helper/file-download-helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -24,6 +28,7 @@ import { red } from '@/styles/colors';
 
 import { getAlertStateI18n, getAlertUrgencyI18n } from '@/services/alert-manager-v2/composables/alert-table-data';
 import {
+    ALERT_EXCEL_FIELDS,
     ALERT_MANAGEMENT_TABLE_FIELDS,
     ALERT_MANAGEMENT_TABLE_HANDLER,
     ALERT_STATUS_FILTERS,
@@ -35,11 +40,14 @@ import type { AlertFilterType } from '@/services/alert-manager-v2/types/alert-ma
 
 const alertPageStore = useAlertPageStore();
 const alertPageState = alertPageStore.state;
+const userStore = useUserStore();
+const userState = userStore.state;
 
 const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
     serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => alertPageState.serviceList),
+    timezone: computed<string>(() => userState.timezone || ''),
 });
 const state = reactive({
     loading: false,
@@ -69,6 +77,10 @@ const filterState = reactive({
     selectedUrgencyFilter: 'ALL',
 });
 
+const alertListApiQuery = new ApiQueryHelper()
+    .setOnly(...state.fields.map((d) => d.name).filter((name) => name !== 'duration'), 'alert_id')
+    .setSort('created_at', true);
+
 const handleSelectServiceDropdownItem = (id: string) => {
     filterState.selectedServiceId = id;
     fetchAlertsList();
@@ -93,13 +105,18 @@ const handleVisibleCustomFieldModal = (visible) => {
 const handleCustomFieldUpdate = (fields: DataTableFieldType[]) => {
     state.fields = fields;
 };
-const handleExportToExcel = () => {
-    console.log('TODO: handleExportToExcel');
+const handleExportToExcel = async () => {
+    await downloadExcel({
+        url: '/alertManager/alert/list',
+        param: {
+            query: { ...alertListApiQuery, only: ALERT_EXCEL_FIELDS.map((d) => d.key) },
+        },
+        fields: ALERT_EXCEL_FIELDS,
+        file_name_prefix: FILE_NAME_PREFIX.alert,
+        timezone: storeState.timezone,
+    });
 };
 
-const alertListApiQuery = new ApiQueryHelper()
-    .setOnly(...state.fields.map((d) => d.name).filter((name) => name !== 'duration'), 'alert_id')
-    .setSort('created_at', true);
 const fetchAlertsList = async () => {
     try {
         let stateFilter: ConsoleFilter[] = [];
