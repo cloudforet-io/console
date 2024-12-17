@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, reactive,
+    computed, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
@@ -11,16 +11,19 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 
 import { i18n } from '@/translations';
 
-import type WidgetFieldValueManager from '@/common/modules/widgets/_widget-field-value-manager';
-import type { WidgetFieldTypeMap } from '@/common/modules/widgets/_widget-field-value-manager/type';
+import { useProxyValue } from '@/common/composables/proxy-state';
+import {
+    getDefaultMenuItemIndex,
+    getInitialSelectedMenuItem,
+} from '@/common/modules/widgets/_helpers/widget-field-helper';
+
 
 const props = withDefaults(defineProps<{
-    fieldKey: keyof WidgetFieldTypeMap;
-    fieldManager: WidgetFieldValueManager;
     defaultCount?: number;
     max?: number;
     menuItems: MenuItem[];
     fieldName?:string|TranslateResult;
+    defaultIndex?: number;
     excludeDateField?: boolean;
     value?: {value?: string; count?: number};
     commonInvalidState?: boolean;
@@ -33,29 +36,59 @@ const props = withDefaults(defineProps<{
     excludeDateField: false,
     value: () => ({}),
 });
-
+const emit = defineEmits<{(e: 'update:is-valid', isValid:boolean): void;
+    (e: 'update:value', value: {value: string; count: number}): void;
+}>();
 const state = reactive({
     isInitiated: false,
-    fieldValue: computed<WidgetFieldTypeMap[typeof props.fieldKey]['value']>(() => props.fieldManager.data[props.fieldKey].value),
-    isMaxValid: computed<boolean>(() => (props.max ? ((state.fieldValue.count <= props.max) && !!state.fieldValue.count) : true)),
-    dataInvalid: computed<boolean>(() => !props.menuItems?.length || !state.fieldValue.data),
+    proxyValue: useProxyValue('value', props, emit),
+    isMaxValid: computed<boolean>(() => (props.max ? ((state.proxyValue?.count <= props.max) && !!state.proxyValue?.count) : true)),
     tooltipDesc: computed(() => i18n.t('COMMON.WIDGETS.MAX_ITEMS_DESC', {
         fieldName: props.fieldName,
         max: props.max,
     })),
+    isAllValid: computed<boolean>(() => ((props.menuItems.length) ? state.isMaxValid : false)),
     selectedItem: undefined as undefined | MenuItem[],
 });
 
 /* Event */
 const handleUpdateSelect = (val: string) => {
-    if (val === state.fieldValue.data) return;
-    props.fieldManager.setFieldValue(props.fieldKey, { ...state.fieldValue, data: val });
+    if (val === state.proxyValue.value) return;
+    state.proxyValue = { ...state.proxyValue, value: val };
 };
 const handleUpdateCount = (val: number) => {
-    if (val === state.fieldValue.count) return;
-    props.fieldManager.setFieldValue(props.fieldKey, { ...state.fieldValue, count: val ?? 1 });
+    if (val === state.proxyValue.count) return;
+    state.proxyValue = { ...state.proxyValue, count: val ?? 1 };
 };
 
+/* Watcher */
+watch(() => state.isAllValid, (isValid) => {
+    emit('update:is-valid', isValid);
+}, { immediate: true });
+
+/* Init */
+const initValue = () => {
+    state.proxyValue = {
+        ...state.proxyValue,
+        value: props.value?.value,
+        count: props.value?.count,
+    };
+};
+watch(() => props.menuItems, (menuItems) => {
+    if (!state.isInitiated) {
+        initValue();
+        state.isInitiated = true;
+    }
+
+    if (!menuItems?.length) return;
+
+    const _defaultIndex = getDefaultMenuItemIndex(props.menuItems, props.defaultIndex, props.excludeDateField);
+    const _value = getInitialSelectedMenuItem(menuItems, state.proxyValue?.value, _defaultIndex);
+    state.proxyValue = {
+        value: _value,
+        count: props.value?.count ?? props.defaultCount ?? 5,
+    };
+}, { immediate: true });
 </script>
 
 <template>
@@ -66,8 +99,8 @@ const handleUpdateCount = (val: number) => {
                        class="w-full"
         >
             <p-select-dropdown :menu="props.menuItems"
-                               :selected="state.fieldValue?.data"
-                               :invalid="state.dataInvalid"
+                               :selected="state.proxyValue?.value"
+                               :invalid="props.commonInvalidState"
                                use-fixed-menu-style
                                block
                                @update:selected="handleUpdateSelect"
@@ -84,7 +117,7 @@ const handleUpdateCount = (val: number) => {
                           :min="1"
                           :max="props.max"
                           :invalid="!state.isMaxValid"
-                          :value="state.fieldValue?.count"
+                          :value="state.proxyValue?.count"
                           @update:value="handleUpdateCount"
             />
             <template #label-extra>
