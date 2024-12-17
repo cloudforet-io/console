@@ -6,7 +6,7 @@ import {
 import { PFieldGroup } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import WidgetFieldDropdownAndMax from '@/common/modules/widgets/_components/_WidgetFieldDropdownAndMax.vue';
+import WidgetFieldDropdownAndMax from '@/common/modules/widgets/_components/WidgetFieldDropdownAndMax.vue';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
