@@ -9,6 +9,8 @@ import { i18n, type SupportLanguage } from '@/translations';
 
 import { useSharedConfigStore } from '@/store/domain/shared-config-store';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type {
@@ -87,8 +89,9 @@ export const useTaskManagementTemplateStore = defineStore('task-management-templ
         state.templateId = templateId;
         try {
             await sharedConfigStore.set<TemplateData>('TASK_TEMPLATE', { template_id: templateId });
+            showSuccessMessage(i18n.t('OPSFLOW.ALT_S_EDIT_TARGET', { target: i18n.t('OPSFLOW.TASK_MANAGEMENT.TEMPLATE_TYPE') }));
         } catch (e) {
-            ErrorHandler.handleError(e);
+            ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ALT_E_EDIT_TARGET', { target: i18n.t('OPSFLOW.TASK_MANAGEMENT.TEMPLATE_TYPE') }));
             state.templateId = prev;
         }
     };
@@ -111,8 +114,15 @@ export const useTaskManagementTemplateStore = defineStore('task-management-templ
         state.enableLanding = enabled;
         try {
             await sharedConfigStore.set<LandingData>('TASK_LANDING', { enabled });
+            showSuccessMessage(
+                enabled
+                    ? i18n.t('OPSFLOW.TASK_MANAGEMENT.ALT_S_ENABLE_LANDING')
+                    : i18n.t('OPSFLOW.TASK_MANAGEMENT.ALT_S_DISABLE_LANDING'),
+            );
         } catch (e) {
-            ErrorHandler.handleError(e);
+            ErrorHandler.handleRequestError(e, enabled
+                ? i18n.t('OPSFLOW.TASK_MANAGEMENT.ALT_E_ENABLE_LANDING')
+                : i18n.t('OPSFLOW.TASK_MANAGEMENT.ALT_E_DISABLE_LANDING'));
             state.enableLanding = prev;
         }
     };

@@ -4234,11 +4234,15 @@
 			"TASK_PROGRESS": "{task} Progress"
 		},
 		"TASK_MANAGEMENT": {
+			"ALT_E_DISABLE_LANDING": "Failed to disable landing page",
+			"ALT_E_ENABLE_LANDING": "Failed to enable landing page",
+			"ALT_S_DISABLE_LANDING": "Landing page successfully disabled",
+			"ALT_S_ENABLE_LANDING": "Landing page successfully enabled",
 			"CATEGORY": {
 				"DELETE_CONFIRMATION_DESC": "There are {tasks} under this category. Once deleted, the {tasks} cannot be edited. Are you sure you want to proceed?",
 				"DESC": "This groups types of {tasks}. Users select the appropriate category when submitting a {task}, helping the assignee manage {tasks} more efficiently."
 			},
-			"ENABLE_LANDING": "Enagle Landing Page",
+			"ENABLE_LANDING": "Enable Landing Page",
 			"ENABLE_LANDING_DESC": "Landing Page Description...",
 			"PACKAGE": {
 				"ADDED": "Added",
