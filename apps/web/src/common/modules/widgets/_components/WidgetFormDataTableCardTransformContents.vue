@@ -16,12 +16,12 @@ import WidgetFormDataTableCardAlertModal
 import WidgetFormDataTableCardFooter from '@/common/modules/widgets/_components/WidgetFormDataTableCardFooter.vue';
 import WidgetFormDataTableCardHeaderTitle
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardHeaderTitle.vue';
+import WidgetFormDataTableCardTransformAddLabels
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformAddLabels.vue';
 import WidgetFormDataTableCardTransformConcatenate
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformConcatenate.vue';
-import WidgetFormDataTableCardTransformFormAddLabels
-    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformFormAddLabels.vue';
-import WidgetFormDataTableCardTransformFormEvaluate
-    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformFormEvaluate.vue';
+import WidgetFormDataTableCardTransformEvaluate
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformEvaluate.vue';
 import WidgetFormDataTableCardTransformJoin
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformJoin.vue';
 import WidgetFormDataTableCardTransformPivotForm
@@ -359,20 +359,20 @@ defineExpose({
                                                     :operator-options.sync="valueState.JOIN"
                                                     :origin-data="props.item.options[state.operator]"
         />
-        <widget-form-data-table-card-transform-form-evaluate v-else-if="state.operator === DATA_TABLE_OPERATOR.EVAL"
-                                                             :base-data-table-id="state.dataTableId"
-                                                             :operator-options.sync="valueState.EVAL"
-                                                             :origin-data="props.item.options[state.operator]"
+        <widget-form-data-table-card-transform-evaluate v-else-if="state.operator === DATA_TABLE_OPERATOR.EVAL"
+                                                        :base-data-table-id="state.dataTableId"
+                                                        :operator-options.sync="valueState.EVAL"
+                                                        :origin-data="props.item.options[state.operator]"
         />
         <widget-form-data-table-card-transform-query v-else-if="state.operator === DATA_TABLE_OPERATOR.QUERY"
                                                      :base-data-table-id="state.dataTableId"
                                                      :operator-options.sync="valueState.QUERY"
                                                      :origin-data="props.item.options[state.operator]"
         />
-        <widget-form-data-table-card-transform-form-add-labels v-if="state.operator === DATA_TABLE_OPERATOR.ADD_LABELS"
-                                                               :base-data-table-id="state.dataTableId"
-                                                               :operator-options.sync="valueState.ADD_LABELS"
-                                                               :origin-data="props.item.options[state.operator]"
+        <widget-form-data-table-card-transform-add-labels v-if="state.operator === DATA_TABLE_OPERATOR.ADD_LABELS"
+                                                          :base-data-table-id="state.dataTableId"
+                                                          :operator-options.sync="valueState.ADD_LABELS"
+                                                          :origin-data="props.item.options[state.operator]"
         />
         <widget-form-data-table-card-footer :disabled="state.applyDisabled"
                                             :changed="state.optionsChanged"

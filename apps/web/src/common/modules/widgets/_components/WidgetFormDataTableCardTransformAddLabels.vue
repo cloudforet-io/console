@@ -95,7 +95,7 @@ onMounted(() => {
     <widget-form-data-table-card-transform-form-wrapper :data-table-id="props.baseDataTableId"
                                                         :operator="DATA_TABLE_OPERATOR.ADD_LABELS"
                                                         :data-table-info.sync="dataTableInfo"
-                                                        class="widget-form-data-table-card-transform-form-add-labels"
+                                                        class="widget-form-data-table-card-transform-add-labels"
     >
         <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.ADDITIONAL_LABELS')"
                        required
@@ -155,7 +155,7 @@ onMounted(() => {
 </template>
 
 <style scoped lang="postcss">
-.widget-form-data-table-card-transform-form-add-labels {
+.widget-form-data-table-card-transform-add-labels {
     @apply flex flex-col gap-2;
 
     .additional-labels-wrapper {

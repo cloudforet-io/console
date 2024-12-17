@@ -128,7 +128,7 @@ watch([dataTableInfo, expressionsInfo], ([_dataTableInfo, _expressionsInfo]) => 
 </script>
 
 <template>
-    <div class="widget-form-data-table-card-transform-form-evaluate">
+    <div class="widget-form-data-table-card-transform-evaluate">
         <widget-form-data-table-card-transform-form-wrapper :data-table-id="props.baseDataTableId"
                                                             :operator="DATA_TABLE_OPERATOR.EVAL"
                                                             :data-table-info.sync="dataTableInfo"
@@ -283,7 +283,7 @@ watch([dataTableInfo, expressionsInfo], ([_dataTableInfo, _expressionsInfo]) => 
 </template>
 
 <style scoped lang="postcss">
-.widget-form-data-table-card-transform-form-evaluate {
+.widget-form-data-table-card-transform-evaluate {
     .expression-form-card {
         @apply border border-gray-200 rounded-lg;
         padding: 0.625rem 0.5rem;
