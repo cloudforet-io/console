@@ -3,6 +3,8 @@ import { computed, ref } from 'vue';
 import { getTextHighlightRegex } from '@cloudforet/mirinae';
 import type { AutocompleteHandler, SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
+import { getParticle, i18n } from '@/translations';
+
 import { useFieldValidator } from '@/common/composables/form-validator';
 
 import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
@@ -25,7 +27,12 @@ export const useCategoryField = ({
     const categoryValidator = useFieldValidator<SelectDropdownMenuItem[]|CategoryItem[]>(
         [],
         isRequired ? (val) => {
-            if (val.length === 0) return 'Please select a category';
+            if (val.length === 0) {
+                return i18n.t('OPSFLOW.VALIDATION.REQUIRED', {
+                    topic: i18n.t('OPSFLOW.CATEGORY'),
+                    particle: getParticle(i18n.t('OPSFLOW.CATEGORY') as string, 'topic'),
+                });
+            }
             return true;
         } : undefined,
     );
@@ -55,14 +62,15 @@ export const useCategoryField = ({
 
         if (hasTaskTypeOnly) {
             await taskTypeStore.listByCategoryIds(taskCategories.map((c) => c.category_id));
-            return taskCategories.filter((c) => {
+            return taskCategories.map((c) => {
                 const taskTypes = taskTypeStore.state.itemsByCategoryId[c.category_id];
-                return taskTypes && taskTypes.length > 0;
-            }).map((c) => ({
-                name: c.category_id,
-                label: c.name,
-                packageId: c.package_id,
-            }));
+                return {
+                    name: c.category_id,
+                    label: c.name,
+                    disabled: !taskTypes || taskTypes.length === 0,
+                    packageId: c.package_id,
+                };
+            });
         }
         return taskCategoryStore.getters.taskCategories.map((c) => ({
             name: c.category_id,
@@ -90,7 +98,7 @@ export const useCategoryField = ({
     };
     const setInitialCategory = async (categoryId: string) => {
         allCategoryItems.value = await loadAllCategoryItems();
-        prevSelectedCategoryItems.value = allCategoryItems.value.filter((c) => c.name === categoryId);
+        prevSelectedCategoryItems.value = allCategoryItems.value.filter((c) => c.name === categoryId && !c.disabled);
         categoryValidator.setValue(prevSelectedCategoryItems.value);
     };
 

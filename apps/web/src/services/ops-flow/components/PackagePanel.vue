@@ -7,11 +7,12 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
+import { i18n as _i18n } from '@/translations';
+
 import ActionMenuButton from '@/common/components/buttons/ActionMenuButton.vue';
 
 import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
-
 
 const taskManagementPageStore = useTaskManagementPageStore();
 const packageStore = usePackageStore();
@@ -20,12 +21,12 @@ const state = reactive({
     packageFields: computed<DataTableField[]>(() => [
         {
             name: 'name',
-            label: 'Package Name',
+            label: _i18n.t('OPSFLOW.NAME') as string,
             width: '20%',
         },
         {
             name: 'description',
-            label: 'Description',
+            label: _i18n.t('OPSFLOW.DESCRIPTION') as string,
             width: '70%',
         },
         {
@@ -34,19 +35,19 @@ const state = reactive({
         },
     ]),
     menu: computed<MenuItem[]>(() => [
-        { name: 'edit', icon: 'ic_edit', label: 'Edit' },
-        { name: 'set-as-default', icon: 'ic_check-circle', label: 'Set as Default' },
-        { name: 'delete', icon: 'ic_delete', label: 'Delete' },
+        { name: 'edit', icon: 'ic_edit', label: _i18n.t('COMMON.BUTTONS.EDIT') as string },
+        { name: 'set-as-default', icon: 'ic_check-circle', label: _i18n.t('OPSFLOW.SET_AS_DEFAULT') as string },
+        { name: 'delete', icon: 'ic_delete', label: _i18n.t('COMMON.BUTTONS.DELETE') as string },
     ]),
     defaultPackageMenu: computed<MenuItem[]>(() => [
         {
-            name: 'edit', icon: 'ic_edit', label: 'Edit',
+            name: 'edit', icon: 'ic_edit', label: _i18n.t('COMMON.BUTTONS.EDIT') as string,
         },
         {
-            name: 'set-as-default', icon: 'ic_check-circle', label: 'Set as Default', disabled: true, iconColor: 'inherit',
+            name: 'set-as-default', icon: 'ic_check-circle', label: _i18n.t('OPSFLOW.SET_AS_DEFAULT') as string, disabled: true, iconColor: 'inherit',
         },
         {
-            name: 'delete', icon: 'ic_delete', label: 'Delete', disabled: true, iconColor: 'inherit',
+            name: 'delete', icon: 'ic_delete', label: _i18n.t('COMMON.BUTTONS.DELETE') as string, disabled: true, iconColor: 'inherit',
         },
     ]),
 });
@@ -56,7 +57,7 @@ const state = reactive({
     <p-pane-layout>
         <p-heading-layout class="pt-6 px-4 mb-2">
             <template #heading>
-                <p-heading title="Support Package"
+                <p-heading :title="$t('OPSFLOW.SUPPORT_PACKAGE')"
                            heading-type="sub"
                 />
             </template>
@@ -69,12 +70,12 @@ const state = reactive({
                           style-type="substitutive"
                           @click="taskManagementPageStore.openAddPackageForm()"
                 >
-                    Add Package
+                    {{ $t('OPSFLOW.ADD_TARGET', { target: $t('OPSFLOW.PACKAGE') }) }}
                 </p-button>
             </template>
         </p-heading-layout>
         <p class="px-4 mb-6 text-label-md text-gray-600">
-            계약에 따라 고객이 이용할 수 있는 기능의 묶음입니다. 전체 서비스의 범위를 나타내며, 하위 카테고를 생성할 수 있습니다.
+            {{ $t('OPSFLOW.TASK_MANAGEMENT.PACKAGE.DESC') }}
         </p>
         <p-data-table :loading="packageStore.getters.loading"
                       :items="packageStore.getters.packages"
@@ -87,7 +88,7 @@ const state = reactive({
                              badge-type="solid-outline"
                              style-type="gray500"
                     >
-                        Default
+                        {{ $t('OPSFLOW.DEFAULT') }}
                     </p-badge>
                 </span>
             </template>

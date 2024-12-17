@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue';
 
+import { isEqual } from 'lodash';
+
 import {
     PFieldTitle, PFieldGroup, PSelectDropdown, PPaneLayout, PButton,
 } from '@cloudforet/mirinae';
@@ -64,6 +66,7 @@ const {
     isRequired: true,
 });
 const handleUpdateSelectedTaskType = async (items: SelectDropdownMenuItem[]) => {
+    if (isEqual(items, selectedTaskTypeItems)) return;
     setForm('taskType', items); // set form for validation
     await taskContentFormStore.setCurrentTaskType(items[0].name); // set current task type to store for other fields
     const taskType = taskContentFormState.currentTaskType;
@@ -132,6 +135,7 @@ const {
     invalidTexts,
     isAllValid,
     resetValidation,
+    resetValidations,
     setForm,
 } = useFormValidator({
     category: categoryValidator,
@@ -176,9 +180,12 @@ watch([() => taskContentFormState.originTask, () => taskContentFormGetters.curre
 }, { immediate: true });
 
 /* initiation for 'create' mode with initial category, task type */
-const stopInitCreateWatch = watch([() => taskContentFormState.currentCategoryId, () => taskContentFormState.currentTaskType], ([categoryId, taskType]) => {
+let hasInitiated = false;
+watch([() => taskContentFormState.currentCategoryId, () => taskContentFormState.currentTaskType], async ([categoryId, taskType]) => {
+    if (hasInitiated) return;
+
     if (taskContentFormState.mode === 'create' && categoryId) {
-        setInitialCategory(categoryId);
+        await setInitialCategory(categoryId);
         // init selected status
         const category = taskContentFormGetters.currentCategory;
         if (category) {
@@ -191,12 +198,11 @@ const stopInitCreateWatch = watch([() => taskContentFormState.currentCategoryId,
         // init task type
         if (taskType) setInitialTaskType(taskType);
 
-        // stop watching
-        stopInitCreateWatch();
-        return;
+        // reset validations
+        resetValidations();
     }
 
-    if (taskContentFormState.mode !== 'create') stopInitCreateWatch();
+    hasInitiated = true;
 }, { immediate: true });
 </script>
 

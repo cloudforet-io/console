@@ -148,7 +148,10 @@ watch([() => taskManagementPageState.visibleCategoryForm, () => taskManagementPa
                 </p-field-group>
                 <p-field-group :label="$t('OPSFLOW.DESCRIPTION')">
                     <p-textarea :value="description"
-                                :placeholder="$t('OPSFLOW.DESCRBE_FIELD', { field: $t('OPSFLOW.CATEGORY') })"
+                                :placeholder="$t('OPSFLOW.DESCRIBE_FIELD', {
+                                    field: $t('OPSFLOW.CATEGORY'),
+                                    particle: getParticle( $t('OPSFLOW.CATEGORY'), 'object')
+                                })"
                                 @update:value="setForm('description', $event)"
                     />
                 </p-field-group>

@@ -10,11 +10,14 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/src/controls/dropdown/select-dropdown/type';
 
+import { getParticle } from '@/translations';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import PackageUpdateConfirmModal from '@/services/ops-flow/components/PackageUpdateConfirmModal.vue';
 import { useCategoryField } from '@/services/ops-flow/composables/use-category-field';
 import { useWorkspaceField } from '@/services/ops-flow/composables/use-workspace-field';
 import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
@@ -79,7 +82,10 @@ const {
     },
 });
 
-/* modal */
+/* update confirm modal */
+const visibleUpdateConfirmModal = ref(false);
+
+/* form modal */
 const loading = ref(false);
 const handleCancelOrClose = () => {
     taskManagementPageStore.closePackageForm();
@@ -87,7 +93,6 @@ const handleCancelOrClose = () => {
 const handleClosed = () => {
     taskManagementPageStore.resetTargetPackageId();
 };
-
 const handleConfirm = async () => {
     if (!isAllValid.value) return;
     loading.value = true;
@@ -101,7 +106,7 @@ const handleConfirm = async () => {
             // bind workspaces and categories
             const errorMessages: string[] = [];
             const responses = await Promise.allSettled([
-                applyPackageToWorkspaces(updatedPackage.package_id, workspaceType.value === 'unset'),
+                applyPackageToWorkspaces(updatedPackage.package_id),
                 applyPackageToCategories(updatedPackage.package_id),
             ]);
             responses.forEach((response) => {
@@ -126,7 +131,7 @@ const handleConfirm = async () => {
             // bind workspaces and categories
             const errorMessages: string[] = [];
             const responses = await Promise.allSettled([
-                applyPackageToWorkspaces(createdPackage.package_id, workspaceType.value === 'unset'),
+                applyPackageToWorkspaces(createdPackage.package_id),
                 applyPackageToCategories(createdPackage.package_id),
             ]);
             responses.forEach((response) => {
@@ -178,65 +183,91 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
 
 
 <template>
-    <p-overlay-layout title="Add Package"
-                      :visible="taskManagementPageState.visiblePackageForm"
-                      @close="handleCancelOrClose"
-                      @closed="handleClosed"
-    >
-        <template #default>
-            <div class="p-6 w-full">
-                <p-field-group label="Name"
-                               required
-                               :invalid="!loading && invalidState.name"
-                               :invalid-text="invalidTexts.name"
-                >
-                    <template #default="{ invalid }">
-                        <p-text-input :value="name"
-                                      :invalid="invalid"
-                                      @update:value="setForm('name', $event)"
+    <fragment>
+        <p-overlay-layout :title="taskManagementPageState.targetPackageId ? $t('OPSFLOW.EDIT_TARGET', { target: $t('OPSFLOW.PACKAGE') }) : $t('OPSFLOW.ADD_TARGET', { target: $t('OPSFLOW.PACKAGE') })"
+                          :visible="taskManagementPageState.visiblePackageForm"
+                          @close="handleCancelOrClose"
+                          @closed="handleClosed"
+        >
+            <template #default>
+                <div class="p-6 w-full">
+                    <p-field-group :label="$t('OPSFLOW.NAME')"
+                                   required
+                                   :invalid="!loading && invalidState.name"
+                                   :invalid-text="invalidTexts.name"
+                    >
+                        <template #default="{ invalid }">
+                            <p-text-input :value="name"
+                                          :invalid="invalid"
+                                          @update:value="setForm('name', $event)"
+                            />
+                        </template>
+                    </p-field-group>
+                    <p-field-group :label="$t('OPSFLOW.DESCRIPTION')"
+                                   required
+                                   :invalid="invalidState.description"
+                                   :invalid-text="invalidTexts.description"
+                    >
+                        <p-textarea :value="description"
+                                    :invalid="invalidState.description"
+                                    :placeholder="$t('OPSFLOW.DESCRIBE_FIELD', {
+                                        field: $t('OPSFLOW.PACKAGE'),
+                                        particle: getParticle( $t('OPSFLOW.PACKAGE'), 'object')
+                                    })"
+                                    @update:value="setForm('description', $event)"
                         />
-                    </template>
-                </p-field-group>
-                <p-field-group label="Description"
-                               required
-                               :invalid="invalidState.description"
-                               :invalid-text="invalidTexts.description"
-                >
-                    <p-textarea :value="description"
-                                :invalid="invalidState.description"
-                                placeholder="Describe this support package in a few words."
-                                @update:value="setForm('description', $event)"
-                    />
-                </p-field-group>
-                <p-field-group v-if="!taskManagementPageState.targetPackageId
-                                   || taskManagementPageState.targetPackageId !== taskManagementPageGetters.defaultPackage?.package_id"
-                               :invalid="invalidState.workspaces"
-                               :invalid-text="invalidTexts.workspaces"
-                               label="Workspace"
-                >
-                    <div class="mt-2">
-                        <p-radio-group>
-                            <p-radio :selected="workspaceType"
-                                     value="unset"
-                                     @change="handleSelectUnsetWorkspace"
-                            >
-                                Unset
-                            </p-radio>
-                            <p-radio :selected="workspaceType"
-                                     value="specific"
-                                     @change="workspaceType = $event"
-                            >
-                                Specific Workspaces
-                            </p-radio>
-                        </p-radio-group>
-                        <p-select-dropdown v-if="workspaceType === 'specific'"
-                                           class="mt-2"
-                                           :selected="selectedWorkspaceItems"
-                                           :invalid="invalidState.workspaces"
-                                           :handler="workspaceMenuItemsHandler"
+                    </p-field-group>
+                    <p-field-group v-if="!taskManagementPageState.targetPackageId
+                                       || taskManagementPageState.targetPackageId !== taskManagementPageGetters.defaultPackage?.package_id"
+                                   :invalid="invalidState.workspaces"
+                                   :invalid-text="invalidTexts.workspaces"
+                                   :label="$t('OPSFLOW.WORKSPACE')"
+                    >
+                        <div class="mt-2">
+                            <p-radio-group>
+                                <p-radio :selected="workspaceType"
+                                         value="unset"
+                                         @change="handleSelectUnsetWorkspace"
+                                >
+                                    {{ $t('OPSFLOW.TASK_MANAGEMENT.PACKAGE.UNSET') }}
+                                </p-radio>
+                                <p-radio :selected="workspaceType"
+                                         value="specific"
+                                         @change="workspaceType = $event"
+                                >
+                                    {{ $t('OPSFLOW.TASK_MANAGEMENT.PACKAGE.SPECIFIC_WORKSPACE') }}
+                                </p-radio>
+                            </p-radio-group>
+                            <p-select-dropdown v-if="workspaceType === 'specific'"
+                                               class="mt-2"
+                                               :selected="selectedWorkspaceItems"
+                                               :invalid="invalidState.workspaces"
+                                               :handler="workspaceMenuItemsHandler"
+                                               :page-size="10"
+                                               appearance-type="badge"
+                                               menu-position="left"
+                                               show-select-marker
+                                               multi-selectable
+                                               use-fixed-menu-style
+                                               block
+                                               show-clear-selection
+                                               is-filterable
+                                               init-selected-with-handler
+                                               @update:selected="handleUpdateWorkspaces"
+                            />
+                        </div>
+                    </p-field-group>
+                    <p-field-group v-if="!taskManagementPageState.targetPackageId
+                                       || taskManagementPageState.targetPackageId !== taskManagementPageGetters.defaultPackage?.package_id"
+                                   :label="$t('OPSFLOW.CATEGORY')"
+                                   :invalid="invalidState.categories"
+                                   :invalid-text="invalidTexts.categories"
+                    >
+                        <p-select-dropdown :selected="selectedCategoryItems"
+                                           :handler="categoryMenuItemsHandler"
+                                           :invalid="invalidState.categories"
                                            :page-size="10"
                                            appearance-type="badge"
-                                           menu-position="left"
                                            show-select-marker
                                            multi-selectable
                                            use-fixed-menu-style
@@ -244,50 +275,30 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
                                            show-clear-selection
                                            is-filterable
                                            init-selected-with-handler
-                                           @update:selected="handleUpdateWorkspaces"
+                                           @update:selected="setSelectedCategoryItems"
                         />
-                    </div>
-                </p-field-group>
-                <p-field-group v-if="!taskManagementPageState.targetPackageId
-                                   || taskManagementPageState.targetPackageId !== taskManagementPageGetters.defaultPackage?.package_id"
-                               label="Category"
-                               :invalid="invalidState.categories"
-                               :invalid-text="invalidTexts.categories"
-                >
-                    <p-select-dropdown :selected="selectedCategoryItems"
-                                       :handler="categoryMenuItemsHandler"
-                                       :invalid="invalidState.categories"
-                                       :page-size="10"
-                                       appearance-type="badge"
-                                       show-select-marker
-                                       multi-selectable
-                                       use-fixed-menu-style
-                                       block
-                                       show-clear-selection
-                                       is-filterable
-                                       init-selected-with-handler
-                                       @update:selected="setSelectedCategoryItems"
-                    />
-                </p-field-group>
-            </div>
-        </template>
-        <template #footer>
-            <div class="py-3 px-6 flex flex-wrap gap-3 justify-end">
-                <p-button style-type="transparent"
-                          :disabled="loading"
-                          @click="handleCancelOrClose"
-                >
-                    Cancel
-                </p-button>
-                <p-button style-type="primary"
-                          :loading="loading"
-                          :disabled="!isAllValid"
-                          @click="handleConfirm"
-                >
-                    Confirm
-                </p-button>
-            </div>
-        </template>
-    </p-overlay-layout>
+                    </p-field-group>
+                </div>
+            </template>
+            <template #footer>
+                <div class="py-3 px-6 flex flex-wrap gap-3 justify-end">
+                    <p-button style-type="transparent"
+                              :disabled="loading"
+                              @click="handleCancelOrClose"
+                    >
+                        {{ $t('COMMON.BUTTONS.CANCEL') }}
+                    </p-button>
+                    <p-button style-type="primary"
+                              :loading="loading"
+                              :disabled="!isAllValid"
+                              @click="handleConfirm"
+                    >
+                        {{ $t('COMMON.BUTTONS.CONFIRM') }}
+                    </p-button>
+                </div>
+            </template>
+        </p-overlay-layout>
+        <package-update-confirm-modal :visible="visibleUpdateConfirmModal" />
+    </fragment>
 </template>
 

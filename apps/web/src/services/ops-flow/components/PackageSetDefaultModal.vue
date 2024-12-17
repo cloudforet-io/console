@@ -3,6 +3,8 @@ import { ref, computed } from 'vue';
 
 import { PButtonModal } from '@cloudforet/mirinae';
 
+import { i18n as _i18n } from '@/translations';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -23,9 +25,9 @@ const handleConfirm = async () => {
         }
         await packageStore.setDefaultPackage(taskManagementPageStore.state.targetPackageId);
         taskManagementPageStore.closeSetDefaultPackageModal();
-        showSuccessMessage('Successfully set the default package', '');
+        showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_CHANGE_DEFAULT_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') }), '');
     } catch (e) {
-        ErrorHandler.handleRequestError(e, 'Failed to set default package');
+        ErrorHandler.handleRequestError(e, _i18n.t('OPSFLOW.ALT_E_CHANGE_DEFAULT_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') }));
     } finally {
         loading.value = false;
     }
@@ -48,10 +50,13 @@ const handleClosed = () => {
                     @closed="handleClosed"
     >
         <template #header-title>
-            Set <strong>{{ name }}</strong> as the default package.
+            <i18n path="OPSFLOW.TASK_MANAGEMENT.PACKAGE.SET_TARGET_AS_DEFAULT">
+                <!-- eslint-disable-next-line vue/singleline-html-element-content-newline -->
+                <template #target><strong>{{ name }}</strong></template>
+            </i18n>
         </template>
         <template #body>
-            This will make it the primary package for related operations.
+            {{ $t('OPSFLOW.TASK_MANAGEMENT.PACKAGE.SET_DEFAULT_DESC') }}
         </template>
     </p-button-modal>
 </template>

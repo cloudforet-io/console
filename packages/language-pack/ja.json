@@ -4176,9 +4176,11 @@
 	"OPSFLOW": {
 		"ADD_TARGET": "",
 		"ALT_E_ADD_TARGET": "",
+		"ALT_E_CHANGE_DEFAULT_TARGET": "",
 		"ALT_E_DELETE_TARGET": "",
 		"ALT_E_EDIT_TARGET": "",
 		"ALT_S_ADD_TARGET": "",
+		"ALT_S_CHANGE_DEFAULT_TARGET": "",
 		"ALT_S_DELETE_TARGET": "",
 		"ALT_S_EDIT_TARGET": "",
 		"ASSIGNEE": "",
@@ -4189,7 +4191,7 @@
 		"DEFAULT": "",
 		"DELETE_TARGET": "",
 		"DELETE_TARGET_CONFIRMATION": "",
-		"DESCRBE_FIELD": "",
+		"DESCRIBE_FIELD": "",
 		"DESCRIPTION": "",
 		"EDIT_TARGET": "",
 		"FIELDS_CONFIG": "",
@@ -4226,6 +4228,8 @@
 		"STATUS_COMPLETED": "",
 		"STATUS_IN_PROGRESS": "",
 		"STATUS_TODO": "",
+		"SUPPORT_PACKAGE": "",
+		"TARGET_LIST": "",
 		"TASK_BOARD": {
 			"TASK_PROGRESS": ""
 		},
@@ -4233,6 +4237,14 @@
 			"CATEGORY": {
 				"DELETE_CONFIRMATION_DESC": "",
 				"DESC": ""
+			},
+			"PACKAGE": {
+				"DELETE_UNAVAILABLE": "",
+				"DESC": "",
+				"SET_DEFAULT_DESC": "",
+				"SET_TARGET_AS_DEFAULT": "",
+				"SPECIFIC_WORKSPACE": "",
+				"UNSET": ""
 			},
 			"STATUS": {
 				"DELETE_CONTINUE": "",
@@ -4243,14 +4255,17 @@
 			"TASK_TYPE": {
 				"DELETE_UNAVAILABLE": "",
 				"DESC": ""
-			}
+			},
+			"TEMPLATE_DESC": "",
+			"TEMPLATE_TYPE": ""
 		},
 		"TITLE": "",
 		"VALIDATION": {
 			"DUPLICATED": "",
 			"LENGTH_MAX": "",
 			"REQUIRED": ""
-		}
+		},
+		"WORKSPACE": ""
 	},
 	"PAGE_SCHEMA": {
 		"ACCOUNT": "アカウントID",

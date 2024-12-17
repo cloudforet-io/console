@@ -3,8 +3,6 @@ import { ref, computed } from 'vue';
 
 import { PButtonModal } from '@cloudforet/mirinae';
 
-import { getParticle, i18n as _i18n } from '@/translations';
-
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -13,18 +11,15 @@ import AssociatedCategories from '@/services/ops-flow/components/AssociatedCateg
 import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
+const props = defineProps<{
+    visible: boolean;
+}>();
+
 const taskManagementPageStore = useTaskManagementPageStore();
 const packageStore = usePackageStore();
 
 const deletable = computed(() => !taskManagementPageStore.getters.associatedCategoriesToPackage.length
         && !taskManagementPageStore.getters.associatedWorkspacesToPackage.length);
-const headerTitle = computed(() => (deletable.value
-    ? _i18n.t('OPSFLOW.DELETE_TARGET_CONFIRMATION', {
-        object: _i18n.t('OPSFLOW.PACKAGE'),
-        particle: getParticle(_i18n.t('OPSFLOW.PACKAGE') as string, 'object'),
-    })
-    : _i18n.t('OPSFLOW.DELETE_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') })));
-
 const loading = ref<boolean>(false);
 const handleConfirm = async () => {
     loading.value = true;
@@ -33,9 +28,9 @@ const handleConfirm = async () => {
             throw new Error('[Console Error] Cannot delete package without a target package');
         }
         await packageStore.delete(taskManagementPageStore.state.targetPackageId);
-        showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_DELETE_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') }) as string, '');
+        showSuccessMessage('Successfully deleted the package', '');
     } catch (e) {
-        ErrorHandler.handleRequestError(e, _i18n.t('OPSFLOW.ALT_E_DELETE_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') }) as string);
+        ErrorHandler.handleRequestError(e, 'Failed to delete package');
     } finally {
         taskManagementPageStore.closeDeletePackageModal();
         loading.value = false;
@@ -50,9 +45,9 @@ const handleClosed = () => {
 </script>
 
 <template>
-    <p-button-modal :visible="taskManagementPageStore.state.visibleDeletePackageModal"
+    <p-button-modal :visible="props.visible"
                     theme-color="alert"
-                    :header-title="headerTitle"
+                    :header-title="deletable ? 'Are you sure you want to delete this package?' : 'Delete Package'"
                     :size="deletable ? 'sm' : 'md'"
                     :loading="loading"
                     :disabled="!deletable"
@@ -63,12 +58,12 @@ const handleClosed = () => {
     >
         <template #body>
             <div v-if="!deletable">
-                <div class="mb-6 flex items-end justify-between">
+                <div class="mb-4 flex items-end justify-between">
                     <p class="text-paragraph-lg font-bold ">
-                        {{ $t('OPSFLOW.TASK_MANAGEMENT.PACKAGE.DELETE_UNAVAILABLE') }}
+                        연결된 카테고리가 존재하므로 패키지 삭제가 불가합니다.
                     </p>
                 </div>
-                <associated-categories />
+                <associated-categories v-if="!!taskManagementPageStore.getters.associatedCategoriesToPackage.length" />
             </div>
         </template>
     </p-button-modal>
