@@ -1254,6 +1254,7 @@
 					"DATA_TABLE_NAME_SUCCESS": "データ名が正常に変更されました。",
 					"DATA_TABLE_NAME_WARNING": "この名前のデータはすでに存在します。",
 					"DATA_UNIT": "データ単位",
+					"DUPLICATED_FIELD_NAME": "",
 					"EVAL": {
 						"ADD_FIELD": "フィールド追加",
 						"CONDITION": "",

@@ -1254,6 +1254,7 @@
 					"DATA_TABLE_NAME_SUCCESS": "Data name successfully changed.",
 					"DATA_TABLE_NAME_WARNING": "A data with this name already exists.",
 					"DATA_UNIT": "Data Unit",
+					"DUPLICATED_FIELD_NAME": "Field Name is duplicated.",
 					"EVAL": {
 						"ADD_FIELD": "Add Field",
 						"CONDITION": "Condition",
