@@ -70,6 +70,7 @@ watch(() => props.breadcrumbs, () => {
         ref="contentRef"
         class="vertical-page-layout"
         :width="width"
+        :min-width="240"
         :enable-double-click-resize="state.menuId === MENU_ID.METRIC_EXPLORER"
         v-on="$listeners"
     >

@@ -71,10 +71,20 @@ const state = reactive({
 
 const leftLayoutContentBox = ref<null|HTMLElement>(null);
 
-const resize = (delta : number) => {
-    state.width = delta;
-};
+const resize = (delta: number) => {
+    const minimumWidth = props.minWidth;
+    const maximumWidth = props.maxWidth;
 
+    if (Number.isNaN(delta)) {
+        return;
+    }
+
+    const newWidth = Math.min(Math.max(delta, minimumWidth), maximumWidth);
+
+    if (state.width !== newWidth) {
+        state.width = newWidth;
+    }
+};
 /* Resizing */
 const isResizing = (event) => {
     if (state.resizing) {
@@ -134,7 +144,17 @@ const handleControllerDoubleClick = () => {
     const minimumWidth = props.minWidth;
     const maximumWidth = props.maxWidth;
 
-    if (state.width <= minimumWidth + (maximumWidth - minimumWidth) / 2) {
+    if (state.width === maximumWidth) {
+        resize(minimumWidth);
+        return;
+    }
+    if (state.width === minimumWidth) {
+        resize(maximumWidth);
+        return;
+    }
+
+
+    if (state.width <= (maximumWidth + minimumWidth) / 2) {
         resize(maximumWidth);
     } else {
         resize(minimumWidth);
