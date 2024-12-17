@@ -94,8 +94,8 @@ export const dropImagePlugin = (upload: ImageUploader<any>, imgFileDataMap: Map<
                             src: downloadUrl,
                             'file-id': fileId,
                         });
-                        // const transaction = view.state.tr.insert(coordinates.pos, node);
-                        const transaction = view.state.tr.setNodeMarkup(coordinates.pos, schema.nodes.image, node.attrs);
+                        const loadingPos = view.state.selection.anchor - 1; // get the position of the loading node
+                        const transaction = view.state.tr.setNodeMarkup(loadingPos, schema.nodes.image, node.attrs);
                         view.dispatch(transaction);
                     } else {
                         reader.onload = (readerEvent) => {
