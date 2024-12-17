@@ -3,6 +3,8 @@ import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/ta
 
 import { ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
 
+import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
+
 import type { AlertManagementTableHandlerType } from '@/services/alert-manager-v2/types/alert-manager-type';
 
 export const ALERT_STATUS_FILTERS = {
@@ -45,3 +47,15 @@ export const ALERT_MANAGEMENT_TABLE_HANDLER: AlertManagementTableHandlerType = {
         'resource.resource_type': makeDistinctValueHandler('alertManager.Alert', 'resource.resource_type'),
     },
 };
+export const ALERT_EXCEL_FIELDS: ExcelDataField[] = [
+    { key: 'alert_number', name: 'No' },
+    { key: 'title', name: 'Title' },
+    { key: 'state', name: 'State' },
+    { key: 'service_id', name: 'Service' },
+    { key: 'urgency', name: 'Urgency' },
+    { key: 'category', name: 'Category' },
+    { key: 'resources', name: 'Resource' },
+    { key: 'updated_by', name: 'Updated by' },
+    { key: 'resolved_by', name: 'Resolved by' },
+    { key: 'acknowledged_by', name: 'Acknowledged by' },
+];

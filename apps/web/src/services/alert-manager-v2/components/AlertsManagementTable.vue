@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive } from 'vue';
 
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import { QueryHelper } from '@cloudforet/core-lib/query';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PToolboxTable, PSelectDropdown, PLink, PBadge, PI, PSelectStatus,
 } from '@cloudforet/mirinae';
+import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
@@ -13,15 +14,22 @@ import { ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
 import { i18n } from '@/translations';
 
+import { useUserStore } from '@/store/user/user-store';
+
+import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
+import { downloadExcel } from '@/lib/helper/file-download-helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import { useQueryTags } from '@/common/composables/query-tags';
+import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
 
 import { red } from '@/styles/colors';
 
 import { getAlertStateI18n, getAlertUrgencyI18n } from '@/services/alert-manager-v2/composables/alert-table-data';
 import {
+    ALERT_EXCEL_FIELDS,
     ALERT_MANAGEMENT_TABLE_FIELDS,
     ALERT_MANAGEMENT_TABLE_HANDLER,
     ALERT_STATUS_FILTERS,
@@ -33,17 +41,23 @@ import type { AlertFilterType } from '@/services/alert-manager-v2/types/alert-ma
 
 const alertPageStore = useAlertPageStore();
 const alertPageState = alertPageStore.state;
+const userStore = useUserStore();
+const userState = userStore.state;
 
 const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
     serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => alertPageState.serviceList),
+    timezone: computed<string>(() => userState.timezone || ''),
 });
 const state = reactive({
     loading: false,
+    visibleCustomFieldModal: false,
+
     alertList: [] as AlertModel[],
     alertStateLabels: getAlertStateI18n(),
     urgencyLabels: getAlertUrgencyI18n(),
+    fields: ALERT_MANAGEMENT_TABLE_FIELDS,
 });
 const filterState = reactive({
     selectedServiceId: '',
@@ -64,6 +78,14 @@ const filterState = reactive({
     selectedUrgencyFilter: 'ALL',
 });
 
+const alertListApiQueryHelper = new ApiQueryHelper()
+    .setOnly(...state.fields.map((d) => d.name).filter((name) => name !== 'duration'), 'alert_id')
+    .setSort('created_at', true);
+
+const filterQueryHelper = new QueryHelper();
+const queryTagHelper = useQueryTags({ keyItemSets: ALERT_MANAGEMENT_TABLE_HANDLER.keyItemSets });
+const { queryTags } = queryTagHelper;
+
 const handleSelectServiceDropdownItem = (id: string) => {
     filterState.selectedServiceId = id;
     fetchAlertsList();
@@ -76,42 +98,55 @@ const handleSelectFilter = (type: 'status' | 'urgency', value: string) => {
     }
     fetchAlertsList();
 };
-const handleChange = () => {
-    console.log('TODO: handleChange');
+const handleChange = async (options: any = {}) => {
+    if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
+    if (options.pageStart !== undefined) alertListApiQueryHelper.setPageStart(options.pageStart);
+    if (options.pageLimit !== undefined) alertListApiQueryHelper.setPageLimit(options.pageLimit);
+    await fetchAlertsList();
 };
 const handleClickSettings = () => {
-    console.log('TODO: handleClickSettings');
+    state.visibleCustomFieldModal = true;
 };
-const handleExportToExcel = () => {
-    console.log('TODO: handleExportToExcel');
+const handleVisibleCustomFieldModal = (visible) => {
+    state.visibleCustomFieldModal = visible;
+};
+const handleCustomFieldUpdate = (fields: DataTableFieldType[]) => {
+    state.fields = fields;
+};
+const handleExportToExcel = async () => {
+    await downloadExcel({
+        url: '/alertManager/alert/list',
+        param: {
+            query: { ...alertListApiQueryHelper.data, only: ALERT_EXCEL_FIELDS.map((d) => d.key) },
+        },
+        fields: ALERT_EXCEL_FIELDS,
+        file_name_prefix: FILE_NAME_PREFIX.alert,
+        timezone: storeState.timezone,
+    });
 };
 
-const alertListApiQuery = new ApiQueryHelper().setSort('created_at', true);
 const fetchAlertsList = async () => {
     try {
-        let stateFilter: ConsoleFilter[] = [];
-        if (filterState.selectedStatusFilter !== 'ALL' && filterState.selectedStatusFilter !== ALERT_STATUS_FILTERS.OPEN) {
-            stateFilter = [{ k: 'state', v: filterState.selectedStatusFilter, o: '=' }];
-        }
-        let urgencyFilter: ConsoleFilter[] = [];
-        if (filterState.selectedUrgencyFilter !== 'ALL') {
-            urgencyFilter = [{ k: 'urgency', v: filterState.selectedUrgencyFilter, o: '=' }];
-        }
-        alertListApiQuery.setFilters([
-            ...stateFilter,
-            ...urgencyFilter,
-            { k: 'service_id', v: filterState.selectedServiceId, o: '=' },
-        ]);
+        filterQueryHelper.setFilters([]);
         if (filterState.selectedStatusFilter === ALERT_STATUS_FILTERS.OPEN) {
-            alertListApiQuery.setOrFilters([
-                { k: 'state', v: ALERT_STATUS_FILTERS.ACKNOWLEDGED, o: '=' },
-                { k: 'state', v: ALERT_STATUS_FILTERS.TRIGGERED, o: '=' },
-            ]);
-        } else {
-            alertListApiQuery.setOrFilters([]);
+            filterQueryHelper.addFilter({ k: 'state', v: [ALERT_STATUS_FILTERS.TRIGGERED, ALERT_STATUS_FILTERS.ACKNOWLEDGED], o: '=' });
+        } else if (filterState.selectedStatusFilter !== 'ALL') {
+            filterQueryHelper.addFilter({ k: 'state', v: filterState.selectedStatusFilter, o: '=' });
         }
+        if (filterState.selectedUrgencyFilter !== 'ALL') {
+            filterQueryHelper.addFilter({ k: 'urgency', v: filterState.selectedUrgencyFilter, o: '=' });
+        }
+        if (filterState.selectedServiceId) {
+            filterQueryHelper.addFilter({ k: 'service_id', v: filterState.selectedServiceId, o: '=' });
+        }
+
+        alertListApiQueryHelper.setFilters([
+            ...queryTagHelper.filters.value,
+            ...filterQueryHelper.filters,
+        ]);
+
         state.alertList = await alertPageStore.fetchAlertsList({
-            query: alertListApiQuery.data,
+            query: alertListApiQueryHelper.data,
         });
     } catch (e) {
         ErrorHandler.handleError(e, true);
@@ -139,8 +174,9 @@ onMounted(async () => {
                          search-type="query"
                          sort-by="created_at"
                          :sort-desc="true"
+                         :query-tags="queryTags"
                          :loading="state.loading"
-                         :fields="ALERT_MANAGEMENT_TABLE_FIELDS"
+                         :fields="state.fields"
                          :items="state.alertList"
                          :key-item-sets="ALERT_MANAGEMENT_TABLE_HANDLER.keyItemSets"
                          :value-handler-map="ALERT_MANAGEMENT_TABLE_HANDLER.valueHandlerMap"
@@ -237,6 +273,13 @@ onMounted(async () => {
                 </template>
             </template>
         </p-toolbox-table>
+        <custom-field-modal :visible="state.visibleCustomFieldModal"
+                            resource-type="alertManager.alert"
+                            :default-field="ALERT_MANAGEMENT_TABLE_FIELDS"
+                            @update:visible="handleVisibleCustomFieldModal"
+                            @complete="fetchAlertsList"
+                            @custom-field-loaded="handleCustomFieldUpdate"
+        />
     </div>
 </template>
 
