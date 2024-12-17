@@ -6,17 +6,19 @@ import dayjs from 'dayjs';
 import { getDateFormat } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { DATE_RANGE_ADVANCED_OPERATOR_MAP } from '@/common/modules/widgets/_widget-fields/date-range/constant';
 import type { DateRangeValue, DateRangeValueType } from '@/common/modules/widgets/_widget-fields/date-range/type';
+import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/granularity/type';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 
 
 interface UseWidgetDateRangeOptions {
     dateRangeFieldValue: ComputedRef<DateRangeValue>;
     baseOnDate: ComputedRef<string|undefined>;
-    granularity: ComputedRef<string>;
+    granularity: ComputedRef<GranularityValue>;
     usePreviewFormat?: boolean;
 }
 
 interface UseWidgetDateRangeState {
+    granularity: ComputedRef<GranularityValue['granularity']>;
     isInherit: ComputedRef<boolean>;
     dateRangeOptions: ComputedRef<DateRangeValue['options']>;
     dateRange: ComputedRef<DateRange>;
@@ -30,11 +32,12 @@ interface UseWidgetDateRangeReturnType {
 export const useWidgetDateRange = (options: UseWidgetDateRangeOptions): UseWidgetDateRangeReturnType => {
     const {
         baseOnDate: _baseOnDate,
-        granularity: _granularity,
+        granularity: _granularityInfo,
         usePreviewFormat: _usePreviewFormat,
     } = options;
 
     const state = reactive<UseWidgetDateRangeState>({
+        granularity: computed<GranularityValue['granularity']>(() => _granularityInfo.value?.granularity ?? 'MONTHLY'),
         isInherit: computed<boolean>(() => !!options.dateRangeFieldValue.value?.inherit),
         dateRangeOptions: computed<DateRangeValue['options']>(() => options.dateRangeFieldValue.value?.options || 'auto'),
         baseOnDate: computed<string|undefined>(() => (state.isInherit ? _baseOnDate.value : undefined)),
@@ -43,17 +46,17 @@ export const useWidgetDateRange = (options: UseWidgetDateRangeOptions): UseWidge
             const { start: _start, end: _end } = state.dateRangeOptions || {};
 
             if (dateRangePresetKey === 'custom') {
-                return state.isInherit ? getWidgetDateRangeByCustomRelativeNumberUnit(_granularity.value, state.baseOnDate, _start, _end)
-                    : getWidgetDateRangeByCustomFixedDateRange(_granularity.value, _start, _end);
+                return state.isInherit ? getWidgetDateRangeByCustomRelativeNumberUnit(state.granularity, state.baseOnDate, _start, _end)
+                    : getWidgetDateRangeByCustomFixedDateRange(state.granularity, _start, _end);
             } if (dateRangePresetKey === 'advanced') {
                 const { start_operator: _startOperator, end_operator: _endOperator } = state.dateRangeOptions || {};
                 const startValue: number = _startOperator === DATE_RANGE_ADVANCED_OPERATOR_MAP.ADD ? _start || 0 : (_start || 0) * -1;
                 const endValue: number = _endOperator === DATE_RANGE_ADVANCED_OPERATOR_MAP.ADD ? _end || 0 : (_end || 0) * -1;
 
-                return getWidgetDateRangeByAdvancedDiffValue(_granularity.value, state.baseOnDate, startValue, endValue, _usePreviewFormat);
+                return getWidgetDateRangeByAdvancedDiffValue(state.granularity, state.baseOnDate, startValue, endValue, _usePreviewFormat);
             }
 
-            return getWidgetDateRangeByPresetKey(_granularity.value, state.baseOnDate, dateRangePresetKey, _usePreviewFormat);
+            return getWidgetDateRangeByPresetKey(state.granularity, state.baseOnDate, dateRangePresetKey, _usePreviewFormat);
         }),
     });
 
