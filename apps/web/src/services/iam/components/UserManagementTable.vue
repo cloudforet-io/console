@@ -1,9 +1,7 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, watchEffect,
+    computed, reactive,
 } from 'vue';
-
-import { storeToRefs } from 'pinia';
 
 import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
@@ -55,8 +53,6 @@ const userPageState = userPageStore.state;
 const userPageGetters = userPageStore.getters;
 const userStore = useUserStore();
 
-const userState = storeToRefs(userPageStore).state;
-
 const roleListApiQueryHelper = new ApiQueryHelper();
 const userListApiQueryHelper = new ApiQueryHelper()
     .setPageStart(userPageState.pageStart).setPageLimit(userPageState.pageLimit)
@@ -78,11 +74,6 @@ const state = reactive({
         last_accessed_at: user?.last_accessed_at,
     }))),
     // refinedUserItems: computed<ExtendUserListItemType[]>(() => userPageState.users.map)
-});
-watchEffect(() => {
-    userState.value.users.forEach((user) => {
-        console.log(user.user_group);
-    });
 });
 const tableState = reactive({
     userTableFields: computed<DataTableFieldType[]>(() => {
@@ -432,7 +423,7 @@ const isWorkspaceGroupUser = (item: ExtendUserListItemType) => !!item?.role_bind
                         <p-badge
                             v-if="idx === 3"
                             badge-type="subtle"
-                            shape="square"
+                            shape="round"
                             style-type="blue300"
                             class="mr-2"
                         >

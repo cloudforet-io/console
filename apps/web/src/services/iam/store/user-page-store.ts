@@ -122,7 +122,10 @@ export const useUserPageStore = defineStore('page-user', () => {
                 state.users = results.map((item) => ({
                     ...item,
                     role_type: item.role_type,
-                    role_binding: this.getRoleBinding(item),
+                    role_binding: {
+                        type: item.role_binding_info?.role_type ?? ROLE_TYPE.USER,
+                        name: state.roles?.find((role) => role.role_id === item.role_binding_info?.role_id)?.name ?? '',
+                    },
                     user_group: userIdToGroupMap[item.user_id] || [],
                 }));
 
@@ -136,25 +139,19 @@ export const useUserPageStore = defineStore('page-user', () => {
             }
         },
 
-        async fetchUserGroups(userIds: string[]): Promise<Record<string, string[]>> {
+        async fetchUserGroups(userIds: string[]): Promise<Record<string, { user_group_id: string; name: string; }[]>> {
             const userGroupPromises = userIds.map(async (userId) => {
                 const { results = [] } = await SpaceConnector.clientV2.identity.userGroup.list<UserGroupListParameters, ListResponse<UserGroupModel>>({ user_id: userId });
-                return { userId, userGroups: results.map((group) => group.name) };
+                return { userId, userGroups: results.map((group) => ({ user_group_id: group.user_group_id, name: group.name })) };
             });
 
             const results = await Promise.all(userGroupPromises);
             return results.reduce((acc, { userId, userGroups }) => {
                 acc[userId] = userGroups;
                 return acc;
-            }, {} as Record<string, string[]>);
+            }, {} as Record<string, { user_group_id: string; name: string; }[]>);
         },
 
-        getRoleBinding(item: WorkspaceUserModel) {
-            return {
-                type: item.role_binding_info?.role_type ?? ROLE_TYPE.USER,
-                name: state.roles?.find((role) => role.role_id === item.role_binding_info?.role_id)?.name ?? '',
-            };
-        },
 
         async getWorkspaceUser(params: WorkspaceUserGetParameters) {
             try {
