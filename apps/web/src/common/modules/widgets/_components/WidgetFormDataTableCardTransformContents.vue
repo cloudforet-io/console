@@ -10,28 +10,35 @@ import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/
 import { i18n } from '@/translations';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import getRandomId from '@/lib/random-id-generator';
 
 import WidgetFormDataTableCardAlertModal
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardAlertModal.vue';
 import WidgetFormDataTableCardFooter from '@/common/modules/widgets/_components/WidgetFormDataTableCardFooter.vue';
 import WidgetFormDataTableCardHeaderTitle
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardHeaderTitle.vue';
-import WidgetFormDataTableCardTransformForm
-    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformForm.vue';
+import WidgetFormDataTableCardTransformAddLabels
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformAddLabels.vue';
+import WidgetFormDataTableCardTransformConcatenate
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformConcatenate.vue';
+import WidgetFormDataTableCardTransformEvaluate
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformEvaluate.vue';
+import WidgetFormDataTableCardTransformJoin
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformJoin.vue';
 import WidgetFormDataTableCardTransformPivotForm
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformPivotForm.vue';
+import WidgetFormDataTableCardTransformQuery
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformQuery.vue';
 import {
-    DATA_TABLE_TYPE, DATA_TABLE_FIELD_TYPE, type DATA_TABLE_OPERATOR, DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP,
+    DATA_TABLE_TYPE, type DATA_TABLE_OPERATOR, DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP,
 } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type {
-    DataTableAlertModalMode, QueryCondition, EvalExpressions, TransformDataTableInfo, AdditionalLabel,
+    DataTableAlertModalMode, TransformDataTableInfo,
 } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
-    DataTableOperator, JoinType, ConcatOptions, JoinOptions, QueryOptions, EvalOptions,
+    DataTableOperator, JoinType, QueryOptions, EvalOptions,
     DataTableTransformOptions,
-    EvaluateExpression, AddLabelsOptions, AdditionalLabels, PivotOptions,
+    EvaluateExpression, AddLabelsOptions, PivotOptions,
 } from '@/common/modules/widgets/types/widget-model';
 
 
@@ -60,11 +67,11 @@ const state = reactive({
     dataTableName: props.item.name ? props.item.name : `${props.item.operator} Data`,
     applyDisabled: computed(() => {
         const haveSavedName = !!originState.name;
-        const haveRequiredConcatOptions = haveSavedName && state.dataTableInfo.dataTables.length === 2 && !state.dataTableInfo.dataTables.includes(undefined);
-        const haveRequiredJoinOptions = haveSavedName && state.dataTableInfo.dataTables.length === 2 && !state.dataTableInfo.dataTables.includes(undefined) && joinState.joinType;
-        const haveRequiredQueryOptions = haveSavedName && !!state.dataTableInfo.dataTableId && queryState.conditions.filter((cond) => !!cond.value.trim()).length > 0;
-        const haveRequiredEvalOptions = haveSavedName && !!state.dataTableInfo.dataTableId && evalState.expressions.filter((expression) => !!expression.name && !!expression.expression).length > 0;
-        const haveRequiredAddLabels = haveSavedName && !!state.dataTableInfo.dataTableId && addLabelsState.labels.every((label) => !!label.name && !!label.value);
+        const haveRequiredConcatOptions = haveSavedName && valueState.CONCAT.data_tables.length === 2 && !valueState.CONCAT.data_tables.includes(undefined);
+        const haveRequiredJoinOptions = haveSavedName && valueState.JOIN.data_tables.length === 2 && valueState.JOIN.how;
+        const haveRequiredQueryOptions = haveSavedName && !!valueState.QUERY.data_table_id && valueState.QUERY.conditions.filter((cond) => !!cond.trim()).length > 0;
+        const haveRequiredEvalOptions = haveSavedName && !!valueState.EVAL.data_table_id && valueState.EVAL.expressions.every((expression) => !!expression.name && !!expression.expression);
+        const haveRequiredAddLabels = haveSavedName && !!valueState.ADD_LABELS.data_table_id && Object.entries(valueState.ADD_LABELS.labels).every(([name, value]) => !!name && !!value);
         const haveRequiredPivotOptions = haveSavedName && !!valueState.PIVOT.data_table_id && !!valueState.PIVOT.fields?.labels && valueState.PIVOT.fields?.labels?.length > 0
             && !!valueState.PIVOT.fields?.column && !!valueState.PIVOT.fields?.data && (!!valueState.PIVOT.select || !!valueState.PIVOT.limit);
         if (state.operator === 'CONCAT') return !haveRequiredConcatOptions;
@@ -76,40 +83,27 @@ const state = reactive({
         return true;
     }),
     optionsChanged: computed(() => {
-        const dataTablesChanged = !isEqual(state.dataTableInfo.dataTables, originState.dataTableInfo.dataTables);
-        const dataTableIdChanged = state.dataTableInfo.dataTableId !== originState.dataTableInfo.dataTableId;
-        const joinTypeChanged = joinState.joinType !== originState.joinType;
-        const conditionsChanged = !isEqual(queryState.conditions.map((cond) => ({ value: cond.value })).filter((cond) => !!cond.value.trim().length), originState.conditions);
-        const expressionsChanged = !isEqual(evalState.expressions.map((expression) => ({
-            name: expression.name,
-            field_type: expression.fieldType,
-            expression: expression.expression,
+        const concatDataTablesChanged = !isEqual(valueState.CONCAT.data_tables, originState.dataTableInfo.dataTables);
+        const joinDataTablesChanged = !isEqual(valueState.JOIN.data_tables, originState.dataTableInfo.dataTables);
+        const joinTypeChanged = valueState.JOIN.how !== originState.joinType;
+        const queryDataTableIdChanged = valueState.QUERY.data_table_id !== originState.dataTableInfo.dataTableId;
+        const queryConditionsChanged = !isEqual(valueState.QUERY.conditions, originState.queryConditions);
+        const evalDataTableIdChanged = valueState.EVAL.data_table_id !== originState.dataTableInfo.dataTableId;
+        const evalChanged = !isEqual(valueState.EVAL.expressions.map((expression) => ({
+            ...expression,
             ...(expression?.condition ? { condition: expression?.condition } : {}),
-            ...(expression?.else ? { else: expression?.else } : {}),
         })).filter((expression) => !!expression.name && !!expression.expression), originState.expressions);
-        const addLabelsChanged = !isEqual(addLabelsState.labels, originState.labels);
-        if (state.operator === 'CONCAT') return dataTablesChanged;
-        if (state.operator === 'JOIN') return dataTablesChanged || joinTypeChanged;
-        if (state.operator === 'QUERY') return dataTableIdChanged || conditionsChanged;
-        if (state.operator === 'EVAL') return dataTableIdChanged || expressionsChanged;
+        const addLabelsChanged = !isEqual(valueState.ADD_LABELS.labels, originState.labels);
+        if (state.operator === 'CONCAT') return concatDataTablesChanged;
+        if (state.operator === 'JOIN') return joinDataTablesChanged || joinTypeChanged;
+        if (state.operator === 'QUERY') return queryDataTableIdChanged || queryConditionsChanged;
+        if (state.operator === 'EVAL') return evalDataTableIdChanged || evalChanged;
         if (state.operator === 'ADD_LABELS') return addLabelsChanged;
         return false;
     }),
     isUnsaved: computed(() => state.dataTableId.startsWith('UNSAVED-')),
     operator: computed(() => props.item.operator as DataTableOperator),
-    dataTableInfo: {
-        dataTables: [] as string[],
-        dataTableId: undefined,
-    } as TransformDataTableInfo,
     failStatus: false,
-    isLegacyDataTable: computed(() => {
-        if (state.operator === 'EVAL') return false;
-        const evalExpressions = (props.item.options as DataTableTransformOptions).EVAL?.expressions;
-        if (!evalExpressions?.length) return false;
-        const isLegacyEval = typeof evalExpressions[0] === 'string';
-        if (isLegacyEval) return true;
-        return false;
-    }),
     isUnavailable: computed<boolean>(() => props.item.state === 'UNAVAILABLE'),
 });
 
@@ -118,28 +112,13 @@ const modalState = reactive({
     mode: '' as DataTableAlertModalMode,
 });
 
-const joinState = reactive({
-    joinType: undefined as JoinType | undefined,
-});
-
-const queryState = reactive({
-    conditions: [{ key: getRandomId(), value: '' }] as QueryCondition[],
-});
-
-const evalState = reactive({
-    expressions: [{
-        key: getRandomId(), fieldType: DATA_TABLE_FIELD_TYPE.DATA, name: '', expression: '', isCollapsed: false,
-    }] as EvalExpressions[],
-});
-
 const valueState = reactive({
     PIVOT: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT,
-});
-
-const addLabelsState = reactive({
-    labels: [{
-        name: '', value: '',
-    }] as AdditionalLabel[],
+    CONCAT: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.CONCAT,
+    JOIN: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.JOIN,
+    EVAL: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.EVAL,
+    QUERY: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.QUERY,
+    ADD_LABELS: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.ADD_LABELS,
 });
 
 const originState = reactive({
@@ -148,15 +127,11 @@ const originState = reactive({
         dataTables: props.item.options[state.operator]?.data_tables ?? [] as string[],
         dataTableId: props.item.options[state.operator]?.data_table_id as string,
     })),
-    joinType: computed(() => (props.item.options as DataTableTransformOptions).JOIN?.how as JoinType),
-    conditions: computed(() => ((props.item.options as DataTableTransformOptions).QUERY?.conditions ?? []).map((condition) => ({
-        value: condition,
-    }))),
+    joinType: computed<JoinType|undefined>(() => (props.item.options as DataTableTransformOptions).JOIN?.how),
+    queryConditions: computed<QueryOptions['conditions']>(() => (props.item.options as DataTableTransformOptions).QUERY?.conditions ?? []),
+    // queryOperator: computed<QueryOptions['operator']|undefined>(() => (props.item.options as DataTableTransformOptions).QUERY?.operator),
     expressions: computed<EvaluateExpression[]|string[]>(() => (props.item.options as DataTableTransformOptions).EVAL?.expressions ?? []),
-    labels: computed<AdditionalLabel[]>(() => {
-        const _labels = (props.item.options as DataTableTransformOptions).ADD_LABELS?.labels ?? {};
-        return Object.entries(_labels).map(([name, value]) => ({ name, value }));
-    }),
+    labels: computed<AddLabelsOptions['labels']>(() => (props.item.options as DataTableTransformOptions).ADD_LABELS?.labels ?? {}),
     pivot: computed<PivotOptions|undefined>(() => {
         const _pivot = (props.item.options as DataTableTransformOptions).PIVOT as PivotOptions|undefined;
         if (!_pivot) return cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT);
@@ -175,11 +150,12 @@ const setFailStatus = (status: boolean) => {
     state.failStatus = status;
 };
 const updateDataTable = async (): Promise<DataTableModel|undefined> => {
-    const isValidDataTableId = valueState[state.operator].data_table_id && storeState.dataTables.some((dataTable) => dataTable.data_table_id === valueState[state.operator].data_table_id);
-    const isValidDataTables = state.dataTableInfo.dataTables.length === 2
-        && !state.dataTableInfo.dataTables.includes(undefined)
-        && storeState.dataTables.some((dataTable) => dataTable.data_table_id === state.dataTableInfo.dataTables[0])
-        && storeState.dataTables.some((dataTable) => dataTable.data_table_id === state.dataTableInfo.dataTables[1]);
+    const _targetDataTableId: string|undefined = valueState[state.operator].data_table_id;
+    const _targetDataTables: string[]|undefined = valueState[state.operator].data_tables;
+    const isValidDataTableId = _targetDataTableId && storeState.dataTables.some((dataTable) => dataTable.data_table_id === _targetDataTableId);
+    const isValidDataTables = _targetDataTables?.length === 2
+        && storeState.dataTables.some((dataTable) => dataTable.data_table_id === _targetDataTables[0])
+        && storeState.dataTables.some((dataTable) => dataTable.data_table_id === _targetDataTables[1]);
     if (!isValidDataTableId && !isValidDataTables) {
         showErrorMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_WARNING'), '');
         setFailStatus(true);
@@ -188,8 +164,8 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
 
     // Duplicated Data Field Handling in 'JOIN'
     if (state.operator === 'JOIN') {
-        const firstDataTable = storeState.dataTables.find((dataTable) => dataTable.data_table_id === state.dataTableInfo.dataTables[0]);
-        const secondDataTable = storeState.dataTables.find((dataTable) => dataTable.data_table_id === state.dataTableInfo.dataTables[1]);
+        const firstDataTable = storeState.dataTables.find((dataTable) => dataTable.data_table_id === valueState.JOIN.data_tables[0]);
+        const secondDataTable = storeState.dataTables.find((dataTable) => dataTable.data_table_id === valueState.JOIN.data_tables[1]);
         const firstDataFields = Object.keys(firstDataTable?.data_info ?? {});
         const secondDataFields = Object.keys(secondDataTable?.data_info ?? {});
         const duplicatedDataFields = intersection(firstDataFields, secondDataFields);
@@ -204,25 +180,14 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
         }
     }
     const firstUpdating = state.isUnsaved;
-    const concatOptions: ConcatOptions = {
-        data_tables: state.dataTableInfo.dataTables,
-    };
-    const joinOptions: JoinOptions = {
-        data_tables: state.dataTableInfo.dataTables,
-        how: joinState.joinType as JoinType,
-    };
-    const queryOptions: QueryOptions = {
-        data_table_id: state.dataTableInfo.dataTableId,
-        conditions: queryState.conditions.map((conditionInfo) => conditionInfo.value),
-    };
+    const concatOptions = cloneDeep(valueState.CONCAT);
+    const joinOptions = cloneDeep(valueState.JOIN);
+    const queryOptions = cloneDeep(valueState.QUERY);
     const evalOptions: EvalOptions = {
-        data_table_id: state.dataTableInfo.dataTableId,
-        expressions: evalState.expressions.map((expressionInfo) => ({
-            name: expressionInfo.name,
-            field_type: expressionInfo.fieldType,
-            expression: expressionInfo.expression,
+        data_table_id: valueState.EVAL.data_table_id,
+        expressions: valueState.EVAL.expressions.map((expressionInfo) => ({
+            ...expressionInfo,
             ...(expressionInfo.condition && { condition: expressionInfo.condition }) || {},
-            ...(expressionInfo.else && { else: expressionInfo.else }) || {},
         })).filter((expressionInfo) => !!expressionInfo.name && !!expressionInfo.expression),
     };
     const pivotOptions: PivotOptions = {
@@ -233,16 +198,7 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
         function: valueState.PIVOT.function,
         order_by: valueState.PIVOT.order_by,
     };
-    const _labels: AdditionalLabels = addLabelsState.labels.reduce((acc, label) => {
-        if (label.name && label.value) {
-            acc[label.name] = label.value;
-        }
-        return acc;
-    }, {});
-    const addLabelsOptions: AddLabelsOptions = {
-        data_table_id: state.dataTableInfo.dataTableId,
-        labels: _labels,
-    };
+    const addLabelsOptions = cloneDeep(valueState.ADD_LABELS);
     const options = () => {
         switch (state.operator) {
         case 'CONCAT':
@@ -335,19 +291,25 @@ const handleUpdateDataTable = async () => {
 
 /* Utils */
 const setInitialDataTableForm = () => {
-    // Initial Form Setting
-    state.dataTableInfo = originState.dataTableInfo;
-    joinState.joinType = originState.joinType;
-    queryState.conditions = originState.conditions.length ? originState.conditions.map((cond) => ({ ...cond, key: getRandomId() })) : [{ key: getRandomId(), value: '' }];
-    evalState.expressions = originState.expressions.length ? originState.expressions.map((expression) => ({
-        ...expression,
-        isCollapsed: false,
-        fieldType: expression.field_type,
-        key: getRandomId(),
-    })) : [{
-        key: getRandomId(), name: '', fieldType: DATA_TABLE_FIELD_TYPE.DATA, expression: '', isCollapsed: false,
-    }];
-    addLabelsState.labels = originState.labels.length ? cloneDeep(originState.labels) : [{ name: '', value: '' }];
+    // TODO: check reset
+    const _originDataTables = originState.dataTableInfo.dataTables.length ? cloneDeep(originState.dataTableInfo.dataTables) : [];
+    const _originDataTableId = originState.dataTableInfo.dataTableId;
+    // CONCAT
+    valueState.CONCAT = {
+        data_tables: _originDataTables,
+    };
+    // JOIN
+    valueState.JOIN.data_tables = _originDataTables;
+    valueState.JOIN.how = originState.joinType;
+    // QUERY
+    valueState.QUERY.data_table_id = _originDataTableId;
+    valueState.QUERY.conditions = originState.queryConditions.length ? cloneDeep(originState.queryConditions) : cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.QUERY.conditions);
+    // EVAL
+    valueState.EVAL.data_table_id = _originDataTableId;
+    valueState.EVAL.expressions = originState.expressions.length ? cloneDeep(originState.expressions) : cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.EVAL.expressions);
+    // ADD_LABELS
+    valueState.ADD_LABELS.labels = originState.labels.length ? cloneDeep(originState.labels) : cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.ADD_LABELS.labels);
+    // PIVOT
     valueState.PIVOT = originState.pivot ? cloneDeep(originState.pivot) : cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT);
 };
 
@@ -380,26 +342,39 @@ defineExpose({
                                                       :data-type="DATA_TABLE_TYPE.TRANSFORMED"
                                                       :selected="props.selected"
                                                       :data-table-name.sync="state.dataTableName"
-                                                      :is-legacy-data-table="state.isLegacyDataTable"
             />
         </div>
         <widget-form-data-table-card-transform-pivot-form v-if="state.operator === DATA_TABLE_OPERATOR.PIVOT"
                                                           :base-data-table-id="state.dataTableId"
                                                           :operator-options.sync="valueState.PIVOT"
-                                                          :origin-data="props.item.options[state.operator] ?? cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT)"
+                                                          :origin-data="props.item.options[state.operator]"
         />
-        <widget-form-data-table-card-transform-form v-else
-                                                    :data-table-id="state.dataTableId"
-                                                    :operator="state.operator"
-                                                    :data-table-info.sync="state.dataTableInfo"
-                                                    :join-type.sync="joinState.joinType"
-                                                    :conditions.sync="queryState.conditions"
-                                                    :expressions.sync="evalState.expressions"
-                                                    :labels.sync="addLabelsState.labels"
-                                                    :is-legacy-data-table="state.isLegacyDataTable"
+        <widget-form-data-table-card-transform-concatenate v-if="state.operator === DATA_TABLE_OPERATOR.CONCAT"
+                                                           :base-data-table-id="state.dataTableId"
+                                                           :operator-options.sync="valueState.CONCAT"
+                                                           :origin-data="props.item.options[state.operator]"
+        />
+        <widget-form-data-table-card-transform-join v-else-if="state.operator === DATA_TABLE_OPERATOR.JOIN"
+                                                    :base-data-table-id="state.dataTableId"
+                                                    :operator-options.sync="valueState.JOIN"
+                                                    :origin-data="props.item.options[state.operator]"
+        />
+        <widget-form-data-table-card-transform-evaluate v-else-if="state.operator === DATA_TABLE_OPERATOR.EVAL"
+                                                        :base-data-table-id="state.dataTableId"
+                                                        :operator-options.sync="valueState.EVAL"
+                                                        :origin-data="props.item.options[state.operator]"
+        />
+        <widget-form-data-table-card-transform-query v-else-if="state.operator === DATA_TABLE_OPERATOR.QUERY"
+                                                     :base-data-table-id="state.dataTableId"
+                                                     :operator-options.sync="valueState.QUERY"
+                                                     :origin-data="props.item.options[state.operator]"
+        />
+        <widget-form-data-table-card-transform-add-labels v-if="state.operator === DATA_TABLE_OPERATOR.ADD_LABELS"
+                                                          :base-data-table-id="state.dataTableId"
+                                                          :operator-options.sync="valueState.ADD_LABELS"
+                                                          :origin-data="props.item.options[state.operator]"
         />
         <widget-form-data-table-card-footer :disabled="state.applyDisabled"
-                                            :is-legacy-data-table="state.isLegacyDataTable"
                                             :changed="state.optionsChanged"
                                             :loading="state.loading"
                                             @delete="handleClickDeleteDataTable"

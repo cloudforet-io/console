@@ -63,12 +63,13 @@ export interface ConcatOptions {
 
 export interface JoinOptions {
     data_tables: string[];
-    how: JoinType;
+    how?: JoinType;
 }
 
 export interface QueryOptions {
-    data_table_id: string;
+    data_table_id?: string;
     conditions: string[];
+    // operator: 'AND'|'OR';
 }
 
 export interface AggregateOptions {
@@ -77,7 +78,7 @@ export interface AggregateOptions {
 }
 
 export interface EvalOptions {
-    data_table_id: string;
+    data_table_id?: string;
     expressions: EvaluateExpression[];
 }
 
@@ -85,6 +86,7 @@ export interface EvaluateExpression {
     name: string;
     field_type: DataTableFieldType;
     expression: string;
+    condition?: string;
 }
 
 export interface PivotOptions {
@@ -106,7 +108,7 @@ export interface PivotFieldOptions {
 }
 
 export interface AddLabelsOptions {
-    data_table_id: string;
+    data_table_id?: string;
     labels: AdditionalLabels;
 }
 

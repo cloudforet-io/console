@@ -1,5 +1,7 @@
-
-import type { PivotOptions } from '@/common/modules/widgets/types/widget-model';
+import type {
+    AddLabelsOptions,
+    ConcatOptions, EvalOptions, JoinOptions, PivotOptions, QueryOptions,
+} from '@/common/modules/widgets/types/widget-model';
 
 import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 
@@ -87,4 +89,30 @@ export const DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP = {
             desc: false,
         },
     } as PivotOptions,
+    CONCAT: {
+        data_tables: [],
+    } as ConcatOptions,
+    JOIN: {
+        data_tables: [],
+        how: undefined,
+    } as JoinOptions,
+    EVAL: {
+        data_table_id: undefined,
+        expressions: [
+            {
+                name: '',
+                field_type: DATA_TABLE_FIELD_TYPE.DATA,
+                expression: '',
+            },
+        ],
+    } as EvalOptions,
+    QUERY: {
+        data_table_id: undefined,
+        conditions: [''],
+        // operator: 'AND',
+    } as QueryOptions,
+    ADD_LABELS: {
+        data_table_id: undefined,
+        labels: { '': '' },
+    } as AddLabelsOptions,
 };
