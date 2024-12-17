@@ -14,6 +14,11 @@ export type ServiceDetailSettingCardType = typeof SERVICE_SETTING_CARD[keyof typ
 
 export type WebhookDetailTabsType = typeof WEBHOOK_DETAIL_TABS[keyof typeof WEBHOOK_DETAIL_TABS];
 
+export type AlertFilterType = {
+    label: TranslateResult;
+    name: string;
+};
+
 export type createHeaderInfoByStep = {
     title: TranslateResult;
     desc?: TranslateResult;
