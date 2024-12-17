@@ -1254,6 +1254,7 @@
 					"DATA_TABLE_NAME_SUCCESS": "데이터 이름 수정 완료",
 					"DATA_TABLE_NAME_WARNING": "동일한 이름의 데이터가 이미 존재합니다.",
 					"DATA_UNIT": "데이터 단위",
+					"DUPLICATED_FIELD_NAME": "",
 					"EVAL": {
 						"ADD_FIELD": "필드 추가",
 						"CONDITION": "",
