@@ -1,19 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive } from 'vue';
 
-import {
-    makeDistinctValueHandler,
-    makeEnumValueHandler,
-} from '@cloudforet/core-lib/component-util/query-search';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PToolboxTable, PSelectDropdown, PLink, PBadge, PI, PSelectStatus,
 } from '@cloudforet/mirinae';
-import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
-import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
 import { ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
@@ -27,7 +21,11 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import { red } from '@/styles/colors';
 
 import { getAlertStateI18n, getAlertUrgencyI18n } from '@/services/alert-manager-v2/composables/alert-table-data';
-import { ALERT_STATUS_FILTERS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
+import {
+    ALERT_MANAGEMENT_TABLE_FIELDS,
+    ALERT_MANAGEMENT_TABLE_HANDLER,
+    ALERT_STATUS_FILTERS,
+} from '@/services/alert-manager-v2/constants/alert-management-table-constant';
 import { alertStateBadgeStyleTypeFormatter } from '@/services/alert-manager-v2/helpers/alert-badge-helper';
 import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
 import { useAlertPageStore } from '@/services/alert-manager-v2/stores/alert-page-store';
@@ -38,39 +36,6 @@ const alertPageState = alertPageStore.state;
 
 const { getProperRouteLocation } = useProperRouteLocation();
 
-const tableState = reactive({
-    fields: computed<DataTableFieldType[]>(() => ([
-        { name: 'alert_number', label: 'No' },
-        { name: 'title', label: 'Title', width: '20rem' },
-        { name: 'state', label: 'Status' },
-        { name: 'service_id', label: 'Service' },
-        { name: 'urgency', label: 'Urgency' },
-        { name: 'category', label: 'Category' },
-        { name: 'resources', label: 'Resource', width: '20rem' },
-        { name: 'updated_by', label: 'Updated by' },
-        { name: 'resolved_by', label: 'Resolved by' },
-        { name: 'acknowledged by', label: 'Acknowledged by' },
-    ])),
-    keyItemSets: computed<KeyItemSet[]>(() => [{
-        title: 'Properties',
-        items: [
-            { name: 'alert_id', label: 'Alert ID' },
-            { name: 'title', label: 'Title' },
-            { name: 'state', label: 'Status' },
-            { name: 'service_id', label: 'Service' },
-            { name: 'category', label: 'Category' },
-            { name: 'resource.resource_type', label: 'Resource Name' },
-        ],
-    }]),
-    valueHandlerMap: computed<ValueHandlerMap>(() => ({
-        alert_id: makeDistinctValueHandler('alertManager.Alert', 'alert_id'),
-        title: makeDistinctValueHandler('alertManager.Alert', 'title'),
-        state: makeEnumValueHandler(ALERT_URGENCY),
-        service: makeDistinctValueHandler('alertManager.Alert', 'service_id'),
-        category: makeDistinctValueHandler('alertManager.Alert', 'category'),
-        'resource.resource_type': makeDistinctValueHandler('alertManager.Alert', 'resource.resource_type'),
-    })),
-});
 const storeState = reactive({
     serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => alertPageState.serviceList),
 });
@@ -175,10 +140,10 @@ onMounted(async () => {
                          sort-by="created_at"
                          :sort-desc="true"
                          :loading="state.loading"
-                         :fields="tableState.fields"
+                         :fields="ALERT_MANAGEMENT_TABLE_FIELDS"
                          :items="state.alertList"
-                         :key-item-sets="tableState.keyItemSets"
-                         :value-handler-map="tableState.valueHandlerMap"
+                         :key-item-sets="ALERT_MANAGEMENT_TABLE_HANDLER.keyItemSets"
+                         :value-handler-map="ALERT_MANAGEMENT_TABLE_HANDLER.valueHandlerMap"
                          settings-visible
                          @change="handleChange"
                          @click-settings="handleClickSettings"

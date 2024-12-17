@@ -17,7 +17,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { useAlertPageStore } from '@/services/alert-manager-v2/stores/alert-page-store';
-import type { RadioType } from '@/services/alert-manager-v2/types/alert-manager-type';
+import type { AlertUrgencyRadioType } from '@/services/alert-manager-v2/types/alert-manager-type';
 
 
 interface Props {
@@ -42,7 +42,7 @@ const state = reactive({
     alertList: [] as AlertModel[],
 
     selectedServiceId: '',
-    radioMenuList: computed<RadioType[]>(() => [
+    radioMenuList: computed<AlertUrgencyRadioType[]>(() => [
         {
             label: i18n.t('ALERT_MANAGER.ALERTS.HIGH'),
             name: ALERT_URGENCY.HIGH,

@@ -22,13 +22,6 @@ export const ALERT_SEVERITY_COLORS = {
     WARNING: yellow[600],
     INFO: blue[600],
 } as const;
-export const ALERT_STATUS_FILTERS = {
-    OPEN: 'OPEN',
-    TRIGGERED: 'TRIGGERED',
-    ACKNOWLEDGED: 'ACKNOWLEDGED',
-    RESOLVED: 'RESOLVED',
-    ERROR: 'ERROR',
-} as const;
 
 export const WEBHOOK_DETAIL_TABS = {
     DETAIL: 'detail',
