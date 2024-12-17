@@ -44,7 +44,7 @@ onUnmounted(() => {
                    :key="field.field_id"
                    :field="field"
                    :value="taskContentFormState.defaultData[field.field_id]"
-                   :readonly="!(taskContentFormGetters.isEditable && isEditableFieldInViewMode(field.field_id))"
+                   :readonly="taskContentFormState.mode === 'view' ? !(taskContentFormGetters.isEditable && isEditableFieldInViewMode(field.field_id)) : false"
                    :files="taskContentFormState.files"
                    @update:value="taskContentFormStore.setDefaultFieldData(field.field_id, $event)"
                    @update:files="taskContentFormStore.setFiles"
