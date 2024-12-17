@@ -6,7 +6,6 @@ import {
     makeEnumValueHandler,
 } from '@cloudforet/core-lib/component-util/query-search';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PToolboxTable, PSelectDropdown, PLink, PBadge, PI, PSelectStatus,
@@ -16,11 +15,8 @@ import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { AlertListParameters } from '@/schema/alert-manager/alert/api-verbs/list';
 import { ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
-import type { ServiceListParameters } from '@/schema/alert-manager/service/api-verbs/list';
 import type { ServiceModel } from '@/schema/alert-manager/service/model';
 import { i18n } from '@/translations';
 
@@ -35,7 +31,11 @@ import { getAlertStateI18n, getAlertUrgencyI18n } from '@/services/alert-manager
 import { ALERT_STATUS_FILTERS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
 import { alertStateBadgeStyleTypeFormatter } from '@/services/alert-manager-v2/helpers/alert-badge-helper';
 import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
+import { useAlertPageStore } from '@/services/alert-manager-v2/stores/alert-page-store';
 import type { AlertFilterType } from '@/services/alert-manager-v2/types/alert-manager-type';
+
+const alertPageStore = useAlertPageStore();
+const alertPageState = alertPageStore.state;
 
 const { getProperRouteLocation } = useProperRouteLocation();
 
@@ -72,14 +72,20 @@ const tableState = reactive({
         'resource.resource_type': makeDistinctValueHandler('alertManager.Alert', 'resource.resource_type'),
     })),
 });
+const storeState = reactive({
+    serviceList: computed<ServiceModel[]>(() => alertPageState.serviceList),
+});
 const state = reactive({
     loading: false,
-    items: [] as AlertModel[],
+    alertList: [] as AlertModel[],
     alertStateLabels: getAlertStateI18n(),
     urgencyLabels: getAlertUrgencyI18n(),
 });
 const filterState = reactive({
-    serviceDropdownList: [] as SelectDropdownMenuItem[],
+    serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => storeState.serviceList.map((i) => ({
+        name: i.service_id,
+        label: i.name,
+    }))),
     selectedServiceId: '',
     statusFields: computed<AlertFilterType[]>(() => ([
         { label: i18n.t('ALERT_MANAGER.ALERTS.ALL'), name: 'ALL' },
@@ -100,7 +106,7 @@ const filterState = reactive({
 
 const handleSelectServiceDropdownItem = (id: string) => {
     filterState.selectedServiceId = id;
-    fetchServiceList();
+    fetchAlertsList();
 };
 const handleSelectFilter = (type: 'status' | 'urgency', value: string) => {
     if (type === 'status') {
@@ -120,21 +126,6 @@ const handleExportToExcel = () => {
     console.log('TODO: handleExportToExcel');
 };
 
-const fetchServiceList = async () => {
-    try {
-        const { results } = await SpaceConnector.clientV2.alertManager.service.list<ServiceListParameters, ListResponse<ServiceModel>>({
-            service_id: filterState.selectedServiceId === '' ? undefined : filterState.selectedServiceId,
-        });
-        filterState.serviceDropdownList = (results || []).map((i) => ({
-            name: i.service_id,
-            label: i.name,
-        }));
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-        filterState.serviceDropdownList = [];
-    }
-};
-
 const alertListApiQuery = new ApiQueryHelper().setSort('created_at', true);
 const fetchAlertsList = async () => {
     try {
@@ -149,6 +140,7 @@ const fetchAlertsList = async () => {
         alertListApiQuery.setFilters([
             ...stateFilter,
             ...urgencyFilter,
+            { k: 'service_id', v: filterState.selectedServiceId, o: '=' },
         ]);
         if (filterState.selectedStatusFilter === ALERT_STATUS_FILTERS.OPEN) {
             alertListApiQuery.setOrFilters([
@@ -158,20 +150,19 @@ const fetchAlertsList = async () => {
         } else {
             alertListApiQuery.setOrFilters([]);
         }
-        const { results } = await SpaceConnector.clientV2.alertManager.alert.list<AlertListParameters, ListResponse<AlertModel>>({
+        state.alertList = await alertPageStore.fetchAlertsList({
             query: alertListApiQuery.data,
         });
-        state.items = results || [];
     } catch (e) {
         ErrorHandler.handleError(e, true);
-        state.items = [];
+        state.alertList = [];
     }
 };
 
 onMounted(async () => {
     try {
         state.loading = true;
-        await fetchServiceList();
+        await alertPageStore.fetchServiceList();
         await fetchAlertsList();
     } finally {
         state.loading = false;
@@ -190,7 +181,7 @@ onMounted(async () => {
                          :sort-desc="true"
                          :loading="state.loading"
                          :fields="tableState.fields"
-                         :items="state.items"
+                         :items="state.alertList"
                          :key-item-sets="tableState.keyItemSets"
                          :value-handler-map="tableState.valueHandlerMap"
                          settings-visible
