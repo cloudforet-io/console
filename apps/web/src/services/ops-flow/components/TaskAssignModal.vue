@@ -9,6 +9,7 @@ import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tabl
 import type { ToolboxTableOptions } from '@cloudforet/mirinae/types/data-display/tables/toolbox-table/type';
 
 import type { TaskModel } from '@/schema/opsflow/task/model';
+import { i18n } from '@/translations';
 
 import type { UserReferenceItem } from '@/store/reference/user-reference-store';
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
@@ -76,10 +77,10 @@ const updateTaskAssignee = async (): Promise<TaskModel|undefined> => {
         if (selectIndex.value.length === 0) throw new Error('assignee is not selected');
         const newTask = await taskStore.changeAssignee(taskAssignStore.state.taskId, refinedUserItems.value[selectIndex.value[0]].name);
         taskContentFormStore.setAssigneeToOriginTask(newTask.assignee);
-        showSuccessMessage('Task assigned successfully', '');
+        showSuccessMessage(i18n.t('OPSFLOW.ALT_S_ASSIGN'), '');
         return newTask;
     } catch (e) {
-        ErrorHandler.handleRequestError(e, 'Failed to assign task');
+        ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ALT_E_ASSIGN'));
         return undefined;
     }
 };
@@ -104,7 +105,7 @@ watch(() => taskAssignStore.state.visibleAssignModal, (visible) => {
 
 <template>
     <p-button-modal :visible="taskAssignStore.state.visibleAssignModal"
-                    header-title="Assign Member"
+                    :header-title="$t('OPSFLOW.TASK_BOARD.ASSIGN_TO')"
                     size="md"
                     :loading="loading || updating"
                     :disabled="selectIndex.length === 0"

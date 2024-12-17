@@ -707,6 +707,7 @@
 			"DONE": "完了",
 			"DOWNLOAD": "ダウンロード",
 			"EDIT": "",
+			"NEXT": "",
 			"PDF_DOWNLOAD_BUTTON": {
 				"DESKTOP": "デスクトップ",
 				"SUPPORT_PDF_HELP_TEXT": "この機能は、ご使用のブラウザまたはデバイスではサポートされていません。 {desktop}で{chrome}または{edge}ブラウザを使用して再試行してください。"
@@ -4175,19 +4176,27 @@
 	},
 	"OPSFLOW": {
 		"ADD_TARGET": "",
+		"ALL_CATEGORIES": "",
 		"ALT_E_ADD_TARGET": "",
+		"ALT_E_ASSIGN": "",
 		"ALT_E_CHANGE_DEFAULT_TARGET": "",
+		"ALT_E_CREATE_TARGET": "",
 		"ALT_E_DELETE_TARGET": "",
 		"ALT_E_EDIT_TARGET": "",
+		"ALT_E_UPDATE_TARGET": "",
 		"ALT_S_ADD_TARGET": "",
+		"ALT_S_ASSIGN": "",
 		"ALT_S_CHANGE_DEFAULT_TARGET": "",
+		"ALT_S_CREATE_TARGET": "",
 		"ALT_S_DELETE_TARGET": "",
 		"ALT_S_EDIT_TARGET": "",
+		"ALT_S_UPDATE_TARGET": "",
 		"ASSIGNEE": "",
 		"ASSIGNEE_POOL": "",
 		"CATEGORY": "",
 		"CREATED_AT": "",
 		"CREATED_BY": "",
+		"CREATE_TARGET": "",
 		"DEFAULT": "",
 		"DELETE_TARGET": "",
 		"DELETE_TARGET_CONFIRMATION": "",
@@ -4222,7 +4231,9 @@
 		"FIELD_NAME": "",
 		"KEY": "",
 		"NAME": "",
+		"NO_AVAILABLE_TARGET": "",
 		"PACKAGE": "",
+		"PROJECT": "",
 		"SET_AS_DEFAULT": "",
 		"STATUS": "",
 		"STATUS_COMPLETED": "",
@@ -4231,7 +4242,13 @@
 		"SUPPORT_PACKAGE": "",
 		"TARGET_LIST": "",
 		"TASK_BOARD": {
-			"TASK_PROGRESS": ""
+			"ASSIGN": "",
+			"ASSIGN_TO": "",
+			"COMMENT": "",
+			"TASK_CONTENT": "",
+			"TASK_PROGRESS": "",
+			"TYPE_INFO": "",
+			"VIEW_ALL_TASKS": ""
 		},
 		"TASK_MANAGEMENT": {
 			"ALT_E_DISABLE_LANDING": "",
@@ -4274,8 +4291,13 @@
 		"TITLE": "",
 		"VALIDATION": {
 			"DUPLICATED": "",
+			"FIELD_REQUIRED": "",
 			"LENGTH_MAX": "",
-			"REQUIRED": ""
+			"REQUIRED": "",
+			"UNSUPPORTED_FIELD_TYPE": "",
+			"VALUE_ARRAY": "",
+			"VALUE_ONLY_ONE": "",
+			"VALUE_STRING": ""
 		},
 		"WORKSPACE": ""
 	},

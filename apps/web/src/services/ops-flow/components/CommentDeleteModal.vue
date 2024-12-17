@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
+import { getParticle, i18n } from '@/translations';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
@@ -18,9 +20,9 @@ const deleteComment = async () => {
         if (!taskDetailPageStore.state.targetComment) throw new Error('targetComment is not defined');
         loading.value = true;
         await commentStore.delete(taskDetailPageStore.state.targetComment.comment_id);
-        showSuccessMessage('Comment deleted successfully', '');
+        showSuccessMessage(i18n.t('OPSFLOW.ALT_S_DELETE_TARGET', { target: i18n.t('OPSFLOW.TASK_BOARD.COMMENT') }));
     } catch (e) {
-        ErrorHandler.handleRequestError(e, 'Failed to delete comment');
+        ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ERR_S_DELETE_TARGET', { target: i18n.t('OPSFLOW.TASK_BOARD.COMMENT') }));
     } finally {
         loading.value = false;
         taskDetailPageStore.closeCommentDeleteModal();
@@ -33,7 +35,9 @@ const handleConfirm = async () => {
 </script>
 
 <template>
-    <delete-modal header-title="Are you sure you want to delete this comment?"
+    <delete-modal :header-title="$t('OPSFLOW.DELETE_TARGET_CONFIRMATION', {
+                      object: $t('OPSFLOW.TASK_BOARD.COMMENT'),
+                      particle:getParticle($t('OPSFLOW.TASK_BOARD.COMMENT'),'object') })"
                   :visible="taskDetailPageStore.state.visibleCommentDeleteModal"
                   :loading="loading"
                   @close="taskDetailPageStore.closeCommentDeleteModal()"

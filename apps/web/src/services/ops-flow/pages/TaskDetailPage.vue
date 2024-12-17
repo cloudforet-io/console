@@ -35,6 +35,8 @@ import type { TabItem } from '@cloudforet/mirinae/types/hooks/use-tab/type';
 import type { TaskModel } from '@/schema/opsflow/task/model';
 import { i18n as _i18n } from '@/translations';
 
+import { useUserStore } from '@/store/user/user-store';
+
 import { queryStringToString } from '@/lib/router-query-string';
 
 import ConfirmBackModal from '@/common/components/modals/ConfirmBackModal.vue';
@@ -71,6 +73,7 @@ const taskContentFormState = taskContentFormStore.state;
 const taskContentFormGetters = taskContentFormStore.getters;
 const taskStore = useTaskStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
+const userStore = useUserStore();
 
 /* task */
 const task = ref<TaskModel|undefined>();
@@ -104,7 +107,7 @@ const checkTaskExist = async () => {
 
 /* header and back button */
 const loading = ref<boolean>(true);
-const headerTitle = computed<string>(() => task?.value?.name ?? 'Inquiry Service Request'); // TODO: i18n
+const headerTitle = computed<string>(() => task?.value?.name ?? '');
 
 
 /* confirm leave modal */
@@ -123,7 +126,7 @@ onBeforeRouteLeave(handleBeforeRouteLeave);
 const tabs = computed<TabItem<object>[]>(() => [
     {
         name: 'content',
-        label: 'Content', // TODO: i18n
+        label: _i18n.t('OPSFLOW.TASK_BOARD.TASK_CONTENT') as string,
         keepAlive: true,
     },
     {
@@ -158,7 +161,7 @@ watch(task, (t) => {
     if (route.hash === '#progress') {
         activeTab.value = 'progress';
     }
-    taskContentFormStore.setMode('view'); // TODO: differentiate by user permission
+    taskContentFormStore.setMode('view');
     if (task.value) taskContentFormStore.setCurrentTask(task.value);
 });
 
@@ -183,10 +186,11 @@ defineExpose({ setPathFrom, checkTaskExist });
                 </p-heading>
             </template>
             <template #extra>
-                <p-button style-type="negative-secondary"
+                <p-button v-if="userStore.getters.isDomainAdmin"
+                          style-type="negative-secondary"
                           @click="taskDetailPageStore.openTaskDeleteModal()"
                 >
-                    Delete
+                    {{ $t('COMMON.BUTTONS.DELETE') }}
                 </p-button>
             </template>
         </p-heading-layout>
@@ -204,19 +208,19 @@ defineExpose({ setPathFrom, checkTaskExist });
                         <task-progress-tab />
                     </template>
                 </p-tab>
-                <div v-if="activeTab === 'content'"
+                <div v-if="activeTab === 'content' && taskContentFormGetters.isEditable"
                      class="py-3 flex flex-wrap gap-1 justify-end"
                 >
                     <p-button style-type="transparent"
                               @click="goBack()"
                     >
-                        Cancel
+                        {{ $t('COMMON.BUTTONS.CANCEL') }}
                     </p-button>
                     <p-button style-type="primary"
                               :disabled="!taskContentFormState.hasUnsavedChanges || !taskContentFormGetters.isAllValid"
                               @click="handleSaveChanges"
                     >
-                        Confirm
+                        {{ $t('COMMON.BUTTONS.CONFIRM') }}
                     </p-button>
                 </div>
             </div>

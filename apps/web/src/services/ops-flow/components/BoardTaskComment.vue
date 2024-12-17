@@ -13,6 +13,7 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 import type { CollapsibleItem } from '@cloudforet/mirinae/types/data-display/collapsible/collapsible-list/type';
 
 import type { CommentModel } from '@/schema/opsflow/comment/model';
+import { i18n } from '@/translations';
 
 import type { UserReferenceItem } from '@/store/reference/user-reference-store';
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
@@ -55,9 +56,9 @@ const addComment = async (cmt: string) => {
             task_id: props.taskId,
             comment: cmt,
         }, true);
-        showSuccessMessage('Comment added successfully', '');
+        showSuccessMessage(i18n.t('OPSFLOW.ALT_S_ADD_TARGET', { target: i18n.t('OPSFLOW.TASK_BOARD.COMMENT') }));
     } catch (e) {
-        ErrorHandler.handleRequestError(e, 'Failed to add comment');
+        ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ALT_E_ADD_TARGET', { target: i18n.t('OPSFLOW.TASK_BOARD.COMMENT') }));
     } finally {
         addingComment.value = false;
     }
@@ -353,7 +354,7 @@ onBeforeMount(async () => {
     <p-pane-layout class="pt-8 pb-10 px-4">
         <p-heading class="mb-6"
                    heading-type="sub"
-                   title="Comment"
+                   :title="$t('OPSFLOW.TASK_BOARD.COMMENT')"
         />
         <div ref="containerRef"
              class="relative mb-3"
@@ -370,7 +371,7 @@ onBeforeMount(async () => {
             <div ref="contentEditableDivRef"
                  contenteditable="true"
                  class="contenteditable-div"
-                 data-placeholder="Add Comment"
+                 :data-placeholder="$t('OPSFLOW.TASK_BOARD.COMMENT')"
                  @input="handleInput"
                  @keydown="handleKeydown"
                  @scroll="syncScroll"
@@ -394,7 +395,7 @@ onBeforeMount(async () => {
                   :loading="addingComment"
                   @click="handleClickAddComment"
         >
-            Add Comment
+            {{ $t('OPSFLOW.ADD_TARGET', { target: $t('OPSFLOW.TASK_BOARD.COMMENT') }) }}
         </p-button>
         <p-collapsible-list :items="commentItems"
                             toggle-position="contents"

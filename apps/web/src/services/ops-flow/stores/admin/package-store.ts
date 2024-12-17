@@ -89,8 +89,8 @@ export const usePackageStore = defineStore('package', () => {
         store.$dispose();
     };
     const appContextStore = useAppContextStore();
-    watch(() => appContextStore.getters.isAdminMode, () => {
-        disposeSelf();
+    watch(() => appContextStore.getters.globalGrantLoading, (globalGrantLoading) => {
+        if (globalGrantLoading) disposeSelf();
     });
     return {
         getters,

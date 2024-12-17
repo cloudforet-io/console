@@ -16,6 +16,7 @@ import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/
 import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
 import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
 import type { TaskModel } from '@/schema/opsflow/task/model';
+import { i18n } from '@/translations';
 
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 
@@ -184,12 +185,12 @@ const handleUpdateFilters = (values: TaskFilters) => {
 const fields = computed<DataTableField[] >(() => [
     {
         name: 'name',
-        label: 'Title',
+        label: i18n.t('OPSFLOW.TITLE') as string,
         width: '13rem',
     },
     {
         name: 'description',
-        label: 'Description',
+        label: i18n.t('OPSFLOW.DESCRIPTION') as string,
         width: '15rem',
     },
     {
@@ -198,23 +199,23 @@ const fields = computed<DataTableField[] >(() => [
     },
     {
         name: 'status_id',
-        label: 'Status',
+        label: i18n.t('OPSFLOW.STATUS') as string,
     },
     {
         name: 'project_id',
-        label: 'Project',
+        label: i18n.t('OPSFLOW.PROJECT') as string,
     },
     {
         name: 'assignee',
-        label: 'Assignee',
+        label: i18n.t('OPSFLOW.ASSIGNEE') as string,
     },
     {
         name: 'created_by',
-        label: 'Created By',
+        label: i18n.t('OPSFLOW.CREATED_BY') as string,
     },
     {
         name: 'created_at',
-        label: 'Created At',
+        label: i18n.t('OPSFLOW.CREATED_AT') as string,
     },
 ]);
 

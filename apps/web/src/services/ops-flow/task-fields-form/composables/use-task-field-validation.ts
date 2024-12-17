@@ -4,6 +4,7 @@ import { watch } from 'vue';
 import { isEqual } from 'lodash';
 
 import type { TaskField, TaskFieldType } from '@/schema/opsflow/_types/task-field-type';
+import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { ValidatorFn } from '@/common/composables/form-validator';
@@ -24,15 +25,15 @@ export const useTaskFieldValidation = <TField extends TaskField, TValue>(
     const stringValidator: ValidatorFn<TValue> = (val): string|boolean => {
         if (val === undefined || val === null) {
             if (props.field.is_required) {
-                return 'This field is required';
+                return i18n.t('OPSFLOW.VALIDATION.FIELD_REQUIRED');
             }
             return true;
         }
         if (typeof val !== 'string') {
-            return 'Value must be a string';
+            return i18n.t('OPSFLOW.VALIDATION.VALUE_STRING');
         }
         if (props.field.is_required && val.trim() === '') {
-            return 'This field is required';
+            return i18n.t('OPSFLOW.VALIDATION.FIELD_REQUIRED');
         }
         return true;
     };
@@ -40,26 +41,26 @@ export const useTaskFieldValidation = <TField extends TaskField, TValue>(
     const stringArrayValidator: ValidatorFn<TValue> = (val): string|boolean => {
         if (val === undefined || val === null) {
             if (props.field.is_required) {
-                return 'This field is required';
+                return i18n.t('OPSFLOW.VALIDATION.FIELD_REQUIRED');
             }
             return true;
         }
         if (!Array.isArray(val)) {
-            return 'Value must be an array';
+            return i18n.t('OPSFLOW.VALIDATION.VALUE_ARRAY');
         }
         // SINGLE case
         if (!props.field.selection_type || props.field.selection_type === 'SINGLE') {
             if (val.length > 1) {
-                return 'Only one value is allowed';
+                return i18n.t('OPSFLOW.VALIDATION.VALUE_ONLY_ONE');
             }
             if (props.field.is_required && val.length === 0) {
-                return 'This field is required';
+                return i18n.t('OPSFLOW.VALIDATION.FIELD_REQUIRED');
             }
             return true;
         }
         // MULTI case
         if (props.field.is_required && val.length === 0) {
-            return 'This field is required';
+            return i18n.t('OPSFLOW.VALIDATION.FIELD_REQUIRED');
         }
         return true;
     };
@@ -77,7 +78,7 @@ export const useTaskFieldValidation = <TField extends TaskField, TValue>(
             return stringArrayValidator(val);
         }
         ErrorHandler.handleError(new Error(`Unsupported field type: ${props.field.field_type}`));
-        return 'Unsupported field type';
+        return i18n.t('OPSFLOW.VALIDATION.UNSUPPORTED_FIELD_TYPE');
     });
 
     const updateFieldValue = (val: TValue) => {

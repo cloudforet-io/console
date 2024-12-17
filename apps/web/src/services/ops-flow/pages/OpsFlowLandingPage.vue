@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router/composables';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 import {
-    PFieldTitle, PButton, PDivider, PSelectCard, PPaneLayout, PEmpty, PRadioGroup, PRadio, PDataLoader,
+    PButton, PDivider, PSelectCard, PEmpty, PRadioGroup, PRadio, PDataLoader,
 } from '@cloudforet/mirinae';
 
 import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
@@ -20,6 +20,9 @@ import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
 import { useTaskStore } from '@/services/ops-flow/stores/task-store';
 import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
+import {
+    useTaskManagementTemplateStore,
+} from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 import type { TaskCreatePageQuery } from '@/services/ops-flow/types/task-create-page-type';
 
 
@@ -30,6 +33,7 @@ const taskTypeStore = useTaskTypeStore();
 const taskTypeState = taskTypeStore.state;
 const taskStore = useTaskStore();
 const userStore = useUserStore();
+const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
 const { getProperRouteLocation } = useProperRouteLocation();
 
@@ -87,7 +91,7 @@ onMounted(async () => {
 <template>
     <div class="ops-flow-landing-page">
         <div class="mb-6 text-center text-display-md font-bold">
-            Service Desk
+            {{ taskManagementTemplateStore.templates.TemplateName }}
         </div>
         <p-data-loader :loading="loading"
                        :data="availableCategories"
@@ -95,8 +99,8 @@ onMounted(async () => {
                        class="min-h-72"
         >
             <div class="max-w-[712px] mx-auto">
-                <div class="mb-4 pt-4 flex justify-between">
-                    <p-field-title label="Active Ticket" />
+                <div class="mb-4 pt-4 flex justify-end">
+                    <!--                    <p-field-title label="Active Ticket" />-->
                     <router-link custom
                                  :to="getProperRouteLocation({
                                      name: OPS_FLOW_ROUTE.BOARD._NAME,
@@ -106,23 +110,24 @@ onMounted(async () => {
                         <template #default="{navigate}">
                             <p-button style-type="secondary"
                                       size="sm"
+                                      class="capitalize"
                                       @click="navigate"
                             >
-                                View All Tickets
+                                {{ $t('OPSFLOW.TASK_BOARD.VIEW_ALL_TASKS', {tasks: taskManagementTemplateStore.templates.tasks}) }}
                             </p-button>
                         </template>
                     </router-link>
                 </div>
-                <p-pane-layout class="mb-10 min-h-20 flex items-center justify-center">
-                    <div v-if="tasks.length" /> <!-- TODO: Implement TaskList -->
-                    <p-empty v-else>
-                        No Active Tickets
-                    </p-empty>
-                </p-pane-layout>
+                <!--                <p-pane-layout class="mb-10 min-h-20 flex items-center justify-center">-->
+                <!--                    <div v-if="tasks.length" /> -->
+                <!--                    <p-empty v-else>-->
+                <!--                        No Active Tickets-->
+                <!--                    </p-empty>-->
+                <!--                </p-pane-layout>-->
                 <p-divider />
                 <div class="mt-10">
                     <p class="mb-6 text-display-md">
-                        Category
+                        {{ taskManagementTemplateStore.templates.TaskCategory }}
                     </p>
                     <div class="flex justify-center">
                         <div class="grid grid-cols-2 gap-4 justify-center items-center">
@@ -139,7 +144,7 @@ onMounted(async () => {
                 </div>
                 <div class="mt-10">
                     <p class="mb-6 text-display-md">
-                        Topic
+                        {{ taskManagementTemplateStore.templates.TaskType }}
                     </p>
                     <p-radio-group v-if="category">
                         <p-radio v-for="t in taskTypeState.itemsByCategoryId[category]"
@@ -158,7 +163,7 @@ onMounted(async () => {
                               :disabled="!isAllValid"
                               @click="goToTaskCreatePage"
                     >
-                        Next
+                        {{ $t('COMMON.BUTTONS.NEXT') }}
                     </p-button>
                 </div>
             </div>
@@ -166,7 +171,7 @@ onMounted(async () => {
                 <p-empty class="my-20"
                          show-image
                 >
-                    No Available Category
+                    {{ $t('OPSFLOW.NO_AVAILABLE_TARGET', {target: taskManagementTemplateStore.templates.TaskCategory }) }}
                 </p-empty>
             </template>
         </p-data-loader>

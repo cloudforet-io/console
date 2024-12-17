@@ -30,6 +30,7 @@ const taskContentFormState = taskContentFormStore.state;
 const taskContentFormGetters = taskContentFormStore.getters;
 const taskFieldMetadataStore = useTaskFieldMetadataStore();
 
+const isEditableFieldInViewMode = (fieldId: string) => fieldId === DEFAULT_FIELD_ID_MAP.title;
 onUnmounted(() => {
     taskContentFormStore.resetFieldsForm();
 });
@@ -43,7 +44,7 @@ onUnmounted(() => {
                    :key="field.field_id"
                    :field="field"
                    :value="taskContentFormState.defaultData[field.field_id]"
-                   :readonly="taskContentFormState.mode === 'view' && field.field_id !== DEFAULT_FIELD_ID_MAP.title"
+                   :readonly="!(taskContentFormGetters.isEditable && isEditableFieldInViewMode(field.field_id))"
                    :files="taskContentFormState.files"
                    @update:value="taskContentFormStore.setDefaultFieldData(field.field_id, $event)"
                    @update:files="taskContentFormStore.setFiles"

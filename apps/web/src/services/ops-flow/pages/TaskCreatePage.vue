@@ -29,6 +29,8 @@ import {
     PHeadingLayout, PHeading, PButton, PPaneLayout, PSkeleton,
 } from '@cloudforet/mirinae';
 
+import { i18n as _i18n } from '@/translations';
+
 import { queryStringToString } from '@/lib/router-query-string';
 
 import ConfirmBackModal from '@/common/components/modals/ConfirmBackModal.vue';
@@ -40,6 +42,9 @@ import TaskContentBaseForm from '@/services/ops-flow/components/TaskContentBaseF
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
 import TaskFieldsForm from '@/services/ops-flow/task-fields-form/TaskFieldsForm.vue';
+import {
+    useTaskManagementTemplateStore,
+} from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 import type { BoardPageQuery } from '@/services/ops-flow/types/board-page-type';
 import type { TaskCreatePageQueryValue } from '@/services/ops-flow/types/task-create-page-type';
 
@@ -48,6 +53,7 @@ import type { TaskCreatePageQueryValue } from '@/services/ops-flow/types/task-cr
 const taskContentFormStore = useTaskContentFormStore();
 const taskContentFormState = taskContentFormStore.state;
 const taskContentFormGetters = taskContentFormStore.getters;
+const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
 /* route and query */
 const route = useRoute();
@@ -57,7 +63,7 @@ const taskTypeId = computed<TaskCreatePageQueryValue['taskTypeId']>(() => queryS
 
 /* header and back button */
 const loading = false; // computed<boolean>(() => taskCategoryStore.getters.loading);
-const headerTitle = 'Create Ticket'; // computed<string>(() => taskCategoryPageStore.getters.currentCategory?.name ?? 'No Category');
+const headerTitle = computed<string>(() => _i18n.t('OPSFLOW.CREATE_TARGET', { target: taskManagementTemplateStore.templates.Task }));
 const {
     setPathFrom,
     goBack,
@@ -119,7 +125,7 @@ defineExpose({ setPathFrom });
         </p-heading-layout>
         <p-pane-layout class="pt-8 px-4 pb-10 mr-auto flex flex-wrap w-full gap-4">
             <p-heading class="mb-6"
-                       title="Type Information"
+                       :title="$t('OPSFLOW.TASK_BOARD.TYPE_INFO', {type: taskManagementTemplateStore.templates.TaskType})"
                        heading-type="sub"
             />
             <div class="w-full">
@@ -131,13 +137,13 @@ defineExpose({ setPathFrom });
             <p-button style-type="transparent"
                       @click="goBack()"
             >
-                Cancel
+                {{ $t('COMMON.BUTTONS.CANCEL') }}
             </p-button>
             <p-button style-type="primary"
                       :disabled="!taskContentFormGetters.isAllValid"
                       @click="handleConfirm"
             >
-                Confirm
+                {{ $t('COMMON.BUTTONS.CONFIRM') }}
             </p-button>
         </div>
         <!-- modals -->

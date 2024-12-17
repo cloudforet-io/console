@@ -4,14 +4,16 @@ import { computed, watch } from 'vue';
 import { isEqual } from 'lodash';
 
 import {
-    PFieldTitle, PFieldGroup, PSelectDropdown, PPaneLayout, PButton,
+    PFieldTitle, PFieldGroup, PSelectDropdown, PPaneLayout, PButton, PBadge,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
 import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
+import { i18n } from '@/translations';
 
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -25,6 +27,9 @@ import { useTaskAssignStore } from '@/services/ops-flow/stores/task-assign-store
 import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
 import { useTaskDetailPageStore } from '@/services/ops-flow/stores/task-detail-page-store';
 import { useTaskStore } from '@/services/ops-flow/stores/task-store';
+import {
+    useTaskManagementTemplateStore,
+} from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
 const taskContentFormStore = useTaskContentFormStore();
 const taskContentFormState = taskContentFormStore.state;
@@ -33,6 +38,8 @@ const userReferenceStore = useUserReferenceStore();
 const taskAssignStore = useTaskAssignStore();
 const taskStore = useTaskStore();
 const taskDetailPageStore = useTaskDetailPageStore();
+const taskManagementTemplateStore = useTaskManagementTemplateStore();
+const userStore = useUserStore();
 
 /* category */
 const {
@@ -94,9 +101,9 @@ const changeStatus = async (statusId: string) => {
             throw new Error('Origin task is not defined');
         }
         await taskStore.changeStatus(taskContentFormState.originTask.task_id, statusId);
-        showSuccessMessage('Status changed successfully', '');
+        showSuccessMessage(i18n.t('OPSFLOW.ALT_S_UPDATE_TARGET', { target: i18n.t('OPSFLOW.STATUS') }));
     } catch (e) {
-        ErrorHandler.handleRequestError(e, 'Failed to change status');
+        ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ALT_E_UPDATE_TARGET', { target: i18n.t('OPSFLOW.STATUS') }));
     }
 };
 const handleUpdateSelectedStatus = (items) => {
@@ -213,7 +220,7 @@ watch([() => taskContentFormState.currentCategoryId, () => taskContentFormState.
     >
         <div class="base-form-top-wrapper">
             <div class="base-form-field-wrapper">
-                <p-field-group label="Category"
+                <p-field-group :label="taskManagementTemplateStore.templates.TaskCategory"
                                :style-type="taskContentFormState.mode === 'create' ? 'primary' : 'secondary'"
                                required
                                :invalid="invalidState.category"
@@ -229,7 +236,7 @@ watch([() => taskContentFormState.currentCategoryId, () => taskContentFormState.
                 </p-field-group>
             </div>
             <div class="base-form-field-wrapper">
-                <p-field-group label="Type"
+                <p-field-group :label="taskManagementTemplateStore.templates.TaskType"
                                :style-type="taskContentFormState.mode === 'create' ? 'primary' : 'secondary'"
                                required
                                :invalid="invalidState.taskType"
@@ -249,7 +256,7 @@ watch([() => taskContentFormState.currentCategoryId, () => taskContentFormState.
              class="base-form-top-wrapper"
         >
             <div class="base-form-field-wrapper">
-                <p-field-group label="Status"
+                <p-field-group :label="$t('OPSFLOW.STATUS')"
                                style-type="secondary"
                                required
                                :invalid="invalidState.status"
@@ -258,10 +265,25 @@ watch([() => taskContentFormState.currentCategoryId, () => taskContentFormState.
                     <p-select-dropdown :selected="selectedStatusItems"
                                        :handler="statusMenuItemsHandler"
                                        :invalid="invalidState.status"
-                                       :readonly="!taskContentFormGetters.currentCategory"
+                                       :readonly="!userStore.getters.isDomainAdmin || !taskContentFormGetters.currentCategory"
                                        block
                                        @update:selected="handleUpdateSelectedStatus"
-                    />
+                    >
+                        <template #dropdown-button="item">
+                            <p-badge badge-type="subtle"
+                                     :style-type="item.color"
+                            >
+                                {{ item.label }}
+                            </p-badge>
+                        </template>
+                        <template #menu-item--format="{ item }">
+                            <p-badge badge-type="subtle"
+                                     :style-type="item.color"
+                            >
+                                {{ item.label }}
+                            </p-badge>
+                        </template>
+                    </p-select-dropdown>
                 </p-field-group>
             </div>
             <div class="base-form-field-wrapper">
@@ -270,13 +292,14 @@ watch([() => taskContentFormState.currentCategoryId, () => taskContentFormState.
                         <p-field-title size="sm"
                                        color="gray"
                         >
-                            Assign to
+                            {{ userStore.getters.isDomainAdmin ? $t('OPSFLOW.TASK_BOARD.ASSIGN_TO') : $t('OPSFLOW.ASSIGNEE') }}
                         </p-field-title>
-                        <p-button size="sm"
+                        <p-button v-if="userStore.getters.isDomainAdmin"
+                                  size="sm"
                                   style-type="tertiary"
                                   @click="handleClickAssign"
                         >
-                            Assign
+                            {{ $t('OPSFLOW.TASK_BOARD.ASSIGN') }}
                         </p-button>
                     </div>
                     <p class="mt-1 text-label-md text-blue-900">

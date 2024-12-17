@@ -5,7 +5,7 @@ import {
 
 import { isEqual } from 'lodash';
 
-import { PSelectDropdown } from '@cloudforet/mirinae';
+import { PSelectDropdown, PBadge } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
@@ -13,6 +13,9 @@ import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
 import { useTaskStatusField } from '@/services/ops-flow/composables/use-task-status-field';
 import { useTaskTypeField } from '@/services/ops-flow/composables/use-task-type-field';
+import {
+    useTaskManagementTemplateStore,
+} from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 import type { TaskFilters } from '@/services/ops-flow/types/task-filters-type';
 
 const props = defineProps<{
@@ -21,6 +24,7 @@ const props = defineProps<{
 const emit = defineEmits<{(event: 'update', value: TaskFilters): void;
 }>();
 
+const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
 /* task type */
 const {
@@ -86,7 +90,7 @@ watch(taskFilters, (newValue, oldValue) => {
         <p-select-dropdown v-if="props.categoryId"
                            :selected="selectedTaskTypeItems"
                            :handler="taskTypeMenuItemsHandler"
-                           selection-label="Topic"
+                           :selection-label="taskManagementTemplateStore.templates.Task"
                            appearance-type="badge"
                            style-type="rounded"
                            multi-selectable
@@ -97,18 +101,26 @@ watch(taskFilters, (newValue, oldValue) => {
         <p-select-dropdown v-if="props.categoryId"
                            :selected="selectedStatusItems"
                            :handler="statusMenuItemsHandler"
-                           selection-label="Status"
+                           :selection-label="$t('OPSFLOW.STATUS')"
                            appearance-type="badge"
                            style-type="rounded"
                            multi-selectable
                            show-select-marker
                            show-delete-all-button
                            @update:selected="handleUpdateSelectedStatusItems"
-        />
+        >
+            <template #menu-item--format="{ item }">
+                <p-badge badge-type="subtle"
+                         :style-type="item.color"
+                >
+                    {{ item.label }}
+                </p-badge>
+            </template>
+        </p-select-dropdown>
         <project-select-dropdown multi-selectable
                                  project-selectable
                                  :selected-project-ids="selectedProjectIds"
-                                 selection-label="Project"
+                                 :selection-label="$t('OPSFLOW.PROJECT')"
                                  style-type="rounded"
                                  appearance-type="badge"
                                  show-delete-all-button
@@ -117,7 +129,7 @@ watch(taskFilters, (newValue, oldValue) => {
         />
         <user-select-dropdown multi-selectable
                               :user-ids="selectedCreatedBy"
-                              selection-label="Created By"
+                              :selection-label="$t('OPSFLOW.CREATED_BY')"
                               style-type="rounded"
                               appearance-type="badge"
                               selection-type="multiple"
@@ -126,7 +138,7 @@ watch(taskFilters, (newValue, oldValue) => {
         />
         <user-select-dropdown multi-selectable
                               :user-ids="selectedAssignee"
-                              selection-label="Assignee"
+                              :selection-label="$t('OPSFLOW.ASSIGNEE')"
                               style-type="rounded"
                               appearance-type="badge"
                               selection-type="multiple"

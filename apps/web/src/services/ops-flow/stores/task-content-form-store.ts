@@ -8,6 +8,9 @@ import type { TaskField } from '@/schema/opsflow/_types/task-field-type';
 import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
 import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
 import type { TaskModel } from '@/schema/opsflow/task/model';
+import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -21,6 +24,9 @@ import {
     useTaskFieldMetadataStore,
 } from '@/services/ops-flow/task-fields-configuration/stores/use-task-field-metadata-store';
 import type { DefaultTaskFieldId } from '@/services/ops-flow/task-fields-configuration/types/task-field-type-metadata-type';
+import {
+    useTaskManagementTemplateStore,
+} from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
 interface UseTaskContentFormStoreState {
     originTask?: TaskModel;
@@ -48,12 +54,15 @@ interface UseTaskContentFormStoreGetters {
     isDefaultFieldValid: boolean;
     isFieldValid: boolean;
     isAllValid: boolean;
+    isEditable: boolean;
 }
 export const useTaskContentFormStore = defineStore('task-content-form', () => {
     const taskCategoryStore = useTaskCategoryStore();
     const taskTypeStore = useTaskTypeStore();
     const taskStore = useTaskStore();
     const taskFieldMetadataStore = useTaskFieldMetadataStore();
+    const taskManagementTemplateStore = useTaskManagementTemplateStore();
+    const userStore = useUserStore();
 
     const state = reactive<UseTaskContentFormStoreState>({
         originTask: undefined,
@@ -94,6 +103,13 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         isAllValid: computed<boolean>(() => {
             if (state.mode === 'view') return getters.isDefaultFieldValid;
             return state.isBaseFormValid && getters.isDefaultFieldValid && getters.isFieldValid;
+        }),
+        isEditable: computed<boolean>(() => {
+            if (state.mode === 'create') return true;
+            if (!state.originTask) return true;
+            if (userStore.getters.isDomainAdmin) return true;
+            if (state.originTask.created_by === userStore.state.userId) return true;
+            return false;
         }),
     } as unknown as UseTaskContentFormStoreGetters; // HACK: to avoid type error
     const actions = {
@@ -188,11 +204,11 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
                     files: state.files.map((f) => f.file_id),
                     project_id: state.defaultData.project?.[0],
                 });
-                showSuccessMessage('Task created successfully', '');
+                showSuccessMessage(i18n.t('OPSFLOW.ALT_S_CREATE_TARGET', { target: taskManagementTemplateStore.templates.task }), '');
                 state.createTaskLoading = false;
                 return true;
             } catch (e) {
-                ErrorHandler.handleRequestError(e, 'Failed to create task');
+                ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ALT_E_CREATE_TARGET', { target: taskManagementTemplateStore.templates.task }));
                 state.createTaskLoading = false;
                 return false;
             }
@@ -204,10 +220,10 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
                     task_id: state.originTask.task_id,
                     name: state.defaultData.title,
                 });
-                showSuccessMessage('Task updated successfully', '');
+                showSuccessMessage(i18n.t('OPSFLOW.ALT_S_UPDATE_TARGET', { target: taskManagementTemplateStore.templates.task }), '');
                 return true;
             } catch (e) {
-                ErrorHandler.handleRequestError(e, 'Failed to update task');
+                ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ALT_E_UPDATE_TARGET', { target: taskManagementTemplateStore.templates.task }));
                 return false;
             }
         },

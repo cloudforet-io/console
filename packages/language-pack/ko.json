@@ -707,6 +707,7 @@
 			"DONE": "완료",
 			"DOWNLOAD": "다운로드",
 			"EDIT": "수정",
+			"NEXT": "다음",
 			"PDF_DOWNLOAD_BUTTON": {
 				"DESKTOP": "데스크탑",
 				"SUPPORT_PDF_HELP_TEXT": "해당 기능을 지원하지 않는 브라우저 또는 디바이스입니다. {desktop} 환경의 {chrome} 또는 {edge} 브라우저에서 이용해주세요."
@@ -4175,19 +4176,27 @@
 	},
 	"OPSFLOW": {
 		"ADD_TARGET": "{target} 추가",
+		"ALL_CATEGORIES": "모든 카테고리",
 		"ALT_E_ADD_TARGET": "{target} 추가 실패",
+		"ALT_E_ASSIGN": "담당자 할당 실패",
 		"ALT_E_CHANGE_DEFAULT_TARGET": "{target} 기본값 변경 실패",
+		"ALT_E_CREATE_TARGET": "{target} 생성 실패",
 		"ALT_E_DELETE_TARGET": "{target} 삭제 실패",
 		"ALT_E_EDIT_TARGET": "{target} 변경 실패",
+		"ALT_E_UPDATE_TARGET": "{target} 변경 실패",
 		"ALT_S_ADD_TARGET": "{target} 추가 완료",
+		"ALT_S_ASSIGN": "담당자 할당 완료",
 		"ALT_S_CHANGE_DEFAULT_TARGET": "{target} 기본값 변경 완료",
+		"ALT_S_CREATE_TARGET": "{target} 생성 완료",
 		"ALT_S_DELETE_TARGET": "{target} 삭제 완료",
 		"ALT_S_EDIT_TARGET": "{target} 변경 완료",
+		"ALT_S_UPDATE_TARGET": "{target} 변경 완료",
 		"ASSIGNEE": "담당자",
 		"ASSIGNEE_POOL": "담당자 풀",
 		"CATEGORY": "카테고리",
 		"CREATED_AT": "생성일",
 		"CREATED_BY": "생성자",
+		"CREATE_TARGET": "{target} 생성",
 		"DEFAULT": "기본",
 		"DELETE_TARGET": "{target} 삭제",
 		"DELETE_TARGET_CONFIRMATION": "정말 이 {object}{particle} 삭제하시겠습니까?",
@@ -4222,7 +4231,9 @@
 		"FIELD_NAME": "{field} 이름",
 		"KEY": "키",
 		"NAME": "이름",
+		"NO_AVAILABLE_TARGET": "사용 가능한 {target} 없음",
 		"PACKAGE": "패키지",
+		"PROJECT": "프로젝트",
 		"SET_AS_DEFAULT": "기본으로 설정",
 		"STATUS": "상태",
 		"STATUS_COMPLETED": "완료됨",
@@ -4231,7 +4242,13 @@
 		"SUPPORT_PACKAGE": "지원 패키지",
 		"TARGET_LIST": "{target} 목록",
 		"TASK_BOARD": {
-			"TASK_PROGRESS": "태스크 진행상황"
+			"ASSIGN": "할당하기",
+			"ASSIGN_TO": "담당자 할당",
+			"COMMENT": "댓글",
+			"TASK_CONTENT": "내용",
+			"TASK_PROGRESS": "태스크 진행상황",
+			"TYPE_INFO": "{type} 정보",
+			"VIEW_ALL_TASKS": "모든 {tasks} 보기"
 		},
 		"TASK_MANAGEMENT": {
 			"ALT_E_DISABLE_LANDING": "랜딩 페이지 비활성화 실패",
@@ -4274,8 +4291,13 @@
 		"TITLE": "제목",
 		"VALIDATION": {
 			"DUPLICATED": "이미 존재하는 {field}입니다",
+			"FIELD_REQUIRED": "이 필드는 필수입니다",
 			"LENGTH_MAX": "{topic}{particle} {length}자 미만이어야 합니다",
-			"REQUIRED": "{topic}{particle} 필수입니다"
+			"REQUIRED": "{topic}{particle} 필수입니다",
+			"UNSUPPORTED_FIELD_TYPE": "지원되지 않는 필드 타입입니다",
+			"VALUE_ARRAY": "값은 배열이어야 합니다",
+			"VALUE_ONLY_ONE": "값은 하나여야 합니다",
+			"VALUE_STRING": "값은 문자열이어야 합니다"
 		},
 		"WORKSPACE": "워크스페이스"
 	},

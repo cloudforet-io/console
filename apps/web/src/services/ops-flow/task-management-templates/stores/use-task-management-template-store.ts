@@ -29,6 +29,7 @@ interface TaskManagementTemplate {
     TaskBoard: string;
     TaskCategory: string;
     taskTypes: string;
+    taskType: string;
     task: string;
     tasks: string;
 }
