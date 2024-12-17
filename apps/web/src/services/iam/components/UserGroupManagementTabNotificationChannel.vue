@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { computed, reactive, watchEffect } from 'vue';
 
 import {
     PHeadingLayout, PHeading, PButton, PToolboxTable, PBadge,
@@ -11,38 +11,59 @@ import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-const
 import { useUserGroupNotificationChannelPageStore } from '@/services/iam/store/user-group-notification-channel-page-store';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
+
 const userGroupNotificationChannelPageStore = useUserGroupNotificationChannelPageStore();
 const userGroupNotificationChannelPageState = userGroupNotificationChannelPageStore.state;
 
 const userGroupPageStore = useUserGroupPageStore();
+const userGroupPageState = userGroupPageStore.state;
+
+interface ChannelItem {
+  name: string;
+  channel: string;
+  schedule: string;
+  details?: any;
+}
 
 const tableState = reactive({
     fields: computed(() => [
         { name: 'name', label: 'Name' },
-        { name: 'channel', label: 'Channel' },
+        { name: 'channel_id', label: 'Channel' },
         { name: 'schedule', label: 'Schedule' },
         { name: 'details', label: 'Details' },
     ]),
-    items: computed(() => ([
-        {
-            name: 'PMT 멤버 채널로 알림',
-            channel: 'Notify to Member Channel',
-            schedule: 'Custom',
-            details: ['abc@mz.co.kr', 'edf@mz.co.kr'],
-        },
-        {
-            name: '이메일 알림',
-            channel: 'Email',
-            schedule: 'Every Day',
-            details: ['abc@mz.co.kr', 'edf@mz.co.kr'],
-        },
-        {
-            name: '개인 핸드폰',
-            channel: 'SMS',
-            schedule: 'Weekdays',
-            details: ['abc@mz.co.kr', 'edf@mz.co.kr', 'edf@mz.co.kr', 'sss@mz.co.kr', 'a@mz.co.kr', 'test@mz.co.kr'],
-        },
-    ])),
+    items: computed<ChannelItem[]>(() => {
+        const channels = userGroupPageState.userGroups[0]?.notification_channel ?? [];
+        return channels.map((channel) => ({
+            name: channel.name,
+            channel: channel.protocol_id,
+            schedule: channel.schedule,
+            details: '',
+        }));
+    }),
+
+
+    // items: computed(() => ([
+    //     {
+    //         name: 'PMT 멤버 채널로 알림',
+    //         channel: 'Notify to Member Channel',
+    //         schedule: 'Custom',
+    //         details: ['abc@mz.co.kr', 'edf@mz.co.kr'],
+    //     },
+    //     {
+    //         name: '이메일 알림',
+    //         channel: 'Email',
+    //         schedule: 'Every Day',
+    //         details: ['abc@mz.co.kr', 'edf@mz.co.kr'],
+    //     },
+    //     {
+    //         name: '개인 핸드폰',
+    //         channel: 'SMS',
+    //         schedule: 'Weekdays',
+    //         details: ['abc@mz.co.kr', 'edf@mz.co.kr', 'edf@mz.co.kr', 'sss@mz.co.kr', 'a@mz.co.kr', 'test@mz.co.kr'],
+    //     },
+    // ])),
+    // loadedItems: computed(() => fetchUserGroupChannelList()),
 });
 
 /* Component */
@@ -71,6 +92,10 @@ const handleUpdateModal = (modalType: string) => {
         break;
     }
 };
+
+watchEffect(async () => {
+    console.log(userGroupPageState.users.list);
+});
 </script>
 
 <template>

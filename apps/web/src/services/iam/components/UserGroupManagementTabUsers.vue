@@ -87,7 +87,7 @@ watch(() => userGroupPageGetters.selectedUserGroups, async (nv_selectedUserGroup
                 if (user.user_id) return usersIdList.includes(user.user_id);
                 return false;
             });
-        } else if (usersIdList === undefined) {
+        } else {
             userGroupPageState.users.list = [];
             userGroupPageState.users.totalCount = 0;
         }
