@@ -3,6 +3,8 @@ import {
     computed, reactive, ref, watch,
 } from 'vue';
 
+import { cloneDeep } from 'lodash';
+
 import {
     PIconButton, PI, PFieldGroup, PSelectButton, PTextInput, PButton, PTextarea, PButtonModal, PToggleButton, PLink, PFieldTitle,
 } from '@cloudforet/mirinae';
@@ -30,7 +32,7 @@ const emit = defineEmits<{(e: 'update:operator-options', value: EvalOptions): vo
 const dataTableInfo = ref<TransformDataTableInfo>({
     dataTableId: props.originData?.data_table_id,
 });
-const expressionsInfo = ref<EvalOptions['expressions']>(props.originData.expressions || []);
+const expressionsInfo = ref<EvalOptions['expressions']>(cloneDeep(props.originData.expressions) || []);
 
 const CONDITION_PLACEHOLDER = '{{ Product }} == \'A\' & {{ Provider }} == \'B\'';
 const FORMULA_PLACEHOLDER = '{{ Product }}';
@@ -123,7 +125,6 @@ watch([dataTableInfo, expressionsInfo], ([_dataTableInfo, _expressionsInfo]) => 
         data_table_id: _dataTableInfo.dataTableId,
         expressions: _expressionsInfo,
     };
-    console.log(_expressionsInfo, state.proxyOperatorOptions);
 }, { deep: true, immediate: true });
 </script>
 

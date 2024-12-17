@@ -3,6 +3,8 @@ import {
     reactive, ref, watch,
 } from 'vue';
 
+import { cloneDeep } from 'lodash';
+
 import {
     PButton, PIconButton, PTextInput, PFieldTitle, PLink,
 } from '@cloudforet/mirinae';
@@ -30,7 +32,7 @@ const emit = defineEmits<{(e: 'update:operator-options', value: QueryOptions): v
 const dataTableInfo = ref<TransformDataTableInfo>({
     dataTableId: props.originData?.data_table_id,
 });
-const conditionsInfo = ref<QueryOptions['conditions']>(props.originData.conditions);
+const conditionsInfo = ref<QueryOptions['conditions']>(cloneDeep(props.originData.conditions));
 // HACK: remove comments after backend development
 // const operatorInfo = ref<QueryOptions['operator']>(props.originData.operator);
 const state = reactive({

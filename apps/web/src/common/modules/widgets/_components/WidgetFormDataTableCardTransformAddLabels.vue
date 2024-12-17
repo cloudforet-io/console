@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive, ref, watch,
+    onMounted, reactive, ref, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
@@ -38,7 +38,7 @@ const labelsInfo = ref<AddLabelsOptions['labels']>(props.originData.labels);
 const state = reactive({
     proxyOperatorOptions: useProxyValue<AddLabelsOptions>('operator-options', props, emit),
     refinedLabels: [] as AdditionalLabel[],
-    groupByKeys: computed<string[]>(() => []),
+    // groupByKeys: computed<string[]>(() => []),
 });
 
 /* Helper */
@@ -47,9 +47,9 @@ const getInvalidText = (idx: number): TranslateResult|undefined => {
     if (!targetName) {
         return undefined;
     }
-    if (state.groupByKeys.includes(targetName)) {
-        return i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.ADD_LABELS.GROUP_BY_KEY_INVALID');
-    }
+    // if (state.groupByKeys.includes(targetName)) {
+    //     return i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.ADD_LABELS.GROUP_BY_KEY_INVALID');
+    // }
     if (targetName === DATE_FIELD) {
         return i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.ADD_LABELS.DATE_FIELD_INVALID');
     }
@@ -84,7 +84,7 @@ watch(() => state.refinedLabels, (_refinedLabels) => {
             return acc;
         }, {}),
     };
-});
+}, { deep: true });
 
 onMounted(() => {
     state.refinedLabels = Object.entries(labelsInfo.value).map(([name, value]) => ({ name, value }));
