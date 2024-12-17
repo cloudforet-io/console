@@ -4238,6 +4238,8 @@
 				"DELETE_CONFIRMATION_DESC": "이 카테고리 하위에 {tasks}{particle} 존재합니다. 삭제 시엔 {tasks} 수정이 불가합니다. 그래도 정말 삭제하시겠습니까?",
 				"DESC": "이는 {tasks}의 유형을 그룹화한 것입니다. 사용자는 {task}{taskObjectParticle} 제출할 때 적절한 카테고리를 선택하여 담당자가 {tasks}{tasksObjectParticle} 더 효율적으로 관리할 수 있도록 돕습니다."
 			},
+			"ENABLE_LANDING": "랜딩 페이지 활성화",
+			"ENABLE_LANDING_DESC": "랜딩페이지를 사용하면 어떻게 되는지 Description",
 			"PACKAGE": {
 				"ADDED": "추가됨",
 				"AFFECTED_DESC": "영향 받는 {workspace}와 {category}는 다음과 같습니다.",

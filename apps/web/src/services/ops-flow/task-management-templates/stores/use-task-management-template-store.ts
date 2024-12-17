@@ -7,7 +7,7 @@ import { APIError } from '@cloudforet/core-lib/space-connector/error';
 
 import { i18n, type SupportLanguage } from '@/translations';
 
-import { useDomainConfigStore } from '@/store/domain/domain-config-store';
+import { useSharedConfigStore } from '@/store/domain/shared-config-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -36,10 +36,10 @@ const messages: Record<SupportLanguage, TaskManagementTemplate> = {
     ko: ko as unknown as TaskManagementTemplate,
 };
 
-interface DomainConfigTemplateData {
+interface TemplateData {
     template_id: TaskManagementTemplateType;
 }
-interface DomainConfigLandingData {
+interface LandingData {
     enabled: boolean;
 }
 interface UseTaskManagementTemplateStoreState {
@@ -47,11 +47,11 @@ interface UseTaskManagementTemplateStoreState {
     enableLanding: boolean;
 }
 export const useTaskManagementTemplateStore = defineStore('task-management-template', () => {
-    const domainConfigStore = useDomainConfigStore();
-    const domainConfigStoreGetters = domainConfigStore.getters;
+    const sharedConfigStore = useSharedConfigStore();
+    const sharedConfigStoreGetters = sharedConfigStore.getters;
 
-    const templateData = toRef(domainConfigStoreGetters, 'TASK_TEMPLATE') as unknown as Ref<DomainConfigTemplateData|undefined>;
-    const landingData = toRef(domainConfigStoreGetters, 'TASK_LANDING') as unknown as Ref<DomainConfigLandingData|undefined>;
+    const templateData = toRef(sharedConfigStoreGetters, 'TASK_TEMPLATE') as unknown as Ref<TemplateData|undefined>;
+    const landingData = toRef(sharedConfigStoreGetters, 'TASK_LANDING') as unknown as Ref<LandingData|undefined>;
 
     const state = reactive<UseTaskManagementTemplateStoreState>({
         templateId: 'default',
@@ -75,7 +75,7 @@ export const useTaskManagementTemplateStore = defineStore('task-management-templ
             return;
         }
         try {
-            const res = await domainConfigStore.get<DomainConfigTemplateData>('TASK_TEMPLATE');
+            const res = await sharedConfigStore.get<TemplateData>('TASK_TEMPLATE');
             state.templateId = res.data.template_id ?? 'default';
         } catch (e) {
             if (e instanceof APIError && e.status === 404) return;
@@ -86,7 +86,7 @@ export const useTaskManagementTemplateStore = defineStore('task-management-templ
         const prev = state.templateId;
         state.templateId = templateId;
         try {
-            await domainConfigStore.set<DomainConfigTemplateData>('TASK_TEMPLATE', { template_id: templateId });
+            await sharedConfigStore.set<TemplateData>('TASK_TEMPLATE', { template_id: templateId });
         } catch (e) {
             ErrorHandler.handleError(e);
             state.templateId = prev;
@@ -98,7 +98,7 @@ export const useTaskManagementTemplateStore = defineStore('task-management-templ
             return;
         }
         try {
-            const res = await domainConfigStore.get<DomainConfigLandingData>('TASK_LANDING');
+            const res = await sharedConfigStore.get<LandingData>('TASK_LANDING');
             state.enableLanding = res.data.enabled ?? false;
         } catch (e) {
             if (e instanceof APIError && e.status === 404) return;
@@ -110,7 +110,7 @@ export const useTaskManagementTemplateStore = defineStore('task-management-templ
         const prev = state.enableLanding;
         state.enableLanding = enabled;
         try {
-            await domainConfigStore.set<DomainConfigLandingData>('TASK_LANDING', { enabled });
+            await sharedConfigStore.set<LandingData>('TASK_LANDING', { enabled });
         } catch (e) {
             ErrorHandler.handleError(e);
             state.enableLanding = prev;

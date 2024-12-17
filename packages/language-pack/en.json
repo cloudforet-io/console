@@ -4238,6 +4238,8 @@
 				"DELETE_CONFIRMATION_DESC": "There are {tasks} under this category. Once deleted, the {tasks} cannot be edited. Are you sure you want to proceed?",
 				"DESC": "This groups types of {tasks}. Users select the appropriate category when submitting a {task}, helping the assignee manage {tasks} more efficiently."
 			},
+			"ENABLE_LANDING": "Enagle Landing Page",
+			"ENABLE_LANDING_DESC": "Landing Page Description...",
 			"PACKAGE": {
 				"ADDED": "Added",
 				"AFFECTED_DESC": "The affected {workspace} and {category} are as follows.",
