@@ -40,7 +40,7 @@ const Template: Story = {
                     :maxWidth="maxWidth"
                     :enableDoubleClickResize="enableDoubleClickResize">
                     <template #sidebar>
-                      Left LayoutLeft
+                        Left Layout
                     </template>
                     <template #default>
                         Right Layout

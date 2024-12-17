@@ -90,7 +90,7 @@ const handleSelectDropdownItem = (selected: AuthType|LocalType) => {
 const getUserList = async () => {
     let isNew = userPageState.isAdminMode || userPageState.afterWorkspaceCreated;
     try {
-        const trimmedText = formState.searchText?.trim();
+        const trimmedText = formState.searchText.trim();
         if (userPageState.isAdminMode || userPageState.afterWorkspaceCreated) {
             await fetchGetUsers(trimmedText);
         } else {
@@ -157,7 +157,7 @@ const initAuthTypeList = async () => {
 };
 const addSelectedItem = (isNew: boolean) => {
     if (!formState.searchText) return;
-    const trimmedText = formState.searchText?.trim();
+    const trimmedText = formState.searchText.trim();
     if (state.selectedItems.some((item) => item.name === trimmedText && item.auth_type === formState.selectedMenuItem)) return;
 
     state.selectedItems.unshift({
@@ -202,7 +202,7 @@ const fetchGetWorkspaceUsers = async (userId: string) => {
     });
     updateValidationState(i18n.t('IAM.USER.FORM.USER_ID_INVALID_WORKSPACE', { userId }));
 };
-const fetchGetUsers = async (userId: string) : Promise<any> => {
+const fetchGetUsers = async (userId: string) => {
     await SpaceConnector.clientV2.identity.user.get<UserGetParameters, UserModel>({
         user_id: userId,
     });
