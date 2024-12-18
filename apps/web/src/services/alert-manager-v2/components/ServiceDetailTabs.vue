@@ -87,8 +87,8 @@ onUnmounted(() => {
                     </p-tab>
                 </template>
             </p-horizontal-layout>
-            <service-detail-tabs-webhook-detail-tabs v-if="state.selectedWebhook[0]"
-                                                     :selected-webhook="state.selectedWebhook[0]"
+            <service-detail-tabs-webhook-detail-tabs v-if="state.selectedWebhook"
+                                                     :selected-webhook="state.selectedWebhook"
             />
             <service-detail-tabs-notifications-detail-tabs v-else-if="state.selectedNotifications[0]"
                                                            :selected-notifications="state.selectedNotifications[0]"

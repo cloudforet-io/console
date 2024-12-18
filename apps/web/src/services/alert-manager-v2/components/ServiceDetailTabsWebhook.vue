@@ -51,7 +51,7 @@ const props = withDefaults(defineProps<Props>(), {
     selectedItem: undefined,
 });
 
-const emit = defineEmits<{(e: 'update:selected-item', value: string[]): void;
+const emit = defineEmits<{(e: 'update:selected-item', value: WebhookModel[]): void;
 }>();
 
 const allReferenceStore = useAllReferenceStore();
@@ -69,13 +69,13 @@ const tableState = reactive({
             type: 'item',
             name: 'enable',
             label: _i18n.t('ALERT_MANAGER.ENABLE'),
-            disabled: state.proxySelectedItem[0]?.state === WEBHOOK_STATE.ENABLED,
+            disabled: state.items[state.selectIndex[0]]?.state === WEBHOOK_STATE.ENABLED,
         },
         {
             type: 'item',
             name: 'disable',
             label: _i18n.t('ALERT_MANAGER.DISABLED'),
-            disabled: state.proxySelectedItem[0]?.state === WEBHOOK_STATE.DISABLED,
+            disabled: state.items[state.selectIndex[0]]?.state === WEBHOOK_STATE.DISABLED,
         },
         { type: 'divider' },
         {
@@ -99,8 +99,8 @@ const state = reactive({
     items: [] as WebhookModel[],
     totalCount: 0,
     selectIndex: [],
-    proxySelectedItem: useProxyValue<WebhookModel[]>('selectedItem', props, emit),
-    isSelectedItem: computed<number>(() => state.proxySelectedItem?.length),
+    isSelectedItem: computed<number>(() => state.selectIndex?.length),
+    proxySelectedItem: useProxyValue<string>('selectedItem', props, emit),
     fields: WEBHOOK_MANAGEMENT_TABLE_FIELDS,
 });
 
@@ -134,7 +134,7 @@ const handleExportExcel = async () => {
     });
 };
 const handleSelectTableRow = (selectedItems: number[]) => {
-    state.proxySelectedItem = selectedItems.map((i) => state.items[i].webhook_id);
+    state.proxySelectedItem = state.items[selectedItems[0]].webhook_id;
 };
 
 const fetchWebhookList = async () => {

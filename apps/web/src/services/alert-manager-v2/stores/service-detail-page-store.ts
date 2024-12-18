@@ -1,3 +1,4 @@
+import type { ComputedRef } from 'vue';
 import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
@@ -26,17 +27,20 @@ interface ServiceFormStoreState {
     serviceList: ServiceModel[];
     notificationProtocolList: NotificationProtocolModel[];
 }
+interface ServiceFormStoreGetters {
+    serviceInfo: ComputedRef<Service>;
+}
 
 export const useServiceDetailPageStore = defineStore('page-service-detail', () => {
     const state = reactive<ServiceFormStoreState>({
         loading: false,
         currentTab: SERVICE_DETAIL_TABS.OVERVIEW,
         serviceInfo: {} as ServiceModel,
-        serviceList: [] as ServiceModel[],
-        notificationProtocolList: [] as NotificationProtocolModel[],
+        serviceList: [],
+        notificationProtocolList: [],
     });
 
-    const getters = reactive({
+    const getters = reactive<ServiceFormStoreGetters>({
         serviceInfo: computed<Service>(() => ({
             ...state.serviceInfo,
             members: {
@@ -48,10 +52,10 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
                 recovery_mode: state.serviceInfo.options?.recovery_mode || RECOVERY_MODE.MANUAL,
             },
             alerts: {
-                TRIGGERED: state.serviceInfo.alerts?.TRIGGERED,
-                ACKNOWLEDGED: state.serviceInfo.alerts?.ACKNOWLEDGED,
-                RESOLVED: state.serviceInfo.alerts?.RESOLVED,
-                TOTAL: state.serviceInfo.alerts?.TOTAL,
+                TRIGGERED: state.serviceInfo.alerts?.TRIGGERED || { high: 0, low: 0 },
+                ACKNOWLEDGED: state.serviceInfo.alerts?.ACKNOWLEDGED || { high: 0, low: 0 },
+                RESOLVED: state.serviceInfo.alerts?.RESOLVED || { high: 0, low: 0 },
+                TOTAL: state.serviceInfo.alerts?.TOTAL || { high: 0, low: 0 },
             },
         })),
     });
