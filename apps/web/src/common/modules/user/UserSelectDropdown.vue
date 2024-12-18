@@ -19,6 +19,8 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { UserGroupReferenceMap } from '@/store/reference/user-group-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
+import type { SelectedUserDropdownIdsType } from '@/common/modules/user/typte';
+
 import { indigo } from '@/styles/colors';
 
 interface DropdownItem extends SelectDropdownMenuItem {
@@ -33,8 +35,8 @@ type DropdownCategoriesType = {
 };
 
 const props = withDefaults(defineProps<{
-     selectedId?: string;
-     selectedIds?: string[];
+     selectedId?: SelectedUserDropdownIdsType;
+     selectedIds?: SelectedUserDropdownIdsType[];
      selectionType?: 'single'|'multiple';
      useFixedMenuStyle?: boolean;
      invalid?: boolean;
@@ -46,8 +48,8 @@ const props = withDefaults(defineProps<{
      showUserGroupList?: boolean;
      showCategoryTitle?: boolean;
 }>(), {
-    selectedId: '',
-    selectedIds: () => [],
+    selectedId: undefined,
+    selectedIds: undefined,
     selectionType: 'single',
     useFixedMenuStyle: false,
     invalid: false,
@@ -59,8 +61,8 @@ const props = withDefaults(defineProps<{
     showCategoryTitle: true,
 });
 
-const emit = defineEmits<{(event: 'update:selected-ids', value: string[]): void;
-    (event: 'update:selected-id', value: string): void;
+const emit = defineEmits<{(event: 'update:selected-ids', value: SelectedUserDropdownIdsType[]): void;
+    (event: 'update:selected-id', value?: SelectedUserDropdownIdsType): void;
 }>();
 
 const allReferenceStore = useAllReferenceStore();
@@ -144,15 +146,15 @@ const menuItemsHandler = (): AutocompleteHandler => async (keyword: string, page
     });
 };
 
-const currentUserIds = computed<string[]>(() => state.selectedItems.map((item) => item.name));
-const currentUserId = computed<string | undefined>(() => currentUserIds.value[0]);
+const currentUserIds = computed<SelectedUserDropdownIdsType[]>(() => state.selectedItems.map((item) => ({ value: item.name, type: checkUserGroup(item.name) ? 'USER_GROUP' : 'USER' })));
+const currentUserId = computed<SelectedUserDropdownIdsType|undefined>(() => ({ value: state.selectedItems[0]?.name, type: checkUserGroup(state.selectedItems[0]?.name) ? 'USER_GROUP' : 'USER' }));
 
 const handleUpdateSelectedUserItems = (selectedUsers: SelectDropdownMenuItem[]) => {
     if (isEqual(selectedUsers, state.selectedItems)) return; // prevent unnecessary update
     state.selectedItems = selectedUsers; // it updates currentUserId and currentUserIds automatically
     if (props.selectionType === 'single') {
-        if (currentUserId.value === props.selectedId) return; // prevent unnecessary update
-        emit('update:selected-id', selectedUsers[0]?.name ?? '');
+        if (currentUserId?.value === props.selectedId) return; // prevent unnecessary update
+        emit('update:selected-id', currentUserId?.value);
     } else {
         if (isEqual(currentUserIds.value, props.selectedIds)) return; // prevent unnecessary update
         emit('update:selected-ids', currentUserIds.value);
@@ -162,19 +164,19 @@ const handleTagDelete = (idx: number) => {
     state.selectedItems.splice(idx, 1);
     emit('update:selected-ids', currentUserIds.value);
 };
-const initSingleType = (_userId?: string) => {
-    if (currentUserId.value !== _userId) {
-        state.selectedItems = _userId
-            ? [{ name: _userId, label: storeState.userReferenceMap[_userId]?.label ?? _userId }]
+const initSingleType = (_userId?: SelectedUserDropdownIdsType) => {
+    if (currentUserId?.value !== _userId?.value) {
+        state.selectedItems = _userId?.value
+            ? [{ name: _userId?.value, label: storeState.userReferenceMap[_userId?.value]?.label ?? _userId?.value }]
             : [];
     }
 };
-const initMultipleType = (_userIds?: string[]) => {
+const initMultipleType = (_userIds?: SelectedUserDropdownIdsType[]) => {
     if (!Array.isArray(_userIds)) throw new Error('userIds should be an array');
     if (!isEqual(currentUserIds.value, _userIds)) {
         state.selectedItems = _userIds.map((userId) => ({
-            name: userId,
-            label: storeState.userReferenceMap[userId]?.label ?? userId,
+            name: userId.value,
+            label: storeState.userReferenceMap[userId.value]?.label ?? userId.value,
         }));
     }
 };
@@ -182,7 +184,7 @@ const checkUserGroup = (id: string): boolean => state.allUserGroupItems.some((i)
 
 watch([() => props.selectedId, () => props.selectedIds], ([newUserId, newUserIds]) => {
     if (props.selectionType === 'single') {
-        if (currentUserId.value === newUserId) return; // prevent infinite loop
+        if (currentUserId?.value === newUserId) return; // prevent infinite loop
         initSingleType(newUserId);
     } else {
         if (isEqual(currentUserIds.value, newUserIds)) return; // prevent infinite loop
