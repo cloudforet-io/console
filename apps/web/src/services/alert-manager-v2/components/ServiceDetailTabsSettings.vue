@@ -6,14 +6,18 @@ import {
     PHeading, PHeadingLayout, PCard, PIconButton, PI,
 } from '@cloudforet/mirinae';
 
+import { NOTIFICATION_URGENCY, RECOVERY_MODE } from '@/schema/alert-manager/service/constants';
+import type { NotificationUrgencyType, RecoveryModeType } from '@/schema/alert-manager/service/type';
 import { i18n } from '@/translations';
 
 import { red } from '@/styles/colors';
 
 import ServiceDetailTabsSettingsEscalationPolicy
     from '@/services/alert-manager-v2/components/ServiceDetailTabsSettingsEscalationPolicy.vue';
+import ServiceDetailTabsSettingsModal from '@/services/alert-manager-v2/components/ServiceDetailTabsSettingsModal.vue';
 import { SERVICE_SETTING_CARD } from '@/services/alert-manager-v2/constants/alert-manager-constant';
-import type { ServiceDetailSettingCardType } from '@/services/alert-manager-v2/types/alert-manager-type';
+import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
+import type { ServiceDetailSettingCardType, Service } from '@/services/alert-manager-v2/types/alert-manager-type';
 
 type CardItemType = {
     title: TranslateResult,
@@ -21,9 +25,19 @@ type CardItemType = {
 };
 type CardValueInfoType = {
     icon?: string,
+    iconColor?: string,
     text: TranslateResult
 };
+
+const serviceDetailPageStore = useServiceDetailPageStore();
+const serviceDetailPageGetters = serviceDetailPageStore.getters;
+
+const storeState = reactive({
+    serviceInfo: computed<Service>(() => serviceDetailPageGetters.serviceInfo),
+});
 const state = reactive({
+    selectModalVisible: false,
+    modalType: undefined as ServiceDetailSettingCardType|undefined,
     settingCardItems: computed<CardItemType[]>(() => [
         {
             title: i18n.t('ALERT_MANAGER.NOTIFICATIONS.NOTIFICATION_POLICY'),
@@ -38,9 +52,9 @@ const state = reactive({
             type: SERVICE_SETTING_CARD.RULE_SET,
         },
     ]),
+    notificationPolicy: computed<NotificationUrgencyType>(() => storeState.serviceInfo.options.notification_urgency),
+    autoRecovery: computed<RecoveryModeType>(() => storeState.serviceInfo.options.recovery_mode),
     // TODO: temp data
-    notificationPolicy: 'ALL',
-    autoRecovery: 'MANUAL',
     ruleSet: 3,
 });
 
@@ -53,12 +67,13 @@ const getCardValueInfo = (type: ServiceDetailSettingCardType): CardValueInfoType
 };
 const getNotificationPolicy = (): CardValueInfoType|undefined => {
     switch (state.notificationPolicy) {
-    case 'ALL': return {
+    case NOTIFICATION_URGENCY.ALL: return {
         icon: 'ic_gnb_bell',
         text: i18n.t('ALERT_MANAGER.NOTIFICATIONS.ALL_NOTIFICATIONS'),
     };
-    case 'HIGH_ONLY': return {
+    case NOTIFICATION_URGENCY.HIGH_ONLY: return {
         icon: 'ic_error-filled',
+        iconColor: red[400],
         text: i18n.t('ALERT_MANAGER.NOTIFICATIONS.HIGH_NOTIFICATIONS_ONLY'),
     };
     default: return undefined;
@@ -66,19 +81,21 @@ const getNotificationPolicy = (): CardValueInfoType|undefined => {
 };
 const getAutoRecovery = (): CardValueInfoType|undefined => {
     switch (state.autoRecovery) {
-    case 'AUTO': return {
+    case RECOVERY_MODE.AUTO: return {
         icon: 'ic_automation',
         text: i18n.t('ALERT_MANAGER.ALERTS.AUTO_RESOLVE_ALERTS'),
     };
-    case 'MANUAL': return {
+    case RECOVERY_MODE.MANUAL: return {
         icon: 'ic_edit-text',
         text: i18n.t('ALERT_MANAGER.ALERTS.MANUALLY'),
     };
     default: return undefined;
     }
 };
-const handleClickEditButton = () => {
-    console.log('TODO: handleClickEditButton');
+const handleClickEditButton = (type: ServiceDetailSettingCardType) => {
+    if (type === SERVICE_SETTING_CARD.RULE_SET) return;
+    state.selectModalVisible = true;
+    state.modalType = type;
 };
 </script>
 
@@ -104,7 +121,7 @@ const handleClickEditButton = () => {
                             <p-icon-button name="ic_edit"
                                            width="2rem"
                                            height="2rem"
-                                           @click="handleClickEditButton"
+                                           @click="handleClickEditButton(item.type)"
                             />
                         </div>
                         <div class="flex items-center justify-center h-12 bg-gray-100 rounded-md">
@@ -112,12 +129,12 @@ const handleClickEditButton = () => {
                                 <p-i v-if="item.type !== SERVICE_SETTING_CARD.RULE_SET"
                                      class="icon"
                                      :name="getCardValueInfo(item.type)?.icon"
-                                     :color="getCardValueInfo(item.type)?.text === 'HIGH_ONLY' ? red[400] : 'inherit'"
+                                     :color="getCardValueInfo(item.type)?.iconColor || 'inherit'"
                                      height="1rem"
                                      width="1rem"
                                 />
                                 <b v-else>{{ state.ruleSet }}</b>
-                                <span>{{ getCardValueInfo(item.type).text }}</span>
+                                <span class="text-label-md">{{ getCardValueInfo(item.type).text }}</span>
                             </div>
                         </div>
                     </div>
@@ -125,5 +142,9 @@ const handleClickEditButton = () => {
             </div>
             <service-detail-tabs-settings-escalation-policy />
         </div>
+        <service-detail-tabs-settings-modal v-if="state.selectModalVisible"
+                                            :visible.sync="state.selectModalVisible"
+                                            :type="state.modalType"
+        />
     </div>
 </template>
