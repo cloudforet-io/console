@@ -20,6 +20,7 @@ export const useServiceCreateFormStore = defineStore('service-create-form', () =
     const state = reactive<ServiceFormStoreState>({
         currentStep: 1,
         currentSubStep: 1,
+        // service
         createdServiceId: '',
         // webhook
         selectedWebhookType: undefined,

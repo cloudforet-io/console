@@ -35,7 +35,6 @@ const state = reactive({
 });
 
 const handleCreateWebhook = async () => {
-    console.log('TODO: API check');
     try {
         const createdWebhookInfo = await SpaceConnector.clientV2.alertManager.webhook.create<WebhookCreateParameters, WebhookModel>({
             name: storeState.webhookName,
