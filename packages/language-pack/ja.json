@@ -30,6 +30,7 @@
 			"LABEL_URGENCY": "緊急度",
 			"LOW": "低い",
 			"MANUALLY": "手動で行います。",
+			"MEMBERS": "構成員",
 			"MODAL_DELETE_ALERT": "",
 			"MODAL_DELETE_NOTE": "選択した項目を削除しますか？",
 			"MODAL_EDIT_ALERT": "アラート名を修正",
@@ -1287,6 +1288,10 @@
 			"SELECT_NO_PROJECT": "プロジェクトを選択しない",
 			"SELECT_PROJECT": "プロジェクト選択",
 			"TITLE": "プロジェクト変更"
+		},
+		"USER_SELECT_DROPDOWN": {
+			"USER": "ユーザー",
+			"USER_GROUP": ""
 		},
 		"WIDGETS": {
 			"ACTUAL": "実際のサイズ",

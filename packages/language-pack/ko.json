@@ -30,6 +30,7 @@
 			"LABEL_URGENCY": "긴급도",
 			"LOW": "낮음",
 			"MANUALLY": "직접 완료합니다.",
+			"MEMBERS": "멤버",
 			"MODAL_DELETE_ALERT": "",
 			"MODAL_DELETE_NOTE": "선택한 항목을 삭제하시겠습니까?",
 			"MODAL_EDIT_ALERT": "얼럿 이름 수정",
@@ -1287,6 +1288,10 @@
 			"SELECT_NO_PROJECT": "프로젝트 선택 안 함",
 			"SELECT_PROJECT": "프로젝트 선택",
 			"TITLE": "프로젝트 변경"
+		},
+		"USER_SELECT_DROPDOWN": {
+			"USER": "사용자",
+			"USER_GROUP": ""
 		},
 		"WIDGETS": {
 			"ACTUAL": "실제 크기",
