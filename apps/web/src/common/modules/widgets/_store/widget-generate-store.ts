@@ -185,7 +185,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 const result = await fetcher(parameters);
                 state.dataTables.push(result);
                 return result;
-            } catch (e) {
+            } catch (e: any) {
                 setDataTableCreateLoading(false); // DataTable Loading Failed Case
                 showErrorMessage(e.message, e);
                 ErrorHandler.handleError(e);
