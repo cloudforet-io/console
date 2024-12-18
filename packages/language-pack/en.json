@@ -141,6 +141,7 @@
 		"STATUS": "Status",
 		"UPDATE": "Update",
 		"WEBHOOK": {
+			"ALT_S_CREATE_WEBHOOK": "Webhook successfully created",
 			"BASE_INFO_TITLE": "Base Information",
 			"COPY_WEBHOOK_URL": "Copy the Webhook URL",
 			"CREATE_DESC": "Now, Copy the Webhook URL and follow {guide}",

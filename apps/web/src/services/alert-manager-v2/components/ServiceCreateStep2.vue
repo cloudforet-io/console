@@ -1,6 +1,17 @@
 <script setup lang="ts">
 import { computed, onUnmounted, reactive } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import type { WebhookCreateParameters } from '@/schema/alert-manager/webhook/api-verbs/create';
+import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
+import type { PluginModel } from '@/schema/repository/plugin/model';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import ServiceCreateStepContainer from '@/services/alert-manager-v2/components/ServiceCreateStepContainer.vue';
 import WebhookCreateForm from '@/services/alert-manager-v2/components/WebhookCreateForm.vue';
 import WebhookCreateSuccessMode
@@ -14,20 +25,33 @@ const serviceFormState = serviceFormStore.state;
 
 const storeState = reactive({
     currentSubStep: computed<number>(() => serviceFormState.currentSubStep),
-    selectedWebhookTypeId: computed<string>(() => serviceFormState.selectedWebhookType?.plugin_id || ''),
+    selectedWebhookType: computed<PluginModel|undefined>(() => serviceFormState.selectedWebhookType),
     webhookName: computed<string>(() => serviceFormState.webhookName || ''),
+    createdServiceId: computed<string>(() => serviceFormState.createdServiceId),
 });
 const state = reactive({
     isAllFormValid: computed(() => {
-        if (storeState.currentSubStep === 1) return storeState.selectedWebhookTypeId !== '';
+        if (storeState.currentSubStep === 1) return storeState.selectedWebhookType?.plugin_id !== '';
         if (storeState.currentSubStep === 2) return storeState.webhookName !== '';
         return true;
     }),
 });
 
 const handleCreateWebhook = async () => {
-    console.log('TODO: handleCreateWebhook');
-    serviceFormStore.setCurrentSubStep(3);
+    try {
+        const createdWebhookInfo = await SpaceConnector.clientV2.alertManager.webhook.create<WebhookCreateParameters, WebhookModel>({
+            name: storeState.webhookName,
+            plugin_info: {
+                plugin_id: storeState.selectedWebhookType?.plugin_id || '',
+            },
+            service_id: storeState.createdServiceId,
+        });
+        showSuccessMessage(i18n.t('ALERT_MANAGER.WEBHOOK.ALT_S_CREATE_WEBHOOK'), '');
+        serviceFormStore.setCreatedWebhookInfo(createdWebhookInfo);
+        serviceFormStore.setCurrentSubStep(3);
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
+    }
 };
 
 onUnmounted(() => {
@@ -37,7 +61,7 @@ onUnmounted(() => {
 
 <template>
     <service-create-step-container class="service-create-step2"
-                                   :selected-item-id="storeState.selectedWebhookTypeId"
+                                   :selected-item-id="storeState.selectedWebhookType?.plugin_id || ''"
                                    :is-all-form-valid="state.isAllFormValid"
                                    @create="handleCreateWebhook"
     >

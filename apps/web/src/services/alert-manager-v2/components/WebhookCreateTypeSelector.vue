@@ -60,6 +60,7 @@ onMounted(async () => {
                        :key="`webhook-${index}`"
                        v-model="state.selectedWebhookType"
                        :value="item"
+                       :show-select-marker="false"
                        class="card"
                        @change="handleSelectWebhook"
         >

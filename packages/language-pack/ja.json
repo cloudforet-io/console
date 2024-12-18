@@ -141,6 +141,7 @@
 		"STATUS": "ステータス",
 		"UPDATE": "編集",
 		"WEBHOOK": {
+			"ALT_S_CREATE_WEBHOOK": "",
 			"BASE_INFO_TITLE": "基本情報",
 			"COPY_WEBHOOK_URL": "Webhook URLをコピー",
 			"CREATE_DESC": "ウェブフックURLをコピーした後、{guide}を参照して設定してください。",

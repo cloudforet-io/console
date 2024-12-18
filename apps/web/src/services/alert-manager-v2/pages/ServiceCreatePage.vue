@@ -31,9 +31,19 @@ const state = reactive({
             };
         }
         if (storeState.step === 2) {
+            if (storeState.subStep === 1) {
+                return {
+                    title: i18n.t('ALERT_MANAGER.SERVICE.INTEGRATE_TOOL_TITLE'),
+                    desc: i18n.t('ALERT_MANAGER.SERVICE.INTEGRATE_TOOL_DESC'),
+                };
+            }
+            if (storeState.subStep === 2) {
+                return {
+                    title: i18n.t('ALERT_MANAGER.SERVICE.CREATE_WEBHOOK_TITLE'),
+                };
+            }
             return {
-                title: i18n.t('ALERT_MANAGER.SERVICE.INTEGRATE_TOOL_TITLE'),
-                desc: i18n.t('ALERT_MANAGER.SERVICE.INTEGRATE_TOOL_DESC'),
+                title: i18n.t('ALERT_MANAGER.WEBHOOK.CREATE_SUCCESS_TITLE'),
             };
         }
         return {

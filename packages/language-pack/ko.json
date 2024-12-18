@@ -141,6 +141,7 @@
 		"STATUS": "상태",
 		"UPDATE": "수정",
 		"WEBHOOK": {
+			"ALT_S_CREATE_WEBHOOK": "",
 			"BASE_INFO_TITLE": "기본 정보",
 			"COPY_WEBHOOK_URL": "웹훅 URL 복사하기 ",
 			"CREATE_DESC": "웹훅 URL을 복사한 후, {guide}를 참고하여 설정해 주세요.",

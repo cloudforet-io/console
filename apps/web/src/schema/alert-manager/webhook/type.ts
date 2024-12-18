@@ -6,8 +6,7 @@ export type WebhookPluginInfoType = {
     plugin_id: string;
     version?: string;
     options?: Record<string, any>;
-    metadata: Record<string, any>;
-    secret_id: string;
+    metadata?: Record<string, any>;
     upgrade_mode?: 'AUTO' | 'MANUAL';
 };
 
