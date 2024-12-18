@@ -100,6 +100,7 @@
 			"TOPIC": "Topic"
 		},
 		"SERVICE": {
+			"ALT_S_CREATE_SERVICE": "Service successfully created",
 			"ALT_S_INVITE_MEMBER": "Member successfully invited",
 			"CREATE_SERVICE_DESC": "Provide a name for your technical service that clearly identifies a specific component of your tech stack to monitor, manage on-call responsibilities, and manually raise incidents for.",
 			"CREATE_SERVICE_TITLE": "Create New Service",
