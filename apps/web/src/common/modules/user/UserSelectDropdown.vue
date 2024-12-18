@@ -99,7 +99,7 @@ const state = reactive({
         }
         return Object.values(storeState.userReferenceMap).map((u: UserReferenceMap[string]) => ({
             name: u.key,
-            label: u.label || u.name || u.key,
+            label: u.key,
             userName: u.name,
         })).sort((a, b) => a.label.localeCompare(b.label));
     }),
