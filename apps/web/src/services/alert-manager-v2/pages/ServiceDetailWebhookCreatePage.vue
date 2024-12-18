@@ -4,10 +4,17 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButton, PCenteredLayoutHeader } from '@cloudforet/mirinae';
 
+import type { WebhookCreateParameters } from '@/schema/alert-manager/webhook/api-verbs/create';
+import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
+import type { PluginModel } from '@/schema/repository/plugin/model';
 import { i18n } from '@/translations';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import WebhookCreateForm from '@/services/alert-manager-v2/components/WebhookCreateForm.vue';
@@ -33,6 +40,7 @@ const router = useRouter();
 const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
+    selectedWebhookType: computed<PluginModel|undefined>(() => serviceCreateFormState.selectedWebhookType),
     selectedWebhookTypeId: computed<string>(() => serviceCreateFormState.selectedWebhookType?.plugin_id || ''),
     webhookName: computed<string>(() => serviceCreateFormState.webhookName || ''),
 });
@@ -45,13 +53,13 @@ const state = reactive({
     headerInfo: computed<createHeaderInfoByStep>(() => {
         if (state.currentStep === 1) {
             return {
-                title: i18n.t('ALERT_MANAGER.SERVICE.INTEGRATE_TOOL_TITLE'),
+                title: i18n.t('ALERT_MANAGER.SERVICE.CREATE_WEBHOOK_TITLE'),
                 desc: i18n.t('ALERT_MANAGER.SERVICE.INTEGRATE_TOOL_DESC'),
             };
         }
         if (state.currentStep === 2) {
             return {
-                title: i18n.t('ALERT_MANAGER.SERVICE.INTEGRATE_TOOL_TITLE'),
+                title: i18n.t('ALERT_MANAGER.SERVICE.CREATE_WEBHOOK_TITLE'),
             };
         }
         return {
@@ -88,9 +96,20 @@ const handleActionButton = () => {
     fetchCreateWebhook();
 };
 
-const fetchCreateWebhook = () => {
-    console.log('TODO: fetchCreateWebhook');
-    state.currentStep = 3;
+const fetchCreateWebhook = async () => {
+    try {
+        await SpaceConnector.clientV2.alertManager.webhook.create<WebhookCreateParameters, WebhookModel>({
+            name: storeState.webhookName,
+            plugin_info: {
+                plugin_id: storeState.selectedWebhookType?.plugin_id || '',
+            },
+            service_id: props.serviceId,
+        });
+        showSuccessMessage(i18n.t('ALERT_MANAGER.WEBHOOK.ALT_S_CREATE_WEBHOOK'), '');
+        state.currentStep = 3;
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
+    }
 };
 
 onUnmounted(() => {
@@ -114,31 +133,29 @@ onUnmounted(() => {
         <webhook-create-form v-else-if="state.currentStep === 2" />
         <webhook-create-success-mode v-else-if="state.currentStep === 3" />
         <div class="flex justify-end mt-8">
-            <p-button v-if="state.currentStep === 3"
+            <p-button v-if="state.currentStep === 1"
                       style-type="transparent"
                       size="lg"
                       @click="handleClickCancelButton"
             >
                 {{ $t('ALERT_MANAGER.CANCEL') }}
             </p-button>
-            <div v-else
-                 class="flex items-center gap-4"
+            <p-button v-else-if="state.currentStep === 2"
+                      style-type="transparent"
+                      size="lg"
+                      icon-left="ic_arrow-left"
+                      @click="handlePrevNavigation"
             >
-                <p-button style-type="transparent"
-                          size="lg"
-                          icon-left="ic_arrow-left"
-                          @click="handlePrevNavigation"
-                >
-                    {{ $t('ALERT_MANAGER.SERVICE.GO_BACK') }}
-                </p-button>
-                <p-button :disabled="!state.isAllFormValid"
-                          style-type="substitutive"
-                          size="lg"
-                          @click="handleActionButton"
-                >
-                    {{ state.currentStep === 1 ? $t('ALERT_MANAGER.CONTINUE') : $t('ALERT_MANAGER.CREATE') }}
-                </p-button>
-            </div>
+                {{ $t('ALERT_MANAGER.SERVICE.GO_BACK') }}
+            </p-button>
+            <p-button :disabled="!state.isAllFormValid"
+                      style-type="substitutive"
+                      size="lg"
+                      class="ml-4"
+                      @click="handleActionButton"
+            >
+                {{ state.currentStep === 1 ? $t('ALERT_MANAGER.CONTINUE') : $t('ALERT_MANAGER.CREATE') }}
+            </p-button>
         </div>
     </div>
 </template>
