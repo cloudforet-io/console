@@ -30,6 +30,7 @@
 			"LABEL_URGENCY": "긴급도",
 			"LOW": "낮음",
 			"MANUALLY": "직접 완료합니다.",
+			"MEMBERS": "멤버",
 			"MODAL_DELETE_ALERT": "",
 			"MODAL_DELETE_NOTE": "선택한 항목을 삭제하시겠습니까?",
 			"MODAL_EDIT_ALERT": "얼럿 이름 수정",
