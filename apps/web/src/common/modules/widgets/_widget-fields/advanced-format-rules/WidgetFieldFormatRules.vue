@@ -138,9 +138,15 @@ const handleUpdateField = (val: string) => {
                                               type="number"
                                               :min="0"
                                               placeholder="3000"
-                                              :invalid="!rule.number?.length"
+                                              :invalid="Number.isNaN(rule.number)"
                                               @update:value="handleFormatRuleInput(idx, 'number', $event)"
-                                />
+                                >
+                                    <template v-if="state.type === _FORMAT_RULE_TYPE.percentThreshold"
+                                              #input-right
+                                    >
+                                        %
+                                    </template>
+                                </p-text-input>
                             </p-field-group>
                         </div>
                         <div class="right-part">
