@@ -3003,13 +3003,17 @@
 				"DELETE": {
 					"TITLE": ""
 				},
+				"DELETE_CHANNEL": {
+					"DELETE": "",
+					"TITLE": ""
+				},
 				"REMOVE_USER": {
 					"TITLE": ""
 				}
 			},
 			"TAB": {
 				"NOTIFICATION_CHANNEL": {
-					"ADD": "",
+					"CREATE": "",
 					"DELETE": "",
 					"EDIT": "",
 					"TITLE": ""

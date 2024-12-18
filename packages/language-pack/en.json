@@ -3003,13 +3003,17 @@
 				"DELETE": {
 					"TITLE": "Are you sure you want to Delete User Group?"
 				},
+				"DELETE_CHANNEL": {
+					"DELETE": "Delete",
+					"TITLE": "Are you sure you want to Delete Notification Channel from the selected user group?"
+				},
 				"REMOVE_USER": {
 					"TITLE": "Are you sure you want to Remove User from the selected user group?"
 				}
 			},
 			"TAB": {
 				"NOTIFICATION_CHANNEL": {
-					"ADD": "Add",
+					"CREATE": "Create",
 					"DELETE": "Delete",
 					"EDIT": "Edit",
 					"TITLE": "Notification Channel"
