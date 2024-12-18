@@ -90,7 +90,15 @@ export const useUserGroupPageStore = defineStore('page-user-group', () => {
             });
             return userGroups ?? [];
         }),
-
+        selectedUserGroupChannel: computed<UserGroupChannelModel[]>((): UserGroupChannelModel[] => {
+            const userGroupChannel: UserGroupChannelModel[] = [];
+            if (state.userGroupChannels.selectedIndices.length === 1) {
+                state.userGroupChannels.selectedIndices.forEach((d: number) => {
+                    userGroupChannel.push(state.userGroupChannels.list[d]);
+                });
+            }
+            return userGroupChannel ?? [];
+        }),
     });
     const actions = {
         reset() {

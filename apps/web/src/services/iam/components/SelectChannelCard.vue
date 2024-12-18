@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { reactive } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import { PSelectCard, PLazyImg } from '@cloudforet/mirinae';
 
@@ -7,8 +8,15 @@ import { i18n } from '@/translations';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
+const emit = defineEmits<{(e: 'select-channel', form: string); }>();
+
+interface ChannelCard {
+  channelList: { icon: string; label: TranslateResult | string }[];
+  selectedChannel: { icon: string; label: TranslateResult | string }[] | null;
+}
+
 // Temporary values
-const state = reactive({
+const state = reactive<ChannelCard>({
     channelList: [
         {
             icon: 'ic_notification-protocol_envelope',
@@ -39,11 +47,13 @@ const state = reactive({
             label: i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.LIST.NOTIFY_TO_MEMBER'),
         },
     ],
-    selectedChannel: {},
+    selectedChannel: null,
 });
 
 /* Component */
-const handleSelectChannel = () => {};
+const handleSelectChannel = (value) => {
+    emit('select-channel', value.label);
+};
 </script>
 
 <template>

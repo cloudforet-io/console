@@ -1,10 +1,16 @@
 <script lang="ts" setup>
 import { reactive } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal, PI, PButton } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
+import type { UserGroupChannelCreateParameters } from '@/schema/alert-manager/user-group-channel/api-verbs/create';
+import type { UserGroupChannelModel } from '@/schema/alert-manager/user-group-channel/model';
+import type { UserGroupChannelScheduleType } from '@/schema/alert-manager/user-group-channel/type';
 import { i18n } from '@/translations';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import UserGroupChannelScheduleSetForm from '@/services/iam/components/UserGroupChannelScheduleSetForm.vue';
 import UserGroupChannelSetInputForm from '@/services/iam/components/UserGroupChannelSetInputForm.vue';
@@ -13,6 +19,9 @@ import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-stor
 
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
+const userGroupPageGetters = userGroupPageStore.getters;
+
+const emit = defineEmits<{(e: 'confirm'): void; }>();
 
 interface ChannelSetModalState {
   loading: boolean;
@@ -24,7 +33,7 @@ interface ChannelSetModalState {
     days: string[];
     start: number;
     end: number;
-    type: string;
+    type: UserGroupChannelScheduleType;
   }
 }
 
@@ -41,15 +50,47 @@ const state = reactive<ChannelSetModalState>({
         days: [],
         start: 0,
         end: 0,
-        type: '',
+        type: 'ALL_DAY',
     },
 });
+
+const allDays = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
 
 /* Component */
 const handleConfirm = async () => {
     try {
+        // TODO: need create | update channel division
         state.loading = true;
-        await fetchCreateUserGroupChannel();
+
+        const scheduleInfo = allDays.reduce((acc, day) => {
+            if (state.scheduleInfo.days.includes(day)) {
+                acc[day] = {
+                    is_scheduled: true,
+                    start: state.scheduleInfo.start,
+                    end: state.scheduleInfo.end,
+                };
+            } else {
+                acc[day] = {
+                    is_scheduled: false,
+                    start: 0,
+                    end: 0,
+                };
+            }
+            return acc;
+        }, {});
+
+        await fetchCreateUserGroupChannel({
+            protocol_id: 'slack',
+            name: 'Channel-test-sy',
+            schedule: {
+                ...scheduleInfo,
+                SCHEDULE_TYPE: state.scheduleInfo.type,
+            },
+            data: {},
+            tags: {},
+            user_group_id: userGroupPageGetters.selectedUserGroups[0].user_group_id ?? undefined,
+        });
+        emit('confirm');
     } finally {
         state.loading = false;
         userGroupPageState.modal = {
@@ -77,7 +118,17 @@ const handleScheduleForm = (value) => {
 };
 
 /* API */
-const fetchCreateUserGroupChannel = async () => {};
+const fetchCreateUserGroupChannel = async (params: UserGroupChannelCreateParameters) => {
+    try {
+        return await SpaceConnector.clientV2.alertManager.userGroupChannel.create<UserGroupChannelCreateParameters, UserGroupChannelModel>(params);
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
+        return {};
+    }
+};
+
+/* Wacher */
+// TODO: all input value must be full to be able to create clickkkk
 </script>
 
 <template>

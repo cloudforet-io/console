@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { ref } from 'vue';
+
 import { PButtonModal } from '@cloudforet/mirinae';
 
 import SelectChannelCard from '@/services/iam/components/SelectChannelCard.vue';
@@ -7,6 +9,8 @@ import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-stor
 
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
+
+const isContinuePossible = ref<boolean>(false);
 
 /* Component */
 const handleConfirm = () => {
@@ -25,6 +29,12 @@ const handleCancel = () => {
         themeColor: 'primary',
     };
 };
+
+const handleSelectedChannel = (value: string) => {
+    if (value) {
+        isContinuePossible.value = true;
+    }
+};
 </script>
 
 <template>
@@ -33,19 +43,19 @@ const handleCancel = () => {
                     :header-title="userGroupPageState.modal.title"
                     :visible="userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.CREATE_NOTIFICATIONS_FIRST"
                     :theme-color="userGroupPageState.modal.themeColor"
+                    :disabled="!isContinuePossible"
                     @confirm="handleConfirm"
                     @cancel="handleCancel"
     >
         <template #body>
             <div class="flex flex-col gap-1 mb-8">
-                <!--              TODO: need to modify-->
                 <p class="text-xs">
                     <span>Step 1</span>
                     <span class="text-gray-500">/2</span>
                 </p>
                 <span class="text-gray-700 leading-4 text-sm">Configure teh notifications to ensure you are promptly informed of any alerts or incidents as they occur.</span>
             </div>
-            <select-channel-card />
+            <select-channel-card @select-channel="handleSelectedChannel" />
         </template>
         <template #confirm-button>
             <span>{{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.CONTINUE') }}</span>

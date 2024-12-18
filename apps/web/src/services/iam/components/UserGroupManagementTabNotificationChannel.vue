@@ -1,10 +1,11 @@
 <script lang="ts" setup>
-import { computed, reactive, watchEffect } from 'vue';
+import { computed, reactive } from 'vue';
 
 import {
     PHeadingLayout, PHeading, PButton, PToolboxTable, PBadge,
 } from '@cloudforet/mirinae';
 
+import type { UserGroupChannelScheduleInfoType } from '@/schema/alert-manager/user-group-channel/type';
 import { i18n } from '@/translations';
 
 import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-constant';
@@ -21,7 +22,7 @@ const userGroupPageState = userGroupPageStore.state;
 interface ChannelItem {
   name: string;
   channel: string;
-  schedule: string;
+  schedule: UserGroupChannelScheduleInfoType;
   details?: any;
 }
 
@@ -41,34 +42,11 @@ const tableState = reactive({
             details: '',
         }));
     }),
-
-
-    // items: computed(() => ([
-    //     {
-    //         name: 'PMT 멤버 채널로 알림',
-    //         channel: 'Notify to Member Channel',
-    //         schedule: 'Custom',
-    //         details: ['abc@mz.co.kr', 'edf@mz.co.kr'],
-    //     },
-    //     {
-    //         name: '이메일 알림',
-    //         channel: 'Email',
-    //         schedule: 'Every Day',
-    //         details: ['abc@mz.co.kr', 'edf@mz.co.kr'],
-    //     },
-    //     {
-    //         name: '개인 핸드폰',
-    //         channel: 'SMS',
-    //         schedule: 'Weekdays',
-    //         details: ['abc@mz.co.kr', 'edf@mz.co.kr', 'edf@mz.co.kr', 'sss@mz.co.kr', 'a@mz.co.kr', 'test@mz.co.kr'],
-    //     },
-    // ])),
-    // loadedItems: computed(() => fetchUserGroupChannelList()),
 });
 
 /* Component */
-const handleSelect = async (index: number) => {
-    console.log('TODO: add selection', index);
+const handleSelect = async (index: number[]) => {
+    userGroupPageState.userGroupChannels.selectedIndices = index;
 };
 
 const handleUpdateModal = (modalType: string) => {
@@ -88,14 +66,17 @@ const handleUpdateModal = (modalType: string) => {
             themeColor: 'primary1',
         });
         break;
+    case 'delete':
+        userGroupPageStore.updateModalSettings({
+            type: USER_GROUP_MODAL_TYPE.DELETE_NOTIFICATION_CHANNEL,
+            title: i18n.t('IAM.USER_GROUP.MODAL.DELETE_CHANNEL.TITLE'),
+            themeColor: 'alert',
+        });
+        break;
     default:
         break;
     }
 };
-
-watchEffect(async () => {
-    console.log(userGroupPageState.users.list);
-});
 </script>
 
 <template>
@@ -115,7 +96,7 @@ watchEffect(async () => {
                                   icon-left="ic_plus"
                                   @click="handleUpdateModal('add')"
                         >
-                            {{ $t('IAM.USER_GROUP.TAB.NOTIFICATION_CHANNEL.ADD') }}
+                            {{ $t('IAM.USER_GROUP.TAB.NOTIFICATION_CHANNEL.CREATE') }}
                         </p-button>
                         <p-button style-type="tertiary"
                                   icon-left="ic_edit-text"
@@ -125,6 +106,7 @@ watchEffect(async () => {
                         </p-button>
                         <p-button style-type="tertiary"
                                   icon-left="ic_delete"
+                                  @click="handleUpdateModal('delete')"
                         >
                             {{ $t('IAM.USER_GROUP.TAB.NOTIFICATION_CHANNEL.DELETE') }}
                         </p-button>
