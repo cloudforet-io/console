@@ -149,14 +149,14 @@ const originDataState = reactive({
     }),
     dataName: computed(() => (props.item.options as DataTableAddOptions).data_name ?? ''),
     dataUnit: computed(() => (props.item.options as DataTableAddOptions).data_unit ?? ''),
-    timeDiff: computed(() => {
+    timeDiff: computed<string>(() => {
         const timeDiff = (props.item.options as DataTableAddOptions).timediff;
-        const timeDiffKeys = Object.keys(timeDiff || {});
+        const timeDiffKeys = Object.keys(timeDiff || {}).filter((key) => key !== 'data_name');
         return timeDiffKeys.length ? timeDiffKeys[0] : 'none';
     }),
-    timeDiffDate: computed(() => {
+    timeDiffDate: computed<string|undefined>(() => {
         const timeDiff = (props.item.options as DataTableAddOptions).timediff;
-        const timeDiffKeys = Object.keys(timeDiff || {});
+        const timeDiffKeys = Object.keys(timeDiff || {}).filter((key) => key !== 'data_name');
         return timeDiffKeys.length ? `${-timeDiff[timeDiffKeys[0]]}` : undefined;
     }),
     timeDiffDataName: computed<string>(() => {
@@ -320,7 +320,7 @@ const setInitialDataTableForm = () => {
     // Advanced Options
     advancedOptionsState.selectedTimeDiff = originDataState.timeDiff;
     advancedOptionsState.selectedTimeDiffDate = originDataState.timeDiffDate;
-    advancedOptionsState.timeDiffDataName = '';
+    advancedOptionsState.timeDiffDataName = originDataState.timeDiffDataName;
 };
 
 onMounted(() => {
