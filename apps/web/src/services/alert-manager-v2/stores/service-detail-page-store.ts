@@ -36,12 +36,12 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
         loading: false,
         currentTab: SERVICE_DETAIL_TABS.OVERVIEW,
         serviceInfo: {} as ServiceModel,
-        serviceList: [] as ServiceModel[],
-        notificationProtocolList: [] as NotificationProtocolModel[],
+        serviceList: [],
+        notificationProtocolList: [],
     });
 
     const getters = reactive<ServiceFormStoreGetters>({
-        serviceInfo: computed(() => ({
+        serviceInfo: computed<Service>(() => ({
             ...state.serviceInfo,
             members: {
                 USER_GROUP: state.serviceInfo.members?.USER_GROUP || [],
