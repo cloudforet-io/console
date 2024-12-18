@@ -871,8 +871,11 @@
 		"BUTTONS": {
 			"ADD": "Add",
 			"CANCEL": "Cancel",
+			"CONFIRM": "Confirm",
+			"DELETE": "Delete",
 			"DONE": "Done",
 			"DOWNLOAD": "Download",
+			"EDIT": "Edit",
 			"PDF_DOWNLOAD_BUTTON": {
 				"DESKTOP": "desktop",
 				"SUPPORT_PDF_HELP_TEXT": "This feature is not supported on your browser or device. Try again with {chrome} or {edge} browser on {desktop}."

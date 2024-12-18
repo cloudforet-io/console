@@ -94,14 +94,14 @@ const state = reactive({
         if (props.userPool && props.userPool.length > 0) {
             return props.userPool.map((userId) => ({
                 name: userId,
-                label: storeState.userReferenceMap[userId]?.label ?? userId,
+                label: storeState.userReferenceMap[userId]?.label || storeState.userReferenceMap[userId]?.name || userId,
             }));
         }
         return Object.values(storeState.userReferenceMap).map((u: UserReferenceMap[string]) => ({
             name: u.key,
-            label: u.key,
+            label: u.label || u.name || u.key,
             userName: u.name,
-        }));
+        })).sort((a, b) => a.label.localeCompare(b.label));
     }),
     allUserGroupItems: computed<DropdownItem[]>(() => {
         if (!props.showUserGroupList) return [];
