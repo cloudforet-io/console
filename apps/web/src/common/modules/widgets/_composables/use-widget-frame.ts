@@ -141,13 +141,13 @@ export const useWidgetFrame = (
 ) => {
     const _state = reactive({
         widgetConfig: computed(() => getWidgetConfig(props.widgetName)),
-        showWidgetHeader: computed<boolean>(() => props.widgetOptions?.widgetHeader?.toggleValue || false),
+        showWidgetHeader: computed<boolean>(() => props.widgetOptions?.widgetHeader?.value?.toggleValue || false),
         title: computed(() => {
-            if (_state.showWidgetHeader) return props.widgetOptions?.widgetHeader?.title;
+            if (_state.showWidgetHeader) return props.widgetOptions?.widgetHeader?.value?.title;
             return undefined;
         }),
         description: computed(() => {
-            if (_state.showWidgetHeader) return props.widgetOptions?.widgetHeader?.description;
+            if (_state.showWidgetHeader) return props.widgetOptions?.widgetHeader?.value?.description;
             return undefined;
         }),
         size: computed<WidgetSize>(() => {
@@ -193,7 +193,7 @@ export const useWidgetFrame = (
             return overrides.noData?.value || false;
         }),
         annotation: computed<string|undefined>(() => {
-            const _displayAnnotation = props.widgetOptions?.displayAnnotation as DisplayAnnotationValue;
+            const _displayAnnotation = props.widgetOptions?.displayAnnotation?.value as DisplayAnnotationValue;
             if (!_displayAnnotation?.toggleValue) return undefined;
             return _displayAnnotation?.annotation;
         }),
