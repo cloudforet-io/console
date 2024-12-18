@@ -29,6 +29,7 @@ import {
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/comparison/type';
+import type { DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
 import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/granularity/type';
 import type { IconValue } from '@/common/modules/widgets/_widget-fields/icon/type';
@@ -65,28 +66,28 @@ const state = reactive({
     previousValue: computed<number>(() => state.previousData?.results?.[0]?.[state.dataField] ?? 0),
     currentValue: computed<number>(() => state.data?.results?.[0]?.[state.dataField] ?? 0),
     valueText: computed<string|undefined>(() => {
-        const _numberFormatMap = props.widgetOptions?.numberFormat as NumberFormatValue;
+        const _numberFormatMap = props.widgetOptions?.numberFormat?.value as NumberFormatValue;
         return getFormattedNumber(state.currentValue, state.dataField, _numberFormatMap, state.unit);
     }),
-    granularity: computed<string>(() => props.widgetOptions?.granularity as string),
-    dataField: computed<string|undefined>(() => props.widgetOptions?.dataField as string),
+    granularity: computed(() => (props.widgetOptions?.granularity?.value as GranularityValue)?.granularity),
+    dataField: computed<string|undefined>(() => (props.widgetOptions?.dataField?.value as DataFieldValue)?.data as string),
     // optional fields
-    iconName: computed<string|undefined>(() => (props.widgetOptions?.icon as IconValue)?.icon?.name),
-    iconColor: computed<string>(() => (props.widgetOptions?.icon as IconValue)?.color),
+    iconInfo: computed<IconValue|undefined>(() => props.widgetOptions?.icon?.value as IconValue),
+    iconName: computed<string|undefined>(() => state.iconInfo?.icon?.name),
+    iconColor: computed<string|undefined>(() => state.iconInfo?.color),
+    comparisonInfo: computed<ComparisonValue|undefined>(() => props.widgetOptions?.comparison?.value as ComparisonValue),
     comparisonColor: computed<string|undefined>(() => {
         const _comparison = state.currentValue - state.previousValue;
         if (!_comparison) return gray[700];
 
-        const _target: ComparisonValue|undefined = props.widgetOptions?.comparison;
         if (state.currentValue > state.previousValue) {
-            return _target?.increaseColor;
+            return state.comparisonInfo?.increaseColor;
         }
-        return _target?.decreaseColor;
+        return state.comparisonInfo?.decreaseColor;
     }),
     comparisonValue: computed<string>(() => {
-        const _target: ComparisonValue|undefined = props.widgetOptions?.comparison;
         const _comparison = Math.abs(state.currentValue - state.previousValue);
-        const _format = _target?.format || 'all';
+        const _format = state.comparisonInfo?.format || 'all';
         let _percentage = '--';
         if (state.previousValue > 0) {
             _percentage = (_comparison / state.previousValue * 100).toFixed(2);
@@ -139,8 +140,8 @@ const setValueTextFontSize = debounce(() => {
 }, 300);
 
 /* Api */
-const privateWidgetFetcher = getCancellableFetcher<PrivateWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.privateWidget.load);
-const publicWidgetFetcher = getCancellableFetcher<PublicWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.publicWidget.load);
+const privateWidgetFetcher = getCancellableFetcher<PrivateWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.privateWidget.loadSum);
+const publicWidgetFetcher = getCancellableFetcher<PublicWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.publicWidget.loadSum);
 const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
     if (props.widgetState === 'INACTIVE') return undefined;
     try {
@@ -149,17 +150,9 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
         const _fetcher = _isPrivate ? privateWidgetFetcher : publicWidgetFetcher;
         const { status, response } = await _fetcher({
             widget_id: props.widgetId,
-            query: {
-                granularity: state.granularity,
-                start: dateRange.value.start,
-                end: dateRange.value.end,
-                fields: {
-                    [state.dataField]: {
-                        key: state.dataField,
-                        operator: 'sum',
-                    },
-                },
-            },
+            granularity: state.granularity,
+            start: dateRange.value.start,
+            end: dateRange.value.end,
             vars: props.dashboardVars,
         });
         if (status === 'succeed') {
@@ -176,8 +169,8 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
     }
 };
 
-const privatePreviousFetcher = getCancellableFetcher<PrivateWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.privateWidget.load);
-const publicPreviousFetcher = getCancellableFetcher<PublicWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.publicWidget.load);
+const privatePreviousFetcher = getCancellableFetcher<PrivateWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.privateWidget.loadSum);
+const publicPreviousFetcher = getCancellableFetcher<PublicWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.publicWidget.loadSum);
 const fetchPreviousData = async (): Promise<Data|undefined> => {
     if (props.widgetState === 'INACTIVE') return undefined;
     try {
@@ -187,17 +180,9 @@ const fetchPreviousData = async (): Promise<Data|undefined> => {
         const _previousDateRange = getPreviousDateRange(state.granularity, dateRange.value);
         const { status, response } = await _fetcher({
             widget_id: props.widgetId,
-            query: {
-                granularity: state.granularity,
-                start: _previousDateRange.start,
-                end: _previousDateRange.end,
-                fields: {
-                    [state.dataField]: {
-                        key: state.dataField,
-                        operator: 'sum',
-                    },
-                },
-            },
+            granularity: state.granularity,
+            start: _previousDateRange.start,
+            end: _previousDateRange.end,
             vars: props.dashboardVars,
         });
         if (status === 'succeed') {
@@ -220,7 +205,7 @@ const loadWidget = async (): Promise<Data|APIErrorToast> => {
     return state.data;
 };
 
-watch([() => props.widgetOptions?.comparison, () => dateRange.value], async ([comparison]) => {
+watch([() => props.widgetOptions?.comparison?.value, () => dateRange.value], async ([comparison]) => {
     if (comparison) {
         state.previousData = await fetchPreviousData();
     } else {
@@ -260,7 +245,7 @@ defineExpose<WidgetExpose<Data>>({
                       style="font-size: 56px;"
                 >{{ state.valueText }}</span>
             </div>
-            <div v-if="props.widgetOptions?.comparison?.toggleValue && !state.previousLoading"
+            <div v-if="state.comparisonInfo?.toggleValue && !state.previousLoading"
                  class="comparison-wrapper"
             >
                 <p-i v-if="state.currentValue !== state.previousValue"
