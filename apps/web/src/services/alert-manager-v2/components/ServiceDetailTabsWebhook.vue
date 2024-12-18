@@ -1,12 +1,10 @@
 <script lang="ts" setup>
 import {
-    reactive, computed,
+    reactive, computed, onMounted,
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import {
-    makeDistinctValueHandler, makeEnumValueHandler,
-} from '@cloudforet/core-lib/component-util/query-search';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PToolboxTable,
@@ -18,24 +16,35 @@ import {
     PHeadingLayout,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
-import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query-search/type';
-import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { WebhookListParameters } from '@/schema/alert-manager/webhook/api-verbs/list';
 import { WEBHOOK_STATE } from '@/schema/alert-manager/webhook/constants';
+import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
 import { i18n as _i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
+import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
+import { downloadExcel } from '@/lib/helper/file-download-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useProxyValue } from '@/common/composables/proxy-state';
+import { useQueryTags } from '@/common/composables/query-tags';
 
 import { webhookStateFormatter } from '@/services/alert-manager-v2/composables/refined-table-data';
+import {
+    ALERT_EXCEL_FIELDS,
+    WEBHOOK_MANAGEMENT_TABLE_FIELDS,
+    WEBHOOK_MANAGEMENT_TABLE_HANDLER,
+} from '@/services/alert-manager-v2/constants/webhook-table-constant';
 import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
 
 interface Props {
-    // TODO: add type
-    selectedItem?: any
+    selectedItem?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -47,31 +56,13 @@ const emit = defineEmits<{(e: 'update:selected-item', value: string[]): void;
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
+const userStore = useUserStore();
+const userState = userStore.state;
 
 const router = useRouter();
 
 const { getProperRouteLocation } = useProperRouteLocation();
 
-const webhookListApiQueryHelper = new ApiQueryHelper()
-    .setPageStart(1).setPageLimit(15)
-    .setSort('created_at', true);
-
-const querySearchHandlers = reactive({
-    keyItemSets: computed<KeyItemSet[]>(() => [{
-        title: 'Properties',
-        items: [
-            { name: 'name', label: 'Name' },
-            { name: 'state', label: 'State' },
-            { name: 'plugin_info.plugin_id', label: 'Plugin' },
-        ],
-    }]),
-    // TODO: change API
-    valueHandlerMap: {
-        name: makeDistinctValueHandler('monitoring.Webhook', 'name'),
-        state: makeEnumValueHandler(WEBHOOK_STATE),
-        'plugin_info.plugin_id': makeDistinctValueHandler('monitoring.Webhook', 'plugin_info.plugin_id'),
-    },
-});
 const tableState = reactive({
     actionMenu: computed<MenuItem[]>(() => ([
         {
@@ -98,38 +89,24 @@ const tableState = reactive({
             label: _i18n.t('ALERT_MANAGER.DELETE'),
         },
     ])),
-    fields: computed<DataTableFieldType[]>(() => [
-        { name: 'name', label: 'Name' },
-        { name: 'state', label: 'State' },
-        { name: 'plugin_info.plugin_id', label: 'Plugin' },
-        { name: 'requests.total', label: 'Total Requests' },
-        { name: 'requests.error', label: 'Failed Requests' },
-    ]),
-    tags: webhookListApiQueryHelper.setKeyItemSets(querySearchHandlers.keyItemSets).queryTags,
-    totalCount: 0,
 });
 const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
+    timezone: computed<string>(() => userState.timezone || ''),
 });
 const state = reactive({
     loading: false,
-    // TODO: temp data
-    items: [{
-        name: 'temp name',
-        state: 'ENABLED',
-        plugin_info: {
-            plugin_id: 'plugin-aws-cloudtrail-mon-datasource',
-        },
-        requests: {
-            total: 20,
-            error: 30,
-        },
-    }],
+    items: [] as WebhookModel[],
+    totalCount: 0,
     selectIndex: [],
-    // TODO: add type
-    proxySelectedItem: useProxyValue<any[]>('selectedItem', props, emit),
-    isSelectedItem: computed(() => state.proxySelectedItem?.length),
+    proxySelectedItem: useProxyValue<WebhookModel[]>('selectedItem', props, emit),
+    isSelectedItem: computed<number>(() => state.proxySelectedItem?.length),
+    fields: WEBHOOK_MANAGEMENT_TABLE_FIELDS,
 });
+
+const webhookListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true);
+const queryTagHelper = useQueryTags({ keyItemSets: WEBHOOK_MANAGEMENT_TABLE_HANDLER.keyItemSets });
+const { queryTags } = queryTagHelper;
 
 const handleClickCreateButton = () => {
     router.push(getProperRouteLocation({
@@ -139,15 +116,48 @@ const handleClickCreateButton = () => {
 const handleSelectDropdownItem = (name) => {
     console.log('TODO: handleSelectDropdownItem', name);
 };
-const handleChangeToolbox = (options: any = {}) => {
-    console.log('TODO: handleChangeToolbox', options);
+const handleChangeToolbox = async (options: any = {}) => {
+    if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
+    if (options.pageStart !== undefined) webhookListApiQueryHelper.setPageStart(options.pageStart);
+    if (options.pageLimit !== undefined) webhookListApiQueryHelper.setPageLimit(options.pageLimit);
+    await fetchWebhookList();
 };
-const handleExportExcel = () => {
-    console.log('TODO: handleExportExcel');
+const handleExportExcel = async () => {
+    await downloadExcel({
+        url: '/alertManager/webhook/list',
+        param: {
+            query: { ...webhookListApiQueryHelper.data, only: ALERT_EXCEL_FIELDS.map((d) => d.key) },
+        },
+        fields: ALERT_EXCEL_FIELDS,
+        file_name_prefix: FILE_NAME_PREFIX.webhook,
+        timezone: storeState.timezone,
+    });
 };
 const handleSelectTableRow = (selectedItems: number[]) => {
-    state.proxySelectedItem = selectedItems.map((i) => state.items[i]);
+    state.proxySelectedItem = selectedItems.map((i) => state.items[i].webhook_id);
 };
+
+const fetchWebhookList = async () => {
+    state.loading = true;
+    try {
+        webhookListApiQueryHelper.setFilters([
+            ...queryTagHelper.filters.value,
+        ]);
+        const { results } = await SpaceConnector.clientV2.alertManager.webhook.list<WebhookListParameters, ListResponse<WebhookModel>>({
+            query: webhookListApiQueryHelper.data,
+        });
+        state.items = results || [];
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
+        state.items = [];
+    } finally {
+        state.loading = false;
+    }
+};
+
+onMounted(() => {
+    fetchWebhookList();
+});
 </script>
 
 <template>
@@ -158,13 +168,13 @@ const handleSelectTableRow = (selectedItems: number[]) => {
                      exportable
                      :multi-select="false"
                      :loading="state.loading"
-                     :total-count="tableState.totalCount"
+                     :total-count="state.totalCount"
                      :items="state.items"
-                     :fields="tableState.fields"
+                     :fields="state.fields"
                      :select-index.sync="state.selectIndex"
-                     :query-tags="tableState.tags"
-                     :key-item-sets="querySearchHandlers.keyItemSets"
-                     :value-handler-map="querySearchHandlers.valueHandlerMap"
+                     :query-tags="queryTags"
+                     :key-item-sets="WEBHOOK_MANAGEMENT_TABLE_HANDLER.keyItemSets"
+                     :value-handler-map="WEBHOOK_MANAGEMENT_TABLE_HANDLER.valueHandlerMap"
                      @change="handleChangeToolbox"
                      @refresh="handleChangeToolbox()"
                      @export="handleExportExcel"
@@ -175,7 +185,7 @@ const handleSelectTableRow = (selectedItems: number[]) => {
                 <template #heading>
                     <p-heading heading-type="sub"
                                use-total-count
-                               :total-count="tableState.totalCount"
+                               :total-count="state.totalCount"
                                :title="$t('ALERT_MANAGER.WEBHOOK.TITLE')"
                     />
                 </template>

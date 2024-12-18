@@ -7,6 +7,7 @@ export const FILE_NAME_PREFIX = Object.freeze({
     workspace: 'workspace',
     collector: 'collector',
     projectWebhook: 'project_webhook',
+    webhook: 'webhook',
     alert: 'alert',
     costAnalysis: 'cost_analysis',
     budget: 'budget',
