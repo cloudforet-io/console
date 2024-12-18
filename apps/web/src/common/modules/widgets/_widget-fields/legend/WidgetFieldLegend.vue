@@ -21,7 +21,7 @@ const props = defineProps<_WidgetFieldComponentProps<_LegendOptions>>();
 
 const state = reactive({
     fieldValue: computed<LegendValue>(() => props.fieldManager.data[FIELD_KEY].value),
-    showPositionField: computed<boolean>(() => !!props.widgetFieldSchema.options?.showPositionField),
+    showPositionField: computed<boolean>(() => !!props.widgetFieldSchema?.options?.showPositionField),
     positionMenuItems: computed(() => ([
         { name: 'right', label: i18n.t('COMMON.WIDGETS.LEGEND.RIGHT') },
         { name: 'left', label: i18n.t('COMMON.WIDGETS.LEGEND.LEFT') },
@@ -59,7 +59,7 @@ const handleSelectPosition = (val: 'right'|'bottom'|'left'|'top') => {
                              @update:value="handleUpdateToggleValue"
             />
         </div>
-        <p-field-group v-if="props.widgetFieldSchema.options?.showPositionField"
+        <p-field-group v-if="props.widgetFieldSchema?.options?.showPositionField"
                        :label="$t('COMMON.WIDGETS.LEGEND.POSITION')"
                        style-type="secondary"
                        class="position-wrapper"

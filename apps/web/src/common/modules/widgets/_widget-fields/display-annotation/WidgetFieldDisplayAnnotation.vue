@@ -86,6 +86,7 @@ const handleUpdateAnnotation = (value: string) => {
 
     .contents {
         @apply flex gap-2;
+        overflow: hidden;
         margin-top: 0.5rem;
         .p-field-group {
             width: 100%;
