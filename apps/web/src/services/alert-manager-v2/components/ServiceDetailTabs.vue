@@ -44,7 +44,7 @@ const storeState = reactive({
     currentTab: computed<ServiceDetailTabsType>(() => serviceDetailPageState.currentTab),
 });
 const state = reactive({
-    selectedWebhook: [],
+    selectedWebhook: undefined,
     selectedNotifications: [],
 });
 
