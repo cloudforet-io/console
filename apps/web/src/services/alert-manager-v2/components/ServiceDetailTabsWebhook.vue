@@ -42,6 +42,7 @@ import {
     WEBHOOK_MANAGEMENT_TABLE_HANDLER,
 } from '@/services/alert-manager-v2/constants/webhook-table-constant';
 import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
+import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
 
 interface Props {
     selectedItem?: string
@@ -51,13 +52,15 @@ const props = withDefaults(defineProps<Props>(), {
     selectedItem: undefined,
 });
 
-const emit = defineEmits<{(e: 'update:selected-item', value: WebhookModel[]): void;
+const emit = defineEmits<{(e: 'update:selected-item', value: string): void;
 }>();
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const userStore = useUserStore();
 const userState = userStore.state;
+const serviceDetailPageStore = useServiceDetailPageStore();
+const serviceDetailPageState = serviceDetailPageStore.state;
 
 const router = useRouter();
 
@@ -89,10 +92,12 @@ const tableState = reactive({
             label: _i18n.t('ALERT_MANAGER.DELETE'),
         },
     ])),
+    fields: WEBHOOK_MANAGEMENT_TABLE_FIELDS,
 });
 const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
     timezone: computed<string>(() => userState.timezone || ''),
+    serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
 });
 const state = reactive({
     loading: false,
@@ -101,7 +106,6 @@ const state = reactive({
     selectIndex: [],
     isSelectedItem: computed<number>(() => state.selectIndex?.length),
     proxySelectedItem: useProxyValue<string>('selectedItem', props, emit),
-    fields: WEBHOOK_MANAGEMENT_TABLE_FIELDS,
 });
 
 const webhookListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true);
@@ -143,13 +147,16 @@ const fetchWebhookList = async () => {
         webhookListApiQueryHelper.setFilters([
             ...queryTagHelper.filters.value,
         ]);
-        const { results } = await SpaceConnector.clientV2.alertManager.webhook.list<WebhookListParameters, ListResponse<WebhookModel>>({
+        const { results, total_count } = await SpaceConnector.clientV2.alertManager.webhook.list<WebhookListParameters, ListResponse<WebhookModel>>({
             query: webhookListApiQueryHelper.data,
+            service_id: storeState.serviceId,
         });
         state.items = results || [];
+        state.totalCount = total_count || 0;
     } catch (e) {
         ErrorHandler.handleError(e, true);
         state.items = [];
+        state.totalCount = 0;
     } finally {
         state.loading = false;
     }
@@ -170,7 +177,7 @@ onMounted(() => {
                      :loading="state.loading"
                      :total-count="state.totalCount"
                      :items="state.items"
-                     :fields="state.fields"
+                     :fields="tableState.fields"
                      :select-index.sync="state.selectIndex"
                      :query-tags="queryTags"
                      :key-item-sets="WEBHOOK_MANAGEMENT_TABLE_HANDLER.keyItemSets"

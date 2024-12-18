@@ -1,11 +1,9 @@
 <script lang="ts" setup>
 import {
-    reactive, computed,
+    reactive, computed, onMounted,
 } from 'vue';
 
-import {
-    makeDistinctValueHandler,
-} from '@cloudforet/core-lib/component-util/query-search';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PToolboxTable,
@@ -15,27 +13,29 @@ import {
     PHeadingLayout,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
-import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query-search/type';
-import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
+import { iso8601Formatter } from '@cloudforet/utils';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { EscalationPolicyListParameters } from '@/schema/alert-manager/escalation-policy/api-verbs/list';
+import type { EscalationPolicyModel } from '@/schema/alert-manager/escalation-policy/model';
+import type { EscalationPolicyRulesType } from '@/schema/alert-manager/escalation-policy/type';
 import { i18n as _i18n } from '@/translations';
 
-const escalationPolicyListApiQueryHelper = new ApiQueryHelper()
-    .setPageStart(1).setPageLimit(15)
-    .setSort('created_at', true);
+import { useUserStore } from '@/store/user/user-store';
 
-const querySearchHandlers = reactive({
-    keyItemSets: computed<KeyItemSet[]>(() => [{
-        title: 'Properties',
-        items: [
-            { name: 'name', label: 'Name' },
-        ],
-    }]),
-    // TODO: change API
-    valueHandlerMap: {
-        name: makeDistinctValueHandler('monitoring.Webhook', 'name'),
-    },
-});
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useQueryTags } from '@/common/composables/query-tags';
+
+import {
+    ESCALATION_POLICY_MANAGEMENT_TABLE_FIELDS, ESCALATION_POLICY_MANAGEMENT_TABLE_HANDLER,
+} from '@/services/alert-manager-v2/constants/escalation-policy-table-constant';
+import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
+
+const serviceDetailPageStore = useServiceDetailPageStore();
+const serviceDetailPageState = serviceDetailPageStore.state;
+const userStore = useUserStore();
+const userState = userStore.state;
+
 const tableState = reactive({
     actionMenu: computed<MenuItem[]>(() => ([
         {
@@ -49,42 +49,73 @@ const tableState = reactive({
             label: _i18n.t('ALERT_MANAGER.DELETE'),
         },
     ])),
-    fields: computed<DataTableFieldType[]>(() => [
-        { name: 'name', label: 'Name' },
-        { name: 'repeat_time', label: 'Repeat Time' },
-        { name: 'channel', label: 'Connected Channel' },
-        { name: 'created_at', label: 'Created' },
-    ]),
-    tags: escalationPolicyListApiQueryHelper.setKeyItemSets(querySearchHandlers.keyItemSets).queryTags,
-    totalCount: 0,
+    fields: ESCALATION_POLICY_MANAGEMENT_TABLE_FIELDS,
+});
+const storeState = reactive({
+    serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
+    timezone: computed<string>(() => userState.timezone || ''),
 });
 const state = reactive({
     loading: false,
-    // TODO: temp data
-    items: [{
-        name: 'temp name',
-        repeat_time: 5,
-        channel: 4,
-        created_at: '2024-12-04 01:30:45',
-    }],
+    items: [] as EscalationPolicyModel[],
+    totalCount: 0,
     selectIndex: [],
-    // TODO: add type
-    selectedItem: computed<number[]>(() => state.selectIndex.map((i) => state.items[i])),
-    isSelectedItem: computed<boolean>(() => state.selectedItem?.length),
+    isSelectedItem: computed<number>(() => state.selectIndex?.length),
+    selectedItem: {} as EscalationPolicyModel,
 });
 
+const escalationPolicyListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true);
+const queryTagHelper = useQueryTags({ keyItemSets: ESCALATION_POLICY_MANAGEMENT_TABLE_HANDLER.keyItemSets });
+const { queryTags } = queryTagHelper;
+
+const getConnectChannelCount = (rules: EscalationPolicyRulesType[]) => {
+    const allChannels = rules.flatMap((item) => item.channels);
+    const uniqueChannels = new Set(allChannels);
+    return uniqueChannels.size;
+};
 const handleClickCreateButton = () => {
     console.log('TODO: handleClickCreateButton');
 };
 const handleSelectDropdownItem = (name) => {
     console.log('TODO: handleSelectDropdownItem', name);
 };
-const handleChangeToolbox = (options: any = {}) => {
-    console.log('TODO: handleChangeToolbox', options);
+const handleChangeToolbox = async (options: any = {}) => {
+    if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
+    if (options.pageStart !== undefined) escalationPolicyListApiQueryHelper.setPageStart(options.pageStart);
+    if (options.pageLimit !== undefined) escalationPolicyListApiQueryHelper.setPageLimit(options.pageLimit);
+    await fetchEscalationPolicyList();
 };
 const handleExportExcel = () => {
     console.log('TODO: handleExportExcel');
 };
+const handleSelectTableRow = (selectedItems: number[]) => {
+    state.selectedItem = state.items[selectedItems[0]];
+};
+
+const fetchEscalationPolicyList = async () => {
+    state.loading = true;
+    try {
+        escalationPolicyListApiQueryHelper.setFilters([
+            ...queryTagHelper.filters.value,
+        ]);
+        const { results, total_count } = await SpaceConnector.clientV2.alertManager.escalationPolicy.list<EscalationPolicyListParameters, ListResponse<EscalationPolicyModel>>({
+            query: escalationPolicyListApiQueryHelper.data,
+            service_id: storeState.serviceId,
+        });
+        state.items = results || [];
+        state.totalCount = total_count || 0;
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
+        state.items = [];
+        state.totalCount = 0;
+    } finally {
+        state.loading = false;
+    }
+};
+
+onMounted(() => {
+    fetchEscalationPolicyList();
+});
 </script>
 
 <template>
@@ -95,23 +126,24 @@ const handleExportExcel = () => {
                      exportable
                      :multi-select="false"
                      :loading="state.loading"
-                     :total-count="tableState.totalCount"
+                     :total-count="state.totalCount"
                      :items="state.items"
                      :fields="tableState.fields"
                      :select-index.sync="state.selectIndex"
-                     :query-tags="tableState.tags"
-                     :key-item-sets="querySearchHandlers.keyItemSets"
-                     :value-handler-map="querySearchHandlers.valueHandlerMap"
+                     :query-tags="queryTags"
+                     :key-item-sets="ESCALATION_POLICY_MANAGEMENT_TABLE_HANDLER.keyItemSets"
+                     :value-handler-map="ESCALATION_POLICY_MANAGEMENT_TABLE_HANDLER.valueHandlerMap"
                      @change="handleChangeToolbox"
                      @refresh="handleChangeToolbox()"
                      @export="handleExportExcel"
+                     @select="handleSelectTableRow"
     >
         <template #toolbox-top>
             <p-heading-layout class="pt-6 px-4">
                 <template #heading>
                     <p-heading heading-type="sub"
                                use-total-count
-                               :total-count="tableState.totalCount"
+                               :total-count="state.totalCount"
                                :title="$t('ALERT_MANAGER.ESCALATION_POLICY.TITLE')"
                     />
                 </template>
@@ -140,6 +172,15 @@ const handleExportExcel = () => {
                                :placeholder="$t('ALERT_MANAGER.ACTION')"
                                @select="handleSelectDropdownItem"
             />
+        </template>
+        <template #col-repeat-format="{value}">
+            {{ value || 0 }}
+        </template>
+        <template #col-rules-format="{value}">
+            {{ getConnectChannelCount(value) }}
+        </template>
+        <template #col-created_at-format="{value}">
+            {{ iso8601Formatter(value, storeState.timezone) }}
         </template>
     </p-toolbox-table>
 </template>
