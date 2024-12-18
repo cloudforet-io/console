@@ -100,6 +100,7 @@
 			"TOPIC": "トピックス"
 		},
 		"SERVICE": {
+			"ALT_S_CREATE_SERVICE": "",
 			"ALT_S_INVITE_MEMBER": "",
 			"CREATE_SERVICE_DESC": "",
 			"CREATE_SERVICE_TITLE": "",
