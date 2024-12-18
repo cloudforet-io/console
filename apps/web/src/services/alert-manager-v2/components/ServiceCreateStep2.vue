@@ -6,6 +6,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { WebhookCreateParameters } from '@/schema/alert-manager/webhook/api-verbs/create';
 import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
 import type { PluginModel } from '@/schema/repository/plugin/model';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -43,6 +46,7 @@ const handleCreateWebhook = async () => {
             },
             service_id: storeState.createdServiceId,
         });
+        showSuccessMessage(i18n.t('ALERT_MANAGER.WEBHOOK.ALT_S_CREATE_WEBHOOK'), '');
         serviceFormStore.setCreatedWebhookInfo(createdWebhookInfo);
         serviceFormStore.setCurrentSubStep(3);
     } catch (e) {
