@@ -25,9 +25,12 @@ import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-wi
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
+import type { FormatRulesValue, ThresholdValue } from '@/common/modules/widgets/_widget-fields/advanced-format-rules/type';
+import type { DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
 import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
-import type { FormatRulesValue } from '@/common/modules/widgets/_widget-fields/format-rules/type';
 import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/granularity/type';
+import type { MaxValue } from '@/common/modules/widgets/_widget-fields/max/type';
+import type { MinValue } from '@/common/modules/widgets/_widget-fields/min/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type {
     WidgetProps, WidgetEmit,
@@ -106,29 +109,26 @@ const state = reactive({
         ],
     })),
     // required fields
-    granularity: computed<string>(() => props.widgetOptions?.granularity as string),
-    dataField: computed<string|undefined>(() => props.widgetOptions?.dataField as string),
-    min: computed<number>(() => props.widgetOptions?.min as number),
-    max: computed<number>(() => props.widgetOptions?.max as number),
-    formatRules: computed<FormatRulesValue[]>(() => props.widgetOptions?.formatRules as FormatRulesValue[]),
+    granularity: computed<string|undefined>(() => (props.widgetOptions?.granularity?.value as GranularityValue)?.granularity),
+    dataField: computed<string|undefined>(() => (props.widgetOptions?.dataField?.value as DataFieldValue)?.data as string),
+    min: computed<number|undefined>(() => (props.widgetOptions?.min?.value as MinValue)?.min),
+    max: computed<number|undefined>(() => (props.widgetOptions?.max?.value as MaxValue)?.max),
+    formatRulesInfo: computed<FormatRulesValue|undefined>(() => props.widgetOptions?.formatRules?.value as FormatRulesValue),
     gaugeColor: computed<string>(() => {
-        let _formatRules = props.widgetOptions?.formatRules as FormatRulesValue[];
+        let _formatRules: ThresholdValue[] = state.formatRulesInfo?.rules || [];
         let _color = gray[200];
         const _percentage = (state.chartData / state.max) * 100;
-        _formatRules = orderBy(_formatRules, ['threshold'], ['asc']);
+        _formatRules = orderBy(_formatRules, ['number'], ['asc']);
         _formatRules?.forEach((d) => {
-            if (_percentage >= (d.threshold || 0)) {
+            if (_percentage >= (d.number || 0)) {
                 _color = d.color;
             }
         });
         return _color;
     }),
-    formatRulesBaseColor: computed<string>(() => {
-        const _formatRules = props.widgetOptions?.formatRules as FormatRulesValue[];
-        return _formatRules?.filter((d) => d.threshold === 0)?.[0]?.color || gray[200];
-    }),
+    formatRulesBaseColor: computed<string>(() => state.formatRulesInfo?.rules?.filter((d) => d.number === 0)?.[0]?.color || gray[200]),
     // optional fields
-    numberFormat: computed(() => props.widgetOptions?.numberFormat as NumberFormatValue),
+    numberFormat: computed<NumberFormatValue|undefined>(() => props.widgetOptions?.numberFormat?.value as NumberFormatValue),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange,
@@ -137,8 +137,8 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
 });
 
 /* Api */
-const privateWidgetFetcher = getCancellableFetcher<PrivateWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.privateWidget.load);
-const publicWidgetFetcher = getCancellableFetcher<PublicWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.publicWidget.load);
+const privateWidgetFetcher = getCancellableFetcher<PrivateWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.privateWidget.loadSum);
+const publicWidgetFetcher = getCancellableFetcher<PublicWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.publicWidget.loadSum);
 const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
     if (props.widgetState === 'INACTIVE') return undefined;
     try {
@@ -147,18 +147,9 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
         const _fetcher = _isPrivate ? privateWidgetFetcher : publicWidgetFetcher;
         const { status, response } = await _fetcher({
             widget_id: props.widgetId,
-            query: {
-                granularity: state.granularity,
-                start: dateRange.value.start,
-                end: dateRange.value.end,
-                group_by: [],
-                fields: {
-                    [state.dataField]: {
-                        key: state.dataField,
-                        operator: 'sum',
-                    },
-                },
-            },
+            granularity: state.granularity,
+            start: dateRange.value.start,
+            end: dateRange.value.end,
             vars: props.dashboardVars,
         });
         if (status === 'succeed') {
