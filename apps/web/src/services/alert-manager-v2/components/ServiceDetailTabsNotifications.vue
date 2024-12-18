@@ -1,12 +1,10 @@
 <script lang="ts" setup>
 import {
-    reactive, computed,
+    reactive, computed, onMounted,
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import {
-    makeDistinctValueHandler, makeEnumValueHandler,
-} from '@cloudforet/core-lib/component-util/query-search';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PToolboxTable,
@@ -18,65 +16,57 @@ import {
     PHeadingLayout,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
-import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query-search/type';
-import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
-import { NOTIFICATION_PROTOCOL_STATE } from '@/schema/alert-manager/notification-protocol/constants';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ServiceChannelListParameters } from '@/schema/alert-manager/service-channel/api-verbs/list';
+import { SERVICE_CHANNEL_STATE } from '@/schema/alert-manager/service-channel/constants';
+import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
 import { i18n as _i18n } from '@/translations';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useProxyValue } from '@/common/composables/proxy-state';
+import { useQueryTags } from '@/common/composables/query-tags';
 
 import { webhookStateFormatter } from '@/services/alert-manager-v2/composables/refined-table-data';
+import {
+    NOTIFICATION_MANAGEMENT_TABLE_FIELDS,
+    NOTIFICATION_MANAGEMENT_TABLE_HANDLER,
+} from '@/services/alert-manager-v2/constants/notification-table-constant';
 import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
+import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
 
 interface Props {
-    // TODO: add type
-    selectedItem?: any
+    selectedItem?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
     selectedItem: undefined,
 });
 
-const emit = defineEmits<{(e: 'update:selected-item', value: string[]): void;
+const emit = defineEmits<{(e: 'update:selected-item', value: string): void;
 }>();
+
+const serviceDetailPageStore = useServiceDetailPageStore();
+const serviceDetailPageState = serviceDetailPageStore.state;
 
 const router = useRouter();
 
 const { getProperRouteLocation } = useProperRouteLocation();
 
-const notificationsListApiQueryHelper = new ApiQueryHelper()
-    .setPageStart(1).setPageLimit(15)
-    .setSort('created_at', true);
-
-const querySearchHandlers = reactive({
-    keyItemSets: computed<KeyItemSet[]>(() => [{
-        title: 'Properties',
-        items: [
-            { name: 'name', label: 'Name' },
-            { name: 'state', label: 'State' },
-        ],
-    }]),
-    // TODO: change API
-    valueHandlerMap: {
-        name: makeDistinctValueHandler('monitoring.Webhook', 'name'),
-        state: makeEnumValueHandler(NOTIFICATION_PROTOCOL_STATE),
-    },
-});
 const tableState = reactive({
     actionMenu: computed<MenuItem[]>(() => ([
         {
             type: 'item',
             name: 'enable',
             label: _i18n.t('ALERT_MANAGER.ENABLE'),
-            disabled: state.proxySelectedItem[0]?.state === NOTIFICATION_PROTOCOL_STATE.ENABLED,
+            disabled: state.proxySelectedItem[0]?.state === SERVICE_CHANNEL_STATE.ENABLED,
         },
         {
             type: 'item',
             name: 'disable',
             label: _i18n.t('ALERT_MANAGER.DISABLED'),
-            disabled: state.proxySelectedItem[0]?.state === NOTIFICATION_PROTOCOL_STATE.DISABLED,
+            disabled: state.proxySelectedItem[0]?.state === SERVICE_CHANNEL_STATE.DISABLED,
         },
         { type: 'divider' },
         {
@@ -90,27 +80,23 @@ const tableState = reactive({
             label: _i18n.t('ALERT_MANAGER.DELETE'),
         },
     ])),
-    fields: computed<DataTableFieldType[]>(() => [
-        { name: 'name', label: 'Name' },
-        { name: 'channel', label: 'Channel' },
-        { name: 'state', label: 'State' },
-    ]),
-    tags: notificationsListApiQueryHelper.setKeyItemSets(querySearchHandlers.keyItemSets).queryTags,
-    totalCount: 0,
+    fields: NOTIFICATION_MANAGEMENT_TABLE_FIELDS,
+});
+const storeState = reactive({
+    serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
 });
 const state = reactive({
     loading: false,
-    // TODO: temp data
-    items: [{
-        name: 'temp name',
-        state: 'ENABLED',
-        channel: 'Notify to Member Channel',
-    }],
+    items: [] as ServiceChannelModel[],
+    totalCount: 0,
     selectIndex: [],
-    // TODO: add type
-    proxySelectedItem: useProxyValue<any[]>('selectedItem', props, emit),
-    isSelectedItem: computed(() => state.proxySelectedItem?.length),
+    isSelectedItem: computed<number>(() => state.selectIndex?.length),
+    proxySelectedItem: useProxyValue<string>('selectedItem', props, emit),
 });
+
+const notificationsListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true);
+const queryTagHelper = useQueryTags({ keyItemSets: NOTIFICATION_MANAGEMENT_TABLE_HANDLER.keyItemSets });
+const { queryTags } = queryTagHelper;
 
 const handleClickCreateButton = () => {
     router.push(getProperRouteLocation({
@@ -120,15 +106,43 @@ const handleClickCreateButton = () => {
 const handleSelectDropdownItem = (name) => {
     console.log('TODO: handleSelectDropdownItem', name);
 };
-const handleChangeToolbox = (options: any = {}) => {
-    console.log('TODO: handleChangeToolbox', options);
+const handleChangeToolbox = async (options: any = {}) => {
+    if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
+    if (options.pageStart !== undefined) notificationsListApiQueryHelper.setPageStart(options.pageStart);
+    if (options.pageLimit !== undefined) notificationsListApiQueryHelper.setPageLimit(options.pageLimit);
+    await fetchNotificationList();
 };
 const handleExportExcel = () => {
     console.log('TODO: handleExportExcel');
 };
 const handleSelectTableRow = (selectedItems: number[]) => {
-    state.proxySelectedItem = selectedItems.map((i) => state.items[i]);
+    state.proxySelectedItem = state.items[selectedItems[0]].channel_id;
 };
+
+const fetchNotificationList = async () => {
+    state.loading = true;
+    try {
+        notificationsListApiQueryHelper.setFilters([
+            ...queryTagHelper.filters.value,
+        ]);
+        const { results, total_count } = await SpaceConnector.clientV2.alertManager.serviceChannel.list<ServiceChannelListParameters, ListResponse<ServiceChannelModel>>({
+            query: notificationsListApiQueryHelper.data,
+            service_id: storeState.serviceId,
+        });
+        state.items = results || [];
+        state.totalCount = total_count || 0;
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
+        state.items = [];
+        state.totalCount = 0;
+    } finally {
+        state.loading = false;
+    }
+};
+
+onMounted(() => {
+    fetchNotificationList();
+});
 </script>
 
 <template>
@@ -139,13 +153,13 @@ const handleSelectTableRow = (selectedItems: number[]) => {
                      exportable
                      :multi-select="false"
                      :loading="state.loading"
-                     :total-count="tableState.totalCount"
+                     :total-count="state.totalCount"
                      :items="state.items"
                      :fields="tableState.fields"
                      :select-index.sync="state.selectIndex"
-                     :query-tags="tableState.tags"
-                     :key-item-sets="querySearchHandlers.keyItemSets"
-                     :value-handler-map="querySearchHandlers.valueHandlerMap"
+                     :query-tags="queryTags"
+                     :key-item-sets="NOTIFICATION_MANAGEMENT_TABLE_HANDLER.keyItemSets"
+                     :value-handler-map="NOTIFICATION_MANAGEMENT_TABLE_HANDLER.valueHandlerMap"
                      @change="handleChangeToolbox"
                      @refresh="handleChangeToolbox()"
                      @export="handleExportExcel"
@@ -156,7 +170,7 @@ const handleSelectTableRow = (selectedItems: number[]) => {
                 <template #heading>
                     <p-heading heading-type="sub"
                                use-total-count
-                               :total-count="tableState.totalCount"
+                               :total-count="state.totalCount"
                                :title="$t('ALERT_MANAGER.NOTIFICATIONS.TITLE')"
                     />
                 </template>
