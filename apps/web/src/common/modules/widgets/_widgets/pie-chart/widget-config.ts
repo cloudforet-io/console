@@ -20,7 +20,6 @@ const pieChart: WidgetConfig = {
                 defaultMaxCount: 10,
                 max: 15,
                 defaultIndex: 0,
-                excludeDateField: true,
             },
         },
         pieChartType: {

@@ -13,7 +13,7 @@ import type {
 } from 'echarts/core';
 import type { LegendOption, EChartsOption } from 'echarts/types/dist/shared';
 import {
-    cloneDeep, isEmpty, orderBy, throttle,
+    groupBy, isEmpty, orderBy, throttle, sumBy,
 } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -37,13 +37,15 @@ import {
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
+import type { DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
 import type { DateFormatValue } from '@/common/modules/widgets/_widget-fields/date-format/type';
 import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { DisplaySeriesLabelValue } from '@/common/modules/widgets/_widget-fields/display-series-label/type';
 import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/granularity/type';
-import type { GroupByValue } from '@/common/modules/widgets/_widget-fields/group-by/type';
+import type { _GroupByValue } from '@/common/modules/widgets/_widget-fields/group-by/type';
 import type { LegendValue } from '@/common/modules/widgets/_widget-fields/legend/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
+import type { PieChartTypeValue } from '@/common/modules/widgets/_widget-fields/pie-chart-type/type';
 import type { TooltipNumberFormatValue } from '@/common/modules/widgets/_widget-fields/tooltip-number-format/type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
@@ -56,6 +58,10 @@ import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 type Data = ListResponse<{
     [key: string]: string|number;
 }>;
+interface PieChartData {
+    name: string;
+    value: number;
+}
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 const { dateRange } = useWidgetDateRange({
@@ -151,7 +157,7 @@ const state = reactive({
                     fontSize: 10,
                     formatter: (p) => {
                         if (p.percent < 5) return '';
-                        if (state.seriesFormat === 'percent') {
+                        if (state.displaySeriesLabel?.format === 'percent') {
                             return `${p.percent}%`;
                         }
                         return getFormattedNumber(p.value, state.dataField, state.numberFormat, state.unit);
@@ -162,22 +168,21 @@ const state = reactive({
         ],
     })),
     // required fields
-    granularity: computed<string>(() => props.widgetOptions?.granularity as string),
-    dataField: computed<string|undefined>(() => props.widgetOptions?.dataField as string),
-    groupByField: computed<string|undefined>(() => (props.widgetOptions?.groupBy as GroupByValue)?.value as string),
-    groupByCount: computed<number>(() => (props.widgetOptions?.groupBy as GroupByValue)?.count as number),
-    chartType: computed<string>(() => props.widgetOptions?.pieChartType as string),
+    granularity: computed<string|undefined>(() => (props.widgetOptions?.granularity?.value as GranularityValue)?.granularity),
+    dataField: computed<string|undefined>(() => (props.widgetOptions?.dataField?.value as DataFieldValue)?.data as string),
+    groupByField: computed<string|undefined>(() => (props.widgetOptions?.groupBy?.value as _GroupByValue)?.data as string),
+    groupByCount: computed<number|undefined>(() => (props.widgetOptions?.groupBy?.value as _GroupByValue)?.count),
+    chartType: computed<string|undefined>(() => (props.widgetOptions?.pieChartType?.value as PieChartTypeValue)?.type),
     // optional fields
-    showLegends: computed<boolean>(() => (props.widgetOptions?.legend as LegendValue)?.toggleValue),
-    legendPosition: computed<string|undefined>(() => (props.widgetOptions?.legend as LegendValue)?.position),
+    showLegends: computed<boolean|undefined>(() => (props.widgetOptions?.legend?.value as LegendValue)?.toggleValue),
+    legendPosition: computed<string|undefined>(() => (props.widgetOptions?.legend?.value as LegendValue)?.position),
     dateFormat: computed<string|undefined>(() => {
-        const _dateFormat = (props.widgetOptions?.dateFormat as DateFormatValue)?.value || 'MMM DD, YYYY';
+        const _dateFormat = (props.widgetOptions?.dateFormat?.value as DateFormatValue)?.value || 'MMM DD, YYYY';
         return DATE_FORMAT?.[_dateFormat]?.[state.granularity];
     }),
-    numberFormat: computed<NumberFormatValue>(() => props.widgetOptions?.numberFormat as NumberFormatValue),
-    tooltipNumberFormat: computed<TooltipNumberFormatValue>(() => props.widgetOptions?.tooltipNumberFormat as TooltipNumberFormatValue),
-    displaySeriesLabel: computed(() => (props.widgetOptions?.displaySeriesLabel as DisplaySeriesLabelValue)),
-    seriesFormat: computed<string>(() => state.displaySeriesLabel?.format || 'numeric'),
+    numberFormat: computed<NumberFormatValue>(() => props.widgetOptions?.numberFormat?.value as NumberFormatValue),
+    tooltipNumberFormat: computed<TooltipNumberFormatValue>(() => props.widgetOptions?.tooltipNumberFormat?.value as TooltipNumberFormatValue),
+    displaySeriesLabel: computed(() => (props.widgetOptions?.displaySeriesLabel?.value as DisplaySeriesLabelValue)),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange,
@@ -196,18 +201,9 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
         const _fetcher = _isPrivate ? privateWidgetFetcher : publicWidgetFetcher;
         const { status, response } = await _fetcher({
             widget_id: props.widgetId,
-            query: {
-                granularity: state.granularity,
-                start: dateRange.value.start,
-                end: dateRange.value.end,
-                group_by: [state.groupByField],
-                fields: {
-                    [state.dataField]: {
-                        key: state.dataField,
-                        operator: 'sum',
-                    },
-                },
-            },
+            granularity: state.granularity,
+            start: dateRange.value.start,
+            end: dateRange.value.end,
             vars: props.dashboardVars,
         });
         if (status === 'succeed') {
@@ -225,25 +221,27 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
 };
 const drawChart = (rawData: Data|null) => {
     if (isEmpty(rawData)) return;
+
     // get chart data
-    let _refinedData = cloneDeep(rawData.results || []);
+    const _groupByData = groupBy(rawData.results || [], state.groupByField);
+    let _refinedData: PieChartData[] = Object.entries(_groupByData).map(([k, v]) => ({
+        name: k,
+        value: sumBy(v, state.dataField),
+    }));
     if (isDateField(state.groupByField)) {
-        _refinedData = orderBy(_refinedData, state.groupByField, 'desc');
+        _refinedData = orderBy(_refinedData, 'name', 'desc');
         _refinedData = _refinedData?.slice(0, state.groupByCount);
     } else {
-        _refinedData = orderBy(_refinedData, state.dataField, 'desc');
-        const _slicedData = _refinedData?.slice(0, state.groupByCount);
-        const _etcData = _refinedData?.slice(state.groupByCount).reduce((acc, cur) => {
-            acc[state.groupByField] = 'etc';
-            acc[state.dataField] = (acc[state.dataField] || 0) + cur[state.dataField];
+        _refinedData = orderBy(_refinedData, 'value', 'desc');
+        const _slicedData: PieChartData[] = _refinedData?.slice(0, state.groupByCount);
+        const _etcData: PieChartData = _refinedData?.slice(state.groupByCount).reduce((acc, cur) => {
+            acc.name = 'etc';
+            acc.value = (acc.value || 0) + (cur.value || 0);
             return acc;
-        }, {} as Record<string, string|number>);
+        }, {} as PieChartData);
         _refinedData = isEmpty(_etcData) ? _slicedData : [..._slicedData, _etcData];
     }
-    state.chartData = _refinedData?.map((v) => ({
-        name: v[state.groupByField],
-        value: v[state.dataField],
-    })) || [];
+    state.chartData = _refinedData;
 };
 
 const loadWidget = async (): Promise<Data|APIErrorToast> => {
