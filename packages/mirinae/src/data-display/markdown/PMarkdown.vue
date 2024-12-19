@@ -46,7 +46,7 @@ export default defineComponent<MarkdownProps>({
             }
             return doc;
         });
-        const { sanitizedHtml } = useMarkdown(refinedValue);
+        const { sanitizedHtml } = useMarkdown({ value: refinedValue });
 
         return {
             sanitizedHtml,
