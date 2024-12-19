@@ -45,7 +45,7 @@ const storeState = reactive({
 });
 const state = reactive({
     selectedWebhook: undefined,
-    selectedNotifications: [],
+    selectedNotifications: undefined,
 });
 
 watch(() => tabState.activeTab, (activeTab) => {
@@ -88,10 +88,10 @@ onUnmounted(() => {
                 </template>
             </p-horizontal-layout>
             <service-detail-tabs-webhook-detail-tabs v-if="state.selectedWebhook"
-                                                     :selected-webhook="state.selectedWebhook"
+                                                     :selected-id="state.selectedWebhook"
             />
-            <service-detail-tabs-notifications-detail-tabs v-else-if="state.selectedNotifications[0]"
-                                                           :selected-notifications="state.selectedNotifications[0]"
+            <service-detail-tabs-notifications-detail-tabs v-else-if="state.selectedNotifications"
+                                                           :selected-id="state.selectedNotifications"
             />
         </div>
         <p-tab v-else

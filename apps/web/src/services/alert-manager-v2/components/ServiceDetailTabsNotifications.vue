@@ -37,14 +37,14 @@ import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route
 import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
 
 interface Props {
-    selectedItem?: string
+    selectedId?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    selectedItem: undefined,
+    selectedId: undefined,
 });
 
-const emit = defineEmits<{(e: 'update:selected-item', value: string): void;
+const emit = defineEmits<{(e: 'update:selected-id', value: string): void;
 }>();
 
 const serviceDetailPageStore = useServiceDetailPageStore();
@@ -60,13 +60,13 @@ const tableState = reactive({
             type: 'item',
             name: 'enable',
             label: _i18n.t('ALERT_MANAGER.ENABLE'),
-            disabled: state.proxySelectedItem[0]?.state === SERVICE_CHANNEL_STATE.ENABLED,
+            disabled: state.selectedItem?.state === SERVICE_CHANNEL_STATE.ENABLED,
         },
         {
             type: 'item',
             name: 'disable',
             label: _i18n.t('ALERT_MANAGER.DISABLED'),
-            disabled: state.proxySelectedItem[0]?.state === SERVICE_CHANNEL_STATE.DISABLED,
+            disabled: state.selectedItem?.state === SERVICE_CHANNEL_STATE.DISABLED,
         },
         { type: 'divider' },
         {
@@ -90,8 +90,8 @@ const state = reactive({
     items: [] as ServiceChannelModel[],
     totalCount: 0,
     selectIndex: [],
-    isSelectedItem: computed<number>(() => state.selectIndex?.length),
-    proxySelectedItem: useProxyValue<string>('selectedItem', props, emit),
+    selectedItem: computed<ServiceChannelModel>(() => state.items[state.selectIndex[0]]),
+    proxySelectedId: useProxyValue<string>('selectedId', props, emit),
 });
 
 const notificationsListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true);
@@ -115,8 +115,8 @@ const handleChangeToolbox = async (options: any = {}) => {
 const handleExportExcel = () => {
     console.log('TODO: handleExportExcel');
 };
-const handleSelectTableRow = (selectedItems: number[]) => {
-    state.proxySelectedItem = state.items[selectedItems[0]].channel_id;
+const handleSelectTableRow = () => {
+    state.proxySelectedId = state.selectedItem.channel_id;
 };
 
 const fetchNotificationList = async () => {
@@ -186,7 +186,7 @@ onMounted(() => {
         </template>
         <template #toolbox-left>
             <p-select-dropdown :menu="tableState.actionMenu"
-                               :disabled="!state.isSelectedItem"
+                               :disabled="!state.selectedItem"
                                reset-selection-on-menu-close
                                :placeholder="$t('ALERT_MANAGER.ACTION')"
                                @select="handleSelectDropdownItem"
