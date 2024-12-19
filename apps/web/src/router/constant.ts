@@ -30,9 +30,13 @@ export const EXTERNAL_PAGE_ROUTE = {
     ALERT_PUBLIC_DETAIL: {
         _NAME: 'alert-public-detail',
     },
+    OPS_FLOW_LANDING: {
+        _NAME: 'ops-flow-landing',
+    },
 } as const;
 
 export const EXTERNAL_PAGES = [
     EXTERNAL_PAGE_ROUTE.COST_REPORT_DETAIL._NAME,
     EXTERNAL_PAGE_ROUTE.ALERT_PUBLIC_DETAIL._NAME,
+    EXTERNAL_PAGE_ROUTE.OPS_FLOW_LANDING._NAME,
 ];

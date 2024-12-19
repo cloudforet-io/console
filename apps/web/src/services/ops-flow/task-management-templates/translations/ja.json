@@ -1,0 +1,24 @@
+{
+	"default": {
+		"Task": "",
+		"TaskBoard": "",
+		"TaskCategory": "",
+		"TaskType": "",
+		"TemplateName": "",
+		"task": "",
+		"taskType": "",
+		"taskTypes": "",
+		"tasks": ""
+	},
+	"service-desk": {
+		"Task": "",
+		"TaskBoard": "",
+		"TaskCategory": "",
+		"TaskType": "",
+		"TemplateName": "",
+		"task": "",
+		"taskType": "",
+		"taskTypes": "",
+		"tasks": ""
+	}
+}

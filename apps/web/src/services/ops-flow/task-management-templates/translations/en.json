@@ -1,0 +1,24 @@
+{
+	"default": {
+		"Task": "Task",
+		"TaskBoard": "Task Board",
+		"TaskCategory": "Task Category",
+		"TaskType": "Task Type",
+		"TemplateName": "Default",
+		"task": "task",
+		"taskType": "task type",
+		"taskTypes": "task types",
+		"tasks": "tasks"
+	},
+	"service-desk": {
+		"Task": "Ticket",
+		"TaskBoard": "Ticket Board",
+		"TaskCategory": "Support Category",
+		"TaskType": "Request Type",
+		"TemplateName": "Service Desk",
+		"task": "ticket",
+		"taskType": "request type",
+		"taskTypes": "request types",
+		"tasks": "tickets"
+	}
+}

@@ -25,6 +25,7 @@ import { initDomain } from '@/lib/site-initializer/domain';
 import { initDomainSettings } from '@/lib/site-initializer/domain-settings';
 import { initEcharts } from '@/lib/site-initializer/echarts';
 import { initErrorHandler } from '@/lib/site-initializer/error-handler';
+import { initTaskManagementTemplate } from '@/lib/site-initializer/initTaskManagementTemplate';
 import { initModeSetting } from '@/lib/site-initializer/mode-setting';
 import { checkSsoAccessToken } from '@/lib/site-initializer/sso';
 import { initUserAndAuth } from '@/lib/site-initializer/user-auth';
@@ -86,7 +87,19 @@ const init = async () => {
         initEcharts();
         initErrorHandler();
         initRequestIdleCallback();
-        await checkSsoAccessToken();
+        const results = await Promise.allSettled([
+            checkSsoAccessToken(),
+            initTaskManagementTemplate(),
+        ]);
+        const errors: any[] = [];
+        results.forEach((result) => {
+            if (result.status === 'rejected') {
+                errors.push(result.reason);
+            }
+        });
+        if (errors.length > 0) {
+            throw errors;
+        }
     } catch (e) {
         if (!isRouterInitialized) initRouter();
         throw e;

@@ -10,6 +10,7 @@ import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
+import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
@@ -263,5 +264,29 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         routeName: INFO_ROUTE.NOTICE._NAME,
         translationId: 'MENU.INFO_NOTICE',
         icon: 'ic_gnb_bell',
+    },
+    [MENU_ID.OPS_FLOW]: {
+        menuId: MENU_ID.OPS_FLOW,
+        routeName: OPS_FLOW_ROUTE._NAME,
+        translationId: 'MENU.OPS_FLOW',
+        icon: 'ic_gnb_bell', // TODO: change icon
+    },
+    [MENU_ID.OPS_FLOW_LANDING]: {
+        menuId: MENU_ID.OPS_FLOW_LANDING,
+        routeName: OPS_FLOW_ROUTE.LANDING._NAME,
+        translationId: 'OpsFlow Landing', // It will be replaced by task management template
+        icon: 'ic_service_service-desk',
+    },
+    [MENU_ID.TASK_BOARD]: {
+        menuId: MENU_ID.TASK_BOARD,
+        routeName: OPS_FLOW_ROUTE.BOARD._NAME,
+        translationId: 'Board', // It will be replaced by task management template
+        icon: 'ic_service_board',
+    },
+    [MENU_ID.TASK_MANAGEMENT]: {
+        menuId: MENU_ID.TASK_MANAGEMENT,
+        routeName: OPS_FLOW_ROUTE.TASK_MANAGEMENT._NAME,
+        translationId: 'MENU.TASK_MANAGEMENT',
+        icon: 'ic_service_task-management',
     },
 });

@@ -1,6 +1,6 @@
 {
   "name": "web",
-  "version": "2.0.0-dev243",
+  "version": "2.0.0-dev244",
   "private": true,
   "description": "Cloudforet Console Web Application",
   "author": "Cloudforet",
@@ -32,6 +32,7 @@
     "@tiptap/core": "^2.0.3",
     "@tiptap/extension-color": "^2.0.3",
     "@tiptap/extension-link": "^2.0.3",
+    "@tiptap/extension-placeholder": "^2.10.2",
     "@tiptap/extension-text-align": "^2.0.3",
     "@tiptap/extension-text-style": "^2.0.3",
     "@tiptap/extension-underline": "^2.0.3",

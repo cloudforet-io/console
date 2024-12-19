@@ -114,12 +114,20 @@ const handleMenuDescription = (value?: boolean) => {
 const handleMinimizedGnbRail = () => {
     gnbStore.createMinimizeNavRail(!gnbGetters.isMinimizeNavRail);
 };
-const convertGNBMenuToMenuItem = (menuList: DisplayMenu[], menuType: ContextMenuType = 'item'): GNBMenuType[] => menuList.map((menu) => ({
-    ...menu,
-    name: menu.id,
-    type: menuType,
-    disabled: menuType === 'header' && menu.id.includes('cost'),
-}));
+const convertGNBMenuToMenuItem = (menuList: DisplayMenu[], menuType: ContextMenuType = 'item'): GNBMenuType[] => {
+    const results: GNBMenuType[] = [];
+    menuList.forEach((menu) => {
+        if (!menu.hideOnGNB && !menu.hideOnSiteMap) {
+            results.push({
+                ...menu,
+                name: menu.id,
+                type: menuType,
+                disabled: menuType === 'header' && menu.id.includes('cost'),
+            });
+        }
+    });
+    return results;
+};
 const removeCostExplorerFromMenuList = (list: GNBMenuType[]) => {
     const index = list.findIndex((d) => d.id === MENU_ID.COST_EXPLORER);
     if (index !== -1) {
