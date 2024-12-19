@@ -72,6 +72,7 @@
     "prosemirror-transform": "^1.7.3",
     "prosemirror-view": "^1.31.5",
     "qrcode": "^1.5.4",
+    "tiptap-markdown": "^0.8.10",
     "uuid": "^8.3.2",
     "v-click-outside": "^3.0.1",
     "v-tooltip": "^2.0.3",

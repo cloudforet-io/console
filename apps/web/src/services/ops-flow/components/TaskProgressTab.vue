@@ -54,7 +54,9 @@ onUnmounted(() => {
                 class="timeline"
             >
                 <div class="text-label-sm text-gray-600">
-                    <text-editor-viewer :contents="item.description" />
+                    <text-editor-viewer :contents="item.description"
+                                        content-type="markdown"
+                    />
                 </div>
             </vertical-timeline-item>
         </p-data-loader>

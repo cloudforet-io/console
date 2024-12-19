@@ -23,6 +23,7 @@ const attachments = computed(() => props.files?.map((d) => ({ fileId: d.file_id,
     >
         <text-editor-viewer :contents="props.description"
                             :attachments="attachments"
+                            content-type="markdown"
         />
     </p-collapsible-panel>
 </template>
