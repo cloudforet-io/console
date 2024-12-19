@@ -22,7 +22,7 @@ const serviceFormStore = useServiceCreateFormStore();
 const serviceFormState = serviceFormStore.state;
 
 const storeState = reactive({
-    selectedWebhookType: computed<PluginModel>(() => serviceFormState.selectedWebhookType),
+    selectedWebhookType: computed<PluginModel|undefined>(() => serviceFormState.selectedWebhookType),
 });
 const state = reactive({
     loading: false,
@@ -56,7 +56,7 @@ const getVersions = async () => {
     state.loading = true;
     try {
         const { results } = await SpaceConnector.clientV2.repository.plugin.getVersions<PluginGetVersionsParameters, ListResponse<string> >({
-            plugin_id: storeState.selectedWebhookType.plugin_id,
+            plugin_id: storeState.selectedWebhookType?.plugin_id || '',
         });
         state.pluginVersions = results ? results[0] : undefined;
     } catch (e) {

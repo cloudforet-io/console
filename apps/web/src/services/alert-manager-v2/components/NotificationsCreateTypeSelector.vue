@@ -37,11 +37,11 @@ const state = reactive({
         ...item,
         icon: storeState.plugins[item.plugin_id]?.icon || '',
     }))),
-    selectedProtocol: {},
+    selectedProtocol: {} as NotificationProtocolModel,
 });
 
 const handleSelectProtocol = () => {
-    serviceFormStore.setSelectedProtocol({ protocol_id: 'temp_id' });
+    serviceFormStore.setSelectedProtocol(state.selectedProtocol);
 };
 
 const fetchNotificationProtocolList = async () => {

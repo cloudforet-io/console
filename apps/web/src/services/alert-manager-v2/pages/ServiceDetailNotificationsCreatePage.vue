@@ -4,15 +4,22 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButton, PCenteredLayoutHeader } from '@cloudforet/mirinae';
 
+import type { ServiceChannelCreateParameters } from '@/schema/alert-manager/service-channel/api-verbs/create';
+import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
+import NotificationsCreateForm from '@/services/alert-manager-v2/components/NotificationsCreateForm.vue';
 import NotificationsCreateTypeSelector
     from '@/services/alert-manager-v2/components/NotificationsCreateTypeSelector.vue';
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
 import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
 import { useServiceCreateFormStore } from '@/services/alert-manager-v2/stores/service-create-form-store';
+import type { CreatedNotificationInfoType } from '@/services/alert-manager-v2/types/alert-manager-type';
 
 interface Props {
     serviceId: string;
@@ -29,16 +36,32 @@ const router = useRouter();
 const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
-    selectedProtocolId: computed<string>(() => serviceCreateFormState.selectedProtocol.protocol_id || ''),
+    selectedProtocolId: computed<string>(() => serviceCreateFormState.selectedProtocol?.protocol_id || ''),
 });
 const state = reactive({
     currentStep: 1,
+    form: {} as CreatedNotificationInfoType,
     isAllFormValid: computed<boolean>(() => {
         if (state.currentStep === 1) return storeState.selectedProtocolId !== '';
-        return true;
+        const { name, data } = state.form;
+
+        if (!name) return false;
+        if (data.FORWARD_TYPE === 'USER') {
+            return Array.isArray(data.USER) && data.USER.length > 0 && !data.USER_GROUP;
+        }
+        if (data.FORWARD_TYPE === 'USER_GROUP') {
+            return Array.isArray(data.USER_GROUP) && data.USER_GROUP.length > 0 && !data.USER;
+        }
+        if (data.FORWARD_TYPE === 'ALL_MEMBER') {
+            return !data.USER && !data.USER_GROUP;
+        }
+        return false;
     }),
 });
 
+const handleChangeForm = (form: CreatedNotificationInfoType) => {
+    state.form = form;
+};
 const handleClickCancelButton = () => {
     router.push(getProperRouteLocation({
         name: ALERT_MANAGER_ROUTE_V2.SERVICE.DETAIL._NAME,
@@ -67,9 +90,17 @@ const handleActionButton = () => {
     fetchCreateNotifications();
 };
 
-const fetchCreateNotifications = () => {
-    console.log('TODO: fetchCreateNotifications');
-    handleClickCancelButton();
+const fetchCreateNotifications = async () => {
+    try {
+        await SpaceConnector.clientV2.alertManager.serviceChannel.create<ServiceChannelCreateParameters, ServiceChannelModel>({
+            protocol_id: storeState.selectedProtocolId,
+            service_id: props.serviceId,
+            ...state.form,
+        });
+        handleClickCancelButton();
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
+    }
 };
 
 onUnmounted(() => {
@@ -90,6 +121,9 @@ onUnmounted(() => {
                                   @close="handleClickCancelButton"
         />
         <notifications-create-type-selector v-if="state.currentStep === 1" />
+        <notifications-create-form v-if="state.currentStep === 2"
+                                   @change-form="handleChangeForm"
+        />
         <div class="flex justify-end mt-8">
             <p-button v-if="state.currentStep === 1"
                       style-type="tertiary"
@@ -107,7 +141,7 @@ onUnmounted(() => {
                 {{ $t('ALERT_MANAGER.SERVICE.GO_BACK') }}
             </p-button>
             <p-button :disabled="!state.isAllFormValid"
-                      style-type="substitutive"
+                      :style-type="state.currentStep === 1 ? 'substitutive' : 'primary'"
                       size="lg"
                       class="ml-4"
                       @click="handleActionButton"
