@@ -1,31 +1,20 @@
 <template>
-    <!-- eslint-disable -->
-    <div class="p-markdown" v-html="md" :class="{'remove-spacing': removeSpacing}" />
+    <!--        eslint-disable-next-line vue/no-v-html-->
+    <div class="p-markdown"
+         :class="{'remove-spacing': removeSpacing}"
+         v-html="sanitizedHtml"
+    />
 </template>
 
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
 
-import DOMPurify from 'dompurify';
 import { render } from 'ejs';
-import hljs from 'highlight.js';
 import { get } from 'lodash';
-import { marked } from 'marked';
 
 import type { MarkdownProps } from '@/data-display/markdown/type';
+import { useMarkdown } from '@/hooks/use-markdown/use-markdown';
 
-
-
-marked.setOptions({
-    gfm: true,
-    breaks: true,
-    pedantic: false,
-    highlight: (code, language) => {
-        const validLanguage = hljs.getLanguage(language) ? language : 'plaintext';
-        const result = hljs.highlight(validLanguage, code);
-        return result.value;
-    },
-});
 const DEFAULT_LANGUAGE = 'en';
 
 export default defineComponent<MarkdownProps>({
@@ -50,23 +39,17 @@ export default defineComponent<MarkdownProps>({
     },
     setup(props) {
         const getI18nMd = (md: any) => get(md, props.language, md[DEFAULT_LANGUAGE] || Object.values(md)[0] || '');
-        const md = computed(() => {
+        const refinedValue = computed(() => {
             let doc = typeof props.markdown === 'object' ? getI18nMd(props.markdown) : props.markdown || '';
             if (props.data) {
                 doc = render(doc, props.data);
             }
-            marked.parse(doc, (error, parseResult) => {
-                if (error) console.error('[Mirinae] Markdown parsing error: ', error);
-                else {
-                    doc = parseResult.replace(/<pre>/g, '<pre class="hljs"').replace(/<a /g, '<a target="_blank"');
-                }
-            });
-
-            return DOMPurify.sanitize(doc, { ADD_ATTR: ['target'] });
+            return doc;
         });
+        const { sanitizedHtml } = useMarkdown(refinedValue);
 
         return {
-            md,
+            sanitizedHtml,
         };
     },
 });
