@@ -67,8 +67,8 @@ export const useRegionReferenceStore = defineStore('reference-region', () => {
 
         const referenceMap: RegionReferenceMap = {};
         try {
-            const isResourceManagerVersionV2 = config.get('RESOURCE_MANAGER_VERSION') === 'v2';
-            const regionFetcher = isResourceManagerVersionV2 ? SpaceConnector.clientV2.inventoryV2.region.list : SpaceConnector.clientV2.inventory.region.list;
+            const isAlertManagerVersionV2 = config.get('ADVANCED_SERVICES').includes('alert-v2');
+            const regionFetcher = isAlertManagerVersionV2 ? SpaceConnector.clientV2.inventoryV2.region.list : SpaceConnector.clientV2.inventory.region.list;
 
             const response = await regionFetcher<RegionListParameters, ListResponse<RegionModel>>({
                 query: {

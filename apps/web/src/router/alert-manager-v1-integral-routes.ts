@@ -1,11 +1,11 @@
 import type { RouteConfig } from 'vue-router';
 
+import { alertManagerV1AdminRoutes } from '@/router/alert-manager-v1-admin-routes';
+import { alertManagerV1WorkspaceRoutes } from '@/router/alert-manager-v1-workspace-routes';
 import { ROOT_ROUTE, ROUTE_SCOPE } from '@/router/constant';
 import { errorRoutes } from '@/router/error-routes';
 import { externalRoutes } from '@/router/external-routes';
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
-import { resourceManagerV1AdminRoutes } from '@/router/resource-manager-v1-admin-routes';
-import { resourceManagerV1WorkspaceRoutes } from '@/router/resource-manager-v1-workspace-routes';
 
 import { pinia } from '@/store/pinia';
 import { useUserStore } from '@/store/user/user-store';
@@ -17,7 +17,7 @@ import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-con
 
 const userStore = useUserStore(pinia);
 
-export const resourceManagerV1IntegralRoutes: RouteConfig[] = [
+export const alertManagerV1IntegralRoutes: RouteConfig[] = [
     {
         path: '/',
         component: { template: '<router-view />' },
@@ -42,7 +42,7 @@ export const resourceManagerV1IntegralRoutes: RouteConfig[] = [
                 },
                 component: { template: '<router-view />' },
                 children: [
-                    ...resourceManagerV1AdminRoutes,
+                    ...alertManagerV1AdminRoutes,
                 ],
             },
             {
@@ -57,7 +57,7 @@ export const resourceManagerV1IntegralRoutes: RouteConfig[] = [
                 }),
                 component: { template: '<router-view />' },
                 children: [
-                    ...resourceManagerV1WorkspaceRoutes,
+                    ...alertManagerV1WorkspaceRoutes,
                 ],
             },
             myPageRoutes,

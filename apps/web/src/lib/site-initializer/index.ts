@@ -5,10 +5,10 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceRouter } from '@/router';
 import { setI18nLocale } from '@/translations';
 
+import { alertManagerV1IntegralRoutes } from '@/router/alert-manager-v1-integral-routes';
 import { ERROR_ROUTE } from '@/router/constant';
 import { errorRoutes } from '@/router/error-routes';
 import { integralRoutes } from '@/router/integral-routes';
-import { resourceManagerV1IntegralRoutes } from '@/router/resource-manager-v1-integral-routes';
 
 import { useDisplayStore } from '@/store/display/display-store';
 import { pinia } from '@/store/pinia';
@@ -45,8 +45,8 @@ const initRouter = (domainId?: string) => {
     const userStore = useUserStore(pinia);
     const allReferenceStore = useAllReferenceStore(pinia);
     const afterGrantedCallback = () => allReferenceStore.flush();
-    const isResourceManagerVersionV2 = config.get('RESOURCE_MANAGER_VERSION') === 'v2';
-    const routes = isResourceManagerVersionV2 ? integralRoutes : resourceManagerV1IntegralRoutes;
+    const isAlertManagerVersionV2 = config.get('ADVANCED_SERVICES').includes('alert-v2');
+    const routes = isAlertManagerVersionV2 ? integralRoutes : alertManagerV1IntegralRoutes;
     if (!domainId) {
         SpaceRouter.init(errorRoutes, afterGrantedCallback, userStore);
     } else {

@@ -10,7 +10,7 @@ import projectRoute from '@/services/project/routes/routes';
 import workspaceHomeRoute from '@/services/workspace-home/routes/routes';
 
 
-export const resourceManagerV1WorkspaceRoutes: RouteConfig[] = [
+export const alertManagerV1WorkspaceRoutes: RouteConfig[] = [
     workspaceHomeRoute,
     dashboardsRoute,
     iamRoutes,

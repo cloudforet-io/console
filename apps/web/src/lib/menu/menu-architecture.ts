@@ -69,7 +69,7 @@ export const MENU_LIST: Menu[] = [
 ];
 
 
-export const MENU_LIST_FOR_RESOURCE_MANAGER_V2: Menu[] = [
+export const MENU_LIST_FOR_ALERT_MANAGER_V2: Menu[] = [
     {
         id: MENU_ID.WORKSPACE_HOME,
         needPermissionByRole: true,
@@ -84,6 +84,8 @@ export const MENU_LIST_FOR_RESOURCE_MANAGER_V2: Menu[] = [
         needPermissionByRole: true,
         subMenuList: [
             { id: MENU_ID.CLOUD_SERVICE, needPermissionByRole: true },
+            { id: MENU_ID.SERVER, needPermissionByRole: true },
+            { id: MENU_ID.SECURITY, needPermissionByRole: true },
             { id: MENU_ID.METRIC_EXPLORER, needPermissionByRole: true },
             { id: MENU_ID.COLLECTOR, needPermissionByRole: true },
             { id: MENU_ID.SERVICE_ACCOUNT, needPermissionByRole: true },
@@ -185,7 +187,7 @@ export const ADMIN_MENU_LIST: Menu[] = [
     },
 ];
 
-export const ADMIN_MENU_LIST_FOR_RESOURCE_MANAGER_V2: Menu[] = [
+export const ADMIN_MENU_LIST_FOR_ALERT_MANAGER_V2: Menu[] = [
     {
         id: MENU_ID.DASHBOARDS,
     },
