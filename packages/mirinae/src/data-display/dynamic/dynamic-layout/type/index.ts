@@ -35,16 +35,20 @@ export interface DynamicLayoutTypeOptions {
     sortable?: boolean;
 }
 
-export interface DynamicLayoutProps<
-    SchemaOptions = DynamicLayoutOptions,
-    > {
+// NOTE: Due to the version issue of mirinae vue, it is not possible to define a type with generics using defineProps, so DynamicLayoutBaseProps is added and used.
+export interface DynamicLayoutBaseProps {
     name: string;
     type: DynamicLayoutType;
-    options: SchemaOptions;
     data?: any;
     fetchOptions?: DynamicLayoutFetchOptions;
     typeOptions?: DynamicLayoutTypeOptions;
     fieldHandler?: DynamicLayoutFieldHandler;
+}
+
+export interface DynamicLayoutProps<
+    SchemaOptions = DynamicLayoutOptions,
+    > extends DynamicLayoutBaseProps {
+    options: SchemaOptions;
 }
 
 export interface DynamicLayoutFieldExtraData extends DynamicField {

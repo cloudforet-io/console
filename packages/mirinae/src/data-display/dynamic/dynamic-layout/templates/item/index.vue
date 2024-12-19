@@ -1,15 +1,113 @@
+<script lang="ts" setup>
+import {
+    computed, reactive,
+} from 'vue';
+
+import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
+import type { DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
+import type { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import type { DynamicLayoutBaseProps, DynamicLayoutFieldHandler, DynamicLayoutTypeOptions } from '@/data-display/dynamic/dynamic-layout/type';
+import type { ItemOptions, DynamicLayoutType } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
+import { getValueByPath } from '@/data-display/dynamic/helper';
+import PHeading from '@/data-display/heading/PHeading.vue';
+import { DEFINITION_TABLE_STYLE_TYPE } from '@/data-display/tables/definition-table/config';
+import PDefinitionTable from '@/data-display/tables/definition-table/PDefinitionTable.vue';
+import type { DefinitionData, DefinitionField } from '@/data-display/tables/definition-table/type';
+import { I18nConnector } from '@/translations';
+
+// NOTE: Due to the vue version issue of mirinae, it is not possible to define a type with generics using defineProps.
+interface Props extends DynamicLayoutBaseProps {
+    name: string;
+    type: DynamicLayoutType;
+    options: ItemOptions;
+    data?: any;
+    typeOptions?: DynamicLayoutTypeOptions;
+    fieldHandler?: DynamicLayoutFieldHandler;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    options: () => ({}) as ItemOptions,
+    data: () => ({}),
+    typeOptions: () => ({}),
+    fieldHandler: undefined,
+});
+
+const state = reactive({
+    layoutName: computed(() => (props.options.translation_id ? I18nConnector.i18n.t(props.options.translation_id) : props.name)),
+    isFieldEmpty: computed<boolean>(() => !props.options.fields || props.options.fields.length === 0),
+    isRootDataEmpty: computed<boolean>(() => !state.rootData || Object.keys(state.rootData).length === 0),
+    fields: computed<DefinitionField[]>(() => {
+        if (state.isFieldEmpty) {
+            if (state.isRootDataEmpty) return [];
+            return Object.keys(state.rootData).map((key) => ({
+                label: key,
+                name: key,
+            }));
+        }
+        const locale = I18nConnector.i18n.locale;
+        return props.options.fields.map((d) => ({
+            label: d.options?.translation_id ? I18nConnector.i18n.t(d.options.translation_id as string, locale) : d.name,
+            name: d.key,
+            disableCopy: !!d.options?.disable_copy,
+        } as DefinitionField));
+    }),
+    rootData: computed<DefinitionData>(() => {
+        if (props.options.root_path) {
+            return getValueByPath(props.data, props.options.root_path) ?? {};
+        }
+        if (Array.isArray(props.data) || typeof props.data === 'string') return {};
+        return props.data;
+    }),
+    loading: computed<boolean|undefined>(() => (props.typeOptions === undefined ? undefined : props.typeOptions.loading)),
+    timezone: computed<string>(() => props.typeOptions?.timezone || 'UTC'),
+});
+
+const getFieldData = (rootData, dataPath: string, type?: string): any => {
+    if (type === 'more') {
+        return rootData;
+    }
+    return getValueByPath(rootData, dataPath);
+};
+
+const dynamicFieldSlots = computed<Record<string, DynamicFieldProps>>(() => {
+    const res = {};
+    if (!props.options.fields) return res;
+
+    props.options.fields.forEach((ds: DynamicField, i) => {
+        const item: DynamicFieldProps = {
+            type: ds.type || 'text',
+            options: { ...ds.options },
+            extraData: { ...ds, index: i },
+            data: getFieldData(state.rootData, ds.key, ds.type),
+        };
+
+        if (item.options.translation_id) delete item.options.translation_id;
+
+        if (ds.type === 'datetime') {
+            item.typeOptions = { timezone: state.timezone };
+        } else if (ds.type === 'more') {
+            item.typeOptions = { displayKey: ds.key };
+        }
+
+        res[`data-${i}`] = item;
+    });
+
+    return res;
+});
+
+</script>
 <template>
     <div>
-        <p-heading v-if="layoutName"
+        <p-heading v-if="state.layoutName"
                    class="pt-8 px-4 pb-4"
                    heading-type="sub"
         >
-            {{ layoutName }}
+            {{ state.layoutName }}
         </p-heading>
-        <p-definition-table :fields="fields"
-                            :data="rootData"
-                            :style-type="options.styleType"
-                            :loading="loading"
+        <p-definition-table :fields="state.fields"
+                            :data="state.rootData"
+                            :style-type="options.styleType ?? DEFINITION_TABLE_STYLE_TYPE.primary"
+                            :loading="state.loading"
                             v-on="$listeners"
         >
             <template v-for="(item, slotName) of dynamicFieldSlots"
@@ -32,117 +130,3 @@
         </p-definition-table>
     </div>
 </template>
-
-<script lang="ts">
-import {
-    computed, getCurrentInstance, reactive, toRefs,
-} from 'vue';
-import type { Vue } from 'vue/types/vue';
-
-import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
-import type { DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
-import type { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
-import type { ItemDynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/templates/item/type';
-import { getValueByPath } from '@/data-display/dynamic/helper';
-import PHeading from '@/data-display/heading/PHeading.vue';
-import PDefinitionTable from '@/data-display/tables/definition-table/PDefinitionTable.vue';
-import type { DefinitionData, DefinitionField } from '@/data-display/tables/definition-table/type';
-
-export default {
-    name: 'PDynamicLayoutItem',
-    components: {
-        PDynamicField,
-        PHeading,
-        PDefinitionTable,
-    },
-    props: {
-        name: {
-            type: String,
-            required: true,
-        },
-        options: {
-            type: Object,
-            default: () => ({}),
-        },
-        data: {
-            type: [Object, Array, String],
-            default: undefined,
-        },
-        fetchOptions: {
-            type: Object,
-            default: undefined,
-        },
-        typeOptions: {
-            type: Object,
-            default: undefined,
-        },
-        fieldHandler: {
-            type: Function,
-            default: undefined,
-        },
-    },
-    setup(props: ItemDynamicLayoutProps) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-
-        const state = reactive({
-            layoutName: computed(() => (props.options.translation_id ? vm.$t(props.options.translation_id) : props.name)),
-            fields: computed<DefinitionField[]>(() => {
-                if (!props.options.fields) return [];
-                const locale = vm.$i18n.locale;
-                return props.options.fields.map((d) => ({
-                    label: d.options?.translation_id ? vm.$t(d.options.translation_id as string, locale) : d.name,
-                    name: d.key,
-                    disableCopy: !!d.options?.disable_copy,
-                } as DefinitionField));
-            }),
-            rootData: computed<DefinitionData>(() => {
-                if (props.options.root_path) {
-                    return getValueByPath(props.data, props.options.root_path) ?? {};
-                }
-                if (Array.isArray(props.data) || typeof props.data === 'string') return {};
-                return props.data;
-            }),
-            loading: computed<boolean|undefined>(() => (props.typeOptions === undefined ? undefined : props.typeOptions.loading)),
-            timezone: computed<string>(() => props.typeOptions?.timezone || 'UTC'),
-        });
-
-        const getFieldData = (rootData, dataPath: string, type?: string): any => {
-            if (type === 'more') {
-                return rootData;
-            }
-            return getValueByPath(rootData, dataPath);
-        };
-
-        const dynamicFieldSlots = computed(() => {
-            const res = {};
-            if (!props.options.fields) return res;
-
-            props.options.fields.forEach((ds: DynamicField, i) => {
-                const item: DynamicFieldProps = {
-                    type: ds.type || 'text',
-                    options: { ...ds.options },
-                    extraData: { ...ds, index: i },
-                    data: getFieldData(state.rootData, ds.key, ds.type),
-                };
-
-                if (item.options.translation_id) delete item.options.translation_id;
-
-                if (ds.type === 'datetime') {
-                    item.typeOptions = { timezone: state.timezone };
-                } else if (ds.type === 'more') {
-                    item.typeOptions = { displayKey: ds.key };
-                }
-
-                res[`data-${i}`] = item;
-            });
-
-            return res;
-        });
-
-        return {
-            ...toRefs(state),
-            dynamicFieldSlots,
-        };
-    },
-};
-</script>

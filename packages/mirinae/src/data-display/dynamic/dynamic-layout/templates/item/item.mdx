@@ -7,6 +7,19 @@ import * as itemStories from './item.stories';
 <Meta of={itemStories} />
 
 # Item Type
+ This is an item type implemented with the `p-definition-table` component. The layout is dynamically generated according to the `options.fields` defined in the schema. For the options of `options.fields`, please refer to the `Dynamic Field` component.
+
+If `options.fields` is not provided, the layout is generated as a key-value pair of 1 depth by default. Therefore, it can be used when the data is in the following code.
+
+```json
+{
+  "key1": "value1",
+  "key2": "value2",
+  "key3": "value3"
+}
+```
+
+
 <br/>
 <br/>
 
