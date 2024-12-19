@@ -5,7 +5,7 @@ import {
     computed, reactive, ref, watch,
 } from 'vue';
 
-import { PI, PContextMenu } from '@cloudforet/mirinae';
+import { PI, PContextMenu, PFieldTitle } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -152,6 +152,13 @@ watch(() => props.dataTableInfo, (newVal) => {
             <div ref="containerRef"
                  class="dropdown-container"
             >
+                <p-field-title v-if="props.operator === 'JOIN'"
+                               size="sm"
+                               color="gray"
+                               class="join-table-text"
+                >
+                    {{ $t('COMMON.WIDGETS.DATA_TABLE.FORM.LEFT_TABLE') }}
+                </p-field-title>
                 <div ref="targetRef"
                      :class="{'select-button': true,
                               selected: !!state.selected,
@@ -188,11 +195,19 @@ watch(() => props.dataTableInfo, (newVal) => {
                  ref="secondContainerRef"
                  class="dropdown-container"
             >
+                <p-field-title v-if="props.operator === 'JOIN'"
+                               size="sm"
+                               color="gray"
+                               class="join-table-text"
+                >
+                    {{ $t('COMMON.WIDGETS.DATA_TABLE.FORM.RIGHT_TABLE') }}
+                </p-field-title>
                 <div ref="targetRef"
                      :class="{'select-button': true,
                               selected: !!state.secondarySelected,
                               error: (state.secondarySelected && !storeState.dataTables.some((dataTable) => dataTable.data_table_id === state.secondarySelected?.[0]?.name))
-                                  || storeState.isJoinRestricted
+                                  || storeState.isJoinRestricted,
+                              [props.operator]: true
                      }"
                      @click="handleClickSelectButton(true)"
                 >
@@ -237,6 +252,9 @@ watch(() => props.dataTableInfo, (newVal) => {
 
         .dropdown-container {
             @apply relative;
+            .join-table-text {
+                margin-bottom: 0.125rem;
+            }
             .select-button {
                 @apply flex justify-between items-center bg-gray-100 border border-gray-300 rounded-xl w-full cursor-pointer;
                 border-left-width: 0.375rem;
@@ -261,6 +279,9 @@ watch(() => props.dataTableInfo, (newVal) => {
 
                 &.selected {
                     @apply bg-indigo-100 border-indigo-400;
+                    &.JOIN {
+                        @apply bg-peacock-100 border-peacock-400;
+                    }
                     .text {
                         @apply text-gray-800;
                     }
