@@ -1,0 +1,37 @@
+{/* useMarkdown.mdx */}
+
+import {Canvas, Meta, Controls} from '@storybook/blocks';
+
+import * as useMarkdownStories from './use-markdown.stories';
+
+<Meta of={useMarkdownStories}/>
+
+
+# useMarkdown
+
+
+The `useMarkdown` hook parses markdown text and sanitizes it for safe HTML rendering.
+
+## Type Declarations
+
+```typescript
+interface UseMarkdownOptions {
+    value: Ref<string>|string; // Markdown content to display. string or Ref<string>
+}
+interface UseMarkdownReturn {
+    sanitizedHtml: Ref<string>; // Sanitized HTML content
+}
+```
+
+## Usage
+<br/>
+
+### Basic
+<Canvas of={useMarkdownStories.Basic}/>
+
+### Playground
+<Canvas of={useMarkdownStories.Playground}/>
+<Controls of={useMarkdownStories.Playground}/>
+
+<br/>
+<br/>
