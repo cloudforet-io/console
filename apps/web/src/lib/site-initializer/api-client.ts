@@ -284,6 +284,16 @@ const getAfterCallApiMap = () => ({
         const allReferenceStore = useAllReferenceStore();
         allReferenceStore.sync('workspace', data);
     },
+    '/identity/workspace/add-package': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('workspace', data);
+    },
+    '/identity/workspace/remove-package': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('workspace', data);
+    },
 });
 
 const getSessionTimeoutCallback = () => () => {

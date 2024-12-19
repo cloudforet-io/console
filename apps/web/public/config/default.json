@@ -19,5 +19,6 @@
     { "label": "GitHub", "link": "https://github.com/cloudforet-io" }
   ],
   "CONTACT_LINK": "",
-  "SMTP_ENABLED": false
+  "SMTP_ENABLED": false,
+  "ADVANCED_SERVICE": {}
 }

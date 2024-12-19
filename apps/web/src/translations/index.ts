@@ -3,6 +3,8 @@ import type { IVueI18n, LocaleMessageObject } from 'vue-i18n';
 import VueI18n from 'vue-i18n';
 
 
+import { endsWithConsonant } from 'hangul-js';
+
 import en from '@cloudforet/language-pack/en.json';
 import ja from '@cloudforet/language-pack/ja.json';
 import ko from '@cloudforet/language-pack/ko.json';
@@ -29,7 +31,7 @@ const removeEmpty = (obj: any): LocaleMessageObject => Object.keys(obj)
     );
 
 const supportLanguages = ['en', 'ko', 'ja'] as const;
-type SupportLanguage = typeof supportLanguages[number];
+export type SupportLanguage = typeof supportLanguages[number];
 
 const loadLocaleFiles = async (lang: string) => {
     // load necessary files
@@ -38,6 +40,17 @@ const loadLocaleFiles = async (lang: string) => {
         loadDayjsLocale(lang),
     ]);
 };
+const KO_PARTICLES = {
+    topic: ['은', '는'],
+    subject: ['이', '가'],
+    object: ['을', '를'],
+};
+export const getParticle = (word: string, type: 'topic'|'subject'|'object') => {
+    const hasBatchim = endsWithConsonant(word);
+    if (i18n.locale === 'ko') return KO_PARTICLES[type][hasBatchim ? 0 : 1];
+    return '';
+};
+
 
 export const i18n = new VueI18n({
     locale: 'en', // set locale

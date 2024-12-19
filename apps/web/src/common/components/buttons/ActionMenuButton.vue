@@ -5,6 +5,8 @@ import { ref, computed } from 'vue';
 import { PIconButton, PContextMenu, useContextMenuStyle } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
+import { i18n } from '@/translations';
+
 interface ActionMenuItem extends MenuItem {
     name: string;
 }
@@ -37,8 +39,8 @@ useContextMenuStyle({
     menuWidth: props.size === 'sm' ? '113px' : '192px',
 });
 const menuMap = computed<Record<SupportMenu, ActionMenuItem>>(() => ({
-    edit: { name: 'edit', icon: 'ic_edit', label: 'Edit' },
-    delete: { name: 'delete', icon: 'ic_delete', label: 'Delete' },
+    edit: { name: 'edit', icon: 'ic_edit', label: i18n.t('COMMON.BUTTONS.EDIT') },
+    delete: { name: 'delete', icon: 'ic_delete', label: i18n.t('COMMON.BUTTONS.DELETE') },
 }));
 const menu = computed<ActionMenuItem[]>(() => {
     if (props.menu) {
@@ -50,8 +52,8 @@ const menu = computed<ActionMenuItem[]>(() => {
         });
     }
     return [
-        { name: 'edit', icon: 'ic_edit', label: 'Edit' },
-        { name: 'delete', icon: 'ic_delete', label: 'Delete' },
+        { name: 'edit', icon: 'ic_edit', label: i18n.t('COMMON.BUTTONS.EDIT') },
+        { name: 'delete', icon: 'ic_delete', label: i18n.t('COMMON.BUTTONS.DELETE') },
     ];
 });
 const toggleMenu = () => {

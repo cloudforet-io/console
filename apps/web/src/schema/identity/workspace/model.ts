@@ -6,6 +6,7 @@ export interface WorkspaceModel {
     workspace_id: string;
     name: string;
     state: WorkspaceState;
+    packages: string[];
     tags: Tags;
     is_managed?: boolean;
     reference_id?: string;

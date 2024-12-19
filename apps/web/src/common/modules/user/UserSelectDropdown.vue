@@ -28,6 +28,10 @@ const props = withDefaults(defineProps<{
      disabled?: boolean;
      readonly?: boolean;
      userPool?: string[];
+     selectionLabel?: string;
+     appearanceType?: string;
+     styleType?: string;
+     block?: boolean;
 }>(), {
     userId: '',
     userIds: () => [],
@@ -36,6 +40,10 @@ const props = withDefaults(defineProps<{
     invalid: false,
     disabled: false,
     userPool: undefined,
+    selectionLabel: undefined,
+    appearanceType: 'badge',
+    styleType: undefined,
+    block: undefined,
 });
 
 const emit = defineEmits<{(event: 'update:user-ids', value: string[]): void;
@@ -49,13 +57,13 @@ const allUserItems = computed<UserDropdownItem[]>(() => {
     if (props.userPool && props.userPool.length > 0) {
         return props.userPool.map((userId) => ({
             name: userId,
-            label: userReferenceMap.value[userId]?.label ?? userId,
+            label: userReferenceMap.value[userId]?.label || userReferenceMap.value[userId]?.name || userId,
         }));
     }
     return Object.values(userReferenceMap.value).map((u: UserReferenceMap[string]) => ({
         name: u.key,
-        label: u.label,
-    }));
+        label: u.label || u.name || u.key,
+    })).sort((a, b) => a.label.localeCompare(b.label));
 });
 const selectedUserItems = ref<SelectDropdownMenuItem[]>([]);
 const userMenuItemsHandler: AutocompleteHandler = async (keyword: string, pageStart = 1, pageLimit = 10) => {
@@ -122,9 +130,11 @@ watch([loading, () => props.userId, () => props.userIds], ([_loading, newUserId,
 </script>
 
 <template>
-    <p-select-dropdown show-select-marker
+    <p-select-dropdown class="user-select-dropdown"
+                       show-select-marker
                        :selected="selectedUserItems"
                        :handler="userMenuItemsHandler"
+                       :page-size="10"
                        is-filterable
                        :invalid="props.invalid"
                        :disabled="props.disabled"
@@ -132,7 +142,16 @@ watch([loading, () => props.userId, () => props.userIds], ([_loading, newUserId,
                        :use-fixed-menu-style="useFixedMenuStyle"
                        show-delete-all-button
                        :multi-selectable="props.selectionType === 'multiple'"
-                       appearance-type="badge"
+                       :selection-label="props.selectionLabel"
+                       :appearance-type="props.appearanceType"
+                       :style-type="props.styleType"
+                       :block="props.block"
                        @update:selected="handleUpdateSelectedUserItems"
     />
 </template>
+
+<style scoped lang="postcss">
+.user-select-dropdown {
+    width: fit-content;
+}
+</style>
