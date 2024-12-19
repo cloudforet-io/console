@@ -24,9 +24,9 @@ export const WEBHOOK_MANAGEMENT_TABLE_HANDLER: AlertManagementTableHandlerType =
         ],
     }],
     valueHandlerMap: {
-        name: makeDistinctValueHandler('alertManager.Webhook', 'name'),
+        name: makeDistinctValueHandler('alert_manager.Webhook', 'name'),
         state: makeEnumValueHandler(WEBHOOK_STATE),
-        'plugin_info.plugin_id': makeDistinctValueHandler('alertManager.Webhook', 'plugin_info.plugin_id'),
+        'plugin_info.plugin_id': makeDistinctValueHandler('alert_manager.Webhook', 'plugin_info.plugin_id'),
     },
 };
 export const ALERT_EXCEL_FIELDS: ExcelDataField[] = [
