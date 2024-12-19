@@ -45,14 +45,14 @@ import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route
 import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
 
 interface Props {
-    selectedItem?: string
+    selectedId?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    selectedItem: undefined,
+    selectedId: undefined,
 });
 
-const emit = defineEmits<{(e: 'update:selected-item', value: string): void;
+const emit = defineEmits<{(e: 'update:selected-id', value: string): void;
 }>();
 
 const allReferenceStore = useAllReferenceStore();
@@ -72,13 +72,13 @@ const tableState = reactive({
             type: 'item',
             name: 'enable',
             label: _i18n.t('ALERT_MANAGER.ENABLE'),
-            disabled: state.items[state.selectIndex[0]]?.state === WEBHOOK_STATE.ENABLED,
+            disabled: state.selectedItem?.state === WEBHOOK_STATE.ENABLED,
         },
         {
             type: 'item',
             name: 'disable',
             label: _i18n.t('ALERT_MANAGER.DISABLED'),
-            disabled: state.items[state.selectIndex[0]]?.state === WEBHOOK_STATE.DISABLED,
+            disabled: state.selectedItem?.state === WEBHOOK_STATE.DISABLED,
         },
         { type: 'divider' },
         {
@@ -104,8 +104,8 @@ const state = reactive({
     items: [] as WebhookModel[],
     totalCount: 0,
     selectIndex: [],
-    isSelectedItem: computed<number>(() => state.selectIndex?.length),
-    proxySelectedItem: useProxyValue<string>('selectedItem', props, emit),
+    selectedItem: computed<WebhookModel>(() => state.items[state.selectIndex[0]]),
+    proxySelectedId: useProxyValue<string>('selectedId', props, emit),
 });
 
 const webhookListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true);
@@ -137,8 +137,8 @@ const handleExportExcel = async () => {
         timezone: storeState.timezone,
     });
 };
-const handleSelectTableRow = (selectedItems: number[]) => {
-    state.proxySelectedItem = state.items[selectedItems[0]].webhook_id;
+const handleSelectTableRow = () => {
+    state.proxySelectedId = state.selectedItem.webhook_id;
 };
 
 const fetchWebhookList = async () => {
@@ -208,7 +208,7 @@ onMounted(() => {
         </template>
         <template #toolbox-left>
             <p-select-dropdown :menu="tableState.actionMenu"
-                               :disabled="!state.isSelectedItem"
+                               :disabled="!state.selectedItem"
                                reset-selection-on-menu-close
                                :placeholder="$t('ALERT_MANAGER.ACTION')"
                                @select="handleSelectDropdownItem"

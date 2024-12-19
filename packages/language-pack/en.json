@@ -83,8 +83,11 @@
 			"TITLE": "Event Rule"
 		},
 		"NOTIFICATIONS": {
+			"ALL_MEMBER": "All Members in Service",
 			"ALL_NOTIFICATIONS": "All Notifications",
 			"ALL_TIME": "All Time",
+			"CHANNEL_NAME": "Channel Name",
+			"CREATE_TITLE": "Create Notifications",
 			"CUSTOM": "Custom",
 			"HIGH_NOTIFICATIONS_ONLY": "High Urgency Notifications Only",
 			"NOTIFICATIONS_CHANNEL": "Notifications Channel",
@@ -97,7 +100,8 @@
 			"SET_UP_DESC": "Configure the notifications to ensure you are promptly informed of any alerts or incidents as they occur.",
 			"SET_UP_NOTIFICATIONS": "Set Up Notifications",
 			"TITLE": "Notifications",
-			"TOPIC": "Topic"
+			"TOPIC": "Topic",
+			"USER": "User"
 		},
 		"SERVICE": {
 			"ALT_S_CREATE_SERVICE": "Service successfully created",

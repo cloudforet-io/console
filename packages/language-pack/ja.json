@@ -83,8 +83,11 @@
 			"TITLE": "イベントルール"
 		},
 		"NOTIFICATIONS": {
+			"ALL_MEMBER": "",
 			"ALL_NOTIFICATIONS": "全ての通知",
 			"ALL_TIME": "すべての時間",
+			"CHANNEL_NAME": "チャンネル名",
+			"CREATE_TITLE": "",
 			"CUSTOM": "カスタム",
 			"HIGH_NOTIFICATIONS_ONLY": "",
 			"NOTIFICATIONS_CHANNEL": "通知チャネル",
@@ -97,7 +100,8 @@
 			"SET_UP_DESC": "",
 			"SET_UP_NOTIFICATIONS": "",
 			"TITLE": "通知",
-			"TOPIC": "トピックス"
+			"TOPIC": "トピックス",
+			"USER": "ユーザー"
 		},
 		"SERVICE": {
 			"ALT_S_CREATE_SERVICE": "",
