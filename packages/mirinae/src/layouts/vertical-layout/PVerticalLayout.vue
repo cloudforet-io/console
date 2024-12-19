@@ -39,7 +39,6 @@ const state = reactive({
     hide: false,
     transition: false,
     isHover: false,
-    isMaximized: props.initWidth === props.maxWidth,
     sidebarContainerStyle: computed(() => ({
         width: `${state.width}px`,
         height: '100%',
@@ -185,7 +184,7 @@ onBeforeMount(() => {
             >
                 <slot
                     name="sidebar"
-                    v-bind="{width: state.width, hide: state.hide, transition: state.transition, height: props.height}"
+                    v-bind="{width: Number(state.width), hide: state.hide, transition: state.transition, height: props.height}"
                 />
             </div>
         </div>
