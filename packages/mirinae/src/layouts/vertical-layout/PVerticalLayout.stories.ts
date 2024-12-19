@@ -32,8 +32,13 @@ const Template: Story = {
             PVerticalLayout,
         },
         template: `
-            <div style="width: 100vw; height: 10rem; border: 1px solid gray;">
-                <p-vertical-layout>
+            <div style="width: 100vw; height: 20rem; border: 1px solid gray;">
+                <p-vertical-layout 
+                    :height="height"
+                    :initWidth="initWidth"
+                    :minWidth="minWidth"
+                    :maxWidth="maxWidth"
+                    :enableDoubleClickResize="enableDoubleClickResize">
                     <template #sidebar>
                         Left Layout
                     </template>

@@ -63,6 +63,7 @@ interface PopoverProps {
     hideArrow?: boolean;
     boundary?: string;
     width?: string;
+    minWidth?: string;
 }
 
 const ARROW_STATIC_SIDES = {
@@ -134,6 +135,10 @@ export default defineComponent<PopoverProps>({
             default: '',
         },
         width: {
+            type: String,
+            default: '',
+        },
+        minWidth: {
             type: String,
             default: '',
         },
@@ -210,7 +215,7 @@ export default defineComponent<PopoverProps>({
                             size({
                                 apply({ rects, elements }) {
                                     Object.assign(elements.floating.style, {
-                                        minWidth: `${rects.reference.width}px`,
+                                        minWidth: props.minWidth ? props.minWidth : `${rects.reference.width}px`,
                                     });
                                 },
                             }),

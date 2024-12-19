@@ -5,8 +5,6 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { debounce } from 'lodash';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PContextMenu, PEmpty, PFieldGroup, PIconButton, PSelectDropdown, PBadge,
@@ -25,7 +23,6 @@ import { useDomainStore } from '@/store/domain/domain-store';
 import { checkEmailFormat } from '@/services/iam/helpers/user-management-form-validations';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { AddModalMenuItem, LocalType } from '@/services/iam/types/user-type';
-
 
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
@@ -62,70 +59,63 @@ const validationState = reactive({
 const hideMenu = () => {
     emit('change-input', { userList: state.selectedItems });
     state.menuVisible = false;
-    validationState.userIdInvalid = false;
-    validationState.userIdInvalidText = '';
-    formState.searchText = '';
 };
 const handleClickTextInput = async () => {
     state.menuVisible = true;
     resetValidationState();
 };
 const handleChangeTextInput = (value: string) => {
-    validationState.userIdInvalid = false;
-    validationState.userIdInvalidText = '';
+    resetValidationState();
     formState.searchText = value;
     if (!userPageState.isAdminMode || userPageState.afterWorkspaceCreated) {
         fetchListUsers();
         state.menuVisible = true;
     }
 };
-const handleEnterTextInput = debounce(async (value) => {
+const handleEnterTextInput = async () => {
     if (formState.searchText === '') return;
     if (validateUserId()) {
-        const isFocusOut = value.type === 'focusout';
-        await getUserList(isFocusOut);
+        await getUserList();
     }
-}, 100);
+};
 const handleClickDeleteButton = (idx: number) => {
     state.selectedItems.splice(idx, 1);
     emit('change-input', { userList: state.selectedItems });
 };
 const handleSelectDropdownItem = (selected: AuthType|LocalType) => {
     formState.selectedMenuItem = selected;
-    validationState.userIdInvalid = false;
-    validationState.userIdInvalidText = '';
+    resetValidationState();
 };
-const getUserList = async (isFocusOut?: boolean) => {
+
+const getUserList = async () => {
     let isNew = userPageState.isAdminMode || userPageState.afterWorkspaceCreated;
     try {
+        const trimmedText = formState.searchText.trim();
         if (userPageState.isAdminMode || userPageState.afterWorkspaceCreated) {
-            await fetchGetUsers(formState.searchText);
+            await fetchGetUsers(trimmedText);
         } else {
             const isIndependentUser = state.independentUsersList.find((user) => user.user_id === formState.searchText);
             isNew = !isIndependentUser;
-            await fetchGetWorkspaceUsers(formState.searchText);
+            await fetchGetWorkspaceUsers(trimmedText);
         }
     } catch (e) {
-        if (!isFocusOut) {
-            addSelectedItem(isNew);
-        }
-    } finally {
+        addSelectedItem(isNew);
         await hideMenu();
+        formState.searchText = '';
+        resetValidationState();
     }
 };
 const checkEmailValidation = () => {
     const { isValid, invalidText } = checkEmailFormat(formState.searchText);
     if (formState.selectedMenuItem === 'EMAIL') {
         if (!isValid) {
-            validationState.userIdInvalid = true;
-            validationState.userIdInvalidText = invalidText;
+            updateValidationState(invalidText);
             return false;
         }
     }
     if (formState.selectedMenuItem === 'ID') {
         if (isValid) {
-            validationState.userIdInvalid = true;
-            validationState.userIdInvalidText = i18n.t('IAM.USER.FORM.ID_INVALID');
+            updateValidationState(i18n.t('IAM.USER.FORM.ID_INVALID'));
             return false;
         }
     }
@@ -135,10 +125,14 @@ const resetValidationState = () => {
     validationState.userIdInvalid = false;
     validationState.userIdInvalidText = '';
 };
+
+const updateValidationState = (invalidText: TranslateResult = '', isInvalid = true) => {
+    validationState.userIdInvalid = isInvalid;
+    validationState.userIdInvalidText = invalidText;
+};
 const validateUserId = () => {
     if (formState.searchText === '') {
-        validationState.userIdInvalid = true;
-        validationState.userIdInvalidText = i18n.t('IAM.USER.FORM.ALT_E_INVALID_FULL_NAME');
+        updateValidationState(i18n.t('IAM.USER.FORM.ALT_E_INVALID_FULL_NAME'));
         return false;
     }
     return checkEmailValidation();
@@ -163,15 +157,16 @@ const initAuthTypeList = async () => {
 };
 const addSelectedItem = (isNew: boolean) => {
     if (!formState.searchText) return;
+    const trimmedText = formState.searchText.trim();
+    if (state.selectedItems.some((item) => item.name === trimmedText && item.auth_type === formState.selectedMenuItem)) return;
+
     state.selectedItems.unshift({
-        user_id: formState.searchText?.trim(),
-        label: formState.searchText?.trim(),
-        name: formState.searchText?.trim(),
+        user_id: trimmedText,
+        label: trimmedText,
+        name: trimmedText,
         isNew,
         auth_type: formState.selectedMenuItem,
     });
-    formState.searchText = '';
-    resetValidationState();
 };
 
 /* API */
@@ -205,19 +200,13 @@ const fetchGetWorkspaceUsers = async (userId: string) => {
     await SpaceConnector.clientV2.identity.workspaceUser.get<WorkspaceUserGetParameters, WorkspaceUserModel>({
         user_id: userId,
     });
-    validationState.userIdInvalid = true;
-    validationState.userIdInvalidText = i18n.t('IAM.USER.FORM.USER_ID_INVALID_WORKSPACE', { userId });
+    updateValidationState(i18n.t('IAM.USER.FORM.USER_ID_INVALID_WORKSPACE', { userId }));
 };
 const fetchGetUsers = async (userId: string) => {
     await SpaceConnector.clientV2.identity.user.get<UserGetParameters, UserModel>({
         user_id: userId,
     });
-    if (userPageState.afterWorkspaceCreated) {
-        addSelectedItem(false);
-    } else {
-        validationState.userIdInvalid = true;
-        validationState.userIdInvalidText = i18n.t('IAM.USER.FORM.USER_ID_INVALID_DOMAIN', { userId });
-    }
+    updateValidationState(i18n.t('IAM.USER.FORM.USER_ID_INVALID_DOMAIN', { userId }));
 };
 
 onClickOutside(containerRef, clickOutside);
@@ -271,7 +260,7 @@ onMounted(() => {
                                class="user-id-input"
                                :class="{'invalid': invalid}"
                                @click="handleClickTextInput"
-                               @focusout="handleEnterTextInput"
+                               @blur="handleEnterTextInput"
                                @keyup.enter="handleEnterTextInput"
                                @input="handleChangeTextInput($event.target.value)"
                         >

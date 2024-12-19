@@ -9,6 +9,9 @@ import { PVerticalLayout } from '@cloudforet/mirinae';
 
 import { useGlobalUIStore } from '@/store/global-ui/global-ui-store';
 
+import { MENU_ID } from '@/lib/menu/config';
+
+import { useCurrentMenuId } from '@/common/composables/current-menu-id';
 import FNB from '@/common/modules/navigations/FNB.vue';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
@@ -35,6 +38,9 @@ const { width: contentsWidth } = useElementSize(contentRef);
 const storeState = reactive({
     isMinimizeNavRail: computed(() => gnbGetters.isMinimizeNavRail),
 });
+
+const { currentMenuId } = useCurrentMenuId();
+
 const state = reactive({
     padding: computed(() => {
         if (contentsWidth.value <= 1920) return '0';
@@ -52,10 +58,14 @@ watch(() => props.breadcrumbs, () => {
 </script>
 
 <template>
-    <p-vertical-layout v-bind="$props"
-                       ref="contentRef"
-                       class="vertical-page-layout"
-                       v-on="$listeners"
+    <p-vertical-layout
+        v-bind="$props"
+        ref="contentRef"
+        class="vertical-page-layout"
+        :width="width"
+        :min-width="240"
+        :enable-double-click-resize="currentMenuId === MENU_ID.METRIC_EXPLORER"
+        v-on="$listeners"
     >
         <template #sidebar="prop">
             <slot name="sidebar"
