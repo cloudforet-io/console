@@ -1,0 +1,149 @@
+<script setup lang="ts">
+import {
+    toRef, computed, ref, watch,
+} from 'vue';
+
+import { isEqual } from 'lodash';
+
+import { PSelectDropdown, PBadge } from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
+
+import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
+import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
+
+import { useTaskStatusField } from '@/services/ops-flow/composables/use-task-status-field';
+import { useTaskTypeField } from '@/services/ops-flow/composables/use-task-type-field';
+import {
+    useTaskManagementTemplateStore,
+} from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
+import type { TaskFilters } from '@/services/ops-flow/types/task-filters-type';
+
+const props = defineProps<{
+    categoryId?: string
+}>();
+const emit = defineEmits<{(event: 'update', value: TaskFilters): void;
+}>();
+
+const taskManagementTemplateStore = useTaskManagementTemplateStore();
+
+/* task type */
+const {
+    selectedTaskTypeItems,
+    taskTypeMenuItemsHandler,
+    setSelectedTaskTypeItems,
+} = useTaskTypeField({
+    categoryId: toRef(props, 'categoryId'),
+    isRequired: true,
+});
+const handleUpdateSelectedTaskTypeItems = (items: SelectDropdownMenuItem[]) => {
+    setSelectedTaskTypeItems(items);
+};
+
+/* status */
+const {
+    selectedStatusItems,
+    statusMenuItemsHandler,
+    setSelectedStatusItems,
+} = useTaskStatusField({
+    categoryId: toRef(props, 'categoryId'),
+    isRequired: true,
+});
+const handleUpdateSelectedStatusItems = (items: SelectDropdownMenuItem[]) => {
+    setSelectedStatusItems(items);
+};
+
+/* project */
+const selectedProjectIds = ref<string[]>([]);
+const handleUpdateSelectedProjectIds = (projectIds: string[]) => {
+    selectedProjectIds.value = projectIds;
+};
+
+/* createdBy */
+const selectedCreatedBy = ref<string[]>([]);
+const handleUpdateCreatedBy = (userIds: string[]) => {
+    selectedCreatedBy.value = userIds;
+};
+
+/* assignee */
+const selectedAssignee = ref<string[]>([]);
+const handleUpdateAssignee = (userIds: string[]) => {
+    selectedAssignee.value = userIds;
+};
+
+/* event */
+const taskFilters = computed<TaskFilters>(() => ({
+    taskType: selectedTaskTypeItems.value.map((d) => d.name),
+    status: selectedStatusItems.value.map((d) => d.name),
+    project: selectedProjectIds.value,
+    createdBy: selectedCreatedBy.value,
+    assignee: selectedAssignee.value,
+}));
+watch(taskFilters, (newValue, oldValue) => {
+    if (!isEqual(newValue, oldValue)) {
+        emit('update', newValue);
+    }
+});
+</script>
+
+<template>
+    <div class="flex flex-wrap gap-4">
+        <p-select-dropdown v-if="props.categoryId"
+                           :selected="selectedTaskTypeItems"
+                           :handler="taskTypeMenuItemsHandler"
+                           :selection-label="taskManagementTemplateStore.templates.Task"
+                           appearance-type="badge"
+                           style-type="rounded"
+                           multi-selectable
+                           show-select-marker
+                           show-delete-all-button
+                           @update:selected="handleUpdateSelectedTaskTypeItems"
+        />
+        <p-select-dropdown v-if="props.categoryId"
+                           :selected="selectedStatusItems"
+                           :handler="statusMenuItemsHandler"
+                           :selection-label="$t('OPSFLOW.STATUS')"
+                           appearance-type="badge"
+                           style-type="rounded"
+                           multi-selectable
+                           show-select-marker
+                           show-delete-all-button
+                           @update:selected="handleUpdateSelectedStatusItems"
+        >
+            <template #menu-item--format="{ item }">
+                <p-badge badge-type="subtle"
+                         :style-type="item.color"
+                >
+                    {{ item.label }}
+                </p-badge>
+            </template>
+        </p-select-dropdown>
+        <project-select-dropdown multi-selectable
+                                 project-selectable
+                                 :selected-project-ids="selectedProjectIds"
+                                 :selection-label="$t('OPSFLOW.PROJECT')"
+                                 style-type="rounded"
+                                 appearance-type="badge"
+                                 show-delete-all-button
+                                 :block="false"
+                                 @update:selected-project-ids="handleUpdateSelectedProjectIds"
+        />
+        <user-select-dropdown multi-selectable
+                              :user-ids="selectedCreatedBy"
+                              :selection-label="$t('OPSFLOW.CREATED_BY')"
+                              style-type="rounded"
+                              appearance-type="badge"
+                              selection-type="multiple"
+                              :block="false"
+                              @update:user-ids="handleUpdateCreatedBy"
+        />
+        <user-select-dropdown multi-selectable
+                              :user-ids="selectedAssignee"
+                              :selection-label="$t('OPSFLOW.ASSIGNEE')"
+                              style-type="rounded"
+                              appearance-type="badge"
+                              selection-type="multiple"
+                              :block="false"
+                              @update:user-ids="handleUpdateAssignee"
+        />
+    </div>
+</template>
