@@ -30,6 +30,7 @@ import type {
 } from '@/store/display/type';
 import { useUserStore } from '@/store/user/user-store';
 
+import config from '@/lib/config';
 import type { Menu, MenuId, MenuInfo } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 import { ADMIN_MENU_LIST, MENU_LIST } from '@/lib/menu/menu-architecture';
@@ -87,6 +88,8 @@ const getDisplayMenuList = (menuList: Menu[], isAdminMode?: boolean, currentWork
     let label = i18n.t(menuInfo.translationId);
     let hideOnGNB = d.hideOnGNB;
     let hideOnSiteMap = d.hideOnSiteMap;
+
+    // Apply templates of task management (ops-flow)
     if (d.id === MENU_ID.OPS_FLOW_LANDING) {
         label = taskManagementTemplateStore.templates.TemplateName;
         hideOnGNB = taskManagementTemplateStore.state.templateId === 'default' || !taskManagementTemplateStore.state.enableLanding;
@@ -94,6 +97,7 @@ const getDisplayMenuList = (menuList: Menu[], isAdminMode?: boolean, currentWork
     } else if (d.id === MENU_ID.TASK_BOARD) {
         label = taskManagementTemplateStore.templates.TaskBoard;
     }
+
     return {
         ...d,
         id: d.id,
@@ -106,6 +110,8 @@ const getDisplayMenuList = (menuList: Menu[], isAdminMode?: boolean, currentWork
         subMenuList: d.subMenuList ? getDisplayMenuList(d.subMenuList, isAdminMode, currentWorkspaceId) : [],
     } as DisplayMenu;
 });
+
+const ADVANCED_SERVICE_NAMES: string[] = [MENU_ID.OPS_FLOW];
 
 export const useDisplayStore = defineStore('display-store', () => {
     const userStore = useUserStore();
@@ -337,6 +343,16 @@ export const useDisplayStore = defineStore('display-store', () => {
                 if (menu.id === MENU_ID.MY_PAGE) {
                     menu.hideOnGNB = true;
                 }
+            });
+        }
+
+        const advancedServices = config.get('ADVANCED_SERVICE');
+        if (advancedServices && advancedServices.length > 0) {
+            _allGnbMenuList = _allGnbMenuList.filter((menu) => {
+                if (ADVANCED_SERVICE_NAMES.includes(menu.id as string)) {
+                    return advancedServices.includes(menu.id);
+                }
+                return true;
             });
         }
 
