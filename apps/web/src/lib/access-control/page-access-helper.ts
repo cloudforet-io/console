@@ -38,9 +38,9 @@ export const flattenMenu = (menuList: Menu[]): Menu[] => menuList.flatMap((menu)
     ...(menu.subMenuList ? flattenMenu(menu.subMenuList) : []),
 ]);
 
-export const getPageAccessMapFromRawData = (pageAccessPermissions?: string[]): PageAccessMap => {
+export const getPageAccessMapFromRawData = (pageAccessPermissions?: string[], domainId?: string): PageAccessMap => {
     const result: PageAccessMap = {};
-    const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICES') ?? []).includes('alert-v2');
+    const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainId);
     const menuListByVersion = (isAlertManagerVersionV2 ? MENU_LIST_FOR_ALERT_MANAGER_V2 : MENU_LIST);
     const flattenedMenuList = flattenMenu(menuListByVersion);
     const setPermissions = (id: string, read = true, write = true, access = true) => {

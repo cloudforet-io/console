@@ -333,7 +333,7 @@ export const useDisplayStore = defineStore('display-store', () => {
         const appContextStore = useAppContextStore();
         const appContextState = appContextStore.$state;
         const userWorkspaceStore = useUserWorkspaceStore();
-        const isAlertManagerVersionV2 = config.get('ADVANCED_SERVICES').includes('alert-v2');
+        const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainStore.state.domainId);
         const menuListByVersion = (isAlertManagerVersionV2 ? MENU_LIST_FOR_ALERT_MANAGER_V2 : MENU_LIST);
         const adminMenuListByVersion = (isAlertManagerVersionV2 ? ADMIN_MENU_LIST_FOR_ALERT_MANAGER_V2 : ADMIN_MENU_LIST);
         const isAdminMode = appContextState.getters.isAdminMode;

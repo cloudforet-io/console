@@ -45,7 +45,7 @@ const assetInventoryRoute: RouteConfig = {
     },
     redirect: (to) => {
         const userStore = useUserStore(pinia);
-        return getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap);
+        return getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap, userStore.getters.domainId);
     },
     component: AssetInventoryContainer,
     children: [
