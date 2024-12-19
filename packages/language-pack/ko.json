@@ -83,8 +83,11 @@
 			"TITLE": "이벤트 규칙"
 		},
 		"NOTIFICATIONS": {
+			"ALL_MEMBER": "",
 			"ALL_NOTIFICATIONS": "모든 알림 받기",
 			"ALL_TIME": "모든 시간",
+			"CHANNEL_NAME": "채널명",
+			"CREATE_TITLE": "",
 			"CUSTOM": "기간 선택",
 			"HIGH_NOTIFICATIONS_ONLY": "",
 			"NOTIFICATIONS_CHANNEL": "알림 채널",
@@ -97,7 +100,8 @@
 			"SET_UP_DESC": "",
 			"SET_UP_NOTIFICATIONS": "",
 			"TITLE": "알람",
-			"TOPIC": "토픽"
+			"TOPIC": "토픽",
+			"USER": "사용자"
 		},
 		"SERVICE": {
 			"ALT_S_CREATE_SERVICE": "",
