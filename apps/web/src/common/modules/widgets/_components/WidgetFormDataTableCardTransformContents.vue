@@ -28,6 +28,8 @@ import WidgetFormDataTableCardTransformPivotForm
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformPivotForm.vue';
 import WidgetFormDataTableCardTransformQuery
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformQuery.vue';
+import WidgetFormDataTableCardTransformValueMapping
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformValueMapping.vue';
 import {
     DATA_TABLE_TYPE, type DATA_TABLE_OPERATOR, DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP,
 } from '@/common/modules/widgets/_constants/data-table-constant';
@@ -75,6 +77,7 @@ const state = reactive({
         if (state.operator === 'EVAL') return invalidState.EVAL;
         if (state.operator === 'PIVOT') return invalidState.PIVOT;
         if (state.operator === 'ADD_LABELS') return invalidState.ADD_LABELS;
+        if (state.operator === 'VALUE_MAPPING') return invalidState.VALUE_MAPPING;
         return true;
     }),
     optionsChanged: computed(() => {
@@ -89,11 +92,13 @@ const state = reactive({
             ...(expression?.condition ? { condition: expression?.condition } : {}),
         })).filter((expression) => !!expression.name && !!expression.expression), originState.expressions);
         const addLabelsChanged = !isEqual(valueState.ADD_LABELS.labels, originState.labels);
+        const valueMappingChanged = !isEqual(valueState.VALUE_MAPPING, originState.valueMapping);
         if (state.operator === 'CONCAT') return concatDataTablesChanged;
         if (state.operator === 'JOIN') return joinDataTablesChanged || joinTypeChanged;
         if (state.operator === 'QUERY') return queryDataTableIdChanged || queryConditionsChanged;
         if (state.operator === 'EVAL') return evalDataTableIdChanged || evalChanged;
         if (state.operator === 'ADD_LABELS') return addLabelsChanged;
+        if (state.operator === 'VALUE_MAPPING') return valueMappingChanged;
         return false;
     }),
     isUnsaved: computed(() => state.dataTableId.startsWith('UNSAVED-')),
@@ -114,6 +119,7 @@ const valueState = reactive({
     EVAL: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.EVAL,
     QUERY: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.QUERY,
     ADD_LABELS: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.ADD_LABELS,
+    VALUE_MAPPING: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.VALUE_MAPPING,
 });
 const invalidState = reactive({
     PIVOT: false,
@@ -122,6 +128,7 @@ const invalidState = reactive({
     EVAL: false,
     QUERY: false,
     ADD_LABELS: false,
+    VALUE_MAPPING: false,
 });
 
 const originState = reactive({
@@ -132,7 +139,6 @@ const originState = reactive({
     })),
     joinType: computed<JoinType|undefined>(() => (props.item.options as DataTableTransformOptions).JOIN?.how),
     queryConditions: computed<QueryOptions['conditions']>(() => (props.item.options as DataTableTransformOptions).QUERY?.conditions ?? []),
-    // queryOperator: computed<QueryOptions['operator']|undefined>(() => (props.item.options as DataTableTransformOptions).QUERY?.operator),
     expressions: computed<EvaluateExpression[]|string[]>(() => (props.item.options as DataTableTransformOptions).EVAL?.expressions ?? []),
     labels: computed<AddLabelsOptions['labels']>(() => (props.item.options as DataTableTransformOptions).ADD_LABELS?.labels ?? {}),
     pivot: computed<PivotOptions|undefined>(() => {
@@ -147,6 +153,7 @@ const originState = reactive({
             order_by: _pivot.order_by,
         };
     }),
+    valueMapping: computed(() => (props.item.options as DataTableTransformOptions).VALUE_MAPPING ?? {}),
 });
 
 const setFailStatus = (status: boolean) => {
@@ -186,6 +193,7 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
     const concatOptions = cloneDeep(valueState.CONCAT);
     const joinOptions = cloneDeep(valueState.JOIN);
     const queryOptions = cloneDeep(valueState.QUERY);
+    const valueMappingOptions = cloneDeep(valueState.VALUE_MAPPING);
     const evalOptions: EvalOptions = {
         data_table_id: valueState.EVAL.data_table_id,
         expressions: valueState.EVAL.expressions.map((expressionInfo) => ({
@@ -216,6 +224,8 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
             return pivotOptions;
         case 'ADD_LABELS':
             return addLabelsOptions;
+        case 'VALUE_MAPPING':
+            return valueMappingOptions;
         default:
             return {};
         }
@@ -314,6 +324,8 @@ const setInitialDataTableForm = () => {
     // PIVOT
     valueState.PIVOT = originState.pivot ? cloneDeep(originState.pivot) : cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT);
     state.resetKey = Math.random();
+    // VALUE_MAPPING
+    valueState.VALUE_MAPPING = originState.valueMapping ? cloneDeep(originState.valueMapping) : cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.VALUE_MAPPING);
 };
 
 onMounted(() => {
@@ -388,6 +400,13 @@ defineExpose({
                                                           :operator-options.sync="valueState.ADD_LABELS"
                                                           :invalid.sync="invalidState.ADD_LABELS"
                                                           :origin-data="props.item.options[state.operator]"
+        />
+        <widget-form-data-table-card-transform-value-mapping v-if="state.operator === DATA_TABLE_OPERATOR.VALUE_MAPPING"
+                                                             :key="`value-mapping-${state.resetKey}`"
+                                                             :base-data-table-id="state.dataTableId"
+                                                             :operator-options.sync="valueState.VALUE_MAPPING"
+                                                             :invalid.sync="invalidState.VALUE_MAPPING"
+                                                             :origin-data="props.item.options[state.operator]"
         />
         <widget-form-data-table-card-footer :disabled="state.applyDisabled"
                                             :changed="state.optionsChanged"

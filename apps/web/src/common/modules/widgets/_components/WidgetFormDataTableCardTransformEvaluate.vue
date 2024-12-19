@@ -58,11 +58,11 @@ const state = reactive({
     fieldTypeMenuItems: computed<MenuItem[]>(() => [
         {
             name: DATA_TABLE_FIELD_TYPE.LABEL,
-            label: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.TYPE_LABEL_FIELD'),
+            label: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.TYPE_LABEL_FIELD'),
         },
         {
             name: DATA_TABLE_FIELD_TYPE.DATA,
-            label: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.TYPE_DATA_FIELD'),
+            label: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.TYPE_DATA_FIELD'),
         },
     ]),
     globalVariablePopperVisible: false,
@@ -196,7 +196,7 @@ watch(() => state.invalid, (_invalid) => {
                     />
                 </div>
                 <div class="form-body">
-                    <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.FIELD_TYPE')"
+                    <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.FIELD_TYPE')"
                                    required
                                    style-type="secondary"
                     >
@@ -212,7 +212,7 @@ watch(() => state.invalid, (_invalid) => {
                             </p-select-button>
                         </div>
                     </p-field-group>
-                    <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.FIELD_NAME')"
+                    <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.FIELD_NAME')"
                                    required
                                    style-type="secondary"
                                    :invalid-text="getInvalidFieldNameText(expression.name)"
