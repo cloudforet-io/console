@@ -78,11 +78,13 @@ const handleUpdateSelectedTaskType = async (items: SelectDropdownMenuItem[]) => 
     await taskContentFormStore.setCurrentTaskType(items[0].name); // set current task type to store for other fields
     const taskType = taskContentFormState.currentTaskType;
     const category = taskContentFormGetters.currentCategory;
-    if (!category || !taskType) {
+    if (items.length > 0 && (!category || !taskType)) {
         ErrorHandler.handleError(new Error('Failed to get category or task type'));
         return;
     }
-    initRelatedFieldsByTaskTypeSelection(category, taskType);
+    if (category && taskType) {
+        initRelatedFieldsByTaskTypeSelection(category, taskType);
+    }
 };
 
 /* status */
@@ -101,19 +103,19 @@ const changeStatus = async (statusId: string) => {
             throw new Error('Origin task is not defined');
         }
         await taskStore.changeStatus(taskContentFormState.originTask.task_id, statusId);
-        showSuccessMessage(i18n.t('OPSFLOW.ALT_S_UPDATE_TARGET', { target: i18n.t('OPSFLOW.STATUS') }));
+        showSuccessMessage(i18n.t('OPSFLOW.ALT_S_UPDATE_TARGET', { target: i18n.t('OPSFLOW.STATUS') }), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ALT_E_UPDATE_TARGET', { target: i18n.t('OPSFLOW.STATUS') }));
     }
 };
-const handleUpdateSelectedStatus = (items) => {
+const handleUpdateSelectedStatus = async (items: SelectDropdownMenuItem[]) => {
     const statusId = items[0].name;
     if (taskContentFormState.statusId === statusId) return;
     taskContentFormStore.setStatusId(statusId);
     setSelectedStatusItems(items);
     if (taskContentFormState.mode === 'view') {
-        changeStatus(statusId);
-        taskDetailPageStore.loadNewEvents();
+        await changeStatus(statusId);
+        await taskDetailPageStore.loadNewEvents();
     }
 };
 

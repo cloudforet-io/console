@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
-import { PButtonModal, PDataTable, PBadge } from '@cloudforet/mirinae';
+import {
+    PButtonModal, PDataTable, PBadge, PCheckbox,
+} from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
@@ -43,18 +45,20 @@ const getLinkStatus = (d: SelectDropdownMenuItem, type: DataType): LinkStatus =>
 };
 const getAllItems = (type: DataType): Item[] => {
     const targetItems = type === 'category' ? props.selectedCategories : props.selectedWorkspaces;
-    const targetRemovedItems = type === 'category' ? props.removedCategories : props.removedWorkspaces;
-    return targetRemovedItems.map((d) => ({
-        ...d,
-        linkStatus: 'removed',
-    })).concat(targetItems.map((d) => ({
+    const refinedItems: Item[] = targetItems.map((d) => ({
         ...d,
         linkStatus: getLinkStatus(d, type),
     })).sort((a, b) => {
         if (a.linkStatus === 'added') return -1;
         if (b.linkStatus === 'added') return 1;
         return 0;
+    });
+    const targetRemovedItems = type === 'category' ? props.removedCategories : props.removedWorkspaces;
+    const refinedRemovedItems: Item[] = targetRemovedItems.map((d) => ({
+        ...d,
+        linkStatus: 'removed',
     }));
+    return refinedRemovedItems.concat(refinedItems);
 };
 const workspaceItems = computed<Item[]>(() => getAllItems('workspace'));
 const categoryItems = computed<Item[]>(() => getAllItems('category'));
@@ -98,10 +102,14 @@ const CategoryFields = computed<DataTableField[]>(() => [
         label: _i18n.t('OPSFLOW.TASK_MANAGEMENT.PACKAGE.CHANGE_STATUS') as string,
     },
 ]);
+const originWorkspaces = computed<SelectDropdownMenuItem[]>(() => props.selectedWorkspaces.filter((sw) => !isAdded(sw, 'workspace')));
+const showCheckbox = computed<boolean>(() => !!originWorkspaces.value.length && !!props.removedCategories.length);
+const checked = ref<boolean>(false);
 const handleConfirm = async () => {
     emit('confirm');
 };
 const handleCloseOrCancel = () => {
+    checked.value = false;
     emit('cancel');
 };
 </script>
@@ -111,9 +119,11 @@ const handleCloseOrCancel = () => {
                     theme-color="primary"
                     :header-title="$t('OPSFLOW.TASK_MANAGEMENT.PACKAGE.UPDATE_CONFIRMATION')"
                     size="md"
+                    :disabled="showCheckbox && !checked"
                     @confirm="handleConfirm"
                     @close="handleCloseOrCancel"
                     @cancel="handleCloseOrCancel"
+                    @closed="checked = false"
     >
         <template #body>
             <i18n path="OPSFLOW.TASK_MANAGEMENT.PACKAGE.AFFECTED_DESC"
@@ -121,9 +131,9 @@ const handleCloseOrCancel = () => {
                   class="mb-4 text-label-md"
             >
                 <!-- eslint-disable-next-line vue/singleline-html-element-content-newline -->
-                <template #workspace><strong>{{ $t('OPSFLOW.WORKSPACE') }}</strong></template>
+                <template #category><strong>{{ $tc('OPSFLOW.TASK_MANAGEMENT.PACKAGE.C_CATEGORY',categoryItems.length) }}</strong></template>
                 <!-- eslint-disable-next-line vue/singleline-html-element-content-newline -->
-                <template #category><strong>{{ $t('OPSFLOW.CATEGORY') }}</strong></template>
+                <template #workspace><strong>{{ $tc('OPSFLOW.TASK_MANAGEMENT.PACKAGE.C_WORKSPACE', workspaceItems.length) }}</strong></template>
             </i18n>
             <div class="flex flex-wrap gap-6">
                 <p-data-table :fields="WorkspaceFields"
@@ -152,6 +162,36 @@ const handleCloseOrCancel = () => {
                         </p-badge>
                     </template>
                 </p-data-table>
+                <div v-if="showCheckbox"
+                     class="flex"
+                >
+                    <p-checkbox :value="true"
+                                :selected="checked"
+                                @change="checked = $event"
+                    />
+                    <i18n path="OPSFLOW.TASK_MANAGEMENT.PACKAGE.UPDATE_CONFIRM_DESC"
+                          class="ml-1 mt-1 text-label-md"
+                    >
+                        <!-- eslint-disable-next-line vue/singleline-html-element-content-newline -->
+                        <template #is>{{ $tc('OPSFLOW.TASK_MANAGEMENT.PACKAGE.C_IS', removedCategories.length) }}</template>
+                        <!-- eslint-disable-next-line vue/singleline-html-element-content-newline -->
+                        <template #category>{{ $tc('OPSFLOW.TASK_MANAGEMENT.PACKAGE.C_CATEGORY',removedCategories.length) }}</template>
+                        <!-- eslint-disable-next-line vue/singleline-html-element-content-newline -->
+                        <template #workspace>{{ $tc('OPSFLOW.TASK_MANAGEMENT.PACKAGE.C_WORKSPACE', selectedWorkspaces.length) }}</template>
+                        <template #workspaceList>
+                            <template v-for="(w, idx) in originWorkspaces">
+                                <!-- eslint-disable-next-line vue/singleline-html-element-content-newline -->
+                                <strong :key="w.name">{{ w.label }}</strong><template v-if="idx !== originWorkspaces.length - 1">, </template>
+                            </template>
+                        </template>
+                        <template #categoryList>
+                            <template v-for="(c, idx) in removedCategories">
+                                <!-- eslint-disable-next-line vue/singleline-html-element-content-newline -->
+                                <strong :key="c.name">{{ c.label }}</strong><template v-if="idx !== removedCategories.length - 1">, </template>
+                            </template>
+                        </template>
+                    </i18n>
+                </div>
             </div>
         </template>
     </p-button-modal>

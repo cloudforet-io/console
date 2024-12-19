@@ -4235,6 +4235,7 @@
 		"PACKAGE": "",
 		"PROJECT": "",
 		"SET_AS_DEFAULT": "",
+		"SHOW_MORE": "",
 		"STATUS": "",
 		"STATUS_COMPLETED": "",
 		"STATUS_IN_PROGRESS": "",
@@ -4265,6 +4266,9 @@
 				"ADDED": "",
 				"AFFECTED_DESC": "",
 				"CHANGE_STATUS": "",
+				"C_CATEGORY": "",
+				"C_IS": "",
+				"C_WORKSPACE": "",
 				"DELETE_UNAVAILABLE": "",
 				"DESC": "",
 				"REMOVED": "",
@@ -4273,7 +4277,8 @@
 				"SPECIFIC_WORKSPACE": "",
 				"UNCHANGED": "",
 				"UNSET": "",
-				"UPDATE_CONFIRMATION": ""
+				"UPDATE_CONFIRMATION": "",
+				"UPDATE_CONFIRM_DESC": ""
 			},
 			"STATUS": {
 				"DELETE_CONTINUE": "",

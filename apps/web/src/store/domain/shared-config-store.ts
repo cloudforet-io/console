@@ -8,18 +8,20 @@ import { APIError } from '@cloudforet/core-lib/space-connector/error';
 
 import type { ResourceGroupType } from '@/schema/_common/type';
 import type { PublicConfigCreateParameters as SharedConfigCreateParameters } from '@/schema/config/public-config/api-verbs/create';
-import type { PublicConfigGetParameters as SharedConfigGetParameters } from '@/schema/config/public-config/api-verbs/get';
+import type {
+    PublicConfigGetAccessibleConfigsParameters as SharedConfigGetAccessibleConfigsParameters,
+} from '@/schema/config/public-config/api-verbs/get-accesible-configs';
 import type { PublicConfigUpdateParameters as SharedConfigUpdateParameters } from '@/schema/config/public-config/api-verbs/update';
 import type { PublicConfigModel as SharedConfigModel } from '@/schema/config/public-config/model';
 
 import { SHARED_CONFIG_NAMES } from '@/store/domain/constant';
-import type { DomainConfigKey } from '@/store/domain/type';
+import type { SharedConfigKey } from '@/store/domain/type';
 
 
 interface UseSharedConfigStoreState {
-    sharedConfigMap: Partial<Record<DomainConfigKey, SharedConfigModel>>;
+    sharedConfigMap: Partial<Record<SharedConfigKey, SharedConfigModel>>;
 }
-type UseSharedConfigStoreGetters = Record<DomainConfigKey, Ref<SharedConfigModel|undefined>>;
+type UseSharedConfigStoreGetters = Record<SharedConfigKey, Ref<SharedConfigModel|undefined>>;
 
 export const useSharedConfigStore = defineStore('shared-config', () => {
     const state = reactive<UseSharedConfigStoreState>({
@@ -31,7 +33,7 @@ export const useSharedConfigStore = defineStore('shared-config', () => {
     });
     const getters = reactive<UseSharedConfigStoreGetters>(_getterObj);
 
-    const createSharedConfig = async <T extends Record<string, any> = Record<string, any>>(key: DomainConfigKey, data: T, resourceGroup: ResourceGroupType) => {
+    const createSharedConfig = async <T extends Record<string, any> = Record<string, any>>(key: SharedConfigKey, data: T, resourceGroup: ResourceGroupType) => {
         const name = SHARED_CONFIG_NAMES[key];
         const sharedConfig = await SpaceConnector.clientV2.config.publicConfig.create<SharedConfigCreateParameters, SharedConfigModel<T>>({
             name,
@@ -40,39 +42,31 @@ export const useSharedConfigStore = defineStore('shared-config', () => {
         });
         return sharedConfig;
     };
-    const updateSharedConfig = async <T extends Record<string, any> = Record<string, any>>(key: DomainConfigKey, data: T, resourceGroupId?: string) => {
+    const updateSharedConfig = async <T extends Record<string, any> = Record<string, any>>(key: SharedConfigKey, data: T) => {
         const name = SHARED_CONFIG_NAMES[key];
-        const projectId = resourceGroupId?.startsWith('project') ? resourceGroupId : undefined;
-        const workspaceId = resourceGroupId?.startsWith('workspace') ? resourceGroupId : undefined;
         const sharedConfig = await SpaceConnector.clientV2.config.publicConfig.update<SharedConfigUpdateParameters, SharedConfigModel<T>>({
             name,
             data,
-            project_id: projectId,
-            workspace_id: workspaceId,
         });
         return sharedConfig;
     };
     const actions = {
-        async get<T extends Record<string, any> = Record<string, any>>(key: DomainConfigKey, resourceGroupId?: string): Promise<SharedConfigModel<T>> {
+        async get<T extends Record<string, any> = Record<string, any>>(key: SharedConfigKey): Promise<SharedConfigModel<T>> {
             const name = SHARED_CONFIG_NAMES[key];
-            const projectId = resourceGroupId?.startsWith('project') ? resourceGroupId : undefined;
-            const workspaceId = resourceGroupId?.startsWith('workspace') ? resourceGroupId : undefined;
             if (state.sharedConfigMap[key]) return state.sharedConfigMap[key] as SharedConfigModel<T>;
-            const sharedConfig = await SpaceConnector.clientV2.config.publicConfig.get<SharedConfigGetParameters, SharedConfigModel<T>>({
+            const sharedConfig = await SpaceConnector.clientV2.config.publicConfig.getAccessibleConfigs<SharedConfigGetAccessibleConfigsParameters, SharedConfigModel<T>>({
                 name,
-                project_id: projectId,
-                workspace_id: workspaceId,
             });
             state.sharedConfigMap = { ...state.sharedConfigMap, [key]: sharedConfig };
             return sharedConfig;
         },
-        async set<T extends Record<string, any> = Record<string, any>>(key: DomainConfigKey, data: T, resourceGroupId?: string) {
-            let sharedConfig;
+        async set<T extends Record<string, any> = Record<string, any>>(key: SharedConfigKey, data: T, resourceGroupId?: string) {
+            let sharedConfig: SharedConfigModel<T>;
             try {
-                sharedConfig = await updateSharedConfig(key, data, resourceGroupId);
+                sharedConfig = await updateSharedConfig(key, data);
             } catch (e) {
                 if (e instanceof APIError && e.status === 404) {
-                    let resourceGroup;
+                    let resourceGroup: ResourceGroupType;
                     if (resourceGroupId === undefined) resourceGroup = 'DOMAIN';
                     else {
                         resourceGroup = resourceGroupId.startsWith('project') ? 'PROJECT' : 'WORKSPACE';

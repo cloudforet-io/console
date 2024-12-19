@@ -4235,6 +4235,7 @@
 		"PACKAGE": "패키지",
 		"PROJECT": "프로젝트",
 		"SET_AS_DEFAULT": "기본으로 설정",
+		"SHOW_MORE": "더 보기",
 		"STATUS": "상태",
 		"STATUS_COMPLETED": "완료됨",
 		"STATUS_IN_PROGRESS": "진행 중",
@@ -4265,6 +4266,9 @@
 				"ADDED": "추가됨",
 				"AFFECTED_DESC": "영향 받는 {workspace}와 {category}는 다음과 같습니다.",
 				"CHANGE_STATUS": "변경 여부",
+				"C_CATEGORY": "카테고리",
+				"C_IS": "",
+				"C_WORKSPACE": "워크스페이스",
 				"DELETE_UNAVAILABLE": "연결된 카테고리가 존재하므로 패키지 삭제가 불가합니다.",
 				"DESC": "계약에 따라 사용자에게 제공되는 기능의 집합으로, 전체 서비스의 범위를 나타냅니다.",
 				"REMOVED": "삭제됨",
@@ -4273,7 +4277,8 @@
 				"SPECIFIC_WORKSPACE": "워크스페이스 선택",
 				"UNCHANGED": "변경 없음",
 				"UNSET": "설정하지 않음",
-				"UPDATE_CONFIRMATION": "패키지 변경사항 확인"
+				"UPDATE_CONFIRMATION": "패키지 변경사항 확인",
+				"UPDATE_CONFIRM_DESC": "{workspaceList} 워크스페이스에서는 더 이상 {categoryList} 카테고리를 지원하지 않는 것을 확인했습니다."
 			},
 			"STATUS": {
 				"DELETE_CONTINUE": "이 상태를 삭제하면 연결된 모든 {task}의 상태가 {default}로 일괄 변경됩니다. 계속 하시겠습니까?",

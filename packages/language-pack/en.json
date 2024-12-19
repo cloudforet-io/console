@@ -4235,6 +4235,7 @@
 		"PACKAGE": "Package",
 		"PROJECT": "Project",
 		"SET_AS_DEFAULT": "Set as Default",
+		"SHOW_MORE": "Show More",
 		"STATUS": "Status",
 		"STATUS_COMPLETED": "Completed",
 		"STATUS_IN_PROGRESS": "In Progress",
@@ -4265,6 +4266,9 @@
 				"ADDED": "Added",
 				"AFFECTED_DESC": "The affected {workspace} and {category} are as follows.",
 				"CHANGE_STATUS": "Change Status",
+				"C_CATEGORY": "category | categories",
+				"C_IS": "is | are",
+				"C_WORKSPACE": "workspace | workspaces",
 				"DELETE_UNAVAILABLE": "The package cannot be deleted because there are linked categories.",
 				"DESC": "A set of features provided to users based on their contract, representing the full scope of the service.",
 				"REMOVED": "Removed",
@@ -4273,7 +4277,8 @@
 				"SPECIFIC_WORKSPACE": "Specific Workspaces",
 				"UNCHANGED": "Unchanged",
 				"UNSET": "Unset",
-				"UPDATE_CONFIRMATION": "Package Update Confirmation"
+				"UPDATE_CONFIRMATION": "Package Update Confirmation",
+				"UPDATE_CONFIRM_DESC": "Confirm that {category} {categoryList} {is} no longer supported in {workspace} {workspaceList}. "
 			},
 			"STATUS": {
 				"DELETE_CONTINUE": "Deleting this status will automatically change the status of all associated {task} to {default}. Do you want to proceed?",
