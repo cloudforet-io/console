@@ -137,7 +137,12 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
 
         const fieldKeys = sortWidgetTableFields(Object.keys(dataTable?.data_info ?? {}));
 
-        result.data = dataFieldOptions.multiSelectable ? [fieldKeys?.[0]] : fieldKeys?.[0];
+        if (dataFieldOptions.multiSelectable) {
+            result.data = dataFieldOptions.allSelected ? fieldKeys : [fieldKeys?.[0]];
+        } else {
+            result.data = fieldKeys?.[0];
+        }
+
 
         return result;
     },
