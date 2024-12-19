@@ -57,6 +57,7 @@ const handleUpdateAttachments = (newAttachments: Attachment<FileModel>[]) => {
                             :contents="fieldValue"
                             :attachments="attachments"
                             show-in-box
+                            content-type="markdown"
         />
         <text-editor v-else
                      class="my-1"
@@ -65,6 +66,7 @@ const handleUpdateAttachments = (newAttachments: Attachment<FileModel>[]) => {
                      :attachments="attachments"
                      :placeholder="props.field.options?.example"
                      :invalid="isInvalid"
+                     content-type="markdown"
                      @update:value="updateFieldValue"
                      @update:attachments="handleUpdateAttachments"
         />
