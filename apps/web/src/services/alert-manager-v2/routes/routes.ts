@@ -26,7 +26,7 @@ const alertManagerRoutesV2: RouteConfig = {
         menuId: MENU_ID.ALERT_MANAGER,
         translationId: MENU_INFO_MAP[MENU_ID.ALERT_MANAGER].translationId,
     },
-    redirect: (to) => getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap),
+    redirect: (to) => getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap, userStore.getters.domainId),
     component: AlertManagerContainer,
     children: [
         {

@@ -30,10 +30,10 @@ const flattenSubMenuList = (subMenuList: Menu[], defaultMenuIds: MenuId[], trans
     return results;
 };
 
-export const getPageAccessMenuListByRoleType = (roleType: RoleType): PageAccessMenuItem[] => {
+export const getPageAccessMenuListByRoleType = (roleType: RoleType, domainId: string): PageAccessMenuItem[] => {
     const results: PageAccessMenuItem[] = [];
     const defaultMenuIdsByRoleType = getDefaultPageAccessPermissionList(roleType);
-    const isAlertManagerVersionV2 = config.get('ADVANCED_SERVICES').includes('alert-v2');
+    const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainId);
     const menuListByVersion = (isAlertManagerVersionV2 ? MENU_LIST_FOR_ALERT_MANAGER_V2 : MENU_LIST);
     menuListByVersion.forEach((menu) => {
         if (menu.needPermissionByRole && defaultMenuIdsByRoleType.includes(menu.id)) {

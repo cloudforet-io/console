@@ -25,6 +25,7 @@ import { setI18nLocale } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useDomainStore } from '@/store/domain/domain-store';
 import { useErrorStore } from '@/store/error/error-store';
 import { languages, MANAGED_ROLES, USER_STORAGE_KEY } from '@/store/user/constant';
 import type {
@@ -113,6 +114,7 @@ const getRoleTypeFromToken = (token: string): RoleType => {
 };
 
 export const useUserStore = defineStore('user-store', () => {
+    const domainStore = useDomainStore();
     let storedUserState: Partial<UserStoreState> = {};
     try {
         storedUserState = LocalStorageAccessor.getItem(USER_STORAGE_KEY) ?? {};
@@ -140,6 +142,7 @@ export const useUserStore = defineStore('user-store', () => {
     const getters = reactive<UserStoreGetters>({
         isDomainAdmin: computed<boolean>(() => state.roleType === ROLE_TYPE.DOMAIN_ADMIN),
         isSystemAdmin: computed<boolean>(() => state.roleType === ROLE_TYPE.SYSTEM_ADMIN),
+        domainId: computed<string>(() => domainStore.state.domainId),
         languageLabel: computed<string>(() => languages[state.language as string] || state.language),
         isNoRoleUser: computed<boolean>(() => !state.currentRoleInfo),
         hasAdminOrWorkspaceOwnerRole: computed<boolean>(() => state.roleType === 'DOMAIN_ADMIN' || state.roleType === 'WORKSPACE_OWNER'),
@@ -147,7 +150,7 @@ export const useUserStore = defineStore('user-store', () => {
         pageAccessPermissionList: computed<MenuId[]>(() => {
             const roleType = state.currentRoleInfo?.roleType ?? 'USER';
             const roleBasePagePermissions = state.currentRoleInfo?.pageAccess ?? ['my_page.*'];
-            const pagePermissionMap = getPageAccessMapFromRawData(roleBasePagePermissions);
+            const pagePermissionMap = getPageAccessMapFromRawData(roleBasePagePermissions, getters.domainId);
             const minimalPagePermissionList = getMinimalPageAccessPermissionList(roleType);
             const defaultPagePermissionList = getDefaultPageAccessPermissionList(roleType);
 
@@ -167,7 +170,7 @@ export const useUserStore = defineStore('user-store', () => {
 
             const roleType = state.currentRoleInfo?.roleType ?? 'USER';
             const roleBasePagePermissions = state.currentRoleInfo?.pageAccess ?? ['my_page.*'];
-            const pagePermissionMap = getPageAccessMapFromRawData(roleBasePagePermissions);
+            const pagePermissionMap = getPageAccessMapFromRawData(roleBasePagePermissions, getters.domainId);
             const minimalPagePermissionList = getMinimalPageAccessPermissionList(roleType);
 
             const isAllReadOnly = checkAllMenuReadonly(roleBasePagePermissions);

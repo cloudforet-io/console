@@ -25,8 +25,8 @@ const getSubMenuIdsToMap = (menu: Menu, flattenedMenuMap: FlattenedMenuMap = {})
     return flattenedMenuMap;
 };
 
-const makeFlattenedMenuMap = () => {
-    const isAlertManagerVersionV2 = config.get('ADVANCED_SERVICES').includes('alert-v2');
+const makeFlattenedMenuMap = (domainId:string) => {
+    const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainId);
     const menuListByVersion = (isAlertManagerVersionV2 ? MENU_LIST_FOR_ALERT_MANAGER_V2 : MENU_LIST);
     menuListByVersion.forEach((menu) => {
         getSubMenuIdsToMap(menu, FLATTENED_MENU_MAP);
@@ -38,9 +38,9 @@ const getSubMenuListByMenuId = (menuId: MenuId): MenuId[] => {
     return [];
 };
 
-export const getRedirectRouteByPagePermission = (route: Route, pagePermissionsMap: PageAccessMap): Location => {
+export const getRedirectRouteByPagePermission = (route: Route, pagePermissionsMap: PageAccessMap, domainId:string): Location => {
     const isFlattenedMenuMapEmpty = Object.keys(FLATTENED_MENU_MAP).length === 0;
-    if (isFlattenedMenuMapEmpty) makeFlattenedMenuMap();
+    if (isFlattenedMenuMapEmpty) makeFlattenedMenuMap(domainId);
     const menuId = route.meta?.menuId;
     if (!menuId) return { name: ERROR_ROUTE._NAME, params: { statusCode: '404' } };
     const subMenuIdList = getSubMenuListByMenuId(menuId);

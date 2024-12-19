@@ -46,11 +46,11 @@ const initRouter = (domainId?: string) => {
     const userStore = useUserStore(pinia);
     const allReferenceStore = useAllReferenceStore(pinia);
     const afterGrantedCallback = () => allReferenceStore.flush();
-    const isAlertManagerVersionV2 = config.get('ADVANCED_SERVICES').includes('alert-v2');
-    const routes = isAlertManagerVersionV2 ? integralRoutes : alertManagerV1IntegralRoutes;
     if (!domainId) {
         SpaceRouter.init(errorRoutes, afterGrantedCallback, userStore);
     } else {
+        const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainId);
+        const routes = isAlertManagerVersionV2 ? integralRoutes : alertManagerV1IntegralRoutes;
         SpaceRouter.init(routes, afterGrantedCallback, userStore);
     }
     isRouterInitialized = true;
