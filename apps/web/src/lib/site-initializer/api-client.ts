@@ -302,6 +302,14 @@ const getApiEndpoints = (config) => {
         throw new Error('ApiClient init failed: There are no endpoint v1.');
     } else throw new Error('ApiClient init failed: There are no endpoint v2.');
 };
+const getApiSettings = (config) => {
+    const apiV1Timeout = config.get('CONSOLE_API.TIMEOUT');
+    const apiV2Timeout = config.get('CONSOLE_API_V2.TIMEOUT');
+    return [
+        apiV1Timeout ? { timeout: apiV1Timeout } : {},
+        apiV2Timeout ? { timeout: apiV2Timeout } : {},
+    ];
+};
 const getMockConfig = (config): MockConfig => ({
     enabled: config.get('DEV.MOCK.ENABLED'),
     endpoints: [config.get('DEV.MOCK.ENDPOINT_V1'), config.get('DEV.MOCK.ENDPOINT_V2')],
@@ -318,6 +326,7 @@ const getAuthConfig = (config): AuthConfig => ({
 export const initApiClient = async (store, config) => {
     const endpoints = getApiEndpoints(config);
     const tokenApi = new TokenAPI(endpoints[1], getSessionTimeoutCallback(store));
+    const apiSettings = getApiSettings(config);
     const devConfig: DevConfig = {
         enabled: config.get('DEV.ENABLED'),
         mockConfig: getMockConfig(config),
@@ -326,6 +335,7 @@ export const initApiClient = async (store, config) => {
     await SpaceConnector.init(
         endpoints,
         tokenApi,
+        apiSettings,
         devConfig,
         getAfterCallApiMap(),
     );

@@ -1,5 +1,5 @@
 import type {
-    AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig, AxiosRequestHeaders,
+    AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig, AxiosRequestHeaders, CreateAxiosDefaults,
 } from 'axios';
 import axios from 'axios';
 
@@ -15,8 +15,9 @@ export default class ServiceAPI {
 
     tokenApi: TokenAPI;
 
-    constructor(baseURL: string, tokenApi: TokenAPI) {
+    constructor(baseURL: string, tokenApi: TokenAPI, settings: CreateAxiosDefaults = {}) {
         this.instance = axios.create({
+            ...settings,
             headers: {
                 'Content-Type': 'application/json',
             },

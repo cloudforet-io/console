@@ -1,9 +1,11 @@
 {
   "CONSOLE_API": {
-    "ENDPOINT": "http://127.0.0.1:8081"
+    "ENDPOINT": "http://127.0.0.1:8081",
+    "TIMEOUT": 3000
   },
   "CONSOLE_API_V2": {
-    "ENDPOINT": "http://127.0.0.1:8082"
+    "ENDPOINT": "http://127.0.0.1:8082",
+    "TIMEOUT": 3000
   },
   "GTAG_ID": "DISABLED",
   "DOMAIN_NAME": "spaceone",
