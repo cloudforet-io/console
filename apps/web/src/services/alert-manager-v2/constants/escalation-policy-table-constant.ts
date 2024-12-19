@@ -19,7 +19,7 @@ export const ESCALATION_POLICY_MANAGEMENT_TABLE_HANDLER: AlertManagementTableHan
         ],
     }],
     valueHandlerMap: {
-        name: makeDistinctValueHandler('alertManager.escalationPolicy', 'name'),
+        name: makeDistinctValueHandler('alert_manager.EscalationPolicy', 'name'),
     },
 };
 export const ALERT_EXCEL_FIELDS: ExcelDataField[] = [

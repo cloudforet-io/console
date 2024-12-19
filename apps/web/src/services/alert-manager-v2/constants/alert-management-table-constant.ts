@@ -39,12 +39,12 @@ export const ALERT_MANAGEMENT_TABLE_HANDLER: AlertManagementTableHandlerType = {
         ],
     }],
     valueHandlerMap: {
-        alert_id: makeDistinctValueHandler('alertManager.Alert', 'alert_id'),
-        title: makeDistinctValueHandler('alertManager.Alert', 'title'),
+        alert_id: makeDistinctValueHandler('alert_manager.Alert', 'alert_id'),
+        title: makeDistinctValueHandler('alert_manager.Alert', 'title'),
         state: makeEnumValueHandler(ALERT_URGENCY),
-        service: makeDistinctValueHandler('alertManager.Alert', 'service_id'),
-        category: makeDistinctValueHandler('alertManager.Alert', 'category'),
-        'resource.resource_type': makeDistinctValueHandler('alertManager.Alert', 'resource.resource_type'),
+        service: makeDistinctValueHandler('alert_manager.Alert', 'service_id'),
+        category: makeDistinctValueHandler('alert_manager.Alert', 'category'),
+        'resource.resource_type': makeDistinctValueHandler('alert_manager.Alert', 'resource.resource_type'),
     },
 };
 export const ALERT_EXCEL_FIELDS: ExcelDataField[] = [

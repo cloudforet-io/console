@@ -21,7 +21,7 @@ export const NOTIFICATION_MANAGEMENT_TABLE_HANDLER: AlertManagementTableHandlerT
         ],
     }],
     valueHandlerMap: {
-        name: makeDistinctValueHandler('alertManager.serviceChannel', 'name'),
+        name: makeDistinctValueHandler('alert_manager.ServiceChannel', 'name'),
         state: makeEnumValueHandler(SERVICE_CHANNEL_STATE),
     },
 };
