@@ -32,7 +32,7 @@ export const useRoleReferenceStore = defineStore('reference-role', () => {
         items: null as RoleReferenceMap | null,
     });
 
-    const getters = reactive({
+    const getters = {
         roleItems: asyncComputed<RoleReferenceMap>(async () => {
             if (state.items === null) await load();
             return state.items ?? {};
@@ -41,9 +41,9 @@ export const useRoleReferenceStore = defineStore('reference-role', () => {
             type: MANAGED_VARIABLE_MODELS.role.meta.key,
             key: MANAGED_VARIABLE_MODELS.role.meta.idKey,
             name: MANAGED_VARIABLE_MODELS.role.meta.name,
-            referenceMap: getters.roleItems,
+            referenceMap: getters.roleItems.value,
         })),
-    });
+    };
 
     const load = async (options?: ReferenceLoadOptions) => {
         const currentTime = new Date().getTime();
