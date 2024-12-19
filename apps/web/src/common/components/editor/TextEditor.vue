@@ -11,6 +11,7 @@ import TextStyle from '@tiptap/extension-text-style';
 import Underline from '@tiptap/extension-underline';
 import StarterKit from '@tiptap/starter-kit';
 import { Editor, EditorContent } from '@tiptap/vue-2';
+import { Markdown } from 'tiptap-markdown';
 
 import { createImageExtension } from '@/common/components/editor/extensions/image';
 import { getAttachments, setAttachmentsToContents } from '@/common/components/editor/extensions/image/helper';
@@ -25,6 +26,7 @@ interface Props {
     attachments?: Attachment<any>[];
     invalid?: boolean;
     placeholder?: string;
+    contentType?: 'html'|'markdown';
 }
 const props = withDefaults(defineProps<Props>(), {
     value: '',
@@ -35,6 +37,7 @@ const props = withDefaults(defineProps<Props>(), {
     attachments: () => [],
     invalid: false,
     placeholder: '',
+    contentType: 'html',
 });
 const emit = defineEmits<{(e: 'update:value', value: string): void;
     (e: 'update:attachments', attachments: Attachment<any>[]): void;
@@ -63,6 +66,7 @@ onMounted(() => {
                     },
                 },
             }),
+            Markdown,
             Placeholder.configure({
                 placeholder: props.placeholder,
             }),
@@ -76,7 +80,13 @@ onMounted(() => {
             createImageExtension(props.imageUploader, imgFileDataMap),
         ],
         onUpdate: () => {
-            emit('update:value', state.editor?.getHTML() ?? '');
+            let content = '';
+            if (props.contentType === 'html') {
+                content = state.editor?.getHTML() ?? '';
+            } else {
+                content = state.editor?.storage.markdown.getMarkdown() ?? '';
+            }
+            emit('update:value', content);
             emit('update:attachments', state.editor ? getAttachments<any>(state.editor as Editor, imgFileDataMap) : []);
         },
     });
@@ -88,7 +98,12 @@ onBeforeUnmount(() => {
 
 watch([() => props.value, () => props.attachments], ([value, attachments], prev) => {
     if (!state.editor) return;
-    const isSame = state.editor.getHTML() === value;
+    let isSame;
+    if (props.contentType === 'html') {
+        isSame = state.editor.getHTML() === value;
+    } else {
+        isSame = state.editor.storage.markdown.getMarkdown() === value;
+    }
     if (isSame) return;
     let newContents = value;
     if (attachments !== prev[1]) newContents = setAttachmentsToContents(value, attachments);

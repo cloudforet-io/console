@@ -28,6 +28,7 @@ import type {
     DisplayMenu, DisplayStoreState, SidebarProps, SidebarType,
     DisplayStoreGetters,
 } from '@/store/display/type';
+import { useDomainStore } from '@/store/domain/domain-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import config from '@/lib/config';
@@ -117,9 +118,9 @@ const getDisplayMenuList = (menuList: Menu[], isAdminMode?: boolean, currentWork
 });
 
 const ADVANCED_SERVICE_NAMES: string[] = [MENU_ID.OPS_FLOW];
-
 export const useDisplayStore = defineStore('display-store', () => {
     const userStore = useUserStore();
+    const domainStore = useDomainStore();
 
     const state = reactive<DisplayStoreState>({
         visibleSidebar: false,
@@ -354,11 +355,11 @@ export const useDisplayStore = defineStore('display-store', () => {
             });
         }
 
-        const advancedServices = config.get('ADVANCED_SERVICE');
-        if (advancedServices && advancedServices.length > 0) {
+        const advanceService: Record<string, string[]>|undefined = config.get('ADVANCED_SERVICE');
+        if (advanceService) {
             _allGnbMenuList = _allGnbMenuList.filter((menu) => {
                 if (ADVANCED_SERVICE_NAMES.includes(menu.id as string)) {
-                    return advancedServices.includes(menu.id);
+                    return advanceService[menu.id]?.includes(domainStore.state.domainId);
                 }
                 return true;
             });

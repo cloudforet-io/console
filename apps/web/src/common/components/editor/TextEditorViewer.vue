@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, toRef } from 'vue';
+
+import { useMarkdown } from '@cloudforet/mirinae';
 
 import { setAttachmentsToContents } from '@/common/components/editor/extensions/image/helper';
 import type { Attachment } from '@/common/components/editor/extensions/image/type';
@@ -10,15 +12,23 @@ interface Props {
     contents?: string;
     attachments?: Attachment[];
     showInBox?: boolean
+    contentType?: 'html'|'markdown';
 }
 const props = withDefaults(defineProps<Props>(), {
     contents: '',
     attachments: () => [],
     showInBox: false,
+    contentType: 'html',
 });
 
 loadMonospaceFonts();
-const refinedContents = computed(() => setAttachmentsToContents(props.contents, props.attachments));
+const { markdown } = useMarkdown(toRef(props, 'contents'));
+const refinedContents = computed(() => {
+    if (props.contentType === 'markdown') {
+        return markdown.value;
+    }
+    return setAttachmentsToContents(props.contents, props.attachments);
+});
 </script>
 
 <template>

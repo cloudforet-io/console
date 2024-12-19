@@ -20,5 +20,5 @@
   ],
   "CONTACT_LINK": "",
   "SMTP_ENABLED": false,
-  "ADVANCED_SERVICE": []
+  "ADVANCED_SERVICE": {}
 }
