@@ -64,6 +64,8 @@ export interface ConcatOptions {
 export interface JoinOptions {
     data_tables: string[];
     how?: JoinType;
+    left_keys: string[];
+    right_keys: string[];
 }
 
 export interface QueryOptions {
