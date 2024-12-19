@@ -1,6 +1,6 @@
 import type {
     AddLabelsOptions,
-    ConcatOptions, EvalOptions, JoinOptions, PivotOptions, QueryOptions,
+    ConcatOptions, EvalOptions, JoinOptions, PivotOptions, QueryOptions, ValueMappingOptions,
 } from '@/common/modules/widgets/types/widget-model';
 
 import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
@@ -95,6 +95,8 @@ export const DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP = {
     JOIN: {
         data_tables: [],
         how: undefined,
+        left_keys: [''],
+        right_keys: [''],
     } as JoinOptions,
     EVAL: {
         data_table_id: undefined,
@@ -115,4 +117,18 @@ export const DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP = {
         data_table_id: undefined,
         labels: { '': '' },
     } as AddLabelsOptions,
+    VALUE_MAPPING: {
+        data_table_id: undefined,
+        name: '',
+        field_type: DATA_TABLE_FIELD_TYPE.LABEL,
+        cases: [
+            {
+                key: '',
+                value: '',
+                operator: 'eq',
+                match: '',
+            },
+        ],
+        else: '',
+    } as ValueMappingOptions,
 };

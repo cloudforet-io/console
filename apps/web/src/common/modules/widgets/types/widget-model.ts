@@ -115,12 +115,12 @@ export interface AddLabelsOptions {
 }
 
 export interface ValueMappingOptions {
-    data_table_id: string;
+    data_table_id?: string;
     name: string;
-    field_type: DataTableFieldType; // defualt LABEL
+    field_type?: DataTableFieldType; // default LABEL
     cases: ValueMappingCase[];
     else: string;
-    condition: string;
+    condition?: string;
 }
 
 export interface ValueMappingCase {

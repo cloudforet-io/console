@@ -221,7 +221,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 EVAL: cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.EVAL),
                 PIVOT: cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT),
                 ADD_LABELS: cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.ADD_LABELS),
-                // TODO: VALUE_MAPPING
+                VALUE_MAPPING: cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.VALUE_MAPPING),
             };
             const unsavedTransformData = {
                 data_table_id: `UNSAVED-${getRandomId()}`,
@@ -230,7 +230,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 operator: operatorType,
                 options: {
                     [operatorType]: options[operatorType],
-                },
+                } as DataTableTransformOptions,
                 state: 'AVAILABLE',
             } as Partial<DataTableModel>;
             state.dataTables.push(unsavedTransformData);

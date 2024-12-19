@@ -147,6 +147,12 @@ const state = reactive({
             description: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.ADD_LABELS_DESC'),
             icon: '', // TODO: Add icon
         },
+        {
+            key: DATA_TABLE_OPERATOR.VALUE_MAPPING,
+            name: 'Value Mapping',
+            description: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.VALUE_MAPPING_DESC'),
+            icon: '', // TODO: Add icon
+        },
     ]),
 });
 
