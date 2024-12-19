@@ -11,9 +11,6 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
-import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
-import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
-import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import type { LSBItem } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
@@ -26,7 +23,7 @@ import { useCloudServiceDetailPageStore } from '@/services/asset-inventory-v1/st
 import { useSecurityPageStore } from '@/services/asset-inventory-v1/stores/security-page-store';
 import type { CloudServiceDetailPageParams } from '@/services/asset-inventory-v1/types/cloud-service-detail-page-type';
 
-const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
@@ -34,8 +31,6 @@ const gnbStore = useGnbStore();
 const securityPageStore = useSecurityPageStore();
 const securityPageGetters = securityPageStore.getters;
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
-const favoriteStore = useFavoriteStore();
-const favoriteGetters = favoriteStore.getters;
 
 const route = useRoute();
 const router = useRouter();
@@ -44,33 +39,12 @@ const storeState = reactive({
     loading: computed(() => securityPageGetters.loading),
     cloudServiceTypeList: computed(() => securityPageGetters.cloudServiceTypeList),
     selectedCloudServiceType: computed(() => securityPageGetters.selectedCloudServiceType),
-    favoriteItems: computed(() => favoriteGetters.securityItems),
 });
 const state = reactive({
     currentPath: computed(() => route.fullPath),
     pageParams: computed<CloudServiceDetailPageParams|undefined>(() => route.params as unknown as CloudServiceDetailPageParams),
-    starredMenuItems: computed<LSBItem[]>(() => storeState.favoriteItems.map((d) => ({
-        type: MENU_ITEM_TYPE.ITEM,
-        label: `[${allReferenceGetters.provider[d.provider].label}] ${d.label}`,
-        id: d.itemId,
-        to: getProperRouteLocation({
-            name: ASSET_INVENTORY_ROUTE_V1.SECURITY.DETAIL._NAME,
-            params: { group: d.parents[0].name, provider: d.provider, name: d.label },
-        }),
-        favoriteOptions: {
-            type: FAVORITE_TYPE.SECURITY,
-            id: d.itemId,
-        },
-    }))),
     menuSet: computed<LSBItem[]>(() => {
-        const defaultMenuSet: LSBItem[] = !isAdminMode.value ? [
-            {
-                type: MENU_ITEM_TYPE.STARRED,
-                childItems: state.starredMenuItems,
-                currentPath: state.currentPath,
-            },
-            { type: MENU_ITEM_TYPE.DIVIDER },
-        ] : [];
+        const defaultMenuSet: LSBItem[] = [];
         storeState.cloudServiceTypeList?.forEach((d, index, array) => {
             defaultMenuSet.push({
                 type: MENU_ITEM_TYPE.TOP_TITLE,
@@ -84,10 +58,6 @@ const state = reactive({
                     label: `[${allReferenceGetters.provider[i.data.provider].label}] ${i.name}`,
                     id: i.key,
                     to: getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE_V1.SECURITY.DETAIL._NAME, params: { group: i.data.group, provider: i.data.provider, name: i.name } }),
-                    favoriteOptions: {
-                        type: FAVORITE_TYPE.SECURITY,
-                        id: i.data.cloud_service_type_key,
-                    },
                 });
             });
             if (index !== array.length - 1) {
@@ -96,10 +66,6 @@ const state = reactive({
         });
         return defaultMenuSet;
     }),
-    favoriteOptions: computed<FavoriteOptions>(() => ({
-        type: FAVORITE_TYPE.SECURITY,
-        id: storeState.selectedCloudServiceType?.data.cloud_service_type_key || '',
-    })),
     securityNavigation: computed(() => {
         if (state.pageParams.name) {
             return [
@@ -140,9 +106,6 @@ watch([() => state.pageParams.name, () => state.pageParams.provider, () => state
 });
 watch(() => storeState.selectedCloudServiceType, () => {
     routeToFirstCloudServiceType();
-});
-watch(() => state.favoriteOptions, (favoriteOptions) => {
-    gnbStore.setFavoriteItemId(favoriteOptions);
 });
 watch(() => state.securityNavigation, async (securityNavigation) => {
     gnbStore.setBreadcrumbs(securityNavigation);
