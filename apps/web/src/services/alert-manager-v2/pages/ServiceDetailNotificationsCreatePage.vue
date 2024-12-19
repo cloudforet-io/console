@@ -81,7 +81,7 @@ onUnmounted(() => {
     <div class="service-detail-notifications-create-page"
          :class="{'wide': state.currentStep === 1}"
     >
-        <p-centered-layout-header :title="$t('ALERT_MANAGER.NOTIFICATIONS.SET_UP_NOTIFICATIONS')"
+        <p-centered-layout-header :title="$t('ALERT_MANAGER.NOTIFICATIONS.CREATE_TITLE')"
                                   :description="$t('ALERT_MANAGER.NOTIFICATIONS.SET_UP_DESC')"
                                   show-step
                                   :current-step="state.currentStep"
@@ -91,22 +91,29 @@ onUnmounted(() => {
         />
         <notifications-create-type-selector v-if="state.currentStep === 1" />
         <div class="flex justify-end mt-8">
-            <div class="flex items-center gap-4">
-                <p-button style-type="transparent"
-                          size="lg"
-                          icon-left="ic_arrow-left"
-                          @click="handlePrevNavigation"
-                >
-                    {{ $t('ALERT_MANAGER.SERVICE.GO_BACK') }}
-                </p-button>
-                <p-button :disabled="!state.isAllFormValid"
-                          style-type="substitutive"
-                          size="lg"
-                          @click="handleActionButton"
-                >
-                    {{ state.currentStep === 1 ? $t('ALERT_MANAGER.CONTINUE') : $t('ALERT_MANAGER.CREATE') }}
-                </p-button>
-            </div>
+            <p-button v-if="state.currentStep === 1"
+                      style-type="tertiary"
+                      size="lg"
+                      @click="handleClickCancelButton"
+            >
+                {{ $t('ALERT_MANAGER.CANCEL') }}
+            </p-button>
+            <p-button v-else
+                      style-type="transparent"
+                      size="lg"
+                      icon-left="ic_arrow-left"
+                      @click="handlePrevNavigation"
+            >
+                {{ $t('ALERT_MANAGER.SERVICE.GO_BACK') }}
+            </p-button>
+            <p-button :disabled="!state.isAllFormValid"
+                      style-type="substitutive"
+                      size="lg"
+                      class="ml-4"
+                      @click="handleActionButton"
+            >
+                {{ state.currentStep === 1 ? $t('ALERT_MANAGER.CONTINUE') : $t('ALERT_MANAGER.CREATE') }}
+            </p-button>
         </div>
     </div>
 </template>
