@@ -3,6 +3,8 @@ import { computed, ref } from 'vue';
 import { getTextHighlightRegex } from '@cloudforet/mirinae';
 import type { AutocompleteHandler, SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
+import { getParticle, i18n } from '@/translations';
+
 import { useFieldValidator } from '@/common/composables/form-validator';
 
 import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
@@ -25,7 +27,12 @@ export const useCategoryField = ({
     const categoryValidator = useFieldValidator<SelectDropdownMenuItem[]|CategoryItem[]>(
         [],
         isRequired ? (val) => {
-            if (val.length === 0) return 'Please select a category';
+            if (val.length === 0) {
+                return i18n.t('OPSFLOW.VALIDATION.REQUIRED', {
+                    topic: i18n.t('OPSFLOW.CATEGORY'),
+                    particle: getParticle(i18n.t('OPSFLOW.CATEGORY') as string, 'topic'),
+                });
+            }
             return true;
         } : undefined,
     );
@@ -50,18 +57,20 @@ export const useCategoryField = ({
     });
 
     const loadAllCategoryItems = async (): Promise<CategoryItem[]> => {
-        const taskCategories = await taskCategoryStore.list() ?? [];
+        let taskCategories = await taskCategoryStore.list() ?? [];
+        taskCategories = taskCategories.filter((c) => c.state !== 'DELETED');
 
         if (hasTaskTypeOnly) {
             await taskTypeStore.listByCategoryIds(taskCategories.map((c) => c.category_id));
-            return taskCategories.filter((c) => {
+            return taskCategories.map((c) => {
                 const taskTypes = taskTypeStore.state.itemsByCategoryId[c.category_id];
-                return taskTypes && taskTypes.length > 0;
-            }).map((c) => ({
-                name: c.category_id,
-                label: c.name,
-                packageId: c.package_id,
-            }));
+                return {
+                    name: c.category_id,
+                    label: c.name,
+                    disabled: !taskTypes || taskTypes.length === 0,
+                    packageId: c.package_id,
+                };
+            });
         }
         return taskCategoryStore.getters.taskCategories.map((c) => ({
             name: c.category_id,
@@ -81,7 +90,6 @@ export const useCategoryField = ({
     };
 
     const prevSelectedCategoryItems = ref<CategoryItem[]>([]);
-    const prevSelectedCategoryIds = computed<string[]>(() => prevSelectedCategoryItems.value.map((c) => c.name));
     const setInitialCategoriesByPackageId = async (packageId?: string) => {
         allCategoryItems.value = await loadAllCategoryItems();
         prevSelectedCategoryItems.value = packageId ? categoryItemsByPackage.value[packageId] ?? [] : [];
@@ -89,7 +97,7 @@ export const useCategoryField = ({
     };
     const setInitialCategory = async (categoryId: string) => {
         allCategoryItems.value = await loadAllCategoryItems();
-        prevSelectedCategoryItems.value = allCategoryItems.value.filter((c) => c.name === categoryId);
+        prevSelectedCategoryItems.value = allCategoryItems.value.filter((c) => c.name === categoryId && !c.disabled);
         categoryValidator.setValue(prevSelectedCategoryItems.value);
     };
 
@@ -130,9 +138,11 @@ export const useCategoryField = ({
             throw new Error(`Failed to bind default package to categories:\n${errorMessages.join('\n')}`);
         }
     };
+    const addedCategoryItems = computed(() => selectedCategoryItems.value.filter((item) => !prevSelectedCategoryItems.value.some((c) => c.name === item.name)));
+    const removedCategoryItems = computed(() => prevSelectedCategoryItems.value.filter((item) => !selectedCategoryItems.value.some((c) => c.name === item.name)));
     const applyPackageToCategories = async (packageId: string) => {
-        const addedCategories = selectedCategoryIds.value.filter((id) => !prevSelectedCategoryIds.value.includes(id));
-        const removedCategories = prevSelectedCategoryIds.value.filter((id) => !selectedCategoryIds.value.includes(id));
+        const addedCategories = addedCategoryItems.value.map((item) => item.name);
+        const removedCategories = removedCategoryItems.value.map((item) => item.name);
         const responses = await Promise.allSettled([
             addPackageToCategories(packageId, addedCategories),
             bindDefaultPackageToCategories(removedCategories),
@@ -157,5 +167,7 @@ export const useCategoryField = ({
         setInitialCategoriesByPackageId,
         setInitialCategory,
         applyPackageToCategories,
+        addedCategoryItems,
+        removedCategoryItems,
     };
 };

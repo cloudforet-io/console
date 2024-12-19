@@ -1,20 +1,24 @@
 {
 	"default": {
-		"createTask": "Create Task",
-		"createTaskType": "Add Task Type",
-		"editTaskType": "Edit Task Type",
-		"taskCategory": "Task Category",
-		"taskProgress": "Task Progress",
-		"taskType": "Task Type",
-		"templateName": "Default"
+		"Task": "Task",
+		"TaskBoard": "Task Board",
+		"TaskCategory": "Task Category",
+		"TaskType": "Task Type",
+		"TemplateName": "Default",
+		"task": "task",
+		"taskType": "task type",
+		"taskTypes": "task types",
+		"tasks": "tasks"
 	},
 	"service-desk": {
-		"createTask": "Create Ticket",
-		"createTaskType": "Add Request Type",
-		"editTaskType": "Edit Request Type",
-		"taskCategory": "Support Category",
-		"taskProgress": "Ticket Progress",
-		"taskType": "Request Type",
-		"templateName": "Service Desk"
+		"Task": "Ticket",
+		"TaskBoard": "Ticket Board",
+		"TaskCategory": "Support Category",
+		"TaskType": "Request Type",
+		"TemplateName": "Service Desk",
+		"task": "ticket",
+		"taskType": "request type",
+		"taskTypes": "request types",
+		"tasks": "tickets"
 	}
 }

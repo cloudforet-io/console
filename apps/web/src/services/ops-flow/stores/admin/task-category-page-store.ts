@@ -32,6 +32,7 @@ interface UseTaskCategoryPageStoreState {
     targetTaskTypeId?: string;
     visibleTaskTypeDeleteModal: boolean;
     associatedTasksToTypeMap: Record<string, TaskModel[]>;
+    loadingAssociatedTasksToType: boolean;
 }
 
 interface UseTaskCategoryPageStoreGetters {
@@ -64,6 +65,7 @@ export const useTaskCategoryPageStore = defineStore('task-category-page', () => 
         targetTaskTypeId: undefined,
         visibleTaskTypeDeleteModal: false,
         associatedTasksToTypeMap: {},
+        loadingAssociatedTasksToType: false,
     });
     const getters: UseTaskCategoryPageStoreGetters = {
         currentCategory: computed<TaskCategoryModel|undefined>(() => taskCategoryStore.getters.taskCategories.find((c) => c.category_id === state.currentCategoryId)),
@@ -107,14 +109,6 @@ export const useTaskCategoryPageStore = defineStore('task-category-page', () => 
         associatedTasksToType: computed<DeepReadonly<TaskModel[]>>(() => {
             if (!state.targetTaskTypeId) return [];
             const taskTypeId = state.targetTaskTypeId;
-            if (state.associatedTasksToTypeMap[taskTypeId]) return state.associatedTasksToTypeMap[taskTypeId];
-            taskStore.list({ task_type_id: taskTypeId }).then((tasks) => {
-                if (!tasks) return;
-                state.associatedTasksToTypeMap = {
-                    ...state.associatedTasksToTypeMap,
-                    [taskTypeId]: tasks,
-                };
-            });
             return state.associatedTasksToTypeMap[taskTypeId] ?? [];
         }),
     } as unknown as UseTaskCategoryPageStoreGetters;
@@ -164,6 +158,28 @@ export const useTaskCategoryPageStore = defineStore('task-category-page', () => 
             state.targetStatus = undefined;
         },
         // task type
+        async loadAssociatedTasksToType(taskTypeId: string, force = false) {
+            state.loadingAssociatedTasksToType = true;
+            if (state.associatedTasksToTypeMap[taskTypeId] && !force) {
+                state.loadingAssociatedTasksToType = false;
+                return;
+            }
+
+            try {
+                const tasks = await taskStore.list({
+                    task_type_id: taskTypeId,
+                });
+                if (!tasks) return; // canceled
+                state.associatedTasksToTypeMap = {
+                    ...state.associatedTasksToTypeMap,
+                    [taskTypeId]: tasks,
+                };
+                state.loadingAssociatedTasksToType = false;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.loadingAssociatedTasksToType = false;
+            }
+        },
         async listTaskTypes() {
             try {
                 if (!state.currentCategoryId) throw new Error('currentCategoryId is not set');

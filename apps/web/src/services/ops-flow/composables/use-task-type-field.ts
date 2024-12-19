@@ -5,10 +5,14 @@ import { getTextHighlightRegex } from '@cloudforet/mirinae';
 import type { AutocompleteHandler, SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
+import { getParticle, i18n } from '@/translations';
 
 import { useFieldValidator } from '@/common/composables/form-validator';
 
 import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
+import {
+    useTaskManagementTemplateStore,
+} from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
 export const useTaskTypeField = ({
     isRequired, categoryId,
@@ -17,11 +21,17 @@ export const useTaskTypeField = ({
     isRequired?: boolean;
 }) => {
     const taskTypeStore = useTaskTypeStore();
+    const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
     const taskTypeValidator = useFieldValidator<SelectDropdownMenuItem[]>(
         [],
         isRequired ? (val) => {
-            if (val.length === 0) return 'Please select a task type';
+            if (val.length === 0) {
+                return i18n.t('OPSFLOW.VALIDATION.REQUIRED', {
+                    topic: taskManagementTemplateStore.templates.taskType,
+                    particle: getParticle(taskManagementTemplateStore.templates.taskType as string, 'topic'),
+                });
+            }
             return true;
         } : undefined,
     );

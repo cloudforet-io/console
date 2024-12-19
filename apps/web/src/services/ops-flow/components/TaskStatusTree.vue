@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 
 import type { TaskStatusOption, TaskStatusType } from '@/schema/opsflow/task/type';
+import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -19,7 +20,7 @@ const taskStatusTree = computed<{
     name: string,
 }[]>(() => [
     { key: 'TODO', name: 'To-do' },
-    { key: 'IN_PROGRESS', name: 'In progress' },
+    { key: 'IN_PROGRESS', name: 'In Progress' },
     { key: 'COMPLETED', name: 'Completed' },
 ]);
 
@@ -34,10 +35,11 @@ const handleUpdateItems = async (statusType: TaskStatusType, items: TaskStatusOp
                 ...taskCategoryPageStore.getters.statusOptions,
                 [statusType]: items,
             },
+            force: true,
         });
-        showSuccessMessage('Task status options updated successfully', '');
+        showSuccessMessage(i18n.t('OPSFLOW.ALT_S_EDIT_TARGET', { target: i18n.t('OPSFLOW.STATUS') }), '');
     } catch (e) {
-        ErrorHandler.handleRequestError(e, 'Failed to update task status options');
+        ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ALT_E_EDIT_TARGET', { target: i18n.t('OPSFLOW.STATUS') }));
     }
 };
 </script>

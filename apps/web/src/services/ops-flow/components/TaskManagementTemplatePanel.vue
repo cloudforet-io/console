@@ -2,7 +2,7 @@
 import { reactive, computed } from 'vue';
 
 import {
-    PSelectDropdown, PI,
+    PSelectDropdown, PI, PTooltip,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
@@ -22,7 +22,7 @@ const taskManagementTemplateState = taskManagementTemplateStore.state;
 const state = reactive({
     templateMenuItems: computed<SelectDropdownMenuItem[]>(() => TASK_MANAGEMENT_TEMPLATE_TYPES.map((templateType) => ({
         name: templateType,
-        label: taskManagementTemplateStore.translate('templateName', templateType).value,
+        label: taskManagementTemplateStore.translate('TemplateName', templateType).value,
     }))),
 });
 
@@ -36,11 +36,16 @@ const handleSelectTemplate = async (templateId: TaskManagementTemplateType) => {
     <div class="inline-flex px-4 py-2 rounded-lg bg-gray-150">
         <div class="flex items-center gap-2 flex-wrap">
             <div class="inline-flex items-center gap-1 text-gray-700 font-bold">
-                <span class="text-label-md">Template Type</span>
-                <p-i name="ic_info-circle"
-                     width="1rem"
-                     height="1rem"
-                />
+                <span class="text-label-md">{{ $t('OPSFLOW.TASK_MANAGEMENT.TEMPLATE_TYPE') }}</span>
+                <p-tooltip :contents="$t('OPSFLOW.TASK_MANAGEMENT.TEMPLATE_DESC')"
+                           position="bottom"
+                           class="tooltip"
+                >
+                    <p-i width="1rem"
+                         height="1rem"
+                         name="ic_info-circle"
+                    />
+                </p-tooltip>
             </div>
             <p-select-dropdown :selected="taskManagementTemplateState.templateId"
                                :menu="state.templateMenuItems"

@@ -6,13 +6,14 @@ import {
 } from '@cloudforet/mirinae';
 import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
+import { i18n as _i18n } from '@/translations';
+
 import ActionMenuButton from '@/common/components/buttons/ActionMenuButton.vue';
 
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
-
 
 const taskCategoryPageStore = useTaskCategoryPageStore();
 const taskCategoryPageGetters = taskCategoryPageStore.getters;
@@ -21,12 +22,12 @@ const taskManagementTemplateStore = useTaskManagementTemplateStore();
 const taskTypeFields = computed<DataTableField[]>(() => [
     {
         name: 'name',
-        label: 'Name',
+        label: _i18n.t('OPSFLOW.NAME') as string,
         width: '20%',
     },
     {
         name: 'description',
-        label: 'Description',
+        label: _i18n.t('OPSFLOW.DESCRIPTION') as string,
         width: '70%',
     },
     {
@@ -41,7 +42,7 @@ const taskTypeFields = computed<DataTableField[]>(() => [
         <p-heading-layout>
             <template #heading>
                 <p-heading heading-type="sub">
-                    {{ taskManagementTemplateStore.templates.taskType }}
+                    {{ taskManagementTemplateStore.templates.TaskType }}
                 </p-heading>
             </template>
             <template #extra>
@@ -52,14 +53,26 @@ const taskTypeFields = computed<DataTableField[]>(() => [
                           icon-left="ic_plus_bold"
                           @click="taskCategoryPageStore.openAddTaskTypeForm()"
                 >
-                    {{ taskManagementTemplateStore.templates.createTaskType }}
+                    {{ $t('OPSFLOW.ADD_TARGET', { target: taskManagementTemplateStore.templates.TaskType }) }}
                 </p-button>
             </template>
         </p-heading-layout>
-        <p class="mt-2 mb-6 text-label-md text-gray-600">
-            티켓 양식으로 티켓에 포함된 필드와 데이터를 결정합니다. 여러 티켓 양식을 만들 수 있습니다. <br>
-            예를 들어 서비스별로 서로 다른 양식을 만들 수 있습니다. 그런 경우에는 최종 사용자가 적절한 양식을 선택하여 요청을 제출합니다.
-        </p>
+        <i18n path="OPSFLOW.TASK_MANAGEMENT.TASK_TYPE.DESC"
+              tag="p"
+              class="mt-2 mb-6 text-label-md text-gray-600 first-letter:capitalize"
+        >
+            <!-- CAUTION: Do not remove the following comments. They are used to prevent auto-formatting of the template. -->
+            <!-- In this case, template tags must be in a single line to prevent inserting unnecessary spaces. -->
+            <!-- eslint-disable-next-line vue/singleline-html-element-content-newline -->
+            <template #taskTypes>{{ taskManagementTemplateStore.templates.taskTypes }}</template>
+            <!-- eslint-disable-next-line vue/singleline-html-element-content-newline -->
+            <template #task>{{ taskManagementTemplateStore.templates.task }}</template>
+            <!-- eslint-disable-next-line vue/singleline-html-element-content-newline -->
+            <template #tasks>{{ taskManagementTemplateStore.templates.tasks }}</template>
+            <template #br>
+                <br>
+            </template>
+        </i18n>
         <p-data-table :loading="!taskCategoryPageGetters.taskTypes"
                       :items="taskCategoryPageGetters.taskTypes"
                       :fields="taskTypeFields"

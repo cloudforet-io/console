@@ -5,6 +5,7 @@ import { getTextHighlightRegex } from '@cloudforet/mirinae';
 import type { AutocompleteHandler, SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { TaskStatusOption, TaskStatusOptions } from '@/schema/opsflow/task/type';
+import { getParticle, i18n } from '@/translations';
 
 import { useFieldValidator } from '@/common/composables/form-validator';
 
@@ -16,6 +17,10 @@ const EMPTY_STATUS_OPTIONS = {
     COMPLETED: [],
 };
 
+interface StatusItem extends SelectDropdownMenuItem {
+    color?: string;
+}
+
 export const useTaskStatusField = ({
     isRequired, categoryId,
 }: {
@@ -24,21 +29,26 @@ export const useTaskStatusField = ({
 }) => {
     const taskCategoryStore = useTaskCategoryStore();
 
-    const taskStatusValidator = useFieldValidator<SelectDropdownMenuItem[]>(
+    const taskStatusValidator = useFieldValidator<StatusItem[]>(
         [],
         isRequired ? (val) => {
-            if (val.length === 0) return 'Please select a status';
+            if (val.length === 0) {
+                return i18n.t('OPSFLOW.VALIDATION.REQUIRED', {
+                    topic: i18n.t('OPSFLOW.STATUS'),
+                    particle: getParticle(i18n.t('OPSFLOW.STATUS') as string, 'topic'),
+                });
+            }
             return true;
         } : undefined,
     );
     const selectedStatusItems = taskStatusValidator.value;
     const selectedStatusId = computed<string|undefined>(() => selectedStatusItems.value[0]?.name);
 
-    const setSelectedStatusItems = (selected: SelectDropdownMenuItem[]) => {
+    const setSelectedStatusItems = (selected: StatusItem[]) => {
         taskStatusValidator.setValue(selected);
     };
 
-    const allStatusItems = ref<SelectDropdownMenuItem[]>([]);
+    const allStatusItems = ref<StatusItem[]>([]);
     const getStatusOptions = async (): Promise<TaskStatusOptions> => {
         if (!categoryId.value) return EMPTY_STATUS_OPTIONS;
         const category = await taskCategoryStore.get(categoryId.value);
@@ -46,21 +56,21 @@ export const useTaskStatusField = ({
     };
     const loadAllStatusItems = async () => {
         const statusOptions = await getStatusOptions();
-        const items: SelectDropdownMenuItem[] = [];
-        items.push({ type: 'header', label: 'To do', name: 'todo' });
+        const items: StatusItem[] = [];
+        items.push({ type: 'header', label: 'To-do', name: 'to-do' });
         items.push({ type: 'divider', name: 'todo-div' });
         statusOptions.TODO.forEach((status) => {
-            items.push({ name: status.status_id, label: status.name });
+            items.push({ name: status.status_id, label: status.name, color: status.color });
         });
-        items.push({ type: 'header', label: 'In progress', name: 'in-porgress' });
+        items.push({ type: 'header', label: 'In progress', name: 'in-progress' });
         items.push({ type: 'divider', name: 'in-progress-div' });
         statusOptions.IN_PROGRESS.forEach((status) => {
-            items.push({ name: status.status_id, label: status.name });
+            items.push({ name: status.status_id, label: status.name, color: status.color });
         });
         items.push({ type: 'header', label: 'Completed', name: 'completed' });
         items.push({ type: 'divider', name: 'completed-div' });
         statusOptions.COMPLETED.forEach((status) => {
-            items.push({ name: status.status_id, label: status.name });
+            items.push({ name: status.status_id, label: status.name, color: status.color });
         });
         return items;
     };
@@ -77,6 +87,7 @@ export const useTaskStatusField = ({
             setSelectedStatusItems([{
                 name: status.status_id,
                 label: status.name,
+                color: status.color,
             }]);
         }
     };

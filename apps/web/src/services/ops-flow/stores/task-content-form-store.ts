@@ -1,4 +1,4 @@
-import { reactive, computed, watch } from 'vue';
+import { reactive, computed } from 'vue';
 
 import { isEmpty, isEqual } from 'lodash';
 import { defineStore } from 'pinia';
@@ -8,19 +8,25 @@ import type { TaskField } from '@/schema/opsflow/_types/task-field-type';
 import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
 import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
 import type { TaskModel } from '@/schema/opsflow/task/model';
+import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
-import { useTaskAssignStore } from '@/services/ops-flow/stores/task-assign-store';
 import { useTaskStore } from '@/services/ops-flow/stores/task-store';
 import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
+import { DEFAULT_FIELD_ID_MAP } from '@/services/ops-flow/task-fields-configuration/constants/default-field-constant';
 import {
     useTaskFieldMetadataStore,
 } from '@/services/ops-flow/task-fields-configuration/stores/use-task-field-metadata-store';
 import type { DefaultTaskFieldId } from '@/services/ops-flow/task-fields-configuration/types/task-field-type-metadata-type';
+import {
+    useTaskManagementTemplateStore,
+} from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
 interface UseTaskContentFormStoreState {
     originTask?: TaskModel;
@@ -38,7 +44,7 @@ interface UseTaskContentFormStoreState {
     dataValidationMap: Record<string, boolean>;
     files: FileModel[];
     // overall
-    mode: 'create-minimal'|'create'|'view'; // create-minimal: create task without status and assignee
+    mode: 'create'|'view';
     hasUnsavedChanges: boolean;
     createTaskLoading: boolean;
 }
@@ -48,13 +54,15 @@ interface UseTaskContentFormStoreGetters {
     isDefaultFieldValid: boolean;
     isFieldValid: boolean;
     isAllValid: boolean;
+    isEditable: boolean;
 }
 export const useTaskContentFormStore = defineStore('task-content-form', () => {
     const taskCategoryStore = useTaskCategoryStore();
     const taskTypeStore = useTaskTypeStore();
     const taskStore = useTaskStore();
     const taskFieldMetadataStore = useTaskFieldMetadataStore();
-    const taskAssignStore = useTaskAssignStore();
+    const taskManagementTemplateStore = useTaskManagementTemplateStore();
+    const userStore = useUserStore();
 
     const state = reactive<UseTaskContentFormStoreState>({
         originTask: undefined,
@@ -82,12 +90,27 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         // task type field form
         currentFields: computed<TaskField[]>(() => {
             const taskType = state.currentTaskType;
-            return taskType ? taskType.fields : [];
+            const fields = taskType?.fields ?? [];
+            const isViewMode = state.mode === 'view';
+            return isViewMode ? fields : fields.filter((f) => f.is_primary || f.is_required);
         }),
-        isDefaultFieldValid: computed<boolean>(() => taskFieldMetadataStore.getters.defaultFields.every((field) => state.defaultDataValidationMap[field.field_id])),
+        isDefaultFieldValid: computed<boolean>(() => {
+            if (state.mode === 'view') return state.defaultDataValidationMap[DEFAULT_FIELD_ID_MAP.title] ?? true;
+            return taskFieldMetadataStore.getters.defaultFields.every((field) => state.defaultDataValidationMap[field.field_id]);
+        }),
         isFieldValid: computed<boolean>(() => getters.currentFields?.every((field) => state.dataValidationMap[field.field_id]) ?? true),
         // overall
-        isAllValid: computed<boolean>(() => state.isBaseFormValid && getters.isDefaultFieldValid && getters.isFieldValid),
+        isAllValid: computed<boolean>(() => {
+            if (state.mode === 'view') return getters.isDefaultFieldValid;
+            return state.isBaseFormValid && getters.isDefaultFieldValid && getters.isFieldValid;
+        }),
+        isEditable: computed<boolean>(() => {
+            if (state.mode === 'create') return true;
+            if (!state.originTask) return true;
+            if (userStore.getters.isDomainAdmin) return true;
+            if (state.originTask.created_by === userStore.state.userId) return true;
+            return false;
+        }),
     } as unknown as UseTaskContentFormStoreGetters; // HACK: to avoid type error
     const actions = {
         async setCurrentCategoryId(categoryId?: string) {
@@ -113,22 +136,13 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         setStatusId(statusId?: string) {
             state.statusId = statusId;
         },
-        setAssignee(assignee?: string) {
-            state.assignee = assignee;
+        setAssigneeToOriginTask(assignee: string) {
+            if (state.originTask) {
+                state.originTask = { ...state.originTask, assignee };
+            }
         },
         setIsBaseFormValid(isValid: boolean) {
             state.isBaseFormValid = isValid;
-        },
-        openAssignModal() {
-            if (!state.currentTaskType) {
-                ErrorHandler.handleError(new Error('Task type is not selected'));
-                return;
-            }
-            if (!state.originTask) {
-                ErrorHandler.handleError(new Error('Origin task is not defined'));
-                return;
-            }
-            taskAssignStore.openAssignModal(state.originTask.task_id, state.originTask.assignee, state.currentTaskType.assignee_pool);
         },
         // default field form
         setDefaultFieldData(fieldId: DefaultTaskFieldId, value: any) {
@@ -173,7 +187,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
             state.dataValidationMap = {};
             state.files = [];
         },
-        setMode(mode: 'create-minimal'|'create'|'view') {
+        setMode(mode: 'create'|'view') {
             state.mode = mode;
         },
         async createTask() {
@@ -190,24 +204,32 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
                     files: state.files.map((f) => f.file_id),
                     project_id: state.defaultData.project?.[0],
                 });
-                showSuccessMessage('Task created successfully', '');
+                showSuccessMessage(i18n.t('OPSFLOW.ALT_S_CREATE_TARGET', { target: taskManagementTemplateStore.templates.task }), '');
                 state.createTaskLoading = false;
                 return true;
             } catch (e) {
-                ErrorHandler.handleRequestError(e, 'Failed to create task');
+                ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ALT_E_CREATE_TARGET', { target: taskManagementTemplateStore.templates.task }));
                 state.createTaskLoading = false;
+                return false;
+            }
+        },
+        async updateTask() {
+            try {
+                if (!state.originTask) throw new Error('Origin task is not defined');
+                await taskStore.update({
+                    task_id: state.originTask.task_id,
+                    name: state.defaultData.title,
+                });
+                showSuccessMessage(i18n.t('OPSFLOW.ALT_S_UPDATE_TARGET', { target: taskManagementTemplateStore.templates.task }), '');
+                return true;
+            } catch (e) {
+                ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ALT_E_UPDATE_TARGET', { target: taskManagementTemplateStore.templates.task }));
                 return false;
             }
         },
     };
 
-    // watch assignee change
-    watch([() => taskAssignStore.state.currentAssignee, () => taskAssignStore.state.visibleAssignModal], ([user, visible]) => {
-        if (!state.originTask) return;
-        if (!visible && user && user !== state.originTask.assignee) {
-            state.originTask.assignee = user;
-        }
-    }, { immediate: true });
+
 
     return {
         state,

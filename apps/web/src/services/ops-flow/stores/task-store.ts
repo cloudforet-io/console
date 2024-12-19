@@ -6,6 +6,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { TaskChangeAssigneeParameters } from '@/schema/opsflow/task/api-verbs/change-assignee';
+import type { TaskChangeStatusParameters } from '@/schema/opsflow/task/api-verbs/change-status';
 import type { TaskCreateParameters } from '@/schema/opsflow/task/api-verbs/create';
 import type { TaskDeleteParameters } from '@/schema/opsflow/task/api-verbs/delete';
 import type { TaskGetParameters } from '@/schema/opsflow/task/api-verbs/get';
@@ -61,6 +63,22 @@ export const useTaskStore = defineStore('task', () => {
             });
             delete state.itemsByTaskId[taskId];
         },
+        async changeStatus(taskId: string, statusId: string) {
+            const response = await SpaceConnector.clientV2.opsflow.task.changeStatus<TaskChangeStatusParameters, TaskModel>({
+                task_id: taskId,
+                status_id: statusId,
+            });
+            state.itemsByTaskId = { ...state.itemsByTaskId, [taskId]: response };
+            return response;
+        },
+        async changeAssignee(taskId: string, assignee: string) {
+            const response = await SpaceConnector.clientV2.opsflow.task.changeAssignee<TaskChangeAssigneeParameters, TaskModel>({
+                task_id: taskId,
+                assignee,
+            });
+            state.itemsByTaskId = { ...state.itemsByTaskId, [taskId]: response };
+            return response;
+        },
         reset() {
             state.itemsByTaskId = {};
         },
@@ -72,8 +90,8 @@ export const useTaskStore = defineStore('task', () => {
         store.$dispose();
     };
     const appContextStore = useAppContextStore();
-    watch([() => appContextStore.getters.isAdminMode, () => appContextStore.getters.workspaceId], () => {
-        disposeSelf();
+    watch(() => appContextStore.getters.globalGrantLoading, (globalGrantLoading) => {
+        if (globalGrantLoading) disposeSelf();
     });
     return {
         state,

@@ -9,13 +9,14 @@ export interface TaskModel {
     priority: TaskPriority;
     description: string;
     data: Record<string, any>;
-    files: FileModel[];
+    files?: FileModel[];
     assignee: string;
     task_type_id: string;
     category_id: string;
     project_id: string;
     workspace_id: string;
     domain_id: string;
+    created_by: string;
     created_at: string;
     started_at: string;
     updated_at: string;

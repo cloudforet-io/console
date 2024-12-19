@@ -8,6 +8,9 @@ import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
+import {
+    useTaskManagementTemplateStore,
+} from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
 const OpsFlowContainer = () => import('@/services/ops-flow/OpsFlowContainer.vue');
 
@@ -17,6 +20,7 @@ const TaskDetailPage = () => import('@/services/ops-flow/pages/TaskDetailPage.vu
 const TaskCreatePage = () => import('@/services/ops-flow/pages/TaskCreatePage.vue');
 
 const userStore = useUserStore(pinia);
+const taskManagementTemplateStore = useTaskManagementTemplateStore(pinia);
 const opsFlowRoutes: RouteConfig = {
     path: 'ops-flow',
     name: OPS_FLOW_ROUTE._NAME,
@@ -32,7 +36,7 @@ const opsFlowRoutes: RouteConfig = {
             name: OPS_FLOW_ROUTE.LANDING._NAME,
             meta: {
                 menuId: MENU_ID.OPS_FLOW_LANDING,
-                translationId: MENU_INFO_MAP[MENU_ID.OPS_FLOW_LANDING].translationId,
+                translationId: () => taskManagementTemplateStore.templates.TemplateName,
             },
             component: OpsFlowLandingPage as any,
         },
@@ -40,8 +44,8 @@ const opsFlowRoutes: RouteConfig = {
             path: 'board',
             name: OPS_FLOW_ROUTE.BOARD._NAME,
             meta: {
-                menuId: MENU_ID.BOARD,
-                translationId: MENU_INFO_MAP[MENU_ID.BOARD].translationId,
+                menuId: MENU_ID.TASK_BOARD,
+                translationId: () => taskManagementTemplateStore.templates.TaskBoard,
                 lsbVisible: true,
             },
             component: BoardPage as any,

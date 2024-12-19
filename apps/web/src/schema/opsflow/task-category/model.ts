@@ -5,6 +5,7 @@ import type { TaskStatusOptions } from '@/schema/opsflow/task/type';
 export interface TaskCategoryModel {
     category_id: string;
     name: string;
+    state: 'ACTIVE' | 'DELETED';
     description: string;
     status_options: TaskStatusOptions;
     fields:TaskField[];
@@ -13,4 +14,5 @@ export interface TaskCategoryModel {
     domain_id: string;
     created_at: string;
     updated_at: string;
+    deleted_at: string;
 }

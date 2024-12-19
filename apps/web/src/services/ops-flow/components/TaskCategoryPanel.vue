@@ -6,6 +6,8 @@ import {
 } from '@cloudforet/mirinae';
 import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 
+import { getParticle, i18n as _i18n } from '@/translations';
+
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import ActionMenuButton from '@/common/components/buttons/ActionMenuButton.vue';
@@ -28,18 +30,18 @@ const state = reactive({
     categoryFields: computed<DataTableField[]>(() => [
         {
             name: 'name',
-            label: 'Category Name',
+            label: _i18n.t('OPSFLOW.NAME') as string,
             width: '20%',
         },
         {
             name: 'package',
-            label: 'Package',
+            label: _i18n.t('OPSFLOW.PACKAGE') as string,
             width: '10%',
             sortable: true,
         },
         {
             name: 'description',
-            label: 'Description',
+            label: _i18n.t('OPSFLOW.DESCRIPTION') as string,
             width: '60%',
         },
         {
@@ -62,7 +64,7 @@ const state = reactive({
     <p-pane-layout>
         <p-heading-layout class="pt-6 px-4 mb-2">
             <template #heading>
-                <p-heading :title="taskManagementTemplateStore.templates.taskCategory"
+                <p-heading :title="taskManagementTemplateStore.templates.TaskCategory"
                            heading-type="sub"
                 />
             </template>
@@ -75,12 +77,17 @@ const state = reactive({
                           style-type="substitutive"
                           @click="taskManagementPageStore.openAddCategoryForm()"
                 >
-                    Add Category
+                    {{ $t('OPSFLOW.ADD_TARGET', { target: $t('OPSFLOW.CATEGORY')}) }}
                 </p-button>
             </template>
         </p-heading-layout>
         <p class="px-4 mb-6 text-label-md text-gray-600">
-            티켓의 유형을 그룹화한 것입니다. 고객은 티켓을 제출할 때 적절한 카테고리를 선택하여 담당자가 티켓을 효율적으로 관리할 수 있게 돕습니다.
+            {{ $t('OPSFLOW.TASK_MANAGEMENT.CATEGORY.DESC', {
+                task: taskManagementTemplateStore.templates.task,
+                tasks: taskManagementTemplateStore.templates.tasks,
+                taskObjectParticle: getParticle(taskManagementTemplateStore.templates.task, 'object'),
+                tasksObjectParticle: getParticle(taskManagementTemplateStore.templates.tasks, 'object'),
+            }) }}
         </p>
         <p-data-table :loading="taskCategoryStore.getters.loading"
                       :items="taskCategoryStore.getters.taskCategories"

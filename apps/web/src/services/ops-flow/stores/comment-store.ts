@@ -47,7 +47,10 @@ export const useCommentStore = defineStore('comment', () => {
          * @return {CommentModel[]|undefined} It returns undefined if the request is canceled.
          */
         async list(params: CommentListParameters = {}): Promise<CommentModel[]|undefined> {
-            const result = await fetchList(params);
+            const result = await fetchList({
+                ...params,
+                comment_type: 'COMMENT',
+            });
             if (result.status === 'succeed') {
                 return result.response.results ?? [];
             }
@@ -113,8 +116,8 @@ export const useCommentStore = defineStore('comment', () => {
         store.$dispose();
     };
     const appContextStore = useAppContextStore();
-    watch([() => appContextStore.getters.isAdminMode, () => appContextStore.getters.workspaceId], () => {
-        disposeSelf();
+    watch(() => appContextStore.getters.globalGrantLoading, (globalGrantLoading) => {
+        if (globalGrantLoading) disposeSelf();
     });
     return {
         state,

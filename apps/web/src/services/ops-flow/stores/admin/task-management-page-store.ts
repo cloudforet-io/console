@@ -10,6 +10,8 @@ import type { TaskModel } from '@/schema/opsflow/task/model';
 import type { WorkspaceItem } from '@/store/reference/workspace-reference-store';
 import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
 import { useTaskStore } from '@/services/ops-flow/stores/task-store';
@@ -26,6 +28,7 @@ interface UseTaskManagementPageStoreState {
     visibleDeleteCategoryModal: boolean;
     // task
     associatedTasksToCategoryMap: Record<string, TaskModel[]>;
+    loadingAssociatedTasksToCategory: boolean;
 }
 
 export const useTaskManagementPageStore = defineStore('task-management-page', () => {
@@ -43,7 +46,9 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
         visibleCategoryForm: false,
         targetCategoryId: undefined,
         visibleDeleteCategoryModal: false,
+        // task
         associatedTasksToCategoryMap: {},
+        loadingAssociatedTasksToCategory: false,
     });
     const getters = {
         targetPackage: computed<PackageModel|undefined>(() => packageStore.getters.packages.find((p) => p.package_id === state.targetPackageId)),
@@ -57,14 +62,6 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
         associatedTasksToCategory: computed<DeepReadonly<TaskModel[]>>(() => {
             if (!state.targetCategoryId) return [];
             const categoryId = state.targetCategoryId;
-            if (state.associatedTasksToCategoryMap[categoryId]) return state.associatedTasksToCategoryMap[categoryId];
-            taskStore.list({ category_id: categoryId }).then((tasks) => {
-                if (!tasks) return;
-                state.associatedTasksToCategoryMap = {
-                    ...state.associatedTasksToCategoryMap,
-                    [categoryId]: tasks,
-                };
-            });
             return state.associatedTasksToCategoryMap[categoryId] ?? [];
         }),
         targetCategory: computed<DeepReadonly<TaskCategoryModel>|undefined>(() => taskCategoryStore.getters.taskCategories.find((c) => c.category_id === state.targetCategoryId)),
@@ -126,6 +123,26 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
         },
         resetTargetCategoryId() {
             state.targetCategoryId = undefined;
+        },
+        // task
+        async loadAssociatedTasksToCategory(categoryId: string) {
+            state.loadingAssociatedTasksToCategory = true;
+            if (state.associatedTasksToCategoryMap[categoryId]) {
+                state.loadingAssociatedTasksToCategory = false;
+                return;
+            }
+            try {
+                const tasks = await taskStore.list({ category_id: categoryId });
+                if (!tasks) return;
+                state.associatedTasksToCategoryMap = {
+                    ...state.associatedTasksToCategoryMap,
+                    [categoryId]: tasks,
+                };
+                state.loadingAssociatedTasksToCategory = false;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.loadingAssociatedTasksToCategory = false;
+            }
         },
     };
     return {

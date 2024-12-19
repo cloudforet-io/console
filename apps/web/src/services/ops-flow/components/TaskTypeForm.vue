@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    ref, nextTick, watch,
+    ref, nextTick, watch, computed,
 } from 'vue';
 
 import { isEqual, cloneDeep } from 'lodash';
@@ -10,6 +10,7 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
+import { getParticle, i18n as _i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -27,13 +28,18 @@ import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
-
 const taskCategoryPageStore = useTaskCategoryPageStore();
 const taskCategoryPageState = taskCategoryPageStore.state;
 const taskCategoryPageGetters = taskCategoryPageStore.getters;
 const taskTypeStore = useTaskTypeStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
+const title = computed(() => {
+    if (taskCategoryPageGetters.targetTaskType) {
+        return _i18n.t('OPSFLOW.EDIT_TARGET', { target: taskManagementTemplateStore.templates.TaskType });
+    }
+    return _i18n.t('OPSFLOW.ADD_TARGET', { target: taskManagementTemplateStore.templates.TaskType });
+});
 
 /* task field configuration */
 const {
@@ -61,11 +67,22 @@ const {
     fields: taskFieldsValidator,
 }, {
     name(value: string) {
-        if (!value.trim().length) return 'Name is required';
-        if (value.length > 50) return 'Name should be less than 50 characters';
+        if (!value.trim().length) {
+            return _i18n.t('OPSFLOW.VALIDATION.REQUIRED', {
+                topic: _i18n.t('OPSFLOW.NAME'),
+                particle: getParticle(_i18n.t('OPSFLOW.NAME') as string, 'topic'),
+            });
+        }
+        if (value.length > 50) {
+            return _i18n.t('OPSFLOW.VALIDATION.LENGTH_MAX', {
+                topic: _i18n.t('OPSFLOW.NAME'),
+                particle: getParticle(_i18n.t('OPSFLOW.NAME') as string, 'topic'),
+                length: 50,
+            });
+        }
         if (!taskCategoryPageGetters.taskTypes) return true;
         const isDuplicated = taskCategoryPageGetters.taskTypes.some((taskType) => taskType.name === value && taskType.task_type_id !== taskCategoryPageGetters.targetTaskType?.task_type_id);
-        if (isDuplicated) return 'Name already exists';
+        if (isDuplicated) return _i18n.t('OPSFLOW.VALIDATION.DUPLICATED', { topic: _i18n.t('OPSFLOW.NAME') });
         return true;
     },
 });
@@ -96,9 +113,9 @@ const createTaskType = async (categoryId: string) => {
             category_id: categoryId,
             fields: fields.value,
         });
-        showSuccessMessage('Task type created successfully', '');
+        showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_ADD_TARGET', { target: taskManagementTemplateStore.templates.TaskType }), '');
     } catch (e) {
-        ErrorHandler.handleRequestError(e, 'Failed to create task type');
+        ErrorHandler.handleRequestError(e, _i18n.t('OPSFLOW.ALT_E_ADD_TARGET', { target: taskManagementTemplateStore.templates.TaskType }));
     }
 };
 
@@ -129,9 +146,9 @@ const updateTaskType = async (target: TaskTypeModel) => {
         if (errorMessages.length) {
             throw new Error(errorMessages.join('\n'));
         }
-        showSuccessMessage('Task type updated successfully', '');
+        showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_EDIT_TARGET', { target: taskManagementTemplateStore.templates.TaskType }), '');
     } catch (e) {
-        ErrorHandler.handleRequestError(e, 'Failed to update task type');
+        ErrorHandler.handleRequestError(e, _i18n.t('OPSFLOW.ALT_E_EDIT_TARGET', { target: taskManagementTemplateStore.templates.TaskType }));
     }
 };
 
@@ -182,8 +199,7 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
 </script>
 
 <template>
-    <p-overlay-layout :title="taskCategoryPageGetters.targetTaskType ?
-                          taskManagementTemplateStore.templates.editTaskType : taskManagementTemplateStore.templates.createTaskType"
+    <p-overlay-layout :title="title"
                       :visible="taskCategoryPageState.visibleTaskTypeForm"
                       size="lg"
                       @close="handleCancelOrClose"
@@ -191,7 +207,7 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
     >
         <template #default>
             <div class="p-6 w-full">
-                <p-field-group label="Name"
+                <p-field-group :label="$t('OPSFLOW.NAME')"
                                required
                                :invalid="!loading && invalidState.name"
                                :invalid-text="invalidTexts.name"
@@ -204,23 +220,27 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
                         />
                     </template>
                 </p-field-group>
-                <p-field-group label="Assignee Pool">
+                <p-field-group :label="$t('OPSFLOW.ASSIGNEE_POOL')">
                     <user-select-dropdown :selected-user-ids="assigneePool"
                                           selection-type="multiple"
                                           @update:user-ids="setForm('assigneePool', $event)"
                     />
                 </p-field-group>
-                <p-field-group label="Description">
+                <p-field-group :label="$t('OPSFLOW.DESCRIPTION')">
                     <p-textarea :value="description"
-                                placeholder="Describe this ticket type in a few words."
+                                :placeholder="$t('OPSFLOW.DESCRIBE_FIELD', {
+                                    field: taskManagementTemplateStore.templates.taskType ,
+                                    particle: getParticle(taskManagementTemplateStore.templates.taskType , 'object')
+                                })"
                                 @update:value="setForm('description', $event)"
                     />
                 </p-field-group>
-                <p-field-group label="Fields Configuration"
+                <p-field-group :label="$t('OPSFLOW.FIELDS_CONFIG')"
                                required
                 >
                     <task-fields-configuration class="mt-2"
                                                :fields="fields"
+                                               :origin-fields="taskCategoryPageGetters.targetTaskType?.fields"
                                                @update:fields="setFields"
                                                @add-field="addField"
                                                @remove-field="removeField"
@@ -235,14 +255,14 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
                           :disabled="loading"
                           @click="handleCancelOrClose"
                 >
-                    Cancel
+                    {{ $t('COMMON.BUTTONS.CANCEL') }}
                 </p-button>
                 <p-button style-type="primary"
                           :loading="loading"
                           :disabled="!isAllValid"
                           @click="handleConfirm"
                 >
-                    Confirm
+                    {{ $t('COMMON.BUTTONS.CONFIRM') }}
                 </p-button>
             </div>
         </template>

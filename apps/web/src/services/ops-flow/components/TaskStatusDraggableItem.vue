@@ -5,10 +5,11 @@ import { PI, PBadge } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import type { TaskStatusType } from '@/schema/opsflow/task/type';
-
+import { i18n } from '@/translations';
 
 import ActionMenuButton from '@/common/components/buttons/ActionMenuButton.vue';
 
+import TaskStatusBadge from '@/services/ops-flow/components/TaskStatusBadge.vue';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
 
 const props = defineProps<{
@@ -21,19 +22,19 @@ const props = defineProps<{
 }>();
 
 const menu = computed<MenuItem[]>(() => [
-    { name: 'edit', icon: 'ic_edit', label: 'Edit' },
-    { name: 'set-as-default', icon: 'ic_check-circle', label: 'Set as Default' },
-    { name: 'delete', icon: 'ic_delete', label: 'Delete' },
+    { name: 'edit', icon: 'ic_edit', label: i18n.t('COMMON.BUTTONS.EDIT') },
+    { name: 'set-as-default', icon: 'ic_check-circle', label: i18n.t('OPSFLOW.SET_AS_DEFAULT') },
+    { name: 'delete', icon: 'ic_delete', label: i18n.t('COMMON.BUTTONS.DELETE') },
 ]);
 const defaultStatusMenu = computed<MenuItem[]>(() => [
     {
-        name: 'edit', icon: 'ic_edit', label: 'Edit',
+        name: 'edit', icon: 'ic_edit', label: i18n.t('COMMON.BUTTONS.EDIT'),
     },
     {
-        name: 'set-as-default', icon: 'ic_check-circle', label: 'Set as Default', disabled: true, iconColor: 'inherit',
+        name: 'set-as-default', icon: 'ic_check-circle', label: i18n.t('OPSFLOW.SET_AS_DEFAULT'), disabled: true, iconColor: 'inherit',
     },
     {
-        name: 'delete', icon: 'ic_delete', label: 'Delete', disabled: true, iconColor: 'inherit',
+        name: 'delete', icon: 'ic_delete', label: i18n.t('COMMON.BUTTONS.DELETE'), disabled: true, iconColor: 'inherit',
     },
 ]);
 const taskCategoryPageStore = useTaskCategoryPageStore();
@@ -57,20 +58,17 @@ const handleSetDefault = () => {
              class="drag-handle"
         />
         <div class="flex-grow">
-            <p-badge class="ml-2"
-                     badge-type="subtle"
-                     shape="square"
-                     :style-type="props.color"
-            >
-                {{ props.name }}
-            </p-badge>
+            <task-status-badge class="ml-2"
+                               :name="props.name"
+                               :color="props.color"
+            />
             <p-badge v-if="props.isDefault"
                      class="ml-1"
                      badge-type="solid-outline"
                      style-type="gray500"
                      shape="round"
             >
-                Default
+                {{ $t('OPSFLOW.DEFAULT') }}
             </p-badge>
         </div>
         <action-menu-button :menu="props.isDefault ? defaultStatusMenu : menu"

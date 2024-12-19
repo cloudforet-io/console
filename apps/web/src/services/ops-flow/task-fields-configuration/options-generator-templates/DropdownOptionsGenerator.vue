@@ -78,7 +78,7 @@ onBeforeMount(() => {
 
 <template>
     <div>
-        <p-field-title label="Value" />
+        <p-field-title :label="$t('OPSFLOW.FIELD_GENERATOR.VALUE')" />
         <draggable v-model="enums"
                    draggable=".draggable-item"
                    handle=".drag-handle"
@@ -117,7 +117,7 @@ onBeforeMount(() => {
                   class="mt-2"
                   @click="handleAdd"
         >
-            Add Value
+            {{ $t('OPSFLOW.ADD_TARGET', { target: $t('OPSFLOW.FIELD_GENERATOR.VALUE') }) }}
         </p-button>
     </div>
 </template>

@@ -37,8 +37,12 @@ import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import {
+    useTaskManagementTemplateStore,
+} from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
 
+const verbose = false;
 const filterMenuByRoute = (menuList: DisplayMenu[], router: VueRouter): DisplayMenu[] => menuList.reduce((results, _menu) => {
     const userWorkspaceStore = useUserWorkspaceStore();
     const targetWorkspaceId = userWorkspaceStore.getters.currentWorkspaceId;
@@ -75,16 +79,30 @@ const filterMenuByAccessPermission = (menuList: DisplayMenu[], pagePermissionLis
 
     return results;
 }, [] as DisplayMenu[]);
+
+const taskManagementTemplateStore = useTaskManagementTemplateStore();
 const getDisplayMenuList = (menuList: Menu[], isAdminMode?: boolean, currentWorkspaceId?: string): DisplayMenu[] => menuList.map((d) => {
     const menuInfo: MenuInfo = MENU_INFO_MAP[d.id];
     const routeName = isAdminMode ? makeAdminRouteName(MENU_INFO_MAP[d.id].routeName) : MENU_INFO_MAP[d.id].routeName;
+    let label = i18n.t(menuInfo.translationId);
+    let hideOnGNB = d.hideOnGNB;
+    let hideOnSiteMap = d.hideOnSiteMap;
+    if (d.id === MENU_ID.OPS_FLOW_LANDING) {
+        label = taskManagementTemplateStore.templates.TemplateName;
+        hideOnGNB = taskManagementTemplateStore.state.templateId === 'default' || !taskManagementTemplateStore.state.enableLanding;
+        hideOnSiteMap = taskManagementTemplateStore.state.templateId === 'default' || !taskManagementTemplateStore.state.enableLanding;
+    } else if (d.id === MENU_ID.TASK_BOARD) {
+        label = taskManagementTemplateStore.templates.TaskBoard;
+    }
     return {
         ...d,
         id: d.id,
-        label: i18n.t(menuInfo.translationId),
+        label,
         icon: menuInfo.icon,
         highlightTag: menuInfo.highlightTag,
         to: { name: routeName, params: { workspaceId: currentWorkspaceId } },
+        hideOnGNB,
+        hideOnSiteMap,
         subMenuList: d.subMenuList ? getDisplayMenuList(d.subMenuList, isAdminMode, currentWorkspaceId) : [],
     } as DisplayMenu;
 });
@@ -217,9 +235,11 @@ export const useDisplayStore = defineStore('display-store', () => {
     let notificationListApiToken: CancelTokenSource | undefined;
     const checkNotification = async (): Promise<void> => {
         if (notificationListApiToken) {
+            if (verbose) console.debug('[CHECK NOTI]', ' pending...');
             return;
         }
         try {
+            if (verbose) console.debug('[CHECK NOTI]', ' start');
             notificationListApiToken = axios.CancelToken.source();
 
             const currentTime = dayjs.tz(dayjs.utc(), userStore.state.timezone);
@@ -230,6 +250,7 @@ export const useDisplayStore = defineStore('display-store', () => {
                 currentTime,
                 lastNotificationReadTime,
             );
+            if (verbose) console.debug('[NOTI QUERY.FILTER]', param.query.filter);
             const { total_count } = await SpaceConnector.clientV2.notification.notification.list<NotificationListParameters, ListResponse<NotificationModel>>(param, {
                 cancelToken: notificationListApiToken.token,
             });
@@ -243,17 +264,20 @@ export const useDisplayStore = defineStore('display-store', () => {
             }
         } finally {
             notificationListApiToken = undefined;
+            if (verbose) console.debug('[CHECK NOTI]', ' finished');
         }
     };
 
     let checkNotificationInterval: undefined|ReturnType<typeof setTimeout>;
     const stopCheckNotification = (): void => {
         if (notificationListApiToken) {
+            if (verbose)console.debug('[NOTI API]', 'canceled');
             notificationListApiToken.cancel();
             notificationListApiToken = undefined;
         }
 
         if (checkNotificationInterval) {
+            if (verbose)console.debug('[NOTI INTERVAL]', 'stopped');
             clearInterval(checkNotificationInterval);
             checkNotificationInterval = undefined;
         }
@@ -261,12 +285,15 @@ export const useDisplayStore = defineStore('display-store', () => {
 
     const startCheckNotification = (): void => {
         if (notificationListApiToken) {
+            if (verbose)console.debug('[NOTI API]', 'previous canceled');
             notificationListApiToken.cancel();
             notificationListApiToken = undefined;
         }
         if (checkNotificationInterval) {
+            if (verbose)console.debug('[NOTI INTERVAL]', 'previous stopped');
             clearInterval(checkNotificationInterval);
         } else {
+            if (verbose) console.debug('[NOTI INTERVAL]', 'start');
             checkNotification();
         }
 

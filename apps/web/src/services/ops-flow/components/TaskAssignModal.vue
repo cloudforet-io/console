@@ -9,7 +9,9 @@ import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tabl
 import type { ToolboxTableOptions } from '@cloudforet/mirinae/types/data-display/tables/toolbox-table/type';
 
 import type { TaskModel } from '@/schema/opsflow/task/model';
+import { i18n } from '@/translations';
 
+import type { UserReferenceItem } from '@/store/reference/user-reference-store';
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -17,18 +19,25 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useTaskAssignStore } from '@/services/ops-flow/stores/task-assign-store';
+import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
+import { useTaskDetailPageStore } from '@/services/ops-flow/stores/task-detail-page-store';
 import { useTaskStore } from '@/services/ops-flow/stores/task-store';
 
 const userReferenceStore = useUserReferenceStore();
 const taskAssignStore = useTaskAssignStore();
 const taskStore = useTaskStore();
+const taskContentFormStore = useTaskContentFormStore();
+const taskDetailPageStore = useTaskDetailPageStore();
 
 const fields: DataTableField[] = [
     { label: 'User ID', name: 'name' },
     { label: 'Name', name: 'label' },
 ];
 
-const allUserReferenceItems = computed<SelectDropdownMenuItem[]>(() => Object.values(userReferenceStore.getters.userItems.map((u) => ({ name: u.key, label: u.label || u.name }))));
+const allUserReferenceItems = computed<SelectDropdownMenuItem[]>(() => Object.values<UserReferenceItem>(userReferenceStore.getters.userItems).map((u) => ({
+    name: u.key,
+    label: u.label || u.name,
+})));
 const allUserItems = computed<SelectDropdownMenuItem[]>(() => {
     const assigneePool = taskAssignStore.state.currentAssigneePool;
     if (assigneePool && assigneePool.length > 0) {
@@ -66,20 +75,19 @@ const updateTaskAssignee = async (): Promise<TaskModel|undefined> => {
     try {
         if (!taskAssignStore.state.taskId) throw new Error('task id is not defined');
         if (selectIndex.value.length === 0) throw new Error('assignee is not selected');
-        const newTask = await taskStore.update({
-            task_id: taskAssignStore.state.taskId,
-            assignee: refinedUserItems.value[selectIndex.value[0]].name,
-        });
-        showSuccessMessage('Task assigned successfully', '');
+        const newTask = await taskStore.changeAssignee(taskAssignStore.state.taskId, refinedUserItems.value[selectIndex.value[0]].name);
+        taskContentFormStore.setAssigneeToOriginTask(newTask.assignee);
+        showSuccessMessage(i18n.t('OPSFLOW.ALT_S_ASSIGN'), '');
         return newTask;
     } catch (e) {
-        ErrorHandler.handleRequestError(e, 'Failed to assign task');
+        ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ALT_E_ASSIGN'));
         return undefined;
     }
 };
 const handleConfirm = async () => {
     updating.value = true;
     const task = await updateTaskAssignee();
+    taskDetailPageStore.loadNewEvents();
     taskAssignStore.closeAssignModal(task?.assignee);
     updating.value = false;
 };
@@ -97,7 +105,7 @@ watch(() => taskAssignStore.state.visibleAssignModal, (visible) => {
 
 <template>
     <p-button-modal :visible="taskAssignStore.state.visibleAssignModal"
-                    header-title="Assign Member"
+                    :header-title="$t('OPSFLOW.TASK_BOARD.ASSIGN_TO')"
                     size="md"
                     :loading="loading || updating"
                     :disabled="selectIndex.length === 0"

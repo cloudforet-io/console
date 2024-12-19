@@ -26,6 +26,9 @@ import {
 } from '@/services/ops-flow/task-fields-configuration/stores/use-task-field-metadata-store';
 import TaskFieldGeneratorHeader from '@/services/ops-flow/task-fields-configuration/TaskFieldGeneratorHeader.vue';
 import type { TaskFieldTypeMetadata } from '@/services/ops-flow/task-fields-configuration/types/task-field-type-metadata-type';
+import {
+    useTaskManagementTemplateStore,
+} from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
 const COMPONENT_MAP: Partial<Record<TaskFieldType, ReturnType<typeof defineAsyncComponent>>> = {
     DROPDOWN: defineAsyncComponent(() => import('@/services/ops-flow/task-fields-configuration/options-generator-templates/DropdownOptionsGenerator.vue')),
@@ -42,6 +45,7 @@ const emit = defineEmits<{(event: 'delete'): void;
 
 const taskFieldMetadataStore = useTaskFieldMetadataStore();
 const taskFieldMetadataStoreGetters = taskFieldMetadataStore.getters;
+const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
 const fieldMetadata = computed<TaskFieldTypeMetadata>(() => taskFieldMetadataStoreGetters.taskFieldTypeMetadataMap[props.field.field_type]);
 const optionsComponent = computed<ReturnType<typeof defineAsyncComponent>|undefined>(() => COMPONENT_MAP[props.field.field_type]);
@@ -70,6 +74,11 @@ const field = computed<TaskField>(() => {
     }
     return result;
 });
+const handleRequiredChange = (value: boolean) => {
+    isRequired.value = value;
+    if (value) isPrimary.value = true;
+};
+
 watch(field, (newField) => {
     if (isEqual(newField, props.field)) return;
     emit('update:field', newField);
@@ -84,7 +93,7 @@ onBeforeMount(() => {
     options.value = props.field.options ?? {};
     isOptionsValid.value = false;
     isRequired.value = props.field.is_required ?? isDefaultField.value;
-    isPrimary.value = props.field.is_primary ?? isDefaultField.value;
+    isPrimary.value = props.field.is_required ? true : (props.field.is_primary ?? isDefaultField.value);
     isFolded.value = isDefaultField.value;
 });
 </script>
@@ -102,7 +111,7 @@ onBeforeMount(() => {
         />
         <div v-if="!isFolded">
             <div class="py-4 pl-8 pr-2 border-b border-gray-150">
-                <p-field-group label="Field Name"
+                <p-field-group :label="$t('OPSFLOW.FIELD_GENERATOR.FIELD_NAME')"
                                :invalid="isNameInvalid"
                                required
                 >
@@ -117,15 +126,17 @@ onBeforeMount(() => {
                            @update:options="options = $event"
                            @update:is-valid="isOptionsValid = $event"
                 />
-                <p-field-group label="Show on Ticket Creation"
+                <p-field-group :label="$t('OPSFLOW.FIELD_GENERATOR.SHOW_TASK_CREATION', {task: taskManagementTemplateStore.templates.Task })"
                                required
                                class="mt-4"
                 >
                     <p class="text-paragraph-sm mb-2">
-                        Display this field during task creation
+                        {{ $t('OPSFLOW.FIELD_GENERATOR.SHOW_TASK_CREATION_DESC') }}
                     </p>
-                    <p-toggle-button :value.sync="isPrimary"
-                                     :disabled="isDefaultField"
+                    <!-- HACK: key is used to force re-render when isRequired changes. This is temporary solution. -->
+                    <p-toggle-button :key="String(isRequired)"
+                                     :value.sync="isPrimary"
+                                     :disabled="isRequired || isDefaultField"
                                      show-state-text
                                      position="left"
                     />
@@ -135,9 +146,9 @@ onBeforeMount(() => {
                 <p-checkbox :selected="isRequired"
                             :value="true"
                             :disabled="isDefaultField"
-                            @change="isRequired = $event"
+                            @change="handleRequiredChange"
                 >
-                    This Field is Required
+                    {{ $t('OPSFLOW.FIELD_GENERATOR.FIELD_REQUIRED') }}
                 </p-checkbox>
             </div>
         </div>

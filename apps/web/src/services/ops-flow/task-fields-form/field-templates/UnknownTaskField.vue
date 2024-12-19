@@ -14,7 +14,7 @@ const props = defineProps<TaskFieldFormProps<TaskField, any>>();
 
 <template>
     <p-field-group :label="props.field.name"
-                   :required="props.field.is_required"
+                   :required="props.readonly ||props.field.is_required"
                    :invalid="!props.readonly"
                    :invalid-text="props.readonly ? undefined : `${props.field.field_type} is not supported`"
                    :help-text="props.readonly ? `${props.field.field_type} is not supported` : undefined"

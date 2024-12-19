@@ -3,15 +3,21 @@ import {
     ref, watch, nextTick,
 } from 'vue';
 
+import { isEqual } from 'lodash';
+
 import {
-    POverlayLayout, PFieldGroup, PTextInput, PTextarea, PSelectDropdown, PButton,
+    POverlayLayout, PFieldGroup, PTextInput, PTextarea, PSelectDropdown, PButton, PRadioGroup, PRadio,
 } from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/src/controls/dropdown/select-dropdown/type';
+
+import { getParticle, i18n as _i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import PackageUpdateConfirmModal from '@/services/ops-flow/components/PackageUpdateConfirmModal.vue';
 import { useCategoryField } from '@/services/ops-flow/composables/use-category-field';
 import { useWorkspaceField } from '@/services/ops-flow/composables/use-workspace-field';
 import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
@@ -29,10 +35,21 @@ const {
     selectedWorkspaceItems,
     workspaceMenuItemsHandler,
     workspaceValidator,
-    handleUpdateSelectedWorkspaces,
+    setSelectedWorkspaces,
     setInitialWorkspaces,
     applyPackageToWorkspaces,
+    addedWorkspaceItems,
+    removedWorkspaceItems,
 } = useWorkspaceField();
+const workspaceType = ref<'unset'|'specific'>('unset');
+const handleSelectUnsetWorkspace = () => {
+    workspaceType.value = 'unset';
+    setSelectedWorkspaces([]);
+};
+const handleUpdateWorkspaces = (items: SelectDropdownMenuItem[]) => {
+    if (isEqual(items, selectedWorkspaceItems.value)) return;
+    setSelectedWorkspaces(items);
+};
 
 /* category */
 const {
@@ -42,6 +59,8 @@ const {
     setSelectedCategoryItems,
     setInitialCategoriesByPackageId,
     applyPackageToCategories,
+    addedCategoryItems,
+    removedCategoryItems,
 } = useCategoryField();
 
 /* form */
@@ -60,14 +79,30 @@ const {
     workspaces: workspaceValidator,
 }, {
     name(value: string) {
-        if (!value.trim().length) return 'Name is required';
-        if (value.length > 50) return 'Name should be less than 50 characters';
-        if (packageStore.getters.packages.some((p) => p.package_id !== taskManagementPageState.targetPackageId && p.name === value)) return 'Name already exists';
+        if (!value.trim().length) {
+            return _i18n.t('OPSFLOW.VALIDATION.REQUIRED', {
+                topic: _i18n.t('OPSFLOW.NAME'),
+                particle: getParticle(_i18n.t('OPSFLOW.NAME') as string, 'topic'),
+            });
+        }
+        if (value.length > 50) {
+            return _i18n.t('OPSFLOW.VALIDATION.LENGTH_MAX', {
+                topic: _i18n.t('OPSFLOW.NAME'),
+                particle: getParticle(_i18n.t('OPSFLOW.NAME') as string, 'topic'),
+                length: 50,
+            });
+        }
+        if (packageStore.getters.packages.some((p) => p.package_id !== taskManagementPageState.targetPackageId && p.name === value)) {
+            return _i18n.t('OPSFLOW.VALIDATION.DUPLICATED', { field: _i18n.t('OPSFLOW.NAME') });
+        }
         return true;
     },
 });
 
-/* modal */
+/* update confirm modal */
+const visibleUpdateConfirmModal = ref(false);
+
+/* form modal */
 const loading = ref(false);
 const handleCancelOrClose = () => {
     taskManagementPageStore.closePackageForm();
@@ -75,9 +110,23 @@ const handleCancelOrClose = () => {
 const handleClosed = () => {
     taskManagementPageStore.resetTargetPackageId();
 };
+const handleFormConfirm = () => {
+    if (addedWorkspaceItems.value.length || removedWorkspaceItems.value.length
+        || addedCategoryItems.value.length || removedCategoryItems.value.length) {
+        visibleUpdateConfirmModal.value = true;
+    } else {
+        handleUpdateConfirm();
+    }
+};
+const handleUpdateCancel = () => {
+    visibleUpdateConfirmModal.value = false;
+};
+const handleUpdateConfirm = async () => {
+    visibleUpdateConfirmModal.value = false;
 
-const handleConfirm = async () => {
-    if (!isAllValid.value) return;
+    if (!isAllValid.value) {
+        ErrorHandler.handleError(new Error('Invalid form'));
+    }
     loading.value = true;
     if (taskManagementPageState.targetPackageId) {
         try {
@@ -85,7 +134,6 @@ const handleConfirm = async () => {
                 package_id: taskManagementPageState.targetPackageId,
                 name: name.value,
                 description: description.value,
-                tags: {},
             });
             // bind workspaces and categories
             const errorMessages: string[] = [];
@@ -101,9 +149,9 @@ const handleConfirm = async () => {
             if (errorMessages.length) {
                 throw new Error(errorMessages.join('\n'));
             }
-            showSuccessMessage('Successfully updated the package', '');
+            showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_EDIT_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') }), '');
         } catch (e) {
-            ErrorHandler.handleRequestError(e, 'Failed to update package');
+            ErrorHandler.handleRequestError(e, _i18n.t('OPSFLOW.ALT_E_EDIT_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') }));
         }
     } else {
         try {
@@ -126,9 +174,9 @@ const handleConfirm = async () => {
             if (errorMessages.length) {
                 throw new Error(errorMessages.join('\n'));
             }
-            showSuccessMessage('Successfully added the package', '');
+            showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_ADD_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') }), '');
         } catch (e) {
-            ErrorHandler.handleRequestError(e, 'Failed to create package');
+            ErrorHandler.handleRequestError(e, _i18n.t('OPSFLOW.ALT_E_ADD_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') }));
         }
     }
     taskManagementPageStore.closePackageForm();
@@ -143,7 +191,8 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
             name: '',
             description: '',
         });
-        setInitialWorkspaces();
+        workspaceType.value = 'unset';
+        await setInitialWorkspaces();
         await setInitialCategoriesByPackageId();
         resetValidations();
         return;
@@ -153,7 +202,12 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
             name: targetPackage.name,
             description: targetPackage.description,
         });
-        setInitialWorkspaces(targetPackage.package_id);
+        await setInitialWorkspaces(targetPackage.package_id);
+        if (selectedWorkspaceItems.value.length > 0) {
+            workspaceType.value = 'specific';
+        } else {
+            workspaceType.value = 'unset';
+        }
         await setInitialCategoriesByPackageId(targetPackage.package_id);
     }
 });
@@ -161,49 +215,91 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
 
 
 <template>
-    <p-overlay-layout title="Add Package"
-                      :visible="taskManagementPageState.visiblePackageForm"
-                      @close="handleCancelOrClose"
-                      @closed="handleClosed"
-    >
-        <template #default>
-            <div class="p-6 w-full">
-                <p-field-group label="Name"
-                               required
-                               :invalid="!loading && invalidState.name"
-                               :invalid-text="invalidTexts.name"
-                >
-                    <template #default="{ invalid }">
-                        <p-text-input :value="name"
-                                      :invalid="invalid"
-                                      @update:value="setForm('name', $event)"
+    <fragment>
+        <p-overlay-layout :title="taskManagementPageState.targetPackageId ? $t('OPSFLOW.EDIT_TARGET', { target: $t('OPSFLOW.PACKAGE') }) : $t('OPSFLOW.ADD_TARGET', { target: $t('OPSFLOW.PACKAGE') })"
+                          :visible="taskManagementPageState.visiblePackageForm"
+                          @close="handleCancelOrClose"
+                          @closed="handleClosed"
+        >
+            <template #default>
+                <div class="p-6 w-full">
+                    <p-field-group :label="$t('OPSFLOW.NAME')"
+                                   required
+                                   :invalid="!loading && invalidState.name"
+                                   :invalid-text="invalidTexts.name"
+                    >
+                        <template #default="{ invalid }">
+                            <p-text-input :value="name"
+                                          :invalid="invalid"
+                                          @update:value="setForm('name', $event)"
+                            />
+                        </template>
+                    </p-field-group>
+                    <p-field-group :label="$t('OPSFLOW.DESCRIPTION')"
+                                   required
+                                   :invalid="invalidState.description"
+                                   :invalid-text="invalidTexts.description"
+                    >
+                        <p-textarea :value="description"
+                                    :invalid="invalidState.description"
+                                    :placeholder="$t('OPSFLOW.DESCRIBE_FIELD', {
+                                        field: $t('OPSFLOW.PACKAGE'),
+                                        particle: getParticle( $t('OPSFLOW.PACKAGE'), 'object')
+                                    })"
+                                    @update:value="setForm('description', $event)"
                         />
-                    </template>
-                </p-field-group>
-                <p-field-group label="Description"
-                               required
-                               :invalid="invalidState.description"
-                               :invalid-text="invalidTexts.description"
-                >
-                    <p-textarea :value="description"
-                                :invalid="invalidState.description"
-                                placeholder="Describe this support package in a few words."
-                                @update:value="setForm('description', $event)"
-                    />
-                </p-field-group>
-                <p-field-group v-if="!taskManagementPageState.targetPackageId
-                                   || taskManagementPageState.targetPackageId !== taskManagementPageGetters.defaultPackage?.package_id"
-                               :invalid="invalidState.workspaces"
-                               :invalid-text="invalidTexts.workspaces"
-                               label="Workspace"
-                >
-                    <div class="mt-2">
-                        <p-select-dropdown :selected="selectedWorkspaceItems"
-                                           :invalid="invalidState.workspaces"
-                                           :handler="workspaceMenuItemsHandler"
+                    </p-field-group>
+                    <p-field-group v-if="!taskManagementPageState.targetPackageId
+                                       || taskManagementPageState.targetPackageId !== taskManagementPageGetters.defaultPackage?.package_id"
+                                   :invalid="invalidState.workspaces"
+                                   :invalid-text="invalidTexts.workspaces"
+                                   :label="$t('OPSFLOW.WORKSPACE')"
+                    >
+                        <div class="mt-2">
+                            <p-radio-group>
+                                <p-radio :selected="workspaceType"
+                                         value="unset"
+                                         @change="handleSelectUnsetWorkspace"
+                                >
+                                    {{ $t('OPSFLOW.TASK_MANAGEMENT.PACKAGE.UNSET') }}
+                                </p-radio>
+                                <p-radio :selected="workspaceType"
+                                         value="specific"
+                                         @change="workspaceType = $event"
+                                >
+                                    {{ $t('OPSFLOW.TASK_MANAGEMENT.PACKAGE.SPECIFIC_WORKSPACE') }}
+                                </p-radio>
+                            </p-radio-group>
+                            <p-select-dropdown v-if="workspaceType === 'specific'"
+                                               class="mt-2"
+                                               :selected="selectedWorkspaceItems"
+                                               :invalid="invalidState.workspaces"
+                                               :handler="workspaceMenuItemsHandler"
+                                               :page-size="10"
+                                               appearance-type="badge"
+                                               menu-position="left"
+                                               show-select-marker
+                                               multi-selectable
+                                               use-fixed-menu-style
+                                               block
+                                               show-clear-selection
+                                               is-filterable
+                                               init-selected-with-handler
+                                               @update:selected="handleUpdateWorkspaces"
+                            />
+                        </div>
+                    </p-field-group>
+                    <p-field-group v-if="!taskManagementPageState.targetPackageId
+                                       || taskManagementPageState.targetPackageId !== taskManagementPageGetters.defaultPackage?.package_id"
+                                   :label="$t('OPSFLOW.CATEGORY')"
+                                   :invalid="invalidState.categories"
+                                   :invalid-text="invalidTexts.categories"
+                    >
+                        <p-select-dropdown :selected="selectedCategoryItems"
+                                           :handler="categoryMenuItemsHandler"
+                                           :invalid="invalidState.categories"
                                            :page-size="10"
                                            appearance-type="badge"
-                                           menu-position="left"
                                            show-select-marker
                                            multi-selectable
                                            use-fixed-menu-style
@@ -211,49 +307,39 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
                                            show-clear-selection
                                            is-filterable
                                            init-selected-with-handler
-                                           @update:selected="handleUpdateSelectedWorkspaces"
+                                           @update:selected="setSelectedCategoryItems"
                         />
-                    </div>
-                </p-field-group>
-                <p-field-group v-if="!taskManagementPageState.targetPackageId
-                                   || taskManagementPageState.targetPackageId !== taskManagementPageGetters.defaultPackage?.package_id"
-                               label="Category"
-                               :invalid="invalidState.categories"
-                               :invalid-text="invalidTexts.categories"
-                >
-                    <p-select-dropdown :selected="selectedCategoryItems"
-                                       :handler="categoryMenuItemsHandler"
-                                       :invalid="invalidState.categories"
-                                       appearance-type="badge"
-                                       show-select-marker
-                                       multi-selectable
-                                       use-fixed-menu-style
-                                       block
-                                       show-clear-selection
-                                       is-filterable
-                                       init-selected-with-handler
-                                       @update:selected="setSelectedCategoryItems"
-                    />
-                </p-field-group>
-            </div>
-        </template>
-        <template #footer>
-            <div class="py-3 px-6 flex flex-wrap gap-3 justify-end">
-                <p-button style-type="transparent"
-                          :disabled="loading"
-                          @click="handleCancelOrClose"
-                >
-                    Cancel
-                </p-button>
-                <p-button style-type="primary"
-                          :loading="loading"
-                          :disabled="!isAllValid"
-                          @click="handleConfirm"
-                >
-                    Confirm
-                </p-button>
-            </div>
-        </template>
-    </p-overlay-layout>
+                    </p-field-group>
+                </div>
+            </template>
+            <template #footer>
+                <div class="py-3 px-6 flex flex-wrap gap-3 justify-end">
+                    <p-button style-type="transparent"
+                              :disabled="loading"
+                              @click="handleCancelOrClose"
+                    >
+                        {{ $t('COMMON.BUTTONS.CANCEL') }}
+                    </p-button>
+                    <p-button style-type="primary"
+                              :loading="loading"
+                              :disabled="!isAllValid"
+                              @click="handleFormConfirm"
+                    >
+                        {{ $t('COMMON.BUTTONS.CONFIRM') }}
+                    </p-button>
+                </div>
+            </template>
+        </p-overlay-layout>
+        <package-update-confirm-modal :visible="visibleUpdateConfirmModal"
+                                      :selected-workspaces="selectedWorkspaceItems"
+                                      :added-workspaces="addedWorkspaceItems"
+                                      :removed-workspaces="removedWorkspaceItems"
+                                      :selected-categories="selectedCategoryItems"
+                                      :added-categories="addedCategoryItems"
+                                      :removed-categories="removedCategoryItems"
+                                      @cancel="handleUpdateCancel"
+                                      @confirm="handleUpdateConfirm"
+        />
+    </fragment>
 </template>
 

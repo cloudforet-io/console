@@ -7,6 +7,10 @@ import {
     POverlayLayout, PFieldGroup, PTextInput, PTextarea, PButton,
 } from '@cloudforet/mirinae';
 
+import { i18n, getParticle } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
@@ -30,9 +34,22 @@ const {
     description: '',
 }, {
     name(value: string) {
-        if (!value.trim().length) return 'Name is required';
-        if (value.length > 50) return 'Name should be less than 50 characters';
-        if (taskCategoryStore.getters.taskCategories.some((p) => taskManagementPageState.targetCategoryId !== p.category_id && p.name === value)) return 'Name already exists';
+        if (!value.trim().length) {
+            return i18n.t('OPSFLOW.VALIDATION.REQUIRED', {
+                topic: i18n.t('OPSFLOW.NAME'),
+                particle: getParticle(i18n.t('OPSFLOW.NAME') as string, 'topic'),
+            });
+        }
+        if (value.length > 50) {
+            return i18n.t('OPSFLOW.VALIDATION.LENGTH_MAX', {
+                topic: i18n.t('OPSFLOW.NAME'),
+                particle: getParticle(i18n.t('OPSFLOW.NAME') as string, 'topic'),
+                length: 50,
+            });
+        }
+        if (taskCategoryStore.getters.taskCategories.some((p) => taskManagementPageState.targetCategoryId !== p.category_id && p.name === value)) {
+            return i18n.t('OPSFLOW.VALIDATION.DUPLICATED', { topic: i18n.t('OPSFLOW.NAME') });
+        }
         return true;
     },
 });
@@ -56,6 +73,7 @@ const handleConfirm = async () => {
                 name: name.value,
                 description: description.value,
             });
+            showSuccessMessage(i18n.t('OPSFLOW.ALT_S_EDIT_TARGET', { target: i18n.t('OPSFLOW.CATEGORY') }), '');
         } else {
             if (!taskManagementPageGetters.defaultPackage) throw Error('Default package is not found');
             await taskCategoryStore.create({
@@ -63,11 +81,15 @@ const handleConfirm = async () => {
                 description: description.value,
                 package_id: taskManagementPageGetters.defaultPackage.package_id,
             });
+            showSuccessMessage(i18n.t('OPSFLOW.ALT_S_ADD_TARGET', { target: i18n.t('OPSFLOW.CATEGORY') }), '');
         }
         taskManagementPageStore.closeCategoryForm();
     } catch (e) {
-        ErrorHandler.handleRequestError(e, 'Failed to save category');
-        // TODO: handle error
+        if (taskManagementPageState.targetCategoryId) {
+            ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ALT_E_EDIT_TARGET', { target: i18n.t('OPSFLOW.CATEGORY') }));
+        } else {
+            ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ALT_E_ADD_TARGET', { target: i18n.t('OPSFLOW.CATEGORY') }));
+        }
     } finally {
         loading.value = false;
     }
@@ -104,14 +126,15 @@ watch([() => taskManagementPageState.visibleCategoryForm, () => taskManagementPa
 </script>
 
 <template>
-    <p-overlay-layout title="Add Category"
+    <p-overlay-layout :title="taskManagementPageState.targetCategoryId ? $t('OPSFLOW.EDIT_TARGET', { target: $t('OPSFLOW.CATEGORY')})
+                          : $t('OPSFLOW.ADD_TARGET', { target: $t('OPSFLOW.CATEGORY')})"
                       :visible="taskManagementPageState.visibleCategoryForm"
                       @close="handleCancelOrClose"
                       @closed="handleClosed"
     >
         <template #default>
             <div class="p-6 w-full">
-                <p-field-group label="Name"
+                <p-field-group :label="$t('OPSFLOW.NAME')"
                                required
                                :invalid="!loading && invalidState.name"
                                :invalid-text="invalidTexts.name"
@@ -123,9 +146,12 @@ watch([() => taskManagementPageState.visibleCategoryForm, () => taskManagementPa
                         />
                     </template>
                 </p-field-group>
-                <p-field-group label="Description">
+                <p-field-group :label="$t('OPSFLOW.DESCRIPTION')">
                     <p-textarea :value="description"
-                                placeholder="Describe this support package in a few words."
+                                :placeholder="$t('OPSFLOW.DESCRIBE_FIELD', {
+                                    field: $t('OPSFLOW.CATEGORY'),
+                                    particle: getParticle( $t('OPSFLOW.CATEGORY'), 'object')
+                                })"
                                 @update:value="setForm('description', $event)"
                     />
                 </p-field-group>
@@ -137,14 +163,14 @@ watch([() => taskManagementPageState.visibleCategoryForm, () => taskManagementPa
                           :disabled="loading"
                           @click="handleCancelOrClose"
                 >
-                    Cancel
+                    {{ $t('COMMON.BUTTONS.CANCEL') }}
                 </p-button>
                 <p-button style-type="primary"
                           :loading="loading"
                           :disabled="!isAllValid"
                           @click="handleConfirm"
                 >
-                    Confirm
+                    {{ $t('COMMON.BUTTONS.CONFIRM') }}
                 </p-button>
             </div>
         </template>

@@ -3,11 +3,12 @@ import {
     reactive, ref, watch, toRaw, computed,
 } from 'vue';
 
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 import {
-    PPaneLayout, PToolbox, PDataTable, PDivider, PLink,
-    PCollapsiblePanel, PBadge,
+    PPaneLayout, PToolbox, PDataTable, PDivider, PBadge,
 } from '@cloudforet/mirinae';
 import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
@@ -15,16 +16,17 @@ import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/
 import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
 import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
 import type { TaskModel } from '@/schema/opsflow/task/model';
+import { i18n } from '@/translations';
 
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 
-import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useTimezoneDate } from '@/common/composables/timezone-date';
 import ProjectLinkButton from '@/common/modules/project/ProjectLinkButton.vue';
 
-import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
+import BoardTaskDescriptionField from '@/services/ops-flow/components/BoardTaskDescriptionField.vue';
+import BoardTaskFilters from '@/services/ops-flow/components/BoardTaskFilters.vue';
+import BoardTaskNameField from '@/services/ops-flow/components/BoardTaskNameField.vue';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
 import { useBoardPageStore } from '@/services/ops-flow/stores/board-page-store';
 import { useTaskStore } from '@/services/ops-flow/stores/task-store';
@@ -32,6 +34,7 @@ import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
+import type { TaskFilters } from '@/services/ops-flow/types/task-filters-type';
 
 const boardPageStore = useBoardPageStore();
 const boardPageState = boardPageStore.state;
@@ -88,8 +91,8 @@ const sort = reactive({
     desc: true,
 });
 const queryHelper = new ApiQueryHelper();
-const getQuery = () => {
-    queryHelper.setFilters([])
+const getQuery = (filters?: ConsoleFilter[]) => {
+    queryHelper.setFilters(filters ?? [])
         .setMultiSortV2([toRaw(sort)])
         .setPage(pagination.page, pagination.size);
     if (search.value) queryHelper.addFilter({ v: search.value });
@@ -154,6 +157,9 @@ watch(() => boardPageState.currentCategoryId, () => {
 }, { immediate: true });
 
 /* toolbox */
+const handleRefresh = () => {
+    listTask(getQuery());
+};
 const handleChange = (options: ToolboxOptions) => {
     if (options.searchText !== undefined) search.value = options.searchText;
     if (options.pageStart !== undefined) pagination.page = options.pageStart;
@@ -163,44 +169,56 @@ const handleChange = (options: ToolboxOptions) => {
     listTask(getQuery());
 };
 
+/* filters */
+const taskFilterHelper = new QueryHelper();
+const handleUpdateFilters = (values: TaskFilters) => {
+    taskFilterHelper.setFilters([]);
+    if (values.taskType.length) taskFilterHelper.addFilter({ k: 'task_type_id', v: values.taskType, o: '=' });
+    if (values.status.length) taskFilterHelper.addFilter({ k: 'status_id', v: values.status, o: '=' });
+    if (values.project.length) taskFilterHelper.addFilter({ k: 'project_id', v: values.project, o: '=' });
+    if (values.createdBy.length) taskFilterHelper.addFilter({ k: 'created_by', v: values.createdBy, o: '=' });
+    if (values.assignee.length) taskFilterHelper.addFilter({ k: 'assignee', v: values.assignee, o: '=' });
+    listTask(getQuery(taskFilterHelper.filters));
+};
+
 /* table */
 const fields = computed<DataTableField[] >(() => [
     {
         name: 'name',
-        label: 'Title',
+        label: i18n.t('OPSFLOW.TITLE') as string,
         width: '13rem',
     },
     {
         name: 'description',
-        label: 'Description',
+        label: i18n.t('OPSFLOW.DESCRIPTION') as string,
         width: '15rem',
     },
     {
         name: 'task_type_id',
-        label: taskManagementTemplateStore.templates.taskType,
+        label: taskManagementTemplateStore.templates.TaskType,
     },
     {
         name: 'status_id',
-        label: 'Status',
+        label: i18n.t('OPSFLOW.STATUS') as string,
     },
     {
         name: 'project_id',
-        label: 'Project',
+        label: i18n.t('OPSFLOW.PROJECT') as string,
     },
     {
         name: 'assignee',
-        label: 'Assignee',
+        label: i18n.t('OPSFLOW.ASSIGNEE') as string,
     },
     {
         name: 'created_by',
-        label: 'Created By',
+        label: i18n.t('OPSFLOW.CREATED_BY') as string,
     },
     {
         name: 'created_at',
-        label: 'Created At',
+        label: i18n.t('OPSFLOW.CREATED_AT') as string,
     },
 ]);
-const { getProperRouteLocation } = useProperRouteLocation();
+
 </script>
 
 <template>
@@ -211,34 +229,30 @@ const { getProperRouteLocation } = useProperRouteLocation();
                        :this-page="pagination.page"
                        :page-size="pagination.size"
                        :total-count="pagination.total"
+                       @refresh="handleRefresh"
                        @change="handleChange"
             />
             <p-divider />
             <div class="mt-6">
-                filters
+                <board-task-filters :category-id="boardPageState.currentCategoryId"
+                                    @update="handleUpdateFilters"
+                />
             </div>
         </div>
         <p-data-table :fields="fields"
                       :items="tasks"
+                      :loading="loading"
                       class="w-auto"
         >
             <template #col-name-format="{item}">
-                <p-collapsible-panel :line-clamp="1">
-                    <p-link :text="item.name"
-                            :to="getProperRouteLocation({
-                                name: OPS_FLOW_ROUTE.BOARD.TASK_DETAIL._NAME,
-                                params: {taskId: item.task_id},
-                            })"
-                            highlight
-                    />
-                </p-collapsible-panel>
+                <board-task-name-field :task-id="item.task_id"
+                                       :name="item.name"
+                />
             </template>
             <template #col-description-format="{item}">
-                <p-collapsible-panel :line-clamp="1">
-                    <text-editor-viewer :contents="item.description"
-                                        :attachments="item.files.map(d => ({ fileId: d.file_id, downloadUrl: d.download_url}))"
-                    />
-                </p-collapsible-panel>
+                <board-task-description-field :description="item.description"
+                                              :files="item.files"
+                />
             </template>
             <template #col-task_type_id-format="{value}">
                 {{ getTaskTypeName(value) }}

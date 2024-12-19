@@ -1,20 +1,24 @@
 {
 	"default": {
-		"createTask": "",
-		"createTaskType": "",
-		"editTaskType": "",
-		"taskCategory": "",
-		"taskProgress": "",
+		"Task": "",
+		"TaskBoard": "",
+		"TaskCategory": "",
+		"TaskType": "",
+		"TemplateName": "",
+		"task": "",
 		"taskType": "",
-		"templateName": ""
+		"taskTypes": "",
+		"tasks": ""
 	},
 	"service-desk": {
-		"createTask": "",
-		"createTaskType": "",
-		"editTaskType": "",
-		"taskCategory": "",
-		"taskProgress": "",
+		"Task": "",
+		"TaskBoard": "",
+		"TaskCategory": "",
+		"TaskType": "",
+		"TemplateName": "",
+		"task": "",
 		"taskType": "",
-		"templateName": ""
+		"taskTypes": "",
+		"tasks": ""
 	}
 }

@@ -1,27 +1,45 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue';
 
+import { isEqual } from 'lodash';
+
 import {
-    PFieldTitle, PFieldGroup, PSelectDropdown, PPaneLayout, PButton,
+    PFieldTitle, PFieldGroup, PSelectDropdown, PPaneLayout, PButton, PBadge,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
 import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
+import { i18n } from '@/translations';
+
+import { useUserReferenceStore } from '@/store/reference/user-reference-store';
+import { useUserStore } from '@/store/user/user-store';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useFieldValidator, useFormValidator } from '@/common/composables/form-validator';
-import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
+import { useFormValidator } from '@/common/composables/form-validator';
 
 import { useCategoryField } from '@/services/ops-flow/composables/use-category-field';
 import { useTaskStatusField } from '@/services/ops-flow/composables/use-task-status-field';
 import { useTaskTypeField } from '@/services/ops-flow/composables/use-task-type-field';
+import { useTaskAssignStore } from '@/services/ops-flow/stores/task-assign-store';
 import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
+import { useTaskDetailPageStore } from '@/services/ops-flow/stores/task-detail-page-store';
+import { useTaskStore } from '@/services/ops-flow/stores/task-store';
+import {
+    useTaskManagementTemplateStore,
+} from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
 const taskContentFormStore = useTaskContentFormStore();
 const taskContentFormState = taskContentFormStore.state;
 const taskContentFormGetters = taskContentFormStore.getters;
-
+const userReferenceStore = useUserReferenceStore();
+const taskAssignStore = useTaskAssignStore();
+const taskStore = useTaskStore();
+const taskDetailPageStore = useTaskDetailPageStore();
+const taskManagementTemplateStore = useTaskManagementTemplateStore();
+const userStore = useUserStore();
 
 /* category */
 const {
@@ -55,15 +73,18 @@ const {
     isRequired: true,
 });
 const handleUpdateSelectedTaskType = async (items: SelectDropdownMenuItem[]) => {
+    if (isEqual(items, selectedTaskTypeItems)) return;
     setForm('taskType', items); // set form for validation
     await taskContentFormStore.setCurrentTaskType(items[0].name); // set current task type to store for other fields
     const taskType = taskContentFormState.currentTaskType;
     const category = taskContentFormGetters.currentCategory;
-    if (!category || !taskType) {
+    if (items.length > 0 && (!category || !taskType)) {
         ErrorHandler.handleError(new Error('Failed to get category or task type'));
         return;
     }
-    initRelatedFieldsByTaskTypeSelection(category, taskType);
+    if (category && taskType) {
+        initRelatedFieldsByTaskTypeSelection(category, taskType);
+    }
 };
 
 /* status */
@@ -75,27 +96,47 @@ const {
     setInitialStatus,
 } = useTaskStatusField({
     categoryId: computed(() => taskContentFormGetters.currentCategory?.category_id),
-    isRequired: true,
 });
-const handleUpdateSelectedStatus = (items) => {
-    taskContentFormStore.setStatusId(items[0].name);
+const changeStatus = async (statusId: string) => {
+    try {
+        if (!taskContentFormState.originTask) {
+            throw new Error('Origin task is not defined');
+        }
+        await taskStore.changeStatus(taskContentFormState.originTask.task_id, statusId);
+        showSuccessMessage(i18n.t('OPSFLOW.ALT_S_UPDATE_TARGET', { target: i18n.t('OPSFLOW.STATUS') }), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ALT_E_UPDATE_TARGET', { target: i18n.t('OPSFLOW.STATUS') }));
+    }
+};
+const handleUpdateSelectedStatus = async (items: SelectDropdownMenuItem[]) => {
+    const statusId = items[0].name;
+    if (taskContentFormState.statusId === statusId) return;
+    taskContentFormStore.setStatusId(statusId);
     setSelectedStatusItems(items);
+    if (taskContentFormState.mode === 'view') {
+        await changeStatus(statusId);
+        await taskDetailPageStore.loadNewEvents();
+    }
 };
 
 /* assignee */
-const assigneeValidator = useFieldValidator('', (value) => {
-    if (!taskContentFormGetters.currentCategory || !taskContentFormState.currentTaskType) return true;
-    if (!value) return 'Assignee is required';
-    return true;
-});
-const assignee = assigneeValidator.value;
-const handleUpdateSelectedAssignee = (userId?: string) => {
-    taskContentFormStore.setAssignee(userId);
-    assigneeValidator.setValue(userId ?? '');
-};
 const handleClickAssign = () => {
-    taskContentFormStore.openAssignModal();
+    if (!taskContentFormState.currentTaskType) {
+        ErrorHandler.handleError(new Error('Task type is not selected'));
+        return;
+    }
+    if (!taskContentFormState.originTask) {
+        ErrorHandler.handleError(new Error('Origin task is not defined'));
+        return;
+    }
+    taskAssignStore.openAssignModal(taskContentFormState.originTask.task_id, taskContentFormState.originTask.assignee, taskContentFormState.currentTaskType.assignee_pool);
 };
+const assigneeName = computed<string>(() => {
+    const userId = taskContentFormState.originTask?.assignee;
+    if (!userId) return '--';
+    const user = userReferenceStore.getters.userItems[userId];
+    return user?.label || user?.name || userId;
+});
 
 /* form validator */
 const {
@@ -103,12 +144,12 @@ const {
     invalidTexts,
     isAllValid,
     resetValidation,
+    resetValidations,
     setForm,
 } = useFormValidator({
     category: categoryValidator,
     taskType: taskTypeValidator,
     status: taskStatusValidator,
-    assignee: assigneeValidator,
 });
 watch(isAllValid, (isValid) => {
     taskContentFormStore.setIsBaseFormValid(isValid);
@@ -123,11 +164,8 @@ const initRelatedFieldsByCategorySelection = (category: TaskCategoryModel) => {
     const defaultStatus = category.status_options.TODO.find((status) => status.is_default);
     setInitialStatus(defaultStatus);
     taskContentFormStore.setStatusId(defaultStatus?.status_id);
-    // init selected assignee
-    assigneeValidator.setValue('');
     // reset validations
     resetValidation('taskType');
-    resetValidation('assignee');
 };
 const initRelatedFieldsByTaskTypeSelection = (category: TaskCategoryModel, taskType: TaskTypeModel) => {
     // init selected task type
@@ -136,10 +174,6 @@ const initRelatedFieldsByTaskTypeSelection = (category: TaskCategoryModel, taskT
     const defaultStatus = category.status_options.TODO.find((status) => status.is_default);
     setInitialStatus(defaultStatus);
     taskContentFormStore.setStatusId(defaultStatus?.status_id);
-    // init selected assignee
-    assigneeValidator.setValue('');
-    // reset validations
-    resetValidation('assignee');
 };
 
 /* initiation for 'view' mode */
@@ -152,20 +186,44 @@ watch([() => taskContentFormState.originTask, () => taskContentFormGetters.curre
     // set status
     const statusOption = category.status_options[task.status_type]?.find((status) => status.status_id === task.status_id);
     setInitialStatus(statusOption);
+}, { immediate: true });
 
-    // setting assignee is not required because it uses the origin task's assignee directly
+/* initiation for 'create' mode with initial category, task type */
+let hasInitiated = false;
+watch([() => taskContentFormState.currentCategoryId, () => taskContentFormState.currentTaskType], async ([categoryId, taskType]) => {
+    if (hasInitiated) return;
+
+    if (taskContentFormState.mode === 'create' && categoryId) {
+        await setInitialCategory(categoryId);
+        // init selected status
+        const category = taskContentFormGetters.currentCategory;
+        if (category) {
+            const defaultStatus = category.status_options.TODO.find((status) => status.is_default);
+            setInitialStatus(defaultStatus);
+            taskContentFormStore.setStatusId(defaultStatus?.status_id);
+        } else {
+            ErrorHandler.handleError(new Error('Failed to get category'));
+        }
+        // init task type
+        if (taskType) setInitialTaskType(taskType);
+
+        // reset validations
+        resetValidations();
+    }
+
+    hasInitiated = true;
 }, { immediate: true });
 </script>
 
 <template>
-    <component :is="taskContentFormState.mode === 'create-minimal' ? 'div' : PPaneLayout"
+    <component :is="taskContentFormState.mode === 'create' ? 'div' : PPaneLayout"
                class="flex flex-wrap gap-4"
-               :class="taskContentFormState.mode === 'create-minimal' ? '' : 'py-6 px-4'"
+               :class="taskContentFormState.mode === 'create' ? '' : 'py-6 px-4'"
     >
         <div class="base-form-top-wrapper">
             <div class="base-form-field-wrapper">
-                <p-field-group label="Category"
-                               :style-type="taskContentFormState.mode === 'create-minimal' ? 'primary' : 'secondary'"
+                <p-field-group :label="taskManagementTemplateStore.templates.TaskCategory"
+                               :style-type="taskContentFormState.mode === 'create' ? 'primary' : 'secondary'"
                                required
                                :invalid="invalidState.category"
                                :invalid-text="invalidTexts.category"
@@ -180,8 +238,8 @@ watch([() => taskContentFormState.originTask, () => taskContentFormGetters.curre
                 </p-field-group>
             </div>
             <div class="base-form-field-wrapper">
-                <p-field-group label="Type"
-                               :style-type="taskContentFormState.mode === 'create-minimal' ? 'primary' : 'secondary'"
+                <p-field-group :label="taskManagementTemplateStore.templates.TaskType"
+                               :style-type="taskContentFormState.mode === 'create' ? 'primary' : 'secondary'"
                                required
                                :invalid="invalidState.taskType"
                                :invalid-text="invalidTexts.taskType"
@@ -196,11 +254,11 @@ watch([() => taskContentFormState.originTask, () => taskContentFormGetters.curre
                 </p-field-group>
             </div>
         </div>
-        <div v-if="taskContentFormState.mode !== 'create-minimal'"
+        <div v-if="taskContentFormState.mode !== 'create'"
              class="base-form-top-wrapper"
         >
             <div class="base-form-field-wrapper">
-                <p-field-group label="Status"
+                <p-field-group :label="$t('OPSFLOW.STATUS')"
                                style-type="secondary"
                                required
                                :invalid="invalidState.status"
@@ -209,10 +267,25 @@ watch([() => taskContentFormState.originTask, () => taskContentFormGetters.curre
                     <p-select-dropdown :selected="selectedStatusItems"
                                        :handler="statusMenuItemsHandler"
                                        :invalid="invalidState.status"
-                                       :readonly="taskContentFormState.mode === 'view' || !taskContentFormGetters.currentCategory"
+                                       :readonly="!userStore.getters.isDomainAdmin || !taskContentFormGetters.currentCategory"
                                        block
                                        @update:selected="handleUpdateSelectedStatus"
-                    />
+                    >
+                        <template #dropdown-button="item">
+                            <p-badge badge-type="subtle"
+                                     :style-type="item.color"
+                            >
+                                {{ item.label }}
+                            </p-badge>
+                        </template>
+                        <template #menu-item--format="{ item }">
+                            <p-badge badge-type="subtle"
+                                     :style-type="item.color"
+                            >
+                                {{ item.label }}
+                            </p-badge>
+                        </template>
+                    </p-select-dropdown>
                 </p-field-group>
             </div>
             <div class="base-form-field-wrapper">
@@ -221,33 +294,20 @@ watch([() => taskContentFormState.originTask, () => taskContentFormGetters.curre
                         <p-field-title size="sm"
                                        color="gray"
                         >
-                            Assign to
+                            {{ userStore.getters.isDomainAdmin ? $t('OPSFLOW.TASK_BOARD.ASSIGN_TO') : $t('OPSFLOW.ASSIGNEE') }}
                         </p-field-title>
-                        <p-button size="sm"
+                        <p-button v-if="userStore.getters.isDomainAdmin"
+                                  size="sm"
                                   style-type="tertiary"
                                   @click="handleClickAssign"
                         >
-                            Assign
+                            {{ $t('OPSFLOW.TASK_BOARD.ASSIGN') }}
                         </p-button>
                     </div>
                     <p class="mt-1 text-label-md text-blue-900">
-                        {{ taskContentFormState.originTask?.assignee || '--' }}
+                        {{ assigneeName }}
                     </p>
                 </div>
-                <p-field-group v-else
-                               label="Assign to"
-                               style-type="secondary"
-                               required
-                               :invalid="invalidState.assignee"
-                               :invalid-text="invalidTexts.assignee"
-                >
-                    <user-select-dropdown :user-id="assignee"
-                                          :invalid="invalidState.assignee"
-                                          :readonly="taskContentFormState.mode === 'view' || !taskContentFormState.currentTaskType"
-                                          :user-pool="taskContentFormState.currentTaskType?.assignee_pool"
-                                          @update:user-id="handleUpdateSelectedAssignee"
-                    />
-                </p-field-group>
             </div>
         </div>
     </component>

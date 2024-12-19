@@ -189,8 +189,8 @@ export const useTaskTypeStore = defineStore('task-type', () => {
         store.$dispose();
     };
     const appContextStore = useAppContextStore();
-    watch([() => appContextStore.getters.isAdminMode, () => appContextStore.getters.workspaceId], () => {
-        disposeSelf();
+    watch(() => appContextStore.getters.globalGrantLoading, (globalGrantLoading) => {
+        if (globalGrantLoading) disposeSelf();
     });
     return {
         state,

@@ -3,11 +3,11 @@ import { reactive, toRef, computed } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import { APIError } from '@cloudforet/core-lib/space-connector/error';
-
 import { i18n, type SupportLanguage } from '@/translations';
 
-import { useDomainConfigStore } from '@/store/domain/domain-config-store';
+import { useSharedConfigStore } from '@/store/domain/shared-config-store';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -21,19 +21,15 @@ import ko from '../translations/ko.json';
 
 
 interface TaskManagementTemplate {
-    templateName: string;
-    taskCategory: string;
-    allTaskCategories: string;
+    TemplateName: string;
+    Task: string;
+    TaskType: string;
+    TaskBoard: string;
+    TaskCategory: string;
+    taskTypes: string;
     taskType: string;
-    createTaskType: string;
-    editTaskType: string;
-    createTask: string;
-    taskProgress: string;
-    landingTitle?: string;
-    landingDescription?: string;
-    activeTasks?: string;
-    viewAllTasks?: string;
-    noActiveTasks?: string;
+    task: string;
+    tasks: string;
 }
 const messages: Record<SupportLanguage, TaskManagementTemplate> = {
     en: en as unknown as TaskManagementTemplate,
@@ -41,28 +37,32 @@ const messages: Record<SupportLanguage, TaskManagementTemplate> = {
     ko: ko as unknown as TaskManagementTemplate,
 };
 
-interface DomainConfigTemplateData {
+interface TemplateData {
     template_id: TaskManagementTemplateType;
 }
-
+interface LandingData {
+    enabled: boolean;
+}
 interface UseTaskManagementTemplateStoreState {
-    templateId: TaskManagementTemplateType
+    templateId: TaskManagementTemplateType;
+    enableLanding: boolean;
 }
 export const useTaskManagementTemplateStore = defineStore('task-management-template', () => {
-    const domainConfigStore = useDomainConfigStore();
-    const domainConfigStoreGetters = domainConfigStore.getters;
+    const sharedConfigStore = useSharedConfigStore();
+    const sharedConfigStoreGetters = sharedConfigStore.getters;
 
-    const templateData = toRef(domainConfigStoreGetters, 'TASK_TEMPLATE') as unknown as Ref<DomainConfigTemplateData|undefined>;
+    const templateData = toRef(sharedConfigStoreGetters, 'TASK_TEMPLATE') as unknown as Ref<TemplateData|undefined>;
+    const landingData = toRef(sharedConfigStoreGetters, 'TASK_LANDING') as unknown as Ref<LandingData|undefined>;
 
     const state = reactive<UseTaskManagementTemplateStoreState>({
         templateId: 'default',
+        enableLanding: true,
     });
 
     const translate = (code: keyof TaskManagementTemplate, type?: TaskManagementTemplateType) => computed(() => {
         const lang = i18n.locale as SupportLanguage;
         const _type = type ?? state.templateId;
         const msg = messages[lang][_type][code] || messages.en[_type][code];
-        console.debug('translate', lang, _type, code, 'msg', msg, typeof msg);
         return msg;
     });
     const templates = computed<TaskManagementTemplate>(() => {
@@ -76,10 +76,9 @@ export const useTaskManagementTemplateStore = defineStore('task-management-templ
             return;
         }
         try {
-            const res = await domainConfigStore.get<DomainConfigTemplateData>('TASK_TEMPLATE');
-            state.templateId = res.data.template_id ?? 'default';
+            const res = await sharedConfigStore.get<TemplateData>('TASK_TEMPLATE');
+            state.templateId = res?.data?.template_id ?? 'default';
         } catch (e) {
-            if (e instanceof APIError && e.status === 404) return;
             ErrorHandler.handleError(e);
         }
     };
@@ -87,19 +86,51 @@ export const useTaskManagementTemplateStore = defineStore('task-management-templ
         const prev = state.templateId;
         state.templateId = templateId;
         try {
-            await domainConfigStore.set<DomainConfigTemplateData>('TASK_TEMPLATE', { template_id: templateId });
+            await sharedConfigStore.set<TemplateData>('TASK_TEMPLATE', { template_id: templateId }, 'DOMAIN');
+            showSuccessMessage(i18n.t('OPSFLOW.ALT_S_EDIT_TARGET', { target: i18n.t('OPSFLOW.TASK_MANAGEMENT.TEMPLATE_TYPE') }), '');
         } catch (e) {
-            ErrorHandler.handleError(e);
+            ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ALT_E_EDIT_TARGET', { target: i18n.t('OPSFLOW.TASK_MANAGEMENT.TEMPLATE_TYPE') }));
             state.templateId = prev;
         }
     };
+    const setInitialLandingData = async () => {
+        if (landingData.value?.enabled) {
+            state.enableLanding = landingData.value.enabled;
+            return;
+        }
+        try {
+            const res = await sharedConfigStore.get<LandingData>('TASK_LANDING');
+            state.enableLanding = res?.data?.enabled ?? false;
+        } catch (e) {
+            ErrorHandler.handleError(e);
+        }
+    };
 
-    setInitialTemplateId();
+    const updateLandingData = async (enabled: boolean) => {
+        const prev = state.enableLanding;
+        state.enableLanding = enabled;
+        try {
+            await sharedConfigStore.set<LandingData>('TASK_LANDING', { enabled }, 'DOMAIN');
+            showSuccessMessage(
+                enabled
+                    ? i18n.t('OPSFLOW.TASK_MANAGEMENT.ALT_S_ENABLE_LANDING')
+                    : i18n.t('OPSFLOW.TASK_MANAGEMENT.ALT_S_DISABLE_LANDING'),
+                '',
+            );
+        } catch (e) {
+            ErrorHandler.handleRequestError(e, enabled
+                ? i18n.t('OPSFLOW.TASK_MANAGEMENT.ALT_E_ENABLE_LANDING')
+                : i18n.t('OPSFLOW.TASK_MANAGEMENT.ALT_E_DISABLE_LANDING'));
+            state.enableLanding = prev;
+        }
+    };
     return {
         state,
         translate,
         templates,
         setInitialTemplateId,
+        setInitialLandingData,
         updateTemplateId,
+        updateLandingData,
     };
 });

@@ -46,7 +46,7 @@ const handleKeyEscape = () => {
     setValue('');
 };
 const handleKeyEnter = (e: KeyboardEvent) => {
-    if (e.isComposing || !value.value || isInvalid) return;
+    if (e.isComposing || !value.value || isInvalid.value) return;
     labelList.value.push(value.value);
     setValue('');
     emit('update:labels', labelList.value);
@@ -89,7 +89,7 @@ watch(() => props.labels, (newLabels) => {
                     {{ $t('DASHBOARDS.CUSTOMIZE.ADD_LABEL') }}
                 </span>
                 <div v-else
-                     class="flex items-center justify-center w-full h-20 text-gray-300"
+                     class="text-gray-300 text-xs"
                 >
                     {{ $t('DASHBOARDS.CUSTOMIZE.NO_LABEL') }}
                 </div>
