@@ -116,7 +116,7 @@ const state = reactive({
     formatRulesInfo: computed<FormatRulesValue|undefined>(() => props.widgetOptions?.formatRules?.value as FormatRulesValue),
     gaugeColor: computed<string>(() => {
         let _formatRules: ThresholdValue[] = state.formatRulesInfo?.rules || [];
-        let _color = gray[200];
+        let _color = state.formatRulesInfo?.baseColor || gray[200];
         const _percentage = (state.chartData / state.max) * 100;
         _formatRules = orderBy(_formatRules, ['number'], ['asc']);
         _formatRules?.forEach((d) => {
@@ -126,7 +126,6 @@ const state = reactive({
         });
         return _color;
     }),
-    formatRulesBaseColor: computed<string>(() => state.formatRulesInfo?.rules?.filter((d) => d.number === 0)?.[0]?.color || gray[200]),
     // optional fields
     numberFormat: computed<NumberFormatValue|undefined>(() => props.widgetOptions?.numberFormat?.value as NumberFormatValue),
 });
