@@ -58,7 +58,7 @@ import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 type Data = ListResponse<{
     [key: string]: string|number;
 }>;
-interface PieChartData {
+interface ChartData {
     name: string;
     value: number;
 }
@@ -75,7 +75,7 @@ const state = reactive({
     errorMessage: undefined as string|undefined,
     data: null as Data | null,
     chart: null as EChartsType | null,
-    chartData: [],
+    chartData: [] as ChartData[],
     unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
     chartLegendOption: computed<LegendOption>(() => {
         if (!state.showLegends) return { show: false };
@@ -224,7 +224,7 @@ const drawChart = (rawData: Data|null) => {
 
     // get chart data
     const _groupByData = groupBy(rawData.results || [], state.groupByField);
-    let _refinedData: PieChartData[] = Object.entries(_groupByData).map(([k, v]) => ({
+    let _refinedData: ChartData[] = Object.entries(_groupByData).map(([k, v]) => ({
         name: k,
         value: sumBy(v, state.dataField),
     }));
@@ -233,12 +233,12 @@ const drawChart = (rawData: Data|null) => {
         _refinedData = _refinedData?.slice(0, state.groupByCount);
     } else {
         _refinedData = orderBy(_refinedData, 'value', 'desc');
-        const _slicedData: PieChartData[] = _refinedData?.slice(0, state.groupByCount);
-        const _etcData: PieChartData = _refinedData?.slice(state.groupByCount).reduce((acc, cur) => {
+        const _slicedData: ChartData[] = _refinedData?.slice(0, state.groupByCount);
+        const _etcData: ChartData = _refinedData?.slice(state.groupByCount).reduce((acc, cur) => {
             acc.name = 'etc';
             acc.value = (acc.value || 0) + (cur.value || 0);
             return acc;
-        }, {} as PieChartData);
+        }, {} as ChartData);
         _refinedData = isEmpty(_etcData) ? _slicedData : [..._slicedData, _etcData];
     }
     state.chartData = _refinedData;
