@@ -6,6 +6,7 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { APIError } from '@cloudforet/core-lib/space-connector/error';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ResourceGroupType } from '@/schema/_common/type';
 import type { PublicConfigCreateParameters as SharedConfigCreateParameters } from '@/schema/config/public-config/api-verbs/create';
 import type {
@@ -51,13 +52,16 @@ export const useSharedConfigStore = defineStore('shared-config', () => {
         return sharedConfig;
     };
     const actions = {
-        async get<T extends Record<string, any> = Record<string, any>>(key: SharedConfigKey): Promise<SharedConfigModel<T>> {
+        async get<T extends Record<string, any> = Record<string, any>>(key: SharedConfigKey): Promise<SharedConfigModel<T>|undefined> {
             const name = SHARED_CONFIG_NAMES[key];
             if (state.sharedConfigMap[key]) return state.sharedConfigMap[key] as SharedConfigModel<T>;
-            const sharedConfig = await SpaceConnector.clientV2.config.publicConfig.getAccessibleConfigs<SharedConfigGetAccessibleConfigsParameters, SharedConfigModel<T>>({
+            const res = await SpaceConnector.clientV2.config.publicConfig.getAccessibleConfigs<SharedConfigGetAccessibleConfigsParameters, ListResponse<SharedConfigModel<T>>>({
                 name,
             });
-            state.sharedConfigMap = { ...state.sharedConfigMap, [key]: sharedConfig };
+            const sharedConfig = res.results?.[0];
+            if (sharedConfig) {
+                state.sharedConfigMap = { ...state.sharedConfigMap, [key]: sharedConfig };
+            }
             return sharedConfig;
         },
         async set<T extends Record<string, any> = Record<string, any>>(key: SharedConfigKey, data: T, resourceGroupId?: string) {

@@ -3,8 +3,6 @@ import { reactive, toRef, computed } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import { APIError } from '@cloudforet/core-lib/space-connector/error';
-
 import { i18n, type SupportLanguage } from '@/translations';
 
 import { useSharedConfigStore } from '@/store/domain/shared-config-store';
@@ -79,9 +77,8 @@ export const useTaskManagementTemplateStore = defineStore('task-management-templ
         }
         try {
             const res = await sharedConfigStore.get<TemplateData>('TASK_TEMPLATE');
-            state.templateId = res.data.template_id ?? 'default';
+            state.templateId = res?.data?.template_id ?? 'default';
         } catch (e) {
-            if (e instanceof APIError && e.status === 404) return;
             ErrorHandler.handleError(e);
         }
     };
@@ -103,9 +100,8 @@ export const useTaskManagementTemplateStore = defineStore('task-management-templ
         }
         try {
             const res = await sharedConfigStore.get<LandingData>('TASK_LANDING');
-            state.enableLanding = res.data.enabled ?? false;
+            state.enableLanding = res?.data?.enabled ?? false;
         } catch (e) {
-            if (e instanceof APIError && e.status === 404) return;
             ErrorHandler.handleError(e);
         }
     };
