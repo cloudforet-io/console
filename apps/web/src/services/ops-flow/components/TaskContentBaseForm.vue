@@ -78,8 +78,8 @@ const handleUpdateSelectedTaskType = async (items: SelectDropdownMenuItem[]) => 
     await taskContentFormStore.setCurrentTaskType(items[0].name); // set current task type to store for other fields
     const taskType = taskContentFormState.currentTaskType;
     const category = taskContentFormGetters.currentCategory;
-    if (items.length > 0 && (!category || !taskType)) {
-        ErrorHandler.handleError(new Error('Failed to get category or task type'));
+    if (items.length > 0 && !category) {
+        ErrorHandler.handleError(new Error('Failed to get category'));
         return;
     }
     if (category && taskType) {
