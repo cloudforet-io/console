@@ -100,7 +100,9 @@ onUnmounted(() => {
         <user-management-form-modal v-if="hasReadWriteAccess"
                                     @confirm="refreshUserList"
         />
-        <user-assign-to-group-modal v-if="hasReadWriteAccess" />
+        <user-assign-to-group-modal v-if="hasReadWriteAccess"
+                                    @confirm="refreshUserList"
+        />
     </section>
 </template>
 
