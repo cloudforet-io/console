@@ -2729,6 +2729,7 @@
 		},
 		"USER": {
 			"ADD": "作成",
+			"ASSIGN_TO_USER_GROUP": "",
 			"FORM": {
 				"ADD_TAG": "タグの追加",
 				"ADD_WORKSPACE": "ユーザーがアクセスできるワークスペース",
@@ -2781,6 +2782,7 @@
 				"ADMINISTRATOR": "管理者",
 				"ALT_S_CHANGE_ROLE": "ワークスペースの役割が正常に変更されました",
 				"ASSIGNED_ROLES": "割り当てられたロール",
+				"ASSIGNED_USER_GROUP": "",
 				"ASSOCIATED_PROJECTS": "関連プロジェクト",
 				"ASSOCIATED_WORKSPACE": "関連ワークスペース",
 				"BASE_INFORMATION": "基本情報",
