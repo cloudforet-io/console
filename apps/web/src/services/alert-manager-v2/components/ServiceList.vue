@@ -46,13 +46,13 @@ const SERVICE_SEARCH_HANDLER: AlertManagementTableHandlerType = {
 
 const state = reactive({
     loading: true,
-    pageStart: 1,
-    pageLimit: 15,
+    totalCount: 0,
     serviceList: [] as ServiceModel[],
     escalationPolicyList: [] as EscalationPolicyModel[],
 });
 
-const serviceListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true);
+const serviceListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
+    .setPage(1, 15);
 const queryTagHelper = useQueryTags({ keyItemSets: SERVICE_SEARCH_HANDLER.keyItemSets });
 const { queryTags } = queryTagHelper;
 
@@ -112,13 +112,15 @@ const fetchServiceList = async () => {
         serviceListApiQueryHelper.setFilters([
             ...queryTagHelper.filters.value,
         ]);
-        const { results } = await SpaceConnector.clientV2.alertManager.service.list<ServiceListParameters, ListResponse<ServiceModel>>({
+        const { results, total_count } = await SpaceConnector.clientV2.alertManager.service.list<ServiceListParameters, ListResponse<ServiceModel>>({
             query: serviceListApiQueryHelper.data,
         });
         state.serviceList = results || [];
+        state.totalCount = total_count || 0;
     } catch (e) {
         ErrorHandler.handleError(e, true);
         state.serviceList = [];
+        state.totalCount = 0;
     } finally {
         state.loading = false;
     }
@@ -145,10 +147,11 @@ onMounted(async () => {
                    searchable
                    filters-visible
                    :page-size-options="pageSizeOptions"
-                   :page-size="state.pageLimit"
+                   :page-size="15"
                    :query-tags="queryTags"
                    :key-item-sets="SERVICE_SEARCH_HANDLER.keyItemSets"
                    :value-handler-map="SERVICE_SEARCH_HANDLER.valueHandlerMap"
+                   :total-count="state.totalCount"
                    @change="handleChangeToolbox"
                    @refresh="fetchServiceList"
         />
