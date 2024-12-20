@@ -240,21 +240,7 @@ watch(() => state.invalid, (_invalid) => {
                             </p-field-title>
                         </div>
                         <div class="field-expression-wrapper">
-                            <p-field-title size="sm"
-                                           color="gray"
-                                           required
-                                           class="use-condition-title"
-                                           :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.USE_CONDITION')"
-                            >
-                                <template #right>
-                                    <p-toggle-button :value="'condition' in expression"
-                                                     class="condition-toggle-button"
-                                                     @change-toggle="handleToggleCondition(eIdx)"
-                                    />
-                                </template>
-                            </p-field-title>
-                            <p-field-group v-if="'condition' in expression"
-                                           :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.CONDITION')"
+                            <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.CONDITION')"
                                            style-type="secondary"
                                            required
                                            class="expression-form"
@@ -268,9 +254,14 @@ watch(() => state.invalid, (_invalid) => {
                                         >
                                             Pandas Query
                                         </p-link>
+                                        <p-toggle-button :value="'condition' in expression"
+                                                         class="condition-toggle-button"
+                                                         @change-toggle="handleToggleCondition(eIdx)"
+                                        />
                                     </div>
                                 </template>
-                                <p-textarea :value.sync="expression.condition"
+                                <p-textarea v-if="'condition' in expression"
+                                            :value.sync="expression.condition"
                                             :placeholder="CONDITION_PLACEHOLDER"
                                             @update:value="handleChangeFieldValue(eIdx, 'condition', $event)"
                                 />
