@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, onUnmounted, reactive, watch,
+    computed, onMounted, reactive, watch,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
@@ -35,7 +35,6 @@ const tabState = reactive({
         { label: i18n.t('ALERT_MANAGER.SERVICE.OVERVIEW'), name: SERVICE_DETAIL_TABS.OVERVIEW },
         { label: i18n.t('ALERT_MANAGER.WEBHOOK.TITLE'), name: SERVICE_DETAIL_TABS.WEBHOOK },
         { label: i18n.t('ALERT_MANAGER.NOTIFICATIONS.TITLE'), name: SERVICE_DETAIL_TABS.NOTIFICATIONS },
-        // { label: i18n.t('ALERT_MANAGER.EVENT_RULE.TITLE'), name: SERVICE_DETAIL_TABS.EVENT_RULE },
         { label: i18n.t('ALERT_MANAGER.SERVICE.SETTINGS'), name: SERVICE_DETAIL_TABS.SETTINGS },
     ])),
     activeTab: SERVICE_DETAIL_TABS.OVERVIEW as ServiceDetailTabsType,
@@ -62,10 +61,6 @@ onMounted(() => {
     } else {
         serviceDetailPageStore.setCurrentTab(SERVICE_DETAIL_TABS.OVERVIEW);
     }
-});
-
-onUnmounted(() => {
-    serviceDetailPageStore.initState();
 });
 </script>
 

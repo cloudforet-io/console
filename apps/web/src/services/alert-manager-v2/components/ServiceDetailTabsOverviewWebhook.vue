@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useElementSize } from '@vueuse/core/index';
 import {
-    computed, onMounted, reactive, ref,
+    computed, reactive, ref, watch,
 } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -21,7 +21,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
 
-
 const ITEM_DEFAULT_WIDTH = 184 + 8;
 const DEFAULT_LEFT_PADDING = 16;
 
@@ -31,14 +30,16 @@ const itemEl = ref<null | HTMLElement>(null);
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
+const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const { width: rowItemsWrapperWidth } = useElementSize(rowItemsWrapperRef);
 
 const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
+    serviceId: computed<string>(() => serviceDetailPageGetters.serviceInfo.service_id),
 });
 const state = reactive({
-    loading: false,
+    loading: true,
     pageStart: 0,
     items: [] as WebhookModel[],
     visibleCount: computed<number>(() => Math.floor((rowItemsWrapperWidth.value - DEFAULT_LEFT_PADDING) / ITEM_DEFAULT_WIDTH)),
@@ -57,16 +58,21 @@ const handleClickArrowButton = (increment: number) => {
     const marginLeft = increment * state.pageStart * element.defaultWidth;
     element.el.style.marginLeft = increment === 1 ? `-${marginLeft}px` : `${marginLeft}px`;
 };
-
 const handleRouteDetail = () => (
     serviceDetailPageStore.setCurrentTab(SERVICE_DETAIL_TABS.WEBHOOK)
 );
+const handleClickWebhookItem = (id: string) => {
+    handleRouteDetail();
+    serviceDetailPageStore.setSelectedWebhookId(id);
+};
 
 const fetchWebhookList = async () => {
     state.loading = true;
     try {
-        const { results } = await SpaceConnector.clientV2.alertManager.webhook.list<WebhookListParameters, ListResponse<WebhookModel>>();
-        state.items = results || [];
+        const { results } = await SpaceConnector.clientV2.alertManager.webhook.list<WebhookListParameters, ListResponse<WebhookModel>>({
+            service_id: storeState.serviceId,
+        });
+        state.items = (results || []).slice(0, 15);
     } catch (e) {
         ErrorHandler.handleError(e, true);
         state.items = [];
@@ -75,9 +81,10 @@ const fetchWebhookList = async () => {
     }
 };
 
-onMounted(() => {
+watch(() => storeState.serviceId, (serviceId) => {
+    if (!serviceId) return;
     fetchWebhookList();
-});
+}, { immediate: true });
 </script>
 
 <template>
@@ -100,6 +107,7 @@ onMounted(() => {
                     <div v-for="(item, idx) in state.items"
                          :key="`service-detail-webhook-item-${idx}`"
                          class="item"
+                         @click="handleClickWebhookItem(item.webhook_id)"
                     >
                         <div class="image-wrapper">
                             <p-lazy-img :src="storeState.plugins[item.plugin_info.plugin_id] ? storeState.plugins[item.plugin_info.plugin_id].icon : 'ic_webhook'"
@@ -113,8 +121,8 @@ onMounted(() => {
                             <p class="text-label-md leading-8">
                                 {{ item.name }}
                             </p>
-                            <p class="text-label-sm text-gray-700">
-                                {{ $t('ALERT_MANAGER.WEBHOOK.REQUEST', { cnt: item.requests.total }) }}
+                            <p class="text-label-sm text-gray-700 pb-1">
+                                {{ $t('ALERT_MANAGER.WEBHOOK.REQUEST', { cnt: item.requests.total || 0 }) }}
                             </p>
                         </div>
                     </div>
@@ -177,6 +185,9 @@ onMounted(() => {
                 min-width: 11.5rem;
                 padding: 0.375rem 0.5rem;
                 border-radius: 0.75rem;
+                &:hover {
+                    @apply border border-secondary cursor-pointer;
+                }
             }
         }
         &::after {
@@ -190,7 +201,7 @@ onMounted(() => {
         }
         .arrow-button {
             @apply absolute bg-white border border-gray-300 rounded-full;
-            top: calc(50% - 1.5rem);
+            top: calc(50% - 1rem);
             width: 2rem;
             height: 2rem;
             box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);

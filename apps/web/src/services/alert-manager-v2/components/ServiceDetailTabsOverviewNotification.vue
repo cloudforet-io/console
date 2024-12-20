@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useElementSize } from '@vueuse/core/index';
 import {
-    computed, onMounted, reactive, ref,
+    computed, reactive, ref, watch,
 } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -44,7 +44,7 @@ const storeState = reactive({
     notificationProtocolList: computed<NotificationProtocolModel[]>(() => serviceDetailPageState.notificationProtocolList),
 });
 const state = reactive({
-    loading: false,
+    loading: true,
     pageStart: 0,
     items: [] as ServiceChannelModel[],
     visibleCount: computed<number>(() => Math.floor((rowItemsWrapperWidth.value - DEFAULT_LEFT_PADDING) / ITEM_DEFAULT_WIDTH)),
@@ -81,7 +81,7 @@ const fetchServiceChannelList = async () => {
         const { results } = await SpaceConnector.clientV2.alertManager.serviceChannel.list<ServiceChannelListParameters, ListResponse<ServiceChannelModel>>({
             service_id: storeState.serviceId,
         });
-        state.items = results || [];
+        state.items = (results || []).slice(0, 15);
     } catch (e) {
         ErrorHandler.handleError(e, true);
         state.items = [];
@@ -90,9 +90,10 @@ const fetchServiceChannelList = async () => {
     }
 };
 
-onMounted(() => {
+watch(() => storeState.serviceId, (serviceId) => {
+    if (!serviceId) return;
     fetchServiceChannelList();
-});
+}, { immediate: true });
 </script>
 
 <template>
@@ -125,7 +126,7 @@ onMounted(() => {
                                         class="image"
                             />
                         </div>
-                        <p class="text-label-md leading-8 flex-1">
+                        <p class="text-label-md leading-8 flex-1 truncate">
                             {{ item.name }}
                         </p>
                     </div>
