@@ -136,10 +136,10 @@ const state = reactive({
             icon: 'ic_db-where',
         },
         {
-            key: DATA_TABLE_OPERATOR.PIVOT,
-            name: 'Pivot',
-            description: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.PIVOT_DESC'),
-            icon: 'ic_db-pivot',
+            key: DATA_TABLE_OPERATOR.VALUE_MAPPING,
+            name: 'Value Mapping',
+            description: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.VALUE_MAPPING_DESC'),
+            icon: '', // TODO: Add icon
         },
         {
             key: DATA_TABLE_OPERATOR.ADD_LABELS,
@@ -148,10 +148,10 @@ const state = reactive({
             icon: '', // TODO: Add icon
         },
         {
-            key: DATA_TABLE_OPERATOR.VALUE_MAPPING,
-            name: 'Value Mapping',
-            description: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.VALUE_MAPPING_DESC'),
-            icon: '', // TODO: Add icon
+            key: DATA_TABLE_OPERATOR.PIVOT,
+            name: 'Pivot',
+            description: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.PIVOT_DESC'),
+            icon: 'ic_db-pivot',
         },
     ]),
 });
@@ -388,29 +388,62 @@ watch(() => state.showPopover, (val) => {
             <div v-else
                  class="data-source-popper-operator-wrapper"
             >
-                <p-select-card v-for="(operatorInfo) in state.operatorInfoList"
-                               :key="operatorInfo.key"
-                               value="operatorKey"
-                               label="a"
-                               block
-                               @click="handleClickOperator(operatorInfo.key)"
-                >
-                    <div class="operator-card-contents">
-                        <p-i :name="operatorInfo.icon"
-                             width="1rem"
-                             height="1rem"
-                             color="inherit"
-                        />
-                        <div class="contents-wrapper">
-                            <p class="name">
-                                {{ operatorInfo.name }}
-                            </p>
-                            <p class="description">
-                                {{ operatorInfo.description }}
-                            </p>
-                        </div>
+                <div class="left-part">
+                    <div class="part-title">
+                        {{ i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.MERGE') }}
                     </div>
-                </p-select-card>
+                    <p-select-card v-for="(operatorInfo) in state.operatorInfoList.slice(0, 2)"
+                                   :key="operatorInfo.key"
+                                   value="operatorKey"
+                                   label="a"
+                                   block
+                                   @click="handleClickOperator(operatorInfo.key)"
+                    >
+                        <div class="operator-card-contents">
+                            <p-i :name="operatorInfo.icon"
+                                 width="1rem"
+                                 height="1rem"
+                                 color="inherit"
+                            />
+                            <div class="contents-wrapper">
+                                <p class="name">
+                                    {{ operatorInfo.name }}
+                                </p>
+                                <p class="description">
+                                    {{ operatorInfo.description }}
+                                </p>
+                            </div>
+                        </div>
+                    </p-select-card>
+                </div>
+                <div class="right-part">
+                    <div class="part-title">
+                        {{ i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.TRANSFORMATIONS') }}
+                    </div>
+                    <p-select-card v-for="(operatorInfo) in state.operatorInfoList.slice(2)"
+                                   :key="operatorInfo.key"
+                                   value="operatorKey"
+                                   label="a"
+                                   block
+                                   @click="handleClickOperator(operatorInfo.key)"
+                    >
+                        <div class="operator-card-contents">
+                            <p-i :name="operatorInfo.icon"
+                                 width="1rem"
+                                 height="1rem"
+                                 color="inherit"
+                            />
+                            <div class="contents-wrapper">
+                                <p class="name">
+                                    {{ operatorInfo.name }}
+                                </p>
+                                <p class="description">
+                                    {{ operatorInfo.description }}
+                                </p>
+                            </div>
+                        </div>
+                    </p-select-card>
+                </div>
             </div>
         </template>
     </p-popover>
@@ -456,11 +489,23 @@ watch(() => state.showPopover, (val) => {
         padding: 1rem;
     }
     .data-source-popper-operator-wrapper {
-        display: flex;
-        flex-direction: column;
+        @apply grid grid-cols-12;
+        //display: flex;
+        //flex-direction: column;
         gap: 0.5rem;
-        width: 21.5rem;
+        width: 43rem;
         padding: 1rem;
+
+        .left-part, .right-part {
+            @apply col-span-6;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .part-title {
+            @apply text-label-sm text-gray-700;
+            font-weight: bold;
+        }
 
         .operator-card-contents {
             @apply flex gap-1;
