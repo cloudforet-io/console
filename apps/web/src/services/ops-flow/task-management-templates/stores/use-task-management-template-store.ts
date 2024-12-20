@@ -110,7 +110,7 @@ export const useTaskManagementTemplateStore = defineStore('task-management-templ
         const prev = state.enableLanding;
         state.enableLanding = enabled;
         try {
-            await sharedConfigStore.set<LandingData>('TASK_LANDING', { enabled }, 'DOMAIN');
+            await sharedConfigStore.set<LandingData>('TASK_LANDING', { enabled });
             showSuccessMessage(
                 enabled
                     ? i18n.t('OPSFLOW.TASK_MANAGEMENT.ALT_S_ENABLE_LANDING')
