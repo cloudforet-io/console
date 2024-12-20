@@ -1,58 +1,45 @@
 <script lang="ts" setup>
-import {
-    computed, reactive, ref, watch, watchEffect,
-} from 'vue';
+import { reactive, ref } from 'vue';
 
 import { cloneDeep } from 'lodash';
 
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { PButtonModal, PSelectDropdown } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import { PButtonModal } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { UserGroupListParameters } from '@/schema/identity/user-group/api-verbs/list';
+import type { UserGroupAddUsersParameters } from '@/schema/identity/user-group/api-verbs/add-users';
 import type { UserGroupModel } from '@/schema/identity/user-group/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
+const userPageGetters = userPageStore.getters;
 
-interface UserAssignUserGroupState {
-  loading: boolean;
-  allUserGroupList: MenuItem[] | any;
-  selectedUserGroupList: MenuItem[];
-}
+const emit = defineEmits<{(e: 'confirm'): void; }>();
 
-const allUserGroupNameList = ref<string[]>();
+const selectedUserGroupIds = ref<{type: 'USER' | 'USER_GROUP'; value: string}[]>([]);
 
-const state = reactive<UserAssignUserGroupState>({
+const state = reactive({
     loading: false,
-    allUserGroupList: computed(() => {
-        const data = fetchUserGroupList({});
-        console.log(data);
-        return data;
-    }),
-    selectedUserGroupList: [],
-});
-
-/* Watcher */
-watch(() => state.allUserGroupList, () => {
-    // allUserGroupNameList.value = state.allUserGroupList.map((userGroup) => userGroup.name)
-}, { deep: true, immediate: true });
-
-watchEffect(() => {
-    console.log(state.allUserGroupList);
 });
 
 /* Component */
-const handleConfirm = () => {
+const handleConfirm = async () => {
     try {
         state.loading = true;
-        console.log('TODO: Add users to user group API');
+        const mappedUserGroupIds = selectedUserGroupIds.value.map((selectedUserGroupId) => selectedUserGroupId.value);
+        const promises = mappedUserGroupIds.map(async (userGroupId) => {
+            await fetchAssignToUserGroup({
+                user_group_id: userGroupId,
+                users: userPageGetters.selectedUsers.map((selectedUser) => selectedUser.user_id),
+            });
+        });
+        await Promise.all(promises);
+        emit('confirm');
     } finally {
         state.loading = false;
         handleClose();
@@ -60,27 +47,33 @@ const handleConfirm = () => {
 };
 
 const handleClose = () => {
+    selectedUserGroupIds.value = [];
     userPageStore.$patch((_state) => {
         _state.state.modal.visible = undefined;
         _state.state.modal = cloneDeep(_state.state.modal);
     });
 };
 
+const handleSelectedIds = (value: { type: 'USER' | 'USER_GROUP'; value: string;}[]) => {
+    selectedUserGroupIds.value = value;
+};
+
 /* API */
-const fetchUserGroupList = async (params: UserGroupListParameters) => {
+const fetchAssignToUserGroup = async (params: UserGroupAddUsersParameters) => {
     try {
-        const res = await SpaceConnector.clientV2.identity.userGroup.list<UserGroupListParameters, ListResponse<UserGroupModel>>(params);
-        return res.results ?? [];
+        return await SpaceConnector.clientV2.identity.userGroup.addUsers<UserGroupAddUsersParameters, UserGroupModel>(params);
     } catch (e) {
         ErrorHandler.handleError(e, true);
-        return [];
+        return {};
     }
 };
+
+/* Watcher */
+
 </script>
 
 <template>
-    <p-button-modal class="user-assign-group-modal"
-                    :header-title="userPageState.modal.title"
+    <p-button-modal :header-title="userPageState.modal.title"
                     :visible="userPageState.modal.visible === 'assignToUserGroup'"
                     size="md"
                     :loading="state.loading"
@@ -89,25 +82,19 @@ const fetchUserGroupList = async (params: UserGroupListParameters) => {
                     @close="handleClose"
     >
         <template #body>
-            <div class="modal-contents">
-                <p class="mb-2">
-                    {{ userPageState.modal.title }}
-                </p>
-                <p-select-dropdown :menu="allUserGroupNameList"
-                                   :selected.sync="state.selectedUserGroupList"
-                                   multi-selectable
-                                   show-select-marker
-                                   is-filterable
-                                   appearance-type="stack"
-                                   block
+            <div class="flex flex-col gap-1">
+                <span class="mb-2 text-gray-900 font-bold">
+                    {{ $t('IAM.USER.ASSIGN_TO_USER_GROUP') }}
+                </span>
+                <user-select-dropdown class="mb-48"
+                                      :show-user-list="false"
+                                      show-user-group-list
+                                      appearance-type="stack"
+                                      selection-type="multiple"
+                                      :selected-ids="selectedUserGroupIds"
+                                      @update:selected-ids="handleSelectedIds"
                 />
             </div>
         </template>
     </p-button-modal>
 </template>
-
-<style scoped lang="postcss">
-.user-assign-group-modal {
-    min-height: 34.875rem;
-}
-</style>
