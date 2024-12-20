@@ -28,6 +28,7 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
+import type { DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
 import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/granularity/type';
 import type { LegendValue } from '@/common/modules/widgets/_widget-fields/legend/type';
@@ -38,6 +39,7 @@ import type {
 } from '@/common/modules/widgets/types/widget-display-type';
 
 import { coral, gray } from '@/styles/colors';
+
 
 
 const props = defineProps<WidgetProps>();
@@ -98,10 +100,10 @@ const state = reactive({
         ],
     })),
     // required fields
-    granularity: computed<string>(() => props.widgetOptions?.granularity as string),
-    dataField: computed<string[]>(() => props.widgetOptions?.dataField as string[] || []),
+    granularity: computed<string|undefined>(() => (props.widgetOptions?.granularity?.value as GranularityValue)?.granularity),
+    dataField: computed<string|undefined>(() => (props.widgetOptions?.dataField?.value as DataFieldValue)?.data as string),
     // optional fields
-    showLegends: computed<boolean>(() => (props.widgetOptions?.legend as LegendValue)?.toggleValue),
+    showLegends: computed<boolean|undefined>(() => (props.widgetOptions?.legend?.value as LegendValue)?.toggleValue),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange,
@@ -120,18 +122,9 @@ const fetchWidget = async (): Promise<WidgetLoadData|APIErrorToast|undefined> =>
         const _fetcher = _isPrivate ? privateWidgetFetcher : publicWidgetFetcher;
         const { status, response } = await _fetcher({
             widget_id: props.widgetId,
-            query: {
-                granularity: state.granularity,
-                start: dateRange.value.start,
-                end: dateRange.value.end,
-                group_by: [REGION_FIELD],
-                fields: {
-                    [state.dataField]: {
-                        key: state.dataField,
-                        operator: 'sum',
-                    },
-                },
-            },
+            granularity: state.granularity,
+            start: dateRange.value.start,
+            end: dateRange.value.end,
             vars: props.dashboardVars,
         });
         if (status === 'succeed') {
