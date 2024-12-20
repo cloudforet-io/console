@@ -45,7 +45,7 @@ const SERVICE_SEARCH_HANDLER: AlertManagementTableHandlerType = {
 };
 
 const state = reactive({
-    loading: false,
+    loading: true,
     pageStart: 1,
     pageLimit: 15,
     serviceList: [] as ServiceModel[],
