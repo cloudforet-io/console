@@ -22,10 +22,10 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 loadMonospaceFonts();
-const { markdown } = useMarkdown(toRef(props, 'contents'));
+const { sanitizedHtml } = useMarkdown({ value: toRef(props, 'contents') });
 const refinedContents = computed(() => {
     if (props.contentType === 'markdown') {
-        return markdown.value;
+        return sanitizedHtml.value;
     }
     return setAttachmentsToContents(props.contents, props.attachments);
 });

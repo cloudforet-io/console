@@ -1,4 +1,4 @@
-import { computed, reactive } from 'vue';
+import { computed } from 'vue';
 
 import { defineStore } from 'pinia';
 
@@ -98,7 +98,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const workspaceGroupReferenceStore = useWorkspaceGroupReferenceStore();
     const roleReferenceStore = useRoleReferenceStore();
 
-    const getters = reactive({
+    const getters = {
         // REFACTOR: unify into one case (serviceAccount or service_account)
         cloudServiceType: computed<CloudServiceTypeReferenceMap>(() => cloudServiceTypeReferenceStore.getters.cloudServiceTypeItems),
         cloud_service_type: computed<CloudServiceTypeReferenceMap>(() => cloudServiceTypeReferenceStore.getters.cloudServiceTypeItems),
@@ -134,7 +134,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
         namespace: computed(() => namespaceReferenceStore.getters.namespaceItems),
         metric: computed<MetricReferenceMap>(() => metricReferenceStore.getters.metricItems),
         role: computed(() => roleReferenceStore.getters.roleItems),
-    });
+    };
 
     const actions = {
         async sync(type: PiniaStoreReferenceType, data?: any) {
