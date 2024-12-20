@@ -394,9 +394,9 @@ const isWorkspaceGroupUser = (item: ExtendUserListItemType) => !!item?.role_bind
                 </p-button>
             </template>
             <template #col-user_group-format="{value}">
-                <div v-if="value.length > 0 && value.length < 3">
+                <div v-if="value.length > 0 && value.length < 4">
                     <p-badge v-for="(val, idx) in value"
-                             :key="`${val}-${idx}`"
+                             :key="`${val.id}-${idx}`"
                              badge-type="subtle"
                              shape="square"
                              style-type="gray200"
