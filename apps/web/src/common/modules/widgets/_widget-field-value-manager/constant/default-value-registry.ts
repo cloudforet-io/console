@@ -286,7 +286,10 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
 
         const result = widgetFieldDefaultValueMap.categoryBy;
 
-        const fieldKeys = sortWidgetTableFields(Object.keys(dataTable?.[groupByOptions.dataTarget] ?? {}));
+        let fieldKeys = sortWidgetTableFields(Object.keys(dataTable?.[groupByOptions.dataTarget] ?? {}));
+        if (groupByOptions.fixedValue) {
+            fieldKeys = fieldKeys.filter((key) => key === groupByOptions.fixedValue);
+        }
 
         result.data = groupByOptions.multiSelectable ? [fieldKeys?.[0]] : fieldKeys?.[0];
 

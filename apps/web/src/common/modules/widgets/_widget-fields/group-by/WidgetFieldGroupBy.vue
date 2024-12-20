@@ -57,7 +57,7 @@ const state = reactive({
         if (!state.menuItems.length) {
             return state.multiselectable ? [] : undefined;
         }
-        if (state.fixedValue) return state.menuItems.find((d) => d.name === state.fixedValue);
+        if (state.fixedValue) return state.fixedValue;
         if (state.multiselectable) {
             return state.menuItems.filter((d) => state.fieldValue.data?.includes(d.name));
         }
