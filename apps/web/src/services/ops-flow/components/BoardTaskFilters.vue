@@ -90,7 +90,7 @@ watch(taskFilters, (newValue, oldValue) => {
         <p-select-dropdown v-if="props.categoryId"
                            :selected="selectedTaskTypeItems"
                            :handler="taskTypeMenuItemsHandler"
-                           :selection-label="taskManagementTemplateStore.templates.Task"
+                           :selection-label="taskManagementTemplateStore.templates.TaskType"
                            appearance-type="badge"
                            style-type="rounded"
                            multi-selectable
