@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { random } from 'lodash';
+import { isEqual, random } from 'lodash';
 
 import {
     PButton, PFieldGroup, PSelectButton, PTextInput, PSelectDropdown, PFieldTitle, PIconButton,
@@ -145,6 +145,14 @@ watch([dataTableInfo, fieldTypeInfo, fieldNameInfo, casesInfo, elseInfo, additio
         ...(_additionalConditionInfo && { condition: _additionalConditionInfo }),
     };
 }, { deep: true, immediate: true });
+watch([fieldTypeInfo], (_curr, _prev) => {
+    if (!isEqual(_curr, _prev)) {
+        casesInfo.value = casesInfo.value.map((d) => ({
+            ...d,
+            key: '',
+        }));
+    }
+});
 watch(() => state.invalid, (_invalid) => {
     emit('update:invalid', _invalid);
 }, { immediate: true });
