@@ -62,7 +62,7 @@ const state = reactive({
             fieldManager = new WidgetFieldValueManager(
                 getWidgetConfig(widgetGenerateState.selectedWidgetName),
                 widgetGenerateGetters.selectedDataTable,
-                widgetGenerateState.widget?.options || {},
+                cloneDeep(widgetGenerateState.widget?.options) || {},
             );
         }
         return fieldManager;
@@ -88,7 +88,7 @@ const state = reactive({
         return WIDGET_WIDTH_RANGE_LIST[state.widgetSize]?.[0] || 0;
     }),
     isWidgetFieldChanged: computed<boolean>(() => {
-        const _isOptionsChanged = !isEqual(state.fieldManager.data, widgetGenerateState.widget?.options);
+        const _isOptionsChanged = !isEqual(cloneDeep(state.fieldManager.data), widgetGenerateState.widget?.options);
         const _isTypeChanged = widgetGenerateState.selectedWidgetName !== widgetGenerateState.widget?.widget_type;
         emit('watch-options-changed', _isOptionsChanged || _isTypeChanged);
         return _isOptionsChanged || _isTypeChanged;
@@ -124,7 +124,7 @@ const updateWidget = async () => {
         state: 'ACTIVE',
     });
     if (widget) {
-        state.fieldManager.updateOriginData(widget.options);
+        state.fieldManager.updateOriginData(cloneDeep(widget.options));
     }
     if (_isCreating) {
         await dashboardStore.addWidgetToDashboard(dashboardDetailState.dashboardId || '', widgetGenerateState.widgetId);
