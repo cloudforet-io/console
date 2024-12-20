@@ -5,7 +5,7 @@ import type { FormatRulesOptions, FormatRulesValue } from '@/common/modules/widg
 import type { _CategoryByValue as CategoryByValue, CategoryByOptions } from '@/common/modules/widgets/_widget-fields/category-by/type';
 import type { ColorSchemaValue } from '@/common/modules/widgets/_widget-fields/color-schema/type';
 import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/comparison/type';
-import type { _CustomTableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
+import type { CustomTableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
 import type { DataFieldOptions, DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
 import { DAILY_ENABLED_VALUES, MONTHLY_ENABLED_VALUES, YEARLY_ENABLED_VALUES } from '@/common/modules/widgets/_widget-fields/date-range/constant';
 import { checkInvalidCustomValue } from '@/common/modules/widgets/_widget-fields/date-range/helper';
@@ -101,7 +101,7 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
         }
         return true;
     },
-    customTableColumnWidth: (fieldValue: _CustomTableColumnWidthValue) => {
+    customTableColumnWidth: (fieldValue: CustomTableColumnWidthValue) => {
         if (fieldValue.widthInfos?.length) {
             return fieldValue.widthInfos.every((d) => !!d.fieldKey && d.width >= 0)
                 || fieldValue.widthInfos.map((d) => d.fieldKey).length === new Set(fieldValue.widthInfos.map((d) => d.fieldKey)).size;
@@ -133,7 +133,7 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
         if (groupByOptions.excludeDateField && fieldValue.data === 'Date') return false;
         return !!fieldValue.data;
     },
-    header: (fieldValue: WidgetHeaderValue) => {
+    widgetHeader: (fieldValue: WidgetHeaderValue) => {
         if (!fieldValue.toggleValue) return true;
         return !!fieldValue.title?.trim();
     },

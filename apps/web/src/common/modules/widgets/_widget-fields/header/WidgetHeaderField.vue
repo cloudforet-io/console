@@ -17,7 +17,7 @@ import type {
     _WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
-const FIELD_KEY = 'header';
+const FIELD_KEY = 'widgetHeader';
 
 const props = defineProps<_WidgetFieldComponentProps<undefined>>();
 
