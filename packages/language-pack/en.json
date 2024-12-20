@@ -2968,7 +2968,8 @@
 							"INFO": "You will only receive notifications in the schedule you choose.",
 							"SETTING_MODE": "Setting Mode",
 							"TITLE": "Schedule",
-							"WEEKDAYS": "Weekdays"
+							"WEEKDAYS": "Weekdays",
+							"WEEKEND": "Weekend"
 						},
 						"USER_MODE": {
 							"ALL_MEMBERS": "All Members in Service",

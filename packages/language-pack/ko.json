@@ -2968,7 +2968,8 @@
 							"INFO": "",
 							"SETTING_MODE": "",
 							"TITLE": "",
-							"WEEKDAYS": ""
+							"WEEKDAYS": "",
+							"WEEKEND": ""
 						},
 						"USER_MODE": {
 							"ALL_MEMBERS": "",
