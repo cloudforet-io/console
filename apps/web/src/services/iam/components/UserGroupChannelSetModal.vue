@@ -26,8 +26,9 @@ const emit = defineEmits<{(e: 'confirm'): void; }>();
 interface ChannelSetModalState {
   loading: boolean;
   userInfo: {
+    channelName: string;
     userMode: MenuItem;
-    users: MenuItem[];
+    users: {type: 'USER' | 'USER_GROUP'; value: string;}[];
   };
   scheduleInfo: {
     days: string[];
@@ -40,6 +41,7 @@ interface ChannelSetModalState {
 const state = reactive<ChannelSetModalState>({
     loading: false,
     userInfo: {
+        channelName: '',
         userMode: {
             label: '',
             name: '',
@@ -81,12 +83,16 @@ const handleConfirm = async () => {
 
         await fetchCreateUserGroupChannel({
             protocol_id: 'slack',
-            name: 'Channel-test-sy',
+            name: state.userInfo.channelName,
             schedule: {
                 ...scheduleInfo,
                 SCHEDULE_TYPE: state.scheduleInfo.type,
             },
-            data: {},
+            data: {
+                FORWARD_TYPE: state.userInfo.userMode.name,
+                USER: state.userInfo.users[0].type === 'USER' ? state.userInfo.users.map((user) => user.value) : [],
+                USER_GROUP: state.userInfo.users[0].type === 'USER_GROUP' ? state.userInfo.users.map((userGroup) => userGroup.value) : [],
+            },
             tags: {},
             user_group_id: userGroupPageGetters.selectedUserGroups[0].user_group_id ?? undefined,
         });

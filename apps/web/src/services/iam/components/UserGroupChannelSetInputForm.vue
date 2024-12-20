@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { reactive, watch } from 'vue';
+
 import {
     PFieldGroup, PTextInput,
 } from '@cloudforet/mirinae';
@@ -6,16 +8,41 @@ import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/typ
 
 import ChannelUserSelect from '@/common/components/channel-user-select/ChannelUserSelect.vue';
 
+interface ChannelInfo {
+  channelName: string;
+}
+
 interface UserModeInfo {
   userMode: MenuItem;
   users: MenuItem[]
 }
 
-const emit = defineEmits<{(e: 'update-user', value:UserModeInfo): void}>();
+const emit = defineEmits<{(e: 'update-user', value: ChannelInfo & UserModeInfo): void}>();
 
+const state = reactive<ChannelInfo & UserModeInfo>({
+    channelName: '',
+    userMode: {},
+    users: [],
+});
+
+/* Component */
 const handleUpdateUser = (value: UserModeInfo) => {
-    emit('update-user', value);
+    state.userMode = value.userMode;
+    state.users = value.users;
 };
+
+const handleChangeChannelName = (value: string) => {
+    state.channelName = value;
+};
+
+/* Watcher */
+watch(() => state, (nv_state) => {
+    emit('update-user', {
+        channelName: nv_state.channelName,
+        userMode: nv_state.userMode,
+        users: nv_state.users,
+    });
+}, { immediate: true, deep: true });
 </script>
 
 <template>
@@ -23,7 +50,10 @@ const handleUpdateUser = (value: UserModeInfo) => {
         <p-field-group :label="$t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.CHANNEL_NAME')"
                        required
         >
-            <p-text-input block />
+            <p-text-input block
+                          :value="state.channelName"
+                          @update:value="handleChangeChannelName"
+            />
         </p-field-group>
         <!--        TODO: channel token & Protocol input (possible to update later) -->
         <p-field-group label="Channel Token"

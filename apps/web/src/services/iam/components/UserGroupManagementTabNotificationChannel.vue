@@ -5,6 +5,7 @@ import {
     PHeadingLayout, PHeading, PButton, PToolboxTable, PBadge,
 } from '@cloudforet/mirinae';
 
+import { USER_GROUP_CHANNEL_SCHEDULE_TYPE } from '@/schema/alert-manager/user-group-channel/constants';
 import type { UserGroupChannelScheduleInfoType } from '@/schema/alert-manager/user-group-channel/type';
 import { i18n } from '@/translations';
 
@@ -18,10 +19,11 @@ const userGroupNotificationChannelPageState = userGroupNotificationChannelPageSt
 
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
+const userGroupPageGetters = userGroupPageStore.getters;
 
 interface ChannelItem {
   name: string;
-  channel: string;
+  channel_id: string;
   schedule: UserGroupChannelScheduleInfoType;
   details?: any;
 }
@@ -34,13 +36,26 @@ const tableState = reactive({
         { name: 'details', label: 'Details' },
     ]),
     items: computed<ChannelItem[]>(() => {
-        const channels = userGroupPageState.userGroups[0]?.notification_channel ?? [];
-        return channels.map((channel) => ({
-            name: channel.name,
-            channel: channel.protocol_id,
-            schedule: channel.schedule,
-            details: '',
-        }));
+        const channels = userGroupPageGetters.selectedUserGroups[0]?.notification_channel ?? [];
+        return channels.map((channel) => {
+            let userList: string[] | undefined = [];
+            if (channel.data) {
+                if (channel.data.FORWARD_TYPE === 'USER') {
+                    userList = channel.data.USER;
+                } else if (channel.data.FORWARD_TYPE === 'USER_GROUP') {
+                    userList = channel.data.USER_GROUP;
+                } else {
+                    // TODO: text 'all member'??
+                    userList = [];
+                }
+            }
+            return {
+                name: channel.name,
+                channel_id: channel.protocol_id,
+                schedule: channel.schedule,
+                details: userList,
+            };
+        });
     }),
 });
 
@@ -117,6 +132,7 @@ const handleUpdateModal = (modalType: string) => {
         <p-toolbox-table search-type="query"
                          searchable
                          selectable
+                         :refreshable="false"
                          :multi-select="false"
                          :select-index="userGroupNotificationChannelPageState.selectedIndices"
                          :fields="tableState.fields"
@@ -124,23 +140,29 @@ const handleUpdateModal = (modalType: string) => {
                          @select="handleSelect"
         >
             <template #col-schedule-format="{value}">
-                <p-badge v-if="value === 'Custom'"
+                <p-badge v-if="value.SCHEDULE_TYPE === USER_GROUP_CHANNEL_SCHEDULE_TYPE.CUSTOM"
                          badge-type="solid-outline"
                          style-type="alert"
                 >
-                    {{ value }}
+                    {{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.SCHEDULE.CUSTOM') }}
                 </p-badge>
-                <p-badge v-else-if="value === 'Every Day'"
+                <p-badge v-else-if="value.SCHEDULE_TYPE === USER_GROUP_CHANNEL_SCHEDULE_TYPE.ALL_DAY"
                          badge-type="solid-outline"
                          style-type="indigo500"
                 >
-                    {{ value }}
+                    {{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.SCHEDULE.EVERYDAY') }}
                 </p-badge>
-                <p-badge v-else-if="value === 'Weekdays'"
+                <p-badge v-else-if="value.SCHEDULE_TYPE === USER_GROUP_CHANNEL_SCHEDULE_TYPE.WEEK_DAY"
                          badge-type="solid-outline"
                          style-type="secondary1"
                 >
-                    {{ value }}
+                    {{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.SCHEDULE.WEEKDAYS') }}
+                </p-badge>
+                <p-badge v-else-if="value.SCHEDULE_TYPE === USER_GROUP_CHANNEL_SCHEDULE_TYPE.WEEKEND"
+                         badge-type="solid-outline"
+                         style-type="gray500"
+                >
+                    {{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.SCHEDULE.WEEKEND') }}
                 </p-badge>
             </template>
             <template #col-details-format="{value}">
