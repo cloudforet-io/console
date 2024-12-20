@@ -10,6 +10,8 @@ import { useErrorStore } from '@/store/error/error-store';
 import { pinia } from '@/store/pinia';
 import { useUserStore } from '@/store/user/user-store';
 
+import { initTaskManagementTemplate } from '@/lib/site-initializer/initTaskManagementTemplate';
+
 
 abstract class Authenticator {
     static async signIn(credentials: Record<string, any>, authType: AuthType | 'SAML', verifyCode?: string): Promise<void> {
@@ -27,6 +29,7 @@ abstract class Authenticator {
         await userWorkspaceStore.load();
         displayStore.setIsSignInFailed(false);
         errorStore.reset();
+        await initTaskManagementTemplate();
     }
 
     static async signOut(): Promise<void> {
