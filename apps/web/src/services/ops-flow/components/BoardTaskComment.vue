@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PPaneLayout, PHeading, PButton, PCollapsibleList, PTextBeautifier,
+    PPaneLayout, PHeading, PButton, PCollapsibleList,
 } from '@cloudforet/mirinae';
 import type { CollapsibleItem } from '@cloudforet/mirinae/types/data-display/collapsible/collapsible-list/type';
 
@@ -18,6 +18,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ActionMenuButton from '@/common/components/buttons/ActionMenuButton.vue';
 import TextEditor from '@/common/components/editor/TextEditor.vue';
+import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useMention } from '@/services/ops-flow/composables/use-mention';
@@ -136,8 +137,8 @@ onBeforeMount(async () => {
                 </div>
             </template>
             <template #default="{data}">
-                <p-text-beautifier class="whitespace-pre-line"
-                                   :value="data.comment"
+                <text-editor-viewer content-type="markdown"
+                                    :contents="data.comment"
                 />
             </template>
         </p-collapsible-list>
