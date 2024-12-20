@@ -5,8 +5,8 @@ import type { FormatRulesValue } from '@/common/modules/widgets/_widget-fields/a
 import type { _CategoryByValue as CategoryByValue } from '@/common/modules/widgets/_widget-fields/category-by/type';
 import type { ColorSchemaValue } from '@/common/modules/widgets/_widget-fields/color-schema/type';
 import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/comparison/type';
-import type { _CustomTableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
-import type { _DataFieldHeatmapColorValue } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
+import type { CustomTableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
+import type { DataFieldHeatmapColorValue } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
 import type { DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
 import type { _DateFormatValue } from '@/common/modules/widgets/_widget-fields/date-format/type';
 import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
@@ -62,7 +62,7 @@ export interface WidgetFieldTypeMap {
     max: WidgetFieldValue<MaxValue>;
     legend: WidgetFieldValue<LegendValue>;
     icon: WidgetFieldValue<_IconValue>;
-    header: WidgetFieldValue<WidgetHeaderValue>;
+    widgetHeader: WidgetFieldValue<WidgetHeaderValue>;
     groupBy: WidgetFieldValue<_GroupByValue>;
     granularity: WidgetFieldValue<GranularityValue>;
     formatRules: WidgetFieldValue<FormatRulesValue>;
@@ -70,9 +70,9 @@ export interface WidgetFieldTypeMap {
     displayAnnotation: WidgetFieldValue<DisplayAnnotationValue>;
     dateRange: WidgetFieldValue<DateRangeValue>;
     dateFormat: WidgetFieldValue<_DateFormatValue>;
-    dataFieldHeatmapColor: WidgetFieldValue<_DataFieldHeatmapColorValue>;
+    dataFieldHeatmapColor: WidgetFieldValue<DataFieldHeatmapColorValue>;
     dataField: WidgetFieldValue<DataFieldValue>;
-    customTableColumnWidth: WidgetFieldValue<_CustomTableColumnWidthValue>;
+    customTableColumnWidth: WidgetFieldValue<CustomTableColumnWidthValue>;
     comparison: WidgetFieldValue<ComparisonValue>;
     colorSchema: WidgetFieldValue<ColorSchemaValue>;
     categoryBy: WidgetFieldValue<CategoryByValue>;

@@ -77,7 +77,7 @@ export const widgetFieldDefaultValueMap: DefaultValueRegistry = {
         granularity: 'MONTHLY',
     },
     groupBy: {},
-    header: {
+    widgetHeader: {
         toggleValue: false,
     },
     icon: {
@@ -296,7 +296,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
 
         return result;
     },
-    header: () => widgetFieldDefaultValueMap.header,
+    widgetHeader: () => widgetFieldDefaultValueMap.widgetHeader,
     icon: (widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const iconOptions = (_fieldsSchema.icon?.options ?? {}) as IconOptions;

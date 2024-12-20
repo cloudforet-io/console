@@ -31,7 +31,7 @@ export default class WidgetFieldValueManager {
         const result: WidgetFieldValueMap = { ...originData };
 
         const integratedFieldSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const widgetFieldKeys = ['header', ...Object.keys(integratedFieldSchema)];
+        const widgetFieldKeys = ['widgetHeader', ...Object.keys(integratedFieldSchema)];
         Object.entries(widgetFieldDefaultValueSetterRegistry).forEach(([key, defaultValueSetter]) => {
             if (widgetFieldKeys.includes(key) && !result[key]) {
                 result[key] = { value: defaultValueSetter(widgetConfig, dataTable) };
