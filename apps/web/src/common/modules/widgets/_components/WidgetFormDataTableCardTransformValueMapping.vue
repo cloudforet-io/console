@@ -273,13 +273,14 @@ watch(() => state.invalid, (_invalid) => {
 <style scoped lang="scss">
 .widget-form-data-table-card-transform-value-mapping {
     .case-form-wrapper {
-        @apply border border-gray-200 rounded-lg;
+        @apply bg-gray-100 rounded-lg;
         padding: 0.625rem 0.5rem;
         margin-bottom: 0.5rem;
         .case-form-card {
-            @apply bg-gray-100 rounded;
+            @apply bg-white rounded border border-gray-150;
             position: relative;
             padding: 0.5rem;
+            z-index: 1;
             margin-bottom: 0.5rem;
             &.expanded {
                 width: 35rem;
