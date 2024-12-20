@@ -30,11 +30,11 @@ const gauge: WidgetConfig = {
             options: {
                 formatRulesType: _FORMAT_RULE_TYPE.percentThreshold,
                 default: [{
-                    threshold: 90,
+                    number: 70,
                     color: yellow[500],
                 },
                 {
-                    threshold: 100,
+                    number: 100,
                     color: red[400],
                 }],
                 baseColor: indigo[100],
