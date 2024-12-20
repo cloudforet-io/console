@@ -80,7 +80,7 @@ const createScheduleMap = (scheduleForm: ScheduleForm): Record<ScheduleDayType, 
     const { days, start, end } = scheduleForm;
 
     const refinedDays = allDays.map((day) => ({
-        is_schedule: days.includes(day),
+        is_scheduled: days.includes(day),
         start,
         end,
     }));

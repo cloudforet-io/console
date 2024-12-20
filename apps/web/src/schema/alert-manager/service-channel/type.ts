@@ -17,7 +17,7 @@ export type ServiceChannelDataType = {
 };
 
 export type ServiceChannelScheduleDayType = {
-    is_schedule: boolean;
+    is_scheduled: boolean;
     start: number;
     end: number;
 };

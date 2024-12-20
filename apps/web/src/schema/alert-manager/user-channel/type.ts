@@ -7,7 +7,7 @@ export type UserChannelStateType = typeof USER_GROUP_CHANNEL_STATE[keyof typeof 
 export type UserChannelScheduleType = typeof USER_GROUP_CHANNEL_SCHEDULE_TYPE[keyof typeof USER_GROUP_CHANNEL_SCHEDULE_TYPE];
 
 export type UserChannelScheduleDayType = {
-    is_schedule: boolean;
+    is_scheduled: boolean;
     start: number;
     end: number;
 };
