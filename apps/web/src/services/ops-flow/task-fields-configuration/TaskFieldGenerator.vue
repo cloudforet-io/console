@@ -6,7 +6,7 @@ import {
 import { isEqual } from 'lodash';
 
 import {
-    PFieldGroup, PTextInput, PToggleButton, PCheckbox, PButton,
+    PFieldGroup, PTextInput, PToggleButton, PCheckbox, PButton, PSelectButton, PCodeEditor,
 } from '@cloudforet/mirinae';
 
 import type {
@@ -14,6 +14,7 @@ import type {
     TaskFieldOptions,
     TaskFieldType,
 } from '@/schema/opsflow/_types/task-field-type';
+import { i18n } from '@/translations';
 
 import InfoTooltip from '@/common/components/guidance/InfoTooltip.vue';
 import ChangedMark from '@/common/components/marks/ChangedMark.vue';
@@ -54,6 +55,19 @@ const optionsComponent = computed<ReturnType<typeof defineAsyncComponent>|undefi
 
 const isDefaultField = computed(() => !!DEFAULT_FIELD_ID_MAP[props.field.field_id]);
 
+const inputTypes = computed<{ name: string; label: string; }[]>(() => [
+    { name: 'form', label: i18n.t('OPSFLOW.FIELD_GENERATOR.FORM') as string },
+    { name: 'json', label: i18n.t('OPSFLOW.FIELD_GENERATOR.JSON') as string },
+]);
+const inputType = ref<string>('form');
+const handleChangeInputType = (value: string) => {
+    if (value === 'json') {
+        jsonCode.value = JSON.stringify(field.value);
+    } else {
+        applyJsonCodeToStates(jsonCode.value);
+    }
+    inputType.value = value;
+};
 /* field id */
 const {
     value: fieldId, setValue: setFieldId, isInvalid: isFieldIdInvalid, validationResult: isFieldIdValid,
@@ -95,6 +109,7 @@ const isAllValid = computed<boolean>(() => (isDefaultField.value ? isFieldIdVali
 const field = computed<TaskField>(() => {
     const result = {
         ...props.field,
+        field_id: fieldId.value ? fieldId.value : props.field.field_id,
         name: name.value ?? '',
         options: options.value,
         is_required: isRequired.value,
@@ -105,6 +120,27 @@ const field = computed<TaskField>(() => {
     }
     return result;
 });
+
+/* json */
+const jsonCode = ref<string>('');
+const applyJsonCodeToStates = (code: string) => {
+    let obj;
+    try {
+        obj = JSON.parse(code);
+    } catch (e) {
+        return;
+    }
+    setFieldId(obj.field_id);
+    setName(obj.name);
+    options.value = obj.options;
+    isRequired.value = obj.is_required;
+    isPrimary.value = obj.is_primary;
+    isFolded.value = false;
+};
+const handleUpdateJsonCode = (code: string) => {
+    jsonCode.value = code;
+    applyJsonCodeToStates(code);
+};
 
 
 watch(field, (newField) => {
@@ -124,6 +160,7 @@ onBeforeMount(() => {
     isRequired.value = props.field.is_required ?? isDefaultField.value;
     isPrimary.value = props.field.is_required ? true : (props.field.is_primary ?? isDefaultField.value);
     isFolded.value = isDefaultField.value;
+    jsonCode.value = JSON.stringify(props.field);
 });
 </script>
 
@@ -139,69 +176,93 @@ onBeforeMount(() => {
                                      @delete="emit('delete')"
         />
         <div v-if="!isFolded">
-            <div class="py-4 pl-8 pr-2 border-b border-gray-150">
-                <p-field-group v-if="!isDefaultField"
-                               :label="$t('OPSFLOW.FIELD_ID')"
-                               :invalid="isFieldIdInvalid"
-                               required
-                >
-                    <template #label-extra>
-                        <info-tooltip :contents="$t('OPSFLOW.FIELD_GENERATOR.FIELD_ID_EDIT_DESC', {
-                                          task: taskManagementTemplateStore.templates.task,
-                                          tasks: taskManagementTemplateStore.templates.tasks,
-                                      })"
-                                      size="sm"
-                        />
-                    </template>
-                    <div class="inline-flex gap-2 items-center">
-                        <span>
-                            <p-text-input :value="fieldId"
-                                          :invalid="isFieldIdInvalid"
-                                          @update:value="setFieldId"
-                            />
-                            <changed-mark v-if="isFieldIdChanged" />
-                        </span>
-                        <p-button v-if="isFieldIdChanged"
-                                  size="sm"
-                                  style-type="tertiary"
-                                  @click="handleClickUndoFieldId"
+            <div class="py-4 pl-8 pr-2 border-gray-150"
+                 :class="{ 'border-b': inputType === 'form' }"
+            >
+                <div class="float-right flex justify-end gap-1 mb-4">
+                    <template v-for="type in inputTypes">
+                        <p-select-button :key="type.name"
+                                         size="sm"
+                                         style-type="gray"
+                                         :value="type.name"
+                                         :selected="inputType"
+                                         @change="handleChangeInputType"
                         >
-                            Undo
-                        </p-button>
-                    </div>
-                </p-field-group>
-                <p-field-group :label="$t('OPSFLOW.FIELD_GENERATOR.FIELD_NAME')"
-                               :invalid="isNameInvalid"
-                               required
-                >
-                    <p-text-input :value="name"
-                                  :placeholder="props.field.name || fieldMetadata.name"
-                                  :invalid="isNameInvalid"
-                                  @update:value="setName"
+                            {{ type.label }}
+                        </p-select-button>
+                    </template>
+                </div>
+                <template v-if="inputType === 'form'">
+                    <p-field-group v-if="!isDefaultField"
+                                   :label="$t('OPSFLOW.FIELD_ID')"
+                                   :invalid="isFieldIdInvalid"
+                                   required
+                    >
+                        <template #label-extra>
+                            <info-tooltip :contents="$t('OPSFLOW.FIELD_GENERATOR.FIELD_ID_EDIT_DESC', {
+                                              task: taskManagementTemplateStore.templates.task,
+                                              tasks: taskManagementTemplateStore.templates.tasks,
+                                          })"
+                                          size="sm"
+                            />
+                        </template>
+                        <div class="inline-flex gap-2 items-center">
+                            <span>
+                                <p-text-input :value="fieldId"
+                                              :invalid="isFieldIdInvalid"
+                                              @update:value="setFieldId"
+                                />
+                                <changed-mark v-if="isFieldIdChanged" />
+                            </span>
+                            <p-button v-if="isFieldIdChanged"
+                                      size="sm"
+                                      style-type="tertiary"
+                                      @click="handleClickUndoFieldId"
+                            >
+                                Undo
+                            </p-button>
+                        </div>
+                    </p-field-group>
+                    <p-field-group :label="$t('OPSFLOW.FIELD_GENERATOR.FIELD_NAME')"
+                                   :invalid="isNameInvalid"
+                                   required
+                    >
+                        <p-text-input :value="name"
+                                      :placeholder="props.field.name || fieldMetadata.name"
+                                      :invalid="isNameInvalid"
+                                      @update:value="setName"
+                        />
+                    </p-field-group>
+                    <component :is="optionsComponent"
+                               :options="options"
+                               @update:options="options = $event"
+                               @update:is-valid="isOptionsValid = $event"
                     />
-                </p-field-group>
-                <component :is="optionsComponent"
-                           :options="options"
-                           @update:options="options = $event"
-                           @update:is-valid="isOptionsValid = $event"
-                />
-                <p-field-group :label="$t('OPSFLOW.FIELD_GENERATOR.SHOW_TASK_CREATION', {task: taskManagementTemplateStore.templates.Task })"
-                               required
-                               class="mt-4"
-                >
-                    <p class="text-paragraph-sm mb-2">
-                        {{ $t('OPSFLOW.FIELD_GENERATOR.SHOW_TASK_CREATION_DESC') }}
-                    </p>
-                    <!-- HACK: key is used to force re-render when isRequired changes. This is temporary solution. -->
-                    <p-toggle-button :key="String(isRequired)"
-                                     :value.sync="isPrimary"
-                                     :disabled="isRequired || isDefaultField"
-                                     show-state-text
-                                     position="left"
+                    <p-field-group :label="$t('OPSFLOW.FIELD_GENERATOR.SHOW_TASK_CREATION', {task: taskManagementTemplateStore.templates.Task })"
+                                   required
+                                   class="mt-4"
+                    >
+                        <p class="text-paragraph-sm mb-2">
+                            {{ $t('OPSFLOW.FIELD_GENERATOR.SHOW_TASK_CREATION_DESC') }}
+                        </p>
+                        <!-- HACK: key is used to force re-render when isRequired changes. This is temporary solution. -->
+                        <p-toggle-button :key="String(isRequired)"
+                                         :value.sync="isPrimary"
+                                         :disabled="isRequired || isDefaultField"
+                                         show-state-text
+                                         position="left"
+                        />
+                    </p-field-group>
+                </template>
+                <template v-else>
+                    <p-code-editor :code="jsonCode"
+                                   @update:code="handleUpdateJsonCode"
                     />
-                </p-field-group>
+                </template>
             </div>
-            <div class="h-9 pl-8 flex items-center">
+            <div v-if="inputType === 'form'"
+                 class="h-9 pl-8 flex items-center"
+            >
                 <p-checkbox :selected="isRequired"
                             :value="true"
                             :disabled="isDefaultField"
