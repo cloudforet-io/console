@@ -49,3 +49,7 @@ export type UserRadioType = {
     label: TranslateResult,
     name: 'ALL_MEMBER' | 'USER' | 'USER_GROUP'
 };
+export type ProtocolInfo = {
+    name: string;
+    icon: string;
+};

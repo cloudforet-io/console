@@ -28,6 +28,7 @@ interface ServiceFormStoreState {
     serviceList: ServiceModel[];
     notificationProtocolList: NotificationProtocolModel[];
     selectedWebhookId?: string;
+    selectedNotificationId?: string;
 }
 interface ServiceFormStoreGetters {
     serviceInfo: ComputedRef<Service>;
@@ -41,6 +42,7 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
         serviceList: [],
         notificationProtocolList: [],
         selectedWebhookId: undefined,
+        selectedNotificationId: undefined,
     });
 
     const getters = reactive<ServiceFormStoreGetters>({
@@ -77,6 +79,9 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
         setSelectedWebhookId(id?: string) {
             state.selectedWebhookId = id;
         },
+        setSelectedNotificationId(id?: string) {
+            state.selectedNotificationId = id;
+        },
     };
 
     const actions = {
@@ -87,6 +92,7 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
             state.serviceList = [];
             state.notificationProtocolList = [];
             state.selectedWebhookId = undefined;
+            state.selectedNotificationId = undefined;
         },
         async fetchServiceDetailData(id: string) {
             state.loading = true;

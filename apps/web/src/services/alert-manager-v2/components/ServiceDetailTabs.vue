@@ -42,9 +42,7 @@ const tabState = reactive({
 const storeState = reactive({
     currentTab: computed<ServiceDetailTabsType>(() => serviceDetailPageState.currentTab),
     selectedWebhookId: computed<string|undefined>(() => serviceDetailPageState.selectedWebhookId),
-});
-const state = reactive({
-    selectedNotifications: undefined,
+    selectedNotificationId: computed<string|undefined>(() => serviceDetailPageState.selectedNotificationId),
 });
 
 watch(() => tabState.activeTab, (activeTab) => {
@@ -77,15 +75,13 @@ onMounted(() => {
                             <service-detail-tabs-webhook :table-height="height" />
                         </template>
                         <template #notifications>
-                            <service-detail-tabs-notifications :selected-id.sync="state.selectedNotifications" />
+                            <service-detail-tabs-notifications :table-height="height" />
                         </template>
                     </p-tab>
                 </template>
             </p-horizontal-layout>
             <service-detail-tabs-webhook-detail-tabs v-if="tabState.activeTab === SERVICE_DETAIL_TABS.WEBHOOK && storeState.selectedWebhookId" />
-            <service-detail-tabs-notifications-detail-tabs v-else-if="tabState.activeTab === SERVICE_DETAIL_TABS.NOTIFICATIONS && state.selectedNotifications"
-                                                           :selected-id="state.selectedNotifications"
-            />
+            <service-detail-tabs-notifications-detail-tabs v-else-if="tabState.activeTab === SERVICE_DETAIL_TABS.NOTIFICATIONS && storeState.selectedNotificationId" />
         </div>
         <p-tab v-else
                :tabs="tabState.tabs"
