@@ -34,7 +34,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useQueryTags } from '@/common/composables/query-tags';
 
-import { webhookStateFormatter } from '@/services/alert-manager-v2/composables/refined-table-data';
+import { alertManagerStateFormatter } from '@/services/alert-manager-v2/composables/refined-table-data';
 import { SERVICE_TAB_HEIGHT } from '@/services/alert-manager-v2/constants/common-constant';
 import {
     ALERT_EXCEL_FIELDS,
@@ -138,7 +138,7 @@ const handleExportExcel = async () => {
         timezone: storeState.timezone,
     });
 };
-const handleSelectTableRow = (item) => {
+const handleSelectTableRow = (item:number[]) => {
     if (item.length === 0) return;
     state.selectIndex = item[0];
     serviceDetailPageStore.setSelectedWebhookId(state.items[item[0]].webhook_id);
@@ -240,7 +240,7 @@ onUnmounted(() => {
         <template #col-state-format="{ value }">
             <p-status
                 class="capitalize"
-                v-bind="webhookStateFormatter(value)"
+                v-bind="alertManagerStateFormatter(value)"
             />
         </template>
         <template #col-requests.total-format="{ value }">

@@ -13,6 +13,7 @@ import { i18n } from '@/translations';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
+import type { ScheduleDayType, ScheduleForm } from '@/common/components/schedule-setting-form/schedule-setting-form';
 import ScheduleSettingForm from '@/common/components/schedule-setting-form/ScheduleSettingForm.vue';
 import { useFormValidator } from '@/common/composables/form-validator';
 import type { SelectedUserDropdownIdsType } from '@/common/modules/user/typte';
@@ -20,7 +21,6 @@ import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
 import { useServiceCreateFormStore } from '@/services/alert-manager-v2/stores/service-create-form-store';
 import type { CreatedNotificationInfoType, UserRadioType } from '@/services/alert-manager-v2/types/alert-manager-type';
-import type { ScheduleDayType, ScheduleForm } from '@/services/alert-manager-v2/types/schedule-setting-form';
 
 const serviceFormStore = useServiceCreateFormStore();
 const serviceFormState = serviceFormStore.state;

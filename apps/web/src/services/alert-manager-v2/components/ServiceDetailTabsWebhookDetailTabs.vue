@@ -26,7 +26,7 @@ import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { webhookStateFormatter } from '@/services/alert-manager-v2/composables/refined-table-data';
+import { alertManagerStateFormatter } from '@/services/alert-manager-v2/composables/refined-table-data';
 import { WEBHOOK_DETAIL_TABS } from '@/services/alert-manager-v2/constants/common-constant';
 import { WEBHOOK_DEFINITION_FIELDS } from '@/services/alert-manager-v2/constants/webhook-table-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
@@ -121,7 +121,7 @@ watch(() => storeState.selectedWebhookId, async (selectedId) => {
             >
                 <template #data-state="{data}">
                     <p-status class="capitalize"
-                              v-bind="webhookStateFormatter(data)"
+                              v-bind="alertManagerStateFormatter(data)"
                     />
                 </template>
                 <template #data-plugin_info.plugin_id="{value}">
