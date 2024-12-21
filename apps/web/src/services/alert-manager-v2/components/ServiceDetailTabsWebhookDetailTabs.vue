@@ -1,66 +1,107 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import {
+    computed, reactive, watch,
+} from 'vue';
 
+import { isEmpty } from 'lodash';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PHeadingLayout, PTab, PHeading, PDefinitionTable, PStatus, PLazyImg, PMarkdown, PBadge,
 } from '@cloudforet/mirinae';
-import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { WebhookGetParameters } from '@/schema/alert-manager/webhook/api-verbs/get';
+import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
+import type { PluginGetParameters } from '@/schema/repository/plugin/api-verbs/get';
 import type { PluginModel } from '@/schema/repository/plugin/model';
+import type { RepositoryListParameters } from '@/schema/repository/repository/api-verbs/list';
+import type { RepositoryModel } from '@/schema/repository/repository/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 import { useUserStore } from '@/store/user/user-store';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { webhookStateFormatter } from '@/services/alert-manager-v2/composables/refined-table-data';
 import { WEBHOOK_DETAIL_TABS } from '@/services/alert-manager-v2/constants/common-constant';
+import { WEBHOOK_DEFINITION_FIELDS } from '@/services/alert-manager-v2/constants/webhook-table-constant';
+import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
 import type { WebhookDetailTabsType } from '@/services/alert-manager-v2/types/alert-manager-type';
-
-interface Props {
-    // TODO: add type
-    selectedWebhook?: any
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    selectedWebhook: undefined,
-});
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const userStore = useUserStore();
+const serviceDetailPageStore = useServiceDetailPageStore();
+const serviceDetailPageState = serviceDetailPageStore.state;
 
 const storeState = reactive({
     language: computed(() => userStore.state.language),
-    plugins: computed<PluginModel[]>(() => Object.values(allReferenceGetters.plugin)),
+    plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
+    selectedWebhookId: computed<string|undefined>(() => serviceDetailPageState.selectedWebhookId),
 });
 const tabState = reactive({
-    webhookDetailTabs: computed<TabItem[]>(() => ([
-        { label: i18n.t('ALERT_MANAGER.ALERTS.DETAILS'), name: WEBHOOK_DETAIL_TABS.DETAIL },
-        { label: i18n.t('ALERT_MANAGER.WEBHOOK.HELP'), name: WEBHOOK_DETAIL_TABS.HELP },
-    ])),
+    webhookDetailTabs: computed<TabItem[]>(() => {
+        const defaultTabs: TabItem[] = [
+            { label: i18n.t('ALERT_MANAGER.ALERTS.DETAILS'), name: WEBHOOK_DETAIL_TABS.DETAIL },
+        ];
+        if (state.selectedPlugin?.docs && !isEmpty(state.selectedPlugin?.docs)) {
+            defaultTabs.push({ label: i18n.t('ALERT_MANAGER.WEBHOOK.HELP'), name: WEBHOOK_DETAIL_TABS.HELP });
+        }
+        return defaultTabs;
+    }),
     activeWebhookDetailTab: WEBHOOK_DETAIL_TABS.DETAIL as WebhookDetailTabsType,
 });
-const tableState = reactive({
-    definitionFields: computed<DefinitionField[]>(() => [
-        { label: 'Webhook ID', name: 'webhook_id' },
-        { label: 'Name', name: 'name' },
-        { label: 'State', name: 'state' },
-        { label: 'Plugin', name: 'plugin_info.plugin_id' },
-        { label: 'Version', name: 'plugin_info.version' },
-        { label: 'Webhook URL', name: 'webhook_url' },
-    ]),
-});
 const state = reactive({
-    selectedPlugin: computed<PluginModel|undefined>(() => {
-        const id = props.selectedWebhook?.plugin_info.plugin_id;
-        return storeState.plugins.find((i) => i.plugin_id === id);
-    }),
+    webhookInfo: {} as WebhookModel,
+    selectedPlugin: {} as PluginModel,
 });
+
+const fetchWebhookDetail = async (selectedId: string) => {
+    try {
+        state.webhookInfo = await SpaceConnector.clientV2.alertManager.webhook.get<WebhookGetParameters, WebhookModel>({
+            webhook_id: selectedId,
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
+        state.webhookInfo = {} as WebhookModel;
+    }
+};
+const getRepositoryID = async () => {
+    const res = await SpaceConnector.clientV2.repository.repository.list<RepositoryListParameters, ListResponse<RepositoryModel>>({
+        repository_type: 'remote',
+    });
+    return res.results ? res.results[0].repository_id : '';
+};
+const fetchPluginInfo = async (pluginId: string) => {
+    try {
+        const repositoryId = await getRepositoryID();
+        state.selectedPlugin = await SpaceConnector.clientV2.repository.plugin.get<PluginGetParameters, PluginModel>({
+            repository_id: repositoryId,
+            plugin_id: pluginId,
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.selectedPlugin = {} as PluginModel;
+    }
+};
+
+watch(() => state.webhookInfo.plugin_info?.plugin_id, async (pluginId) => {
+    if (!pluginId) return;
+    await fetchPluginInfo(pluginId);
+}, { immediate: true });
+watch(() => storeState.selectedWebhookId, async (selectedId) => {
+    if (!selectedId) return;
+    await fetchWebhookDetail(selectedId);
+}, { immediate: true });
 </script>
 
 <template>
-    <p-tab :tabs="tabState.webhookDetailTabs"
+    <p-tab :key="`webhook-detail-tabs-${tabState.webhookDetailTabs.length}`"
+           :tabs="tabState.webhookDetailTabs"
            :active-tab.sync="tabState.activeWebhookDetailTab"
            class="service-detail-tabs-webhook-detail-tabs"
     >
@@ -73,8 +114,8 @@ const state = reactive({
                     />
                 </template>
             </p-heading-layout>
-            <p-definition-table :fields="tableState.definitionFields"
-                                :data="props.selectedWebhook"
+            <p-definition-table :fields="WEBHOOK_DEFINITION_FIELDS"
+                                :data="state.webhookInfo"
                                 :skeleton-rows="4"
                                 block
             >
@@ -84,8 +125,8 @@ const state = reactive({
                     />
                 </template>
                 <template #data-plugin_info.plugin_id="{value}">
-                    <div class="col-type">
-                        <p-lazy-img :src="state.selectedPlugin ? state.selectedPlugin?.tags?.icon : 'ic_webhook'"
+                    <div class="col-type inline-flex items-center">
+                        <p-lazy-img :src="state.selectedPlugin ? state.selectedPlugin.tags?.icon : 'ic_webhook'"
                                     error-icon="ic_webhook"
                                     width="1rem"
                                     height="1rem"
@@ -97,26 +138,26 @@ const state = reactive({
             </p-definition-table>
         </template>
         <template #help>
-            <div class="help-tap">
-                <div class="plugin-wrapper">
-                    <p-lazy-img :src="state.selectedPlugin ? state.selectedPlugin?.tags?.icon : 'ic_webhook'"
+            <div class="pt-8 pr-4 pl-4">
+                <div class="flex gap-4">
+                    <p-lazy-img :src="state.selectedPlugin ? state.selectedPlugin.tags?.icon : 'ic_webhook'"
                                 error-icon="ic_webhook"
                                 width="2rem"
                                 height="2rem"
                     />
-                    <div class="plugin-info-wrapper">
-                        <p class="plugin-info">
-                            <span class="name">
-                                {{ state.selectedPlugin ? state.selectedPlugin?.name : props.selectedWebhook?.plugin_info.plugin_id }}
+                    <div class="flex-1">
+                        <p class="flex items-center gap-0.5">
+                            <span class="text-label-xl font-bold">
+                                {{ state.selectedPlugin?.name || state.webhookInfo?.plugin_info.plugin_id }}
                             </span>
                             <p-badge style-type="gray900"
                                      badge-type="solid-outline"
                             >
-                                v {{ props.selectedWebhook?.plugin_info.version }}
+                                v {{ state.webhookInfo?.plugin_info.version }}
                             </p-badge>
                         </p>
-                        <p class="desc">
-                            {{ state.selectedPlugin?.tags?.long_description || state.selectedPlugin?.tags.description }}
+                        <p class="text-label-sm text-gray-600">
+                            {{ state.selectedPlugin.tags?.description }}
                         </p>
                     </div>
                 </div>
@@ -124,7 +165,7 @@ const state = reactive({
                     <p-markdown :markdown="state.selectedPlugin?.docs"
                                 :language="storeState.language"
                                 remove-spacing
-                                class="markdown"
+                                class="bg-violet-100 p-4 rounded-md	overflow-x-auto"
                     />
                 </div>
             </div>
@@ -135,47 +176,12 @@ const state = reactive({
 <style scoped lang="postcss">
 .service-detail-tabs-webhook-detail-tabs {
     .col-type {
-        display: inline-flex;
-        align-items: center;
         .name {
             margin-top: -0.125rem;
         }
     }
-    .help-tap {
-        padding-top: 2rem;
-        padding-right: 1rem;
-        padding-left: 1rem;
-        .plugin-wrapper {
-            @apply flex;
-            gap: 1rem;
-            .plugin-info-wrapper {
-                flex: 1;
-                .plugin-info {
-                    @apply flex items-center;
-                    gap: 0.125rem;
-                    .name {
-                        @apply text-label-xl font-bold;
-                    }
-                }
-                .desc {
-                    @apply text-label-sm text-gray-600;
-                }
-            }
-        }
-        .docs-wrapper {
-            margin-top: 1.125rem;
-            .empty {
-                @apply bg-violet-100;
-                padding-top: 4.125rem;
-                padding-bottom: 4.125rem;
-                border-radius: 0.375rem;
-            }
-        }
-        .markdown {
-            @apply bg-violet-100;
-            padding: 1rem;
-            border-radius: 0.375rem;
-        }
+    .docs-wrapper {
+        margin-top: 1.125rem;
     }
 }
 </style>

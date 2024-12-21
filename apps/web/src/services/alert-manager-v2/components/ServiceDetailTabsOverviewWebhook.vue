@@ -71,6 +71,9 @@ const fetchWebhookList = async () => {
     try {
         const { results } = await SpaceConnector.clientV2.alertManager.webhook.list<WebhookListParameters, ListResponse<WebhookModel>>({
             service_id: storeState.serviceId,
+            query: {
+                sort: [{ key: 'created_at', desc: true }],
+            },
         });
         state.items = (results || []).slice(0, 15);
     } catch (e) {

@@ -74,7 +74,7 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
         setCurrentTab(currentTab: ServiceDetailTabsType) {
             state.currentTab = currentTab;
         },
-        setSelectedWebhookId(id: string) {
+        setSelectedWebhookId(id?: string) {
             state.selectedWebhookId = id;
         },
     };
