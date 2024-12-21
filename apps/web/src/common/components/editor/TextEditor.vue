@@ -99,6 +99,7 @@ onMounted(() => {
             } else {
                 content = editor.value.storage.markdown.getMarkdown() ?? '';
             }
+            console.debug('content type', props.contentType, '\ncontent: \n', content);
             emit('update:value', content);
             emit('update:attachments', getAttachments<any>(editor.value, imgFileDataMap));
         },
