@@ -33,7 +33,6 @@ export const useTaskFieldMetadataStore = defineStore('task-field-metadata', () =
             getters.taskFieldTypeMetadataMap.LABELS,
             getters.taskFieldTypeMetadataMap.DROPDOWN,
             getters.taskFieldTypeMetadataMap.DATE,
-            getters.taskFieldTypeMetadataMap.ASSET,
             getters.taskFieldTypeMetadataMap.PROJECT,
         ]),
         defaultFields: computed<TaskField[]>(() => [

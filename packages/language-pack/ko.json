@@ -2593,6 +2593,7 @@
 				"EMAIL_INVALID": "잘못된 이메일 형식입니다. ",
 				"GENERATE": "생성",
 				"GENERATE_PLACEHOLDER": "비밀번호 자동 생성 또는 입력",
+				"ID_INVALID": "잘못된 ID 형식입니다.",
 				"MEMBER": "멤버",
 				"NAME": "이름",
 				"NAME_VALID": "사용 가능한 아이디입니다.",

@@ -29,7 +29,7 @@ export const usePluginReferenceStore = defineStore('reference-plugin', () => {
         items: null as PluginReferenceMap | null,
     });
 
-    const getters = reactive({
+    const getters = {
         pluginItems: asyncComputed<PluginReferenceMap>(async () => {
             if (state.items === null) await load();
             return state.items ?? {};
@@ -38,9 +38,9 @@ export const usePluginReferenceStore = defineStore('reference-plugin', () => {
             type: 'plugin',
             key: 'plugin_id',
             name: 'name',
-            referenceMap: getters.pluginItems,
+            referenceMap: getters.pluginItems.value,
         })),
-    });
+    };
 
     const load = async (options?: ReferenceLoadOptions) => {
         const currentTime = new Date().getTime();

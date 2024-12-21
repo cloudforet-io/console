@@ -2593,6 +2593,7 @@
 				"EMAIL_INVALID": "Invalid e-mail format.",
 				"GENERATE": "Generate",
 				"GENERATE_PLACEHOLDER": "Generate or Enter Password",
+				"ID_INVALID": "Invalid ID format.",
 				"MEMBER": "Member",
 				"NAME": "Name",
 				"NAME_VALID": "You can use this ID",
