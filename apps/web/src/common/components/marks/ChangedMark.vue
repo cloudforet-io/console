@@ -3,7 +3,6 @@ import { onMounted, ref } from 'vue';
 
 const changedMarkRef = ref<HTMLElement|null>(null);
 onMounted(() => {
-    console.log('ChangedMark component is mounted');
     const changedMark = changedMarkRef.value as HTMLElement;
 
     const parent = changedMark.parentElement as HTMLElement;
