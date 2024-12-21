@@ -14,6 +14,9 @@ import ColorPicker from '@/common/components/editor/ColorPicker.vue';
 interface Props {
     editor: Editor;
     useColor: boolean;
+    useTextAlign: boolean;
+    useImage: boolean;
+    showUndoRedoButtons: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
     editor: () => ({} as Editor),
@@ -112,22 +115,24 @@ const handleLinkClick = () => {
 
 <template>
     <div class="menu-bar">
-        <p-icon-button class="menu-button"
-                       style-type="transparent"
-                       name="ic_arrows-uturn-left"
-                       :disabled="!props.editor.can().undo()"
-                       @click="props.editor.chain().focus().undo().run()"
-        />
-        <p-icon-button class="menu-button"
-                       style-type="transparent"
-                       name="ic_arrows-uturn-right"
-                       :disabled="!props.editor.can().redo()"
-                       @click="props.editor.chain().focus().redo().run()"
-        />
+        <template v-if="props.showUndoRedoButtons">
+            <p-icon-button class="menu-button"
+                           style-type="transparent"
+                           name="ic_arrows-uturn-left"
+                           :disabled="!props.editor.can().undo()"
+                           @click="props.editor.chain().focus().undo().run()"
+            />
+            <p-icon-button class="menu-button"
+                           style-type="transparent"
+                           name="ic_arrows-uturn-right"
+                           :disabled="!props.editor.can().redo()"
+                           @click="props.editor.chain().focus().redo().run()"
+            />
 
-        <p-divider class="menu-divider"
-                   vertical
-        />
+            <p-divider class="menu-divider"
+                       vertical
+            />
+        </template>
 
         <p-select-dropdown :selected="state.selectedTextStyle"
                            class="menu-dropdown text-style"
@@ -144,28 +149,30 @@ const handleLinkClick = () => {
             </template>
         </p-select-dropdown>
 
-        <p-divider class="menu-divider"
-                   vertical
-        />
+        <template v-if="props.useTextAlign">
+            <p-divider class="menu-divider"
+                       vertical
+            />
 
-        <div class="text-align-wrapper">
-            <p-select-dropdown :selected="state.selectedTextAlign"
-                               class="menu-dropdown"
-                               style-type="transparent"
-                               :menu="state.textAlignItems"
-                               @select="handleTextAlignSelect"
-            >
-                <template #menu-item--format="{item}">
-                    <p-i :name="TEXT_ALIGN_ICONS[item.name]" />
-                    {{ item.label }}
-                </template>
-                <template #dropdown-button>
-                    <p-i :name="TEXT_ALIGN_ICONS[state.selectedTextAlign]"
-                         color="inherit"
-                    />
-                </template>
-            </p-select-dropdown>
-        </div>
+            <div class="text-align-wrapper">
+                <p-select-dropdown :selected="state.selectedTextAlign"
+                                   class="menu-dropdown"
+                                   style-type="transparent"
+                                   :menu="state.textAlignItems"
+                                   @select="handleTextAlignSelect"
+                >
+                    <template #menu-item--format="{item}">
+                        <p-i :name="TEXT_ALIGN_ICONS[item.name]" />
+                        {{ item.label }}
+                    </template>
+                    <template #dropdown-button>
+                        <p-i :name="TEXT_ALIGN_ICONS[state.selectedTextAlign]"
+                             color="inherit"
+                        />
+                    </template>
+                </p-select-dropdown>
+            </div>
+        </template>
 
         <template v-if="props.useColor">
             <p-divider class="menu-divider"
@@ -241,7 +248,8 @@ const handleLinkClick = () => {
                        :class="{ 'selected': props.editor.isActive('link') }"
                        @click="handleLinkClick"
         />
-        <p-popover :is-visible.sync="state.imagePopoverVisible"
+        <p-popover v-if="props.useImage"
+                   :is-visible.sync="state.imagePopoverVisible"
                    position="bottom"
         >
             <p-icon-button class="menu-button"

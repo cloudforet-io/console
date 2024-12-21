@@ -28,6 +28,7 @@ interface Props {
     invalid?: boolean;
     placeholder?: string;
     contentType?: 'html'|'markdown';
+    showUndoRedoButtons?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
     value: '',
@@ -36,6 +37,7 @@ const props = withDefaults(defineProps<Props>(), {
     invalid: false,
     placeholder: '',
     contentType: 'html',
+    showUndoRedoButtons: true,
 });
 const emit = defineEmits<{(e: 'update:value', value: string): void;
     (e: 'update:attachments', attachments: Attachment<any>[]): void;
@@ -65,14 +67,14 @@ const getExtensions = (): AnyExtension[] => {
         Underline,
         Link,
         TextStyle,
-        TextAlign.configure({
-            types: ['heading', 'paragraph'],
-        }),
     ];
 
     // add extensions based on content type
     if (props.contentType === 'html') {
         extensions.push(Color);
+        extensions.push(TextAlign.configure({
+            types: ['heading', 'paragraph'],
+        }));
     }
     if (props.contentType === 'markdown') {
         extensions.push(Markdown);
@@ -97,6 +99,7 @@ onMounted(() => {
             } else {
                 content = editor.value.storage.markdown.getMarkdown() ?? '';
             }
+            console.debug('content type', props.contentType, '\ncontent: \n', content);
             emit('update:value', content);
             emit('update:attachments', getAttachments<any>(editor.value, imgFileDataMap));
         },
@@ -129,6 +132,9 @@ watch([() => props.value, () => props.attachments], ([value, attachments], prev)
     >
         <menu-bar :editor="editor"
                   :use-color="props.contentType === 'html'"
+                  :use-text-align="props.contentType === 'html'"
+                  :use-image="!!props.imageUploader"
+                  :show-undo-redo-buttons="props.showUndoRedoButtons"
         />
         <editor-content class="editor-content"
                         :editor="editor"
