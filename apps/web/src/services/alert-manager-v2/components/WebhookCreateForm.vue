@@ -59,6 +59,7 @@ const getVersions = async () => {
             plugin_id: storeState.selectedWebhookType?.plugin_id || '',
         });
         state.pluginVersions = results ? results[0] : undefined;
+        serviceFormStore.setWebhookVersion(state.pluginVersions);
     } catch (e) {
         state.pluginVersions = undefined;
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_GET_VERSION_TITLE'));
@@ -73,7 +74,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <p-data-loader class="service-create-step2-webhook-form"
+    <p-data-loader class="webhook-create-form"
                    :data="true"
                    :loading="state.loading"
                    loader-backdrop-color="0"
@@ -88,10 +89,10 @@ onMounted(async () => {
             />
             <div class="info">
                 <p class="text-label-xl">
-                    {{ storeState.selectedWebhookType.name }}
+                    {{ storeState.selectedWebhookType?.name }}
                 </p>
                 <p class="text-label-sm text-gray-600">
-                    {{ storeState.selectedWebhookType.tags?.long_description || storeState.selectedWebhookType.tags?.description }}
+                    {{ storeState.selectedWebhookType?.tags?.long_description || storeState.selectedWebhookType?.tags?.description }}
                 </p>
             </div>
         </div>
@@ -124,7 +125,7 @@ onMounted(async () => {
 </template>
 
 <style lang="postcss" scoped>
-.service-create-step2-webhook-form {
+.webhook-create-form {
     .webhook-item {
         @apply flex items-center w-full;
         margin-bottom: 1.5rem;

@@ -35,7 +35,7 @@ const userStore = useUserStore();
 
 const storeState = reactive({
     language: computed(() => userStore.state.language),
-    selectedWebhookType: computed<PluginModel>(() => serviceFormState.selectedWebhookType),
+    selectedWebhookType: computed<PluginModel|undefined>(() => serviceFormState.selectedWebhookType),
 });
 
 const state = reactive({
@@ -62,9 +62,9 @@ const handleCopyWebhookUrl = () => {
 </script>
 
 <template>
-    <div class="service-create-step2-created-webhook">
+    <div class="webhook-create-success-mode">
         <div class="webhook-item">
-            <p-lazy-img :src="assetUrlConverter(storeState.selectedWebhookType.tags?.icon || '')"
+            <p-lazy-img :src="assetUrlConverter(storeState.selectedWebhookType?.tags?.icon || '')"
                         width="4rem"
                         height="4rem"
                         error-icon="ic_webhook"
@@ -75,7 +75,7 @@ const handleCopyWebhookUrl = () => {
                         <p-link new-tab
                                 highlight
                                 action-icon="external-link"
-                                :href="props.succeedWebhook?.plugin_info"
+                                :href="state.guideDocsLink"
                         >
                             {{ $t('ALERT_MANAGER.WEBHOOK.GUIDE') }}
                         </p-link>
@@ -83,21 +83,20 @@ const handleCopyWebhookUrl = () => {
                 </i18n>
             </span>
         </div>
-        <div class="table">
-            <p-definition-table :fields="state.fields"
-                                :data="state.data"
-                                :skeleton-rows="3"
-                                disable-copy
-                                style-type="white"
-            >
-                <template #data-state="{ value }">
-                    <p-status
-                        class="capitalize"
-                        v-bind="userStateFormatter(value)"
-                    />
-                </template>
-            </p-definition-table>
-        </div>
+        <p-definition-table :fields="state.fields"
+                            :data="state.data"
+                            :skeleton-rows="3"
+                            disable-copy
+                            class="webhook-table"
+                            style-type="white"
+        >
+            <template #data-state="{ value }">
+                <p-status
+                    class="capitalize"
+                    v-bind="userStateFormatter(value)"
+                />
+            </template>
+        </p-definition-table>
         <div class="webhook-url">
             <div class="left">
                 <p class="title">
@@ -125,7 +124,7 @@ const handleCopyWebhookUrl = () => {
 </template>
 
 <style lang="postcss" scoped>
-.service-create-step2-created-webhook {
+.webhook-create-success-mode {
     @apply flex flex-col;
     gap: 1rem;
     .webhook-item {
@@ -133,10 +132,16 @@ const handleCopyWebhookUrl = () => {
         gap: 1.5rem;
         padding-bottom: 0.5rem;
     }
-    .table {
+    .webhook-table {
         @apply border border-gray-200 rounded-lg;
+        overflow: hidden;
+        min-height: unset;
     }
-
+    :deep(.webhook-table) {
+        tr:last-child {
+            border-bottom-width: 0;
+        }
+    }
     .webhook-url {
         @apply border border-gray-200 rounded-lg bg-violet-100 flex justify-between gap-2 text-gray-900 text-label-md;
         text-align: left;
@@ -155,7 +160,8 @@ const handleCopyWebhookUrl = () => {
         }
     }
     .markdown {
-        @apply border border-gray-200;
+        @apply bg-white border border-gray-200 overflow-auto;
+        max-height: 28.75rem;
         padding: 1rem;
         border-radius: 0.375rem;
     }
