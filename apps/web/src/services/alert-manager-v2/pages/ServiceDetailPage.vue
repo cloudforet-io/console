@@ -14,9 +14,9 @@ const props = withDefaults(defineProps<Props>(), {
 
 const serviceDetailPageStore = useServiceDetailPageStore();
 
-onMounted(() => {
-    serviceDetailPageStore.fetchServiceDetailData(props.serviceId);
-    serviceDetailPageStore.fetchNotificationProtocolList();
+onMounted(async () => {
+    await serviceDetailPageStore.fetchNotificationProtocolList();
+    await serviceDetailPageStore.fetchServiceDetailData(props.serviceId);
 });
 
 onUnmounted(() => {
