@@ -10,13 +10,14 @@ import * as useMarkdownStories from './use-markdown.stories';
 # useMarkdown
 
 
-The `useMarkdown` hook parses markdown text and sanitizes it for safe HTML rendering.
+The `useMarkdown` hook parses Markdown text, sanitizes it for safe HTML rendering, and provides options for code block highlighting, link target behavior, and inline code styling.
 
 ## Type Declarations
 
 ```typescript
 interface UseMarkdownOptions {
     value: Ref<string>|string; // Markdown content to display. string or Ref<string>
+    inlineCodeClass?: string; // Class name for inline code
 }
 interface UseMarkdownReturn {
     sanitizedHtml: Ref<string>; // Sanitized HTML content
@@ -28,6 +29,12 @@ interface UseMarkdownReturn {
 
 ### Basic
 <Canvas of={useMarkdownStories.Basic}/>
+
+### With Inline Code Class
+<Canvas of={useMarkdownStories.WithInlineCodeClass} />
+
+### With Code Block Highlighting
+<Canvas of={useMarkdownStories.WithCodeHighlightingDisabled}/>
 
 ### Playground
 <Canvas of={useMarkdownStories.Playground}/>
