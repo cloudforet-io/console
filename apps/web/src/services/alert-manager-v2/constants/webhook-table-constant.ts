@@ -36,3 +36,12 @@ export const ALERT_EXCEL_FIELDS: ExcelDataField[] = [
     { name: 'Total Requests', key: 'requests.total' },
     { name: 'Failed Requests', key: 'requests.error' },
 ];
+
+export const WEBHOOK_DEFINITION_FIELDS: DataTableFieldType[] = [
+    { name: 'name', label: 'Name' },
+    { name: 'plugin_info.plugin_id', label: 'Plugin' },
+    { name: 'state', label: 'State' },
+    { name: 'plugin_info.version', label: 'Version' },
+    { name: 'webhook_id', label: 'Webhook ID' },
+    { name: 'webhook_url', label: 'Webhook URL' },
+];

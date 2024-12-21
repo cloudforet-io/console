@@ -3,7 +3,7 @@ import { onMounted, reactive } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PSelectCard, PLazyImg,
+    PSelectCard, PLazyImg, PDataLoader,
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -21,6 +21,7 @@ import { useServiceCreateFormStore } from '@/services/alert-manager-v2/stores/se
 const serviceFormStore = useServiceCreateFormStore();
 
 const state = reactive({
+    loading: true,
     webhookTypeList: [] as PluginModel[],
     selectedWebhookType: {} as PluginModel,
 });
@@ -36,16 +37,20 @@ const getRepositoryID = async (): Promise<string> => {
     return res.results ? res.results[0].repository_id : '';
 };
 const getListWebhookType = async () => {
+    state.loading = true;
     try {
         const repositoryId = await getRepositoryID();
         const { results } = await SpaceConnector.clientV2.repository.plugin.list<PluginListParameters, ListResponse<PluginModel>>({
             repository_id: repositoryId,
+            // TODO: Change to 'alert-manager.Webhook' after the plugin is created
             resource_type: 'monitoring.Webhook',
         });
         state.webhookTypeList = results ?? [];
     } catch (e) {
         ErrorHandler.handleError(e);
         state.webhookTypeList = [];
+    } finally {
+        state.loading = false;
     }
 };
 
@@ -55,40 +60,48 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="service-create-step2-select-webhook-type">
-        <p-select-card v-for="(item, index) in state.webhookTypeList"
-                       :key="`webhook-${index}`"
-                       v-model="state.selectedWebhookType"
-                       :value="item"
-                       :show-select-marker="false"
-                       class="card"
-                       @change="handleSelectWebhook"
-        >
-            <div class="card-item">
-                <p-lazy-img :src="assetUrlConverter(item.tags?.icon)"
-                            width="2.5rem"
-                            height="2.5rem"
-                            error-icon="ic_webhook"
-                            class="image"
-                />
-                <p>{{ item.name }}</p>
-            </div>
-        </p-select-card>
-    </div>
+    <p-data-loader class="webhook-create-type-selector"
+                   :loading="state.loading"
+                   :data="state.webhookTypeList"
+                   loader-backdrop-color="transparent"
+    >
+        <div class="contents">
+            <p-select-card v-for="(item, index) in state.webhookTypeList"
+                           :key="`webhook-${index}`"
+                           v-model="state.selectedWebhookType"
+                           :value="item"
+                           :show-select-marker="false"
+                           class="card"
+                           @change="handleSelectWebhook"
+            >
+                <div class="card-item">
+                    <p-lazy-img :src="assetUrlConverter(item.tags?.icon)"
+                                width="2.5rem"
+                                height="2.5rem"
+                                error-icon="ic_webhook"
+                                class="image"
+                    />
+                    <p>{{ item.name }}</p>
+                </div>
+            </p-select-card>
+        </div>
+    </p-data-loader>
 </template>
 
 <style scoped lang="postcss">
-.service-create-step2-select-webhook-type {
-    @apply grid grid-cols-3;
-    gap: 0.5rem;
-    .card {
-        width: 19.5rem;
-        padding: 1rem;
-        .card-item {
-            @apply flex items-center w-full;
-            gap: 0.75rem;
-            .image {
-                margin-bottom: 0;
+.webhook-create-type-selector {
+    .contents {
+        @apply grid grid-cols-3;
+        gap: 0.5rem;
+        .card {
+            width: 19.5rem;
+            padding: 1rem;
+            .card-item {
+                @apply flex items-center w-full;
+                gap: 0.75rem;
+                .image {
+                    margin-bottom: 0;
+                }
             }
         }
     }

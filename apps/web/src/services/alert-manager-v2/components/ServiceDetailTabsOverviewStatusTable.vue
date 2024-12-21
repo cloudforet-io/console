@@ -43,23 +43,23 @@ const state = reactive({
     alertStatusInfo: computed<AlertStatusInfoType[]>(() => [
         {
             status: i18n.t('ALERT_MANAGER.ALERTS.TRIGGERED'),
-            total: (storeState.serviceInfo.alerts.TRIGGERED?.high || 0) + (storeState.serviceInfo.alerts.TRIGGERED?.low || 0),
-            high: storeState.serviceInfo.alerts.TRIGGERED?.high || 0,
-            low: storeState.serviceInfo.alerts.TRIGGERED?.low || 0,
+            total: storeState.serviceInfo.alerts.TRIGGERED.high + storeState.serviceInfo.alerts.TRIGGERED.low,
+            high: storeState.serviceInfo.alerts.TRIGGERED.high,
+            low: storeState.serviceInfo.alerts.TRIGGERED?.low,
             name: SERVICE_ALERTS_TYPE.TRIGGERED,
         },
         {
             status: i18n.t('ALERT_MANAGER.ALERTS.ACKNOWLEDGED'),
-            total: (storeState.serviceInfo.alerts.ACKNOWLEDGED?.high || 0) + (storeState.serviceInfo.alerts.ACKNOWLEDGED?.low || 0),
-            high: storeState.serviceInfo.alerts.ACKNOWLEDGED?.high || 0,
-            low: storeState.serviceInfo.alerts.ACKNOWLEDGED?.low || 0,
+            total: storeState.serviceInfo.alerts.ACKNOWLEDGED.high + storeState.serviceInfo.alerts.ACKNOWLEDGED.low,
+            high: storeState.serviceInfo.alerts.ACKNOWLEDGED.high,
+            low: storeState.serviceInfo.alerts.ACKNOWLEDGED.low,
             name: SERVICE_ALERTS_TYPE.ACKNOWLEDGED,
         },
         {
             status: i18n.t('ALERT_MANAGER.ALERTS.RESOLVED'),
-            total: (storeState.serviceInfo.alerts.RESOLVED?.high || 0) + (storeState.serviceInfo.alerts.RESOLVED?.low || 0),
-            high: storeState.serviceInfo.alerts.RESOLVED?.high || 0,
-            low: storeState.serviceInfo.alerts.RESOLVED?.low || 0,
+            total: storeState.serviceInfo.alerts.RESOLVED.high + storeState.serviceInfo.alerts.RESOLVED.low,
+            high: storeState.serviceInfo.alerts.RESOLVED.high,
+            low: storeState.serviceInfo.alerts.RESOLVED.low,
             name: SERVICE_ALERTS_TYPE.RESOLVED,
         },
     ]),
@@ -92,9 +92,11 @@ const tableState = reactive({
 
 const handleClickStatus = (name: AlertStateType) => {
     state.selectedStatus = name;
+    fetchAlertsList();
 };
 const handleSelectUrgency = (value: AlertUrgencyType) => {
     state.selectedUrgency = value;
+    fetchAlertsList();
 };
 
 const fetchAlertsList = async () => {
@@ -103,6 +105,7 @@ const fetchAlertsList = async () => {
         const { results } = await SpaceConnector.clientV2.alertManager.alert.list<AlertListParameters, ListResponse<AlertModel>>({
             service_id: storeState.serviceInfo.service_id,
             state: state.selectedStatus,
+            urgency: state.selectedUrgency === 'ALL' ? undefined : state.selectedUrgency as AlertUrgencyType,
         });
         tableState.alertsList = results || [];
     } catch (e) {
@@ -113,7 +116,8 @@ const fetchAlertsList = async () => {
     }
 };
 
-watch(() => state.selectedStatus, () => {
+watch(() => storeState.serviceInfo.service_id, (service_id) => {
+    if (!service_id) return;
     fetchAlertsList();
 }, { immediate: true });
 </script>

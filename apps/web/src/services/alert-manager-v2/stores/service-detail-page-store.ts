@@ -12,12 +12,13 @@ import type { ServiceDeleteParameters } from '@/schema/alert-manager/service/api
 import type { ServiceGetParameters } from '@/schema/alert-manager/service/api-verbs/get';
 import type { ServiceListParameters } from '@/schema/alert-manager/service/api-verbs/list';
 import type { ServiceUpdateParameters } from '@/schema/alert-manager/service/api-verbs/update';
-import { NOTIFICATION_URGENCY, RECOVERY_MODE } from '@/schema/alert-manager/service/constants';
+import { NOTIFICATION_URGENCY, RECOVERY_MODE, SERVICE_ALERTS_TYPE } from '@/schema/alert-manager/service/constants';
 import type { ServiceModel } from '@/schema/alert-manager/service/model';
+import type { AlertsInfoType, AlertsType } from '@/schema/alert-manager/service/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
+import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/common-constant';
 import type { ServiceDetailTabsType, Service } from '@/services/alert-manager-v2/types/alert-manager-type';
 
 interface ServiceFormStoreState {
@@ -26,6 +27,8 @@ interface ServiceFormStoreState {
     serviceInfo: ServiceModel;
     serviceList: ServiceModel[];
     notificationProtocolList: NotificationProtocolModel[];
+    selectedWebhookId?: string;
+    selectedNotificationId?: string;
 }
 interface ServiceFormStoreGetters {
     serviceInfo: ComputedRef<Service>;
@@ -38,37 +41,58 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
         serviceInfo: {} as ServiceModel,
         serviceList: [],
         notificationProtocolList: [],
+        selectedWebhookId: undefined,
+        selectedNotificationId: undefined,
     });
 
     const getters = reactive<ServiceFormStoreGetters>({
-        serviceInfo: computed<Service>(() => ({
-            ...state.serviceInfo,
-            members: {
-                USER_GROUP: state.serviceInfo.members?.USER_GROUP || [],
-                USER: state.serviceInfo.members?.USER || [],
-            },
-            options: {
-                notification_urgency: state.serviceInfo.options?.notification_urgency || NOTIFICATION_URGENCY.ALL,
-                recovery_mode: state.serviceInfo.options?.recovery_mode || RECOVERY_MODE.MANUAL,
-            },
-            alerts: {
-                TRIGGERED: state.serviceInfo.alerts?.TRIGGERED || { high: 0, low: 0 },
-                ACKNOWLEDGED: state.serviceInfo.alerts?.ACKNOWLEDGED || { high: 0, low: 0 },
-                RESOLVED: state.serviceInfo.alerts?.RESOLVED || { high: 0, low: 0 },
-                TOTAL: state.serviceInfo.alerts?.TOTAL || { high: 0, low: 0 },
-            },
-        })),
+        serviceInfo: computed<Service>(() => {
+            const defaultAlerts = { high: 0, low: 0 };
+            const getAlerts = (alertKey: AlertsType): AlertsInfoType => {
+                const alertValue = state.serviceInfo.alerts?.[alertKey] || defaultAlerts;
+                return Object.keys(alertValue || {}).length ? alertValue : defaultAlerts;
+            };
+            return {
+                ...state.serviceInfo,
+                members: {
+                    USER_GROUP: state.serviceInfo.members?.USER_GROUP || [],
+                    USER: state.serviceInfo.members?.USER || [],
+                },
+                options: {
+                    notification_urgency: state.serviceInfo.options?.notification_urgency || NOTIFICATION_URGENCY.ALL,
+                    recovery_mode: state.serviceInfo.options?.recovery_mode || RECOVERY_MODE.MANUAL,
+                },
+                alerts: {
+                    TRIGGERED: getAlerts(SERVICE_ALERTS_TYPE.TRIGGERED),
+                    ACKNOWLEDGED: getAlerts(SERVICE_ALERTS_TYPE.ACKNOWLEDGED),
+                    RESOLVED: getAlerts(SERVICE_ALERTS_TYPE.RESOLVED),
+                    TOTAL: getAlerts(SERVICE_ALERTS_TYPE.TOTAL),
+                },
+            };
+        }),
     });
 
     const mutations = {
         setCurrentTab(currentTab: ServiceDetailTabsType) {
             state.currentTab = currentTab;
         },
+        setSelectedWebhookId(id?: string) {
+            state.selectedWebhookId = id;
+        },
+        setSelectedNotificationId(id?: string) {
+            state.selectedNotificationId = id;
+        },
     };
 
     const actions = {
         initState() {
+            state.loading = false;
             state.currentTab = SERVICE_DETAIL_TABS.OVERVIEW;
+            state.serviceInfo = {} as ServiceModel;
+            state.serviceList = [];
+            state.notificationProtocolList = [];
+            state.selectedWebhookId = undefined;
+            state.selectedNotificationId = undefined;
         },
         async fetchServiceDetailData(id: string) {
             state.loading = true;

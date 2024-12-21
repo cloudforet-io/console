@@ -31,7 +31,7 @@ const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
 });
 const state = reactive({
-    loading: false,
+    loading: true,
     protocolList: [] as NotificationProtocolModel[],
     protocolCardList: computed<ProtocolCardItemType>(() => state.protocolList.map((item) => ({
         ...item,
@@ -66,6 +66,7 @@ onMounted(() => {
     <p-data-loader class="service-create-step3-select-protocol"
                    :loading="state.loading"
                    :data="state.protocolList"
+                   loader-backdrop-color="transparent"
     >
         <div class="contents">
             <p-select-card v-for="(item, index) in state.protocolCardList"

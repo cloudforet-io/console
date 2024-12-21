@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    reactive, computed, onMounted,
+    reactive, computed, watch, onUnmounted,
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
@@ -32,10 +32,10 @@ import { downloadExcel } from '@/lib/helper/file-download-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
-import { useProxyValue } from '@/common/composables/proxy-state';
 import { useQueryTags } from '@/common/composables/query-tags';
 
-import { webhookStateFormatter } from '@/services/alert-manager-v2/composables/refined-table-data';
+import { alertManagerStateFormatter } from '@/services/alert-manager-v2/composables/refined-table-data';
+import { SERVICE_TAB_HEIGHT } from '@/services/alert-manager-v2/constants/common-constant';
 import {
     ALERT_EXCEL_FIELDS,
     WEBHOOK_MANAGEMENT_TABLE_FIELDS,
@@ -45,15 +45,12 @@ import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route
 import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
 
 interface Props {
-    selectedId?: string
+    tableHeight: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    selectedId: undefined,
+    tableHeight: 522,
 });
-
-const emit = defineEmits<{(e: 'update:selected-id', value: string): void;
-}>();
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
@@ -98,20 +95,24 @@ const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
     timezone: computed<string>(() => userState.timezone || ''),
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
+    selectedWebhookId: computed<string|undefined>(() => serviceDetailPageState.selectedWebhookId),
 });
 const state = reactive({
-    loading: false,
+    loading: true,
     items: [] as WebhookModel[],
     totalCount: 0,
-    selectIndex: [],
-    selectedItem: computed<WebhookModel>(() => state.items[state.selectIndex[0]]),
-    proxySelectedId: useProxyValue<string>('selectedId', props, emit),
+    selectIndex: undefined as number|undefined,
+    selectedItem: computed<WebhookModel>(() => state.items[state.selectIndex]),
 });
 
-const webhookListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true);
+const webhookListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
+    .setPage(1, 15);
 const queryTagHelper = useQueryTags({ keyItemSets: WEBHOOK_MANAGEMENT_TABLE_HANDLER.keyItemSets });
 const { queryTags } = queryTagHelper;
 
+const initSelectedWebhook = () => {
+    state.selectIndex = state.items.findIndex((item) => item.webhook_id === storeState.selectedWebhookId);
+};
 const handleClickCreateButton = () => {
     router.push(getProperRouteLocation({
         name: ALERT_MANAGER_ROUTE_V2.SERVICE.DETAIL.WEBHOOK.CREATE._NAME,
@@ -137,8 +138,10 @@ const handleExportExcel = async () => {
         timezone: storeState.timezone,
     });
 };
-const handleSelectTableRow = () => {
-    state.proxySelectedId = state.selectedItem.webhook_id;
+const handleSelectTableRow = (item:number[]) => {
+    if (item.length === 0) return;
+    state.selectIndex = item[0];
+    serviceDetailPageStore.setSelectedWebhookId(state.items[item[0]].webhook_id);
 };
 
 const fetchWebhookList = async () => {
@@ -162,8 +165,17 @@ const fetchWebhookList = async () => {
     }
 };
 
-onMounted(() => {
+watch(() => storeState.serviceId, (id) => {
+    if (!id) return;
     fetchWebhookList();
+}, { immediate: true });
+watch([() => storeState.selectedWebhookId, () => state.items], ([selectedWebhookId]) => {
+    if (!selectedWebhookId) return;
+    initSelectedWebhook();
+}, { immediate: true });
+
+onUnmounted(() => {
+    serviceDetailPageStore.setSelectedWebhookId(undefined);
 });
 </script>
 
@@ -178,10 +190,11 @@ onMounted(() => {
                      :total-count="state.totalCount"
                      :items="state.items"
                      :fields="tableState.fields"
-                     :select-index.sync="state.selectIndex"
+                     :select-index="[state.selectIndex]"
                      :query-tags="queryTags"
                      :key-item-sets="WEBHOOK_MANAGEMENT_TABLE_HANDLER.keyItemSets"
                      :value-handler-map="WEBHOOK_MANAGEMENT_TABLE_HANDLER.valueHandlerMap"
+                     :style="{height: `${props.tableHeight - SERVICE_TAB_HEIGHT}px`}"
                      @change="handleChangeToolbox"
                      @refresh="handleChangeToolbox()"
                      @export="handleExportExcel"
@@ -227,7 +240,7 @@ onMounted(() => {
         <template #col-state-format="{ value }">
             <p-status
                 class="capitalize"
-                v-bind="webhookStateFormatter(value)"
+                v-bind="alertManagerStateFormatter(value)"
             />
         </template>
         <template #col-requests.total-format="{ value }">

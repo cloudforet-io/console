@@ -12,6 +12,7 @@ interface ServiceFormStoreState {
     createdServiceId: string;
     selectedWebhookType?: PluginModel;
     webhookName: string;
+    webhookVersion?: string;
     createdWebhookInfo?: WebhookModel;
     selectedProtocol?: NotificationProtocolModel;
 }
@@ -25,6 +26,7 @@ export const useServiceCreateFormStore = defineStore('service-create-form', () =
         // webhook
         selectedWebhookType: undefined,
         webhookName: '',
+        webhookVersion: undefined,
         createdWebhookInfo: undefined,
         // notification
         selectedProtocol: undefined,
@@ -37,6 +39,7 @@ export const useServiceCreateFormStore = defineStore('service-create-form', () =
             state.createdServiceId = '';
             state.selectedWebhookType = undefined;
             state.webhookName = '';
+            state.webhookVersion = undefined;
             state.createdWebhookInfo = undefined;
             state.selectedProtocol = undefined;
         },
@@ -62,6 +65,9 @@ export const useServiceCreateFormStore = defineStore('service-create-form', () =
         },
         setWebhookName(name: string) {
             state.webhookName = name;
+        },
+        setWebhookVersion(version?: string) {
+            state.webhookVersion = version;
         },
         setCreatedWebhookInfo(webhook: WebhookModel) {
             state.createdWebhookInfo = webhook;

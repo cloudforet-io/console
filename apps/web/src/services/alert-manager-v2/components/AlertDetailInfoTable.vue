@@ -14,7 +14,7 @@ import { i18n } from '@/translations';
 import { useUserStore } from '@/store/user/user-store';
 
 import AlertDetailInfoTableDescription from '@/services/alert-manager-v2/components/AlertDetailInfoTableDescription.vue';
-import { ALERT_SEVERITY_COLORS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
+import { ALERT_SEVERITY_COLORS } from '@/services/alert-manager-v2/constants/common-constant';
 
 const userStore = useUserStore();
 

@@ -3,7 +3,7 @@ import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PHeading, PHeadingLayout, PSelectDropdown, PLink, PI,
+    PHeading, PHeadingLayout, PSelectDropdown, PLink, PI, PTooltip,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
 
@@ -111,8 +111,14 @@ const handleGoBackButton = () => {
                  :color="gray[500]"
                  class="dot"
             />
-            <p class="truncate flex-1">
-                {{ storeState.serviceInfo?.description }}
+            <p class="flex-1 truncate">
+                <p-tooltip position="bottom"
+                           tag="p"
+                           class="flex-1 truncate"
+                           :contents="storeState.serviceInfo?.description || ''"
+                >
+                    {{ storeState.serviceInfo?.description }}
+                </p-tooltip>
             </p>
         </div>
         <service-detail-edit-modal v-if="modalState.type === 'edit'"

@@ -9,7 +9,7 @@ import type { AlertManagementTableHandlerType } from '@/services/alert-manager-v
 
 export const NOTIFICATION_MANAGEMENT_TABLE_FIELDS: DataTableFieldType[] = [
     { name: 'name', label: 'Name' },
-    { name: 'channel', label: 'Channel' },
+    { name: 'protocol_id', label: 'Channel' },
     { name: 'state', label: 'State' },
 ];
 export const NOTIFICATION_MANAGEMENT_TABLE_HANDLER: AlertManagementTableHandlerType = {
@@ -31,4 +31,12 @@ export const ALERT_EXCEL_FIELDS: ExcelDataField[] = [
     { name: 'Plugin', key: 'plugin_info.plugin_id' },
     { name: 'Total Requests', key: 'requests.total' },
     { name: 'Failed Requests', key: 'requests.error' },
+];
+
+export const NOTIFICATION_DEFINITION_FIELDS: DataTableFieldType[] = [
+    { label: 'Name', name: 'name' },
+    { label: 'Channel', name: 'protocol_id' },
+    { label: 'State', name: 'state' },
+    { label: 'Member', name: 'data' },
+    { label: 'Schedule', name: 'schedule', disableCopy: true },
 ];

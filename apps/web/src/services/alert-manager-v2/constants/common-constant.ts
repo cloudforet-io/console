@@ -27,7 +27,7 @@ export const WEBHOOK_DETAIL_TABS = {
     DETAIL: 'detail',
     HELP: 'help',
 } as const;
-export const WEBHOOK_STATE_COLOR = {
+export const ALERT_MANAGER_STATE_COLOR = {
     ENABLED: {
         iconColor: styles.safe,
         textColor: styles.gray[900],
@@ -41,3 +41,5 @@ export const WEBHOOK_STATE_COLOR = {
 export const NOTIFICATIONS_DETAIL_TABS = {
     DETAIL: 'detail',
 } as const;
+
+export const SERVICE_TAB_HEIGHT = 44;

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    reactive, computed, onMounted,
+    reactive, computed, watch, onUnmounted,
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
@@ -11,44 +11,57 @@ import {
     PHeading,
     PButton,
     PStatus,
-    PI,
+    PLazyImg,
     PSelectDropdown,
     PHeadingLayout,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
 import type { ServiceChannelListParameters } from '@/schema/alert-manager/service-channel/api-verbs/list';
 import { SERVICE_CHANNEL_STATE } from '@/schema/alert-manager/service-channel/constants';
 import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
+import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
 import { i18n as _i18n } from '@/translations';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
+import { useUserStore } from '@/store/user/user-store';
+
+import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
+import { assetUrlConverter } from '@/lib/helper/asset-helper';
+import { downloadExcel } from '@/lib/helper/file-download-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
-import { useProxyValue } from '@/common/composables/proxy-state';
 import { useQueryTags } from '@/common/composables/query-tags';
 
-import { webhookStateFormatter } from '@/services/alert-manager-v2/composables/refined-table-data';
+import { alertManagerStateFormatter } from '@/services/alert-manager-v2/composables/refined-table-data';
+import { SERVICE_TAB_HEIGHT } from '@/services/alert-manager-v2/constants/common-constant';
 import {
+    ALERT_EXCEL_FIELDS,
     NOTIFICATION_MANAGEMENT_TABLE_FIELDS,
     NOTIFICATION_MANAGEMENT_TABLE_HANDLER,
 } from '@/services/alert-manager-v2/constants/notification-table-constant';
 import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
+import type { ProtocolInfo } from '@/services/alert-manager-v2/types/alert-manager-type';
 
 interface Props {
-    selectedId?: string
+    tableHeight: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    selectedId: undefined,
+    tableHeight: 522,
 });
-
-const emit = defineEmits<{(e: 'update:selected-id', value: string): void;
-}>();
 
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
+const userStore = useUserStore();
+const userState = userStore.state;
+const allReferenceStore = useAllReferenceStore();
+const allReferenceGetters = allReferenceStore.getters;
 
 const router = useRouter();
 
@@ -83,21 +96,32 @@ const tableState = reactive({
     fields: NOTIFICATION_MANAGEMENT_TABLE_FIELDS,
 });
 const storeState = reactive({
+    plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
+    notificationProtocolList: computed<NotificationProtocolModel[]>(() => serviceDetailPageState.notificationProtocolList),
+    timezone: computed<string>(() => userState.timezone || ''),
 });
 const state = reactive({
     loading: false,
     items: [] as ServiceChannelModel[],
     totalCount: 0,
-    selectIndex: [],
-    selectedItem: computed<ServiceChannelModel>(() => state.items[state.selectIndex[0]]),
-    proxySelectedId: useProxyValue<string>('selectedId', props, emit),
+    selectIndex: undefined as number|undefined,
+    selectedItem: computed<WebhookModel>(() => state.items[state.selectIndex]),
 });
 
-const notificationsListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true);
+const notificationsListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
+    .setPage(1, 15);
 const queryTagHelper = useQueryTags({ keyItemSets: NOTIFICATION_MANAGEMENT_TABLE_HANDLER.keyItemSets });
 const { queryTags } = queryTagHelper;
 
+const getProtocolInfo = (id: string): ProtocolInfo => {
+    const protocol = storeState.notificationProtocolList.find((item) => item.protocol_id === id);
+    const plugin = storeState.plugins[protocol?.plugin_info.plugin_id || ''];
+    return {
+        name: protocol?.name || '',
+        icon: plugin?.icon || '',
+    };
+};
 const handleClickCreateButton = () => {
     router.push(getProperRouteLocation({
         name: ALERT_MANAGER_ROUTE_V2.SERVICE.DETAIL.NOTIFICATIONS.CREATE._NAME,
@@ -112,11 +136,21 @@ const handleChangeToolbox = async (options: any = {}) => {
     if (options.pageLimit !== undefined) notificationsListApiQueryHelper.setPageLimit(options.pageLimit);
     await fetchNotificationList();
 };
-const handleExportExcel = () => {
-    console.log('TODO: handleExportExcel');
+const handleExportExcel = async () => {
+    await downloadExcel({
+        url: '/alertManager/serviceChannel/list',
+        param: {
+            query: { ...notificationsListApiQueryHelper.data, only: ALERT_EXCEL_FIELDS.map((d) => d.key) },
+        },
+        fields: ALERT_EXCEL_FIELDS,
+        file_name_prefix: FILE_NAME_PREFIX.notifications,
+        timezone: storeState.timezone,
+    });
 };
-const handleSelectTableRow = () => {
-    state.proxySelectedId = state.selectedItem.channel_id;
+const handleSelectTableRow = (item:number[]) => {
+    if (item.length === 0) return;
+    state.selectIndex = item[0];
+    serviceDetailPageStore.setSelectedNotificationId(state.items[item[0]].channel_id);
 };
 
 const fetchNotificationList = async () => {
@@ -140,8 +174,13 @@ const fetchNotificationList = async () => {
     }
 };
 
-onMounted(() => {
+watch(() => storeState.serviceId, (id) => {
+    if (!id) return;
     fetchNotificationList();
+}, { immediate: true });
+
+onUnmounted(() => {
+    serviceDetailPageStore.setSelectedNotificationId(undefined);
 });
 </script>
 
@@ -156,10 +195,11 @@ onMounted(() => {
                      :total-count="state.totalCount"
                      :items="state.items"
                      :fields="tableState.fields"
-                     :select-index.sync="state.selectIndex"
+                     :select-index="[state.selectIndex]"
                      :query-tags="queryTags"
                      :key-item-sets="NOTIFICATION_MANAGEMENT_TABLE_HANDLER.keyItemSets"
                      :value-handler-map="NOTIFICATION_MANAGEMENT_TABLE_HANDLER.valueHandlerMap"
+                     :style="{height: `${props.tableHeight - SERVICE_TAB_HEIGHT}px`}"
                      @change="handleChangeToolbox"
                      @refresh="handleChangeToolbox()"
                      @export="handleExportExcel"
@@ -195,17 +235,17 @@ onMounted(() => {
         <template #col-state-format="{ value }">
             <p-status
                 class="capitalize"
-                v-bind="webhookStateFormatter(value)"
+                v-bind="alertManagerStateFormatter(value)"
             />
         </template>
-        <template #col-channel-format="{value}">
+        <template #col-protocol_id-format="{value}">
             <div class="col-channel">
-                <p-i name="ic_envelope-filled"
-                     width="1rem"
-                     height="1rem"
-                     color="gray-200"
+                <p-lazy-img :src="assetUrlConverter(getProtocolInfo(value).icon)"
+                            width="1rem"
+                            height="1rem"
+                            class="service-img"
                 />
-                <span>{{ value }}</span>
+                <span>{{ getProtocolInfo(value).name }}</span>
             </div>
         </template>
     </p-toolbox-table>

@@ -20,7 +20,7 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import WebhookCreateForm from '@/services/alert-manager-v2/components/WebhookCreateForm.vue';
 import WebhookCreateSuccessMode from '@/services/alert-manager-v2/components/WebhookCreateSuccessMode.vue';
 import WebhookCreateTypeSelector from '@/services/alert-manager-v2/components/WebhookCreateTypeSelector.vue';
-import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
+import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/common-constant';
 import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
 import { useServiceCreateFormStore } from '@/services/alert-manager-v2/stores/service-create-form-store';
 import type { createHeaderInfoByStep } from '@/services/alert-manager-v2/types/alert-manager-type';
@@ -43,8 +43,10 @@ const storeState = reactive({
     selectedWebhookType: computed<PluginModel|undefined>(() => serviceCreateFormState.selectedWebhookType),
     selectedWebhookTypeId: computed<string>(() => serviceCreateFormState.selectedWebhookType?.plugin_id || ''),
     webhookName: computed<string>(() => serviceCreateFormState.webhookName || ''),
+    webhookVersion: computed<string|undefined>(() => serviceCreateFormState.webhookVersion || ''),
 });
 const state = reactive({
+    loading: false,
     currentStep: 1,
     isAllFormValid: computed<boolean>(() => {
         if (state.currentStep === 1) return storeState.selectedWebhookTypeId !== '';
@@ -66,6 +68,7 @@ const state = reactive({
             title: i18n.t('ALERT_MANAGER.WEBHOOK.CREATE_SUCCESS_TITLE'),
         };
     }),
+    succeedWebhook: undefined as undefined|WebhookModel,
 });
 
 const handleClickCancelButton = () => {
@@ -97,18 +100,23 @@ const handleActionButton = () => {
 };
 
 const fetchCreateWebhook = async () => {
+    state.loading = true;
     try {
-        await SpaceConnector.clientV2.alertManager.webhook.create<WebhookCreateParameters, WebhookModel>({
+        state.succeedWebhook = await SpaceConnector.clientV2.alertManager.webhook.create<WebhookCreateParameters, WebhookModel>({
             name: storeState.webhookName,
             plugin_info: {
                 plugin_id: storeState.selectedWebhookType?.plugin_id || '',
+                version: storeState.webhookVersion,
             },
             service_id: props.serviceId,
         });
         showSuccessMessage(i18n.t('ALERT_MANAGER.WEBHOOK.ALT_S_CREATE_WEBHOOK'), '');
         state.currentStep = 3;
     } catch (e) {
+        state.succeedWebhook = undefined;
         ErrorHandler.handleError(e, true);
+    } finally {
+        state.loading = false;
     }
 };
 
@@ -131,7 +139,9 @@ onUnmounted(() => {
         />
         <webhook-create-type-selector v-if="state.currentStep === 1" />
         <webhook-create-form v-else-if="state.currentStep === 2" />
-        <webhook-create-success-mode v-else-if="state.currentStep === 3" />
+        <webhook-create-success-mode v-else-if="state.currentStep === 3"
+                                     :succeed-webhook="state.succeedWebhook"
+        />
         <div class="flex justify-end mt-8">
             <p-button v-if="state.currentStep === 1"
                       style-type="transparent"
@@ -148,10 +158,19 @@ onUnmounted(() => {
             >
                 {{ $t('ALERT_MANAGER.SERVICE.GO_BACK') }}
             </p-button>
-            <p-button :disabled="!state.isAllFormValid"
+            <p-button v-if="state.currentStep === 3"
+                      size="lg"
+                      class="ml-4"
+                      @click="handleClickCancelButton"
+            >
+                {{ $t('ALERT_MANAGER.DONE') }}
+            </p-button>
+            <p-button v-else
+                      :disabled="!state.isAllFormValid"
                       style-type="substitutive"
                       size="lg"
                       class="ml-4"
+                      :loading="state.loading"
                       @click="handleActionButton"
             >
                 {{ state.currentStep === 1 ? $t('ALERT_MANAGER.CONTINUE') : $t('ALERT_MANAGER.CREATE') }}

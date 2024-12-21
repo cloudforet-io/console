@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, onUnmounted, reactive, watch,
+    computed, onMounted, reactive, watch,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
@@ -21,7 +21,7 @@ import ServiceDetailTabsSettings from '@/services/alert-manager-v2/components/Se
 import ServiceDetailTabsWebhook from '@/services/alert-manager-v2/components/ServiceDetailTabsWebhook.vue';
 import ServiceDetailTabsWebhookDetailTabs
     from '@/services/alert-manager-v2/components/ServiceDetailTabsWebhookDetailTabs.vue';
-import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
+import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/common-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
 import type { ServiceDetailTabsType } from '@/services/alert-manager-v2/types/alert-manager-type';
 
@@ -35,17 +35,14 @@ const tabState = reactive({
         { label: i18n.t('ALERT_MANAGER.SERVICE.OVERVIEW'), name: SERVICE_DETAIL_TABS.OVERVIEW },
         { label: i18n.t('ALERT_MANAGER.WEBHOOK.TITLE'), name: SERVICE_DETAIL_TABS.WEBHOOK },
         { label: i18n.t('ALERT_MANAGER.NOTIFICATIONS.TITLE'), name: SERVICE_DETAIL_TABS.NOTIFICATIONS },
-        // { label: i18n.t('ALERT_MANAGER.EVENT_RULE.TITLE'), name: SERVICE_DETAIL_TABS.EVENT_RULE },
         { label: i18n.t('ALERT_MANAGER.SERVICE.SETTINGS'), name: SERVICE_DETAIL_TABS.SETTINGS },
     ])),
     activeTab: SERVICE_DETAIL_TABS.OVERVIEW as ServiceDetailTabsType,
 });
 const storeState = reactive({
     currentTab: computed<ServiceDetailTabsType>(() => serviceDetailPageState.currentTab),
-});
-const state = reactive({
-    selectedWebhook: undefined,
-    selectedNotifications: undefined,
+    selectedWebhookId: computed<string|undefined>(() => serviceDetailPageState.selectedWebhookId),
+    selectedNotificationId: computed<string|undefined>(() => serviceDetailPageState.selectedNotificationId),
 });
 
 watch(() => tabState.activeTab, (activeTab) => {
@@ -63,10 +60,6 @@ onMounted(() => {
         serviceDetailPageStore.setCurrentTab(SERVICE_DETAIL_TABS.OVERVIEW);
     }
 });
-
-onUnmounted(() => {
-    serviceDetailPageStore.initState();
-});
 </script>
 
 <template>
@@ -79,20 +72,16 @@ onUnmounted(() => {
                            :style="{ height: `${height}px` }"
                     >
                         <template #webhook>
-                            <service-detail-tabs-webhook :selected-item.sync="state.selectedWebhook" />
+                            <service-detail-tabs-webhook :table-height="height" />
                         </template>
                         <template #notifications>
-                            <service-detail-tabs-notifications :selected-item.sync="state.selectedNotifications" />
+                            <service-detail-tabs-notifications :table-height="height" />
                         </template>
                     </p-tab>
                 </template>
             </p-horizontal-layout>
-            <service-detail-tabs-webhook-detail-tabs v-if="state.selectedWebhook"
-                                                     :selected-id="state.selectedWebhook"
-            />
-            <service-detail-tabs-notifications-detail-tabs v-else-if="state.selectedNotifications"
-                                                           :selected-id="state.selectedNotifications"
-            />
+            <service-detail-tabs-webhook-detail-tabs v-if="tabState.activeTab === SERVICE_DETAIL_TABS.WEBHOOK && storeState.selectedWebhookId" />
+            <service-detail-tabs-notifications-detail-tabs v-else-if="tabState.activeTab === SERVICE_DETAIL_TABS.NOTIFICATIONS && storeState.selectedNotificationId" />
         </div>
         <p-tab v-else
                :tabs="tabState.tabs"

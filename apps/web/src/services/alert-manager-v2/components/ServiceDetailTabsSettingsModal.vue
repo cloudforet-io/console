@@ -18,7 +18,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { red } from '@/styles/colors';
 
-import { SERVICE_SETTING_CARD } from '@/services/alert-manager-v2/constants/alert-manager-constant';
+import { SERVICE_SETTING_CARD } from '@/services/alert-manager-v2/constants/common-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
 import type { ServiceDetailSettingCardType, Service } from '@/services/alert-manager-v2/types/alert-manager-type';
 
