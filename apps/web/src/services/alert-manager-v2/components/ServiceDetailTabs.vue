@@ -21,7 +21,7 @@ import ServiceDetailTabsSettings from '@/services/alert-manager-v2/components/Se
 import ServiceDetailTabsWebhook from '@/services/alert-manager-v2/components/ServiceDetailTabsWebhook.vue';
 import ServiceDetailTabsWebhookDetailTabs
     from '@/services/alert-manager-v2/components/ServiceDetailTabsWebhookDetailTabs.vue';
-import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
+import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/common-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
 import type { ServiceDetailTabsType } from '@/services/alert-manager-v2/types/alert-manager-type';
 

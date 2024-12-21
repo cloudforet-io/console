@@ -22,7 +22,7 @@ import { useQueryTags } from '@/common/composables/query-tags';
 
 import { red } from '@/styles/colors';
 
-import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
+import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/common-constant';
 import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
 import type { AlertManagementTableHandlerType } from '@/services/alert-manager-v2/types/alert-manager-type';
 

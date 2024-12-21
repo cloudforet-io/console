@@ -18,7 +18,7 @@ import type { AlertsInfoType, AlertsType } from '@/schema/alert-manager/service/
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
+import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/common-constant';
 import type { ServiceDetailTabsType, Service } from '@/services/alert-manager-v2/types/alert-manager-type';
 
 interface ServiceFormStoreState {

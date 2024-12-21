@@ -14,7 +14,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { webhookStateFormatter } from '@/services/alert-manager-v2/composables/refined-table-data';
-import { WEBHOOK_DETAIL_TABS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
+import { WEBHOOK_DETAIL_TABS } from '@/services/alert-manager-v2/constants/common-constant';
 import type { WebhookDetailTabsType } from '@/services/alert-manager-v2/types/alert-manager-type';
 
 interface Props {

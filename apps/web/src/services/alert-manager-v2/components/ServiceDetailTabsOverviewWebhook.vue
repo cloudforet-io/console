@@ -18,7 +18,7 @@ import type { PluginReferenceMap } from '@/store/reference/plugin-reference-stor
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/alert-manager-constant';
+import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/common-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
 
 const ITEM_DEFAULT_WIDTH = 184 + 8;

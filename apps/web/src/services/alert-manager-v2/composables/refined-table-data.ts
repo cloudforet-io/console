@@ -1,4 +1,4 @@
-import { WEBHOOK_STATE_COLOR } from '@/services/alert-manager-v2/constants/alert-manager-constant';
+import { WEBHOOK_STATE_COLOR } from '@/services/alert-manager-v2/constants/common-constant';
 
 const colorBindFactory = (colorMapping, textFnc) => (value) => ({
     text: textFnc(value),

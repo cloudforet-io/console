@@ -12,7 +12,7 @@ import { i18n } from '@/translations';
 import { webhookStateFormatter } from '@/services/alert-manager-v2/composables/refined-table-data';
 import {
     NOTIFICATIONS_DETAIL_TABS,
-} from '@/services/alert-manager-v2/constants/alert-manager-constant';
+} from '@/services/alert-manager-v2/constants/common-constant';
 import type { WebhookDetailTabsType } from '@/services/alert-manager-v2/types/alert-manager-type';
 
 interface Props {

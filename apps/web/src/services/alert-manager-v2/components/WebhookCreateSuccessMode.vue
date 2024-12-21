@@ -9,7 +9,7 @@ import {
     PDefinitionTable, PButton, PStatus, PMarkdown, PLazyImg, PLink,
 } from '@cloudforet/mirinae';
 
-import type { WebhookModel } from '@/schema/monitoring/webhook/model';
+import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
 import type { PluginModel } from '@/schema/repository/plugin/model';
 import { i18n as _i18n } from '@/translations';
 

@@ -11,7 +11,7 @@ import type {
     SERVICE_DETAIL_TABS,
     WEBHOOK_DETAIL_TABS,
     SERVICE_SETTING_CARD,
-} from '@/services/alert-manager-v2/constants/alert-manager-constant';
+} from '@/services/alert-manager-v2/constants/common-constant';
 
 export type ServiceDetailTabsType = typeof SERVICE_DETAIL_TABS[keyof typeof SERVICE_DETAIL_TABS];
 export type ServiceDetailSettingCardType = typeof SERVICE_SETTING_CARD[keyof typeof SERVICE_SETTING_CARD];
