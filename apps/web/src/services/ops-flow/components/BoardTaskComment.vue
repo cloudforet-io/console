@@ -107,6 +107,7 @@ onBeforeMount(async () => {
         <div class="mb-3">
             <text-editor :placeholder="$t('OPSFLOW.TASK_BOARD.COMMENT')"
                          content-type="markdown"
+                         :show-undo-redo-buttons="false"
                          :value="contents"
                          :style="{minHeight: '5rem'}"
                          @update:value="contents = $event"
