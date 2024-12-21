@@ -20,7 +20,7 @@ emit('update:is-valid', true);
 <template>
     <div>
         <text-editor :value="props.options.example"
-                     placeholder="Enter the default description to be displayed."
+                     :placeholder="$t('OPSFLOW.FIELD_GENERATOR.ENTER_DEFAULT_DESCRIPTION')"
                      @update:value="emit('update:options', { ...props.options, example: $event })"
         />
     </div>

@@ -4210,8 +4210,10 @@
 			"ASSET": "",
 			"DATE": "",
 			"DROPDOWN": "",
+			"ENTER_DEFAULT_DESCRIPTION": "",
 			"FIELD": "",
 			"FIELD_DELETE_DESC": "",
+			"FIELD_ID_EDIT_DESC": "",
 			"FIELD_NAME": "",
 			"FIELD_REQUIRED": "",
 			"GLOBAL": "",
@@ -4229,6 +4231,7 @@
 			"USER": "",
 			"VALUE": ""
 		},
+		"FIELD_ID": "",
 		"FIELD_NAME": "",
 		"KEY": "",
 		"NAME": "",

@@ -4210,8 +4210,10 @@
 			"ASSET": "Asset",
 			"DATE": "Date",
 			"DROPDOWN": "Dropdown",
+			"ENTER_DEFAULT_DESCRIPTION": "Enter the default description to be displayed.",
 			"FIELD": "Field",
 			"FIELD_DELETE_DESC": "Deleting the {field} from {taskType} will also remove it from existing {task}.",
+			"FIELD_ID_EDIT_DESC": "If you change the field ID, existing {task} content will be lost and the change will only affect new {tasks}.",
 			"FIELD_NAME": "Field Name",
 			"FIELD_REQUIRED": "This Field is Required",
 			"GLOBAL": "Global",
@@ -4229,6 +4231,7 @@
 			"USER": "User",
 			"VALUE": "Value"
 		},
+		"FIELD_ID": "Field ID",
 		"FIELD_NAME": "{field} Name",
 		"KEY": "Key",
 		"NAME": "Name",

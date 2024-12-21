@@ -4210,8 +4210,10 @@
 			"ASSET": "자산",
 			"DATE": "날짜",
 			"DROPDOWN": "드롭다운",
+			"ENTER_DEFAULT_DESCRIPTION": "기본적으로 표시될 설명을 입력하세요.",
 			"FIELD": "필드",
 			"FIELD_DELETE_DESC": "{taskType}의 {field}를 삭제하면, 기존 {task}에도 해당 필드 삭제가 반영됩니다.",
+			"FIELD_ID_EDIT_DESC": "필드 아이디를 수정하면 기존 {task}에 작성한 내용이 보이지 않게되며, 새로 생성되는 {task}에만 반영됩니다.",
 			"FIELD_NAME": "필드 이름",
 			"FIELD_REQUIRED": "이 필드는 필수입니다",
 			"GLOBAL": "글로벌",
@@ -4229,6 +4231,7 @@
 			"USER": "사용자",
 			"VALUE": "값"
 		},
+		"FIELD_ID": "필드 아이디",
 		"FIELD_NAME": "{field} 이름",
 		"KEY": "키",
 		"NAME": "이름",
