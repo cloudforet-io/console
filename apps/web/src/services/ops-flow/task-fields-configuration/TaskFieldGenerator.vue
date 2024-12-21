@@ -6,7 +6,7 @@ import {
 import { isEqual } from 'lodash';
 
 import {
-    PFieldGroup, PTextInput, PToggleButton, PCheckbox,
+    PFieldGroup, PTextInput, PToggleButton, PCheckbox, PButton,
 } from '@cloudforet/mirinae';
 
 import type {
@@ -15,6 +15,8 @@ import type {
     TaskFieldType,
 } from '@/schema/opsflow/_types/task-field-type';
 
+import InfoTooltip from '@/common/components/guidance/InfoTooltip.vue';
+import ChangedMark from '@/common/components/marks/ChangedMark.vue';
 import { useFieldValidator } from '@/common/composables/form-validator';
 
 import {
@@ -51,33 +53,59 @@ const fieldMetadata = computed<TaskFieldTypeMetadata>(() => taskFieldMetadataSto
 const optionsComponent = computed<ReturnType<typeof defineAsyncComponent>|undefined>(() => COMPONENT_MAP[props.field.field_type]);
 
 const isDefaultField = computed(() => !!DEFAULT_FIELD_ID_MAP[props.field.field_id]);
+
+/* field id */
+const {
+    value: fieldId, setValue: setFieldId, isInvalid: isFieldIdInvalid, validationResult: isFieldIdValid,
+} = useFieldValidator<string|undefined>('', (val?: string) => (val ? val.trim().length > 0 : false));
+const isFieldIdChanged = computed(() => {
+    if (isDefaultField.value) return true;
+    return fieldId.value !== props.field.field_id;
+});
+const handleClickUndoFieldId = () => {
+    setFieldId(props.field.field_id);
+};
+
+/* field name */
 const {
     value: name, setValue: setName, resetValidation: resetNameValidation, isInvalid: isNameInvalid, validationResult: isNameValid,
 } = useFieldValidator<string|undefined>('', (val?: string) => (val ? val.trim().length > 0 : false));
+
+/* field options */
 const options = ref<TaskFieldOptions>({});
 const isOptionsValid = ref<boolean>(false);
+
+/* field required */
 const isRequired = ref<boolean>(false);
+const handleRequiredChange = (value: boolean) => {
+    isRequired.value = value;
+    if (value) isPrimary.value = true;
+};
+
+/* other field properties */
 const isPrimary = ref<boolean>(false);
 const isFolded = ref<boolean>(false);
-const isAllValid = computed<boolean>(() => isNameValid.value && (optionsComponent.value ? isOptionsValid.value : true));
 
+/* validation */
+const isAllValid = computed<boolean>(() => (isDefaultField.value ? isFieldIdValid.value : true)
+    && isNameValid.value
+    && (optionsComponent.value ? isOptionsValid.value : true));
+
+/* aggregated field */
 const field = computed<TaskField>(() => {
-    const result: TaskField = {
+    const result = {
         ...props.field,
-        name: name.value,
+        name: name.value ?? '',
         options: options.value,
         is_required: isRequired.value,
         is_primary: isPrimary.value,
-    };
+    } as TaskField;
     if (!result.selection_type && MULTI_SELECTION_FIELD_TYPES.includes(props.field.field_type)) {
         result.selection_type = 'MULTI';
     }
     return result;
 });
-const handleRequiredChange = (value: boolean) => {
-    isRequired.value = value;
-    if (value) isPrimary.value = true;
-};
+
 
 watch(field, (newField) => {
     if (isEqual(newField, props.field)) return;
@@ -88,6 +116,7 @@ watch(isAllValid, (isValid) => {
 }, { immediate: true });
 
 onBeforeMount(() => {
+    setFieldId(props.field.field_id);
     setName(props.field.name ?? fieldMetadata.value.name);
     resetNameValidation();
     options.value = props.field.options ?? {};
@@ -111,6 +140,36 @@ onBeforeMount(() => {
         />
         <div v-if="!isFolded">
             <div class="py-4 pl-8 pr-2 border-b border-gray-150">
+                <p-field-group v-if="!isDefaultField"
+                               :label="$t('OPSFLOW.FIELD_ID')"
+                               :invalid="isFieldIdInvalid"
+                               required
+                >
+                    <template #label-extra>
+                        <info-tooltip :contents="$t('OPSFLOW.FIELD_GENERATOR.FIELD_ID_EDIT_DESC', {
+                                          task: taskManagementTemplateStore.templates.task,
+                                          tasks: taskManagementTemplateStore.templates.tasks,
+                                      })"
+                                      size="sm"
+                        />
+                    </template>
+                    <div class="inline-flex gap-2 items-center">
+                        <span>
+                            <p-text-input :value="fieldId"
+                                          :invalid="isFieldIdInvalid"
+                                          @update:value="setFieldId"
+                            />
+                            <changed-mark v-if="isFieldIdChanged" />
+                        </span>
+                        <p-button v-if="isFieldIdChanged"
+                                  size="sm"
+                                  style-type="tertiary"
+                                  @click="handleClickUndoFieldId"
+                        >
+                            Undo
+                        </p-button>
+                    </div>
+                </p-field-group>
                 <p-field-group :label="$t('OPSFLOW.FIELD_GENERATOR.FIELD_NAME')"
                                :invalid="isNameInvalid"
                                required
@@ -118,7 +177,7 @@ onBeforeMount(() => {
                     <p-text-input :value="name"
                                   :placeholder="props.field.name || fieldMetadata.name"
                                   :invalid="isNameInvalid"
-                                  @update:value="setName($event)"
+                                  @update:value="setName"
                     />
                 </p-field-group>
                 <component :is="optionsComponent"
