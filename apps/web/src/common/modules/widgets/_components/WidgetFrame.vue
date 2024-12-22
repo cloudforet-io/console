@@ -16,6 +16,7 @@ import { i18n } from '@/translations';
 
 import { WIDGET_WIDTH_STR_MAP } from '@/common/modules/widgets/_constants/widget-display-constant';
 import { WIDGET_HEIGHT } from '@/common/modules/widgets/_constants/widget-field-constant';
+import type { WidgetHeightValue } from '@/common/modules/widgets/_widget-fields/widget-height/type';
 import type { WidgetEmit } from '@/common/modules/widgets/types/widget-display-type';
 import type { WidgetFrameProps } from '@/common/modules/widgets/types/widget-frame-type';
 
@@ -55,6 +56,10 @@ const state = reactive({
         label: WIDGET_WIDTH_STR_MAP[size],
     }))),
     unitText: computed<string>(() => Object.values(props.unitMap || {}).join(', ') || '--'),
+    widgetHeight: computed<string>(() => {
+        const widgetHeight = props.widgetOptions?.widgetHeight?.value as WidgetHeightValue;
+        return widgetHeight?.type ?? WIDGET_HEIGHT.default;
+    }),
 });
 
 /* Event */
@@ -96,7 +101,7 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
          :class="{
              full: state.isFull,
              [props.size]: props.size,
-             [`widget-height-${props.widgetOptions?.widgetHeight?.value ?? WIDGET_HEIGHT.default}`]: true,
+             [`widget-height-${state.widgetHeight}`]: true,
          }"
          :style="{ width: (props.width && !state.isFull) ? `${props.width}px` : '100%'}"
     >
