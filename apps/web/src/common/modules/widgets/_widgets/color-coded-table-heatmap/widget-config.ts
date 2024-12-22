@@ -21,7 +21,12 @@ const colorCodedTableHeatmap: WidgetConfig = {
                 max: 31,
             },
         },
-        dataField: {},
+        dataField: {
+            options: {
+                multiSelectable: true,
+                allSelected: true,
+            },
+        },
         formatRules: {
             options: {
                 formatRulesType: FORMAT_RULE_TYPE.textNumberThreshold,
