@@ -48,8 +48,8 @@ const state = reactive({
                 ...Object.keys(widgetGenerateGetters.selectedDataTable?.data_info ?? {}),
             ],
         ) ?? [];
-        return [...fieldList, 'Sub Total'].map((d) => ({
-            name: d === 'Sub Total' ? 'sub_total' : d,
+        return fieldList.map((d) => ({
+            name: d,
             label: d,
             disabled: state.customWidthItems.some((customWidthItem) => customWidthItem.fieldKey === d),
         }));

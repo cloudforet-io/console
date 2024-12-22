@@ -28,7 +28,7 @@ const state = reactive({
     ]),
     selectedWidthType: computed(() => state.fieldValue?.widthType),
     fixedWidthInvalid: computed(() => {
-        if (state.proxyValue.widthType === 'auto') return false;
+        if (state.fieldValue.widthType === 'auto') return false;
         const fixedWidth = state.fieldValue.fixedWidth;
         if (fixedWidth === undefined) return true;
         if (fixedWidth === 0) return true;
