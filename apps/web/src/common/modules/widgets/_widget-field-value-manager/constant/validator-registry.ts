@@ -1,7 +1,6 @@
 import { FORMAT_RULE_TYPE } from '@/common/modules/widgets/_constants/widget-field-constant';
 import { integrateFieldsSchema } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import type { FieldValueValidator } from '@/common/modules/widgets/_widget-field-value-manager/type';
-import type { FormatRulesOptions, FormatRulesValue } from '@/common/modules/widgets/_widget-fields/advanced-format-rules/type';
 import type { CategoryByValue, CategoryByOptions } from '@/common/modules/widgets/_widget-fields/category-by/type';
 import type { ColorSchemaValue } from '@/common/modules/widgets/_widget-fields/color-schema/type';
 import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/comparison/type';
@@ -12,6 +11,7 @@ import { checkInvalidCustomValue } from '@/common/modules/widgets/_widget-fields
 import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { DisplayAnnotationValue } from '@/common/modules/widgets/_widget-fields/display-annotation/type';
 import type { DisplaySeriesLabelValue } from '@/common/modules/widgets/_widget-fields/display-series-label/type';
+import type { FormatRulesOptions, FormatRulesValue } from '@/common/modules/widgets/_widget-fields/format-rules/type';
 import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/granularity/type';
 import type { GroupByOptions, GroupByValue } from '@/common/modules/widgets/_widget-fields/group-by/type';
 import type { WidgetHeaderValue } from '@/common/modules/widgets/_widget-fields/header/type';

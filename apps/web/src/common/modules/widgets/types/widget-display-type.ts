@@ -49,5 +49,5 @@ export interface WidgetEmit {
 export type WidgetOverlayType = 'ADD'|'EDIT'|'EXPAND';
 
 export interface WidgetExpose {
-    loadWidget: (...args: any) => Promise<void>;
+    loadWidget: (...args: any) => Promise<void>|void;
 }

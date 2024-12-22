@@ -5,23 +5,22 @@ import {
 
 import { isEqual } from 'lodash';
 
-import type { APIErrorToast } from '@/common/composables/error/errorHandler';
 import type {
     WidgetProps, WidgetEmit,
 } from '@/common/modules/widgets/types/widget-display-type';
 
 
-interface UseWidgetInitAndRefreshOptions<Data> {
+interface UseWidgetInitAndRefreshOptions {
     props: WidgetProps;
     emit: WidgetEmit;
-    loadWidget: (...args: any) => Promise<Data|APIErrorToast>;
+    loadWidget: (...args: any) => Promise<void>|void;
 }
 
-export const useWidgetInitAndRefresh = <Data = any>({
+export const useWidgetInitAndRefresh = ({
     props,
     emit,
     loadWidget,
-}: UseWidgetInitAndRefreshOptions<Data>): void => {
+}: UseWidgetInitAndRefreshOptions): void => {
     const initiated = ref(false);
 
     const stopVariablesWatch = watch(() => props.dashboardVars, async (after, before) => {

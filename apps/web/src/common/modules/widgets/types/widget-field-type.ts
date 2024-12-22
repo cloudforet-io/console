@@ -3,7 +3,6 @@ import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-tabl
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 
 import type WidgetFieldValueManager from '@/common/modules/widgets/_widget-field-value-manager';
-import type { FormatRulesOptions } from '@/common/modules/widgets/_widget-fields/advanced-format-rules/type';
 import type { CategoryByOptions } from '@/common/modules/widgets/_widget-fields/category-by/type';
 import type { _ColorSchemaOptions as ColorSchemaOptions } from '@/common/modules/widgets/_widget-fields/color-schema/type';
 import type { ComparisonOptions } from '@/common/modules/widgets/_widget-fields/comparison/type';
@@ -13,6 +12,7 @@ import type { DataFieldOptions } from '@/common/modules/widgets/_widget-fields/d
 import type { DateFormatOptions } from '@/common/modules/widgets/_widget-fields/date-format/type';
 import type { DateRangeOptions } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { DisplaySeriesLabelOptions } from '@/common/modules/widgets/_widget-fields/display-series-label/type';
+import type { FormatRulesOptions } from '@/common/modules/widgets/_widget-fields/format-rules/type';
 import type { GroupByOptions } from '@/common/modules/widgets/_widget-fields/group-by/type';
 import type { IconOptions } from '@/common/modules/widgets/_widget-fields/icon/type';
 import type { LegendOptions } from '@/common/modules/widgets/_widget-fields/legend/type';
@@ -48,7 +48,7 @@ export interface WidgetFieldSchema<FieldOption=WidgetFieldOptions> {
     options?: Partial<FieldOption>;
 }
 
-export type FieldDataTargetType = 'data_info' | 'label_info';
+export type FieldDataTargetType = 'data_info' | 'labels_info';
 
 export type WidgetFieldName = 'dataField' | 'tableDataField' | 'xAxis' | 'yAxis'
     | 'stackBy' | 'groupBy' | 'categoryBy'

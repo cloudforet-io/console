@@ -1,4 +1,3 @@
-import type { FormatRulesValue } from '@/common/modules/widgets/_widget-fields/advanced-format-rules/type';
 import type { CategoryByValue } from '@/common/modules/widgets/_widget-fields/category-by/type';
 import type { ColorSchemaValue } from '@/common/modules/widgets/_widget-fields/color-schema/type';
 import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/comparison/type';
@@ -8,6 +7,7 @@ import type { DateFormatValue } from '@/common/modules/widgets/_widget-fields/da
 import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { DisplayAnnotationValue } from '@/common/modules/widgets/_widget-fields/display-annotation/type';
 import type { DisplaySeriesLabelValue } from '@/common/modules/widgets/_widget-fields/display-series-label/type';
+import type { FormatRulesValue } from '@/common/modules/widgets/_widget-fields/format-rules/type';
 import type { GroupByValue } from '@/common/modules/widgets/_widget-fields/group-by/type';
 import type { WidgetHeaderValue } from '@/common/modules/widgets/_widget-fields/header/type';
 import type { IconValue } from '@/common/modules/widgets/_widget-fields/icon/type';

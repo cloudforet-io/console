@@ -205,7 +205,7 @@ const loading = computed(() => results.value?.[0].isLoading);
 const errorMessage = computed(() => results.value?.[0].error?.message);
 
 
-const finalData = computed<Data>(() => {
+const refinedData = computed<Data>(() => {
     const data = results.value?.[0].data;
     const totalData = results.value?.[1].data;
 
@@ -241,7 +241,7 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
     dateRange,
     errorMessage: errorMessage.value,
     widgetLoading: loading.value,
-    noData: computed(() => (finalData.value ? !(finalData.value.results?.length) : false)),
+    noData: computed(() => (refinedData.value ? !(refinedData.value.results?.length) : false)),
 });
 
 const handleUpdateThisPage = async (newPage: number) => {
@@ -273,7 +273,7 @@ defineExpose<WidgetExpose>({
                 <widget-data-table class="data-table"
                                    :widget-id="props.widgetId"
                                    :fields="state.tableFields"
-                                   :items="finalData?.results"
+                                   :items="refinedData?.results"
                                    :data-field="widgetOptionsState.dataFieldInfo?.data"
                                    :comparison-info="widgetOptionsState.comparisonInfo"
                                    :sub-total-info="widgetOptionsState.subTotalInfo"
@@ -294,7 +294,7 @@ defineExpose<WidgetExpose>({
             <div class="table-pagination-wrapper">
                 <p-pagination :this-page="state.thisPage"
                               :page-size="state.pageSize"
-                              :total-count="finalData?.total_count ?? 0"
+                              :total-count="refinedData?.total_count ?? 0"
                               size="sm"
                               @change="handleUpdateThisPage"
                 />

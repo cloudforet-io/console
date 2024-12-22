@@ -20,7 +20,7 @@ import { widgetValidatorRegistry } from '@/common/modules/widgets/_widget-field-
 import type {
     FormatRulesValue, FormatRulesOptions, ThresholdValue, FormatRulesType,
 
-} from '@/common/modules/widgets/_widget-fields/advanced-format-rules/type';
+} from '@/common/modules/widgets/_widget-fields/format-rules/type';
 import type {
     _WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
@@ -118,7 +118,7 @@ const handleUpdateField = (val: string) => {
                          class="format-rules-input-wrapper"
                     >
                         <div class="left-part"
-                             :class="[state.type === FORMAT_RULE_TYPE.textThreshold ? 'grid-cols-2' : 'grid-cols-1']"
+                             :class="[state.type === FORMAT_RULE_TYPE.textNumberThreshold ? 'grid-cols-2' : 'grid-cols-1']"
                         >
                             <p-field-group v-if="state.type === FORMAT_RULE_TYPE.textNumberThreshold || state.type === FORMAT_RULE_TYPE.textThreshold"
                                            required
