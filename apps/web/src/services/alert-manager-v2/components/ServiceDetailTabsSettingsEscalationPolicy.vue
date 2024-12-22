@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    reactive, computed, onMounted,
+    reactive, computed, watch,
 } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -26,10 +26,13 @@ import { useUserStore } from '@/store/user/user-store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 
+import ServiceDetailTabsSettingsEscalationPolicyFormModal
+    from '@/services/alert-manager-v2/components/ServiceDetailTabsSettingsEscalationPolicyFormModal.vue';
 import {
     ESCALATION_POLICY_MANAGEMENT_TABLE_FIELDS, ESCALATION_POLICY_MANAGEMENT_TABLE_HANDLER,
 } from '@/services/alert-manager-v2/constants/escalation-policy-table-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
+import type { EscalationPolicyModalType } from '@/services/alert-manager-v2/types/alert-manager-type';
 
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
@@ -59,12 +62,16 @@ const state = reactive({
     loading: false,
     items: [] as EscalationPolicyModel[],
     totalCount: 0,
-    selectIndex: [],
-    isSelectedItem: computed<number>(() => state.selectIndex?.length),
-    selectedItem: {} as EscalationPolicyModel,
+    selectIndex: undefined as number|undefined,
+    selectedItem: computed<EscalationPolicyModel>(() => state.items[state.selectIndex]),
+});
+const modalState = reactive({
+    visible: false,
+    type: 'CREATE' as EscalationPolicyModalType,
 });
 
-const escalationPolicyListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true);
+const escalationPolicyListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
+    .setPage(1, 15);
 const queryTagHelper = useQueryTags({ keyItemSets: ESCALATION_POLICY_MANAGEMENT_TABLE_HANDLER.keyItemSets });
 const { queryTags } = queryTagHelper;
 
@@ -73,8 +80,9 @@ const getConnectChannelCount = (rules: EscalationPolicyRulesType[]) => {
     const uniqueChannels = new Set(allChannels);
     return uniqueChannels.size;
 };
-const handleClickCreateButton = () => {
-    console.log('TODO: handleClickCreateButton');
+const handleClickCreateButton = (type: EscalationPolicyModalType) => {
+    modalState.visible = true;
+    modalState.type = type;
 };
 const handleSelectDropdownItem = (name) => {
     console.log('TODO: handleSelectDropdownItem', name);
@@ -89,7 +97,7 @@ const handleExportExcel = () => {
     console.log('TODO: handleExportExcel');
 };
 const handleSelectTableRow = (selectedItems: number[]) => {
-    state.selectedItem = state.items[selectedItems[0]];
+    state.selectIndex = selectedItems[0];
 };
 
 const fetchEscalationPolicyList = async () => {
@@ -113,80 +121,88 @@ const fetchEscalationPolicyList = async () => {
     }
 };
 
-onMounted(() => {
+watch(() => storeState.serviceId, (id) => {
+    if (!id) return;
     fetchEscalationPolicyList();
-});
+}, { immediate: true });
 </script>
 
 <template>
-    <p-toolbox-table class="service-detail-tabs-escalation-policy mt-4"
-                     search-type="query"
-                     selectable
-                     sortable
-                     exportable
-                     :multi-select="false"
-                     :loading="state.loading"
-                     :total-count="state.totalCount"
-                     :items="state.items"
-                     :fields="tableState.fields"
-                     :select-index.sync="state.selectIndex"
-                     :query-tags="queryTags"
-                     :key-item-sets="ESCALATION_POLICY_MANAGEMENT_TABLE_HANDLER.keyItemSets"
-                     :value-handler-map="ESCALATION_POLICY_MANAGEMENT_TABLE_HANDLER.valueHandlerMap"
-                     @change="handleChangeToolbox"
-                     @refresh="handleChangeToolbox()"
-                     @export="handleExportExcel"
-                     @select="handleSelectTableRow"
-    >
-        <template #toolbox-top>
-            <p-heading-layout class="pt-6 px-4">
-                <template #heading>
-                    <p-heading heading-type="sub"
-                               use-total-count
-                               :total-count="state.totalCount"
-                               :title="$t('ALERT_MANAGER.ESCALATION_POLICY.TITLE')"
-                    />
-                </template>
-                <template #extra>
-                    <p-button style-type="tertiary"
-                              icon-left="ic_settings-filled"
-                              size="sm"
-                              @click="handleClickCreateButton"
-                    >
-                        {{ $t('ALERT_MANAGER.ESCALATION_POLICY.SET_POLICY') }}
-                    </p-button>
-                    <p-button style-type="primary"
-                              icon-left="ic_plus_bold"
-                              size="sm"
-                              @click="handleClickCreateButton"
-                    >
-                        {{ $t('ALERT_MANAGER.CREATE') }}
-                    </p-button>
-                </template>
-            </p-heading-layout>
-        </template>
-        <template #toolbox-left>
-            <p-select-dropdown :menu="tableState.actionMenu"
-                               :disabled="!state.isSelectedItem"
-                               reset-selection-on-menu-close
-                               :placeholder="$t('ALERT_MANAGER.ACTION')"
-                               @select="handleSelectDropdownItem"
-            />
-        </template>
-        <template #col-repeat-format="{value}">
-            {{ value || 0 }}
-        </template>
-        <template #col-rules-format="{value}">
-            {{ getConnectChannelCount(value) }}
-        </template>
-        <template #col-created_at-format="{value}">
-            {{ iso8601Formatter(value, storeState.timezone) }}
-        </template>
-    </p-toolbox-table>
+    <div class="service-detail-tabs-escalation-policy">
+        <p-toolbox-table class="escalation-policy-table mt-4"
+                         search-type="query"
+                         selectable
+                         sortable
+                         exportable
+                         :multi-select="false"
+                         :loading="state.loading"
+                         :total-count="state.totalCount"
+                         :items="state.items"
+                         :fields="tableState.fields"
+                         :select-index="state.selectIndex"
+                         :query-tags="queryTags"
+                         :key-item-sets="ESCALATION_POLICY_MANAGEMENT_TABLE_HANDLER.keyItemSets"
+                         :value-handler-map="ESCALATION_POLICY_MANAGEMENT_TABLE_HANDLER.valueHandlerMap"
+                         @change="handleChangeToolbox"
+                         @refresh="handleChangeToolbox()"
+                         @export="handleExportExcel"
+                         @select="handleSelectTableRow"
+        >
+            <template #toolbox-top>
+                <p-heading-layout class="pt-6 px-4">
+                    <template #heading>
+                        <p-heading heading-type="sub"
+                                   use-total-count
+                                   :total-count="state.totalCount"
+                                   :title="$t('ALERT_MANAGER.ESCALATION_POLICY.TITLE')"
+                        />
+                    </template>
+                    <template #extra>
+                        <p-button style-type="tertiary"
+                                  icon-left="ic_settings-filled"
+                                  size="sm"
+                                  @click="handleClickCreateButton('SET')"
+                        >
+                            {{ $t('ALERT_MANAGER.ESCALATION_POLICY.SET_POLICY') }}
+                        </p-button>
+                        <p-button style-type="primary"
+                                  icon-left="ic_plus_bold"
+                                  size="sm"
+                                  @click="handleClickCreateButton('CREATE')"
+                        >
+                            {{ $t('ALERT_MANAGER.CREATE') }}
+                        </p-button>
+                    </template>
+                </p-heading-layout>
+            </template>
+            <template #toolbox-left>
+                <p-select-dropdown :menu="tableState.actionMenu"
+                                   :disabled="!state.selectIndex"
+                                   reset-selection-on-menu-close
+                                   :placeholder="$t('ALERT_MANAGER.ACTION')"
+                                   @select="handleSelectDropdownItem"
+                />
+            </template>
+            <template #col-repeat-format="{value}">
+                {{ value || 0 }}
+            </template>
+            <template #col-rules-format="{value}">
+                {{ getConnectChannelCount(value) }}
+            </template>
+            <template #col-created_at-format="{value}">
+                {{ iso8601Formatter(value, storeState.timezone) }}
+            </template>
+        </p-toolbox-table>
+        <service-detail-tabs-settings-escalation-policy-form-modal :visible="modalState.visible"
+                                                                   :type="modalState.type"
+        />
+    </div>
 </template>
 
 <style scoped lang="postcss">
 .service-detail-tabs-escalation-policy {
-    @apply rounded-md;
+    .escalation-policy-table {
+        @apply rounded-md;
+    }
 }
 </style>
