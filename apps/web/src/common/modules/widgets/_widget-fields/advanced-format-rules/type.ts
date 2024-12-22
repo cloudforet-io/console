@@ -1,20 +1,10 @@
-import type { _FORMAT_RULE_TYPE, ADVANCED_FORMAT_RULE_TYPE } from '@/common/modules/widgets/_constants/widget-field-constant';
+import type { FORMAT_RULE_TYPE } from '@/common/modules/widgets/_constants/widget-field-constant';
 import type { FieldDataTargetType } from '@/common/modules/widgets/types/widget-field-type';
 
 export interface AdvancedFormatRulesValue {
     field?: string;
     value: FormatRulesValue[];
     baseColor?: string;
-}
-
-export type AdvancedFormatRulesType = typeof ADVANCED_FORMAT_RULE_TYPE[keyof typeof ADVANCED_FORMAT_RULE_TYPE];
-
-export interface AdvancedFormatRulesOptions {
-    useField?: boolean;
-    formatRulesType: AdvancedFormatRulesType;
-    description?: string;
-    baseColor?: string;
-    default?: FormatRulesValue[];
 }
 
 export interface ThresholdValue {
@@ -38,4 +28,4 @@ export interface FormatRulesOptions {
     default?: ThresholdValue[];
 }
 
-export type FormatRulesType = typeof _FORMAT_RULE_TYPE[keyof typeof _FORMAT_RULE_TYPE];
+export type FormatRulesType = typeof FORMAT_RULE_TYPE[keyof typeof FORMAT_RULE_TYPE];

@@ -1,4 +1,4 @@
-import { _FORMAT_RULE_TYPE } from '@/common/modules/widgets/_constants/widget-field-constant';
+import { FORMAT_RULE_TYPE } from '@/common/modules/widgets/_constants/widget-field-constant';
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 
 
@@ -26,7 +26,8 @@ const colorCodedHeatmap: WidgetConfig = {
         formatRules: {
             options: {
                 useField: true,
-                formatRulesType: _FORMAT_RULE_TYPE.textThreshold,
+                dataTarget: 'labels_info',
+                formatRulesType: FORMAT_RULE_TYPE.textThreshold,
                 description: 'COMMON.WIDGETS.ADVANCED_FORMAT_RULES.COLOR_CODED_HEATMAP_DESC',
             },
         },

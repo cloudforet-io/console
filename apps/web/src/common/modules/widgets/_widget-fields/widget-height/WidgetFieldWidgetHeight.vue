@@ -11,7 +11,7 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 import { WIDGET_HEIGHT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import type {
     WidgetHeightOptions,
-    _WidgetHeightValue,
+    WidgetHeightValue,
 } from '@/common/modules/widgets/_widget-fields/widget-height/type';
 import type {
     _WidgetFieldComponentProps,
@@ -23,7 +23,7 @@ const props = withDefaults(defineProps<_WidgetFieldComponentProps<WidgetHeightOp
 });
 
 const state = reactive({
-    fieldValue: computed<_WidgetHeightValue>(() => props.fieldManager.data[FIELD_KEY].value),
+    fieldValue: computed<WidgetHeightValue>(() => props.fieldManager.data[FIELD_KEY].value),
     widgetHeightMenuItems: computed<MenuItem[]>(() => [
         {
             name: WIDGET_HEIGHT.default,
@@ -36,7 +36,7 @@ const state = reactive({
     ]),
 });
 
-const handleChangeWidgetHeight = (value: _WidgetHeightValue['type']) => {
+const handleChangeWidgetHeight = (value: WidgetHeightValue['type']) => {
     props.fieldManager.setFieldValue(FIELD_KEY, {
         type: value,
     });

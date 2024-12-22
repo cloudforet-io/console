@@ -23,7 +23,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { getSharedDashboardLayouts } from '@/services/dashboards/helpers/dashboard-share-helper';
-import { migrateLegacyWidgetOptions } from '@/services/dashboards/helpers/widget-migration-helper';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { SharedDashboardInfo } from '@/services/dashboards/types/shared-dashboard-type';
 
@@ -67,7 +66,7 @@ const listDashboardWidgets = async (dashboardId: string): Promise<WidgetModel[]>
         const res = await fetcher<PublicWidgetListParameters|PrivateWidgetListParameters, ListResponse<WidgetModel>>({
             dashboard_id: dashboardId,
         });
-        return migrateLegacyWidgetOptions(res.results || []);
+        return res.results || [];
     } catch (e) {
         ErrorHandler.handleError(e);
         return [];

@@ -17,7 +17,9 @@ const props = defineProps<props>();
 <template>
     <fragment>
         <cloud-service-l-s-b v-if="currentMenuId === MENU_ID.CLOUD_SERVICE" />
-        <metric-explorer-l-s-b v-else-if="currentMenuId === MENU_ID.METRIC_EXPLORER" :width="width"/>
+        <metric-explorer-l-s-b v-else-if="currentMenuId === MENU_ID.METRIC_EXPLORER"
+                               :width="width"
+        />
         <security-l-s-b v-else-if="currentMenuId === MENU_ID.SECURITY" />
     </fragment>
 </template>

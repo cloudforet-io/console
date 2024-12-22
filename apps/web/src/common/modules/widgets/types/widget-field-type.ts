@@ -13,9 +13,9 @@ import type { DataFieldOptions } from '@/common/modules/widgets/_widget-fields/d
 import type { DateFormatOptions } from '@/common/modules/widgets/_widget-fields/date-format/type';
 import type { DateRangeOptions } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { DisplaySeriesLabelOptions } from '@/common/modules/widgets/_widget-fields/display-series-label/type';
-import type { _GroupByOptions as GroupByOptions } from '@/common/modules/widgets/_widget-fields/group-by/type';
+import type { GroupByOptions } from '@/common/modules/widgets/_widget-fields/group-by/type';
 import type { IconOptions } from '@/common/modules/widgets/_widget-fields/icon/type';
-import type { _LegendOptions as LegendOptions } from '@/common/modules/widgets/_widget-fields/legend/type';
+import type { LegendOptions } from '@/common/modules/widgets/_widget-fields/legend/type';
 import type { MaxOptions } from '@/common/modules/widgets/_widget-fields/max/type';
 import type { MinOptions } from '@/common/modules/widgets/_widget-fields/min/type';
 import type { MissingValueOptions } from '@/common/modules/widgets/_widget-fields/missing-value/type';
@@ -24,7 +24,6 @@ import type { PieChartTypeOptions } from '@/common/modules/widgets/_widget-field
 import type { StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
 import type { SubTotalOptions } from '@/common/modules/widgets/_widget-fields/sub-total/type';
 import type { TableColumnWidthOptions } from '@/common/modules/widgets/_widget-fields/table-column-width/type';
-import type { TableDataFieldOptions } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
 import type { TextWrapOptions } from '@/common/modules/widgets/_widget-fields/text-wrap/type';
 import type { TooltipNumberFormatOptions } from '@/common/modules/widgets/_widget-fields/tooltip-number-format/type';
 import type { TotalOptions } from '@/common/modules/widgets/_widget-fields/total/type';
@@ -37,7 +36,7 @@ import type {
 } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
-export type WidgetFieldOptions = DataFieldOptions | TableDataFieldOptions | XAxisOptions | YAxisOptions
+export type WidgetFieldOptions = DataFieldOptions | XAxisOptions | YAxisOptions
     | StackByOptions | GroupByOptions | CategoryByOptions
     | FormatRulesOptions | MinOptions | MaxOptions | LegendOptions | IconOptions | SubTotalOptions | TotalOptions
     | ComparisonOptions | ColorSchemaOptions | PieChartTypeOptions | DateFormatOptions

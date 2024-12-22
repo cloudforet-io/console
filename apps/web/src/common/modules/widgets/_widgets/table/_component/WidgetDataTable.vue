@@ -27,8 +27,8 @@ import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-hel
 import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/comparison/type';
 import type { CustomTableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
 import type { DataFieldHeatmapColorValue } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
-import type { _DateFormatValue as DateFormatValue } from '@/common/modules/widgets/_widget-fields/date-format/type';
-import type { _MissingValueValue as MissingValueValue } from '@/common/modules/widgets/_widget-fields/missing-value/type';
+import type { DateFormatValue } from '@/common/modules/widgets/_widget-fields/date-format/type';
+import type { MissingValueValue } from '@/common/modules/widgets/_widget-fields/missing-value/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type { TableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/table-column-width/type';
 import type { TextWrapValue } from '@/common/modules/widgets/_widget-fields/text-wrap/type';

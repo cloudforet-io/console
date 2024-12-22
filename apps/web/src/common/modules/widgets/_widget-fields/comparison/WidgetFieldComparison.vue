@@ -34,7 +34,7 @@ const state = reactive({
         // TODO: add disable case with PIVOT DT
         if (props.widgetConfig.widgetName !== 'table') return false;
         const groupByField = props.fieldManager.data.groupBy.value as GroupByValue;
-        return Array.isArray(groupByField?.value) && isIncludingDateField(groupByField.value);
+        return Array.isArray(groupByField?.data) && isIncludingDateField(groupByField.data);
     }),
     infoText: computed<TranslateResult>(() => {
         if (props.widgetConfig.widgetName !== 'table') return i18n.t('COMMON.WIDGETS.COMPARISON.INFO_TOOLTIP_TABLE');
