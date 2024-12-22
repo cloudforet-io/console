@@ -20,7 +20,11 @@ const stackedColumnChart: WidgetConfig = {
                 max: 31,
             },
         },
-        dataField: {},
+        dataField: {
+            options: {
+                multiSelectable: true,
+            },
+        },
     },
     optionalFieldsSchema: {
         legend: {
