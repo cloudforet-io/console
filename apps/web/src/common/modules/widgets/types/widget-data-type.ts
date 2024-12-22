@@ -3,7 +3,7 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 
 export interface DateRange {
-    start?: string;
+    start: string;
     end: string;
 }
 
