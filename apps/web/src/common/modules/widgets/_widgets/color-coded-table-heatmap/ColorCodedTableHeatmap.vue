@@ -30,14 +30,12 @@ import {
 import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
 import {
-    getWidgetLoadApiQuery,
     getWidgetLoadApiQueryDateRange,
 } from '@/common/modules/widgets/_helpers/widget-load-helper';
 import type { AdvancedFormatRulesValue } from '@/common/modules/widgets/_widget-fields/advanced-format-rules/type';
 import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/granularity/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
-import type { TableDataFieldValue } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
 import type { XAxisValue } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/common/modules/widgets/types/widget-display-type';
@@ -104,11 +102,11 @@ const state = reactive({
     legendList: [] as WidgetLegend[],
     // required fields
     granularity: computed<string>(() => props.widgetOptions?.granularity as string),
-    xAxisField: computed<string>(() => (props.widgetOptions?.xAxis as XAxisValue)?.value),
-    xAxisCount: computed<number>(() => (props.widgetOptions?.xAxis as XAxisValue)?.count),
-    dataFieldInfo: computed<TableDataFieldValue>(() => props.widgetOptions?.tableDataField as TableDataFieldValue),
-    dynamicFieldInfo: computed<TableDataFieldValue['dynamicFieldInfo']>(() => state.dataFieldInfo?.dynamicFieldInfo),
-    staticFieldInfo: computed<TableDataFieldValue['staticFieldInfo']>(() => state.dataFieldInfo?.staticFieldInfo),
+    xAxisField: computed<string|undefined>(() => (props.widgetOptions?.xAxis as XAxisValue)?.data),
+    xAxisCount: computed<number|undefined>(() => (props.widgetOptions?.xAxis as XAxisValue)?.count),
+    dataFieldInfo: computed(() => props.widgetOptions?.tableDataField),
+    dynamicFieldInfo: computed(() => state.dataFieldInfo?.dynamicFieldInfo),
+    staticFieldInfo: computed(() => state.dataFieldInfo?.staticFieldInfo),
     dataField: computed<string|string[]|undefined>(() => {
         if (state.dataFieldInfo?.fieldType === 'staticField') return state.staticFieldInfo?.fieldValue;
         return state.dynamicFieldInfo?.fieldValue;
@@ -156,7 +154,7 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
                 granularity: state.granularity,
                 ...(!isDateField(state.xAxisField) && { page: { start: 1, limit: state.xAxisCount } }),
                 ...getWidgetLoadApiQueryDateRange(state.granularity, dateRange.value),
-                ...getWidgetLoadApiQuery(state.dataFieldInfo, state.xAxisField),
+                // ...getWidgetLoadApiQuery(state.dataFieldInfo, state.xAxisField),
             },
             vars: props.dashboardVars,
         });

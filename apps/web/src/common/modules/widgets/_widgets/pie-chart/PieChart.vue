@@ -42,7 +42,7 @@ import type { DateFormatValue } from '@/common/modules/widgets/_widget-fields/da
 import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { DisplaySeriesLabelValue } from '@/common/modules/widgets/_widget-fields/display-series-label/type';
 import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/granularity/type';
-import type { _GroupByValue } from '@/common/modules/widgets/_widget-fields/group-by/type';
+import type { GroupByValue } from '@/common/modules/widgets/_widget-fields/group-by/type';
 import type { LegendValue } from '@/common/modules/widgets/_widget-fields/legend/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type { PieChartTypeValue } from '@/common/modules/widgets/_widget-fields/pie-chart-type/type';
@@ -170,14 +170,14 @@ const state = reactive({
     // required fields
     granularity: computed<string|undefined>(() => (props.widgetOptions?.granularity?.value as GranularityValue)?.granularity),
     dataField: computed<string|undefined>(() => (props.widgetOptions?.dataField?.value as DataFieldValue)?.data as string),
-    groupByField: computed<string|undefined>(() => (props.widgetOptions?.groupBy?.value as _GroupByValue)?.data as string),
-    groupByCount: computed<number|undefined>(() => (props.widgetOptions?.groupBy?.value as _GroupByValue)?.count),
+    groupByField: computed<string|undefined>(() => (props.widgetOptions?.groupBy?.value as GroupByValue)?.data as string),
+    groupByCount: computed<number|undefined>(() => (props.widgetOptions?.groupBy?.value as GroupByValue)?.count),
     chartType: computed<string|undefined>(() => (props.widgetOptions?.pieChartType?.value as PieChartTypeValue)?.type),
     // optional fields
     showLegends: computed<boolean|undefined>(() => (props.widgetOptions?.legend?.value as LegendValue)?.toggleValue),
     legendPosition: computed<string|undefined>(() => (props.widgetOptions?.legend?.value as LegendValue)?.position),
     dateFormat: computed<string|undefined>(() => {
-        const _dateFormat = (props.widgetOptions?.dateFormat?.value as DateFormatValue)?.value || 'MMM DD, YYYY';
+        const _dateFormat = (props.widgetOptions?.dateFormat?.value as DateFormatValue)?.format || 'MMM DD, YYYY';
         return DATE_FORMAT?.[_dateFormat]?.[state.granularity];
     }),
     numberFormat: computed<NumberFormatValue>(() => props.widgetOptions?.numberFormat?.value as NumberFormatValue),
