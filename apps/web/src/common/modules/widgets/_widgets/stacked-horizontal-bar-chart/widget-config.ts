@@ -25,6 +25,7 @@ const stackedHorizontalBarChart: WidgetConfig = {
         dataField: {
             options: {
                 multiSelectable: true,
+                allSelected: true,
             },
         },
     },

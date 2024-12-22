@@ -23,7 +23,6 @@ import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type WidgetFieldValueManager from '@/common/modules/widgets/_widget-field-value-manager';
 import WidgetHeaderField from '@/common/modules/widgets/_widget-fields/header/WidgetHeaderField.vue';
-import type { DataTableAddOptions } from '@/common/modules/widgets/types/widget-model';
 
 import { red } from '@/styles/colors';
 
@@ -104,9 +103,8 @@ const checkDefaultValidation = () => {
     };
     switch (selectedChartType) {
     case 'geoMap': {
-        const groupBySelection = (selectedDataTable?.options as DataTableAddOptions)?.group_by ?? [];
-        const filteredSelection = groupBySelection.filter((item) => (item?.name === 'Region'));
-        if (filteredSelection.length === 0) {
+        const labelsInfo = cloneDeep(selectedDataTable.labels_info ?? {});
+        if (!Object.keys(labelsInfo).includes('Region')) {
             state.errorModalCurrentType = 'geoMap';
             state.widgetDefaultValidationModalVisible = true;
         }

@@ -20,6 +20,7 @@ const stackedAreaChart: WidgetConfig = {
         dataField: {
             options: {
                 multiSelectable: true,
+                allSelected: true,
             },
         },
     },

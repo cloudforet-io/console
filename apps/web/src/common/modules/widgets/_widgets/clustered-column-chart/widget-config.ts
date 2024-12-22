@@ -20,6 +20,7 @@ const clusteredColumnChart: WidgetConfig = {
         dataField: {
             options: {
                 multiSelectable: true,
+                allSelected: true,
             },
         },
     },
