@@ -19,7 +19,7 @@ import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widge
 
 import type { APIErrorToast } from '@/common/composables/error/errorHandler';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import WidgetCustomLagend from '@/common/modules/widgets/_components/WidgetCustomLagend.vue';
+import WidgetCustomLegend from '@/common/modules/widgets/_components/WidgetCustomLegend.vue';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
@@ -183,7 +183,7 @@ defineExpose<WidgetExpose<Data>>({
                 <span>{{ $t('COMMON.WIDGETS.NO_DATA_TO_DISPLAY') }}</span>
             </p-empty>
         </div>
-        <widget-custom-lagend :legend-list.sync="state.legendList"
+        <widget-custom-legend :legend-list.sync="state.legendList"
                               class="widget-custom-legend"
         />
     </widget-frame>
