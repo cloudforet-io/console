@@ -1,6 +1,5 @@
 import type { Component } from 'vue';
 
-import formatRules from '@/common/modules/widgets/_widget-fields/advanced-format-rules/WidgetFieldFormatRules.vue';
 import categoryBy from '@/common/modules/widgets/_widget-fields/category-by/WidgetFieldCategoryBy.vue';
 import colorSchema from '@/common/modules/widgets/_widget-fields/color-schema/WidgetFieldColorSchema.vue';
 import comparison from '@/common/modules/widgets/_widget-fields/comparison/WidgetFieldComparison.vue';
@@ -11,6 +10,7 @@ import dateFormat from '@/common/modules/widgets/_widget-fields/date-format/Widg
 import dateRange from '@/common/modules/widgets/_widget-fields/date-range/WidgetFieldDateRange.vue';
 import displayAnnotation from '@/common/modules/widgets/_widget-fields/display-annotation/WidgetFieldDisplayAnnotation.vue';
 import displaySeriesLabel from '@/common/modules/widgets/_widget-fields/display-series-label/WidgetFieldDisplaySeriesLabel.vue';
+import formatRules from '@/common/modules/widgets/_widget-fields/format-rules/WidgetFieldFormatRules.vue';
 import granularity from '@/common/modules/widgets/_widget-fields/granularity/WidgetFieldGranularity.vue';
 import groupBy from '@/common/modules/widgets/_widget-fields/group-by/WidgetFieldGroupBy.vue';
 import icon from '@/common/modules/widgets/_widget-fields/icon/WidgetFieldIcon.vue';

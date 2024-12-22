@@ -25,8 +25,8 @@ const colorCodedHeatmap: WidgetConfig = {
         },
         formatRules: {
             options: {
-                useField: true,
                 dataTarget: 'labels_info',
+                useField: true,
                 formatRulesType: FORMAT_RULE_TYPE.textThreshold,
                 description: 'COMMON.WIDGETS.ADVANCED_FORMAT_RULES.COLOR_CODED_HEATMAP_DESC',
             },
