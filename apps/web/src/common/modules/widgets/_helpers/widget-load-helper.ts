@@ -38,7 +38,7 @@ export const getWidgetLoadApiQueryDateRange = (granularity: string, dateRange: D
 
 export const getWidgetLoadApiQuerySort = (xAxisField: string, dataField: string[]): Query['sort'] => {
     if (xAxisField === 'Date') {
-        return [{ key: 'Date', desc: false }];
+        return [{ key: 'Date', desc: true }];
     }
     return dataField.map((field) => ({ key: field, desc: true }));
 };
