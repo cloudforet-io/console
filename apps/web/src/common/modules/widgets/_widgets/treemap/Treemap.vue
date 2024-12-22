@@ -35,7 +35,7 @@ import {
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
-import type { _CategoryByValue } from '@/common/modules/widgets/_widget-fields/category-by/type';
+import type { CategoryByValue } from '@/common/modules/widgets/_widget-fields/category-by/type';
 import type { DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
 import type { DateFormatValue } from '@/common/modules/widgets/_widget-fields/date-format/type';
 import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
@@ -118,11 +118,11 @@ const state = reactive({
     // required fields
     granularity: computed<string|undefined>(() => (props.widgetOptions?.granularity?.value as GranularityValue)?.granularity),
     dataField: computed<string|undefined>(() => (props.widgetOptions?.dataField?.value as DataFieldValue)?.data as string),
-    categoryByField: computed<string|undefined>(() => (props.widgetOptions?.categoryBy?.value as _CategoryByValue)?.data),
-    categoryByCount: computed<number|undefined>(() => (props.widgetOptions?.categoryBy?.value as _CategoryByValue)?.count),
+    categoryByField: computed<string|undefined>(() => (props.widgetOptions?.categoryBy?.value as CategoryByValue)?.data),
+    categoryByCount: computed<number|undefined>(() => (props.widgetOptions?.categoryBy?.value as CategoryByValue)?.count),
     // optional fields
     dateFormat: computed<string|undefined>(() => {
-        const _dateFormat = (props.widgetOptions?.dateFormat?.value as DateFormatValue)?.value || 'MMM DD, YYYY';
+        const _dateFormat = (props.widgetOptions?.dateFormat?.value as DateFormatValue)?.format || 'MMM DD, YYYY';
         return DATE_FORMAT?.[_dateFormat]?.[state.granularity];
     }),
     numberFormat: computed<NumberFormatValue>(() => props.widgetOptions?.numberFormat?.value as NumberFormatValue),

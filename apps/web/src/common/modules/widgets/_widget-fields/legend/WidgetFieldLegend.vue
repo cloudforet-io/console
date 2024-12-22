@@ -10,14 +10,14 @@ import { i18n } from '@/translations';
 import {
     widgetFieldDefaultValueMap,
 } from '@/common/modules/widgets/_widget-field-value-manager/constant/default-value-registry';
-import type { LegendValue, _LegendOptions } from '@/common/modules/widgets/_widget-fields/legend/type';
+import type { LegendValue, LegendOptions } from '@/common/modules/widgets/_widget-fields/legend/type';
 import type {
     _WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 const FIELD_KEY = 'legend';
 
-const props = defineProps<_WidgetFieldComponentProps<_LegendOptions>>();
+const props = defineProps<_WidgetFieldComponentProps<LegendOptions>>();
 
 const state = reactive({
     fieldValue: computed<LegendValue>(() => props.fieldManager.data[FIELD_KEY].value),

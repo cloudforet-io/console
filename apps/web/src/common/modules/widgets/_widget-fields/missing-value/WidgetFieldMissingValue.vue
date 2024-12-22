@@ -8,7 +8,7 @@ import { i18n } from '@/translations';
 
 import type {
     MissingValueOptions,
-    _MissingValueValue,
+    MissingValueValue,
 } from '@/common/modules/widgets/_widget-fields/missing-value/type';
 import type {
     _WidgetFieldComponentProps,
@@ -19,7 +19,7 @@ const FIELD_KEY = 'missingValue';
 const props = defineProps<_WidgetFieldComponentProps<MissingValueOptions>>();
 
 const state = reactive({
-    fieldValue: computed<_MissingValueValue>(() => props.fieldManager.data[FIELD_KEY].value),
+    fieldValue: computed<MissingValueValue>(() => props.fieldManager.data[FIELD_KEY].value),
     missingValueMenuItems: computed<MenuItem[]>(() => [
         {
             name: 'lineToZero',
@@ -33,7 +33,7 @@ const state = reactive({
 });
 
 /* Event */
-const handleChangeMissingValue = (value: _MissingValueValue['type']) => {
+const handleChangeMissingValue = (value: MissingValueValue['type']) => {
     props.fieldManager.setFieldValue(FIELD_KEY, {
         type: value,
     });

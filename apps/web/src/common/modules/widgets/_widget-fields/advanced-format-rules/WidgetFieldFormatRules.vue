@@ -12,7 +12,7 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
 import {
-    _FORMAT_RULE_TYPE,
+    FORMAT_RULE_TYPE,
 } from '@/common/modules/widgets/_constants/widget-field-constant';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
@@ -118,9 +118,9 @@ const handleUpdateField = (val: string) => {
                          class="format-rules-input-wrapper"
                     >
                         <div class="left-part"
-                             :class="[state.type === _FORMAT_RULE_TYPE.textThreshold ? 'grid-cols-2' : 'grid-cols-1']"
+                             :class="[state.type === FORMAT_RULE_TYPE.textThreshold ? 'grid-cols-2' : 'grid-cols-1']"
                         >
-                            <p-field-group v-if="state.type === _FORMAT_RULE_TYPE.textNumberThreshold || state.type === _FORMAT_RULE_TYPE.textThreshold"
+                            <p-field-group v-if="state.type === FORMAT_RULE_TYPE.textNumberThreshold || state.type === FORMAT_RULE_TYPE.textThreshold"
                                            required
                             >
                                 <p-text-input :value="rule.text"
@@ -129,9 +129,9 @@ const handleUpdateField = (val: string) => {
                                               @update:value="handleFormatRuleInput(idx, 'text', $event)"
                                 />
                             </p-field-group>
-                            <p-field-group v-if="state.type === _FORMAT_RULE_TYPE.textNumberThreshold
-                                               || state.type === _FORMAT_RULE_TYPE.numberThreshold
-                                               || state.type === _FORMAT_RULE_TYPE.percentThreshold"
+                            <p-field-group v-if="state.type === FORMAT_RULE_TYPE.textNumberThreshold
+                                               || state.type === FORMAT_RULE_TYPE.numberThreshold
+                                               || state.type === FORMAT_RULE_TYPE.percentThreshold"
                                            required
                             >
                                 <p-text-input :value="rule.number"
@@ -141,7 +141,7 @@ const handleUpdateField = (val: string) => {
                                               :invalid="Number.isNaN(rule.number)"
                                               @update:value="handleFormatRuleInput(idx, 'number', $event)"
                                 >
-                                    <template v-if="state.type === _FORMAT_RULE_TYPE.percentThreshold"
+                                    <template v-if="state.type === FORMAT_RULE_TYPE.percentThreshold"
                                               #input-right
                                     >
                                         %

@@ -15,7 +15,7 @@ import {
     widgetValidatorRegistry,
 } from '@/common/modules/widgets/_widget-field-value-manager/constant/validator-registry';
 import { ICON_FIELD_ITEMS } from '@/common/modules/widgets/_widget-fields/icon/constant';
-import type { Icon, IconOptions, _IconValue } from '@/common/modules/widgets/_widget-fields/icon/type';
+import type { Icon, IconOptions, IconValue } from '@/common/modules/widgets/_widget-fields/icon/type';
 import type {
     _WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
@@ -28,7 +28,7 @@ const props = defineProps<_WidgetFieldComponentProps<IconOptions>>();
 const validator = widgetValidatorRegistry[FIELD_KEY];
 
 const state = reactive({
-    fieldValue: computed<_IconValue>(() => props.fieldManager.data[FIELD_KEY].value),
+    fieldValue: computed<IconValue>(() => props.fieldManager.data[FIELD_KEY].value),
     visibleMenu: false,
     invalid: computed(() => !validator(state.fieldValue, props.widgetConfig)),
     iconList: ICON_FIELD_ITEMS,

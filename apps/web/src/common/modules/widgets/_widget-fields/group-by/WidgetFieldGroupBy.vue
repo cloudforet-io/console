@@ -16,8 +16,8 @@ import {
     widgetValidatorRegistry,
 } from '@/common/modules/widgets/_widget-field-value-manager/constant/validator-registry';
 import type {
-    _GroupByOptions,
-    _GroupByValue,
+    GroupByOptions,
+    GroupByValue,
 } from '@/common/modules/widgets/_widget-fields/group-by/type';
 import type {
     _WidgetFieldComponentProps,
@@ -26,7 +26,7 @@ import type {
 const DEFAULT_COUNT = 5;
 const FIELD_KEY = 'groupBy';
 
-const props = defineProps<_WidgetFieldComponentProps<_GroupByOptions>>();
+const props = defineProps<_WidgetFieldComponentProps<GroupByOptions>>();
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
 // const {
@@ -39,7 +39,7 @@ const validator = widgetValidatorRegistry[FIELD_KEY];
 
 const state = reactive({
     isInitiated: false,
-    fieldValue: computed<_GroupByValue>(() => props.fieldManager.data[FIELD_KEY].value),
+    fieldValue: computed<GroupByValue>(() => props.fieldManager.data[FIELD_KEY].value),
     menuItems: computed<MenuItem[]>(() => {
         const dataTarget = props.widgetFieldSchema?.options?.dataTarget;
         if (!widgetGenerateGetters.selectedDataTable || !dataTarget) return [];

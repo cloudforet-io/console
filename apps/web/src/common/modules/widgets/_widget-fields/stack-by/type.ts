@@ -1,9 +1,5 @@
 import type { FieldDataTargetType } from '@/common/modules/widgets/types/widget-field-type';
 
-export interface StackByValue {
-    value: string;
-    count: number;
-}
 
 export interface StackByOptions {
     dataTarget: FieldDataTargetType;
@@ -12,7 +8,7 @@ export interface StackByOptions {
     excludeDateField?: boolean;
 }
 
-export interface _StackByValue {
+export interface StackByValue {
     data?: string;
     count: number;
 }

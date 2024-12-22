@@ -5,9 +5,6 @@ export interface ColorSchemaValue {
     colorName: keyof typeof COLOR_SCHEMA;
     colorValue: ColorValue;
 }
-export interface ColorSchemaOptions {
-    default?: string;
-}
 
 export interface _ColorSchemaOptions {
     default?: keyof typeof COLOR_SCHEMA;

@@ -1,9 +1,5 @@
 import type { FieldDataTargetType } from '@/common/modules/widgets/types/widget-field-type';
 
-export interface CategoryByValue {
-    value: string;
-    count: number;
-}
 
 export interface CategoryByOptions {
     dataTarget: FieldDataTargetType;
@@ -12,7 +8,7 @@ export interface CategoryByOptions {
     excludeDateField?: boolean;
 }
 
-export interface _CategoryByValue {
+export interface CategoryByValue {
     data?: string;
     count: number;
 }

@@ -11,10 +11,10 @@ import type { ComparisonOptions } from '@/common/modules/widgets/_widget-fields/
 import type { DataFieldHeatmapColorOptions, DataFieldHeatmapColorValue } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
 import type { DataFieldOptions } from '@/common/modules/widgets/_widget-fields/data-field/type';
 import type { DateFormatOptions } from '@/common/modules/widgets/_widget-fields/date-format/type';
-import type { _GroupByOptions } from '@/common/modules/widgets/_widget-fields/group-by/type';
+import type { GroupByOptions } from '@/common/modules/widgets/_widget-fields/group-by/type';
 import { ICON_FIELD_ITEMS } from '@/common/modules/widgets/_widget-fields/icon/constant';
 import type { IconOptions } from '@/common/modules/widgets/_widget-fields/icon/type';
-import type { _LegendOptions } from '@/common/modules/widgets/_widget-fields/legend/type';
+import type { LegendOptions } from '@/common/modules/widgets/_widget-fields/legend/type';
 import type { MaxOptions } from '@/common/modules/widgets/_widget-fields/max/type';
 import type { MinOptions } from '@/common/modules/widgets/_widget-fields/min/type';
 import type { MissingValueOptions } from '@/common/modules/widgets/_widget-fields/missing-value/type';
@@ -282,7 +282,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
     granularity: () => widgetFieldDefaultValueMap.granularity,
     groupBy: (widgetConfig, dataTable) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const groupByOptions = (_fieldsSchema.groupBy?.options ?? {}) as _GroupByOptions;
+        const groupByOptions = (_fieldsSchema.groupBy?.options ?? {}) as GroupByOptions;
 
         const result = widgetFieldDefaultValueMap.categoryBy;
 
@@ -319,7 +319,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
     },
     legend: (widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const legendOptions = (_fieldsSchema.legend?.options ?? {}) as _LegendOptions;
+        const legendOptions = (_fieldsSchema.legend?.options ?? {}) as LegendOptions;
 
         const initialValue = widgetFieldDefaultValueMap.legend;
 

@@ -12,7 +12,7 @@ import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-co
 import { getFormattedDate } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import type {
     DateFormatOptions,
-    _DateFormatValue,
+    DateFormatValue,
 } from '@/common/modules/widgets/_widget-fields/date-format/type';
 import type {
     _WidgetFieldComponentProps,
@@ -29,7 +29,7 @@ const FIELD_KEY = 'dateFormat';
 
 const props = defineProps<_WidgetFieldComponentProps<DateFormatOptions>>();
 const state = reactive({
-    fieldValue: computed<_DateFormatValue>(() => props.fieldManager.data[FIELD_KEY].value),
+    fieldValue: computed<DateFormatValue>(() => props.fieldManager.data[FIELD_KEY].value),
     menuItems: computed<MenuItem[]>(() => Object.keys(DATE_FORMAT).map((d) => ({
         name: d,
         label: DATE_FORMAT_LABEL_MAP[d] ?? d,

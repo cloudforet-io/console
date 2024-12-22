@@ -20,7 +20,7 @@ import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type {
     CustomColumnWidthItem,
-    _CustomTableColumnWidthValue, _CustomTableColumnWidthOptions,
+    CustomTableColumnWidthValue, CustomTableColumnWidthOptions,
 } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
 import type {
     _WidgetFieldComponentProps,
@@ -31,12 +31,12 @@ interface CustomWidthFieldItem extends CustomColumnWidthItem {
 }
 const FIELD_KEY = 'customTableColumnWidth';
 
-const props = defineProps<_WidgetFieldComponentProps<_CustomTableColumnWidthOptions>>();
+const props = defineProps<_WidgetFieldComponentProps<CustomTableColumnWidthOptions>>();
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
 
 const state = reactive({
-    fieldValue: computed<_CustomTableColumnWidthValue>(() => props.fieldManager.data[FIELD_KEY].value),
+    fieldValue: computed<CustomTableColumnWidthValue>(() => props.fieldManager.data[FIELD_KEY].value),
     customWidthItems: [] as CustomWidthFieldItem[],
     // isPivotedData: computed<boolean>(() => false), // TODO: implement after creating pivot DT
     // dataFieldType: computed(() => props.allValueMap?.tableDataField?.fieldType ?? 'dynamicField'),

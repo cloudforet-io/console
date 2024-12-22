@@ -1,8 +1,8 @@
-import { _FORMAT_RULE_TYPE } from '@/common/modules/widgets/_constants/widget-field-constant';
+import { FORMAT_RULE_TYPE } from '@/common/modules/widgets/_constants/widget-field-constant';
 import { integrateFieldsSchema } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import type { FieldValueValidator } from '@/common/modules/widgets/_widget-field-value-manager/type';
 import type { FormatRulesOptions, FormatRulesValue } from '@/common/modules/widgets/_widget-fields/advanced-format-rules/type';
-import type { _CategoryByValue as CategoryByValue, CategoryByOptions } from '@/common/modules/widgets/_widget-fields/category-by/type';
+import type { CategoryByValue, CategoryByOptions } from '@/common/modules/widgets/_widget-fields/category-by/type';
 import type { ColorSchemaValue } from '@/common/modules/widgets/_widget-fields/color-schema/type';
 import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/comparison/type';
 import type { CustomTableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
@@ -13,16 +13,16 @@ import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/dat
 import type { DisplayAnnotationValue } from '@/common/modules/widgets/_widget-fields/display-annotation/type';
 import type { DisplaySeriesLabelValue } from '@/common/modules/widgets/_widget-fields/display-series-label/type';
 import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/granularity/type';
-import type { _GroupByOptions, _GroupByValue } from '@/common/modules/widgets/_widget-fields/group-by/type';
+import type { GroupByOptions, GroupByValue } from '@/common/modules/widgets/_widget-fields/group-by/type';
 import type { WidgetHeaderValue } from '@/common/modules/widgets/_widget-fields/header/type';
 import { ICON_FIELD_ITEMS } from '@/common/modules/widgets/_widget-fields/icon/constant';
-import type { _IconValue } from '@/common/modules/widgets/_widget-fields/icon/type';
+import type { IconValue } from '@/common/modules/widgets/_widget-fields/icon/type';
 import type { MaxValue } from '@/common/modules/widgets/_widget-fields/max/type';
 import type { MinValue } from '@/common/modules/widgets/_widget-fields/min/type';
-import type { _StackByValue, StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
+import type { StackByValue, StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
 import type { TableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/table-column-width/type';
-import type { _XAxisValue, XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
-import type { _YAxisValue, YAxisOptions } from '@/common/modules/widgets/_widget-fields/y-axis/type';
+import type { XAxisValue, XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
+import type { YAxisValue, YAxisOptions } from '@/common/modules/widgets/_widget-fields/y-axis/type';
 
 export interface WidgetValidatorRegistry {
     [fieldKey: string]: FieldValueValidator<any>;
@@ -53,13 +53,13 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
         const formatRulesOptions = (_fieldsSchema.formatRules?.options ?? {}) as FormatRulesOptions;
         const type = formatRulesOptions.formatRulesType;
 
-        if (type === _FORMAT_RULE_TYPE.textThreshold) {
+        if (type === FORMAT_RULE_TYPE.textThreshold) {
             return fieldValue.rules.every((d) => !!d.text && !!d.color);
         }
-        if (type === _FORMAT_RULE_TYPE.numberThreshold || type === _FORMAT_RULE_TYPE.percentThreshold) {
+        if (type === FORMAT_RULE_TYPE.numberThreshold || type === FORMAT_RULE_TYPE.percentThreshold) {
             return fieldValue.rules.every((d) => !!d.number && !!d.color);
         }
-        if (type === _FORMAT_RULE_TYPE.textNumberThreshold) {
+        if (type === FORMAT_RULE_TYPE.textNumberThreshold) {
             return fieldValue.rules.every((d) => !!d.text && !!d.number && !!d.color);
         }
         if (formatRulesOptions.useField) {
@@ -73,19 +73,19 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
         if (!fieldValue.data || !fieldValue.count || fieldValue.count < 0 || fieldValue.count > categoryByOptions.max) return false;
         return true;
     },
-    stackBy: (fieldValue: _StackByValue, widgetConfig) => {
+    stackBy: (fieldValue: StackByValue, widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const stackByOptions = (_fieldsSchema.stackBy?.options ?? {}) as StackByOptions;
         if (!fieldValue.data || !fieldValue.count || fieldValue.count < 0 || fieldValue.count > stackByOptions.max) return false;
         return true;
     },
-    xAxis: (fieldValue: _XAxisValue, widgetConfig) => {
+    xAxis: (fieldValue: XAxisValue, widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const xAxisOptions = (_fieldsSchema.xAxis?.options ?? {}) as XAxisOptions;
         if (!fieldValue.data || !fieldValue.count || fieldValue.count < 0 || fieldValue.count > xAxisOptions.max) return false;
         return true;
     },
-    yAxis: (fieldValue: _YAxisValue, widgetConfig) => {
+    yAxis: (fieldValue: YAxisValue, widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const yAxisOptions = (_fieldsSchema.yAxis?.options ?? {}) as YAxisOptions;
         if (!fieldValue.data || !fieldValue.count || fieldValue.count < 0 || fieldValue.count > yAxisOptions.max) return false;
@@ -123,9 +123,9 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
         if (!fieldValue.granularity) return false;
         return true;
     },
-    groupBy: (fieldValue: _GroupByValue, widgetConfig) => {
+    groupBy: (fieldValue: GroupByValue, widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const groupByOptions = (_fieldsSchema.groupBy?.options ?? {}) as _GroupByOptions;
+        const groupByOptions = (_fieldsSchema.groupBy?.options ?? {}) as GroupByOptions;
         if (groupByOptions.fixedValue && fieldValue.data !== groupByOptions.fixedValue) return false;
         if (groupByOptions.hideCount && !!fieldValue.count) return false;
         if (!groupByOptions.hideCount && groupByOptions.max && groupByOptions.defaultMaxCount && (!fieldValue.count || fieldValue.count > groupByOptions.max)) return false;
@@ -137,7 +137,7 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
         if (!fieldValue.toggleValue) return true;
         return !!fieldValue.title?.trim();
     },
-    icon: (fieldValue: _IconValue) => {
+    icon: (fieldValue: IconValue) => {
         if (!fieldValue.toggleValue) return true;
         return !!fieldValue.color && !!fieldValue.icon && ICON_FIELD_ITEMS.some((item) => item.name === fieldValue.icon?.name);
     },
