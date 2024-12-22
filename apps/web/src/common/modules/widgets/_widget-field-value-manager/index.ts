@@ -64,7 +64,12 @@ export default class WidgetFieldValueManager {
             throw new Error(`Field "${key}" does not exist.`);
         }
 
-        this.modifiedData.value[key].value = value;
+        this.modifiedData.value = {
+            ...this.modifiedData.value,
+            [key]: {
+                value,
+            },
+        };
 
         const validator = widgetValidatorRegistry[key];
         if (validator) {
