@@ -123,6 +123,7 @@ const fetchWidget = async (): Promise<WidgetLoadData|APIErrorToast|undefined> =>
         const { status, response } = await _fetcher({
             widget_id: props.widgetId,
             granularity: state.granularity,
+            group_by: ['Region'],
             start: dateRange.value.start,
             end: dateRange.value.end,
             vars: props.dashboardVars,

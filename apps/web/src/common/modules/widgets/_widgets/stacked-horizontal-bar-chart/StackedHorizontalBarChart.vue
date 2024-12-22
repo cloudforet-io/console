@@ -36,7 +36,7 @@ import {
 import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
 import {
-    getWidgetLoadApiQueryDateRange,
+    getWidgetLoadApiQueryDateRange, getWidgetLoadApiQuerySort,
 } from '@/common/modules/widgets/_helpers/widget-load-helper';
 import type { DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
 import type { DateFormatValue } from '@/common/modules/widgets/_widget-fields/date-format/type';
@@ -183,12 +183,13 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
         state.loading = true;
         const _isPrivate = props.widgetId.startsWith('private');
         const _fetcher = _isPrivate ? privateWidgetFetcher : publicWidgetFetcher;
-        // TODO: set sort and pagination
         const { status, response } = await _fetcher({
             widget_id: props.widgetId,
             granularity: state.granularity,
             group_by: [state.yAxisField],
             vars: props.dashboardVars,
+            sort: getWidgetLoadApiQuerySort(state.yAxisField, state.dataField),
+            page: { start: 0, limit: state.yAxisCount },
             ...getWidgetLoadApiQueryDateRange(state.granularity, dateRange.value),
         });
         if (status === 'succeed') {

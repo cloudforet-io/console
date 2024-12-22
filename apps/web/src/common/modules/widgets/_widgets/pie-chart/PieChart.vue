@@ -202,9 +202,12 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
         const { status, response } = await _fetcher({
             widget_id: props.widgetId,
             granularity: state.granularity,
+            group_by: [state.groupByField],
             start: dateRange.value.start,
             end: dateRange.value.end,
             vars: props.dashboardVars,
+            sort: [{ key: state.dataField, desc: true }],
+            page: { start: 0, limit: state.groupByCount },
         });
         if (status === 'succeed') {
             state.errorMessage = undefined;
