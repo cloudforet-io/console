@@ -15,19 +15,19 @@ import getRandomId from '@/lib/random-id-generator';
 import DropdownTaskFieldEnumForm
     from '@/services/ops-flow/task-fields-configuration/components/DropdownTaskFieldEnumForm.vue';
 import type {
+    OptionsGeneratorEmit,
+    OptionsGeneratorProps,
+} from '@/services/ops-flow/task-fields-configuration/types/options-generator-type';
+import type {
     ControllableTaskFieldEnum,
 } from '@/services/ops-flow/task-fields-configuration/types/task-field-dropdown-enum-type';
 
-const props = withDefaults(defineProps<{
-    options: DropdownTaskFieldOptions;
-}>(), {
+const props = withDefaults(defineProps<OptionsGeneratorProps<DropdownTaskFieldOptions>>(), {
     options: () => ({
         enums: [],
     }),
 });
-const emit = defineEmits<{(event: 'update:options', value: DropdownTaskFieldOptions): void;
-    (event: 'update:is-valid', value: boolean): void;
-}>();
+const emit = defineEmits<OptionsGeneratorEmit<DropdownTaskFieldOptions>>();
 
 const enums = ref<ControllableTaskFieldEnum[]>([]);
 const updateEnum = (index: number, key: 'key' | 'name', value: string) => {
