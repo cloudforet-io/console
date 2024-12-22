@@ -8,6 +8,7 @@ export interface PrivateWidgetLoadParameters {
     granularity: string;
     start: string;
     end: string;
+    group_by?: string[];
     sort?: Sort[];
     page?: Page
     vars?: DashboardVars;

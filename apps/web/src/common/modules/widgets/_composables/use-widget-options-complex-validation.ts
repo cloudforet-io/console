@@ -6,17 +6,15 @@ import type { TranslateResult } from 'vue-i18n';
 
 import { i18n } from '@/translations';
 
-import type { GroupByValue, GroupByOptions } from '@/common/modules/widgets/_widget-fields/group-by/type';
-import type { TableDataFieldValue } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
-import type { XAxisValue } from '@/common/modules/widgets/_widget-fields/x-axis/type';
-import type { YAxisValue } from '@/common/modules/widgets/_widget-fields/y-axis/type';
+import type { WidgetFieldValue } from '@/common/modules/widgets/_widget-field-value-manager/type';
+import type { GroupByOptions, GroupByValue } from '@/common/modules/widgets/_widget-fields/group-by/type';
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 import type {
     WidgetFieldValues,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
-type OptionsValueMap = Record<string, WidgetFieldValues|undefined>;
+type OptionsValueMap = Record<string, WidgetFieldValue<WidgetFieldValues>|undefined>;
 interface WidgetOptionValidationProps {
     optionValueMap: Ref<OptionsValueMap>;
     widgetConfig: Ref<WidgetConfig>;
@@ -43,7 +41,7 @@ export const useWidgetOptionsComplexValidation = ({
         invalidText: computed(() => {
             if (_state.widgetConfig.widgetName === 'geoMap') {
                 const fixedVal = (_state.widgetConfig.requiredFieldsSchema.groupBy?.options as GroupByOptions)?.fixedValue;
-                const val = (_state.valueMap?.groupBy as GroupByValue)?.value;
+                const val = (_state.valueMap?.groupBy?.value as GroupByValue)?.data;
                 if (fixedVal) {
                     if ((Array.isArray(val) && !val.includes(fixedVal)) || val !== fixedVal) {
                         return i18n.t('COMMON.WIDGETS.FORM.WIDGET_VALIDATION_WARNING_DESC_GEO_MAP');
@@ -57,7 +55,7 @@ export const useWidgetOptionsComplexValidation = ({
     const getRequiredFieldValidation = (valueMap: OptionsValueMap, config: WidgetConfig): boolean => {
         if (config.widgetName === 'geoMap') {
             const fixedVal = (config.requiredFieldsSchema.groupBy?.options as GroupByOptions)?.fixedValue;
-            const val = (valueMap?.groupBy as GroupByValue)?.value;
+            const val = (valueMap?.groupBy?.value as GroupByValue)?.data;
             if (fixedVal) {
                 if (Array.isArray(val)) return val.includes(fixedVal);
                 return val === fixedVal;
@@ -70,23 +68,9 @@ export const useWidgetOptionsComplexValidation = ({
         // Label Info Fields Value Duplicate Validation (Table Widget)
         if (config.widgetName === 'table') {
             const groupByField = 'groupBy';
-            const tableDataField = 'tableDataField';
-            const groupByFieldValue = valueMap[groupByField] as GroupByValue;
-            const tableDataFieldValue = valueMap[tableDataField] as TableDataFieldValue;
-            const allValueExist = groupByFieldValue?.value && !!groupByFieldValue.value.length
-                && (tableDataFieldValue?.staticFieldInfo?.fieldValue || tableDataFieldValue?.dynamicFieldInfo?.fieldValue);
-            if (tableDataFieldValue?.fieldType === 'dynamicField' && allValueExist) {
-                isValid = !(groupByFieldValue?.value ?? []).includes(tableDataFieldValue.dynamicFieldInfo?.fieldValue as string);
-            }
-        } else if (['clusteredColumnChart', 'lineChart', 'stackedAreaChart', 'stackedColumnChart', 'stackedHorizontalBarChart', 'heatmap', 'colorCodedTableHeatmap'].includes(config.widgetName)) {
-            let fieldValue = valueMap.xAxis as XAxisValue;
-            if (config.widgetName === 'stackedHorizontalBarChart') {
-                fieldValue = valueMap.yAxis as YAxisValue;
-            }
-            const tableDataFieldValue = valueMap.tableDataField as TableDataFieldValue;
-            if (tableDataFieldValue?.fieldType === 'dynamicField') {
-                isValid = fieldValue?.value !== tableDataFieldValue?.dynamicFieldInfo?.fieldValue;
-            }
+            const groupByFieldValue = valueMap[groupByField]?.value as GroupByValue;
+            const allValueExist = groupByFieldValue?.data && !!groupByFieldValue.data.length;
+            isValid = !!allValueExist;
         } else {
             // Label Info Fields Value Duplicate Validation (Except Table Widget)
             const allFields = [..._state.requiredFields, ..._state.optionalFields];
