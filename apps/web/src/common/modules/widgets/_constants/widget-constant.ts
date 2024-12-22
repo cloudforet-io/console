@@ -11,3 +11,5 @@ export const REFERENCE_FIELD_MAP = {
     Region: 'region',
     'Service Account': 'serviceAccount',
 } as const;
+
+export const WIDGET_LOAD_STALE_TIME = 1000 * 60 * 10;

@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Fragment from 'vue-fragment';
 
 import LottieVuePlayer from '@lottiefiles/vue-lottie-player';
+import { VueQueryPlugin } from '@tanstack/vue-query';
 import { PiniaVuePlugin } from 'pinia';
 import PortalVue from 'portal-vue';
 import VTooltip from 'v-tooltip';
@@ -29,6 +30,7 @@ Vue.use(Fragment.Plugin);
 Vue.use(VTooltip, { defaultClass: 'p-tooltip', defaultBoundariesElement: document.body });
 Vue.use(PortalVue);
 Vue.use(PiniaVuePlugin);
+Vue.use(VueQueryPlugin);
 
 directive(Vue);
 

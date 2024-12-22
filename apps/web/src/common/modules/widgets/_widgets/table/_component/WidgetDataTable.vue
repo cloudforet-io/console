@@ -79,7 +79,6 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:sort-by', value: Query['sort']): void;
   (e: 'update:this-page', value: number): void;
-  (e: 'load'): void;
 }>();
 const allReferenceStore = useAllReferenceStore();
 
@@ -124,8 +123,12 @@ const state = reactive({
 
 const getComparisonInfo = (fieldName: string) => `${fieldName} Compared to ${props.granularity || 'Previous'}`;
 const getField = (field: TableWidgetField): string => {
-    if (field.fieldInfo?.type === 'dataField' && field.fieldInfo?.reference) return storeState[field.fieldInfo.reference][field.label]?.name || field.label || field.name;
-    if (field.fieldInfo?.type === 'dataField' && field.fieldInfo?.additionalType === 'dateFormat' && !!state.refinedDateFormat) return getFormattedDate(field.name, state.refinedDateFormat);
+    if (field.fieldInfo?.type === 'dataField' && field.fieldInfo?.reference) {
+        return storeState[field.fieldInfo.reference][field.label]?.name || field.label || field.name;
+    }
+    if (field.fieldInfo?.type === 'dataField' && field.fieldInfo?.additionalType === 'dateFormat' && !!state.refinedDateFormat) {
+        return getFormattedDate(field.name, state.refinedDateFormat);
+    }
     return field.label || field.name;
 };
 
@@ -200,7 +203,6 @@ const handleClickSort = async (sortKey: string) => {
     }
     state.proxySortBy = resultSortBy;
     state.proxyThisPage = 1;
-    emit('load');
 };
 
 const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {

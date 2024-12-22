@@ -142,10 +142,7 @@ const reset = () => {
     dashboardDetailStore.setOptions(state.dashboardOptionsSnapshot);
 };
 const loadOverlayWidget = async () => {
-    const res = await overlayWidgetRef?.value?.loadWidget();
-    if (typeof res === 'function') {
-        res('Please check the widget options.');
-    }
+    await overlayWidgetRef?.value?.loadWidget();
 };
 
 /* Event */

@@ -3,7 +3,6 @@ import type {
     DashboardVars,
 } from '@/schema/dashboard/_types/dashboard-type';
 
-import type { APIErrorToast } from '@/common/composables/error/errorHandler';
 import type { WIDGET_SIZE } from '@/common/modules/widgets/_constants/widget-display-constant';
 import type { WidgetFieldValue } from '@/common/modules/widgets/_widget-field-value-manager/type';
 import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-field-type';
@@ -49,6 +48,6 @@ export interface WidgetEmit {
 
 export type WidgetOverlayType = 'ADD'|'EDIT'|'EXPAND';
 
-export interface WidgetExpose<Data = any> {
-    loadWidget: (...args: any) => Promise<Data|APIErrorToast>;
+export interface WidgetExpose {
+    loadWidget: (...args: any) => Promise<void>;
 }
