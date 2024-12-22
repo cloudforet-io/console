@@ -4,6 +4,7 @@ import getRandomId from '@/lib/random-id-generator';
 
 import { useFieldValidator } from '@/common/composables/form-validator';
 
+import type { MutableTaskField } from '@/services/ops-flow/task-fields-configuration/types/mutable-task-field-type';
 import type {
     TaskFieldTypeMetadata,
 } from '@/services/ops-flow/task-fields-configuration/types/task-field-type-metadata-type';
@@ -24,7 +25,7 @@ const DEFAULT_SELECTION_TYPE_MAP: Record<TaskFieldType, TaskFieldSelectionType|u
 export const useTaskFieldsConfiguration = () => {
     const validationMap = new Map<string, boolean>();
 
-    const taskFieldsValidator = useFieldValidator<TaskField[]>([], (_fields) => _fields.every((field) => validationMap.get(field.field_id)));
+    const taskFieldsValidator = useFieldValidator<MutableTaskField[]>([], (_fields) => _fields.every((field) => validationMap.get(field._field_id)));
     const {
         value: fields,
         setValue: setFields,
@@ -39,6 +40,7 @@ export const useTaskFieldsConfiguration = () => {
             const fieldId = getRandomId();
             validationMap.set(fieldId, false);
             setFields([...fields.value, {
+                _field_id: fieldId,
                 field_id: fieldId,
                 field_type: field.type,
                 name: field.name,
@@ -46,7 +48,7 @@ export const useTaskFieldsConfiguration = () => {
                 selection_type: DEFAULT_SELECTION_TYPE_MAP[field.type],
                 is_primary: false,
                 options: {},
-            } as TaskField]);
+            } as MutableTaskField]);
         },
         removeField(fieldId: string) {
             validationMap.delete(fieldId);
@@ -59,10 +61,17 @@ export const useTaskFieldsConfiguration = () => {
         },
         setInitialFields(initialFields?: TaskField[]) {
             validationMap.clear();
-            initialFields?.forEach((field) => {
+            const mutableFields: MutableTaskField[] = initialFields?.map((field) => {
                 validationMap.set(field.field_id, true);
+                return {
+                    ...field,
+                    _field_id: field.field_id,
+                };
+            }) ?? [];
+            mutableFields.forEach((field) => {
+                validationMap.set(field._field_id, true);
             });
-            setFields(initialFields ?? []);
+            setFields(mutableFields ?? []);
         },
     };
 };

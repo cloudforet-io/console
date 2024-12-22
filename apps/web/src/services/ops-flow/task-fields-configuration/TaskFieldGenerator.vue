@@ -3,7 +3,7 @@ import {
     defineAsyncComponent, computed, onBeforeMount, ref, watch,
 } from 'vue';
 
-import { isEqual } from 'lodash';
+import { isEqual, cloneDeep } from 'lodash';
 
 import {
     PFieldGroup, PTextInput, PToggleButton, PCheckbox, PButton, PSelectButton, PCodeEditor,
@@ -14,7 +14,7 @@ import type {
     TaskFieldOptions,
     TaskFieldType,
 } from '@/schema/opsflow/_types/task-field-type';
-import { i18n } from '@/translations';
+import { getParticle, i18n } from '@/translations';
 
 import InfoTooltip from '@/common/components/guidance/InfoTooltip.vue';
 import ChangedMark from '@/common/components/marks/ChangedMark.vue';
@@ -28,6 +28,9 @@ import {
     useTaskFieldMetadataStore,
 } from '@/services/ops-flow/task-fields-configuration/stores/use-task-field-metadata-store';
 import TaskFieldGeneratorHeader from '@/services/ops-flow/task-fields-configuration/TaskFieldGeneratorHeader.vue';
+import type {
+    OptionalMutableTaskField,
+} from '@/services/ops-flow/task-fields-configuration/types/mutable-task-field-type';
 import type { TaskFieldTypeMetadata } from '@/services/ops-flow/task-fields-configuration/types/task-field-type-metadata-type';
 import {
     useTaskManagementTemplateStore,
@@ -39,7 +42,8 @@ const COMPONENT_MAP: Partial<Record<TaskFieldType, ReturnType<typeof defineAsync
 };
 
 const props = defineProps<{
-    field: TaskField;
+    field: OptionalMutableTaskField;
+    allFields: OptionalMutableTaskField[];
 }>();
 const emit = defineEmits<{(event: 'delete'): void;
     (event: 'update:field', value: TaskField): void;
@@ -55,6 +59,7 @@ const optionsComponent = computed<ReturnType<typeof defineAsyncComponent>|undefi
 
 const isDefaultField = computed(() => !!DEFAULT_FIELD_ID_MAP[props.field.field_id]);
 
+/* input type */
 const inputTypes = computed<{ name: string; label: string; }[]>(() => [
     { name: 'form', label: i18n.t('OPSFLOW.FIELD_GENERATOR.FORM') as string },
     { name: 'json', label: i18n.t('OPSFLOW.FIELD_GENERATOR.JSON') as string },
@@ -62,7 +67,9 @@ const inputTypes = computed<{ name: string; label: string; }[]>(() => [
 const inputType = ref<string>('form');
 const handleChangeInputType = (value: string) => {
     if (value === 'json') {
-        jsonCode.value = JSON.stringify(field.value);
+        const taskField = cloneDeep(field.value);
+        delete taskField._field_id;
+        jsonCode.value = JSON.stringify(taskField);
     } else {
         applyJsonCodeToStates(jsonCode.value);
     }
@@ -70,24 +77,56 @@ const handleChangeInputType = (value: string) => {
 };
 /* field id */
 const {
-    value: fieldId, setValue: setFieldId, isInvalid: isFieldIdInvalid, validationResult: isFieldIdValid,
-} = useFieldValidator<string|undefined>('', (val?: string) => (val ? val.trim().length > 0 : false));
+    value: fieldId, setValue: setFieldId, isInvalid: isFieldIdInvalid, validationResult: isFieldIdValid, invalidText: fieldIdInvalidText,
+} = useFieldValidator<string|undefined>('', (val?: string) => {
+    if (!val?.trim()) {
+        return i18n.t('OPSFLOW.VALIDATION.REQUIRED', {
+            topic: i18n.t('OPSFLOW.FIELD_ID', { field: i18n.t('OPSFLOW.FIELD_GENERATOR.FIELD') }),
+            particle: getParticle(i18n.t('OPSFLOW.FIELD_ID', { field: i18n.t('OPSFLOW.FIELD_GENERATOR.FIELD') }) as string, 'topic'),
+        });
+    }
+    if (props.allFields.some((f) => {
+        const id = f._field_id || f.field_id;
+        return id === val && id !== props.field._field_id;
+    })) {
+        return i18n.t('OPSFLOW.VALIDATION.DUPLICATED', {
+            field: i18n.t('OPSFLOW.FIELD_ID', { field: i18n.t('OPSFLOW.FIELD_GENERATOR.FIELD') }),
+        });
+    }
+    return true;
+});
 const isFieldIdChanged = computed(() => {
     if (isDefaultField.value) return true;
-    return fieldId.value !== props.field.field_id;
+    return fieldId.value !== props.field._field_id;
 });
 const handleClickUndoFieldId = () => {
-    setFieldId(props.field.field_id);
+    setFieldId(props.field._field_id);
 };
 
 /* field name */
 const {
-    value: name, setValue: setName, resetValidation: resetNameValidation, isInvalid: isNameInvalid, validationResult: isNameValid,
-} = useFieldValidator<string|undefined>('', (val?: string) => (val ? val.trim().length > 0 : false));
+    value: name, setValue: setName, resetValidation: resetNameValidation, isInvalid: isNameInvalid, invalidText: nameInvalidText, validationResult: isNameValid,
+} = useFieldValidator<string|undefined>('', (val?: string) => {
+    if (!val?.trim()) {
+        return i18n.t('OPSFLOW.VALIDATION.REQUIRED', {
+            topic: i18n.t('OPSFLOW.FIELD_NAME', { field: i18n.t('OPSFLOW.FIELD_GENERATOR.FIELD') }),
+            particle: getParticle(i18n.t('OPSFLOW.FIELD_NAME', { field: i18n.t('OPSFLOW.FIELD_GENERATOR.FIELD') }) as string, 'topic'),
+        });
+    }
+    return true;
+});
 
 /* field options */
 const options = ref<TaskFieldOptions>({});
 const isOptionsValid = ref<boolean>(false);
+const optionsInvalidText = ref<string>('');
+const handleUpdateOptions = (value: TaskFieldOptions) => {
+    options.value = value;
+};
+const handleUpdateOptionsValidation = (isValid: boolean, invalidText: string) => {
+    isOptionsValid.value = isValid;
+    optionsInvalidText.value = invalidText;
+};
 
 /* field required */
 const isRequired = ref<boolean>(false);
@@ -105,11 +144,12 @@ const isAllValid = computed<boolean>(() => (isDefaultField.value ? isFieldIdVali
     && isNameValid.value
     && (optionsComponent.value ? isOptionsValid.value : true));
 
+
 /* aggregated field */
-const field = computed<TaskField>(() => {
+const field = computed<OptionalMutableTaskField>(() => {
     const result = {
         ...props.field,
-        field_id: fieldId.value ? fieldId.value : props.field.field_id,
+        field_id: fieldId.value,
         name: name.value ?? '',
         options: options.value,
         is_required: isRequired.value,
@@ -123,6 +163,14 @@ const field = computed<TaskField>(() => {
 
 /* json */
 const jsonCode = ref<string>('');
+const jsonInvalidText = computed<string>(() => {
+    const allInvalidTexts: string[] = [];
+    if (fieldIdInvalidText.value) allInvalidTexts.push(fieldIdInvalidText.value as string);
+    if (nameInvalidText.value) allInvalidTexts.push(nameInvalidText.value as string);
+    if (optionsComponent.value && !isOptionsValid.value) allInvalidTexts.push(optionsInvalidText.value);
+    if (isRequired.value && !isPrimary.value) allInvalidTexts.push(i18n.t('OPSFLOW.VALIDATION.PRIMARY_FIELD_REQUIRED') as string);
+    return allInvalidTexts.join('\n');
+});
 const applyJsonCodeToStates = (code: string) => {
     let obj;
     try {
@@ -194,8 +242,9 @@ onBeforeMount(() => {
                 </div>
                 <template v-if="inputType === 'form'">
                     <p-field-group v-if="!isDefaultField"
-                                   :label="$t('OPSFLOW.FIELD_ID')"
+                                   :label="$t('OPSFLOW.FIELD_ID', {field: $t('OPSFLOW.FIELD_GENERATOR.FIELD')})"
                                    :invalid="isFieldIdInvalid"
+                                   :invalid-text="fieldIdInvalidText"
                                    required
                     >
                         <template #label-extra>
@@ -219,7 +268,7 @@ onBeforeMount(() => {
                                       style-type="tertiary"
                                       @click="handleClickUndoFieldId"
                             >
-                                Undo
+                                {{ $t('OPSFLOW.FIELD_GENERATOR.UNDO') }}
                             </p-button>
                         </div>
                     </p-field-group>
@@ -235,8 +284,8 @@ onBeforeMount(() => {
                     </p-field-group>
                     <component :is="optionsComponent"
                                :options="options"
-                               @update:options="options = $event"
-                               @update:is-valid="isOptionsValid = $event"
+                               @update:options="handleUpdateOptions"
+                               @update:is-valid="handleUpdateOptionsValidation"
                     />
                     <p-field-group :label="$t('OPSFLOW.FIELD_GENERATOR.SHOW_TASK_CREATION', {task: taskManagementTemplateStore.templates.Task })"
                                    required
@@ -258,6 +307,11 @@ onBeforeMount(() => {
                     <p-code-editor :code="jsonCode"
                                    @update:code="handleUpdateJsonCode"
                     />
+                    <p v-if="jsonInvalidText"
+                       class="mt-1 text-label-sm text-alert whitespace-pre"
+                    >
+                        {{ jsonInvalidText }}
+                    </p>
                 </template>
             </div>
             <div v-if="inputType === 'form'"

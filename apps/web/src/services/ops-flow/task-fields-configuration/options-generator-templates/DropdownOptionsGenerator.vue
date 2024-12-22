@@ -9,6 +9,7 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { DropdownTaskFieldOptions } from '@/schema/opsflow/_types/task-field-type';
+import { i18n } from '@/translations';
 
 import getRandomId from '@/lib/random-id-generator';
 
@@ -19,7 +20,7 @@ import type {
     OptionsGeneratorProps,
 } from '@/services/ops-flow/task-fields-configuration/types/options-generator-type';
 import type {
-    ControllableTaskFieldEnum,
+    ControllableTaskFieldEnum, InvalidType, ValidationInfo,
 } from '@/services/ops-flow/task-fields-configuration/types/task-field-dropdown-enum-type';
 
 const props = withDefaults(defineProps<OptionsGeneratorProps<DropdownTaskFieldOptions>>(), {
@@ -45,16 +46,47 @@ const updateEnum = (index: number, key: 'key' | 'name', value: string) => {
 const allKeys = computed<string[]>(() => enums.value.map((item) => item.key));
 const isDeletable = computed<boolean>(() => enums.value.length > 1);
 
-const validationMap = ref<{ [itemId: string]: boolean }>({});
-const isAllValid = computed<boolean>(() => enums.value.every((item) => validationMap.value[item._id]));
-watch(isAllValid, (isValid) => {
-    emit('update:is-valid', isValid);
+const validationMap = ref<{ [itemId: string]: ValidationInfo }>({});
+const handleUpdateValidation = (index: number, isValid: boolean, invalidTypes: InvalidType[]) => {
+    validationMap.value[enums.value[index]._id] = { isValid, invalidTypes, touched: true };
+};
+const isAllValid = computed<boolean>(() => enums.value.every((item) => {
+    const validation = validationMap.value[item._id];
+    return validation.isValid;
+}));
+const invalidTexts = computed<string[]>(() => {
+    const texts: string[] = [];
+    const distinctInvalidTypes = new Set<InvalidType>();
+    enums.value.forEach((item) => {
+        const validation = validationMap.value[item._id];
+        if (!validation.touched) return;
+        validation.invalidTypes.forEach((type) => {
+            distinctInvalidTypes.add(type);
+        });
+    });
+    if (distinctInvalidTypes.has('KEY_REQUIRED')) {
+        texts.push(i18n.t('OPSFLOW.VALIDATION.ENUM_REQUIRED') as string);
+    }
+    if (distinctInvalidTypes.has('KEY_DUPLICATED')) {
+        texts.push(i18n.t('OPSFLOW.VALIDATION.ENUM_KEY_DUPLICATED') as string);
+    }
+    if (distinctInvalidTypes.has('NAME_REQUIRED')) {
+        texts.push(i18n.t('OPSFLOW.VALIDATION.ENUM_NAME_REQUIRED') as string);
+    }
+    return texts;
+});
+watch([isAllValid, invalidTexts], ([isValid, texts]) => {
+    if (isValid === undefined) return;
+    emit('update:is-valid', isValid, texts.join('\n'));
 }, { immediate: true });
 
 const handleAdd = () => {
     const newId = getRandomId();
     enums.value.push({ _id: newId, key: '', name: '' });
-    validationMap.value = { ...validationMap.value, [newId]: false };
+    validationMap.value = {
+        ...validationMap.value,
+        [newId]: { isValid: undefined, touched: false, invalidTypes: [] },
+    };
 };
 const handleDelete = (index: number) => {
     const itemId = enums.value[index]._id;
@@ -66,11 +98,15 @@ onBeforeMount(() => {
     if (!props.options.enums || !props.options.enums.length) {
         enums.value = [{ _id: getRandomId(), key: '', name: '' }];
     } else {
-        enums.value = props.options.enums;
+        enums.value = props.options.enums.map((item) => ({
+            _id: getRandomId(),
+            key: item.key,
+            name: item.name,
+        }));
     }
-    const newValidationMap: { [itemId: string]: boolean } = {};
+    const newValidationMap: { [itemId: string]: ValidationInfo } = {};
     enums.value.forEach((item) => {
-        newValidationMap[item._id] = false;
+        newValidationMap[item._id] = { isValid: undefined, touched: false, invalidTypes: [] };
     });
     validationMap.value = newValidationMap;
 });
@@ -101,7 +137,7 @@ onBeforeMount(() => {
                                                :values="allKeys"
                                                @update:name="updateEnum(idx, 'name', $event)"
                                                @update:value="updateEnum(idx, 'key', $event)"
-                                               @update:is-valid="validationMap[item._id] = $event"
+                                               @update:is-valid="handleUpdateValidation(idx, ...arguments)"
                 />
                 <p-icon-button shape="square"
                                size="sm"

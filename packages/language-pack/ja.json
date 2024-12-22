@@ -4219,6 +4219,7 @@
 			"FORM": "",
 			"GLOBAL": "",
 			"JSON": "",
+			"KEY": "",
 			"LABELS": "",
 			"PARAGRAPH": "",
 			"PROJECT": "",
@@ -4230,6 +4231,7 @@
 			"TASK_DESCRIPTION": "",
 			"TASK_TITLE": "",
 			"TEXT": "",
+			"UNDO": "",
 			"USER": "",
 			"VALUE": ""
 		},
@@ -4303,7 +4305,9 @@
 		"VALIDATION": {
 			"DUPLICATED": "",
 			"FIELD_REQUIRED": "",
+			"INVALID_FORMAT": "",
 			"LENGTH_MAX": "",
+			"PRIMARY_FIELD_REQUIRED": "",
 			"REQUIRED": "",
 			"UNSUPPORTED_FIELD_TYPE": "",
 			"VALUE_ARRAY": "",
