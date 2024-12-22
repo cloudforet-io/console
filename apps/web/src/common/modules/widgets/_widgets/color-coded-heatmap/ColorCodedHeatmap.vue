@@ -105,8 +105,12 @@ const queryResult = useQuery({
         start: dateRange.value.start,
         end: dateRange.value.end,
         vars: props.dashboardVars,
-        page: { start: 1, limit: MAX_COUNT },
+        page: {
+            start: 1,
+            limit: MAX_COUNT,
+        },
     }),
+    enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable && state.runQueries),
 });
 
 const loading = computed(() => queryResult.isLoading);
