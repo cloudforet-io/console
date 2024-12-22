@@ -67,8 +67,6 @@ const state = reactive({
     isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
     dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
 
-    loading: false,
-    errorMessage: undefined as string|undefined,
     data: null as Data | null,
     chart: null as EChartsType | null,
     xAxisData: computed<string[]>(() => {

@@ -92,7 +92,7 @@ const queryKey = computed(() => [
         granularity: widgetOptionsState.granularityInfo?.granularity,
         dataTableId: state.dataTable?.data_table_id,
         dataTableOptions: JSON.stringify(sortObjectByKeys(state.dataTable?.options) ?? {}),
-        groupBy: JSON.stringify([widgetOptionsState.groupByInfo.data as string, widgetOptionsState.formatRulesInfo.field as string]),
+        groupBy: [widgetOptionsState.groupByInfo?.data as string, widgetOptionsState.formatRulesInfo?.field as string],
     },
 ]);
 
@@ -101,7 +101,7 @@ const queryResult = useQuery({
     queryFn: () => fetchWidgetData({
         widget_id: props.widgetId,
         granularity: widgetOptionsState.granularityInfo?.granularity,
-        group_by: [widgetOptionsState.groupByInfo.data as string, widgetOptionsState.formatRulesInfo.field as string],
+        group_by: [widgetOptionsState.groupByInfo?.data as string, widgetOptionsState.formatRulesInfo?.field as string],
         start: dateRange.value.start,
         end: dateRange.value.end,
         vars: props.dashboardVars,
