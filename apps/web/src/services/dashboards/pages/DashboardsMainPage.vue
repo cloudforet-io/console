@@ -325,10 +325,10 @@ onUnmounted(() => {
                     {{ $t('DASHBOARDS.ALL_DASHBOARDS.HELP_TEXT_CREATE') }}
                 </p-empty>
             </template>
-            <div v-if="(storeState.isAdminMode || storeState.isWorkspaceOwner) && state.refinedPublicTreeData.length"
+            <div v-if="state.refinedPublicTreeData.length"
                  class="tree-wrapper"
             >
-                <dashboard-folder-tree-title v-if="storeState.isWorkspaceOwner"
+                <dashboard-folder-tree-title v-if="!storeState.isAdminMode"
                                              :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.SHARED')"
                                              :is-collapsed.sync="state.treeCollapseMap.public"
                 />
