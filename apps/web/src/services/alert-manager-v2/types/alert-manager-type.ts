@@ -2,7 +2,7 @@ import type { TranslateResult } from 'vue-i18n';
 
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
-import type { AlertUrgencyType } from '@/schema/alert-manager/alert/type';
+import type { AlertStateType, AlertUrgencyType } from '@/schema/alert-manager/alert/type';
 import type { ServiceChannelDataType, ServiceChannelScheduleInfoType } from '@/schema/alert-manager/service-channel/type';
 import type { ServiceModel } from '@/schema/alert-manager/service/model';
 import type { AlertsInfoType, AlertsType } from '@/schema/alert-manager/service/type';
@@ -53,3 +53,9 @@ export type ProtocolInfo = {
     name: string;
     icon: string;
 };
+
+export type EscalationPolicyRadioType = {
+    label: TranslateResult,
+    name: AlertStateType
+};
+export type EscalationPolicyModalType = 'CREATE' | 'SET';

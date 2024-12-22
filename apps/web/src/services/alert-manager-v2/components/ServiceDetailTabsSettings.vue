@@ -14,7 +14,7 @@ import { red } from '@/styles/colors';
 
 import ServiceDetailTabsSettingsEscalationPolicy
     from '@/services/alert-manager-v2/components/ServiceDetailTabsSettingsEscalationPolicy.vue';
-import ServiceDetailTabsSettingsModal from '@/services/alert-manager-v2/components/ServiceDetailTabsSettingsModal.vue';
+import ServiceDetailTabsSettingsModal from '@/services/alert-manager-v2/components/ServiceDetailTabsSettingsUpdateModal.vue';
 import { SERVICE_SETTING_CARD } from '@/services/alert-manager-v2/constants/common-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
 import type { ServiceDetailSettingCardType, Service } from '@/services/alert-manager-v2/types/alert-manager-type';
