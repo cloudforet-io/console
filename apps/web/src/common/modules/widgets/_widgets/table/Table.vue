@@ -1,30 +1,31 @@
 <script setup lang="ts">
 import {
-    defineExpose, reactive, computed, watch, onMounted,
+    defineExpose, reactive, computed, onMounted,
 } from 'vue';
 
+import { useQueries } from '@tanstack/vue-query';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
-import type { CancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
+import type { Sort } from '@cloudforet/core-lib/space-connector/type';
 import { PPagination } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
+import type { PrivateWidgetLoadSumParameters } from '@/schema/dashboard/private-widget/api-verbs/load-sum';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
+import type { PublicWidgetLoadSumParameters } from '@/schema/dashboard/public-widget/api-verbs/load-sum';
 
-import type { APIErrorToast } from '@/common/composables/error/errorHandler';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
-import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
+import { WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
+import { sortObjectByKeys } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import {
     getPreviousDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
-import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { getWidgetDataTable } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/comparison/type';
 import type { CustomTableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
@@ -62,49 +63,22 @@ const { dateRange } = useWidgetDateRange({
 });
 
 const state = reactive({
-    loading: false,
-    isPrivateWidget: computed(() => props.widgetId.startsWith('private')),
-    errorMessage: undefined as string|undefined,
-    data: null as Data | null,
-    fullPageData: null as Data | null,
-    comparisonData: null as Data | null,
-    fullPageComparisonData: null as Data | null,
+    runQueries: false,
+    isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
+    pageSize: computed<number>(() => (props.size === 'full' ? 30 : 10)),
+    thisPage: 1 as number,
+    sortBy: [] as Sort[],
     dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
-    // converted data
-    finalConvertedData: computed<Data|null>(() => {
-        if (!state.data) return null;
-        return state.staticFieldSlicedData;
-    }),
-    staticFieldSlicedData: null as Data | null,
-    timeSeriesDynamicFieldSlicedData: null as Data | null,
-    noneTimeSeriesDynamicFieldSlicedData: null as Data | null,
-    // data fetch options
-    granularityInfo: computed<GranularityValue>(() => props.widgetOptions?.granularity?.value as GranularityValue),
-    basedOnDate: computed(() => props.dashboardOptions?.date_range?.end),
-    dateRangeField: computed<DateRangeValue|undefined>(() => props.widgetOptions?.dateRange?.value as DateRangeValue),
-    dataFieldInfo: computed<DataFieldValue>(() => props.widgetOptions?.dataField?.value as DataFieldValue),
-    groupByInfo: computed<GroupByValue>(() => props.widgetOptions?.groupBy?.value as GroupByValue),
-    comparisonDateRange: computed<DateRange>(() => getPreviousDateRange(state.granularityInfo?.granularity, dateRange.value)),
-    // data for optional fields
-    isComparisonEnabled: computed<boolean>(() => !isDateField(state.tableDataField) && !state.groupByInfo?.data?.some((groupBy) => Object.values(DATE_FIELD).includes(groupBy))),
-    comparisonInfo: computed<ComparisonValue|undefined>(() => props.widgetOptions?.comparison?.value as ComparisonValue),
-    subTotalInfo: computed<TotalValue|undefined>(() => props.widgetOptions?.subTotal?.value as TotalValue),
-    totalInfo: computed<TotalValue|undefined>(() => props.widgetOptions?.total?.value as TotalValue),
-    dateFormatInfo: computed<DateFormatValue|undefined>(() => props.widgetOptions?.dateFormat?.value as DateFormatValue),
-    numberFormatInfo: computed<NumberFormatValue|undefined>(() => props.widgetOptions?.numberFormat?.value as NumberFormatValue),
-    dataFieldHeatmapColorInfo: computed<DataFieldHeatmapColorValue|undefined>(() => props.widgetOptions?.dataFieldHeatmapColor?.value as DataFieldHeatmapColorValue),
-    textWrapInfo: computed<TextWrapValue>(() => props.widgetOptions?.textWrap?.value as TextWrapValue),
-    tableColumnWidthInfo: computed<TableColumnWidthValue|undefined>(() => props.widgetOptions?.tableColumnWidth?.value as TableColumnWidthValue),
-    customTableColumnWidthInfo: computed<CustomTableColumnWidthValue|undefined>(() => props.widgetOptions?.customTableColumnWidth?.value as CustomTableColumnWidthValue),
-    missingValueInfo: computed<MissingValueValue|undefined>(() => props.widgetOptions?.missingValue?.value as MissingValueValue),
-    // table
+    comparisonDateRange: computed<DateRange>(() => getPreviousDateRange(widgetOptionsState.granularityInfo?.granularity, dateRange.value)),
+    isComparisonEnabled: computed<boolean>(() => !!(widgetOptionsState.comparisonInfo?.toggleValue)),
+    dataInfo: computed<DataInfo|undefined>(() => widgetOptionsState.dataTable?.data_info),
     tableFields: computed<TableWidgetField[]>(() => {
-        const labelFields: TableWidgetField[] = (state.groupByInfo?.data ?? []).map(
+        const labelFields: TableWidgetField[] = (widgetOptionsState.groupByInfo?.data ?? []).map(
             (field) => ({ name: field, label: field, fieldInfo: { type: 'labelField', additionalType: field === 'Date' ? 'dateFormat' : undefined } }),
         ) ?? [];
         const dataFields: TableWidgetField[] = [];
 
-        state.dataFieldInfo?.data?.forEach((field) => {
+        widgetOptionsState.dataFieldInfo?.data?.forEach((field) => {
             dataFields.push({
                 name: field,
                 label: field,
@@ -113,7 +87,7 @@ const state = reactive({
                     unit: state.dataInfo?.[field]?.unit,
                 },
             });
-            if (state.comparisonInfo?.format && state.isComparisonEnabled) {
+            if (widgetOptionsState.comparisonInfo?.format && state.isComparisonEnabled) {
                 dataFields.push({
                     name: `comparison_${field}`,
                     label: field,
@@ -128,192 +102,163 @@ const state = reactive({
         const basicFields = [...labelFields, ...dataFields];
         return basicFields;
     }),
-    dataInfo: computed<DataInfo|undefined>(() => state.dataTable?.data_info),
-    sortBy: [],
-    thisPage: 1,
-    pageSize: computed<number>(() => (props.size === 'full' ? 30 : 10)),
-    allPage: computed(() => {
-        const totalCount = state.data?.total_count ?? 0;
-        return Math.ceil(totalCount / state.pageSize) || 1;
-    }),
+});
+
+const widgetOptionsState = reactive({
+    comparisonInfo: computed<ComparisonValue>(() => props.widgetOptions?.comparison?.value as ComparisonValue),
+    totalInfo: computed<TotalValue>(() => props.widgetOptions?.total?.value as TotalValue),
+    subTotalInfo: computed<TotalValue|undefined>(() => props.widgetOptions?.subTotal?.value as TotalValue),
+    needFullDataFetch: computed<boolean>(() => state.totalInfo?.toggleValue),
+    granularityInfo: computed<GranularityValue>(() => props.widgetOptions?.granularity?.value as GranularityValue),
+    groupByInfo: computed<GroupByValue>(() => props.widgetOptions?.groupBy?.value as GroupByValue),
+    dataFieldInfo: computed<DataFieldValue>(() => props.widgetOptions?.dataField?.value as DataFieldValue),
+    dateFormatInfo: computed<DateFormatValue|undefined>(() => props.widgetOptions?.dateFormat?.value as DateFormatValue),
+    numberFormatInfo: computed<NumberFormatValue|undefined>(() => props.widgetOptions?.numberFormat?.value as NumberFormatValue),
+    dataFieldHeatmapColorInfo: computed<DataFieldHeatmapColorValue|undefined>(() => props.widgetOptions?.dataFieldHeatmapColor?.value as DataFieldHeatmapColorValue),
+    textWrapInfo: computed<TextWrapValue>(() => props.widgetOptions?.textWrap?.value as TextWrapValue),
+    tableColumnWidthInfo: computed<TableColumnWidthValue|undefined>(() => props.widgetOptions?.tableColumnWidth?.value as TableColumnWidthValue),
+    customTableColumnWidthInfo: computed<CustomTableColumnWidthValue|undefined>(() => props.widgetOptions?.customTableColumnWidth?.value as CustomTableColumnWidthValue),
+    missingValueInfo: computed<MissingValueValue|undefined>(() => props.widgetOptions?.missingValue?.value as MissingValueValue),
+
+});
+
+
+
+const fetchWidgetData = async (params: PrivateWidgetLoadParameters|PublicWidgetLoadParameters): Promise<Data> => {
+    const defaultFetcher = state.isPrivateWidget
+        ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
+        : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>;
+    const res = await defaultFetcher(params);
+    return res;
+};
+
+const fetchWidgetSumData = async (params: PrivateWidgetLoadSumParameters|PublicWidgetLoadSumParameters): Promise<Data> => {
+    const defaultFetcher = state.isPrivateWidget
+        ? SpaceConnector.clientV2.dashboard.privateWidget.loadSum<PrivateWidgetLoadSumParameters, Data>
+        : SpaceConnector.clientV2.dashboard.publicWidget.loadSum<PublicWidgetLoadSumParameters, Data>;
+    const res = await defaultFetcher(params);
+    return res;
+};
+
+const baseQueryKey = computed(() => [
+    'widget-load-table',
+    props.widgetId,
+    {
+        start: dateRange.value.start,
+        end: dateRange.value.end,
+        sort: state.sortBy,
+        page: state.thisPage,
+        pageSize: state.pageSize,
+        granularity: widgetOptionsState.granularityInfo?.granularity,
+        dataTableId: state.dataTable?.data_table_id,
+        dataTableOptions: JSON.stringify(sortObjectByKeys(state.dataTable?.options) ?? {}),
+    },
+]);
+
+const fullDataQueryKey = computed(() => [
+    'widget-load-table-sum',
+    props.widgetId,
+    {
+        start: dateRange.value.start,
+        end: dateRange.value.end,
+        granularity: widgetOptionsState.granularityInfo.granularity,
+        dataTableId: state.dataTable?.data_table_id,
+        dataTableOptions: JSON.stringify(sortObjectByKeys(state.dataTable?.options) ?? {}),
+    },
+]);
+
+const results = useQueries({
+    queries: [
+        {
+            queryKey: baseQueryKey,
+            queryFn: () => fetchWidgetData({
+                widget_id: props.widgetId,
+                start: dateRange.value.start,
+                end: dateRange.value.end,
+                sort: state.sortBy,
+                page: {
+                    start: (state.pageSize * (state.thisPage - 1)) + 1,
+                    limit: state.pageSize,
+                },
+                vars: props.dashboardVars,
+                granularity: widgetOptionsState.granularityInfo.granularity,
+            }),
+            enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable && state.runQueries),
+            staleTime: WIDGET_LOAD_STALE_TIME,
+        },
+        {
+            queryKey: fullDataQueryKey,
+            queryFn: () => fetchWidgetSumData({
+                widget_id: props.widgetId,
+                start: dateRange.value.start,
+                end: dateRange.value.end,
+                vars: props.dashboardVars,
+                granularity: widgetOptionsState.granularityInfo.granularity,
+            }),
+            enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable && widgetOptionsState.totalInfo.toggleValue && state.runQueries),
+            staleTime: WIDGET_LOAD_STALE_TIME,
+        },
+    ],
+});
+
+const loading = computed(() => results.value?.[0].isLoading);
+const errorMessage = computed(() => results.value?.[0].error?.message);
+
+
+const finalData = computed<Data>(() => {
+    const data = results.value?.[0].data;
+    const totalData = results.value?.[1].data;
+
+    if (!data) return null;
+
+    let refinedResults: TableDataItem[] = [...(data.results ?? [])];
+    refinedResults.forEach((d) => {
+        // Basic Data
+        const dataItem = { ...d };
+
+        refinedResults = [
+            ...refinedResults,
+            dataItem,
+        ];
+        return dataItem;
+    });
+
+    if (widgetOptionsState.totalInfo?.toggleValue) {
+        const totalRowItem: TableDataItem = {
+            [widgetOptionsState.groupByInfo.data?.[0] ?? '']: 'Total',
+        };
+        [...(totalData?.results ?? [])].forEach((d) => {
+            const fieldKey = Object.keys(d)[0];
+            totalRowItem[fieldKey] = d[fieldKey];
+        });
+        refinedResults = [...refinedResults, totalRowItem];
+    }
+
+    return { ...data, results: refinedResults };
 });
 
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange,
-    errorMessage: computed(() => state.errorMessage),
-    widgetLoading: computed(() => state.loading),
-    noData: computed(() => (state.data ? !state.data.results?.length : false)),
+    errorMessage: errorMessage.value,
+    widgetLoading: loading.value,
+    noData: computed(() => (finalData.value ? !(finalData.value.results?.length) : false)),
 });
 
-/* Helper */
-const getTotalDataItem = (data: TableDataItem[]): TableDataItem => {
-    const hasComparisonInfo = state.comparisonInfo?.format;
-
-    const totalDataItem: TableDataItem = {};
-    if ((state.groupByInfo?.data ?? []).length) totalDataItem[(state.groupByInfo?.data ?? [])[0]] = 'Total';
-    const _tableDataField = state.dataFieldInfo?.data ?? [];
-    [..._tableDataField, 'sub_total'].forEach((field) => {
-        totalDataItem[field] = data.reduce((acc, cur) => acc + cur[field], 0);
-        if (field !== 'sub_total' && hasComparisonInfo) {
-            const comparisionFieldName = `comparison_${field}`;
-            totalDataItem[comparisionFieldName] = {
-                target: totalDataItem[field],
-                subject: data.reduce((acc, cur) => acc + cur[comparisionFieldName].subject, 0),
-            };
-        }
-    });
-    return totalDataItem;
+const handleUpdateThisPage = async (newPage: number) => {
+    state.thisPage = newPage;
 };
 
-
-const fetchWidget = async (
-    loadFetcher: CancellableFetcher<PrivateWidgetLoadParameters|PublicWidgetLoadParameters, Data>,
-    options: { isComparison?: boolean, fullDataFetch?: boolean },
-): Promise<Data|APIErrorToast|undefined> => {
-    const { isComparison, fullDataFetch } = options;
-    if (props.widgetState === 'INACTIVE') return undefined;
-    try {
-        state.loading = true;
-        const _sort: PublicWidgetLoadParameters['sort'] = [];
-        const sortAndPageQuery = fullDataFetch ? {} : {
-            sort: state.sortBy.length ? state.sortBy : _sort,
-            page: {
-                start: (state.pageSize * (state.thisPage - 1)) + 1,
-                limit: state.pageSize,
-            },
-        };
-
-        const { status, response } = await loadFetcher({
-            widget_id: props.widgetId,
-            granularity: state.granularityInfo?.granularity,
-            start: isComparison ? state.comparisonDateRange.start : dateRange.value.start,
-            end: isComparison ? state.comparisonDateRange.end : dateRange.value.end,
-            ...sortAndPageQuery,
-            vars: props.dashboardVars,
-        });
-
-        if (status === 'succeed') {
-            state.errorMessage = undefined;
-            return response;
-        }
-        return undefined;
-    } catch (e: any) {
-        state.errorMessage = e.message;
-        ErrorHandler.handleError(e);
-        return ErrorHandler.makeAPIErrorToast(e);
-    } finally {
-        state.loading = false;
-    }
+const loadWidget = async () => {
+    state.runQueries = true;
 };
 
-const defaultFetcher = state.isPrivateWidget ? SpaceConnector.clientV2.dashboard.privateWidget.load : SpaceConnector.clientV2.dashboard.publicWidget.load;
-const widgetBaseLoadFetcher = getCancellableFetcher<PrivateWidgetLoadParameters|PublicWidgetLoadParameters, Data>(defaultFetcher);
-const widgetComparisonLoadFetcher = getCancellableFetcher<PrivateWidgetLoadParameters|PublicWidgetLoadParameters, Data>(defaultFetcher);
-const widgetFullDataLoadFetcher = getCancellableFetcher<PrivateWidgetLoadParameters|PublicWidgetLoadParameters, Data>(defaultFetcher);
-const widgetFullDataComparisonLoadFetcher = getCancellableFetcher<PrivateWidgetLoadParameters|PublicWidgetLoadParameters, Data>(defaultFetcher);
-
-const loadWidget = async (manualLoad?: boolean): Promise<Data|APIErrorToast> => {
-    if (!manualLoad) {
-        state.sortBy = [];
-        state.thisPage = 1;
-    }
-
-    const res = await fetchWidget(widgetBaseLoadFetcher, {});
-    if (res === undefined) return state.data;
-    const comparisonRes = state.isComparisonEnabled && state.comparisonInfo?.format ? await fetchWidget(widgetComparisonLoadFetcher, { isComparison: true }) : null;
-    if (comparisonRes === undefined) return state.data;
-    if (typeof res === 'function') return res;
-    state.data = res;
-    state.comparisonData = comparisonRes;
-
-    if (state.totalInfo?.toggleValue) {
-        const fullDataRes = await fetchWidget(widgetFullDataLoadFetcher, { fullDataFetch: true });
-        if (fullDataRes === undefined) return state.data;
-        const fullDataComparisonRes = state.isComparisonEnabled && state.comparisonInfo?.format
-            ? await fetchWidget(widgetFullDataComparisonLoadFetcher, { isComparison: true, fullDataFetch: true })
-            : null;
-        if (fullDataComparisonRes === undefined) return state.data;
-        state.fullPageData = fullDataRes;
-        state.fullPageComparisonData = fullDataComparisonRes;
-    }
-
-    return state.data;
-};
-
-const handleManualLoadWidget = async () => {
-    await loadWidget(true);
-};
-const handleUpdateThisPage = async (_thisPage: number) => {
-    state.thisPage = _thisPage;
-    await loadWidget(true);
-};
-
-watch([() => props.size], async () => {
-    await loadWidget(true);
-});
-
-// Data Converting
-watch([() => state.data, () => state.fullPageData], ([data, fullPageData]) => {
-    if (!data) return;
-    const _fullPageDataResults = fullPageData?.results ?? [];
-
-    const comparisonData = state.comparisonData?.results;
-    const hasComparisonInfo = state.comparisonInfo?.format;
-    const results = data.results.map((d, idx) => {
-        // Basic Data
-        const dataItem = { ...d };
-
-        // Sub Total & Comparison Data
-        let subTotalValue = 0;
-
-        state.dataFieldInfo?.data?.forEach((field) => {
-            const fieldValue = d[field] ?? 0;
-            subTotalValue += fieldValue;
-
-            if (hasComparisonInfo) {
-                const comparisonValue = comparisonData?.[idx]?.[field] ?? 0;
-                dataItem[`comparison_${field}`] = { target: dataItem[field], subject: comparisonValue };
-            }
-        });
-
-        dataItem.sub_total = subTotalValue;
-        return dataItem;
-    });
-
-    // Full Total Data
-    if (state.totalInfo?.toggleValue) {
-        const fullDataComparison = state.fullPageComparisonData?.results ?? [];
-        const fullDataResults = _fullPageDataResults.map((d, idx) => {
-            const dataItem = { ...d };
-            let subTotalValue = 0;
-
-            state.dataFieldInfo?.data?.forEach((field) => {
-                const fieldValue = d[field] ?? 0;
-                subTotalValue += fieldValue;
-
-                if (hasComparisonInfo) {
-                    const comparisonValue = fullDataComparison?.[idx]?.[field] ?? 0;
-                    dataItem[`comparison_${field}`] = { target: dataItem[field], subject: comparisonValue };
-                }
-            });
-
-            dataItem.sub_total = subTotalValue;
-            return dataItem;
-        });
-        const fullTotalDataItem = getTotalDataItem(fullDataResults);
-        results.push(fullTotalDataItem);
-    }
-
-    state.staticFieldSlicedData = { results };
-}, { immediate: true });
-
+useWidgetInitAndRefresh({ props, emit, loadWidget });
 
 onMounted(async () => {
     if (!props.dataTableId) return;
     state.dataTable = await getWidgetDataTable(props.dataTableId);
 });
-useWidgetInitAndRefresh({ props, emit, loadWidget });
-defineExpose<WidgetExpose<Data>>({
+defineExpose<WidgetExpose>({
     loadWidget,
 });
 </script>
@@ -328,29 +273,28 @@ defineExpose<WidgetExpose<Data>>({
                 <widget-data-table class="data-table"
                                    :widget-id="props.widgetId"
                                    :fields="state.tableFields"
-                                   :items="state.finalConvertedData?.results"
-                                   :data-field="state.dataFieldInfo?.data"
-                                   :comparison-info="state.comparisonInfo"
-                                   :sub-total-info="state.subTotalInfo"
-                                   :total-info="state.totalInfo"
-                                   :granularity="state.granularityInfo?.granularity"
+                                   :items="finalData?.results"
+                                   :data-field="widgetOptionsState.dataFieldInfo?.data"
+                                   :comparison-info="widgetOptionsState.comparisonInfo"
+                                   :sub-total-info="widgetOptionsState.subTotalInfo"
+                                   :total-info="widgetOptionsState.totalInfo"
+                                   :granularity="widgetOptionsState.granularityInfo?.granularity"
                                    :data-info="state.dataInfo"
-                                   :date-format-info="state.dateFormatInfo"
-                                   :number-format-info="state.numberFormatInfo"
-                                   :data-field-heatmap-color-info="state.dataFieldHeatmapColorInfo"
-                                   :text-wrap-info="state.textWrapInfo"
-                                   :table-column-width-info="state.tableColumnWidthInfo"
-                                   :custom-table-column-width-info="state.customTableColumnWidthInfo"
-                                   :missing-value-info="state.missingValueInfo"
+                                   :date-format-info="widgetOptionsState.dateFormatInfo"
+                                   :number-format-info="widgetOptionsState.numberFormatInfo"
+                                   :data-field-heatmap-color-info="widgetOptionsState.dataFieldHeatmapColorInfo"
+                                   :text-wrap-info="widgetOptionsState.textWrapInfo"
+                                   :table-column-width-info="widgetOptionsState.tableColumnWidthInfo"
+                                   :custom-table-column-width-info="widgetOptionsState.customTableColumnWidthInfo"
+                                   :missing-value-info="widgetOptionsState.missingValueInfo"
                                    :sort-by.sync="state.sortBy"
                                    :this-page.sync="state.thisPage"
-                                   @load="handleManualLoadWidget"
                 />
             </div>
             <div class="table-pagination-wrapper">
                 <p-pagination :this-page="state.thisPage"
                               :page-size="state.pageSize"
-                              :total-count="state.data?.total_count ?? 0"
+                              :total-count="finalData?.total_count ?? 0"
                               size="sm"
                               @change="handleUpdateThisPage"
                 />
