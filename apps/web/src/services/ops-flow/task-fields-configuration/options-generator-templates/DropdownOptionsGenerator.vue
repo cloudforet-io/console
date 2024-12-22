@@ -4,11 +4,13 @@ import {
 } from 'vue';
 import draggable from 'vuedraggable';
 
+import { isEqual } from 'lodash';
+
 import {
     PFieldTitle, PButton, PIconButton, PI,
 } from '@cloudforet/mirinae';
 
-import type { DropdownTaskFieldOptions } from '@/schema/opsflow/_types/task-field-type';
+import type { DropdownTaskFieldOptions, TaskFieldEnum } from '@/schema/opsflow/_types/task-field-type';
 import { i18n } from '@/translations';
 
 import getRandomId from '@/lib/random-id-generator';
@@ -65,7 +67,7 @@ const invalidTexts = computed<string[]>(() => {
         });
     });
     if (distinctInvalidTypes.has('KEY_REQUIRED')) {
-        texts.push(i18n.t('OPSFLOW.VALIDATION.ENUM_REQUIRED') as string);
+        texts.push(i18n.t('OPSFLOW.VALIDATION.ENUM_KEY_REQUIRED') as string);
     }
     if (distinctInvalidTypes.has('KEY_DUPLICATED')) {
         texts.push(i18n.t('OPSFLOW.VALIDATION.ENUM_KEY_DUPLICATED') as string);
@@ -75,9 +77,10 @@ const invalidTexts = computed<string[]>(() => {
     }
     return texts;
 });
-watch([isAllValid, invalidTexts], ([isValid, texts]) => {
+const aggregatedInvalidText = computed<string>(() => invalidTexts.value.join('\n'));
+watch([isAllValid, aggregatedInvalidText], ([isValid, msg]) => {
     if (isValid === undefined) return;
-    emit('update:is-valid', isValid, texts.join('\n'));
+    emit('update:is-valid', isValid, msg);
 }, { immediate: true });
 
 const handleAdd = () => {
@@ -110,6 +113,20 @@ onBeforeMount(() => {
     });
     validationMap.value = newValidationMap;
 });
+
+const idRemovedEnums = computed<TaskFieldEnum[]>(() => enums.value.map((item) => ({
+    key: item.key,
+    name: item.name,
+})));
+watch(() => props.options, (op) => {
+    // op.enums has no _id, so need to compare the key and name
+    if (isEqual(op.enums, idRemovedEnums.value)) return;
+    enums.value = op.enums.map((item) => ({
+        _id: getRandomId(),
+        key: item.key,
+        name: item.name,
+    }));
+}, { deep: true });
 </script>
 
 <template>
@@ -148,6 +165,11 @@ onBeforeMount(() => {
                 />
             </div>
         </draggable>
+        <p v-if="aggregatedInvalidText"
+           class="mt-1 text-label-sm text-alert whitespace-pre"
+        >
+            {{ aggregatedInvalidText }}
+        </p>
         <p-button style-type="secondary"
                   icon-left="ic_plus_bold"
                   class="mt-2"

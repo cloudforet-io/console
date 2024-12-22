@@ -4304,15 +4304,18 @@
 		"TITLE": "제목",
 		"VALIDATION": {
 			"DUPLICATED": "이미 존재하는 {field}입니다",
-			"FIELD_REQUIRED": "이 필드는 필수입니다",
+			"ENUM_KEY_DUPLICATED": "중복된 키가 존재합니다.",
+			"ENUM_KEY_REQUIRED": "키는 필수입니다.",
+			"ENUM_NAME_REQUIRED": "이름은 필수입니다.",
+			"FIELD_REQUIRED": "이 필드는 필수입니다.",
 			"INVALID_FORMAT": "잘못된 형식입니다. 예상되는 형식: {format}",
-			"LENGTH_MAX": "{topic}{particle} {length}자 미만이어야 합니다",
+			"LENGTH_MAX": "{topic}{particle} {length}자 미만이어야 합니다.",
 			"PRIMARY_FIELD_REQUIRED": "'is_required'가 활성화되면 'is_primary'도 활성화해야 합니다.",
-			"REQUIRED": "{topic}{particle} 필수입니다",
-			"UNSUPPORTED_FIELD_TYPE": "지원되지 않는 필드 타입입니다",
-			"VALUE_ARRAY": "값은 배열이어야 합니다",
-			"VALUE_ONLY_ONE": "값은 하나여야 합니다",
-			"VALUE_STRING": "값은 문자열이어야 합니다"
+			"REQUIRED": "{topic}{particle} 필수입니다.",
+			"UNSUPPORTED_FIELD_TYPE": "지원되지 않는 필드 타입입니다.",
+			"VALUE_ARRAY": "값은 배열이어야 합니다.",
+			"VALUE_ONLY_ONE": "값은 하나여야 합니다.",
+			"VALUE_STRING": "값은 문자열이어야 합니다."
 		},
 		"WORKSPACE": "워크스페이스"
 	},

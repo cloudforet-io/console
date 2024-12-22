@@ -4304,15 +4304,18 @@
 		"TITLE": "Title",
 		"VALIDATION": {
 			"DUPLICATED": "{topic} already exists",
-			"FIELD_REQUIRED": "This field is required",
+			"ENUM_KEY_DUPLICATED": "Duplicate key found.",
+			"ENUM_KEY_REQUIRED": "Key is required.",
+			"ENUM_NAME_REQUIRED": "Name is required.",
+			"FIELD_REQUIRED": "This field is required.",
 			"INVALID_FORMAT": "Invalid data format. Expected format: {format}",
-			"LENGTH_MAX": "{topic} should be less than {length} characters",
+			"LENGTH_MAX": "{topic} should be less than {length} characters.",
 			"PRIMARY_FIELD_REQUIRED": "If 'is_required' is enabled, then 'is_primary' must also be enabled.",
-			"REQUIRED": "{topic} is required",
-			"UNSUPPORTED_FIELD_TYPE": "Unsupported field type",
-			"VALUE_ARRAY": "Value must be an array",
-			"VALUE_ONLY_ONE": "Only one value is allowed",
-			"VALUE_STRING": "Value must be a string"
+			"REQUIRED": "{topic} is required.",
+			"UNSUPPORTED_FIELD_TYPE": "Unsupported field type.",
+			"VALUE_ARRAY": "Value must be an array.",
+			"VALUE_ONLY_ONE": "Only one value is allowed.",
+			"VALUE_STRING": "Value must be a string."
 		},
 		"WORKSPACE": "Workspace"
 	},

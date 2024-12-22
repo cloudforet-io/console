@@ -167,7 +167,8 @@ const jsonInvalidText = computed<string>(() => {
     const allInvalidTexts: string[] = [];
     if (fieldIdInvalidText.value) allInvalidTexts.push(fieldIdInvalidText.value as string);
     if (nameInvalidText.value) allInvalidTexts.push(nameInvalidText.value as string);
-    if (optionsComponent.value && !isOptionsValid.value) allInvalidTexts.push(optionsInvalidText.value);
+    // NOTE: options invalid text is not shown in json mode yet, because validation is executed in option components and the component is not rendered in json mode.
+    // if (optionsComponent.value && !isOptionsValid.value) allInvalidTexts.push(optionsInvalidText.value);
     if (isRequired.value && !isPrimary.value) allInvalidTexts.push(i18n.t('OPSFLOW.VALIDATION.PRIMARY_FIELD_REQUIRED') as string);
     return allInvalidTexts.join('\n');
 });

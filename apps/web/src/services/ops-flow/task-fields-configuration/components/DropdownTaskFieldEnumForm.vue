@@ -35,7 +35,7 @@ const {
         return true;
     },
     name(val?: string): InvalidType|true {
-        if (!val || val.trim().length > 0) return true;
+        if (val && val.trim().length > 0) return true;
         return 'NAME_REQUIRED';
     },
 });

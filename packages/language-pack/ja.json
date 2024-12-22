@@ -4304,6 +4304,9 @@
 		"TITLE": "",
 		"VALIDATION": {
 			"DUPLICATED": "",
+			"ENUM_KEY_DUPLICATED": "",
+			"ENUM_KEY_REQUIRED": "",
+			"ENUM_NAME_REQUIRED": "",
 			"FIELD_REQUIRED": "",
 			"INVALID_FORMAT": "",
 			"LENGTH_MAX": "",
