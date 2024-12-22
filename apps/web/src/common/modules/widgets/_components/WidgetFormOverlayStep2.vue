@@ -143,10 +143,6 @@ const reset = () => {
 };
 const loadOverlayWidget = async () => {
     await overlayWidgetRef?.value?.loadWidget();
-    // const res = await overlayWidgetRef?.value?.loadWidget();
-    // if (typeof res === 'function') {
-    //     res('Please check the widget options.');
-    // }
 };
 
 /* Event */
