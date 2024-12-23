@@ -16,12 +16,12 @@ import type {
     _ColorSchemaOptions as ColorSchemaOptions,
 } from '@/common/modules/widgets/_widget-fields/color-schema/type';
 import type {
-    _WidgetFieldComponentProps,
+    WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 const FIELD_KEY = 'colorSchema';
 
-const props = defineProps<_WidgetFieldComponentProps<ColorSchemaOptions>>();
+const props = defineProps<WidgetFieldComponentProps<ColorSchemaOptions>>();
 type ColorSchemaMenuItem = {
     name: ColorSchemaValue['colorName'],
     label: ColorSchemaValue['colorName']

@@ -7,13 +7,13 @@ import {
 
 import type { SubTotalOptions, SubTotalValue } from '@/common/modules/widgets/_widget-fields/sub-total/type';
 import type {
-    _WidgetFieldComponentProps,
+    WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 
 const FIELD_KEY = 'subTotal';
 
-const props = defineProps<_WidgetFieldComponentProps<SubTotalOptions>>();
+const props = defineProps<WidgetFieldComponentProps<SubTotalOptions>>();
 
 const state = reactive({
     fieldValue: computed<SubTotalValue>(() => props.fieldManager.data[FIELD_KEY].value),

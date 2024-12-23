@@ -1,7 +1,3 @@
-import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
-import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
-import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
-
 import type WidgetFieldValueManager from '@/common/modules/widgets/_widget-field-value-manager';
 import type { CategoryByOptions } from '@/common/modules/widgets/_widget-fields/category-by/type';
 import type { _ColorSchemaOptions as ColorSchemaOptions } from '@/common/modules/widgets/_widget-fields/color-schema/type';
@@ -31,9 +27,6 @@ import type { WidgetHeightOptions } from '@/common/modules/widgets/_widget-field
 import type { XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { YAxisOptions } from '@/common/modules/widgets/_widget-fields/y-axis/type';
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
-import type {
-    WidgetFieldValues,
-} from '@/common/modules/widgets/types/widget-field-value-type';
 
 
 export type WidgetFieldOptions = DataFieldOptions | XAxisOptions | YAxisOptions
@@ -63,21 +56,8 @@ export type WidgetFieldName = 'dataField' | 'tableDataField' | 'xAxis' | 'yAxis'
     | 'missingValue' | 'widgetHeight'
     | 'widgetHeader';
 
-export interface WidgetFieldComponentProps<FieldOptions, FieldValue = any> {
-    dataTable?: PublicDataTableModel|PrivateDataTableModel;
-    allValueMap?: {
-        [key in WidgetFieldName]: WidgetFieldValues;
-    }
-    widgetFieldSchema?: WidgetFieldSchema<FieldOptions>;
-    isValid?: boolean;
-    value?: FieldValue;
-    widgetConfig?: WidgetConfig;
-    widgetId?: string;
-    dateRange?: DateRange;
-}
 
-// TODO: replace this with WidgetFieldComponentProps
-export interface _WidgetFieldComponentProps<FieldOptions> {
+export interface WidgetFieldComponentProps<FieldOptions> {
     widgetFieldSchema?: WidgetFieldSchema<FieldOptions>;
     fieldManager: WidgetFieldValueManager;
     widgetConfig: WidgetConfig;

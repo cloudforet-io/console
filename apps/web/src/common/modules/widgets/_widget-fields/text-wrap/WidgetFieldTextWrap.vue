@@ -5,12 +5,12 @@ import { PFieldTitle, PToggleButton } from '@cloudforet/mirinae';
 
 import type { TextWrapValue, TextWrapOptions } from '@/common/modules/widgets/_widget-fields/text-wrap/type';
 import type {
-    _WidgetFieldComponentProps,
+    WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 const FIELD_KEY = 'textWrap';
 
-const props = defineProps<_WidgetFieldComponentProps<TextWrapOptions>>();
+const props = defineProps<WidgetFieldComponentProps<TextWrapOptions>>();
 
 const state = reactive({
     fieldValue: computed<TextWrapValue>(() => props.fieldManager.data[FIELD_KEY].value),

@@ -5,13 +5,13 @@ import { PFieldTitle, PToggleButton, PCheckbox } from '@cloudforet/mirinae';
 
 import type { TotalValue, TotalOptions } from '@/common/modules/widgets/_widget-fields/total/type';
 import type {
-    _WidgetFieldComponentProps,
+    WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 
 const FIELD_KEY = 'total';
 
-const props = defineProps<_WidgetFieldComponentProps<TotalOptions>>();
+const props = defineProps<WidgetFieldComponentProps<TotalOptions>>();
 
 const state = reactive({
     fieldValue: computed<TotalValue>(() => props.fieldManager.data[FIELD_KEY].value),

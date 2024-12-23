@@ -17,14 +17,14 @@ import {
 import { ICON_FIELD_ITEMS } from '@/common/modules/widgets/_widget-fields/icon/constant';
 import type { Icon, IconOptions, IconValue } from '@/common/modules/widgets/_widget-fields/icon/type';
 import type {
-    _WidgetFieldComponentProps,
+    WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 
 
 const FIELD_KEY = 'icon';
 
-const props = defineProps<_WidgetFieldComponentProps<IconOptions>>();
+const props = defineProps<WidgetFieldComponentProps<IconOptions>>();
 const validator = widgetValidatorRegistry[FIELD_KEY];
 
 const state = reactive({

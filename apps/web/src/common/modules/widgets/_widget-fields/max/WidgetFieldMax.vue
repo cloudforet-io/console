@@ -7,12 +7,12 @@ import { PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
 import type { MaxOptions, MaxValue } from '@/common/modules/widgets/_widget-fields/max/type';
 import type {
-    _WidgetFieldComponentProps,
+    WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 const FIELD_KEY = 'max';
 
-const props = defineProps<_WidgetFieldComponentProps<MaxOptions>>();
+const props = defineProps<WidgetFieldComponentProps<MaxOptions>>();
 
 const state = reactive({
     fieldValue: computed<MaxValue>(() => props.fieldManager.data[FIELD_KEY].value),

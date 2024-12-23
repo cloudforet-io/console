@@ -15,7 +15,7 @@ import type {
     DateFormatValue,
 } from '@/common/modules/widgets/_widget-fields/date-format/type';
 import type {
-    _WidgetFieldComponentProps,
+    WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 const BIRTHDAY_OF_WONNY = '2020-01-29';
@@ -27,7 +27,7 @@ const DATE_FORMAT_LABEL_MAP = {
 };
 const FIELD_KEY = 'dateFormat';
 
-const props = defineProps<_WidgetFieldComponentProps<DateFormatOptions>>();
+const props = defineProps<WidgetFieldComponentProps<DateFormatOptions>>();
 const state = reactive({
     fieldValue: computed<DateFormatValue>(() => props.fieldManager.data[FIELD_KEY].value),
     menuItems: computed<MenuItem[]>(() => Object.keys(DATE_FORMAT).map((d) => ({

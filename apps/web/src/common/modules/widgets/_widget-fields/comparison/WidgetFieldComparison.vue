@@ -19,14 +19,14 @@ import {
 import type { ComparisonFormat, ComparisonValue, ComparisonOptions } from '@/common/modules/widgets/_widget-fields/comparison/type';
 import type { GroupByValue } from '@/common/modules/widgets/_widget-fields/group-by/type';
 import type {
-    _WidgetFieldComponentProps,
+    WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 
 
 const FIELD_KEY = 'comparison';
 
-const props = defineProps<_WidgetFieldComponentProps<ComparisonOptions>>();
+const props = defineProps<WidgetFieldComponentProps<ComparisonOptions>>();
 
 const state = reactive({
     fieldValue: computed<ComparisonValue>(() => props.fieldManager.data[FIELD_KEY].value),

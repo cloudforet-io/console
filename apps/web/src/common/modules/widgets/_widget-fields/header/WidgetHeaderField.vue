@@ -14,12 +14,12 @@ import {
 } from '@/common/modules/widgets/_widget-field-value-manager/constant/validator-registry';
 import type { WidgetHeaderValue } from '@/common/modules/widgets/_widget-fields/header/type';
 import type {
-    _WidgetFieldComponentProps,
+    WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 const FIELD_KEY = 'widgetHeader';
 
-const props = defineProps<_WidgetFieldComponentProps<undefined>>();
+const props = defineProps<WidgetFieldComponentProps<undefined>>();
 
 const validator = widgetValidatorRegistry[FIELD_KEY];
 

@@ -20,13 +20,13 @@ import type {
     GroupByValue,
 } from '@/common/modules/widgets/_widget-fields/group-by/type';
 import type {
-    _WidgetFieldComponentProps,
+    WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 const DEFAULT_COUNT = 5;
 const FIELD_KEY = 'groupBy';
 
-const props = defineProps<_WidgetFieldComponentProps<GroupByOptions>>();
+const props = defineProps<WidgetFieldComponentProps<GroupByOptions>>();
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
 // const {

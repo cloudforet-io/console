@@ -31,7 +31,7 @@ import type {
 } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/granularity/type';
 import type {
-    _WidgetFieldComponentProps,
+    WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
@@ -50,7 +50,7 @@ const getCommonDateRangeValueLabel = (value: string): string => {
 };
 const FIELD_KEY = 'dateRange';
 
-const props = defineProps<_WidgetFieldComponentProps<DateRangeOptions>>();
+const props = defineProps<WidgetFieldComponentProps<DateRangeOptions>>();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 

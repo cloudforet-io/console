@@ -14,14 +14,14 @@ import {
 } from '@/common/modules/widgets/_widget-field-value-manager/constant/validator-registry';
 import type { DisplayAnnotationValue } from '@/common/modules/widgets/_widget-fields/display-annotation/type';
 import type {
-    _WidgetFieldComponentProps,
+    WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 
 const FIELD_KEY = 'displayAnnotation';
 const validator = widgetValidatorRegistry[FIELD_KEY];
 
-const props = defineProps<_WidgetFieldComponentProps<undefined>>();
+const props = defineProps<WidgetFieldComponentProps<undefined>>();
 const state = reactive({
     fieldValue: computed<DisplayAnnotationValue>(() => props.fieldManager.data[FIELD_KEY].value),
     invalid: computed(() => !validator(state.fieldValue, props.widgetConfig)),

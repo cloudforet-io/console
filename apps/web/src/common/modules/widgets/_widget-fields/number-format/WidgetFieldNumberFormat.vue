@@ -15,7 +15,7 @@ import { NUMBER_FORMAT } from '@/common/modules/widgets/_constants/widget-field-
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { NumberFormat, NumberFormatValue, NumberFormatOptions } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type {
-    _WidgetFieldComponentProps,
+    WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 
@@ -30,7 +30,7 @@ const SAMPLE_FORMAT_LIST = [
 ];
 const FIELD_KEY = 'numberFormat';
 
-const props = defineProps<_WidgetFieldComponentProps<NumberFormatOptions>>();
+const props = defineProps<WidgetFieldComponentProps<NumberFormatOptions>>();
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
 const state = reactive({

@@ -12,11 +12,11 @@ import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-g
 import { widgetValidatorRegistry } from '@/common/modules/widgets/_widget-field-value-manager/constant/validator-registry';
 import type { DataFieldOptions, DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
 import type {
-    _WidgetFieldComponentProps,
+    WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 const FIELD_KEY = 'dataField';
-const props = withDefaults(defineProps<_WidgetFieldComponentProps<DataFieldOptions>>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<DataFieldOptions>>(), {
     widgetFieldSchema: () => ({}),
 });
 const widgetGenerateStore = useWidgetGenerateStore();

@@ -12,12 +12,12 @@ import {
 } from '@/common/modules/widgets/_widget-field-value-manager/constant/default-value-registry';
 import type { LegendValue, LegendOptions } from '@/common/modules/widgets/_widget-fields/legend/type';
 import type {
-    _WidgetFieldComponentProps,
+    WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 const FIELD_KEY = 'legend';
 
-const props = defineProps<_WidgetFieldComponentProps<LegendOptions>>();
+const props = defineProps<WidgetFieldComponentProps<LegendOptions>>();
 
 const state = reactive({
     fieldValue: computed<LegendValue>(() => props.fieldManager.data[FIELD_KEY].value),

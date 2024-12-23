@@ -11,13 +11,13 @@ import type {
     PieChartTypeValue,
 } from '@/common/modules/widgets/_widget-fields/pie-chart-type/type';
 import type {
-    _WidgetFieldComponentProps,
+    WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 
 const FIELD_KEY = 'pieChartType';
 
-const props = defineProps<_WidgetFieldComponentProps<PieChartTypeOptions>>();
+const props = defineProps<WidgetFieldComponentProps<PieChartTypeOptions>>();
 
 const state = reactive({
     fieldValue: computed<PieChartTypeValue>(() => props.fieldManager.data[FIELD_KEY].value),

@@ -11,11 +11,11 @@ import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { YAxisOptions } from '@/common/modules/widgets/_widget-fields/y-axis/type';
 import type {
-    _WidgetFieldComponentProps,
+    WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 const FIELD_KEY = 'yAxis';
-const props = defineProps<_WidgetFieldComponentProps<YAxisOptions>>();
+const props = defineProps<WidgetFieldComponentProps<YAxisOptions>>();
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
 // const {

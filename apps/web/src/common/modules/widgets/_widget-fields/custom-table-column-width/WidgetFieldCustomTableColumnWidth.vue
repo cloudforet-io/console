@@ -23,7 +23,7 @@ import type {
     CustomTableColumnWidthValue, CustomTableColumnWidthOptions,
 } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
 import type {
-    _WidgetFieldComponentProps,
+    WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 interface CustomWidthFieldItem extends CustomColumnWidthItem {
@@ -31,7 +31,7 @@ interface CustomWidthFieldItem extends CustomColumnWidthItem {
 }
 const FIELD_KEY = 'customTableColumnWidth';
 
-const props = defineProps<_WidgetFieldComponentProps<CustomTableColumnWidthOptions>>();
+const props = defineProps<WidgetFieldComponentProps<CustomTableColumnWidthOptions>>();
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
 

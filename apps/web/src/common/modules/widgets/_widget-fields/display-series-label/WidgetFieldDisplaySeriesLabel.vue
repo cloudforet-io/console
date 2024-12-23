@@ -12,7 +12,7 @@ import { i18n } from '@/translations';
 
 import type { DisplaySeriesLabelValue, DisplaySeriesLabelOptions } from '@/common/modules/widgets/_widget-fields/display-series-label/type';
 import type {
-    _WidgetFieldComponentProps,
+    WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 
@@ -21,7 +21,7 @@ const ROTATE_MIN = -90;
 const ROTATE_MAX = 90;
 const FIELD_KEY = 'displaySeriesLabel';
 
-const props = defineProps<_WidgetFieldComponentProps<DisplaySeriesLabelOptions>>();
+const props = defineProps<WidgetFieldComponentProps<DisplaySeriesLabelOptions>>();
 const state = reactive({
     fieldValue: computed<DisplaySeriesLabelValue>(() => props.fieldManager.data[FIELD_KEY].value),
     menuItems: computed<SelectDropdownMenuItem[]>(() => {
