@@ -11,11 +11,11 @@ import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type {
-    _WidgetFieldComponentProps,
+    WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 const FIELD_KEY = 'xAxis';
-const props = defineProps<_WidgetFieldComponentProps<XAxisOptions>>();
+const props = defineProps<WidgetFieldComponentProps<XAxisOptions>>();
 //
 // const {
 //     invalid: widgetOptionsInvalid,

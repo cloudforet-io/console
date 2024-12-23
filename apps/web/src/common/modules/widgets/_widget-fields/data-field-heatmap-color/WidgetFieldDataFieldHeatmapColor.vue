@@ -19,12 +19,12 @@ import type {
     _DataFieldHeatmapColorValue,
 } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
 import type {
-    _WidgetFieldComponentProps,
+    WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 const FIELD_KEY = 'dataFieldHeatmapColor';
 
-const props = defineProps<_WidgetFieldComponentProps<DataFieldHeatmapColorOptions>>();
+const props = defineProps<WidgetFieldComponentProps<DataFieldHeatmapColorOptions>>();
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
 const state = reactive({

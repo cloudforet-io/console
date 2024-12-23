@@ -7,12 +7,12 @@ import {
 
 import type { TooltipNumberFormatOptions, TooltipNumberFormatValue } from '@/common/modules/widgets/_widget-fields/tooltip-number-format/type';
 import type {
-    _WidgetFieldComponentProps,
+    WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 const FIELD_KEY = 'tooltipNumberFormat';
 
-const props = defineProps<_WidgetFieldComponentProps<TooltipNumberFormatOptions>>();
+const props = defineProps<WidgetFieldComponentProps<TooltipNumberFormatOptions>>();
 
 const state = reactive({
     fieldValue: computed<TooltipNumberFormatValue>(() => props.fieldManager.data[FIELD_KEY].value),

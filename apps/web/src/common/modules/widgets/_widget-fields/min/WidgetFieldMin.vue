@@ -7,12 +7,12 @@ import { PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
 import type { MinOptions, MinValue } from '@/common/modules/widgets/_widget-fields/min/type';
 import type {
-    _WidgetFieldComponentProps,
+    WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 const FIELD_KEY = 'min';
 
-const props = defineProps<_WidgetFieldComponentProps<MinOptions>>();
+const props = defineProps<WidgetFieldComponentProps<MinOptions>>();
 
 const state = reactive({
     fieldValue: computed<MinValue>(() => props.fieldManager.data[FIELD_KEY].value),

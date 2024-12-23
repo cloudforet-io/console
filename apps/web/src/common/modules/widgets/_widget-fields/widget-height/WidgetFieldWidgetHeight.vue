@@ -14,12 +14,12 @@ import type {
     WidgetHeightValue,
 } from '@/common/modules/widgets/_widget-fields/widget-height/type';
 import type {
-    _WidgetFieldComponentProps,
+    WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 const FIELD_KEY = 'widgetHeight';
 
-const props = withDefaults(defineProps<_WidgetFieldComponentProps<WidgetHeightOptions>>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<WidgetHeightOptions>>(), {
 });
 
 const state = reactive({

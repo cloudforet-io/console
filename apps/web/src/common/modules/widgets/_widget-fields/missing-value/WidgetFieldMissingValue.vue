@@ -11,12 +11,12 @@ import type {
     MissingValueValue,
 } from '@/common/modules/widgets/_widget-fields/missing-value/type';
 import type {
-    _WidgetFieldComponentProps,
+    WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 const FIELD_KEY = 'missingValue';
 
-const props = defineProps<_WidgetFieldComponentProps<MissingValueOptions>>();
+const props = defineProps<WidgetFieldComponentProps<MissingValueOptions>>();
 
 const state = reactive({
     fieldValue: computed<MissingValueValue>(() => props.fieldManager.data[FIELD_KEY].value),

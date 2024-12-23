@@ -22,13 +22,13 @@ import type {
 
 } from '@/common/modules/widgets/_widget-fields/format-rules/type';
 import type {
-    _WidgetFieldComponentProps,
+    WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 
 const FIELD_KEY = 'formatRules';
 
-const props = defineProps<_WidgetFieldComponentProps<FormatRulesOptions>>();
+const props = defineProps<WidgetFieldComponentProps<FormatRulesOptions>>();
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
 

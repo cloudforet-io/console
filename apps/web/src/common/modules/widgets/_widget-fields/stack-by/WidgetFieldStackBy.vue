@@ -11,11 +11,11 @@ import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
 import type {
-    _WidgetFieldComponentProps,
+    WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 const FIELD_KEY = 'stackBy';
-const props = defineProps<_WidgetFieldComponentProps<StackByOptions>>();
+const props = defineProps<WidgetFieldComponentProps<StackByOptions>>();
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
 

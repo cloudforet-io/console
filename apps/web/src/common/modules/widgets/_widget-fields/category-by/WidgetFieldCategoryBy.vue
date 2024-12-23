@@ -13,11 +13,11 @@ import type {
     CategoryByOptions,
 } from '@/common/modules/widgets/_widget-fields/category-by/type';
 import type {
-    _WidgetFieldComponentProps,
+    WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 const FIELD_KEY = 'categoryBy';
-const props = defineProps<_WidgetFieldComponentProps<CategoryByOptions>>();
+const props = defineProps<WidgetFieldComponentProps<CategoryByOptions>>();
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
 

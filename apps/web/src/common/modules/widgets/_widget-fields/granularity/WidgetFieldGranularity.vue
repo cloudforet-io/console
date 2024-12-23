@@ -11,12 +11,12 @@ import { VariableModelFactory } from '@/lib/variable-models';
 
 import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/granularity/type';
 import type {
-    _WidgetFieldComponentProps,
+    WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 const FIELD_KEY = 'granularity';
 
-const props = defineProps<_WidgetFieldComponentProps<undefined>>();
+const props = defineProps<WidgetFieldComponentProps<undefined>>();
 const state = reactive({
     fieldValue: computed<GranularityValue>(() => props.fieldManager.data[FIELD_KEY].value),
     granularityMenuItems: asyncComputed<MenuItem[]>(async () => {
