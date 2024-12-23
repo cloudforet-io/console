@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, reactive,
+    computed, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
@@ -11,12 +11,11 @@ import {
 
 import { ALERT_STATE } from '@/schema/alert-manager/alert/constants';
 import type { EscalationPolicyCreateParameters } from '@/schema/alert-manager/escalation-policy/api-verbs/create';
+import type { EscalationPolicyUpdateParameters } from '@/schema/alert-manager/escalation-policy/api-verbs/update';
 import { ESCALATION_POLICY_STATE } from '@/schema/alert-manager/escalation-policy/constants';
 import type { EscalationPolicyModel } from '@/schema/alert-manager/escalation-policy/model';
 import type { EscalationPolicyRulesType } from '@/schema/alert-manager/escalation-policy/type';
 import { i18n } from '@/translations';
-
-import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
@@ -31,15 +30,16 @@ import type { EscalationPolicyRadioType, EscalationPolicyModalType } from '@/ser
 interface Props {
     visible: boolean;
     type: EscalationPolicyModalType;
+    selectedItem?: EscalationPolicyModel;
 }
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
     type: 'CREATE',
+    selectedItem: undefined,
 });
 
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
-const userStore = useUserStore();
 
 const emit = defineEmits<{(e: 'update:visible'): void;
     (e: 'close'): void;
@@ -51,10 +51,9 @@ const storeState = reactive({
 const state = reactive({
     loading: false,
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
-    selectedEscalationPolicyId: undefined as string|undefined,
     headerTitle: computed<TranslateResult>(() => {
-        if (props.type === 'CREATE') return i18n.t('ALERT_MANAGER.ESCALATION_POLICY.CREATE_MODAL_TITLE');
-        return i18n.t('ALERT_MANAGER.ESCALATION_POLICY.SET_MODAL_TITLE');
+        if (props.type === 'CREATE') return i18n.t('ALERT_MANAGER.ESCALATION_POLICY.MODAL_CREATE_TITLE');
+        return i18n.t('ALERT_MANAGER.ESCALATION_POLICY.MODAL_SET_TITLE');
     }),
     radioMenuList: computed<EscalationPolicyRadioType[]>(() => [
         {
@@ -67,15 +66,13 @@ const state = reactive({
         },
     ]),
     selectedRadioIdx: 0,
-
-    timezone: computed<string|undefined>(() => userStore.state.timezone),
-    isModalValid: computed<boolean>(() => name.value !== '' && !invalidState.name && state.formValid),
     rules: [{
         channels: [],
         escalate_minutes: 30,
     }] as EscalationPolicyRulesType[],
-    formValid: computed<boolean>(() => state.rules.every((r) => r.channels.length > 0)),
     repeatCount: 0,
+    formValid: computed<boolean>(() => state.rules.every((r) => r.channels.length > 0)),
+    isModalValid: computed<boolean>(() => name.value !== '' && !invalidState.name && state.formValid),
 });
 
 const {
@@ -103,16 +100,26 @@ const handleRouteDetail = () => {
 const handleClickConfirm = async () => {
     state.loading = true;
     try {
-        state.succeedWebhook = await SpaceConnector.clientV2.alertManager.escalationPolicy.create<EscalationPolicyCreateParameters, EscalationPolicyModel>({
+        const params = {
             name: name.value,
             rules: state.rules,
-            service_id: storeState.serviceId,
             repeat: {
                 state: ESCALATION_POLICY_STATE.DISABLED,
                 count: state.repeatCount,
             },
             finish_condition: state.radioMenuList[state.selectedRadioIdx].name,
-        });
+        };
+        if (props.type === 'CREATE') {
+            await SpaceConnector.clientV2.alertManager.escalationPolicy.create<EscalationPolicyCreateParameters>({
+                service_id: storeState.serviceId,
+                ...params,
+            });
+        } else {
+            await SpaceConnector.clientV2.alertManager.escalationPolicy.update<EscalationPolicyUpdateParameters>({
+                escalation_policy_id: props.selectedItem?.escalation_policy_id || '',
+                ...params,
+            });
+        }
         handleClose();
         emit('close');
     } catch (e) {
@@ -121,6 +128,14 @@ const handleClickConfirm = async () => {
         state.loading = false;
     }
 };
+
+watch(() => props.type, (type) => {
+    if (type === 'CREATE') return;
+    setForm('name', props.selectedItem?.name || '');
+    state.selectedRadioIdx = state.radioMenuList.findIndex((r) => r.name === props.selectedItem?.finish_condition);
+    state.rules = props.selectedItem?.rules;
+    state.repeatCount = props.selectedItem?.repeat?.count || 0;
+}, { immediate: true });
 </script>
 
 <template>

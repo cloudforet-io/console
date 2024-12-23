@@ -35,7 +35,6 @@ interface DropdownItem extends SelectDropdownMenuItem {
     name: string;
     label: string;
     members?: number;
-    userName?: string;
 }
 type DropdownCategoriesType = {
     key: string;

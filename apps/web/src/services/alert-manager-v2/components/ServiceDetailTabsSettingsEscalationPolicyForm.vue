@@ -23,7 +23,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
     rules: undefined,
-    repeatCount: 1,
+    repeatCount: 0,
 });
 
 const emit = defineEmits<{(event: 'update:rules', rules: EscalationPolicyRulesType[]): void;
@@ -51,8 +51,8 @@ const handleAddStep = () => {
     });
     state.proxyRules = _rules;
 };
-const handleUpdateRepeatCount = (_repeatCount: number) => {
-    state.proxyRepeatCount = _repeatCount;
+const handleUpdateRepeatCount = (_repeatCount: string) => {
+    state.proxyRepeatCount = Number(_repeatCount);
 };
 </script>
 
@@ -138,6 +138,7 @@ const handleUpdateRepeatCount = (_repeatCount: number) => {
                     </template>
                 </i18n>
                 <service-detail-tabs-settings-escalation-policy-form-channel-dropdown class="mt-2"
+                                                                                      :selected-ids="rule.channels"
                                                                                       @update:selected-ids="handleSelectChannelDropdown(idx, $event)"
                 />
             </p-card>
