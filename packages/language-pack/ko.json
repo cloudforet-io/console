@@ -1546,14 +1546,15 @@
 		"ANOMALY_DETECTION_CONFIGURATION": "이상 비용 탐지 설정",
 		"COST_ADVANCED_SETTINGS": "고급 설정",
 		"COST_ANALYSIS": {
-			"UNIFIED_COST_DESC": "모든 데이터 소스의 비용을 한 곳에서 통합하여 관리할 수 있도록 지원합니다."
+			"UNIFIED_COST_ADMIN_DESC": "모든 데이터 소스의 비용을 한 곳에서 통합하여 관리할 수 있도록 지원합니다. Unified Cost의 통화는 [고급 설정] > [환율 설정] 페이지에서 설정 가능합니다.",
+			"UNIFIED_COST_DESC": "모든 데이터 소스의 비용을 한 곳에서 통합하여 관리할 수 있도록 지원합니다. Unified Cost의 통화는 관리자가 설정한 기준에 따라 반영됩니다."
 		},
 		"CURRENCY_CONVERTER": "환율 설정",
 		"CURRENCY_CONVERTER_PAGE": {
 			"AGGREGATION_DATE": "집계 날짜",
 			"EXCHANGE_RATE_SOURCE": "환율 기준",
 			"LAST_DAY_OF_THE_MONTH": "매월 마지막일 ",
-			"NOTIFICATION": "집계가 완료되면, 날짜 변경은 다음 달부터 적용됩니다.",
+			"NOTIFICATION": "비용 분석 페이지에서 Unified Cost에 대한 환율을 설정할 수 있습니다. 비용 집계가 완료되면, 날짜 변경은 다음 달부터 적용됩니다.",
 			"UPDATE_SUCCESS_ALT": "환율 설정 업데이트 완료"
 		}
 	},

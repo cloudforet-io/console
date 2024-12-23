@@ -192,7 +192,7 @@ watch(() => state.favoriteOptions, async (favoriteOptions) => {
                                icon="ic_info-circle"
                                layout="in-section"
         >
-            {{ $t('COST_EXPLORER.COST_ANALYSIS.UNIFIED_COST_DESC') }}
+            {{ storeState.isAdminMode ? $t('COST_EXPLORER.COST_ANALYSIS.UNIFIED_COST_ADMIN_DESC') : $t('COST_EXPLORER.COST_ANALYSIS.UNIFIED_COST_DESC') }}
         </p-scoped-notification>
         <p-divider class="heading-divider" />
         <cost-analysis-query-form-modal :visible.sync="state.queryFormModalVisible"
