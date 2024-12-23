@@ -12,7 +12,8 @@ import { i18n } from '@/translations';
 import ColorPicker from '@/common/components/editor/ColorPicker.vue';
 
 interface Props {
-    editor: Editor
+    editor: Editor;
+    useColor: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
     editor: () => ({} as Editor),
@@ -166,14 +167,16 @@ const handleLinkClick = () => {
             </p-select-dropdown>
         </div>
 
-        <p-divider class="menu-divider"
-                   vertical
-        />
+        <template v-if="props.useColor">
+            <p-divider class="menu-divider"
+                       vertical
+            />
 
-        <color-picker class="menu-dropdown"
-                      :editor="props.editor"
-                      @select="props.editor.chain().focus().setColor($event).run()"
-        />
+            <color-picker class="menu-dropdown"
+                          :editor="props.editor"
+                          @select="props.editor.chain().focus().setColor($event).run()"
+            />
+        </template>
 
         <p-divider class="menu-divider"
                    vertical

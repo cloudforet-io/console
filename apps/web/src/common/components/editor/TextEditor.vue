@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    onBeforeUnmount, onMounted, reactive, watch,
+    onBeforeUnmount, onMounted, shallowRef, watch,
 } from 'vue';
 
 import { Color } from '@tiptap/extension-color';
@@ -10,6 +10,7 @@ import TextAlign from '@tiptap/extension-text-align';
 import TextStyle from '@tiptap/extension-text-style';
 import Underline from '@tiptap/extension-underline';
 import StarterKit from '@tiptap/starter-kit';
+import type { AnyExtension } from '@tiptap/vue-2';
 import { Editor, EditorContent } from '@tiptap/vue-2';
 import { Markdown } from 'tiptap-markdown';
 
@@ -30,10 +31,7 @@ interface Props {
 }
 const props = withDefaults(defineProps<Props>(), {
     value: '',
-    imageUploader: () => Promise.resolve<Attachment<any>>({
-        downloadUrl: '',
-        fileId: '',
-    }),
+    imageUploader: undefined,
     attachments: () => [],
     invalid: false,
     placeholder: '',
@@ -45,80 +43,95 @@ const emit = defineEmits<{(e: 'update:value', value: string): void;
 
 loadMonospaceFonts();
 
-const state = reactive({
-    editor: null as null|Editor,
-});
+const editor = shallowRef<null|Editor>(null);
 
 const imgFileDataMap = new Map();
+
+const getExtensions = (): AnyExtension[] => {
+    const extensions: AnyExtension[] = [
+        StarterKit.configure({
+            heading: {
+                levels: [1, 2, 3],
+            },
+            code: {
+                HTMLAttributes: {
+                    class: 'inline-code',
+                },
+            },
+        }),
+        Placeholder.configure({
+            placeholder: props.placeholder,
+        }),
+        Underline,
+        Link,
+        TextStyle,
+        TextAlign.configure({
+            types: ['heading', 'paragraph'],
+        }),
+    ];
+
+    // add extensions based on content type
+    if (props.contentType === 'html') {
+        extensions.push(Color);
+    }
+    if (props.contentType === 'markdown') {
+        extensions.push(Markdown);
+    }
+
+    // add image extension if imageUploader is provided
+    if (props.imageUploader) {
+        extensions.push(createImageExtension(props.imageUploader, imgFileDataMap));
+    }
+    return extensions;
+};
+
 onMounted(() => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    state.editor = new Editor({
+    editor.value = new Editor({
         content: setAttachmentsToContents(props.value, props.attachments),
-        extensions: [
-            StarterKit.configure({
-                heading: {
-                    levels: [1, 2, 3],
-                },
-                code: {
-                    HTMLAttributes: {
-                        class: 'inline-code',
-                    },
-                },
-            }),
-            Markdown,
-            Placeholder.configure({
-                placeholder: props.placeholder,
-            }),
-            Underline,
-            Link,
-            TextStyle,
-            Color,
-            TextAlign.configure({
-                types: ['heading', 'paragraph'],
-            }),
-            createImageExtension(props.imageUploader, imgFileDataMap),
-        ],
+        extensions: getExtensions(),
         onUpdate: () => {
             let content = '';
+            if (!editor.value) return;
             if (props.contentType === 'html') {
-                content = state.editor?.getHTML() ?? '';
+                content = editor.value?.getHTML() ?? '';
             } else {
-                content = state.editor?.storage.markdown.getMarkdown() ?? '';
+                content = editor.value.storage.markdown.getMarkdown() ?? '';
             }
             emit('update:value', content);
-            emit('update:attachments', state.editor ? getAttachments<any>(state.editor as Editor, imgFileDataMap) : []);
+            emit('update:attachments', getAttachments<any>(editor.value, imgFileDataMap));
         },
     });
 });
 
 onBeforeUnmount(() => {
-    if (state.editor) state.editor.destroy();
+    if (editor.value) editor.value.destroy();
 });
 
 watch([() => props.value, () => props.attachments], ([value, attachments], prev) => {
-    if (!state.editor) return;
+    if (!editor.value) return;
     let isSame;
     if (props.contentType === 'html') {
-        isSame = state.editor.getHTML() === value;
+        isSame = editor.value.getHTML() === value;
     } else {
-        isSame = state.editor.storage.markdown.getMarkdown() === value;
+        isSame = editor.value.storage.markdown.getMarkdown() === value;
     }
     if (isSame) return;
     let newContents = value;
     if (attachments !== prev[1]) newContents = setAttachmentsToContents(value, attachments);
-    state.editor.commands.setContent(newContents, false);
+    editor.value.commands.setContent(newContents, false);
 });
 </script>
 
 <template>
-    <div v-if="state.editor"
+    <div v-if="editor"
          class="text-editor"
          :class="{invalid: props.invalid}"
     >
-        <menu-bar :editor="state.editor" />
+        <menu-bar :editor="editor"
+                  :use-color="props.contentType === 'html'"
+        />
         <editor-content class="editor-content"
-                        :editor="state.editor"
+                        :editor="editor"
         />
     </div>
 </template>
@@ -160,5 +173,16 @@ watch([() => props.value, () => props.attachments], ([value, attachments], prev)
     &.invalid {
         @apply border-alert;
     }
+    >.suggestion-list {
+        @apply absolute;
+        z-index: 10;
+    }
+}
+</style>
+
+<style lang="postcss">
+.mention {
+    @apply bg-violet-150 text-violet-600 rounded-md;
+    padding: 0 2px;
 }
 </style>
