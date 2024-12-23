@@ -17,6 +17,7 @@ export type ServiceDetailTabsType = typeof SERVICE_DETAIL_TABS[keyof typeof SERV
 export type ServiceDetailSettingCardType = typeof SERVICE_SETTING_CARD[keyof typeof SERVICE_SETTING_CARD];
 
 export type WebhookDetailTabsType = typeof WEBHOOK_DETAIL_TABS[keyof typeof WEBHOOK_DETAIL_TABS];
+export type WebhookModalType = 'UPDATE' | 'ENABLE' | 'DISABLE' | 'DELETE';
 
 export type AlertFilterType = {
     label: TranslateResult;

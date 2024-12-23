@@ -107,8 +107,8 @@ const handleSelectTableRow = (selectedItems: number[]) => {
     state.selectIndex = selectedItems[0];
 };
 const handleCloseModal = () => {
-    handleChangeToolbox();
     state.selectIndex = undefined;
+    fetchEscalationPolicyList();
 };
 
 const fetchEscalationPolicyList = async () => {

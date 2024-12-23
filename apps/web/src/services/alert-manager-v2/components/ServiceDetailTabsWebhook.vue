@@ -34,6 +34,12 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useQueryTags } from '@/common/composables/query-tags';
 
+import ServiceDetailTabsWebhookDeleteModal
+    from '@/services/alert-manager-v2/components/ServiceDetailTabsWebhookDeleteModal.vue';
+import ServiceDetailTabsWebhookTableModal
+    from '@/services/alert-manager-v2/components/ServiceDetailTabsWebhookTableModal.vue';
+import ServiceDetailTabsWebhookUpdateModal
+    from '@/services/alert-manager-v2/components/ServiceDetailTabsWebhookUpdateModal.vue';
 import { alertManagerStateFormatter } from '@/services/alert-manager-v2/composables/refined-table-data';
 import { SERVICE_TAB_HEIGHT } from '@/services/alert-manager-v2/constants/common-constant';
 import {
@@ -43,6 +49,7 @@ import {
 } from '@/services/alert-manager-v2/constants/webhook-table-constant';
 import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
+import type { WebhookModalType } from '@/services/alert-manager-v2/types/alert-manager-type';
 
 interface Props {
     tableHeight: number;
@@ -67,25 +74,25 @@ const tableState = reactive({
     actionMenu: computed<MenuItem[]>(() => ([
         {
             type: 'item',
-            name: 'enable',
+            name: 'ENABLE',
             label: _i18n.t('ALERT_MANAGER.ENABLE'),
             disabled: state.selectedItem?.state === WEBHOOK_STATE.ENABLED,
         },
         {
             type: 'item',
-            name: 'disable',
+            name: 'DISABLE',
             label: _i18n.t('ALERT_MANAGER.DISABLED'),
             disabled: state.selectedItem?.state === WEBHOOK_STATE.DISABLED,
         },
         { type: 'divider' },
         {
             type: 'item',
-            name: 'update',
+            name: 'UPDATE',
             label: _i18n.t('ALERT_MANAGER.UPDATE'),
         },
         {
             type: 'item',
-            name: 'delete',
+            name: 'DELETE',
             label: _i18n.t('ALERT_MANAGER.DELETE'),
         },
     ])),
@@ -104,12 +111,21 @@ const state = reactive({
     selectIndex: undefined as number|undefined,
     selectedItem: computed<WebhookModel>(() => state.items[state.selectIndex]),
 });
+const modalState = reactive({
+    visible: false,
+    type: undefined as WebhookModalType|undefined,
+});
 
 const webhookListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
     .setPage(1, 15);
 const queryTagHelper = useQueryTags({ keyItemSets: WEBHOOK_MANAGEMENT_TABLE_HANDLER.keyItemSets });
 const { queryTags } = queryTagHelper;
 
+const handleCloseModal = () => {
+    state.selectIndex = undefined;
+    fetchWebhookList();
+    serviceDetailPageStore.setSelectedWebhookId(undefined);
+};
 const initSelectedWebhook = () => {
     state.selectIndex = state.items.findIndex((item) => item.webhook_id === storeState.selectedWebhookId);
 };
@@ -119,7 +135,8 @@ const handleClickCreateButton = () => {
     }));
 };
 const handleSelectDropdownItem = (name) => {
-    console.log('TODO: handleSelectDropdownItem', name);
+    modalState.visible = true;
+    modalState.type = name;
 };
 const handleChangeToolbox = async (options: any = {}) => {
     if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
@@ -180,81 +197,100 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <p-toolbox-table class="service-detail-tabs-webhook"
-                     search-type="query"
-                     selectable
-                     sortable
-                     exportable
-                     :multi-select="false"
-                     :loading="state.loading"
-                     :total-count="state.totalCount"
-                     :items="state.items"
-                     :fields="tableState.fields"
-                     :select-index="[state.selectIndex]"
-                     :query-tags="queryTags"
-                     :key-item-sets="WEBHOOK_MANAGEMENT_TABLE_HANDLER.keyItemSets"
-                     :value-handler-map="WEBHOOK_MANAGEMENT_TABLE_HANDLER.valueHandlerMap"
-                     :style="{height: `${props.tableHeight - SERVICE_TAB_HEIGHT}px`}"
-                     @change="handleChangeToolbox"
-                     @refresh="handleChangeToolbox()"
-                     @export="handleExportExcel"
-                     @select="handleSelectTableRow"
-    >
-        <template #toolbox-top>
-            <p-heading-layout class="pt-8 px-4">
-                <template #heading>
-                    <p-heading heading-type="sub"
-                               use-total-count
-                               :total-count="state.totalCount"
-                               :title="$t('ALERT_MANAGER.WEBHOOK.TITLE')"
-                    />
-                </template>
-                <template #extra>
-                    <p-button style-type="primary"
-                              icon-left="ic_plus_bold"
-                              @click="handleClickCreateButton"
-                    >
-                        {{ $t('ALERT_MANAGER.CREATE') }}
-                    </p-button>
-                </template>
-            </p-heading-layout>
-        </template>
-        <template #toolbox-left>
-            <p-select-dropdown :menu="tableState.actionMenu"
-                               :disabled="!state.selectedItem"
-                               reset-selection-on-menu-close
-                               :placeholder="$t('ALERT_MANAGER.ACTION')"
-                               @select="handleSelectDropdownItem"
-            />
-        </template>
-        <template #col-plugin_info.plugin_id-format="{value}">
-            <div class="col-type">
-                <p-lazy-img :src="storeState.plugins[value] ? storeState.plugins[value].icon : 'ic_webhook'"
-                            error-icon="ic_webhook"
-                            width="1.5rem"
-                            height="1.5rem"
+    <div>
+        <p-toolbox-table class="service-detail-tabs-webhook"
+                         search-type="query"
+                         selectable
+                         sortable
+                         exportable
+                         :multi-select="false"
+                         :loading="state.loading"
+                         :total-count="state.totalCount"
+                         :items="state.items"
+                         :fields="tableState.fields"
+                         :select-index="[state.selectIndex]"
+                         :query-tags="queryTags"
+                         :key-item-sets="WEBHOOK_MANAGEMENT_TABLE_HANDLER.keyItemSets"
+                         :value-handler-map="WEBHOOK_MANAGEMENT_TABLE_HANDLER.valueHandlerMap"
+                         :style="{height: `${props.tableHeight - SERVICE_TAB_HEIGHT}px`}"
+                         @change="handleChangeToolbox"
+                         @refresh="handleChangeToolbox()"
+                         @export="handleExportExcel"
+                         @select="handleSelectTableRow"
+        >
+            <template #toolbox-top>
+                <p-heading-layout class="pt-8 px-4">
+                    <template #heading>
+                        <p-heading heading-type="sub"
+                                   use-total-count
+                                   :total-count="state.totalCount"
+                                   :title="$t('ALERT_MANAGER.WEBHOOK.TITLE')"
+                        />
+                    </template>
+                    <template #extra>
+                        <p-button style-type="primary"
+                                  icon-left="ic_plus_bold"
+                                  @click="handleClickCreateButton"
+                        >
+                            {{ $t('ALERT_MANAGER.CREATE') }}
+                        </p-button>
+                    </template>
+                </p-heading-layout>
+            </template>
+            <template #toolbox-left>
+                <p-select-dropdown :menu="tableState.actionMenu"
+                                   :disabled="!state.selectedItem"
+                                   reset-selection-on-menu-close
+                                   :placeholder="$t('ALERT_MANAGER.ACTION')"
+                                   @select="handleSelectDropdownItem"
                 />
-                {{ storeState.plugins[value] ? storeState.plugins[value].label : value }}
-            </div>
-        </template>
-        <template #col-state-format="{ value }">
-            <p-status
-                class="capitalize"
-                v-bind="alertManagerStateFormatter(value)"
+            </template>
+            <template #col-plugin_info.plugin_id-format="{value}">
+                <div class="col-type">
+                    <p-lazy-img :src="storeState.plugins[value] ? storeState.plugins[value].icon : 'ic_webhook'"
+                                error-icon="ic_webhook"
+                                width="1.5rem"
+                                height="1.5rem"
+                    />
+                    {{ storeState.plugins[value] ? storeState.plugins[value].label : value }}
+                </div>
+            </template>
+            <template #col-state-format="{ value }">
+                <p-status
+                    class="capitalize"
+                    v-bind="alertManagerStateFormatter(value)"
+                />
+            </template>
+            <template #col-requests.total-format="{ value }">
+                <span>{{ value || 0 }}</span>
+            </template>
+            <template #col-requests.error-format="{ value, item }">
+                <span v-if="value"
+                      class="col-failed-requests"
+                >
+                    {{ value || 0 }}
+                    <span>({{ ((value / item?.requests?.total) * 100).toFixed(1) }}%)</span>
+                </span>
+            </template>
+        </p-toolbox-table>
+        <div v-if="modalState.visible">
+            <service-detail-tabs-webhook-update-modal v-if="modalState.type === 'UPDATE'"
+                                                      :visible.sync="modalState.visible"
+                                                      :selected-item="state.selectedItem"
+                                                      @close="handleCloseModal"
             />
-        </template>
-        <template #col-requests.total-format="{ value }">
-            <span>{{ value || 0 }}</span>
-        </template>
-        <template #col-requests.error-format="{ value, item }">
-            <span v-if="value"
-                  class="col-failed-requests"
-            >
-                {{ value || 0 }}
-                <span>({{ ((value / item?.requests?.total) * 100).toFixed(1) }}%)</span>
-            </span>
-        </template>
-    </p-toolbox-table>
+            <service-detail-tabs-webhook-delete-modal v-if="modalState.type === 'DELETE'"
+                                                      :visible.sync="modalState.visible"
+                                                      :selected-item="state.selectedItem"
+                                                      @close="handleCloseModal"
+            />
+            <service-detail-tabs-webhook-table-modal v-else
+                                                     :visible.sync="modalState.visible"
+                                                     :selected-item="state.selectedItem"
+                                                     @close="handleCloseModal"
+            />
+        </div>
+    </div>
 </template>
 
 <style scoped lang="postcss">
