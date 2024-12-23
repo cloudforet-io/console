@@ -186,7 +186,7 @@ const queryKey = computed(() => [
         granularity: widgetOptionsState.granularityInfo?.granularity,
         dataTableId: state.dataTable?.data_table_id,
         dataTableOptions: JSON.stringify(sortObjectByKeys(state.dataTable?.options) ?? {}),
-        groupBy: [widgetOptionsState.xAxisInfo?.data as string],
+        groupBy: widgetOptionsState.xAxisInfo?.data,
         count: widgetOptionsState.xAxisInfo?.count,
     },
 ]);

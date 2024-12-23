@@ -35,7 +35,7 @@ import {
 import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { getFormattedNumber, getWidgetDataTable } from '@/common/modules/widgets/_helpers/widget-helper';
 import {
-    getWidgetLoadApiQueryDateRange,
+    getWidgetLoadApiQueryDateRange, getWidgetLoadApiQuerySort,
 } from '@/common/modules/widgets/_helpers/widget-load-helper';
 import type { DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
 import type { DateFormatValue } from '@/common/modules/widgets/_widget-fields/date-format/type';
@@ -186,7 +186,7 @@ const queryKey = computed(() => [
         granularity: widgetOptionsState.granularityInfo?.granularity,
         dataTableId: state.dataTable?.data_table_id,
         dataTableOptions: JSON.stringify(sortObjectByKeys(state.dataTable?.options) ?? {}),
-        groupBy: [widgetOptionsState.xAxisInfo?.data as string],
+        groupBy: widgetOptionsState.xAxisInfo?.data,
         count: widgetOptionsState.xAxisInfo?.count,
     },
 ]);
@@ -197,9 +197,10 @@ const queryResult = useQuery({
         widget_id: props.widgetId,
         granularity: widgetOptionsState.granularityInfo?.granularity,
         group_by: widgetOptionsState.xAxisInfo?.data ? [widgetOptionsState.xAxisInfo?.data] : [],
-        ...getWidgetLoadApiQueryDateRange(widgetOptionsState.granularityInfo?.granularity, dateRange.value),
+        sort: getWidgetLoadApiQuerySort(widgetOptionsState.xAxisInfo?.data as string, widgetOptionsState.dataFieldInfo.data),
         page: { start: 0, limit: widgetOptionsState.xAxisInfo?.count },
         vars: props.dashboardVars,
+        ...getWidgetLoadApiQueryDateRange(widgetOptionsState.granularityInfo?.granularity, dateRange.value),
     }),
     enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable && state.runQueries),
     staleTime: WIDGET_LOAD_STALE_TIME,
