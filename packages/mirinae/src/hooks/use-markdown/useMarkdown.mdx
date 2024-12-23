@@ -18,6 +18,7 @@ The `useMarkdown` hook parses Markdown text, sanitizes it for safe HTML renderin
 interface UseMarkdownOptions {
     value: Ref<string>|string; // Markdown content to display. string or Ref<string>
     inlineCodeClass?: string; // Class name for inline code
+    codeBlockHighlighting?: boolean; // Whether to apply code block highlighting
 }
 interface UseMarkdownReturn {
     sanitizedHtml: Ref<string>; // Sanitized HTML content
