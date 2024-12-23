@@ -27,6 +27,7 @@ interface Props {
     // for dashboard create page
     disableLink?: boolean;
     readonlyMode?: boolean;
+    showControlButtons?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
     selectedIdMap: () => ({}),
@@ -154,7 +155,9 @@ const handleClickShowAll = () => {
                 />
                 <span>{{ $t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.NAME') }}</span>
             </div>
-            <div class="right-part">
+            <div v-if="props.showControlButtons"
+                 class="right-part"
+            >
                 <p-icon-button v-for="controlButton in state.controlButtons"
                                :key="`control-button-${controlButton.name}`"
                                :name="controlButton.icon"

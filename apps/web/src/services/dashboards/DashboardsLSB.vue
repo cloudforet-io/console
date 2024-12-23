@@ -225,7 +225,7 @@ callApiWithGrantGuard();
                                   :dashboards="dashboardPageControlGetters.publicDashboardItems"
             />
         </template>
-        <template v-if="storeState.isWorkspaceOwner"
+        <template v-if="!storeState.isAdminMode"
                   #slot-shared
         >
             <l-s-b-collapsible-menu-item v-if="dashboardPageControlGetters.publicDashboardItems.length || dashboardPageControlGetters.privateFolderItems.length"

@@ -12,8 +12,9 @@ import { getClonedName } from '@cloudforet/utils';
 
 import { SpaceRouter } from '@/router';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
-import type { DashboardCreateParams, DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardCreateParams, DashboardModel, DashboardType } from '@/schema/dashboard/_types/dashboard-type';
 import type { PublicDashboardCreateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -51,6 +52,7 @@ const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const userStore = useUserStore();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    isWorkspaceMember: computed<boolean>(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
 });
 const state = reactive({
     loading: false,
@@ -60,7 +62,7 @@ const state = reactive({
     }),
     privateMap: {} as Record<string, boolean>,
     tableFields: computed(() => {
-        if (storeState.isAdminMode) return TABLE_FIELDS.filter((f) => f.name !== 'private');
+        if (storeState.isAdminMode || storeState.isWorkspaceMember) return TABLE_FIELDS.filter((f) => f.name !== 'private');
         if (state.bundleCaseType === 'TEMPLATE') return TABLE_FIELDS.filter((f) => f.name !== 'location');
         return TABLE_FIELDS;
     }),
@@ -103,10 +105,13 @@ const createBundleOotb = async () => {
         };
         if (storeState.isAdminMode) {
             (_dashboardParams as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.DOMAIN;
-        } else if (!_isPrivate) {
+        } else if (!storeState.isWorkspaceMember && !_isPrivate) {
             (_dashboardParams as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.WORKSPACE;
         }
-        const _createType = _isPrivate ? 'PRIVATE' : 'PUBLIC';
+        let _createType: DashboardType = _isPrivate ? 'PRIVATE' : 'PUBLIC';
+        if (storeState.isWorkspaceMember) {
+            _createType = 'PRIVATE';
+        }
         _promises.push(dashboardStore.createDashboard(_createType, _dashboardParams));
     }));
     const _results = await Promise.allSettled(_promises);
