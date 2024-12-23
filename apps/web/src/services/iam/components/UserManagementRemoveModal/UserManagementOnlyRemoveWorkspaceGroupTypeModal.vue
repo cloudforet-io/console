@@ -57,7 +57,7 @@ const handleClose = () => {
                     :theme-color="userPageState.modal.themeColor"
                     :loading="state.loading"
                     hide-footer-confirm-button
-                    modal-size="md"
+                    size="md"
                     @cancel="handleClose"
                     @close="handleClose"
     >

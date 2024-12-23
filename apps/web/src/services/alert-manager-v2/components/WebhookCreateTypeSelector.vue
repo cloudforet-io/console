@@ -42,7 +42,6 @@ const getListWebhookType = async () => {
         const repositoryId = await getRepositoryID();
         const { results } = await SpaceConnector.clientV2.repository.plugin.list<PluginListParameters, ListResponse<PluginModel>>({
             repository_id: repositoryId,
-            // TODO: Change to 'alert-manager.Webhook' after the plugin is created
             resource_type: 'monitoring.Webhook',
         });
         state.webhookTypeList = results ?? [];
