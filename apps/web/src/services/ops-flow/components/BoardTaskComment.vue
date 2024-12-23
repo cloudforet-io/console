@@ -4,21 +4,20 @@ import {
 } from 'vue';
 
 import {
-    PPaneLayout, PHeading, PButton, PCollapsibleList, PTextBeautifier, getTextHighlightRegex, PContextMenu,
+    PPaneLayout, PHeading, PButton, PCollapsibleList, PTextBeautifier,
 } from '@cloudforet/mirinae';
-import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import type { CollapsibleItem } from '@cloudforet/mirinae/types/data-display/collapsible/collapsible-list/type';
 
 import type { CommentModel } from '@/schema/opsflow/comment/model';
 import { i18n } from '@/translations';
 
-import type { UserReferenceItem } from '@/store/reference/user-reference-store';
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ActionMenuButton from '@/common/components/buttons/ActionMenuButton.vue';
+import TextEditor from '@/common/components/editor/TextEditor.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useMention } from '@/services/ops-flow/composables/use-mention';
@@ -67,49 +66,24 @@ const addCommentAndApplyToEvents = async (comment: string) => {
     await addComment(comment);
     await taskDetailPageStore.loadNewEvents();
 };
+const contents = ref<string>('');
 
 
 /* mention */
-const containerRef = ref<HTMLDivElement|null>(null);
-const contentEditableDivRef = ref<HTMLDivElement|null>(null);
-const menuRef = ref<any|null>(null);
-const {
-    showSuggestions,
-    handleInput,
-    handleKeydown,
-    selectSuggestion,
-    handleMenuEsc,
-    reset,
-    focusOnInput,
-    popupStyle,
-    syncScroll,
-    keyword,
-    getRawContents,
-} = useMention({
-    containerRef,
-    contentEditableDivRef,
-    menuRef,
-    onKeydownEnter(e: KeyboardEvent) {
-        if (!showSuggestions.value && !e.shiftKey) {
-            addCommentAndApplyToEvents(getRawContents());
-            reset();
-        }
-    },
-});
-const allUserItems = computed<SelectDropdownMenuItem[]>(() => (Object.values(userReferenceStore.getters.userItems) as UserReferenceItem[]).map((u) => ({
-    name: u.key,
-    label: u.label || u.name,
-})));
-const refinedUserItems = computed<SelectDropdownMenuItem[]>(() => {
-    const filtered = allUserItems.value.filter((item) => getTextHighlightRegex(keyword.value).test(item.label as string));
-    return filtered.slice(0, 10);
-});
+// const allUserItems = computed<SelectDropdownMenuItem[]>(() => (Object.values(userReferenceStore.getters.userItems) as UserReferenceItem[]).map((u) => ({
+//     name: u.key,
+//     label: u.label || u.name,
+// })));
+// const getMentionList = (keyword: string) => {
+//     const filtered = allUserItems.value.filter((item) => getTextHighlightRegex(keyword).test(item.label as string));
+//     return filtered.slice(0, 10);
+// };
 
 
 /* handle add comment events */
 const handleClickAddComment = () => {
-    addCommentAndApplyToEvents(getRawContents());
-    reset();
+    addCommentAndApplyToEvents(contents.value);
+    contents.value = '';
 };
 
 
@@ -129,28 +103,12 @@ onBeforeMount(async () => {
                    heading-type="sub"
                    :title="$t('OPSFLOW.TASK_BOARD.COMMENT')"
         />
-        <div ref="containerRef"
-             class="mb-3"
-        >
-            <div ref="contentEditableDivRef"
-                 contenteditable="true"
-                 class="contenteditable-div"
-                 :data-placeholder="$t('OPSFLOW.TASK_BOARD.COMMENT')"
-                 @input="handleInput"
-                 @keydown="handleKeydown"
-                 @scroll="syncScroll"
-            />
-            <p-context-menu v-if="showSuggestions"
-                            ref="menuRef"
-                            :menu="refinedUserItems"
-                            :selected="[]"
-                            :highlight-term="keyword"
-                            :style="popupStyle"
-                            class="suggestion-list"
-                            @select="selectSuggestion"
-                            @keyup:up:end="focusOnInput"
-                            @keyup:down:end="focusOnInput"
-                            @keyup:esc="handleMenuEsc"
+        <div class="mb-3">
+            <text-editor :placeholder="$t('OPSFLOW.TASK_BOARD.COMMENT')"
+                         content-type="markdown"
+                         :value="contents"
+                         :style="{minHeight: '5rem'}"
+                         @update:value="contents = $event"
             />
         </div>
         <p-button class="mb-6"
@@ -187,10 +145,6 @@ onBeforeMount(async () => {
 </template>
 
 <style scoped lang="postcss">
-.suggestion-list {
-    @apply absolute;
-    z-index: 10;
-}
 .contenteditable-div {
     @apply text-label-md bg-white border border-gray-300 rounded-md text-gray-900;
     min-height: 7.75rem;
@@ -207,9 +161,3 @@ onBeforeMount(async () => {
 }
 </style>
 
-<style lang="postcss">
-.mention {
-    @apply bg-violet-150 text-violet-600 rounded-md;
-    padding: 0 2px;
-}
-</style>
