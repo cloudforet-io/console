@@ -187,7 +187,7 @@ const queryKey = computed(() => [
         dataTableId: state.dataTable?.data_table_id,
         dataTableOptions: JSON.stringify(sortObjectByKeys(state.dataTable?.options) ?? {}),
         groupBy: [widgetOptionsState.xAxisInfo?.data as string],
-        count: widgetOptionsState.xAxisInfo.count,
+        count: widgetOptionsState.xAxisInfo?.count,
     },
 ]);
 

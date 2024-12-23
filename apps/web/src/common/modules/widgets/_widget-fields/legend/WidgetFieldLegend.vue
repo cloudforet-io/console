@@ -59,7 +59,7 @@ const handleSelectPosition = (val: 'right'|'bottom'|'left'|'top') => {
                              @update:value="handleUpdateToggleValue"
             />
         </div>
-        <p-field-group v-if="props.widgetFieldSchema?.options?.showPositionField"
+        <p-field-group v-if="state.fieldValue?.toggleValue && props.widgetFieldSchema?.options?.showPositionField"
                        :label="$t('COMMON.WIDGETS.LEGEND.POSITION')"
                        style-type="secondary"
                        class="position-wrapper"

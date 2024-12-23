@@ -31,7 +31,7 @@ const pieChart: WidgetConfig = {
     optionalFieldsSchema: {
         legend: {
             options: {
-                default: true,
+                toggle: true,
                 showPositionField: true,
             },
         },
