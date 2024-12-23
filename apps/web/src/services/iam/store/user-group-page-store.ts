@@ -42,7 +42,6 @@ interface UserGroupPageState {
         list: UserGroupChannelModel[];
         pageStart: number;
         pageLimit: number;
-        totalCount: number;
         selectedIndices: number[];
         searchFilters: ConsoleFilter[];
     }
@@ -71,8 +70,7 @@ export const useUserGroupPageStore = defineStore('page-user-group', () => {
             list: [],
             pageStart: 1,
             pageLimit: 15,
-            totalCount: 0,
-            selectedIndices: [],
+            selectedIndices: [0],
             searchFilters: [],
         },
         modal: {
@@ -90,14 +88,14 @@ export const useUserGroupPageStore = defineStore('page-user-group', () => {
             });
             return userGroups ?? [];
         }),
-        selectedUserGroupChannel: computed<UserGroupChannelModel[]>((): UserGroupChannelModel[] => {
-            const userGroupChannel: UserGroupChannelModel[] = [];
-            if (state.userGroupChannels.selectedIndices.length === 1) {
-                state.userGroupChannels.selectedIndices.forEach((d: number) => {
-                    userGroupChannel.push(state.userGroupChannels.list[d]);
-                });
-            }
-            return userGroupChannel ?? [];
+        selectedUserGroupChannel: computed(() => {
+            const userGroupChannels: UserGroupChannelModel[] = [];
+            state.userGroupChannels.selectedIndices.forEach((d: number) => {
+                if (getters.selectedUserGroups && getters.selectedUserGroups.length > 0 && getters.selectedUserGroups[0].notification_channel) {
+                    userGroupChannels.push(getters.selectedUserGroups[0].notification_channel[d]);
+                }
+            });
+            return userGroupChannels ?? [];
         }),
     });
     const actions = {
@@ -122,8 +120,7 @@ export const useUserGroupPageStore = defineStore('page-user-group', () => {
                 list: [],
                 pageStart: 1,
                 pageLimit: 15,
-                totalCount: 0,
-                selectedIndices: [],
+                selectedIndices: [0],
                 searchFilters: [],
             };
             state.modal = {
@@ -139,10 +136,13 @@ export const useUserGroupPageStore = defineStore('page-user-group', () => {
                 // TODO: need test after getting real data
                 const userGroupIdToChannelMap = await this.fetchUserGroupChannels(results.map((result) => result.user_group_id));
 
-                state.userGroups = results.map((item) => ({
-                    ...item,
-                    notification_channel: userGroupIdToChannelMap[item.user_group_id] || [],
-                })) || [];
+                state.userGroups = results.map((item) => {
+                    state.userGroupChannels.list = userGroupIdToChannelMap[item.user_group_id] || [];
+                    return {
+                        ...item,
+                        notification_channel: userGroupIdToChannelMap[item.user_group_id] || [],
+                    };
+                }) || [];
                 state.totalCount = total_count ?? 0;
                 state.selectedIndices = [];
             } catch (e) {
