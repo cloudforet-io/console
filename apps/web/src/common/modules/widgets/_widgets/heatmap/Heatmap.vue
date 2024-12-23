@@ -67,7 +67,7 @@ const state = reactive({
     isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
     dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
 
-    data: null as Data | null,
+    data: computed<Data | null>(() => queryResult.data?.value ?? null),
     chart: null as EChartsType | null,
     xAxisData: computed<string[]>(() => {
         if (!state.data?.results?.length) return [];
@@ -193,19 +193,14 @@ const queryKey = computed(() => [
 
 const queryResult = useQuery({
     queryKey,
-    queryFn: async () => {
-        const results = await fetchWidgetData({
-            widget_id: props.widgetId,
-            granularity: widgetOptionsState.granularityInfo?.granularity,
-            group_by: [widgetOptionsState.xAxisInfo?.data as string],
-            ...getWidgetLoadApiQueryDateRange(widgetOptionsState.granularityInfo?.granularity, dateRange.value),
-            ...(!isDateField(widgetOptionsState.xAxisInfo.data) && { page: { start: 1, limit: widgetOptionsState.xAxisInfo?.count } }),
-            vars: props.dashboardVars,
-        });
-        state.data = results;
-        drawChart(state.data);
-        return results;
-    },
+    queryFn: () => fetchWidgetData({
+        widget_id: props.widgetId,
+        granularity: widgetOptionsState.granularityInfo?.granularity,
+        group_by: widgetOptionsState.xAxisInfo?.data ? [widgetOptionsState.xAxisInfo?.data] : [],
+        ...getWidgetLoadApiQueryDateRange(widgetOptionsState.granularityInfo?.granularity, dateRange.value),
+        ...(!isDateField(widgetOptionsState.xAxisInfo.data) && { page: { start: 0, limit: widgetOptionsState.xAxisInfo?.count } }),
+        vars: props.dashboardVars,
+    }),
     enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable && state.runQueries),
     staleTime: WIDGET_LOAD_STALE_TIME,
 });
@@ -240,6 +235,10 @@ watch([() => state.chartData, () => chartContext.value], ([, chartCtx]) => {
         state.chart = init(chartContext.value);
         state.chart.setOption(state.chartOptions, true);
     }
+});
+
+watch(() => state.data, (newData) => {
+    drawChart(newData);
 });
 
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
