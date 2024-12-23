@@ -95,11 +95,11 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
         publicDashboardItems: computed<PublicDashboardModel[]>(() => {
             const _v2DashboardItems = dashboardState.publicDashboardItems.filter((d) => d.version !== '1.0');
             if (storeState.isAdminMode) return _v2DashboardItems;
-            return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && d.project_id === '*'));
+            return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
         }),
         publicFolderItems: computed<PublicFolderModel[]>(() => {
             if (storeState.isAdminMode) return dashboardState.publicFolderItems;
-            return dashboardState.publicFolderItems.filter((d) => !(d.resource_group === 'DOMAIN' && d.project_id === '*'));
+            return dashboardState.publicFolderItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
         }),
         publicDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getDashboardTreeData(getters.publicFolderItems, getters.publicDashboardItems, state.newIdList)),
         publicTreeControlButtonDisableMap: computed<Record<string, boolean>>(() => {
