@@ -4,15 +4,21 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButtonModal, PTextInput, PRadio, PFieldGroup, PRadioGroup, PTextButton,
 } from '@cloudforet/mirinae';
 
 import { ALERT_STATE } from '@/schema/alert-manager/alert/constants';
+import type { EscalationPolicyCreateParameters } from '@/schema/alert-manager/escalation-policy/api-verbs/create';
+import { ESCALATION_POLICY_STATE } from '@/schema/alert-manager/escalation-policy/constants';
+import type { EscalationPolicyModel } from '@/schema/alert-manager/escalation-policy/model';
+import type { EscalationPolicyRulesType } from '@/schema/alert-manager/escalation-policy/type';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -32,11 +38,18 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const serviceDetailPageStore = useServiceDetailPageStore();
+const serviceDetailPageGetters = serviceDetailPageStore.getters;
 const userStore = useUserStore();
 
-const emit = defineEmits<{(e: 'update:visible'): void; }>();
+const emit = defineEmits<{(e: 'update:visible'): void;
+    (e: 'close'): void;
+}>();
 
+const storeState = reactive({
+    serviceId: computed<string>(() => serviceDetailPageGetters.serviceInfo.service_id),
+});
 const state = reactive({
+    loading: false,
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
     selectedEscalationPolicyId: undefined as string|undefined,
     headerTitle: computed<TranslateResult>(() => {
@@ -56,7 +69,13 @@ const state = reactive({
     selectedRadioIdx: 0,
 
     timezone: computed<string|undefined>(() => userStore.state.timezone),
-    isModalValid: computed<boolean>(() => name.value === '' && !invalidState.name),
+    isModalValid: computed<boolean>(() => name.value !== '' && !invalidState.name && state.formValid),
+    rules: [{
+        channels: [],
+        escalate_minutes: 30,
+    }] as EscalationPolicyRulesType[],
+    formValid: computed<boolean>(() => state.rules.every((r) => r.channels.length > 0)),
+    repeatCount: 0,
 });
 
 const {
@@ -82,8 +101,25 @@ const handleRouteDetail = () => {
     handleClose();
 };
 const handleClickConfirm = async () => {
-    console.log('TODO: handleClickConfirm');
-    handleClose();
+    state.loading = true;
+    try {
+        state.succeedWebhook = await SpaceConnector.clientV2.alertManager.escalationPolicy.create<EscalationPolicyCreateParameters, EscalationPolicyModel>({
+            name: name.value,
+            rules: state.rules,
+            service_id: storeState.serviceId,
+            repeat: {
+                state: ESCALATION_POLICY_STATE.DISABLED,
+                count: state.repeatCount,
+            },
+            finish_condition: state.radioMenuList[state.selectedRadioIdx].name,
+        });
+        handleClose();
+        emit('close');
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
+    } finally {
+        state.loading = false;
+    }
 };
 </script>
 
@@ -92,6 +128,7 @@ const handleClickConfirm = async () => {
                     :header-title="state.headerTitle"
                     :fade="true"
                     :backdrop="true"
+                    :loading="state.loading"
                     :visible.sync="state.proxyVisible"
                     :disabled="!state.isModalValid"
                     @confirm="handleClickConfirm"
@@ -147,7 +184,9 @@ const handleClickConfirm = async () => {
                             </p-text-button>
                         </div>
                     </template>
-                    <service-detail-tabs-settings-escalation-policy-form />
+                    <service-detail-tabs-settings-escalation-policy-form :rules.sync="state.rules"
+                                                                         :repeat-count.sync="state.repeatCount"
+                    />
                 </p-field-group>
             </div>
         </template>

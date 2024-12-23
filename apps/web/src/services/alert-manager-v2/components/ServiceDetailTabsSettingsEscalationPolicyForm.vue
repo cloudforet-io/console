@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { reactive } from 'vue';
+
 import { cloneDeep } from 'lodash';
 
 import {
@@ -7,69 +9,50 @@ import {
 
 import type { EscalationPolicyRulesType } from '@/schema/alert-manager/escalation-policy/type';
 
-import { useFormValidator } from '@/common/composables/form-validator';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
 
 import ServiceDetailTabsSettingsEscalationPolicyFormChannelDropdown
     from '@/services/alert-manager-v2/components/ServiceDetailTabsSettingsEscalationPolicyFormChannelDropdown.vue';
 
-const {
-    forms: {
-        repeatCount,
-        rules,
-    },
-    setForm,
-    invalidState,
-    invalidTexts,
-} = useFormValidator({
-    repeatCount: 0,
-    rules: [{
-        channels: [],
-        escalate_minutes: 30,
-    }] as EscalationPolicyRulesType[],
-}, {
-    repeatCount(value) {
-        if (value === undefined) return true;
-        if (Number.isNaN(value) || typeof value !== 'number') return 'Only numbers are allowed.';
-        if (value < 0) return 'Must be 0 or greater.';
-        return true;
-    },
-    rules(value: EscalationPolicyRulesType[]) {
-        let result = '';
-        value.forEach((d, idx) => {
-            if (!repeatCount.value && idx === value.length - 1) return;
-            if (d?.escalate_minutes === undefined) result = 'Only numbers are allowed.';
-            else if (d?.escalate_minutes < 0) result = 'Must be 0 or greater.';
-        });
-        return result;
-    },
+interface Props {
+    rules: EscalationPolicyRulesType[];
+    repeatCount: number;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    rules: undefined,
+    repeatCount: 1,
 });
 
+const emit = defineEmits<{(event: 'update:rules', rules: EscalationPolicyRulesType[]): void;
+    (event: 'update:repeat-count', rules: EscalationPolicyRulesType[]): void;
+}>();
+
+const state = reactive({
+    proxyRules: useProxyValue('rules', props, emit),
+    proxyRepeatCount: useProxyValue('repeatCount', props, emit),
+});
+
+const handleSelectChannelDropdown = (idx: number, ids: string[]) => {
+    state.proxyRules[idx].channels = ids;
+};
 const handleDeleteRule = (idx: number) => {
-    const _rules = cloneDeep(rules.value);
+    const _rules = cloneDeep(state.proxyRules);
     _rules.splice(idx, 1);
-    if (_rules.length > 0 && !repeatCount.value) _rules[_rules.length - 1].escalate_minutes = 30;
-    setForm('rules', _rules);
+    state.proxyRules = _rules;
 };
 const handleAddStep = () => {
-    const _rules = cloneDeep(rules.value);
-    if (_rules.length > 0 && !repeatCount.value) _rules[_rules.length - 1].escalate_minutes = 30;
+    const _rules = cloneDeep(state.proxyRules);
     _rules.push({
         channels: [],
         escalate_minutes: 30,
     });
-    setForm('rules', _rules);
+    state.proxyRules = _rules;
 };
 const handleUpdateRepeatCount = (_repeatCount: number) => {
-    const _after = Number(_repeatCount);
-    const _before = repeatCount.value;
-    const _rules = cloneDeep(rules.value);
-    //
-    if (!_before && _after > 0) _rules[_rules.length - 1].escalate_minutes = 30;
-    if (!_after) _rules[_rules.length - 1].escalate_minutes = 30;
-    setForm('rules', _rules);
-    setForm('repeatCount', _after);
+    state.proxyRepeatCount = _repeatCount;
 };
 </script>
 
@@ -82,12 +65,10 @@ const handleUpdateRepeatCount = (_repeatCount: number) => {
                      height="1.25rem"
                 />
                 <p-field-group required
-                               :invalid="invalidState.repeatCount"
-                               :invalid-text="invalidTexts.repeatCount"
                                class="repeat-form"
                 >
                     <template #default="{invalid}">
-                        <p-text-input :value="repeatCount"
+                        <p-text-input :value="state.proxyRepeatCount"
                                       type="number"
                                       :min="0"
                                       block
@@ -107,12 +88,12 @@ const handleUpdateRepeatCount = (_repeatCount: number) => {
                            shape="square"
                            name="ic_plus_bold"
                            style-type="tertiary"
-                           :disabled="rules.length >= 5"
+                           :disabled="state.proxyRules.length >= 5"
                            @click="handleAddStep"
             />
         </div>
         <div class="py-4 px-6">
-            <p-card v-for="(rule, idx) in rules"
+            <p-card v-for="(rule, idx) in state.proxyRules"
                     :key="`rule-${idx}`"
                     class="card"
             >
@@ -129,7 +110,7 @@ const handleUpdateRepeatCount = (_repeatCount: number) => {
                         >
                             {{ $t('ALERT_MANAGER.ESCALATION_POLICY.STEP', { step: idx + 1}) }}
                         </p-badge>
-                        <p-icon-button v-if="rules.length > 1"
+                        <p-icon-button v-if="state.proxyRules.length > 1"
                                        class="ml-auto"
                                        name="ic_delete"
                                        size="sm"
@@ -156,7 +137,9 @@ const handleUpdateRepeatCount = (_repeatCount: number) => {
                         </p-field-group>
                     </template>
                 </i18n>
-                <service-detail-tabs-settings-escalation-policy-form-channel-dropdown class="mt-2" />
+                <service-detail-tabs-settings-escalation-policy-form-channel-dropdown class="mt-2"
+                                                                                      @update:selected-ids="handleSelectChannelDropdown(idx, $event)"
+                />
             </p-card>
             <p-text-button class="add-rule-button mt-4 mx-auto "
                            icon-left="ic_plus_bold"

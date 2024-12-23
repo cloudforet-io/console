@@ -17,8 +17,6 @@ import type {
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ServiceChannelListParameters } from '@/schema/alert-manager/service-channel/api-verbs/list';
 import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
-import type { UserChannelListParameters } from '@/schema/alert-manager/user-channel/api-verbs/list';
-import type { UserChannelModel } from '@/schema/alert-manager/user-channel/model';
 import type { UserGroupChannelListParameters } from '@/schema/alert-manager/user-group-channel/api-verbs/list';
 import type { UserGroupChannelModel } from '@/schema/alert-manager/user-group-channel/model';
 import { i18n } from '@/translations';
@@ -28,7 +26,6 @@ import type { UserGroupReferenceMap } from '@/store/reference/user-group-referen
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import type { SelectedUserDropdownIdsType } from '@/common/modules/user/typte';
 
 import { indigo } from '@/styles/colors';
 
@@ -46,12 +43,12 @@ type DropdownCategoriesType = {
 };
 
 const props = withDefaults(defineProps<{
-     selectedIds?: SelectedUserDropdownIdsType[];
+     selectedIds?: string[];
 }>(), {
     selectedIds: undefined,
 });
 
-const emit = defineEmits<{(event: 'update:selected-ids', value: SelectedUserDropdownIdsType[]): void;
+const emit = defineEmits<{(event: 'update:selected-ids', value: string[]): void;
 }>();
 
 const allReferenceStore = useAllReferenceStore();
@@ -68,7 +65,6 @@ const state = reactive({
     loading: false,
     serviceChannelList: [] as DropdownItem[],
     userGroupChannelList: [] as DropdownItem[],
-    userChannelList: [] as DropdownItem[],
     dropdownCategories: computed<DropdownCategoriesType[]>(() => {
         const result: DropdownCategoriesType[] = [];
         if (state.serviceChannelList.length > 0) {
@@ -81,12 +77,6 @@ const state = reactive({
             result.push({
                 key: 'user_group_channel',
                 title: i18n.t('ALERT_MANAGER.ESCALATION_POLICY.USER_GROUP') as string,
-            });
-        }
-        if (state.userChannelList.length > 0) {
-            result.push({
-                key: 'user_channel',
-                title: i18n.t('ALERT_MANAGER.ESCALATION_POLICY.USER') as string,
             });
         }
         return result;
@@ -105,7 +95,6 @@ const menuItemsHandler = (): AutocompleteHandler => async (keyword: string, page
             ];
             if (c.key === 'service_channel') items.push(...state.serviceChannelList);
             else if (c.key === 'user_group_channel') items.push(...state.userGroupChannelList);
-            else items.push(...state.userChannelList);
 
             const _slicedItems = filterItems(items);
             _slicedItems.unshift();
@@ -123,7 +112,6 @@ const menuItemsHandler = (): AutocompleteHandler => async (keyword: string, page
         const items: DropdownItem[] = [];
         if (c.key === 'service_channel') items.push(...state.serviceChannelList);
         else if (c.key === 'user_group_channel') items.push(...state.userGroupChannelList);
-        else items.push(...state.userChannelList);
         const _slicedItems = filterItems(items);
         if (i !== resultIndex) return { results: [], title: c.title };
         return {
@@ -133,24 +121,24 @@ const menuItemsHandler = (): AutocompleteHandler => async (keyword: string, page
     });
 };
 
-const currentUserIds = computed<SelectedUserDropdownIdsType[]>(() => state.selectedItems.map((item) => ({ value: item.name, type: checkUserGroup(item.name) ? 'USER_GROUP' : 'USER' })));
+const currentChannelIds = computed<string[]>(() => state.selectedItems.map((item) => item.name));
 
 const handleUpdateSelectedUserItems = (selectedUsers: SelectDropdownMenuItem[]) => {
     if (isEqual(selectedUsers, state.selectedItems)) return; // prevent unnecessary update
-    state.selectedItems = selectedUsers; // it updates currentUserId and currentUserIds automatically
-    if (isEqual(currentUserIds.value, props.selectedIds)) return; // prevent unnecessary update
-    emit('update:selected-ids', currentUserIds.value);
+    state.selectedItems = selectedUsers; // it updates currentChannelIds automatically
+    if (isEqual(currentChannelIds.value, props.selectedIds)) return; // prevent unnecessary update
+    emit('update:selected-ids', currentChannelIds.value);
 };
 const handleTagDelete = (idx: number) => {
     state.selectedItems.splice(idx, 1);
-    emit('update:selected-ids', currentUserIds.value);
+    emit('update:selected-ids', currentChannelIds.value);
 };
-const initMultipleType = (_userIds?: SelectedUserDropdownIdsType[]) => {
-    if (!Array.isArray(_userIds)) throw new Error('userIds should be an array');
-    if (!isEqual(currentUserIds.value, _userIds)) {
-        state.selectedItems = _userIds.map((userId) => ({
-            name: userId.value,
-            label: storeState.userReferenceMap[userId.value]?.label ?? userId.value,
+const initMultipleType = (_channelIds?: string[]) => {
+    if (!Array.isArray(_channelIds)) return;
+    if (!isEqual(currentChannelIds.value, _channelIds)) {
+        state.selectedItems = _channelIds.map((channelId) => ({
+            name: channelId,
+            label: storeState.userReferenceMap[channelId]?.label ?? channelId,
         }));
     }
 };
@@ -172,7 +160,7 @@ const fetchServiceChannelList = async () => {
 };
 const fetchUserGroupChannelList = async () => {
     try {
-        const { results } = await SpaceConnector.clientV2.alertManager.userGroupChnnel.list<UserGroupChannelListParameters, ListResponse<UserGroupChannelModel>>();
+        const { results } = await SpaceConnector.clientV2.alertManager.userGroupChannel.list<UserGroupChannelListParameters, ListResponse<UserGroupChannelModel>>();
         state.userGroupChannelList = (results || []).map((item) => ({
             name: item.channel_id,
             label: item.name,
@@ -182,28 +170,15 @@ const fetchUserGroupChannelList = async () => {
         state.userGroupChannelList = [];
     }
 };
-const fetchUserChannelList = async () => {
-    try {
-        const { results } = await SpaceConnector.clientV2.alertManager.userChnnel.list<UserChannelListParameters, ListResponse<UserChannelModel>>();
-        state.userChannelList = (results || []).map((item) => ({
-            name: item.channel_id,
-            label: item.name,
-        })).sort((a, b) => a.label.localeCompare(b.label));
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-        state.userChannelList = [];
-    }
-};
 
 watch(() => storeState.serviceId, async (serviceId) => {
     if (!serviceId) return;
     await fetchServiceChannelList();
     await fetchUserGroupChannelList();
-    await fetchUserChannelList();
 }, { immediate: true });
-watch(() => props.selectedIds, (newUserIds) => {
-    if (isEqual(currentUserIds.value, newUserIds)) return; // prevent infinite loop
-    initMultipleType(newUserIds);
+watch(() => props.selectedIds, (newChannelId) => {
+    if (isEqual(currentChannelIds.value, newChannelId)) return; // prevent infinite loop
+    initMultipleType(newChannelId);
 }, { immediate: true });
 </script>
 

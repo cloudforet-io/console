@@ -193,8 +193,9 @@ watch(() => storeState.serviceId, (id) => {
                 {{ iso8601Formatter(value, storeState.timezone) }}
             </template>
         </p-toolbox-table>
-        <service-detail-tabs-settings-escalation-policy-form-modal :visible="modalState.visible"
+        <service-detail-tabs-settings-escalation-policy-form-modal :visible.sync="modalState.visible"
                                                                    :type="modalState.type"
+                                                                   @close="handleChangeToolbox"
         />
     </div>
 </template>
