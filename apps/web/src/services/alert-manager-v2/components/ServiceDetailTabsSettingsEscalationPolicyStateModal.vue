@@ -50,18 +50,11 @@ const state = reactive({
     loading: false,
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
 });
-
 const getConnectChannelCount = (rules: EscalationPolicyRulesType[]) => {
     const allChannels = rules.flatMap((item) => item.channels);
     const uniqueChannels = new Set(allChannels);
     return uniqueChannels.size;
 };
-const handleClose = () => {
-    state.proxyVisible = false;
-    emit('close');
-};
-
-
 const handleConfirm = async () => {
     state.loading = true;
     try {
@@ -69,7 +62,9 @@ const handleConfirm = async () => {
             escalation_policy_id: props.selectedItem.escalation_policy_id,
             service_id: storeState.serviceId,
         });
-        handleClose();
+        await serviceDetailPageStore.fetchServiceDetailData(storeState.serviceId);
+        state.proxyVisible = false;
+        emit('close');
     } catch (e) {
         ErrorHandler.handleError(e, true);
     } finally {
@@ -80,13 +75,11 @@ const handleConfirm = async () => {
 
 <template>
     <p-button-modal class="service-detail-tabs-settings-escalation-policy-state-modal"
-                    :visible="state.proxyVisible"
+                    :visible.sync="state.proxyVisible"
                     :header-title="$t('ALERT_MANAGER.ESCALATION_POLICY.MODAL_STATE_TITLE')"
                     :loading="state.loading"
                     size="md"
                     @confirm="handleConfirm"
-                    @cancel="handleClose"
-                    @close="handleClose"
     >
         <template #body>
             <p-definition-table :fields="ESCALATION_POLICY_MANAGEMENT_TABLE_FIELDS"

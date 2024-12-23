@@ -32,9 +32,9 @@ export const ALERT_MANAGER_STATE_COLOR = {
         iconColor: styles.safe,
         textColor: styles.gray[900],
     },
-    PENDING: {
-        iconColor: styles.yellow[500],
-        textColor: styles.gray[900],
+    DISABLED: {
+        iconColor: styles.gray[400],
+        textColor: styles.gray[400],
     },
 } as const;
 

@@ -31,19 +31,14 @@ const state = reactive({
     loading: false,
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
 });
-
-const handleClose = () => {
-    state.proxyVisible = false;
-    emit('close');
-};
-
 const handleConfirm = async () => {
     state.loading = true;
     try {
         await SpaceConnector.clientV2.alertManager.escalationPolicy.delete<EscalationPolicyDeleteParameters>({
             escalation_policy_id: props.selectedItem.escalation_policy_id,
         });
-        handleClose();
+        state.proxyVisible = false;
+        emit('close');
     } catch (e) {
         ErrorHandler.handleError(e, true);
     } finally {
@@ -54,14 +49,12 @@ const handleConfirm = async () => {
 
 <template>
     <p-button-modal class="service-detail-tabs-settings-escalation-policy-delete-modal"
-                    :visible="state.proxyVisible"
+                    :visible.sync="state.proxyVisible"
                     :header-title="$t('ALERT_MANAGER.ESCALATION_POLICY.MODAL_DELETE_TITLE')"
                     :loading="state.loading"
                     theme-color="alert"
                     size="sm"
                     @confirm="handleConfirm"
-                    @cancel="handleClose"
-                    @close="handleClose"
     >
         <template #confirm-button>
             {{ $t('ALERT_MANAGER.ESCALATION_POLICY.MODAL_DELETE_BUTTON') }}

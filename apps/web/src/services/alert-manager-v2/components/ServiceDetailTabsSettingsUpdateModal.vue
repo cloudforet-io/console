@@ -101,15 +101,12 @@ const handleConfirm = async () => {
             options,
         });
         await serviceDetailPageStore.fetchServiceDetailData(storeState.serviceInfo.service_id);
+        state.proxyVisible = false;
     } catch (e) {
         ErrorHandler.handleError(e, true);
     } finally {
         state.loading = false;
-        handleClose();
     }
-};
-const handleClose = () => {
-    state.proxyVisible = false;
 };
 
 watch(() => props.type, (type) => {
@@ -125,11 +122,9 @@ watch(() => props.type, (type) => {
                     size="sm"
                     :fade="true"
                     :backdrop="true"
-                    :visible="state.proxyVisible"
+                    :visible.sync="state.proxyVisible"
                     :loading="state.loading"
                     @confirm="handleConfirm"
-                    @cancel="handleClose"
-                    @close="handleClose"
     >
         <template #body>
             <div class="form-contents">
