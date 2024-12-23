@@ -22,7 +22,7 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
-import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
+import { DATE_FIELD, WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
 import { sortObjectByKeys } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import {
     getWidgetDateFields, getWidgetDateRange,
@@ -69,7 +69,7 @@ const state = reactive({
     isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
     dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
 
-    data: null as Data | null,
+    data: computed<Data | null>(() => queryResult.data?.value),
     // unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
     boxWidth: BOX_MIN_WIDTH,
     boxHeight: 0,
@@ -122,26 +122,23 @@ const queryKey = computed(() => [
         granularity: widgetOptionsState.granularityInfo?.granularity,
         dataTableId: state.dataTable?.data_table_id,
         dataTableOptions: JSON.stringify(sortObjectByKeys(state.dataTable?.options) ?? {}),
-        groupBy: [widgetOptionsState.xAxisInfo?.data as string],
-        count: widgetOptionsState.xAxisInfo.count,
+        groupBy: widgetOptionsState.xAxisInfo?.data,
+        count: widgetOptionsState.xAxisInfo?.count,
     },
 ]);
 
 const queryResult = useQuery({
     queryKey,
-    queryFn: async () => {
-        const results = await fetchWidgetData({
-            widget_id: props.widgetId,
-            granularity: widgetOptionsState.granularityInfo?.granularity,
-            group_by: [widgetOptionsState.xAxisInfo?.data as string],
-            ...getWidgetLoadApiQueryDateRange(widgetOptionsState.granularityInfo?.granularity, dateRange.value),
-            ...(!isDateField(widgetOptionsState.xAxisInfo.data) && { page: { start: 1, limit: widgetOptionsState.xAxisInfo.count } }),
-            vars: props.dashboardVars,
-        });
-        state.data = results;
-        return results;
-    },
+    queryFn: () => fetchWidgetData({
+        widget_id: props.widgetId,
+        granularity: widgetOptionsState.granularityInfo?.granularity,
+        group_by: widgetOptionsState.xAxisInfo?.data ? [widgetOptionsState.xAxisInfo?.data as string] : [],
+        ...getWidgetLoadApiQueryDateRange(widgetOptionsState.granularityInfo?.granularity, dateRange.value),
+        ...(!isDateField(widgetOptionsState.xAxisInfo.data) && { page: { start: 1, limit: widgetOptionsState.xAxisInfo?.count } }),
+        vars: props.dashboardVars,
+    }),
     enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable && state.runQueries),
+    staleTime: WIDGET_LOAD_STALE_TIME,
 });
 
 const loading = computed(() => queryResult.isLoading);

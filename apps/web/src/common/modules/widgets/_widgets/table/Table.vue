@@ -154,7 +154,6 @@ const baseQueryKey = computed(() => [
         granularity: widgetOptionsState.granularityInfo?.granularity,
         dataTableId: state.dataTable?.data_table_id,
         dataTableOptions: JSON.stringify(sortObjectByKeys(state.dataTable?.options) ?? {}),
-        enabledLoad: state.runQueries,
     },
 ]);
 
@@ -168,7 +167,6 @@ const fullDataQueryKey = computed(() => [
         dataTableId: state.dataTable?.data_table_id,
         dataTableOptions: JSON.stringify(sortObjectByKeys(state.dataTable?.options) ?? {}),
         enabledTotal: !!widgetOptionsState.totalInfo?.toggleValue,
-        enabledLoad: state.runQueries,
     },
 ]);
 
