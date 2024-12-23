@@ -3,7 +3,9 @@ import {
     computed, defineExpose, onMounted, reactive, watch,
 } from 'vue';
 
-import { cloneDeep, intersection, isEqual } from 'lodash';
+import {
+    cloneDeep, intersection, isEmpty, isEqual,
+} from 'lodash';
 
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
@@ -38,11 +40,11 @@ import type {
     DataTableAlertModalMode, TransformDataTableInfo,
 } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
-    DataTableOperator, JoinType, QueryOptions, EvalOptions,
+    DataTableOperator, QueryOptions, EvalOptions,
     DataTableTransformOptions,
-    EvaluateExpression, AddLabelsOptions, PivotOptions,
+    AddLabelsOptions, PivotOptions,
+    JoinOptions, ValueMappingOptions, ConcatOptions,
 } from '@/common/modules/widgets/types/widget-model';
-
 
 
 
@@ -68,39 +70,11 @@ const state = reactive({
     resetKey: Math.random(),
     dataTableId: computed(() => props.item.data_table_id),
     dataTableName: props.item.name ? props.item.name : `${props.item.operator} Data`,
-    applyDisabled: computed(() => {
-        const haveSavedName = !!originState.name;
-        if (!haveSavedName) return true;
-        if (state.operator === 'CONCAT') return invalidState.CONCAT;
-        if (state.operator === 'JOIN') return invalidState.JOIN;
-        if (state.operator === 'QUERY') return invalidState.QUERY;
-        if (state.operator === 'EVAL') return invalidState.EVAL;
-        if (state.operator === 'PIVOT') return invalidState.PIVOT;
-        if (state.operator === 'ADD_LABELS') return invalidState.ADD_LABELS;
-        if (state.operator === 'VALUE_MAPPING') return invalidState.VALUE_MAPPING;
-        return true;
+    applyDisabled: computed<boolean>(() => {
+        if (!originState.name) return true;
+        return invalidState[state.operator];
     }),
-    optionsChanged: computed(() => {
-        const concatDataTablesChanged = !isEqual(valueState.CONCAT.data_tables, originState.dataTableInfo.dataTables);
-        const joinDataTablesChanged = !isEqual(valueState.JOIN.data_tables, originState.dataTableInfo.dataTables);
-        const joinTypeChanged = valueState.JOIN.how !== originState.joinType;
-        const queryDataTableIdChanged = valueState.QUERY.data_table_id !== originState.dataTableInfo.dataTableId;
-        const queryConditionsChanged = !isEqual(valueState.QUERY.conditions, originState.queryConditions);
-        const evalDataTableIdChanged = valueState.EVAL.data_table_id !== originState.dataTableInfo.dataTableId;
-        const evalChanged = !isEqual(valueState.EVAL.expressions.map((expression) => ({
-            ...expression,
-            ...(expression?.condition ? { condition: expression?.condition } : {}),
-        })).filter((expression) => !!expression.name && !!expression.expression), originState.expressions);
-        const addLabelsChanged = !isEqual(valueState.ADD_LABELS.labels, originState.labels);
-        const valueMappingChanged = !isEqual(valueState.VALUE_MAPPING, originState.valueMapping);
-        if (state.operator === 'CONCAT') return concatDataTablesChanged;
-        if (state.operator === 'JOIN') return joinDataTablesChanged || joinTypeChanged;
-        if (state.operator === 'QUERY') return queryDataTableIdChanged || queryConditionsChanged;
-        if (state.operator === 'EVAL') return evalDataTableIdChanged || evalChanged;
-        if (state.operator === 'ADD_LABELS') return addLabelsChanged;
-        if (state.operator === 'VALUE_MAPPING') return valueMappingChanged;
-        return false;
-    }),
+    optionsChanged: computed<boolean>(() => !isEqual(valueState[state.operator], originState[state.operator])),
     isUnsaved: computed(() => state.dataTableId.startsWith('UNSAVED-')),
     operator: computed(() => props.item.operator as DataTableOperator),
     failStatus: false,
@@ -137,11 +111,13 @@ const originState = reactive({
         dataTables: props.item.options[state.operator]?.data_tables ?? [] as string[],
         dataTableId: props.item.options[state.operator]?.data_table_id as string,
     })),
-    joinType: computed<JoinType|undefined>(() => (props.item.options as DataTableTransformOptions).JOIN?.how),
-    queryConditions: computed<QueryOptions['conditions']>(() => (props.item.options as DataTableTransformOptions).QUERY?.conditions ?? []),
-    expressions: computed<EvaluateExpression[]|string[]>(() => (props.item.options as DataTableTransformOptions).EVAL?.expressions ?? []),
-    labels: computed<AddLabelsOptions['labels']>(() => (props.item.options as DataTableTransformOptions).ADD_LABELS?.labels ?? {}),
-    pivot: computed<PivotOptions|undefined>(() => {
+    CONCAT: computed<ConcatOptions|undefined>(() => props.item.options.CONCAT),
+    JOIN: computed<JoinOptions|undefined>(() => props.item.options.JOIN),
+    QUERY: computed<QueryOptions|undefined>(() => props.item.options.QUERY),
+    EVAL: computed<EvalOptions|undefined>(() => props.item.options.EVAL),
+    ADD_LABELS: computed<AddLabelsOptions|undefined>(() => props.item.options.ADD_LABELS),
+    VALUE_MAPPING: computed<ValueMappingOptions|undefined>(() => props.item.options.VALUE_MAPPING),
+    PIVOT: computed<PivotOptions|undefined>(() => {
         const _pivot = (props.item.options as DataTableTransformOptions).PIVOT as PivotOptions|undefined;
         if (!_pivot) return cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT);
         return {
@@ -153,7 +129,6 @@ const originState = reactive({
             order_by: _pivot.order_by,
         };
     }),
-    valueMapping: computed(() => (props.item.options as DataTableTransformOptions).VALUE_MAPPING ?? {}),
 });
 
 const setFailStatus = (status: boolean) => {
@@ -304,28 +279,15 @@ const handleUpdateDataTable = async () => {
 
 /* Utils */
 const setInitialDataTableForm = () => {
-    const _originDataTables = originState.dataTableInfo.dataTables.length ? cloneDeep(originState.dataTableInfo.dataTables) : [];
-    const _originDataTableId = originState.dataTableInfo.dataTableId;
-    // CONCAT
-    valueState.CONCAT = {
-        data_tables: _originDataTables,
-    };
-    // JOIN
-    valueState.JOIN.data_tables = _originDataTables;
-    valueState.JOIN.how = originState.joinType;
-    // QUERY
-    valueState.QUERY.data_table_id = _originDataTableId;
-    valueState.QUERY.conditions = originState.queryConditions.length ? cloneDeep(originState.queryConditions) : cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.QUERY.conditions);
-    // EVAL
-    valueState.EVAL.data_table_id = _originDataTableId;
-    valueState.EVAL.expressions = originState.expressions.length ? cloneDeep(originState.expressions) : cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.EVAL.expressions);
-    // ADD_LABELS
-    valueState.ADD_LABELS.labels = originState.labels.length ? cloneDeep(originState.labels) : cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.ADD_LABELS.labels);
-    // PIVOT
-    valueState.PIVOT = originState.pivot ? cloneDeep(originState.pivot) : cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT);
+    valueState.CONCAT = !isEmpty(originState.CONCAT) ? cloneDeep(originState.CONCAT) : cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.CONCAT);
+    valueState.JOIN = !isEmpty(originState.JOIN) ? cloneDeep(originState.JOIN) : cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.JOIN);
+    valueState.QUERY = !isEmpty(originState.QUERY) ? cloneDeep(originState.QUERY) : cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.QUERY);
+    valueState.EVAL = !isEmpty(originState.EVAL) ? cloneDeep(originState.EVAL) : cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.EVAL);
+    valueState.ADD_LABELS = !isEmpty(originState.ADD_LABELS) ? cloneDeep(originState.ADD_LABELS) : cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.ADD_LABELS);
+    valueState.PIVOT = originState.PIVOT ? cloneDeep(originState.PIVOT) : cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT);
+    valueState.VALUE_MAPPING = !isEmpty(originState.VALUE_MAPPING) ? cloneDeep(originState.VALUE_MAPPING) : cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.VALUE_MAPPING);
+
     state.resetKey = Math.random();
-    // VALUE_MAPPING
-    valueState.VALUE_MAPPING = originState.valueMapping ? cloneDeep(originState.valueMapping) : cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.VALUE_MAPPING);
 };
 
 onMounted(() => {
