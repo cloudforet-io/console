@@ -52,7 +52,8 @@ export default class ServiceAPI {
 
             // Set the access token
             const auth = request.headers?.Authorization;
-            if (!auth) request.headers.Authorization = `Bearer ${this.tokenApi.getAccessToken()}`;
+            const token = this.tokenApi.getAccessToken();
+            if (!auth && token) request.headers.Authorization = `Bearer ${token}`;
 
             return request;
         });
