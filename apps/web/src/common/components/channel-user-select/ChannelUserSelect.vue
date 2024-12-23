@@ -12,6 +12,11 @@ import { i18n } from '@/translations';
 
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
+import { useNotificationChannelCreateFormStore } from '@/services/iam/store/notification-channel-create-form-store';
+
+const notificationChannelCreateFormStore = useNotificationChannelCreateFormStore();
+const notificationChannelCreateFormState = notificationChannelCreateFormStore.state;
+
 const USER_MODE = {
     ALL_MEMBER: 'ALL_MEMBER',
     USER_GROUP: 'USER_GROUP',
@@ -71,6 +76,15 @@ watch([() => selectedIds, () => state.selectedUserModeIdx], ([nv_selected_ids, n
         userMode: state.userMode[nv_selected_user_mode_idx],
         users: nv_selected_ids,
     });
+}, { immediate: true, deep: true });
+
+watch(() => notificationChannelCreateFormState.userInfo, (nv_user_info) => {
+    // TODO: select user mode
+    // state.selectedUserModeIdx = state.userMode.findIndex((mode) => mode?.name === nv_user_info.type);
+    selectedIds.value = nv_user_info.value.map((id) => ({
+        type: nv_user_info.type,
+        value: id,
+    }));
 }, { immediate: true, deep: true });
 </script>
 

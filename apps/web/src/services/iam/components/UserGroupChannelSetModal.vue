@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { reactive } from 'vue';
+import { reactive, ref, watch } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal, PI, PButton } from '@cloudforet/mirinae';
@@ -38,6 +38,8 @@ interface ChannelSetModalState {
   }
 }
 
+const isCreateAble = ref<boolean>(false);
+
 const state = reactive<ChannelSetModalState>({
     loading: false,
     userInfo: {
@@ -63,40 +65,43 @@ const handleConfirm = async () => {
     try {
         // TODO: need create | update channel division
         state.loading = true;
+        if (userGroupPageState.modal.title === i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE')) {
+            const scheduleInfo = allDays.reduce((acc, day) => {
+                if (state.scheduleInfo.days.includes(day)) {
+                    acc[day] = {
+                        is_scheduled: true,
+                        start: state.scheduleInfo.start,
+                        end: state.scheduleInfo.end,
+                    };
+                } else {
+                    acc[day] = {
+                        is_scheduled: false,
+                        start: 0,
+                        end: 0,
+                    };
+                }
+                return acc;
+            }, {});
 
-        const scheduleInfo = allDays.reduce((acc, day) => {
-            if (state.scheduleInfo.days.includes(day)) {
-                acc[day] = {
-                    is_scheduled: true,
-                    start: state.scheduleInfo.start,
-                    end: state.scheduleInfo.end,
-                };
-            } else {
-                acc[day] = {
-                    is_scheduled: false,
-                    start: 0,
-                    end: 0,
-                };
-            }
-            return acc;
-        }, {});
-
-        await fetchCreateUserGroupChannel({
-            protocol_id: 'slack',
-            name: state.userInfo.channelName,
-            schedule: {
-                ...scheduleInfo,
-                SCHEDULE_TYPE: state.scheduleInfo.type,
-            },
-            data: {
-                FORWARD_TYPE: state.userInfo.userMode.name,
-                USER: state.userInfo.users[0].type === 'USER' ? state.userInfo.users.map((user) => user.value) : [],
-                USER_GROUP: state.userInfo.users[0].type === 'USER_GROUP' ? state.userInfo.users.map((userGroup) => userGroup.value) : [],
-            },
-            tags: {},
-            user_group_id: userGroupPageGetters.selectedUserGroups[0].user_group_id ?? undefined,
-        });
-        emit('confirm');
+            await fetchCreateUserGroupChannel({
+                protocol_id: 'slack',
+                name: state.userInfo.channelName,
+                schedule: {
+                    ...scheduleInfo,
+                    SCHEDULE_TYPE: state.scheduleInfo.type,
+                },
+                data: {
+                    FORWARD_TYPE: state.userInfo.userMode.name,
+                    USER: state.userInfo.users[0].type === 'USER' ? state.userInfo.users.map((user) => user.value) : [],
+                    USER_GROUP: state.userInfo.users[0].type === 'USER_GROUP' ? state.userInfo.users.map((userGroup) => userGroup.value) : [],
+                },
+                tags: {},
+                user_group_id: userGroupPageGetters.selectedUserGroups[0].user_group_id ?? undefined,
+            });
+            emit('confirm');
+        } else if (userGroupPageState.modal.title === i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.UPDATE_TITLE')) {
+        //   TODO: add update API
+        }
     } finally {
         state.loading = false;
         userGroupPageState.modal = {
@@ -112,6 +117,14 @@ const handleCancel = () => {
         type: USER_GROUP_MODAL_TYPE.CREATE_NOTIFICATIONS_FIRST,
         title: i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE'),
         themeColor: 'primary1',
+    };
+};
+
+const handleClose = () => {
+    userGroupPageState.modal = {
+        type: '',
+        title: '',
+        themeColor: 'primary',
     };
 };
 
@@ -133,8 +146,19 @@ const fetchCreateUserGroupChannel = async (params: UserGroupChannelCreateParamet
     }
 };
 
-/* Wacher */
-// TODO: all input value must be full to be able to create clickkkk
+// const fetchUpdateUserGroupChannel = async (params: UserGroupChannelUpdateParameters) => {
+//     try {
+//         return await SpaceConnector.clientV2.alertManager.userGroupChannel.update<UserGroupChannelUpdateParameters, UserGroupChannelModel>(params);
+//     } catch (e) {
+//         ErrorHandler.handleError(e, true);
+//         return {};
+//     }
+// };
+
+/* Watcher */
+watch(() => state.userInfo, (nv_userInfo) => {
+    isCreateAble.value = !!nv_userInfo.channelName;
+}, { immediate: true, deep: true });
 </script>
 
 <template>
@@ -143,8 +167,10 @@ const fetchCreateUserGroupChannel = async (params: UserGroupChannelCreateParamet
                         :visible="userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.CREATE_NOTIFICATIONS_SECOND"
                         :header-title="userGroupPageState.modal.title"
                         :theme-color="userGroupPageState.modal.themeColor"
+                        :disabled="!isCreateAble"
                         @confirm="handleConfirm"
                         @cancel="handleCancel"
+                        @close="handleClose"
         >
             <template #body>
                 <div class="flex flex-col gap-1 mb-8">
@@ -175,7 +201,8 @@ const fetchCreateUserGroupChannel = async (params: UserGroupChannelCreateParamet
                 </p-button>
             </template>
             <template #confirm-button>
-                <span>{{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.CREATE') }}</span>
+                <span v-if="userGroupPageState.modal.title === i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.UPDATE_TITLE')">{{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.UPDATE') }}</span>
+                <span v-else>{{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.CREATE') }}</span>
             </template>
         </p-button-modal>
     </div>

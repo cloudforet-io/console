@@ -1,21 +1,28 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import {
+    computed, reactive, ref, watch,
+} from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PHeadingLayout, PHeading, PButton, PToolboxTable, PBadge,
 } from '@cloudforet/mirinae';
 
+import type { UserGroupChannelGetParameters } from '@/schema/alert-manager/user-group-channel/api-verbs/get';
 import { USER_GROUP_CHANNEL_SCHEDULE_TYPE } from '@/schema/alert-manager/user-group-channel/constants';
+import type { UserGroupChannelModel } from '@/schema/alert-manager/user-group-channel/model';
 import type { UserGroupChannelScheduleInfoType } from '@/schema/alert-manager/user-group-channel/type';
 import { i18n } from '@/translations';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-constant';
-import { useUserGroupNotificationChannelPageStore } from '@/services/iam/store/user-group-notification-channel-page-store';
+import { useNotificationChannelCreateFormStore } from '@/services/iam/store/notification-channel-create-form-store';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
 
-const userGroupNotificationChannelPageStore = useUserGroupNotificationChannelPageStore();
-const userGroupNotificationChannelPageState = userGroupNotificationChannelPageStore.state;
+
+const notificationChannelCreateFormStore = useNotificationChannelCreateFormStore();
 
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
@@ -27,6 +34,8 @@ interface ChannelItem {
   schedule: UserGroupChannelScheduleInfoType;
   details?: any;
 }
+
+const isDeleteable = ref<boolean>(false);
 
 const tableState = reactive({
     fields: computed(() => [
@@ -59,37 +68,102 @@ const tableState = reactive({
     }),
 });
 
+const totalCount = computed<number>(() => {
+    if (userGroupPageGetters.selectedUserGroups && userGroupPageGetters.selectedUserGroups[0].notification_channel) {
+        return userGroupPageGetters.selectedUserGroups[0].notification_channel.length;
+    }
+    return 0;
+});
+
 /* Component */
 const handleSelect = async (index: number[]) => {
     userGroupPageState.userGroupChannels.selectedIndices = index;
 };
 
-const handleUpdateModal = (modalType: string) => {
-    switch (modalType) {
-    case 'add':
+const handleUpdateModal = async (modalType: string) => {
+    if (modalType === 'create') {
         userGroupPageStore.updateModalSettings({
             type: USER_GROUP_MODAL_TYPE.CREATE_NOTIFICATIONS_FIRST,
             title: i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE'),
             themeColor: 'primary1',
         });
-        break;
-    //     TODO: Update with stored values
-    case 'edit':
+    } else if (modalType === 'edit') {
+        const result = await fetchGetUserGroupChannel({
+            channel_id: userGroupPageGetters.selectedUserGroupChannel[0].channel_id,
+        });
+        if (result) {
+            notificationChannelCreateFormStore.setSelectedProtocol(result.protocol_id);
+            notificationChannelCreateFormStore.setChannelName(result.name);
+            if (result.data) {
+                if (result.data.USER && result.data.USER.length > 0) {
+                    notificationChannelCreateFormStore.setUserInfo({
+                        type: 'USER',
+                        value: result.data.USER,
+                    });
+                } else if (result.data.USER_GROUP && result.data.USER_GROUP.length > 0) {
+                    notificationChannelCreateFormStore.setUserInfo({
+                        type: 'USER_GROUP',
+                        value: result.data.USER_GROUP,
+                    });
+                }
+            }
+            if (result.schedule.SCHEDULE_TYPE === 'ALL_DAY') {
+                notificationChannelCreateFormStore.setScheduleInfo({
+                    days: ['MON', 'TUE', 'WED', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    start: result.schedule.MON.start,
+                    end: result.schedule.MON.end,
+                    type: 'ALL_DAY',
+                });
+            } else if (result.schedule.SCHEDULE_TYPE === 'WEEK_DAY') {
+                notificationChannelCreateFormStore.setScheduleInfo({
+                    days: ['MON', 'TUE', 'WED', 'Thu', 'Fri'],
+                    start: result.schedule.MON.start,
+                    end: result.schedule.MON.end,
+                    type: 'WEEK_DAY',
+                });
+            } else if (result.schedule.SCHEDULE_TYPE === 'CUSTOM') {
+                notificationChannelCreateFormStore.setScheduleInfo({
+                    days: Object.values(result.schedule).map((sc, idx) => {
+                        if (typeof sc === 'object' && sc.is_scheduled) {
+                            return Object.keys(result.schedule)[idx];
+                        }
+                        return null;
+                    }),
+                    start: result.schedule.MON.start,
+                    end: result.schedule.MON.end,
+                    type: 'CUSTOM',
+                });
+            }
+            console.log(result);
+        }
         userGroupPageStore.updateModalSettings({
             type: USER_GROUP_MODAL_TYPE.CREATE_NOTIFICATIONS_FIRST,
             title: i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.UPDATE_TITLE'),
             themeColor: 'primary1',
         });
-        break;
-    case 'delete':
+    } else if (modalType === 'delete') {
         userGroupPageStore.updateModalSettings({
             type: USER_GROUP_MODAL_TYPE.DELETE_NOTIFICATION_CHANNEL,
             title: i18n.t('IAM.USER_GROUP.MODAL.DELETE_CHANNEL.TITLE'),
             themeColor: 'alert',
         });
-        break;
-    default:
-        break;
+    }
+};
+
+/* Watcher */
+watch(() => tableState.items, (nv_items) => {
+    if (nv_items.length > 0) {
+        isDeleteable.value = true;
+    }
+}, { immediate: true });
+
+/* API */
+const fetchGetUserGroupChannel = async (params: UserGroupChannelGetParameters): Promise<UserGroupChannelModel | undefined> => {
+    try {
+        return await SpaceConnector.clientV2.alertManager.userGroupChannel.get<UserGroupChannelGetParameters, UserGroupChannelModel>(params);
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
+        return undefined;
     }
 };
 </script>
@@ -100,7 +174,7 @@ const handleUpdateModal = (modalType: string) => {
             <template #heading>
                 <p-heading heading-type="sub"
                            use-total-count
-                           :total-count="userGroupNotificationChannelPageState.totalCount"
+                           :total-count="totalCount"
                            :title="i18n.t('IAM.USER_GROUP.TAB.NOTIFICATION_CHANNEL.TITLE')"
                 />
             </template>
@@ -109,7 +183,7 @@ const handleUpdateModal = (modalType: string) => {
                     <div class="toolbox">
                         <p-button style-type="tertiary"
                                   icon-left="ic_plus"
-                                  @click="handleUpdateModal('add')"
+                                  @click="handleUpdateModal('create')"
                         >
                             {{ $t('IAM.USER_GROUP.TAB.NOTIFICATION_CHANNEL.CREATE') }}
                         </p-button>
@@ -121,6 +195,7 @@ const handleUpdateModal = (modalType: string) => {
                         </p-button>
                         <p-button style-type="tertiary"
                                   icon-left="ic_delete"
+                                  :disabled="!isDeleteable"
                                   @click="handleUpdateModal('delete')"
                         >
                             {{ $t('IAM.USER_GROUP.TAB.NOTIFICATION_CHANNEL.DELETE') }}

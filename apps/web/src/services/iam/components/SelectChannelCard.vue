@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { reactive } from 'vue';
+import { reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { PSelectCard, PLazyImg } from '@cloudforet/mirinae';
@@ -8,11 +8,14 @@ import { i18n } from '@/translations';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
-const emit = defineEmits<{(e: 'select-channel', form: string); }>();
+import { useNotificationChannelCreateFormStore } from '@/services/iam/store/notification-channel-create-form-store';
+
+const notificationChannelCreateFormStore = useNotificationChannelCreateFormStore();
+const notificationChannelCreateFormState = notificationChannelCreateFormStore.state;
 
 interface ChannelCard {
   channelList: { icon: string; label: TranslateResult | string }[];
-  selectedChannel: { icon: string; label: TranslateResult | string }[] | null;
+  selectedProtocol: string | { icon: string; label: TranslateResult | string };
 }
 
 // Temporary values
@@ -47,20 +50,72 @@ const state = reactive<ChannelCard>({
             label: i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.LIST.NOTIFY_TO_MEMBER'),
         },
     ],
-    selectedChannel: null,
+    selectedProtocol: notificationChannelCreateFormState.selectedProtocol,
 });
 
 /* Component */
 const handleSelectChannel = (value) => {
-    emit('select-channel', value.label);
+    notificationChannelCreateFormStore.setSelectedProtocol(value);
 };
+
+/* Watcher */
+watch(() => state.selectedProtocol, (nv_protocol) => {
+    if (typeof nv_protocol === 'string') {
+        switch (nv_protocol) {
+        case i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.LIST.EMAIL'):
+            state.selectedProtocol = state.channelList[0];
+            break;
+        case i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.LIST.SMS'):
+            state.selectedProtocol = state.channelList[1];
+            break;
+        case i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.LIST.TELEGRAM'):
+            state.selectedProtocol = state.channelList[2];
+            break;
+        case i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.LIST.SLACK'):
+            state.selectedProtocol = state.channelList[3];
+            break;
+        case i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.LIST.MS_TEAMS'):
+            state.selectedProtocol = state.channelList[4];
+            break;
+        case i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.LIST.KAKAOTALK'):
+            state.selectedProtocol = state.channelList[5];
+            break;
+        default:
+            break;
+        }
+    } else {
+        switch (nv_protocol.label) {
+        case i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.LIST.EMAIL'):
+            state.selectedProtocol = state.channelList[0];
+            break;
+        case i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.LIST.SMS'):
+            state.selectedProtocol = state.channelList[1];
+            break;
+        case i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.LIST.TELEGRAM'):
+            state.selectedProtocol = state.channelList[2];
+            break;
+        case i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.LIST.SLACK'):
+            state.selectedProtocol = state.channelList[3];
+            break;
+        case i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.LIST.MS_TEAMS'):
+            state.selectedProtocol = state.channelList[4];
+            break;
+        case i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.LIST.KAKAOTALK'):
+            state.selectedProtocol = state.channelList[5];
+            break;
+        default:
+            break;
+        }
+    }
+}, { deep: true, immediate: true });
 </script>
 
 <template>
     <div class="select-channel-card">
         <p-select-card v-for="(channel, idx) in state.channelList"
                        :key="`channel-${idx}`"
-                       v-model="state.selectedChannel"
+                       v-model="state.selectedProtocol"
+                       :selected="state.selectedProtocol"
                        class="card"
                        :multi-selectable="false"
                        show-select-marker
@@ -79,6 +134,7 @@ const handleSelectChannel = (value) => {
                     {{ channel.label }}
                 </p>
             </div>
+            <!--            <template></template>-->
         </p-select-card>
     </div>
 </template>

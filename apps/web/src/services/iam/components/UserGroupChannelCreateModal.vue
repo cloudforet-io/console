@@ -1,20 +1,23 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 
 import { PButtonModal } from '@cloudforet/mirinae';
 
 import SelectChannelCard from '@/services/iam/components/SelectChannelCard.vue';
 import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-constant';
+import { useNotificationChannelCreateFormStore } from '@/services/iam/store/notification-channel-create-form-store';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 
+const notificationChannelCreateFormStore = useNotificationChannelCreateFormStore();
+const notificationChannelCreateFormState = notificationChannelCreateFormStore.state;
+
 const isContinuePossible = ref<boolean>(false);
 
 /* Component */
 const handleConfirm = () => {
-//   TODO: store
     userGroupPageState.modal = {
         type: USER_GROUP_MODAL_TYPE.CREATE_NOTIFICATIONS_SECOND,
         title: userGroupPageState.modal.title,
@@ -23,6 +26,7 @@ const handleConfirm = () => {
 };
 
 const handleCancel = () => {
+    isContinuePossible.value = false;
     userGroupPageState.modal = {
         type: '',
         title: '',
@@ -30,11 +34,17 @@ const handleCancel = () => {
     };
 };
 
-const handleSelectedChannel = (value: string) => {
-    if (value) {
-        isContinuePossible.value = true;
-    }
-};
+/* Watcher */
+watch(() => notificationChannelCreateFormState.selectedProtocol, (nv_protocol) => {
+    isContinuePossible.value = !!nv_protocol;
+});
+// watch(() => userGroupPageState.modal.type, (nv_modal, ov_modal) => {
+//     if (nv_modal !== ov_modal && ov_modal !== USER_GROUP_MODAL_TYPE.CREATE_NOTIFICATIONS_SECOND) {
+//         isContinuePossible.value = false;
+//     } else if (ov_modal === USER_GROUP_MODAL_TYPE.CREATE_NOTIFICATIONS_SECOND) {
+//         isContinuePossible.value = true;
+//     }
+// });
 </script>
 
 <template>
@@ -46,6 +56,7 @@ const handleSelectedChannel = (value: string) => {
                     :disabled="!isContinuePossible"
                     @confirm="handleConfirm"
                     @cancel="handleCancel"
+                    @close="handleCancel"
     >
         <template #body>
             <div class="flex flex-col gap-1 mb-8">
@@ -55,7 +66,7 @@ const handleSelectedChannel = (value: string) => {
                 </p>
                 <span class="text-gray-700 leading-4 text-sm">Configure teh notifications to ensure you are promptly informed of any alerts or incidents as they occur.</span>
             </div>
-            <select-channel-card @select-channel="handleSelectedChannel" />
+            <select-channel-card />
         </template>
         <template #confirm-button>
             <span>{{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.CONTINUE') }}</span>

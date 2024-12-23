@@ -26,10 +26,12 @@ const state = reactive({
 const handleConfirm = async () => {
     try {
         state.loading = true;
-        await fetchDeleteNotificationChannel({
-            channel_id: userGroupPageGetters.selectedUserGroupChannel[0].channel_id,
-        });
-        emit('confirm');
+        if (userGroupPageGetters.selectedUserGroups && userGroupPageGetters.selectedUserGroups[0].notification_channel && userGroupPageGetters.selectedUserGroups[0].notification_channel.length > 0) {
+            await fetchDeleteNotificationChannel({
+                channel_id: userGroupPageGetters.selectedUserGroups[0].notification_channel[userGroupPageState.userGroupChannels.selectedIndices[0]].channel_id,
+            });
+            emit('confirm');
+        }
     } finally {
         state.loading = false;
         handleCancel();

@@ -8,6 +8,11 @@ import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/typ
 
 import ChannelUserSelect from '@/common/components/channel-user-select/ChannelUserSelect.vue';
 
+import { useNotificationChannelCreateFormStore } from '@/services/iam/store/notification-channel-create-form-store';
+
+const notificationChannelCreateFormStore = useNotificationChannelCreateFormStore();
+const notificationChannelCreateFormState = notificationChannelCreateFormStore.state;
+
 interface ChannelInfo {
   channelName: string;
 }
@@ -20,7 +25,7 @@ interface UserModeInfo {
 const emit = defineEmits<{(e: 'update-user', value: ChannelInfo & UserModeInfo): void}>();
 
 const state = reactive<ChannelInfo & UserModeInfo>({
-    channelName: '',
+    channelName: notificationChannelCreateFormState.channelName,
     userMode: {},
     users: [],
 });
