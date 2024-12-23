@@ -3,7 +3,7 @@ import { PTooltip, PI } from '@cloudforet/mirinae';
 
 const props = withDefaults(defineProps<{
     contents: string;
-    size: 'sm'|'md';
+    size?: 'sm'|'md';
 }>(), {
     contents: '',
     size: 'md',
