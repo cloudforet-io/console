@@ -24,6 +24,7 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
+import { WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
 import { sortObjectByKeys } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import {
     getReferenceLabel,
@@ -101,7 +102,7 @@ const queryResult = useQuery({
     queryFn: () => fetchWidgetData({
         widget_id: props.widgetId,
         granularity: widgetOptionsState.granularityInfo?.granularity,
-        group_by: [widgetOptionsState.groupByInfo?.data as string, widgetOptionsState.formatRulesInfo?.field as string],
+        group_by: (widgetOptionsState.groupByInfo?.data && widgetOptionsState.formatRulesInfo?.field) ? [widgetOptionsState.groupByInfo?.data, widgetOptionsState.formatRulesInfo?.field] : [],
         start: dateRange.value.start,
         end: dateRange.value.end,
         vars: props.dashboardVars,
@@ -111,6 +112,7 @@ const queryResult = useQuery({
         },
     }),
     enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable && state.runQueries),
+    staleTime: WIDGET_LOAD_STALE_TIME,
 });
 
 const loading = computed(() => queryResult.isLoading);

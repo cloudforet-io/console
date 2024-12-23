@@ -37,6 +37,7 @@ import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/g
 import type { GroupByValue } from '@/common/modules/widgets/_widget-fields/group-by/type';
 import type { MissingValueValue } from '@/common/modules/widgets/_widget-fields/missing-value/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
+import type { SubTotalValue } from '@/common/modules/widgets/_widget-fields/sub-total/type';
 import type { TableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/table-column-width/type';
 import type { TextWrapValue } from '@/common/modules/widgets/_widget-fields/text-wrap/type';
 import type { TotalValue } from '@/common/modules/widgets/_widget-fields/total/type';
@@ -62,6 +63,7 @@ const { dateRange } = useWidgetDateRange({
     granularity: computed<GranularityValue>(() => props.widgetOptions?.granularity?.value as GranularityValue),
 });
 
+
 const state = reactive({
     runQueries: false,
     isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
@@ -71,7 +73,7 @@ const state = reactive({
     dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
     comparisonDateRange: computed<DateRange>(() => getPreviousDateRange(widgetOptionsState.granularityInfo?.granularity, dateRange.value)),
     isComparisonEnabled: computed<boolean>(() => !!(widgetOptionsState.comparisonInfo?.toggleValue)),
-    dataInfo: computed<DataInfo|undefined>(() => widgetOptionsState.dataTable?.data_info),
+    dataInfo: computed<DataInfo|undefined>(() => state.dataTable?.data_info),
     tableFields: computed<TableWidgetField[]>(() => {
         const labelFields: TableWidgetField[] = (widgetOptionsState.groupByInfo?.data ?? []).map(
             (field) => ({ name: field, label: field, fieldInfo: { type: 'labelField', additionalType: field === 'Date' ? 'dateFormat' : undefined } }),
@@ -107,7 +109,7 @@ const state = reactive({
 const widgetOptionsState = reactive({
     comparisonInfo: computed<ComparisonValue>(() => props.widgetOptions?.comparison?.value as ComparisonValue),
     totalInfo: computed<TotalValue>(() => props.widgetOptions?.total?.value as TotalValue),
-    subTotalInfo: computed<TotalValue|undefined>(() => props.widgetOptions?.subTotal?.value as TotalValue),
+    subTotalInfo: computed<SubTotalValue|undefined>(() => props.widgetOptions?.subTotal?.value as SubTotalValue),
     needFullDataFetch: computed<boolean>(() => state.totalInfo?.toggleValue),
     granularityInfo: computed<GranularityValue>(() => props.widgetOptions?.granularity?.value as GranularityValue),
     groupByInfo: computed<GroupByValue>(() => props.widgetOptions?.groupBy?.value as GroupByValue),
@@ -161,13 +163,14 @@ const fullDataQueryKey = computed(() => [
     {
         start: dateRange.value.start,
         end: dateRange.value.end,
-        granularity: widgetOptionsState.granularityInfo.granularity,
+        granularity: widgetOptionsState.granularityInfo?.granularity,
         dataTableId: state.dataTable?.data_table_id,
         dataTableOptions: JSON.stringify(sortObjectByKeys(state.dataTable?.options) ?? {}),
+        enabledTotal: !!widgetOptionsState.totalInfo?.toggleValue,
     },
 ]);
 
-const results = useQueries({
+const queryResults = useQueries({
     queries: [
         {
             queryKey: baseQueryKey,
@@ -181,9 +184,14 @@ const results = useQueries({
                     limit: state.pageSize,
                 },
                 vars: props.dashboardVars,
-                granularity: widgetOptionsState.granularityInfo.granularity,
+                granularity: widgetOptionsState.granularityInfo?.granularity,
             }),
-            enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable && state.runQueries),
+            enabled: computed<boolean>(() => {
+                const loadEnabled = state.runQueries;
+                const widgetActive = props.widgetState !== 'INACTIVE';
+                const dataTableReady = !!state.dataTable;
+                return loadEnabled && widgetActive && dataTableReady;
+            }),
             staleTime: WIDGET_LOAD_STALE_TIME,
         },
         {
@@ -193,26 +201,32 @@ const results = useQueries({
                 start: dateRange.value.start,
                 end: dateRange.value.end,
                 vars: props.dashboardVars,
-                granularity: widgetOptionsState.granularityInfo.granularity,
+                granularity: widgetOptionsState.granularityInfo?.granularity,
             }),
-            enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable && widgetOptionsState.totalInfo.toggleValue && state.runQueries),
+            enabled: computed<boolean>(() => {
+                const loadEnabled = state.runQueries;
+                const widgetActive = props.widgetState !== 'INACTIVE';
+                const dataTableReady = !!state.dataTable;
+                const totalEnabled = !!widgetOptionsState.totalInfo?.toggleValue;
+                return loadEnabled && widgetActive && dataTableReady && totalEnabled;
+            }),
             staleTime: WIDGET_LOAD_STALE_TIME,
         },
     ],
 });
 
-const loading = computed(() => results.value?.[0].isLoading);
-const errorMessage = computed(() => results.value?.[0].error?.message);
+const loading = computed(() => queryResults.value?.[0].isLoading);
+const errorMessage = computed(() => queryResults.value?.[0].error?.message);
 
 
 const refinedData = computed<Data>(() => {
-    const data = results.value?.[0].data;
-    const totalData = results.value?.[1].data;
+    const data = queryResults.value?.[0].data;
+    const totalData = queryResults.value?.[1].data;
 
     if (!data) return null;
 
-    let refinedResults: TableDataItem[] = [...(data.results ?? [])];
-    refinedResults.forEach((d) => {
+    let refinedResults: TableDataItem[] = [];
+    (data.results ?? []).forEach((d) => {
         // Basic Data
         const dataItem = { ...d };
 
@@ -222,10 +236,9 @@ const refinedData = computed<Data>(() => {
         ];
         return dataItem;
     });
-
     if (widgetOptionsState.totalInfo?.toggleValue) {
         const totalRowItem: TableDataItem = {
-            [widgetOptionsState.groupByInfo.data?.[0] ?? '']: 'Total',
+            [widgetOptionsState.groupByInfo?.data?.[0] ?? '']: 'Total',
         };
         [...(totalData?.results ?? [])].forEach((d) => {
             const fieldKey = Object.keys(d)[0];
@@ -261,6 +274,7 @@ onMounted(async () => {
 defineExpose<WidgetExpose>({
     loadWidget,
 });
+
 </script>
 
 <template>

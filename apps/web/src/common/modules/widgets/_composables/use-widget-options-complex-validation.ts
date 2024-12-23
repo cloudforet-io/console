@@ -66,12 +66,7 @@ export const useWidgetOptionsComplexValidation = ({
     const getDuplicatedLabelInfoValidation = (valueMap: OptionsValueMap, config: WidgetConfig): boolean => {
         let isValid = true;
         // Label Info Fields Value Duplicate Validation (Table Widget)
-        if (config.widgetName === 'table') {
-            const groupByField = 'groupBy';
-            const groupByFieldValue = valueMap[groupByField]?.value as GroupByValue;
-            const allValueExist = groupByFieldValue?.data && !!groupByFieldValue.data.length;
-            isValid = !!allValueExist;
-        } else {
+        if (config.widgetName !== 'table') {
             // Label Info Fields Value Duplicate Validation (Except Table Widget)
             const allFields = [..._state.requiredFields, ..._state.optionalFields];
             const labelInfoFields = allFields.filter((field) => config.requiredFieldsSchema[field]?.options?.dataTarget === 'labels_info'

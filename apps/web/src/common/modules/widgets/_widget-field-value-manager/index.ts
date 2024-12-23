@@ -1,5 +1,7 @@
 import { ref } from 'vue';
 
+import { cloneDeep } from 'lodash';
+
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 
@@ -28,7 +30,7 @@ export default class WidgetFieldValueManager {
         widgetConfig: WidgetConfig,
         dataTable?: PublicDataTableModel|PrivateDataTableModel,
     ): WidgetFieldValueMap {
-        const result: WidgetFieldValueMap = { ...originData };
+        const result: WidgetFieldValueMap = cloneDeep({ ...originData });
 
         const integratedFieldSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const widgetFieldKeys = ['widgetHeader', ...Object.keys(integratedFieldSchema)];
@@ -97,15 +99,6 @@ export default class WidgetFieldValueManager {
         });
 
         return isValid;
-    }
-
-    getValidationErrors(): Record<string, string> {
-        return this.validationErrors;
-    }
-
-    resetToOrigin(): void {
-        this.modifiedData.value = { ...this.originData };
-        this.validationErrors = {};
     }
 
     updateOriginData(data: WidgetFieldValueMap): void {

@@ -150,11 +150,12 @@ const handleChangeWidgetSize = (widgetSize: string) => {
     state.selectedWidgetSize = widgetSize;
 };
 const handleUpdateWidgetOptions = async () => {
-    await updateWidget();
     if (state.selectedWidgetType === widgetGenerateState.selectedWidgetName) {
+        await updateWidget();
         await loadOverlayWidget();
     } else {
         state.selectedWidgetType = widgetGenerateState.selectedWidgetName;
+        await updateWidget();
         state.mounted = false;
     }
 };
