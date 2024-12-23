@@ -171,7 +171,6 @@ const getColor = (val: string|number): string => {
     let _formatRules = cloneDeep(widgetOptionsState.formatRulesInfo?.rules);
     let _color = widgetOptionsState.formatRulesInfo?.baseColor || gray[200];
     _formatRules = _formatRules?.sort((a, b) => (a?.number || 0) - (b?.number || 0)) || [];
-    console.debug('getColor', val, _formatRules);
     _formatRules?.forEach((d) => {
         if (val >= (d.number || 0)) {
             _color = d.color;
