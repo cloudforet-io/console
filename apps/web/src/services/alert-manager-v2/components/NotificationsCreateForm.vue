@@ -1,24 +1,22 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-import { zipObject } from 'lodash';
-
 import {
     PFieldGroup, PLazyImg, PTextInput, PRadioGroup, PRadio, PPaneLayout,
 } from '@cloudforet/mirinae';
 
 import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
-import type { ServiceChannelScheduleDayType } from '@/schema/alert-manager/service-channel/type';
 import { i18n } from '@/translations';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
-import type { ScheduleDayType, ScheduleForm } from '@/common/components/schedule-setting-form/schedule-setting-form';
+import type { ScheduleForm } from '@/common/components/schedule-setting-form/schedule-setting-form';
 import ScheduleSettingForm from '@/common/components/schedule-setting-form/ScheduleSettingForm.vue';
 import { useFormValidator } from '@/common/composables/form-validator';
 import type { SelectedUserDropdownIdsType } from '@/common/modules/user/typte';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
+import { createScheduleMap } from '@/services/alert-manager-v2/composables/form-data';
 import { useServiceCreateFormStore } from '@/services/alert-manager-v2/stores/service-create-form-store';
 import type { CreatedNotificationInfoType, UserRadioType } from '@/services/alert-manager-v2/types/alert-manager-type';
 
@@ -59,33 +57,13 @@ const {
     invalidTexts,
 } = useFormValidator({
     name: '',
-}, {
-    name(value: string) {
-        if (value.length >= 40) {
-            return i18n.t('ALERT_MANAGER.WEBHOOK.VALIDATION_NAME_MAX');
-        }
-        return '';
-    },
-});
+}, {});
 
 const handleScheduleForm = (form: ScheduleForm) => {
     state.scheduleForm = form;
 };
 const handleChangeRadio = () => {
     state.selectedMemberItems = [];
-};
-
-const createScheduleMap = (scheduleForm: ScheduleForm): Record<ScheduleDayType, ServiceChannelScheduleDayType> => {
-    const allDays: ScheduleDayType[] = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
-    const { days, start, end } = scheduleForm;
-
-    const refinedDays = allDays.map((day) => ({
-        is_scheduled: days.includes(day),
-        start,
-        end,
-    }));
-
-    return zipObject(allDays, refinedDays) as Record<ScheduleDayType, ServiceChannelScheduleDayType>;
 };
 
 watch([() => name.value, () => state.scheduleForm, () => state.selectedRadioIdx, () => state.selectedMemberItems], ([nameVal, scheduleForm, selectedRadioIdx, selectedMemberItems]) => {

@@ -54,6 +54,7 @@ export type ProtocolInfo = {
     name: string;
     icon: string;
 };
+export type NotificationsModalType = 'UPDATE' | 'ENABLE' | 'DISABLE' | 'DELETE';
 
 export type EscalationPolicyRadioType = {
     label: TranslateResult,

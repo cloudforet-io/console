@@ -134,7 +134,7 @@ const handleClickCreateButton = () => {
         name: ALERT_MANAGER_ROUTE_V2.SERVICE.DETAIL.WEBHOOK.CREATE._NAME,
     }));
 };
-const handleSelectDropdownItem = (name) => {
+const handleSelectDropdownItem = (name: WebhookModalType) => {
     modalState.visible = true;
     modalState.type = name;
 };
@@ -279,7 +279,7 @@ onUnmounted(() => {
                                                       :selected-item="state.selectedItem"
                                                       @close="handleCloseModal"
             />
-            <service-detail-tabs-webhook-delete-modal v-if="modalState.type === 'DELETE'"
+            <service-detail-tabs-webhook-delete-modal v-else-if="modalState.type === 'DELETE'"
                                                       :visible.sync="modalState.visible"
                                                       :selected-item="state.selectedItem"
                                                       @close="handleCloseModal"
