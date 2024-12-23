@@ -149,7 +149,7 @@ const disableUser = async (userId?: string): Promise<boolean> => {
                     :header-title="userPageState.modal.title"
                     :theme-color="userPageState.modal.themeColor"
                     :loading="state.loading"
-                    modal-size="md"
+                    size="md"
                     @confirm="checkModalConfirm"
                     @close="handleClose"
                     @cancel="handleClose"

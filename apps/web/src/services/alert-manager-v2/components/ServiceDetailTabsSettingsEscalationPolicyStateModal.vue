@@ -1,0 +1,128 @@
+<script lang="ts" setup>
+import {
+    computed, reactive,
+} from 'vue';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PButtonModal, PDefinitionTable,
+} from '@cloudforet/mirinae';
+import { iso8601Formatter } from '@cloudforet/utils';
+
+import type { EscalationPolicyModel } from '@/schema/alert-manager/escalation-policy/model';
+import type { EscalationPolicyRulesType } from '@/schema/alert-manager/escalation-policy/type';
+import type { ServiceUpdateParameters } from '@/schema/alert-manager/service/api-verbs/update';
+import type { ServiceModel } from '@/schema/alert-manager/service/model';
+
+import { useUserStore } from '@/store/user/user-store';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProxyValue } from '@/common/composables/proxy-state';
+
+import {
+    ESCALATION_POLICY_MANAGEMENT_TABLE_FIELDS,
+} from '@/services/alert-manager-v2/constants/escalation-policy-table-constant';
+import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
+
+interface Props {
+    visible: boolean;
+    selectedItem: EscalationPolicyModel;
+}
+const props = withDefaults(defineProps<Props>(), {
+    visible: false,
+    selectedItem: undefined,
+});
+
+const userStore = useUserStore();
+const userState = userStore.state;
+const serviceDetailPageStore = useServiceDetailPageStore();
+const serviceDetailPageState = serviceDetailPageStore.state;
+
+const emit = defineEmits<{(e: 'update:visible'): void;
+    (e: 'close'): void;
+}>();
+
+const storeState = reactive({
+    timezone: computed<string>(() => userState.timezone || ''),
+    serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
+});
+const state = reactive({
+    loading: false,
+    proxyVisible: useProxyValue<boolean>('visible', props, emit),
+});
+
+const getConnectChannelCount = (rules: EscalationPolicyRulesType[]) => {
+    const allChannels = rules.flatMap((item) => item.channels);
+    const uniqueChannels = new Set(allChannels);
+    return uniqueChannels.size;
+};
+const handleClose = () => {
+    state.proxyVisible = false;
+    emit('close');
+};
+
+
+const handleConfirm = async () => {
+    state.loading = true;
+    try {
+        await SpaceConnector.clientV2.alertManager.service.update<ServiceUpdateParameters, ServiceModel>({
+            escalation_policy_id: props.selectedItem.escalation_policy_id,
+            service_id: storeState.serviceId,
+        });
+        handleClose();
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
+    } finally {
+        state.loading = false;
+    }
+};
+</script>
+
+<template>
+    <p-button-modal class="service-detail-tabs-settings-escalation-policy-state-modal"
+                    :visible="state.proxyVisible"
+                    :header-title="$t('ALERT_MANAGER.ESCALATION_POLICY.MODAL_STATE_TITLE')"
+                    :loading="state.loading"
+                    size="md"
+                    @confirm="handleConfirm"
+                    @cancel="handleClose"
+                    @close="handleClose"
+    >
+        <template #body>
+            <p-definition-table :fields="ESCALATION_POLICY_MANAGEMENT_TABLE_FIELDS"
+                                :data="props.selectedItem"
+                                :skeleton-rows="4"
+                                block
+                                disable-copy
+                                class="table mb-18"
+                                style-type="white"
+            >
+                <template #data-repeat="{data}">
+                    {{ data?.count || 0 }}
+                </template>
+                <template #data-rules="{data}">
+                    {{ getConnectChannelCount(data) }}
+                </template>
+                <template #data-created_at="{data}">
+                    {{ iso8601Formatter(data, storeState.timezone) }}
+                </template>
+            </p-definition-table>
+        </template>
+    </p-button-modal>
+</template>
+
+
+<style lang="postcss" scoped>
+.service-detail-tabs-settings-escalation-policy-state-modal {
+    .table {
+        @apply border border-gray-200 rounded-lg;
+        overflow: hidden;
+        min-height: unset;
+    }
+    :deep(.table) {
+        tr:last-child {
+            border-bottom-width: 0;
+        }
+    }
+}
+</style>

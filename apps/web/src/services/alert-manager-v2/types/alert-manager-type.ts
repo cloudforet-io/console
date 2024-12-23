@@ -58,4 +58,4 @@ export type EscalationPolicyRadioType = {
     label: TranslateResult,
     name: AlertStateType
 };
-export type EscalationPolicyModalType = 'CREATE' | 'SET';
+export type EscalationPolicyModalType = 'CREATE' | 'UPDATE' | 'STATE' | 'DELETE';

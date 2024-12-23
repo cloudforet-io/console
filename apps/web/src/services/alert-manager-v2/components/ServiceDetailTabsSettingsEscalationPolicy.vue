@@ -11,6 +11,8 @@ import {
     PButton,
     PSelectDropdown,
     PHeadingLayout,
+    PBadge,
+    PI,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import { iso8601Formatter } from '@cloudforet/utils';
@@ -26,8 +28,14 @@ import { useUserStore } from '@/store/user/user-store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 
+import { green } from '@/styles/colors';
+
+import ServiceDetailTabsSettingsEscalationPolicyDeleteModal
+    from '@/services/alert-manager-v2/components/ServiceDetailTabsSettingsEscalationPolicyDeleteModal.vue';
 import ServiceDetailTabsSettingsEscalationPolicyFormModal
     from '@/services/alert-manager-v2/components/ServiceDetailTabsSettingsEscalationPolicyFormModal.vue';
+import ServiceDetailTabsSettingsEscalationPolicyStateModal
+    from '@/services/alert-manager-v2/components/ServiceDetailTabsSettingsEscalationPolicyStateModal.vue';
 import {
     ESCALATION_POLICY_MANAGEMENT_TABLE_FIELDS, ESCALATION_POLICY_MANAGEMENT_TABLE_HANDLER,
 } from '@/services/alert-manager-v2/constants/escalation-policy-table-constant';
@@ -43,12 +51,13 @@ const tableState = reactive({
     actionMenu: computed<MenuItem[]>(() => ([
         {
             type: 'item',
-            name: 'use',
+            name: 'STATE',
             label: _i18n.t('ALERT_MANAGER.ESCALATION_POLICY.IN_USE'),
+            disabled: state.selectedItem?.escalation_policy_id === storeState.defaultEscalationPolicyId,
         },
         {
             type: 'item',
-            name: 'delete',
+            name: 'DELETE',
             label: _i18n.t('ALERT_MANAGER.DELETE'),
         },
     ])),
@@ -56,6 +65,7 @@ const tableState = reactive({
 });
 const storeState = reactive({
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
+    defaultEscalationPolicyId: computed<string>(() => serviceDetailPageState.serviceInfo.escalation_policy_id),
     timezone: computed<string>(() => userState.timezone || ''),
 });
 const state = reactive({
@@ -80,12 +90,9 @@ const getConnectChannelCount = (rules: EscalationPolicyRulesType[]) => {
     const uniqueChannels = new Set(allChannels);
     return uniqueChannels.size;
 };
-const handleClickCreateButton = (type: EscalationPolicyModalType) => {
+const handleActionModal = (type: EscalationPolicyModalType) => {
     modalState.visible = true;
     modalState.type = type;
-};
-const handleSelectDropdownItem = (name) => {
-    console.log('TODO: handleSelectDropdownItem', name);
 };
 const handleChangeToolbox = async (options: any = {}) => {
     if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
@@ -98,6 +105,10 @@ const handleExportExcel = () => {
 };
 const handleSelectTableRow = (selectedItems: number[]) => {
     state.selectIndex = selectedItems[0];
+};
+const handleCloseModal = () => {
+    handleChangeToolbox();
+    state.selectIndex = undefined;
 };
 
 const fetchEscalationPolicyList = async () => {
@@ -139,7 +150,7 @@ watch(() => storeState.serviceId, (id) => {
                          :total-count="state.totalCount"
                          :items="state.items"
                          :fields="tableState.fields"
-                         :select-index="state.selectIndex"
+                         :select-index="[state.selectIndex]"
                          :query-tags="queryTags"
                          :key-item-sets="ESCALATION_POLICY_MANAGEMENT_TABLE_HANDLER.keyItemSets"
                          :value-handler-map="ESCALATION_POLICY_MANAGEMENT_TABLE_HANDLER.valueHandlerMap"
@@ -161,14 +172,15 @@ watch(() => storeState.serviceId, (id) => {
                         <p-button style-type="tertiary"
                                   icon-left="ic_settings-filled"
                                   size="sm"
-                                  @click="handleClickCreateButton('SET')"
+                                  :disabled="!state.selectedItem"
+                                  @click="handleActionModal('UPDATE')"
                         >
                             {{ $t('ALERT_MANAGER.ESCALATION_POLICY.SET_POLICY') }}
                         </p-button>
                         <p-button style-type="primary"
                                   icon-left="ic_plus_bold"
                                   size="sm"
-                                  @click="handleClickCreateButton('CREATE')"
+                                  @click="handleActionModal('CREATE')"
                         >
                             {{ $t('ALERT_MANAGER.CREATE') }}
                         </p-button>
@@ -177,14 +189,32 @@ watch(() => storeState.serviceId, (id) => {
             </template>
             <template #toolbox-left>
                 <p-select-dropdown :menu="tableState.actionMenu"
-                                   :disabled="!state.selectIndex"
+                                   :disabled="!state.selectedItem"
                                    reset-selection-on-menu-close
                                    :placeholder="$t('ALERT_MANAGER.ACTION')"
-                                   @select="handleSelectDropdownItem"
+                                   @select="handleActionModal"
                 />
             </template>
+            <template #col-name-format="{value, item}">
+                <div>
+                    <span>{{ value }}</span>
+                    <p-badge v-if="item.escalation_policy_id === storeState.defaultEscalationPolicyId"
+                             style-type="safe"
+                             badge-type="solid-outline"
+                             class="ml-2"
+                    >
+                        <p-i name="ic_circle"
+                             width="0.75rem"
+                             height="0.75rem"
+                             :color="green[500]"
+                             class="mr-1"
+                        />
+                        {{ $t('ALERT_MANAGER.ESCALATION_POLICY.IN_USE') }}
+                    </p-badge>
+                </div>
+            </template>
             <template #col-repeat-format="{value}">
-                {{ value || 0 }}
+                {{ value?.count || 0 }}
             </template>
             <template #col-rules-format="{value}">
                 {{ getConnectChannelCount(value) }}
@@ -193,9 +223,24 @@ watch(() => storeState.serviceId, (id) => {
                 {{ iso8601Formatter(value, storeState.timezone) }}
             </template>
         </p-toolbox-table>
-        <service-detail-tabs-settings-escalation-policy-form-modal :visible="modalState.visible"
-                                                                   :type="modalState.type"
-        />
+        <div v-if="modalState.visible">
+            <service-detail-tabs-settings-escalation-policy-form-modal v-if="modalState.type === 'CREATE' || modalState.type === 'UPDATE'"
+                                                                       :visible.sync="modalState.visible"
+                                                                       :type="modalState.type"
+                                                                       :selected-item="state.selectedItem"
+                                                                       @close="handleCloseModal"
+            />
+            <service-detail-tabs-settings-escalation-policy-state-modal v-if="modalState.type === 'STATE'"
+                                                                        :visible.sync="modalState.visible"
+                                                                        :selected-item="state.selectedItem"
+                                                                        @close="handleCloseModal"
+            />
+            <service-detail-tabs-settings-escalation-policy-delete-modal v-if="modalState.type === 'DELETE'"
+                                                                         :visible.sync="modalState.visible"
+                                                                         :selected-item="state.selectedItem"
+                                                                         @close="handleCloseModal"
+            />
+        </div>
     </div>
 </template>
 
