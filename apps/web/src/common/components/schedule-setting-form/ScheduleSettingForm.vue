@@ -9,18 +9,25 @@ import {
     PFieldGroup, PRadioGroup, PRadio, PI, PSelectButton, PSelectDropdown,
 } from '@cloudforet/mirinae';
 
+import type { ServiceChannelScheduleType } from '@/schema/alert-manager/service-channel/type';
 import { i18n } from '@/translations';
 
 import type {
     ScheduleDayButtonType,
     ScheduleRadioType,
-    ScheduleType,
     ScheduleDayType,
     ScheduleForm,
 } from '@/common/components/schedule-setting-form/schedule-setting-form';
 
 import { blue } from '@/styles/colors';
 
+interface Props {
+    scheduleForm?: ScheduleForm;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    scheduleForm: undefined,
+});
 
 const emit = defineEmits<{(e: 'schedule-form', form: ScheduleForm): void; }>();
 
@@ -50,7 +57,7 @@ const generateHourlyTimeArray = () => range(0, 25).map((h) => ({
     name: h,
 }));
 
-const handleSelectScheduleType = (type: ScheduleType) => {
+const handleSelectScheduleType = (type: ServiceChannelScheduleType) => {
     if (type === 'WEEK_DAY') {
         state.selectedDayButton = state.days.slice(0, 5).map((day) => day.name);
     } else if (type === 'ALL_DAY') {
@@ -71,6 +78,14 @@ const handleSelectDropdown = (type: 'start' | 'end', value: number) => {
     }
 };
 
+watch(() => props.scheduleForm, (scheduleForm) => {
+    if (scheduleForm) {
+        state.selectedRadioIdx = state.scheduleTypeList.findIndex((item) => item.name === props.scheduleForm?.type);
+        state.selectedDayButton = props.scheduleForm?.days || [];
+        state.start = props.scheduleForm?.start || 9;
+        state.end = props.scheduleForm?.end || 18;
+    }
+}, { immediate: true });
 watch([() => state.selectedRadioIdx, () => state.selectedDayButton, () => state.start, () => state.end], ([selectedRadioIdx, selectedDayButton, start, end]) => {
     emit('schedule-form', {
         type: state.scheduleTypeList[selectedRadioIdx].name,

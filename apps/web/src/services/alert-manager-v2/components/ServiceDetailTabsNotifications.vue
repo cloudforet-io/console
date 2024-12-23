@@ -22,7 +22,6 @@ import type { NotificationProtocolModel } from '@/schema/alert-manager/notificat
 import type { ServiceChannelListParameters } from '@/schema/alert-manager/service-channel/api-verbs/list';
 import { SERVICE_CHANNEL_STATE } from '@/schema/alert-manager/service-channel/constants';
 import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
-import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
 import { i18n as _i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -37,6 +36,12 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useQueryTags } from '@/common/composables/query-tags';
 
+import ServiceDetailTabsNotificationsDeleteModal
+    from '@/services/alert-manager-v2/components/ServiceDetailTabsNotificationsDeleteModal.vue';
+import ServiceDetailTabsNotificationsTableModal
+    from '@/services/alert-manager-v2/components/ServiceDetailTabsNotificationsTableModal.vue';
+import ServiceDetailTabsNotificationsUpdateModal
+    from '@/services/alert-manager-v2/components/ServiceDetailTabsNotificationsUpdateModal.vue';
 import { alertManagerStateFormatter } from '@/services/alert-manager-v2/composables/refined-table-data';
 import { SERVICE_TAB_HEIGHT } from '@/services/alert-manager-v2/constants/common-constant';
 import {
@@ -46,7 +51,7 @@ import {
 } from '@/services/alert-manager-v2/constants/notification-table-constant';
 import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
-import type { ProtocolInfo } from '@/services/alert-manager-v2/types/alert-manager-type';
+import type { ProtocolInfo, NotificationsModalType } from '@/services/alert-manager-v2/types/alert-manager-type';
 
 interface Props {
     tableHeight: number;
@@ -71,25 +76,25 @@ const tableState = reactive({
     actionMenu: computed<MenuItem[]>(() => ([
         {
             type: 'item',
-            name: 'enable',
+            name: 'ENABLE',
             label: _i18n.t('ALERT_MANAGER.ENABLE'),
             disabled: state.selectedItem?.state === SERVICE_CHANNEL_STATE.ENABLED,
         },
         {
             type: 'item',
-            name: 'disable',
+            name: 'DISABLE',
             label: _i18n.t('ALERT_MANAGER.DISABLED'),
             disabled: state.selectedItem?.state === SERVICE_CHANNEL_STATE.DISABLED,
         },
         { type: 'divider' },
         {
             type: 'item',
-            name: 'update',
+            name: 'UPDATE',
             label: _i18n.t('ALERT_MANAGER.UPDATE'),
         },
         {
             type: 'item',
-            name: 'delete',
+            name: 'DELETE',
             label: _i18n.t('ALERT_MANAGER.DELETE'),
         },
     ])),
@@ -106,7 +111,11 @@ const state = reactive({
     items: [] as ServiceChannelModel[],
     totalCount: 0,
     selectIndex: undefined as number|undefined,
-    selectedItem: computed<WebhookModel>(() => state.items[state.selectIndex]),
+    selectedItem: computed<ServiceChannelModel>(() => state.items[state.selectIndex]),
+});
+const modalState = reactive({
+    visible: false,
+    type: undefined as NotificationsModalType|undefined,
 });
 
 const notificationsListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
@@ -122,13 +131,19 @@ const getProtocolInfo = (id: string): ProtocolInfo => {
         icon: plugin?.icon || '',
     };
 };
+const handleCloseModal = () => {
+    state.selectIndex = undefined;
+    fetchNotificationList();
+    serviceDetailPageStore.setSelectedNotificationId(undefined);
+};
 const handleClickCreateButton = () => {
     router.push(getProperRouteLocation({
         name: ALERT_MANAGER_ROUTE_V2.SERVICE.DETAIL.NOTIFICATIONS.CREATE._NAME,
     }));
 };
-const handleSelectDropdownItem = (name) => {
-    console.log('TODO: handleSelectDropdownItem', name);
+const handleSelectDropdownItem = (name: NotificationsModalType) => {
+    modalState.visible = true;
+    modalState.type = name;
 };
 const handleChangeToolbox = async (options: any = {}) => {
     if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
@@ -185,70 +200,89 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <p-toolbox-table class="service-detail-tabs-notifications"
-                     search-type="query"
-                     selectable
-                     sortable
-                     exportable
-                     :multi-select="false"
-                     :loading="state.loading"
-                     :total-count="state.totalCount"
-                     :items="state.items"
-                     :fields="tableState.fields"
-                     :select-index="[state.selectIndex]"
-                     :query-tags="queryTags"
-                     :key-item-sets="NOTIFICATION_MANAGEMENT_TABLE_HANDLER.keyItemSets"
-                     :value-handler-map="NOTIFICATION_MANAGEMENT_TABLE_HANDLER.valueHandlerMap"
-                     :style="{height: `${props.tableHeight - SERVICE_TAB_HEIGHT}px`}"
-                     @change="handleChangeToolbox"
-                     @refresh="handleChangeToolbox()"
-                     @export="handleExportExcel"
-                     @select="handleSelectTableRow"
-    >
-        <template #toolbox-top>
-            <p-heading-layout class="pt-8 px-4">
-                <template #heading>
-                    <p-heading heading-type="sub"
-                               use-total-count
-                               :total-count="state.totalCount"
-                               :title="$t('ALERT_MANAGER.NOTIFICATIONS.TITLE')"
-                    />
-                </template>
-                <template #extra>
-                    <p-button style-type="primary"
-                              icon-left="ic_plus_bold"
-                              @click="handleClickCreateButton"
-                    >
-                        {{ $t('ALERT_MANAGER.CREATE') }}
-                    </p-button>
-                </template>
-            </p-heading-layout>
-        </template>
-        <template #toolbox-left>
-            <p-select-dropdown :menu="tableState.actionMenu"
-                               :disabled="!state.selectedItem"
-                               reset-selection-on-menu-close
-                               :placeholder="$t('ALERT_MANAGER.ACTION')"
-                               @select="handleSelectDropdownItem"
-            />
-        </template>
-        <template #col-state-format="{ value }">
-            <p-status
-                class="capitalize"
-                v-bind="alertManagerStateFormatter(value)"
-            />
-        </template>
-        <template #col-protocol_id-format="{value}">
-            <div class="col-channel">
-                <p-lazy-img :src="assetUrlConverter(getProtocolInfo(value).icon)"
-                            width="1rem"
-                            height="1rem"
-                            class="service-img"
+    <div>
+        <p-toolbox-table class="service-detail-tabs-notifications"
+                         search-type="query"
+                         selectable
+                         sortable
+                         exportable
+                         :multi-select="false"
+                         :loading="state.loading"
+                         :total-count="state.totalCount"
+                         :items="state.items"
+                         :fields="tableState.fields"
+                         :select-index="[state.selectIndex]"
+                         :query-tags="queryTags"
+                         :key-item-sets="NOTIFICATION_MANAGEMENT_TABLE_HANDLER.keyItemSets"
+                         :value-handler-map="NOTIFICATION_MANAGEMENT_TABLE_HANDLER.valueHandlerMap"
+                         :style="{height: `${props.tableHeight - SERVICE_TAB_HEIGHT}px`}"
+                         @change="handleChangeToolbox"
+                         @refresh="handleChangeToolbox()"
+                         @export="handleExportExcel"
+                         @select="handleSelectTableRow"
+        >
+            <template #toolbox-top>
+                <p-heading-layout class="pt-8 px-4">
+                    <template #heading>
+                        <p-heading heading-type="sub"
+                                   use-total-count
+                                   :total-count="state.totalCount"
+                                   :title="$t('ALERT_MANAGER.NOTIFICATIONS.TITLE')"
+                        />
+                    </template>
+                    <template #extra>
+                        <p-button style-type="primary"
+                                  icon-left="ic_plus_bold"
+                                  @click="handleClickCreateButton"
+                        >
+                            {{ $t('ALERT_MANAGER.CREATE') }}
+                        </p-button>
+                    </template>
+                </p-heading-layout>
+            </template>
+            <template #toolbox-left>
+                <p-select-dropdown :menu="tableState.actionMenu"
+                                   :disabled="!state.selectedItem"
+                                   reset-selection-on-menu-close
+                                   :placeholder="$t('ALERT_MANAGER.ACTION')"
+                                   @select="handleSelectDropdownItem"
                 />
-                <span>{{ getProtocolInfo(value).name }}</span>
-            </div>
-        </template>
-    </p-toolbox-table>
+            </template>
+            <template #col-state-format="{ value }">
+                <p-status
+                    class="capitalize"
+                    v-bind="alertManagerStateFormatter(value)"
+                />
+            </template>
+            <template #col-protocol_id-format="{value}">
+                <div class="col-channel">
+                    <p-lazy-img :src="assetUrlConverter(getProtocolInfo(value).icon)"
+                                width="1rem"
+                                height="1rem"
+                                class="service-img"
+                    />
+                    <span>{{ getProtocolInfo(value).name }}</span>
+                </div>
+            </template>
+        </p-toolbox-table>
+        <div v-if="modalState.visible">
+            <service-detail-tabs-notifications-update-modal v-if="modalState.type === 'UPDATE'"
+                                                            :visible.sync="modalState.visible"
+                                                            :selected-item="state.selectedItem"
+                                                            @close="handleCloseModal"
+            />
+            <service-detail-tabs-notifications-delete-modal v-else-if="modalState.type === 'DELETE'"
+                                                            :visible.sync="modalState.visible"
+                                                            :selected-item="state.selectedItem"
+                                                            @close="handleCloseModal"
+            />
+            <service-detail-tabs-notifications-table-modal v-else
+                                                           :visible.sync="modalState.visible"
+                                                           :selected-item="state.selectedItem"
+                                                           @close="handleCloseModal"
+            />
+        </div>
+    </div>
 </template>
 
 <style scoped lang="postcss">
