@@ -3,18 +3,11 @@ import type { TranslateResult } from 'vue-i18n';
 
 import { defineStore } from 'pinia';
 
-import type { UserGroupChannelScheduleType } from '@/schema/alert-manager/user-group-channel/type';
+import type { ServiceChannelForwardType, ServiceChannelScheduleInfoType } from '@/schema/alert-manager/service-channel/type';
 
 interface UserInfoType {
-    type: 'ALL_MEMBERS' | 'USER' | 'USER_GROUP';
-    value: string[];
-}
-
-interface ScheduleInfoType {
-    days: (string|null)[];
-    start: number;
-    end: number;
-    type: UserGroupChannelScheduleType
+    type: ServiceChannelForwardType
+    value: string[] | undefined;
 }
 
 interface NotificationChannelCreateFormState {
@@ -23,7 +16,7 @@ interface NotificationChannelCreateFormState {
     channelName: string;
 //     TODO: about channel info
     userInfo: UserInfoType;
-    scheduleInfo: ScheduleInfoType;
+    scheduleInfo: ServiceChannelScheduleInfoType;
 }
 
 export const useNotificationChannelCreateFormStore = defineStore('channel-create-form', () => {
@@ -32,14 +25,18 @@ export const useNotificationChannelCreateFormStore = defineStore('channel-create
         selectedProtocol: '',
         channelName: '',
         userInfo: {
-            type: 'ALL_MEMBERS',
+            type: 'ALL_MEMBER',
             value: [],
         },
         scheduleInfo: {
-            days: [],
-            start: 0,
-            end: 0,
-            type: 'ALL_DAY',
+            SCHEDULE_TYPE: 'ALL_DAY',
+            MON: { is_scheduled: false, start: 9, end: 18 },
+            TUE: { is_scheduled: false, start: 9, end: 18 },
+            WED: { is_scheduled: false, start: 9, end: 18 },
+            THU: { is_scheduled: false, start: 9, end: 18 },
+            FRI: { is_scheduled: false, start: 9, end: 18 },
+            SAT: { is_scheduled: false, start: 9, end: 18 },
+            SUN: { is_scheduled: false, start: 9, end: 18 },
         },
     });
 
@@ -49,30 +46,22 @@ export const useNotificationChannelCreateFormStore = defineStore('channel-create
             state.selectedProtocol = '';
             state.channelName = '';
             state.userInfo = {
-                type: 'ALL_MEMBERS',
+                type: 'ALL_MEMBER',
                 value: [],
             };
             state.scheduleInfo = {
-                days: [],
-                start: 0,
-                end: 0,
-                type: 'ALL_DAY',
+                SCHEDULE_TYPE: 'ALL_DAY',
+                MON: { is_scheduled: false, start: 9, end: 18 },
+                TUE: { is_scheduled: false, start: 9, end: 18 },
+                WED: { is_scheduled: false, start: 9, end: 18 },
+                THU: { is_scheduled: false, start: 9, end: 18 },
+                FRI: { is_scheduled: false, start: 9, end: 18 },
+                SAT: { is_scheduled: false, start: 9, end: 18 },
+                SUN: { is_scheduled: false, start: 9, end: 18 },
             };
-        },
-        setCurrentStep(step: number) {
-            state.currentStep = step;
         },
         setSelectedProtocol(protocol: string | { icon: string; label: TranslateResult | string }) {
             state.selectedProtocol = protocol;
-        },
-        setChannelName(name: string) {
-            state.channelName = name;
-        },
-        setUserInfo(userInfo: UserInfoType) {
-            state.userInfo = userInfo;
-        },
-        setScheduleInfo(scheduleInfo: ScheduleInfoType) {
-            state.scheduleInfo = scheduleInfo;
         },
     };
 
