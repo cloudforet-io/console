@@ -1,7 +1,5 @@
-import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
+import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
-
-import { ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
 
 import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 
@@ -20,7 +18,7 @@ export const ALERT_MANAGEMENT_TABLE_FIELDS: DataTableFieldType[] = [
     { name: 'state', label: 'Status' },
     { name: 'service_id', label: 'Service' },
     { name: 'urgency', label: 'Urgency' },
-    { name: 'category', label: 'Category' },
+    { name: 'triggered_type', label: 'Category' },
     { name: 'resources', label: 'Resource', width: '20rem' },
     { name: 'updated_by', label: 'Updated by' },
     { name: 'resolved_by', label: 'Resolved by' },
@@ -32,18 +30,14 @@ export const ALERT_MANAGEMENT_TABLE_HANDLER: AlertManagementTableHandlerType = {
         items: [
             { name: 'alert_id', label: 'Alert ID' },
             { name: 'title', label: 'Title' },
-            { name: 'state', label: 'Status' },
-            { name: 'service_id', label: 'Service' },
-            { name: 'category', label: 'Category' },
+            { name: 'triggered_type', label: 'Category' },
             { name: 'resource.resource_type', label: 'Resource Name' },
         ],
     }],
     valueHandlerMap: {
         alert_id: makeDistinctValueHandler('alert_manager.Alert', 'alert_id'),
         title: makeDistinctValueHandler('alert_manager.Alert', 'title'),
-        state: makeEnumValueHandler(ALERT_URGENCY),
-        service: makeDistinctValueHandler('alert_manager.Alert', 'service_id'),
-        category: makeDistinctValueHandler('alert_manager.Alert', 'category'),
+        triggered_type: makeDistinctValueHandler('alert_manager.Alert', 'triggered_type'),
         'resource.resource_type': makeDistinctValueHandler('alert_manager.Alert', 'resource.resource_type'),
     },
 };
@@ -53,7 +47,7 @@ export const ALERT_EXCEL_FIELDS: ExcelDataField[] = [
     { key: 'state', name: 'State' },
     { key: 'service_id', name: 'Service' },
     { key: 'urgency', name: 'Urgency' },
-    { key: 'category', name: 'Category' },
+    { key: 'triggered_type', name: 'Category' },
     { key: 'resources', name: 'Resource' },
     { key: 'updated_by', name: 'Updated by' },
     { key: 'resolved_by', name: 'Resolved by' },

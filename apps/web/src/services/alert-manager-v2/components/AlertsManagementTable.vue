@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -12,13 +13,13 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 
 import { ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
+import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
@@ -27,17 +28,24 @@ import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/C
 
 import { red } from '@/styles/colors';
 
-import { getAlertStateI18n, getAlertUrgencyI18n } from '@/services/alert-manager-v2/composables/alert-table-data';
+import {
+    alertStateBadgeStyleTypeFormatter,
+    getAlertStateI18n,
+    getAlertUrgencyI18n,
+} from '@/services/alert-manager-v2/composables/alert-table-data';
 import {
     ALERT_EXCEL_FIELDS,
     ALERT_MANAGEMENT_TABLE_FIELDS,
     ALERT_MANAGEMENT_TABLE_HANDLER,
     ALERT_STATUS_FILTERS,
 } from '@/services/alert-manager-v2/constants/alert-management-table-constant';
-import { alertStateBadgeStyleTypeFormatter } from '@/services/alert-manager-v2/helpers/alert-badge-helper';
 import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
 import { useAlertPageStore } from '@/services/alert-manager-v2/stores/alert-page-store';
 import type { AlertFilterType } from '@/services/alert-manager-v2/types/alert-manager-type';
+
+interface AlertItem extends AlertModel {
+    alert_number: string;
+}
 
 const alertPageStore = useAlertPageStore();
 const alertPageState = alertPageStore.state;
@@ -48,13 +56,17 @@ const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
     serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => alertPageState.serviceList),
+    alertList: computed<AlertModel[]>(() => alertPageState.alertList),
     timezone: computed<string>(() => userState.timezone || ''),
 });
 const state = reactive({
     loading: false,
     visibleCustomFieldModal: false,
 
-    alertList: [] as AlertModel[],
+    refinedAlertList: computed<AlertItem[]>(() => storeState.alertList.map((alert) => ({
+        ...alert,
+        alert_number: alert.alert_id.split('-')[2],
+    }))),
     alertStateLabels: getAlertStateI18n(),
     urgencyLabels: getAlertUrgencyI18n(),
     fields: ALERT_MANAGEMENT_TABLE_FIELDS,
@@ -62,14 +74,14 @@ const state = reactive({
 const filterState = reactive({
     selectedServiceId: '',
     statusFields: computed<AlertFilterType[]>(() => ([
-        { label: i18n.t('ALERT_MANAGER.ALERTS.ALL'), name: 'ALL' },
         { label: i18n.t('ALERT_MANAGER.ALERTS.OPEN'), name: ALERT_STATUS_FILTERS.OPEN },
         { label: i18n.t('ALERT_MANAGER.ALERTS.TRIGGERED'), name: ALERT_STATUS_FILTERS.TRIGGERED },
         { label: i18n.t('ALERT_MANAGER.ALERTS.ACKNOWLEDGED'), name: ALERT_STATUS_FILTERS.ACKNOWLEDGED },
         { label: i18n.t('ALERT_MANAGER.ALERTS.RESOLVED'), name: ALERT_STATUS_FILTERS.RESOLVED },
         { label: i18n.t('ALERT_MANAGER.ALERTS.ERROR'), name: ALERT_STATUS_FILTERS.ERROR },
+        { label: i18n.t('ALERT_MANAGER.ALERTS.ALL'), name: 'ALL' },
     ])),
-    selectedStatusFilter: 'ALL',
+    selectedStatusFilter: 'OPEN',
     urgencyFields: computed<AlertFilterType[]>(() => ([
         { label: i18n.t('ALERT_MANAGER.ALERTS.ALL'), name: 'ALL' },
         { label: i18n.t('ALERT_MANAGER.ALERTS.HIGH'), name: ALERT_URGENCY.HIGH },
@@ -79,13 +91,16 @@ const filterState = reactive({
 });
 
 const alertListApiQueryHelper = new ApiQueryHelper()
-    .setOnly(...state.fields.map((d) => d.name).filter((name) => name !== 'duration'), 'alert_id')
     .setSort('created_at', true);
 
 const filterQueryHelper = new QueryHelper();
 const queryTagHelper = useQueryTags({ keyItemSets: ALERT_MANAGEMENT_TABLE_HANDLER.keyItemSets });
 const { queryTags } = queryTagHelper;
 
+const getServiceName = (id: string): TranslateResult => {
+    if (storeState.serviceDropdownList.length === 0) return '';
+    return storeState.serviceDropdownList.find((i) => i.name === id)?.label || '';
+};
 const handleSelectServiceDropdownItem = (id: string) => {
     filterState.selectedServiceId = id;
     fetchAlertsList();
@@ -145,12 +160,13 @@ const fetchAlertsList = async () => {
             ...filterQueryHelper.filters,
         ]);
 
-        state.alertList = await alertPageStore.fetchAlertsList({
+        const params = {
             query: alertListApiQueryHelper.data,
-        });
+        };
+        await alertPageStore.setAlertListParams(params);
+        await alertPageStore.fetchAlertsList(params);
     } catch (e) {
         ErrorHandler.handleError(e, true);
-        state.alertList = [];
     }
 };
 
@@ -177,7 +193,7 @@ onMounted(async () => {
                          :query-tags="queryTags"
                          :loading="state.loading"
                          :fields="state.fields"
-                         :items="state.alertList"
+                         :items="state.refinedAlertList"
                          :key-item-sets="ALERT_MANAGEMENT_TABLE_HANDLER.keyItemSets"
                          :value-handler-map="ALERT_MANAGEMENT_TABLE_HANDLER.valueHandlerMap"
                          settings-visible
@@ -238,7 +254,7 @@ onMounted(async () => {
             </template>
             <template #col-state-format="{ value }">
                 <p-badge :style-type="alertStateBadgeStyleTypeFormatter(value)"
-                         badge-type="'subtle'"
+                         :badge-type="value === ALERT_STATE.TRIGGERED ? 'solid' : 'subtle'"
                 >
                     {{ state.alertStateLabels[value] }}
                 </p-badge>
@@ -252,6 +268,22 @@ onMounted(async () => {
                 />
                 <span>{{ state.urgencyLabels[value] }}</span>
             </template>
+            <template #col-service_id-format="{ value }">
+                <template v-if="value">
+                    <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                            new-tab
+                            highlight
+                            :to="getProperRouteLocation({
+                                name: ALERT_MANAGER_ROUTE_V2.SERVICE.DETAIL._NAME,
+                                params: {
+                                    serviceId: value,
+                                },
+                            })"
+                    >
+                        {{ getServiceName(value) }}
+                    </p-link>
+                </template>
+            </template>
             <template #col-resources-format="{ value }">
                 <span v-if="(value ?? []).length === 0">
                     --
@@ -260,16 +292,6 @@ onMounted(async () => {
                     <p class="additional-info">
                         {{ value?.[0]?.name }}
                     </p>
-                </template>
-            </template>
-            <template #col-service_id-format="{ value }">
-                <template v-if="value">
-                    <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
-                            new-tab
-                            :to="getProperRouteLocation(referenceRouter(value,{ resource_type: 'identity.Project' }))"
-                    >
-                        {{ value }}
-                    </p-link>
                 </template>
             </template>
         </p-toolbox-table>

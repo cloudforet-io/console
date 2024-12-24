@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import type { AlertStateType, AlertUrgencyType } from '@/schema/alert-manager/alert/type';
+import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import { i18n } from '@/translations';
 
 
@@ -19,3 +20,24 @@ export const getAlertUrgencyI18n = (): ComputedRef<Record<AlertUrgencyType, Tran
     HIGH: i18n.t('ALERT_MANAGER.ALERTS.HIGH'),
     LOW: i18n.t('ALERT_MANAGER.ALERTS.LOW'),
 }));
+
+export const alertStateBadgeStyleTypeFormatter = (alertState) => {
+    let style = '';
+    switch (alertState) {
+    case ALERT_STATE.TRIGGERED:
+        style = 'alert';
+        break;
+    case ALERT_STATE.ACKNOWLEDGED:
+        style = 'primary3';
+        break;
+    case ALERT_STATE.RESOLVED:
+        style = 'gray200';
+        break;
+    case ALERT_STATE.ERROR:
+        style = 'red200';
+        break;
+    default: style = '';
+        break;
+    }
+    return style;
+};

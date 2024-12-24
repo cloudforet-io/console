@@ -16,6 +16,8 @@ import type { ServiceModel } from '@/schema/alert-manager/service/model';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface AlertPageStoreState {
+    alertList: AlertModel[]
+    alertListParams?: AlertListParameters;
     serviceList: SelectDropdownMenuItem[];
     alertData: Partial<AlertModel>|null;
 }
@@ -26,16 +28,24 @@ interface UpdateAlertPayload {
 
 export const useAlertPageStore = defineStore('page-alert', () => {
     const state = reactive<AlertPageStoreState>({
+        alertList: [],
+        alertListParams: undefined,
         serviceList: [],
         alertData: null,
     });
+    const mutations = {
+        setAlertListParams(params: AlertListParameters) {
+            state.alertListParams = params;
+        },
+    };
     const actions = {
         async fetchAlertsList(params?: AlertListParameters) {
             try {
                 const { results } = await SpaceConnector.clientV2.alertManager.alert.list<AlertListParameters, ListResponse<AlertModel>>(params);
-                return results || [];
+                state.alertList = results || [];
             } catch (e) {
                 ErrorHandler.handleError(e);
+                state.alertList = [];
                 throw e;
             }
         },
@@ -80,6 +90,7 @@ export const useAlertPageStore = defineStore('page-alert', () => {
 
     return {
         state,
+        ...mutations,
         ...actions,
     };
 });
