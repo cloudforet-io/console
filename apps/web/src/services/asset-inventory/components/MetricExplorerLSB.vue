@@ -46,6 +46,11 @@ import {
 } from '@/services/asset-inventory/stores/metric-explorer-l-s-b-store';
 import type { NamespaceSubItemType } from '@/services/asset-inventory/types/asset-analysis-type';
 
+interface props {
+  width : number
+}
+const props = defineProps<props>();
+
 const lsbRef = ref<HTMLElement|null>(null);
 const { width: lsbWidth } = useElementSize(lsbRef);
 
@@ -277,16 +282,18 @@ onMounted(() => {
 <template>
     <div class="metric-explorer-l-s-b">
         <p-popover class="metric-select-guide-popover"
-                   :is-visible="guidePopoverState.metricGuideVisible"
+                   :is-visible.sync="guidePopoverState.metricGuideVisible"
                    position="right"
                    ignore-outside-click
                    ignore-target-click
                    boundary=".metric-explorer-l-s-b"
                    :trigger="POPOVER_TRIGGER.NONE"
+                   min-width="21.5rem"
                    :style="{ left: `${lsbWidth}px`}"
         >
             <l-s-b ref="lsbRef"
                    :menu-set="state.menuSet"
+                   :style="{ width: `${props.width}px` }"
             >
                 <template #collapsible-contents-starred>
                     <div v-if="state.starredMenuSet.length > 0">
@@ -405,6 +412,7 @@ onMounted(() => {
                     <metric-explorer-l-s-b-metric :is-detail-page="state.isDetailPage" />
                 </template>
             </l-s-b>
+
             <template #content>
                 <div class="metric-select-guide-content">
                     <p class="title">
