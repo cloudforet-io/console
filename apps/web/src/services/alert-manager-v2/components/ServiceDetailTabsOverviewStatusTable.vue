@@ -6,24 +6,30 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PI, PPaneLayout, PTooltip, PFieldTitle, PSelectStatus, PIconButton, PDataTable, PBadge,
 } from '@cloudforet/mirinae';
-import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 import type { ValueItem } from '@cloudforet/mirinae/types/controls/search/query-search/type';
+import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { AlertListParameters } from '@/schema/alert-manager/alert/api-verbs/list';
-import { ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
+import { ALERT_STATE, ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
 import type { AlertStateType, AlertUrgencyType } from '@/schema/alert-manager/alert/type';
 import { SERVICE_ALERTS_TYPE } from '@/schema/alert-manager/service/constants';
 import { i18n } from '@/translations';
 
+import { useUserStore } from '@/store/user/user-store';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { red } from '@/styles/colors';
 
+import {
+    alertStateBadgeStyleTypeFormatter,
+    getAlertStateI18n, getAlertUrgencyI18n,
+} from '@/services/alert-manager-v2/composables/alert-table-data';
+import { SERVICE_ALERT_TABLE_FIELDS } from '@/services/alert-manager-v2/constants/service-table-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
 import type { Service } from '@/services/alert-manager-v2/types/alert-manager-type';
-
 
 type AlertStatusInfoType = {
     status: TranslateResult,
@@ -35,9 +41,12 @@ type AlertStatusInfoType = {
 
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
+const userStore = useUserStore();
+const userState = userStore.state;
 
 const storeState = reactive({
     serviceInfo: computed<Service>(() => serviceDetailPageGetters.serviceInfo),
+    timezone: computed<string>(() => userState.timezone || ''),
 });
 const state = reactive({
     alertStatusInfo: computed<AlertStatusInfoType[]>(() => [
@@ -74,20 +83,8 @@ const state = reactive({
 const tableState = reactive({
     loading: false,
     alertsList: [] as AlertModel[],
-    fields: computed<DataTableFieldType[]>(() => [
-        {
-            name: 'name', label: i18n.t('ALERT_MANAGER.ALERTS.LABEL_TITLE') as string, width: '50%', sortable: false,
-        },
-        {
-            name: 'status', label: i18n.t('ALERT_MANAGER.STATUS') as string, width: '15%', sortable: false,
-        },
-        {
-            name: 'urgency', label: i18n.t('ALERT_MANAGER.ALERTS.LABEL_URGENCY') as string, width: '15%', sortable: false,
-        },
-        {
-            name: 'created_at', label: i18n.t('ALERT_MANAGER.ALERTS.CREATED') as string, width: '20%', sortable: false,
-        },
-    ]),
+    alertStateLabels: getAlertStateI18n(),
+    urgencyLabels: getAlertUrgencyI18n(),
 });
 
 const handleClickStatus = (name: AlertStateType) => {
@@ -199,7 +196,7 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
                                    @click="fetchAlertsList"
                     />
                 </div>
-                <p-data-table :fields="tableState.fields"
+                <p-data-table :fields="SERVICE_ALERT_TABLE_FIELDS"
                               :items="tableState.alertsList"
                               :loading="tableState.loading"
                               striped
@@ -207,9 +204,11 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
                               sort-by="created_at"
                               sortable
                 >
-                    <template #col-status-format="{value}">
-                        <p-badge style-type="alert">
-                            {{ value }}
+                    <template #col-state-format="{value}">
+                        <p-badge :style-type="alertStateBadgeStyleTypeFormatter(value)"
+                                 :badge-type="value === ALERT_STATE.TRIGGERED ? 'solid' : 'subtle'"
+                        >
+                            {{ tableState.alertStateLabels[value] }}
                         </p-badge>
                     </template>
                     <template #col-urgency-format="{value}">
@@ -219,8 +218,11 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
                                  height="1rem"
                                  :color="value === ALERT_URGENCY.HIGH ? red[400] : red[200]"
                             />
-                            <span class="text">{{ value }}</span>
+                            <span>{{ tableState.urgencyLabels[value] }}</span>
                         </div>
+                    </template>
+                    <template #col-created_at-format="{value}">
+                        {{ iso8601Formatter(value, storeState.timezone) }}
                     </template>
                 </p-data-table>
             </p-pane-layout>
