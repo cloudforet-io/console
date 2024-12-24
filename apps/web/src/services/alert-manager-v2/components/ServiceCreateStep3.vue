@@ -1,25 +1,84 @@
 <script setup lang="ts">
 import { computed, onUnmounted, reactive } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import type { ServiceChannelCreateParameters } from '@/schema/alert-manager/service-channel/api-verbs/create';
+import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+
+import NotificationsCreateForm from '@/services/alert-manager-v2/components/NotificationsCreateForm.vue';
 import NotificationsCreateTypeSelector
     from '@/services/alert-manager-v2/components/NotificationsCreateTypeSelector.vue';
 import ServiceCreateStepContainer from '@/services/alert-manager-v2/components/ServiceCreateStepContainer.vue';
+import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/common-constant';
+import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
 import { useServiceCreateFormStore } from '@/services/alert-manager-v2/stores/service-create-form-store';
+import type { CreatedNotificationInfoType } from '@/services/alert-manager-v2/types/alert-manager-type';
 
 const serviceFormStore = useServiceCreateFormStore();
 const serviceFormState = serviceFormStore.state;
 
+const router = useRouter();
+
+const { getProperRouteLocation } = useProperRouteLocation();
+
 const storeState = reactive({
     currentSubStep: computed<number>(() => serviceFormState.currentSubStep),
-    selectedProtocol: computed<any>(() => serviceFormState.selectedProtocol?.protocol_id || ''),
+    selectedProtocol: computed<string>(() => serviceFormState.selectedProtocol?.protocol_id || ''),
+    createdServiceId: computed<string>(() => serviceFormState.createdServiceId),
     webhookName: computed<string>(() => serviceFormState.webhookName || ''),
 });
 const state = reactive({
-    isAllFormValid: computed(() => {
+    form: {} as CreatedNotificationInfoType,
+    isAllFormValid: computed<boolean>(() => {
         if (storeState.currentSubStep === 1) return storeState.selectedProtocol !== '';
-        return true;
+        const { name, data } = state.form;
+
+        if (!name) return false;
+        if (data.FORWARD_TYPE === 'USER') {
+            return Array.isArray(data.USER) && data.USER.length > 0 && !data.USER_GROUP;
+        }
+        if (data.FORWARD_TYPE === 'USER_GROUP') {
+            return Array.isArray(data.USER_GROUP) && data.USER_GROUP.length > 0 && !data.USER;
+        }
+        if (data.FORWARD_TYPE === 'ALL_MEMBER') {
+            return !data.USER && !data.USER_GROUP;
+        }
+        return false;
     }),
 });
+
+const routeDetailSettingPage = () => {
+    router.push(getProperRouteLocation({
+        name: ALERT_MANAGER_ROUTE_V2.SERVICE.DETAIL._NAME,
+        params: {
+            serviceId: storeState.createdServiceId,
+        },
+        query: {
+            tab: SERVICE_DETAIL_TABS.SETTINGS,
+        },
+    }));
+};
+const handleChangeForm = (form: CreatedNotificationInfoType) => {
+    state.form = form;
+};
+
+const fetchCreateNotifications = async () => {
+    try {
+        await SpaceConnector.clientV2.alertManager.serviceChannel.create<ServiceChannelCreateParameters, ServiceChannelModel>({
+            protocol_id: storeState.selectedProtocol,
+            service_id: storeState.createdServiceId,
+            ...state.form,
+        });
+        await routeDetailSettingPage();
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
+    }
+};
 
 onUnmounted(() => {
     serviceFormStore.initStep2();
@@ -30,7 +89,11 @@ onUnmounted(() => {
     <service-create-step-container class="service-create-step3"
                                    :selected-item-id="storeState.selectedProtocol"
                                    :is-all-form-valid="state.isAllFormValid"
+                                   @create="fetchCreateNotifications"
     >
         <notifications-create-type-selector v-if="storeState.currentSubStep === 1" />
+        <notifications-create-form v-if="storeState.currentSubStep === 2"
+                                   @change-form="handleChangeForm"
+        />
     </service-create-step-container>
 </template>

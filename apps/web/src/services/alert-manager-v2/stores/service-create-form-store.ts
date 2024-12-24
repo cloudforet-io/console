@@ -3,7 +3,6 @@ import { reactive } from 'vue';
 import { defineStore } from 'pinia';
 
 import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
-import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
 import type { PluginModel } from '@/schema/repository/plugin/model';
 
 interface ServiceFormStoreState {
@@ -13,7 +12,6 @@ interface ServiceFormStoreState {
     selectedWebhookType?: PluginModel;
     webhookName: string;
     webhookVersion?: string;
-    createdWebhookInfo?: WebhookModel;
     selectedProtocol?: NotificationProtocolModel;
 }
 
@@ -27,7 +25,6 @@ export const useServiceCreateFormStore = defineStore('service-create-form', () =
         selectedWebhookType: undefined,
         webhookName: '',
         webhookVersion: undefined,
-        createdWebhookInfo: undefined,
         // notification
         selectedProtocol: undefined,
     });
@@ -40,7 +37,6 @@ export const useServiceCreateFormStore = defineStore('service-create-form', () =
             state.selectedWebhookType = undefined;
             state.webhookName = '';
             state.webhookVersion = undefined;
-            state.createdWebhookInfo = undefined;
             state.selectedProtocol = undefined;
         },
         initStep2() {
@@ -68,9 +64,6 @@ export const useServiceCreateFormStore = defineStore('service-create-form', () =
         },
         setWebhookVersion(version?: string) {
             state.webhookVersion = version;
-        },
-        setCreatedWebhookInfo(webhook: WebhookModel) {
-            state.createdWebhookInfo = webhook;
         },
 
         setSelectedProtocol(protocol: NotificationProtocolModel) {

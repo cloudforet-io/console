@@ -28,6 +28,7 @@ const storeState = reactive({
     selectedWebhookType: computed<PluginModel|undefined>(() => serviceFormState.selectedWebhookType),
     webhookName: computed<string>(() => serviceFormState.webhookName || ''),
     createdServiceId: computed<string>(() => serviceFormState.createdServiceId),
+    webhookVersion: computed<string|undefined>(() => serviceFormState.webhookVersion || ''),
 });
 const state = reactive({
     isAllFormValid: computed(() => {
@@ -35,19 +36,20 @@ const state = reactive({
         if (storeState.currentSubStep === 2) return storeState.webhookName !== '';
         return true;
     }),
+    succeedWebhook: undefined as undefined|WebhookModel,
 });
 
 const handleCreateWebhook = async () => {
     try {
-        const createdWebhookInfo = await SpaceConnector.clientV2.alertManager.webhook.create<WebhookCreateParameters, WebhookModel>({
+        state.succeedWebhook = await SpaceConnector.clientV2.alertManager.webhook.create<WebhookCreateParameters, WebhookModel>({
             name: storeState.webhookName,
             plugin_info: {
                 plugin_id: storeState.selectedWebhookType?.plugin_id || '',
+                version: storeState.webhookVersion,
             },
             service_id: storeState.createdServiceId,
         });
         showSuccessMessage(i18n.t('ALERT_MANAGER.WEBHOOK.ALT_S_CREATE_WEBHOOK'), '');
-        serviceFormStore.setCreatedWebhookInfo(createdWebhookInfo);
         serviceFormStore.setCurrentSubStep(3);
     } catch (e) {
         ErrorHandler.handleError(e, true);
@@ -67,6 +69,8 @@ onUnmounted(() => {
     >
         <webhook-create-type-selector v-if="storeState.currentSubStep === 1" />
         <webhook-create-form v-else-if="storeState.currentSubStep === 2" />
-        <webhook-create-success-mode v-else-if="storeState.currentSubStep === 3" />
+        <webhook-create-success-mode v-else-if="storeState.currentSubStep === 3"
+                                     :succeed-webhook="state.succeedWebhook"
+        />
     </service-create-step-container>
 </template>
