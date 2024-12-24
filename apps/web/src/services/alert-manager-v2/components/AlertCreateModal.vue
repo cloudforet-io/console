@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -8,17 +8,16 @@ import {
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { AlertCreateParameters } from '@/schema/alert-manager/alert/api-verbs/create';
+import type { AlertListParameters } from '@/schema/alert-manager/alert/api-verbs/list';
 import { ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
 import { i18n } from '@/translations';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { useAlertPageStore } from '@/services/alert-manager-v2/stores/alert-page-store';
 import type { AlertUrgencyRadioType } from '@/services/alert-manager-v2/types/alert-manager-type';
-
 
 interface Props {
     visible: boolean;
@@ -35,11 +34,12 @@ const emit = defineEmits<{(e: 'update:visible'): void; }>();
 
 const storeState = reactive({
     serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => alertPageState.serviceList),
+    alertListParams: computed<AlertListParameters|undefined>(() => alertPageState.alertListParams),
+    alertList: computed<AlertModel[]>(() => alertPageState.alertList),
 });
 const state = reactive({
     loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
-    alertList: [] as AlertModel[],
 
     selectedServiceId: '',
     radioMenuList: computed<AlertUrgencyRadioType[]>(() => [
@@ -49,7 +49,7 @@ const state = reactive({
         },
         {
             label: i18n.t('ALERT_MANAGER.ALERTS.LOW'),
-            name: ALERT_URGENCY.HIGH,
+            name: ALERT_URGENCY.LOW,
         },
     ]),
     selectedRadioIdx: 0,
@@ -69,7 +69,7 @@ const {
 }, {
     name(value: string) {
         if (!value) return ' ';
-        const duplicatedName = state.alertList?.find((item) => item.title === value);
+        const duplicatedName = storeState.alertList?.find((item) => item.title === value);
         if (duplicatedName) {
             return i18n.t('ALERT_MANAGER.ALERTS.VALIDATION_NAME_UNIQUE');
         }
@@ -86,6 +86,7 @@ const handleConfirm = async () => {
             service_id: state.selectedServiceId,
             urgency: state.radioMenuList[state.selectedRadioIdx].name,
         });
+        await alertPageStore.fetchAlertsList(storeState.alertListParams);
     } finally {
         state.loading = false;
         handleClose();
@@ -95,18 +96,6 @@ const handleClose = () => {
     state.proxyVisible = false;
 };
 
-const fetchAlertsList = async () => {
-    try {
-        state.alertList = await alertPageStore.fetchAlertsList();
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-        state.alertList = [];
-    }
-};
-
-onMounted(() => {
-    fetchAlertsList();
-});
 </script>
 
 <template>
