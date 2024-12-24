@@ -35,7 +35,6 @@ const emit = defineEmits<{(e: 'update:visible'): void; }>();
 const storeState = reactive({
     serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => alertPageState.serviceList),
     alertListParams: computed<AlertListParameters|undefined>(() => alertPageState.alertListParams),
-    alertList: computed<AlertModel[]>(() => alertPageState.alertList),
 });
 const state = reactive({
     loading: false,
@@ -69,10 +68,6 @@ const {
 }, {
     name(value: string) {
         if (!value) return ' ';
-        const duplicatedName = storeState.alertList?.find((item) => item.title === value);
-        if (duplicatedName) {
-            return i18n.t('ALERT_MANAGER.ALERTS.VALIDATION_NAME_UNIQUE');
-        }
         return '';
     },
 });

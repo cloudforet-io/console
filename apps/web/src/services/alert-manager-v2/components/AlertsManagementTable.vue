@@ -38,7 +38,7 @@ import {
     ALERT_MANAGEMENT_TABLE_FIELDS,
     ALERT_MANAGEMENT_TABLE_HANDLER,
     ALERT_STATUS_FILTERS,
-} from '@/services/alert-manager-v2/constants/alert-management-table-constant';
+} from '@/services/alert-manager-v2/constants/alert-table-constant';
 import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
 import { useAlertPageStore } from '@/services/alert-manager-v2/stores/alert-page-store';
 import type { AlertFilterType } from '@/services/alert-manager-v2/types/alert-manager-type';
@@ -184,7 +184,6 @@ onMounted(async () => {
 <template>
     <div class="alert-data-table">
         <p-toolbox-table searchable
-                         selectable
                          sortable
                          exportable
                          search-type="query"

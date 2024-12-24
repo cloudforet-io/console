@@ -74,7 +74,7 @@ const { queryTags } = queryTagHelper;
 const getWebhookIcon = (id: string): string|undefined => {
     const webhook = state.webhookList.find((item) => item.webhook_id === id);
     if (!webhook) return undefined;
-    return storeState.plugins[webhook.plugin_info.plugin_id].icon;
+    return storeState.plugins[webhook.plugin_info.plugin_id]?.icon || '';
 };
 const getEscalationPolicyName = (id: string): string => {
     const escalationPolicy = state.escalationPolicyList.find((item) => item.escalation_policy_id === id);

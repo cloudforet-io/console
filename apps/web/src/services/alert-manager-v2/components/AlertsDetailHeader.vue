@@ -10,8 +10,12 @@ import { i18n } from '@/translations';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
+import AlertDetailDeleteModal from '@/services/alert-manager-v2/components/AlertDetailDeleteModal.vue';
+import AlertDetailEditModal from '@/services/alert-manager-v2/components/AlertDetailEditModal.vue';
 import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
 import { useAlertDetailPageStore } from '@/services/alert-manager-v2/stores/alert-detail-page-store';
+
+type ModalType = 'edit' | 'delete';
 
 const alertDetailPageStore = useAlertDetailPageStore();
 const alertDetailPageState = alertDetailPageStore.state;
@@ -37,16 +41,20 @@ const state = reactive({
         },
     ]),
 });
+const modalState = reactive({
+    modalVisible: false,
+    type: '' as ModalType,
+});
 
 const handleRouteBackButton = () => {
     router.push(getProperRouteLocation({
         name: ALERT_MANAGER_ROUTE_V2.ALERTS._NAME,
     }));
 };
-const handleSelectDropdownMenu = () => {
-    console.log('TODO: handleSelectDropdownMenu');
-};
-</script>
+const handleSelectDropdownMenu = (type: ModalType) => {
+    modalState.modalVisible = true;
+    modalState.type = type;
+}; </script>
 
 <template>
     <div class="alerts-detail-page pb-6">
@@ -71,5 +79,13 @@ const handleSelectDropdownMenu = () => {
                 </p-heading>
             </template>
         </p-heading-layout>
+        <div v-if="modalState.modalVisible">
+            <alert-detail-edit-modal v-if="modalState.type === 'edit'"
+                                     :visible.sync="modalState.modalVisible"
+            />
+            <alert-detail-delete-modal v-if="modalState.type === 'delete'"
+                                       :visible.sync="modalState.modalVisible"
+            />
+        </div>
     </div>
 </template>
