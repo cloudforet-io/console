@@ -28,7 +28,7 @@ import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 import CloudServiceLSBDropdownMenuItem from '@/services/asset-inventory-v1/components/CloudServiceLSBDropdownMenuItem.vue';
 import {
     CLOUD_SERVICE_FILTER_KEY,
-    CLOUD_SERVICE_GLOBAL_FILTER_KEY,
+    CLOUD_SERVICE_GLOBAL_FILTER_KEY, UNIDENTIFIED_PROVIDER,
 } from '@/services/asset-inventory-v1/constants/cloud-service-constant';
 import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory-v1/stores/cloud-service-detail-page-store';
@@ -67,24 +67,43 @@ const state = reactive({
     }),
     cloudServiceMainMenuSet: computed<LSBItem[]>(() => ([
         {
-            type: MENU_ITEM_TYPE.COLLAPSIBLE,
+            type: MENU_ITEM_TYPE.TOP_TITLE,
             label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.PROVIDER'),
+        },
+        {
+            type: MENU_ITEM_TYPE.SLOT,
             id: PROVIDER_MENU_ID,
         },
         {
-            type: MENU_ITEM_TYPE.COLLAPSIBLE,
+            type: MENU_ITEM_TYPE.DIVIDER,
+        },
+        {
+            type: MENU_ITEM_TYPE.SLOT,
+            id: UNIDENTIFIED_PROVIDER,
+        },
+        {
+            type: MENU_ITEM_TYPE.TOP_TITLE,
             label: i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_CATEGORY'),
+        },
+        {
+            type: MENU_ITEM_TYPE.SLOT,
             id: CATEGORY_MENU_ID,
         },
         {
-            type: MENU_ITEM_TYPE.COLLAPSIBLE,
+            type: MENU_ITEM_TYPE.TOP_TITLE,
             label: i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.REGION'),
+        },
+        {
+            type: MENU_ITEM_TYPE.SLOT,
             id: REGION_MENU_ID,
         },
     ])),
     cloudServiceDetailMenuSet: computed<LSBItem[]>(() => {
         const selectedItem = cloudServiceDetailPageState.cloudServiceTypeList[0];
         const results: LSBItem[] = [
+            {
+                type: MENU_ITEM_TYPE.DIVIDER,
+            },
             {
                 type: MENU_ITEM_TYPE.BUTTON_TITLE,
                 label: state.detailPageParams.group,
@@ -106,13 +125,19 @@ const state = reactive({
     }),
     menuSet: computed<LSBMenu[]>(() => [
         {
-            type: MENU_ITEM_TYPE.COLLAPSIBLE,
+            type: MENU_ITEM_TYPE.TOP_TITLE,
             label: i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.PROJECT'),
+        },
+        {
+            type: MENU_ITEM_TYPE.SLOT,
             id: PROJECT_MENU_ID,
         },
         {
-            type: MENU_ITEM_TYPE.COLLAPSIBLE,
+            type: MENU_ITEM_TYPE.TOP_TITLE,
             label: i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_ACCOUNT'),
+        },
+        {
+            type: MENU_ITEM_TYPE.SLOT,
             id: SERVICE_ACCOUNT_MENU_ID,
         },
         ...state.isCloudServiceDetailPage ? state.cloudServiceDetailMenuSet : state.cloudServiceMainMenuSet,
@@ -127,6 +152,7 @@ const providerState = reactive({
         })),
     ]),
     selectedItem: computed(() => {
+        if (UNIDENTIFIED_PROVIDER === cloudServicePageState.selectedProvider) return UNIDENTIFIED_PROVIDER;
         const item = storeState.providers[cloudServicePageState.selectedProvider];
         if (item) {
             return storeState.providers[cloudServicePageState.selectedProvider].key;
@@ -170,21 +196,21 @@ watch([() => state.detailPageParams, () => storeState.currentGrantInfo], async (
            class="cloud-service-l-s-b"
            :class="{'is-admin-mode': isAdminMode, 'is-detail-page': state.isCloudServiceDetailPage}"
     >
-        <template #collapsible-contents-project>
+        <template #slot-project>
             <cloud-service-l-s-b-dropdown-menu-item class="collapsible-item"
                                                     is-global-filter
                                                     :type="CLOUD_SERVICE_GLOBAL_FILTER_KEY.PROJECT"
                                                     :label="$t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_CATEGORY')"
             />
         </template>
-        <template #collapsible-contents-service-account>
+        <template #slot-service-account>
             <cloud-service-l-s-b-dropdown-menu-item class="collapsible-item"
                                                     is-global-filter
                                                     :type="CLOUD_SERVICE_GLOBAL_FILTER_KEY.SERVICE_ACCOUNT"
                                                     :label="$t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_CATEGORY')"
             />
         </template>
-        <template #collapsible-contents-provider>
+        <template #slot-provider>
             <p-radio-group direction="vertical"
                            class="provider-radio-group"
             >
@@ -206,13 +232,23 @@ watch([() => state.detailPageParams, () => storeState.currentGrantInfo], async (
                 </p-radio>
             </p-radio-group>
         </template>
-        <template #collapsible-contents-category>
+        <template #slot-Unidentified>
+            <p-radio :key="UNIDENTIFIED_PROVIDER"
+                     class="provider-item mb-3 mx-1"
+                     :value="UNIDENTIFIED_PROVIDER"
+                     :selected="providerState.selectedItem"
+                     @change="handleSelectProvider"
+            >
+                Unidentified assets
+            </p-radio>
+        </template>
+        <template #slot-category>
             <cloud-service-l-s-b-dropdown-menu-item class="collapsible-item"
                                                     :type="CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY"
                                                     :label="$t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_CATEGORY')"
             />
         </template>
-        <template #collapsible-contents-region>
+        <template #slot-region>
             <cloud-service-l-s-b-dropdown-menu-item class="collapsible-item"
                                                     :type="CLOUD_SERVICE_FILTER_KEY.REGION"
                                                     :label="$t('INVENTORY.CLOUD_SERVICE.MAIN.REGION')"
@@ -240,6 +276,11 @@ watch([() => state.detailPageParams, () => storeState.currentGrantInfo], async (
     }
     &:deep(.l-s-b-collapsible-menu-item) {
         margin-top: 0.5rem;
+    }
+
+    .collapsible-item {
+        width: 100%;
+        margin: 0 0.375rem 0.75rem 0.375rem;
     }
 }
 </style>
