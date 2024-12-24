@@ -1,22 +1,28 @@
 <script setup lang="ts">
-import { computed, defineProps, reactive } from 'vue';
+import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import { PHeadingLayout, PHeading, PSelectDropdown } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
 
+import type { AlertModel } from '@/schema/alert-manager/alert/model';
 import { i18n } from '@/translations';
 
-interface Props {
-    alertId: string;
-}
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
-const props = withDefaults(defineProps<Props>(), {
-    alertId: '',
-});
+import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
+import { useAlertDetailPageStore } from '@/services/alert-manager-v2/stores/alert-detail-page-store';
+
+const alertDetailPageStore = useAlertDetailPageStore();
+const alertDetailPageState = alertDetailPageStore.state;
 
 const router = useRouter();
 
+const { getProperRouteLocation } = useProperRouteLocation();
+
+const storeState = reactive({
+    alertInfo: computed<AlertModel>(() => alertDetailPageState.alertInfo),
+});
 const state = reactive({
     menuItems: computed<MenuItem[]>(() => [
         {
@@ -32,6 +38,11 @@ const state = reactive({
     ]),
 });
 
+const handleRouteBackButton = () => {
+    router.push(getProperRouteLocation({
+        name: ALERT_MANAGER_ROUTE_V2.ALERTS._NAME,
+    }));
+};
 const handleSelectDropdownMenu = () => {
     console.log('TODO: handleSelectDropdownMenu');
 };
@@ -41,12 +52,12 @@ const handleSelectDropdownMenu = () => {
     <div class="alerts-detail-page pb-6">
         <p-heading-layout>
             <template #heading>
-                <p-heading :title="props.alertId"
+                <p-heading :title="storeState.alertInfo.title"
                            show-back-button
-                           @click-back-button="router.go(-1)"
+                           @click-back-button="handleRouteBackButton"
                 >
                     <template #title-right-extra>
-                        <span class="text-label-xl text-gray-700 mr-2">NO.temp number</span>
+                        <span class="text-label-xl text-gray-700 mr-2">NO. {{ storeState.alertInfo.alert_id?.split('-')[2] }}</span>
                         <p-select-dropdown :menu="state.menuItems"
                                            style-type="icon-button"
                                            button-icon="ic_ellipsis-horizontal"
