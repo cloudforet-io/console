@@ -1,14 +1,23 @@
 <script lang="ts" setup>
-import { reactive, watch } from 'vue';
+import {
+    onMounted, reactive, ref, watch,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PSelectCard, PLazyImg } from '@cloudforet/mirinae';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { NotificationProtocolListParameters } from '@/schema/alert-manager/notification-protocol/api-verbs/list';
+import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
 import { i18n } from '@/translations';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import { useNotificationChannelCreateFormStore } from '@/services/iam/store/notification-channel-create-form-store';
+
 
 const notificationChannelCreateFormStore = useNotificationChannelCreateFormStore();
 const notificationChannelCreateFormState = notificationChannelCreateFormStore.state;
@@ -18,6 +27,7 @@ interface ChannelCard {
   selectedProtocol: string | { icon: string; label: TranslateResult | string };
 }
 
+const notificationProtocolList = ref<any>([]);
 // Temporary values
 const state = reactive<ChannelCard>({
     channelList: [
@@ -108,6 +118,21 @@ watch(() => state.selectedProtocol, (nv_protocol) => {
         }
     }
 }, { deep: true, immediate: true });
+
+/* API */
+const fetchNotificationProtocolList = async (params: NotificationProtocolListParameters) => {
+    try {
+        const { results } = await SpaceConnector.clientV2.alertManager.notificationProtocol.list<NotificationProtocolListParameters, ListResponse<NotificationProtocolModel>>(params);
+        notificationProtocolList.value = results;
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
+    }
+};
+
+/* Mounted */
+onMounted(async () => {
+    await fetchNotificationProtocolList({});
+});
 </script>
 
 <template>
