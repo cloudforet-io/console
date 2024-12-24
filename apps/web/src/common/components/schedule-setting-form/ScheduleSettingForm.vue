@@ -52,6 +52,12 @@ const state = reactive({
     end: 18,
 });
 
+const defaultScheduleForm = () => {
+    state.selectedRadioIdx = state.scheduleTypeList.findIndex((item) => item.name === props.scheduleForm?.type);
+    state.selectedDayButton = props.scheduleForm?.days || [];
+    state.start = props.scheduleForm?.start || 9;
+    state.end = props.scheduleForm?.end || 18;
+};
 const generateHourlyTimeArray = () => range(0, 25).map((h) => ({
     label: `${h.toString().padStart(2, '0')}:00`,
     name: h,
@@ -72,20 +78,13 @@ const handleSelectDayButton = (value: ScheduleDayType[]) => {
 };
 const handleSelectDropdown = (type: 'start' | 'end', value: number) => {
     if (type === 'start') {
-        state.start = value;
+        state.start = value || 0;
     } else {
-        state.end = value;
+        state.end = value || 0;
     }
 };
 
-watch(() => props.scheduleForm, (scheduleForm) => {
-    if (scheduleForm) {
-        state.selectedRadioIdx = state.scheduleTypeList.findIndex((item) => item.name === props.scheduleForm?.type);
-        state.selectedDayButton = props.scheduleForm?.days || [];
-        state.start = props.scheduleForm?.start || 9;
-        state.end = props.scheduleForm?.end || 18;
-    }
-}, { immediate: true });
+
 watch([() => state.selectedRadioIdx, () => state.selectedDayButton, () => state.start, () => state.end], ([selectedRadioIdx, selectedDayButton, start, end]) => {
     emit('schedule-form', {
         type: state.scheduleTypeList[selectedRadioIdx].name,
@@ -98,6 +97,9 @@ watch([() => state.selectedRadioIdx, () => state.selectedDayButton, () => state.
 onMounted(() => {
     if (state.selectedRadioIdx === 0) {
         state.selectedDayButton = state.days.slice(0, 5).map((day) => day.name);
+    }
+    if (props.scheduleForm) {
+        defaultScheduleForm();
     }
 });
 </script>

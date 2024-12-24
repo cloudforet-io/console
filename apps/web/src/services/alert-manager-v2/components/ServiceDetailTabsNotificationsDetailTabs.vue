@@ -92,8 +92,8 @@ const getScheduleInfo = (schedule: ServiceChannelScheduleInfoType): ScheduleInfo
         if (day === 'SCHEDULE_TYPE') return;
         const scheduleDay = s as ServiceChannelScheduleDayType;
         if (scheduleDay) {
-            const startTime = `${String(scheduleDay.start).padStart(2, '0')}:00`;
-            const endTime = `${String(scheduleDay.end).padStart(2, '0')}:00`;
+            const startTime = `${String(scheduleDay.start || 0).padStart(2, '0')}:00`;
+            const endTime = `${String(scheduleDay.end || 0).padStart(2, '0')}:00`;
             if (scheduleDay.is_scheduled) {
                 scheduleInfo.days.push(state.dayMapping[day]);
                 scheduleInfo.time = `${startTime} ~ ${endTime}`;
