@@ -1,40 +1,34 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import dayjs from 'dayjs';
 
 import {
-    PPaneLayout, PSelectDropdown, PI,
+    PPaneLayout, PSelectDropdown, PI, PBadge,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
+import type { AlertModel } from '@/schema/alert-manager/alert/model';
 import { ALERT_STATE, ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
 import type { AlertState, AlertUrgency } from '@/schema/monitoring/alert/type';
 import { i18n } from '@/translations';
 
 import { red } from '@/styles/colors';
 
-import { useAlertPageStore } from '@/services/alert-manager-v2/stores/alert-page-store';
+import { useAlertDetailPageStore } from '@/services/alert-manager-v2/stores/alert-detail-page-store';
 
-const calculateTime = (time):string => {
-    const today = dayjs().toISOString();
-    const createdTime = iso8601Formatter(time, 'UTC');
-    const todayTime = iso8601Formatter(today, 'UTC');
-    const timeForCalculate = dayjs(todayTime).diff(createdTime, 'minute');
-    const days = Math.floor((timeForCalculate / 1440) % 365);
-    const hours = Math.floor((timeForCalculate / 60) % 24);
-    const minutes = Math.floor(timeForCalculate % 60);
-    return `${days}d ${hours}h ${minutes}m`;
-};
-const alertPageStore = useAlertPageStore();
-const alertPageState = alertPageStore.state;
+const alertDetailPageStore = useAlertDetailPageStore();
+const alertDetailPageState = alertDetailPageStore.state;
 
+const storeState = reactive({
+    alertInfo: computed<AlertModel>(() => alertDetailPageState.alertInfo),
+});
 const state = reactive({
     alertState: 'TRIGGERED',
     alertUrgency: 'HIGH',
-    reassignModalVisible: false,
-    duration: computed<string>(() => calculateTime(alertPageState.alertData?.created_at)),
+    duration: computed<string>(() => calculateTime(storeState.alertInfo?.created_at)),
+
     alertStateList: computed<SelectDropdownMenuItem[]>(() => ([
         { name: ALERT_STATE.TRIGGERED, label: i18n.t('ALERT_MANAGER.ALERTS.TRIGGERED') },
         { name: ALERT_STATE.ACKNOWLEDGED, label: i18n.t('ALERT_MANAGER.ALERTS.ACKNOWLEDGED') },
@@ -46,37 +40,65 @@ const state = reactive({
     ])),
 });
 
-const handleChangeAlertState = async (alertState: AlertState) => {
-    console.log('TODO: handleChangeAlertState', alertState);
+const calculateTime = (time):string => {
+    const today = dayjs().toISOString();
+    const createdTime = iso8601Formatter(time, 'UTC');
+    const todayTime = iso8601Formatter(today, 'UTC');
+    const timeForCalculate = dayjs(todayTime).diff(createdTime, 'minute');
+    const days = Math.floor((timeForCalculate / 1440) % 365);
+    const hours = Math.floor((timeForCalculate / 60) % 24);
+    const minutes = Math.floor(timeForCalculate % 60);
+    return `${days}d ${hours}h ${minutes}m`;
 };
 
-const handleChangeAlertUrgency = async (alertUrgency: AlertUrgency) => {
-    console.log('TODO: changeAlertUrgency', alertUrgency);
+const handleChangeAlertState = async (alertState: AlertState) => {
+    await alertDetailPageStore.updateAlertDetail({
+        alert_id: storeState.alertInfo.alert_id,
+        state: alertState,
+    });
 };
+const handleChangeAlertUrgency = async (alertUrgency: AlertUrgency) => {
+    await alertDetailPageStore.updateAlertDetail({
+        alert_id: storeState.alertInfo.alert_id,
+        urgency: alertUrgency,
+    });
+};
+
+watch(() => alertDetailPageState.alertInfo, (alertInfo) => {
+    if (!alertInfo) return;
+    state.alertState = alertInfo?.state;
+    state.alertUrgency = alertInfo?.urgency;
+}, { immediate: true });
 </script>
 
 <template>
     <p-pane-layout class="alert-detail-summary flex flex-wrap gap-4 w-full">
         <div class="content-wrapper">
             <span class="title">{{ $t('ALERT_MANAGER.ALERTS.LABEL_STATE') }}</span>
-            <p-select-dropdown
-                :menu="state.alertStateList"
-                :selected="state.alertState"
-                class="state-dropdown"
-                @select="handleChangeAlertState"
+            <p-badge v-if="state.alertState === ALERT_STATE.ERROR"
+                     style-type="alert"
+                     badge-type="solid-outline"
+                     class="mt-1.5"
+            >
+                Error
+            </p-badge>
+            <p-select-dropdown v-else
+                               :menu="state.alertStateList"
+                               :selected.sync="state.alertState"
+                               class="state-dropdown"
+                               :class="{'triggered': state.alertState === ALERT_STATE.TRIGGERED}"
+                               @select="handleChangeAlertState"
             >
                 <template #dropdown-button>
-                    <span :class="{'text-alert': state.alertState === ALERT_STATE.TRIGGERED}">
-                        {{ state.alertStateList.find(d => d.name === state.alertState).label }}
-                    </span>
+                    <span class="button-text">{{ state.alertStateList.find(d => d.name === state.alertState)?.label }}</span>
                 </template>
             </p-select-dropdown>
         </div>
         <div class="content-wrapper">
             <span class="title">{{ $t('ALERT_MANAGER.ALERTS.LABEL_URGENCY') }}</span>
             <p-select-dropdown :menu="state.alertUrgencyList"
-                               :selected="state.alertUrgency"
-                               :disabled="(state.alertState === ALERT_STATE.ERROR || props.manageDisabled)"
+                               :selected.sync="state.alertUrgency"
+                               :disabled="(state.alertState === ALERT_STATE.ERROR)"
                                class="state-dropdown"
                                @select="handleChangeAlertUrgency"
             >
@@ -96,7 +118,7 @@ const handleChangeAlertUrgency = async (alertUrgency: AlertUrgency) => {
                              class="mr-2"
                              :color="red[200]"
                         />
-                        <span>{{ state.alertUrgencyList.find(d => d.name === state.alertUrgency).label }}</span>
+                        <span>{{ state.alertUrgencyList.find(d => d.name === state.alertUrgency)?.label }}</span>
                     </span>
                 </template>
             </p-select-dropdown>
@@ -119,8 +141,20 @@ const handleChangeAlertUrgency = async (alertUrgency: AlertUrgency) => {
         }
         .state-dropdown {
             width: 9rem;
-            .text-alert, .selected-urgency {
+            .selected-urgency {
                 @apply flex items-center;
+            }
+        }
+
+        /* custom design-system component - p-select-dropdown */
+        :deep(.p-select-dropdown) {
+            &.triggered {
+                .dropdown-button {
+                    @apply bg-alert text-white border-none;
+                }
+                .button-text, .arrow-button {
+                    @apply text-white;
+                }
             }
         }
     }
