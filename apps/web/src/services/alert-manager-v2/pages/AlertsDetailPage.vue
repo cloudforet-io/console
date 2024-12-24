@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { defineProps } from 'vue';
+import { defineProps, onUnmounted, watch } from 'vue';
 
 import AlertDetailInfoTable from '@/services/alert-manager-v2/components/AlertDetailInfoTable.vue';
 import AlertDetailNote from '@/services/alert-manager-v2/components/AlertDetailNote.vue';
 import AlertDetailSummary from '@/services/alert-manager-v2/components/AlertDetailSummary.vue';
 import AlertDetailTabs from '@/services/alert-manager-v2/components/AlertDetailTabs.vue';
 import AlertsDetailHeader from '@/services/alert-manager-v2/components/AlertsDetailHeader.vue';
+import { useAlertDetailPageStore } from '@/services/alert-manager-v2/stores/alert-detail-page-store';
 
 interface Props {
     alertId: string;
@@ -14,15 +15,26 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     alertId: '',
 });
+
+const alertDetailPageStore = useAlertDetailPageStore();
+
+watch(() => props.alertId, async (alertId) => {
+    if (!alertId) return;
+    await alertDetailPageStore.fetchAlertDetail(alertId);
+}, { immediate: true });
+
+onUnmounted(() => {
+    alertDetailPageStore.init();
+    alertDetailPageStore.$dispose();
+});
 </script>
 
 <template>
     <div class="alerts-detail-page">
-        <alerts-detail-header :alert-id="props.alertId" />
+        <alerts-detail-header />
         <div class="flex gap-4 items-start">
             <div class="flex w-8/12 flex-col gap-4">
                 <alert-detail-summary />
-
                 <alert-detail-info-table />
                 <alert-detail-tabs />
             </div>

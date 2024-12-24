@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-
 import {
     PBadge, PDefinitionTable, PPaneLayout,
 } from '@cloudforet/mirinae';
@@ -9,60 +8,84 @@ import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/table
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import { ALERT_SEVERITY } from '@/schema/alert-manager/alert/constants';
+import type { AlertModel } from '@/schema/alert-manager/alert/model';
+import type { AlertSeverityType } from '@/schema/alert-manager/alert/type';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
 
+
 import AlertDetailInfoTableDescription from '@/services/alert-manager-v2/components/AlertDetailInfoTableDescription.vue';
-import { ALERT_SEVERITY_COLORS } from '@/services/alert-manager-v2/constants/common-constant';
+import { useAlertDetailPageStore } from '@/services/alert-manager-v2/stores/alert-detail-page-store';
+
+type BadgeInfo = {
+    badgeType: string;
+    styleType: string;
+};
 
 const userStore = useUserStore();
+const alertDetailPageStore = useAlertDetailPageStore();
+const alertDetailPageState = alertDetailPageStore.state;
 
 const storeState = reactive({
     timezone: computed<string>(() => userStore.state.timezone ?? 'UTC'),
+    alertInfo: computed<AlertModel>(() => alertDetailPageState.alertInfo),
 });
 const tableState = reactive({
     fields: computed<DefinitionField[]>(() => [
         { name: 'description', label: i18n.t('ALERT_MANAGER.ALERTS.DESC'), disableCopy: true },
         { name: 'rule', label: i18n.t('ALERT_MANAGER.ALERTS.RULE'), disableCopy: true },
         { name: 'severity', label: i18n.t('ALERT_MANAGER.ALERTS.SEVERITY'), disableCopy: true },
-        { name: 'triggered_by', label: i18n.t('ALERT_MANAGER.ALERTS.TRIGGERED_BY'), copyValueFormatter: () => state.data.triggered_by },
-        { name: 'account', label: i18n.t('ALERT_MANAGER.ALERTS.ACCOUNT_ID'), copyValueFormatter: () => state.data.account },
+        { name: 'triggered_by', label: i18n.t('ALERT_MANAGER.ALERTS.TRIGGERED_BY'), copyValueFormatter: () => storeState.alertInfo.triggered_by },
+        { name: 'account', label: i18n.t('ALERT_MANAGER.ALERTS.ACCOUNT_ID'), copyValueFormatter: () => storeState.alertInfo.account },
         { name: 'resources', label: i18n.t('ALERT_MANAGER.ALERTS.RESOURCE'), disableCopy: true },
-        { name: 'responder', label: i18n.t('ALERT_MANAGER.ALERTS.RESPONDER') },
         { name: 'created_at', label: i18n.t('ALERT_MANAGER.ALERTS.CREATED'), disableCopy: true },
         { name: 'acknowledged_at', label: i18n.t('ALERT_MANAGER.ALERTS.ACKNOWLEDGED'), disableCopy: true },
         { name: 'resolved_at', label: i18n.t('ALERT_MANAGER.ALERTS.RESOLVED'), disableCopy: true },
     ]),
 });
-const state = reactive({
-    data: {
-        alert_id: 'alert_id',
-        description: 'description',
-        rule: {},
-        severity: 'CRITICAL',
-        triggered_by: 'webhook-db1678262551',
-        account: '722069360300',
-        resources: [],
-        responder: 'wonny@mz.co.kr',
-        created_at: '2023-11-28 15:06:51',
-        acknowledged_at: '2023-11-28 15:06:51',
-        resolved_at: '2023-11-28 15:06:51',
-    },
-});
+
+const getBadgeInfo = (value: AlertSeverityType): BadgeInfo => {
+    switch (value) {
+    case ALERT_SEVERITY.CRITICAL:
+        return {
+            badgeType: 'outline-solid',
+            styleType: 'alert',
+        };
+    case ALERT_SEVERITY.ERROR:
+        return {
+            badgeType: 'solid',
+            styleType: 'alert',
+        };
+    case ALERT_SEVERITY.INFO:
+        return {
+            badgeType: 'subtle',
+            styleType: 'gray200',
+        };
+    case ALERT_SEVERITY.WARNING:
+        return {
+            badgeType: 'subtle',
+            styleType: 'yellow200',
+        };
+    default:
+        return {} as BadgeInfo;
+    }
+};
 </script>
 
 <template>
     <p-pane-layout class="alert-detail-info-table overflow-hidden pb-10">
         <p-definition-table :fields="tableState.fields"
-                            :data="state.data"
+                            :data="storeState.alertInfo"
                             :skeleton-rows="10"
                             custom-key-width="10rem"
                             style-type="white"
                             block
         >
             <template #data-description>
-                <alert-detail-info-table-description />
+                <alert-detail-info-table-description :value="storeState.alertInfo.description"
+                                                     :alert-id="storeState.alertInfo.alert_id"
+                />
             </template>
             <template #data-rule="{value}">
                 <span v-if="Object.keys(value).length === 0">
@@ -70,9 +93,8 @@ const state = reactive({
                 </span>
             </template>
             <template #data-severity="{value}">
-                <p-badge background-color="white"
-                         :text-color="ALERT_SEVERITY_COLORS[value]"
-                         :outline-color="ALERT_SEVERITY_COLORS[value]"
+                <p-badge :badge-type="getBadgeInfo(value).badgeType"
+                         :style-type="getBadgeInfo(value).styleType"
                 >
                     {{ ALERT_SEVERITY[value] || value }}
                 </p-badge>
@@ -90,15 +112,21 @@ const state = reactive({
                     </p>
                 </template>
             </template>
+            <template #data-triggered_by="{ value }">
+                {{ value || '--' }}
+            </template>
+            <template #data-account="{ value }">
+                {{ value || '--' }}
+            </template>
             <template #data-created_at="{ value }">
                 {{ iso8601Formatter(value, storeState.timezone) }}
             </template>
             <template #data-acknowledged_at="{ value }">
-                <span v-if="state.data.acknowledged_at"> {{ iso8601Formatter(value, storeState.timezone) }}</span>
+                <span v-if="storeState.alertInfo.acknowledged_at"> {{ iso8601Formatter(value, storeState.timezone) }}</span>
                 <span v-else>--</span>
             </template>
             <template #data-resolved_at="{ value }">
-                <span v-if="state.data.resolved_at"> {{ iso8601Formatter(value, storeState.timezone) }}</span>
+                <span v-if="storeState.alertInfo.resolved_at"> {{ iso8601Formatter(value, storeState.timezone) }}</span>
                 <span v-else>--</span>
             </template>
         </p-definition-table>

@@ -1,21 +1,43 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import {
+    onMounted, reactive,
+} from 'vue';
 
 import {
     PTextarea, PButton, PTextBeautifier, PCollapsiblePanel,
 } from '@cloudforet/mirinae';
 
+import { useAlertDetailPageStore } from '@/services/alert-manager-v2/stores/alert-detail-page-store';
+
+interface Props {
+    value: string
+    alertId: string
+}
+const props = withDefaults(defineProps<Props>(), {
+    value: '',
+    alertId: '',
+});
+
+const alertDetailPageStore = useAlertDetailPageStore();
+
 const state = reactive({
     isEditMode: false,
-    dataForUpdate: 'dataForUpdate',
+    dataForUpdate: '',
 });
 
 const handleClickEditModeButton = (value: boolean) => {
     state.isEditMode = value;
 };
-const handleClickSaveButton = () => {
-    console.log('TODO: handleClickSaveButton');
+const handleClickSaveButton = async () => {
+    await alertDetailPageStore.updateAlertDetail({
+        alert_id: props.alertId,
+        description: state.dataForUpdate,
+    });
 };
+
+onMounted(() => {
+    state.dataForUpdate = props.value;
+});
 </script>
 
 <template>
@@ -25,11 +47,11 @@ const handleClickSaveButton = () => {
         <div v-if="!state.isEditMode"
              class="content-wrapper"
         >
-            <p-collapsible-panel :line-clamp="10"
+            <p-collapsible-panel :line-clamp="5"
                                  class="collapsible-panel"
             >
                 <p-text-beautifier class="whitespace-pre-line"
-                                   value="description"
+                                   :value="props.value || '--'"
                 />&zwnj;
             </p-collapsible-panel>
             <p-button style-type="tertiary"
@@ -43,7 +65,7 @@ const handleClickSaveButton = () => {
              class="content-wrapper"
         >
             <p-textarea v-model="state.dataForUpdate"
-                        class="min-h-60"
+                        class="update-description"
             />
             <div class="buttons-wrapper flex ml-auto gap-2">
                 <p-button style-type="secondary"
@@ -74,6 +96,9 @@ const handleClickSaveButton = () => {
     &.edit-mode {
         .content-wrapper {
             @apply flex-col gap-2;
+        }
+        .update-description {
+            min-height: 13rem;
         }
     }
 }

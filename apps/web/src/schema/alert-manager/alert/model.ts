@@ -3,6 +3,7 @@ import type {
     AlertSeverityType,
     AlertStateType, AlertTriggeredType,
     AlertUrgencyType,
+    AlertEventActionType,
 } from '@/schema/alert-manager/alert/type';
 
 export interface AlertModel {
@@ -29,5 +30,13 @@ export interface AlertModel {
     updated_at: string;
     acknowledged_at: string;
     resolved_at: string;
+}
 
+export interface AlertEventModel {
+    alert_id: string;
+    action: AlertEventActionType;
+    description: string;
+    event_info: AlertModel;
+    created_by: string;
+    created_at: string;
 }
