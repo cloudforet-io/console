@@ -113,7 +113,7 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
                            show-select-marker
                            is-filterable
                            is-fixed-width
-                           page-size="10"
+                           :page-size="10"
                            multi-selectable
                            appearance-type="badge"
                            show-delete-all-button

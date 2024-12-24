@@ -11,6 +11,8 @@ import type { DashboardVariableSchemaProperty, DashboardVars } from '@/schema/da
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
+import ChangedMark from '@/common/components/marks/ChangedMark.vue';
+
 import DashboardGlobalVariableFilter
     from '@/services/dashboards/components/dashboard-detail/DashboardGlobalVariableFilter.vue';
 import DashboardManageVariableOverlay from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableOverlay.vue';
@@ -98,13 +100,9 @@ const handleResetVariables = () => {
          :class="{'dashboard-variables-select-dropdown': true, 'detail-page': !props.widgetMode}"
     >
         <template v-for="(property, idx) in state.newGlobalVariables">
-            <div :key="`${property.name}-${idx}`"
-                 class="variable-selector-box"
-            >
+            <div :key="`${property.name}-${idx}`">
                 <dashboard-global-variable-filter :variable="property" />
-                <span class="circle-mark"
-                      :class="{'changed': state.modifiedVariablesSchemaProperties.includes(property.key)}"
-                />
+                <changed-mark v-if="state.modifiedVariablesSchemaProperties.includes(property.key)" />
             </div>
         </template>
         <p-text-button style-type="highlight"
@@ -141,19 +139,6 @@ const handleResetVariables = () => {
 .dashboard-variables-select-dropdown {
     &.detail-page {
         @apply w-full;
-    }
-    .variable-selector-box {
-        position: relative;
-        .circle-mark {
-            &.changed {
-                @apply bg-secondary1 rounded-xl border-white border-2;
-                position: absolute;
-                width: 0.75rem;
-                height: 0.75rem;
-                right: -0.25rem;
-                top: -0.25rem;
-            }
-        }
     }
     .reset-button {
         @apply flex items-center;

@@ -68,6 +68,27 @@ export const Basic: Story = {
     }),
 };
 
+export const Sync: Story = {
+    render: () => ({
+        components: { PCodeEditor },
+        template: `
+            <div class="h-full w-full overflow p-8">
+                <p-code-editor :code="sampleCode" 
+                               @update:code="sampleCode = $event" 
+                />
+            </div>
+        `,
+        setup() {
+            const state = reactive({
+                sampleCode,
+            });
+            return {
+                ...toRefs(state),
+            };
+        },
+    }),
+};
+
 export const Loading: Story = {
     render: () => ({
         components: { PCodeEditor, PButton },
