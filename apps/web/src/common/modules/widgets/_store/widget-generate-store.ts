@@ -26,6 +26,7 @@ import getRandomId from '@/lib/random-id-generator';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import {
+    DATA_TABLE_OPERATOR,
     DATA_TABLE_TYPE,
     DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP,
 } from '@/common/modules/widgets/_constants/data-table-constant';
@@ -38,7 +39,7 @@ import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-fi
 import type {
     DataTableOperator,
     WidgetState,
-    DataTableTransformOptions,
+    DataTableTransformOptions, ConcatOptions, JoinOptions,
 } from '@/common/modules/widgets/types/widget-model';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
@@ -47,6 +48,11 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashbo
 type DataTableModel = PublicDataTableModel|PrivateDataTableModel;
 type WidgetModel = PublicWidgetModel|PrivateWidgetModel;
 type WidgetUpdateParameters = PublicWidgetUpdateParameters|PrivateWidgetUpdateParameters;
+interface DataTableReference {
+    data_table_id: string;
+    parents: string[];
+    children: string[];
+}
 export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const dashboardDetailStore = useDashboardDetailInfoStore();
     const dashboardDetailGetters = dashboardDetailStore.getters;
@@ -84,6 +90,73 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         }),
         widgetState: computed<WidgetState|undefined>(() => state.widget?.state),
         allDataTableInvalid: computed<boolean>(() => Object.values(state.allDataTableInvalidMap).some((invalid) => invalid)),
+        dataTableReferenceMap: computed<Record<string, DataTableReference>>(() => {
+            const referenceMap = {} as Record<string, DataTableReference>;
+            const savedDataTables = state.dataTables.filter((dataTable) => dataTable.data_table_id && !dataTable.data_table_id.startsWith('UNSAVED-')) as DataTableModel[];
+            const MULTIPE_DATA_TABLE_OPERATORS = [DATA_TABLE_OPERATOR.CONCAT, DATA_TABLE_OPERATOR.JOIN];
+            savedDataTables.forEach((dataTable) => {
+                if (!referenceMap[dataTable.data_table_id]) {
+                    referenceMap[dataTable.data_table_id] = setIniitialDataTableReferenceProperty(dataTable.data_table_id);
+                }
+
+                if (dataTable.data_type === DATA_TABLE_TYPE.TRANSFORMED) {
+                    if (MULTIPE_DATA_TABLE_OPERATORS.includes(dataTable.operator)) {
+                        const [firstReferenceDataTableId, secondReferenceDataTableId] = (dataTable.options[dataTable.operator] as ConcatOptions|JoinOptions).data_tables;
+                        if (!referenceMap[firstReferenceDataTableId]) {
+                            referenceMap[firstReferenceDataTableId] = setIniitialDataTableReferenceProperty(firstReferenceDataTableId);
+                        }
+                        if (!referenceMap[secondReferenceDataTableId]) {
+                            referenceMap[secondReferenceDataTableId] = setIniitialDataTableReferenceProperty(secondReferenceDataTableId);
+                        }
+                        referenceMap[firstReferenceDataTableId] = {
+                            ...referenceMap[firstReferenceDataTableId],
+                            children: [
+                                ...referenceMap[firstReferenceDataTableId].children,
+                                dataTable.data_table_id,
+                            ],
+                        };
+                        referenceMap[secondReferenceDataTableId] = {
+                            ...referenceMap[secondReferenceDataTableId],
+                            children: [
+                                ...referenceMap[secondReferenceDataTableId].children,
+                                dataTable.data_table_id,
+                            ],
+                        };
+                        referenceMap[dataTable.data_table_id] = {
+                            ...referenceMap[dataTable.data_table_id],
+                            parents: [
+                                firstReferenceDataTableId,
+                                secondReferenceDataTableId,
+                            ],
+                        };
+                    } else {
+                        const referenceDataTableId = dataTable.options[dataTable.operator].data_table_id;
+                        if (!referenceMap[referenceDataTableId]) {
+                            referenceMap[referenceDataTableId] = setIniitialDataTableReferenceProperty(referenceDataTableId);
+                        }
+                        referenceMap[referenceDataTableId] = {
+                            ...referenceMap[referenceDataTableId],
+                            children: [
+                                ...referenceMap[referenceDataTableId].children,
+                                dataTable.data_table_id,
+                            ],
+                        };
+                        referenceMap[dataTable.data_table_id] = {
+                            ...referenceMap[dataTable.data_table_id],
+                            parents: [referenceDataTableId],
+                        };
+                    }
+                }
+            });
+            return referenceMap;
+        }),
+    });
+
+    /* Helper */
+    const setIniitialDataTableReferenceProperty = (dataTableId: string): DataTableReference => ({
+        data_table_id: dataTableId,
+        parents: [],
+        children: [],
     });
 
     /* Mutations */
@@ -260,35 +333,8 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 }
                 state.dataTables = state.dataTables.map((dataTable) => (dataTable.data_table_id === result.data_table_id ? result : dataTable));
 
-                // Update Referenced Transformed DataTable
-                if (!preventReferenceUpdating) {
-                    const referencedDataTableIds = [] as string[];
-                    state.dataTables.forEach((dataTable) => {
-                        const transformDataTalbeOptions = dataTable.options as DataTableTransformOptions;
-                        const isReferenced = dataTable.data_type === 'TRANSFORMED'
-                            && !dataTable?.data_table_id?.startsWith('UNSAVED-')
-                            && (
-                                transformDataTalbeOptions?.JOIN?.data_tables?.includes(updateParams.data_table_id)
-                                || transformDataTalbeOptions?.CONCAT?.data_tables?.includes(updateParams.data_table_id)
-                                || transformDataTalbeOptions?.QUERY?.data_table_id === updateParams.data_table_id
-                                || transformDataTalbeOptions?.EVAL?.data_table_id === updateParams.data_table_id
-                            );
-                        if (isReferenced) referencedDataTableIds.push(dataTable.data_table_id as string);
-                    });
-                    if (referencedDataTableIds.length) {
-                        await Promise.all(referencedDataTableIds.map((dataTableId) => {
-                            const dataTable = state.dataTables.find((_dataTable) => _dataTable.data_table_id === dataTableId) as PublicDataTableModel|PrivateDataTableModel;
-                            actions.updateDataTable({
-                                data_table_id: dataTable.data_table_id,
-                                name: dataTable.name,
-                                options: {
-                                    ...dataTable.options,
-                                },
-                            });
-                            return null;
-                        }));
-                    }
-                }
+                // Cascade Update Referenced Transformed DataTable
+                if (!preventReferenceUpdating) await actions.cascadeUpdateDataTable(result.data_table_id);
 
                 return result;
             } catch (e: any) {
@@ -296,6 +342,30 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 ErrorHandler.handleError(e);
                 return undefined;
             }
+        },
+        cascadeUpdateDataTable: async (dataTableId: string) => {
+            const isPrivate = state.widgetId.startsWith('private');
+            const fetcher = isPrivate
+                ? SpaceConnector.clientV2.dashboard.privateDataTable.update<DataTableUpdateParameters, DataTableModel>
+                : SpaceConnector.clientV2.dashboard.publicDataTable.update<DataTableUpdateParameters, DataTableModel>;
+
+            const children = getters.dataTableReferenceMap[dataTableId].children;
+            return children.reduce((chain, childId) => chain.then(async () => {
+                const currentDataTable = state.dataTables.find(
+                    (_dataTable) => _dataTable.data_table_id === childId,
+                ) as DataTableModel;
+
+                const result = await fetcher({
+                    data_table_id: childId,
+                    name: currentDataTable?.name,
+                    options: {
+                        ...(currentDataTable?.options ?? {}),
+                    },
+                });
+                state.dataTables = state.dataTables.map((dataTable) => (dataTable.data_table_id === result.data_table_id ? result : dataTable));
+
+                return actions.cascadeUpdateDataTable(childId);
+            }), Promise.resolve());
         },
         deleteDataTable: async (deleteParams: DataTableDeleteParameters, unsaved?: boolean) => {
             if (unsaved) {
