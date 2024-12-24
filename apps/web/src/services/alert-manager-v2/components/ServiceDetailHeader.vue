@@ -16,11 +16,12 @@ import { gray } from '@/styles/colors';
 
 import ServiceDetailDeleteModal from '@/services/alert-manager-v2/components/ServiceDetailDeleteModal.vue';
 import ServiceDetailEditModal from '@/services/alert-manager-v2/components/ServiceDetailEditModal.vue';
+import ServiceDetailMemberModal from '@/services/alert-manager-v2/components/ServiceDetailMemberModal.vue';
 import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
 import type { Service } from '@/services/alert-manager-v2/types/alert-manager-type';
 
-type ModalType = 'edit' | 'delete';
+type ModalType = 'edit' | 'delete' | 'member';
 
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
@@ -51,7 +52,7 @@ const modalState = reactive({
     type: '' as ModalType,
 });
 
-const handleSelectDropdownMenu = (type: ModalType) => {
+const handleActionModal = (type: ModalType) => {
     modalState.modalVisible = true;
     modalState.type = type;
 };
@@ -62,83 +63,99 @@ const handleGoBackButton = () => {
 
 <template>
     <div class="service-detail-header">
-        <p-heading-layout>
-            <template #heading>
-                <p-heading :title="storeState.serviceInfo.name"
-                           show-back-button
-                           @click-back-button="handleGoBackButton"
+        <div class="content">
+            <p-heading-layout>
+                <template #heading>
+                    <p-heading :title="storeState.serviceInfo.name"
+                               show-back-button
+                               @click-back-button="handleGoBackButton"
+                    >
+                        <template #title-right-extra>
+                            <p-select-dropdown :menu="state.menuItems"
+                                               style-type="icon-button"
+                                               button-icon="ic_ellipsis-horizontal"
+                                               use-fixed-menu-style
+                                               class="bg-white rounded-full border border-gray-300"
+                                               reset-selected-on-unmounted
+                                               size="sm"
+                                               @select="handleActionModal"
+                            />
+                        </template>
+                    </p-heading>
+                </template>
+                <template #extra>
+                    <p-link :to="getProperRouteLocation({ name: ALERT_MANAGER_ROUTE_V2.ALERTS._NAME })"
+                            action-icon="internal-link"
+                            new-tab
+                            class="text-label-md"
+                    >
+                        <span class="pr-0.5">{{ $t('ALERT_MANAGER.SERVICE.SHOW_IN_ALERTS') }}</span>
+                    </p-link>
+                </template>
+            </p-heading-layout>
+            <div class="service-info-wrapper">
+                <div class="service-member flex items-center text-gray-700 gap-0.5"
+                     @click="handleActionModal('member')"
                 >
-                    <template #title-right-extra>
-                        <p-select-dropdown :menu="state.menuItems"
-                                           style-type="icon-button"
-                                           button-icon="ic_ellipsis-horizontal"
-                                           use-fixed-menu-style
-                                           class="bg-white rounded-full border border-gray-300"
-                                           reset-selected-on-unmounted
-                                           size="sm"
-                                           @select="handleSelectDropdownMenu"
-                        />
-                    </template>
-                </p-heading>
-            </template>
-            <template #extra>
-                <p-link :to="getProperRouteLocation({ name: ALERT_MANAGER_ROUTE_V2.ALERTS._NAME })"
-                        action-icon="internal-link"
-                        new-tab
-                        class="text-label-md"
-                >
-                    <span class="pr-0.5">{{ $t('ALERT_MANAGER.SERVICE.SHOW_IN_ALERTS') }}</span>
-                </p-link>
-            </template>
-        </p-heading-layout>
-        <div class="service-info-wrapper">
-            <div class="flex items-center text-gray-700 gap-0.5">
-                <p-i class="select-marker"
-                     name="ic_member"
-                     width="0.75rem"
-                     height="0.75rem"
+                    <p-i class="select-marker"
+                         name="ic_member"
+                         width="0.75rem"
+                         height="0.75rem"
+                    />
+                    <span>{{ storeState.serviceInfo.members[MEMBERS_TYPE.USER_GROUP]?.length }}</span>
+                    <span>{{ $t('ALERT_MANAGER.SERVICE.USER_GROUP') }}</span>
+                    <span> / </span>
+                    <span>{{ storeState.serviceInfo.members[MEMBERS_TYPE.USER]?.length }}</span>
+                    <span>{{ $t('ALERT_MANAGER.SERVICE.MEMBERS') }}</span>
+                </div>
+                <p-i v-if="storeState.serviceInfo?.description"
+                     name="ic_dot"
+                     width="0.125rem"
+                     height="0.125rem"
+                     :color="gray[500]"
+                     class="dot"
                 />
-                <span>{{ storeState.serviceInfo.members[MEMBERS_TYPE.USER_GROUP]?.length }}</span>
-                <span>{{ $t('ALERT_MANAGER.SERVICE.USER_GROUP') }}</span>
-                <span> / </span>
-                <span>{{ storeState.serviceInfo.members[MEMBERS_TYPE.USER]?.length }}</span>
-                <span>{{ $t('ALERT_MANAGER.SERVICE.MEMBERS') }}</span>
+                <p class="flex-1 truncate">
+                    <p-tooltip position="bottom"
+                               tag="p"
+                               class="flex-1 truncate"
+                               :contents="storeState.serviceInfo?.description || ''"
+                    >
+                        {{ storeState.serviceInfo?.description }}
+                    </p-tooltip>
+                </p>
             </div>
-            <p-i v-if="storeState.serviceInfo?.description"
-                 name="ic_dot"
-                 width="0.125rem"
-                 height="0.125rem"
-                 :color="gray[500]"
-                 class="dot"
-            />
-            <p class="flex-1 truncate">
-                <p-tooltip position="bottom"
-                           tag="p"
-                           class="flex-1 truncate"
-                           :contents="storeState.serviceInfo?.description || ''"
-                >
-                    {{ storeState.serviceInfo?.description }}
-                </p-tooltip>
-            </p>
         </div>
-        <service-detail-edit-modal v-if="modalState.type === 'edit'"
-                                   :visible.sync="modalState.modalVisible"
-        />
-        <service-detail-delete-modal v-if="modalState.type === 'delete'"
-                                     :visible.sync="modalState.modalVisible"
-        />
+        <div v-if="modalState.modalVisible">
+            <service-detail-edit-modal v-if="modalState.type === 'edit'"
+                                       :visible.sync="modalState.modalVisible"
+            />
+            <service-detail-delete-modal v-if="modalState.type === 'delete'"
+                                         :visible.sync="modalState.modalVisible"
+            />
+            <service-detail-member-modal v-if="modalState.type === 'member'"
+                                         :visible.sync="modalState.modalVisible"
+            />
+        </div>
     </div>
 </template>
 
 <style scoped lang="postcss">
 .service-detail-header {
-    @apply flex flex-col;
-    padding-bottom: 1.5rem;
-    gap: 0.375rem;
-    .service-info-wrapper {
-        @apply flex items-center text-label-sm;
-        padding-left: 2.5rem;
-        gap: 0.5rem;
+    .content {
+        @apply flex flex-col;
+        padding-bottom: 1.5rem;
+        gap: 0.375rem;
+        .service-info-wrapper {
+            @apply flex items-center text-label-sm;
+            padding-left: 2.5rem;
+            gap: 0.5rem;
+            .service-member {
+                &:hover {
+                    @apply cursor-pointer;
+                }
+            }
+        }
     }
 }
 </style>
