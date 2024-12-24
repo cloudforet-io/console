@@ -16,6 +16,7 @@ const table: WidgetConfig = {
         dataField: {
             options: {
                 multiSelectable: true,
+                allSelected: true,
             },
         },
         groupBy: {
@@ -28,12 +29,6 @@ const table: WidgetConfig = {
     },
     optionalFieldsSchema: {
         comparison: {},
-        subTotal: {
-            options: {
-                toggle: false,
-                default: true,
-            },
-        },
         total: {
             options: {
                 toggle: false,
