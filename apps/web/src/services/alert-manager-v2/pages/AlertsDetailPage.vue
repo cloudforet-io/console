@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps, watch } from 'vue';
+import { defineProps, onUnmounted, watch } from 'vue';
 
 import AlertDetailInfoTable from '@/services/alert-manager-v2/components/AlertDetailInfoTable.vue';
 import AlertDetailNote from '@/services/alert-manager-v2/components/AlertDetailNote.vue';
@@ -22,6 +22,11 @@ watch(() => props.alertId, async (alertId) => {
     if (!alertId) return;
     await alertDetailPageStore.fetchAlertDetail(alertId);
 }, { immediate: true });
+
+onUnmounted(() => {
+    alertDetailPageStore.init();
+    alertDetailPageStore.$dispose();
+});
 </script>
 
 <template>

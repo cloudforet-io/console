@@ -19,6 +19,9 @@ export const useAlertDetailPageStore = defineStore('page-alert-detail', () => {
         alertInfo: {} as AlertModel,
     });
     const actions = {
+        async init() {
+            state.alertInfo = {} as AlertModel;
+        },
         async fetchAlertDetail(alertId: string): Promise<void|Error> {
             try {
                 state.alertInfo = await SpaceConnector.clientV2.alertManager.alert.get<AlertGetParameters, AlertModel>({
