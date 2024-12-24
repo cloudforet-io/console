@@ -16,6 +16,7 @@ on:
       - '**/.lintstagedrc.js'
       - '**/*.md'
       - '**/*.env'
+      - '**/__tests__/**/*.test.ts'
     branches:
       - master
       - feature-*
