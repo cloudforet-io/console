@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { onUnmounted, reactive } from 'vue';
 
 import { PHeadingLayout, PHeading, PButton } from '@cloudforet/mirinae';
 
 import AlertCreateModal from '@/services/alert-manager-v2/components/AlertCreateModal.vue';
 import AlertsManagementTable from '@/services/alert-manager-v2/components/AlertsManagementTable.vue';
+import { useAlertPageStore } from '@/services/alert-manager-v2/stores/alert-page-store';
+
+const alertPageStore = useAlertPageStore();
 
 const state = reactive({
     createModalVisible: false,
@@ -13,6 +16,11 @@ const state = reactive({
 const handleClickCreateButton = () => {
     state.createModalVisible = true;
 };
+
+onUnmounted(() => {
+    alertPageStore.init();
+    alertPageStore.$dispose();
+});
 </script>
 
 <template>
