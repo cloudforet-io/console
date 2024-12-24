@@ -177,7 +177,7 @@ const fetchWidgetData = async (params: PrivateWidgetLoadParameters|PublicWidgetL
 };
 
 const queryKey = computed(() => [
-    'widget-load-line-chart',
+    'widget-load-stacked-column-chart',
     props.widgetId,
     {
         start: dateRange.value.start,
@@ -196,7 +196,7 @@ const queryResult = useQuery({
         widget_id: props.widgetId,
         granularity: widgetOptionsState.granularityInfo?.granularity,
         group_by: widgetOptionsState.xAxisInfo?.data ? [widgetOptionsState.xAxisInfo?.data] : [],
-        sort: getWidgetLoadApiQuerySort(widgetOptionsState.xAxisInfo?.data as string, widgetOptionsState.dataFieldInfo.data),
+        sort: getWidgetLoadApiQuerySort(widgetOptionsState.xAxisInfo?.data as string, widgetOptionsState.dataFieldInfo?.data as string[]),
         page: { start: 0, limit: widgetOptionsState.xAxisInfo?.count },
         vars: props.dashboardVars,
         ...getWidgetLoadApiQueryDateRange(widgetOptionsState.granularityInfo?.granularity, dateRange.value),
