@@ -2989,6 +2989,7 @@
 						"TELEGRAM": "Telegram"
 					},
 					"TITLE": "Create Notification",
+					"UPDATE": "Update",
 					"UPDATE_TITLE": "Update Notification"
 				},
 				"CREATE_USER_GROUP": {
