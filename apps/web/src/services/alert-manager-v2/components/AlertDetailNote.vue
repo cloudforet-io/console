@@ -1,53 +1,95 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PCollapsibleList, PPaneLayout, PHeading, PTextarea, PSelectDropdown, PTextBeautifier, PHeadingLayout,
 } from '@cloudforet/mirinae';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { NoteModel } from '@/schema/monitoring/note/model';
+
+
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { AlertModel } from '@/schema/alert-manager/alert/model';
+import type { NoteCreateParameters } from '@/schema/alert-manager/note/api-verbs/create';
+import type { NoteDeleteParameters } from '@/schema/alert-manager/note/api-verbs/delete';
+import type { NoteListParameters } from '@/schema/alert-manager/note/api-verbs/list';
+import type { NoteModel } from '@/schema/alert-manager/note/model';
 
 import { useUserStore } from '@/store/user/user-store';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { useAlertDetailPageStore } from '@/services/alert-manager-v2/stores/alert-detail-page-store';
+
 const userStore = useUserStore();
+const alertDetailPageStore = useAlertDetailPageStore();
+const alertDetailPageState = alertDetailPageStore.state;
 
 const storeState = reactive({
     timezone: computed<string>(() => userStore.state.timezone ?? 'UTC'),
+    alertInfo: computed<AlertModel>(() => alertDetailPageState.alertInfo),
 });
 const state = reactive({
-    noteInput: '',
     noteList: [] as NoteModel[],
     menuItems: [
         {
             label: 'Delete', name: 'delete',
         },
     ],
-    selectedNoteIdForDelete: '',
+    noteInput: '',
+    selectedNoteId: '',
 });
 
 const handleChangeNoteInput = (e) => {
     state.noteInput = e.target?.value;
 };
-const handleCreateNote = async () => {
-    console.log('TODO: handleCreateNote');
-};
-
-const fetchNoteList = async () => {
-    console.log('TODO: fetchNoteList');
-};
-const handleDeleteModal = () => {
-    console.log('TODO: handleDeleteModal');
-};
-
 const handleSelect = (noteId) => {
-    state.selectedNoteIdForDelete = noteId;
+    state.selectedNoteId = noteId;
     handleDeleteModal();
 };
 
-(async () => {
+const handleCreateNote = async () => {
+    try {
+        await SpaceConnector.clientV2.alertManager.note.create<NoteCreateParameters, NoteModel>({
+            alert_id: storeState.alertInfo.alert_id,
+            note: state.noteInput,
+        });
+        await fetchNoteList();
+    } catch (e: any) {
+        ErrorHandler.handleError(e, true);
+    } finally {
+        state.noteInput = '';
+    }
+};
+const handleDeleteModal = async () => {
+    try {
+        await SpaceConnector.clientV2.alertManager.note.delete<NoteDeleteParameters, NoteModel>({
+            note_id: state.selectedNoteId,
+        });
+        await fetchNoteList();
+    } catch (e: any) {
+        ErrorHandler.handleError(e, true);
+    } finally {
+        state.selectedNoteId = '';
+    }
+};
+const fetchNoteList = async () => {
+    try {
+        const { results } = await SpaceConnector.clientV2.alertManager.note.list<NoteListParameters, ListResponse<NoteModel>>({
+            alert_id: storeState.alertInfo.alert_id,
+        });
+        state.noteList = results || [];
+    } catch (e: any) {
+        ErrorHandler.handleError(e, true);
+        state.noteList = [];
+    }
+};
+
+watch(() => storeState.alertInfo.alert_id, async (id) => {
+    if (!id) return;
     await fetchNoteList();
-})();
+}, { immediate: true });
 </script>
 
 <template>
@@ -60,7 +102,7 @@ const handleSelect = (noteId) => {
             </template>
         </p-heading-layout>
         <article class="flex flex-col mt-2">
-            <article class="pt-2 px-4 pb-4">
+            <article class="pb-2">
                 <p-textarea :value="state.noteInput"
                             @input="handleChangeNoteInput"
                 />
