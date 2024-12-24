@@ -3,6 +3,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PHorizontalLayout } from '@cloudforet/mirinae';
 
 import UserGroupChannelCreateModal from '@/services/iam/components/UserGroupChannelCreateModal.vue';
+import UserGroupChannelDeleteDoubleCheckModal
+    from '@/services/iam/components/UserGroupChannelDeleteDoubleCheckModal.vue';
 import UserGroupChannelSetModal from '@/services/iam/components/UserGroupChannelSetModal.vue';
 import UserGroupDeleteDoubleCheckModal from '@/services/iam/components/UserGroupDeleteDoubleCheckModal.vue';
 import UserGroupManagementAddUsersModal from '@/services/iam/components/UserGroupManagementAddUsersModal.vue';
@@ -47,7 +49,8 @@ const refreshUserGroupList = async () => {
         <user-group-delete-double-check-modal @confirm="refreshUserGroupList" />
         <user-per-group-remove-double-check-modal @confirm="refreshUserGroupList" />
         <user-group-channel-create-modal />
-        <user-group-channel-set-modal />
+        <user-group-channel-set-modal @confirm="refreshUserGroupList" />
+        <user-group-channel-delete-double-check-modal @confirm="refreshUserGroupList" />
     </section>
 </template>
 

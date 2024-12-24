@@ -2784,6 +2784,7 @@
 		},
 		"USER": {
 			"ADD": "Add",
+			"ASSIGN_TO_USER_GROUP": "Assign to User Group",
 			"FORM": {
 				"ADD_TAG": "Add Tag",
 				"ADD_WORKSPACE": "New users will have access to",
@@ -2837,6 +2838,7 @@
 				"ADMINISTRATOR": "Administrator",
 				"ALT_S_CHANGE_ROLE": "Workspace role successfully changed",
 				"ASSIGNED_ROLES": "Assigned Roles",
+				"ASSIGNED_USER_GROUP": "Assigned User Group",
 				"ASSOCIATED_PROJECTS": "Associated Projects",
 				"ASSOCIATED_WORKSPACE": "Associated Workspaces",
 				"BASE_INFORMATION": "Base Information",
@@ -3022,7 +3024,8 @@
 							"INFO": "You will only receive notifications in the schedule you choose.",
 							"SETTING_MODE": "Setting Mode",
 							"TITLE": "Schedule",
-							"WEEKDAYS": "Weekdays"
+							"WEEKDAYS": "Weekdays",
+							"WEEKEND": "Weekend"
 						},
 						"USER_MODE": {
 							"ALL_MEMBERS": "All Members in Service",
@@ -3042,6 +3045,7 @@
 						"TELEGRAM": "Telegram"
 					},
 					"TITLE": "Create Notification",
+					"UPDATE": "Update",
 					"UPDATE_TITLE": "Update Notification"
 				},
 				"CREATE_USER_GROUP": {
@@ -3059,13 +3063,17 @@
 				"DELETE": {
 					"TITLE": "Are you sure you want to Delete User Group?"
 				},
+				"DELETE_CHANNEL": {
+					"DELETE": "Delete",
+					"TITLE": "Are you sure you want to Delete Notification Channel from the selected user group?"
+				},
 				"REMOVE_USER": {
 					"TITLE": "Are you sure you want to Remove User from the selected user group?"
 				}
 			},
 			"TAB": {
 				"NOTIFICATION_CHANNEL": {
-					"ADD": "Add",
+					"CREATE": "Create",
 					"DELETE": "Delete",
 					"EDIT": "Edit",
 					"TITLE": "Notification Channel"

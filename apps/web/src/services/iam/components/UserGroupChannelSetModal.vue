@@ -1,55 +1,98 @@
 <script lang="ts" setup>
-import { reactive } from 'vue';
+import {
+    reactive, ref, watch,
+} from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal, PI, PButton } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
+import type { UserGroupChannelCreateParameters } from '@/schema/alert-manager/user-group-channel/api-verbs/create';
+import type { UserGroupChannelUpdateParameters } from '@/schema/alert-manager/user-group-channel/api-verbs/update';
+import type { UserGroupChannelModel } from '@/schema/alert-manager/user-group-channel/model';
+import type { UserGroupChannelScheduleType } from '@/schema/alert-manager/user-group-channel/type';
 import { i18n } from '@/translations';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import UserGroupChannelScheduleSetForm from '@/services/iam/components/UserGroupChannelScheduleSetForm.vue';
 import UserGroupChannelSetInputForm from '@/services/iam/components/UserGroupChannelSetInputForm.vue';
 import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-constant';
+import { useNotificationChannelCreateFormStore } from '@/services/iam/store/notification-channel-create-form-store';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
+const userGroupPageGetters = userGroupPageStore.getters;
+
+const notificationChannelCreateFormStore = useNotificationChannelCreateFormStore();
+const notificationChannelCreateFormState = notificationChannelCreateFormStore.state;
+
+const emit = defineEmits<{(e: 'confirm'): void; }>();
 
 interface ChannelSetModalState {
   loading: boolean;
   userInfo: {
+    channelName: string;
     userMode: MenuItem;
-    users: MenuItem[];
+    users: {type: 'USER' | 'USER_GROUP'; value: string;}[];
   };
   scheduleInfo: {
-    days: string[];
+    days: (string|null)[];
     start: number;
     end: number;
-    type: string;
+    type: UserGroupChannelScheduleType;
   }
 }
+
+const isCreateAble = ref<boolean>(false);
 
 const state = reactive<ChannelSetModalState>({
     loading: false,
     userInfo: {
+        channelName: '',
         userMode: {
             label: '',
             name: '',
         },
         users: [],
     },
-    scheduleInfo: {
-        days: [],
-        start: 0,
-        end: 0,
-        type: '',
-    },
+    scheduleInfo: notificationChannelCreateFormState.scheduleInfo,
 });
 
 /* Component */
 const handleConfirm = async () => {
     try {
         state.loading = true;
-        await fetchCreateUserGroupChannel();
+        if (userGroupPageState.modal.title === i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE')) {
+            const userListPerMode = notificationChannelCreateFormState.userInfo.type === 'USER'
+                ? { USER: notificationChannelCreateFormState.userInfo.value } : { USER_GROUP: notificationChannelCreateFormState.userInfo.value };
+
+            await fetchCreateUserGroupChannel({
+                protocol_id: 'slack',
+                name: notificationChannelCreateFormState.channelName,
+                schedule: notificationChannelCreateFormState.scheduleInfo,
+                data: {
+                    FORWARD_TYPE: notificationChannelCreateFormState.userInfo.type,
+                    ...userListPerMode,
+                },
+                tags: {},
+                user_group_id: userGroupPageGetters.selectedUserGroups[0].user_group_id ?? undefined,
+            });
+            emit('confirm');
+        } else if (userGroupPageState.modal.title === i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.UPDATE_TITLE')) {
+            await fetchUpdateUserGroupChannel({
+                channel_id: userGroupPageGetters.selectedUserGroupChannel[0].channel_id,
+                name: notificationChannelCreateFormState.channelName,
+                data: {
+                    FORWARD_TYPE: notificationChannelCreateFormState.userInfo.type,
+                    USER: notificationChannelCreateFormState.userInfo.type === 'USER' ? notificationChannelCreateFormState.userInfo.value : [],
+                    USER_GROUP: notificationChannelCreateFormState.userInfo.type === 'USER_GROUP' ? notificationChannelCreateFormState.userInfo.value : [],
+                },
+                schedule: notificationChannelCreateFormState.scheduleInfo,
+            });
+            emit('confirm');
+        }
     } finally {
         state.loading = false;
         userGroupPageState.modal = {
@@ -57,6 +100,7 @@ const handleConfirm = async () => {
             title: '',
             themeColor: 'primary',
         };
+        notificationChannelCreateFormStore.initState();
     }
 };
 
@@ -68,16 +112,37 @@ const handleCancel = () => {
     };
 };
 
-const handleUpdateUser = (value) => {
-    state.userInfo = value;
-};
-
-const handleScheduleForm = (value) => {
-    state.scheduleInfo = value;
+const handleClose = () => {
+    userGroupPageState.modal = {
+        type: '',
+        title: '',
+        themeColor: 'primary',
+    };
 };
 
 /* API */
-const fetchCreateUserGroupChannel = async () => {};
+const fetchCreateUserGroupChannel = async (params: UserGroupChannelCreateParameters) => {
+    try {
+        return await SpaceConnector.clientV2.alertManager.userGroupChannel.create<UserGroupChannelCreateParameters, UserGroupChannelModel>(params);
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
+        return {};
+    }
+};
+
+const fetchUpdateUserGroupChannel = async (params: UserGroupChannelUpdateParameters) => {
+    try {
+        return await SpaceConnector.clientV2.alertManager.userGroupChannel.update<UserGroupChannelUpdateParameters, UserGroupChannelModel>(params);
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
+        return {};
+    }
+};
+
+/* Watcher */
+watch(() => notificationChannelCreateFormState, (nv_channel_state) => {
+    isCreateAble.value = !!nv_channel_state.channelName;
+}, { immediate: true, deep: true });
 </script>
 
 <template>
@@ -86,8 +151,10 @@ const fetchCreateUserGroupChannel = async () => {};
                         :visible="userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.CREATE_NOTIFICATIONS_SECOND"
                         :header-title="userGroupPageState.modal.title"
                         :theme-color="userGroupPageState.modal.themeColor"
+                        :disabled="!isCreateAble"
                         @confirm="handleConfirm"
                         @cancel="handleCancel"
+                        @close="handleClose"
         >
             <template #body>
                 <div class="flex flex-col gap-1 mb-8">
@@ -107,8 +174,8 @@ const fetchCreateUserGroupChannel = async () => {};
                         </p>
                     </div>
                 </div>
-                <user-group-channel-set-input-form @update-user="handleUpdateUser" />
-                <user-group-channel-schedule-set-form @schedule-form="handleScheduleForm" />
+                <user-group-channel-set-input-form />
+                <user-group-channel-schedule-set-form />
             </template>
             <template #close-button>
                 <p-button icon-left="ic_arrow-left"
@@ -118,7 +185,8 @@ const fetchCreateUserGroupChannel = async () => {};
                 </p-button>
             </template>
             <template #confirm-button>
-                <span>{{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.CREATE') }}</span>
+                <span v-if="userGroupPageState.modal.title === i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.UPDATE_TITLE')">{{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.UPDATE') }}</span>
+                <span v-else>{{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.CREATE') }}</span>
             </template>
         </p-button-modal>
     </div>

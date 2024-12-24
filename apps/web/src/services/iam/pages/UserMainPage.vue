@@ -12,6 +12,7 @@ import { useUserStore } from '@/store/user/user-store';
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
+import UserAssignToGroupModal from '@/services/iam/components/UserAssignToGroupModal.vue';
 import UserManagementAddModal from '@/services/iam/components/UserManagementAddModal.vue';
 import UserManagementFormModal from '@/services/iam/components/UserManagementFormModal.vue';
 import UserManagementHeader from '@/services/iam/components/UserManagementHeader.vue';
@@ -97,6 +98,9 @@ onUnmounted(() => {
                                       @confirm="refreshUserList"
         />
         <user-management-form-modal v-if="hasReadWriteAccess"
+                                    @confirm="refreshUserList"
+        />
+        <user-assign-to-group-modal v-if="hasReadWriteAccess"
                                     @confirm="refreshUserList"
         />
     </section>

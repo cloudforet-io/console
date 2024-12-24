@@ -7,6 +7,8 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { UserGroupChannelListParameters } from '@/schema/alert-manager/user-group-channel/api-verbs/list';
+import type { UserGroupChannelModel } from '@/schema/alert-manager/user-group-channel/model';
 import type { UserGroupGetParameters } from '@/schema/identity/user-group/api-verbs/get';
 import type { UserGroupListParameters } from '@/schema/identity/user-group/api-verbs/list';
 import type { UserGroupModel } from '@/schema/identity/user-group/model';
@@ -22,7 +24,7 @@ import type { UserListItemType } from '@/services/iam/types/user-type';
 interface UserGroupPageState {
     loading: boolean;
     userGroups: UserGroupListItemType[];
-    selectedUserGroup: UserGroupListItemType;
+    selectedUserGroup: UserGroupListItemType | undefined;
     totalCount: number;
     selectedIndices: number[];
     pageStart: number;
@@ -36,6 +38,13 @@ interface UserGroupPageState {
         selectedIndices: number[];
         searchFilters: ConsoleFilter[];
     }
+    userGroupChannels: {
+        list: UserGroupChannelModel[];
+        pageStart: number;
+        pageLimit: number;
+        selectedIndices: number[];
+        searchFilters: ConsoleFilter[];
+    }
     modal: ModalState;
 }
 
@@ -43,7 +52,7 @@ export const useUserGroupPageStore = defineStore('page-user-group', () => {
     const state = reactive<UserGroupPageState>({
         loading: true,
         userGroups: [],
-        selectedUserGroup: {},
+        selectedUserGroup: undefined,
         totalCount: 0,
         selectedIndices: [],
         pageStart: 1,
@@ -55,6 +64,13 @@ export const useUserGroupPageStore = defineStore('page-user-group', () => {
             pageLimit: 15,
             totalCount: 0,
             selectedIndices: [],
+            searchFilters: [],
+        },
+        userGroupChannels: {
+            list: [],
+            pageStart: 1,
+            pageLimit: 15,
+            selectedIndices: [0],
             searchFilters: [],
         },
         modal: {
@@ -72,13 +88,21 @@ export const useUserGroupPageStore = defineStore('page-user-group', () => {
             });
             return userGroups ?? [];
         }),
-
+        selectedUserGroupChannel: computed(() => {
+            const userGroupChannels: UserGroupChannelModel[] = [];
+            state.userGroupChannels.selectedIndices.forEach((d: number) => {
+                if (getters.selectedUserGroups && getters.selectedUserGroups.length > 0 && getters.selectedUserGroups[0].notification_channel) {
+                    userGroupChannels.push(getters.selectedUserGroups[0].notification_channel[d]);
+                }
+            });
+            return userGroupChannels ?? [];
+        }),
     });
     const actions = {
         reset() {
             state.loading = true;
             state.userGroups = [];
-            state.selectedUserGroup = {};
+            state.selectedUserGroup = undefined;
             state.totalCount = 0;
             state.selectedIndices = [];
             state.pageStart = 1;
@@ -92,6 +116,13 @@ export const useUserGroupPageStore = defineStore('page-user-group', () => {
                 selectedIndices: [],
                 searchFilters: [],
             };
+            state.userGroupChannels = {
+                list: [],
+                pageStart: 1,
+                pageLimit: 15,
+                selectedIndices: [0],
+                searchFilters: [],
+            };
             state.modal = {
                 type: '',
                 title: '',
@@ -100,9 +131,19 @@ export const useUserGroupPageStore = defineStore('page-user-group', () => {
         },
         async listUserGroups(params: UserGroupListParameters) {
             try {
-                const response = await SpaceConnector.clientV2.identity.userGroup.list<UserGroupListParameters, ListResponse<UserGroupModel>>(params);
-                state.userGroups = response.results || [];
-                state.totalCount = response.total_count ?? 0;
+                const { results = [], total_count = 0 } = await SpaceConnector.clientV2.identity.userGroup.list<UserGroupListParameters, ListResponse<UserGroupModel>>(params);
+
+                // TODO: need test after getting real data
+                const userGroupIdToChannelMap = await this.fetchUserGroupChannels(results.map((result) => result.user_group_id));
+
+                state.userGroups = results.map((item) => {
+                    state.userGroupChannels.list = userGroupIdToChannelMap[item.user_group_id] || [];
+                    return {
+                        ...item,
+                        notification_channel: userGroupIdToChannelMap[item.user_group_id] || [],
+                    };
+                }) || [];
+                state.totalCount = total_count ?? 0;
                 state.selectedIndices = [];
             } catch (e) {
                 ErrorHandler.handleError(e, true);
@@ -110,6 +151,24 @@ export const useUserGroupPageStore = defineStore('page-user-group', () => {
                 state.totalCount = 0;
                 throw e;
             }
+        },
+        async fetchUserGroupChannels(userGroupIds: string[]) {
+            const userGroupChannelPromises = userGroupIds.map(async (userGroupId) => {
+                try {
+                    const { results = [] } = await SpaceConnector.clientV2.alertManager.userGroupChannel.list<UserGroupChannelListParameters, ListResponse<UserGroupChannelModel>>({
+                        user_group_id: userGroupId,
+                    });
+                    return { userGroupId, userGroupChannels: results };
+                } catch (e) {
+                    ErrorHandler.handleError(e, true);
+                    return { userGroupId: '', userGroupChannels: [] };
+                }
+            });
+            const results = await Promise.all(userGroupChannelPromises);
+            return results.reduce((acc, { userGroupId, userGroupChannels }) => {
+                acc[userGroupId] = userGroupChannels;
+                return acc;
+            }, {} as Record<string, any>);
         },
         async getUserGroup(params: UserGroupGetParameters) {
             try {
@@ -126,6 +185,14 @@ export const useUserGroupPageStore = defineStore('page-user-group', () => {
             try {
                 const response = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>(params);
                 state.users.list = response.results || [];
+            } catch (e) {
+                ErrorHandler.handleError(e, true);
+            }
+        },
+        async listUserGroupChannels(params: UserGroupChannelListParameters) {
+            try {
+                const response = await SpaceConnector.clientV2.alertManager.userGroupChannel.list<UserGroupChannelListParameters, ListResponse<UserGroupChannelModel>>(params);
+                state.userGroupChannels.list = response.results || [];
             } catch (e) {
                 ErrorHandler.handleError(e, true);
             }

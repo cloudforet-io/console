@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PButton, PDefinitionTable, PHeading, PI, PStatus, PHeadingLayout,
+    PButton, PDefinitionTable, PHeading, PI, PStatus, PHeadingLayout, PTag,
 } from '@cloudforet/mirinae';
 import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
 import { iso8601Formatter } from '@cloudforet/utils';
@@ -95,6 +95,7 @@ const tableState = reactive({
             { name: 'last_accessed_at', label: i18n.t('IAM.USER.MAIN.LAST_ACTIVITY'), disableCopy: true },
             { name: 'domain_id', label: i18n.t('IAM.USER.MAIN.DOMAIN_ID') },
             ...additionalRoleFields,
+            { name: 'user_group', label: i18n.t('IAM.USER.MAIN.ASSIGNED_USER_GROUP'), disableCopy: true },
             { name: 'language', label: i18n.t('IAM.USER.MAIN.LANGUAGE'), disableCopy: true },
             { name: 'timezone', label: i18n.t('IAM.USER.MAIN.TIMEZONE'), disableCopy: true },
             { name: 'created_at', label: i18n.t('IAM.USER.MAIN.CREATED_AT') },
@@ -283,6 +284,16 @@ const handleClickVerifyButton = async () => {
                     >
                         {{ $t('IAM.USER.MAIN.NOT_VERIFIED') }}
                     </span>
+                </div>
+            </template>
+            <template #data-user_group="{data}">
+                <div v-if="data.length > 0">
+                    <p-tag v-for="(d, i) in data"
+                           :key="`${d}-${i}`"
+                           :deletable="false"
+                    >
+                        {{ d.name }}
+                    </p-tag>
                 </div>
             </template>
             <template #extra="{label}">

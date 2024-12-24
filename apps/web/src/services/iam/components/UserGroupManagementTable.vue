@@ -46,7 +46,10 @@ const storeState = reactive({
 });
 
 const state = reactive({
-    userGroupItems: computed<UserGroupListItemType[]>(() => userGroupPageState.userGroups),
+    userGroupItems: computed<UserGroupListItemType[]>(() => userGroupPageState.userGroups.map((userGroup) => ({
+        ...userGroup,
+        notification_channel: userGroup.notification_channel?.length ?? 0,
+    }))),
 });
 
 const tableState = reactive({

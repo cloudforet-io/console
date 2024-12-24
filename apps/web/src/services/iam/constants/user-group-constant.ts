@@ -46,5 +46,5 @@ export const USER_GROUP_MODAL_TYPE = {
     CREATE: 'create',
     CREATE_NOTIFICATIONS_FIRST: 'create_notifications_step1',
     CREATE_NOTIFICATIONS_SECOND: 'create_notifications_step2',
-
+    DELETE_NOTIFICATION_CHANNEL: 'delete_notification_channel',
 };

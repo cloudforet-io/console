@@ -18,6 +18,7 @@ export const USER_MODAL_TYPE = {
     ENABLE: 'enable',
     DISABLE: 'disable',
     UPDATE: 'update',
+    ASSIGN: 'assign',
 } as const;
 
 // Table
