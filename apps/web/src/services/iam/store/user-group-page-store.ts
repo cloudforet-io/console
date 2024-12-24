@@ -154,12 +154,16 @@ export const useUserGroupPageStore = defineStore('page-user-group', () => {
         },
         async fetchUserGroupChannels(userGroupIds: string[]) {
             const userGroupChannelPromises = userGroupIds.map(async (userGroupId) => {
-                const { results = [] } = await SpaceConnector.clientV2.alertManager.userGroupChannel.list<UserGroupChannelListParameters, ListResponse<UserGroupChannelModel>>({
-                    user_group_id: userGroupId,
-                });
-                return { userGroupId, userGroupChannels: results };
+                try {
+                    const { results = [] } = await SpaceConnector.clientV2.alertManager.userGroupChannel.list<UserGroupChannelListParameters, ListResponse<UserGroupChannelModel>>({
+                        user_group_id: userGroupId,
+                    });
+                    return { userGroupId, userGroupChannels: results };
+                } catch (e) {
+                    ErrorHandler.handleError(e, true);
+                    return { userGroupId: '', userGroupChannels: [] };
+                }
             });
-
             const results = await Promise.all(userGroupChannelPromises);
             return results.reduce((acc, { userGroupId, userGroupChannels }) => {
                 acc[userGroupId] = userGroupChannels;
