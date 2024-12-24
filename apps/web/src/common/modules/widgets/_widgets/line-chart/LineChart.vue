@@ -28,6 +28,7 @@ import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-wi
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD, WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
+import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import { sortObjectByKeys } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import {
     getReferenceLabel, getWidgetDateFields, getWidgetDateRange,
@@ -108,7 +109,7 @@ const state = reactive({
                 const _params = params as any[];
                 let _axisValue = getReferenceLabel(props.allReferenceTypeInfo, widgetOptionsState.xAxisInfo?.data, _params[0].axisValue);
                 if (widgetOptionsState.xAxisInfo?.data === DATE_FIELD.DATE) {
-                    _axisValue = dayjs.utc(_axisValue).format(widgetOptionsState.dateFormatInfo?.format);
+                    _axisValue = dayjs.utc(_axisValue).format(state.dateFormat);
                 }
                 const _values = _params.map((p) => {
                     const _unit: string|undefined = state.unitMap[p.seriesName];
@@ -130,7 +131,7 @@ const state = reactive({
             axisLabel: {
                 formatter: (val) => {
                     if (widgetOptionsState.xAxisInfo?.data === DATE_FIELD.DATE) {
-                        return dayjs.utc(val).format(widgetOptionsState.dateFormatInfo?.format);
+                        return dayjs.utc(val).format(state.dateFormat);
                     }
                     return getReferenceLabel(props.allReferenceTypeInfo, widgetOptionsState.xAxisInfo?.data, val);
                 },
@@ -152,6 +153,7 @@ const state = reactive({
         }
         return { start: _start, end: _end };
     }),
+    dateFormat: computed<string|undefined>(() => DATE_FORMAT?.[widgetOptionsState.dateFormatInfo?.format]?.[widgetOptionsState.granularityInfo?.granularity]),
 });
 
 const widgetOptionsState = reactive({
