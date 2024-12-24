@@ -6,16 +6,19 @@ import { map } from 'lodash';
 import { PDefinitionTable, PHeading, PHeadingLayout } from '@cloudforet/mirinae';
 import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
 
-import { useAlertPageStore } from '@/services/alert-manager-v2/stores/alert-page-store';
+import type { AlertModel } from '@/schema/alert-manager/alert/model';
 
-const alertPageStore = useAlertPageStore();
-const alertPageState = alertPageStore.state;
+import { useAlertDetailPageStore } from '@/services/alert-manager-v2/stores/alert-detail-page-store';
 
+const alertDetailPageStore = useAlertDetailPageStore();
+const alertDetailPageState = alertDetailPageStore.state;
 
-const additionalState = reactive({
-    fields: computed<DefinitionField[]>(() => map(additionalState.data, (d, k) => ({ name: k, label: k })).sort((a, b) => a.label.localeCompare(b.label))),
-    // TODO: add type
-    data: computed(() => alertPageState.alertData?.additional_info) || {},
+const storeState = reactive({
+    alertInfo: computed<AlertModel>(() => alertDetailPageState.alertInfo),
+});
+const state = reactive({
+    data: computed<Record<string, any>>(() => alertDetailPageState.alertInfo?.additional_info) || {},
+    fields: computed<DefinitionField[]>(() => map(state.data, (d, k) => ({ name: k, label: k })).sort((a, b) => a.label.localeCompare(b.label))),
 });
 
 </script>
@@ -29,9 +32,9 @@ const additionalState = reactive({
                 />
             </template>
         </p-heading-layout>
-        <p-definition-table :fields="additionalState.fields"
-                            :data="additionalState.data"
-                            :skeleton-rows="7"
+        <p-definition-table :fields="state.fields"
+                            :data="storeState.alertInfo"
+                            :skeleton-rows="5"
                             block
         />
     </section>
