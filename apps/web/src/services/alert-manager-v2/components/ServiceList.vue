@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { onMounted, reactive } from 'vue';
+import { computed, onMounted, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PDivider, PSelectCard, PToolbox, PI, PTextButton, PDataLoader, PEmpty, PButton,
+    PDivider, PSelectCard, PToolbox, PI, PTextButton, PDataLoader, PEmpty, PButton, PLazyImg,
 } from '@cloudforet/mirinae';
 import type { ToolboxOptions } from '@cloudforet/mirinae/src/controls/toolbox/type';
 
@@ -15,6 +15,11 @@ import type { EscalationPolicyListParameters } from '@/schema/alert-manager/esca
 import type { EscalationPolicyModel } from '@/schema/alert-manager/escalation-policy/model';
 import type { ServiceListParameters } from '@/schema/alert-manager/service/api-verbs/list';
 import type { ServiceModel } from '@/schema/alert-manager/service/model';
+import type { WebhookListParameters } from '@/schema/alert-manager/webhook/api-verbs/list';
+import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
@@ -24,13 +29,19 @@ import { red } from '@/styles/colors';
 
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/common-constant';
 import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
+import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
 import type { AlertManagementTableHandlerType } from '@/services/alert-manager-v2/types/alert-manager-type';
+
 
 const pageSizeOptions = [15, 30, 45];
 
-const router = useRouter();
+const allReferenceStore = useAllReferenceStore();
+const allReferenceGetters = allReferenceStore.getters;
+const serviceDetailPageStore = useServiceDetailPageStore();
 
 const { getProperRouteLocation } = useProperRouteLocation();
+
+const router = useRouter();
 
 const SERVICE_SEARCH_HANDLER: AlertManagementTableHandlerType = {
     keyItemSets: [{
@@ -44,11 +55,15 @@ const SERVICE_SEARCH_HANDLER: AlertManagementTableHandlerType = {
     },
 };
 
+const storeState = reactive({
+    plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
+});
 const state = reactive({
     loading: true,
     totalCount: 0,
     serviceList: [] as ServiceModel[],
     escalationPolicyList: [] as EscalationPolicyModel[],
+    webhookList: [] as WebhookModel[],
 });
 
 const serviceListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
@@ -56,7 +71,12 @@ const serviceListApiQueryHelper = new ApiQueryHelper().setSort('created_at', tru
 const queryTagHelper = useQueryTags({ keyItemSets: SERVICE_SEARCH_HANDLER.keyItemSets });
 const { queryTags } = queryTagHelper;
 
-const getEscalationPolicyName = (id: string) => {
+const getWebhookIcon = (id: string): string|undefined => {
+    const webhook = state.webhookList.find((item) => item.webhook_id === id);
+    if (!webhook) return undefined;
+    return storeState.plugins[webhook.plugin_info.plugin_id].icon;
+};
+const getEscalationPolicyName = (id: string): string => {
     const escalationPolicy = state.escalationPolicyList.find((item) => item.escalation_policy_id === id);
     return escalationPolicy?.name || '';
 };
@@ -89,6 +109,9 @@ const handleClickEscalationPolicy = (id: string) => {
     }));
 };
 const handleClickWebhookItem = (id: string, webhookId?: string) => {
+    if (webhookId) {
+        serviceDetailPageStore.setSelectedWebhookId(webhookId);
+    }
     router.push(getProperRouteLocation({
         name: ALERT_MANAGER_ROUTE_V2.SERVICE.DETAIL._NAME,
         params: {
@@ -134,9 +157,19 @@ const fetchEscalationPolicy = async () => {
         state.escalationPolicyList = [];
     }
 };
+const fetchWebhookList = async () => {
+    try {
+        const { results } = await SpaceConnector.clientV2.alertManager.webhook.list<WebhookListParameters, ListResponse<WebhookModel>>();
+        state.webhookList = results || [];
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
+        state.webhookList = [];
+    }
+};
 
 onMounted(async () => {
     await fetchEscalationPolicy();
+    await fetchWebhookList();
     await fetchServiceList();
 });
 </script>
@@ -206,17 +239,16 @@ onMounted(async () => {
                                         {{ $t('ALERT_MANAGER.SERVICE.WEBHOOK', { cnt: item?.webhooks?.length || 0 }) }}
                                     </p>
                                     <div class="webhook-list">
-                                        <!-- TODO: check the link & icon -->
-                                        <span v-for="(webhook, webhookIdx) in item.webhooks"
+                                        <span v-for="(webhook, webhookIdx) in item.webhooks?.slice(0,5)"
                                               :key="`webhook-item-${webhookIdx}`"
                                               class="webhook"
                                               @click.stop="handleClickWebhookItem(item.service_id, webhook)"
                                         >
-                                            <p-i name="ic_check"
-                                                 class="icon success"
-                                                 height="0.875rem"
-                                                 width="0.875rem"
-                                                 color="inherit"
+                                            <p-lazy-img :src="getWebhookIcon(webhook)"
+                                                        error-icon="ic_webhook"
+                                                        width="0.875rem"
+                                                        height="0.875rem"
+                                                        class="icon"
                                             />
                                         </span>
                                         <span class="webhook chevron"
@@ -334,6 +366,9 @@ onMounted(async () => {
                                 }
                                 &.chevron {
                                     @apply border-gray-200;
+                                }
+                                .icon {
+                                    margin-bottom: 0;
                                 }
                             }
                         }
