@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
+import {
+    ref, watch,
+} from 'vue';
 
 import { PButtonModal } from '@cloudforet/mirinae';
 
@@ -32,6 +34,7 @@ const handleCancel = () => {
         title: '',
         themeColor: 'primary',
     };
+    notificationChannelCreateFormStore.initState();
 };
 
 /* Watcher */

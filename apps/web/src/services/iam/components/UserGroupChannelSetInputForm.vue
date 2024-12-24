@@ -22,8 +22,6 @@ interface UserModeInfo {
   users: MenuItem[]
 }
 
-const emit = defineEmits<{(e: 'update-user', value: ChannelInfo & UserModeInfo): void}>();
-
 const state = reactive<ChannelInfo & UserModeInfo>({
     channelName: notificationChannelCreateFormState.channelName,
     userMode: {},
@@ -42,10 +40,9 @@ const handleChangeChannelName = (value: string) => {
 
 /* Watcher */
 watch(() => state, (nv_state) => {
-    emit('update-user', {
-        channelName: nv_state.channelName,
-        userMode: nv_state.userMode,
-        users: nv_state.users,
+    notificationChannelCreateFormStore.$patch((_state) => {
+        _state.state.channelName = nv_state.channelName;
+        // _state.state.userInfo.type = nv_state.userMode
     });
 }, { immediate: true, deep: true });
 </script>

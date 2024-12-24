@@ -28,13 +28,8 @@ const SHOW_TYPE = {
     USER_GROUP_LIST: 'userGroupList',
 };
 
-const emit = defineEmits<{(e: 'update-user', form: {
-  userMode: MenuItem;
-  users: {type: 'USER' | 'USER_GROUP'; value: string}[];
-  })}>();
-
 const showType = ref<string>();
-const selectedIds = ref<any[]>([]);
+const selectedIds = ref<any>([]);
 
 const state = reactive({
     userMode: computed<MenuItem[]>(() => [{
@@ -70,22 +65,39 @@ watch(() => state.selectedUserModeIdx, async (nv_selectedIdx, ov_selectedIdx) =>
     }
 });
 
-// TODO: update after userSelectionDropdown changed
-watch([() => selectedIds, () => state.selectedUserModeIdx], ([nv_selected_ids, nv_selected_user_mode_idx]) => {
-    emit('update-user', {
-        userMode: state.userMode[nv_selected_user_mode_idx],
-        users: nv_selected_ids,
-    });
+watch(() => state.selectedUserModeIdx, (nv_selected_idx) => {
+    if (nv_selected_idx === 0) {
+        notificationChannelCreateFormState.userInfo.type = 'ALL_MEMBER';
+    } else if (nv_selected_idx === 1) {
+        notificationChannelCreateFormState.userInfo.type = 'USER_GROUP';
+    } else {
+        notificationChannelCreateFormState.userInfo.type = 'USER';
+    }
+});
+
+watch([() => notificationChannelCreateFormState.userInfo.type, () => notificationChannelCreateFormState.userInfo.value], () => {
+    // TODO: Retrieving a list of existing users
+    // if (nv_user_info_type) {
+    //     if (nv_user_info_type !== 'ALL_MEMBER') {
+    //         state.selectedUserModeIdx = nv_user_info_type === 'USER_GROUP' ? 1 : 2;
+    //
+    //         selectedIds.value = {
+    //             type: nv_user_info_type,
+    //             value: nv_user_info_value,
+    //         };
+    //     } else {
+    //         state.selectedUserModeIdx = 0;
+    //     }
+    // }
 }, { immediate: true, deep: true });
 
-watch(() => notificationChannelCreateFormState.userInfo, (nv_user_info) => {
-    // TODO: select user mode
-    // state.selectedUserModeIdx = state.userMode.findIndex((mode) => mode?.name === nv_user_info.type);
-    selectedIds.value = nv_user_info.value.map((id) => ({
-        type: nv_user_info.type,
-        value: id,
-    }));
-}, { immediate: true, deep: true });
+watch(selectedIds, (nv_selected_ids) => {
+    const result: string[] = [];
+    nv_selected_ids.forEach((id) => {
+        result.push(id.value);
+    });
+    notificationChannelCreateFormState.userInfo.value = result;
+}, { immediate: true });
 </script>
 
 <template>

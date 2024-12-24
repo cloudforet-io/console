@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, ref, watch,
+    computed, reactive, ref, watch, watchEffect,
 } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -20,13 +20,11 @@ import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-const
 import { useNotificationChannelCreateFormStore } from '@/services/iam/store/notification-channel-create-form-store';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
-
-
-const notificationChannelCreateFormStore = useNotificationChannelCreateFormStore();
-
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 const userGroupPageGetters = userGroupPageStore.getters;
+
+const notificationChannelCreateFormStore = useNotificationChannelCreateFormStore();
 
 interface ChannelItem {
   name: string;
@@ -92,49 +90,31 @@ const handleUpdateModal = async (modalType: string) => {
             channel_id: userGroupPageGetters.selectedUserGroupChannel[0].channel_id,
         });
         if (result) {
-            notificationChannelCreateFormStore.setSelectedProtocol(result.protocol_id);
-            notificationChannelCreateFormStore.setChannelName(result.name);
-            if (result.data) {
-                if (result.data.USER && result.data.USER.length > 0) {
-                    notificationChannelCreateFormStore.setUserInfo({
-                        type: 'USER',
-                        value: result.data.USER,
-                    });
-                } else if (result.data.USER_GROUP && result.data.USER_GROUP.length > 0) {
-                    notificationChannelCreateFormStore.setUserInfo({
-                        type: 'USER_GROUP',
-                        value: result.data.USER_GROUP,
-                    });
-                }
-            }
-            if (result.schedule.SCHEDULE_TYPE === 'ALL_DAY') {
-                notificationChannelCreateFormStore.setScheduleInfo({
-                    days: ['MON', 'TUE', 'WED', 'Thu', 'Fri', 'Sat', 'Sun'],
-                    start: result.schedule.MON.start,
-                    end: result.schedule.MON.end,
-                    type: 'ALL_DAY',
-                });
-            } else if (result.schedule.SCHEDULE_TYPE === 'WEEK_DAY') {
-                notificationChannelCreateFormStore.setScheduleInfo({
-                    days: ['MON', 'TUE', 'WED', 'Thu', 'Fri'],
-                    start: result.schedule.MON.start,
-                    end: result.schedule.MON.end,
-                    type: 'WEEK_DAY',
-                });
-            } else if (result.schedule.SCHEDULE_TYPE === 'CUSTOM') {
-                notificationChannelCreateFormStore.setScheduleInfo({
-                    days: Object.values(result.schedule).map((sc, idx) => {
-                        if (typeof sc === 'object' && sc.is_scheduled) {
-                            return Object.keys(result.schedule)[idx];
-                        }
-                        return null;
-                    }),
-                    start: result.schedule.MON.start,
-                    end: result.schedule.MON.end,
-                    type: 'CUSTOM',
+            const {
+                protocol_id, name, data, schedule,
+            } = result;
+
+            if (data && (data.USER && Array.isArray(data.USER) && Array.isArray(data.USER_GROUP))) {
+                const userInfoType = data.USER?.length > 0 ? 'USER' : 'USER_GROUP';
+                const userInfoValue = data[userInfoType] || [];
+                notificationChannelCreateFormStore.$patch((_state) => {
+                    _state.state.userInfo = { type: userInfoType, value: userInfoValue };
                 });
             }
-            console.log(result);
+
+            notificationChannelCreateFormStore.$patch((_state) => {
+                _state.state.selectedProtocol = protocol_id;
+                _state.state.channelName = name;
+                _state.state.scheduleInfo = schedule;
+                _state.state.userInfo.type = data.FORWARD_TYPE;
+                _state.state.userInfo.value = data.FORWARD_TYPE === 'USER' ? data.USER : data.USER_GROUP;
+            });
+
+            userGroupPageStore.updateModalSettings({
+                type: USER_GROUP_MODAL_TYPE.CREATE_NOTIFICATIONS_FIRST,
+                title: i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.UPDATE_TITLE'),
+                themeColor: 'primary1',
+            });
         }
         userGroupPageStore.updateModalSettings({
             type: USER_GROUP_MODAL_TYPE.CREATE_NOTIFICATIONS_FIRST,
@@ -151,6 +131,8 @@ const handleUpdateModal = async (modalType: string) => {
 };
 
 /* Watcher */
+watchEffect(() => {});
+
 watch(() => tableState.items, (nv_items) => {
     if (nv_items.length > 0) {
         isDeleteable.value = true;
@@ -209,7 +191,7 @@ const fetchGetUserGroupChannel = async (params: UserGroupChannelGetParameters): 
                          selectable
                          :refreshable="false"
                          :multi-select="false"
-                         :select-index="userGroupNotificationChannelPageState.selectedIndices"
+                         :select-index="userGroupPageState.userGroupChannels.selectedIndices"
                          :fields="tableState.fields"
                          :items="tableState.items"
                          @select="handleSelect"

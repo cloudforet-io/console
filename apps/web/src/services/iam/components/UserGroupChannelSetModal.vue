@@ -1,11 +1,14 @@
 <script lang="ts" setup>
-import { reactive, ref, watch } from 'vue';
+import {
+    reactive, ref, watch,
+} from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal, PI, PButton } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import type { UserGroupChannelCreateParameters } from '@/schema/alert-manager/user-group-channel/api-verbs/create';
+import type { UserGroupChannelUpdateParameters } from '@/schema/alert-manager/user-group-channel/api-verbs/update';
 import type { UserGroupChannelModel } from '@/schema/alert-manager/user-group-channel/model';
 import type { UserGroupChannelScheduleType } from '@/schema/alert-manager/user-group-channel/type';
 import { i18n } from '@/translations';
@@ -15,11 +18,15 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import UserGroupChannelScheduleSetForm from '@/services/iam/components/UserGroupChannelScheduleSetForm.vue';
 import UserGroupChannelSetInputForm from '@/services/iam/components/UserGroupChannelSetInputForm.vue';
 import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-constant';
+import { useNotificationChannelCreateFormStore } from '@/services/iam/store/notification-channel-create-form-store';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 const userGroupPageGetters = userGroupPageStore.getters;
+
+const notificationChannelCreateFormStore = useNotificationChannelCreateFormStore();
+const notificationChannelCreateFormState = notificationChannelCreateFormStore.state;
 
 const emit = defineEmits<{(e: 'confirm'): void; }>();
 
@@ -31,7 +38,7 @@ interface ChannelSetModalState {
     users: {type: 'USER' | 'USER_GROUP'; value: string;}[];
   };
   scheduleInfo: {
-    days: string[];
+    days: (string|null)[];
     start: number;
     end: number;
     type: UserGroupChannelScheduleType;
@@ -50,57 +57,41 @@ const state = reactive<ChannelSetModalState>({
         },
         users: [],
     },
-    scheduleInfo: {
-        days: [],
-        start: 0,
-        end: 0,
-        type: 'ALL_DAY',
-    },
+    scheduleInfo: notificationChannelCreateFormState.scheduleInfo,
 });
-
-const allDays = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
 
 /* Component */
 const handleConfirm = async () => {
     try {
-        // TODO: need create | update channel division
         state.loading = true;
         if (userGroupPageState.modal.title === i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE')) {
-            const scheduleInfo = allDays.reduce((acc, day) => {
-                if (state.scheduleInfo.days.includes(day)) {
-                    acc[day] = {
-                        is_scheduled: true,
-                        start: state.scheduleInfo.start,
-                        end: state.scheduleInfo.end,
-                    };
-                } else {
-                    acc[day] = {
-                        is_scheduled: false,
-                        start: 0,
-                        end: 0,
-                    };
-                }
-                return acc;
-            }, {});
+            const userListPerMode = notificationChannelCreateFormState.userInfo.type === 'USER'
+                ? { USER: notificationChannelCreateFormState.userInfo.value } : { USER_GROUP: notificationChannelCreateFormState.userInfo.value };
 
             await fetchCreateUserGroupChannel({
                 protocol_id: 'slack',
-                name: state.userInfo.channelName,
-                schedule: {
-                    ...scheduleInfo,
-                    SCHEDULE_TYPE: state.scheduleInfo.type,
-                },
+                name: notificationChannelCreateFormState.channelName,
+                schedule: notificationChannelCreateFormState.scheduleInfo,
                 data: {
-                    FORWARD_TYPE: state.userInfo.userMode.name,
-                    USER: state.userInfo.users[0].type === 'USER' ? state.userInfo.users.map((user) => user.value) : [],
-                    USER_GROUP: state.userInfo.users[0].type === 'USER_GROUP' ? state.userInfo.users.map((userGroup) => userGroup.value) : [],
+                    FORWARD_TYPE: notificationChannelCreateFormState.userInfo.type,
+                    ...userListPerMode,
                 },
                 tags: {},
                 user_group_id: userGroupPageGetters.selectedUserGroups[0].user_group_id ?? undefined,
             });
             emit('confirm');
         } else if (userGroupPageState.modal.title === i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.UPDATE_TITLE')) {
-        //   TODO: add update API
+            await fetchUpdateUserGroupChannel({
+                channel_id: userGroupPageGetters.selectedUserGroupChannel[0].channel_id,
+                name: notificationChannelCreateFormState.channelName,
+                data: {
+                    FORWARD_TYPE: notificationChannelCreateFormState.userInfo.type,
+                    USER: notificationChannelCreateFormState.userInfo.type === 'USER' ? notificationChannelCreateFormState.userInfo.value : [],
+                    USER_GROUP: notificationChannelCreateFormState.userInfo.type === 'USER_GROUP' ? notificationChannelCreateFormState.userInfo.value : [],
+                },
+                schedule: notificationChannelCreateFormState.scheduleInfo,
+            });
+            emit('confirm');
         }
     } finally {
         state.loading = false;
@@ -109,6 +100,7 @@ const handleConfirm = async () => {
             title: '',
             themeColor: 'primary',
         };
+        notificationChannelCreateFormStore.initState();
     }
 };
 
@@ -128,14 +120,6 @@ const handleClose = () => {
     };
 };
 
-const handleUpdateUser = (value) => {
-    state.userInfo = value;
-};
-
-const handleScheduleForm = (value) => {
-    state.scheduleInfo = value;
-};
-
 /* API */
 const fetchCreateUserGroupChannel = async (params: UserGroupChannelCreateParameters) => {
     try {
@@ -146,18 +130,18 @@ const fetchCreateUserGroupChannel = async (params: UserGroupChannelCreateParamet
     }
 };
 
-// const fetchUpdateUserGroupChannel = async (params: UserGroupChannelUpdateParameters) => {
-//     try {
-//         return await SpaceConnector.clientV2.alertManager.userGroupChannel.update<UserGroupChannelUpdateParameters, UserGroupChannelModel>(params);
-//     } catch (e) {
-//         ErrorHandler.handleError(e, true);
-//         return {};
-//     }
-// };
+const fetchUpdateUserGroupChannel = async (params: UserGroupChannelUpdateParameters) => {
+    try {
+        return await SpaceConnector.clientV2.alertManager.userGroupChannel.update<UserGroupChannelUpdateParameters, UserGroupChannelModel>(params);
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
+        return {};
+    }
+};
 
 /* Watcher */
-watch(() => state.userInfo, (nv_userInfo) => {
-    isCreateAble.value = !!nv_userInfo.channelName;
+watch(() => notificationChannelCreateFormState, (nv_channel_state) => {
+    isCreateAble.value = !!nv_channel_state.channelName;
 }, { immediate: true, deep: true });
 </script>
 
@@ -190,8 +174,8 @@ watch(() => state.userInfo, (nv_userInfo) => {
                         </p>
                     </div>
                 </div>
-                <user-group-channel-set-input-form @update-user="handleUpdateUser" />
-                <user-group-channel-schedule-set-form @schedule-form="handleScheduleForm" />
+                <user-group-channel-set-input-form />
+                <user-group-channel-schedule-set-form />
             </template>
             <template #close-button>
                 <p-button icon-left="ic_arrow-left"
