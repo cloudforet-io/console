@@ -184,7 +184,6 @@ onMounted(async () => {
 <template>
     <div class="alert-data-table">
         <p-toolbox-table searchable
-                         selectable
                          sortable
                          exportable
                          search-type="query"
