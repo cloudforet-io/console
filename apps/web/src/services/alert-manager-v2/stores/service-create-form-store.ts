@@ -29,22 +29,7 @@ export const useServiceCreateFormStore = defineStore('service-create-form', () =
         selectedProtocol: undefined,
     });
 
-    const actions = {
-        initState() {
-            state.currentStep = 1;
-            state.currentSubStep = 1;
-            state.createdServiceId = '';
-            state.selectedWebhookType = undefined;
-            state.webhookName = '';
-            state.webhookVersion = undefined;
-            state.selectedProtocol = undefined;
-        },
-        initStep2() {
-            state.currentSubStep = 1;
-            state.selectedWebhookType = undefined;
-            state.webhookName = '';
-        },
-
+    const mutations = {
         setCurrentStep(step: number) {
             state.currentStep = step;
         },
@@ -70,9 +55,26 @@ export const useServiceCreateFormStore = defineStore('service-create-form', () =
             state.selectedProtocol = protocol;
         },
     };
+    const actions = {
+        initState() {
+            state.currentStep = 1;
+            state.currentSubStep = 1;
+            state.createdServiceId = '';
+            state.selectedWebhookType = undefined;
+            state.webhookName = '';
+            state.webhookVersion = undefined;
+            state.selectedProtocol = undefined;
+        },
+        initStep2() {
+            state.currentSubStep = 1;
+            state.selectedWebhookType = undefined;
+            state.webhookName = '';
+        },
+    };
 
     return {
         state,
+        ...mutations,
         ...actions,
     };
 });

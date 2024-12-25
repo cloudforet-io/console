@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { defineProps, onUnmounted, watch } from 'vue';
+import {
+    defineProps, onUnmounted, watch,
+} from 'vue';
 
 import ServiceDetailHeader from '@/services/alert-manager-v2/components/ServiceDetailHeader.vue';
 import ServiceDetailTabs from '@/services/alert-manager-v2/components/ServiceDetailTabs.vue';
@@ -22,7 +24,6 @@ watch(() => props.serviceId, async (serviceId) => {
 
 onUnmounted(() => {
     serviceDetailPageStore.initState();
-    serviceDetailPageStore.$dispose();
 });
 </script>
 

@@ -118,7 +118,6 @@ const handleClickWebhookItem = (id: string, webhookId?: string) => {
         },
         query: {
             tab: SERVICE_DETAIL_TABS.WEBHOOK,
-            webhookId,
         },
     }));
 };
