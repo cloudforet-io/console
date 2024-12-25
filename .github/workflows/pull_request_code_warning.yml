@@ -3,7 +3,7 @@ name: "[PR] Code Warning"
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-    path-ignores:
+    paths-ignores:
       - '.github/**'
       - '**/deploy/**'
       - '**/Dockerfile'
@@ -42,15 +42,13 @@ jobs:
             !packages/mirinae/cli
             !apps/web/public
             !apps/web/build
-
-          # bring only the latest commit
-          fetch-depth: 1
+            
 
       - name: Check for TODOs
         id: check_todo
         run: |
           echo "Checking for TODOs..."
-          TODO_FILES=$(grep -rl "TODO" . --exclude-dir={node_modules,.git} || true)
+          TODO_FILES=$(grep -rl "// TODO" . --exclude-dir={node_modules,.git} || true)
           TODO_COUNT=0
           if [ -n "$TODO_FILES" ]; then
             echo "The following files contain TODO:"
