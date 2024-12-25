@@ -27,18 +27,30 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NODE_ENV: 'development'
-      EXCLUDE_DIRS_TODO: '{node_modules,.github,.git,**/__tests__/**/*.test.ts}'
-      EXCLUDE_DIRS_LOG: '{node_modules,.git,**/vite.config.js,packages/mirinae/scripts/**,packages/mirinae/cli/**,apps/web/public/lottie.js,apps/web/build}'
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          # checkout the PR branch not the base branch
+          ref: ${{ github.event.pull_request.head.sha }}
+          # checkout only the files we need
+          sparse-checkout: |
+            apps
+            packages
+            !packages/mirinae/scripts
+            !packages/mirinae/cli
+            !apps/web/public
+            !apps/web/build
+
+          # bring only the latest commit
+          fetch-depth: 1
 
       - name: Check for TODOs
         id: check_todo
         run: |
           echo "Checking for TODOs..."
-          TODO_FILES=$(grep -rl "// TODO" apps/web/src --exclude-dir=$EXCLUDE_DIRS_TODO || true)
+          TODO_FILES=$(grep -rl "TODO" . --exclude-dir={node_modules,.git} || true)
           TODO_COUNT=0
           if [ -n "$TODO_FILES" ]; then
             echo "The following files contain TODO:"
@@ -54,7 +66,7 @@ jobs:
         id: check_console_log
         run: |
           echo "Checking for console.log..."
-          LOG_FILES=$(grep -rl "console.log" . --exclude-dir=$EXCLUDE_DIRS_LOG || true)
+          LOG_FILES=$(grep -rl "console.log" . --exclude-dir={node_modules,.git} || true)
           LOG_COUNT=0
           if [ -n "$LOG_FILES" ]; then
             echo "The following files contain console.log:"
@@ -70,7 +82,7 @@ jobs:
         id: check_console_debug
         run: |
           echo "Checking for console.debug..."
-          LOG_FILES=$(grep -rl "console.debug" . --exclude-dir=$EXCLUDE_DIRS_LOG || true)
+          LOG_FILES=$(grep -rl "console.debug" .  --exclude-dir={node_modules,.git} || true)
           LOG_COUNT=0
           if [ -n "$LOG_FILES" ]; then
             echo "The following files contain console.debug:"
