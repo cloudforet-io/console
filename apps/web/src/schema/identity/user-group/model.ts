@@ -1,4 +1,5 @@
 import type { Tags } from '@/schema/_common/model';
+import type { UserGroupChannelModel } from '@/schema/alert-manager/user-group-channel/model';
 
 export interface UserGroupModel {
     user_group_id: string;
@@ -9,6 +10,7 @@ export interface UserGroupModel {
     workspace_id: string;
     domain_id: string;
     created_at: string;
+    notification_channel: UserGroupChannelModel[];
 }
 
 export interface NotificationChannelPerUserGroupModel {
