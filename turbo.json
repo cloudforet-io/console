@@ -1,66 +1,148 @@
 {
   "globalDependencies": [
-    "turbo.json", "package.json", "package-lock.json"
+    "turbo.json",
+    "package.json",
+    "package-lock.json"
   ],
-  "pipeline": {
+  "tasks": {
     "@cloudforet/utils#build": {
-      "outputs": ["./dist/**"],
+      "outputs": [
+        "./dist/**"
+      ],
       "inputs": [
-        "src/**", "package.json", "package-lock.json", "tsconfig.build.json",
-        "!./**/__tests__/**", "!./**/*.babel", "!./**/LICENSE", "!./**/AUTHORS", "!./**/README.md", "!./**/CHANGELOG.md"
+        "src/**",
+        "package.json",
+        "package-lock.json",
+        "tsconfig.build.json",
+        "!./**/__tests__/**",
+        "!./**/*.babel",
+        "!./**/LICENSE",
+        "!./**/AUTHORS",
+        "!./**/README.md",
+        "!./**/CHANGELOG.md"
       ],
       "cache": true
     },
     "@cloudforet/core-lib#build": {
-      "dependsOn": ["@cloudforet/mirinae#transpile"],
-      "outputs": ["./dist/**"],
+      "dependsOn": [
+        "@cloudforet/mirinae#transpile"
+      ],
+      "outputs": [
+        "./dist/**"
+      ],
       "inputs": [
-        "src/**", "package.json", "package-lock.json", "tsconfig.build.json",
-        "!./**/__tests__/**", "!./**/*.babel", "!./**/LICENSE", "!./**/AUTHORS", "!./**/README.md", "!./**/CHANGELOG.md"
+        "src/**",
+        "package.json",
+        "package-lock.json",
+        "tsconfig.build.json",
+        "!./**/__tests__/**",
+        "!./**/*.babel",
+        "!./**/LICENSE",
+        "!./**/AUTHORS",
+        "!./**/README.md",
+        "!./**/CHANGELOG.md"
       ],
       "cache": true
     },
     "web#build": {
-      "dependsOn": ["@cloudforet/mirinae#build", "@cloudforet/mirinae#transpile", "@cloudforet/utils#build", "@cloudforet/core-lib#build"],
-      "outputs": ["./dist/**"],
+      "dependsOn": [
+        "@cloudforet/mirinae#build",
+        "@cloudforet/mirinae#transpile",
+        "@cloudforet/utils#build",
+        "@cloudforet/core-lib#build"
+      ],
+      "outputs": [
+        "./dist/**"
+      ],
       "inputs": [
-        "public/**", "!public/config/development.json",
-        "src/**", "!src/assets/**", "src/assets/images/**",
-        "package.json", "package-lock.json", "tsconfig.json",
-        "vite.config.js", "postcss.config.cjs", "tailwind.config.cjs",
-        "!./**/__tests__/**", "!./**/*.babel", "!./**/LICENSE", "!./**/AUTHORS", "!./**/README.md", "!./**/CHANGELOG.md"
+        "public/**",
+        "!public/config/development.json",
+        "src/**",
+        "!src/assets/**",
+        "src/assets/images/**",
+        "package.json",
+        "package-lock.json",
+        "tsconfig.json",
+        "vite.config.js",
+        "postcss.config.cjs",
+        "tailwind.config.cjs",
+        "!./**/__tests__/**",
+        "!./**/*.babel",
+        "!./**/LICENSE",
+        "!./**/AUTHORS",
+        "!./**/README.md",
+        "!./**/CHANGELOG.md"
       ],
       "cache": true
     },
     "storybook#build": {
-      "outputs": ["./.storybook-static/**"],
+      "outputs": [
+        "./.storybook-static/**"
+      ],
       "inputs": [
-        "../../packages/mirinae/src/**", "../../packages/mirinae/postcss.config.js", "../../packages/mirinae/tailwind.config.js",  "../../packages/mirinae/package.json",
-        "tsconfig.json", "tailwind.config.js", "postcss.config.js", ".storybook/**/*",
-        "!./**/__tests__/**", "!./**/*.babel", "!./**/LICENSE", "!./**/AUTHORS", "!./**/README.md", "!./**/CHANGELOG.md"
+        "../../packages/mirinae/src/**",
+        "../../packages/mirinae/postcss.config.js",
+        "../../packages/mirinae/tailwind.config.js",
+        "../../packages/mirinae/package.json",
+        "tsconfig.json",
+        "tailwind.config.js",
+        "postcss.config.js",
+        ".storybook/**/*",
+        "!./**/__tests__/**",
+        "!./**/*.babel",
+        "!./**/LICENSE",
+        "!./**/AUTHORS",
+        "!./**/README.md",
+        "!./**/CHANGELOG.md"
       ],
       "cache": true
     },
     "transpile": {
-      "dependsOn": ["^transpile"],
-      "outputs": ["./types/**"],
+      "dependsOn": [
+        "^transpile"
+      ],
+      "outputs": [
+        "./types/**"
+      ],
       "cache": true
     },
     "@cloudforet/mirinae#transpile": {
-      "outputs": ["./types/**"],
-        "inputs": [
-          "src/**",
-          "package.json", "tsconfig.build.json", "vite.config.js",
-          "!./**/__tests__/**", "!./**/*.babel", "!./**/LICENSE", "!./**/AUTHORS", "!./**/README.md", "!./**/CHANGELOG.md"
-        ],
+      "outputs": [
+        "./types/**"
+      ],
+      "inputs": [
+        "src/**",
+        "package.json",
+        "tsconfig.build.json",
+        "vite.config.js",
+        "!./**/__tests__/**",
+        "!./**/*.babel",
+        "!./**/LICENSE",
+        "!./**/AUTHORS",
+        "!./**/README.md",
+        "!./**/CHANGELOG.md"
+      ],
       "cache": true
     },
     "@cloudforet/mirinae#build": {
-      "outputs": ["./dist/**", "./css/**", "./types/**"],
+      "outputs": [
+        "./dist/**",
+        "./css/**",
+        "./types/**"
+      ],
       "inputs": [
-        "src/**", "postcss.config.cjs", "tailwind.config.cjs",
-        "package.json", "tsconfig.build.json", "vite.config.js",
-        "!./**/__tests__/**", "!./**/*.babel", "!./**/LICENSE", "!./**/AUTHORS", "!./**/README.md", "!./**/CHANGELOG.md"
+        "src/**",
+        "postcss.config.cjs",
+        "tailwind.config.cjs",
+        "package.json",
+        "tsconfig.build.json",
+        "vite.config.js",
+        "!./**/__tests__/**",
+        "!./**/*.babel",
+        "!./**/LICENSE",
+        "!./**/AUTHORS",
+        "!./**/README.md",
+        "!./**/CHANGELOG.md"
       ],
       "cache": true
     },
@@ -68,17 +150,23 @@
       "cache": false
     },
     "lint": {
-      "dependsOn": ["^lint"],
+      "dependsOn": [
+        "^lint"
+      ],
       "outputs": [],
       "cache": false
     },
     "format": {
-      "dependsOn": ["^format"],
+      "dependsOn": [
+        "^format"
+      ],
       "outputs": [],
       "cache": false
     },
     "test": {
-      "dependsOn": ["^test"],
+      "dependsOn": [
+        "^test"
+      ],
       "outputs": [],
       "cache": false
     }
