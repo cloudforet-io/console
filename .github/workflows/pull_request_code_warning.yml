@@ -42,7 +42,10 @@ jobs:
             !packages/mirinae/cli
             !apps/web/public
             !apps/web/build
-            
+
+      - name: All checkout files
+        run: |
+          ls -al
 
       - name: Check for TODOs
         id: check_todo
