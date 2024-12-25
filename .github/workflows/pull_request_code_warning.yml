@@ -63,7 +63,7 @@ jobs:
         id: check_console_log
         run: |
           echo "Checking for console.log..."
-          LOG_FILES=$(grep -rl "console.log" . --exclude-dir={apps/web/build, apps/web/public, packages/mirinae/scripts, packages/mirinae/cli} || true)
+          LOG_FILES=$(grep -rl "console.log" . --exclude-dir={.git,apps/web/build,apps/web/public,packages/mirinae/scripts,packages/mirinae/cli} || true)
           LOG_COUNT=0
           if [ -n "$LOG_FILES" ]; then
             echo "The following files contain console.log:"
@@ -79,7 +79,7 @@ jobs:
         id: check_console_debug
         run: |
           echo "Checking for console.debug..."
-          LOG_FILES=$(grep -rl "console.debug" .  --exclude-dir={apps/web/build, apps/web/public, packages/mirinae/scripts, packages/mirinae/cli} || true)
+          LOG_FILES=$(grep -rl "console.debug" .  --exclude-dir={.git,apps/web/build,apps/web/public,packages/mirinae/scripts,packages/mirinae/cli} || true)
           LOG_COUNT=0
           if [ -n "$LOG_FILES" ]; then
             echo "The following files contain console.debug:"
