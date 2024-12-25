@@ -105,6 +105,7 @@ const fetchCreateNotifications = async () => {
 
 onUnmounted(() => {
     serviceCreateFormStore.initState();
+    serviceCreateFormStore.$dispose();
 });
 </script>
 

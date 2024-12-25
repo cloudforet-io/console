@@ -23,8 +23,6 @@ import type { EscalationPolicyModel } from '@/schema/alert-manager/escalation-po
 import type { EscalationPolicyRulesType } from '@/schema/alert-manager/escalation-policy/type';
 import { i18n as _i18n } from '@/translations';
 
-import { useUserStore } from '@/store/user/user-store';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 
@@ -44,8 +42,7 @@ import type { EscalationPolicyModalType } from '@/services/alert-manager-v2/type
 
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
-const userStore = useUserStore();
-const userState = userStore.state;
+const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const tableState = reactive({
     actionMenu: computed<MenuItem[]>(() => ([
@@ -66,7 +63,7 @@ const tableState = reactive({
 const storeState = reactive({
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
     defaultEscalationPolicyId: computed<string>(() => serviceDetailPageState.serviceInfo.escalation_policy_id),
-    timezone: computed<string>(() => userState.timezone || ''),
+    timezone: computed<string>(() => serviceDetailPageGetters.timezone),
 });
 const state = reactive({
     loading: false,
@@ -85,7 +82,7 @@ const escalationPolicyListApiQueryHelper = new ApiQueryHelper().setSort('created
 const queryTagHelper = useQueryTags({ keyItemSets: ESCALATION_POLICY_MANAGEMENT_TABLE_HANDLER.keyItemSets });
 const { queryTags } = queryTagHelper;
 
-const getConnectChannelCount = (rules: EscalationPolicyRulesType[]) => {
+const getConnectChannelCount = (rules: EscalationPolicyRulesType[]): number => {
     const allChannels = rules.flatMap((item) => item.channels);
     const uniqueChannels = new Set(allChannels);
     return uniqueChannels.size;

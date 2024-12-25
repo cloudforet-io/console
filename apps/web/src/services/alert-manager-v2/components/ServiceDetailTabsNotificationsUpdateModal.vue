@@ -14,7 +14,6 @@ import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel
 import type { ServiceChannelScheduleInfoType, ServiceChannelScheduleType } from '@/schema/alert-manager/service-channel/type';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
@@ -31,7 +30,6 @@ import { createScheduleMap } from '@/services/alert-manager-v2/composables/form-
 import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
 import type { UserRadioType, ProtocolInfo } from '@/services/alert-manager-v2/types/alert-manager-type';
 
-
 interface Props {
     selectedItem?: ServiceChannelModel;
     visible?: boolean;
@@ -41,10 +39,9 @@ const props = withDefaults(defineProps<Props>(), {
     visible: false,
 });
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
+const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const emit = defineEmits<{(e: 'close'): void;
     (e: 'update:visible'): void
@@ -52,7 +49,7 @@ const emit = defineEmits<{(e: 'close'): void;
 
 const storeState = reactive({
     notificationProtocolList: computed<NotificationProtocolModel[]>(() => serviceDetailPageState.notificationProtocolList),
-    plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
+    plugins: computed<PluginReferenceMap>(() => serviceDetailPageGetters.pluginsReferenceMap),
 });
 const state = reactive({
     loading: false,

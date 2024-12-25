@@ -9,6 +9,7 @@ import {
     PDefinitionTable, PButton, PStatus, PMarkdown, PLazyImg, PLink,
 } from '@cloudforet/mirinae';
 
+import { WEBHOOK_STATE } from '@/schema/alert-manager/webhook/constants';
 import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
 import type { PluginModel } from '@/schema/repository/plugin/model';
 import { i18n as _i18n } from '@/translations';
@@ -22,6 +23,11 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { useServiceCreateFormStore } from '@/services/alert-manager-v2/stores/service-create-form-store';
 import { userStateFormatter } from '@/services/iam/composables/refined-table-data';
 
+type WebhookTableData = {
+    name: string;
+    state: string;
+    version: string;
+};
 interface Props {
     succeedWebhook?: WebhookModel;
 }
@@ -29,13 +35,13 @@ const props = withDefaults(defineProps<Props>(), {
     succeedWebhook: undefined,
 });
 
-const serviceFormStore = useServiceCreateFormStore();
-const serviceFormState = serviceFormStore.state;
+const serviceCreateFormStore = useServiceCreateFormStore();
+const serviceCreateFormState = serviceCreateFormStore.state;
 const userStore = useUserStore();
 
 const storeState = reactive({
-    language: computed(() => userStore.state.language),
-    selectedWebhookType: computed<PluginModel|undefined>(() => serviceFormState.selectedWebhookType),
+    language: computed<string>(() => userStore.state.language || 'en'),
+    selectedWebhookType: computed<PluginModel|undefined>(() => serviceCreateFormState.selectedWebhookType),
 });
 
 const state = reactive({
@@ -44,12 +50,12 @@ const state = reactive({
         { name: 'state', label: _i18n.t('ALERT_MANAGER.WEBHOOK.LABEL_STATE') },
         { name: 'version', label: _i18n.t('ALERT_MANAGER.WEBHOOK.VERSION') },
     ]),
-    data: computed(() => ({
-        name: props.succeedWebhook?.name,
-        state: props.succeedWebhook?.state,
-        version: props.succeedWebhook?.plugin_info?.version,
+    data: computed<WebhookTableData>(() => ({
+        name: props.succeedWebhook?.name || '',
+        state: props.succeedWebhook?.state || WEBHOOK_STATE.ENABLED,
+        version: props.succeedWebhook?.plugin_info?.version || '',
     })),
-    guideDocsLink: computed(() => {
+    guideDocsLink: computed<string>(() => {
         const language = storeState.language === 'ko' ? 'ko/' : '';
         return `https://cloudforet.io/${language}docs/guides/plugins/alert-manager-webhook/`;
     }),

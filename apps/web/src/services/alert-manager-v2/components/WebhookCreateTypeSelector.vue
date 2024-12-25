@@ -18,7 +18,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useServiceCreateFormStore } from '@/services/alert-manager-v2/stores/service-create-form-store';
 
-const serviceFormStore = useServiceCreateFormStore();
+const serviceCreateFormStore = useServiceCreateFormStore();
 
 const state = reactive({
     loading: true,
@@ -27,7 +27,7 @@ const state = reactive({
 });
 
 const handleSelectWebhook = () => {
-    serviceFormStore.setSelectedWebhookType(state.selectedWebhookType);
+    serviceCreateFormStore.setSelectedWebhookType(state.selectedWebhookType);
 };
 
 const getRepositoryID = async (): Promise<string> => {

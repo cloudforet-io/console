@@ -20,18 +20,18 @@ import WebhookCreateTypeSelector
     from '@/services/alert-manager-v2/components/WebhookCreateTypeSelector.vue';
 import { useServiceCreateFormStore } from '@/services/alert-manager-v2/stores/service-create-form-store';
 
-const serviceFormStore = useServiceCreateFormStore();
-const serviceFormState = serviceFormStore.state;
+const serviceCreateFormStore = useServiceCreateFormStore();
+const serviceCreateFormState = serviceCreateFormStore.state;
 
 const storeState = reactive({
-    currentSubStep: computed<number>(() => serviceFormState.currentSubStep),
-    selectedWebhookType: computed<PluginModel|undefined>(() => serviceFormState.selectedWebhookType),
-    webhookName: computed<string>(() => serviceFormState.webhookName || ''),
-    createdServiceId: computed<string>(() => serviceFormState.createdServiceId),
-    webhookVersion: computed<string|undefined>(() => serviceFormState.webhookVersion || ''),
+    currentSubStep: computed<number>(() => serviceCreateFormState.currentSubStep),
+    selectedWebhookType: computed<PluginModel|undefined>(() => serviceCreateFormState.selectedWebhookType),
+    webhookName: computed<string>(() => serviceCreateFormState.webhookName || ''),
+    createdServiceId: computed<string>(() => serviceCreateFormState.createdServiceId),
+    webhookVersion: computed<string|undefined>(() => serviceCreateFormState.webhookVersion || ''),
 });
 const state = reactive({
-    isAllFormValid: computed(() => {
+    isAllFormValid: computed<boolean>(() => {
         if (storeState.currentSubStep === 1) return storeState.selectedWebhookType?.plugin_id !== '';
         if (storeState.currentSubStep === 2) return storeState.webhookName !== '';
         return true;
@@ -50,14 +50,14 @@ const handleCreateWebhook = async () => {
             service_id: storeState.createdServiceId,
         });
         showSuccessMessage(i18n.t('ALERT_MANAGER.WEBHOOK.ALT_S_CREATE_WEBHOOK'), '');
-        serviceFormStore.setCurrentSubStep(3);
+        serviceCreateFormStore.setCurrentSubStep(3);
     } catch (e) {
         ErrorHandler.handleError(e, true);
     }
 };
 
 onUnmounted(() => {
-    serviceFormStore.initStep2();
+    serviceCreateFormStore.initStep2();
 });
 </script>
 

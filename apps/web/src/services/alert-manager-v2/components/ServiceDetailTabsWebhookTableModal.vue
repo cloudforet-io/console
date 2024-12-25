@@ -11,7 +11,6 @@ import { WEBHOOK_STATE } from '@/schema/alert-manager/webhook/constants';
 import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -19,6 +18,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { alertManagerStateFormatter } from '@/services/alert-manager-v2/composables/refined-table-data';
 import { WEBHOOK_MANAGEMENT_TABLE_FIELDS } from '@/services/alert-manager-v2/constants/webhook-table-constant';
+import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
 
 interface Props {
     selectedItem?: WebhookModel;
@@ -29,11 +29,11 @@ const props = withDefaults(defineProps<Props>(), {
     visible: false,
 });
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
+const serviceDetailPageStore = useServiceDetailPageStore();
+const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const storeState = reactive({
-    plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
+    plugins: computed<PluginReferenceMap>(() => serviceDetailPageGetters.pluginsReferenceMap),
 });
 
 const emit = defineEmits<{(e: 'close'): void;

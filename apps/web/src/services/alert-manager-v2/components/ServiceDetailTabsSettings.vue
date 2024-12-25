@@ -55,7 +55,7 @@ const state = reactive({
     notificationPolicy: computed<NotificationUrgencyType>(() => storeState.serviceInfo.options.notification_urgency),
     autoRecovery: computed<RecoveryModeType>(() => storeState.serviceInfo.options.recovery_mode),
     // TODO: temp data
-    ruleSet: 3,
+    ruleSet: 0,
 });
 
 const getCardValueInfo = (type: ServiceDetailSettingCardType): CardValueInfoType|undefined => {

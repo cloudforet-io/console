@@ -13,12 +13,13 @@ import type { WebhookUpdateParameters } from '@/schema/alert-manager/webhook/api
 import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginItem, PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
+
+import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
 
 interface Props {
     selectedItem?: WebhookModel;
@@ -29,15 +30,15 @@ const props = withDefaults(defineProps<Props>(), {
     visible: false,
 });
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
+const serviceDetailPageStore = useServiceDetailPageStore();
+const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const emit = defineEmits<{(e: 'close'): void;
     (e: 'update:visible'): void
 }>();
 
 const storeState = reactive({
-    plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
+    plugins: computed<PluginReferenceMap>(() => serviceDetailPageGetters.pluginsReferenceMap),
 });
 const state = reactive({
     loading: false,

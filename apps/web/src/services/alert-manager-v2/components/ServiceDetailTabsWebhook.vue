@@ -23,9 +23,7 @@ import { WEBHOOK_STATE } from '@/schema/alert-manager/webhook/constants';
 import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
 import { i18n as _i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
-import { useUserStore } from '@/store/user/user-store';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
@@ -59,12 +57,9 @@ const props = withDefaults(defineProps<Props>(), {
     tableHeight: 522,
 });
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
-const userStore = useUserStore();
-const userState = userStore.state;
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
+const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const router = useRouter();
 
@@ -99,8 +94,8 @@ const tableState = reactive({
     fields: WEBHOOK_MANAGEMENT_TABLE_FIELDS,
 });
 const storeState = reactive({
-    plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
-    timezone: computed<string>(() => userState.timezone || ''),
+    plugins: computed<PluginReferenceMap>(() => serviceDetailPageGetters.pluginsReferenceMap),
+    timezone: computed<string>(() => serviceDetailPageGetters.timezone),
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
     selectedWebhookId: computed<string|undefined>(() => serviceDetailPageState.selectedWebhookId),
 });

@@ -14,8 +14,6 @@ import type { EscalationPolicyRulesType } from '@/schema/alert-manager/escalatio
 import type { ServiceUpdateParameters } from '@/schema/alert-manager/service/api-verbs/update';
 import type { ServiceModel } from '@/schema/alert-manager/service/model';
 
-import { useUserStore } from '@/store/user/user-store';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -33,24 +31,23 @@ const props = withDefaults(defineProps<Props>(), {
     selectedItem: undefined,
 });
 
-const userStore = useUserStore();
-const userState = userStore.state;
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
+const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const emit = defineEmits<{(e: 'update:visible'): void;
     (e: 'close'): void;
 }>();
 
 const storeState = reactive({
-    timezone: computed<string>(() => userState.timezone || ''),
+    timezone: computed<string>(() => serviceDetailPageGetters.timezone),
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
 });
 const state = reactive({
     loading: false,
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
 });
-const getConnectChannelCount = (rules: EscalationPolicyRulesType[]) => {
+const getConnectChannelCount = (rules: EscalationPolicyRulesType[]): number => {
     const allChannels = rules.flatMap((item) => item.channels);
     const uniqueChannels = new Set(allChannels);
     return uniqueChannels.size;

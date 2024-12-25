@@ -15,8 +15,6 @@ import { ALERT_EVENT_ACTION } from '@/schema/alert-manager/alert/constants';
 import type { AlertModel, AlertEventModel } from '@/schema/alert-manager/alert/model';
 import type { AlertEventActionType } from '@/schema/alert-manager/alert/type';
 
-import { useUserStore } from '@/store/user/user-store';
-
 import { copyAnyData } from '@/lib/helper/copy-helper';
 
 import VerticalTimelineItem from '@/common/components/vertical-timeline/VerticalTimelineItem.vue';
@@ -26,12 +24,11 @@ import { useAlertDetailPageStore } from '@/services/alert-manager-v2/stores/aler
 
 const alertDetailPageStore = useAlertDetailPageStore();
 const alertDetailPageState = alertDetailPageStore.state;
-const userStore = useUserStore();
-const userState = userStore.state;
+const alertDetailPageGetters = alertDetailPageStore.getters;
 
 const storeState = reactive({
     alertInfo: computed<AlertModel>(() => alertDetailPageState.alertInfo),
-    timezone: computed(() => userState.timezone),
+    timezone: computed<string>(() => alertDetailPageGetters.timezone),
 });
 const state = reactive({
     loading: true,
@@ -47,7 +44,7 @@ const state = reactive({
     isAlertVisible: false,
 });
 
-const getStyleInfo = (item: AlertEventActionType) => {
+const getStyleInfo = (item: AlertEventActionType): string => {
     if (item === ALERT_EVENT_ACTION.TRIGGERED) return 'red';
     if (item === ALERT_EVENT_ACTION.ACKNOWLEDGED) return 'violet';
     if (item === ALERT_EVENT_ACTION.RESOLVED) return 'green';

@@ -18,7 +18,6 @@ import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel
 import type { ServiceChannelScheduleInfoType, ServiceChannelScheduleDayType } from '@/schema/alert-manager/service-channel/type';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 import type { UserGroupReferenceMap } from '@/store/reference/user-group-reference-store';
 
@@ -44,8 +43,8 @@ type ScheduleInfo = {
 
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
+const serviceDetailPageGetters = serviceDetailPageStore.getters;
+
 const tabState = reactive({
     notificationsDetailTabs: computed<TabItem[]>(() => ([
         { label: i18n.t('ALERT_MANAGER.ALERTS.DETAILS'), name: NOTIFICATIONS_DETAIL_TABS.DETAIL },
@@ -55,8 +54,8 @@ const tabState = reactive({
 const storeState = reactive({
     selectedNotificationId: computed<string|undefined>(() => serviceDetailPageState.selectedNotificationId),
     notificationProtocolList: computed<NotificationProtocolModel[]>(() => serviceDetailPageState.notificationProtocolList),
-    plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
-    userGroup: computed<UserGroupReferenceMap>(() => allReferenceGetters.user_group),
+    plugins: computed<PluginReferenceMap>(() => serviceDetailPageGetters.pluginsReferenceMap),
+    userGroup: computed<UserGroupReferenceMap>(() => serviceDetailPageGetters.userGroupReferenceMap),
 });
 const state = reactive({
     notificationInfo: {} as ServiceChannelModel,

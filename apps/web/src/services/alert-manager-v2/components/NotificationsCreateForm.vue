@@ -20,11 +20,11 @@ import { createScheduleMap } from '@/services/alert-manager-v2/composables/form-
 import { useServiceCreateFormStore } from '@/services/alert-manager-v2/stores/service-create-form-store';
 import type { CreatedNotificationInfoType, UserRadioType } from '@/services/alert-manager-v2/types/alert-manager-type';
 
-const serviceFormStore = useServiceCreateFormStore();
-const serviceFormState = serviceFormStore.state;
+const serviceCreateFormStore = useServiceCreateFormStore();
+const serviceCreateFormState = serviceCreateFormStore.state;
 
 const storeState = reactive({
-    selectedProtocolType: computed<NotificationProtocolModel|undefined>(() => serviceFormState.selectedProtocol),
+    selectedProtocolType: computed<NotificationProtocolModel|undefined>(() => serviceCreateFormState.selectedProtocol),
 });
 const state = reactive({
     scheduleForm: {} as ScheduleForm,

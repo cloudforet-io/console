@@ -39,6 +39,10 @@ const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
 });
 
+const handleClose = () => {
+    state.proxyVisible = false;
+};
+
 const handleConfirm = async () => {
     state.loading = true;
     try {
@@ -50,9 +54,6 @@ const handleConfirm = async () => {
         state.loading = false;
         handleClose();
     }
-};
-const handleClose = () => {
-    state.proxyVisible = false;
 };
 </script>
 

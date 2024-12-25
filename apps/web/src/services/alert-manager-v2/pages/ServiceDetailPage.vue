@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps, onMounted, onUnmounted } from 'vue';
+import { defineProps, onUnmounted, watch } from 'vue';
 
 import ServiceDetailHeader from '@/services/alert-manager-v2/components/ServiceDetailHeader.vue';
 import ServiceDetailTabs from '@/services/alert-manager-v2/components/ServiceDetailTabs.vue';
@@ -14,13 +14,15 @@ const props = withDefaults(defineProps<Props>(), {
 
 const serviceDetailPageStore = useServiceDetailPageStore();
 
-onMounted(async () => {
+watch(() => props.serviceId, async (serviceId) => {
+    if (!serviceId) return;
     await serviceDetailPageStore.fetchNotificationProtocolList();
-    await serviceDetailPageStore.fetchServiceDetailData(props.serviceId);
-});
+    await serviceDetailPageStore.fetchServiceDetailData(serviceId);
+}, { immediate: true });
 
 onUnmounted(() => {
     serviceDetailPageStore.initState();
+    serviceDetailPageStore.$dispose();
 });
 </script>
 

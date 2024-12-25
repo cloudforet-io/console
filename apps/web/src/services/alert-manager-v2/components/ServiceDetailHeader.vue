@@ -63,7 +63,7 @@ const handleGoBackButton = () => {
 
 <template>
     <div class="service-detail-header">
-        <div class="content">
+        <div class="flex flex-col pb-6 gap-1">
             <p-heading-layout>
                 <template #heading>
                     <p-heading :title="storeState.serviceInfo.name"
@@ -93,7 +93,7 @@ const handleGoBackButton = () => {
                     </p-link>
                 </template>
             </p-heading-layout>
-            <div class="service-info-wrapper">
+            <div class="flex items-center pl-10 text-label-sm gap-2">
                 <div class="service-member flex items-center text-gray-700 gap-0.5"
                      @click="handleActionModal('member')"
                 >
@@ -142,19 +142,9 @@ const handleGoBackButton = () => {
 
 <style scoped lang="postcss">
 .service-detail-header {
-    .content {
-        @apply flex flex-col;
-        padding-bottom: 1.5rem;
-        gap: 0.375rem;
-        .service-info-wrapper {
-            @apply flex items-center text-label-sm;
-            padding-left: 2.5rem;
-            gap: 0.5rem;
-            .service-member {
-                &:hover {
-                    @apply cursor-pointer;
-                }
-            }
+    .service-member {
+        &:hover {
+            @apply cursor-pointer;
         }
     }
 }

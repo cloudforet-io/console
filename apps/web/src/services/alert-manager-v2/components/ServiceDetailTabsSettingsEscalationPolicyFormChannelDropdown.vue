@@ -21,7 +21,6 @@ import type { UserGroupChannelListParameters } from '@/schema/alert-manager/user
 import type { UserGroupChannelModel } from '@/schema/alert-manager/user-group-channel/model';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { UserGroupReferenceMap } from '@/store/reference/user-group-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
@@ -50,14 +49,12 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{(event: 'update:selected-ids', value: string[]): void;
 }>();
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const storeState = reactive({
-    userReferenceMap: computed<UserReferenceMap>(() => allReferenceGetters.user),
-    userGroupReferenceMap: computed<UserGroupReferenceMap>(() => allReferenceGetters.user_group),
+    userReferenceMap: computed<UserReferenceMap>(() => serviceDetailPageGetters.userReferenceMap),
+    userGroupReferenceMap: computed<UserGroupReferenceMap>(() => serviceDetailPageGetters.userGroupReferenceMap),
     serviceId: computed<string>(() => serviceDetailPageGetters.serviceInfo.service_id),
 });
 const state = reactive({
@@ -85,7 +82,7 @@ const state = reactive({
 
 const menuItemsHandler = (): AutocompleteHandler => async (keyword: string, pageStart = 1, pageLimit = 10, filters, resultIndex) => {
     const _totalCount = pageStart - 1 + pageLimit;
-    const filterItems = (items: DropdownItem[]) => items.filter((item) => getTextHighlightRegex(keyword).test(item.name)).slice(pageStart - 1, _totalCount);
+    const filterItems = (items: DropdownItem[]): DropdownItem[] => items.filter((item) => getTextHighlightRegex(keyword).test(item.name)).slice(pageStart - 1, _totalCount);
 
     if (resultIndex === undefined) {
         return state.dropdownCategories.map((c, idx) => {
@@ -123,9 +120,9 @@ const menuItemsHandler = (): AutocompleteHandler => async (keyword: string, page
 const currentChannelIds = computed<string[]>(() => state.selectedItems.map((item) => item.name));
 
 const handleUpdateSelectedUserItems = (selectedUsers: SelectDropdownMenuItem[]) => {
-    if (isEqual(selectedUsers, state.selectedItems)) return; // prevent unnecessary update
-    state.selectedItems = selectedUsers; // it updates currentChannelIds automatically
-    if (isEqual(currentChannelIds.value, props.selectedIds)) return; // prevent unnecessary update
+    if (isEqual(selectedUsers, state.selectedItems)) return;
+    state.selectedItems = selectedUsers;
+    if (isEqual(currentChannelIds.value, props.selectedIds)) return;
     emit('update:selected-ids', currentChannelIds.value);
 };
 const handleTagDelete = (idx: number) => {
@@ -176,7 +173,7 @@ watch(() => storeState.serviceId, async (serviceId) => {
     await fetchUserGroupChannelList();
 }, { immediate: true });
 watch(() => props.selectedIds, (newChannelId) => {
-    if (isEqual(currentChannelIds.value, newChannelId)) return; // prevent infinite loop
+    if (isEqual(currentChannelIds.value, newChannelId)) return;
     initMultipleType(newChannelId);
 }, { immediate: true });
 </script>

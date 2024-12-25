@@ -18,11 +18,11 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import { useServiceCreateFormStore } from '@/services/alert-manager-v2/stores/service-create-form-store';
 
-const serviceFormStore = useServiceCreateFormStore();
-const serviceFormState = serviceFormStore.state;
+const serviceCreateFormStore = useServiceCreateFormStore();
+const serviceCreateFormState = serviceCreateFormStore.state;
 
 const storeState = reactive({
-    selectedWebhookType: computed<PluginModel|undefined>(() => serviceFormState.selectedWebhookType),
+    selectedWebhookType: computed<PluginModel|undefined>(() => serviceCreateFormState.selectedWebhookType),
 });
 const state = reactive({
     loading: false,
@@ -49,7 +49,7 @@ const {
 
 const handleChangeInput = (val: string) => {
     setForm('name', val);
-    serviceFormStore.setWebhookName(val);
+    serviceCreateFormStore.setWebhookName(val);
 };
 
 const getVersions = async () => {
@@ -59,7 +59,7 @@ const getVersions = async () => {
             plugin_id: storeState.selectedWebhookType?.plugin_id || '',
         });
         state.pluginVersions = results ? results[0] : undefined;
-        serviceFormStore.setWebhookVersion(state.pluginVersions);
+        serviceCreateFormStore.setWebhookVersion(state.pluginVersions);
     } catch (e) {
         state.pluginVersions = undefined;
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_GET_VERSION_TITLE'));

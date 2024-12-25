@@ -16,6 +16,12 @@ import { NOTIFICATION_URGENCY, RECOVERY_MODE, SERVICE_ALERTS_TYPE } from '@/sche
 import type { ServiceModel } from '@/schema/alert-manager/service/model';
 import type { AlertsInfoType, AlertsType } from '@/schema/alert-manager/service/type';
 
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
+import type { UserGroupReferenceMap } from '@/store/reference/user-group-reference-store';
+import type { UserReferenceMap } from '@/store/reference/user-reference-store';
+import { useUserStore } from '@/store/user/user-store';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/common-constant';
@@ -32,9 +38,19 @@ interface ServiceFormStoreState {
 }
 interface ServiceFormStoreGetters {
     serviceInfo: ComputedRef<Service>;
+    pluginsReferenceMap: ComputedRef<PluginReferenceMap>;
+    userGroupReferenceMap: ComputedRef<UserGroupReferenceMap>;
+    userReferenceMap: ComputedRef<UserReferenceMap>;
+    timezone: ComputedRef<string>;
+    language: ComputedRef<string>;
 }
 
 export const useServiceDetailPageStore = defineStore('page-service-detail', () => {
+    const allReferenceStore = useAllReferenceStore();
+    const allReferenceGetters = allReferenceStore.getters;
+    const userStore = useUserStore();
+    const userState = userStore.state;
+
     const state = reactive<ServiceFormStoreState>({
         loading: false,
         currentTab: SERVICE_DETAIL_TABS.OVERVIEW,
@@ -46,7 +62,7 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
     });
 
     const getters = reactive<ServiceFormStoreGetters>({
-        serviceInfo: computed<Service>(() => {
+        serviceInfo: computed(() => {
             const defaultAlerts = { high: 0, low: 0 };
             const getAlerts = (alertKey: AlertsType): AlertsInfoType => {
                 const alertValue = state.serviceInfo.alerts?.[alertKey] || defaultAlerts;
@@ -70,6 +86,11 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
                 },
             };
         }),
+        pluginsReferenceMap: computed(() => allReferenceGetters.plugin),
+        userGroupReferenceMap: computed(() => allReferenceGetters.user_group),
+        userReferenceMap: computed(() => allReferenceGetters.user),
+        timezone: computed(() => userState.timezone || 'UTC'),
+        language: computed(() => userStore.state.language || 'en'),
     });
 
     const mutations = {

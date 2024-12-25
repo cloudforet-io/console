@@ -30,7 +30,6 @@ const state = reactive({
     loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
 });
-
 const handleConfirm = async () => {
     state.loading = true;
     try {

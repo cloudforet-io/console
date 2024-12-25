@@ -36,8 +36,6 @@ const handleClickCreateButton = () => {
                 </p-button>
             </template>
         </p-heading-layout>
-        <div class="mt-6">
-            <service-list />
-        </div>
+        <service-list class="mt-6" />
     </div>
 </template>

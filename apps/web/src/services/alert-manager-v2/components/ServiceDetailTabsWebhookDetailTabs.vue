@@ -20,9 +20,7 @@ import type { RepositoryListParameters } from '@/schema/repository/repository/ap
 import type { RepositoryModel } from '@/schema/repository/repository/model';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
-import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -32,15 +30,13 @@ import { WEBHOOK_DEFINITION_FIELDS } from '@/services/alert-manager-v2/constants
 import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
 import type { WebhookDetailTabsType } from '@/services/alert-manager-v2/types/alert-manager-type';
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
-const userStore = useUserStore();
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
+const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const storeState = reactive({
-    language: computed(() => userStore.state.language),
-    plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
+    language: computed<string>(() => serviceDetailPageGetters.language),
+    plugins: computed<PluginReferenceMap>(() => serviceDetailPageGetters.pluginsReferenceMap),
     selectedWebhookId: computed<string|undefined>(() => serviceDetailPageState.selectedWebhookId),
 });
 const tabState = reactive({

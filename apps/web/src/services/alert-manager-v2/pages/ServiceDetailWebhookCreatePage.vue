@@ -122,6 +122,7 @@ const fetchCreateWebhook = async () => {
 
 onUnmounted(() => {
     serviceCreateFormStore.initState();
+    serviceCreateFormStore.$dispose();
 });
 </script>
 

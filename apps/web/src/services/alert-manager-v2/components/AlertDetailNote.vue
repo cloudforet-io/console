@@ -7,8 +7,6 @@ import {
 } from '@cloudforet/mirinae';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-
-
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
 import type { NoteCreateParameters } from '@/schema/alert-manager/note/api-verbs/create';
@@ -16,18 +14,16 @@ import type { NoteDeleteParameters } from '@/schema/alert-manager/note/api-verbs
 import type { NoteListParameters } from '@/schema/alert-manager/note/api-verbs/list';
 import type { NoteModel } from '@/schema/alert-manager/note/model';
 
-import { useUserStore } from '@/store/user/user-store';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useAlertDetailPageStore } from '@/services/alert-manager-v2/stores/alert-detail-page-store';
 
-const userStore = useUserStore();
 const alertDetailPageStore = useAlertDetailPageStore();
 const alertDetailPageState = alertDetailPageStore.state;
+const alertDetailPageGetters = alertDetailPageStore.getters;
 
 const storeState = reactive({
-    timezone: computed<string>(() => userStore.state.timezone ?? 'UTC'),
+    timezone: computed<string>(() => alertDetailPageGetters.timezone),
     alertInfo: computed<AlertModel>(() => alertDetailPageState.alertInfo),
 });
 const state = reactive({

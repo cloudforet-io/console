@@ -1,4 +1,5 @@
-import { reactive } from 'vue';
+import type { ComputedRef } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
@@ -8,16 +9,29 @@ import type { AlertGetParameters } from '@/schema/alert-manager/alert/api-verbs/
 import type { AlertUpdateParameters } from '@/schema/alert-manager/alert/api-verbs/update';
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
 
+import { useUserStore } from '@/store/user/user-store';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface AlertDetailPageStoreState {
     alertInfo: AlertModel;
 }
+interface AlertDetailPageStoreGetters {
+    timezone: ComputedRef<string>;
+}
 
 export const useAlertDetailPageStore = defineStore('page-alert-detail', () => {
+    const userStore = useUserStore();
+    const userState = userStore.state;
+
     const state = reactive<AlertDetailPageStoreState>({
         alertInfo: {} as AlertModel,
     });
+
+    const getters = reactive<AlertDetailPageStoreGetters>({
+        timezone: computed(() => userState.timezone || 'UTC'),
+    });
+
     const actions = {
         async init() {
             state.alertInfo = {} as AlertModel;
@@ -43,6 +57,7 @@ export const useAlertDetailPageStore = defineStore('page-alert-detail', () => {
 
     return {
         state,
+        getters,
         ...actions,
     };
 });

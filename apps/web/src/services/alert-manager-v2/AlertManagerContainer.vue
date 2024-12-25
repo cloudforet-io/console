@@ -5,7 +5,6 @@ import CenteredPageLayout from '@/common/modules/page-layouts/CenteredPageLayout
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 
 const route = useRoute();
-
 </script>
 
 <template>
