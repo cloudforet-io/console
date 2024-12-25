@@ -3,7 +3,7 @@ name: "[PR] Code Warning"
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-    paths-ignores:
+    paths-ignore:
       - '.github/**'
       - '**/deploy/**'
       - '**/Dockerfile'
@@ -19,7 +19,7 @@ on:
     branches:
       - master
       - feature-*
-    workflow_dispatch:
+  workflow_dispatch:
 
 
 jobs:
