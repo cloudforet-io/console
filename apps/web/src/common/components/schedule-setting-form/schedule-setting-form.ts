@@ -1,21 +1,24 @@
 import type { TranslateResult } from 'vue-i18n';
 
-import type { ServiceChannelScheduleType } from '@/schema/alert-manager/service-channel/type';
-
-export type ScheduleDayType = 'MON' | 'TUE' | 'WED' | 'THU' | 'FRI' | 'SAT' | 'SUN';
+export type ScheduleType = 'ALL_DAY' | 'WEEK_DAY' | 'WEEKEND' | 'CUSTOM';
+export type DayType = 'MON' | 'TUE' | 'WED' | 'THU' | 'FRI' | 'SAT' | 'SUN';
 
 export type ScheduleRadioType = {
-    name: ServiceChannelScheduleType;
+    name: ScheduleType;
     label: TranslateResult;
 };
 export type ScheduleDayButtonType = {
-    name: ScheduleDayType;
+    name: DayType;
     label: TranslateResult;
 };
 
-export type ScheduleForm = {
-    type: ServiceChannelScheduleType;
-    days: ScheduleDayType[];
+type ScheduleFormType = {
+    SCHEDULE_TYPE: ScheduleType;
+};
+export type ScheduleFormDayType = {
+    is_scheduled: boolean;
     start: number;
     end: number;
 };
+
+export type ScheduleSettingFormType = ScheduleFormType & Record<DayType, ScheduleFormDayType>;

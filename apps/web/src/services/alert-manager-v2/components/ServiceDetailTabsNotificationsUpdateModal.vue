@@ -11,14 +11,13 @@ import {
 import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
 import type { ServiceChannelUpdateParameters } from '@/schema/alert-manager/service-channel/api-verbs/update';
 import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
-import type { ServiceChannelScheduleInfoType, ServiceChannelScheduleType } from '@/schema/alert-manager/service-channel/type';
 import { i18n } from '@/translations';
 
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
-import type { ScheduleForm, ScheduleDayType } from '@/common/components/schedule-setting-form/schedule-setting-form';
+import type { ScheduleSettingFormType } from '@/common/components/schedule-setting-form/schedule-setting-form';
 import ScheduleSettingForm from '@/common/components/schedule-setting-form/ScheduleSettingForm.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
@@ -26,7 +25,6 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import type { SelectedUserDropdownIdsType } from '@/common/modules/user/typte';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
-import { createScheduleMap } from '@/services/alert-manager-v2/composables/form-data';
 import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
 import type { UserRadioType, ProtocolInfo } from '@/services/alert-manager-v2/types/alert-manager-type';
 
@@ -55,7 +53,7 @@ const state = reactive({
     loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
 
-    scheduleForm: {} as ScheduleForm,
+    scheduleForm: {} as ScheduleSettingFormType,
     radioMenuList: computed<UserRadioType[]>(() => ([
         {
             label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.ALL_MEMBER'),
@@ -94,26 +92,8 @@ const getProtocolInfo = (id: string): ProtocolInfo => {
 const handleChangeRadio = () => {
     state.selectedMemberItems = [];
 };
-const handleScheduleForm = (form: ScheduleForm) => {
+const handleScheduleForm = (form: ScheduleSettingFormType) => {
     state.scheduleForm = form;
-};
-
-const transformToScheduleForm = (data: ServiceChannelScheduleInfoType): ScheduleForm => {
-    const type: ServiceChannelScheduleType = data.SCHEDULE_TYPE;
-
-    const days: ScheduleDayType[] = Object.keys(data)
-        .filter((day) => ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'].includes(day))
-        .filter((day) => data[day].is_scheduled !== false) as ScheduleDayType[];
-
-    const start = data[days[0]]?.start || 0;
-    const end = data[days[0]]?.end || 0;
-
-    return {
-        type,
-        days,
-        start,
-        end,
-    };
 };
 
 const handleConfirm = async () => {
@@ -122,10 +102,7 @@ const handleConfirm = async () => {
         await SpaceConnector.clientV2.alertManager.serviceChannel.update<ServiceChannelUpdateParameters>({
             channel_id: props.selectedItem?.channel_id || '',
             name: name.value,
-            schedule: {
-                SCHEDULE_TYPE: state.scheduleForm.type,
-                ...createScheduleMap(state.scheduleForm),
-            },
+            schedule: state.scheduleForm,
             data: {
                 FORWARD_TYPE: state.radioMenuList[state.selectedRadioIdx].name,
                 USER_GROUP: state.selectedRadioIdx === 1 ? state.selectedMemberItems.map((item) => item.value) : undefined,
@@ -156,7 +133,7 @@ watch(() => props.selectedItem, (selectedItem) => {
             })) || [];
             state.selectedMemberItems = [...userList, ...userGroupList];
         }
-        state.scheduleForm = transformToScheduleForm(selectedItem.schedule);
+        state.scheduleForm = selectedItem.schedule;
     }
 }, { immediate: true });
 </script>
@@ -232,7 +209,7 @@ watch(() => props.selectedItem, (selectedItem) => {
                             {{ $t('ALERT_MANAGER.NOTIFICATIONS.SCHEDULE') }}
                         </p>
                         <schedule-setting-form :schedule-form="state.scheduleForm"
-                                               @schedule-form="handleScheduleForm"
+                                               @update-form="handleScheduleForm"
                         />
                     </p-pane-layout>
                 </div>
