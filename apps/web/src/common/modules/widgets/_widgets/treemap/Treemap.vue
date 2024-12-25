@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { useResizeObserver } from '@vueuse/core/index';
 import {
-    computed, defineExpose, reactive, ref, watch,
+    computed, defineExpose, onMounted, reactive, ref, watch,
 } from 'vue';
 
+import { useQuery } from '@tanstack/vue-query';
 import dayjs from 'dayjs';
 import type { TreemapSeriesOption } from 'echarts/charts';
 import { init } from 'echarts/core';
@@ -15,26 +16,27 @@ import {
 } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
+import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
 
-import type { APIErrorToast } from '@/common/composables/error/errorHandler';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
-import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
+import { DATE_FIELD, WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
 import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
+import { sortObjectByKeys } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import {
     getReferenceLabel,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
-import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
+import { getFormattedNumber, getWidgetDataTable } from '@/common/modules/widgets/_helpers/widget-helper';
+import { getWidgetLoadApiQueryDateRange } from '@/common/modules/widgets/_helpers/widget-load-helper';
 import type { CategoryByValue } from '@/common/modules/widgets/_widget-fields/category-by/type';
 import type { DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
 import type { DateFormatValue } from '@/common/modules/widgets/_widget-fields/date-format/type';
@@ -67,23 +69,25 @@ const { dateRange } = useWidgetDateRange({
 });
 const chartContext = ref<HTMLElement|null>(null);
 const state = reactive({
-    loading: false,
-    errorMessage: undefined as string|undefined,
+    runQueries: false,
+    isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
+    dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
+
     data: null as Data | null,
     chart: null as EChartsType | null,
     chartData: [] as ChartData[],
-    unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
+    unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[widgetOptionsState.dataFieldInfo?.data as string]),
     chartOptions: computed<TreemapSeriesOption>(() => ({
         color: MASSIVE_CHART_COLORS,
         tooltip: {
             trigger: 'item',
             position: 'inside',
             formatter: (params) => {
-                let _name = getReferenceLabel(props.allReferenceTypeInfo, state.categoryByField, params.name);
+                let _name = getReferenceLabel(props.allReferenceTypeInfo, widgetOptionsState.categoryByInfo?.data, params.name);
                 if (state.unit) _name = `${_name} (${state.unit})`;
                 let _value = numberFormatter(params.value) || '';
-                if (state.tooltipNumberFormat?.toggleValue) {
-                    _value = getFormattedNumber(params.value, state.dataField, state.numberFormat, state.unit);
+                if (widgetOptionsState.tooltipNumberFormatInfo?.toggleValue) {
+                    _value = getFormattedNumber(params.value, widgetOptionsState.dataFieldInfo?.data as string, widgetOptionsState.numberFormatInfo, state.unit);
                 }
                 return `${params.marker} ${_name}: <b>${_value}</b>`;
             },
@@ -101,12 +105,12 @@ const state = reactive({
                 },
                 label: {
                     show: true,
-                    position: state.displaySeriesLabel?.position,
-                    rotate: state.displaySeriesLabel?.rotate,
+                    position: widgetOptionsState.displaySeriesLabelInfo?.position,
+                    rotate: widgetOptionsState.displaySeriesLabelInfo?.rotate,
                     fontSize: 10,
                     formatter: (p) => {
-                        if (state.displaySeriesLabel?.toggleValue) {
-                            return `${p.name}\n\n${getFormattedNumber(p.value, state.dataField, state.numberFormat, state.unit)}`;
+                        if (widgetOptionsState.displaySeriesLabelInfo?.toggleValue) {
+                            return `${p.name}\n\n${getFormattedNumber(p.value, widgetOptionsState.dataFieldInfo?.data as string, widgetOptionsState.numberFormatInfo, state.unit)}`;
                         }
                         return p.name;
                     },
@@ -115,74 +119,78 @@ const state = reactive({
             },
         ],
     })),
-    // required fields
-    granularity: computed<string|undefined>(() => (props.widgetOptions?.granularity?.value as GranularityValue)?.granularity),
-    dataField: computed<string|undefined>(() => (props.widgetOptions?.dataField?.value as DataFieldValue)?.data as string),
-    categoryByField: computed<string|undefined>(() => (props.widgetOptions?.categoryBy?.value as CategoryByValue)?.data),
-    categoryByCount: computed<number|undefined>(() => (props.widgetOptions?.categoryBy?.value as CategoryByValue)?.count),
-    // optional fields
     dateFormat: computed<string|undefined>(() => {
         const _dateFormat = (props.widgetOptions?.dateFormat?.value as DateFormatValue)?.format || 'MMM DD, YYYY';
-        return DATE_FORMAT?.[_dateFormat]?.[state.granularity];
+        return DATE_FORMAT?.[_dateFormat]?.[widgetOptionsState.granularityInfo?.granularity];
     }),
-    numberFormat: computed<NumberFormatValue>(() => props.widgetOptions?.numberFormat?.value as NumberFormatValue),
-    tooltipNumberFormat: computed<TooltipNumberFormatValue>(() => props.widgetOptions?.tooltipNumberFormat?.value as TooltipNumberFormatValue),
-    displaySeriesLabel: computed(() => (props.widgetOptions?.displaySeriesLabel?.value as DisplaySeriesLabelValue)),
 });
-const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
-    dateRange,
-    errorMessage: computed(() => state.errorMessage),
-    widgetLoading: computed(() => state.loading),
-    noData: computed(() => (state.data ? !state.data.results?.length : false)),
+
+const widgetOptionsState = reactive({
+    granularityInfo: computed<GranularityValue>(() => props.widgetOptions?.granularity?.value as GranularityValue),
+    dataFieldInfo: computed<DataFieldValue>(() => props.widgetOptions?.dataField?.value as DataFieldValue),
+    categoryByInfo: computed<CategoryByValue>(() => props.widgetOptions?.categoryBy?.value as CategoryByValue),
+    dateFormatInfo: computed<DateFormatValue>(() => props.widgetOptions?.dateFormat?.value as DateFormatValue),
+    numberFormatInfo: computed<NumberFormatValue>(() => props.widgetOptions?.numberFormat?.value as NumberFormatValue),
+    tooltipNumberFormatInfo: computed<TooltipNumberFormatValue>(() => props.widgetOptions?.tooltipNumberFormat?.value as TooltipNumberFormatValue),
+    displaySeriesLabelInfo: computed<DisplaySeriesLabelValue>(() => props.widgetOptions?.displaySeriesLabel?.value as DisplaySeriesLabelValue),
 });
 
 /* Util */
-const privateWidgetFetcher = getCancellableFetcher<PrivateWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.privateWidget.load);
-const publicWidgetFetcher = getCancellableFetcher<PublicWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.publicWidget.load);
-const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
-    if (props.widgetState === 'INACTIVE') return undefined;
-    try {
-        state.loading = true;
-        const _isPrivate = props.widgetId.startsWith('private');
-        const _fetcher = _isPrivate ? privateWidgetFetcher : publicWidgetFetcher;
-        const { status, response } = await _fetcher({
-            widget_id: props.widgetId,
-            granularity: state.granularity,
-            group_by: [state.categoryByField],
-            start: dateRange.value.start,
-            end: dateRange.value.end,
-            vars: props.dashboardVars,
-            sort: [{ key: state.dataField, desc: true }],
-            page: { start: 0, limit: state.categoryByCount },
-        });
-        if (status === 'succeed') {
-            state.errorMessage = undefined;
-            state.loading = false;
-            return response;
-        }
-        return undefined;
-    } catch (e: any) {
-        state.loading = false;
-        state.errorMessage = e.message;
-        ErrorHandler.handleError(e);
-        return ErrorHandler.makeAPIErrorToast(e);
-    }
+const fetchWidgetData = async (params: PrivateWidgetLoadParameters|PublicWidgetLoadParameters): Promise<Data> => {
+    const defaultFetcher = state.isPrivateWidget
+        ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
+        : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>;
+    const res = await defaultFetcher(params);
+    return res;
 };
+
+const queryKey = computed(() => [
+    'widget-load-treemap',
+    props.widgetId,
+    {
+        start: dateRange.value.start,
+        end: dateRange.value.end,
+        granularity: widgetOptionsState.granularityInfo?.granularity,
+        dataTableId: state.dataTable?.data_table_id,
+        dataTableOptions: JSON.stringify(sortObjectByKeys(state.dataTable?.options) ?? {}),
+        groupBy: widgetOptionsState.categoryByInfo?.data,
+        count: widgetOptionsState.categoryByInfo?.count,
+    },
+]);
+
+const queryResult = useQuery({
+    queryKey,
+    queryFn: () => fetchWidgetData({
+        widget_id: props.widgetId,
+        granularity: widgetOptionsState.granularityInfo?.granularity,
+        group_by: widgetOptionsState.categoryByInfo?.data ? [widgetOptionsState.categoryByInfo?.data as string] : [],
+        sort: widgetOptionsState.dataFieldInfo?.data ? [{ key: widgetOptionsState.dataFieldInfo?.data as string, desc: true }] : undefined,
+        page: { start: 0, limit: widgetOptionsState.categoryByInfo?.count ?? 0 },
+        vars: props.dashboardVars,
+        ...getWidgetLoadApiQueryDateRange(widgetOptionsState.granularityInfo?.granularity, dateRange.value),
+    }),
+    enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable && state.runQueries),
+    staleTime: WIDGET_LOAD_STALE_TIME,
+});
+
+const loading = computed(() => queryResult.isLoading);
+const errorMessage = computed(() => queryResult.error?.value?.message);
+
 const drawChart = (rawData: Data|null) => {
     if (isEmpty(rawData)) return;
 
-    const _categoryByData = groupBy(rawData.results || [], state.categoryByField);
+    const _categoryByData = groupBy(rawData.results || [], widgetOptionsState.categoryByInfo?.data);
     let _refinedData: ChartData[] = Object.entries(_categoryByData).map(([k, v]) => ({
         name: k,
-        value: sumBy(v, state.dataField),
+        value: sumBy(v, widgetOptionsState.dataFieldInfo?.data as string),
     }));
-    if (isDateField(state.categoryByField)) {
+    if (isDateField(widgetOptionsState.categoryByInfo?.data)) {
         _refinedData = orderBy(_refinedData, 'name', 'desc');
-        _refinedData = _refinedData?.slice(0, state.categoryByCount);
+        _refinedData = _refinedData?.slice(0, widgetOptionsState.categoryByInfo?.count);
     } else {
         _refinedData = orderBy(_refinedData, 'value', 'desc');
-        const _slicedData = _refinedData.slice(0, state.categoryByCount);
-        const _etcValue = _refinedData.slice(state.categoryByCount).reduce((acc, v) => acc + v.value, 0);
+        const _slicedData = _refinedData.slice(0, widgetOptionsState.categoryByInfo?.count);
+        const _etcValue = _refinedData.slice(widgetOptionsState.categoryByInfo?.count).reduce((acc, v) => acc + v.value, 0);
         const _etcData: ChartData = {
             name: 'etc',
             value: _etcValue,
@@ -192,8 +200,8 @@ const drawChart = (rawData: Data|null) => {
 
     // get chart data
     state.chartData = _refinedData?.map((v) => {
-        let _name = getReferenceLabel(props.allReferenceTypeInfo, state.categoryByField, v.name);
-        if (state.categoryByField === DATE_FIELD.DATE) {
+        let _name = getReferenceLabel(props.allReferenceTypeInfo, widgetOptionsState.categoryByInfo?.data, v.name);
+        if (widgetOptionsState.categoryByInfo?.data === DATE_FIELD.DATE) {
             _name = dayjs.utc(v.name).format(state.dateFormat);
         }
         return {
@@ -203,14 +211,16 @@ const drawChart = (rawData: Data|null) => {
     }) || [];
 };
 
-const loadWidget = async (): Promise<Data|APIErrorToast> => {
-    const res = await fetchWidget();
-    if (!res) return state.data;
-    if (typeof res === 'function') return res;
-    state.data = res;
-    drawChart(state.data);
-    return state.data;
+const loadWidget = () => {
+    state.runQueries = true;
 };
+
+const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
+    dateRange,
+    errorMessage: errorMessage.value,
+    widgetLoading: loading.value,
+    noData: computed(() => (state.data ? !state.data.results?.length : false)),
+});
 
 /* Watcher */
 watch([() => state.chartData, () => chartContext.value], ([, chartCtx]) => {
@@ -219,12 +229,19 @@ watch([() => state.chartData, () => chartContext.value], ([, chartCtx]) => {
         state.chart.setOption(state.chartOptions, true);
     }
 });
+watch(() => state.data, (newData) => {
+    drawChart(newData);
+});
 
 useResizeObserver(chartContext, throttle(() => {
     state.chart?.resize();
 }, 500));
 useWidgetInitAndRefresh({ props, emit, loadWidget });
-defineExpose<WidgetExpose<Data>>({
+onMounted(async () => {
+    if (!props.dataTableId) return;
+    state.dataTable = await getWidgetDataTable(props.dataTableId);
+});
+defineExpose<WidgetExpose>({
     loadWidget,
 });
 </script>
