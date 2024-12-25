@@ -30,23 +30,23 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{(e: 'create'): void}>();
 
-const serviceFormStore = useServiceCreateFormStore();
-const serviceFormState = serviceFormStore.state;
+const serviceCreateFormStore = useServiceCreateFormStore();
+const serviceCreateFormState = serviceCreateFormStore.state;
 
 const router = useRouter();
 
 const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
-    currentStep: computed<number>(() => serviceFormState.currentStep),
-    currentSubStep: computed<number>(() => serviceFormState.currentSubStep),
-    createdServiceId: computed<string>(() => serviceFormState.createdServiceId),
+    currentStep: computed<number>(() => serviceCreateFormState.currentStep),
+    currentSubStep: computed<number>(() => serviceCreateFormState.currentSubStep),
+    createdServiceId: computed<string>(() => serviceCreateFormState.createdServiceId),
 });
 const state = reactive({
-    previousStep: computed<number>(() => serviceFormState.currentStep - 1),
-    nextStep: computed<number>(() => serviceFormState.currentStep + 1),
-    previousSubStep: computed<number>(() => serviceFormState.currentSubStep - 1),
-    nextSubStep: computed<number>(() => serviceFormState.currentSubStep + 1),
+    previousStep: computed<number>(() => serviceCreateFormState.currentStep - 1),
+    nextStep: computed<number>(() => serviceCreateFormState.currentStep + 1),
+    previousSubStep: computed<number>(() => serviceCreateFormState.currentSubStep - 1),
+    nextSubStep: computed<number>(() => serviceCreateFormState.currentSubStep + 1),
     actionButtonInfoMap: computed<Record<string, actionButtonType>>(() => ({
         1: {
             label: i18n.t('ALERT_MANAGER.CREATE'),
@@ -103,21 +103,21 @@ const handlePrevNavigation = () => {
                 router.push(getProperRouteLocation({ name: ALERT_MANAGER_ROUTE_V2.SERVICE._NAME }));
                 return;
             }
-            serviceFormStore.setCurrentSubStep(state.previousSubStep);
+            serviceCreateFormStore.setCurrentSubStep(state.previousSubStep);
             return;
         }
     }
     if (storeState.currentStep === 3) {
         if (storeState.currentSubStep === 2) {
-            serviceFormStore.setCurrentSubStep(state.previousSubStep);
+            serviceCreateFormStore.setCurrentSubStep(state.previousSubStep);
             return;
         }
     }
 
-    serviceFormStore.setCurrentStep(state.previousStep);
+    serviceCreateFormStore.setCurrentStep(state.previousStep);
 };
 const handleNextNavigation = () => {
-    serviceFormStore.setCurrentStep(state.nextStep);
+    serviceCreateFormStore.setCurrentStep(state.nextStep);
 };
 
 const handleActionButton = () => {
@@ -132,7 +132,7 @@ const handleActionButton = () => {
 
 const handleClickSelectButton = () => {
     if (props.selectedItemId) {
-        serviceFormStore.setCurrentSubStep(state.nextSubStep);
+        serviceCreateFormStore.setCurrentSubStep(state.nextSubStep);
     }
 };
 const handleClickSkipButton = () => {

@@ -23,7 +23,7 @@ interface ProtocolCardItemType extends NotificationProtocolModel {
     icon: string;
 }
 
-const serviceFormStore = useServiceCreateFormStore();
+const serviceCreateFormStore = useServiceCreateFormStore();
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 
@@ -41,7 +41,7 @@ const state = reactive({
 });
 
 const handleSelectProtocol = () => {
-    serviceFormStore.setSelectedProtocol(state.selectedProtocol);
+    serviceCreateFormStore.setSelectedProtocol(state.selectedProtocol);
 };
 
 const fetchNotificationProtocolList = async () => {

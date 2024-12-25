@@ -72,6 +72,9 @@ const {
     },
 });
 
+const handleClose = () => {
+    state.proxyVisible = false;
+};
 const handleConfirm = async () => {
     state.loading = true;
     try {
@@ -87,10 +90,6 @@ const handleConfirm = async () => {
         handleClose();
     }
 };
-const handleClose = () => {
-    state.proxyVisible = false;
-};
-
 </script>
 
 <template>

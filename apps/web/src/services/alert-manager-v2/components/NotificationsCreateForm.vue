@@ -10,24 +10,23 @@ import { i18n } from '@/translations';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
-import type { ScheduleForm } from '@/common/components/schedule-setting-form/schedule-setting-form';
+import type { ScheduleSettingFormType } from '@/common/components/schedule-setting-form/schedule-setting-form';
 import ScheduleSettingForm from '@/common/components/schedule-setting-form/ScheduleSettingForm.vue';
 import { useFormValidator } from '@/common/composables/form-validator';
 import type { SelectedUserDropdownIdsType } from '@/common/modules/user/typte';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
-import { createScheduleMap } from '@/services/alert-manager-v2/composables/form-data';
 import { useServiceCreateFormStore } from '@/services/alert-manager-v2/stores/service-create-form-store';
 import type { CreatedNotificationInfoType, UserRadioType } from '@/services/alert-manager-v2/types/alert-manager-type';
 
-const serviceFormStore = useServiceCreateFormStore();
-const serviceFormState = serviceFormStore.state;
+const serviceCreateFormStore = useServiceCreateFormStore();
+const serviceCreateFormState = serviceCreateFormStore.state;
 
 const storeState = reactive({
-    selectedProtocolType: computed<NotificationProtocolModel|undefined>(() => serviceFormState.selectedProtocol),
+    selectedProtocolType: computed<NotificationProtocolModel|undefined>(() => serviceCreateFormState.selectedProtocol),
 });
 const state = reactive({
-    scheduleForm: {} as ScheduleForm,
+    scheduleForm: {} as ScheduleSettingFormType,
     radioMenuList: computed<UserRadioType[]>(() => ([
         {
             label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.ALL_MEMBER'),
@@ -59,7 +58,7 @@ const {
     name: '',
 }, {});
 
-const handleScheduleForm = (form: ScheduleForm) => {
+const handleScheduleForm = (form: ScheduleSettingFormType) => {
     state.scheduleForm = form;
 };
 const handleChangeRadio = () => {
@@ -69,10 +68,7 @@ const handleChangeRadio = () => {
 watch([() => name.value, () => state.scheduleForm, () => state.selectedRadioIdx, () => state.selectedMemberItems], ([nameVal, scheduleForm, selectedRadioIdx, selectedMemberItems]) => {
     emit('change-form', {
         name: nameVal,
-        schedule: {
-            SCHEDULE_TYPE: scheduleForm.type,
-            ...createScheduleMap(scheduleForm),
-        },
+        schedule: scheduleForm,
         data: {
             FORWARD_TYPE: state.radioMenuList[selectedRadioIdx].name,
             USER_GROUP: selectedRadioIdx === 1 ? selectedMemberItems.map((item) => item.value) : undefined,
@@ -150,7 +146,7 @@ watch([() => name.value, () => state.scheduleForm, () => state.selectedRadioIdx,
                 <p class="pb-4 text-display-md">
                     {{ $t('ALERT_MANAGER.NOTIFICATIONS.SCHEDULE') }}
                 </p>
-                <schedule-setting-form @schedule-form="handleScheduleForm" />
+                <schedule-setting-form @update-form="handleScheduleForm" />
             </p-pane-layout>
         </div>
     </div>

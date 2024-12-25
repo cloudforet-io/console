@@ -17,8 +17,6 @@ import type { AlertStateType, AlertUrgencyType } from '@/schema/alert-manager/al
 import { SERVICE_ALERTS_TYPE } from '@/schema/alert-manager/service/constants';
 import { i18n } from '@/translations';
 
-import { useUserStore } from '@/store/user/user-store';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { red } from '@/styles/colors';
@@ -41,12 +39,10 @@ type AlertStatusInfoType = {
 
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
-const userStore = useUserStore();
-const userState = userStore.state;
 
 const storeState = reactive({
     serviceInfo: computed<Service>(() => serviceDetailPageGetters.serviceInfo),
-    timezone: computed<string>(() => userState.timezone || ''),
+    timezone: computed<string>(() => serviceDetailPageGetters.timezone),
 });
 const state = reactive({
     alertStatusInfo: computed<AlertStatusInfoType[]>(() => [

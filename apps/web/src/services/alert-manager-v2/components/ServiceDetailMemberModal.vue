@@ -14,7 +14,6 @@ import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleType } from '@/schema/identity/role/type';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { UserGroupReferenceMap } from '@/store/reference/user-group-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
@@ -30,6 +29,7 @@ import type { Service } from '@/services/alert-manager-v2/types/alert-manager-ty
 import { useRoleFormatter } from '@/services/iam/composables/refined-table-data';
 
 type modalMode = 'member' | 'invitation';
+
 type ModalInfoType = {
     title: TranslateResult;
     size: string;
@@ -48,8 +48,6 @@ const props = withDefaults(defineProps<Props>(), {
     visible: false,
 });
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
@@ -57,8 +55,8 @@ const emit = defineEmits<{(e: 'update:visible'): void; }>();
 
 const storeState = reactive({
     serviceInfo: computed<Service>(() => serviceDetailPageGetters.serviceInfo),
-    userMap: computed<UserReferenceMap>(() => allReferenceGetters.user),
-    userGroupMap: computed<UserGroupReferenceMap>(() => allReferenceGetters.user_group),
+    userMap: computed<UserReferenceMap>(() => serviceDetailPageGetters.userReferenceMap),
+    userGroupMap: computed<UserGroupReferenceMap>(() => serviceDetailPageGetters.userGroupReferenceMap),
 });
 const state = reactive({
     loading: false,
@@ -106,6 +104,9 @@ const state = reactive({
 const handleClickInviteButton = () => {
     state.mode = 'invitation';
 };
+const handleClose = () => {
+    state.proxyVisible = false;
+};
 const handleConfirm = async () => {
     if (state.mode === 'member') {
         handleClose();
@@ -150,9 +151,6 @@ const inviteMember = async () => {
         state.loading = false;
         state.mode = 'member';
     }
-};
-const handleClose = () => {
-    state.proxyVisible = false;
 };
 </script>
 

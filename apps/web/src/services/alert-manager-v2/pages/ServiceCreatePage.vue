@@ -15,16 +15,16 @@ import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route
 import { useServiceCreateFormStore } from '@/services/alert-manager-v2/stores/service-create-form-store';
 import type { createHeaderInfoByStep } from '@/services/alert-manager-v2/types/alert-manager-type';
 
-const serviceFormStore = useServiceCreateFormStore();
-const serviceFormState = serviceFormStore.state;
+const serviceCreateFormStore = useServiceCreateFormStore();
+const serviceCreateFormState = serviceCreateFormStore.state;
 
 const { getProperRouteLocation } = useProperRouteLocation();
 
 const router = useRouter();
 
 const storeState = reactive({
-    step: computed(() => serviceFormState.currentStep),
-    subStep: computed(() => serviceFormState.currentSubStep),
+    step: computed<number>(() => serviceCreateFormState.currentStep),
+    subStep: computed<number>(() => serviceCreateFormState.currentSubStep),
 });
 const state = reactive({
     headerInfo: computed<createHeaderInfoByStep>(() => {
@@ -71,7 +71,8 @@ const handleClickClose = () => {
 };
 
 onUnmounted(() => {
-    serviceFormStore.initState();
+    serviceCreateFormStore.initState();
+    serviceCreateFormStore.$dispose();
 });
 </script>
 

@@ -32,7 +32,6 @@ import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route
 import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
 import type { AlertManagementTableHandlerType } from '@/services/alert-manager-v2/types/alert-manager-type';
 
-
 const pageSizeOptions = [15, 30, 45];
 
 const allReferenceStore = useAllReferenceStore();
@@ -119,7 +118,6 @@ const handleClickWebhookItem = (id: string, webhookId?: string) => {
         },
         query: {
             tab: SERVICE_DETAIL_TABS.WEBHOOK,
-            webhookId,
         },
     }));
 };

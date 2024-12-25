@@ -3,8 +3,8 @@ import type {
     ServiceChannelScheduleDayType,
     ServiceChannelScheduleInfoType,
 } from '@/schema/alert-manager/service-channel/type';
-import type { UserGroupChannelScheduleType } from '@/schema/alert-manager/user-group-channel/type';
 
+import type { ScheduleSettingFormType } from '@/common/components/schedule-setting-form/schedule-setting-form';
 import ScheduleSettingForm from '@/common/components/schedule-setting-form/ScheduleSettingForm.vue';
 
 import { useNotificationChannelCreateFormStore } from '@/services/iam/store/notification-channel-create-form-store';
@@ -12,7 +12,8 @@ import { useNotificationChannelCreateFormStore } from '@/services/iam/store/noti
 const notificationChannelCreateFormStore = useNotificationChannelCreateFormStore();
 
 /* Component */
-const handleScheduleForm = (value: {days: (string|null)[]; start: number; end: number; type: UserGroupChannelScheduleType;}) => {
+const handleScheduleForm = (value: ScheduleSettingFormType) => {
+    // TODO: Plz check the type of value (to SY)
     notificationChannelCreateFormStore.$patch((_state) => {
         _state.state.scheduleInfo = convertScheduleInfo(value);
     });
@@ -45,6 +46,6 @@ const convertScheduleInfo = (scheduleInfo: any): ServiceChannelScheduleInfoType 
         <p class="text-2xl mb-4">
             {{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.SCHEDULE.TITLE') }}
         </p>
-        <schedule-setting-form @schedule-form="handleScheduleForm" />
+        <schedule-setting-form @update-form="handleScheduleForm" />
     </div>
 </template>

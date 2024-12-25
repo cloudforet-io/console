@@ -3,7 +3,7 @@ import {
     computed, onMounted, reactive, watch,
 } from 'vue';
 
-import { range } from 'lodash';
+import { range, zipObject } from 'lodash';
 
 import {
     PFieldGroup, PRadioGroup, PRadio, PI, PSelectButton, PSelectDropdown,
@@ -15,21 +15,24 @@ import { i18n } from '@/translations';
 import type {
     ScheduleDayButtonType,
     ScheduleRadioType,
-    ScheduleDayType,
-    ScheduleForm,
+    DayType,
+    ScheduleSettingFormType,
+    ScheduleFormDayType,
 } from '@/common/components/schedule-setting-form/schedule-setting-form';
 
 import { blue } from '@/styles/colors';
 
 interface Props {
-    scheduleForm?: ScheduleForm;
+    scheduleForm?: ScheduleSettingFormType;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     scheduleForm: undefined,
 });
 
-const emit = defineEmits<{(e: 'schedule-form', form: ScheduleForm): void; }>();
+const DAYS: DayType[] = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+
+const emit = defineEmits<{(e: 'update-form', form: ScheduleSettingFormType): void; }>();
 
 const state = reactive({
     scheduleTypeList: computed<ScheduleRadioType[]>(() => [
@@ -47,16 +50,32 @@ const state = reactive({
         { name: 'SAT', label: i18n.t('COMMON.SCHEDULE_SETTING.SAT') },
         { name: 'SUN', label: i18n.t('COMMON.SCHEDULE_SETTING.SUN') },
     ]),
-    selectedDayButton: [] as ScheduleDayType[],
+    selectedDayButton: ['MON', 'TUE', 'WED', 'THU', 'FRI'] as DayType[],
     start: 9,
     end: 18,
+    scheduleDayForm: computed<Record<DayType, ScheduleFormDayType>>(() => {
+        const refinedDays = DAYS.map((day) => ({
+            is_scheduled: state.selectedDayButton.includes(day),
+            start: state.start,
+            end: state.end,
+        }));
+        return zipObject(DAYS, refinedDays) as Record<DayType, ScheduleFormDayType>;
+    }),
 });
 
-const defaultScheduleForm = () => {
-    state.selectedRadioIdx = state.scheduleTypeList.findIndex((item) => item.name === props.scheduleForm?.type);
-    state.selectedDayButton = props.scheduleForm?.days || [];
-    state.start = props.scheduleForm?.start || 9;
-    state.end = props.scheduleForm?.end || 18;
+const initScheduleForm = () => {
+    if (!props.scheduleForm) return;
+    state.selectedRadioIdx = state.scheduleTypeList.findIndex((item) => item.name === props.scheduleForm?.SCHEDULE_TYPE) || 0;
+
+    const filteredSchedule: string[] = DAYS.filter((day) => {
+        if (!props.scheduleForm) return [];
+        const schedule = props.scheduleForm[day];
+        return schedule.is_scheduled;
+    });
+
+    state.selectedDayButton = filteredSchedule;
+    state.start = props.scheduleForm[filteredSchedule[0]]?.start || 9;
+    state.end = props.scheduleForm[filteredSchedule[0]]?.end || 18;
 };
 const generateHourlyTimeArray = () => range(0, 25).map((h) => ({
     label: `${h.toString().padStart(2, '0')}:00`,
@@ -72,7 +91,7 @@ const handleSelectScheduleType = (type: ServiceChannelScheduleType) => {
         state.selectedDayButton = [];
     }
 };
-const handleSelectDayButton = (value: ScheduleDayType[]) => {
+const handleSelectDayButton = (value: DayType[]) => {
     state.selectedRadioIdx = 2;
     state.selectedDayButton = value;
 };
@@ -85,21 +104,16 @@ const handleSelectDropdown = (type: 'start' | 'end', value: number) => {
 };
 
 
-watch([() => state.selectedRadioIdx, () => state.selectedDayButton, () => state.start, () => state.end], ([selectedRadioIdx, selectedDayButton, start, end]) => {
-    emit('schedule-form', {
-        type: state.scheduleTypeList[selectedRadioIdx].name,
-        days: selectedDayButton,
-        start,
-        end,
+watch([() => state.selectedRadioIdx, () => state.selectedDayButton, () => state.start, () => state.end], ([selectedRadioIdx]) => {
+    emit('update-form', {
+        SCHEDULE_TYPE: state.scheduleTypeList[selectedRadioIdx].name,
+        ...state.scheduleDayForm,
     });
-}, { deep: true });
+});
 
 onMounted(() => {
-    if (state.selectedRadioIdx === 0) {
-        state.selectedDayButton = state.days.slice(0, 5).map((day) => day.name);
-    }
     if (props.scheduleForm) {
-        defaultScheduleForm();
+        initScheduleForm();
     }
 });
 </script>
@@ -142,11 +156,13 @@ onMounted(() => {
             </div>
             <div class="flex items-center gap-2">
                 <p-select-dropdown :menu="generateHourlyTimeArray()"
+                                   :selected="state.start"
                                    placeholder="9:00"
                                    @select="handleSelectDropdown('start', $event)"
                 />
                 <span>{{ $t('COMMON.SCHEDULE_SETTING.TO') }}</span>
                 <p-select-dropdown :menu="generateHourlyTimeArray()"
+                                   :selected="state.end"
                                    placeholder="18:00"
                                    @select="handleSelectDropdown('end', $event)"
                 />

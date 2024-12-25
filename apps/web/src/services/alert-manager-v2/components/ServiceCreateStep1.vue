@@ -24,7 +24,7 @@ import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 import ServiceCreateStepContainer from '@/services/alert-manager-v2/components/ServiceCreateStepContainer.vue';
 import { useServiceCreateFormStore } from '@/services/alert-manager-v2/stores/service-create-form-store';
 
-const serviceFormStore = useServiceCreateFormStore();
+const serviceCreateFormStore = useServiceCreateFormStore();
 
 const dropdownState = reactive({
     selectedMemberItems: [] as SelectedUserDropdownIdsType[],
@@ -68,7 +68,7 @@ const {
     },
 });
 
-const convertToSnakeCase = (str) => {
+const convertToSnakeCase = (str): string => {
     const cleanedInput = str.replace(/[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/g, '');
     return cleanedInput
         .toLowerCase()
@@ -102,8 +102,8 @@ const handleCreateService = async () => {
             description: description.value,
         });
         showSuccessMessage(i18n.t('ALERT_MANAGER.SERVICE.ALT_S_CREATE_SERVICE'), '');
-        serviceFormStore.setCreatedServiceId(createdServiceInfo.service_id);
-        serviceFormStore.setCurrentStep(2);
+        serviceCreateFormStore.setCreatedServiceId(createdServiceInfo.service_id);
+        serviceCreateFormStore.setCurrentStep(2);
     } catch (e) {
         ErrorHandler.handleError(e, true);
     }

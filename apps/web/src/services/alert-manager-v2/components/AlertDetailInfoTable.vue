@@ -12,9 +12,6 @@ import type { AlertModel } from '@/schema/alert-manager/alert/model';
 import type { AlertSeverityType } from '@/schema/alert-manager/alert/type';
 import { i18n } from '@/translations';
 
-import { useUserStore } from '@/store/user/user-store';
-
-
 import AlertDetailInfoTableDescription from '@/services/alert-manager-v2/components/AlertDetailInfoTableDescription.vue';
 import { useAlertDetailPageStore } from '@/services/alert-manager-v2/stores/alert-detail-page-store';
 
@@ -23,12 +20,12 @@ type BadgeInfo = {
     styleType: string;
 };
 
-const userStore = useUserStore();
 const alertDetailPageStore = useAlertDetailPageStore();
 const alertDetailPageState = alertDetailPageStore.state;
+const alertDetailPageGetters = alertDetailPageStore.getters;
 
 const storeState = reactive({
-    timezone: computed<string>(() => userStore.state.timezone ?? 'UTC'),
+    timezone: computed<string>(() => alertDetailPageGetters.timezone),
     alertInfo: computed<AlertModel>(() => alertDetailPageState.alertInfo),
 });
 const tableState = reactive({

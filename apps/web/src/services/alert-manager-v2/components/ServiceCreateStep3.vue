@@ -19,18 +19,18 @@ import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route
 import { useServiceCreateFormStore } from '@/services/alert-manager-v2/stores/service-create-form-store';
 import type { CreatedNotificationInfoType } from '@/services/alert-manager-v2/types/alert-manager-type';
 
-const serviceFormStore = useServiceCreateFormStore();
-const serviceFormState = serviceFormStore.state;
+const serviceCreateFormStore = useServiceCreateFormStore();
+const serviceCreateFormState = serviceCreateFormStore.state;
 
 const router = useRouter();
 
 const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
-    currentSubStep: computed<number>(() => serviceFormState.currentSubStep),
-    selectedProtocol: computed<string>(() => serviceFormState.selectedProtocol?.protocol_id || ''),
-    createdServiceId: computed<string>(() => serviceFormState.createdServiceId),
-    webhookName: computed<string>(() => serviceFormState.webhookName || ''),
+    currentSubStep: computed<number>(() => serviceCreateFormState.currentSubStep),
+    selectedProtocol: computed<string>(() => serviceCreateFormState.selectedProtocol?.protocol_id || ''),
+    createdServiceId: computed<string>(() => serviceCreateFormState.createdServiceId),
+    webhookName: computed<string>(() => serviceCreateFormState.webhookName || ''),
 });
 const state = reactive({
     form: {} as CreatedNotificationInfoType,
@@ -81,7 +81,7 @@ const fetchCreateNotifications = async () => {
 };
 
 onUnmounted(() => {
-    serviceFormStore.initStep2();
+    serviceCreateFormStore.initStep2();
 });
 </script>
 
