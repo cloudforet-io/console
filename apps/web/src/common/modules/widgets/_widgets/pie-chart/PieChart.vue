@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { useResizeObserver } from '@vueuse/core/index';
 import {
-    computed, defineExpose,
+    computed, defineExpose, onMounted,
     reactive, ref, watch,
 } from 'vue';
 
+import { useQuery } from '@tanstack/vue-query';
 import dayjs from 'dayjs';
 import type { PieSeriesOption } from 'echarts/charts';
 import { init } from 'echarts/core';
@@ -17,26 +18,29 @@ import {
 } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
+import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
 
-import type { APIErrorToast } from '@/common/composables/error/errorHandler';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
-import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
+import { DATE_FIELD, WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
 import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
+import { sortObjectByKeys } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import {
     getReferenceLabel,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
-import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
+import { getFormattedNumber, getWidgetDataTable } from '@/common/modules/widgets/_helpers/widget-helper';
+import {
+    getWidgetLoadApiQueryDateRange,
+} from '@/common/modules/widgets/_helpers/widget-load-helper';
 import type { DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
 import type { DateFormatValue } from '@/common/modules/widgets/_widget-fields/date-format/type';
 import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
@@ -71,14 +75,16 @@ const { dateRange } = useWidgetDateRange({
 });
 const chartContext = ref<HTMLElement|null>(null);
 const state = reactive({
-    loading: true,
-    errorMessage: undefined as string|undefined,
+    runQueries: false,
+    isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
+    dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
+
     data: null as Data | null,
     chart: null as EChartsType | null,
     chartData: [] as ChartData[],
-    unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
+    unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[widgetOptionsState.dataFieldInfo?.data as string]),
     chartLegendOption: computed<LegendOption>(() => {
-        if (!state.showLegends) return { show: false };
+        if (!widgetOptionsState.legendInfo?.toggleValue) return { show: false };
         const _option: LegendOption = {
             show: true,
             type: 'scroll',
@@ -86,18 +92,18 @@ const state = reactive({
             itemHeight: 10,
             icon: 'circle',
             formatter: (val) => {
-                if (state.groupByField === DATE_FIELD.DATE) return dayjs.utc(val).format(state.dateFormat);
-                return getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, val);
+                if (widgetOptionsState.groupByInfo?.data === DATE_FIELD.DATE) return dayjs.utc(val).format(state.dateFormat);
+                return getReferenceLabel(props.allReferenceTypeInfo, widgetOptionsState.groupByInfo?.data as string, val);
             },
         };
-        if (['left', 'right'].includes(state.legendPosition)) {
+        if (['left', 'right'].includes(widgetOptionsState.legendInfo?.position)) {
             _option.orient = 'vertical';
             _option.top = 20;
-            if (state.legendPosition === 'right') _option.right = 10;
+            if (widgetOptionsState.legendInfo?.position === 'right') _option.right = 10;
             else _option.left = 10;
         } else {
             _option.orient = 'horizontal';
-            if (state.legendPosition === 'bottom') _option.bottom = 0;
+            if (widgetOptionsState.legendInfo?.position === 'bottom') _option.bottom = 0;
             else _option.top = 0;
         }
         return _option;
@@ -107,17 +113,17 @@ const state = reactive({
             type: 'pie',
             avoidLabelOverlap: true,
         };
-        if (state.chartType === 'donut') {
+        if (widgetOptionsState.pieChartTypeInfo?.type === 'donut') {
             _option.radius = ['30%', '70%'];
         }
-        if (['left', 'right'].includes(state.legendPosition)) {
+        if (['left', 'right'].includes(widgetOptionsState.legendInfo?.position)) {
             if (props.size === 'full') {
-                if (state.legendPosition === 'right') _option.center = ['40%', '50%'];
+                if (widgetOptionsState.legendInfo?.position === 'right') _option.center = ['40%', '50%'];
                 else _option.center = ['60%', '50%'];
             } else _option.center = ['30%', '50%'];
         }
-        if (['top', 'bottom'].includes(state.legendPosition)) {
-            if (state.legendPosition === 'bottom') {
+        if (['top', 'bottom'].includes(widgetOptionsState.legendInfo?.position)) {
+            if (widgetOptionsState.legendInfo?.position === 'bottom') {
                 _option.center = ['50%', '45%'];
             } else {
                 _option.center = ['50%', '55%'];
@@ -131,13 +137,13 @@ const state = reactive({
             trigger: 'item',
             position: 'inside',
             formatter: (params) => {
-                let _name = getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, params.name);
-                if (state.groupByField === DATE_FIELD.DATE) {
+                let _name = getReferenceLabel(props.allReferenceTypeInfo, widgetOptionsState.groupByInfo?.data as string, params.name);
+                if (widgetOptionsState.groupByInfo?.data === DATE_FIELD.DATE) {
                     _name = dayjs.utc(_name).format(state.dateFormat);
                 }
                 let _value = numberFormatter(params.value) || '';
-                if (state.tooltipNumberFormat?.toggleValue) {
-                    _value = getFormattedNumber(params.value, state.dataField, state.numberFormat, state.unit);
+                if (widgetOptionsState.tooltipNumberFormatInfo?.toggleValue) {
+                    _value = getFormattedNumber(params.value, widgetOptionsState.dataFieldInfo?.data as string, widgetOptionsState.numberFormatInfo, state.unit);
                 }
                 if (state.unit) _name = `${_name} (${state.unit})`;
                 return `${params.marker} ${_name}: <b>${_value}</b>`;
@@ -151,93 +157,99 @@ const state = reactive({
             {
                 ...state.chartSeriesOption,
                 label: {
-                    show: !!state.displaySeriesLabel?.toggleValue,
-                    position: state.displaySeriesLabel?.position,
-                    rotate: state.displaySeriesLabel?.rotate,
+                    show: !!widgetOptionsState.displaySeriesLabelInfo?.toggleValue,
+                    position: widgetOptionsState.displaySeriesLabelInfo?.position,
+                    rotate: widgetOptionsState.displaySeriesLabelInfo?.rotate,
                     fontSize: 10,
                     formatter: (p) => {
                         if (p.percent < 5) return '';
-                        if (state.displaySeriesLabel?.format === 'percent') {
+                        if (widgetOptionsState.displaySeriesLabelInfo?.format === 'percent') {
                             return `${p.percent}%`;
                         }
-                        return getFormattedNumber(p.value, state.dataField, state.numberFormat, state.unit);
+                        return getFormattedNumber(p.value, widgetOptionsState.dataFieldInfo?.data as string, widgetOptionsState.numberFormatInfo, state.unit);
                     },
                 },
                 data: state.chartData,
             },
         ],
     })),
-    // required fields
-    granularity: computed<string|undefined>(() => (props.widgetOptions?.granularity?.value as GranularityValue)?.granularity),
-    dataField: computed<string|undefined>(() => (props.widgetOptions?.dataField?.value as DataFieldValue)?.data as string),
-    groupByField: computed<string|undefined>(() => (props.widgetOptions?.groupBy?.value as GroupByValue)?.data as string),
-    groupByCount: computed<number|undefined>(() => (props.widgetOptions?.groupBy?.value as GroupByValue)?.count),
-    chartType: computed<string|undefined>(() => (props.widgetOptions?.pieChartType?.value as PieChartTypeValue)?.type),
-    // optional fields
-    showLegends: computed<boolean|undefined>(() => (props.widgetOptions?.legend?.value as LegendValue)?.toggleValue),
-    legendPosition: computed<string|undefined>(() => (props.widgetOptions?.legend?.value as LegendValue)?.position),
     dateFormat: computed<string|undefined>(() => {
         const _dateFormat = (props.widgetOptions?.dateFormat?.value as DateFormatValue)?.format || 'MMM DD, YYYY';
-        return DATE_FORMAT?.[_dateFormat]?.[state.granularity];
+        return DATE_FORMAT?.[_dateFormat]?.[widgetOptionsState.granularityInfo?.granularity];
     }),
-    numberFormat: computed<NumberFormatValue>(() => props.widgetOptions?.numberFormat?.value as NumberFormatValue),
-    tooltipNumberFormat: computed<TooltipNumberFormatValue>(() => props.widgetOptions?.tooltipNumberFormat?.value as TooltipNumberFormatValue),
-    displaySeriesLabel: computed(() => (props.widgetOptions?.displaySeriesLabel?.value as DisplaySeriesLabelValue)),
-});
-const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
-    dateRange,
-    errorMessage: computed(() => state.errorMessage),
-    widgetLoading: computed(() => state.loading),
 });
 
+const widgetOptionsState = reactive({
+    granularityInfo: computed<GranularityValue>(() => props.widgetOptions?.granularity?.value as GranularityValue),
+    dataFieldInfo: computed<DataFieldValue>(() => props.widgetOptions?.dataField?.value as DataFieldValue),
+    groupByInfo: computed<GroupByValue>(() => props.widgetOptions?.groupBy?.value as GroupByValue),
+    pieChartTypeInfo: computed<PieChartTypeValue>(() => props.widgetOptions?.pieChartType?.value as PieChartTypeValue),
+    legendInfo: computed<LegendValue>(() => props.widgetOptions?.legend?.value as LegendValue),
+    dateFormatInfo: computed<DateFormatValue>(() => props.widgetOptions?.dateFormat?.value as DateFormatValue),
+    numberFormatInfo: computed<NumberFormatValue>(() => props.widgetOptions?.numberFormat?.value as NumberFormatValue),
+    tooltipNumberFormatInfo: computed<TooltipNumberFormatValue>(() => props.widgetOptions?.tooltipNumberFormat?.value as TooltipNumberFormatValue),
+    displaySeriesLabelInfo: computed<DisplaySeriesLabelValue>(() => props.widgetOptions?.displaySeriesLabel?.value as DisplaySeriesLabelValue),
+});
+
+
+
 /* Util */
-const privateWidgetFetcher = getCancellableFetcher<PrivateWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.privateWidget.load);
-const publicWidgetFetcher = getCancellableFetcher<PublicWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.publicWidget.load);
-const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
-    if (props.widgetState === 'INACTIVE') return undefined;
-    try {
-        state.loading = true;
-        const _isPrivate = props.widgetId.startsWith('private');
-        const _fetcher = _isPrivate ? privateWidgetFetcher : publicWidgetFetcher;
-        const { status, response } = await _fetcher({
-            widget_id: props.widgetId,
-            granularity: state.granularity,
-            group_by: [state.groupByField],
-            start: dateRange.value.start,
-            end: dateRange.value.end,
-            vars: props.dashboardVars,
-            sort: [{ key: state.dataField, desc: true }],
-            page: { start: 0, limit: state.groupByCount },
-        });
-        if (status === 'succeed') {
-            state.errorMessage = undefined;
-            state.loading = false;
-            return response;
-        }
-        return undefined;
-    } catch (e: any) {
-        state.loading = false;
-        state.errorMessage = e.message;
-        ErrorHandler.handleError(e);
-        return ErrorHandler.makeAPIErrorToast(e);
-    }
+const fetchWidgetData = async (params: PrivateWidgetLoadParameters|PublicWidgetLoadParameters): Promise<Data> => {
+    const defaultFetcher = state.isPrivateWidget
+        ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
+        : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>;
+    const res = await defaultFetcher(params);
+    return res;
 };
+
+const queryKey = computed(() => [
+    'widget-load-pie-chart',
+    props.widgetId,
+    {
+        start: dateRange.value.start,
+        end: dateRange.value.end,
+        granularity: widgetOptionsState.granularityInfo?.granularity,
+        dataTableId: state.dataTable?.data_table_id,
+        dataTableOptions: JSON.stringify(sortObjectByKeys(state.dataTable?.options) ?? {}),
+        groupBy: widgetOptionsState.groupByInfo?.data,
+        count: widgetOptionsState.groupByInfo?.count,
+    },
+]);
+
+const queryResult = useQuery({
+    queryKey,
+    queryFn: () => fetchWidgetData({
+        widget_id: props.widgetId,
+        granularity: widgetOptionsState.granularityInfo?.granularity,
+        group_by: widgetOptionsState.groupByInfo?.data ? [widgetOptionsState.groupByInfo?.data as string] : [],
+        sort: widgetOptionsState.dataFieldInfo?.data ? [{ key: widgetOptionsState.dataFieldInfo?.data as string, desc: true }] : undefined,
+        page: { start: 0, limit: widgetOptionsState.groupByInfo?.count ?? 0 },
+        vars: props.dashboardVars,
+        ...getWidgetLoadApiQueryDateRange(widgetOptionsState.granularityInfo?.granularity, dateRange.value),
+    }),
+    enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable && state.runQueries),
+    staleTime: WIDGET_LOAD_STALE_TIME,
+});
+
+const loading = computed(() => queryResult.isLoading);
+const errorMessage = computed(() => queryResult.error?.value?.message);
+
 const drawChart = (rawData: Data|null) => {
     if (isEmpty(rawData)) return;
 
     // get chart data
-    const _groupByData = groupBy(rawData.results || [], state.groupByField);
+    const _groupByData = groupBy(rawData.results || [], widgetOptionsState.groupByInfo?.data);
     let _refinedData: ChartData[] = Object.entries(_groupByData).map(([k, v]) => ({
         name: k,
-        value: sumBy(v, state.dataField),
+        value: sumBy(v, widgetOptionsState.groupByInfo?.data),
     }));
     if (isDateField(state.groupByField)) {
         _refinedData = orderBy(_refinedData, 'name', 'desc');
-        _refinedData = _refinedData?.slice(0, state.groupByCount);
+        _refinedData = _refinedData?.slice(0, widgetOptionsState.groupByInfo?.count);
     } else {
         _refinedData = orderBy(_refinedData, 'value', 'desc');
-        const _slicedData: ChartData[] = _refinedData?.slice(0, state.groupByCount);
-        const _etcData: ChartData = _refinedData?.slice(state.groupByCount).reduce((acc, cur) => {
+        const _slicedData: ChartData[] = _refinedData?.slice(0, widgetOptionsState.groupByInfo?.count);
+        const _etcData: ChartData = _refinedData?.slice(widgetOptionsState.groupByInfo?.count).reduce((acc, cur) => {
             acc.name = 'etc';
             acc.value = (acc.value || 0) + (cur.value || 0);
             return acc;
@@ -247,14 +259,15 @@ const drawChart = (rawData: Data|null) => {
     state.chartData = _refinedData;
 };
 
-const loadWidget = async (): Promise<Data|APIErrorToast> => {
-    const res = await fetchWidget();
-    if (!res) return state.data;
-    if (typeof res === 'function') return res;
-    state.data = res;
-    drawChart(state.data);
-    return state.data;
+const loadWidget = () => {
+    state.runQueries = true;
 };
+
+const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
+    dateRange,
+    errorMessage: errorMessage.value,
+    widgetLoading: loading.value,
+});
 
 watch(() => props.size, () => {
     state.chart.setOption(state.chartOptions, true);
@@ -265,12 +278,19 @@ watch([() => state.chartData, () => chartContext.value], ([, chartCtx]) => {
         state.chart.setOption(state.chartOptions, true);
     }
 });
+watch(() => state.data, (newData) => {
+    drawChart(newData);
+});
 
 useResizeObserver(chartContext, throttle(() => {
     state.chart?.resize();
 }, 500));
 useWidgetInitAndRefresh({ props, emit, loadWidget });
-defineExpose<WidgetExpose<Data>>({
+onMounted(async () => {
+    if (!props.dataTableId) return;
+    state.dataTable = await getWidgetDataTable(props.dataTableId);
+});
+defineExpose<WidgetExpose>({
     loadWidget,
 });
 </script>
