@@ -1,6 +1,6 @@
 {
   "name": "cloudforet-console",
-  "version": "2.0.0-dev251",
+  "version": "2.0.0-dev253",
   "private": true,
   "workspaces": [
     "apps/*",
@@ -23,7 +23,7 @@
     "eslint-config-custom": "*",
     "husky": "^8.0.3",
     "lint-staged": "^13.2.0",
-    "turbo": "^1.10.5"
+    "turbo": "^2.3.3"
   },
   "engines": {
     "npm": ">=10.2.3",
