@@ -36,7 +36,6 @@ const validator = widgetValidatorRegistry[FIELD_KEY];
 
 const state = reactive({
     fieldValue: computed<FormatRulesValue>(() => props.fieldManager.data[FIELD_KEY].value),
-    // TODO: remove options type assertion
     type: computed<FormatRulesType>(() => props.widgetFieldSchema?.options?.formatRulesType as FormatRulesType),
     invalid: computed(() => !validator(state.fieldValue, props.widgetConfig)),
     selectedField: computed<string|undefined>(() => {

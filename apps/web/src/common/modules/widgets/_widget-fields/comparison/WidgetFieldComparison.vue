@@ -31,7 +31,6 @@ const props = defineProps<WidgetFieldComponentProps<ComparisonOptions>>();
 const state = reactive({
     fieldValue: computed<ComparisonValue>(() => props.fieldManager.data[FIELD_KEY].value),
     disabled: computed<boolean>(() => { // NOTE: EXCEPTION FOR ONLY TABLE WIDGET
-        // TODO: add disable case with PIVOT DT
         if (props.widgetConfig.widgetName !== 'table') return false;
         const groupByField = props.fieldManager.data.groupBy.value as GroupByValue;
         return Array.isArray(groupByField?.data) && isIncludingDateField(groupByField.data);

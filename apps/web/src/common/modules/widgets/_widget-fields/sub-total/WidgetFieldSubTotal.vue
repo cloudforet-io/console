@@ -17,13 +17,7 @@ const props = defineProps<WidgetFieldComponentProps<SubTotalOptions>>();
 
 const state = reactive({
     fieldValue: computed<SubTotalValue>(() => props.fieldManager.data[FIELD_KEY].value),
-    disabled: computed(() => {
-        console.debug('TODO: refactoring after subTotal planning');
-        // const tableDataField = props.allValueMap?.tableDataField as TableDataFieldValue;
-        // if (!tableDataField) return false;
-        // if (tableDataField.fieldType === 'staticField') return true;
-        return false;
-    }),
+    disabled: computed(() => false),
 });
 
 const handleUpdateValue = (value: boolean) => {
