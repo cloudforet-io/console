@@ -25,15 +25,15 @@ export const useTaskFieldValidation = <TField extends TaskField, TValue>(
     const stringValidator: ValidatorFn<TValue> = (val): string|boolean => {
         if (val === undefined || val === null) {
             if (props.field.is_required) {
-                return i18n.t('OPSFLOW.VALIDATION.FIELD_REQUIRED');
+                return i18n.t('OPSFLOW.VALIDATION.FIELD_REQUIRED') as string;
             }
             return true;
         }
         if (typeof val !== 'string') {
-            return i18n.t('OPSFLOW.VALIDATION.VALUE_STRING');
+            return i18n.t('OPSFLOW.VALIDATION.VALUE_STRING') as string;
         }
         if (props.field.is_required && val.trim() === '') {
-            return i18n.t('OPSFLOW.VALIDATION.FIELD_REQUIRED');
+            return i18n.t('OPSFLOW.VALIDATION.FIELD_REQUIRED') as string;
         }
         return true;
     };
@@ -41,26 +41,26 @@ export const useTaskFieldValidation = <TField extends TaskField, TValue>(
     const stringArrayValidator: ValidatorFn<TValue> = (val): string|boolean => {
         if (val === undefined || val === null) {
             if (props.field.is_required) {
-                return i18n.t('OPSFLOW.VALIDATION.FIELD_REQUIRED');
+                return i18n.t('OPSFLOW.VALIDATION.FIELD_REQUIRED') as string;
             }
             return true;
         }
         if (!Array.isArray(val)) {
-            return i18n.t('OPSFLOW.VALIDATION.VALUE_ARRAY');
+            return i18n.t('OPSFLOW.VALIDATION.VALUE_ARRAY') as string;
         }
         // SINGLE case
         if (!props.field.selection_type || props.field.selection_type === 'SINGLE') {
             if (val.length > 1) {
-                return i18n.t('OPSFLOW.VALIDATION.VALUE_ONLY_ONE');
+                return i18n.t('OPSFLOW.VALIDATION.VALUE_ONLY_ONE') as string;
             }
             if (props.field.is_required && val.length === 0) {
-                return i18n.t('OPSFLOW.VALIDATION.FIELD_REQUIRED');
+                return i18n.t('OPSFLOW.VALIDATION.FIELD_REQUIRED') as string;
             }
             return true;
         }
         // MULTI case
         if (props.field.is_required && val.length === 0) {
-            return i18n.t('OPSFLOW.VALIDATION.FIELD_REQUIRED');
+            return i18n.t('OPSFLOW.VALIDATION.FIELD_REQUIRED') as string;
         }
         return true;
     };

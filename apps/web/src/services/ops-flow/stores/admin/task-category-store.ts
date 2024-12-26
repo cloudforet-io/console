@@ -37,6 +37,7 @@ const DEFAULT_STATUS_OPTIONS: TaskCategoryCreateParameters['status_options'] = {
         { name: 'Done', color: 'green200', is_default: true },
     ],
 };
+
 export const useTaskCategoryStore = defineStore('task-category', () => {
     const state = reactive<UseTaskCategoryStoreState>({
         loading: false,

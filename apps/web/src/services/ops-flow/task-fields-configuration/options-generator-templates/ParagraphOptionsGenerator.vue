@@ -1,18 +1,19 @@
 <script setup lang="ts">
-import type { DropdownTaskFieldOptions, ParagraphTaskFieldOptions } from '@/schema/opsflow/_types/task-field-type';
+import type { ParagraphTaskFieldOptions } from '@/schema/opsflow/_types/task-field-type';
 
 import TextEditor from '@/common/components/editor/TextEditor.vue';
 
-const props = withDefaults(defineProps<{
-    options: ParagraphTaskFieldOptions;
-}>(), {
+import type {
+    OptionsGeneratorEmit,
+    OptionsGeneratorProps,
+} from '@/services/ops-flow/task-fields-configuration/types/options-generator-type';
+
+const props = withDefaults(defineProps<OptionsGeneratorProps<ParagraphTaskFieldOptions>>(), {
     options: () => ({
         example: '',
     }),
 });
-const emit = defineEmits<{(event: 'update:options', value: DropdownTaskFieldOptions): void;
-    (event: 'update:is-valid', value: boolean): void;
-}>();
+const emit = defineEmits<OptionsGeneratorEmit<ParagraphTaskFieldOptions>>();
 emit('update:is-valid', true);
 
 </script>
@@ -20,7 +21,7 @@ emit('update:is-valid', true);
 <template>
     <div>
         <text-editor :value="props.options.example"
-                     placeholder="Enter the default description to be displayed."
+                     :placeholder="$t('OPSFLOW.FIELD_GENERATOR.ENTER_DEFAULT_DESCRIPTION')"
                      @update:value="emit('update:options', { ...props.options, example: $event })"
         />
     </div>
