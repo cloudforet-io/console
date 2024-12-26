@@ -32,8 +32,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          # checkout the PR branch not the base branch
-          ref: ${{ github.event.pull_request.head.sha }}
           # checkout only the files we need
           sparse-checkout: |
             apps
@@ -45,7 +43,7 @@ jobs:
         run: |
           mkdir -p changed_files
           git fetch origin ${{ github.event.pull_request.base.ref }} --depth=1
-          git diff --name-only origin/${{ github.event.pull_request.base.ref }} ${{ github.sha }} | rsync --files-from=- ./ changed_files/
+          git diff --name-only origin/${{ github.event.pull_request.base.sha }} ${{ github.sha }} | rsync --files-from=- ./ changed_files/
 
       - name: Check for TODOs
         id: check_todo
