@@ -190,7 +190,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         setMode(mode: 'create'|'view') {
             state.mode = mode;
         },
-        async createTask() {
+        async createTask(): Promise<TaskModel|undefined> {
             try {
                 if (!state.currentTaskType) throw new Error('Task type is not selected');
                 state.createTaskLoading = true;
@@ -206,11 +206,11 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
                 });
                 showSuccessMessage(i18n.t('OPSFLOW.ALT_S_CREATE_TARGET', { target: taskManagementTemplateStore.templates.task }), '');
                 state.createTaskLoading = false;
-                return true;
+                return state.originTask;
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ALT_E_CREATE_TARGET', { target: taskManagementTemplateStore.templates.task }));
                 state.createTaskLoading = false;
-                return false;
+                return undefined;
             }
         },
         async updateTask() {
