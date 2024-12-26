@@ -25,6 +25,7 @@ interface UseTaskCategoryStoreState {
 interface UseTaskCategoryStoreGetters {
     loading: boolean;
     taskCategories: TaskCategoryModel[];
+    taskCategoriesIncludingDeleted: TaskCategoryModel[];
 }
 const DEFAULT_STATUS_OPTIONS: TaskCategoryCreateParameters['status_options'] = {
     TODO: [

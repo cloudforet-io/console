@@ -147,7 +147,7 @@ const handleUpdateActiveTab = (tab: 'content'|'progress') => {
 const handleSaveChanges = async () => {
     if (!taskContentFormGetters.isAllValid) return;
     hasUpdated.value = await taskContentFormStore.updateTask();
-    if (hasUpdated.value) goBack();
+    // if (hasUpdated.value) goBack();
 };
 
 /* lifecycle */
@@ -157,12 +157,14 @@ onUnmounted(() => {
 });
 watch(task, (t) => {
     if (!t) return; // route guard will get task and go back if task is not found
-    taskDetailPageStore.setCurrentTaskId(props.taskId);
     if (route.hash === '#progress') {
         activeTab.value = 'progress';
     }
     taskContentFormStore.setMode('view');
-    if (task.value) taskContentFormStore.setCurrentTask(task.value);
+    if (task.value) {
+        taskContentFormStore.setCurrentTask(task.value);
+        taskDetailPageStore.setCurrentTask(task.value);
+    }
 });
 
 /* expose */

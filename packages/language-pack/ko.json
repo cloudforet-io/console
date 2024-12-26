@@ -4251,12 +4251,21 @@
 		"SUPPORT_PACKAGE": "지원 패키지",
 		"TARGET_LIST": "{target} 목록",
 		"TASK_BOARD": {
+			"AFTER": "변경 후",
 			"ASSIGN": "할당하기",
 			"ASSIGN_TO": "담당자 할당",
+			"BEFORE": "변경 전",
+			"CHANGE_STATUS": "상태 변경됨",
 			"COMMENT": "댓글",
+			"COMMENTED": "댓글",
+			"COMMENT_PLACEHOLDER": "댓글을 입력하세요",
+			"CONTENT": "내용",
+			"CREATED": "생성됨",
+			"FIELD": "필드",
 			"TASK_CONTENT": "내용",
 			"TASK_PROGRESS": "태스크 진행상황",
 			"TYPE_INFO": "{type} 정보",
+			"UPDATED": "변경됨",
 			"VIEW_ALL_TASKS": "모든 {tasks} 보기"
 		},
 		"TASK_MANAGEMENT": {

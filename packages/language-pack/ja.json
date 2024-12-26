@@ -4251,12 +4251,21 @@
 		"SUPPORT_PACKAGE": "",
 		"TARGET_LIST": "",
 		"TASK_BOARD": {
+			"AFTER": "",
 			"ASSIGN": "",
 			"ASSIGN_TO": "",
+			"BEFORE": "",
+			"CHANGE_STATUS": "",
 			"COMMENT": "",
+			"COMMENTED": "",
+			"COMMENT_PLACEHOLDER": "",
+			"CONTENT": "",
+			"CREATED": "",
+			"FIELD": "",
 			"TASK_CONTENT": "",
 			"TASK_PROGRESS": "",
 			"TYPE_INFO": "",
+			"UPDATED": "",
 			"VIEW_ALL_TASKS": ""
 		},
 		"TASK_MANAGEMENT": {
