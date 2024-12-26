@@ -5,6 +5,7 @@ export interface PublicFolderModel {
     folder_id: string;
     name: string;
     shared: boolean;
+    scope: 'WORKSPACE'|'PROJECT';
     //
     tags: Tags;
     resource_group: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'PROJECT'>;

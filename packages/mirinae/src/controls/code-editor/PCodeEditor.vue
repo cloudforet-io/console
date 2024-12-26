@@ -14,7 +14,7 @@ import {
 
 import type { EditorConfiguration } from 'codemirror';
 import CodeMirror from 'codemirror';
-import { forEach, isEqual } from 'lodash';
+import { forEach, isEqual, debounce } from 'lodash';
 
 import PDataLoader from '@/feedbacks/loading/data-loader/PDataLoader.vue';
 
@@ -30,8 +30,9 @@ import 'codemirror/addon/lint/json-lint';
 import 'codemirror/addon/edit/closebrackets';
 import 'codemirror/addon/edit/closetag';
 
+type CodeFormat = string|Record<string, any>|Array<any>;
 interface Props {
-    code?: string|Record<string, any>|Array<any>;
+    code?: CodeFormat;
     options?: EditorConfiguration;
     readOnly?: boolean;
     loading?: boolean;
@@ -114,8 +115,11 @@ const forceFold = (cmInstance: CodeMirror.Editor) => {
 const setCode = (cmInstance: CodeMirror.Editor, code: string) => {
     if (code !== cmInstance.getValue()) {
         const scrollInfo = cmInstance.getScrollInfo();
+        const cursorInfo = cmInstance.getCursor();
         cmInstance.setValue(code);
         cmInstance.scrollTo(scrollInfo.left, scrollInfo.top);
+        cmInstance.setCursor(cursorInfo);
+        state.content = code;
     }
 };
 
@@ -156,11 +160,17 @@ const destroy = (cmInstance: CodeMirror.Editor|null) => {
 const initCodeMirrorInstance = (textareaRef: HTMLTextAreaElement): CodeMirror.Editor => {
     const editor = CodeMirror.fromTextArea(textareaRef, state.mergedOptions);
 
-    editor.on('change', (cm) => {
-        emit('update:code', cm.getValue());
-    });
+    editor.on('change', onChange);
     return editor;
 };
+
+const onChange = debounce((cm: CodeMirror.Editor) => {
+    const newCode = cm.getValue();
+    const currentRefinedCode = refineCode(state.content);
+    const newRefinedCode = refineCode(newCode);
+    if (currentRefinedCode === newRefinedCode) return;
+    emit('update:code', newRefinedCode);
+}, 300);
 
 watch([() => state.textareaRef, () => props.code, () => props.disableAutoReformat, () => state.mergedOptions], async ([textareaRef, code, , options], [,,, prevOptions]) => {
     if (!textareaRef) return;
@@ -168,7 +178,10 @@ watch([() => state.textareaRef, () => props.code, () => props.disableAutoReforma
 
     const editor = state.cmInstance as CodeMirror.Editor;
     if (!isEqual(options, prevOptions)) setOptions(editor, options);
-    setCode(editor, refineCode(code));
+
+    const refinedNewCode = refineCode(code);
+    setCode(editor, refinedNewCode);
+
     if (props.highlightLines) setHighlightLines(editor, props.highlightLines);
     if (props.folded) forceFold(editor);
     await refresh(editor);

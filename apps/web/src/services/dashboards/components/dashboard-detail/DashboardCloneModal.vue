@@ -16,6 +16,7 @@ import type { PrivateDashboardCreateParameters } from '@/schema/dashboard/privat
 import type { PrivateWidgetListParameters } from '@/schema/dashboard/private-widget/api-verbs/list';
 import type { PublicDashboardCreateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
 import type { PublicWidgetListParameters } from '@/schema/dashboard/public-widget/api-verbs/list';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -79,6 +80,8 @@ const {
 });
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    isWorkspaceOwner: computed<boolean>(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+    isWorkspaceMember: computed<boolean>(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
 });
 const state = reactive({
@@ -134,7 +137,9 @@ const cloneDashboard = async (): Promise<string|undefined> => {
             vars: state.targetDashboard.vars,
             vars_schema: state.targetDashboard.vars_schema,
         };
-        if (storeState.isAdminMode) {
+        if (storeState.isWorkspaceMember) {
+            state.isPrivate = true;
+        } else if (storeState.isAdminMode) {
             state.isPrivate = false;
             (_sharedDashboard as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.DOMAIN;
         } else if (!state.isPrivate) {
@@ -197,7 +202,7 @@ watch(() => props.visible, (visible) => {
                     />
                 </template>
             </p-field-group>
-            <p-field-group v-if="!storeState.isAdminMode"
+            <p-field-group v-if="storeState.isWorkspaceOwner"
                            :label="$t('DASHBOARDS.FORM.LABEL_MAKE_PRIVATE')"
                            required
                            class="mt-6"

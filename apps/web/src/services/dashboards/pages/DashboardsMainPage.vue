@@ -63,8 +63,9 @@ const queryTagsHelper = useQueryTags({
 });
 
 const storeState = reactive({
-    isWorkspaceOwner: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    isWorkspaceOwner: computed<boolean>(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+    isWorkspaceMember: computed<boolean>(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
+    isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
 });
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -324,10 +325,10 @@ onUnmounted(() => {
                     {{ $t('DASHBOARDS.ALL_DASHBOARDS.HELP_TEXT_CREATE') }}
                 </p-empty>
             </template>
-            <div v-if="(storeState.isAdminMode || storeState.isWorkspaceOwner) && state.refinedPublicTreeData.length"
+            <div v-if="state.refinedPublicTreeData.length"
                  class="tree-wrapper"
             >
-                <dashboard-folder-tree-title v-if="storeState.isWorkspaceOwner"
+                <dashboard-folder-tree-title v-if="!storeState.isAdminMode"
                                              :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.SHARED')"
                                              :is-collapsed.sync="state.treeCollapseMap.public"
                 />
@@ -335,6 +336,7 @@ onUnmounted(() => {
                                        :selected-id-map="dashboardPageControlState.selectedPublicIdMap"
                                        :dashboard-tree-data="state.refinedPublicTreeData"
                                        :button-disable-map="state.publicTreeControlButtonDisableMap"
+                                       :show-control-buttons="!storeState.isWorkspaceMember"
                                        @update:selectedIdMap="handleUpdateSelectedIdMap('PUBLIC', $event)"
                                        @click-clone="dashboardPageControlStore.openBundleCloneModal('PUBLIC')"
                                        @click-delete="dashboardPageControlStore.openBundleDeleteModal('PUBLIC')"
@@ -351,6 +353,7 @@ onUnmounted(() => {
                                        :selected-id-map="dashboardPageControlState.selectedPrivateIdMap"
                                        :dashboard-tree-data="state.refinedPrivateTreeData"
                                        :button-disable-map="dashboardPageControlGetters.privateTreeControlButtonDisableMap"
+                                       show-control-buttons
                                        @update:selectedIdMap="handleUpdateSelectedIdMap('PRIVATE', $event)"
                                        @click-clone="dashboardPageControlStore.openBundleCloneModal('PRIVATE')"
                                        @click-delete="dashboardPageControlStore.openBundleDeleteModal('PRIVATE')"

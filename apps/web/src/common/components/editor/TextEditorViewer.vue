@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, toRef } from 'vue';
 
+import DOMPurify from 'dompurify';
+
 import { useMarkdown } from '@cloudforet/mirinae';
 
 import { setAttachmentsToContents } from '@/common/components/editor/extensions/image/helper';
@@ -22,12 +24,16 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 loadMonospaceFonts();
-const { sanitizedHtml } = useMarkdown({ value: toRef(props, 'contents') });
+const { sanitizedHtml } = useMarkdown({
+    value: toRef(props, 'contents'),
+    inlineCodeClass: 'inline-code',
+});
 const refinedContents = computed(() => {
     if (props.contentType === 'markdown') {
         return sanitizedHtml.value;
     }
-    return setAttachmentsToContents(props.contents, props.attachments);
+    const sanitized = DOMPurify.sanitize(props.contents);
+    return setAttachmentsToContents(sanitized, props.attachments);
 });
 </script>
 
