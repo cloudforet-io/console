@@ -20,9 +20,9 @@ import { i18n as _i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
+import { DOMAIN_CONFIG_NAMES } from '@/store/config/constant';
 import { CURRENCY_SYMBOL } from '@/store/display/constant';
 import type { Currency } from '@/store/display/type';
-import { DOMAIN_CONFIG_NAMES } from '@/store/domain/constant';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 

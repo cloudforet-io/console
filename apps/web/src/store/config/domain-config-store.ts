@@ -9,8 +9,8 @@ import type { DomainConfigGetParameters } from '@/schema/config/domain-config/ap
 import type { DomainConfigSetParameters } from '@/schema/config/domain-config/api-verbs/set';
 import type { DomainConfigModel } from '@/schema/config/domain-config/model';
 
-import { DOMAIN_CONFIG_NAMES } from '@/store/domain/constant';
-import type { DomainConfigKey } from '@/store/domain/type';
+import { DOMAIN_CONFIG_NAMES } from '@/store/config/constant';
+import type { DomainConfigKey } from '@/store/config/type';
 
 
 interface UseDomainConfigStoreState {

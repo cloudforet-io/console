@@ -1,4 +1,4 @@
-import type { DOMAIN_CONFIG_NAMES, SHARED_CONFIG_NAMES } from '@/store/domain/constant';
+import type { DOMAIN_CONFIG_NAMES, SHARED_CONFIG_NAMES } from '@/store/config/constant';
 
 export type ExtendedAuthType = 'GOOGLE_OAUTH2' | 'KEYCLOAK_OIDC' | 'SAML';
 

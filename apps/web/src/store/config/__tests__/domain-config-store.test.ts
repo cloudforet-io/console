@@ -5,9 +5,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { DomainConfigModel } from '@/schema/config/domain-config/model';
 
-import { DOMAIN_CONFIG_NAMES } from '@/store/domain/constant';
-import { useDomainConfigStore } from '@/store/domain/domain-config-store';
-import type { DomainConfigKey } from '@/store/domain/type';
+import { DOMAIN_CONFIG_NAMES } from '@/store/config/constant';
+import { useDomainConfigStore } from '@/store/config/domain-config-store';
+import type { DomainConfigKey } from '@/store/config/type';
 
 vi.mock('@cloudforet/core-lib/space-connector', () => ({
     SpaceConnector: {

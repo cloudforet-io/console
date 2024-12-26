@@ -15,8 +15,8 @@ import type {
 import type { PublicConfigUpdateParameters as SharedConfigUpdateParameters } from '@/schema/config/public-config/api-verbs/update';
 import type { PublicConfigModel as SharedConfigModel } from '@/schema/config/public-config/model';
 
-import { SHARED_CONFIG_NAMES } from '@/store/domain/constant';
-import type { SharedConfigKey } from '@/store/domain/type';
+import { SHARED_CONFIG_NAMES } from '@/store/config/constant';
+import type { SharedConfigKey } from '@/store/config/type';
 
 
 interface UseSharedConfigStoreState {

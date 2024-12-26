@@ -10,9 +10,9 @@ import type {
     Metadata,
 } from '@/schema/identity/domain/api-verbs/get-auth-info';
 
+import { DOMAIN_CONFIG_NAMES } from '@/store/config/constant';
+import type { ExtendedAuthType, ExtraMenuSet } from '@/store/config/type';
 import type { Currency } from '@/store/display/type';
-import { DOMAIN_CONFIG_NAMES } from '@/store/domain/constant';
-import type { ExtendedAuthType, ExtraMenuSet } from '@/store/domain/type';
 
 import config from '@/lib/config';
 

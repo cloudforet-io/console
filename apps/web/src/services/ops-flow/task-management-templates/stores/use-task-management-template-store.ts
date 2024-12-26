@@ -5,7 +5,7 @@ import { defineStore } from 'pinia';
 
 import { i18n, type SupportLanguage } from '@/translations';
 
-import { useSharedConfigStore } from '@/store/domain/shared-config-store';
+import { useSharedConfigStore } from '@/store/config/shared-config-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
