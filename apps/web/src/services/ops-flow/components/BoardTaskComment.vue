@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PPaneLayout, PHeading, PButton, PCollapsibleList,
+    PPaneLayout, PHeading, PButton, PCollapsibleList, PBadge, PLazyImg,
 } from '@cloudforet/mirinae';
 import type { CollapsibleItem } from '@cloudforet/mirinae/types/data-display/collapsible/collapsible-list/type';
 
@@ -37,8 +37,11 @@ const userStore = useUserStore();
 const userId = computed(() => userStore.state.userId);
 const getAuthor = (item: CommentModel) => {
     const u = item.created_by;
-    return userReferenceStore.getters.userItems[u]?.label ?? u ?? 'Unknown';
+    if (!u) return 'Unknown';
+    return userReferenceStore.getters.userItems[u]?.label ?? u;
 };
+const getSourceIcon = (item: CommentModel) => item.source?.icon ?? '';
+const getSourceName = (item: CommentModel) => item.source?.name ?? '';
 const getWritePermission = (item: CommentModel) => item.created_by === userId.value;
 const comments = computed<CommentModel[]>(() => commentStore.state.itemsByTaskId[props.taskId] ?? []);
 const commentItems = computed<CollapsibleItem<CommentModel>[]>(() => comments.value.map((comment) => ({
@@ -127,6 +130,18 @@ onBeforeMount(async () => {
         >
             <template #no-styled-title="{data}">
                 <div class="flex w-full gap-1 items-center">
+                    <template v-if="data.source">
+                        <div class="pr-1">
+                            <p-lazy-img :src="getSourceIcon(data)" />
+                        </div>
+                        <p-badge v-if="!data.source"
+                                 badge-type="subtle"
+                                 style-type="primary3"
+                                 shpae="square"
+                        >
+                            {{ getSourceName(data) }}
+                        </p-badge>
+                    </template>
                     <span class="text-paragraph-md font-bold text-blue-900">{{ getAuthor(data) }}</span>
                     <div class="flex-1 truncate">
                         <span class="flex-grow text-paragraph-sm text-gray-400">{{ getTimezoneDate(data.created_at) }}</span>
@@ -141,9 +156,11 @@ onBeforeMount(async () => {
                 </div>
             </template>
             <template #default="{data}">
-                <text-editor-viewer content-type="markdown"
-                                    :contents="data.comment"
-                />
+                <div :class="{'pl-10': !!data.source}">
+                    <text-editor-viewer content-type="markdown"
+                                        :contents="data.comment"
+                    />
+                </div>
             </template>
         </p-collapsible-list>
     </p-pane-layout>

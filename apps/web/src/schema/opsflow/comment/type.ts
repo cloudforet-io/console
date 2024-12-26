@@ -3,3 +3,7 @@ export interface MentionTargets {
     USER?: string[];
     USER_GROUP?: string[];
 }
+export interface MentionSource {
+    name: string;
+    icon?: string;
+}
