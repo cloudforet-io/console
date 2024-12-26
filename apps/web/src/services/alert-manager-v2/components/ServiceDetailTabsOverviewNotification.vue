@@ -10,11 +10,8 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
 import type { ServiceChannelListParameters } from '@/schema/alert-manager/service-channel/api-verbs/list';
 import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
-
-import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
@@ -22,6 +19,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/common-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
+import type { ProtocolCardItemType } from '@/services/alert-manager-v2/types/alert-manager-type';
 
 const ITEM_DEFAULT_WIDTH = 120 + 8;
 const DEFAULT_LEFT_PADDING = 16;
@@ -36,9 +34,8 @@ const serviceDetailPageGetters = serviceDetailPageStore.getters;
 const { width: rowItemsWrapperWidth } = useElementSize(rowItemsWrapperRef);
 
 const storeState = reactive({
-    plugins: computed<PluginReferenceMap>(() => serviceDetailPageGetters.pluginsReferenceMap),
     serviceId: computed<string>(() => serviceDetailPageGetters.serviceInfo.service_id),
-    notificationProtocolList: computed<NotificationProtocolModel[]>(() => serviceDetailPageState.notificationProtocolList),
+    notificationProtocolList: computed<ProtocolCardItemType[]>(() => serviceDetailPageState.notificationProtocolList),
 });
 const state = reactive({
     loading: true,
@@ -64,8 +61,7 @@ const getPluginIcon = (protocolId: string): string => {
     const notificationProtocol = storeState.notificationProtocolList.find((item) => item.protocol_id === protocolId);
     if (!notificationProtocol) return '';
 
-    const plugin = storeState.plugins[notificationProtocol.plugin_info.plugin_id];
-    return assetUrlConverter(plugin?.icon || '');
+    return assetUrlConverter(notificationProtocol?.icon || '');
 };
 
 const handleRouteDetail = () => (
@@ -83,7 +79,7 @@ const fetchServiceChannelList = async () => {
         });
         state.items = (results || []).slice(0, 15);
     } catch (e) {
-        ErrorHandler.handleError(e, true);
+        ErrorHandler.handleError(e);
         state.items = [];
     } finally {
         state.loading = false;

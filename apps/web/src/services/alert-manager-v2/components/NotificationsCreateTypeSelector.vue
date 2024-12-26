@@ -9,19 +9,18 @@ import {
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { NotificationProtocolListParameters } from '@/schema/alert-manager/notification-protocol/api-verbs/list';
 import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
+import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useServiceCreateFormStore } from '@/services/alert-manager-v2/stores/service-create-form-store';
-
-interface ProtocolCardItemType extends NotificationProtocolModel {
-    icon: string;
-}
+import type { ProtocolCardItemType } from '@/services/alert-manager-v2/types/alert-manager-type';
 
 const serviceCreateFormStore = useServiceCreateFormStore();
 const allReferenceStore = useAllReferenceStore();
@@ -33,11 +32,18 @@ const storeState = reactive({
 const state = reactive({
     loading: true,
     protocolList: [] as NotificationProtocolModel[],
-    protocolCardList: computed<ProtocolCardItemType>(() => state.protocolList.map((item) => ({
-        ...item,
-        icon: storeState.plugins[item.plugin_id]?.icon || '',
-    }))),
-    selectedProtocol: {} as NotificationProtocolModel,
+    protocolCardList: computed<ProtocolCardItemType[]>(() => [
+        ...state.protocolList.map((item) => ({
+            ...item,
+            icon: storeState.plugins[item.plugin_info.plugin_id]?.icon || '',
+        })),
+        {
+            protocol_id: 'forward',
+            name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.ASSOCIATED_MEMBER'),
+            icon: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/notifications_member.svg',
+        },
+    ]),
+    selectedProtocol: {} as ProtocolCardItemType,
 });
 
 const handleSelectProtocol = () => {
@@ -50,7 +56,7 @@ const fetchNotificationProtocolList = async () => {
         const { results } = await SpaceConnector.clientV2.alertManager.notificationProtocol.list<NotificationProtocolListParameters, ListResponse<NotificationProtocolModel>>();
         state.protocolList = results || [];
     } catch (e) {
-        ErrorHandler.handleError(e, true);
+        ErrorHandler.handleError(e);
         state.protocolList = [];
     } finally {
         state.loading = false;
@@ -65,7 +71,7 @@ onMounted(() => {
 <template>
     <p-data-loader class="service-create-step3-select-protocol"
                    :loading="state.loading"
-                   :data="state.protocolList"
+                   :data="state.protocolCardList"
                    loader-backdrop-color="transparent"
     >
         <div class="contents">
@@ -78,7 +84,7 @@ onMounted(() => {
                            @change="handleSelectProtocol"
             >
                 <div class="card-item">
-                    <p-lazy-img :src="assetUrlConverter(item.icon)"
+                    <p-lazy-img :src="assetUrlConverter(item.icon || '')"
                                 width="2.5rem"
                                 height="2.5rem"
                                 class="image"
@@ -106,6 +112,18 @@ onMounted(() => {
                 .image {
                     margin-bottom: 0;
                 }
+            }
+        }
+
+        @screen tablet {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        @screen mobile {
+            grid-template-columns: repeat(1, 1fr);
+            .card {
+                margin-right: auto;
+                margin-left: auto;
             }
         }
     }

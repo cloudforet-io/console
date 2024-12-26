@@ -5,6 +5,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ServiceChannelDeleteParameters } from '@/schema/alert-manager/service-channel/api-verbs/delete';
 import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -34,6 +37,7 @@ const handleConfirm = async () => {
         await SpaceConnector.clientV2.alertManager.serviceChannel.delete<ServiceChannelDeleteParameters>({
             channel_id: props.selectedItem?.channel_id || '',
         });
+        showSuccessMessage(i18n.t('ALERT_MANAGER.NOTIFICATIONS.ALT_S_DELETED'), '');
         state.proxyVisible = false;
         emit('close');
     } catch (e) {

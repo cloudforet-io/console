@@ -15,6 +15,8 @@ import { i18n } from '@/translations';
 
 import type { PluginItem, PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -72,6 +74,7 @@ const handleConfirm = async () => {
             webhook_id: props.selectedItem?.webhook_id || '',
             name: name.value,
         });
+        showSuccessMessage(i18n.t('ALERT_MANAGER.WEBHOOK.ALT_S_UPDATE_WEBHOOK'), '');
         state.proxyVisible = false;
         emit('close');
     } catch (e) {

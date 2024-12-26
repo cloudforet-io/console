@@ -62,7 +62,7 @@ const fetchWebhookDetail = async (selectedId: string) => {
             webhook_id: selectedId,
         });
     } catch (e) {
-        ErrorHandler.handleError(e, true);
+        ErrorHandler.handleError(e);
         state.webhookInfo = {} as WebhookModel;
     }
 };

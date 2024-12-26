@@ -1,3 +1,5 @@
+import type { TranslateResult } from 'vue-i18n';
+
 import type { Tags } from '@/schema/_common/model';
 import type {
     NotificationProtocolPluginInfoType,
@@ -6,7 +8,7 @@ import type {
 
 export interface NotificationProtocolModel {
     protocol_id: string;
-    name: string;
+    name: string|TranslateResult;
     state: NotificationProtocolStateType;
     plugin_info: NotificationProtocolPluginInfoType;
     tags: Tags;

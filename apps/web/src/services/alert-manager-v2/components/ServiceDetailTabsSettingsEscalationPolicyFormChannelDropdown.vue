@@ -150,7 +150,7 @@ const fetchServiceChannelList = async () => {
             label: item.name,
         })).sort((a, b) => a.label.localeCompare(b.label));
     } catch (e) {
-        ErrorHandler.handleError(e, true);
+        ErrorHandler.handleError(e);
         state.serviceChannelList = [];
     }
 };
@@ -162,7 +162,7 @@ const fetchUserGroupChannelList = async () => {
             label: item.name,
         })).sort((a, b) => a.label.localeCompare(b.label));
     } catch (e) {
-        ErrorHandler.handleError(e, true);
+        ErrorHandler.handleError(e);
         state.userGroupChannelList = [];
     }
 };

@@ -191,5 +191,9 @@ onUnmounted(() => {
         padding-right: 0;
         padding-left: 0;
     }
+
+    @screen tablet {
+        min-width: unset;
+    }
 }
 </style>

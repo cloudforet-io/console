@@ -109,7 +109,7 @@ const handleClickEditButton = (type: ServiceDetailSettingCardType) => {
             </template>
         </p-heading-layout>
         <div class="p-4 mx-4 bg-blue-100 rounded-lg">
-            <div class="flex gap-4">
+            <div class="cards flex gap-4">
                 <p-card v-for="(item, index) in state.settingCardItems"
                         :key="`setting-card-${i18n.locale}-${index}`"
                         :header="false"
@@ -148,3 +148,13 @@ const handleClickEditButton = (type: ServiceDetailSettingCardType) => {
         />
     </div>
 </template>
+
+<style scoped lang="postcss">
+.service-detail-tabs-settings {
+    @screen tablet {
+        .cards {
+            flex-direction: column;
+        }
+    }
+}
+</style>

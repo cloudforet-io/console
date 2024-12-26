@@ -4,6 +4,10 @@ import { useRouter } from 'vue-router/composables';
 
 import { PButtonModal } from '@cloudforet/mirinae';
 
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -35,6 +39,7 @@ const handleConfirm = async () => {
     try {
         await serviceDetailPageStore.deleteServiceDetailData();
         await router.push(getProperRouteLocation({ name: ALERT_MANAGER_ROUTE_V2.SERVICE._NAME }));
+        showSuccessMessage(i18n.t('ALERT_MANAGER.SERVICE.ALT_S_DELETE_SERVICE'), '');
     } finally {
         state.loading = false;
         handleClose();

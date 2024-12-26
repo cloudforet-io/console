@@ -17,6 +17,8 @@ import type { EscalationPolicyModel } from '@/schema/alert-manager/escalation-po
 import type { EscalationPolicyRulesType } from '@/schema/alert-manager/escalation-policy/type';
 import { i18n } from '@/translations';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -114,11 +116,13 @@ const handleClickConfirm = async () => {
                 service_id: storeState.serviceId,
                 ...params,
             });
+            showSuccessMessage(i18n.t('ALERT_MANAGER.ESCALATION_POLICY.ALT_S_CREATE_POLICY'), '');
         } else {
             await SpaceConnector.clientV2.alertManager.escalationPolicy.update<EscalationPolicyUpdateParameters>({
                 escalation_policy_id: props.selectedItem?.escalation_policy_id || '',
                 ...params,
             });
+            showSuccessMessage(i18n.t('ALERT_MANAGER.ESCALATION_POLICY.ALT_S_UPDATE_POLICY'), '');
         }
         handleClose();
         emit('close');

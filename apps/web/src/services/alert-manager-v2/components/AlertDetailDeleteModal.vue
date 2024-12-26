@@ -7,7 +7,11 @@ import { PButtonModal } from '@cloudforet/mirinae';
 
 import type { AlertDeleteParameters } from '@/schema/alert-manager/alert/api-verbs/delete';
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
+import { i18n } from '@/translations';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -50,6 +54,9 @@ const handleConfirm = async () => {
             alert_id: storeState.alertInfo.alert_id,
         });
         await router.push(getProperRouteLocation({ name: ALERT_MANAGER_ROUTE_V2.ALERTS._NAME }));
+        showSuccessMessage(i18n.t('ALERT_MANAGER.ALERTS.ALT_S_DELETE'), '');
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
     } finally {
         state.loading = false;
         handleClose();

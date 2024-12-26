@@ -5,17 +5,15 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButtonModal, PFieldGroup, PTextInput, PRadio, PRadioGroup, PPaneLayout, PLazyImg,
+    PButtonModal, PFieldGroup, PTextInput, PRadio, PRadioGroup, PPaneLayout, PLazyImg, PJsonSchemaForm,
 } from '@cloudforet/mirinae';
 
-import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
 import type { ServiceChannelUpdateParameters } from '@/schema/alert-manager/service-channel/api-verbs/update';
 import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
 import { i18n } from '@/translations';
 
-import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
-
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import type { ScheduleSettingFormType } from '@/common/components/schedule-setting-form/schedule-setting-form';
 import ScheduleSettingForm from '@/common/components/schedule-setting-form/ScheduleSettingForm.vue';
@@ -26,7 +24,7 @@ import type { SelectedUserDropdownIdsType } from '@/common/modules/user/typte';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
 import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
-import type { UserRadioType, ProtocolInfo } from '@/services/alert-manager-v2/types/alert-manager-type';
+import type { UserRadioType, ProtocolInfo, ProtocolCardItemType } from '@/services/alert-manager-v2/types/alert-manager-type';
 
 interface Props {
     selectedItem?: ServiceChannelModel;
@@ -46,14 +44,16 @@ const emit = defineEmits<{(e: 'close'): void;
 }>();
 
 const storeState = reactive({
-    notificationProtocolList: computed<NotificationProtocolModel[]>(() => serviceDetailPageState.notificationProtocolList),
-    plugins: computed<PluginReferenceMap>(() => serviceDetailPageGetters.pluginsReferenceMap),
+    notificationProtocolList: computed<ProtocolCardItemType[]>(() => serviceDetailPageState.notificationProtocolList),
+    language: computed<string>(() => serviceDetailPageGetters.language),
 });
 const state = reactive({
     loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
 
+    isForwardTypeProtocol: computed<boolean>(() => props.selectedItem?.protocol_id?.toLowerCase().includes('forward') || false),
     scheduleForm: {} as ScheduleSettingFormType,
+    schemaForm: {} as Record<string, any>,
     radioMenuList: computed<UserRadioType[]>(() => ([
         {
             label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.ALL_MEMBER'),
@@ -70,6 +70,17 @@ const state = reactive({
     ])),
     selectedRadioIdx: 0,
     selectedMemberItems: [] as SelectedUserDropdownIdsType[],
+    isSchemaDataValid: false,
+    isMemberDataValid: computed<boolean>(() => {
+        if (state.selectedRadioIdx === 0) {
+            return true;
+        }
+        return state.selectedMemberItems.length > 0;
+    }),
+    isAllFormValid: computed<boolean>(() => {
+        if (!name.value) return false;
+        return state.isForwardTypeProtocol ? state.isMemberDataValid : state.isSchemaDataValid;
+    }),
 });
 
 const {
@@ -83,10 +94,10 @@ const {
 
 const getProtocolInfo = (id: string): ProtocolInfo => {
     const protocol = storeState.notificationProtocolList.find((item) => item.protocol_id === id);
-    const plugin = storeState.plugins[protocol?.plugin_info.plugin_id || ''];
     return {
         name: protocol?.name || '',
-        icon: plugin?.icon || '',
+        icon: protocol?.icon || '',
+        schema: protocol?.plugin_info?.metadata.data.schema || {},
     };
 };
 const handleChangeRadio = () => {
@@ -94,6 +105,9 @@ const handleChangeRadio = () => {
 };
 const handleScheduleForm = (form: ScheduleSettingFormType) => {
     state.scheduleForm = form;
+};
+const handleSchemaValidate = (isValid: boolean) => {
+    state.isSchemaDataValid = isValid;
 };
 
 const handleConfirm = async () => {
@@ -103,12 +117,13 @@ const handleConfirm = async () => {
             channel_id: props.selectedItem?.channel_id || '',
             name: name.value,
             schedule: state.scheduleForm,
-            data: {
+            data: !state.isForwardTypeProtocol ? state.schemaForm : {
                 FORWARD_TYPE: state.radioMenuList[state.selectedRadioIdx].name,
                 USER_GROUP: state.selectedRadioIdx === 1 ? state.selectedMemberItems.map((item) => item.value) : undefined,
                 USER: state.selectedRadioIdx === 2 ? state.selectedMemberItems.map((item) => item.value) : undefined,
             },
         });
+        showSuccessMessage(i18n.t('ALERT_MANAGER.SERVICE.ALT_S_UPDATE_SERVICE'), '');
         state.proxyVisible = false;
         emit('close');
     } catch (e) {
@@ -173,7 +188,8 @@ watch(() => props.selectedItem, (selectedItem) => {
                             />
                         </template>
                     </p-field-group>
-                    <p-field-group :label="$t('ALERT_MANAGER.NOTIFICATIONS.USER')"
+                    <p-field-group v-if="state.isForwardTypeProtocol"
+                                   :label="$t('ALERT_MANAGER.NOTIFICATIONS.USER')"
                                    required
                     >
                         <template #default>
@@ -202,6 +218,13 @@ watch(() => props.selectedItem, (selectedItem) => {
                             </div>
                         </template>
                     </p-field-group>
+                    <p-json-schema-form v-else
+                                        :form-data.sync="state.schemaForm"
+                                        :schema="getProtocolInfo(props.selectedItem.protocol_id).schema"
+                                        :language="storeState.language"
+                                        uniform-width
+                                        @validate="handleSchemaValidate"
+                    />
                 </p-pane-layout>
                 <div class="pt-2">
                     <p-pane-layout class="pt-6 px-4 pb-4">

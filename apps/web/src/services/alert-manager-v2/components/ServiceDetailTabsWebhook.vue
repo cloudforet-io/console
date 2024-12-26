@@ -169,7 +169,7 @@ const fetchWebhookList = async () => {
         state.items = results || [];
         state.totalCount = total_count || 0;
     } catch (e) {
-        ErrorHandler.handleError(e, true);
+        ErrorHandler.handleError(e);
         state.items = [];
         state.totalCount = 0;
     } finally {

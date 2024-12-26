@@ -1,12 +1,14 @@
 <script setup lang="ts">
+import { useWindowSize } from '@vueuse/core';
 import { computed, reactive, watch } from 'vue';
 
 import {
-    PFieldGroup, PLazyImg, PTextInput, PRadioGroup, PRadio, PPaneLayout,
+    PFieldGroup, PLazyImg, PTextInput, PRadioGroup, PRadio, PPaneLayout, PJsonSchemaForm, screens,
 } from '@cloudforet/mirinae';
 
-import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
 import { i18n } from '@/translations';
+
+import { useUserStore } from '@/store/user/user-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
@@ -17,16 +19,24 @@ import type { SelectedUserDropdownIdsType } from '@/common/modules/user/typte';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
 import { useServiceCreateFormStore } from '@/services/alert-manager-v2/stores/service-create-form-store';
-import type { CreatedNotificationInfoType, UserRadioType } from '@/services/alert-manager-v2/types/alert-manager-type';
+import type { CreatedNotificationInfoType, UserRadioType, ProtocolCardItemType } from '@/services/alert-manager-v2/types/alert-manager-type';
 
 const serviceCreateFormStore = useServiceCreateFormStore();
 const serviceCreateFormState = serviceCreateFormStore.state;
+const userStore = useUserStore();
+const userState = userStore.state;
+
+const { width } = useWindowSize();
 
 const storeState = reactive({
-    selectedProtocolType: computed<NotificationProtocolModel|undefined>(() => serviceCreateFormState.selectedProtocol),
+    language: computed<string|undefined>(() => userState.language),
+    selectedProtocolType: computed<ProtocolCardItemType>(() => serviceCreateFormState.selectedProtocol),
 });
 const state = reactive({
+    isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
+    isForwardTypeProtocol: computed<boolean>(() => storeState.selectedProtocolType.protocol_id?.toLowerCase().includes('forward') || false),
     scheduleForm: {} as ScheduleSettingFormType,
+    schemaForm: {} as Record<string, any>,
     radioMenuList: computed<UserRadioType[]>(() => ([
         {
             label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.ALL_MEMBER'),
@@ -43,9 +53,16 @@ const state = reactive({
     ])),
     selectedRadioIdx: 0,
     selectedMemberItems: [] as SelectedUserDropdownIdsType[],
+    isSchemaDataValid: false,
+    isMemberDataValid: computed<boolean>(() => {
+        if (state.selectedRadioIdx === 0) {
+            return true;
+        }
+        return state.selectedMemberItems.length > 0;
+    }),
 });
 
-const emit = defineEmits<{(e: 'change-form', form: CreatedNotificationInfoType): void}>();
+const emit = defineEmits<{(e: 'change-form', form: CreatedNotificationInfoType, valid: boolean): void}>();
 
 const {
     forms: {
@@ -58,6 +75,9 @@ const {
     name: '',
 }, {});
 
+const handleSchemaValidate = (isValid: boolean) => {
+    state.isSchemaDataValid = isValid;
+};
 const handleScheduleForm = (form: ScheduleSettingFormType) => {
     state.scheduleForm = form;
 };
@@ -65,16 +85,22 @@ const handleChangeRadio = () => {
     state.selectedMemberItems = [];
 };
 
-watch([() => name.value, () => state.scheduleForm, () => state.selectedRadioIdx, () => state.selectedMemberItems], ([nameVal, scheduleForm, selectedRadioIdx, selectedMemberItems]) => {
-    emit('change-form', {
-        name: nameVal,
-        schedule: scheduleForm,
-        data: {
-            FORWARD_TYPE: state.radioMenuList[selectedRadioIdx].name,
-            USER_GROUP: selectedRadioIdx === 1 ? selectedMemberItems.map((item) => item.value) : undefined,
-            USER: selectedRadioIdx === 2 ? selectedMemberItems.map((item) => item.value) : undefined,
+watch([() => name.value, () => state.scheduleForm, () => state.selectedRadioIdx, () => state.selectedMemberItems, () => state.schemaForm], (
+    [nameVal, scheduleForm, selectedRadioIdx, selectedMemberItems, schemaForm],
+) => {
+    emit(
+        'change-form',
+        {
+            name: nameVal,
+            schedule: scheduleForm,
+            data: !state.isForwardTypeProtocol ? schemaForm : {
+                FORWARD_TYPE: state.radioMenuList[selectedRadioIdx].name,
+                USER_GROUP: selectedRadioIdx === 1 ? selectedMemberItems.map((item) => item.value) : undefined,
+                USER: selectedRadioIdx === 2 ? selectedMemberItems.map((item) => item.value) : undefined,
+            },
         },
-    });
+        state.isForwardTypeProtocol ? state.isMemberDataValid : state.isSchemaDataValid,
+    );
 });
 </script>
 
@@ -83,7 +109,7 @@ watch([() => name.value, () => state.scheduleForm, () => state.selectedRadioIdx,
         <div v-if="storeState.selectedProtocolType"
              class="protocol-item"
         >
-            <p-lazy-img :src="assetUrlConverter(storeState.selectedProtocolType?.tags?.icon || '')"
+            <p-lazy-img :src="assetUrlConverter(storeState.selectedProtocolType?.icon || '')"
                         width="4rem"
                         height="4rem"
                         error-icon="ic_webhook"
@@ -112,12 +138,13 @@ watch([() => name.value, () => state.scheduleForm, () => state.selectedRadioIdx,
                 />
             </template>
         </p-field-group>
-        <p-field-group :label="$t('ALERT_MANAGER.NOTIFICATIONS.USER')"
+        <p-field-group v-if="state.isForwardTypeProtocol"
+                       :label="$t('ALERT_MANAGER.NOTIFICATIONS.USER')"
                        required
         >
             <template #default>
                 <div class="flex flex-col mt-1 gap-2">
-                    <p-radio-group>
+                    <p-radio-group :direction="state.isMobileSize ? 'vertical' : 'horizontal'">
                         <p-radio v-for="(item, idx) in state.radioMenuList"
                                  :key="`notification-scope-${idx}`"
                                  v-model="state.selectedRadioIdx"
@@ -141,6 +168,13 @@ watch([() => name.value, () => state.scheduleForm, () => state.selectedRadioIdx,
                 </div>
             </template>
         </p-field-group>
+        <p-json-schema-form v-else
+                            :form-data.sync="state.schemaForm"
+                            :schema="storeState.selectedProtocolType?.plugin_info?.metadata.data.schema"
+                            :language="storeState.language"
+                            uniform-width
+                            @validate="handleSchemaValidate"
+        />
         <div class="pt-2">
             <p-pane-layout class="pt-8 px-4 pb-4">
                 <p class="pb-4 text-display-md">

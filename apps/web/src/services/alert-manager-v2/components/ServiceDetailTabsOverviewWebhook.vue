@@ -74,7 +74,7 @@ const fetchWebhookList = async () => {
         });
         state.items = (results || []).slice(0, 15);
     } catch (e) {
-        ErrorHandler.handleError(e, true);
+        ErrorHandler.handleError(e);
         state.items = [];
     } finally {
         state.loading = false;

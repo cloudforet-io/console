@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import { useWindowSize } from '@vueuse/core';
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { partition, reject, map } from 'lodash';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButton, PButtonModal, PPaneLayout, PFieldGroup, PFieldTitle, PDataLoader, PIconButton, PAvatar,
+    PButton, PButtonModal, PPaneLayout, PFieldGroup, PFieldTitle, PDataLoader, PIconButton, PAvatar, screens,
 } from '@cloudforet/mirinae';
 
 import type { ServiceChangeMembersParameters } from '@/schema/alert-manager/service/api-verbs/chagne-members';
@@ -16,6 +19,8 @@ import { i18n } from '@/translations';
 
 import type { UserGroupReferenceMap } from '@/store/reference/user-group-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -51,6 +56,8 @@ const props = withDefaults(defineProps<Props>(), {
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
+const { width } = useWindowSize();
+
 const emit = defineEmits<{(e: 'update:visible'): void; }>();
 
 const storeState = reactive({
@@ -60,6 +67,7 @@ const storeState = reactive({
 });
 const state = reactive({
     loading: false,
+    isMobileSize: computed(() => width.value < screens.mobile.max),
     proxyVisible: useProxyValue('visible', props, emit),
     mode: 'member' as modalMode,
     modalInfo: computed<ModalInfoType>(() => {
@@ -98,6 +106,8 @@ const state = reactive({
         });
         return [...userList, ...userGroupList];
     }),
+    userList: computed<MemberInfoType[]>(() => state.memberList.filter((i) => i.type === 'USER').map((i) => i.key)),
+    userGroupList: computed<MemberInfoType[]>(() => state.memberList.filter((i) => i.type === 'USER_GROUP').map((i) => i.key)),
     selectedMemberItems: [] as SelectedUserDropdownIdsType[],
 });
 
@@ -114,42 +124,50 @@ const handleConfirm = async () => {
         await inviteMember();
     }
 };
-
 const handleRemoveMember = async (key: string) => {
-    const _memberList = state.memberList.filter((i) => i.key !== key);
-    try {
-        const selectedWorkspaceMemberList = _memberList.filter((i) => i.type === 'USER').map((i) => i.key);
-        const selectedUserGroupList = _memberList.filter((i) => i.type === 'USER_GROUP').map((i) => i.key);
-        await SpaceConnector.clientV2.alertManager.service.changeMember<ServiceChangeMembersParameters>({
-            service_id: storeState.serviceInfo.service_id,
-            members: {
-                USER: selectedWorkspaceMemberList,
-                USER_GROUP: selectedUserGroupList,
-            },
-        });
-        await serviceDetailPageStore.fetchServiceDetailData(storeState.serviceInfo.service_id);
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-    }
+    const _memberList = reject(state.memberList, { key });
+    const [userList, userGroupList] = partition(_memberList, { type: 'USER' });
+    const selectedWorkspaceMemberList = map(userList, 'key');
+    const selectedUserGroupList = map(userGroupList, 'key');
+    await fetcherChangeMembers(selectedWorkspaceMemberList, selectedUserGroupList);
 };
 const inviteMember = async () => {
     state.loading = true;
     try {
-        const selectedWorkspaceMemberList = state.selectedMemberItems.filter((i) => i.type === 'USER').map((i) => i.value);
-        const selectedUserGroupList = state.selectedMemberItems.filter((i) => i.type === 'USER_GROUP').map((i) => i.value);
-        await SpaceConnector.clientV2.alertManager.service.changeMember<ServiceChangeMembersParameters>({
-            service_id: storeState.serviceInfo.service_id,
-            members: {
-                USER: selectedWorkspaceMemberList,
-                USER_GROUP: selectedUserGroupList,
-            },
-        });
-        await serviceDetailPageStore.fetchServiceDetailData(storeState.serviceInfo.service_id);
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
+        const [defaultUserList, defaultUserGroupList] = partition(state.memberList, { type: 'USER' });
+        const [selectedUserList, selectedUserGroupList] = partition(state.selectedMemberItems, { type: 'USER' });
+
+        const _defaultUserList = map(defaultUserList, 'key');
+        const _defaultUserGroupList = map(defaultUserGroupList, 'key');
+        const _selectedUserList = map(selectedUserList, 'value');
+        const _selectedUserGroupList = map(selectedUserGroupList, 'value');
+
+        await fetcherChangeMembers(
+            [..._defaultUserList, ..._selectedUserList],
+            [..._defaultUserGroupList, ..._selectedUserGroupList],
+        );
     } finally {
         state.loading = false;
         state.mode = 'member';
+        state.selectedMemberItems = [];
+    }
+};
+
+const fetcherChangeMembers = async (userData: string[], userGroupData: string[]) => {
+    try {
+        await SpaceConnector.clientV2.alertManager.service.changeMembers<ServiceChangeMembersParameters>({
+            service_id: storeState.serviceInfo.service_id,
+            members: {
+                USER: userData,
+                USER_GROUP: userGroupData,
+            },
+        });
+        if (state.mode === 'invitation') {
+            showSuccessMessage(i18n.t('ALERT_MANAGER.SERVICE.ALT_S_INVITE_MEMBER'), '');
+        }
+        await serviceDetailPageStore.fetchServiceDetailData(storeState.serviceInfo.service_id);
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
     }
 };
 </script>
@@ -190,22 +208,26 @@ const inviteMember = async () => {
                                      :key="`member-item-${idx}`"
                                      class="flex items-center justify-between p-2 text-label-md"
                                 >
-                                    <p class="member-info-content">
-                                        <img v-if="item.type === MEMBERS_TYPE.USER"
-                                             :src="useRoleFormatter(item?.roleType || ROLE_TYPE.USER).image"
-                                             alt="Role Type Icon"
-                                             class="role-image inline"
+                                    <div class="member-info-content">
+                                        <p v-if="!state.isMobileSize"
+                                           class="inline"
                                         >
-                                        <p-avatar v-else
-                                                  class="menu-icon"
-                                                  icon="ic_member"
-                                                  :color="indigo[300]"
-                                                  size="sm"
-                                        />
+                                            <img v-if="item.type === MEMBERS_TYPE.USER"
+                                                 :src="useRoleFormatter(item?.roleType || ROLE_TYPE.USER).image"
+                                                 alt="Role Type Icon"
+                                                 class="role-image"
+                                            >
+                                            <p-avatar v-else
+                                                      class="menu-icon"
+                                                      icon="ic_member"
+                                                      :color="indigo[300]"
+                                                      size="sm"
+                                            />
+                                        </p>
                                         <span>{{ item.label }}</span>
-                                    </p>
+                                    </div>
                                     <p class="member-info-content">
-                                        <span v-if="item.type === MEMBERS_TYPE.USER"
+                                        <span v-if="!state.isMobileSize && item.type === MEMBERS_TYPE.USER"
                                               class="text-gray-500"
                                         >
                                             {{ item?.roleType }}
