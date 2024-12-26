@@ -34,13 +34,13 @@ const _isPublicControlButtonDisabled = (dashboardItems: DashboardModel[], select
         if (_isFolder) {
             const _childrenDashboards = dashboardItems.filter((d) => d.folder_id === id);
             _childrenDashboards?.forEach((child) => {
-                if (child?.shared && child?.workspace_id === '*') {
+                if (child?.shared && child?.scope === 'WORKSPACE') {
                     result = true;
                 }
             });
         } else {
             const _dashboard = dashboardItems.find((d) => d.dashboard_id === id);
-            if (_dashboard?.shared && _dashboard?.workspace_id === '*') {
+            if (_dashboard?.shared && _dashboard?.scope === 'WORKSPACE') {
                 result = true;
             }
         }
