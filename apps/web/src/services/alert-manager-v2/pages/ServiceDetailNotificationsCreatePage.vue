@@ -9,6 +9,9 @@ import { PButton, PCenteredLayoutHeader } from '@cloudforet/mirinae';
 
 import type { ServiceChannelCreateParameters } from '@/schema/alert-manager/service-channel/api-verbs/create';
 import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
@@ -41,26 +44,19 @@ const storeState = reactive({
 const state = reactive({
     currentStep: 1,
     form: {} as CreatedNotificationInfoType,
+    formValid: false,
     isAllFormValid: computed<boolean>(() => {
         if (state.currentStep === 1) return storeState.selectedProtocolId !== '';
-        const { name, data } = state.form;
+        const { name } = state.form;
 
         if (!name) return false;
-        if (data.FORWARD_TYPE === 'USER') {
-            return Array.isArray(data.USER) && data.USER.length > 0 && !data.USER_GROUP;
-        }
-        if (data.FORWARD_TYPE === 'USER_GROUP') {
-            return Array.isArray(data.USER_GROUP) && data.USER_GROUP.length > 0 && !data.USER;
-        }
-        if (data.FORWARD_TYPE === 'ALL_MEMBER') {
-            return !data.USER && !data.USER_GROUP;
-        }
-        return false;
+        return state.formValid;
     }),
 });
 
-const handleChangeForm = (form: CreatedNotificationInfoType) => {
+const handleChangeForm = (form: CreatedNotificationInfoType, formValid: boolean) => {
     state.form = form;
+    state.formValid = formValid;
 };
 const handleClickCancelButton = () => {
     router.push(getProperRouteLocation({
@@ -97,6 +93,7 @@ const fetchCreateNotifications = async () => {
             service_id: props.serviceId,
             ...state.form,
         });
+        showSuccessMessage(i18n.t('ALERT_MANAGER.NOTIFICATIONS.ALT_S_CREATED'), '');
         handleClickCancelButton();
     } catch (e) {
         ErrorHandler.handleError(e, true);

@@ -2,6 +2,8 @@
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { partition, reject, map } from 'lodash';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PButtonModal, PPaneLayout, PFieldGroup, PFieldTitle, PDataLoader, PIconButton, PAvatar,
@@ -16,6 +18,8 @@ import { i18n } from '@/translations';
 
 import type { UserGroupReferenceMap } from '@/store/reference/user-group-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -98,6 +102,8 @@ const state = reactive({
         });
         return [...userList, ...userGroupList];
     }),
+    userList: computed<MemberInfoType[]>(() => state.memberList.filter((i) => i.type === 'USER').map((i) => i.key)),
+    userGroupList: computed<MemberInfoType[]>(() => state.memberList.filter((i) => i.type === 'USER_GROUP').map((i) => i.key)),
     selectedMemberItems: [] as SelectedUserDropdownIdsType[],
 });
 
@@ -114,42 +120,50 @@ const handleConfirm = async () => {
         await inviteMember();
     }
 };
-
 const handleRemoveMember = async (key: string) => {
-    const _memberList = state.memberList.filter((i) => i.key !== key);
-    try {
-        const selectedWorkspaceMemberList = _memberList.filter((i) => i.type === 'USER').map((i) => i.key);
-        const selectedUserGroupList = _memberList.filter((i) => i.type === 'USER_GROUP').map((i) => i.key);
-        await SpaceConnector.clientV2.alertManager.service.changeMember<ServiceChangeMembersParameters>({
-            service_id: storeState.serviceInfo.service_id,
-            members: {
-                USER: selectedWorkspaceMemberList,
-                USER_GROUP: selectedUserGroupList,
-            },
-        });
-        await serviceDetailPageStore.fetchServiceDetailData(storeState.serviceInfo.service_id);
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-    }
+    const _memberList = reject(state.memberList, { key });
+    const [userList, userGroupList] = partition(_memberList, { type: 'USER' });
+    const selectedWorkspaceMemberList = map(userList, 'key');
+    const selectedUserGroupList = map(userGroupList, 'key');
+    await fetcherChangeMembers(selectedWorkspaceMemberList, selectedUserGroupList);
 };
 const inviteMember = async () => {
     state.loading = true;
     try {
-        const selectedWorkspaceMemberList = state.selectedMemberItems.filter((i) => i.type === 'USER').map((i) => i.value);
-        const selectedUserGroupList = state.selectedMemberItems.filter((i) => i.type === 'USER_GROUP').map((i) => i.value);
-        await SpaceConnector.clientV2.alertManager.service.changeMember<ServiceChangeMembersParameters>({
-            service_id: storeState.serviceInfo.service_id,
-            members: {
-                USER: selectedWorkspaceMemberList,
-                USER_GROUP: selectedUserGroupList,
-            },
-        });
-        await serviceDetailPageStore.fetchServiceDetailData(storeState.serviceInfo.service_id);
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
+        const [defaultUserList, defaultUserGroupList] = partition(state.memberList, { type: 'USER' });
+        const [selectedUserList, selectedUserGroupList] = partition(state.selectedMemberItems, { type: 'USER' });
+
+        const _defaultUserList = map(defaultUserList, 'key');
+        const _defaultUserGroupList = map(defaultUserGroupList, 'key');
+        const _selectedUserList = map(selectedUserList, 'value');
+        const _selectedUserGroupList = map(selectedUserGroupList, 'value');
+
+        await fetcherChangeMembers(
+            [..._defaultUserList, ..._selectedUserList],
+            [..._defaultUserGroupList, ..._selectedUserGroupList],
+        );
     } finally {
         state.loading = false;
         state.mode = 'member';
+        state.selectedMemberItems = [];
+    }
+};
+
+const fetcherChangeMembers = async (userData: string[], userGroupData: string[]) => {
+    try {
+        await SpaceConnector.clientV2.alertManager.service.changeMembers<ServiceChangeMembersParameters>({
+            service_id: storeState.serviceInfo.service_id,
+            members: {
+                USER: userData,
+                USER_GROUP: userGroupData,
+            },
+        });
+        if (state.mode === 'invitation') {
+            showSuccessMessage(i18n.t('ALERT_MANAGER.SERVICE.ALT_S_INVITE_MEMBER'), '');
+        }
+        await serviceDetailPageStore.fetchServiceDetailData(storeState.serviceInfo.service_id);
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
     }
 };
 </script>

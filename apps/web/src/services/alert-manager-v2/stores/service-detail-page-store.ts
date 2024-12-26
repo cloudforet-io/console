@@ -168,7 +168,7 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
                 const { results } = await SpaceConnector.clientV2.alertManager.notificationProtocol.list<NotificationProtocolListParameters, ListResponse<NotificationProtocolModel>>();
                 state.notificationProtocolList = (results || []).map((i) => ({
                     ...i,
-                    icon: getters.pluginsReferenceMap.value[i.plugin_info.plugin_id || ''],
+                    icon: getters.pluginsReferenceMap[i.plugin_info.plugin_id || ''].icon,
                 }));
             } catch (e) {
                 ErrorHandler.handleError(e);
