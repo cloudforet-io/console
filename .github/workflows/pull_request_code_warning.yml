@@ -38,13 +38,18 @@ jobs:
           sparse-checkout: |
             apps
             packages
+          # fetch all history so we can check diff between PR and base branch
+          fetch-depth: 0
 
-      - name: All checkout files
+      - name: Copy changed files to specific directory
         run: |
-          ls -al
+          mkdir -p changed_files
+          git fetch origin ${{ github.event.pull_request.base.ref }} --depth=1
+          git diff --name-only origin/${{ github.event.pull_request.base.ref }} ${{ github.sha }} | rsync --files-from=- ./ changed_files/
 
       - name: Check for TODOs
         id: check_todo
+        working-directory: changed_files
         run: |
           echo "Checking for TODOs..."
           TODO_FILES=$(grep -rl "// TODO" . --exclude-dir=.git --exclude=apps/web/public/lottie.js || true)
@@ -61,6 +66,7 @@ jobs:
 
       - name: Check for console.log
         id: check_console_log
+        working-directory: changed_files
         run: |
           echo "Checking for console.log..."
           LOG_FILES=$(find . -type f \
@@ -88,6 +94,7 @@ jobs:
 
       - name: Check for console.debug
         id: check_console_debug
+        working-directory: changed_files
         run: |
           echo "Checking for console.debug..."
           DEBUG_FILES=$(find . -type f \
