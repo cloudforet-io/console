@@ -24,7 +24,6 @@ import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/u
 import { WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
 import { sortObjectByKeys } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import { getWidgetDataTable } from '@/common/modules/widgets/_helpers/widget-helper';
-import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/comparison/type';
 import type { CustomTableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
 import type { DataFieldHeatmapColorValue } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
 import type { DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
@@ -35,6 +34,7 @@ import type { GroupByValue } from '@/common/modules/widgets/_widget-fields/group
 import type { MissingValueValue } from '@/common/modules/widgets/_widget-fields/missing-value/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type { SubTotalValue } from '@/common/modules/widgets/_widget-fields/sub-total/type';
+import type { TableColumnComparisonValue } from '@/common/modules/widgets/_widget-fields/table-column-comparison/type';
 import type { TableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/table-column-width/type';
 import type { TextWrapValue } from '@/common/modules/widgets/_widget-fields/text-wrap/type';
 import type { TotalValue } from '@/common/modules/widgets/_widget-fields/total/type';
@@ -68,34 +68,24 @@ const state = reactive({
     thisPage: 1 as number,
     sortBy: [] as Sort[],
     dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
-    isComparisonEnabled: computed<boolean>(() => !!(widgetOptionsState.comparisonInfo?.toggleValue)),
     dataInfo: computed<DataInfo|undefined>(() => state.dataTable?.data_info),
     tableFields: computed<TableWidgetField[]>(() => {
-        const labelFields: TableWidgetField[] = (widgetOptionsState.groupByInfo?.data ?? []).map(
+        const labelFields: TableWidgetField[] = (widgetOptionsState.groupByInfo?.data as string[] ?? []).map(
             (field) => ({ name: field, label: field, fieldInfo: { type: 'labelField', additionalType: field === 'Date' ? 'dateFormat' : undefined } }),
         ) ?? [];
         const dataFields: TableWidgetField[] = [];
+        const comparisonFields = widgetOptionsState.tableColumnComparisonInfo?.fields ?? [];
 
-        widgetOptionsState.dataFieldInfo?.data?.forEach((field) => {
+        (widgetOptionsState.dataFieldInfo?.data as string[])?.forEach((field) => {
             dataFields.push({
                 name: field,
                 label: field,
                 fieldInfo: {
                     type: 'dataField',
+                    additionalType: comparisonFields.includes(field) ? 'comparison' : undefined,
                     unit: state.dataInfo?.[field]?.unit,
                 },
             });
-            if (widgetOptionsState.comparisonInfo?.format && state.isComparisonEnabled) {
-                dataFields.push({
-                    name: `comparison_${field}`,
-                    label: field,
-                    fieldInfo: {
-                        type: 'dataField',
-                        additionalType: 'comparison',
-                        unit: state.dataInfo?.[field]?.unit,
-                    },
-                });
-            }
         });
         const basicFields = [...labelFields, ...dataFields];
         return basicFields;
@@ -103,7 +93,7 @@ const state = reactive({
 });
 
 const widgetOptionsState = reactive({
-    comparisonInfo: computed<ComparisonValue>(() => props.widgetOptions?.comparison?.value as ComparisonValue),
+    tableColumnComparisonInfo: computed<TableColumnComparisonValue>(() => props.widgetOptions?.comparison?.value as TableColumnComparisonValue),
     totalInfo: computed<TotalValue>(() => props.widgetOptions?.total?.value as TotalValue),
     subTotalInfo: computed<SubTotalValue|undefined>(() => props.widgetOptions?.subTotal?.value as SubTotalValue),
     needFullDataFetch: computed<boolean>(() => state.totalInfo?.toggleValue),
@@ -285,7 +275,7 @@ defineExpose<WidgetExpose>({
                                    :fields="state.tableFields"
                                    :items="refinedData?.results"
                                    :data-field="widgetOptionsState.dataFieldInfo?.data"
-                                   :comparison-info="widgetOptionsState.comparisonInfo"
+                                   :table-column-comparison-info="widgetOptionsState.tableColumnComparisonInfo"
                                    :sub-total-info="widgetOptionsState.subTotalInfo"
                                    :total-info="widgetOptionsState.totalInfo"
                                    :granularity="widgetOptionsState.granularityInfo?.granularity"

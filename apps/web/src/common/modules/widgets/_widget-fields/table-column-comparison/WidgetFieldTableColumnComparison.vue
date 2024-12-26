@@ -4,6 +4,8 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { sortBy } from 'lodash';
+
 import {
     PFieldTitle, PToggleButton, PFieldGroup, PSelectDropdown, PI, PTooltip,
 } from '@cloudforet/mirinae';
@@ -12,39 +14,58 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dr
 import { i18n } from '@/translations';
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
-import { isIncludingDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
+import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
+import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import {
     widgetFieldDefaultValueMap,
 } from '@/common/modules/widgets/_widget-field-value-manager/constant/default-value-registry';
-import type { ComparisonFormat, ComparisonValue, ComparisonOptions } from '@/common/modules/widgets/_widget-fields/comparison/type';
-import type { GroupByValue } from '@/common/modules/widgets/_widget-fields/group-by/type';
+import type { ComparisonFormat } from '@/common/modules/widgets/_widget-fields/comparison/type';
+import type {
+    TableColumnComparisonOptions,
+    TableColumnComparisonValue,
+} from '@/common/modules/widgets/_widget-fields/table-column-comparison/type';
 import type {
     WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 
 
-const FIELD_KEY = 'comparison';
+const FIELD_KEY = 'tableColumnComparison';
 
-const props = defineProps<WidgetFieldComponentProps<ComparisonOptions>>();
+const props = defineProps<WidgetFieldComponentProps<TableColumnComparisonOptions>>();
+const widgetGenerateStore = useWidgetGenerateStore();
+const widgetGenerateGetters = widgetGenerateStore.getters;
 
 const state = reactive({
-    fieldValue: computed<ComparisonValue>(() => props.fieldManager.data[FIELD_KEY].value),
-    disabled: computed<boolean>(() => { // NOTE: EXCEPTION FOR ONLY TABLE WIDGET
-        if (props.widgetConfig.widgetName !== 'table') return false;
-        const groupByField = props.fieldManager.data.groupBy.value as GroupByValue;
-        return Array.isArray(groupByField?.data) && isIncludingDateField(groupByField.data);
-    }),
+    fieldValue: computed<TableColumnComparisonValue>(() => props.fieldManager.data[FIELD_KEY].value),
     infoText: computed<TranslateResult>(() => {
         if (props.widgetConfig.widgetName !== 'table') return i18n.t('COMMON.WIDGETS.COMPARISON.INFO_TOOLTIP_TABLE');
         return i18n.t('COMMON.WIDGETS.COMPARISON.INFO_TOOLTIP');
     }),
-    initialValue: computed<ComparisonValue>(() => widgetFieldDefaultValueMap.comparison),
+    initialValue: computed<TableColumnComparisonValue>(() => widgetFieldDefaultValueMap.comparison),
     formatMenu: computed<SelectDropdownMenuItem[]>(() => [
         { label: i18n.t('COMMON.WIDGETS.COMPARISON.ALL'), name: 'all' },
         { label: `${i18n.t('COMMON.WIDGETS.COMPARISON.PERCENT')}(%)`, name: 'percent' },
         { label: i18n.t('COMMON.WIDGETS.COMPARISON.FIXED'), name: 'fixed' },
     ]),
+    fieldsMenu: computed<SelectDropdownMenuItem[]>(() => {
+        const isPivotDataTable = widgetGenerateGetters?.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT;
+        const pivotSortKeys = (widgetGenerateGetters.selectedDataTable?.sort_keys ?? []);
+
+        const dataInfoList = Object.keys(widgetGenerateGetters.selectedDataTable?.data_info ?? {}) ?? [];
+        const sortedDataInfoList = sortBy(dataInfoList, (item) => {
+            const index = pivotSortKeys.indexOf(item);
+            return index === -1 ? Infinity : index;
+        });
+        return (isPivotDataTable ? sortedDataInfoList : dataInfoList).map((d) => ({
+            name: d,
+            label: d,
+        }));
+    }),
+    selectedFields: computed<SelectDropdownMenuItem[]>(() => (state.fieldValue?.fields ?? []).map((item) => ({
+        name: item,
+        label: item,
+    }))),
 });
 
 const handleUpdateColor = (key:'decreaseColor'|'increaseColor', color:string) => {
@@ -70,13 +91,22 @@ const handleUpdateFormat = (format: ComparisonFormat) => {
     });
 };
 
+const handleUpdateFields = (items: SelectDropdownMenuItem[]) => {
+    props.fieldManager.setFieldValue(FIELD_KEY, {
+        ...state.fieldValue,
+        fields: items.map((d) => d.name),
+    });
+};
+
 </script>
 
 <template>
-    <div class="widget-field-comparison">
+    <div class="widget-field-tale-column-comparison">
         <div class="field-header">
+            <!--                TODO: apply translation-->
+            <!--                {{ $t('COMMON.WIDGETS.COMPARISON.COMPARISON') }}-->
             <p-field-title>
-                {{ $t('COMMON.WIDGETS.COMPARISON.COMPARISON') }}
+                {{ $t('Table Column Comparison') }}
                 <p-tooltip :contents="state.infoText">
                     <p-i name="ic_info-circle"
                          width="0.875rem"
@@ -85,7 +115,6 @@ const handleUpdateFormat = (format: ComparisonFormat) => {
                 </p-tooltip>
             </p-field-title>
             <p-toggle-button :value="state.fieldValue?.toggleValue"
-                             :disabled="state.disabled"
                              @change-toggle="handleUpdateToggle"
             />
         </div>
@@ -131,12 +160,28 @@ const handleUpdateFormat = (format: ComparisonFormat) => {
                     />
                 </p-field-group>
             </div>
+            <!--            TODO: apply translation after design fixed-->
+            <p-field-group :label="$t('Fields')"
+                           class="w-full"
+                           style-type="secondary"
+                           required
+            >
+                <p-select-dropdown :menu="state.fieldsMenu"
+                                   use-fixed-menu-style
+                                   :selected="state.selectedFields"
+                                   :invalid="!state.selectedFields?.length"
+                                   multi-selectable
+                                   show-select-marker
+                                   block
+                                   @update:selected="handleUpdateFields"
+                />
+            </p-field-group>
         </template>
     </div>
 </template>
 
 <style lang="postcss" scoped>
-.widget-field-comparison {
+.widget-field-tale-column-comparison {
     .field-header {
         @apply flex items-center gap-1 justify-between;
     }

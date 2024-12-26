@@ -2,7 +2,6 @@ import type WidgetFieldValueManager from '@/common/modules/widgets/_widget-field
 import type { CategoryByOptions } from '@/common/modules/widgets/_widget-fields/category-by/type';
 import type { _ColorSchemaOptions as ColorSchemaOptions } from '@/common/modules/widgets/_widget-fields/color-schema/type';
 import type { ComparisonOptions } from '@/common/modules/widgets/_widget-fields/comparison/type';
-import type { CustomTableColumnWidthOptions } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
 import type { DataFieldHeatmapColorOptions } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
 import type { DataFieldOptions } from '@/common/modules/widgets/_widget-fields/data-field/type';
 import type { DateFormatOptions } from '@/common/modules/widgets/_widget-fields/date-format/type';
@@ -19,6 +18,7 @@ import type { NumberFormatOptions } from '@/common/modules/widgets/_widget-field
 import type { PieChartTypeOptions } from '@/common/modules/widgets/_widget-fields/pie-chart-type/type';
 import type { StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
 import type { SubTotalOptions } from '@/common/modules/widgets/_widget-fields/sub-total/type';
+import type { TableColumnComparisonOptions } from '@/common/modules/widgets/_widget-fields/table-column-comparison/type';
 import type { TableColumnWidthOptions } from '@/common/modules/widgets/_widget-fields/table-column-width/type';
 import type { TextWrapOptions } from '@/common/modules/widgets/_widget-fields/text-wrap/type';
 import type { TooltipNumberFormatOptions } from '@/common/modules/widgets/_widget-fields/tooltip-number-format/type';
@@ -32,8 +32,8 @@ import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-
 export type WidgetFieldOptions = DataFieldOptions | XAxisOptions | YAxisOptions
     | StackByOptions | GroupByOptions | CategoryByOptions
     | FormatRulesOptions | MinOptions | MaxOptions | LegendOptions | IconOptions | SubTotalOptions | TotalOptions
-    | ComparisonOptions | ColorSchemaOptions | PieChartTypeOptions | DateFormatOptions
-    | NumberFormatOptions | DataFieldHeatmapColorOptions | TextWrapOptions | TableColumnWidthOptions | CustomTableColumnWidthOptions
+    | ComparisonOptions | ColorSchemaOptions | PieChartTypeOptions | DateFormatOptions | TableColumnComparisonOptions
+    | NumberFormatOptions | DataFieldHeatmapColorOptions | TextWrapOptions | TableColumnWidthOptions
     | MissingValueOptions | WidgetHeightOptions | DisplaySeriesLabelOptions | DateRangeOptions
     | TooltipNumberFormatOptions;
 
@@ -48,7 +48,7 @@ export type WidgetFieldName = 'dataField' | 'tableDataField' | 'xAxis' | 'yAxis'
     | 'min' | 'max'
     | 'icon' | 'comparison' | 'legend'
     | 'subTotal' | 'total'
-    | 'progressBar'
+    | 'progressBar' | 'tableColumnComparison'
     | 'formatRules' | 'advancedFormatRules'
     | 'granularity' | 'dateRange' | 'colorSchema' | 'pieChartType'
     | 'dateFormat' | 'numberFormat' | 'tooltipNumberFormat' | 'dataFieldHeatmapColor'

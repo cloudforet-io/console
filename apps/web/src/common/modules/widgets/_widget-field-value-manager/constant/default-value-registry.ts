@@ -22,6 +22,7 @@ import type { NumberFormatOptions, NumberFormatValue } from '@/common/modules/wi
 import type { PieChartTypeOptions } from '@/common/modules/widgets/_widget-fields/pie-chart-type/type';
 import type { StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
 import type { SubTotalOptions } from '@/common/modules/widgets/_widget-fields/sub-total/type';
+import type { TableColumnComparisonOptions } from '@/common/modules/widgets/_widget-fields/table-column-comparison/type';
 import type { TableColumnWidthOptions } from '@/common/modules/widgets/_widget-fields/table-column-width/type';
 import type { TextWrapOptions } from '@/common/modules/widgets/_widget-fields/text-wrap/type';
 import type { TooltipNumberFormatOptions } from '@/common/modules/widgets/_widget-fields/tooltip-number-format/type';
@@ -53,6 +54,13 @@ export const widgetFieldDefaultValueMap: DefaultValueRegistry = {
         increaseColor: DEFAULT_COMPARISON_COLOR.INCREASE,
         format: 'all',
         toggleValue: true,
+    },
+    tableColumnComparison: {
+        decreaseColor: DEFAULT_COMPARISON_COLOR.DECREASE,
+        increaseColor: DEFAULT_COMPARISON_COLOR.INCREASE,
+        format: 'all',
+        toggleValue: true,
+        fields: [],
     },
     customTableColumnWidth: {
         widthInfos: [],
@@ -242,6 +250,18 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
 
         if (comparisonOptions.toggle) {
             return widgetFieldDefaultValueMap.comparison;
+        }
+
+        return {
+            toggleValue: false,
+        };
+    },
+    tableColumnComparison: (widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const tableColumnComparisonOptions = (_fieldsSchema.tableColumnComparison?.options ?? {}) as TableColumnComparisonOptions;
+
+        if (tableColumnComparisonOptions.toggle) {
+            return widgetFieldDefaultValueMap.tableColumnComparison;
         }
 
         return {

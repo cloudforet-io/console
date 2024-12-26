@@ -24,12 +24,12 @@ import {
     getRefinedDateFormatByGranularity,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
-import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/comparison/type';
 import type { CustomTableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
 import type { DataFieldHeatmapColorValue } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
 import type { DateFormatValue } from '@/common/modules/widgets/_widget-fields/date-format/type';
 import type { MissingValueValue } from '@/common/modules/widgets/_widget-fields/missing-value/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
+import type { TableColumnComparisonValue } from '@/common/modules/widgets/_widget-fields/table-column-comparison/type';
 import type { TableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/table-column-width/type';
 import type { TextWrapValue } from '@/common/modules/widgets/_widget-fields/text-wrap/type';
 import type { TotalValue } from '@/common/modules/widgets/_widget-fields/total/type';
@@ -65,7 +65,7 @@ interface Props {
   dataField?: string[];
   granularity?: string;
   // optional field info
-  comparisonInfo?: ComparisonValue;
+  tableColumnComparisonInfo?: TableColumnComparisonValue;
   subTotalInfo?: TotalValue;
   totalInfo?: TotalValue;
   dateFormatInfo?: DateFormatValue;
@@ -164,17 +164,17 @@ const getValue = (item: TableDataItem, field: TableWidgetField) => {
         const percentageValue = fixedValue / (targetValue || 1) * 100;
         if (!fixedValue || fixedValue === 0) return '-';
         if (item[props.fields[0].name] === 'Total') return valueFormatter(fixedValue, field);
-        if (props.comparisonInfo?.format === 'fixed') return valueFormatter(fixedValue, field);
-        if (props.comparisonInfo?.format === 'percent') return `${numberFormatter(percentageValue)}%`;
-        if (props.comparisonInfo?.format === 'all') return `${valueFormatter(fixedValue, field)} (${numberFormatter(percentageValue)}%)`;
+        if (props.tableColumnComparisonInfo?.format === 'fixed') return valueFormatter(fixedValue, field);
+        if (props.tableColumnComparisonInfo?.format === 'percent') return `${numberFormatter(percentageValue)}%`;
+        if (props.tableColumnComparisonInfo?.format === 'all') return `${valueFormatter(fixedValue, field)} (${numberFormatter(percentageValue)}%)`;
         return '-';
     }
     return itemValue ? valueFormatter(itemValue, field) : '-';
 };
 const getComparisonValueIcon = (item: TableDataItem, field: TableWidgetField): { icon: string; color: string; }|undefined => {
     const subtraction = (item?.[field.name]?.target ?? 0) - (item?.[field.name]?.subject ?? 0);
-    if (subtraction > 0) return { icon: 'ic_arrow-up-bold-alt', color: props.comparisonInfo?.increaseColor || DEFAULT_COMPARISON_COLOR.INCREASE };
-    if (subtraction < 0) return { icon: 'ic_arrow-down-bold-alt', color: props.comparisonInfo?.decreaseColor || DEFAULT_COMPARISON_COLOR.DECREASE };
+    if (subtraction > 0) return { icon: 'ic_arrow-up-bold-alt', color: props.tableColumnComparisonInfo?.increaseColor || DEFAULT_COMPARISON_COLOR.INCREASE };
+    if (subtraction < 0) return { icon: 'ic_arrow-down-bold-alt', color: props.tableColumnComparisonInfo?.decreaseColor || DEFAULT_COMPARISON_COLOR.DECREASE };
     return undefined;
 };
 const getValueTooltipText = (item: TableDataItem, field: TableWidgetField) => {
