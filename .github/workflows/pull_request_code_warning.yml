@@ -67,6 +67,7 @@ jobs:
             ! -path "./.git/*" \
             ! -path "./apps/web/build/*" \
             ! -path "./apps/web/public/*" \
+            ! -path "./apps/web/vite.config.js" \
             ! -path "./packages/mirinae/scripts/*" \
             ! -path "./packages/mirinae/cli/*" \
             -exec grep -l "console\.log" {} + || true)
