@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { useResizeObserver } from '@vueuse/core/index';
 import {
-    computed, defineExpose, reactive, ref, watch,
+    computed, defineExpose, onMounted, reactive, ref, watch,
 } from 'vue';
 
+import { useQuery } from '@tanstack/vue-query';
 import type { GaugeSeriesOption } from 'echarts/charts';
 import type {
     EChartsType,
@@ -12,19 +13,20 @@ import { init } from 'echarts/core';
 import { isEmpty, orderBy, throttle } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
+import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
 
-import type { APIErrorToast } from '@/common/composables/error/errorHandler';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
-import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
+import { WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
+import { sortObjectByKeys } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
+import { getFormattedNumber, getWidgetDataTable } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
 import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { FormatRulesValue, ThresholdValue } from '@/common/modules/widgets/_widget-fields/format-rules/type';
@@ -53,10 +55,12 @@ const { dateRange } = useWidgetDateRange({
     granularity: computed<GranularityValue>(() => props.widgetOptions?.granularity?.value as GranularityValue),
 });
 const state = reactive({
-    loading: false,
-    errorMessage: undefined as string|undefined,
+    runQueries: false,
+    isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
+    dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
+
     unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
-    data: null as Data | null,
+    data: computed<Data | null>(() => queryResult?.data?.value || null),
     chart: null as EChartsType | null,
     chartData: undefined as undefined|number,
     chartOptions: computed<{series: GaugeSeriesOption[]}>(() => ({
@@ -66,8 +70,8 @@ const state = reactive({
                 center: ['50%', '60%'],
                 startAngle: 200,
                 endAngle: -20,
-                min: state.min,
-                max: state.max,
+                min: widgetOptionsState.minInfo?.min,
+                max: widgetOptionsState.maxInfo?.max,
                 splitNumber: 4,
                 itemStyle: {
                     color: state.gaugeColor,
@@ -88,12 +92,12 @@ const state = reactive({
                     distance: -55,
                     color: gray[700],
                     fontSize: 12,
-                    formatter: (val) => getFormattedNumber(val, state.dataField, state.numberFormat, state.unit),
+                    formatter: (val) => getFormattedNumber(val, widgetOptionsState.dataFieldInfo?.data as string, widgetOptionsState.numberFormatInfo, state.unit),
                 },
                 detail: {
                     offsetCenter: [0, 0],
                     fontSize: 32,
-                    formatter: (val) => getFormattedNumber(val, state.dataField, state.numberFormat, state.unit),
+                    formatter: (val) => getFormattedNumber(val, widgetOptionsState.dataFieldInfo?.data as string, widgetOptionsState.numberFormatInfo, state.unit),
                     color: gray[700],
                 },
                 data: [
@@ -108,16 +112,10 @@ const state = reactive({
             },
         ],
     })),
-    // required fields
-    granularity: computed<string|undefined>(() => (props.widgetOptions?.granularity?.value as GranularityValue)?.granularity),
-    dataField: computed<string|undefined>(() => (props.widgetOptions?.dataField?.value as DataFieldValue)?.data as string),
-    min: computed<number|undefined>(() => (props.widgetOptions?.min?.value as MinValue)?.min),
-    max: computed<number|undefined>(() => (props.widgetOptions?.max?.value as MaxValue)?.max),
-    formatRulesInfo: computed<FormatRulesValue|undefined>(() => props.widgetOptions?.formatRules?.value as FormatRulesValue),
     gaugeColor: computed<string>(() => {
-        let _formatRules: ThresholdValue[] = state.formatRulesInfo?.rules || [];
-        let _color = state.formatRulesInfo?.baseColor || gray[200];
-        const _percentage = (state.chartData / state.max) * 100;
+        let _formatRules: ThresholdValue[] = widgetOptionsState.formatRulesInfo?.rules || [];
+        let _color = widgetOptionsState.formatRulesInfo?.baseColor || gray[200];
+        const _percentage = (state.chartData / (widgetOptionsState.maxInfo?.max || 100)) * 100;
         _formatRules = orderBy(_formatRules, ['number'], ['asc']);
         _formatRules?.forEach((d) => {
             if (_percentage >= (d.number || 0)) {
@@ -126,58 +124,70 @@ const state = reactive({
         });
         return _color;
     }),
-    // optional fields
-    numberFormat: computed<NumberFormatValue|undefined>(() => props.widgetOptions?.numberFormat?.value as NumberFormatValue),
-});
-const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
-    dateRange,
-    errorMessage: computed(() => state.errorMessage),
-    widgetLoading: computed(() => state.loading),
 });
 
+const widgetOptionsState = reactive({
+    granularityInfo: computed<GranularityValue>(() => props.widgetOptions?.granularity?.value as GranularityValue),
+    dataFieldInfo: computed<DataFieldValue>(() => props.widgetOptions?.dataField?.value as DataFieldValue),
+    minInfo: computed<MinValue>(() => props.widgetOptions?.min?.value as MinValue),
+    maxInfo: computed<MaxValue>(() => props.widgetOptions?.max?.value as MaxValue),
+    formatRulesInfo: computed<FormatRulesValue>(() => props.widgetOptions?.formatRules?.value as FormatRulesValue),
+    numberFormatInfo: computed<NumberFormatValue>(() => props.widgetOptions?.numberFormat?.value as NumberFormatValue),
+});
+
+
 /* Api */
-const privateWidgetFetcher = getCancellableFetcher<PrivateWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.privateWidget.loadSum);
-const publicWidgetFetcher = getCancellableFetcher<PublicWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.publicWidget.loadSum);
-const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
-    if (props.widgetState === 'INACTIVE') return undefined;
-    try {
-        state.loading = true;
-        const _isPrivate = props.widgetId.startsWith('private');
-        const _fetcher = _isPrivate ? privateWidgetFetcher : publicWidgetFetcher;
-        const { status, response } = await _fetcher({
-            widget_id: props.widgetId,
-            granularity: state.granularity,
-            start: dateRange.value.start,
-            end: dateRange.value.end,
-            vars: props.dashboardVars,
-        });
-        if (status === 'succeed') {
-            state.errorMessage = undefined;
-            state.loading = false;
-            return response;
-        }
-        return undefined;
-    } catch (e: any) {
-        state.loading = false;
-        state.errorMessage = e.message;
-        ErrorHandler.handleError(e);
-        return ErrorHandler.makeAPIErrorToast(e);
-    }
+const fetchWidgetData = async (params: PrivateWidgetLoadParameters|PublicWidgetLoadParameters): Promise<Data> => {
+    const defaultFetcher = state.isPrivateWidget
+        ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
+        : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>;
+    const res = await defaultFetcher(params);
+    return res;
 };
+
+const queryKey = computed(() => [
+    'widget-load-gauge',
+    props.widgetId,
+    {
+        start: dateRange.value.start,
+        end: dateRange.value.end,
+        granularity: widgetOptionsState.granularityInfo?.granularity,
+        dataTableId: state.dataTable?.data_table_id,
+        dataTableOptions: JSON.stringify(sortObjectByKeys(state.dataTable?.options) ?? {}),
+    },
+]);
+
+const queryResult = useQuery({
+    queryKey,
+    queryFn: () => fetchWidgetData({
+        widget_id: props.widgetId,
+        granularity: widgetOptionsState.granularityInfo?.granularity,
+        start: dateRange.value.start,
+        end: dateRange.value.end,
+        vars: props.dashboardVars,
+    }),
+    enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable && state.runQueries),
+    staleTime: WIDGET_LOAD_STALE_TIME,
+});
+
+const loading = computed(() => queryResult.isLoading);
+const errorMessage = computed(() => queryResult.error?.value?.message);
 
 /* Util */
 const drawChart = (rawData: Data|null) => {
     if (isEmpty(rawData)) return;
-    state.chartData = rawData?.results?.[0]?.[state.dataField] || 0;
+    state.chartData = rawData?.results?.[0]?.[widgetOptionsState.dataFieldInfo?.data as string] || 0;
 };
-const loadWidget = async (): Promise<Data|APIErrorToast> => {
-    const res = await fetchWidget();
-    if (!res) return state.data;
-    if (typeof res === 'function') return res;
-    state.data = res;
-    drawChart(state.data);
-    return state.data;
+const loadWidget = () => {
+    state.runQueries = true;
 };
+
+
+const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
+    dateRange,
+    errorMessage: errorMessage.value,
+    widgetLoading: loading.value,
+});
 
 /* Watcher */
 watch([() => state.chartData, () => chartContext.value], ([, chartCtx]) => {
@@ -186,9 +196,16 @@ watch([() => state.chartData, () => chartContext.value], ([, chartCtx]) => {
         state.chart.setOption(state.chartOptions, true);
     }
 });
+watch(() => state.data, (newData) => {
+    drawChart(newData);
+});
 
 useWidgetInitAndRefresh({ props, emit, loadWidget });
-defineExpose<WidgetExpose<Data>>({
+onMounted(async () => {
+    if (!props.dataTableId) return;
+    state.dataTable = await getWidgetDataTable(props.dataTableId);
+});
+defineExpose<WidgetExpose>({
     loadWidget,
 });
 useResizeObserver(chartContext, throttle(() => {

@@ -73,7 +73,7 @@ const state = reactive({
     isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
     dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
 
-    data: null as Data | null,
+    data: computed<Data | null>(() => queryResult?.data?.value || null),
     chart: null as EChartsType | null,
     chartData: [] as ChartData[],
     unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[widgetOptionsState.dataFieldInfo?.data as string]),

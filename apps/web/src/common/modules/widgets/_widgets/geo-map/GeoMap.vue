@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { useResizeObserver } from '@vueuse/core/index';
 import {
-    computed, defineExpose, reactive, ref, watch,
+    computed, defineExpose, onMounted, reactive, ref, watch,
 } from 'vue';
 
+import { useQuery } from '@tanstack/vue-query';
 import axios from 'axios';
 import type { MapSeriesOption } from 'echarts/charts';
 import { init, registerMap } from 'echarts/core';
@@ -13,25 +14,27 @@ import type {
 import { throttle } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import { numberFormatter } from '@cloudforet/utils';
 
+import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
+import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { RegionReferenceMap } from '@/store/reference/region-reference-store';
 
-import type { APIErrorToast } from '@/common/composables/error/errorHandler';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
+import { WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
+import { sortObjectByKeys } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
+import { getWidgetDataTable } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
 import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/granularity/type';
-import type { LegendValue } from '@/common/modules/widgets/_widget-fields/legend/type';
+import type { GroupByValue } from '@/common/modules/widgets/_widget-fields/group-by/type';
 import type { WidgetLoadData } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit,
@@ -58,12 +61,14 @@ const storeState = reactive({
 });
 const state = reactive({
     mapLoaded: false,
-    loading: false,
-    errorMessage: undefined as string|undefined,
-    data: null as WidgetLoadData | null,
+    runQueries: false,
+    isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
+    dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
+
+    data: computed<WidgetLoadData | null>(() => queryResult?.data?.value || null),
     chart: null as EChartsType | null,
     chartData: [],
-    unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
+    unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[widgetOptionsState.dataFieldInfo?.data as string]),
     chartOptions: computed<MapSeriesOption>(() => ({
         map: 'world',
         geo: {
@@ -99,48 +104,52 @@ const state = reactive({
             },
         ],
     })),
-    // required fields
-    granularity: computed<string|undefined>(() => (props.widgetOptions?.granularity?.value as GranularityValue)?.granularity),
-    dataField: computed<string|undefined>(() => (props.widgetOptions?.dataField?.value as DataFieldValue)?.data as string),
-    // optional fields
-    showLegends: computed<boolean|undefined>(() => (props.widgetOptions?.legend?.value as LegendValue)?.toggleValue),
 });
-const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
-    dateRange,
-    errorMessage: computed(() => state.errorMessage),
-    widgetLoading: computed(() => state.loading),
+
+const widgetOptionsState = reactive({
+    granularityInfo: computed<GranularityValue>(() => props.widgetOptions?.granularity?.value as GranularityValue),
+    dataFieldInfo: computed<DataFieldValue>(() => props.widgetOptions?.dataField?.value as DataFieldValue),
+    groupByInfo: computed<GroupByValue>(() => props.widgetOptions?.groupBy?.value as GroupByValue),
 });
 
 /* Api */
-const privateWidgetFetcher = getCancellableFetcher<PrivateWidgetLoadParameters, WidgetLoadData>(SpaceConnector.clientV2.dashboard.privateWidget.load);
-const publicWidgetFetcher = getCancellableFetcher<PublicWidgetLoadParameters, WidgetLoadData>(SpaceConnector.clientV2.dashboard.publicWidget.load);
-const fetchWidget = async (): Promise<WidgetLoadData|APIErrorToast|undefined> => {
-    if (props.widgetState === 'INACTIVE') return undefined;
-    try {
-        state.loading = true;
-        const _isPrivate = props.widgetId.startsWith('private');
-        const _fetcher = _isPrivate ? privateWidgetFetcher : publicWidgetFetcher;
-        const { status, response } = await _fetcher({
-            widget_id: props.widgetId,
-            granularity: state.granularity,
-            group_by: ['Region'],
-            start: dateRange.value.start,
-            end: dateRange.value.end,
-            vars: props.dashboardVars,
-        });
-        if (status === 'succeed') {
-            state.errorMessage = undefined;
-            state.loading = false;
-            return response;
-        }
-        return undefined;
-    } catch (e: any) {
-        state.loading = false;
-        state.errorMessage = e.message;
-        ErrorHandler.handleError(e);
-        return ErrorHandler.makeAPIErrorToast(e);
-    }
+const fetchWidgetData = async (params: PrivateWidgetLoadParameters|PublicWidgetLoadParameters): Promise<WidgetLoadData> => {
+    const defaultFetcher = state.isPrivateWidget
+        ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, WidgetLoadData>
+        : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, WidgetLoadData>;
+    const res = await defaultFetcher(params);
+    return res;
 };
+
+const queryKey = computed(() => [
+    'widget-load-geo-map',
+    props.widgetId,
+    {
+        start: dateRange.value.start,
+        end: dateRange.value.end,
+        granularity: widgetOptionsState.granularityInfo?.granularity,
+        dataTableId: state.dataTable?.data_table_id,
+        dataTableOptions: JSON.stringify(sortObjectByKeys(state.dataTable?.options) ?? {}),
+        groupBy: widgetOptionsState.groupByInfo?.data,
+    },
+]);
+
+const queryResult = useQuery({
+    queryKey,
+    queryFn: () => fetchWidgetData({
+        widget_id: props.widgetId,
+        granularity: widgetOptionsState.granularityInfo?.granularity,
+        group_by: !!widgetOptionsState.groupByInfo?.data && widgetOptionsState.groupByInfo?.data === 'Region' ? ['Region'] : [],
+        vars: props.dashboardVars,
+        start: dateRange.value.start,
+        end: dateRange.value.end,
+    }),
+    enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable && state.runQueries),
+    staleTime: WIDGET_LOAD_STALE_TIME,
+});
+
+const loading = computed(() => queryResult.isLoading);
+const errorMessage = computed(() => queryResult.error?.value?.message);
 
 /* Util */
 const loadMap = async () => {
@@ -159,7 +168,7 @@ const drawChart = async (rawData: WidgetLoadData|null) => {
             value: [
                 _targetRegion?.continent.longitude,
                 _targetRegion?.continent.latitude,
-                result[state.dataField],
+                result[widgetOptionsState.dataFieldInfo?.data as string],
             ],
             itemStyle: {
                 normal: {
@@ -171,15 +180,15 @@ const drawChart = async (rawData: WidgetLoadData|null) => {
 
     state.chartData = _seriesData;
 };
-const loadWidget = async (): Promise<WidgetLoadData|APIErrorToast> => {
-    await loadMap();
-    const res = await fetchWidget();
-    if (!res) return state.data;
-    if (typeof res === 'function') return res;
-    state.data = res;
-    await drawChart(state.data);
-    return state.data;
+const loadWidget = async () => {
+    state.runQueries = true;
 };
+
+const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
+    dateRange,
+    errorMessage: errorMessage.value,
+    widgetLoading: loading.value,
+});
 
 /* Watcher */
 watch([() => state.chartData, () => chartContext.value, () => state.mapLoaded], ([, chartCtx, mapLoaded]) => {
@@ -188,12 +197,20 @@ watch([() => state.chartData, () => chartContext.value, () => state.mapLoaded], 
         state.chart.setOption(state.chartOptions, true);
     }
 });
+watch(() => state.data, async (newData) => {
+    await loadMap();
+    await drawChart(newData);
+});
 
 useResizeObserver(chartContext, throttle(() => {
     state.chart?.resize();
 }, 500));
 useWidgetInitAndRefresh({ props, emit, loadWidget });
-defineExpose<WidgetExpose<WidgetLoadData>>({
+onMounted(async () => {
+    if (!props.dataTableId) return;
+    state.dataTable = await getWidgetDataTable(props.dataTableId);
+});
+defineExpose<WidgetExpose>({
     loadWidget,
 });
 </script>

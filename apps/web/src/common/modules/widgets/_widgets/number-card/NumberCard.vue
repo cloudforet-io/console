@@ -1,39 +1,43 @@
 <script setup lang="ts">
 import { useElementSize, useResizeObserver } from '@vueuse/core';
 import {
-    computed, defineExpose, reactive, ref, watch,
+    computed, defineExpose, onMounted, reactive, ref,
 } from 'vue';
 
+import { useQueries } from '@tanstack/vue-query';
 import { debounce, throttle } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import {
     PI,
 } from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
-import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
+import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
+import type { PrivateWidgetLoadSumParameters } from '@/schema/dashboard/private-widget/api-verbs/load-sum';
+import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
+import type { PublicWidgetLoadSumParameters } from '@/schema/dashboard/public-widget/api-verbs/load-sum';
 import { i18n } from '@/translations';
 
-import type { APIErrorToast } from '@/common/composables/error/errorHandler';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
+import { WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
+import { sortObjectByKeys } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import {
     getPreviousDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
-import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
+import { getFormattedNumber, getWidgetDataTable } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/comparison/type';
 import type { DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
 import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/granularity/type';
 import type { IconValue } from '@/common/modules/widgets/_widget-fields/icon/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
+import type { WidgetHeightValue } from '@/common/modules/widgets/_widget-fields/widget-height/type';
+import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
@@ -57,37 +61,32 @@ const { dateRange } = useWidgetDateRange({
     granularity: computed<GranularityValue>(() => props.widgetOptions?.granularity?.value as GranularityValue),
 });
 const state = reactive({
-    loading: false,
+    runQueries: false,
+    isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
+    dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
     previousLoading: false,
-    errorMessage: undefined as string|undefined,
-    data: null as Data | null,
-    previousData: null as Data | null,
-    unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
-    previousValue: computed<number>(() => state.previousData?.results?.[0]?.[state.dataField] ?? 0),
-    currentValue: computed<number>(() => state.data?.results?.[0]?.[state.dataField] ?? 0),
-    valueText: computed<string|undefined>(() => {
-        const _numberFormatMap = props.widgetOptions?.numberFormat?.value as NumberFormatValue;
-        return getFormattedNumber(state.currentValue, state.dataField, _numberFormatMap, state.unit);
-    }),
-    granularity: computed(() => (props.widgetOptions?.granularity?.value as GranularityValue)?.granularity),
-    dataField: computed<string|undefined>(() => (props.widgetOptions?.dataField?.value as DataFieldValue)?.data as string),
-    // optional fields
-    iconInfo: computed<IconValue|undefined>(() => props.widgetOptions?.icon?.value as IconValue),
-    iconName: computed<string|undefined>(() => state.iconInfo?.icon?.name),
-    iconColor: computed<string|undefined>(() => state.iconInfo?.color),
-    comparisonInfo: computed<ComparisonValue|undefined>(() => props.widgetOptions?.comparison?.value as ComparisonValue),
+
+    data: computed<Data | null>(() => queryResults.value?.[0].data || null),
+    previousData: computed<Data | null>(() => queryResults.value?.[1]?.data || null),
+    unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[widgetOptionsState.dataFieldInfo?.data as string]),
+    previousValue: computed<number>(() => state.previousData?.results?.[0]?.[widgetOptionsState.dataFieldInfo?.data as string] ?? 0),
+    currentValue: computed<number>(() => state.data?.results?.[0]?.[widgetOptionsState.dataFieldInfo?.data as string] ?? 0),
+    valueText: computed<string|undefined>(() => getFormattedNumber(state.currentValue, widgetOptionsState.dataFieldInfo?.data as string, widgetOptionsState.numberFormatInfo, state.unit)),
+
+    iconName: computed<string|undefined>(() => widgetOptionsState.iconInfo?.icon?.name),
+    iconColor: computed<string|undefined>(() => widgetOptionsState.iconInfo?.color),
     comparisonColor: computed<string|undefined>(() => {
         const _comparison = state.currentValue - state.previousValue;
         if (!_comparison) return gray[700];
 
         if (state.currentValue > state.previousValue) {
-            return state.comparisonInfo?.increaseColor;
+            return widgetOptionsState.comparisonInfo?.increaseColor;
         }
-        return state.comparisonInfo?.decreaseColor;
+        return widgetOptionsState.comparisonInfo?.decreaseColor;
     }),
     comparisonValue: computed<string>(() => {
         const _comparison = Math.abs(state.currentValue - state.previousValue);
-        const _format = state.comparisonInfo?.format || 'all';
+        const _format = widgetOptionsState.comparisonInfo?.format || 'all';
         let _percentage = '--';
         if (state.previousValue > 0) {
             _percentage = (_comparison / state.previousValue * 100).toFixed(2);
@@ -103,7 +102,7 @@ const state = reactive({
         return _fixedAmount;
     }),
     comparisonText: computed(() => {
-        const _previousDateRange = getPreviousDateRange(state.granularity, dateRange.value);
+        const _previousDateRange = getPreviousDateRange(widgetOptionsState.granularityInfo?.granularity, dateRange.value);
         const _comparison = state.currentValue - state.previousValue;
         if (!_comparison) return i18n.t('COMMON.WIDGETS.NUMBER_CARD.NO_CHANGE');
 
@@ -117,13 +116,22 @@ const state = reactive({
         }
         return `more than '${_dateText}'`;
     }),
+    comparisonDateRange: computed<DateRange>(() => {
+        const _previousDateRange = getPreviousDateRange(widgetOptionsState.granularityInfo?.granularity, dateRange.value);
+        return _previousDateRange;
+    }),
 });
-const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
-    dateRange,
-    errorMessage: computed(() => state.errorMessage),
-    widgetLoading: computed(() => state.loading),
-    noData: computed(() => !state.currentValue && !state.previousValue),
+
+const widgetOptionsState = reactive({
+    granularityInfo: computed<GranularityValue>(() => props.widgetOptions?.granularity?.value as GranularityValue),
+    dataFieldInfo: computed<DataFieldValue>(() => props.widgetOptions?.dataField?.value as DataFieldValue),
+    iconInfo: computed<IconValue>(() => props.widgetOptions?.icon?.value as IconValue),
+    comparisonInfo: computed<ComparisonValue>(() => props.widgetOptions?.comparison?.value as ComparisonValue),
+    numberFormatInfo: computed<NumberFormatValue>(() => props.widgetOptions?.numberFormat?.value as NumberFormatValue),
+    widgetHeightInfo: computed<WidgetHeightValue>(() => props.widgetOptions?.widgetHeight?.value as WidgetHeightValue),
 });
+
+
 
 /* Util */
 const setValueTextFontSize = debounce(() => {
@@ -140,83 +148,90 @@ const setValueTextFontSize = debounce(() => {
 }, 300);
 
 /* Api */
-const privateWidgetFetcher = getCancellableFetcher<PrivateWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.privateWidget.loadSum);
-const publicWidgetFetcher = getCancellableFetcher<PublicWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.publicWidget.loadSum);
-const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
-    if (props.widgetState === 'INACTIVE') return undefined;
-    try {
-        state.loading = true;
-        const _isPrivate = props.widgetId.startsWith('private');
-        const _fetcher = _isPrivate ? privateWidgetFetcher : publicWidgetFetcher;
-        const { status, response } = await _fetcher({
-            widget_id: props.widgetId,
-            granularity: state.granularity,
-            start: dateRange.value.start,
-            end: dateRange.value.end,
-            vars: props.dashboardVars,
-        });
-        if (status === 'succeed') {
-            state.errorMessage = undefined;
-            state.loading = false;
-            return response;
-        }
-        return undefined;
-    } catch (e: any) {
-        state.loading = false;
-        state.errorMessage = e.message;
-        ErrorHandler.handleError(e);
-        return ErrorHandler.makeAPIErrorToast(e);
-    }
+const fetchWidgetData = async (params: PrivateWidgetLoadSumParameters|PublicWidgetLoadSumParameters): Promise<Data> => {
+    const defaultFetcher = state.isPrivateWidget
+        ? SpaceConnector.clientV2.dashboard.privateWidget.loadSum<PrivateWidgetLoadSumParameters, Data>
+        : SpaceConnector.clientV2.dashboard.publicWidget.loadSum<PublicWidgetLoadSumParameters, Data>;
+    const res = await defaultFetcher(params);
+    return res;
 };
 
-const privatePreviousFetcher = getCancellableFetcher<PrivateWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.privateWidget.loadSum);
-const publicPreviousFetcher = getCancellableFetcher<PublicWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.publicWidget.loadSum);
-const fetchPreviousData = async (): Promise<Data|undefined> => {
-    if (props.widgetState === 'INACTIVE') return undefined;
-    try {
-        state.previousLoading = true;
-        const _isPrivate = props.widgetId.startsWith('private');
-        const _fetcher = _isPrivate ? privatePreviousFetcher : publicPreviousFetcher;
-        const _previousDateRange = getPreviousDateRange(state.granularity, dateRange.value);
-        const { status, response } = await _fetcher({
-            widget_id: props.widgetId,
-            granularity: state.granularity,
-            start: _previousDateRange.start,
-            end: _previousDateRange.end,
-            vars: props.dashboardVars,
-        });
-        if (status === 'succeed') {
-            return response;
-        }
-        return undefined;
-    } catch (e: any) {
-        ErrorHandler.handleError(e);
-        return undefined;
-    } finally {
-        state.previousLoading = false;
-    }
+const baseQueryKey = computed(() => [
+    'widget-load-number-card',
+    props.widgetId,
+    {
+        start: dateRange.value.start,
+        end: dateRange.value.end,
+        granularity: widgetOptionsState.granularityInfo?.granularity,
+        dataTableId: state.dataTable?.data_table_id,
+        dataTableOptions: JSON.stringify(sortObjectByKeys(state.dataTable?.options) ?? {}),
+    },
+]);
+
+const comparisonQueryKey = computed(() => [
+    'widget-load-number-card-comparison',
+    props.widgetId,
+    {
+        start: dateRange.value.start,
+        end: dateRange.value.end,
+        granularity: widgetOptionsState.granularityInfo?.granularity,
+        dataTableId: state.dataTable?.data_table_id,
+        dataTableOptions: JSON.stringify(sortObjectByKeys(state.dataTable?.options) ?? {}),
+    },
+]);
+
+const queryResults = useQueries({
+    queries: [
+        {
+            queryKey: baseQueryKey,
+            queryFn: () => fetchWidgetData({
+                widget_id: props.widgetId,
+                granularity: widgetOptionsState.granularityInfo?.granularity,
+                start: dateRange.value.start,
+                end: dateRange.value.end,
+                vars: props.dashboardVars,
+            }),
+            enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable && state.runQueries),
+            staleTime: WIDGET_LOAD_STALE_TIME,
+        },
+        {
+            queryKey: comparisonQueryKey,
+            queryFn: () => fetchWidgetData({
+                widget_id: props.widgetId,
+                granularity: widgetOptionsState.granularityInfo?.granularity,
+                start: state.comparisonDateRange.start,
+                end: state.comparisonDateRange.end,
+                vars: props.dashboardVars,
+            }),
+            enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable && state.runQueries && widgetOptionsState.comparisonInfo?.toggleValue),
+            staleTime: WIDGET_LOAD_STALE_TIME,
+        },
+    ],
+});
+
+const loading = computed(() => queryResults.value?.[0].isLoading);
+const errorMessage = computed(() => queryResults.value?.[0].error?.message);
+
+const loadWidget = () => {
+    state.runQueries = true;
 };
 
-const loadWidget = async (): Promise<Data|APIErrorToast> => {
-    const res = await fetchWidget();
-    if (!res) return state.data;
-    if (typeof res === 'function') return res;
-    state.data = res;
-    return state.data;
-};
+const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
+    dateRange,
+    errorMessage: errorMessage.value,
+    widgetLoading: loading.value,
+    noData: computed(() => !state.currentValue && !state.previousValue),
+});
 
-watch([() => props.widgetOptions?.comparison?.value, () => dateRange.value], async ([comparison]) => {
-    if (comparison) {
-        state.previousData = await fetchPreviousData();
-    } else {
-        state.previousData = null;
-    }
-}, { immediate: true });
 useResizeObserver(valueTextRef, throttle(() => {
     setValueTextFontSize();
 }, 500));
 useWidgetInitAndRefresh({ props, emit, loadWidget });
-defineExpose<WidgetExpose<Data>>({
+onMounted(async () => {
+    if (!props.dataTableId) return;
+    state.dataTable = await getWidgetDataTable(props.dataTableId);
+});
+defineExpose<WidgetExpose>({
     loadWidget,
 });
 </script>
@@ -245,7 +260,7 @@ defineExpose<WidgetExpose<Data>>({
                       style="font-size: 56px;"
                 >{{ state.valueText }}</span>
             </div>
-            <div v-if="state.comparisonInfo?.toggleValue && !state.previousLoading"
+            <div v-if="widgetOptionsState.comparisonInfo?.toggleValue && !state.previousLoading"
                  class="comparison-wrapper"
             >
                 <p-i v-if="state.currentValue !== state.previousValue"
