@@ -52,7 +52,7 @@ export const useTaskFieldsConfiguration = () => {
         },
         removeField(fieldId: string) {
             validationMap.delete(fieldId);
-            setFields(fields.value.filter((field) => field.field_id !== fieldId));
+            setFields(fields.value.filter((field) => field._field_id !== fieldId));
         },
         updateFieldValidation(fieldId: string, isValid: boolean) {
             validationMap.set(fieldId, isValid);

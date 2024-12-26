@@ -303,7 +303,8 @@ createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, (
                                        @update:selected="handleUpdateSelectedStatus"
                     >
                         <template #dropdown-button="item">
-                            <p-badge badge-type="subtle"
+                            <p-badge v-if="item.label"
+                                     badge-type="subtle"
                                      :style-type="item.color"
                             >
                                 {{ item.label }}
