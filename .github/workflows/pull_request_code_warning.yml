@@ -47,7 +47,7 @@ jobs:
         id: check_todo
         run: |
           echo "Checking for TODOs..."
-          TODO_FILES=$(grep -rl "// TODO" . --exclude-dir=.git || true)
+          TODO_FILES=$(grep -rl "// TODO" . --exclude-dir=.git --exclude=apps/web/public/lottie.js || true)
           TODO_COUNT=0
           if [ -n "$TODO_FILES" ]; then
             echo "The following files contain TODO:"
@@ -63,7 +63,13 @@ jobs:
         id: check_console_log
         run: |
           echo "Checking for console.log..."
-          LOG_FILES=$(grep -rl "console\.log" . --exclude-dir=.git --exclude-dir=apps/web/build --exclude-dir=apps/web/public --exclude-dir=packages/mirinae/scripts --exclude-dir=packages/mirinae/cli || true)
+          LOG_FILES=$(find . -type f \
+            ! -path "./.git/*" \
+            ! -path "./apps/web/build/*" \
+            ! -path "./apps/web/public/*" \
+            ! -path "./packages/mirinae/scripts/*" \
+            ! -path "./packages/mirinae/cli/*" \
+            -exec grep -l "console\.log" {} + || true)
           LOG_COUNT=0
           if [ -n "$LOG_FILES" ]; then
             echo "The following files contain console.log:"
@@ -79,7 +85,13 @@ jobs:
         id: check_console_debug
         run: |
           echo "Checking for console.debug..."
-          DEBUG_FILES=$(grep -rl "console\.log" . --exclude-dir=.git --exclude-dir=apps/web/build --exclude-dir=apps/web/public --exclude-dir=packages/mirinae/scripts --exclude-dir=packages/mirinae/cli || true)
+          DEBUG_FILES=$(find . -type f \
+            ! -path "./.git/*" \
+            ! -path "./apps/web/build/*" \
+            ! -path "./apps/web/public/*" \
+            ! -path "./packages/mirinae/scripts/*" \
+            ! -path "./packages/mirinae/cli/*" \
+            -exec grep -l "console\.debug" {} + || true)
           LOG_COUNT=0
           if [ -n "DEBUG_FILES" ]; then
             echo "The following files contain console.debug:"
