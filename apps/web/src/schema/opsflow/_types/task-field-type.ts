@@ -47,5 +47,6 @@ export interface DropdownTaskField extends BaseTaskField {
 }
 export interface OtherTaskField extends BaseTaskField {
     field_type: Exclude<TaskFieldType, 'TEXT'|'PARAGRAPH'|'DROPDOWN'>;
+    options: OtherTaskFieldOptions;
 }
 export type TaskField = TextTaskField | ParagraphTaskField | DropdownTaskField | OtherTaskField;
