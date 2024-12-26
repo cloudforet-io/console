@@ -96,12 +96,12 @@ jobs:
           if [ -n "DEBUG_FILES" ]; then
             echo "The following files contain console.debug:"
             echo "DEBUG_FILES"
-            LOG_COUNT=$(echo "DEBUG_FILES" | wc -l)
+            DEBUG_COUNT=$(echo "DEBUG_FILES" | wc -l)
           else
             echo "No console.debug found."
           fi
-          echo "::warning:: Found $LOG_COUNT file(s) with console.debug."
-          echo "console_debug_count=$LOG_COUNT" >> $GITHUB_ENV
+          echo "::warning:: Found DEBUG_COUNT file(s) with console.debug."
+          echo "console_debug_count=DEBUG_COUNT" >> $GITHUB_ENV
 
       - name: Fail if issues found
         run: |
