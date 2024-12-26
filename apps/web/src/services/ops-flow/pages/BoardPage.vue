@@ -6,6 +6,7 @@ import {
     PHeadingLayout, PHeading, PButton,
 } from '@cloudforet/mirinae';
 
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import BoardTaskTable from '@/services/ops-flow/components/BoardTaskTable.vue';
@@ -22,6 +23,8 @@ const { getProperRouteLocation } = useProperRouteLocation();
 
 const boardPageStore = useBoardPageStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
+
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const taskCreatePageLink = computed(() => getProperRouteLocation({
     name: OPS_FLOW_ROUTE.BOARD.TASK_CREATE._NAME,
@@ -41,7 +44,8 @@ watch(() => route.query.categoryId, (categoryId) => {
                 <p-heading>{{ taskManagementTemplateStore.templates.TaskBoard }}</p-heading>
             </template>
             <template #extra>
-                <router-link v-slot="{ navigate }"
+                <router-link v-if="hasReadWriteAccess"
+                             v-slot="{ navigate }"
                              :to="taskCreatePageLink"
                              custom
                 >

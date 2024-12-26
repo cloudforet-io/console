@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import {
+    ref, computed, watch, onBeforeUnmount,
+} from 'vue';
 
 import { PButtonModal } from '@cloudforet/mirinae/';
 
@@ -72,6 +74,9 @@ watch(() => taskManagementPageState.visibleDeleteCategoryModal, (visible) => {
         }
         taskManagementPageStore.loadAssociatedTasksToCategory(taskManagementPageState.targetCategoryId);
     }
+});
+onBeforeUnmount(() => {
+    taskManagementPageStore.flushAssociatedTasksToCategoryMap();
 });
 </script>
 

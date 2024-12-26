@@ -25,6 +25,7 @@ interface UseTaskCategoryStoreState {
 interface UseTaskCategoryStoreGetters {
     loading: boolean;
     taskCategories: TaskCategoryModel[];
+    taskCategoriesIncludingDeleted: TaskCategoryModel[];
 }
 const DEFAULT_STATUS_OPTIONS: TaskCategoryCreateParameters['status_options'] = {
     TODO: [
@@ -84,14 +85,14 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
                 ...params,
                 status_options: DEFAULT_STATUS_OPTIONS,
             });
-            state.items?.push(response);
+            state.items = state.items ? [...state.items, response] : [response];
             return response;
         },
         async update(params: TaskCategoryUpdateParameters) {
             const response = await SpaceConnector.clientV2.opsflow.taskCategory.update<TaskCategoryUpdateParameters, TaskCategoryModel>(params);
             const item = state.items?.find((c) => c.category_id === response.category_id);
             if (item) {
-                Object.assign(item, response);
+                state.items = state.items?.map((c) => (c.category_id === response.category_id ? response : c));
             }
             return response;
         },

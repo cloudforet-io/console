@@ -144,6 +144,9 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
                 state.loadingAssociatedTasksToCategory = false;
             }
         },
+        flushAssociatedTasksToCategoryMap() {
+            state.associatedTasksToCategoryMap = {};
+        },
     };
     return {
         state,

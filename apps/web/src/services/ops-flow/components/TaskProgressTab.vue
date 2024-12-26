@@ -6,13 +6,13 @@ import {
 import { PDataLoader, PButton } from '@cloudforet/mirinae';
 
 import type { EventModel } from '@/schema/opsflow/event/model';
-
+import { i18n as _i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
 
-import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 import VerticalTimelineItem from '@/common/components/vertical-timeline/VerticalTimelineItem.vue';
 
+import TaskProgressEventView from '@/services/ops-flow/components/TaskProgressEventView.vue';
 import { useTaskDetailPageStore } from '@/services/ops-flow/stores/task-detail-page-store';
 
 const taskDetailPageStore = useTaskDetailPageStore();
@@ -21,6 +21,12 @@ const taskDetailPageGetters = taskDetailPageStore.getters;
 const userStore = useUserStore();
 
 const timezone = computed(() => userStore.state.timezone);
+const getTitle = (item: EventModel) => {
+    if (item.event_type === 'CREATED') return _i18n.t('OPSFLOW.TASK_BOARD.CREATED');
+    if (item.event_type === 'COMMENTED') return _i18n.t('OPSFLOW.TASK_BOARD.COMMENTED');
+    if (item.event_type === 'CHANGE_STATUS') return _i18n.t('OPSFLOW.TASK_BOARD.CHANGE_STATUS');
+    return _i18n.t('OPSFLOW.TASK_BOARD.UPDATED');
+};
 const getStyleType = (item: EventModel) => {
     if (item.event_type === 'CREATED') return 'gray';
     if (item.event_type === 'COMMENTED') return 'yellow';
@@ -45,7 +51,7 @@ onUnmounted(() => {
             <vertical-timeline-item
                 v-for="(item, idx) in taskDetailPageState.events"
                 :key="item.event_id"
-                :title="item.name"
+                :title="getTitle(item)"
                 :description="item.description"
                 :datetime="item.created_at"
                 :timezone="timezone"
@@ -54,8 +60,9 @@ onUnmounted(() => {
                 class="timeline"
             >
                 <div class="text-label-sm text-gray-600">
-                    <text-editor-viewer :contents="item.description"
-                                        content-type="markdown"
+                    <task-progress-event-view :task-type-id="taskDetailPageState.task?.task_type_id"
+                                              :event-type="item.event_type"
+                                              :additional-info="item.additional_info"
                     />
                 </div>
             </vertical-timeline-item>
