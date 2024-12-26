@@ -210,6 +210,7 @@ const queryResults = useQueries({
 });
 
 const loading = computed(() => queryResults.value?.[0].isLoading);
+const previousLoading = computed(() => queryResults.value?.[1].isLoading);
 const errorMessage = computed(() => queryResults.value?.[0].error?.message);
 
 const loadWidget = () => {
@@ -260,7 +261,7 @@ defineExpose<WidgetExpose>({
                       style="font-size: 56px;"
                 >{{ state.valueText }}</span>
             </div>
-            <div v-if="widgetOptionsState.comparisonInfo?.toggleValue && !state.previousLoading"
+            <div v-if="widgetOptionsState.comparisonInfo?.toggleValue && !previousLoading"
                  class="comparison-wrapper"
             >
                 <p-i v-if="state.currentValue !== state.previousValue"
