@@ -92,7 +92,7 @@ jobs:
             ! -path "./packages/mirinae/scripts/*" \
             ! -path "./packages/mirinae/cli/*" \
             -exec grep -l "console\.debug" {} + || true)
-          LOG_COUNT=0
+          DEBUG_COUNT=0
           if [ -n "DEBUG_FILES" ]; then
             echo "The following files contain console.debug:"
             echo "DEBUG_FILES"
