@@ -1,4 +1,5 @@
 export interface PublicConfigGetParameters {
     name: string;
-    domain_id: string;
+    project_id?: string;
+    workspace_id?: string;
 }

@@ -9,9 +9,9 @@ import {
 
 import { i18n } from '@/translations';
 
-import { useDomainConfigStore } from '@/store/config/domain-config-store';
+import { usePreferencesStore } from '@/store/preferences/preferences-store';
 
-const domainConfigStore = useDomainConfigStore();
+const domainConfigStore = usePreferencesStore();
 
 const route = useRoute();
 

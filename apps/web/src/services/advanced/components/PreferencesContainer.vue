@@ -11,12 +11,12 @@ import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
-import { useDomainConfigStore } from '@/store/config/domain-config-store';
+import { usePreferencesStore } from '@/store/preferences/preferences-store';
 
 import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 
 
-const domainConfigStore = useDomainConfigStore();
+const domainConfigStore = usePreferencesStore();
 
 const route = useRoute();
 

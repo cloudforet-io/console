@@ -8,14 +8,15 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { DomainConfigCreateParameters } from '@/schema/config/domain-config/api-verbs/create';
 import type { DomainConfigListParameters } from '@/schema/config/domain-config/api-verbs/list';
 import type { DomainConfigUpdateParameters } from '@/schema/config/domain-config/api-verbs/update';
-import { DOMAIN_CONFIG_NAMES } from '@/schema/config/domain-config/constant';
 import type { DomainConfigModel } from '@/schema/config/domain-config/model';
+
+import { DOMAIN_CONFIG_NAMES } from '@/store/domain/constant';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { PreferencesData, UnifiedCostConfig } from '@/services/advanced/types/preferences-type';
 
-export const useDomainConfigStore = defineStore('domain-config', () => {
+export const usePreferencesStore = defineStore('domain-config', () => {
     const state = reactive({
         domainConfig: null as null|DomainConfigModel<PreferencesData>,
     });

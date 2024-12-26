@@ -10,8 +10,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { SharedConfigListParameters } from '@/schema/config/shared-config/api-verbs/list';
-import type { SharedConfigModel } from '@/schema/config/shared-config/model';
+import type { PublicConfigListParameters } from '@/schema/config/public-config/api-verbs/list';
+import type { PublicConfigModel } from '@/schema/config/public-config/model';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
@@ -130,7 +130,7 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
                     { k: 'data.link', v: null, o: '=' },
                 ]);
             try {
-                const { results } = await SpaceConnector.clientV2.config.sharedConfig.list<SharedConfigListParameters, ListResponse<SharedConfigModel>>({
+                const { results } = await SpaceConnector.clientV2.config.publicConfig.list<PublicConfigListParameters, ListResponse<PublicConfigModel>>({
                     query: bookmarkListApiQuery.data,
                 });
 
@@ -185,7 +185,7 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
                 .setFilters(defaultFilters);
             state.loading = true;
             try {
-                const { results } = await SpaceConnector.clientV2.config.sharedConfig.list<SharedConfigListParameters, ListResponse<SharedConfigModel>>({
+                const { results } = await SpaceConnector.clientV2.config.publicConfig.list<PublicConfigListParameters, ListResponse<PublicConfigModel>>({
                     query: BookmarkListApiQueryHelper.data,
                 });
 

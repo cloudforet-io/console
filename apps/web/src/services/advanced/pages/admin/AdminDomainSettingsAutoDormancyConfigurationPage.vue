@@ -13,7 +13,6 @@ import { getNumberFromString, numberFormatter } from '@cloudforet/utils';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { DomainConfigListParameters } from '@/schema/config/domain-config/api-verbs/list';
 import type { DomainConfigUpdateParameters } from '@/schema/config/domain-config/api-verbs/update';
-import { DOMAIN_CONFIG_NAMES } from '@/schema/config/domain-config/constant';
 import type { DomainConfigModel } from '@/schema/config/domain-config/model';
 import type { CostReportConfigListParameters } from '@/schema/cost-analysis/cost-report-config/api-verbs/list';
 import type { CostReportConfigModel } from '@/schema/cost-analysis/cost-report-config/model';
@@ -23,6 +22,7 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { CURRENCY_SYMBOL } from '@/store/display/constant';
 import type { Currency } from '@/store/display/type';
+import { DOMAIN_CONFIG_NAMES } from '@/store/domain/constant';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 

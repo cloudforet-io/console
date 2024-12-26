@@ -8,13 +8,13 @@ import {
 
 import { i18n } from '@/translations';
 
-import { useDomainConfigStore } from '@/store/config/domain-config-store';
+import { usePreferencesStore } from '@/store/preferences/preferences-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
 const router = useRouter();
-const domainConfigStore = useDomainConfigStore();
+const domainConfigStore = usePreferencesStore();
 const domainConfigGetters = domainConfigStore.getters;
 
 const { hasReadWriteAccess } = usePageEditableStatus();

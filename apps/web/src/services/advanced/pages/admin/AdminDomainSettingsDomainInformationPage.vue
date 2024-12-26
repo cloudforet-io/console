@@ -10,8 +10,8 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 
 import { i18n } from '@/translations';
 
-import { useDomainConfigStore } from '@/store/config/domain-config-store';
 import { useDomainStore } from '@/store/domain/domain-store';
+import { usePreferencesStore } from '@/store/preferences/preferences-store';
 import { languages, timezoneList } from '@/store/user/constant';
 import type { LanguageCode } from '@/store/user/type';
 
@@ -20,7 +20,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
-const domainConfigStore = useDomainConfigStore();
+const domainConfigStore = usePreferencesStore();
 const domainConfigGetters = domainConfigStore.getters;
 const domainStore = useDomainStore();
 

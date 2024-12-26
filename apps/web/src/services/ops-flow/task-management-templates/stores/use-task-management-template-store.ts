@@ -3,12 +3,9 @@ import { reactive, toRef, computed } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import { APIError } from '@cloudforet/core-lib/space-connector/error';
-
 import { i18n, type SupportLanguage } from '@/translations';
 
-
-import { usePublicConfigStore } from '@/store/config/public-config-store';
+import { useSharedConfigStore } from '@/store/domain/shared-config-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -21,6 +18,7 @@ import type {
 import en from '../translations/en.json';
 import ja from '../translations/ja.json';
 import ko from '../translations/ko.json';
+
 
 interface TaskManagementTemplate {
     TemplateName: string;
@@ -50,11 +48,11 @@ interface UseTaskManagementTemplateStoreState {
     enableLanding: boolean;
 }
 export const useTaskManagementTemplateStore = defineStore('task-management-template', () => {
-    const publicConfigStore = usePublicConfigStore();
-    const publicConfigStoreGetters = publicConfigStore.getters;
+    const sharedConfigStore = useSharedConfigStore();
+    const sharedConfigStoreGetters = sharedConfigStore.getters;
 
-    const templateData = toRef(publicConfigStoreGetters, 'TASK_TEMPLATE') as unknown as Ref<TemplateData|undefined>;
-    const landingData = toRef(publicConfigStoreGetters, 'TASK_LANDING') as unknown as Ref<LandingData|undefined>;
+    const templateData = toRef(sharedConfigStoreGetters, 'TASK_TEMPLATE') as unknown as Ref<TemplateData|undefined>;
+    const landingData = toRef(sharedConfigStoreGetters, 'TASK_LANDING') as unknown as Ref<LandingData|undefined>;
 
     const state = reactive<UseTaskManagementTemplateStoreState>({
         templateId: 'default',
@@ -78,13 +76,9 @@ export const useTaskManagementTemplateStore = defineStore('task-management-templ
             return;
         }
         try {
-            const res = await publicConfigStore.get<TemplateData>('TASK_TEMPLATE');
+            const res = await sharedConfigStore.get<TemplateData>('TASK_TEMPLATE');
             state.templateId = res?.data?.template_id ?? 'default';
         } catch (e) {
-            if (e instanceof APIError && e.status === 404) {
-                state.templateId = 'default';
-                return;
-            }
             ErrorHandler.handleError(e);
         }
     };
@@ -92,7 +86,7 @@ export const useTaskManagementTemplateStore = defineStore('task-management-templ
         const prev = state.templateId;
         state.templateId = templateId;
         try {
-            await publicConfigStore.set<TemplateData>('TASK_TEMPLATE', { template_id: templateId });
+            await sharedConfigStore.set<TemplateData>('TASK_TEMPLATE', { template_id: templateId });
             showSuccessMessage(i18n.t('OPSFLOW.ALT_S_EDIT_TARGET', { target: i18n.t('OPSFLOW.TASK_MANAGEMENT.TEMPLATE_TYPE') }), '');
         } catch (e) {
             ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ALT_E_EDIT_TARGET', { target: i18n.t('OPSFLOW.TASK_MANAGEMENT.TEMPLATE_TYPE') }));
@@ -105,13 +99,9 @@ export const useTaskManagementTemplateStore = defineStore('task-management-templ
             return;
         }
         try {
-            const res = await publicConfigStore.get<LandingData>('TASK_LANDING');
+            const res = await sharedConfigStore.get<LandingData>('TASK_LANDING');
             state.enableLanding = res?.data?.enabled ?? false;
         } catch (e) {
-            if (e instanceof APIError && e.status === 404) {
-                state.enableLanding = false;
-                return;
-            }
             ErrorHandler.handleError(e);
         }
     };
@@ -120,7 +110,7 @@ export const useTaskManagementTemplateStore = defineStore('task-management-templ
         const prev = state.enableLanding;
         state.enableLanding = enabled;
         try {
-            await publicConfigStore.set<LandingData>('TASK_LANDING', { enabled });
+            await sharedConfigStore.set<LandingData>('TASK_LANDING', { enabled });
             showSuccessMessage(
                 enabled
                     ? i18n.t('OPSFLOW.TASK_MANAGEMENT.ALT_S_ENABLE_LANDING')
