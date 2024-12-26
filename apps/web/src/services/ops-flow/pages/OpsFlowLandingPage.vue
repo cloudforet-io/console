@@ -14,6 +14,7 @@ import type { TaskModel } from '@/schema/opsflow/task/model';
 import { useUserStore } from '@/store/user/user-store';
 
 import { useFormValidator } from '@/common/composables/form-validator';
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
@@ -36,6 +37,8 @@ const userStore = useUserStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
 const { getProperRouteLocation } = useProperRouteLocation();
+
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const loading = ref(true);
 const availableCategories = ref<TaskCategoryModel[]>([]);
@@ -75,8 +78,9 @@ const goToTaskCreatePage = () => {
 
 onMounted(async () => {
     loading.value = true;
-    const allCategories = await taskCategoryStore.list(true);
-    if (!allCategories || !allCategories.length) {
+    let allCategories = await taskCategoryStore.list(true) ?? [];
+    allCategories = allCategories.filter((c) => c.state !== 'DELETED');
+    if (!allCategories.length) {
         loading.value = false;
         return;
     }
@@ -158,7 +162,8 @@ onMounted(async () => {
                     </p-radio-group>
                 </div>
                 <div class="mt-10 flex justify-end">
-                    <p-button style-type="substitutive"
+                    <p-button v-if="hasReadWriteAccess"
+                              style-type="substitutive"
                               icon-right="ic_arrow-right"
                               :disabled="!isAllValid"
                               @click="goToTaskCreatePage"

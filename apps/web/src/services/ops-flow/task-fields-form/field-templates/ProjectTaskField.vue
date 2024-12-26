@@ -33,7 +33,7 @@ const {
         <project-select-dropdown class="my-1"
                                  block
                                  project-selectable
-                                 :project-group-selectable="false"
+                                 project-group-selectable
                                  :selected-project-ids="fieldValue"
                                  :readonly="props.readonly"
                                  @update:selected-project-ids="updateFieldValue"

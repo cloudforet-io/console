@@ -113,7 +113,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         }),
     } as unknown as UseTaskContentFormStoreGetters; // HACK: to avoid type error
     const actions = {
-        async setCurrentCategoryId(categoryId?: string) {
+        setCurrentCategoryId(categoryId?: string) {
             if (state.currentCategoryId === categoryId) return;
             state.currentCategoryId = categoryId;
             state.currentTaskType = undefined;

@@ -24,11 +24,11 @@ const loading = ref<boolean>(false);
 let hasDeleted = false;
 const deleteTask = async () => {
     try {
-        if (!taskDetailPageStore.state.taskId) throw new Error('taskId is not defined');
+        if (!taskDetailPageStore.state.task) throw new Error('task is not defined');
         loading.value = true;
-        await taskStore.delete(taskDetailPageStore.state.taskId);
+        await taskStore.delete(taskDetailPageStore.state.task.task_id);
         hasDeleted = true;
-        showSuccessMessage(i18n.t('OPSFLOW.ALT_S_DELETE_TARGET', { target: taskManagementTemplateStore.templates.Task }));
+        showSuccessMessage(i18n.t('OPSFLOW.ALT_S_DELETE_TARGET', { target: taskManagementTemplateStore.templates.Task }) as string, '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ERR_S_DELETE_TARGET', { target: taskManagementTemplateStore.templates.Task }));
     } finally {

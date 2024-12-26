@@ -4252,12 +4252,21 @@
 		"SUPPORT_PACKAGE": "Support Package",
 		"TARGET_LIST": "{target} List",
 		"TASK_BOARD": {
+			"AFTER": "After",
 			"ASSIGN": "Assign",
 			"ASSIGN_TO": "Assign to",
+			"BEFORE": "Before",
+			"CHANGE_STATUS": "Status Changed",
 			"COMMENT": "Comment",
+			"COMMENTED": "Commented",
+			"COMMENT_PLACEHOLDER": "Type your comment",
+			"CONTENT": "Content",
+			"CREATED": "Created",
+			"FIELD": "Field",
 			"TASK_CONTENT": "Content",
 			"TASK_PROGRESS": "{task} Progress",
 			"TYPE_INFO": "{type} Information",
+			"UPDATED": "Updated",
 			"VIEW_ALL_TASKS": "View All {tasks}"
 		},
 		"TASK_MANAGEMENT": {
