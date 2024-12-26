@@ -73,6 +73,7 @@ jobs:
             ! -path "./apps/web/src/lib/site-analytics/*" \
             ! -path "./packages/mirinae/scripts/*" \
             ! -path "./packages/mirinae/cli/*" \
+            ! -path "./**/*.stories.ts" \
             -exec grep -l "console\.log" {} + || true)
           LOG_COUNT=0
           if [ -n "$LOG_FILES" ]; then
@@ -96,10 +97,11 @@ jobs:
             ! -path "./apps/web/build/*" \
             ! -path "./apps/web/public/*" \
             ! -path "./apps/web/src/store/display/display-store.ts" \
+            ! -path "./apps/web/src/lib/config/index.ts" \
             ! -path "./packages/mirinae/scripts/*" \
             ! -path "./packages/mirinae/cli/*" \
             ! -path "./packages/core-lib/src/space-connector/token-api.ts" \
-            ! -path "./**/stories.ts" \
+            ! -path "./**/*.stories.ts" \
             -exec grep -l "console\.debug" {} + || true)
           DEBUG_COUNT=0
           if [ -n "$DEBUG_FILES" ]; then
