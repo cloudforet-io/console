@@ -73,7 +73,7 @@ const handleUpdateFormat = (format: ComparisonFormat) => {
 </script>
 
 <template>
-    <div class="widget-field-total">
+    <div class="widget-field-comparison">
         <div class="field-header">
             <p-field-title>
                 {{ $t('COMMON.WIDGETS.COMPARISON.COMPARISON') }}
@@ -136,7 +136,7 @@ const handleUpdateFormat = (format: ComparisonFormat) => {
 </template>
 
 <style lang="postcss" scoped>
-.widget-field-total {
+.widget-field-comparison {
     .field-header {
         @apply flex items-center gap-1 justify-between;
     }

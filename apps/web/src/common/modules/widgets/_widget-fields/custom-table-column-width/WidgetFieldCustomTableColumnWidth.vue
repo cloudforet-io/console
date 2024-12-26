@@ -20,7 +20,7 @@ import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type {
     CustomColumnWidthItem,
-    CustomTableColumnWidthValue, CustomTableColumnWidthOptions,
+    CustomTableColumnWidthValue,
 } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
 import type {
     WidgetFieldComponentProps,
@@ -31,7 +31,7 @@ interface CustomWidthFieldItem extends CustomColumnWidthItem {
 }
 const FIELD_KEY = 'customTableColumnWidth';
 
-const props = defineProps<WidgetFieldComponentProps<CustomTableColumnWidthOptions>>();
+const props = defineProps<WidgetFieldComponentProps<undefined>>();
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
 
