@@ -1,4 +1,4 @@
-import type { DOMAIN_CONFIG_NAMES, SHARED_CONFIG_NAMES } from '@/store/domain/constant';
+import type { DOMAIN_CONFIG_NAMES } from '@/schema/config/domain-config/constant';
 
 export type ExtendedAuthType = 'GOOGLE_OAUTH2' | 'KEYCLOAK_OIDC' | 'SAML';
 
@@ -19,4 +19,3 @@ export interface ExtraSubMenu {
 }
 
 export type DomainConfigKey = keyof typeof DOMAIN_CONFIG_NAMES;
-export type SharedConfigKey = keyof typeof SHARED_CONFIG_NAMES;

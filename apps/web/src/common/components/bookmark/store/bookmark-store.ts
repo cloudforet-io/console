@@ -116,7 +116,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                     fetcher = SpaceConnector.clientV2.config.userConfig.set;
                     resource_group = undefined;
                 } else if (_getters.isAdminMode || type === BOOKMARK_TYPE.WORKSPACE || state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
-                    fetcher = SpaceConnector.clientV2.config.publicConfig.create;
+                    fetcher = SpaceConnector.clientV2.config.sharedConfig.create;
                     resource_group = _getters.isAdminMode ? 'DOMAIN' : 'WORKSPACE';
                 }
                 await fetcher({
@@ -143,7 +143,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                     fetcher = SpaceConnector.clientV2.config.userConfig.set;
                     resource_group = undefined;
                 } else if (_getters.isAdminMode || type === BOOKMARK_TYPE.WORKSPACE || state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
-                    fetcher = SpaceConnector.clientV2.config.publicConfig.create;
+                    fetcher = SpaceConnector.clientV2.config.sharedConfig.create;
                     if (_getters.isAdminMode) {
                         if (isDefault) {
                             resource_group = 'WORKSPACE';
@@ -180,7 +180,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 if (state.bookmarkType === BOOKMARK_TYPE.USER) {
                     fetcher = SpaceConnector.clientV2.config.userConfig.update;
                 } else if (_getters.isAdminMode || state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
-                    fetcher = SpaceConnector.clientV2.config.publicConfig.update;
+                    fetcher = SpaceConnector.clientV2.config.sharedConfig.update;
                 }
                 await fetcher({
                     name: id || '',
@@ -212,7 +212,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 if (state.bookmarkType === BOOKMARK_TYPE.USER) {
                     fetcher = SpaceConnector.clientV2.config.userConfig.update;
                 } else if (_getters.isAdminMode || state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
-                    fetcher = SpaceConnector.clientV2.config.publicConfig.update;
+                    fetcher = SpaceConnector.clientV2.config.sharedConfig.update;
                 }
                 await fetcher({
                     name: id,
@@ -237,7 +237,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 if (state.bookmarkType === BOOKMARK_TYPE.USER) {
                     fetcher = SpaceConnector.clientV2.config.userConfig.delete;
                 } else if (_getters.isAdminMode || state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
-                    fetcher = SpaceConnector.clientV2.config.publicConfig.delete;
+                    fetcher = SpaceConnector.clientV2.config.sharedConfig.delete;
                 }
                 await fetcher({
                     name: id || '',
@@ -257,7 +257,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 if (state.bookmarkType === BOOKMARK_TYPE.USER) {
                     fetcher = SpaceConnector.clientV2.config.userConfig.delete;
                 } else if (_getters.isAdminMode || state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
-                    fetcher = SpaceConnector.clientV2.config.publicConfig.delete;
+                    fetcher = SpaceConnector.clientV2.config.sharedConfig.delete;
                 }
                 await fetcher({
                     name: id || '',

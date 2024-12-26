@@ -7,6 +7,8 @@ import { PI, PTextButton, PDivider } from '@cloudforet/mirinae';
 
 import type { DashboardVariables, DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
 
+import ChangedMark from '@/common/components/marks/ChangedMark.vue';
+
 import DashboardVariableDropdown from '@/services/dashboards/components/legacy/DashboardVariableDropdown.vue';
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
@@ -70,7 +72,6 @@ const handleResetVariables = () => {
         <template v-for="(propertyName, idx) in state.order">
             <div v-if="state.variableProperties[propertyName]?.use"
                  :key="`${propertyName}-${idx}`"
-                 class="variable-selector-box"
             >
                 <dashboard-variable-dropdown :property-name="propertyName"
                                              :property-label="state.variableProperties[propertyName]?.name"
@@ -79,9 +80,7 @@ const handleResetVariables = () => {
                                              :disabled="props.loading"
                                              :dashboard-variables="dashboardDetailState.variables"
                 />
-                <span class="circle-mark"
-                      :class="{'changed': state.modifiedVariablesSchemaProperties.includes(propertyName)}"
-                />
+                <changed-mark v-if="state.modifiedVariablesSchemaProperties.includes(propertyName)" />
             </div>
         </template>
         <p-text-button style-type="highlight"
@@ -112,19 +111,6 @@ const handleResetVariables = () => {
 
 <style lang="postcss" scoped>
 .dashboard-variables-select-dropdown {
-    .variable-selector-box {
-        position: relative;
-        .circle-mark {
-            &.changed {
-                @apply bg-secondary1 rounded-xl border-white border-2;
-                position: absolute;
-                width: 0.75rem;
-                height: 0.75rem;
-                right: -0.25rem;
-                top: -0.25rem;
-            }
-        }
-    }
     .reset-button {
         @apply flex items-center;
         gap: 0.25rem;
