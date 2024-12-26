@@ -38,8 +38,6 @@ const widgetGenerateGetters = widgetGenerateStore.getters;
 const state = reactive({
     fieldValue: computed<CustomTableColumnWidthValue>(() => props.fieldManager.data[FIELD_KEY].value),
     customWidthItems: [] as CustomWidthFieldItem[],
-    // isPivotedData: computed<boolean>(() => false), // TODO: implement after creating pivot DT
-    // dataFieldType: computed(() => props.allValueMap?.tableDataField?.fieldType ?? 'dynamicField'),
     allFieldList: computed<MenuItem[]>(() => {
         if (!widgetGenerateGetters.selectedDataTable) return [];
         const fieldList = sortWidgetTableFields(

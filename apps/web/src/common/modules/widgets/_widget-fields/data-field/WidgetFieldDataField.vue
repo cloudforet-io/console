@@ -1,5 +1,3 @@
-<!-- TODO: Edit component file name -->
-
 <script lang="ts" setup>
 import {
     computed, reactive,
