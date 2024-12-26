@@ -16,14 +16,9 @@ import type {
 
 const FIELD_KEY = 'yAxis';
 const props = defineProps<WidgetFieldComponentProps<YAxisOptions>>();
+
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
-// const {
-//     invalid: widgetOptionsInvalid,
-// } = useWidgetOptionsComplexValidation({
-//     optionValueMap: toRef(props, 'allValueMap') as Record<string, WidgetFieldValues|undefined>,
-//     widgetConfig: toRef(props, 'widgetConfig') as Ref<WidgetConfig>,
-// });
 
 const state = reactive({
     menuItems: computed<MenuItem[]>(() => {

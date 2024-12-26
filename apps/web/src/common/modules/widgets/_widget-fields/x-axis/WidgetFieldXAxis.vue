@@ -16,13 +16,7 @@ import type {
 
 const FIELD_KEY = 'xAxis';
 const props = defineProps<WidgetFieldComponentProps<XAxisOptions>>();
-//
-// const {
-//     invalid: widgetOptionsInvalid,
-// } = useWidgetOptionsComplexValidation({
-//     optionValueMap: toRef(props, 'allValueMap') as Record<string, WidgetFieldValues|undefined>,
-//     widgetConfig: toRef(props, 'widgetConfig') as Ref<WidgetConfig>,
-// });
+
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
 

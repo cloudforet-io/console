@@ -29,12 +29,7 @@ const FIELD_KEY = 'groupBy';
 const props = defineProps<WidgetFieldComponentProps<GroupByOptions>>();
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
-// const {
-//     invalid: widgetOptionsInvalid,
-// } = useWidgetOptionsComplexValidation({
-//     optionValueMap: toRef(props, 'allValueMap') as Record<string, WidgetFieldValues|undefined>,
-//     widgetConfig: toRef(props, 'widgetConfig') as Ref<WidgetConfig>,
-// });
+
 const validator = widgetValidatorRegistry[FIELD_KEY];
 
 const state = reactive({
