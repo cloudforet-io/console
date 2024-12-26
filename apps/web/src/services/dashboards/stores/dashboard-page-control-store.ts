@@ -34,13 +34,13 @@ const _isPublicControlButtonDisabled = (dashboardItems: DashboardModel[], select
         if (_isFolder) {
             const _childrenDashboards = dashboardItems.filter((d) => d.folder_id === id);
             _childrenDashboards?.forEach((child) => {
-                if (child?.shared && child?.workspace_id === '*') {
+                if (child?.shared && child?.scope === 'WORKSPACE') {
                     result = true;
                 }
             });
         } else {
             const _dashboard = dashboardItems.find((d) => d.dashboard_id === id);
-            if (_dashboard?.shared && _dashboard?.workspace_id === '*') {
+            if (_dashboard?.shared && _dashboard?.scope === 'WORKSPACE') {
                 result = true;
             }
         }
@@ -95,11 +95,11 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
         publicDashboardItems: computed<PublicDashboardModel[]>(() => {
             const _v2DashboardItems = dashboardState.publicDashboardItems.filter((d) => d.version !== '1.0');
             if (storeState.isAdminMode) return _v2DashboardItems;
-            return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && d.project_id === '*'));
+            return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
         }),
         publicFolderItems: computed<PublicFolderModel[]>(() => {
             if (storeState.isAdminMode) return dashboardState.publicFolderItems;
-            return dashboardState.publicFolderItems.filter((d) => !(d.resource_group === 'DOMAIN' && d.project_id === '*'));
+            return dashboardState.publicFolderItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
         }),
         publicDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getDashboardTreeData(getters.publicFolderItems, getters.publicDashboardItems, state.newIdList)),
         publicTreeControlButtonDisableMap: computed<Record<string, boolean>>(() => {

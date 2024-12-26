@@ -14,6 +14,7 @@ export const getPopoverArgs = (): Args => ({
     hideArrow: false,
     boundary: '',
     width: '',
+    minWidth: '',
     'v-model': false,
     defaultSlot: null,
     contentRefSlot: null,
@@ -187,6 +188,21 @@ export const getPopoverArgTypes = (): ArgTypes => {
             name: 'width',
             type: { name: 'string' },
             description: 'Width of the popover. If you set the value to `100%`, it would be calculated based on the width of the root element or the boundary element(when `boundary` props is set).',
+            table: {
+                type: {
+                    summary: 'string',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: false,
+                },
+            },
+            control: 'text',
+        },
+        minWidth: {
+            name: 'minWidth',
+            type: { name: 'string' },
+            description: 'minWidth of the popover. If the minWidth is not set, it would be calculated based on the width of the component it is applied to.',
             table: {
                 type: {
                     summary: 'string',

@@ -75,6 +75,7 @@ export const usePackageStore = defineStore('package', () => {
             if (prev) prev.is_default = false;
             const current = state.items?.find((p) => p.package_id === packageId);
             if (current) current.is_default = true;
+            if (state.items) state.items = [...state.items];
             return response;
         },
         async delete(packageId: string) {
