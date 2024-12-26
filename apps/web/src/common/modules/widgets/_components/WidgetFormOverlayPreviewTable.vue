@@ -5,6 +5,7 @@ import {
 } from 'vue';
 
 import bytes from 'bytes';
+import { sortBy } from 'lodash';
 
 import {
     PToolbox, PI, PSelectDropdown, PEmpty, PSpinner,
@@ -69,6 +70,7 @@ const state = reactive({
     dataInfo: computed<DataInfo|undefined>(() => storeState.selectedDataTable?.data_info),
     isPivot: computed<boolean>(() => storeState.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
     isAutoTypeColumnPivot: computed<boolean>(() => state.isPivot && !!storeState.selectedDataTable?.options?.[DATA_TABLE_OPERATOR.PIVOT]?.limit),
+    pivotSortKeys: computed<string[]>(() => (state.isPivot ? storeState.selectedDataTable?.sort_keys ?? [] : [])),
     fields: computed<PreviewTableField[]>(() => {
         if (!storeState.selectedDataTableId || !storeState.previewData?.results?.length) {
             return [{
@@ -77,8 +79,13 @@ const state = reactive({
             }];
         }
 
+        const sortBySortKeys = (targetArray: string[]): string[] => sortBy(targetArray, (item) => {
+            const index = state.pivotSortKeys.indexOf(item);
+            return index === -1 ? Infinity : index;
+        });
+
         return [
-            ...state.labelFields.map((key) => ({
+            ...sortBySortKeys(state.labelFields).map((key) => ({
                 type: 'LABEL',
                 name: key,
                 sortKey: key,
@@ -96,7 +103,7 @@ const state = reactive({
                 type: 'DIVIDER',
                 name: '',
             },
-            ...state.dataFields.map((key) => ({
+            ...sortBySortKeys(state.dataFields).map((key) => ({
                 type: 'DATA',
                 name: key,
             })),
