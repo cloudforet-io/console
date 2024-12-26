@@ -1,56 +1,81 @@
-import type { Ref } from 'vue';
-import { reactive, computed } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { DomainConfigGetParameters } from '@/schema/config/domain-config/api-verbs/get';
-import type { DomainConfigSetParameters } from '@/schema/config/domain-config/api-verbs/set';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { DomainConfigCreateParameters } from '@/schema/config/domain-config/api-verbs/create';
+import type { DomainConfigListParameters } from '@/schema/config/domain-config/api-verbs/list';
+import type { DomainConfigUpdateParameters } from '@/schema/config/domain-config/api-verbs/update';
+import { DOMAIN_CONFIG_NAMES } from '@/schema/config/domain-config/constant';
 import type { DomainConfigModel } from '@/schema/config/domain-config/model';
 
-import { DOMAIN_CONFIG_NAMES } from '@/store/config/constant';
-import type { DomainConfigKey } from '@/store/config/type';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
-
-interface UseDomainConfigStoreState {
-    domainConfigMap: Partial<Record<DomainConfigKey, DomainConfigModel>>;
-}
-type UseDomainConfigStoreGetters = Record<DomainConfigKey, Ref<DomainConfigModel|undefined>>;
+import type { PreferencesData, UnifiedCostConfig } from '@/services/advanced/types/preferences-type';
 
 export const useDomainConfigStore = defineStore('domain-config', () => {
-    const state = reactive<UseDomainConfigStoreState>({
-        domainConfigMap: {},
+    const state = reactive({
+        domainConfig: null as null|DomainConfigModel<PreferencesData>,
     });
-    const _getterObj = {} as UseDomainConfigStoreGetters;
-    Object.keys(DOMAIN_CONFIG_NAMES).forEach((key) => {
-        _getterObj[key] = computed<DomainConfigModel|undefined>(() => state.domainConfigMap[key]);
-    });
-    const getters = reactive<UseDomainConfigStoreGetters>(_getterObj);
 
-    const actions = {
-        async get<T extends Record<string, any> = Record<string, any>>(key: DomainConfigKey): Promise<DomainConfigModel<T>> {
-            const name = DOMAIN_CONFIG_NAMES[key];
-            if (state.domainConfigMap[key]) return state.domainConfigMap[key] as DomainConfigModel<T>;
-            const domainConfig = await SpaceConnector.client.config.domainConfig.get<DomainConfigGetParameters, DomainConfigModel<T>>({
-                name,
+    const getters = reactive({
+        displayName: computed<string|undefined>(() => state.domainConfig?.data?.display_name),
+        adminEmail: computed<string|undefined>(() => state.domainConfig?.data?.admin_email),
+        timezone: computed<string|undefined>(() => state.domainConfig?.data?.timezone),
+        language: computed<string|undefined>(() => state.domainConfig?.data?.language),
+        wordtypeLogoUrl: computed<string|undefined>(() => state.domainConfig?.data?.wordtype_logo_url),
+        symbolFaviconUrl: computed<string|undefined>(() => state.domainConfig?.data?.symbol_favicon_url),
+        loginPageImageUrl: computed<string|undefined>(() => state.domainConfig?.data?.login_page_image_url),
+        unifiedCostConfig: computed<UnifiedCostConfig|undefined>(() => state.domainConfig?.data?.unified_cost_config),
+    });
+
+    /* Actions */
+    const fetchPreferences = async () => {
+        try {
+            const res = await SpaceConnector.client.config.domainConfig.list<DomainConfigListParameters, ListResponse<DomainConfigModel>>({
+                name: DOMAIN_CONFIG_NAMES.SETTINGS,
             });
-            state.domainConfigMap = { ...state.domainConfigMap, [key]: domainConfig };
-            return domainConfig;
-        },
-        async set<T extends Record<string, any> = Record<string, any>>(key: DomainConfigKey, data: T) {
-            const name = DOMAIN_CONFIG_NAMES[key];
-            const domainConfig = await SpaceConnector.client.config.domainConfig.set<DomainConfigSetParameters, DomainConfigModel<T>>({
-                name,
+            state.domainConfig = res.results?.[0] ?? null;
+        } catch (e) {
+            ErrorHandler.handleError(e);
+            state.domainConfig = null;
+        }
+    };
+    const createPreferences = async (data: PreferencesData) => {
+        try {
+            state.domainConfig = await SpaceConnector.client.config.domainConfig.create<DomainConfigCreateParameters, DomainConfigModel>({
+                name: DOMAIN_CONFIG_NAMES.SETTINGS,
                 data,
             });
-            state.domainConfigMap = { ...state.domainConfigMap, [key]: domainConfig };
-            return domainConfig;
-        },
+        } catch (e) {
+            ErrorHandler.handleError(e);
+            throw e;
+        }
+    };
+    const updatePreferences = async (data: PreferencesData) => {
+        if (!state.domainConfig) {
+            await createPreferences(data);
+            return;
+        }
+        try {
+            state.domainConfig = await SpaceConnector.client.config.domainConfig.update<DomainConfigUpdateParameters, DomainConfigModel>({
+                name: DOMAIN_CONFIG_NAMES.SETTINGS,
+                data: {
+                    ...state.domainConfig.data,
+                    ...data,
+                },
+            });
+        } catch (e) {
+            ErrorHandler.handleError(e);
+            throw e;
+        }
+    };
 
-        reset() {
-            state.domainConfigMap = {};
-        },
+    const actions = {
+        fetchPreferences,
+        updatePreferences,
     };
 
     return {
