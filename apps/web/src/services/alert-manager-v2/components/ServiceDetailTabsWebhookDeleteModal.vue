@@ -6,6 +6,9 @@ import { PTextInput } from '@cloudforet/mirinae';
 
 import type { WebhookDeleteParameters } from '@/schema/alert-manager/webhook/api-verbs/delete';
 import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -42,6 +45,7 @@ const handleConfirm = async () => {
         await SpaceConnector.clientV2.alertManager.webhook.delete<WebhookDeleteParameters>({
             webhook_id: props.selectedItem?.webhook_id || '',
         });
+        showSuccessMessage(i18n.t('ALERT_MANAGER.WEBHOOK.ALT_S_DELETE_WEBHOOK'), '');
         state.proxyVisible = false;
         emit('close');
     } catch (e) {

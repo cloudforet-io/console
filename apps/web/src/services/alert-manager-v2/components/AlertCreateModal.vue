@@ -13,6 +13,9 @@ import { ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
 import { i18n } from '@/translations';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -84,7 +87,10 @@ const handleConfirm = async () => {
             service_id: state.selectedServiceId,
             urgency: state.radioMenuList[state.selectedRadioIdx].name,
         });
+        showSuccessMessage(i18n.t('ALERT_MANAGER.ALERTS.ALT_S_CREATE'), '');
         await alertPageStore.fetchAlertsList(storeState.alertListParams);
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
     } finally {
         state.loading = false;
         handleClose();

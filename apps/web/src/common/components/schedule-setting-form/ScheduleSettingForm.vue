@@ -109,7 +109,7 @@ watch([() => state.selectedRadioIdx, () => state.selectedDayButton, () => state.
         SCHEDULE_TYPE: state.scheduleTypeList[selectedRadioIdx].name,
         ...state.scheduleDayForm,
     });
-});
+}, { immediate: true });
 
 onMounted(() => {
     if (props.scheduleForm) {

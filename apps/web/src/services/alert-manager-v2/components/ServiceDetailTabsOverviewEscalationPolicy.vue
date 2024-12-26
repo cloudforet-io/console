@@ -66,7 +66,7 @@ const fetchEscalationPolicy = async () => {
             escalation_policy_id: storeState.escalationPolicyId,
         });
     } catch (e) {
-        ErrorHandler.handleError(e, true);
+        ErrorHandler.handleError(e);
         state.item = {};
     } finally {
         state.loading = false;

@@ -18,13 +18,10 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
 import type { ServiceChannelListParameters } from '@/schema/alert-manager/service-channel/api-verbs/list';
 import { SERVICE_CHANNEL_STATE } from '@/schema/alert-manager/service-channel/constants';
 import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
 import { i18n as _i18n } from '@/translations';
-
-import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
@@ -49,7 +46,7 @@ import {
 } from '@/services/alert-manager-v2/constants/notification-table-constant';
 import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
-import type { ProtocolInfo, NotificationsModalType } from '@/services/alert-manager-v2/types/alert-manager-type';
+import type { ProtocolInfo, NotificationsModalType, ProtocolCardItemType } from '@/services/alert-manager-v2/types/alert-manager-type';
 
 interface Props {
     tableHeight: number;
@@ -96,10 +93,9 @@ const tableState = reactive({
     fields: NOTIFICATION_MANAGEMENT_TABLE_FIELDS,
 });
 const storeState = reactive({
-    plugins: computed<PluginReferenceMap>(() => serviceDetailPageGetters.pluginsReferenceMap),
     timezone: computed<string>(() => serviceDetailPageGetters.timezone),
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
-    notificationProtocolList: computed<NotificationProtocolModel[]>(() => serviceDetailPageState.notificationProtocolList),
+    notificationProtocolList: computed<ProtocolCardItemType[]>(() => serviceDetailPageState.notificationProtocolList),
 });
 const state = reactive({
     loading: false,
@@ -120,10 +116,9 @@ const { queryTags } = queryTagHelper;
 
 const getProtocolInfo = (id: string): ProtocolInfo => {
     const protocol = storeState.notificationProtocolList.find((item) => item.protocol_id === id);
-    const plugin = storeState.plugins[protocol?.plugin_info.plugin_id || ''];
     return {
         name: protocol?.name || '',
-        icon: plugin?.icon || '',
+        icon: protocol?.icon || '',
     };
 };
 const handleCloseModal = () => {
@@ -176,7 +171,7 @@ const fetchNotificationList = async () => {
         state.items = results || [];
         state.totalCount = total_count || 0;
     } catch (e) {
-        ErrorHandler.handleError(e, true);
+        ErrorHandler.handleError(e);
         state.items = [];
         state.totalCount = 0;
     } finally {

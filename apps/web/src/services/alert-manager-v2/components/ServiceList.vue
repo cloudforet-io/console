@@ -139,7 +139,7 @@ const fetchServiceList = async () => {
         state.serviceList = results || [];
         state.totalCount = total_count || 0;
     } catch (e) {
-        ErrorHandler.handleError(e, true);
+        ErrorHandler.handleError(e);
         state.serviceList = [];
         state.totalCount = 0;
     } finally {
@@ -151,7 +151,7 @@ const fetchEscalationPolicy = async () => {
         const { results } = await SpaceConnector.clientV2.alertManager.escalationPolicy.list<EscalationPolicyListParameters, ListResponse<EscalationPolicyModel>>();
         state.escalationPolicyList = results || [];
     } catch (e) {
-        ErrorHandler.handleError(e, true);
+        ErrorHandler.handleError(e);
         state.escalationPolicyList = [];
     }
 };
@@ -160,7 +160,7 @@ const fetchWebhookList = async () => {
         const { results } = await SpaceConnector.clientV2.alertManager.webhook.list<WebhookListParameters, ListResponse<WebhookModel>>();
         state.webhookList = results || [];
     } catch (e) {
-        ErrorHandler.handleError(e, true);
+        ErrorHandler.handleError(e);
         state.webhookList = [];
     }
 };

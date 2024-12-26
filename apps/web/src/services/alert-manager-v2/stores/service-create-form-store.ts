@@ -2,17 +2,18 @@ import { reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
 import type { PluginModel } from '@/schema/repository/plugin/model';
+
+import type { ProtocolCardItemType } from '@/services/alert-manager-v2/types/alert-manager-type';
 
 interface ServiceFormStoreState {
     currentStep: number;
     currentSubStep: number;
     createdServiceId: string;
-    selectedWebhookType?: PluginModel;
+    selectedWebhookType: PluginModel;
     webhookName: string;
     webhookVersion?: string;
-    selectedProtocol?: NotificationProtocolModel;
+    selectedProtocol: ProtocolCardItemType;
 }
 
 export const useServiceCreateFormStore = defineStore('service-create-form', () => {
@@ -22,11 +23,11 @@ export const useServiceCreateFormStore = defineStore('service-create-form', () =
         // service
         createdServiceId: '',
         // webhook
-        selectedWebhookType: undefined,
+        selectedWebhookType: {} as PluginModel,
         webhookName: '',
         webhookVersion: undefined,
         // notification
-        selectedProtocol: undefined,
+        selectedProtocol: {} as ProtocolCardItemType,
     });
 
     const mutations = {
@@ -51,7 +52,7 @@ export const useServiceCreateFormStore = defineStore('service-create-form', () =
             state.webhookVersion = version;
         },
 
-        setSelectedProtocol(protocol: NotificationProtocolModel) {
+        setSelectedProtocol(protocol: ProtocolCardItemType) {
             state.selectedProtocol = protocol;
         },
     };
@@ -60,14 +61,14 @@ export const useServiceCreateFormStore = defineStore('service-create-form', () =
             state.currentStep = 1;
             state.currentSubStep = 1;
             state.createdServiceId = '';
-            state.selectedWebhookType = undefined;
+            state.selectedWebhookType = {} as PluginModel;
             state.webhookName = '';
             state.webhookVersion = undefined;
-            state.selectedProtocol = undefined;
+            state.selectedProtocol = {} as ProtocolCardItemType;
         },
         initStep2() {
             state.currentSubStep = 1;
-            state.selectedWebhookType = undefined;
+            state.selectedWebhookType = {} as PluginModel;
             state.webhookName = '';
         },
     };

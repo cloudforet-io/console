@@ -10,6 +10,9 @@ import {
 
 import type { EscalationPolicyDeleteParameters } from '@/schema/alert-manager/escalation-policy/api-verbs/delete';
 import type { EscalationPolicyModel } from '@/schema/alert-manager/escalation-policy/model';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -37,6 +40,7 @@ const handleConfirm = async () => {
         await SpaceConnector.clientV2.alertManager.escalationPolicy.delete<EscalationPolicyDeleteParameters>({
             escalation_policy_id: props.selectedItem.escalation_policy_id,
         });
+        showSuccessMessage(i18n.t('ALERT_MANAGER.ESCALATION_POLICY.ALT_S_DELETE_POLICY'), '');
         state.proxyVisible = false;
         emit('close');
     } catch (e) {

@@ -13,6 +13,8 @@ import { i18n } from '@/translations';
 
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -58,10 +60,12 @@ const handleConfirm = async () => {
             await SpaceConnector.clientV2.alertManager.webhook.disable<WebhookDisableParameters>({
                 webhook_id: props.selectedItem?.webhook_id || '',
             });
+            showSuccessMessage(i18n.t('ALERT_MANAGER.WEBHOOK.ALT_S_DISABLE_WEBHOOK'), '');
         } else {
             await SpaceConnector.clientV2.alertManager.webhook.enable<WebhookEnableParameters>({
                 webhook_id: props.selectedItem?.webhook_id || '',
             });
+            showSuccessMessage(i18n.t('ALERT_MANAGER.WEBHOOK.ALT_S_ENABLE_WEBHOOK'), '');
         }
         state.proxyVisible = false;
         emit('close');

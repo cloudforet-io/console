@@ -4,7 +4,7 @@ import type { ServiceChannelDataType, ServiceChannelScheduleInfoType } from '@/s
 export interface ServiceChannelCreateParameters {
     protocol_id: string;
     name: string;
-    data: ServiceChannelDataType;
+    data: ServiceChannelDataType | Record<string, any>;
     schedule?: ServiceChannelScheduleInfoType;
     tags?: Tags;
     service_id: string;

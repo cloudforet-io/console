@@ -13,6 +13,9 @@ import type { EscalationPolicyModel } from '@/schema/alert-manager/escalation-po
 import type { EscalationPolicyRulesType } from '@/schema/alert-manager/escalation-policy/type';
 import type { ServiceUpdateParameters } from '@/schema/alert-manager/service/api-verbs/update';
 import type { ServiceModel } from '@/schema/alert-manager/service/model';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -59,6 +62,7 @@ const handleConfirm = async () => {
             escalation_policy_id: props.selectedItem.escalation_policy_id,
             service_id: storeState.serviceId,
         });
+        showSuccessMessage(i18n.t('ALERT_MANAGER.SERVICE.ALT_S_UPDATE_SERVICE'), '');
         await serviceDetailPageStore.fetchServiceDetailData(storeState.serviceId);
         state.proxyVisible = false;
         emit('close');

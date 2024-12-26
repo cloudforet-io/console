@@ -5,16 +5,14 @@ import type { TranslateResult } from 'vue-i18n';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PTableCheckModal, PLazyImg, PStatus } from '@cloudforet/mirinae';
 
-import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
 import type { ServiceChannelDisableParameters } from '@/schema/alert-manager/service-channel/api-verbs/disable';
 import type { ServiceChannelEnableParameters } from '@/schema/alert-manager/service-channel/api-verbs/enable';
 import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
 import { WEBHOOK_STATE } from '@/schema/alert-manager/webhook/constants';
 import { i18n } from '@/translations';
 
-import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
-
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -22,7 +20,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { alertManagerStateFormatter } from '@/services/alert-manager-v2/composables/refined-table-data';
 import { NOTIFICATION_MANAGEMENT_TABLE_FIELDS } from '@/services/alert-manager-v2/constants/notification-table-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
-import type { ProtocolInfo } from '@/services/alert-manager-v2/types/alert-manager-type';
+import type { ProtocolInfo, ProtocolCardItemType } from '@/services/alert-manager-v2/types/alert-manager-type';
 
 interface Props {
     selectedItem?: ServiceChannelModel;
@@ -35,11 +33,9 @@ const props = withDefaults(defineProps<Props>(), {
 
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
-const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const storeState = reactive({
-    plugins: computed<PluginReferenceMap>(() => serviceDetailPageGetters.pluginsReferenceMap),
-    notificationProtocolList: computed<NotificationProtocolModel[]>(() => serviceDetailPageState.notificationProtocolList),
+    notificationProtocolList: computed<ProtocolCardItemType[]>(() => serviceDetailPageState.notificationProtocolList),
 });
 
 const emit = defineEmits<{(e: 'close'): void;
@@ -59,10 +55,9 @@ const state = reactive({
 
 const getProtocolInfo = (id: string): ProtocolInfo => {
     const protocol = storeState.notificationProtocolList.find((item) => item.protocol_id === id);
-    const plugin = storeState.plugins[protocol?.plugin_info.plugin_id || ''];
     return {
         name: protocol?.name || '',
-        icon: plugin?.icon || '',
+        icon: protocol?.icon || '',
     };
 };
 const handleConfirm = async () => {
@@ -72,10 +67,12 @@ const handleConfirm = async () => {
             await SpaceConnector.clientV2.alertManager.serviceChannel.disable<ServiceChannelDisableParameters>({
                 channel_id: props.selectedItem?.channel_id || '',
             });
+            showSuccessMessage(i18n.t('ALERT_MANAGER.NOTIFICATIONS.ALT_S_DISABLED'), '');
         } else {
             await SpaceConnector.clientV2.alertManager.serviceChannel.enable<ServiceChannelEnableParameters>({
                 channel_id: props.selectedItem?.channel_id || '',
             });
+            showSuccessMessage(i18n.t('ALERT_MANAGER.NOTIFICATIONS.ALT_S_ENABLED'), '');
         }
         state.proxyVisible = false;
         emit('close');

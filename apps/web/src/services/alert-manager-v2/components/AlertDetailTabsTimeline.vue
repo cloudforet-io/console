@@ -73,7 +73,7 @@ const fetchHistoryList = async () => {
         });
         state.historyList = results || [];
     } catch (e: any) {
-        ErrorHandler.handleError(e, true);
+        ErrorHandler.handleError(e);
         state.historyList = [];
     } finally {
         state.loading = false;

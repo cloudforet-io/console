@@ -13,6 +13,8 @@ import type { ServiceModel } from '@/schema/alert-manager/service/model';
 import type { NotificationUrgencyType, RecoveryModeType } from '@/schema/alert-manager/service/type';
 import { i18n } from '@/translations';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -100,6 +102,7 @@ const handleConfirm = async () => {
             service_id: storeState.serviceInfo.service_id,
             options,
         });
+        showSuccessMessage(i18n.t('ALERT_MANAGER.SERVICE.ALT_S_UPDATE_SERVICE'), '');
         await serviceDetailPageStore.fetchServiceDetailData(storeState.serviceInfo.service_id);
         state.proxyVisible = false;
     } catch (e) {

@@ -15,6 +15,7 @@ import type { ServiceUpdateParameters } from '@/schema/alert-manager/service/api
 import { NOTIFICATION_URGENCY, RECOVERY_MODE, SERVICE_ALERTS_TYPE } from '@/schema/alert-manager/service/constants';
 import type { ServiceModel } from '@/schema/alert-manager/service/model';
 import type { AlertsInfoType, AlertsType } from '@/schema/alert-manager/service/type';
+import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
@@ -22,17 +23,19 @@ import type { UserGroupReferenceMap } from '@/store/reference/user-group-referen
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager-v2/constants/common-constant';
-import type { ServiceDetailTabsType, Service } from '@/services/alert-manager-v2/types/alert-manager-type';
+import type { ServiceDetailTabsType, Service, ProtocolCardItemType } from '@/services/alert-manager-v2/types/alert-manager-type';
 
 interface ServiceFormStoreState {
     loading: boolean;
     currentTab: ServiceDetailTabsType;
     serviceInfo: ServiceModel;
     serviceList: ServiceModel[];
-    notificationProtocolList: NotificationProtocolModel[];
+    notificationProtocolList: ProtocolCardItemType[];
     selectedWebhookId?: string;
     selectedNotificationId?: string;
 }
@@ -122,8 +125,9 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
                     service_id: id,
                 });
             } catch (e) {
-                ErrorHandler.handleError(e, true);
+                ErrorHandler.handleError(e);
                 state.serviceInfo = {} as ServiceModel;
+                throw e;
             } finally {
                 state.loading = false;
             }
@@ -134,6 +138,7 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
                     service_id: getters.serviceInfo.service_id,
                     name,
                 });
+                showSuccessMessage(i18n.t('ALERT_MANAGER.SERVICE.ALT_S_UPDATE_SERVICE'), '');
             } catch (e) {
                 ErrorHandler.handleError(e, true);
                 state.serviceInfo = {} as ServiceModel;
@@ -146,6 +151,7 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
                 });
             } catch (e) {
                 ErrorHandler.handleError(e, true);
+                throw e;
             }
         },
         async fetchServiceList() {
@@ -160,7 +166,10 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
         async fetchNotificationProtocolList() {
             try {
                 const { results } = await SpaceConnector.clientV2.alertManager.notificationProtocol.list<NotificationProtocolListParameters, ListResponse<NotificationProtocolModel>>();
-                state.notificationProtocolList = results || [];
+                state.notificationProtocolList = (results || []).map((i) => ({
+                    ...i,
+                    icon: getters.pluginsReferenceMap.value[i.plugin_info.plugin_id || ''],
+                }));
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.notificationProtocolList = [];

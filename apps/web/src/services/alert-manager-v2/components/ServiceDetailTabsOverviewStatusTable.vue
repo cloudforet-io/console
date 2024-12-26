@@ -102,7 +102,7 @@ const fetchAlertsList = async () => {
         });
         tableState.alertsList = results || [];
     } catch (e) {
-        ErrorHandler.handleError(e, true);
+        ErrorHandler.handleError(e);
         tableState.alertsList = [];
     } finally {
         tableState.loading = false;

@@ -8,7 +8,6 @@ import {
 } from '@cloudforet/mirinae';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
-import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
 import type { ServiceChannelGetParameters } from '@/schema/alert-manager/service-channel/api-verbs/get';
 import {
     SERVICE_CHANNEL_FORWARD_TYPE,
@@ -18,12 +17,11 @@ import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel
 import type { ServiceChannelScheduleInfoType, ServiceChannelScheduleDayType } from '@/schema/alert-manager/service-channel/type';
 import { i18n } from '@/translations';
 
-import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 import type { UserGroupReferenceMap } from '@/store/reference/user-group-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
-import type { ScheduleDayType } from '@/common/components/schedule-setting-form/schedule-setting-form';
+import type { DayType } from '@/common/components/schedule-setting-form/schedule-setting-form';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { alertManagerStateFormatter } from '@/services/alert-manager-v2/composables/refined-table-data';
@@ -32,7 +30,7 @@ import {
 } from '@/services/alert-manager-v2/constants/common-constant';
 import { NOTIFICATION_DEFINITION_FIELDS } from '@/services/alert-manager-v2/constants/notification-table-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager-v2/stores/service-detail-page-store';
-import type { ProtocolInfo, WebhookDetailTabsType } from '@/services/alert-manager-v2/types/alert-manager-type';
+import type { ProtocolInfo, WebhookDetailTabsType, ProtocolCardItemType } from '@/services/alert-manager-v2/types/alert-manager-type';
 
 type ScheduleInfo = {
     styleType: string;
@@ -53,13 +51,12 @@ const tabState = reactive({
 });
 const storeState = reactive({
     selectedNotificationId: computed<string|undefined>(() => serviceDetailPageState.selectedNotificationId),
-    notificationProtocolList: computed<NotificationProtocolModel[]>(() => serviceDetailPageState.notificationProtocolList),
-    plugins: computed<PluginReferenceMap>(() => serviceDetailPageGetters.pluginsReferenceMap),
+    notificationProtocolList: computed<ProtocolCardItemType[]>(() => serviceDetailPageState.notificationProtocolList),
     userGroup: computed<UserGroupReferenceMap>(() => serviceDetailPageGetters.userGroupReferenceMap),
 });
 const state = reactive({
     notificationInfo: {} as ServiceChannelModel,
-    dayMapping: computed<Record<ScheduleDayType, TranslateResult>>(() => ({
+    dayMapping: computed<Record<DayType, TranslateResult>>(() => ({
         MON: i18n.t('ALERT_MANAGER.NOTIFICATIONS.MONDAY'),
         TUE: i18n.t('ALERT_MANAGER.NOTIFICATIONS.TUESDAY'),
         WED: i18n.t('ALERT_MANAGER.NOTIFICATIONS.WEDNESDAY'),
@@ -72,10 +69,9 @@ const state = reactive({
 
 const getProtocolInfo = (id: string): ProtocolInfo => {
     const protocol = storeState.notificationProtocolList.find((item) => item.protocol_id === id);
-    const plugin = storeState.plugins[protocol?.plugin_info.plugin_id || ''];
     return {
         name: protocol?.name || '',
-        icon: plugin?.icon || '',
+        icon: protocol?.icon || '',
     };
 };
 const getUserGroupName = (userGroup: string[] = []): string => userGroup.map((group) => {
@@ -126,7 +122,7 @@ const fetchNotificationDetail = async (selectedId: string) => {
             channel_id: selectedId,
         });
     } catch (e) {
-        ErrorHandler.handleError(e, true);
+        ErrorHandler.handleError(e);
         state.notificationInfo = {} as ServiceChannelModel;
     }
 };

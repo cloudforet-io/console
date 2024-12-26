@@ -13,6 +13,9 @@ import type { NoteCreateParameters } from '@/schema/alert-manager/note/api-verbs
 import type { NoteDeleteParameters } from '@/schema/alert-manager/note/api-verbs/delete';
 import type { NoteListParameters } from '@/schema/alert-manager/note/api-verbs/list';
 import type { NoteModel } from '@/schema/alert-manager/note/model';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -51,6 +54,7 @@ const handleCreateNote = async () => {
             alert_id: storeState.alertInfo.alert_id,
             note: state.noteInput,
         });
+        showSuccessMessage(i18n.t('ALERT_MANAGER.ALERTS.ALT_S_NOTE_CREATE'), '');
         await fetchNoteList();
     } catch (e: any) {
         ErrorHandler.handleError(e, true);
@@ -63,6 +67,7 @@ const handleDeleteModal = async () => {
         await SpaceConnector.clientV2.alertManager.note.delete<NoteDeleteParameters, NoteModel>({
             note_id: state.selectedNoteId,
         });
+        showSuccessMessage(i18n.t('ALERT_MANAGER.ALERTS.ALT_S_NOTE_DELETE'), '');
         await fetchNoteList();
     } catch (e: any) {
         ErrorHandler.handleError(e, true);
@@ -77,8 +82,9 @@ const fetchNoteList = async () => {
         });
         state.noteList = results || [];
     } catch (e: any) {
-        ErrorHandler.handleError(e, true);
+        ErrorHandler.handleError(e);
         state.noteList = [];
+        throw e;
     }
 };
 

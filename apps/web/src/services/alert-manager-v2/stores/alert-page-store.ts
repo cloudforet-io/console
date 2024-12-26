@@ -54,8 +54,9 @@ export const useAlertPageStore = defineStore('page-alert', () => {
                     label: i.name,
                 }));
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.serviceList = [];
-                ErrorHandler.handleError(e, true);
+                throw e;
             }
         },
 
