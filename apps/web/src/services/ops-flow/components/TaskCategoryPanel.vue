@@ -31,18 +31,18 @@ const state = reactive({
         {
             name: 'name',
             label: _i18n.t('OPSFLOW.NAME') as string,
-            width: '20%',
+            width: '30%',
         },
         {
             name: 'package',
             label: _i18n.t('OPSFLOW.PACKAGE') as string,
-            width: '10%',
+            width: '25%',
             sortable: true,
         },
         {
             name: 'description',
             label: _i18n.t('OPSFLOW.DESCRIPTION') as string,
-            width: '60%',
+            width: '45%',
         },
         {
             name: 'buttons',
