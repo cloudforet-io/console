@@ -23,12 +23,13 @@ import {
     ref, computed, onBeforeMount, onUnmounted,
     // eslint-disable-next-line import/no-duplicates
 } from 'vue';
-import { useRoute, onBeforeRouteLeave } from 'vue-router/composables';
+import { useRouter, useRoute, onBeforeRouteLeave } from 'vue-router/composables';
 
 import {
     PHeadingLayout, PHeading, PButton, PPaneLayout, PSkeleton,
 } from '@cloudforet/mirinae';
 
+import type { TaskModel } from '@/schema/opsflow/task/model';
 import { i18n as _i18n } from '@/translations';
 
 import { queryStringToString } from '@/lib/router-query-string';
@@ -56,6 +57,7 @@ const taskContentFormGetters = taskContentFormStore.getters;
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
 /* route and query */
+const router = useRouter();
 const route = useRoute();
 const { getProperRouteLocation } = useProperRouteLocation();
 const categoryId = computed<TaskCreatePageQueryValue['categoryId']>(() => queryStringToString(route.query.categoryId));
@@ -65,30 +67,40 @@ const taskTypeId = computed<TaskCreatePageQueryValue['taskTypeId']>(() => queryS
 const loading = false; // computed<boolean>(() => taskCategoryStore.getters.loading);
 const headerTitle = computed<string>(() => _i18n.t('OPSFLOW.CREATE_TARGET', { target: taskManagementTemplateStore.templates.Task }) as string);
 const {
+    pathFrom,
     setPathFrom,
     goBack,
 } = useGoBack(getProperRouteLocation({
     name: OPS_FLOW_ROUTE.BOARD._NAME,
     query: { categoryId: categoryId.value } as BoardPageQuery,
 }));
+const handleClickBack = () => {
+    if (pathFrom.value?.name === OPS_FLOW_ROUTE.LANDING._NAME) {
+        router.back();
+        return;
+    }
+    goBack();
+};
 
 /* confirm leave modal */
-const hasCreated = ref(false);
+const createdTask = ref<TaskModel|undefined>(undefined);
 const {
     isConfirmLeaveModalVisible,
     handleBeforeRouteLeave,
     confirmRouteLeave,
     stopRouteLeave,
 } = useConfirmRouteLeave({
-    passConfirmation: computed(() => !taskContentFormState.hasUnsavedChanges || hasCreated.value),
+    passConfirmation: computed(() => !taskContentFormState.hasUnsavedChanges || !!createdTask.value),
 });
 onBeforeRouteLeave(handleBeforeRouteLeave);
 
 /* form button handling */
 const handleConfirm = async () => {
     if (!taskContentFormGetters.isAllValid) return;
-    hasCreated.value = await taskContentFormStore.createTask();
-    if (hasCreated.value) goBack();
+    createdTask.value = await taskContentFormStore.createTask();
+    if (createdTask.value) {
+        goBack();
+    }
 };
 
 /* lifecycle */
@@ -111,7 +123,7 @@ defineExpose({ setPathFrom });
         <p-heading-layout class="mb-6">
             <template #heading>
                 <p-heading show-back-button
-                           @click-back-button="goBack"
+                           @click-back-button="handleClickBack"
                 >
                     <p-skeleton v-if="loading"
                                 height="1.75rem"
