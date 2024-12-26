@@ -45,6 +45,11 @@ jobs:
           git fetch origin ${{ github.event.pull_request.base.ref }} --depth=1
           git diff --name-only origin/${{ github.event.pull_request.base.sha }} ${{ github.sha }} | rsync --files-from=- ./ changed_files/
 
+      - name: Display changed files
+        run: |
+          echo "Changed files copied to 'changed_files' directory:"
+          find changed_files -type f
+
       - name: Check for TODOs
         id: check_todo
         working-directory: changed_files
