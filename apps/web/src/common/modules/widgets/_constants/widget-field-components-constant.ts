@@ -22,6 +22,7 @@ import numberFormat from '@/common/modules/widgets/_widget-fields/number-format/
 import pieChartType from '@/common/modules/widgets/_widget-fields/pie-chart-type/WidgetFieldPieChartType.vue';
 import stackBy from '@/common/modules/widgets/_widget-fields/stack-by/WidgetFieldStackBy.vue';
 import subTotal from '@/common/modules/widgets/_widget-fields/sub-total/WidgetFieldSubTotal.vue';
+import tableColumnComparison from '@/common/modules/widgets/_widget-fields/table-column-comparison/WidgetFieldTableColumnComparison.vue';
 import tableColumnWidth from '@/common/modules/widgets/_widget-fields/table-column-width/WidgetFieldTableColumnWidth.vue';
 import textWrap from '@/common/modules/widgets/_widget-fields/text-wrap/WidgetFieldTextWrap.vue';
 import tooltipNumberFormat from '@/common/modules/widgets/_widget-fields/tooltip-number-format/WidgetFieldTooltipNumberFormat.vue';
@@ -48,6 +49,7 @@ export const WIDGET_FIELD_COMPONENTS: Record<Partial<WidgetFieldName>, Component
     subTotal,
     total,
     comparison,
+    tableColumnComparison,
     granularity,
     colorSchema,
     pieChartType,

@@ -24,6 +24,7 @@ import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/
 import type { PieChartTypeValue } from '@/common/modules/widgets/_widget-fields/pie-chart-type/type';
 import type { StackByValue } from '@/common/modules/widgets/_widget-fields/stack-by/type';
 import type { SubTotalValue } from '@/common/modules/widgets/_widget-fields/sub-total/type';
+import type { TableColumnComparisonValue } from '@/common/modules/widgets/_widget-fields/table-column-comparison/type';
 import type { TableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/table-column-width/type';
 import type { TextWrapValue } from '@/common/modules/widgets/_widget-fields/text-wrap/type';
 import type { TooltipNumberFormatValue } from '@/common/modules/widgets/_widget-fields/tooltip-number-format/type';
@@ -74,6 +75,7 @@ export interface WidgetFieldTypeMap {
     dataField: WidgetFieldValue<DataFieldValue>;
     customTableColumnWidth: WidgetFieldValue<CustomTableColumnWidthValue>;
     comparison: WidgetFieldValue<ComparisonValue>;
+    tableColumnComparison: WidgetFieldValue<TableColumnComparisonValue>;
     colorSchema: WidgetFieldValue<ColorSchemaValue>;
     categoryBy: WidgetFieldValue<CategoryByValue>;
 }

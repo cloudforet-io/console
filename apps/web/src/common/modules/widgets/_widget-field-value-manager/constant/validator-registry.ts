@@ -20,6 +20,7 @@ import type { IconValue } from '@/common/modules/widgets/_widget-fields/icon/typ
 import type { MaxValue } from '@/common/modules/widgets/_widget-fields/max/type';
 import type { MinValue } from '@/common/modules/widgets/_widget-fields/min/type';
 import type { StackByValue, StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
+import type { TableColumnComparisonValue } from '@/common/modules/widgets/_widget-fields/table-column-comparison/type';
 import type { TableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/table-column-width/type';
 import type { XAxisValue, XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { YAxisValue, YAxisOptions } from '@/common/modules/widgets/_widget-fields/y-axis/type';
@@ -98,6 +99,12 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
     comparison: (fieldValue: ComparisonValue) => {
         if (fieldValue.toggleValue) {
             return !!fieldValue.decreaseColor && !!fieldValue.increaseColor && !!fieldValue.format;
+        }
+        return true;
+    },
+    tableColumnComparison: (fieldValue: TableColumnComparisonValue) => {
+        if (fieldValue.toggleValue) {
+            return !!fieldValue.decreaseColor && !!fieldValue.increaseColor && !!fieldValue.format && !!fieldValue.fields?.length;
         }
         return true;
     },
