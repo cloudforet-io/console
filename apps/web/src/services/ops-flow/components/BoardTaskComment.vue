@@ -22,7 +22,6 @@ import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useTimezoneDate } from '@/common/composables/timezone-date';
 
-import { useMention } from '@/services/ops-flow/composables/use-mention';
 import { useCommentStore } from '@/services/ops-flow/stores/comment-store';
 import { useTaskDetailPageStore } from '@/services/ops-flow/stores/task-detail-page-store';
 
