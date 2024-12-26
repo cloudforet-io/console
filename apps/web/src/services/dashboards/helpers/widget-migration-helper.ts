@@ -33,7 +33,7 @@ const _migrateXYChart = (widget: PublicWidgetModel|PrivateWidgetModel, groupByFi
                 tableDataField: {
                     fieldType: 'dynamicField',
                     dynamicFieldInfo: {
-                        criteria: _options.dataField,
+                        criteria: _options?.dataField,
                         fieldValue: _options[groupByField].value,
                         valueType: 'auto',
                         count: _options?.[groupByField]?.count || 5,
@@ -47,7 +47,7 @@ const _migrateXYChart = (widget: PublicWidgetModel|PrivateWidgetModel, groupByFi
                 tableDataField: {
                     fieldType: 'staticField',
                     staticFieldInfo: {
-                        fieldValue: [_options.dataField],
+                        fieldValue: [_options?.dataField],
                     },
                     version: 'v1',
                 } as TableDataFieldValueV1,
@@ -59,7 +59,7 @@ const _migrateXYChart = (widget: PublicWidgetModel|PrivateWidgetModel, groupByFi
     const _tableDataFieldNoVersionToTableDataFieldV1 = () => {
         _options = {
             ..._options,
-            tableDataField: migrateTableDataField(_options.tableDataField),
+            tableDataField: migrateTableDataField(_options?.tableDataField),
         };
     };
     if ('dataField' in _options) {
@@ -71,7 +71,7 @@ const _migrateXYChart = (widget: PublicWidgetModel|PrivateWidgetModel, groupByFi
 
     // Legend version migration
     // no version
-    if (_options?.legend && !_options.legend?.toggleValue) {
+    if (_options?.legend && !_options?.legend?.toggleValue) {
         _options = {
             ..._options,
             legend: {
@@ -99,7 +99,7 @@ const _migrateClusteredColumnChart = (widget: PublicWidgetModel|PrivateWidgetMod
             tableDataField: {
                 fieldType: 'staticField',
                 staticFieldInfo: {
-                    fieldValue: _options.dataField,
+                    fieldValue: _options?.dataField,
                 },
                 version: 'v1',
             },
@@ -109,7 +109,7 @@ const _migrateClusteredColumnChart = (widget: PublicWidgetModel|PrivateWidgetMod
     const _tableDataFieldNoVersionToTableDataFieldV1 = () => {
         _options = {
             ..._options,
-            tableDataField: migrateTableDataField(_options.tableDataField),
+            tableDataField: migrateTableDataField(_options?.tableDataField),
         };
     };
     if ('dataField' in _options) {
@@ -137,10 +137,10 @@ const _migrateHeatmap = (widget: PublicWidgetModel|PrivateWidgetModel): PublicWi
             tableDataField: {
                 fieldType: 'dynamicField',
                 dynamicFieldInfo: {
-                    criteria: _options.dataField,
-                    fieldValue: _options.yAxis?.value,
+                    criteria: _options?.dataField,
+                    fieldValue: _options?.yAxis?.value,
                     valueType: 'auto',
-                    count: _options.yAxis?.count || 7,
+                    count: _options?.yAxis?.count || 7,
                 },
                 version: 'v1',
             } as TableDataFieldValueV1,
@@ -175,7 +175,7 @@ const migrateTable = (widget: PublicWidgetModel|PrivateWidgetModel): PublicWidge
     // Comparison version migration
     _options = {
         ..._options,
-        comparison: migrateComparison(_options.comparison),
+        comparison: migrateComparison(_options?.comparison),
     };
     return {
         ...widget,
@@ -192,7 +192,7 @@ const migrateNumberCard = (widget: PublicWidgetModel|PrivateWidgetModel): Public
     // Comparison version migration
     _options = {
         ..._options,
-        comparison: migrateComparison(_options.comparison),
+        comparison: migrateComparison(_options?.comparison),
     };
     return {
         ...widget,
