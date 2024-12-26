@@ -63,7 +63,7 @@ const taskTypeId = computed<TaskCreatePageQueryValue['taskTypeId']>(() => queryS
 
 /* header and back button */
 const loading = false; // computed<boolean>(() => taskCategoryStore.getters.loading);
-const headerTitle = computed<string>(() => _i18n.t('OPSFLOW.CREATE_TARGET', { target: taskManagementTemplateStore.templates.Task }));
+const headerTitle = computed<string>(() => _i18n.t('OPSFLOW.CREATE_TARGET', { target: taskManagementTemplateStore.templates.Task }) as string);
 const {
     setPathFrom,
     goBack,

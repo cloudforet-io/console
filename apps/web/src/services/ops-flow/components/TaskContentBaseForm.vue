@@ -10,6 +10,7 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 
 import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
 import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
+import type { TaskModel } from '@/schema/opsflow/task/model';
 import { i18n } from '@/translations';
 
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
@@ -176,9 +177,13 @@ const initRelatedFieldsByTaskTypeSelection = (category: TaskCategoryModel, taskT
     taskContentFormStore.setStatusId(defaultStatus?.status_id);
 };
 
+let hasInitiated = false;
+
 /* initiation for 'view' mode */
-watch([() => taskContentFormState.originTask, () => taskContentFormGetters.currentCategory, () => taskContentFormState.currentTaskType], async ([task, category, taskType]) => {
-    if (taskContentFormState.mode !== 'view' || !task || !category || !taskType) return;
+const initForViewMode = (task?: TaskModel, category?: TaskCategoryModel, taskType?: TaskTypeModel) => {
+    if (hasInitiated) return;
+
+    if (!task || !category || !taskType) return;
     // set category
     setInitialCategory(task.category_id);
     // set task type
@@ -186,14 +191,15 @@ watch([() => taskContentFormState.originTask, () => taskContentFormGetters.curre
     // set status
     const statusOption = category.status_options[task.status_type]?.find((status) => status.status_id === task.status_id);
     setInitialStatus(statusOption);
-}, { immediate: true });
+
+    hasInitiated = true;
+};
 
 /* initiation for 'create' mode with initial category, task type */
-let hasInitiated = false;
-watch([() => taskContentFormState.currentCategoryId, () => taskContentFormState.currentTaskType], async ([categoryId, taskType]) => {
+const initForCreateMode = async (categoryId?: string, taskType?: TaskTypeModel) => {
     if (hasInitiated) return;
 
-    if (taskContentFormState.mode === 'create' && categoryId) {
+    if (categoryId) {
         await setInitialCategory(categoryId);
         // init selected status
         const category = taskContentFormGetters.currentCategory;
@@ -203,15 +209,40 @@ watch([() => taskContentFormState.currentCategoryId, () => taskContentFormState.
             taskContentFormStore.setStatusId(defaultStatus?.status_id);
         } else {
             ErrorHandler.handleError(new Error('Failed to get category'));
+            hasInitiated = true;
+            return;
         }
         // init task type
         if (taskType) setInitialTaskType(taskType);
 
         // reset validations
         resetValidations();
-    }
 
-    hasInitiated = true;
+        hasInitiated = true;
+    }
+};
+
+let viewModeInitWatchStop;
+let createModeInitWatchStop;
+
+viewModeInitWatchStop = watch([
+    () => taskContentFormState.originTask,
+    () => taskContentFormGetters.currentCategory,
+    () => taskContentFormState.currentTaskType], async ([task, category, taskType]) => {
+    if (hasInitiated && viewModeInitWatchStop) {
+        viewModeInitWatchStop();
+        viewModeInitWatchStop = null;
+        return;
+    }
+    if (taskContentFormState.mode === 'view') initForViewMode(task, category, taskType);
+}, { immediate: true });
+createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, () => taskContentFormState.currentTaskType], async ([categoryId, taskType]) => {
+    if (hasInitiated && createModeInitWatchStop) {
+        createModeInitWatchStop();
+        createModeInitWatchStop = undefined;
+        return;
+    }
+    if (taskContentFormState.mode === 'create') await initForCreateMode(categoryId, taskType);
 }, { immediate: true });
 </script>
 

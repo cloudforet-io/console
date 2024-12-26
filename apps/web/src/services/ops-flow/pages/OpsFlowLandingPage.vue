@@ -75,8 +75,9 @@ const goToTaskCreatePage = () => {
 
 onMounted(async () => {
     loading.value = true;
-    const allCategories = await taskCategoryStore.list(true);
-    if (!allCategories || !allCategories.length) {
+    let allCategories = await taskCategoryStore.list(true) ?? [];
+    allCategories = allCategories.filter((c) => c.state !== 'DELETED');
+    if (!allCategories.length) {
         loading.value = false;
         return;
     }
