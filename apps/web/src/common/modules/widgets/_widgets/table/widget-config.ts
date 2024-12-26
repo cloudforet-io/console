@@ -28,7 +28,6 @@ const table: WidgetConfig = {
         },
     },
     optionalFieldsSchema: {
-        comparison: {},
         total: {
             options: {
                 toggle: false,
@@ -46,6 +45,7 @@ const table: WidgetConfig = {
         //     },
         // },
         dateFormat: {},
+        tableColumnComparison: {},
         numberFormat: {
             options: {
                 default: NUMBER_FORMAT.FULL_NUMBER,
