@@ -111,8 +111,8 @@ jobs:
           else
             echo "No console.debug found."
           fi
-          echo "::warning:: Found DEBUG_COUNT file(s) with console.debug."
-          echo "console_debug_count=DEBUG_COUNT" >> $GITHUB_ENV
+          echo "::warning:: Found $DEBUG_COUNT file(s) with console.debug."
+          echo "console_debug_count=$DEBUG_COUNT" >> $GITHUB_ENV
 
       - name: Fail if issues found
         run: |
