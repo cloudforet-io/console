@@ -23,9 +23,6 @@ import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
 import { sortObjectByKeys } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
-import {
-    getPreviousDateRange,
-} from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { getWidgetDataTable } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/comparison/type';
 import type { CustomTableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
@@ -44,7 +41,7 @@ import type { TotalValue } from '@/common/modules/widgets/_widget-fields/total/t
 import WidgetDataTable from '@/common/modules/widgets/_widgets/table/_component/WidgetDataTable.vue';
 import type { TableWidgetField } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
-    DateRange, TableDataItem,
+    TableDataItem,
 } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
@@ -71,7 +68,6 @@ const state = reactive({
     thisPage: 1 as number,
     sortBy: [] as Sort[],
     dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
-    comparisonDateRange: computed<DateRange>(() => getPreviousDateRange(widgetOptionsState.granularityInfo?.granularity, dateRange.value)),
     isComparisonEnabled: computed<boolean>(() => !!(widgetOptionsState.comparisonInfo?.toggleValue)),
     dataInfo: computed<DataInfo|undefined>(() => state.dataTable?.data_info),
     tableFields: computed<TableWidgetField[]>(() => {

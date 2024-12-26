@@ -79,7 +79,7 @@ const state = reactive({
     isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
     dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
 
-    data: null as Data | null,
+    data: computed<Data | null>(() => queryResult?.data?.value || null),
     chart: null as EChartsType | null,
     chartData: [] as ChartData[],
     unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[widgetOptionsState.dataFieldInfo?.data as string]),
@@ -241,7 +241,7 @@ const drawChart = (rawData: Data|null) => {
     const _groupByData = groupBy(rawData.results || [], widgetOptionsState.groupByInfo?.data);
     let _refinedData: ChartData[] = Object.entries(_groupByData).map(([k, v]) => ({
         name: k,
-        value: sumBy(v, widgetOptionsState.groupByInfo?.data),
+        value: sumBy(v, widgetOptionsState.groupByInfo?.data as string),
     }));
     if (isDateField(state.groupByField)) {
         _refinedData = orderBy(_refinedData, 'name', 'desc');

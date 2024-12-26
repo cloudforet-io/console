@@ -180,7 +180,7 @@ const fetchWidgetData = async (params: PrivateWidgetLoadParameters|PublicWidgetL
 };
 
 const queryKey = computed(() => [
-    'widget-load-line-chart',
+    state.isAreaChart ? 'widget-load-area-chart' : 'widget-load-line-chart',
     props.widgetId,
     {
         start: dateRange.value.start,
