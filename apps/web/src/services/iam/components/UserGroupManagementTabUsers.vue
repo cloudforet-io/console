@@ -16,6 +16,12 @@ import { USER_GROUP_MODAL_TYPE, USER_GROUP_USERS_SEARCH_HANDLERS } from '@/servi
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 import type { UserListItemType } from '@/services/iam/types/user-type';
 
+interface Props {
+  hasReadWriteAccess: boolean;
+}
+
+const props = defineProps<Props>();
+
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 const userGroupPageGetters = userGroupPageStore.getters;
@@ -110,7 +116,9 @@ watch(() => userGroupPageState.users, (nv_users) => {
                            :title="`${i18n.t('IAM.USER_GROUP.TAB.USERS.TITLE')}`"
                 />
             </template>
-            <template #extra>
+            <template v-if="props.hasReadWriteAccess"
+                      #extra
+            >
                 <div class="toolbox-wrapper">
                     <div class="toolbox">
                         <p-button style-type="tertiary"

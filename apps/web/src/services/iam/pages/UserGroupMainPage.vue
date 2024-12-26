@@ -2,6 +2,8 @@
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PHorizontalLayout } from '@cloudforet/mirinae';
 
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
+
 import UserGroupChannelCreateModal from '@/services/iam/components/UserGroupChannelCreateModal.vue';
 import UserGroupChannelDeleteDoubleCheckModal
     from '@/services/iam/components/UserGroupChannelDeleteDoubleCheckModal.vue';
@@ -17,6 +19,8 @@ import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-stor
 
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
+
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const userGroupListApiQueryHelper = new ApiQueryHelper()
     .setSort('name', true);
@@ -37,19 +41,31 @@ const refreshUserGroupList = async () => {
 
 <template>
     <section class="user-group-page">
-        <user-group-management-header />
+        <user-group-management-header :has-read-write-access="hasReadWriteAccess" />
         <p-horizontal-layout class="user-group-toolbox-layout">
             <template #container="{height}">
-                <user-group-management-table :table-height="height" />
+                <user-group-management-table :table-height="height"
+                                             :has-read-write-access="hasReadWriteAccess"
+                />
             </template>
         </p-horizontal-layout>
-        <user-group-management-tab />
-        <user-group-management-edit-modal @confirm="refreshUserGroupList" />
-        <user-group-management-add-users-modal @confirm="refreshUserGroupList" />
-        <user-group-delete-double-check-modal @confirm="refreshUserGroupList" />
-        <user-per-group-remove-double-check-modal @confirm="refreshUserGroupList" />
-        <user-group-channel-create-modal />
-        <user-group-channel-set-modal @confirm="refreshUserGroupList" />
+        <user-group-management-tab :has-read-write-access="hasReadWriteAccess" />
+        <user-group-management-edit-modal v-if="hasReadWriteAccess"
+                                          @confirm="refreshUserGroupList"
+        />
+        <user-group-management-add-users-modal v-if="hasReadWriteAccess"
+                                               @confirm="refreshUserGroupList"
+        />
+        <user-group-delete-double-check-modal v-if="hasReadWriteAccess"
+                                              @confirm="refreshUserGroupList"
+        />
+        <user-per-group-remove-double-check-modal v-if="hasReadWriteAccess"
+                                                  @confirm="refreshUserGroupList"
+        />
+        <user-group-channel-create-modal v-if="hasReadWriteAccess" />
+        <user-group-channel-set-modal v-if="hasReadWriteAccess"
+                                      @confirm="refreshUserGroupList"
+        />
         <user-group-channel-delete-double-check-modal @confirm="refreshUserGroupList" />
     </section>
 </template>

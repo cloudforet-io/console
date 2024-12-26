@@ -8,6 +8,12 @@ import { i18n } from '@/translations';
 import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-constant';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
+interface Props {
+  hasReadWriteAccess: boolean;
+}
+
+const props = defineProps<Props>();
+
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 
@@ -32,7 +38,9 @@ const handleCreateGroup = () => {
                            :total-count="totalCount"
                 />
             </template>
-            <template #extra>
+            <template v-if="props.hasReadWriteAccess"
+                      #extra
+            >
                 <div class="toolbox-wrapper">
                     <p-button style-type="primary"
                               icon-left="ic_plus_bold"
