@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import { useWindowSize } from '@vueuse/core';
 import { computed, reactive, watch } from 'vue';
 
 import {
-    PFieldGroup, PLazyImg, PTextInput, PRadioGroup, PRadio, PPaneLayout, PJsonSchemaForm,
+    PFieldGroup, PLazyImg, PTextInput, PRadioGroup, PRadio, PPaneLayout, PJsonSchemaForm, screens,
 } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
@@ -25,11 +26,14 @@ const serviceCreateFormState = serviceCreateFormStore.state;
 const userStore = useUserStore();
 const userState = userStore.state;
 
+const { width } = useWindowSize();
+
 const storeState = reactive({
     language: computed<string|undefined>(() => userState.language),
     selectedProtocolType: computed<ProtocolCardItemType>(() => serviceCreateFormState.selectedProtocol),
 });
 const state = reactive({
+    isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
     isForwardTypeProtocol: computed<boolean>(() => storeState.selectedProtocolType.protocol_id?.toLowerCase().includes('forward') || false),
     scheduleForm: {} as ScheduleSettingFormType,
     schemaForm: {} as Record<string, any>,
@@ -140,7 +144,7 @@ watch([() => name.value, () => state.scheduleForm, () => state.selectedRadioIdx,
         >
             <template #default>
                 <div class="flex flex-col mt-1 gap-2">
-                    <p-radio-group>
+                    <p-radio-group :direction="state.isMobileSize ? 'vertical' : 'horizontal'">
                         <p-radio v-for="(item, idx) in state.radioMenuList"
                                  :key="`notification-scope-${idx}`"
                                  v-model="state.selectedRadioIdx"

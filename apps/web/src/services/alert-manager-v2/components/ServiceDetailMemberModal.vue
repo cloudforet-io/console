@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useWindowSize } from '@vueuse/core';
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
@@ -6,7 +7,7 @@ import { partition, reject, map } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButton, PButtonModal, PPaneLayout, PFieldGroup, PFieldTitle, PDataLoader, PIconButton, PAvatar,
+    PButton, PButtonModal, PPaneLayout, PFieldGroup, PFieldTitle, PDataLoader, PIconButton, PAvatar, screens,
 } from '@cloudforet/mirinae';
 
 import type { ServiceChangeMembersParameters } from '@/schema/alert-manager/service/api-verbs/chagne-members';
@@ -55,6 +56,8 @@ const props = withDefaults(defineProps<Props>(), {
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
+const { width } = useWindowSize();
+
 const emit = defineEmits<{(e: 'update:visible'): void; }>();
 
 const storeState = reactive({
@@ -64,6 +67,7 @@ const storeState = reactive({
 });
 const state = reactive({
     loading: false,
+    isMobileSize: computed(() => width.value < screens.mobile.max),
     proxyVisible: useProxyValue('visible', props, emit),
     mode: 'member' as modalMode,
     modalInfo: computed<ModalInfoType>(() => {
@@ -204,22 +208,26 @@ const fetcherChangeMembers = async (userData: string[], userGroupData: string[])
                                      :key="`member-item-${idx}`"
                                      class="flex items-center justify-between p-2 text-label-md"
                                 >
-                                    <p class="member-info-content">
-                                        <img v-if="item.type === MEMBERS_TYPE.USER"
-                                             :src="useRoleFormatter(item?.roleType || ROLE_TYPE.USER).image"
-                                             alt="Role Type Icon"
-                                             class="role-image inline"
+                                    <div class="member-info-content">
+                                        <p v-if="!state.isMobileSize"
+                                           class="inline"
                                         >
-                                        <p-avatar v-else
-                                                  class="menu-icon"
-                                                  icon="ic_member"
-                                                  :color="indigo[300]"
-                                                  size="sm"
-                                        />
+                                            <img v-if="item.type === MEMBERS_TYPE.USER"
+                                                 :src="useRoleFormatter(item?.roleType || ROLE_TYPE.USER).image"
+                                                 alt="Role Type Icon"
+                                                 class="role-image"
+                                            >
+                                            <p-avatar v-else
+                                                      class="menu-icon"
+                                                      icon="ic_member"
+                                                      :color="indigo[300]"
+                                                      size="sm"
+                                            />
+                                        </p>
                                         <span>{{ item.label }}</span>
-                                    </p>
+                                    </div>
                                     <p class="member-info-content">
-                                        <span v-if="item.type === MEMBERS_TYPE.USER"
+                                        <span v-if="!state.isMobileSize && item.type === MEMBERS_TYPE.USER"
                                               class="text-gray-500"
                                         >
                                             {{ item?.roleType }}

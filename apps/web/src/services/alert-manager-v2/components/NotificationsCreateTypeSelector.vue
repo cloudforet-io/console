@@ -114,6 +114,18 @@ onMounted(() => {
                 }
             }
         }
+
+        @screen tablet {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        @screen mobile {
+            grid-template-columns: repeat(1, 1fr);
+            .card {
+                margin-right: auto;
+                margin-left: auto;
+            }
+        }
     }
 }
 </style>

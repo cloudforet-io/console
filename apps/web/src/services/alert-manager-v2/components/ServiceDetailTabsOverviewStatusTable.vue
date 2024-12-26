@@ -117,7 +117,7 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
 
 <template>
     <div class="service-detail-tabs-overview-status-table">
-        <div class="p-2 bg-gray-100">
+        <div class="inner-contents p-2 bg-gray-100">
             <div class="flex">
                 <p-pane-layout v-for="(item, idx) in state.alertStatusInfo"
                                :key="`alert-status-${idx}`"
@@ -228,66 +228,71 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
 
 <style scoped lang="postcss">
 .service-detail-tabs-overview-status-table {
+    @apply overflow-x-auto;
     padding: 0.875rem 1rem;
-    .status {
-        flex: 1;
-        height: 9.375rem;
-        padding: 1.5rem;
-        border-bottom-color: transparent;
-        border-bottom-right-radius: 0;
-        border-bottom-left-radius: 0;
-        order: 1;
-        &:hover {
-            @apply cursor-pointer;
-        }
-        &:not(.selected) {
-            @apply bg-transparent border-b;
-            border-top-color: transparent;
-            border-left-color: transparent;
-            border-radius: 0;
-            &:last-child {
+    .inner-contents {
+        min-width: 37.125rem;
+        width: 100%;
+        .status {
+            flex: 1;
+            height: 9.375rem;
+            padding: 1.5rem;
+            border-bottom-color: transparent;
+            border-bottom-right-radius: 0;
+            border-bottom-left-radius: 0;
+            order: 1;
+            &:hover {
+                @apply cursor-pointer;
+            }
+            &:not(.selected) {
+                @apply bg-transparent border-b;
+                border-top-color: transparent;
+                border-left-color: transparent;
+                border-radius: 0;
+                &:last-child {
+                    border-right-color: transparent;
+                }
+            }
+            &.no-right-border {
                 border-right-color: transparent;
             }
         }
-        &.no-right-border {
-            border-right-color: transparent;
+        .cnt-wrapper {
+            @apply flex items-center text-label-md;
+            gap: 0.25rem;
         }
-    }
-    .cnt-wrapper {
-        @apply flex items-center text-label-md;
-        gap: 0.25rem;
-    }
-    .table-wrapper {
-        margin-top: -0.125rem;
-        padding-top: 1rem;
-        padding-right: 1rem;
-        padding-left: 1rem;
-        order: 2;
+        .table-wrapper {
+            margin-top: -0.125rem;
+            padding-top: 1rem;
+            padding-right: 1rem;
+            padding-left: 1rem;
+            order: 2;
 
-        .select-urgency-wrapper {
-            @apply flex items-center pb-3 text-gray-600;
-            gap: 0.5rem;
+            .select-urgency-wrapper {
+                @apply flex items-center pb-3 text-gray-600;
+                gap: 0.5rem;
 
-            .label-urgency {
-                @apply relative;
-                padding-right: 0.75rem;
+                .label-urgency {
+                    @apply relative;
+                    padding-right: 0.75rem;
 
-                &::after {
-                    @apply border-r border-gray-300 absolute;
-                    content: '';
-                    top: 0;
-                    right: 0;
-                    height: 100%;
+                    &::after {
+                        @apply border-r border-gray-300 absolute;
+                        content: '';
+                        top: 0;
+                        right: 0;
+                        height: 100%;
+                    }
                 }
             }
-        }
 
-        &.triggered {
-            border-top-left-radius: 0;
-        }
+            &.triggered {
+                border-top-left-radius: 0;
+            }
 
-        &.resolved {
-            border-top-right-radius: 0;
+            &.resolved {
+                border-top-right-radius: 0;
+            }
         }
     }
 }

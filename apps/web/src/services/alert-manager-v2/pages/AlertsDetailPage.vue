@@ -32,13 +32,26 @@ onUnmounted(() => {
 <template>
     <div class="alerts-detail-page">
         <alerts-detail-header />
-        <div class="flex gap-4 items-start">
-            <div class="flex w-8/12 flex-col gap-4">
+        <div class="content flex gap-4 items-start">
+            <div class="section flex w-8/12 flex-col gap-4">
                 <alert-detail-summary />
                 <alert-detail-info-table />
                 <alert-detail-tabs />
             </div>
-            <alert-detail-note class="w-4/12" />
+            <alert-detail-note class="section w-4/12" />
         </div>
     </div>
 </template>
+
+<style scoped lang="postcss">
+.alerts-detail-page {
+    @screen tablet {
+        .content {
+            flex-direction: column;
+        }
+        .section {
+            width: 100%;
+        }
+    }
+}
+</style>

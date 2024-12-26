@@ -159,18 +159,18 @@ watch(() => alertDetailPageState.alertInfo, (alertInfo) => {
         }
     }
 
-    @screen mobile {
-        flex-wrap: wrap;
-        gap: 1.5rem;
-        .content-wrapper {
-            width: 100%;
-        }
-    }
-
     @screen tablet {
         flex-wrap: wrap;
         gap: 1.5rem;
         max-width: 100%;
+    }
+
+    @screen mobile {
+        flex-direction: column;
+        gap: 1.5rem;
+        .content-wrapper {
+            width: 100%;
+        }
     }
 }
 
