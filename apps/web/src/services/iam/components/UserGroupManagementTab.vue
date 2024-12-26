@@ -17,7 +17,7 @@ const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 
 interface Props {
-  hasReadWriteAccess: boolean;
+  hasReadWriteAccess?: boolean;
 }
 
 const props = defineProps<Props>();

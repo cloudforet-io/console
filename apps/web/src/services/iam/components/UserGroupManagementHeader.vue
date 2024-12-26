@@ -9,7 +9,7 @@ import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-const
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
 interface Props {
-  hasReadWriteAccess: boolean;
+  hasReadWriteAccess?: boolean;
 }
 
 const props = defineProps<Props>();
