@@ -43,7 +43,13 @@ jobs:
         run: |
           mkdir -p changed_files
           git fetch origin ${{ github.event.pull_request.base.ref }} --depth=1
-          git diff --name-only origin/${{ github.event.pull_request.base.ref }} ${{ github.sha }} | rsync --files-from=- ./ changed_files/
+          git diff --name-only origin/${{ github.event.pull_request.base.ref }} ${{ github.sha }} | while read file; do
+            if [ -f "$file" ]; then
+              rsync -R "$file" changed_files/
+            else
+              echo "Skipping missing file: $file"
+            fi
+          done
 
       - name: Display changed files
         run: |
