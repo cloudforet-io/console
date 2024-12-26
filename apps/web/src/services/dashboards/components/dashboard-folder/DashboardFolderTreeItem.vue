@@ -69,7 +69,7 @@ const state = reactive({
 /* Util */
 const getSharedColor = (node: TreeNode<DashboardTreeDataType>): string|undefined => {
     if (node.data.shared) {
-        if (node.data.projectId === '*') return violet[500];
+        if (node.data.scope === 'PROJECT') return violet[500];
         return indigo[500];
     }
     return undefined;
@@ -77,10 +77,10 @@ const getSharedColor = (node: TreeNode<DashboardTreeDataType>): string|undefined
 const getSharedText = (node: TreeNode<DashboardTreeDataType>): TranslateResult|undefined => {
     if (node.data.shared) {
         if (storeState.isAdminMode) {
-            if (node.data.projectId === '*') return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
+            if (node.data.scope === 'PROJECT') return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
             return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_WORKSPACES');
         }
-        if (node.data.projectId === '*') return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
+        if (node.data.scope === 'PROJECT') return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
         return i18n.t('DASHBOARDS.DETAIL.SHARED_BY_ADMIN');
     }
     return undefined;

@@ -7,6 +7,7 @@ export interface DashboardTreeDataType extends TreeData {
     id: string;
     folderId?: string;
     shared?: boolean;
+    scope?: string;
     projectId?: string;
     workspaceId?: string;
     userId?: string;
