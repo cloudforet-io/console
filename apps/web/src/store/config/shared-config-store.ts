@@ -14,9 +14,8 @@ import type {
 } from '@/schema/config/public-config/api-verbs/get-accesible-configs';
 import type { PublicConfigUpdateParameters as SharedConfigUpdateParameters } from '@/schema/config/public-config/api-verbs/update';
 import type { PublicConfigModel as SharedConfigModel } from '@/schema/config/public-config/model';
-
-import { SHARED_CONFIG_NAMES } from '@/store/config/constant';
-import type { SharedConfigKey } from '@/store/config/type';
+import { SHARED_CONFIG_NAMES } from '@/schema/config/shared-config/constant';
+import type { SharedConfigKey } from '@/schema/config/shared-config/type';
 
 
 interface UseSharedConfigStoreState {
@@ -36,7 +35,7 @@ export const useSharedConfigStore = defineStore('shared-config', () => {
 
     const createSharedConfig = async <T extends Record<string, any> = Record<string, any>>(key: SharedConfigKey, data: T, resourceGroup: ResourceGroupType) => {
         const name = SHARED_CONFIG_NAMES[key];
-        const sharedConfig = await SpaceConnector.clientV2.config.publicConfig.create<SharedConfigCreateParameters, SharedConfigModel<T>>({
+        const sharedConfig = await SpaceConnector.clientV2.config.sharedConfig.create<SharedConfigCreateParameters, SharedConfigModel<T>>({
             name,
             data,
             resource_group: resourceGroup,
@@ -45,7 +44,7 @@ export const useSharedConfigStore = defineStore('shared-config', () => {
     };
     const updateSharedConfig = async <T extends Record<string, any> = Record<string, any>>(key: SharedConfigKey, data: T) => {
         const name = SHARED_CONFIG_NAMES[key];
-        const sharedConfig = await SpaceConnector.clientV2.config.publicConfig.update<SharedConfigUpdateParameters, SharedConfigModel<T>>({
+        const sharedConfig = await SpaceConnector.clientV2.config.sharedConfig.update<SharedConfigUpdateParameters, SharedConfigModel<T>>({
             name,
             data,
         });
@@ -55,7 +54,7 @@ export const useSharedConfigStore = defineStore('shared-config', () => {
         async get<T extends Record<string, any> = Record<string, any>>(key: SharedConfigKey): Promise<SharedConfigModel<T>|undefined> {
             const name = SHARED_CONFIG_NAMES[key];
             if (state.sharedConfigMap[key]) return state.sharedConfigMap[key] as SharedConfigModel<T>;
-            const res = await SpaceConnector.clientV2.config.publicConfig.getAccessibleConfigs<SharedConfigGetAccessibleConfigsParameters, ListResponse<SharedConfigModel<T>>>({
+            const res = await SpaceConnector.clientV2.config.sharedConfig.getAccessibleConfigs<SharedConfigGetAccessibleConfigsParameters, ListResponse<SharedConfigModel<T>>>({
                 name,
             });
             const sharedConfig = res.results?.[0];
