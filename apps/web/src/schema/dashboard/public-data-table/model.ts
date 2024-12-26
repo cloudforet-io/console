@@ -20,6 +20,7 @@ export interface PublicDataTableModel {
     source_type?: DataTableSourceType;
     operator?: DataTableOperator;
     options: DataTableOptions;
+    sort_keys?: string[]; // Pivot only
     tags?: Tags;
     labels_info?: LabelsInfo;
     data_info?: DataInfo;

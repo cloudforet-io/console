@@ -5,9 +5,12 @@ import {
     computed, reactive,
 } from 'vue';
 
+import { sortBy } from 'lodash';
+
 import { PSelectDropdown, PFieldGroup } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
+import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import { widgetValidatorRegistry } from '@/common/modules/widgets/_widget-field-value-manager/constant/validator-registry';
 import type { DataFieldOptions, DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
@@ -28,8 +31,15 @@ const state = reactive({
     fieldValue: computed<DataFieldValue>(() => props.fieldManager.data[FIELD_KEY]?.value),
     multiselectable: computed(() => props.widgetFieldSchema?.options?.multiSelectable),
     menuItems: computed<MenuItem[]>(() => {
+        const isPivotDataTable = widgetGenerateGetters?.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT;
+        const pivotSortKeys = (widgetGenerateGetters.selectedDataTable?.sort_keys ?? []);
+
         const dataInfoList = Object.keys(widgetGenerateGetters.selectedDataTable?.data_info ?? {}) ?? [];
-        return dataInfoList.map((d) => ({
+        const sortedDataInfoList = sortBy(dataInfoList, (item) => {
+            const index = pivotSortKeys.indexOf(item);
+            return index === -1 ? Infinity : index;
+        });
+        return (isPivotDataTable ? sortedDataInfoList : dataInfoList).map((d) => ({
             name: d,
             label: d,
         }));
