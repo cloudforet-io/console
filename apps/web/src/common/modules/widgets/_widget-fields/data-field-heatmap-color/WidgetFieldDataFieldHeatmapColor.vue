@@ -16,7 +16,7 @@ import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-g
 import type {
     DataFieldHeatmapColor,
     DataFieldHeatmapColorOptions,
-    _DataFieldHeatmapColorValue,
+    DataFieldHeatmapColorValue,
 } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
 import type {
     WidgetFieldComponentProps,
@@ -29,7 +29,7 @@ const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
 const state = reactive({
     isInitiated: false,
-    fieldValue: computed<_DataFieldHeatmapColorValue>(() => props.fieldManager.data[FIELD_KEY].value),
+    fieldValue: computed<DataFieldHeatmapColorValue>(() => props.fieldManager.data[FIELD_KEY].value),
     dataFieldList: computed<string[]>(() => Object.keys(widgetGenerateGetters.selectedDataTable?.data_info ?? {}) ?? []),
     menuItems: computed<SelectDropdownMenuItem[]>(() => Object.entries(DATA_FIELD_HEATMAP_COLOR).map(([key, value]) => {
         if (key === DATA_FIELD_HEATMAP_COLOR.NONE.key) {
