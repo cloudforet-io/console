@@ -170,7 +170,7 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
                     fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.userConfig.list);
                     bookmarkListApiQuery.addFilter({ k: 'data.workspaceId', v: _getters.currentWorkspaceId || '', o: '=' });
                 } else if (_getters.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
-                    fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.publicConfig.list);
+                    fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.sharedConfig.list);
                     bookmarkListApiQuery.setOrFilters([
                         { k: 'workspace_id', v: '*', o: '=' },
                         { k: 'data.workspaceId', v: _getters.currentWorkspaceId || '', o: '=' },
@@ -205,7 +205,7 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
                     fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.userConfig.list);
                     bookmarkListApiQuery.addFilter({ k: 'data.workspaceId', v: _getters.currentWorkspaceId || '', o: '=' });
                 } else if (_getters.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
-                    fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.publicConfig.list);
+                    fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.sharedConfig.list);
                     bookmarkListApiQuery.setOrFilters([
                         { k: 'workspace_id', v: '*', o: '=' },
                         { k: 'data.workspaceId', v: _getters.currentWorkspaceId || '', o: '=' },
