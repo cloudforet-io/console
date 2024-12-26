@@ -53,10 +53,10 @@ jobs:
             echo "The following files contain TODO:"
             echo "$TODO_FILES"
             TODO_COUNT=$(echo "$TODO_FILES" | wc -l)
+            echo "::warning:: Found $TODO_COUNT file(s) with TODO."
           else
             echo "No TODOs found."
           fi
-          echo "::warning:: Found $TODO_COUNT file(s) with TODO."
           echo "todo_count=$TODO_COUNT" >> $GITHUB_ENV
 
       - name: Check for console.log
@@ -80,10 +80,10 @@ jobs:
             echo "The following files contain console.log:"
             echo "$LOG_FILES"
             LOG_COUNT=$(echo "$LOG_FILES" | wc -l)
+            echo "::warning:: Found $LOG_COUNT file(s) with console.log."
           else
             echo "No console.log found."
           fi
-          echo "::warning:: Found $LOG_COUNT file(s) with console.log."
           echo "console_log_count=$LOG_COUNT" >> $GITHUB_ENV
 
       - name: Check for console.debug
@@ -108,10 +108,10 @@ jobs:
             echo "The following files contain console.debug:"
             echo "$DEBUG_FILES"
             DEBUG_COUNT=$(echo "$DEBUG_FILES" | wc -l)
+            echo "::warning:: Found $DEBUG_COUNT file(s) with console.debug."
           else
             echo "No console.debug found."
           fi
-          echo "::warning:: Found $DEBUG_COUNT file(s) with console.debug."
           echo "console_debug_count=$DEBUG_COUNT" >> $GITHUB_ENV
 
       - name: Fail if issues found
