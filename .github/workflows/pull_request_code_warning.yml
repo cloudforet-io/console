@@ -47,7 +47,7 @@ jobs:
         id: check_todo
         run: |
           echo "Checking for TODOs..."
-          TODO_FILES=$(grep -rl "// TODO" . --exclude-dir={node_modules,.git} || true)
+          TODO_FILES=$(grep -rl "// TODO" . --exclude-dir=.git || true)
           TODO_COUNT=0
           if [ -n "$TODO_FILES" ]; then
             echo "The following files contain TODO:"
@@ -63,7 +63,7 @@ jobs:
         id: check_console_log
         run: |
           echo "Checking for console.log..."
-          LOG_FILES=$(grep -rl "console.log" . --exclude-dir={.git,apps/web/build,apps/web/public,packages/mirinae/scripts,packages/mirinae/cli} || true)
+          LOG_FILES=$(grep -rl "console\.log" . --exclude-dir=.git --exclude-dir=apps/web/build --exclude-dir=apps/web/public --exclude-dir=packages/mirinae/scripts --exclude-dir=packages/mirinae/cli || true)
           LOG_COUNT=0
           if [ -n "$LOG_FILES" ]; then
             echo "The following files contain console.log:"
@@ -79,12 +79,12 @@ jobs:
         id: check_console_debug
         run: |
           echo "Checking for console.debug..."
-          LOG_FILES=$(grep -rl "console.debug" .  --exclude-dir={.git,apps/web/build,apps/web/public,packages/mirinae/scripts,packages/mirinae/cli} || true)
+          DEBUG_FILES=$(grep -rl "console\.log" . --exclude-dir=.git --exclude-dir=apps/web/build --exclude-dir=apps/web/public --exclude-dir=packages/mirinae/scripts --exclude-dir=packages/mirinae/cli || true)
           LOG_COUNT=0
-          if [ -n "$LOG_FILES" ]; then
+          if [ -n "DEBUG_FILES" ]; then
             echo "The following files contain console.debug:"
-            echo "$LOG_FILES"
-            LOG_COUNT=$(echo "$LOG_FILES" | wc -l)
+            echo "DEBUG_FILES"
+            LOG_COUNT=$(echo "DEBUG_FILES" | wc -l)
           else
             echo "No console.debug found."
           fi
@@ -96,8 +96,8 @@ jobs:
           echo "TODO Count: $todo_count"
           echo "console.log Count: $console_log_count"
           echo "console.debug Count: $console_debug_count"
-          if [ "$todo_count" -gt 0 ]; then
-            echo "::warning:: Workflow failed. TODO count: $todo_count, console.log count: $console_log_count, console.debug count: $console_debug_count"
+          if [ "$todo_count" -gt 0 ] || [ "$console_log_count" -gt 0 ] || [ "$console_debug_count" -gt 0 ]; then
+            echo "::error:: Workflow failed. TODO count: $todo_count, console.log count: $console_log_count, console.debug count: $console_debug_count"
             exit 1
           else
             echo "No issues found. Workflow passed."
