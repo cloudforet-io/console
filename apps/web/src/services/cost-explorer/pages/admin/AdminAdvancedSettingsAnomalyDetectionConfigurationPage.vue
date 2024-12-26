@@ -15,9 +15,9 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
 import type { DomainConfigGetParameters } from '@/schema/config/domain-config/api-verbs/get';
 import type { DomainConfigSetParameters } from '@/schema/config/domain-config/api-verbs/set';
+import { DOMAIN_CONFIG_NAMES } from '@/schema/config/domain-config/constant';
 import type { DomainConfigModel } from '@/schema/config/domain-config/model';
 
-import { DOMAIN_CONFIG_NAMES } from '@/store/domain/constant';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';

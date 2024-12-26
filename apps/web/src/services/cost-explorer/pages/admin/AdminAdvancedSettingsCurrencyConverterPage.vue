@@ -12,9 +12,9 @@ import {
 
 import { i18n } from '@/translations';
 
+import { useDomainConfigStore } from '@/store/config/domain-config-store';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/display/constant';
 import type { Currency } from '@/store/display/type';
-import { usePreferencesStore } from '@/store/preferences/preferences-store';
 
 import config from '@/lib/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -30,7 +30,7 @@ import {
 
 const DEFAULT_AGGREGATION_DATE = 15;
 
-const domainConfigStore = usePreferencesStore();
+const domainConfigStore = useDomainConfigStore();
 const domainConfigGetters = domainConfigStore.getters;
 
 const exchangeRateSourceOptions = [YAHOO_FINANCE_ID];
