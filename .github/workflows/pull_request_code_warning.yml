@@ -93,10 +93,10 @@ jobs:
             ! -path "./packages/mirinae/cli/*" \
             -exec grep -l "console\.debug" {} + || true)
           DEBUG_COUNT=0
-          if [ -n "DEBUG_FILES" ]; then
+          if [ -n "$DEBUG_FILES" ]; then
             echo "The following files contain console.debug:"
-            echo "DEBUG_FILES"
-            DEBUG_COUNT=$(echo "DEBUG_FILES" | wc -l)
+            echo "$DEBUG_FILES"
+            DEBUG_COUNT=$(echo "$DEBUG_FILES" | wc -l)
           else
             echo "No console.debug found."
           fi
