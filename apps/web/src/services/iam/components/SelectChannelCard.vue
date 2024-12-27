@@ -1,62 +1,36 @@
 <script lang="ts" setup>
-import {
-    computed,
-    onMounted, reactive, ref,
-} from 'vue';
-import type { TranslateResult } from 'vue-i18n';
+import { computed, reactive } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PSelectCard, PLazyImg } from '@cloudforet/mirinae';
-
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { NotificationProtocolListParameters } from '@/schema/alert-manager/notification-protocol/api-verbs/list';
-import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
 import { useNotificationChannelCreateFormStore } from '@/services/iam/store/notification-channel-create-form-store';
+import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
+const userGroupPageStore = useUserGroupPageStore();
+const userGroupPageState = userGroupPageStore.state;
 
 const notificationChannelCreateFormStore = useNotificationChannelCreateFormStore();
-const notificationChannelCreateFormState = notificationChannelCreateFormStore.state;
 
-interface ChannelCard {
-  protocolList: { icon: string; label: string; value: string; }[];
-  selectedProtocol: string | { icon: string; label: TranslateResult | string; value: string; };
-}
-
-const notificationProtocolList = ref<NotificationProtocolModel[]>([]);
-
-const state = reactive<ChannelCard>({
-    protocolList: computed<{ icon: string; label: string; value: string; }[]>(() => notificationProtocolList.value.map((protocol) => ({
+const state = reactive({
+    protocolList: computed<{ icon: string; label: string; value: string; }[]>(() => userGroupPageState.protocolList.map((protocol) => ({
         icon: 'ic_notification-protocol_envelope',
         label: protocol.name,
         value: protocol.protocol_id,
     }))),
-    selectedProtocol: notificationChannelCreateFormState.selectedProtocol,
+    selectedProtocol: {},
 });
 
 /* Component */
 const handleSelectChannel = (selectedProtocol) => {
-    notificationChannelCreateFormStore.setSelectedProtocol(selectedProtocol.value);
+    notificationChannelCreateFormStore.$patch((_state) => {
+        _state.state.selectedProtocol = {
+            name: selectedProtocol.label,
+            protocol_id: selectedProtocol.value,
+        };
+    });
 };
-
-/* API */
-const fetchNotificationProtocolList = async (params: NotificationProtocolListParameters) => {
-    try {
-        const { results } = await SpaceConnector.clientV2.alertManager.notificationProtocol.list<NotificationProtocolListParameters, ListResponse<NotificationProtocolModel>>(params);
-        notificationProtocolList.value = results;
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-    }
-};
-
-/* Mounted */
-onMounted(async () => {
-    await fetchNotificationProtocolList({});
-});
 </script>
 
 <template>
