@@ -39,12 +39,13 @@ interface UserGroupPageState {
         searchFilters: ConsoleFilter[];
     }
     userGroupChannels: {
-        list: UserGroupChannelModel[];
+        list?: UserGroupChannelModel[];
         pageStart: number;
         pageLimit: number;
         selectedIndices: number[];
         searchFilters: ConsoleFilter[];
     }
+    protocolList?: any[];
     modal: ModalState;
 }
 
@@ -73,6 +74,7 @@ export const useUserGroupPageStore = defineStore('page-user-group', () => {
             selectedIndices: [0],
             searchFilters: [],
         },
+        protocolList: [],
         modal: {
             type: '',
             title: '',
@@ -92,7 +94,7 @@ export const useUserGroupPageStore = defineStore('page-user-group', () => {
             const userGroupChannels: UserGroupChannelModel[] = [];
             state.userGroupChannels.selectedIndices.forEach((d: number) => {
                 if (getters.selectedUserGroups && getters.selectedUserGroups.length > 0 && getters.selectedUserGroups[0].notification_channel) {
-                    userGroupChannels.push(getters.selectedUserGroups[0].notification_channel[d]);
+                    userGroupChannels.push(state.userGroupChannels.list[d]);
                 }
             });
             return userGroupChannels ?? [];
@@ -123,6 +125,7 @@ export const useUserGroupPageStore = defineStore('page-user-group', () => {
                 selectedIndices: [0],
                 searchFilters: [],
             };
+            state.protocolList = [];
             state.modal = {
                 type: '',
                 title: '',
