@@ -226,10 +226,10 @@ callApiWithGrantGuard();
                                   :dashboards="dashboardPageControlGetters.publicDashboardItems"
             />
         </template>
-        <template v-if="storeState.isWorkspaceOwner"
+        <template v-if="!storeState.isAdminMode"
                   #slot-shared
         >
-            <l-s-b-collapsible-menu-item v-if="dashboardPageControlGetters.publicDashboardItems.length || dashboardPageControlGetters.privateFolderItems.length"
+            <l-s-b-collapsible-menu-item v-if="dashboardPageControlGetters.publicFolderItems.length || dashboardPageControlGetters.publicDashboardItems.length"
                                          class="category-menu-item mt-1"
                                          :item="{
                                              type: 'collapsible',
@@ -246,7 +246,7 @@ callApiWithGrantGuard();
             </l-s-b-collapsible-menu-item>
         </template>
         <template #slot-private>
-            <l-s-b-collapsible-menu-item v-if="dashboardPageControlGetters.privateDashboardItems.length || dashboardPageControlGetters.privateFolderItems.length"
+            <l-s-b-collapsible-menu-item v-if="dashboardPageControlGetters.privateFolderItems.length || dashboardPageControlGetters.privateDashboardItems.length"
                                          class="category-menu-item mt-1"
                                          :item="{
                                              type: 'collapsible',

@@ -57,7 +57,7 @@ const state = reactive({
     availableFolderItems: computed<FolderModel[]>(() => {
         if (dashboardPageControlState.folderModalType === 'PRIVATE') return dashboardPageControlGetters.privateFolderItems;
         if (storeState.isAdminMode) return dashboardPageControlGetters.publicFolderItems;
-        return dashboardPageControlGetters.publicFolderItems.filter((d) => !(d.shared && d.workspace_id === '*'));
+        return dashboardPageControlGetters.publicFolderItems.filter((d) => !(d.shared && d.scope === 'WORKSPACE'));
     }),
     headerTitle: computed<TranslateResult>(() => i18n.t('DASHBOARDS.ALL_DASHBOARDS.MOVE_DASHBOARDS', { count: state.targetDashboardIdList.length })),
     menuItems: computed<SelectDropdownMenuItem[]>(() => {

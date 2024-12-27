@@ -1,4 +1,4 @@
-import type { InternalAxiosRequestConfig } from 'axios';
+import type { InternalAxiosRequestConfig, CreateAxiosDefaults } from 'axios';
 import axios from 'axios';
 import type { CustomAxiosRequestConfig } from 'axios-auth-refresh/dist/utils';
 import { camelCase } from 'lodash';
@@ -60,6 +60,7 @@ export class SpaceConnector {
     constructor(
         endpoints: string[],
         tokenApi: TokenAPI,
+        apiSettings: CreateAxiosDefaults[],
         devConfig: DevConfig|undefined,
         afterCallApiMap: AfterCallApiMap,
     ) {
@@ -67,8 +68,8 @@ export class SpaceConnector {
         SpaceConnector.authConfig = devConfig?.authConfig ?? {};
         SpaceConnector.isDevMode = devConfig?.enabled ?? false;
         this.tokenApi = tokenApi;
-        this.serviceApi = new ServiceAPI(endpoints[0], this.tokenApi);
-        this.serviceApiV2 = new ServiceAPI(endpoints[1], this.tokenApi);
+        this.serviceApi = new ServiceAPI(endpoints[0], this.tokenApi, apiSettings[0]);
+        this.serviceApiV2 = new ServiceAPI(endpoints[1], this.tokenApi, apiSettings[1]);
         this.afterCallApiMap = afterCallApiMap;
         this.setApiTokenCheckInterval();
     }
@@ -85,9 +86,9 @@ export class SpaceConnector {
         }
     }
 
-    static async init(endpoints: string[], tokenApi: TokenAPI, devConfig: DevConfig = {}, afterCallApiMap: AfterCallApiMap = {}): Promise<void> {
+    static async init(endpoints: string[], tokenApi: TokenAPI, apiSettings: CreateAxiosDefaults[] = [], devConfig: DevConfig = {}, afterCallApiMap: AfterCallApiMap = {}): Promise<void> {
         if (!SpaceConnector.instance) {
-            SpaceConnector.instance = new SpaceConnector(endpoints, tokenApi, devConfig, afterCallApiMap);
+            SpaceConnector.instance = new SpaceConnector(endpoints, tokenApi, apiSettings, devConfig, afterCallApiMap);
             await Promise.allSettled([
                 SpaceConnector.instance.loadAPI(1),
                 SpaceConnector.instance.loadAPI(2),

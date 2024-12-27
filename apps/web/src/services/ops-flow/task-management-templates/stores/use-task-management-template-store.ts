@@ -86,7 +86,7 @@ export const useTaskManagementTemplateStore = defineStore('task-management-templ
         const prev = state.templateId;
         state.templateId = templateId;
         try {
-            await sharedConfigStore.set<TemplateData>('TASK_TEMPLATE', { template_id: templateId }, 'DOMAIN');
+            await sharedConfigStore.set<TemplateData>('TASK_TEMPLATE', { template_id: templateId });
             showSuccessMessage(i18n.t('OPSFLOW.ALT_S_EDIT_TARGET', { target: i18n.t('OPSFLOW.TASK_MANAGEMENT.TEMPLATE_TYPE') }), '');
         } catch (e) {
             ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ALT_E_EDIT_TARGET', { target: i18n.t('OPSFLOW.TASK_MANAGEMENT.TEMPLATE_TYPE') }));
@@ -110,7 +110,7 @@ export const useTaskManagementTemplateStore = defineStore('task-management-templ
         const prev = state.enableLanding;
         state.enableLanding = enabled;
         try {
-            await sharedConfigStore.set<LandingData>('TASK_LANDING', { enabled }, 'DOMAIN');
+            await sharedConfigStore.set<LandingData>('TASK_LANDING', { enabled });
             showSuccessMessage(
                 enabled
                     ? i18n.t('OPSFLOW.TASK_MANAGEMENT.ALT_S_ENABLE_LANDING')

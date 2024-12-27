@@ -1,6 +1,6 @@
 {
   "name": "web",
-  "version": "2.0.0-dev248",
+  "version": "2.0.0-dev257",
   "private": true,
   "description": "Cloudforet Console Web Application",
   "author": "Cloudforet",
@@ -52,6 +52,7 @@
     "currency.js": "^2.0.4",
     "dayjs": "^1.11.7",
     "diff-match-patch": "^1.0.5",
+    "dompurify": "^3.2.3",
     "echarts": "^5.5.0",
     "ejs": "^3.1.10",
     "hangul-js": "^0.2.6",
