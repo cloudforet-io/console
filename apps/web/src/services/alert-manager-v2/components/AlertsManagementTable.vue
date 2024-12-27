@@ -49,13 +49,14 @@ interface AlertItem extends AlertModel {
 
 const alertPageStore = useAlertPageStore();
 const alertPageState = alertPageStore.state;
+const alertPageGetters = alertPageStore.getters;
 const userStore = useUserStore();
 const userState = userStore.state;
 
 const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
-    serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => alertPageState.serviceList),
+    serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => alertPageGetters.serviceDropdownList),
     alertList: computed<AlertModel[]>(() => alertPageState.alertList),
     timezone: computed<string>(() => userState.timezone || ''),
 });
@@ -173,7 +174,6 @@ const fetchAlertsList = async () => {
 onMounted(async () => {
     try {
         state.loading = true;
-        await alertPageStore.fetchServiceList();
         await fetchAlertsList();
     } finally {
         state.loading = false;

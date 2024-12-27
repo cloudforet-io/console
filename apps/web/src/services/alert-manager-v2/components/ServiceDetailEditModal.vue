@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
-import type { ServiceModel } from '@/schema/alert-manager/service/model';
 import { i18n } from '@/translations';
+
+import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -20,13 +21,12 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const serviceDetailPageStore = useServiceDetailPageStore();
-const serviceDetailPageState = serviceDetailPageStore.state;
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const emit = defineEmits<{(e: 'update:visible'): void; }>();
 
 const storeState = reactive({
-    serviceList: computed<ServiceModel[]>(() => serviceDetailPageState.serviceList),
+    serviceListMap: computed<ServiceReferenceMap>(() => serviceDetailPageGetters.serviceReferenceMap),
     serviceName: computed<string>(() => serviceDetailPageGetters.serviceInfo.name),
 });
 const state = reactive({
@@ -46,7 +46,7 @@ const {
 }, {
     name(value: string) {
         if (!value) return ' ';
-        const duplicatedName = storeState.serviceList?.find((item) => item.name === value);
+        const duplicatedName = Object.values(storeState.serviceListMap)?.find((item) => item.label === value);
         if (duplicatedName) {
             return i18n.t('ALERT_MANAGER.SERVICE.VALIDATION_NAME_UNIQUE');
         }
@@ -66,10 +66,6 @@ const handleConfirm = async () => {
 const handleClose = () => {
     state.proxyVisible = false;
 };
-
-onMounted(() => {
-    serviceDetailPageStore.fetchServiceList();
-});
 </script>
 
 <template>

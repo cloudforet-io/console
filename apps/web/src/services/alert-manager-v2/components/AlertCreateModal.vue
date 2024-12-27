@@ -32,11 +32,12 @@ const props = withDefaults(defineProps<Props>(), {
 
 const alertPageStore = useAlertPageStore();
 const alertPageState = alertPageStore.state;
+const alertPageGetters = alertPageStore.getters;
 
 const emit = defineEmits<{(e: 'update:visible'): void; }>();
 
 const storeState = reactive({
-    serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => alertPageState.serviceList),
+    serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => alertPageGetters.serviceDropdownList),
     alertListParams: computed<AlertListParameters|undefined>(() => alertPageState.alertListParams),
 });
 const state = reactive({

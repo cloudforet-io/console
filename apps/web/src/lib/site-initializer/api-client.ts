@@ -197,6 +197,11 @@ const getAfterCallApiMap = () => ({
         const allReferenceStore = useAllReferenceStore();
         allReferenceStore.sync('user', data);
     },
+    '/identity/user/delete': () => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.load('user', { force: true });
+    },
     '/identity/user-group/create': (data) => {
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();
@@ -313,6 +318,21 @@ const getAfterCallApiMap = () => ({
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();
         allReferenceStore.sync('workspace', data);
+    },
+    '/alert-manager/service/create': () => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.load('service', { force: true });
+    },
+    '/alert-manager/service/delete': () => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.load('service', { force: true });
+    },
+    '/alert-manager/service/update': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('service', data);
     },
 });
 
