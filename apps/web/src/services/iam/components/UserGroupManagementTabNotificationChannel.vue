@@ -1,22 +1,33 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, ref, watch, watchEffect,
+    computed, onMounted, reactive, ref, watch,
 } from 'vue';
 
+import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
+import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PHeadingLayout, PHeading, PButton, PToolboxTable, PBadge,
 } from '@cloudforet/mirinae';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { NotificationProtocolListParameters } from '@/schema/alert-manager/notification-protocol/api-verbs/list';
+import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
 import type { UserGroupChannelGetParameters } from '@/schema/alert-manager/user-group-channel/api-verbs/get';
+import type { UserGroupChannelListParameters } from '@/schema/alert-manager/user-group-channel/api-verbs/list';
 import { USER_GROUP_CHANNEL_SCHEDULE_TYPE } from '@/schema/alert-manager/user-group-channel/constants';
 import type { UserGroupChannelModel } from '@/schema/alert-manager/user-group-channel/model';
 import type { UserGroupChannelScheduleInfoType } from '@/schema/alert-manager/user-group-channel/type';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useQueryTags } from '@/common/composables/query-tags';
 
-import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-constant';
+import {
+    USER_GROUP_CHANNELS_SEARCH_HANDLERS,
+    USER_GROUP_MODAL_TYPE,
+} from '@/services/iam/constants/user-group-constant';
 import { useNotificationChannelCreateFormStore } from '@/services/iam/store/notification-channel-create-form-store';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
@@ -32,6 +43,15 @@ const userGroupPageGetters = userGroupPageStore.getters;
 
 const notificationChannelCreateFormStore = useNotificationChannelCreateFormStore();
 
+const channelListApiQueryHelper = new ApiQueryHelper()
+    .setPageStart(userGroupPageState.userGroupChannels.pageStart)
+    .setSort('name', true);
+let channelListApiQuery = channelListApiQueryHelper.data;
+
+const queryTagHelper = useQueryTags({ keyItemSets: USER_GROUP_CHANNELS_SEARCH_HANDLERS });
+const { queryTags } = queryTagHelper;
+
+
 interface ChannelItem {
   name: string;
   channel_id: string;
@@ -39,37 +59,32 @@ interface ChannelItem {
   details?: any;
 }
 
-const isDeleteable = ref<boolean>(false);
+const isDeleteAble = ref<boolean>(false);
+const channelList = ref<any>();
 
 const tableState = reactive({
     fields: computed(() => [
         { name: 'name', label: 'Name' },
         { name: 'channel_id', label: 'Channel' },
         { name: 'schedule', label: 'Schedule' },
-        { name: 'details', label: 'Details' },
     ]),
     items: computed<ChannelItem[]>(() => {
-        const channels = userGroupPageGetters.selectedUserGroups[0]?.notification_channel ?? [];
-        return channels.map((channel) => {
-            let userList: string[] | undefined = [];
-            if (channel.data) {
-                if (channel.data.FORWARD_TYPE === 'USER') {
-                    userList = channel.data.USER;
-                } else if (channel.data.FORWARD_TYPE === 'USER_GROUP') {
-                    userList = channel.data.USER_GROUP;
-                } else {
-                    // TODO: text 'all member'??
-                    userList = [];
-                }
-            }
-            return {
-                name: channel.name,
-                channel_id: channel.protocol_id,
-                schedule: channel.schedule,
-                details: userList,
-            };
-        });
+        const channels = userGroupPageState.userGroupChannels.list ?? [];
+        return channels.map((channel) => ({
+            name: channel.name,
+            channel_id: channel.protocol_id,
+            schedule: channel.schedule,
+        }));
     }),
+    valueHandlerMap: computed(() => ({
+        name: makeDistinctValueHandler('alert_manager.UserGroupChannel', 'name'),
+        schedule: makeDistinctValueHandler('alert_manager.UserGroupChannel', 'schedule.SCHEDULE_TYPE'),
+    })),
+});
+
+const state = reactive({
+    loading: false,
+    channelName: '',
 });
 
 const totalCount = computed<number>(() => {
@@ -80,6 +95,18 @@ const totalCount = computed<number>(() => {
 });
 
 /* Component */
+const handleChange = async (options: any = {}) => {
+    channelListApiQuery = getApiQueryWithToolboxOptions(channelListApiQueryHelper, options) ?? channelListApiQuery;
+    if (options.queryTags !== undefined) {
+        userGroupPageStore.$patch((_state) => {
+            _state.state.userGroupChannels.searchFilters = channelListApiQueryHelper.filters;
+        });
+    }
+    if (options.pageStart !== undefined) userGroupPageState.userGroupChannels.pageStart = options.pageStart;
+    if (options.pageLimit !== undefined) userGroupPageState.userGroupChannels.pageLimit = options.pageLimit;
+    await fetchListUserGroupChannel({ user_group_id: userGroupPageGetters.selectedUserGroups[0].user_group_id, query: channelListApiQuery });
+};
+
 const handleSelect = async (index: number[]) => {
     userGroupPageState.userGroupChannels.selectedIndices = index;
 };
@@ -109,7 +136,7 @@ const handleUpdateModal = async (modalType: string) => {
             }
 
             notificationChannelCreateFormStore.$patch((_state) => {
-                _state.state.selectedProtocol = protocol_id;
+                _state.state.selectedProtocol.protocol_id = protocol_id;
                 _state.state.channelName = name;
                 _state.state.scheduleInfo = schedule;
                 _state.state.userInfo.type = data.FORWARD_TYPE;
@@ -123,9 +150,9 @@ const handleUpdateModal = async (modalType: string) => {
             });
         }
         userGroupPageStore.updateModalSettings({
-            type: USER_GROUP_MODAL_TYPE.CREATE_NOTIFICATIONS_FIRST,
+            type: USER_GROUP_MODAL_TYPE.CREATE_NOTIFICATIONS_SECOND,
             title: i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.UPDATE_TITLE'),
-            themeColor: 'primary1',
+            themeColor: 'primary',
         });
     } else if (modalType === 'delete') {
         userGroupPageStore.updateModalSettings({
@@ -137,15 +164,34 @@ const handleUpdateModal = async (modalType: string) => {
 };
 
 /* Watcher */
-watchEffect(() => {});
+watch(() => userGroupPageGetters.selectedUserGroups, async (nv_selected_user_group, ov_selected_user_group) => {
+    if (nv_selected_user_group !== ov_selected_user_group && nv_selected_user_group[0].user_group_id) {
+        try {
+            state.loading = true;
+            await fetchListUserGroupChannel({ user_group_id: nv_selected_user_group[0].user_group_id, query: channelListApiQuery });
+        } finally {
+            state.loading = false;
+        }
+    }
+}, { deep: true, immediate: true });
 
 watch(() => tableState.items, (nv_items) => {
     if (nv_items.length > 0) {
-        isDeleteable.value = true;
+        isDeleteAble.value = true;
     }
 }, { immediate: true });
 
 /* API */
+const fetchListUserGroupChannel = async (params: UserGroupChannelListParameters) => {
+    try {
+        const { results } = await SpaceConnector.clientV2.alertManager.userGroupChannel.list<UserGroupChannelListParameters, ListResponse<UserGroupChannelModel>>(params);
+        userGroupPageState.userGroupChannels.list = results;
+        channelList.value = results;
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
+    }
+};
+
 const fetchGetUserGroupChannel = async (params: UserGroupChannelGetParameters): Promise<UserGroupChannelModel | undefined> => {
     try {
         return await SpaceConnector.clientV2.alertManager.userGroupChannel.get<UserGroupChannelGetParameters, UserGroupChannelModel>(params);
@@ -154,6 +200,29 @@ const fetchGetUserGroupChannel = async (params: UserGroupChannelGetParameters): 
         return undefined;
     }
 };
+
+const fetchNotificationProtocolList = async (params: NotificationProtocolListParameters) => {
+    try {
+        const { results } = await SpaceConnector.clientV2.alertManager.notificationProtocol.list<NotificationProtocolListParameters, ListResponse<NotificationProtocolModel>>(params);
+        userGroupPageState.protocolList = results;
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
+    }
+};
+
+/* Mounted */
+onMounted(async () => {
+    if (userGroupPageGetters.selectedUserGroups[0].user_group_id) {
+        await fetchListUserGroupChannel({
+            user_group_id: userGroupPageGetters.selectedUserGroups[0].user_group_id,
+            query: channelListApiQuery,
+        });
+    }
+});
+
+onMounted(async () => {
+    await fetchNotificationProtocolList({});
+});
 </script>
 
 <template>
@@ -185,7 +254,7 @@ const fetchGetUserGroupChannel = async (params: UserGroupChannelGetParameters): 
                         </p-button>
                         <p-button style-type="tertiary"
                                   icon-left="ic_delete"
-                                  :disabled="!isDeleteable"
+                                  :disabled="!isDeleteAble"
                                   @click="handleUpdateModal('delete')"
                         >
                             {{ $t('IAM.USER_GROUP.TAB.NOTIFICATION_CHANNEL.DELETE') }}
@@ -197,13 +266,25 @@ const fetchGetUserGroupChannel = async (params: UserGroupChannelGetParameters): 
         <p-toolbox-table search-type="query"
                          searchable
                          selectable
+                         sortable
+                         sort-desc
+                         :loading="state.loading"
                          :refreshable="false"
                          :multi-select="false"
+                         :key-item-sets="USER_GROUP_CHANNELS_SEARCH_HANDLERS"
+                         :query-tags="queryTags"
+                         :value-handler-map="tableState.valueHandlerMap"
                          :select-index="userGroupPageState.userGroupChannels.selectedIndices"
                          :fields="tableState.fields"
                          :items="tableState.items"
                          @select="handleSelect"
+                         @change="handleChange"
         >
+            <template #col-channel_id-format="{value}">
+                {{
+                    userGroupPageState.protocolList.filter(protocol => protocol.protocol_id === value)[0]?.name
+                }}
+            </template>
             <template #col-schedule-format="{value}">
                 <p-badge v-if="value.SCHEDULE_TYPE === USER_GROUP_CHANNEL_SCHEDULE_TYPE.CUSTOM"
                          badge-type="solid-outline"
@@ -229,35 +310,6 @@ const fetchGetUserGroupChannel = async (params: UserGroupChannelGetParameters): 
                 >
                     {{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.SCHEDULE.WEEKEND') }}
                 </p-badge>
-            </template>
-            <template #col-details-format="{value}">
-                <div v-if="value.length < 5">
-                    <span v-for="(v, i) in value"
-                          :key="i"
-                    >
-                        <span v-if="i === value.length - 1">
-                            {{ v }}
-                        </span>
-                        <span v-else>
-                            {{ v }},
-                        </span>
-                    </span>
-                </div>
-                <div v-else-if="value.length > 5">
-                    <span v-for="(v, i) in value"
-                          :key="i"
-                    >
-                        <span v-if="i < 4">
-                            {{ v }},
-                        </span>
-                        <span v-else-if="i === 4">
-                            {{ v }}
-                        </span>
-                        <span v-else-if="i > 4">
-                            ...
-                        </span>
-                    </span>
-                </div>
             </template>
         </p-toolbox-table>
     </div>
