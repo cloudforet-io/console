@@ -48,7 +48,7 @@ export const getPageAccessMapFromRawData = (pageAccessPermissions?: string[], do
     };
 
     const handleWildcardPermissions = (menuId: string, accessType: string) => {
-        const menu = MENU_LIST.find(({ id }) => id === menuId);
+        const menu = menuListByVersion.find(({ id }) => id === menuId);
         if (!menu) return;
 
         const write = accessType === PAGE_ACCESS.WRITABLE;
@@ -73,7 +73,7 @@ export const getPageAccessMapFromRawData = (pageAccessPermissions?: string[], do
 
             setPermissions(menuId, true, accessType === PAGE_ACCESS.WRITABLE, true);
 
-            const menu = MENU_LIST.find(({ id }) => id === menuId);
+            const menu = menuListByVersion.find(({ id }) => id === menuId);
             const subMenuExists = menu?.subMenuList?.some(({ id }) => id === subMenuId);
 
             setPermissions(subMenuId, subMenuExists, accessType === PAGE_ACCESS.WRITABLE, subMenuExists);
