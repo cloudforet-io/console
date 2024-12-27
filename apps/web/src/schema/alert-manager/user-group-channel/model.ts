@@ -1,7 +1,9 @@
 
 import type { Tags } from '@/schema/_common/model';
-import type { ServiceChannelDataType } from '@/schema/alert-manager/service-channel/type';
-import type { UserGroupChannelStateType, UserGroupChannelScheduleInfoType } from '@/schema/alert-manager/user-group-channel/type';
+import type {
+    UserGroupChannelStateType,
+    UserGroupChannelScheduleInfoType,
+} from '@/schema/alert-manager/user-group-channel/type';
 
 export interface UserGroupChannelModel {
     channel_id: string;
@@ -15,5 +17,5 @@ export interface UserGroupChannelModel {
     workspace_id: string;
     domain_id: string;
     created_at: string;
-    data: ServiceChannelDataType;
+    data: Record<string, any>;
 }
