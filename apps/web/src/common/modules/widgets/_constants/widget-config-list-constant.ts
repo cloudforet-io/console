@@ -7,6 +7,7 @@ import heatmap from '@/common/modules/widgets/_widgets/heatmap/widget-config';
 import lineChart from '@/common/modules/widgets/_widgets/line-chart/widget-config';
 import numberCard from '@/common/modules/widgets/_widgets/number-card/widget-config';
 import pieChart from '@/common/modules/widgets/_widgets/pie-chart/widget-config';
+import sankeyChart from '@/common/modules/widgets/_widgets/sankey-chart/widget-config';
 import stackedAreaChart from '@/common/modules/widgets/_widgets/stacked-area-chart/widget-config';
 import stackedColumnChart from '@/common/modules/widgets/_widgets/stacked-column-chart/widget-config';
 import stackedHorizontalBarChart from '@/common/modules/widgets/_widgets/stacked-horizontal-bar-chart/widget-config';
@@ -31,6 +32,7 @@ export const CONSOLE_WIDGET_CONFIG_KEYS = [
     'table',
     'stackedAreaChart',
     'gauge',
+    'sankeyChart',
 ] as const;
 
 export const CONSOLE_WIDGET_CONFIG: Record<WidgetConfigKey, Partial<WidgetConfig>> = {
@@ -48,4 +50,5 @@ export const CONSOLE_WIDGET_CONFIG: Record<WidgetConfigKey, Partial<WidgetConfig
     table,
     stackedAreaChart,
     gauge,
+    sankeyChart,
 };
