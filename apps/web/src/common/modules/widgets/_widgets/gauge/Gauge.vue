@@ -25,6 +25,7 @@ import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-wi
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
+import { normalizeAndSerialize } from '@/common/modules/widgets/_helpers/global-variable-helper';
 import { sortObjectByKeys } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import { getFormattedNumber, getWidgetDataTable } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
@@ -154,6 +155,7 @@ const queryKey = computed(() => [
         granularity: widgetOptionsState.granularityInfo?.granularity,
         dataTableId: state.dataTable?.data_table_id,
         dataTableOptions: JSON.stringify(sortObjectByKeys(state.dataTable?.options) ?? {}),
+        vars: normalizeAndSerialize(props.dashboardVars),
     },
 ]);
 
