@@ -142,7 +142,7 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.ALERT_MANAGER,
         routeName: ALERT_MANAGER_ROUTE._NAME,
         translationId: 'MENU.ALERT_MANAGER',
-        icon: 'ic_service_alert-manager',
+        icon: 'ic_service_alert',
     },
     [MENU_ID.SERVICE]: {
         menuId: MENU_ID.SERVICE,
