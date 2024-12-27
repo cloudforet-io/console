@@ -23,6 +23,7 @@ import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import type { SelectedUserDropdownIdsType } from '@/common/modules/user/typte';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
@@ -57,6 +58,7 @@ const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const { width } = useWindowSize();
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const emit = defineEmits<{(e: 'update:visible'): void; }>();
 
@@ -195,7 +197,8 @@ const fetcherChangeMembers = async (userData: string[], userGroupData: string[])
                                 <p-field-title :label="$t('ALERT_MANAGER.SERVICE.INVITE_MEMBER_DESC')"
                                                required
                                 />
-                                <p-button style-type="tertiary"
+                                <p-button v-if="hasReadWriteAccess"
+                                          style-type="tertiary"
                                           icon-left="ic_plus_bold"
                                           class="ml-auto"
                                           @click="handleClickInviteButton"

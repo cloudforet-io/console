@@ -14,12 +14,16 @@ import { ALERT_STATE, ALERT_URGENCY } from '@/schema/monitoring/alert/constants'
 import type { AlertState, AlertUrgency } from '@/schema/monitoring/alert/type';
 import { i18n } from '@/translations';
 
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
+
 import { red } from '@/styles/colors';
 
 import { useAlertDetailPageStore } from '@/services/alert-manager/stores/alert-detail-page-store';
 
 const alertDetailPageStore = useAlertDetailPageStore();
 const alertDetailPageState = alertDetailPageStore.state;
+
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const storeState = reactive({
     alertInfo: computed<AlertModel>(() => alertDetailPageState.alertInfo),
@@ -86,6 +90,7 @@ watch(() => alertDetailPageState.alertInfo, (alertInfo) => {
                                :menu="state.alertStateList"
                                :selected.sync="state.alertState"
                                class="state-dropdown"
+                               :disabled="!hasReadWriteAccess"
                                :class="{'triggered': state.alertState === ALERT_STATE.TRIGGERED}"
                                @select="handleChangeAlertState"
             >
@@ -98,7 +103,7 @@ watch(() => alertDetailPageState.alertInfo, (alertInfo) => {
             <span class="title">{{ $t('ALERT_MANAGER.ALERTS.LABEL_URGENCY') }}</span>
             <p-select-dropdown :menu="state.alertUrgencyList"
                                :selected.sync="state.alertUrgency"
-                               :disabled="(state.alertState === ALERT_STATE.ERROR)"
+                               :disabled="!hasReadWriteAccess || (state.alertState === ALERT_STATE.ERROR)"
                                class="state-dropdown"
                                @select="handleChangeAlertUrgency"
             >

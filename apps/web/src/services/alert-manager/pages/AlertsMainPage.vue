@@ -3,11 +3,15 @@ import { onUnmounted, reactive } from 'vue';
 
 import { PHeadingLayout, PHeading, PButton } from '@cloudforet/mirinae';
 
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
+
 import AlertCreateModal from '@/services/alert-manager/components/AlertCreateModal.vue';
 import AlertsManagementTable from '@/services/alert-manager/components/AlertsManagementTable.vue';
 import { useAlertPageStore } from '@/services/alert-manager/stores/alert-page-store';
 
 const alertPageStore = useAlertPageStore();
+
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const state = reactive({
     createModalVisible: false,
@@ -29,7 +33,9 @@ onUnmounted(() => {
             <template #heading>
                 <p-heading :title="$t('MENU.ALERT_MANAGER_ALERTS')" />
             </template>
-            <template #extra>
+            <template v-if="hasReadWriteAccess"
+                      #extra
+            >
                 <p-button style-type="primary"
                           icon-left="ic_plus_bold"
                           @click="handleClickCreateButton"
@@ -41,7 +47,7 @@ onUnmounted(() => {
         <div class="mt-6">
             <alerts-management-table />
         </div>
-        <alert-create-modal v-if="state.createModalVisible"
+        <alert-create-modal v-if="hasReadWriteAccess && state.createModalVisible"
                             :visible.sync="state.createModalVisible"
         />
     </div>

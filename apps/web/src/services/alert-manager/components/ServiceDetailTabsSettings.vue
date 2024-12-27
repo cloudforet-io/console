@@ -10,6 +10,8 @@ import { NOTIFICATION_URGENCY, RECOVERY_MODE } from '@/schema/alert-manager/serv
 import type { NotificationUrgencyType, RecoveryModeType } from '@/schema/alert-manager/service/type';
 import { i18n } from '@/translations';
 
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
+
 import { red } from '@/styles/colors';
 
 import ServiceDetailTabsSettingsEscalationPolicy
@@ -31,6 +33,8 @@ type CardValueInfoType = {
 
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
+
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const storeState = reactive({
     serviceInfo: computed<Service>(() => serviceDetailPageGetters.serviceInfo),
@@ -118,7 +122,8 @@ const handleClickEditButton = (type: ServiceDetailSettingCardType) => {
                     <div class="py-3 px-0.5">
                         <div class="flex items-center justify-between mb-6">
                             <span class="text-label-xl">{{ item.title }}</span>
-                            <p-icon-button name="ic_edit"
+                            <p-icon-button v-if="hasReadWriteAccess"
+                                           name="ic_edit"
                                            width="2rem"
                                            height="2rem"
                                            @click="handleClickEditButton(item.type)"

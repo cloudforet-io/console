@@ -8,6 +8,7 @@ import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/typ
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
 import { i18n } from '@/translations';
 
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import AlertDetailDeleteModal from '@/services/alert-manager/components/AlertDetailDeleteModal.vue';
@@ -23,6 +24,7 @@ const alertDetailPageState = alertDetailPageStore.state;
 const router = useRouter();
 
 const { getProperRouteLocation } = useProperRouteLocation();
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const storeState = reactive({
     alertInfo: computed<AlertModel>(() => alertDetailPageState.alertInfo),
@@ -66,7 +68,8 @@ const handleSelectDropdownMenu = (type: ModalType) => {
                 >
                     <template #title-right-extra>
                         <span class="text-label-xl text-gray-700 mr-2">NO. {{ storeState.alertInfo.alert_id?.split('-')[2] }}</span>
-                        <p-select-dropdown :menu="state.menuItems"
+                        <p-select-dropdown v-if="hasReadWriteAccess"
+                                           :menu="state.menuItems"
                                            style-type="icon-button"
                                            button-icon="ic_ellipsis-horizontal"
                                            use-fixed-menu-style
@@ -79,7 +82,7 @@ const handleSelectDropdownMenu = (type: ModalType) => {
                 </p-heading>
             </template>
         </p-heading-layout>
-        <div v-if="modalState.modalVisible">
+        <div v-if="hasReadWriteAccess && modalState.modalVisible">
             <alert-detail-edit-modal v-if="modalState.type === 'edit'"
                                      :visible.sync="modalState.modalVisible"
             />

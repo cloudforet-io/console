@@ -5,6 +5,7 @@ import {
     PButton, PHeading, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import ServiceList from '@/services/alert-manager/components/ServiceList.vue';
@@ -13,8 +14,10 @@ import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-const
 const router = useRouter();
 
 const { getProperRouteLocation } = useProperRouteLocation();
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const handleClickCreateButton = () => {
+    if (!hasReadWriteAccess) return;
     router.push(getProperRouteLocation({
         name: ALERT_MANAGER_ROUTE.SERVICE.CREATE._NAME,
     }));
@@ -28,7 +31,8 @@ const handleClickCreateButton = () => {
                 <p-heading :title="$t('MENU.ALERT_MANAGER_SERVICE')" />
             </template>
             <template #extra>
-                <p-button style-type="primary"
+                <p-button v-if="hasReadWriteAccess"
+                          style-type="primary"
                           icon-left="ic_plus_bold"
                           @click="handleClickCreateButton"
                 >

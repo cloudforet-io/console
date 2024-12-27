@@ -18,12 +18,15 @@ import { i18n } from '@/translations';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
 import { useAlertDetailPageStore } from '@/services/alert-manager/stores/alert-detail-page-store';
 
 const alertDetailPageStore = useAlertDetailPageStore();
 const alertDetailPageState = alertDetailPageStore.state;
 const alertDetailPageGetters = alertDetailPageStore.getters;
+
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const storeState = reactive({
     timezone: computed<string>(() => alertDetailPageGetters.timezone),
@@ -108,7 +111,8 @@ watch(() => storeState.alertInfo.alert_id, async (id) => {
                 <p-textarea :value="state.noteInput"
                             @input="handleChangeNoteInput"
                 />
-                <p-button style-type="tertiary"
+                <p-button v-if="hasReadWriteAccess"
+                          style-type="tertiary"
                           class="add-btn mt-2"
                           :disabled="(state.noteInput.trim()).length === 0"
                           @click="handleCreateNote"
