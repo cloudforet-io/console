@@ -20,6 +20,7 @@ import type { MinOptions } from '@/common/modules/widgets/_widget-fields/min/typ
 import type { MissingValueOptions } from '@/common/modules/widgets/_widget-fields/missing-value/type';
 import type { NumberFormatOptions, NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type { PieChartTypeOptions } from '@/common/modules/widgets/_widget-fields/pie-chart-type/type';
+import type { SankeyAxisOptions } from '@/common/modules/widgets/_widget-fields/sankey-axis/type';
 import type { StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
 import type { SubTotalOptions } from '@/common/modules/widgets/_widget-fields/sub-total/type';
 import type { TableColumnComparisonOptions } from '@/common/modules/widgets/_widget-fields/table-column-comparison/type';
@@ -129,6 +130,9 @@ export const widgetFieldDefaultValueMap: DefaultValueRegistry = {
     },
     widgetHeight: {
         type: WIDGET_HEIGHT.default,
+    },
+    sankeyAxis: {
+        data: [],
     },
 } as const;
 
@@ -440,16 +444,16 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const tableColumnWidthOptions = (_fieldsSchema.tableColumnWidth?.options ?? {}) as TableColumnWidthOptions;
 
-        const initalValue = widgetFieldDefaultValueMap.tableColumnWidth;
+        const initialValue = widgetFieldDefaultValueMap.tableColumnWidth;
 
         if (tableColumnWidthOptions.defaultMinimumWidth || tableColumnWidthOptions.defaultFixedWidth) {
             return {
-                minimumWidth: tableColumnWidthOptions.defaultMinimumWidth ? tableColumnWidthOptions.defaultMinimumWidth : initalValue.minimumWidth,
+                minimumWidth: tableColumnWidthOptions.defaultMinimumWidth ? tableColumnWidthOptions.defaultMinimumWidth : initialValue.minimumWidth,
                 widthType: tableColumnWidthOptions?.defaultFixedWidth ? 'fixed' : 'auto',
                 fixedWidth: tableColumnWidthOptions?.defaultFixedWidth,
             };
         }
-        return initalValue;
+        return initialValue;
     },
     textWrap: (widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
@@ -483,5 +487,14 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
             };
         }
         return widgetFieldDefaultValueMap.widgetHeight;
+    },
+    sankeyAxis: (widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const sankeyAxisOptions = (_fieldsSchema.sankeyAxis?.options ?? {}) as SankeyAxisOptions;
+
+        return {
+            data: [],
+            count: sankeyAxisOptions.defaultMaxCount,
+        };
     },
 };
