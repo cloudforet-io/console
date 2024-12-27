@@ -3081,6 +3081,7 @@
 					"UPDATE_TITLE": ""
 				},
 				"DELETE": {
+					"SHOW_SUCCESS_MESSAGE": "",
 					"TITLE": ""
 				},
 				"DELETE_CHANNEL": {
@@ -3088,6 +3089,7 @@
 					"TITLE": ""
 				},
 				"REMOVE_USER": {
+					"SHOW_SUCCESS_MESSAGE": "",
 					"TITLE": ""
 				}
 			},

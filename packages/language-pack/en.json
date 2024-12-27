@@ -3081,6 +3081,7 @@
 					"UPDATE_TITLE": "Update User Group"
 				},
 				"DELETE": {
+					"SHOW_SUCCESS_MESSAGE": "UserGroup successfully Delete",
 					"TITLE": "Are you sure you want to Delete User Group?"
 				},
 				"DELETE_CHANNEL": {
@@ -3088,6 +3089,7 @@
 					"TITLE": "Are you sure you want to Delete Notification Channel from the selected user group?"
 				},
 				"REMOVE_USER": {
+					"SHOW_SUCCESS_MESSAGE": "User successfully removed from this user group",
 					"TITLE": "Are you sure you want to Remove User from the selected user group?"
 				}
 			},
