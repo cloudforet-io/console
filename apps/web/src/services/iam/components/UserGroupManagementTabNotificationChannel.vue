@@ -20,6 +20,12 @@ import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-const
 import { useNotificationChannelCreateFormStore } from '@/services/iam/store/notification-channel-create-form-store';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
+interface Props {
+  hasReadWriteAccess: boolean;
+}
+
+const props = defineProps<Props>();
+
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 const userGroupPageGetters = userGroupPageStore.getters;
@@ -160,7 +166,9 @@ const fetchGetUserGroupChannel = async (params: UserGroupChannelGetParameters): 
                            :title="i18n.t('IAM.USER_GROUP.TAB.NOTIFICATION_CHANNEL.TITLE')"
                 />
             </template>
-            <template #extra>
+            <template v-if="props.hasReadWriteAccess"
+                      #extra
+            >
                 <div class="toolbox-wrapper">
                     <div class="toolbox">
                         <p-button style-type="tertiary"

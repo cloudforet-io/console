@@ -16,6 +16,12 @@ import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-stor
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 
+interface Props {
+  hasReadWriteAccess?: boolean;
+}
+
+const props = defineProps<Props>();
+
 const userGroupTabs = reactive({
     activeTab: USER_GROUP_TABS.USERS,
     tabs: computed<TabItem[]>(() => ([
@@ -32,10 +38,10 @@ const userGroupTabs = reactive({
                :active-tab.sync="userGroupTabs.activeTab"
         >
             <template #users>
-                <user-group-management-tab-users />
+                <user-group-management-tab-users :has-read-write-access="props.hasReadWriteAccess" />
             </template>
             <template #notification_channel>
-                <user-group-management-tab-notification-channel />
+                <user-group-management-tab-notification-channel :has-read-write-access="props.hasReadWriteAccess" />
             </template>
         </p-tab>
     </section>

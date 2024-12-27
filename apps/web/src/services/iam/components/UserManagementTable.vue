@@ -393,7 +393,9 @@ const isWorkspaceGroupUser = (item: ExtendUserListItemType) => !!item?.role_bind
                     {{ $t('IAM.USER.REMOVE') }}
                 </p-button>
             </template>
-            <template #col-user_group-format="{value}">
+            <template v-if="!userPageState.isAdminMode"
+                      #col-user_group-format="{value}"
+            >
                 <div v-if="value.length > 0 && value.length < 4">
                     <p-badge v-for="(val, idx) in value"
                              :key="`${val.id}-${idx}`"

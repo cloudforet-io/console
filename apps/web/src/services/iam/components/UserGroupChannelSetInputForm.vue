@@ -6,7 +6,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
-import ChannelUserSelect from '@/common/components/channel-user-select/ChannelUserSelect.vue';
+
 
 import { useNotificationChannelCreateFormStore } from '@/services/iam/store/notification-channel-create-form-store';
 
@@ -29,11 +29,6 @@ const state = reactive<ChannelInfo & UserModeInfo>({
 });
 
 /* Component */
-const handleUpdateUser = (value: UserModeInfo) => {
-    state.userMode = value.userMode;
-    state.users = value.users;
-};
-
 const handleChangeChannelName = (value: string) => {
     state.channelName = value;
 };
@@ -57,21 +52,6 @@ watch(() => state, (nv_state) => {
                           @update:value="handleChangeChannelName"
             />
         </p-field-group>
-        <!--        TODO: channel token & Protocol input (possible to update later) -->
-        <p-field-group label="Channel Token"
-                       required
-        >
-            <p-text-input placeholder="xoxb-123456789012-0987654321098-ABCDEFG"
-                          block
-            />
-        </p-field-group>
-        <p-field-group label="Channel Protocol"
-                       required
-        >
-            <p-text-input placeholder="xoxb-123456789012-0987654321098-ABCDEFG"
-                          block
-            />
-        </p-field-group>
-        <channel-user-select @update-user="handleUpdateUser" />
+        <user-group-channel-add-form-data />
     </div>
 </template>
