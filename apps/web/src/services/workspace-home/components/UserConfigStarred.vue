@@ -64,6 +64,11 @@ const dropdownState = reactive({
                 name: FAVORITE_TYPE.COST_ANALYSIS, label: i18n.t('MENU.COST_EXPLORER_COST_ANALYSIS'), type: CONTEXT_MENU_TYPE.item,
             });
         }
+        if (favoriteGetters.serviceItems.length) {
+            results.push({
+                name: FAVORITE_TYPE.SERVICE, label: i18n.t('MENU.ALERT_MANAGER_SERVICE'), type: CONTEXT_MENU_TYPE.item,
+            });
+        }
         return results;
     }),
     selectedItem: 'All',

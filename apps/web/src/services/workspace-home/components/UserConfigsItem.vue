@@ -10,11 +10,13 @@ import type { MenuInfo } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { gray, indigo, peacock } from '@/styles/colors';
 
+import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
 import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
@@ -29,6 +31,8 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const workspaceHomePageStore = useWorkspaceHomePageStore();
+
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const router = useRouter();
 
@@ -54,12 +58,12 @@ const handleClickItem = () => {
     if (!props.item) return;
     const itemName = props.item.name as string;
     if (props.item.itemType === FAVORITE_TYPE.DASHBOARD) {
-        router.push({
+        router.push(getProperRouteLocation({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
                 dashboardId: itemName,
             },
-        }).catch(() => {});
+        }));
         return;
     }
     if (props.item.itemType === FAVORITE_TYPE.PROJECT) {
@@ -72,30 +76,39 @@ const handleClickItem = () => {
     }
     if (props.item.itemType === FAVORITE_TYPE.COST_ANALYSIS) {
         const parsedKeys = getParsedKeysWithManagedCostQueryFavoriteKey(itemName);
-        router.push({
+        router.push(getProperRouteLocation({
             name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
             params: {
                 dataSourceId: props.item.dataSourceId,
                 costQuerySetId: parsedKeys ? parsedKeys[1] : itemName,
             },
-        }).catch(() => {});
+        }));
         return;
     }
     if (props.item.itemType === FAVORITE_TYPE.SECURITY) {
         const itemInfo: string[] = itemName.split('.');
-        router.push({
+        router.push(getProperRouteLocation({
             name: ASSET_INVENTORY_ROUTE_V1.SECURITY.DETAIL._NAME,
             params: {
                 provider: itemInfo[0],
                 group: itemInfo[1],
                 name: props.item.label as string,
             },
-        }).catch(() => {});
+        }));
+        return;
+    }
+    if (props.item.itemType === FAVORITE_TYPE.SERVICE) {
+        router.push(getProperRouteLocation({
+            name: ALERT_MANAGER_ROUTE_V2.SERVICE.DETAIL._NAME,
+            params: {
+                serviceId: props.item.itemId,
+            },
+        }));
         return;
     }
     const menuInfo: MenuInfo = MENU_INFO_MAP[itemName];
     if (menuInfo && router.currentRoute.name !== itemName) {
-        router.push({ name: menuInfo.routeName }).catch(() => {});
+        router.push(getProperRouteLocation({ name: menuInfo.routeName }));
     }
 };
 </script>

@@ -14,6 +14,7 @@ export const FAVORITE_TYPE = {
     METRIC: 'METRIC',
     METRIC_EXAMPLE: 'METRIC_EXAMPLE',
     WORKSPACE: 'WORKSPACE',
+    SERVICE: 'SERVICE',
 } as const;
 export type FavoriteType = typeof FAVORITE_TYPE[keyof typeof FAVORITE_TYPE];
 
