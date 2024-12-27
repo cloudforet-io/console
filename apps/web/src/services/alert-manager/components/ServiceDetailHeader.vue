@@ -10,6 +10,7 @@ import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/typ
 import { MEMBERS_TYPE } from '@/schema/alert-manager/service/constants';
 import { i18n } from '@/translations';
 
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { gray } from '@/styles/colors';
@@ -29,6 +30,7 @@ const serviceDetailPageGetters = serviceDetailPageStore.getters;
 const router = useRouter();
 
 const { getProperRouteLocation } = useProperRouteLocation();
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const storeState = reactive({
     serviceInfo: computed<Service>(() => serviceDetailPageGetters.serviceInfo),
@@ -70,7 +72,9 @@ const handleGoBackButton = () => {
                                show-back-button
                                @click-back-button="handleGoBackButton"
                     >
-                        <template #title-right-extra>
+                        <template v-if="hasReadWriteAccess"
+                                  #title-right-extra
+                        >
                             <p-select-dropdown :menu="state.menuItems"
                                                style-type="icon-button"
                                                button-icon="ic_ellipsis-horizontal"
@@ -127,10 +131,10 @@ const handleGoBackButton = () => {
             </div>
         </div>
         <div v-if="modalState.modalVisible">
-            <service-detail-edit-modal v-if="modalState.type === 'edit'"
+            <service-detail-edit-modal v-if="hasReadWriteAccess && modalState.type === 'edit'"
                                        :visible.sync="modalState.modalVisible"
             />
-            <service-detail-delete-modal v-if="modalState.type === 'delete'"
+            <service-detail-delete-modal v-if="hasReadWriteAccess && modalState.type === 'delete'"
                                          :visible.sync="modalState.modalVisible"
             />
             <service-detail-member-modal v-if="modalState.type === 'member'"

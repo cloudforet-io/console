@@ -29,6 +29,7 @@ import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useQueryTags } from '@/common/composables/query-tags';
 
@@ -64,6 +65,7 @@ const serviceDetailPageGetters = serviceDetailPageStore.getters;
 const router = useRouter();
 
 const { getProperRouteLocation } = useProperRouteLocation();
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const tableState = reactive({
     actionMenu: computed<MenuItem[]>(() => ([
@@ -125,6 +127,7 @@ const initSelectedWebhook = () => {
     state.selectIndex = state.items.findIndex((item) => item.webhook_id === storeState.selectedWebhookId);
 };
 const handleClickCreateButton = () => {
+    if (!hasReadWriteAccess) return;
     router.push(getProperRouteLocation({
         name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL.WEBHOOK.CREATE._NAME,
     }));
@@ -222,7 +225,9 @@ onUnmounted(() => {
                                    :title="$t('ALERT_MANAGER.WEBHOOK.TITLE')"
                         />
                     </template>
-                    <template #extra>
+                    <template v-if="hasReadWriteAccess"
+                              #extra
+                    >
                         <p-button style-type="primary"
                                   icon-left="ic_plus_bold"
                                   @click="handleClickCreateButton"
@@ -234,7 +239,7 @@ onUnmounted(() => {
             </template>
             <template #toolbox-left>
                 <p-select-dropdown :menu="tableState.actionMenu"
-                                   :disabled="!state.selectedItem"
+                                   :disabled="!state.selectedItem || !hasReadWriteAccess"
                                    reset-selection-on-menu-close
                                    :placeholder="$t('ALERT_MANAGER.ACTION')"
                                    @select="handleSelectDropdownItem"

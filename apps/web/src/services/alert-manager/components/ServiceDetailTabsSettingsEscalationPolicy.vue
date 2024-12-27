@@ -24,6 +24,7 @@ import type { EscalationPolicyRulesType } from '@/schema/alert-manager/escalatio
 import { i18n as _i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import { green } from '@/styles/colors';
@@ -43,6 +44,8 @@ import type { EscalationPolicyModalType } from '@/services/alert-manager/types/a
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
+
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const tableState = reactive({
     actionMenu: computed<MenuItem[]>(() => ([
@@ -165,7 +168,9 @@ watch(() => storeState.serviceId, (id) => {
                                    :title="$t('ALERT_MANAGER.ESCALATION_POLICY.TITLE')"
                         />
                     </template>
-                    <template #extra>
+                    <template v-if="hasReadWriteAccess"
+                              #extra
+                    >
                         <p-button style-type="tertiary"
                                   icon-left="ic_settings-filled"
                                   size="sm"
@@ -186,7 +191,7 @@ watch(() => storeState.serviceId, (id) => {
             </template>
             <template #toolbox-left>
                 <p-select-dropdown :menu="tableState.actionMenu"
-                                   :disabled="!state.selectedItem"
+                                   :disabled="!state.selectedItem || !hasReadWriteAccess"
                                    reset-selection-on-menu-close
                                    :placeholder="$t('ALERT_MANAGER.ACTION')"
                                    @select="handleActionModal"

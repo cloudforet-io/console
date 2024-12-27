@@ -7,6 +7,8 @@ import {
     PTextarea, PButton, PTextBeautifier, PCollapsiblePanel,
 } from '@cloudforet/mirinae';
 
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
+
 import { useAlertDetailPageStore } from '@/services/alert-manager/stores/alert-detail-page-store';
 
 interface Props {
@@ -19,6 +21,8 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const alertDetailPageStore = useAlertDetailPageStore();
+
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const state = reactive({
     isEditMode: false,
@@ -54,7 +58,8 @@ onMounted(() => {
                                    :value="props.value || '--'"
                 />&zwnj;
             </p-collapsible-panel>
-            <p-button style-type="tertiary"
+            <p-button v-if="hasReadWriteAccess"
+                      style-type="tertiary"
                       size="sm"
                       @click="handleClickEditModeButton(true)"
             >
