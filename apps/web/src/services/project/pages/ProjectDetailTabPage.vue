@@ -241,7 +241,9 @@ onUnmounted(() => {
 
 <template>
     <div class="project-detail-tab-page">
-        <project-detail-tab-header :id="props.id" />
+        <project-detail-tab-header :id="props.id"
+                                   :key="`project-detail-tab-header-${props.id}`"
+        />
         <p-data-loader class="detail-tab-content"
                        :loading="projectDetailPageState.loading"
                        :loader-backdrop-color="BACKGROUND_COLOR"
