@@ -10,7 +10,6 @@ import type { NotificationProtocolListParameters } from '@/schema/alert-manager/
 import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
 import type { ServiceDeleteParameters } from '@/schema/alert-manager/service/api-verbs/delete';
 import type { ServiceGetParameters } from '@/schema/alert-manager/service/api-verbs/get';
-import type { ServiceListParameters } from '@/schema/alert-manager/service/api-verbs/list';
 import type { ServiceUpdateParameters } from '@/schema/alert-manager/service/api-verbs/update';
 import { NOTIFICATION_URGENCY, RECOVERY_MODE, SERVICE_ALERTS_TYPE } from '@/schema/alert-manager/service/constants';
 import type { ServiceModel } from '@/schema/alert-manager/service/model';
@@ -19,6 +18,7 @@ import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
+import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
 import type { UserGroupReferenceMap } from '@/store/reference/user-group-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 import { useUserStore } from '@/store/user/user-store';
@@ -34,7 +34,6 @@ interface ServiceFormStoreState {
     loading: boolean;
     currentTab: ServiceDetailTabsType;
     serviceInfo: ServiceModel;
-    serviceList: ServiceModel[];
     notificationProtocolList: ProtocolCardItemType[];
     selectedWebhookId?: string;
     selectedNotificationId?: string;
@@ -44,6 +43,7 @@ interface ServiceFormStoreGetters {
     pluginsReferenceMap: ComputedRef<PluginReferenceMap>;
     userGroupReferenceMap: ComputedRef<UserGroupReferenceMap>;
     userReferenceMap: ComputedRef<UserReferenceMap>;
+    serviceReferenceMap: ComputedRef<ServiceReferenceMap>;
     timezone: ComputedRef<string>;
     language: ComputedRef<string>;
 }
@@ -58,7 +58,6 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
         loading: false,
         currentTab: SERVICE_DETAIL_TABS.OVERVIEW,
         serviceInfo: {} as ServiceModel,
-        serviceList: [],
         notificationProtocolList: [],
         selectedWebhookId: undefined,
         selectedNotificationId: undefined,
@@ -92,6 +91,7 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
         pluginsReferenceMap: computed(() => allReferenceGetters.plugin),
         userGroupReferenceMap: computed(() => allReferenceGetters.user_group),
         userReferenceMap: computed(() => allReferenceGetters.user),
+        serviceReferenceMap: computed(() => allReferenceGetters.service),
         timezone: computed(() => userState.timezone || 'UTC'),
         language: computed(() => userStore.state.language || 'en'),
     });
@@ -113,7 +113,6 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
             state.loading = false;
             state.currentTab = SERVICE_DETAIL_TABS.OVERVIEW;
             state.serviceInfo = {} as ServiceModel;
-            state.serviceList = [];
             state.notificationProtocolList = [];
             state.selectedWebhookId = undefined;
             state.selectedNotificationId = undefined;
@@ -139,6 +138,7 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
                     name,
                 });
                 showSuccessMessage(i18n.t('ALERT_MANAGER.SERVICE.ALT_S_UPDATE_SERVICE'), '');
+                await allReferenceStore.sync('service', state.serviceInfo);
             } catch (e) {
                 ErrorHandler.handleError(e, true);
                 state.serviceInfo = {} as ServiceModel;
@@ -154,21 +154,12 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
                 throw e;
             }
         },
-        async fetchServiceList() {
-            try {
-                const { results } = await SpaceConnector.clientV2.alertManager.service.list<ServiceListParameters, ListResponse<ServiceModel>>();
-                state.serviceList = results || [];
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.serviceList = [];
-            }
-        },
         async fetchNotificationProtocolList() {
             try {
                 const { results } = await SpaceConnector.clientV2.alertManager.notificationProtocol.list<NotificationProtocolListParameters, ListResponse<NotificationProtocolModel>>();
                 state.notificationProtocolList = (results || []).map((i) => ({
                     ...i,
-                    icon: getters.pluginsReferenceMap[i.plugin_info.plugin_id || ''].icon,
+                    icon: getters.pluginsReferenceMap[i.plugin_info.plugin_id || '']?.icon || '',
                 }));
             } catch (e) {
                 ErrorHandler.handleError(e);

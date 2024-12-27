@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -8,11 +8,12 @@ import {
     PFieldGroup, PTextInput, PTooltip, PI,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ServiceCreateParameters } from '@/schema/alert-manager/service/api-verbs/create';
-import type { ServiceListParameters } from '@/schema/alert-manager/service/api-verbs/list';
 import type { ServiceModel } from '@/schema/alert-manager/service/model';
 import { i18n } from '@/translations';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -25,16 +26,20 @@ import ServiceCreateStepContainer from '@/services/alert-manager-v2/components/S
 import { useServiceCreateFormStore } from '@/services/alert-manager-v2/stores/service-create-form-store';
 
 const serviceCreateFormStore = useServiceCreateFormStore();
+const allReferenceStore = useAllReferenceStore();
+const allReferenceGetters = allReferenceStore.getters;
 
 const dropdownState = reactive({
     selectedMemberItems: [] as SelectedUserDropdownIdsType[],
+});
+const storeState = reactive({
+    serviceListMap: computed<ServiceReferenceMap>(() => allReferenceGetters.service),
 });
 const state = reactive({
     isFocusedKey: false,
     isAllFormValid: computed<boolean>(() => (isAllValid && (name && name.value !== '') && (key && key.value !== ''))),
     selectedWorkspaceMemberList: computed<string[]>(() => dropdownState.selectedMemberItems.filter((i) => i.type === 'USER').map((i) => i.value)),
     selectedUserGroupList: computed<string[]>(() => dropdownState.selectedMemberItems.filter((i) => i.type === 'USER_GROUP').map((i) => i.value)),
-    serviceList: [] as ServiceModel[],
 });
 
 const {
@@ -53,14 +58,14 @@ const {
     description: '',
 }, {
     name(value: string) {
-        const duplicatedName = state.serviceList?.find((item) => item.name === value);
+        const duplicatedName = Object.values(storeState.serviceListMap)?.find((item) => item.label === value);
         if (duplicatedName) {
             return i18n.t('ALERT_MANAGER.SERVICE.VALIDATION_NAME_UNIQUE');
         }
         return '';
     },
     key(value: string) {
-        const duplicatedName = state.serviceList?.find((item) => item.service_key === value);
+        const duplicatedName = Object.values(storeState.serviceListMap)?.find((item) => item.key === value);
         if (duplicatedName) {
             return i18n.t('ALERT_MANAGER.SERVICE.VALIDATION_KEY_UNIQUE');
         }
@@ -81,15 +86,6 @@ const handleChangeInput = (label: 'name'|'key'|'description', value?: string) =>
     setForm(label, value);
 };
 
-const fetchServiceList = async () => {
-    try {
-        const { results } = await SpaceConnector.clientV2.alertManager.service.list<ServiceListParameters, ListResponse<ServiceModel>>();
-        state.serviceList = results || [];
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.serviceList = [];
-    }
-};
 const handleCreateService = async () => {
     try {
         const createdServiceInfo = await SpaceConnector.clientV2.alertManager.service.create<ServiceCreateParameters, ServiceModel>({
@@ -113,10 +109,6 @@ watch(() => state.isFocusedKey, (isFocusedKey) => {
     if (isFocusedKey && !key.value) {
         handleChangeInput('key', convertToSnakeCase(name.value));
     }
-});
-
-onMounted(async () => {
-    await fetchServiceList();
 });
 </script>
 

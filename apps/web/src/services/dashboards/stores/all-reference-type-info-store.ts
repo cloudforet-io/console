@@ -16,6 +16,7 @@ import { useProviderReferenceStore } from '@/store/reference/provider-reference-
 import { useRegionReferenceStore } from '@/store/reference/region-reference-store';
 import { useSecretReferenceStore } from '@/store/reference/secret-reference-store';
 import { useServiceAccountReferenceStore } from '@/store/reference/service-account-reference-store';
+import { useServiceReferenceStore } from '@/store/reference/service-reference-store';
 import type { ReferenceTypeInfo } from '@/store/reference/type';
 import { useUserGroupReferenceStore } from '@/store/reference/user-group-reference-store';
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
@@ -43,6 +44,7 @@ export type ReferenceType = Extract<ManagedVariableModelKey,
     | 'collector'
     | 'namespace'
     | 'metric'
+    | 'service'
 >;
 export type AllReferenceTypeInfo = Record<ReferenceType, ReferenceTypeInfo>;
 
@@ -65,6 +67,7 @@ export const useAllReferenceTypeInfoStore = defineStore('all-reference-type-info
     const regionReferenceStore = useRegionReferenceStore();
     const namespaceReferenceStore = useNamespaceReferenceStore();
     const metricReferenceStore = useMetricReferenceStore();
+    const serviceReferenceStore = useServiceReferenceStore();
 
     const getters = reactive({
         allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => ({
@@ -86,6 +89,7 @@ export const useAllReferenceTypeInfoStore = defineStore('all-reference-type-info
             region: regionReferenceStore.getters.regionTypeInfo,
             namespace: namespaceReferenceStore.getters.namespaceTypeInfo,
             metric: metricReferenceStore.getters.metricTypeInfo,
+            service: serviceReferenceStore.getters.serviceTypeInfo,
         })),
     });
 

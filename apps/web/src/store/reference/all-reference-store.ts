@@ -33,6 +33,7 @@ import { useRegionReferenceStore } from '@/store/reference/region-reference-stor
 import { useRoleReferenceStore } from '@/store/reference/role-reference-store';
 import { useSecretReferenceStore } from '@/store/reference/secret-reference-store';
 import { useServiceAccountReferenceStore } from '@/store/reference/service-account-reference-store';
+import { useServiceReferenceStore } from '@/store/reference/service-reference-store';
 import { useTrustedAccountReferenceStore } from '@/store/reference/trusted-account-reference-store';
 import type { ReferenceLoadOptions } from '@/store/reference/type';
 import type { UserGroupReferenceMap } from '@/store/reference/user-group-reference-store';
@@ -70,7 +71,8 @@ type PiniaStoreReferenceType =
     |'metric'
     |'namespace'
     |'workspace_group'
-    |'role';
+    |'role'
+    |'service';
 
 export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const cloudServiceTypeReferenceStore = useCloudServiceTypeReferenceStore();
@@ -97,6 +99,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const metricReferenceStore = useMetricReferenceStore();
     const workspaceGroupReferenceStore = useWorkspaceGroupReferenceStore();
     const roleReferenceStore = useRoleReferenceStore();
+    const serviceReferenceStore = useServiceReferenceStore();
 
     const getters = {
         // REFACTOR: unify into one case (serviceAccount or service_account)
@@ -134,6 +137,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
         namespace: computed(() => namespaceReferenceStore.getters.namespaceItems),
         metric: computed<MetricReferenceMap>(() => metricReferenceStore.getters.metricItems),
         role: computed(() => roleReferenceStore.getters.roleItems),
+        service: computed(() => serviceReferenceStore.getters.serviceItems),
     };
 
     const actions = {
@@ -183,6 +187,8 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
                 await metricReferenceStore.sync(data); break;
             case 'role':
                 await roleReferenceStore.sync(data); break;
+            case 'service':
+                await serviceReferenceStore.sync(data); break;
             default: break;
             }
         },
@@ -236,6 +242,8 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
                 await metricReferenceStore.load(options); break;
             case 'role':
                 await roleReferenceStore.load(options); break;
+            case 'service':
+                await serviceReferenceStore.load(options); break;
             default: break;
             }
         },
@@ -264,6 +272,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
             namespaceReferenceStore.flush();
             metricReferenceStore.flush();
             roleReferenceStore.flush();
+            serviceReferenceStore.flush();
         },
     };
 
