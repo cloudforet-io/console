@@ -22,6 +22,7 @@ import type { MinValue } from '@/common/modules/widgets/_widget-fields/min/type'
 import type { MissingValueValue } from '@/common/modules/widgets/_widget-fields/missing-value/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type { PieChartTypeValue } from '@/common/modules/widgets/_widget-fields/pie-chart-type/type';
+import type { SankeyAxisValue } from '@/common/modules/widgets/_widget-fields/sankey-axis/type';
 import type { StackByValue } from '@/common/modules/widgets/_widget-fields/stack-by/type';
 import type { SubTotalValue } from '@/common/modules/widgets/_widget-fields/sub-total/type';
 import type { TableColumnComparisonValue } from '@/common/modules/widgets/_widget-fields/table-column-comparison/type';
@@ -78,4 +79,5 @@ export interface WidgetFieldTypeMap {
     tableColumnComparison: WidgetFieldValue<TableColumnComparisonValue>;
     colorSchema: WidgetFieldValue<ColorSchemaValue>;
     categoryBy: WidgetFieldValue<CategoryByValue>;
+    sankeyAxis: WidgetFieldValue<SankeyAxisValue>;
 }

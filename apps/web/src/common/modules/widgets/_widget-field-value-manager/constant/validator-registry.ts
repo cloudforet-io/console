@@ -19,6 +19,7 @@ import { ICON_FIELD_ITEMS } from '@/common/modules/widgets/_widget-fields/icon/c
 import type { IconValue } from '@/common/modules/widgets/_widget-fields/icon/type';
 import type { MaxValue } from '@/common/modules/widgets/_widget-fields/max/type';
 import type { MinValue } from '@/common/modules/widgets/_widget-fields/min/type';
+import type { SankeyAxisOptions, SankeyAxisValue } from '@/common/modules/widgets/_widget-fields/sankey-axis/type';
 import type { StackByValue, StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
 import type { TableColumnComparisonValue } from '@/common/modules/widgets/_widget-fields/table-column-comparison/type';
 import type { TableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/table-column-width/type';
@@ -139,6 +140,12 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
         if (groupByOptions.multiSelectable && (!Array.isArray(fieldValue.data) || !fieldValue.data.length)) return false;
         if (groupByOptions.excludeDateField && fieldValue.data === 'Date') return false;
         return !!fieldValue.data;
+    },
+    sankeyAxis: (fieldValue: SankeyAxisValue, widgetConfig) => {
+        const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
+        const sankeyAxisOptions = (_fieldsSchema.sankeyAxis?.options ?? {}) as SankeyAxisOptions;
+        if (!fieldValue.data || fieldValue.data.length !== 2 || !fieldValue.count || fieldValue.count > sankeyAxisOptions.max) return false;
+        return true;
     },
     widgetHeader: (fieldValue: WidgetHeaderValue) => {
         if (!fieldValue.toggleValue) return true;

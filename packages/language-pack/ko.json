@@ -2160,6 +2160,8 @@
 					"PROGRESS_BAR_DESCRIPTION_1": "비율 계산 공식: ",
 					"PROGRESS_BAR_DESCRIPTION_2": "[기준 필드 ÷ 총합 필드 x 100]",
 					"REQUIRED_FIELDS": "필수 입력 항목",
+					"SANKEY_AXIS": "",
+					"SANKEY_AXIS_WARNING": "",
 					"STACK_BY": "스택별",
 					"START": "시작",
 					"STATIC_FIELD": "고정 데이터 필드",

@@ -2160,6 +2160,8 @@
 					"PROGRESS_BAR_DESCRIPTION_1": "The percentage is calculated as:",
 					"PROGRESS_BAR_DESCRIPTION_2": "[Basis Field ÷ Total Field x 100]",
 					"REQUIRED_FIELDS": "Required Fields",
+					"SANKEY_AXIS": "Sankey Axis",
+					"SANKEY_AXIS_WARNING": "There can be a maximum of 2 Sankey Axis.",
 					"STACK_BY": "Stack by",
 					"START": "Start",
 					"STATIC_FIELD": "Static Field",
