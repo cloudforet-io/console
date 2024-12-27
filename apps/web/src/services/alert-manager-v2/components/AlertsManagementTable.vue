@@ -5,7 +5,7 @@ import type { TranslateResult } from 'vue-i18n';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PToolboxTable, PSelectDropdown, PLink, PBadge, PI, PSelectStatus,
+    PToolboxTable, PSelectDropdown, PLink, PBadge, PI, PSelectStatus, PDivider,
 } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
@@ -212,13 +212,15 @@ onMounted(async () => {
                 />
             </template>
             <template #toolbox-bottom>
-                <div class="flex justify-between mr-4 mb-4 ml-4">
+                <div class="quick-filter-wrapper flex justify-between mr-4 mb-4 ml-4">
                     <div class="status-filter-wrapper">
-                        <span class="mr-2">{{ $t('ALERT_MANAGER.STATUS') }}</span>
+                        <span>{{ $t('ALERT_MANAGER.STATUS') }}</span>
+                        <p-divider class="divider"
+                                   vertical
+                        />
                         <p-select-status v-for="(item, idx) in filterState.statusFields"
                                          :key="idx"
                                          :selected="filterState.selectedStatusFilter"
-                                         class="mr-2"
                                          :value="item.name"
                                          @change="handleSelectFilter('status', item.name)"
                         >
@@ -226,11 +228,13 @@ onMounted(async () => {
                         </p-select-status>
                     </div>
                     <div class="status-filter-wrapper">
-                        <span class="mr-2">{{ $t('ALERT_MANAGER.ALERTS.LABEL_URGENCY') }}</span>
+                        <span>{{ $t('ALERT_MANAGER.ALERTS.LABEL_URGENCY') }}</span>
+                        <p-divider class="divider"
+                                   vertical
+                        />
                         <p-select-status v-for="(item, idx) in filterState.urgencyFields"
                                          :key="idx"
                                          :selected="filterState.selectedUrgencyFilter"
-                                         class="mr-2"
                                          :value="item.name"
                                          @change="handleSelectFilter('urgency', item.name)"
                         >
@@ -310,10 +314,29 @@ onMounted(async () => {
         margin-bottom: -0.5rem;
         width: max-content;
     }
-    .status-filter-wrapper {
-        @apply flex items-center text-label-md text-gray-600;
-        gap: 0.5rem;
-        margin-top: -0.5rem;
+    .quick-filter-wrapper {
+        .status-filter-wrapper {
+            @apply flex items-center flex-wrap text-label-md text-gray-600;
+            gap: 0.75rem;
+            margin-top: -0.5rem;
+            .divider {
+                height: 1rem;
+                padding-top: 0.25rem;
+                padding-bottom: 0.25rem;
+            }
+        }
+
+        @screen mobile {
+            flex-direction: column;
+            gap: 1rem;
+            .status-filter-wrapper {
+                margin-top: 0;
+                .divider {
+                    padding-top: 0;
+                    padding-bottom: 0;
+                }
+            }
+        }
     }
 }
 </style>
