@@ -2,7 +2,7 @@ import type { MenuId, MenuInfo } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
 import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
-import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
+import { ALERT_MANAGER_ROUTE_V1 } from '@/services/alert-manager-v1/routes/route-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
@@ -127,14 +127,14 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
     // NOTE: v1 menu
     [MENU_ID.ALERT_MANAGER_DASHBOARD]: {
         menuId: MENU_ID.ALERT_MANAGER_DASHBOARD,
-        routeName: ALERT_MANAGER_ROUTE.DASHBOARD._NAME,
+        routeName: ALERT_MANAGER_ROUTE_V1.DASHBOARD._NAME,
         translationId: 'MENU.ALERT_MANAGER_DASHBOARD',
         icon: 'ic_service_alert-dashboard',
     },
     // NOTE: v1 menu
     [MENU_ID.ESCALATION_POLICY]: {
         menuId: MENU_ID.ESCALATION_POLICY,
-        routeName: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME,
+        routeName: ALERT_MANAGER_ROUTE_V1.ESCALATION_POLICY._NAME,
         translationId: 'MENU.ALERT_MANAGER_ESCALATION_POLICY',
         icon: 'ic_service_escalation-policy',
     },
@@ -146,7 +146,7 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
     },
     [MENU_ID.SERVICE]: {
         menuId: MENU_ID.SERVICE,
-        routeName: ALERT_MANAGER_ROUTE_V2.SERVICE._NAME,
+        routeName: ALERT_MANAGER_ROUTE.SERVICE._NAME,
         translationId: 'MENU.ALERT_MANAGER_SERVICE',
         icon: 'ic_service_alert-dashboard',
     },

@@ -66,7 +66,7 @@ const state = reactive({
 /* Util */
 const getIsValid = (isProject: boolean, selectProjectGroup: boolean, selectedProjectGroupIdList: string[], originParentGroupId?: string) => {
     if (isProject) return true;
-    if (!selectProjectGroup) { // no project group
+    if (!selectProjectGroup) { // no project-v1 group
         if (!originParentGroupId) return false;
     } else {
         if (!selectedProjectGroupIdList.length) return false;

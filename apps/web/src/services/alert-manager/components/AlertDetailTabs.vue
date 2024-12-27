@@ -3,26 +3,25 @@ import {
     computed, reactive,
 } from 'vue';
 
-import { PHeading, PTab } from '@cloudforet/mirinae';
+import { PTab } from '@cloudforet/mirinae';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
 import { i18n } from '@/translations';
 
 import AlertDetailTabsDetails from '@/services/alert-manager/components/AlertDetailTabsDetails.vue';
-import AlertDetailTabsPushedEvent from '@/services/alert-manager/components/AlertDetailTabsPushedEvent.vue';
+import AlertDetailTabsTimeline from '@/services/alert-manager/components/AlertDetailTabsTimeline.vue';
 
-const props = withDefaults(defineProps<{
-    id: string;
-}>(), {
-    id: '',
-});
+const DETAIL_TABS = {
+    DETAIL: 'detail',
+    TIMELINE: 'timeline',
+} as const;
 
 const tabState = reactive({
-    tabs: computed(() => ([
-        { name: 'details', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.ADDITIONAL_INFO') },
-        { name: 'pushed-event', label: i18n.t('MONITORING.ALERT.DETAIL.PUSHED_EVENT.PUSHED_EVENT') },
-    ] as TabItem[])),
-    activeTab: 'details',
+    tabs: computed<TabItem[]>(() => ([
+        { name: DETAIL_TABS.DETAIL, label: i18n.t('ALERT_MANAGER.ALERTS.DETAILS') },
+        { name: DETAIL_TABS.TIMELINE, label: i18n.t('ALERT_MANAGER.ALERTS.TIMELINE') },
+    ])),
+    activeTab: DETAIL_TABS.DETAIL,
 });
 </script>
 
@@ -30,15 +29,11 @@ const tabState = reactive({
     <p-tab :tabs="tabState.tabs"
            :active-tab.sync="tabState.activeTab"
     >
-        <template #pushed-event>
-            <p-heading class="pt-8 px-4 pb-4"
-                       heading-type="sub"
-                       :title="$t('MONITORING.ALERT.DETAIL.PUSHED_EVENT.PUSHED_EVENT')"
-            />
-            <alert-detail-tabs-pushed-event :id="props.id" />
+        <template #detail>
+            <alert-detail-tabs-details />
         </template>
-        <template #details>
-            <alert-detail-tabs-details :id="props.id" />
+        <template #timeline>
+            <alert-detail-tabs-timeline />
         </template>
     </p-tab>
 </template>

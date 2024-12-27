@@ -12,12 +12,8 @@ const ProjectDetailPage = () => import('@/services/project/pages/ProjectDetailPa
 const ProjectDetailTabPage = () => import('@/services/project/pages/ProjectDetailTabPage.vue');
 const ProjectDashboardPage = () => import('@/services/project/pages/ProjectDashboardPage.vue');
 const ProjectSummaryPage = () => import('@/services/project/pages/ProjectSummaryPage.vue');
-const ProjectAlertPage = () => import('@/services/project/pages/ProjectAlertPage.vue');
-const ProjectAlertWebhookCreatePage = () => import('@/services/project/pages/ProjectAlertWebhookCreatePage.vue');
-const ProjectNotificationsPage = () => import('@/services/project/pages/ProjectNotificationPage.vue');
-const ProjectAlertEventRulePage = () => import('@/services/project/pages/ProjectAlertEventRulePage.vue');
-const ProjectNotificationAddPage = () => import('@/services/project/pages/ProjectNotificationAddPage.vue');
-export default {
+
+const projectRoute: RouteConfig = {
     path: 'project',
     meta: {
         menuId: MENU_ID.PROJECT,
@@ -57,20 +53,6 @@ export default {
                             component: ProjectSummaryPage,
                         },
                         {
-                            path: 'alert',
-                            name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
-                            meta: { lsbVisible: true },
-                            props: true,
-                            component: ProjectAlertPage,
-                        },
-                        {
-                            path: 'notification',
-                            name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
-                            meta: { lsbVisible: true },
-                            props: true,
-                            component: ProjectNotificationsPage,
-                        },
-                        {
                             path: '*',
                             redirect: 'summary',
                         },
@@ -83,27 +65,9 @@ export default {
                         },
                     ],
                 },
-                {
-                    path: 'event-rule',
-                    name: PROJECT_ROUTE.DETAIL.EVENT_RULE._NAME,
-                    props: (route) => ({ projectId: route.params.id }),
-                    meta: { lsbVisible: true },
-                    component: ProjectAlertEventRulePage,
-                },
-                {
-                    path: 'notification/:protocolId',
-                    name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS.ADD._NAME,
-                    meta: { lsbVisible: true },
-                    component: ProjectNotificationAddPage,
-                    props: true,
-                },
-                {
-                    path: 'webhook/create',
-                    name: PROJECT_ROUTE.DETAIL.TAB.ALERT.WEBHOOK.CREATE._NAME,
-                    meta: { centeredLayout: true },
-                    component: ProjectAlertWebhookCreatePage,
-                },
             ],
         },
     ],
-} as RouteConfig;
+};
+
+export default projectRoute;

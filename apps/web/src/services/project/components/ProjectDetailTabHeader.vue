@@ -26,10 +26,6 @@ import type { ProjectModel } from '@/schema/identity/project/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
 import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
-import type { ProjectAlertConfigListParameters } from '@/schema/monitoring/project-alert-config/api-verbs/list';
-import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';
-import type { WebhookListParameters } from '@/schema/monitoring/webhook/api-verbs/list';
-import type { WebhookModel } from '@/schema/monitoring/webhook/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -181,12 +177,6 @@ const tagsState = reactive({
     tags: computed(() => state.currentProject?.tags ?? {}),
 });
 
-const webhooksState = reactive({
-    loading: false,
-    webhookCount: 0,
-    alertActivated: false,
-});
-
 /* Event */
 const handleSelectItem = (selected: MenuItem) => {
     if (selected.name === 'update') state.projectEditModalVisible = true;
@@ -194,14 +184,6 @@ const handleSelectItem = (selected: MenuItem) => {
     if (selected.name === 'delete') state.projectDeleteModalVisible = true;
 };
 
-const handleClickWebhook = () => {
-    if (!props.id) return;
-    if (!webhooksState.alertActivated) {
-        router.push(getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME, params: { id: props.id } }));
-        return;
-    }
-    router.push(getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME, params: { id: props.id }, query: { tab: 'webhook' } }));
-};
 const handleOpenMemberModal = () => {
     memberState.memberModalVisible = true;
 };
@@ -314,35 +296,9 @@ const fetchUserList = async () => {
     }
 };
 
-const listWebhooks = async () => {
-    if (!props.id) return;
-    try {
-        const res = await SpaceConnector.clientV2.monitoring.webhook.list<WebhookListParameters, ListResponse<WebhookModel>>({
-            project_id: props.id,
-        });
-        webhooksState.webhookCount = res.total_count ?? 0;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
-const getProjectAlertActivated = async () => {
-    try {
-        const { results } = await SpaceConnector.clientV2.monitoring.projectAlertConfig.list<ProjectAlertConfigListParameters, ListResponse<ProjectAlertConfigModel>>({
-            project_id: props.id,
-        });
-        webhooksState.alertActivated = !!results?.length;
-    } catch (e) {
-        webhooksState.alertActivated = false;
-        ErrorHandler.handleError(e);
-    }
-};
-
-
 /* Watchers */
 watch(() => projectDetailPageGetters.projectType, async () => {
     await Promise.allSettled([
-        getProjectAlertActivated(),
-        listWebhooks(),
         fetchUserList(),
     ]);
 });
@@ -457,17 +413,6 @@ watch(() => projectDetailPageState.projectId, (projectId) => {
                                  :color="gray[400]"
                             />
                         </template>
-                        <div class="info-item"
-                             @click="handleClickWebhook"
-                        >
-                            <p-i class="info-icon"
-                                 name="ic_webhook"
-                                 width="0.75rem"
-                                 height="0.75rem"
-                                 color="inherit"
-                            />
-                            <span>{{ webhooksState.webhookCount }} {{ $t('PROJECT.DETAIL.WEBHOOKS') }}</span>
-                        </div>
                         <p-i name="ic_dot"
                              width="0.125rem"
                              height="0.125rem"

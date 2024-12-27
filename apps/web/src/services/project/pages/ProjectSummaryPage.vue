@@ -1,22 +1,15 @@
 <script lang="ts" setup>
 import {
-    reactive, watch,
+    reactive,
 } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PI, PIconButton } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { ProjectAlertConfigListParameters } from '@/schema/monitoring/project-alert-config/api-verbs/list';
-import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
 
 import { gray, indigo } from '@/styles/colors';
 
 import CloudServices from '@/services/asset-inventory-v1/components/CloudServices.vue';
-import ProjectSummaryAlertWidget from '@/services/project/components/ProjectSummaryAlertWidget.vue';
 import ProjectSummaryAllSummaryWidget from '@/services/project/components/ProjectSummaryAllSummaryWidget.vue';
 import ProjectSummaryBillingWidget from '@/services/project/components/ProjectSummaryBillingWidget.vue';
 import ProjectSummaryPersonalHealthDashboardWidget from '@/services/project/components/ProjectSummaryPersonalHealthDashboardWidget.vue';
@@ -30,29 +23,12 @@ interface Props {
 }
 const props = defineProps<Props>();
 const state = reactive({
-    hasAlertConfig: false,
     deprecatedNotiVisible: true,
 });
 
 const handleClickNotiClose = () => {
     state.deprecatedNotiVisible = false;
 };
-
-/* api */
-const getProjectAlertConfig = async () => {
-    try {
-        const { results } = await SpaceConnector.clientV2.monitoring.projectAlertConfig.list<ProjectAlertConfigListParameters, ListResponse<ProjectAlertConfigModel>>({
-            project_id: props.id,
-        });
-        state.hasAlertConfig = !!results?.length;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
-
-watch(() => props.id, () => {
-    getProjectAlertConfig();
-}, { immediate: true });
 </script>
 
 <template>
@@ -89,15 +65,9 @@ watch(() => props.id, () => {
             :project-id="props.id"
         />
         <div class="col-span-12 lg:col-span-9 grid grid-cols-12 left-part">
-            <project-summary-alert-widget
-                v-if="state.hasAlertConfig"
-                :key="`project-summary-alert-widget-${props.id}`"
-                class="col-span-12"
-                :project-id="props.id"
-            />
-            <!--            <project-summary-billing-widget-->
+            <!--            <project-v1-summary-billing-widget-->
             <!--                class="col-span-12"-->
-            <!--                :project-id="props.id"-->
+            <!--                :project-v1-id="props.id"-->
             <!--            />-->
             <project-summary-billing-widget
                 :key="`project-summary-billing-widget-${props.id}`"
