@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import {
-    defineProps, onUnmounted, watch,
+    computed,
+    defineProps, onUnmounted, reactive, watch,
 } from 'vue';
+
+import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
+import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import ServiceDetailHeader from '@/services/alert-manager-v2/components/ServiceDetailHeader.vue';
 import ServiceDetailTabs from '@/services/alert-manager-v2/components/ServiceDetailTabs.vue';
@@ -14,12 +19,20 @@ const props = withDefaults(defineProps<Props>(), {
     serviceId: '',
 });
 
+const gnbStore = useGnbStore();
 const serviceDetailPageStore = useServiceDetailPageStore();
 
+const state = reactive({
+    favoriteOptions: computed<FavoriteOptions>(() => ({
+        type: FAVORITE_TYPE.SERVICE,
+        id: props.serviceId,
+    })),
+});
 watch(() => props.serviceId, async (serviceId) => {
     if (!serviceId) return;
     await serviceDetailPageStore.fetchNotificationProtocolList();
     await serviceDetailPageStore.fetchServiceDetailData(serviceId);
+    await gnbStore.setFavoriteItemId(state.favoriteOptions);
 }, { immediate: true });
 
 onUnmounted(() => {

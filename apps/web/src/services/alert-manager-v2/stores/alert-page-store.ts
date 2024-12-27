@@ -1,4 +1,4 @@
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
@@ -8,23 +8,29 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { AlertListParameters } from '@/schema/alert-manager/alert/api-verbs/list';
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
-import type { ServiceListParameters } from '@/schema/alert-manager/service/api-verbs/list';
-import type { ServiceModel } from '@/schema/alert-manager/service/model';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface AlertPageStoreState {
     alertList: AlertModel[]
     alertListParams?: AlertListParameters;
-    serviceList: SelectDropdownMenuItem[];
 }
 
 export const useAlertPageStore = defineStore('page-alert', () => {
+    const allReferenceStore = useAllReferenceStore();
+    const allReferenceGetters = allReferenceStore.getters;
     const state = reactive<AlertPageStoreState>({
         alertList: [],
         alertListParams: undefined,
-        serviceList: [],
     });
+    const getters = {
+        serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => Object.values(allReferenceGetters.service).map((i) => ({
+            name: i.name,
+            label: i.label,
+        }))),
+    };
     const mutations = {
         setAlertListParams(params: AlertListParameters) {
             state.alertListParams = params;
@@ -34,7 +40,6 @@ export const useAlertPageStore = defineStore('page-alert', () => {
         async init() {
             state.alertList = [];
             state.alertListParams = undefined;
-            state.serviceList = [];
         },
         async fetchAlertsList(params?: AlertListParameters) {
             try {
@@ -46,24 +51,12 @@ export const useAlertPageStore = defineStore('page-alert', () => {
                 throw e;
             }
         },
-        async fetchServiceList() {
-            try {
-                const { results } = await SpaceConnector.clientV2.alertManager.service.list<ServiceListParameters, ListResponse<ServiceModel>>();
-                state.serviceList = (results || []).map((i) => ({
-                    name: i.service_id,
-                    label: i.name,
-                }));
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.serviceList = [];
-                throw e;
-            }
-        },
 
     };
 
     return {
         state,
+        getters,
         ...mutations,
         ...actions,
     };

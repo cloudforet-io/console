@@ -59,6 +59,7 @@ const alertManagerRoutesV2: RouteConfig = {
                             path: '/',
                             name: ALERT_MANAGER_ROUTE_V2.SERVICE.DETAIL._NAME,
                             props: true,
+                            meta: { label: ({ params }) => params.serviceId, copiable: true },
                             component: ServiceDetailPage as any,
                         },
                         {
@@ -97,6 +98,7 @@ const alertManagerRoutesV2: RouteConfig = {
                     path: ':alertId',
                     name: ALERT_MANAGER_ROUTE_V2.ALERTS.DETAIL._NAME,
                     props: true,
+                    meta: { label: ({ params }) => params.alertId, copiable: true },
                     component: AlertsDetailPage as any,
                 },
             ],

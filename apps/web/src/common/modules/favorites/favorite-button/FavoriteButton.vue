@@ -20,6 +20,7 @@ import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-sou
 import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
+import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
 
 import type { ReferenceData } from '@/lib/helper/config-data-helper';
 import {
@@ -32,6 +33,7 @@ import {
     convertProjectConfigToReferenceData,
     convertProjectGroupConfigToReferenceData,
     convertWorkspaceConfigToReferenceData,
+    convertServiceConfigToReferenceData,
 } from '@/lib/helper/config-data-helper';
 
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
@@ -81,6 +83,7 @@ const storeState = reactive({
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
+    service: computed<ServiceReferenceMap>(() => allReferenceStore.getters.service),
     metricExamples: computed<MetricExampleModel[]>(() => gnbStoreGetters.metricExamples),
     costQuerySets: computed<CostQuerySetModel[]>(() => gnbStoreGetters.costQuerySets),
 });
@@ -139,6 +142,9 @@ const convertFavoriteToReferenceData = (favoriteConfig: FavoriteConfig): Referen
     }
     if (itemType === FAVORITE_TYPE.WORKSPACE) {
         return convertWorkspaceConfigToReferenceData([favoriteConfig], storeState.workspaceList)[0];
+    }
+    if (itemType === FAVORITE_TYPE.SERVICE) {
+        return convertServiceConfigToReferenceData([favoriteConfig], storeState.service)[0];
     }
     const allMenuList = displayStore.getAllMenuList(route);
     return convertMenuConfigToReferenceData([favoriteConfig], allMenuList)[0];
