@@ -2160,6 +2160,8 @@
 					"PROGRESS_BAR_DESCRIPTION_1": "割合計算式:",
 					"PROGRESS_BAR_DESCRIPTION_2": "[基準フィールド ÷ 総合フィールド x 100]",
 					"REQUIRED_FIELDS": "必須フィールド",
+					"SANKEY_AXIS": "",
+					"SANKEY_AXIS_WARNING": "",
 					"STACK_BY": "スタック別",
 					"START": "開始",
 					"STATIC_FIELD": "静的フィールド",
