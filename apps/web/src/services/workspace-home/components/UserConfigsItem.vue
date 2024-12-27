@@ -16,7 +16,7 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { gray, indigo, peacock } from '@/styles/colors';
 
-import { ALERT_MANAGER_ROUTE_V2 } from '@/services/alert-manager-v2/routes/route-constant';
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
@@ -99,7 +99,7 @@ const handleClickItem = () => {
     }
     if (props.item.itemType === FAVORITE_TYPE.SERVICE) {
         router.push(getProperRouteLocation({
-            name: ALERT_MANAGER_ROUTE_V2.SERVICE.DETAIL._NAME,
+            name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME,
             params: {
                 serviceId: props.item.itemId,
             },

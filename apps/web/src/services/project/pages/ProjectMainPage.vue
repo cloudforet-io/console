@@ -36,7 +36,6 @@ import { useProjectTreeStore } from '@/services/project/stores/project-tree-stor
 const gnbStore = useGnbStore();
 // const gnbGetters = gnbStore.getters;
 const allReferenceStore = useAllReferenceStore();
-const userStore = useUserStore();
 const projectTreeStore = useProjectTreeStore();
 const projectPageStore = useProjectPageStore();
 const projectPageState = projectPageStore.state;
@@ -44,9 +43,10 @@ const projectPageState = projectPageStore.state;
 const menuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement | null>(null);
 const route = useRoute();
+const userStore = useUserStore();
 
 const storeState = reactive({
-    userId: computed<string|undefined>(() => userStore.state.userId),
+    userId: computed(() => userStore.state.userId),
     groupName: computed(() => storeState.projectGroups[state.currentProjectGroupId]?.name),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
