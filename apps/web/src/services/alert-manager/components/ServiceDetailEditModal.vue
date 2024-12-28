@@ -89,12 +89,14 @@ const handleClose = () => {
                                class="input-form"
                                required
                 >
-                    <p-text-input :value="name"
-                                  :invalid="invalidState.name"
-                                  class="text-input"
-                                  block
-                                  @update:value="setForm('name', $event)"
-                    />
+                    <template #default="{invalid}">
+                        <p-text-input :value="name"
+                                      :invalid="invalid"
+                                      class="text-input"
+                                      block
+                                      @update:value="setForm('name', $event)"
+                        />
+                    </template>
                 </p-field-group>
             </div>
         </template>

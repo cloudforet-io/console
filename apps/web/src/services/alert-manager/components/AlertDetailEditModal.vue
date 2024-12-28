@@ -36,7 +36,6 @@ const {
     },
     setForm,
     invalidState,
-    invalidTexts,
     isAllValid,
 } = useFormValidator({
     name: storeState.alertInfo.title,
@@ -81,17 +80,18 @@ const handleConfirm = async () => {
         <template #body>
             <div class="form-contents">
                 <p-field-group :label="$t('ALERT_MANAGER.ALERTS.LABEL_NAME')"
-                               :invalid="invalidState.name"
-                               :invalid-text="invalidTexts.name"
                                class="input-form"
+                               :invalid="invalidState.name"
                                required
                 >
-                    <p-text-input :value="name"
-                                  :invalid="invalidState.name"
-                                  class="text-input"
-                                  block
-                                  @update:value="setForm('name', $event)"
-                    />
+                    <template #default="{invalid}">
+                        <p-text-input :value="name"
+                                      class="text-input"
+                                      :invalid="invalid"
+                                      block
+                                      @update:value="setForm('name', $event)"
+                        />
+                    </template>
                 </p-field-group>
             </div>
         </template>

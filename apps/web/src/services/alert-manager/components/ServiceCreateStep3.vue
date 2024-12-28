@@ -37,21 +37,10 @@ const storeState = reactive({
 });
 const state = reactive({
     form: {} as CreatedNotificationInfoType,
+    formValid: false,
     isAllFormValid: computed<boolean>(() => {
         if (storeState.currentSubStep === 1) return storeState.selectedProtocol !== '';
-        const { name, data } = state.form;
-
-        if (!name) return false;
-        if (data.FORWARD_TYPE === 'USER') {
-            return Array.isArray(data.USER) && data.USER.length > 0 && !data.USER_GROUP;
-        }
-        if (data.FORWARD_TYPE === 'USER_GROUP') {
-            return Array.isArray(data.USER_GROUP) && data.USER_GROUP.length > 0 && !data.USER;
-        }
-        if (data.FORWARD_TYPE === 'ALL_MEMBER') {
-            return !data.USER && !data.USER_GROUP;
-        }
-        return false;
+        return state.formValid;
     }),
 });
 
@@ -66,8 +55,9 @@ const routeDetailSettingPage = () => {
         },
     }));
 };
-const handleChangeForm = (form: CreatedNotificationInfoType) => {
+const handleChangeForm = (form: CreatedNotificationInfoType, formValid: boolean) => {
     state.form = form;
+    state.formValid = formValid;
 };
 
 const fetchCreateNotifications = async () => {

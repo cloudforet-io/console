@@ -47,9 +47,6 @@ const state = reactive({
     formValid: false,
     isAllFormValid: computed<boolean>(() => {
         if (state.currentStep === 1) return storeState.selectedProtocolId !== '';
-        const { name } = state.form;
-
-        if (!name) return false;
         return state.formValid;
     }),
 });

@@ -70,10 +70,18 @@ const {
     },
     setForm,
     invalidState,
-    invalidTexts,
+    isAllValid,
 } = useFormValidator({
     name: '',
-}, {});
+}, {
+    name(value: string) {
+        if (!value) return ' ';
+        if (value.length >= 40) {
+            return i18n.t('ALERT_MANAGER.NOTIFICATIONS.NAME_INVALID_TEXT');
+        }
+        return '';
+    },
+});
 
 const handleSchemaValidate = (isValid: boolean) => {
     state.isSchemaDataValid = isValid;
@@ -99,7 +107,7 @@ watch([() => name.value, () => state.scheduleForm, () => state.selectedRadioIdx,
                 USER: selectedRadioIdx === 2 ? selectedMemberItems.map((item) => item.value) : undefined,
             },
         },
-        state.isForwardTypeProtocol ? state.isMemberDataValid : state.isSchemaDataValid,
+        isAllValid.value && (state.isForwardTypeProtocol ? state.isMemberDataValid : state.isSchemaDataValid),
     );
 });
 </script>
@@ -125,7 +133,6 @@ watch([() => name.value, () => state.scheduleForm, () => state.selectedRadioIdx,
         </div>
         <p-field-group :label="$t('ALERT_MANAGER.NOTIFICATIONS.CHANNEL_NAME')"
                        class="pt-2"
-                       :invalid-text="invalidTexts.name"
                        :invalid="invalidState.name"
                        required
         >

@@ -142,7 +142,7 @@ watch(() => storeState.serviceId, (id) => {
     <div class="service-detail-tabs-escalation-policy">
         <p-toolbox-table class="escalation-policy-table mt-4"
                          search-type="query"
-                         selectable
+                         :selectable="hasReadWriteAccess"
                          sortable
                          exportable
                          :multi-select="false"
@@ -189,9 +189,11 @@ watch(() => storeState.serviceId, (id) => {
                     </template>
                 </p-heading-layout>
             </template>
-            <template #toolbox-left>
+            <template v-if="hasReadWriteAccess"
+                      #toolbox-left
+            >
                 <p-select-dropdown :menu="tableState.actionMenu"
-                                   :disabled="!state.selectedItem || !hasReadWriteAccess"
+                                   :disabled="!state.selectedItem"
                                    reset-selection-on-menu-close
                                    :placeholder="$t('ALERT_MANAGER.ACTION')"
                                    @select="handleActionModal"

@@ -74,7 +74,7 @@ const state = reactive({
     }] as EscalationPolicyRulesType[],
     repeatCount: 0,
     formValid: computed<boolean>(() => state.rules.every((r) => r.channels.length > 0)),
-    isModalValid: computed<boolean>(() => name.value !== '' && !invalidState.name && state.formValid),
+    isModalValid: computed<boolean>(() => isAllValid.value && state.formValid),
 });
 
 const {
@@ -82,11 +82,12 @@ const {
     setForm,
     invalidState,
     invalidTexts,
+    isAllValid,
 } = useFormValidator({
     name: '',
 }, {
     name(value: string) {
-        if (value === '') return '';
+        if (!value) return ' ';
         if (value.length > 40) return i18n.t('ALERT_MANAGER.ESCALATION_POLICY.NAME_INVALID_TEXT');
         return '';
     },
