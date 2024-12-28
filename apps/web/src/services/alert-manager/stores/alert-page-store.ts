@@ -15,6 +15,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface AlertPageStoreState {
     alertList: AlertModel[]
+    totalAlertCount: number;
     alertListParams?: AlertListParameters;
 }
 
@@ -23,6 +24,7 @@ export const useAlertPageStore = defineStore('page-alert', () => {
     const allReferenceGetters = allReferenceStore.getters;
     const state = reactive<AlertPageStoreState>({
         alertList: [],
+        totalAlertCount: 0,
         alertListParams: undefined,
     });
     const getters = {
@@ -39,15 +41,18 @@ export const useAlertPageStore = defineStore('page-alert', () => {
     const actions = {
         async init() {
             state.alertList = [];
+            state.totalAlertCount = 0;
             state.alertListParams = undefined;
         },
         async fetchAlertsList(params?: AlertListParameters) {
             try {
-                const { results } = await SpaceConnector.clientV2.alertManager.alert.list<AlertListParameters, ListResponse<AlertModel>>(params);
+                const { results, total_count } = await SpaceConnector.clientV2.alertManager.alert.list<AlertListParameters, ListResponse<AlertModel>>(params);
                 state.alertList = results || [];
+                state.totalAlertCount = total_count || 0;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.alertList = [];
+                state.totalAlertCount = 0;
                 throw e;
             }
         },
