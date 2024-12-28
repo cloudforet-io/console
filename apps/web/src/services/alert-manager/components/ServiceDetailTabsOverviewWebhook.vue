@@ -117,8 +117,8 @@ watch(() => storeState.serviceId, (serviceId) => {
                                         class="image"
                             />
                         </div>
-                        <div>
-                            <p class="text-label-md leading-8">
+                        <div class="text-wrapper">
+                            <p class="text-label-md leading-8 truncate">
                                 {{ item.name }}
                             </p>
                             <p class="text-label-sm text-gray-700 pb-1">
@@ -178,6 +178,9 @@ watch(() => storeState.serviceId, (serviceId) => {
                 width: 2rem;
                 height: 2rem;
                 padding: 0.375rem;
+            }
+            .text-wrapper {
+                width: calc(100% - 2rem);
             }
             .item {
                 @apply flex items-start border border-gray-150;

@@ -201,7 +201,7 @@ onMounted(async () => {
                             {{ item.name }}
                         </p>
                         <div class="contents">
-                            <div class="alerts-wrapper">
+                            <div class="section alerts-wrapper">
                                 <div class="alerts">
                                     <p class="title text-gray-700">
                                         {{ $t('ALERT_MANAGER.SERVICE.OPEN_ALERTS') }}
@@ -231,7 +231,7 @@ onMounted(async () => {
                                     </div>
                                 </div>
                             </div>
-                            <div class="additional-info-wrapper">
+                            <div class="section additional-info-wrapper">
                                 <div>
                                     <p class="title">
                                         {{ $t('ALERT_MANAGER.SERVICE.WEBHOOK', { cnt: item?.webhooks?.length || 0 }) }}
@@ -265,8 +265,10 @@ onMounted(async () => {
                                     <p class="title">
                                         {{ $t('ALERT_MANAGER.ESCALATION_POLICY.TITLE', { cnt: 11 }) }}
                                     </p>
-                                    <p-text-button @click.stop="handleClickEscalationPolicy(item.service_id)">
-                                        {{ getEscalationPolicyName(item.escalation_policy_id) }}
+                                    <p-text-button class="w-full"
+                                                   @click.stop="handleClickEscalationPolicy(item.service_id)"
+                                    >
+                                        <span class="truncate">{{ getEscalationPolicyName(item.escalation_policy_id) }}</span>
                                     </p-text-button>
                                 </div>
                             </div>
@@ -315,6 +317,9 @@ onMounted(async () => {
                 gap: 1.75rem;
                 .contents {
                     @apply flex gap-8;
+                    .section {
+                        max-width: calc(50% - 1rem);
+                    }
                     .alerts-wrapper {
                         @apply flex flex-col;
                         flex: 1;
