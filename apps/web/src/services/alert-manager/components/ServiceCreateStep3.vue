@@ -5,6 +5,9 @@ import { useRouter } from 'vue-router/composables';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ServiceChannelCreateParameters } from '@/schema/alert-manager/service-channel/api-verbs/create';
+import type {
+    ServiceChannelCreateForwardChannelParameters,
+} from '@/schema/alert-manager/service-channel/api-verbs/create-forward-channel';
 import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
 import { i18n } from '@/translations';
 
@@ -42,6 +45,7 @@ const state = reactive({
         if (storeState.currentSubStep === 1) return storeState.selectedProtocol !== '';
         return state.formValid;
     }),
+    isForwardTypeProtocol: computed<boolean>(() => storeState.selectedProtocol?.toLowerCase().includes('forward') || false),
 });
 
 const routeDetailSettingPage = () => {
@@ -61,12 +65,17 @@ const handleChangeForm = (form: CreatedNotificationInfoType, formValid: boolean)
 };
 
 const fetchCreateNotifications = async () => {
+    const fetcher = state.isForwardTypeProtocol
+        ? SpaceConnector.clientV2.alertManager.serviceChannel.createForwardChannel<ServiceChannelCreateForwardChannelParameters, ServiceChannelModel>
+        : SpaceConnector.clientV2.alertManager.serviceChannel.create<ServiceChannelCreateParameters, ServiceChannelModel>;
+    const defaultParams = {
+        service_id: storeState.createdServiceId,
+        ...state.form,
+    };
     try {
-        await SpaceConnector.clientV2.alertManager.serviceChannel.create<ServiceChannelCreateParameters, ServiceChannelModel>({
-            protocol_id: storeState.selectedProtocol,
-            service_id: storeState.createdServiceId,
-            ...state.form,
-        });
+        await fetcher(state.isForwardTypeProtocol
+            ? defaultParams
+            : { protocol_id: storeState.selectedProtocol, ...defaultParams });
         await routeDetailSettingPage();
         showSuccessMessage(i18n.t('ALERT_MANAGER.NOTIFICATIONS.ALT_S_CREATED'), '');
     } catch (e) {
