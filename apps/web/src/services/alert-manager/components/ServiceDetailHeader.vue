@@ -68,7 +68,7 @@ const handleGoBackButton = () => {
         <div class="flex flex-col pb-6 gap-1">
             <p-heading-layout>
                 <template #heading>
-                    <p-heading :title="storeState.serviceInfo.name"
+                    <p-heading :title="storeState.serviceInfo.name || ''"
                                show-back-button
                                @click-back-button="handleGoBackButton"
                     >
