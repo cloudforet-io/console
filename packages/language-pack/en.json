@@ -30,7 +30,7 @@
 			"HIGH": "High",
 			"INFO": "Info",
 			"LABEL_NAME": "Alert Name",
-			"LABEL_STATE": "State",
+			"LABEL_STATUS": "Status",
 			"LABEL_TITLE": "Title",
 			"LABEL_URGENCY": "Urgency",
 			"LOW": "Low",

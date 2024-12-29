@@ -30,7 +30,7 @@
 			"HIGH": "높음",
 			"INFO": "Info",
 			"LABEL_NAME": "",
-			"LABEL_STATE": "상태",
+			"LABEL_STATUS": "",
 			"LABEL_TITLE": "제목",
 			"LABEL_URGENCY": "긴급도",
 			"LOW": "낮음",
