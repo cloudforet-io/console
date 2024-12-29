@@ -237,7 +237,15 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
                             :colspan="SERVICE_ALERT_TABLE_FIELDS.length"
                         >
                             <p-link highlight
-                                    :to="{ name: ALERT_MANAGER_ROUTE.ALERTS }"
+                                    :to="{
+                                        name: ALERT_MANAGER_ROUTE.ALERTS._NAME,
+                                        query: {
+                                            serviceId: storeState.serviceInfo.service_id,
+                                            status: state.selectedStatus,
+                                            urgency: state.selectedUrgency,
+                                        }
+                                    }"
+                                    new-tab
                             >
                                 {{ $t('ALERT_MANAGER.SERVICE.VIEW_ALL_OPEN_ALERTS') }}
                             </p-link>

@@ -88,13 +88,17 @@ const handleGoBackButton = () => {
                     </p-heading>
                 </template>
                 <template #extra>
-                    <p-link :to="getProperRouteLocation({ name: ALERT_MANAGER_ROUTE.ALERTS._NAME })"
+                    <p-link :to="{
+                                name: ALERT_MANAGER_ROUTE.ALERTS._NAME,
+                                query: {
+                                    serviceId: storeState.serviceInfo.service_id,
+                                }
+                            }"
                             action-icon="internal-link"
                             new-tab
-                            class="text-label-md"
-                    >
-                        <span class="pr-0.5">{{ $t('ALERT_MANAGER.SERVICE.SHOW_IN_ALERTS') }}</span>
-                    </p-link>
+                            class="pr-0.5 text-label-md"
+                            :text="$t('ALERT_MANAGER.SERVICE.SHOW_IN_ALERTS')"
+                    />
                 </template>
             </p-heading-layout>
             <div class="flex items-center pl-10 text-label-sm gap-2">

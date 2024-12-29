@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive } from 'vue';
+import {
+    computed, reactive, watch,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import { useRoute } from 'vue-router/composables';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -59,6 +62,8 @@ const userStore = useUserStore();
 const userState = userStore.state;
 
 const { getProperRouteLocation } = useProperRouteLocation();
+
+const route = useRoute();
 
 const storeState = reactive({
     cloudServiceTypeInfo: computed<CloudServiceTypeReferenceMap>(() => allReferenceGetters.cloudServiceType),
@@ -186,14 +191,25 @@ const fetchAlertsList = async () => {
     }
 };
 
-onMounted(async () => {
+watch(() => route.query, async (query) => {
+    const { serviceId, status, urgency } = query;
+    if (serviceId) {
+        filterState.selectedServiceId = serviceId as string;
+    }
+    if (status) {
+        filterState.selectedStatusFilter = status as string;
+    }
+    if (urgency) {
+        filterState.selectedUrgencyFilter = urgency as string;
+    }
+
     try {
         state.loading = true;
         await fetchAlertsList();
     } finally {
         state.loading = false;
     }
-});
+}, { immediate: true });
 </script>
 
 <template>
