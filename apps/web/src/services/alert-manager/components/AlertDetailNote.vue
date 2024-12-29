@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
+import dayjs from 'dayjs';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PCollapsibleList, PPaneLayout, PHeading, PTextarea, PSelectDropdown, PTextBeautifier, PHeadingLayout,
 } from '@cloudforet/mirinae';
-import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
@@ -83,7 +84,14 @@ const fetchNoteList = async () => {
         const { results } = await SpaceConnector.clientV2.alertManager.note.list<NoteListParameters, ListResponse<NoteModel>>({
             alert_id: storeState.alertInfo.alert_id,
         });
-        state.noteList = results || [];
+        state.noteList = (results || []).map((d) => ({
+            title: d.created_by,
+            data: {
+                note: d.note,
+                note_id: d.note_id,
+            },
+            ...d,
+        }));
     } catch (e: any) {
         ErrorHandler.handleError(e);
         state.noteList = [];
@@ -98,8 +106,8 @@ watch(() => storeState.alertInfo.alert_id, async (id) => {
 </script>
 
 <template>
-    <p-pane-layout class="alert-detail-note py-6 px-4 pb-10">
-        <p-heading-layout class="pb-6">
+    <p-pane-layout class="alert-detail-note py-6 pb-10">
+        <p-heading-layout class="pb-6 px-4">
             <template #heading>
                 <p-heading heading-type="sub"
                            :title="$t('ALERT_MANAGER.ALERTS.NOTE')"
@@ -107,7 +115,7 @@ watch(() => storeState.alertInfo.alert_id, async (id) => {
             </template>
         </p-heading-layout>
         <article class="flex flex-col mt-2">
-            <article class="pb-2">
+            <article class="pb-2 px-4">
                 <p-textarea :value="state.noteInput"
                             @input="handleChangeNoteInput"
                 />
@@ -129,10 +137,10 @@ watch(() => storeState.alertInfo.alert_id, async (id) => {
                     <div class="flex items-center justify-between w-full text-label-md">
                         <p>
                             <span class="text-blue-900 font-bold mr-0.5">{{ title }}</span>
-                            <span class="text-gray-400 text-label-sm">{{ iso8601Formatter(state.noteList[index].created_at, storeState.timezone) }}</span>
+                            <span class="text-gray-400 text-label-sm">{{ dayjs.tz(state.noteList[index].created_at, storeState.timezone).format('MM/DD HH:mm') }}</span>
                         </p>
                         <p-select-dropdown style-type="icon-button"
-                                           button-icon="ic_chevron-down"
+                                           button-icon="ic_ellipsis-horizontal"
                                            :menu="state.menuItems"
                                            menu-position="right"
                                            use-fixed-menu-style
@@ -141,7 +149,7 @@ watch(() => storeState.alertInfo.alert_id, async (id) => {
                     </div>
                 </template>
                 <template #default="{data}">
-                    <p-text-beautifier class="whitespace-pre-line"
+                    <p-text-beautifier class="whitespace-pre-line text-label-md text-gray-700"
                                        :value="data.note"
                     />
                 </template>

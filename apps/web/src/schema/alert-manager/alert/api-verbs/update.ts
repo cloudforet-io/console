@@ -1,9 +1,9 @@
-import type { AlertUrgencyType, AlertStateType } from '@/schema/alert-manager/alert/type';
+import type { AlertUrgencyType, AlertStatusType } from '@/schema/alert-manager/alert/type';
 
 export interface AlertUpdateParameters {
     alert_id: string;
     title?: string;
-    state?: AlertStateType;
+    status?: AlertStatusType;
     description?: string;
     urgency?: AlertUrgencyType;
 }

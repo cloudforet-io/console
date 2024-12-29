@@ -165,7 +165,7 @@ const handleChangeToolbox = async (options: any = {}) => {
 };
 const handleExportExcel = async () => {
     await downloadExcel({
-        url: '/alertManager/serviceChannel/list',
+        url: '/alert-manager/service-channel/list',
         param: {
             query: { ...notificationsListApiQueryHelper.data, only: ALERT_EXCEL_FIELDS.map((d) => d.key) },
         },

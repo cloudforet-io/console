@@ -26,11 +26,9 @@ export const NOTIFICATION_MANAGEMENT_TABLE_HANDLER: AlertManagementTableHandlerT
     },
 };
 export const ALERT_EXCEL_FIELDS: ExcelDataField[] = [
-    { name: 'Name', key: 'name' },
-    { name: 'State', key: 'state' },
-    { name: 'Plugin', key: 'plugin_info.plugin_id' },
-    { name: 'Total Requests', key: 'requests.total' },
-    { name: 'Failed Requests', key: 'requests.error' },
+    { key: 'name', name: 'Name' },
+    { key: 'protocol_id', name: 'Channel' },
+    { key: 'state', name: 'State' },
 ];
 
 export const NOTIFICATION_DEFINITION_FIELDS: DataTableFieldType[] = [

@@ -1,4 +1,4 @@
-export const ALERT_STATE = {
+export const ALERT_STATUS = {
     TRIGGERED: 'TRIGGERED',
     ACKNOWLEDGED: 'ACKNOWLEDGED',
     RESOLVED: 'RESOLVED',

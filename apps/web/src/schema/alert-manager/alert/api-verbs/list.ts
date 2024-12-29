@@ -3,14 +3,14 @@ import type { Query } from '@cloudforet/core-lib/space-connector/type';
 import type {
     AlertResourcesType,
     AlertSeverityType,
-    AlertStateType, AlertTriggeredType,
+    AlertStatusType, AlertTriggeredType,
     AlertUrgencyType,
 } from '@/schema/alert-manager/alert/type';
 
 export interface AlertListParameters {
     query?: Query;
     alert_id?: string;
-    state?: AlertStateType;
+    status?: AlertStatusType;
     urgency?: AlertUrgencyType;
     severity?: AlertSeverityType;
     resources?: AlertResourcesType[];
