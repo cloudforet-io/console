@@ -8,6 +8,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButton, PCenteredLayoutHeader } from '@cloudforet/mirinae';
 
 import type { ServiceChannelCreateParameters } from '@/schema/alert-manager/service-channel/api-verbs/create';
+import type {
+    ServiceChannelCreateForwardChannelParameters,
+} from '@/schema/alert-manager/service-channel/api-verbs/create-forward-channel';
 import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
 import { i18n } from '@/translations';
 
@@ -47,11 +50,9 @@ const state = reactive({
     formValid: false,
     isAllFormValid: computed<boolean>(() => {
         if (state.currentStep === 1) return storeState.selectedProtocolId !== '';
-        const { name } = state.form;
-
-        if (!name) return false;
         return state.formValid;
     }),
+    isForwardTypeProtocol: computed<boolean>(() => storeState.selectedProtocolId?.toLowerCase().includes('forward') || false),
 });
 
 const handleChangeForm = (form: CreatedNotificationInfoType, formValid: boolean) => {
@@ -87,12 +88,17 @@ const handleActionButton = () => {
 };
 
 const fetchCreateNotifications = async () => {
+    const fetcher = state.isForwardTypeProtocol
+        ? SpaceConnector.clientV2.alertManager.serviceChannel.createForwardChannel<ServiceChannelCreateForwardChannelParameters, ServiceChannelModel>
+        : SpaceConnector.clientV2.alertManager.serviceChannel.create<ServiceChannelCreateParameters, ServiceChannelModel>;
+    const defaultParams = {
+        service_id: props.serviceId,
+        ...state.form,
+    };
     try {
-        await SpaceConnector.clientV2.alertManager.serviceChannel.create<ServiceChannelCreateParameters, ServiceChannelModel>({
-            protocol_id: storeState.selectedProtocolId,
-            service_id: props.serviceId,
-            ...state.form,
-        });
+        await fetcher(state.isForwardTypeProtocol
+            ? defaultParams
+            : { protocol_id: storeState.selectedProtocolId, ...defaultParams });
         showSuccessMessage(i18n.t('ALERT_MANAGER.NOTIFICATIONS.ALT_S_CREATED'), '');
         handleClickCancelButton();
     } catch (e) {

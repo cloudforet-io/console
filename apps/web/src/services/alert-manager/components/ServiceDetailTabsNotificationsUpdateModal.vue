@@ -88,9 +88,16 @@ const {
         name,
     },
     setForm,
+    invalidState,
+    isAllValid,
 } = useFormValidator({
     name: '',
-}, {});
+}, {
+    name(value: string) {
+        if (!value) return ' ';
+        return '';
+    },
+});
 
 const getProtocolInfo = (id: string): ProtocolInfo => {
     const protocol = storeState.notificationProtocolList.find((item) => item.protocol_id === id);
@@ -158,7 +165,7 @@ watch(() => props.selectedItem, (selectedItem) => {
                     :header-title="$t('ALERT_MANAGER.NOTIFICATIONS.MODAL_UPDATE_TITLE')"
                     :visible.sync="state.proxyVisible"
                     :loading="state.loading"
-                    :disalbed="name === ''"
+                    :disalbed="!isAllValid"
                     @confirm="handleConfirm"
     >
         <template #body>
@@ -177,6 +184,7 @@ watch(() => props.selectedItem, (selectedItem) => {
                     </div>
                     <p-field-group :label="$t('ALERT_MANAGER.NOTIFICATIONS.CHANNEL_NAME')"
                                    class="pt-2"
+                                   :invalid="invalidState.name"
                                    required
                     >
                         <template #default="{invalid}">

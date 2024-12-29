@@ -40,6 +40,7 @@ const {
     name: '',
 }, {
     name(value: string) {
+        if (!value) return ' ';
         if (value.length >= 40) {
             return i18n.t('ALERT_MANAGER.WEBHOOK.VALIDATION_NAME_MAX');
         }

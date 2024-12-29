@@ -37,7 +37,6 @@ const storeState = reactive({
 });
 const state = reactive({
     isFocusedKey: false,
-    isAllFormValid: computed<boolean>(() => (isAllValid && (name && name.value !== '') && (key && key.value !== ''))),
     selectedWorkspaceMemberList: computed<string[]>(() => dropdownState.selectedMemberItems.filter((i) => i.type === 'USER').map((i) => i.value)),
     selectedUserGroupList: computed<string[]>(() => dropdownState.selectedMemberItems.filter((i) => i.type === 'USER_GROUP').map((i) => i.value)),
 });
@@ -58,6 +57,7 @@ const {
     description: '',
 }, {
     name(value: string) {
+        if (!value) return ' ';
         const duplicatedName = Object.values(storeState.serviceListMap)?.find((item) => item.label === value);
         if (duplicatedName) {
             return i18n.t('ALERT_MANAGER.SERVICE.VALIDATION_NAME_UNIQUE');
@@ -65,6 +65,7 @@ const {
         return '';
     },
     key(value: string) {
+        if (!value) return ' ';
         const duplicatedName = Object.values(storeState.serviceListMap)?.find((item) => item.key === value);
         if (duplicatedName) {
             return i18n.t('ALERT_MANAGER.SERVICE.VALIDATION_KEY_UNIQUE');
@@ -114,7 +115,7 @@ watch(() => state.isFocusedKey, (isFocusedKey) => {
 
 <template>
     <service-create-step-container class="service-create-step1"
-                                   :is-all-form-valid="state.isAllFormValid"
+                                   :is-all-form-valid="isAllValid"
                                    @create="handleCreateService"
     >
         <div>
