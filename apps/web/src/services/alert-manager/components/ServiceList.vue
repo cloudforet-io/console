@@ -207,7 +207,7 @@ onMounted(async () => {
                                         {{ $t('ALERT_MANAGER.SERVICE.OPEN_ALERTS') }}
                                     </p>
                                     <p class="count font-medium">
-                                        {{ (item?.alerts.TOTAL?.high || 0) + (item?.alerts.TOTAL?.low || 0) }}
+                                        {{ (item?.alerts.TOTAL?.HIGH || 0) + (item?.alerts.TOTAL?.LOW || 0) }}
                                     </p>
                                 </div>
                                 <p-divider />
@@ -217,7 +217,7 @@ onMounted(async () => {
                                     </p>
                                     <div class="triggered-info">
                                         <p class="count">
-                                            {{ (item?.alerts.TRIGGERED?.high || 0) + (item?.alerts.TRIGGERED?.low || 0) }}
+                                            {{ (item?.alerts.TRIGGERED?.HIGH || 0) + (item?.alerts.TRIGGERED?.LOW || 0) }}
                                         </p>
                                         <div class="ml-2">
                                             <p-i name="ic_error-filled"
@@ -226,7 +226,7 @@ onMounted(async () => {
                                                  height="1rem"
                                             />
                                             <span class="text-gray-900 pl-1">{{ $t('ALERT_MANAGER.ALERTS.HIGH') }}:</span>
-                                            <span> {{ item?.alerts.TRIGGERED?.high || 0 }}</span>
+                                            <span> {{ item?.alerts.TRIGGERED?.HIGH || 0 }}</span>
                                         </div>
                                     </div>
                                 </div>
