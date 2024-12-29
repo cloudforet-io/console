@@ -144,6 +144,9 @@ watch(() => storeState.serviceId, (serviceId) => {
                                @click="handleClickArrowButton(1)"
                 />
             </div>
+            <template #no-data>
+                <span class="text-violet-700 font-medium">{{ $t('ALERT_MANAGER.NOTIFICATIONS.NO_DATA') }}</span>
+            </template>
         </p-data-loader>
         <div>
             <p-divider class="bg-gray-150" />

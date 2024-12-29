@@ -143,6 +143,9 @@ watch(() => storeState.serviceId, (serviceId) => {
                                height="1.5rem"
                                @click="handleClickArrowButton(1)"
                 />
+                <template #no-data>
+                    <span class="text-violet-700 font-medium">{{ $t('ALERT_MANAGER.WEBHOOK.NO_DATA') }}</span>
+                </template>
             </p-data-loader>
         </div>
         <p-divider class="bg-gray-150" />

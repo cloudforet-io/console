@@ -7,7 +7,7 @@ import { partition, reject, map } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButton, PButtonModal, PPaneLayout, PFieldGroup, PFieldTitle, PDataLoader, PIconButton, PAvatar, screens,
+    PButton, PButtonModal, PPaneLayout, PFieldGroup, PFieldTitle, PDataLoader, PIconButton, PAvatar, screens, PEmpty,
 } from '@cloudforet/mirinae';
 
 import type { ServiceChangeMembersParameters } from '@/schema/alert-manager/service/api-verbs/chagne-members';
@@ -206,7 +206,7 @@ const fetcherChangeMembers = async (userData: string[], userGroupData: string[])
                                     {{ $t('ALERT_MANAGER.SERVICE.INVITE') }}
                                 </p-button>
                             </p-field-group>
-                            <div>
+                            <div v-if="state.memberList.length > 0">
                                 <div v-for="(item, idx) in state.memberList"
                                      :key="`member-item-${idx}`"
                                      class="flex items-center justify-between p-2 text-label-md"
@@ -242,6 +242,12 @@ const fetcherChangeMembers = async (userData: string[], userGroupData: string[])
                                     </p>
                                 </div>
                             </div>
+
+                            <p-empty v-else
+                                     show-image
+                                     class="pt-12"
+                                     :title="$t('ALERT_MANAGER.SERVICE.EMPTY_MEMBER')"
+                            />
                         </p-pane-layout>
                     </p-data-loader>
                 </div>

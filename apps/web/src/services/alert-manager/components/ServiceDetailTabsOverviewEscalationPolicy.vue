@@ -108,7 +108,7 @@ watch(() => storeState.escalationPolicyId, (escalationPolicyId) => {
                                  style-type="gray500"
                                  class="mb-1"
                         >
-                            {{ `STEP ${idx}` }}
+                            {{ `STEP ${idx + 1}` }}
                         </p-badge>
                         <p class="data-row">
                             <span>{{ $t('ALERT_MANAGER.ESCALATION_POLICY.CHANNEL') }}</span>
@@ -137,6 +137,9 @@ watch(() => storeState.escalationPolicyId, (escalationPolicyId) => {
                                @click="handleClickArrowButton(1)"
                 />
             </div>
+            <template #no-data>
+                <span class="text-violet-700 font-medium">{{ $t('ALERT_MANAGER.ESCALATION_POLICY.NO_DATA') }}</span>
+            </template>
         </p-data-loader>
         <div>
             <p-divider class="bg-gray-150" />
