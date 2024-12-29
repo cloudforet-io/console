@@ -46,7 +46,7 @@ const getBadgeInfo = (value: AlertSeverityType): BadgeInfo => {
     switch (value) {
     case ALERT_SEVERITY.CRITICAL:
         return {
-            badgeType: 'outline-solid',
+            badgeType: 'solid-outline',
             styleType: 'alert',
         };
     case ALERT_SEVERITY.ERROR:
@@ -93,7 +93,7 @@ const getBadgeInfo = (value: AlertSeverityType): BadgeInfo => {
                 <p-badge :badge-type="getBadgeInfo(value).badgeType"
                          :style-type="getBadgeInfo(value).styleType"
                 >
-                    {{ ALERT_SEVERITY[value] || value }}
+                    {{ (ALERT_SEVERITY[value] || value).toLowerCase().replace(/^./, (char) => char.toUpperCase()) }}
                 </p-badge>
             </template>
             <template #data-resources="{ value }">

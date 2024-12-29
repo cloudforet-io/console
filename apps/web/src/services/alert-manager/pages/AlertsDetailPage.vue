@@ -25,7 +25,6 @@ watch(() => props.alertId, async (alertId) => {
 
 onUnmounted(() => {
     alertDetailPageStore.init();
-    alertDetailPageStore.$dispose();
 });
 </script>
 
