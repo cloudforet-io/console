@@ -4,7 +4,7 @@ import type { TranslateResult } from 'vue-i18n';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PI, PPaneLayout, PTooltip, PFieldTitle, PSelectStatus, PIconButton, PDataTable, PBadge,
+    PI, PPaneLayout, PTooltip, PFieldTitle, PSelectStatus, PIconButton, PDataTable, PBadge, PLink,
 } from '@cloudforet/mirinae';
 import type { ValueItem } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import { iso8601Formatter } from '@cloudforet/utils';
@@ -26,6 +26,7 @@ import {
     getAlertStateI18n, getAlertUrgencyI18n,
 } from '@/services/alert-manager/composables/alert-table-data';
 import { SERVICE_ALERT_TABLE_FIELDS } from '@/services/alert-manager/constants/service-table-constant';
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
 import type { Service } from '@/services/alert-manager/types/alert-manager-type';
 
@@ -81,6 +82,7 @@ const tableState = reactive({
     alertsList: [] as AlertModel[],
     alertStateLabels: getAlertStateI18n(),
     urgencyLabels: getAlertUrgencyI18n(),
+    totalCounts: 0,
 });
 
 const handleClickStatus = (name: AlertStateType) => {
@@ -95,15 +97,23 @@ const handleSelectUrgency = (value: AlertUrgencyType) => {
 const fetchAlertsList = async () => {
     tableState.loading = true;
     try {
-        const { results } = await SpaceConnector.clientV2.alertManager.alert.list<AlertListParameters, ListResponse<AlertModel>>({
+        const { results, total_count } = await SpaceConnector.clientV2.alertManager.alert.list<AlertListParameters, ListResponse<AlertModel>>({
             service_id: storeState.serviceInfo.service_id,
             state: state.selectedStatus,
             urgency: state.selectedUrgency === 'ALL' ? undefined : state.selectedUrgency as AlertUrgencyType,
+            query: {
+                page: {
+                    start: 1,
+                    limit: 15,
+                },
+            },
         });
         tableState.alertsList = results || [];
+        tableState.totalCounts = total_count || 0;
     } catch (e) {
         ErrorHandler.handleError(e);
         tableState.alertsList = [];
+        tableState.totalCounts = 0;
     } finally {
         tableState.loading = false;
     }
@@ -196,9 +206,11 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
                               :items="tableState.alertsList"
                               :loading="tableState.loading"
                               striped
-                              no-border
+                              :bordered="false"
+                              :show-footer="tableState.totalCounts > tableState.alertsList.length"
                               sort-by="created_at"
                               sortable
+                              class="table"
                 >
                     <template #col-state-format="{value}">
                         <p-badge :style-type="alertStateBadgeStyleTypeFormatter(value)"
@@ -219,6 +231,17 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
                     </template>
                     <template #col-created_at-format="{value}">
                         {{ iso8601Formatter(value, storeState.timezone) }}
+                    </template>
+                    <template #foot>
+                        <td class="w-full table-cell bg-white text-label-sm font-normal text-center pt-2 pb-2"
+                            :colspan="SERVICE_ALERT_TABLE_FIELDS.length"
+                        >
+                            <p-link highlight
+                                    :to="{ name: ALERT_MANAGER_ROUTE.ALERTS }"
+                            >
+                                {{ $t('ALERT_MANAGER.SERVICE.VIEW_ALL_OPEN_ALERTS') }}
+                            </p-link>
+                        </td>
                     </template>
                 </p-data-table>
             </p-pane-layout>
@@ -268,6 +291,10 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
             padding-left: 1rem;
             order: 2;
 
+            .table {
+                @apply overflow-y-auto;
+                min-height: 17rem;
+            }
             .select-urgency-wrapper {
                 @apply flex items-center pb-3 text-gray-600;
                 gap: 0.5rem;
