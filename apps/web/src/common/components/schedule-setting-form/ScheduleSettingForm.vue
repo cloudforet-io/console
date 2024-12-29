@@ -12,6 +12,8 @@ import {
 import type { ServiceChannelScheduleType } from '@/schema/alert-manager/service-channel/type';
 import { i18n } from '@/translations';
 
+import { useUserStore } from '@/store/user/user-store';
+
 import type {
     ScheduleDayButtonType,
     ScheduleRadioType,
@@ -30,8 +32,14 @@ const props = withDefaults(defineProps<Props>(), {
     scheduleForm: undefined,
 });
 
+const userStore = useUserStore();
+const userState = userStore.state;
+
 const emit = defineEmits<{(e: 'update-form', form: ScheduleSettingFormType): void; }>();
 
+const storeState = reactive({
+    timezone: computed(() => userState.timezone || 'UTC'),
+});
 const state = reactive({
     scheduleTypeList: computed<ScheduleRadioType[]>(() => [
         { name: 'WEEK_DAY', label: i18n.t('COMMON.SCHEDULE_SETTING.WEEKDAYS') },
@@ -105,6 +113,7 @@ const handleSelectDropdown = (type: 'start' | 'end', value: number) => {
 watch([() => state.selectedRadioIdx, () => state.selectedDayButton, () => state.start, () => state.end], ([selectedRadioIdx]) => {
     emit('update-form', {
         SCHEDULE_TYPE: state.scheduleTypeList[selectedRadioIdx].name,
+        TIMEZONE: storeState.timezone,
         ...state.scheduleDayForm,
     });
 }, { immediate: true });
