@@ -6,6 +6,7 @@ import {
     PFieldGroup, PLazyImg, PTextInput, PRadioGroup, PRadio, PPaneLayout, PJsonSchemaForm, screens,
 } from '@cloudforet/mirinae';
 
+import type { MembersType } from '@/schema/alert-manager/service/type';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
@@ -30,6 +31,7 @@ const { width } = useWindowSize();
 
 const storeState = reactive({
     language: computed<string|undefined>(() => userState.language),
+    createdServiceMembers: computed<Record<MembersType, string[]>>(() => serviceCreateFormState.createdService.members),
     selectedProtocolType: computed<ProtocolCardItemType>(() => serviceCreateFormState.selectedProtocol),
 });
 const state = reactive({
@@ -167,6 +169,8 @@ watch([() => name.value, () => state.scheduleForm, () => state.selectedRadioIdx,
                                           selection-type="multiple"
                                           appearance-type="stack"
                                           use-fixed-menu-style
+                                          :user-pool="storeState.createdServiceMembers?.USER || []"
+                                          :user-group-pool="storeState.createdServiceMembers?.USER_GROUP || []"
                                           :show-category-title="false"
                                           :show-user-group-list="state.selectedRadioIdx === 1"
                                           :show-user-list="state.selectedRadioIdx === 2"

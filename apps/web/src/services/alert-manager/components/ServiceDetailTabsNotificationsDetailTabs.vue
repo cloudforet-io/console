@@ -11,7 +11,7 @@ import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type
 import type { ServiceChannelGetParameters } from '@/schema/alert-manager/service-channel/api-verbs/get';
 import {
     SERVICE_CHANNEL_FORWARD_TYPE,
-    SERVICE_CHANNEL_SCHEDULE_TYPE,
+    SERVICE_CHANNEL_SCHEDULE_TYPE, SERVICE_CHANNEL_TYPE,
 } from '@/schema/alert-manager/service-channel/constants';
 import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
 import type { ServiceChannelScheduleInfoType, ServiceChannelScheduleDayType } from '@/schema/alert-manager/service-channel/type';
@@ -56,6 +56,15 @@ const storeState = reactive({
 });
 const state = reactive({
     notificationInfo: {} as ServiceChannelModel,
+    refinedNotificationInfo: computed<ServiceChannelModel>(() => {
+        if (state.notificationInfo.channel_type === SERVICE_CHANNEL_TYPE.FORWARD) {
+            return {
+                ...state.notificationInfo,
+                protocol_id: 'forward',
+            };
+        }
+        return state.notificationInfo;
+    }),
     dayMapping: computed<Record<DayType, TranslateResult>>(() => ({
         MON: i18n.t('ALERT_MANAGER.NOTIFICATIONS.MONDAY'),
         TUE: i18n.t('ALERT_MANAGER.NOTIFICATIONS.TUESDAY'),
@@ -68,6 +77,12 @@ const state = reactive({
 });
 
 const getProtocolInfo = (id: string): ProtocolInfo => {
+    if (id === 'forward') {
+        return {
+            name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.ASSOCIATED_MEMBER'),
+            icon: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/notifications_member.svg',
+        };
+    }
     const protocol = storeState.notificationProtocolList.find((item) => item.protocol_id === id);
     return {
         name: protocol?.name || '',
@@ -80,19 +95,23 @@ const getUserGroupName = (userGroup: string[] = []): string => userGroup.map((gr
 }).join(', ');
 const getScheduleInfo = (schedule: ServiceChannelScheduleInfoType): ScheduleInfo => {
     const scheduleInfo = {
-        styleType: '', value: '' as TranslateResult, days: [] as string[], time: '',
+        styleType: '', value: '' as TranslateResult, days: [] as TranslateResult[], time: '',
     };
 
     Object.entries(schedule).forEach(([day, s]) => {
         if (day === 'SCHEDULE_TYPE') return;
         const scheduleDay = s as ServiceChannelScheduleDayType;
         if (scheduleDay) {
-            const startTime = `${String(scheduleDay.start || 0).padStart(2, '0')}:00`;
-            const endTime = `${String(scheduleDay.end || 0).padStart(2, '0')}:00`;
-            if (scheduleDay.is_scheduled) {
+            const startTime = `${String(scheduleDay?.start || 0).padStart(2, '0')}:00`;
+            const endTime = `${String(scheduleDay?.end || 0).padStart(2, '0')}:00`;
+            if (schedule.SCHEDULE_TYPE === 'WEEK_DAY') {
+                scheduleInfo.days = Object.values(state.dayMapping).slice(0, 5).map((d) => d as TranslateResult);
+            } else if (schedule.SCHEDULE_TYPE === 'ALL_DAY') {
+                scheduleInfo.days = Object.values(state.dayMapping).map((d) => d as TranslateResult);
+            } else if (scheduleDay?.is_scheduled) {
                 scheduleInfo.days.push(state.dayMapping[day]);
-                scheduleInfo.time = `${startTime} ~ ${endTime}`;
             }
+            scheduleInfo.time = `${startTime} ~ ${endTime}`;
         }
     });
 
@@ -148,7 +167,7 @@ watch(() => storeState.selectedNotificationId, async (selectedId) => {
                 </template>
             </p-heading-layout>
             <p-definition-table :fields="NOTIFICATION_DEFINITION_FIELDS"
-                                :data="state.notificationInfo"
+                                :data="state.refinedNotificationInfo"
                                 :skeleton-rows="4"
                                 block
             >

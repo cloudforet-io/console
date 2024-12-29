@@ -10,6 +10,7 @@ import {
 
 import type { ServiceChannelUpdateParameters } from '@/schema/alert-manager/service-channel/api-verbs/update';
 import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
+import type { MembersType } from '@/schema/alert-manager/service/type';
 import { i18n } from '@/translations';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
@@ -44,6 +45,7 @@ const emit = defineEmits<{(e: 'close'): void;
 }>();
 
 const storeState = reactive({
+    serviceMember: computed<Record<MembersType, string[]>>(() => serviceDetailPageGetters.serviceInfo?.members || []),
     notificationProtocolList: computed<ProtocolCardItemType[]>(() => serviceDetailPageState.notificationProtocolList),
     language: computed<string>(() => serviceDetailPageGetters.language),
 });
@@ -100,6 +102,12 @@ const {
 });
 
 const getProtocolInfo = (id: string): ProtocolInfo => {
+    if (id === 'forward') {
+        return {
+            name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.ASSOCIATED_MEMBER'),
+            icon: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/notifications_member.svg',
+        };
+    }
     const protocol = storeState.notificationProtocolList.find((item) => item.protocol_id === id);
     return {
         name: protocol?.name || '',
@@ -218,6 +226,8 @@ watch(() => props.selectedItem, (selectedItem) => {
                                                       selection-type="multiple"
                                                       appearance-type="stack"
                                                       use-fixed-menu-style
+                                                      :user-pool="storeState.serviceMember?.USER || []"
+                                                      :user-group-pool="storeState.serviceMember?.USER_GROUP || []"
                                                       :show-category-title="false"
                                                       :show-user-group-list="state.selectedRadioIdx === 1"
                                                       :show-user-list="state.selectedRadioIdx === 2"

@@ -40,7 +40,7 @@ const { getProperRouteLocation } = useProperRouteLocation();
 const storeState = reactive({
     currentStep: computed<number>(() => serviceCreateFormState.currentStep),
     currentSubStep: computed<number>(() => serviceCreateFormState.currentSubStep),
-    createdServiceId: computed<string>(() => serviceCreateFormState.createdServiceId),
+    createdServiceId: computed<string>(() => serviceCreateFormState.createdService.service_id),
 });
 const state = reactive({
     previousStep: computed<number>(() => serviceCreateFormState.currentStep - 1),

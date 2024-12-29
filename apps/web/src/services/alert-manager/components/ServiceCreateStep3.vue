@@ -35,7 +35,7 @@ const { getProperRouteLocation } = useProperRouteLocation();
 const storeState = reactive({
     currentSubStep: computed<number>(() => serviceCreateFormState.currentSubStep),
     selectedProtocol: computed<string>(() => serviceCreateFormState.selectedProtocol?.protocol_id || ''),
-    createdServiceId: computed<string>(() => serviceCreateFormState.createdServiceId),
+    createdServiceId: computed<string>(() => serviceCreateFormState.createdService.service_id),
     webhookName: computed<string>(() => serviceCreateFormState.webhookName || ''),
 });
 const state = reactive({
