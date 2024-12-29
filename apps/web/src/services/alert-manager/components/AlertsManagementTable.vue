@@ -14,9 +14,8 @@ import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/ta
 import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import { ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
+import { ALERT_STATUS, ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
-import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -34,7 +33,7 @@ import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/C
 import { red } from '@/styles/colors';
 
 import {
-    alertStateBadgeStyleTypeFormatter,
+    alertStatusBadgeStyleTypeFormatter,
     getAlertStateI18n,
     getAlertUrgencyI18n,
 } from '@/services/alert-manager/composables/alert-table-data';
@@ -76,10 +75,13 @@ const state = reactive({
     loading: false,
     visibleCustomFieldModal: false,
 
-    refinedAlertList: computed<AlertItem[]>(() => storeState.alertList.map((alert) => ({
-        ...alert,
-        alert_number: alert.alert_id.split('-')[2],
-    }))),
+    refinedAlertList: computed<AlertItem[]>(() => storeState.alertList.map((alert) => {
+        const number = alert.alert_id.split('-');
+        return {
+            ...alert,
+            alert_number: number[number.length - 1],
+        };
+    })),
     alertStateLabels: getAlertStateI18n(),
     urgencyLabels: getAlertUrgencyI18n(),
     fields: ALERT_MANAGEMENT_TABLE_FIELDS,
@@ -165,9 +167,9 @@ const fetchAlertsList = async () => {
     try {
         filterQueryHelper.setFilters([]);
         if (filterState.selectedStatusFilter === ALERT_STATUS_FILTERS.OPEN) {
-            filterQueryHelper.addFilter({ k: 'state', v: [ALERT_STATUS_FILTERS.TRIGGERED, ALERT_STATUS_FILTERS.ACKNOWLEDGED], o: '=' });
+            filterQueryHelper.addFilter({ k: 'status', v: [ALERT_STATUS_FILTERS.TRIGGERED, ALERT_STATUS_FILTERS.ACKNOWLEDGED], o: '=' });
         } else if (filterState.selectedStatusFilter !== 'ALL') {
-            filterQueryHelper.addFilter({ k: 'state', v: filterState.selectedStatusFilter, o: '=' });
+            filterQueryHelper.addFilter({ k: 'status', v: filterState.selectedStatusFilter, o: '=' });
         }
         if (filterState.selectedUrgencyFilter !== 'ALL') {
             filterQueryHelper.addFilter({ k: 'urgency', v: filterState.selectedUrgencyFilter, o: '=' });
@@ -288,9 +290,9 @@ watch(() => route.query, async (query) => {
                     </p-link>
                 </template>
             </template>
-            <template #col-state-format="{ value }">
-                <p-badge :style-type="alertStateBadgeStyleTypeFormatter(value)"
-                         :badge-type="value === ALERT_STATE.TRIGGERED ? 'solid' : 'subtle'"
+            <template #col-status-format="{ value }">
+                <p-badge :style-type="alertStatusBadgeStyleTypeFormatter(value)"
+                         :badge-type="value === ALERT_STATUS.TRIGGERED ? 'solid' : 'subtle'"
                 >
                     {{ state.alertStateLabels[value] }}
                 </p-badge>

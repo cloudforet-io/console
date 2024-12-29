@@ -9,9 +9,9 @@ import {
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
+import { ALERT_URGENCY, ALERT_STATUS } from '@/schema/alert-manager/alert/constants';
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
-import { ALERT_STATE, ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
-import type { AlertState, AlertUrgency } from '@/schema/monitoring/alert/type';
+import type { AlertStatusType, AlertUrgencyType } from '@/schema/alert-manager/alert/type';
 import { i18n } from '@/translations';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
@@ -29,14 +29,14 @@ const storeState = reactive({
     alertInfo: computed<AlertModel>(() => alertDetailPageState.alertInfo),
 });
 const state = reactive({
-    alertState: 'TRIGGERED',
+    alertStatus: 'TRIGGERED',
     alertUrgency: 'HIGH',
     duration: computed<string>(() => calculateTime(storeState.alertInfo?.created_at)),
 
     alertStateList: computed<SelectDropdownMenuItem[]>(() => ([
-        { name: ALERT_STATE.TRIGGERED, label: i18n.t('ALERT_MANAGER.ALERTS.TRIGGERED') },
-        { name: ALERT_STATE.ACKNOWLEDGED, label: i18n.t('ALERT_MANAGER.ALERTS.ACKNOWLEDGED') },
-        { name: ALERT_STATE.RESOLVED, label: i18n.t('ALERT_MANAGER.ALERTS.RESOLVED') },
+        { name: ALERT_STATUS.TRIGGERED, label: i18n.t('ALERT_MANAGER.ALERTS.TRIGGERED') },
+        { name: ALERT_STATUS.ACKNOWLEDGED, label: i18n.t('ALERT_MANAGER.ALERTS.ACKNOWLEDGED') },
+        { name: ALERT_STATUS.RESOLVED, label: i18n.t('ALERT_MANAGER.ALERTS.RESOLVED') },
     ])),
     alertUrgencyList: computed<SelectDropdownMenuItem[]>(() => ([
         { name: ALERT_URGENCY.HIGH, label: i18n.t('ALERT_MANAGER.ALERTS.HIGH') },
@@ -55,13 +55,13 @@ const calculateTime = (time):string => {
     return `${days}d ${hours}h ${minutes}m`;
 };
 
-const handleChangeAlertState = async (alertState: AlertState) => {
+const handleChangeAlertState = async (alertState: AlertStatusType) => {
     await alertDetailPageStore.updateAlertDetail({
         alert_id: storeState.alertInfo.alert_id,
-        state: alertState,
+        status: alertState,
     });
 };
-const handleChangeAlertUrgency = async (alertUrgency: AlertUrgency) => {
+const handleChangeAlertUrgency = async (alertUrgency: AlertUrgencyType) => {
     await alertDetailPageStore.updateAlertDetail({
         alert_id: storeState.alertInfo.alert_id,
         urgency: alertUrgency,
@@ -70,7 +70,7 @@ const handleChangeAlertUrgency = async (alertUrgency: AlertUrgency) => {
 
 watch(() => alertDetailPageState.alertInfo, (alertInfo) => {
     if (!alertInfo) return;
-    state.alertState = alertInfo?.state;
+    state.alertStatus = alertInfo?.status;
     state.alertUrgency = alertInfo?.urgency;
 }, { immediate: true });
 </script>
@@ -78,8 +78,8 @@ watch(() => alertDetailPageState.alertInfo, (alertInfo) => {
 <template>
     <p-pane-layout class="alert-detail-summary flex flex-wrap gap-4 w-full">
         <div class="content-wrapper">
-            <span class="title">{{ $t('ALERT_MANAGER.ALERTS.LABEL_STATE') }}</span>
-            <p-badge v-if="state.alertState === ALERT_STATE.ERROR"
+            <span class="title">{{ $t('ALERT_MANAGER.ALERTS.LABEL_STATUS') }}</span>
+            <p-badge v-if="state.alertStatus === ALERT_STATUS.ERROR"
                      style-type="alert"
                      badge-type="solid-outline"
                      class="mt-1.5"
@@ -88,14 +88,14 @@ watch(() => alertDetailPageState.alertInfo, (alertInfo) => {
             </p-badge>
             <p-select-dropdown v-else
                                :menu="state.alertStateList"
-                               :selected.sync="state.alertState"
+                               :selected.sync="state.alertStatus"
                                class="state-dropdown"
                                :disabled="!hasReadWriteAccess"
-                               :class="{'triggered': state.alertState === ALERT_STATE.TRIGGERED}"
+                               :class="{'triggered': state.alertStatus === ALERT_STATUS.TRIGGERED}"
                                @select="handleChangeAlertState"
             >
                 <template #dropdown-button>
-                    <span class="button-text">{{ state.alertStateList.find(d => d.name === state.alertState)?.label }}</span>
+                    <span class="button-text">{{ state.alertStateList.find(d => d.name === state.alertStatus)?.label }}</span>
                 </template>
             </p-select-dropdown>
         </div>
@@ -103,7 +103,7 @@ watch(() => alertDetailPageState.alertInfo, (alertInfo) => {
             <span class="title">{{ $t('ALERT_MANAGER.ALERTS.LABEL_URGENCY') }}</span>
             <p-select-dropdown :menu="state.alertUrgencyList"
                                :selected.sync="state.alertUrgency"
-                               :disabled="!hasReadWriteAccess || (state.alertState === ALERT_STATE.ERROR)"
+                               :disabled="!hasReadWriteAccess || (state.alertStatus === ALERT_STATUS.ERROR)"
                                class="state-dropdown"
                                @select="handleChangeAlertUrgency"
             >

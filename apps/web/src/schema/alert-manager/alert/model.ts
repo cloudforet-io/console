@@ -1,7 +1,7 @@
 import type {
     AlertResourcesType,
     AlertSeverityType,
-    AlertStateType, AlertTriggeredType,
+    AlertStatusType, AlertTriggeredType,
     AlertUrgencyType,
     AlertEventActionType,
 } from '@/schema/alert-manager/alert/type';
@@ -9,7 +9,7 @@ import type {
 export interface AlertModel {
     alert_id: string;
     title: string;
-    state: AlertStateType;
+    status: AlertStatusType;
     description: string;
     urgency: AlertUrgencyType;
     severity: AlertSeverityType;

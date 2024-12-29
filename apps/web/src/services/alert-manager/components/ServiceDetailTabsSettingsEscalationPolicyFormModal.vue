@@ -9,7 +9,7 @@ import {
     PButtonModal, PTextInput, PRadio, PFieldGroup, PRadioGroup, PTextButton,
 } from '@cloudforet/mirinae';
 
-import { ALERT_STATE } from '@/schema/alert-manager/alert/constants';
+import { ALERT_STATUS } from '@/schema/alert-manager/alert/constants';
 import type { EscalationPolicyCreateParameters } from '@/schema/alert-manager/escalation-policy/api-verbs/create';
 import type { EscalationPolicyUpdateParameters } from '@/schema/alert-manager/escalation-policy/api-verbs/update';
 import { ESCALATION_POLICY_STATE } from '@/schema/alert-manager/escalation-policy/constants';
@@ -60,11 +60,11 @@ const state = reactive({
     radioMenuList: computed<EscalationPolicyRadioType[]>(() => [
         {
             label: i18n.t('ALERT_MANAGER.ALERTS.ACKNOWLEDGED'),
-            name: ALERT_STATE.ACKNOWLEDGED,
+            name: ALERT_STATUS.ACKNOWLEDGED,
         },
         {
             label: i18n.t('ALERT_MANAGER.ALERTS.RESOLVED'),
-            name: ALERT_STATE.RESOLVED,
+            name: ALERT_STATUS.RESOLVED,
         },
     ]),
     selectedRadioIdx: 0,

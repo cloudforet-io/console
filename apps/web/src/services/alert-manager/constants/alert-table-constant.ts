@@ -15,7 +15,7 @@ export const ALERT_STATUS_FILTERS = {
 export const ALERT_MANAGEMENT_TABLE_FIELDS: DataTableFieldType[] = [
     { name: 'alert_number', label: 'No' },
     { name: 'title', label: 'Title', width: '20rem' },
-    { name: 'state', label: 'Status' },
+    { name: 'status', label: 'Status' },
     { name: 'service_id', label: 'Service' },
     { name: 'urgency', label: 'Urgency' },
     { name: 'triggered_type', label: 'Category' },
@@ -44,7 +44,7 @@ export const ALERT_MANAGEMENT_TABLE_HANDLER: AlertManagementTableHandlerType = {
 export const ALERT_EXCEL_FIELDS: ExcelDataField[] = [
     { key: 'alert_id', name: 'No' },
     { key: 'title', name: 'Title' },
-    { key: 'state', name: 'State' },
+    { key: 'status', name: 'State' },
     { key: 'service_id', name: 'Service' },
     { key: 'urgency', name: 'Urgency' },
     { key: 'triggered_type', name: 'Category' },

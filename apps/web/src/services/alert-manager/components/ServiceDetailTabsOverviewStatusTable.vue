@@ -11,9 +11,9 @@ import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { AlertListParameters } from '@/schema/alert-manager/alert/api-verbs/list';
-import { ALERT_STATE, ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
+import { ALERT_STATUS, ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
-import type { AlertStateType, AlertUrgencyType } from '@/schema/alert-manager/alert/type';
+import type { AlertStatusType, AlertUrgencyType } from '@/schema/alert-manager/alert/type';
 import { SERVICE_ALERTS_TYPE } from '@/schema/alert-manager/service/constants';
 import { i18n } from '@/translations';
 
@@ -22,7 +22,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { red } from '@/styles/colors';
 
 import {
-    alertStateBadgeStyleTypeFormatter,
+    alertStatusBadgeStyleTypeFormatter,
     getAlertStateI18n, getAlertUrgencyI18n,
 } from '@/services/alert-manager/composables/alert-table-data';
 import { SERVICE_ALERT_TABLE_FIELDS } from '@/services/alert-manager/constants/service-table-constant';
@@ -35,7 +35,7 @@ type AlertStatusInfoType = {
     total: number,
     high?: number,
     low?: number,
-    name: AlertStateType
+    name: AlertStatusType
 };
 
 const serviceDetailPageStore = useServiceDetailPageStore();
@@ -69,7 +69,7 @@ const state = reactive({
             name: SERVICE_ALERTS_TYPE.RESOLVED,
         },
     ]),
-    selectedStatus: SERVICE_ALERTS_TYPE.TRIGGERED as AlertStateType,
+    selectedStatus: SERVICE_ALERTS_TYPE.TRIGGERED as AlertStatusType,
     urgencyField: computed<ValueItem[]>(() => ([
         { label: i18n.t('ALERT_MANAGER.ALERTS.ALL') as string, name: 'ALL' },
         { label: i18n.t('ALERT_MANAGER.ALERTS.HIGH') as string, name: ALERT_URGENCY.HIGH },
@@ -85,7 +85,7 @@ const tableState = reactive({
     totalCounts: 0,
 });
 
-const handleClickStatus = (name: AlertStateType) => {
+const handleClickStatus = (name: AlertStatusType) => {
     state.selectedStatus = name;
     fetchAlertsList();
 };
@@ -99,7 +99,7 @@ const fetchAlertsList = async () => {
     try {
         const { results, total_count } = await SpaceConnector.clientV2.alertManager.alert.list<AlertListParameters, ListResponse<AlertModel>>({
             service_id: storeState.serviceInfo.service_id,
-            state: state.selectedStatus,
+            status: state.selectedStatus,
             urgency: state.selectedUrgency === 'ALL' ? undefined : state.selectedUrgency as AlertUrgencyType,
             query: {
                 page: {
@@ -212,9 +212,18 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
                               sortable
                               class="table"
                 >
-                    <template #col-state-format="{value}">
-                        <p-badge :style-type="alertStateBadgeStyleTypeFormatter(value)"
-                                 :badge-type="value === ALERT_STATE.TRIGGERED ? 'solid' : 'subtle'"
+                    <template #col-title-format="{ value, item }">
+                        <p-link :to="{
+                            name: ALERT_MANAGER_ROUTE.ALERTS.DETAIL._NAME,
+                            params: { alertId: item.alert_id }
+                        }"
+                        >
+                            <span class="title-link">{{ value }}</span>
+                        </p-link>
+                    </template>
+                    <template #col-status-format="{value}">
+                        <p-badge :style-type="alertStatusBadgeStyleTypeFormatter(value)"
+                                 :badge-type="value === ALERT_STATUS.TRIGGERED ? 'solid' : 'subtle'"
                         >
                             {{ tableState.alertStateLabels[value] }}
                         </p-badge>

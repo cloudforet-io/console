@@ -3,7 +3,7 @@ import type { TranslateResult } from 'vue-i18n';
 import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-schema-form/type';
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
-import type { AlertStateType, AlertUrgencyType } from '@/schema/alert-manager/alert/type';
+import type { AlertStatusType, AlertUrgencyType } from '@/schema/alert-manager/alert/type';
 import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
 import type { ServiceChannelDataType, ServiceChannelScheduleInfoType } from '@/schema/alert-manager/service-channel/type';
 import type { ServiceModel } from '@/schema/alert-manager/service/model';
@@ -64,6 +64,6 @@ export interface ProtocolCardItemType extends Partial<NotificationProtocolModel>
 
 export type EscalationPolicyRadioType = {
     label: TranslateResult,
-    name: AlertStateType
+    name: AlertStatusType
 };
 export type EscalationPolicyModalType = 'CREATE' | 'UPDATE' | 'STATE' | 'DELETE';
