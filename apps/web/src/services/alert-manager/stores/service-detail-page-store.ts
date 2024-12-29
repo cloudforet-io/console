@@ -65,7 +65,7 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
 
     const getters = reactive<ServiceFormStoreGetters>({
         serviceInfo: computed(() => {
-            const defaultAlerts = { high: 0, low: 0 };
+            const defaultAlerts = { HIGH: 0, LOW: 0 };
             const getAlerts = (alertKey: AlertsType): AlertsInfoType => {
                 const alertValue = state.serviceInfo.alerts?.[alertKey] || defaultAlerts;
                 return Object.keys(alertValue || {}).length ? alertValue : defaultAlerts;
@@ -122,6 +122,7 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
             try {
                 state.serviceInfo = await SpaceConnector.clientV2.alertManager.service.get<ServiceGetParameters, ServiceModel>({
                     service_id: id,
+                    details: true,
                 });
             } catch (e) {
                 ErrorHandler.handleError(e);

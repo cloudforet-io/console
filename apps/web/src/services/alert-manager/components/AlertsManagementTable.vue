@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive } from 'vue';
+import {
+    computed, reactive, watch,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import { useRoute } from 'vue-router/composables';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -16,6 +19,8 @@ import type { AlertModel } from '@/schema/alert-manager/alert/model';
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import { i18n } from '@/translations';
 
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
@@ -42,11 +47,14 @@ import {
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { useAlertPageStore } from '@/services/alert-manager/stores/alert-page-store';
 import type { AlertFilterType } from '@/services/alert-manager/types/alert-manager-type';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 
 interface AlertItem extends AlertModel {
     alert_number: string;
 }
 
+const allReferenceStore = useAllReferenceStore();
+const allReferenceGetters = allReferenceStore.getters;
 const alertPageStore = useAlertPageStore();
 const alertPageState = alertPageStore.state;
 const alertPageGetters = alertPageStore.getters;
@@ -55,8 +63,12 @@ const userState = userStore.state;
 
 const { getProperRouteLocation } = useProperRouteLocation();
 
+const route = useRoute();
+
 const storeState = reactive({
+    cloudServiceTypeInfo: computed<CloudServiceTypeReferenceMap>(() => allReferenceGetters.cloudServiceType),
     serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => alertPageGetters.serviceDropdownList),
+    totalCount: computed<number>(() => alertPageState.totalAlertCount),
     alertList: computed<AlertModel[]>(() => alertPageState.alertList),
     timezone: computed<string>(() => userState.timezone || ''),
 });
@@ -91,13 +103,21 @@ const filterState = reactive({
     selectedUrgencyFilter: 'ALL',
 });
 
-const alertListApiQueryHelper = new ApiQueryHelper()
-    .setSort('created_at', true);
+const alertListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
+    .setPage(1, 15);
 
 const filterQueryHelper = new QueryHelper();
 const queryTagHelper = useQueryTags({ keyItemSets: ALERT_MANAGEMENT_TABLE_HANDLER.keyItemSets });
 const { queryTags } = queryTagHelper;
 
+const getAssetInfo = (assetId: string) => {
+    const assetTypeData = storeState.cloudServiceTypeInfo[assetId]?.data;
+    return {
+        provider: assetTypeData?.provider,
+        group: assetTypeData?.group,
+        name: assetTypeData?.cloud_service_type_key,
+    };
+};
 const getServiceName = (id: string): TranslateResult => {
     if (storeState.serviceDropdownList.length === 0) return '';
     return storeState.serviceDropdownList.find((i) => i.name === id)?.label || '';
@@ -171,14 +191,25 @@ const fetchAlertsList = async () => {
     }
 };
 
-onMounted(async () => {
+watch(() => route.query, async (query) => {
+    const { serviceId, status, urgency } = query;
+    if (serviceId) {
+        filterState.selectedServiceId = serviceId as string;
+    }
+    if (status) {
+        filterState.selectedStatusFilter = status as string;
+    }
+    if (urgency) {
+        filterState.selectedUrgencyFilter = urgency as string;
+    }
+
     try {
         state.loading = true;
         await fetchAlertsList();
     } finally {
         state.loading = false;
     }
-});
+}, { immediate: true });
 </script>
 
 <template>
@@ -191,6 +222,7 @@ onMounted(async () => {
                          :sort-desc="true"
                          :query-tags="queryTags"
                          :loading="state.loading"
+                         :total-count="storeState.totalCount"
                          :fields="state.fields"
                          :items="state.refinedAlertList"
                          :key-item-sets="ALERT_MANAGEMENT_TABLE_HANDLER.keyItemSets"
@@ -205,10 +237,11 @@ onMounted(async () => {
                 <p-select-dropdown :menu="storeState.serviceDropdownList"
                                    :selection-label="$t('ALERT_MANAGER.ALERTS.SERVICE')"
                                    style-type="rounded"
+                                   show-delete-all-button
                                    use-fixed-menu-style
                                    :selected="filterState.selectedServiceId"
                                    class="service-dropdown pt-6 pl-4"
-                                   @select="handleSelectServiceDropdownItem"
+                                   @update:selected="handleSelectServiceDropdownItem"
                 />
             </template>
             <template #toolbox-bottom>
@@ -292,9 +325,24 @@ onMounted(async () => {
                     --
                 </span>
                 <template v-else>
-                    <p class="additional-info">
-                        {{ value?.[0]?.name }}
-                    </p>
+                    <div v-for="(item, idx) in value.slice(0, 3)"
+                         :key="`resource-item-${idx}`"
+                         class="flex items-center gap-2"
+                    >
+                        <p class="resource-item truncate">
+                            {{ item?.name }}
+                        </p>
+                        <p-link :text="i18n.t('ALERT_MANAGER.ALERTS.VIEW')"
+                                :to="{
+                                    name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                                    params: getAssetInfo(item.asset_id)
+                                }"
+                                size="sm"
+                                highlight
+                                action-icon="internal-link"
+                                new-tab
+                        />
+                    </div>
                 </template>
             </template>
         </p-toolbox-table>
@@ -337,6 +385,9 @@ onMounted(async () => {
                 }
             }
         }
+    }
+    .resource-item {
+        max-width: 14.75rem;
     }
 }
 </style>

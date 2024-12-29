@@ -43,6 +43,7 @@ const props = withDefaults(defineProps<{
      disabled?: boolean;
      readonly?: boolean;
      userPool?: string[];
+     userGroupPool?: string[];
      appearanceType?: 'badge'|'stack';
      showUserList?: boolean;
      showUserGroupList?: boolean;
@@ -55,6 +56,7 @@ const props = withDefaults(defineProps<{
     invalid: false,
     disabled: false,
     userPool: undefined,
+    userGroupPool: undefined,
     appearanceType: 'badge',
     showUserList: true,
     showUserGroupList: true,
@@ -91,8 +93,8 @@ const state = reactive({
     }),
     allUserItems: computed<DropdownItem[]>(() => {
         if (!props.showUserList) return [];
-        if (props.userPool && props.userPool.length > 0) {
-            return props.userPool.map((userId) => ({
+        if (props.userPool) {
+            return props.userPool?.map((userId) => ({
                 name: userId,
                 label: storeState.userReferenceMap[userId]?.label || storeState.userReferenceMap[userId]?.name || userId,
             }));
@@ -105,13 +107,19 @@ const state = reactive({
     }),
     allUserGroupItems: computed<DropdownItem[]>(() => {
         if (!props.showUserGroupList) return [];
+        if (props.userGroupPool) {
+            return props.userGroupPool?.map((userGroupId) => ({
+                name: userGroupId,
+                label: storeState.userGroupReferenceMap[userGroupId]?.label || storeState.userGroupReferenceMap[userGroupId]?.name || userGroupId,
+            }));
+        }
         return Object.values(storeState.userGroupReferenceMap).map((u: UserGroupReferenceMap[string]) => ({
             name: u.key,
             label: u.label,
             members: u.data.users?.length,
         }));
     }),
-    selectedItems: [] as SelectDropdownMenuItem[],
+    selectedItems: [] as DropdownItem[],
 });
 
 const menuItemsHandler = (): AutocompleteHandler => async (keyword: string, pageStart = 1, pageLimit = 10, filters, resultIndex) => {

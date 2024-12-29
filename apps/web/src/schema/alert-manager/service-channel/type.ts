@@ -23,6 +23,7 @@ export type ServiceChannelScheduleDayType = {
 };
 export type ServiceChannelScheduleInfoType = {
     SCHEDULE_TYPE: ServiceChannelScheduleType;
+    TIMEZONE: string;
     MON: ServiceChannelScheduleDayType;
     TUE: ServiceChannelScheduleDayType;
     WED: ServiceChannelScheduleDayType;

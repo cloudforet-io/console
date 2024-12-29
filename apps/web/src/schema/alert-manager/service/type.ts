@@ -12,6 +12,6 @@ export type ServiceOptionsType = {
     recovery_mode: RecoveryModeType;
 };
 export type AlertsInfoType = {
-    high: number;
-    low: number;
+    HIGH: number;
+    LOW: number;
 };

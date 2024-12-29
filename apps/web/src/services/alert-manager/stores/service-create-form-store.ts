@@ -2,6 +2,7 @@ import { reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
+import type { ServiceModel } from '@/schema/alert-manager/service/model';
 import type { PluginModel } from '@/schema/repository/plugin/model';
 
 import type { ProtocolCardItemType } from '@/services/alert-manager/types/alert-manager-type';
@@ -9,7 +10,7 @@ import type { ProtocolCardItemType } from '@/services/alert-manager/types/alert-
 interface ServiceFormStoreState {
     currentStep: number;
     currentSubStep: number;
-    createdServiceId: string;
+    createdService: ServiceModel;
     selectedWebhookType: PluginModel;
     webhookName: string;
     webhookVersion?: string;
@@ -21,7 +22,7 @@ export const useServiceCreateFormStore = defineStore('service-create-form', () =
         currentStep: 1,
         currentSubStep: 1,
         // service
-        createdServiceId: '',
+        createdService: {} as ServiceModel,
         // webhook
         selectedWebhookType: {} as PluginModel,
         webhookName: '',
@@ -38,8 +39,8 @@ export const useServiceCreateFormStore = defineStore('service-create-form', () =
             state.currentSubStep = step;
         },
 
-        setCreatedServiceId(id: string) {
-            state.createdServiceId = id;
+        setCreatedService(service: ServiceModel) {
+            state.createdService = service;
         },
 
         setSelectedWebhookType(webhookType: PluginModel) {
@@ -60,7 +61,7 @@ export const useServiceCreateFormStore = defineStore('service-create-form', () =
         initState() {
             state.currentStep = 1;
             state.currentSubStep = 1;
-            state.createdServiceId = '';
+            state.createdService = {} as ServiceModel;
             state.selectedWebhookType = {} as PluginModel;
             state.webhookName = '';
             state.webhookVersion = undefined;

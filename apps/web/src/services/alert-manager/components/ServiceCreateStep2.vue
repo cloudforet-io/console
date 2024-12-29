@@ -27,7 +27,7 @@ const storeState = reactive({
     currentSubStep: computed<number>(() => serviceCreateFormState.currentSubStep),
     selectedWebhookType: computed<PluginModel|undefined>(() => serviceCreateFormState.selectedWebhookType),
     webhookName: computed<string>(() => serviceCreateFormState.webhookName || ''),
-    createdServiceId: computed<string>(() => serviceCreateFormState.createdServiceId),
+    createdServiceId: computed<string>(() => serviceCreateFormState.createdService.service_id),
     webhookVersion: computed<string|undefined>(() => serviceCreateFormState.webhookVersion || ''),
 });
 const state = reactive({

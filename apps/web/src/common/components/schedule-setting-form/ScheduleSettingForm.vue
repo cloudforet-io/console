@@ -12,6 +12,8 @@ import {
 import type { ServiceChannelScheduleType } from '@/schema/alert-manager/service-channel/type';
 import { i18n } from '@/translations';
 
+import { useUserStore } from '@/store/user/user-store';
+
 import type {
     ScheduleDayButtonType,
     ScheduleRadioType,
@@ -30,10 +32,14 @@ const props = withDefaults(defineProps<Props>(), {
     scheduleForm: undefined,
 });
 
-const DAYS: DayType[] = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+const userStore = useUserStore();
+const userState = userStore.state;
 
 const emit = defineEmits<{(e: 'update-form', form: ScheduleSettingFormType): void; }>();
 
+const storeState = reactive({
+    timezone: computed(() => userState.timezone || 'UTC'),
+});
 const state = reactive({
     scheduleTypeList: computed<ScheduleRadioType[]>(() => [
         { name: 'WEEK_DAY', label: i18n.t('COMMON.SCHEDULE_SETTING.WEEKDAYS') },
@@ -51,15 +57,15 @@ const state = reactive({
         { name: 'SUN', label: i18n.t('COMMON.SCHEDULE_SETTING.SUN') },
     ]),
     selectedDayButton: ['MON', 'TUE', 'WED', 'THU', 'FRI'] as DayType[],
-    start: 9,
-    end: 18,
+    start: 0,
+    end: 24,
     scheduleDayForm: computed<Record<DayType, ScheduleFormDayType>>(() => {
-        const refinedDays = DAYS.map((day) => ({
-            is_scheduled: state.selectedDayButton.includes(day),
+        const refinedDays = state.days.map((day) => ({
+            is_scheduled: state.selectedDayButton.includes(day.name),
             start: state.start,
             end: state.end,
         }));
-        return zipObject(DAYS, refinedDays) as Record<DayType, ScheduleFormDayType>;
+        return zipObject(state.selectedDayButton, refinedDays) as Record<DayType, ScheduleFormDayType>;
     }),
 });
 
@@ -67,15 +73,15 @@ const initScheduleForm = () => {
     if (!props.scheduleForm) return;
     state.selectedRadioIdx = state.scheduleTypeList.findIndex((item) => item.name === props.scheduleForm?.SCHEDULE_TYPE) || 0;
 
-    const filteredSchedule: string[] = DAYS.filter((day) => {
+    const filteredSchedule: string[] = state.days.filter((day) => {
         if (!props.scheduleForm) return [];
-        const schedule = props.scheduleForm[day];
-        return schedule.is_scheduled;
+        const schedule = props.scheduleForm[day.name];
+        return schedule?.is_scheduled;
     });
 
     state.selectedDayButton = filteredSchedule;
-    state.start = props.scheduleForm[filteredSchedule[0]]?.start || 9;
-    state.end = props.scheduleForm[filteredSchedule[0]]?.end || 18;
+    state.start = props.scheduleForm[filteredSchedule[0]]?.start || 0;
+    state.end = props.scheduleForm[filteredSchedule[0]]?.end || 24;
 };
 const generateHourlyTimeArray = () => range(0, 25).map((h) => ({
     label: `${h.toString().padStart(2, '0')}:00`,
@@ -107,6 +113,7 @@ const handleSelectDropdown = (type: 'start' | 'end', value: number) => {
 watch([() => state.selectedRadioIdx, () => state.selectedDayButton, () => state.start, () => state.end], ([selectedRadioIdx]) => {
     emit('update-form', {
         SCHEDULE_TYPE: state.scheduleTypeList[selectedRadioIdx].name,
+        TIMEZONE: storeState.timezone,
         ...state.scheduleDayForm,
     });
 }, { immediate: true });
@@ -157,13 +164,13 @@ onMounted(() => {
             <div class="flex items-center gap-2">
                 <p-select-dropdown :menu="generateHourlyTimeArray()"
                                    :selected="state.start"
-                                   placeholder="9:00"
+                                   placeholder="00:00"
                                    @select="handleSelectDropdown('start', $event)"
                 />
                 <span>{{ $t('COMMON.SCHEDULE_SETTING.TO') }}</span>
                 <p-select-dropdown :menu="generateHourlyTimeArray()"
                                    :selected="state.end"
-                                   placeholder="18:00"
+                                   placeholder="24:00"
                                    @select="handleSelectDropdown('end', $event)"
                 />
             </div>

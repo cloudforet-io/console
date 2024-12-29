@@ -145,6 +145,7 @@ const handleUpdateRepeatCount = (_repeatCount: string) => {
             <p-text-button class="add-rule-button mt-4 mx-auto "
                            icon-left="ic_plus_bold"
                            size="lg"
+                           @click="handleAddStep"
             >
                 {{ $t('ALERT_MANAGER.ESCALATION_POLICY.ADD_RULE') }}
             </p-text-button>

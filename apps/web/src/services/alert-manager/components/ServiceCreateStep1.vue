@@ -99,7 +99,7 @@ const handleCreateService = async () => {
             description: description.value,
         });
         showSuccessMessage(i18n.t('ALERT_MANAGER.SERVICE.ALT_S_CREATE_SERVICE'), '');
-        serviceCreateFormStore.setCreatedServiceId(createdServiceInfo.service_id);
+        serviceCreateFormStore.setCreatedService(createdServiceInfo);
         serviceCreateFormStore.setCurrentStep(2);
     } catch (e) {
         ErrorHandler.handleError(e, true);

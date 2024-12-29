@@ -19,9 +19,10 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ServiceChannelListParameters } from '@/schema/alert-manager/service-channel/api-verbs/list';
-import { SERVICE_CHANNEL_STATE } from '@/schema/alert-manager/service-channel/constants';
+import { SERVICE_CHANNEL_STATE, SERVICE_CHANNEL_TYPE } from '@/schema/alert-manager/service-channel/constants';
 import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
-import { i18n as _i18n } from '@/translations';
+import type { ServiceModel } from '@/schema/alert-manager/service/model';
+import { i18n, i18n as _i18n } from '@/translations';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
@@ -46,6 +47,7 @@ import {
     NOTIFICATION_MANAGEMENT_TABLE_HANDLER,
 } from '@/services/alert-manager/constants/notification-table-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
+import { useServiceCreateFormStore } from '@/services/alert-manager/stores/service-create-form-store';
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
 import type { ProtocolInfo, NotificationsModalType, ProtocolCardItemType } from '@/services/alert-manager/types/alert-manager-type';
 
@@ -60,6 +62,7 @@ const props = withDefaults(defineProps<Props>(), {
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
+const serviceCreateFormStore = useServiceCreateFormStore();
 
 const router = useRouter();
 
@@ -96,15 +99,24 @@ const tableState = reactive({
 });
 const storeState = reactive({
     timezone: computed<string>(() => serviceDetailPageGetters.timezone),
-    serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
+    service: computed<ServiceModel>(() => serviceDetailPageState.serviceInfo),
     notificationProtocolList: computed<ProtocolCardItemType[]>(() => serviceDetailPageState.notificationProtocolList),
 });
 const state = reactive({
     loading: false,
     items: [] as ServiceChannelModel[],
+    refinedItems: computed<ServiceChannelModel[]>(() => state.items.map((i) => {
+        if (i.channel_type === SERVICE_CHANNEL_TYPE.FORWARD) {
+            return {
+                ...i,
+                protocol_id: 'forward',
+            };
+        }
+        return i;
+    })),
     totalCount: 0,
     selectIndex: undefined as number|undefined,
-    selectedItem: computed<ServiceChannelModel>(() => state.items[state.selectIndex]),
+    selectedItem: computed<ServiceChannelModel>(() => state.refinedItems[state.selectIndex]),
 });
 const modalState = reactive({
     visible: false,
@@ -117,6 +129,12 @@ const queryTagHelper = useQueryTags({ keyItemSets: NOTIFICATION_MANAGEMENT_TABLE
 const { queryTags } = queryTagHelper;
 
 const getProtocolInfo = (id: string): ProtocolInfo => {
+    if (id === 'forward') {
+        return {
+            name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.ASSOCIATED_MEMBER'),
+            icon: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/notifications_member.svg',
+        };
+    }
     const protocol = storeState.notificationProtocolList.find((item) => item.protocol_id === id);
     return {
         name: protocol?.name || '',
@@ -130,6 +148,7 @@ const handleCloseModal = () => {
 };
 const handleClickCreateButton = () => {
     if (!hasReadWriteAccess) return;
+    serviceCreateFormStore.setCreatedService(storeState.service);
     router.push(getProperRouteLocation({
         name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL.NOTIFICATIONS.CREATE._NAME,
     }));
@@ -158,7 +177,7 @@ const handleExportExcel = async () => {
 const handleSelectTableRow = (item:number[]) => {
     if (item.length === 0) return;
     state.selectIndex = item[0];
-    serviceDetailPageStore.setSelectedNotificationId(state.items[item[0]].channel_id);
+    serviceDetailPageStore.setSelectedNotificationId(state.refinedItems[item[0]].channel_id);
 };
 
 const fetchNotificationList = async () => {
@@ -169,7 +188,7 @@ const fetchNotificationList = async () => {
         ]);
         const { results, total_count } = await SpaceConnector.clientV2.alertManager.serviceChannel.list<ServiceChannelListParameters, ListResponse<ServiceChannelModel>>({
             query: notificationsListApiQueryHelper.data,
-            service_id: storeState.serviceId,
+            service_id: storeState.service.service_id,
         });
         state.items = results || [];
         state.totalCount = total_count || 0;
@@ -182,7 +201,7 @@ const fetchNotificationList = async () => {
     }
 };
 
-watch(() => storeState.serviceId, (id) => {
+watch(() => storeState.service.service_id, (id) => {
     if (!id) return;
     fetchNotificationList();
 }, { immediate: true });
@@ -202,7 +221,7 @@ onUnmounted(() => {
                          :multi-select="false"
                          :loading="state.loading"
                          :total-count="state.totalCount"
-                         :items="state.items"
+                         :items="state.refinedItems"
                          :fields="tableState.fields"
                          :select-index="[state.selectIndex]"
                          :query-tags="queryTags"
