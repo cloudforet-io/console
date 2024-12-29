@@ -5,4 +5,5 @@ export interface ServiceListParameters {
     name?: string;
     escalation_policy_id?: string;
     query?: Query;
+    details?: boolean;
 }

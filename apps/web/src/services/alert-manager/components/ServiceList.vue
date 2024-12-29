@@ -135,6 +135,7 @@ const fetchServiceList = async () => {
         ]);
         const { results, total_count } = await SpaceConnector.clientV2.alertManager.service.list<ServiceListParameters, ListResponse<ServiceModel>>({
             query: serviceListApiQueryHelper.data,
+            details: true,
         });
         state.serviceList = results || [];
         state.totalCount = total_count || 0;

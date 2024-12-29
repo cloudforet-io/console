@@ -122,6 +122,7 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
             try {
                 state.serviceInfo = await SpaceConnector.clientV2.alertManager.service.get<ServiceGetParameters, ServiceModel>({
                     service_id: id,
+                    details: true,
                 });
             } catch (e) {
                 ErrorHandler.handleError(e);
