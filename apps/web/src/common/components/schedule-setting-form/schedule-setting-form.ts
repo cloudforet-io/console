@@ -21,4 +21,4 @@ export type ScheduleFormDayType = {
     end: number;
 };
 
-export type ScheduleSettingFormType = ScheduleFormType & Record<DayType, ScheduleFormDayType>;
+export type ScheduleSettingFormType = ScheduleFormType & Partial<Record<DayType, ScheduleFormDayType>>;

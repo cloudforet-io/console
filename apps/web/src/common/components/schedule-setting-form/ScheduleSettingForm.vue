@@ -30,8 +30,6 @@ const props = withDefaults(defineProps<Props>(), {
     scheduleForm: undefined,
 });
 
-const DAYS: DayType[] = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
-
 const emit = defineEmits<{(e: 'update-form', form: ScheduleSettingFormType): void; }>();
 
 const state = reactive({
@@ -51,15 +49,15 @@ const state = reactive({
         { name: 'SUN', label: i18n.t('COMMON.SCHEDULE_SETTING.SUN') },
     ]),
     selectedDayButton: ['MON', 'TUE', 'WED', 'THU', 'FRI'] as DayType[],
-    start: 9,
-    end: 18,
+    start: 0,
+    end: 24,
     scheduleDayForm: computed<Record<DayType, ScheduleFormDayType>>(() => {
-        const refinedDays = DAYS.map((day) => ({
-            is_scheduled: state.selectedDayButton.includes(day),
+        const refinedDays = state.days.map((day) => ({
+            is_scheduled: state.selectedDayButton.includes(day.name),
             start: state.start,
             end: state.end,
         }));
-        return zipObject(DAYS, refinedDays) as Record<DayType, ScheduleFormDayType>;
+        return zipObject(state.selectedDayButton, refinedDays) as Record<DayType, ScheduleFormDayType>;
     }),
 });
 
@@ -67,15 +65,15 @@ const initScheduleForm = () => {
     if (!props.scheduleForm) return;
     state.selectedRadioIdx = state.scheduleTypeList.findIndex((item) => item.name === props.scheduleForm?.SCHEDULE_TYPE) || 0;
 
-    const filteredSchedule: string[] = DAYS.filter((day) => {
+    const filteredSchedule: string[] = state.days.filter((day) => {
         if (!props.scheduleForm) return [];
-        const schedule = props.scheduleForm[day];
-        return schedule.is_scheduled;
+        const schedule = props.scheduleForm[day.name];
+        return schedule?.is_scheduled;
     });
 
     state.selectedDayButton = filteredSchedule;
-    state.start = props.scheduleForm[filteredSchedule[0]]?.start || 9;
-    state.end = props.scheduleForm[filteredSchedule[0]]?.end || 18;
+    state.start = props.scheduleForm[filteredSchedule[0]]?.start || 0;
+    state.end = props.scheduleForm[filteredSchedule[0]]?.end || 24;
 };
 const generateHourlyTimeArray = () => range(0, 25).map((h) => ({
     label: `${h.toString().padStart(2, '0')}:00`,
@@ -157,13 +155,13 @@ onMounted(() => {
             <div class="flex items-center gap-2">
                 <p-select-dropdown :menu="generateHourlyTimeArray()"
                                    :selected="state.start"
-                                   placeholder="9:00"
+                                   placeholder="00:00"
                                    @select="handleSelectDropdown('start', $event)"
                 />
                 <span>{{ $t('COMMON.SCHEDULE_SETTING.TO') }}</span>
                 <p-select-dropdown :menu="generateHourlyTimeArray()"
                                    :selected="state.end"
-                                   placeholder="18:00"
+                                   placeholder="24:00"
                                    @select="handleSelectDropdown('end', $event)"
                 />
             </div>
