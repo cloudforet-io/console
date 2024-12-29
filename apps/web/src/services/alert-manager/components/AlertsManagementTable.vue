@@ -151,7 +151,7 @@ const handleCustomFieldUpdate = (fields: DataTableFieldType[]) => {
 };
 const handleExportToExcel = async () => {
     await downloadExcel({
-        url: '/alertManager/alert/list',
+        url: '/alert-manager/alert/list',
         param: {
             query: { ...alertListApiQueryHelper.data, only: ALERT_EXCEL_FIELDS.map((d) => d.key) },
         },

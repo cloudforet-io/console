@@ -144,7 +144,7 @@ const handleChangeToolbox = async (options: any = {}) => {
 };
 const handleExportExcel = async () => {
     await downloadExcel({
-        url: '/alertManager/webhook/list',
+        url: '/alert-manager/webhook/list',
         param: {
             query: { ...webhookListApiQueryHelper.data, only: ALERT_EXCEL_FIELDS.map((d) => d.key) },
         },

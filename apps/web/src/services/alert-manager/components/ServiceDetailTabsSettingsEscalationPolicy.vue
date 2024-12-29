@@ -23,6 +23,9 @@ import type { EscalationPolicyModel } from '@/schema/alert-manager/escalation-po
 import type { EscalationPolicyRulesType } from '@/schema/alert-manager/escalation-policy/type';
 import { i18n as _i18n } from '@/translations';
 
+import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
+import { downloadExcel } from '@/lib/helper/file-download-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useQueryTags } from '@/common/composables/query-tags';
@@ -36,6 +39,7 @@ import ServiceDetailTabsSettingsEscalationPolicyFormModal
 import ServiceDetailTabsSettingsEscalationPolicyStateModal
     from '@/services/alert-manager/components/ServiceDetailTabsSettingsEscalationPolicyStateModal.vue';
 import {
+    ALERT_EXCEL_FIELDS,
     ESCALATION_POLICY_MANAGEMENT_TABLE_FIELDS, ESCALATION_POLICY_MANAGEMENT_TABLE_HANDLER,
 } from '@/services/alert-manager/constants/escalation-policy-table-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
@@ -100,8 +104,16 @@ const handleChangeToolbox = async (options: any = {}) => {
     if (options.pageLimit !== undefined) escalationPolicyListApiQueryHelper.setPageLimit(options.pageLimit);
     await fetchEscalationPolicyList();
 };
-const handleExportExcel = () => {
-    console.log('TODO: handleExportExcel');
+const handleExportExcel = async () => {
+    await downloadExcel({
+        url: '/alert-manager/escalation-policy/list',
+        param: {
+            query: { ...escalationPolicyListApiQueryHelper.data, only: ALERT_EXCEL_FIELDS.map((d) => d.key) },
+        },
+        fields: ALERT_EXCEL_FIELDS,
+        file_name_prefix: FILE_NAME_PREFIX.escalationPolicy,
+        timezone: storeState.timezone,
+    });
 };
 const handleSelectTableRow = (selectedItems: number[]) => {
     state.selectIndex = selectedItems[0];
