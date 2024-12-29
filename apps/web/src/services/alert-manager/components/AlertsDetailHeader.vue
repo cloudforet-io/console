@@ -62,7 +62,7 @@ const handleSelectDropdownMenu = (type: ModalType) => {
     <div class="alerts-detail-page pb-6">
         <p-heading-layout>
             <template #heading>
-                <p-heading :title="storeState.alertInfo.title"
+                <p-heading :title="storeState.alertInfo.title || ''"
                            show-back-button
                            @click-back-button="handleRouteBackButton"
                 >

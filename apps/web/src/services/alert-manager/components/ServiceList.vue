@@ -208,7 +208,7 @@ onMounted(async () => {
                                         {{ $t('ALERT_MANAGER.SERVICE.OPEN_ALERTS') }}
                                     </p>
                                     <p class="count font-medium">
-                                        {{ (item?.alerts.TOTAL?.HIGH || 0) + (item?.alerts.TOTAL?.LOW || 0) }}
+                                        {{ (item?.alerts.TRIGGERED?.HIGH || 0) + (item?.alerts.TRIGGERED?.LOW || 0) + (item?.alerts.ACKNOWLEDGED?.HIGH || 0) + (item?.alerts.ACKNOWLEDGED?.LOW || 0) }}
                                     </p>
                                 </div>
                                 <p-divider />
