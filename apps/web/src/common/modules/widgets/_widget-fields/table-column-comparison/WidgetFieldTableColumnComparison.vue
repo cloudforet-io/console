@@ -9,9 +9,11 @@ import { sortBy } from 'lodash';
 import {
     PFieldTitle, PToggleButton, PFieldGroup, PSelectDropdown, PI, PTooltip,
 } from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import { i18n } from '@/translations';
+
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
 import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
@@ -28,8 +30,6 @@ import type {
     WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
-
-
 const FIELD_KEY = 'tableColumnComparison';
 
 const props = defineProps<WidgetFieldComponentProps<TableColumnComparisonOptions>>();
@@ -42,13 +42,13 @@ const state = reactive({
         if (props.widgetConfig.widgetName !== 'table') return i18n.t('COMMON.WIDGETS.COMPARISON.INFO_TOOLTIP_TABLE');
         return i18n.t('COMMON.WIDGETS.COMPARISON.INFO_TOOLTIP');
     }),
-    initialValue: computed<TableColumnComparisonValue>(() => widgetFieldDefaultValueMap.comparison),
+    initialValue: computed<TableColumnComparisonValue>(() => widgetFieldDefaultValueMap.tableColumnComparison),
     formatMenu: computed<SelectDropdownMenuItem[]>(() => [
-        { label: i18n.t('COMMON.WIDGETS.COMPARISON.ALL'), name: 'all' },
-        { label: `${i18n.t('COMMON.WIDGETS.COMPARISON.PERCENT')}(%)`, name: 'percent' },
+        // { label: i18n.t('COMMON.WIDGETS.COMPARISON.ALL'), name: 'all' },
         { label: i18n.t('COMMON.WIDGETS.COMPARISON.FIXED'), name: 'fixed' },
+        { label: `${i18n.t('COMMON.WIDGETS.COMPARISON.PERCENT')}(%)`, name: 'percent' },
     ]),
-    fieldsMenu: computed<SelectDropdownMenuItem[]>(() => {
+    fieldMenuItems: computed<SelectDropdownMenuItem[]>(() => {
         const isPivotDataTable = widgetGenerateGetters?.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT;
         const pivotSortKeys = (widgetGenerateGetters.selectedDataTable?.sort_keys ?? []);
 
@@ -91,10 +91,10 @@ const handleUpdateFormat = (format: ComparisonFormat) => {
     });
 };
 
-const handleUpdateFields = (items: SelectDropdownMenuItem[]) => {
+const handleUpdateFields = (fields: MenuItem[]) => {
     props.fieldManager.setFieldValue(FIELD_KEY, {
         ...state.fieldValue,
-        fields: items.map((d) => d.name),
+        fields: fields.map((item) => item.name),
     });
 };
 
@@ -106,7 +106,7 @@ const handleUpdateFields = (items: SelectDropdownMenuItem[]) => {
             <!--                TODO: apply translation-->
             <!--                {{ $t('COMMON.WIDGETS.COMPARISON.COMPARISON') }}-->
             <p-field-title>
-                {{ $t('Table Column Comparison') }}
+                {{ $t('Table Column Comparison UI') }}
                 <p-tooltip :contents="state.infoText">
                     <p-i name="ic_info-circle"
                          width="0.875rem"
@@ -166,12 +166,13 @@ const handleUpdateFields = (items: SelectDropdownMenuItem[]) => {
                            style-type="secondary"
                            required
             >
-                <p-select-dropdown :menu="state.fieldsMenu"
+                <p-select-dropdown :menu="state.fieldMenuItems"
                                    use-fixed-menu-style
                                    :selected="state.selectedFields"
                                    :invalid="!state.selectedFields?.length"
                                    multi-selectable
                                    show-select-marker
+                                   appearance-type="badge"
                                    block
                                    @update:selected="handleUpdateFields"
                 />

@@ -59,7 +59,7 @@ export const widgetFieldDefaultValueMap: DefaultValueRegistry = {
     tableColumnComparison: {
         decreaseColor: DEFAULT_COMPARISON_COLOR.DECREASE,
         increaseColor: DEFAULT_COMPARISON_COLOR.INCREASE,
-        format: 'all',
+        format: 'fixed',
         toggleValue: true,
         fields: [],
     },
