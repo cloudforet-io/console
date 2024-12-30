@@ -89,6 +89,7 @@ onMounted(async () => {
 
 <style scoped lang="postcss">
 .webhook-create-type-selector {
+    min-height: 16rem;
     .contents {
         @apply grid grid-cols-3;
         gap: 0.5rem;
