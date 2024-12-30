@@ -180,17 +180,23 @@ const initRelatedFieldsByTaskTypeSelection = (category: TaskCategoryModel, taskT
 let hasInitiated = false;
 
 /* initiation for 'view' mode */
-const initForViewMode = (task?: TaskModel, category?: TaskCategoryModel, taskType?: TaskTypeModel) => {
+const initForViewMode = async (task?: TaskModel) => {
     if (hasInitiated) return;
 
-    if (!task || !category || !taskType) return;
+    if (!task) return;
     // set category
-    setInitialCategory(task.category_id);
+    taskContentFormStore.setCurrentCategoryId(task.category_id);
+    await setInitialCategory(task.category_id);
+    const category = taskContentFormGetters.currentCategory;
     // set task type
+    await taskContentFormStore.setCurrentTaskType(task.task_type_id);
+    const taskType = taskContentFormState.currentTaskType;
     setInitialTaskType(taskType);
     // set status
-    const statusOption = category.status_options[task.status_type]?.find((status) => status.status_id === task.status_id);
-    setInitialStatus(statusOption);
+    if (category) {
+        const statusOption = category.status_options[task.status_type]?.find((status) => status.status_id === task.status_id);
+        setInitialStatus(statusOption);
+    }
 
     hasInitiated = true;
 };
@@ -225,16 +231,13 @@ const initForCreateMode = async (categoryId?: string, taskType?: TaskTypeModel) 
 let viewModeInitWatchStop;
 let createModeInitWatchStop;
 
-viewModeInitWatchStop = watch([
-    () => taskContentFormState.originTask,
-    () => taskContentFormGetters.currentCategory,
-    () => taskContentFormState.currentTaskType], async ([task, category, taskType]) => {
+viewModeInitWatchStop = watch(() => taskContentFormState.originTask, async (task) => {
     if (hasInitiated && viewModeInitWatchStop) {
         viewModeInitWatchStop();
         viewModeInitWatchStop = null;
         return;
     }
-    if (taskContentFormState.mode === 'view') initForViewMode(task, category, taskType);
+    if (taskContentFormState.mode === 'view') await initForViewMode(task);
 }, { immediate: true });
 createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, () => taskContentFormState.currentTaskType], async ([categoryId, taskType]) => {
     if (hasInitiated && createModeInitWatchStop) {
@@ -256,32 +259,36 @@ createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, (
                 <p-field-group :label="taskManagementTemplateStore.templates.TaskCategory"
                                :style-type="taskContentFormState.mode === 'create' ? 'primary' : 'secondary'"
                                required
-                               :invalid="invalidState.category"
+                               :invalid="taskContentFormState.mode !== 'view' && invalidState.category"
                                :invalid-text="invalidTexts.category"
                 >
-                    <p-select-dropdown :selected="selectedCategoryItems"
-                                       :handler="categoryMenuItemsHandler"
-                                       :invalid="invalidState.category"
-                                       :readonly="taskContentFormState.mode === 'view'"
-                                       block
-                                       @update:selected="handleUpdateSelectedCategory"
-                    />
+                    <template #default="{invalid}">
+                        <p-select-dropdown :selected="selectedCategoryItems"
+                                           :handler="categoryMenuItemsHandler"
+                                           :invalid="invalid"
+                                           :readonly="taskContentFormState.mode === 'view'"
+                                           block
+                                           @update:selected="handleUpdateSelectedCategory"
+                        />
+                    </template>
                 </p-field-group>
             </div>
             <div class="base-form-field-wrapper">
                 <p-field-group :label="taskManagementTemplateStore.templates.TaskType"
                                :style-type="taskContentFormState.mode === 'create' ? 'primary' : 'secondary'"
                                required
-                               :invalid="invalidState.taskType"
+                               :invalid="taskContentFormState.mode !== 'view' && invalidState.taskType"
                                :invalid-text="invalidTexts.taskType"
                 >
-                    <p-select-dropdown :selected="selectedTaskTypeItems"
-                                       :handler="taskTypeMenuItemsHandler"
-                                       :invalid="invalidState.taskType"
-                                       :readonly="taskContentFormState.mode === 'view' || !taskContentFormGetters.currentCategory"
-                                       block
-                                       @update:selected="handleUpdateSelectedTaskType"
-                    />
+                    <template #default="{invalid}">
+                        <p-select-dropdown :selected="selectedTaskTypeItems"
+                                           :handler="taskTypeMenuItemsHandler"
+                                           :invalid="invalid"
+                                           :readonly="taskContentFormState.mode === 'view' || !taskContentFormGetters.currentCategory"
+                                           block
+                                           @update:selected="handleUpdateSelectedTaskType"
+                        />
+                    </template>
                 </p-field-group>
             </div>
         </div>
