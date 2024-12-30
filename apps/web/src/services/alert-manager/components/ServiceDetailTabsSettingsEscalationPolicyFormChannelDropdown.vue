@@ -17,16 +17,9 @@ import type {
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ServiceChannelListParameters } from '@/schema/alert-manager/service-channel/api-verbs/list';
 import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
-import type { UserGroupChannelListParameters } from '@/schema/alert-manager/user-group-channel/api-verbs/list';
-import type { UserGroupChannelModel } from '@/schema/alert-manager/user-group-channel/model';
 import { i18n } from '@/translations';
 
-import type { UserGroupReferenceMap } from '@/store/reference/user-group-reference-store';
-import type { UserReferenceMap } from '@/store/reference/user-reference-store';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import { indigo } from '@/styles/colors';
 
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
 
@@ -53,8 +46,6 @@ const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const storeState = reactive({
-    userReferenceMap: computed<UserReferenceMap>(() => serviceDetailPageGetters.userReferenceMap),
-    userGroupReferenceMap: computed<UserGroupReferenceMap>(() => serviceDetailPageGetters.userGroupReferenceMap),
     serviceId: computed<string>(() => serviceDetailPageGetters.serviceInfo.service_id),
 });
 const state = reactive({
@@ -69,12 +60,6 @@ const state = reactive({
                 title: i18n.t('ALERT_MANAGER.ESCALATION_POLICY.CHANNEL') as string,
             });
         }
-        if (state.userGroupChannelList.length > 0) {
-            result.push({
-                key: 'user_group_channel',
-                title: i18n.t('ALERT_MANAGER.ESCALATION_POLICY.USER_GROUP') as string,
-            });
-        }
         return result;
     }),
     selectedItems: [] as SelectDropdownMenuItem[],
@@ -85,18 +70,14 @@ const menuItemsHandler = (): AutocompleteHandler => async (keyword: string, page
     const filterItems = (items: DropdownItem[]): DropdownItem[] => items.filter((item) => getTextHighlightRegex(keyword).test(item.name)).slice(pageStart - 1, _totalCount);
 
     if (resultIndex === undefined) {
-        return state.dropdownCategories.map((c, idx) => {
+        return state.dropdownCategories.map((c) => {
             const items: DropdownItem[] = [
                 { type: 'header', label: c.title, name: 'header' },
             ];
             if (c.key === 'service_channel') items.push(...state.serviceChannelList);
-            else if (c.key === 'user_group_channel') items.push(...state.userGroupChannelList);
 
             const _slicedItems = filterItems(items);
             _slicedItems.unshift();
-            if (idx !== 0) {
-                _slicedItems.unshift({ type: 'divider', label: '', name: '' });
-            }
             return {
                 results: _slicedItems,
                 more: _totalCount < items.length,
@@ -107,7 +88,6 @@ const menuItemsHandler = (): AutocompleteHandler => async (keyword: string, page
     return state.dropdownCategories.map((c, i) => {
         const items: DropdownItem[] = [];
         if (c.key === 'service_channel') items.push(...state.serviceChannelList);
-        else if (c.key === 'user_group_channel') items.push(...state.userGroupChannelList);
         const _slicedItems = filterItems(items);
         if (i !== resultIndex) return { results: [], title: c.title };
         return {
@@ -132,13 +112,15 @@ const handleTagDelete = (idx: number) => {
 const initMultipleType = (_channelIds?: string[]) => {
     if (!Array.isArray(_channelIds)) return;
     if (!isEqual(currentChannelIds.value, _channelIds)) {
-        state.selectedItems = _channelIds.map((channelId) => ({
-            name: channelId,
-            label: storeState.userReferenceMap[channelId]?.label ?? channelId,
-        }));
+        state.selectedItems = _channelIds.map((channelId) => {
+            const channel = state.serviceChannelList.find((item) => item.name === channelId);
+            return {
+                name: channelId,
+                label: channel?.label ?? channelId,
+            };
+        });
     }
 };
-const checkUserGroup = (id: string): boolean => state.userGroupChannelList.some((i) => i.name === id);
 
 const fetchServiceChannelList = async () => {
     try {
@@ -154,27 +136,13 @@ const fetchServiceChannelList = async () => {
         state.serviceChannelList = [];
     }
 };
-const fetchUserGroupChannelList = async () => {
-    try {
-        const { results } = await SpaceConnector.clientV2.alertManager.userGroupChannel.list<UserGroupChannelListParameters, ListResponse<UserGroupChannelModel>>();
-        state.userGroupChannelList = (results || []).map((item) => ({
-            name: item.channel_id,
-            label: item.name,
-        })).sort((a, b) => a.label.localeCompare(b.label));
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.userGroupChannelList = [];
-    }
-};
 
 watch(() => storeState.serviceId, async (serviceId) => {
     if (!serviceId) return;
     await fetchServiceChannelList();
-    await fetchUserGroupChannelList();
-}, { immediate: true });
-watch(() => props.selectedIds, (newChannelId) => {
-    if (isEqual(currentChannelIds.value, newChannelId)) return;
-    initMultipleType(newChannelId);
+    if (props.selectedIds) {
+        await initMultipleType(props.selectedIds);
+    }
 }, { immediate: true });
 </script>
 
@@ -195,19 +163,13 @@ watch(() => props.selectedIds, (newChannelId) => {
             <div class="flex flex-wrap py-1 gap-y-2">
                 <p-tag v-for="(item, idx) in state.selectedItems"
                        :key="item.name"
-                       :outline="!checkUserGroup(item.name)"
+                       outline
                        class="tag border-none"
                        selected
                        @delete="handleTagDelete(idx)"
                 >
                     <div class="member-menu-item h-4">
-                        <p-avatar v-if="checkUserGroup(item.name)"
-                                  icon="ic_member"
-                                  :color="indigo[300]"
-                                  size="xs"
-                        />
-                        <p-avatar v-else
-                                  icon="ic_my-page_notifications-channel"
+                        <p-avatar icon="ic_my-page_notifications-channel"
                                   size="xs"
                         />
                         <span class="leading-4">{{ item.label }}</span>
@@ -218,22 +180,12 @@ watch(() => props.selectedIds, (newChannelId) => {
         <template #menu-item--format="{ item }">
             <div class="member-menu-item">
                 <div>
-                    <p-avatar v-if="checkUserGroup(item.name)"
-                              class="menu-icon"
-                              icon="ic_member"
-                              :color="indigo[300]"
-                              size="xs"
-                    />
-                    <p-avatar v-else
-                              class="menu-icon"
+                    <p-avatar class="menu-icon"
                               icon="ic_my-page_notifications-channel"
                               size="xs"
                     />
                 </div>
                 <span>{{ item.label }}</span>
-                <span class="text-gray-500">
-                    <span v-if="checkUserGroup(item.name)">({{ item?.members || 0 }} {{ $t('ALERT_MANAGER.ALERTS.MEMBERS') }})</span>
-                </span>
             </div>
         </template>
     </p-select-dropdown>

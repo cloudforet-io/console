@@ -1,16 +1,20 @@
 <script setup lang="ts">
 import {
     computed,
-    defineProps, onUnmounted, reactive, watch,
+    defineProps, onMounted, onUnmounted, reactive, watch,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import ServiceDetailHeader from '@/services/alert-manager/components/ServiceDetailHeader.vue';
 import ServiceDetailTabs from '@/services/alert-manager/components/ServiceDetailTabs.vue';
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
+
 
 interface Props {
     serviceId: string;
@@ -21,6 +25,10 @@ const props = withDefaults(defineProps<Props>(), {
 
 const gnbStore = useGnbStore();
 const serviceDetailPageStore = useServiceDetailPageStore();
+
+const router = useRouter();
+
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const state = reactive({
     favoriteOptions: computed<FavoriteOptions>(() => ({
@@ -34,6 +42,12 @@ watch(() => props.serviceId, async (serviceId) => {
     await serviceDetailPageStore.fetchServiceDetailData(serviceId);
     await gnbStore.setFavoriteItemId(state.favoriteOptions);
 }, { immediate: true });
+
+onMounted(() => {
+    if (!props.serviceId) {
+        router.push(getProperRouteLocation({ name: ALERT_MANAGER_ROUTE.SERVICE._NAME }));
+    }
+});
 
 onUnmounted(() => {
     serviceDetailPageStore.initState();

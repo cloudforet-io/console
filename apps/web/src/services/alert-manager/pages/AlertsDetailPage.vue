@@ -1,11 +1,17 @@
 <script setup lang="ts">
-import { defineProps, onUnmounted, watch } from 'vue';
+import {
+    defineProps, onMounted, onUnmounted, watch,
+} from 'vue';
+import { useRouter } from 'vue-router/composables';
+
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import AlertDetailInfoTable from '@/services/alert-manager/components/AlertDetailInfoTable.vue';
 import AlertDetailNote from '@/services/alert-manager/components/AlertDetailNote.vue';
 import AlertDetailSummary from '@/services/alert-manager/components/AlertDetailSummary.vue';
 import AlertDetailTabs from '@/services/alert-manager/components/AlertDetailTabs.vue';
 import AlertsDetailHeader from '@/services/alert-manager/components/AlertsDetailHeader.vue';
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { useAlertDetailPageStore } from '@/services/alert-manager/stores/alert-detail-page-store';
 
 interface Props {
@@ -18,11 +24,20 @@ const props = withDefaults(defineProps<Props>(), {
 
 const alertDetailPageStore = useAlertDetailPageStore();
 
+const router = useRouter();
+
+const { getProperRouteLocation } = useProperRouteLocation();
+
 watch(() => props.alertId, async (alertId) => {
     if (!alertId) return;
     await alertDetailPageStore.fetchAlertDetail(alertId);
 }, { immediate: true });
 
+onMounted(() => {
+    if (!props.alertId) {
+        router.push(getProperRouteLocation({ name: ALERT_MANAGER_ROUTE.ALERTS._NAME }));
+    }
+});
 onUnmounted(() => {
     alertDetailPageStore.init();
 });

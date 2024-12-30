@@ -6,6 +6,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PHeadingLayout, PTab, PHeading, PDefinitionTable, PStatus, PLazyImg, PBadge,
 } from '@cloudforet/mirinae';
+import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
 import type { ServiceChannelGetParameters } from '@/schema/alert-manager/service-channel/api-verbs/get';
@@ -28,7 +29,6 @@ import { alertManagerStateFormatter } from '@/services/alert-manager/composables
 import {
     NOTIFICATIONS_DETAIL_TABS,
 } from '@/services/alert-manager/constants/common-constant';
-import { NOTIFICATION_DEFINITION_FIELDS } from '@/services/alert-manager/constants/notification-table-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
 import type { ProtocolInfo, WebhookDetailTabsType, ProtocolCardItemType } from '@/services/alert-manager/types/alert-manager-type';
 
@@ -74,6 +74,16 @@ const state = reactive({
         SAT: i18n.t('ALERT_MANAGER.NOTIFICATIONS.SATURDAY'),
         SUN: i18n.t('ALERT_MANAGER.NOTIFICATIONS.SUNDAY'),
     })),
+    fields: computed<DataTableFieldType[]>(() => {
+        const forwardField = (state.notificationInfo.channel_type === SERVICE_CHANNEL_TYPE.FORWARD) ? [{ label: 'Member', name: 'data' }] : [];
+        return [
+            { label: 'Name', name: 'name' },
+            { label: 'Channel', name: 'protocol_id' },
+            { label: 'State', name: 'state' },
+            ...forwardField,
+            { label: 'Schedule', name: 'schedule', disableCopy: true },
+        ];
+    }),
 });
 
 const getProtocolInfo = (id: string): ProtocolInfo => {
@@ -166,7 +176,7 @@ watch(() => storeState.selectedNotificationId, async (selectedId) => {
                     />
                 </template>
             </p-heading-layout>
-            <p-definition-table :fields="NOTIFICATION_DEFINITION_FIELDS"
+            <p-definition-table :fields="state.fields"
                                 :data="state.refinedNotificationInfo"
                                 :skeleton-rows="4"
                                 block
