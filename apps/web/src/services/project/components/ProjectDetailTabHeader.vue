@@ -71,9 +71,11 @@ interface ViewInItem {
     to: Location;
 }
 interface Props {
-    id: string;
+    id?: string;
 }
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    id: '',
+});
 // const route = useRoute();
 const router = useRouter();
 const { getProperRouteLocation } = useProperRouteLocation();
@@ -345,7 +347,7 @@ watch(() => projectDetailPageGetters.projectType, async () => {
         listWebhooks(),
         fetchUserList(),
     ]);
-});
+}, { immediate: true });
 
 watch(() => projectDetailPageState.projectId, async (projectId) => {
     if (projectId) {
@@ -354,7 +356,7 @@ watch(() => projectDetailPageState.projectId, async (projectId) => {
             projectDetailPageStore.getAlertCounts(projectId),
         ]);
     }
-});
+}, { immediate: true });
 
 
 watch([
@@ -448,7 +450,7 @@ watch(() => projectDetailPageState.projectId, (projectId) => {
                                          height="0.75rem"
                                          color="inherit"
                                     />
-                                    <span>{{ memberState.totalCount }}{{ $t('PROJECT.DETAIL.MEMBERS') }}</span>
+                                    <span>{{ memberState.totalCount }} {{ $t('PROJECT.DETAIL.MEMBERS') }}</span>
                                 </template>
                             </div>
                             <p-i name="ic_dot"
