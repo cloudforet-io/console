@@ -14,8 +14,10 @@ import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
+import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
 
 import AlertDetailInfoTableDescription from '@/services/alert-manager/components/AlertDetailInfoTableDescription.vue';
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { useAlertDetailPageStore } from '@/services/alert-manager/stores/alert-detail-page-store';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 
@@ -34,6 +36,7 @@ const storeState = reactive({
     timezone: computed<string>(() => alertDetailPageGetters.timezone),
     alertInfo: computed<AlertModel>(() => alertDetailPageState.alertInfo),
     cloudServiceTypeInfo: computed<CloudServiceTypeReferenceMap>(() => allReferenceGetters.cloudServiceType),
+    serviceMap: computed<ServiceReferenceMap>(() => allReferenceGetters.service),
 });
 const tableState = reactive({
     fields: computed<DefinitionField[]>(() => [
@@ -41,7 +44,7 @@ const tableState = reactive({
         { name: 'rule', label: i18n.t('ALERT_MANAGER.ALERTS.RULE'), disableCopy: true },
         { name: 'severity', label: i18n.t('ALERT_MANAGER.ALERTS.SEVERITY'), disableCopy: true },
         { name: 'triggered_by', label: i18n.t('ALERT_MANAGER.ALERTS.TRIGGERED_BY'), copyValueFormatter: () => storeState.alertInfo.triggered_by },
-        { name: 'account', label: i18n.t('ALERT_MANAGER.ALERTS.ACCOUNT_ID'), copyValueFormatter: () => storeState.alertInfo.account },
+        { name: 'service_id', label: i18n.t('ALERT_MANAGER.ALERTS.SERVICE'), disableCopy: true },
         { name: 'resources', label: i18n.t('ALERT_MANAGER.ALERTS.RESOURCE'), disableCopy: true },
         { name: 'created_at', label: i18n.t('ALERT_MANAGER.ALERTS.CREATED'), disableCopy: true },
         { name: 'acknowledged_at', label: i18n.t('ALERT_MANAGER.ALERTS.ACKNOWLEDGED'), disableCopy: true },
@@ -139,8 +142,21 @@ const getAssetInfo = (assetId: string) => {
             <template #data-triggered_by="{ value }">
                 {{ value || '--' }}
             </template>
-            <template #data-account="{ value }">
-                {{ value || '--' }}
+            <template #data-service_id="{ value }">
+                <p-link v-if="storeState.serviceMap[value].label "
+                        :text="storeState.serviceMap[value].label"
+                        :to="{
+                            name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME,
+                            params: {
+                                serviceId: value
+                            }
+                        }"
+                        size="sm"
+                        highlight
+                        action-icon="internal-link"
+                        new-tab
+                />
+                <span v-else>--</span>
             </template>
             <template #data-created_at="{ value }">
                 {{ iso8601Formatter(value, storeState.timezone) }}

@@ -2,7 +2,6 @@
 	"ALERT_MANAGER": {
 		"ACTION": "作業",
 		"ALERTS": {
-			"ACCOUNT_ID": "アカウントID",
 			"ACKNOWLEDGED": "確認",
 			"ADD_NOTE": "ノート追加",
 			"ALL": "合計",

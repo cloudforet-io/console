@@ -2,7 +2,6 @@
 	"ALERT_MANAGER": {
 		"ACTION": "Action",
 		"ALERTS": {
-			"ACCOUNT_ID": "Account ID",
 			"ACKNOWLEDGED": "Acknowledged",
 			"ADD_NOTE": "Add Note",
 			"ALL": "All",
