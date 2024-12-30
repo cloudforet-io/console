@@ -4324,7 +4324,8 @@
 			"UNSUPPORTED_FIELD_TYPE": "Unsupported field type.",
 			"VALUE_ARRAY": "Value must be an array.",
 			"VALUE_ONLY_ONE": "Only one value is allowed.",
-			"VALUE_STRING": "Value must be a string."
+			"VALUE_STRING": "Value must be a string.",
+			"VALUE_TOO_LONG": "Your input is too long. Please limit it to {length} characters or fewer."
 		},
 		"WORKSPACE": "Workspace"
 	},

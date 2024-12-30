@@ -35,6 +35,9 @@ export const useTaskFieldValidation = <TField extends TaskField, TValue>(
         if (props.field.is_required && val.trim() === '') {
             return i18n.t('OPSFLOW.VALIDATION.FIELD_REQUIRED') as string;
         }
+        if (typeof props.field.options?.maxLength === 'number' && val.length > props.field.options.maxLength) {
+            return i18n.t('OPSFLOW.VALIDATION.VALUE_TOO_LONG', { length: props.field.options.maxLength }) as string;
+        }
         return true;
     };
 
