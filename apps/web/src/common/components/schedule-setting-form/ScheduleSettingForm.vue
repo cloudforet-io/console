@@ -65,7 +65,7 @@ const state = reactive({
             start: state.start,
             end: state.end,
         }));
-        return zipObject(state.selectedDayButton, refinedDays) as Record<DayType, ScheduleFormDayType>;
+        return zipObject(state.days.map((i) => i.name), refinedDays) as Record<DayType, ScheduleFormDayType>;
     }),
 });
 
@@ -77,7 +77,7 @@ const initScheduleForm = () => {
         if (!props.scheduleForm) return [];
         const schedule = props.scheduleForm[day.name];
         return schedule?.is_scheduled;
-    });
+    }).map((i) => i.name);
 
     state.selectedDayButton = filteredSchedule;
     state.start = props.scheduleForm[filteredSchedule[0]]?.start || 0;
