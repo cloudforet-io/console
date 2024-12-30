@@ -13,11 +13,12 @@ export type UserGroupChannelScheduleDayType = {
 };
 export type UserGroupChannelScheduleInfoType = {
     SCHEDULE_TYPE: UserGroupChannelScheduleType;
-    MON: UserGroupChannelScheduleDayType;
-    TUE: UserGroupChannelScheduleDayType;
-    WED: UserGroupChannelScheduleDayType;
-    THU: UserGroupChannelScheduleDayType;
-    FRI: UserGroupChannelScheduleDayType;
-    SAT: UserGroupChannelScheduleDayType;
-    SUN: UserGroupChannelScheduleDayType;
+    TIMEZONE: string;
+    MON?: UserGroupChannelScheduleDayType;
+    TUE?: UserGroupChannelScheduleDayType;
+    WED?: UserGroupChannelScheduleDayType;
+    THU?: UserGroupChannelScheduleDayType;
+    FRI?: UserGroupChannelScheduleDayType;
+    SAT?: UserGroupChannelScheduleDayType;
+    SUN?: UserGroupChannelScheduleDayType;
 };
