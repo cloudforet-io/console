@@ -51,7 +51,7 @@ const HEATMAP_COLOR_HEX_MAP = {
 const SKIP_HEATMAP_FIELD = ['subTotal', 'comparison'];
 
 type TableDataValue = number | undefined | null;
-// const TABLE_MISSING_VALUE_SYMBOL = '-';
+const TABLE_MISSING_VALUE_SYMBOL = '-';
 
 interface Props {
   fields: TableWidgetField[];
@@ -132,16 +132,17 @@ const getField = (field: TableWidgetField): string => {
     return field.label || field.name;
 };
 
-const valueFormatter = (value: TableDataValue, field: TableWidgetField) => {
+const valueFormatter = (value: TableDataValue, field: TableWidgetField, numberFormatInfo: NumberFormatValue = {}, isPercentage?: boolean) => {
     // HACK: handle missing value after applying table missing value
-    // // handle missing value
-    // const isMissingValue = value === null || value === undefined;
-    // if (isMissingValue && props.missingValueInfo?.type === 'lineBreaks') return TABLE_MISSING_VALUE_SYMBOL;
+    // handle missing value
+    const isMissingValue = value === null || value === undefined || value === 0;
+    if (isMissingValue && props.missingValueInfo?.type === 'lineBreaks') return TABLE_MISSING_VALUE_SYMBOL;
 
     const _value = value || 0;
     const _unit = field.fieldInfo?.unit;
-    const dataField = field.name?.replace('comparison_', '');
-    return getFormattedNumber(_value, dataField, props.numberFormatInfo, _unit);
+    // const dataField = field.name?.replace('comparison_', '');
+    if (isPercentage) return `${numberFormatter(_value)}%`;
+    return getFormattedNumber(_value, field.name, numberFormatInfo, _unit);
 };
 
 const getValue = (item: TableDataItem, field: TableWidgetField) => {
@@ -158,23 +159,18 @@ const getValue = (item: TableDataItem, field: TableWidgetField) => {
     }
     const itemValue = item[field.name];
     if (field.fieldInfo?.additionalType === 'comparison') {
-        const targetValue = itemValue?.target ?? 0;
-        const subjectValue = itemValue?.subject ?? 0;
-        const fixedValue = Math.abs(targetValue - subjectValue);
-        const percentageValue = fixedValue / (targetValue || 1) * 100;
-        if (!fixedValue || fixedValue === 0) return '-';
-        if (item[props.fields[0].name] === 'Total') return valueFormatter(fixedValue, field);
-        if (props.tableColumnComparisonInfo?.format === 'fixed') return valueFormatter(fixedValue, field);
-        if (props.tableColumnComparisonInfo?.format === 'percent') return `${numberFormatter(percentageValue)}%`;
-        if (props.tableColumnComparisonInfo?.format === 'all') return `${valueFormatter(fixedValue, field)} (${numberFormatter(percentageValue)}%)`;
+        if (item[props.fields[0].name] === 'Total') return valueFormatter(itemValue, field, props.numberFormatInfo);
+        if (props.tableColumnComparisonInfo?.format === 'fixed') return valueFormatter(itemValue, field, props.numberFormatInfo);
+        if (props.tableColumnComparisonInfo?.format === 'percent') return valueFormatter(itemValue, field, props.numberFormatInfo, true);
+        // if (props.tableColumnComparisonInfo?.format === 'all') return `${valueFormatter(fixedValue, field)} (${numberFormatter(percentageValue)}%)`;
         return '-';
     }
-    return itemValue ? valueFormatter(itemValue, field) : '-';
+    return valueFormatter(itemValue, field, props.numberFormatInfo);
 };
 const getComparisonValueIcon = (item: TableDataItem, field: TableWidgetField): { icon: string; color: string; }|undefined => {
-    const subtraction = (item?.[field.name]?.target ?? 0) - (item?.[field.name]?.subject ?? 0);
-    if (subtraction > 0) return { icon: 'ic_arrow-up-bold-alt', color: props.tableColumnComparisonInfo?.increaseColor || DEFAULT_COMPARISON_COLOR.INCREASE };
-    if (subtraction < 0) return { icon: 'ic_arrow-down-bold-alt', color: props.tableColumnComparisonInfo?.decreaseColor || DEFAULT_COMPARISON_COLOR.DECREASE };
+    const value = item?.[field.name];
+    if (value > 0) return { icon: 'ic_arrow-up-bold-alt', color: props.tableColumnComparisonInfo?.increaseColor || DEFAULT_COMPARISON_COLOR.INCREASE };
+    if (value < 0) return { icon: 'ic_arrow-down-bold-alt', color: props.tableColumnComparisonInfo?.decreaseColor || DEFAULT_COMPARISON_COLOR.DECREASE };
     return undefined;
 };
 const getValueTooltipText = (item: TableDataItem, field: TableWidgetField) => {
@@ -240,8 +236,7 @@ const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
 // };
 
 const getFieldMinWidth = (field: TableWidgetField): string|undefined => {
-    let customWidth: string|number|undefined = props.customTableColumnWidthInfo?.widthInfos?.find((item) => item.fieldKey === field?.name)?.width;
-    if (field?.fieldInfo?.additionalType === 'comparison') customWidth = props.customTableColumnWidthInfo?.widthInfos?.find((item) => item.fieldKey === field?.name.replace('comparison_', ''))?.width;
+    const customWidth: string|number|undefined = props.customTableColumnWidthInfo?.widthInfos?.find((item) => item.fieldKey === field?.name)?.width;
 
     const minimumWidth = props.tableColumnWidthInfo?.minimumWidth ?? TABLE_DEFAULT_MINIMUM_WIDTH;
     const fixedWidth = props.tableColumnWidthInfo?.widthType === 'fixed' ? props.tableColumnWidthInfo?.fixedWidth : undefined;
@@ -250,8 +245,7 @@ const getFieldMinWidth = (field: TableWidgetField): string|undefined => {
     return calculatedWidth ? `${calculatedWidth}px` : undefined;
 };
 const getFieldWidth = (field: TableWidgetField): string|undefined => {
-    let customWidth: string|number|undefined = props.customTableColumnWidthInfo?.widthInfos?.find((item) => item.fieldKey === field?.name)?.width;
-    if (field?.fieldInfo?.additionalType === 'comparison') customWidth = props.customTableColumnWidthInfo?.widthInfos?.find((item) => item.fieldKey === field?.name.replace('comparison_', ''))?.width;
+    const customWidth: string|number|undefined = props.customTableColumnWidthInfo?.widthInfos?.find((item) => item.fieldKey === field?.name)?.width;
 
     const fixedWidth = props.tableColumnWidthInfo?.widthType === 'fixed' ? props.tableColumnWidthInfo?.fixedWidth : undefined;
     const calculatedWidth = customWidth || fixedWidth;

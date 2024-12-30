@@ -56,7 +56,7 @@ const table: WidgetConfig = {
         tableColumnWidth: {},
         customTableColumnWidth: {},
         displayAnnotation: {},
-        // missingValue: {},
+        missingValue: {},
     },
     dependencies: {
         groupBy: ['comparison', 'customTableColumnWidth'],
