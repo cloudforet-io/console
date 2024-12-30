@@ -3,7 +3,9 @@ import { reactive, watch } from 'vue';
 
 import { PI, PLazyImg } from '@cloudforet/mirinae';
 
-import type { LSBCollapsibleItem } from '@/common/modules/navigations/lsb/type';
+import { assetUrlConverter } from '@/lib/helper/asset-helper';
+
+import type { LSBCollapsibleItem, LSBIcon } from '@/common/modules/navigations/lsb/type';
 
 interface Props {
     item: LSBCollapsibleItem;
@@ -28,6 +30,10 @@ const handleClickCollapsibleTitle = () => {
 const updateCollapsedByForced = (collapsed: boolean) => {
     state.isCollapsed = collapsed;
 };
+const getIconName = (icon: LSBIcon): string => {
+    if (typeof icon === 'string') return icon;
+    return icon.name;
+};
 watch(() => props.overrideCollapsed, (changedCollapsed) => {
     updateCollapsedByForced(!!changedCollapsed);
 }, { immediate: true });
@@ -47,9 +53,16 @@ watch(() => props.overrideCollapsed, (changedCollapsed) => {
                  class="arrow-button"
             />
             <slot name="left-image">
-                <p-lazy-img v-if="props.item.icon"
+                <p-i v-if="props.item.icon"
+                     :name="getIconName(item.icon)"
+                     :color="item.icon?.color"
+                     width="1rem"
+                     height="1rem"
+                     class="title-image"
+                />
+                <p-lazy-img v-if="props.item.imgIcon"
                             class="title-image"
-                            :src="props.item.icon"
+                            :src="assetUrlConverter(props.item.imgIcon)"
                             width="1rem"
                             height="1rem"
                 />
