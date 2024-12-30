@@ -124,35 +124,29 @@ const handleUpdateModal = async (modalType: string) => {
         });
         if (result) {
             const {
-                protocol_id, name, data, schedule,
+                protocol_id, name, schedule,
             } = result;
-
-            if (data && (data.USER && Array.isArray(data.USER) && Array.isArray(data.USER_GROUP))) {
-                const userInfoType = data.USER?.length > 0 ? 'USER' : 'USER_GROUP';
-                const userInfoValue = data[userInfoType] || [];
-                notificationChannelCreateFormStore.$patch((_state) => {
-                    _state.state.userInfo = { type: userInfoType, value: userInfoValue };
-                });
-            }
 
             notificationChannelCreateFormStore.$patch((_state) => {
                 _state.state.selectedProtocol.protocol_id = protocol_id;
                 _state.state.channelName = name;
-                _state.state.scheduleInfo = schedule;
-                _state.state.userInfo.type = data.FORWARD_TYPE;
-                _state.state.userInfo.value = data.FORWARD_TYPE === 'USER' ? data.USER : data.USER_GROUP;
-            });
-
-            userGroupPageStore.updateModalSettings({
-                type: USER_GROUP_MODAL_TYPE.CREATE_NOTIFICATIONS_FIRST,
-                title: i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.UPDATE_TITLE'),
-                themeColor: 'primary1',
+                _state.state.scheduleInfo = {
+                    SCHEDULE_TYPE: schedule.SCHEDULE_TYPE,
+                    TIMEZONE: schedule.TIMEZONE,
+                    MON: schedule.MON,
+                    TUE: schedule.TUE,
+                    WED: schedule.WED,
+                    THU: schedule.THU,
+                    FRI: schedule.FRI,
+                    SAT: schedule.SAT,
+                    SUN: schedule.SUN,
+                };
             });
         }
         userGroupPageStore.updateModalSettings({
             type: USER_GROUP_MODAL_TYPE.CREATE_NOTIFICATIONS_SECOND,
             title: i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.UPDATE_TITLE'),
-            themeColor: 'primary',
+            themeColor: 'primary1',
         });
     } else if (modalType === 'delete') {
         userGroupPageStore.updateModalSettings({

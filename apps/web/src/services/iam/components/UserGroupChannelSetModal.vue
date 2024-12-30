@@ -10,7 +10,9 @@ import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/typ
 import type { UserGroupChannelCreateParameters } from '@/schema/alert-manager/user-group-channel/api-verbs/create';
 import type { UserGroupChannelUpdateParameters } from '@/schema/alert-manager/user-group-channel/api-verbs/update';
 import type { UserGroupChannelModel } from '@/schema/alert-manager/user-group-channel/model';
-import type { UserGroupChannelScheduleType } from '@/schema/alert-manager/user-group-channel/type';
+import type {
+    UserGroupChannelScheduleInfoType,
+} from '@/schema/alert-manager/user-group-channel/type';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -37,12 +39,7 @@ interface ChannelSetModalState {
     userMode: MenuItem;
     users: {type: 'USER' | 'USER_GROUP'; value: string;}[];
   };
-  scheduleInfo: {
-    days: (string|null)[];
-    start: number;
-    end: number;
-    type: UserGroupChannelScheduleType;
-  }
+  scheduleInfo: UserGroupChannelScheduleInfoType;
 }
 
 const isCreateAble = ref<boolean>(false);
@@ -87,12 +84,12 @@ const handleConfirm = async () => {
         }
     } finally {
         state.loading = false;
+        notificationChannelCreateFormStore.initState();
         userGroupPageState.modal = {
             type: '',
             title: '',
             themeColor: 'primary',
         };
-        notificationChannelCreateFormStore.initState();
     }
 };
 
@@ -105,15 +102,12 @@ const handleCancel = () => {
             themeColor: 'primary1',
         };
     } else {
-        userGroupPageState.modal = {
-            type: '',
-            title: '',
-            themeColor: 'primary',
-        };
+        handleClose();
     }
 };
 
 const handleClose = () => {
+    notificationChannelCreateFormStore.initState();
     userGroupPageState.modal = {
         type: '',
         title: '',

@@ -2,12 +2,7 @@ import { reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import type { ServiceChannelForwardType, ServiceChannelScheduleInfoType } from '@/schema/alert-manager/service-channel/type';
-
-interface UserInfoType {
-    type: ServiceChannelForwardType
-    value: string[] | undefined;
-}
+import type { UserGroupChannelScheduleInfoType } from '@/schema/alert-manager/user-group-channel/type';
 
 interface NotificationChannelCreateFormState {
     selectedProtocol: {
@@ -16,8 +11,7 @@ interface NotificationChannelCreateFormState {
     };
     protocolSchemaForm: Record<string, any>;
     channelName: string;
-    userInfo: UserInfoType;
-    scheduleInfo: ServiceChannelScheduleInfoType;
+    scheduleInfo: UserGroupChannelScheduleInfoType
 }
 
 export const useNotificationChannelCreateFormStore = defineStore('channel-create-form', () => {
@@ -28,19 +22,24 @@ export const useNotificationChannelCreateFormStore = defineStore('channel-create
         },
         protocolSchemaForm: {},
         channelName: '',
-        userInfo: {
-            type: 'ALL_MEMBER',
-            value: [],
-        },
         scheduleInfo: {
-            SCHEDULE_TYPE: 'ALL_DAY',
-            MON: { is_scheduled: false, start: 9, end: 18 },
-            TUE: { is_scheduled: false, start: 9, end: 18 },
-            WED: { is_scheduled: false, start: 9, end: 18 },
-            THU: { is_scheduled: false, start: 9, end: 18 },
-            FRI: { is_scheduled: false, start: 9, end: 18 },
-            SAT: { is_scheduled: false, start: 9, end: 18 },
-            SUN: { is_scheduled: false, start: 9, end: 18 },
+            SCHEDULE_TYPE: 'WEEK_DAY',
+            TIMEZONE: 'UTC',
+            MON: {
+                is_scheduled: true,
+            },
+            TUE: {
+                is_scheduled: true,
+            },
+            WED: {
+                is_scheduled: true,
+            },
+            THU: {
+                is_scheduled: true,
+            },
+            FRI: {
+                is_scheduled: true,
+            },
         },
     });
 
@@ -52,19 +51,24 @@ export const useNotificationChannelCreateFormStore = defineStore('channel-create
             };
             state.protocolSchemaForm = {};
             state.channelName = '';
-            state.userInfo = {
-                type: 'ALL_MEMBER',
-                value: [],
-            };
             state.scheduleInfo = {
-                SCHEDULE_TYPE: 'ALL_DAY',
-                MON: { is_scheduled: false, start: 9, end: 18 },
-                TUE: { is_scheduled: false, start: 9, end: 18 },
-                WED: { is_scheduled: false, start: 9, end: 18 },
-                THU: { is_scheduled: false, start: 9, end: 18 },
-                FRI: { is_scheduled: false, start: 9, end: 18 },
-                SAT: { is_scheduled: false, start: 9, end: 18 },
-                SUN: { is_scheduled: false, start: 9, end: 18 },
+                SCHEDULE_TYPE: 'WEEK_DAY',
+                TIMEZONE: 'UTC',
+                MON: {
+                    is_scheduled: true,
+                },
+                TUE: {
+                    is_scheduled: true,
+                },
+                WED: {
+                    is_scheduled: true,
+                },
+                THU: {
+                    is_scheduled: true,
+                },
+                FRI: {
+                    is_scheduled: true,
+                },
             };
         },
     };
