@@ -51,7 +51,7 @@ const state = reactive({
         }
         .section {
             width: calc(50% - 0.125rem);
-            height: 17.25rem;
+            height: 15.25rem;
         }
 
         @screen tablet {

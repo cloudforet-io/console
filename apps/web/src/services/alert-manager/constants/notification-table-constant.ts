@@ -30,11 +30,3 @@ export const ALERT_EXCEL_FIELDS: ExcelDataField[] = [
     { key: 'protocol_id', name: 'Channel' },
     { key: 'state', name: 'State' },
 ];
-
-export const NOTIFICATION_DEFINITION_FIELDS: DataTableFieldType[] = [
-    { label: 'Name', name: 'name' },
-    { label: 'Channel', name: 'protocol_id' },
-    { label: 'State', name: 'state' },
-    { label: 'Member', name: 'data' },
-    { label: 'Schedule', name: 'schedule', disableCopy: true },
-];

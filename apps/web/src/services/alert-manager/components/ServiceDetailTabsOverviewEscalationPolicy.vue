@@ -88,7 +88,7 @@ watch(() => storeState.escalationPolicyId, (escalationPolicyId) => {
         />
         <p-data-loader :loading="state.loading"
                        :data="state.item"
-                       class="content flex-1 pt-2"
+                       class="content flex-1"
                        :class="{ 'empty': !state.rules.length }"
         >
             <p class="pb-3 pl-4 text-paragraph-md">
@@ -172,7 +172,7 @@ watch(() => storeState.escalationPolicyId, (escalationPolicyId) => {
                     @apply flex flex-col bg-gray-100 text-paragraph-sm border-l-4 border-gray-200 cursor-default;
                     min-width: 11.5rem;
                     width: 11.5rem;
-                    height: 6rem;
+                    height: 4.625rem;
                     padding: 1rem 0.75rem;
                     border-radius: 0.375rem;
                     .data-row {

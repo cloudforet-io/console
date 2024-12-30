@@ -189,7 +189,7 @@ watch(() => storeState.serviceId, (serviceId) => {
                     @apply flex items-start bg-gray-100;
                     width: 7.5rem;
                     min-width: 7.5rem;
-                    padding: 0.375rem 0.5rem;
+                    padding: 0.75rem 0.5rem;
                     border-radius: 0.75rem;
                 }
             }
