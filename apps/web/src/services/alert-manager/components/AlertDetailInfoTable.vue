@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PBadge, PDefinitionTable, PPaneLayout,
+    PBadge, PDefinitionTable, PPaneLayout, PLink,
 } from '@cloudforet/mirinae';
 import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
 import { iso8601Formatter } from '@cloudforet/utils';
@@ -12,8 +12,12 @@ import type { AlertModel } from '@/schema/alert-manager/alert/model';
 import type { AlertSeverityType } from '@/schema/alert-manager/alert/type';
 import { i18n } from '@/translations';
 
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
+
 import AlertDetailInfoTableDescription from '@/services/alert-manager/components/AlertDetailInfoTableDescription.vue';
 import { useAlertDetailPageStore } from '@/services/alert-manager/stores/alert-detail-page-store';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 
 type BadgeInfo = {
     badgeType: string;
@@ -23,10 +27,13 @@ type BadgeInfo = {
 const alertDetailPageStore = useAlertDetailPageStore();
 const alertDetailPageState = alertDetailPageStore.state;
 const alertDetailPageGetters = alertDetailPageStore.getters;
+const allReferenceStore = useAllReferenceStore();
+const allReferenceGetters = allReferenceStore.getters;
 
 const storeState = reactive({
     timezone: computed<string>(() => alertDetailPageGetters.timezone),
     alertInfo: computed<AlertModel>(() => alertDetailPageState.alertInfo),
+    cloudServiceTypeInfo: computed<CloudServiceTypeReferenceMap>(() => allReferenceGetters.cloudServiceType),
 });
 const tableState = reactive({
     fields: computed<DefinitionField[]>(() => [
@@ -68,6 +75,14 @@ const getBadgeInfo = (value: AlertSeverityType): BadgeInfo => {
         return {} as BadgeInfo;
     }
 };
+const getAssetInfo = (assetId: string) => {
+    const assetTypeData = storeState.cloudServiceTypeInfo[assetId]?.data;
+    return {
+        provider: assetTypeData?.provider,
+        group: assetTypeData?.group,
+        name: assetTypeData?.cloud_service_type_key,
+    };
+};
 </script>
 
 <template>
@@ -101,12 +116,24 @@ const getBadgeInfo = (value: AlertSeverityType): BadgeInfo => {
                     --
                 </span>
                 <template v-else>
-                    <p v-for="resource in value"
-                       :key="resource.resource_id"
-                       class="text-label-md"
+                    <div v-for="(item, idx) in value.slice(0, 3)"
+                         :key="`resource-item-${idx}`"
+                         class="flex items-center justify-between"
                     >
-                        {{ resource.name }}
-                    </p>
+                        <p class="resource-item truncate">
+                            {{ item?.name }}
+                        </p>
+                        <p-link :text="i18n.t('ALERT_MANAGER.ALERTS.VIEW_RESOURCE')"
+                                :to="{
+                                    name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                                    params: getAssetInfo(item.asset_id)
+                                }"
+                                size="sm"
+                                highlight
+                                action-icon="internal-link"
+                                new-tab
+                        />
+                    </div>
                 </template>
             </template>
             <template #data-triggered_by="{ value }">
