@@ -114,10 +114,6 @@ watch(() => storeState.escalationPolicyId, (escalationPolicyId) => {
                             <span>{{ $t('ALERT_MANAGER.ESCALATION_POLICY.CHANNEL') }}</span>
                             <span>{{ i.channels.length }}</span>
                         </p>
-                        <p class="data-row">
-                            <span>{{ $t('ALERT_MANAGER.ESCALATION_POLICY.USER_GROUP') }}</span>
-                            <span>0</span>
-                        </p>
                     </div>
                 </div>
                 <p-icon-button v-if="state.pageStart !== 0"
