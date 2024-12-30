@@ -2,7 +2,6 @@
 	"ALERT_MANAGER": {
 		"ACTION": "작업",
 		"ALERTS": {
-			"ACCOUNT_ID": "계정 ID",
 			"ACKNOWLEDGED": "확인",
 			"ADD_NOTE": "노트 추가",
 			"ALL": "전체",
