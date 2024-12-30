@@ -100,6 +100,7 @@ onMounted(() => {
 
 <style scoped lang="postcss">
 .service-create-step3-select-protocol {
+    min-height: 16rem;
     .contents {
         @apply grid grid-cols-3;
         gap: 0.5rem;
