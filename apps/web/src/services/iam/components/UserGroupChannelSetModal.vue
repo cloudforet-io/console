@@ -84,12 +84,12 @@ const handleConfirm = async () => {
         }
     } finally {
         state.loading = false;
+        notificationChannelCreateFormStore.initState();
         userGroupPageState.modal = {
             type: '',
             title: '',
             themeColor: 'primary',
         };
-        notificationChannelCreateFormStore.initState();
     }
 };
 
@@ -102,15 +102,12 @@ const handleCancel = () => {
             themeColor: 'primary1',
         };
     } else {
-        userGroupPageState.modal = {
-            type: '',
-            title: '',
-            themeColor: 'primary',
-        };
+        handleClose();
     }
 };
 
 const handleClose = () => {
+    notificationChannelCreateFormStore.initState();
     userGroupPageState.modal = {
         type: '',
         title: '',

@@ -2,13 +2,7 @@ import { reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import type { ServiceChannelForwardType } from '@/schema/alert-manager/service-channel/type';
 import type { UserGroupChannelScheduleInfoType } from '@/schema/alert-manager/user-group-channel/type';
-
-interface UserInfoType {
-    type: ServiceChannelForwardType
-    value: string[] | undefined;
-}
 
 interface NotificationChannelCreateFormState {
     selectedProtocol: {
@@ -17,7 +11,6 @@ interface NotificationChannelCreateFormState {
     };
     protocolSchemaForm: Record<string, any>;
     channelName: string;
-    userInfo: UserInfoType;
     scheduleInfo: UserGroupChannelScheduleInfoType
 }
 
@@ -29,20 +22,24 @@ export const useNotificationChannelCreateFormStore = defineStore('channel-create
         },
         protocolSchemaForm: {},
         channelName: '',
-        userInfo: {
-            type: 'ALL_MEMBER',
-            value: [],
-        },
         scheduleInfo: {
-            SCHEDULE_TYPE: 'ALL_DAY',
+            SCHEDULE_TYPE: 'WEEK_DAY',
             TIMEZONE: 'UTC',
-            MON: { is_scheduled: false, start: 0, end: 24 },
-            TUE: { is_scheduled: false, start: 0, end: 24 },
-            WED: { is_scheduled: false, start: 0, end: 24 },
-            THU: { is_scheduled: false, start: 0, end: 24 },
-            FRI: { is_scheduled: false, start: 0, end: 24 },
-            SAT: { is_scheduled: false, start: 0, end: 24 },
-            SUN: { is_scheduled: false, start: 0, end: 24 },
+            MON: {
+                is_scheduled: true,
+            },
+            TUE: {
+                is_scheduled: true,
+            },
+            WED: {
+                is_scheduled: true,
+            },
+            THU: {
+                is_scheduled: true,
+            },
+            FRI: {
+                is_scheduled: true,
+            },
         },
     });
 
@@ -54,20 +51,24 @@ export const useNotificationChannelCreateFormStore = defineStore('channel-create
             };
             state.protocolSchemaForm = {};
             state.channelName = '';
-            state.userInfo = {
-                type: 'ALL_MEMBER',
-                value: [],
-            };
             state.scheduleInfo = {
-                SCHEDULE_TYPE: 'ALL_DAY',
+                SCHEDULE_TYPE: 'WEEK_DAY',
                 TIMEZONE: 'UTC',
-                MON: { is_scheduled: false, start: 9, end: 18 },
-                TUE: { is_scheduled: false, start: 9, end: 18 },
-                WED: { is_scheduled: false, start: 9, end: 18 },
-                THU: { is_scheduled: false, start: 9, end: 18 },
-                FRI: { is_scheduled: false, start: 9, end: 18 },
-                SAT: { is_scheduled: false, start: 9, end: 18 },
-                SUN: { is_scheduled: false, start: 9, end: 18 },
+                MON: {
+                    is_scheduled: true,
+                },
+                TUE: {
+                    is_scheduled: true,
+                },
+                WED: {
+                    is_scheduled: true,
+                },
+                THU: {
+                    is_scheduled: true,
+                },
+                FRI: {
+                    is_scheduled: true,
+                },
             };
         },
     };

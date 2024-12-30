@@ -8,8 +8,8 @@ export type UserGroupChannelScheduleType = typeof USER_GROUP_CHANNEL_SCHEDULE_TY
 
 export type UserGroupChannelScheduleDayType = {
     is_scheduled: boolean;
-    start: number;
-    end: number;
+    start?: number;
+    end?: number;
 };
 export type UserGroupChannelScheduleInfoType = {
     SCHEDULE_TYPE: UserGroupChannelScheduleType;
