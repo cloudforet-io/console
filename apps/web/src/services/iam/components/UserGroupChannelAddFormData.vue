@@ -85,17 +85,8 @@ const handleSchemaFormChange = (isValid, form) => {
                             :form-data="state.schemaForm"
                             :schema="state.schema"
                             :language="storeState.language"
+                            uniform-width
                             @change="handleSchemaFormChange"
         />
     </div>
 </template>
-
-<style scoped lang="postcss">
-/* custom design-system component - p-json-schema-form */
-:deep(.p-json-schema-form) {
-    .p-text-input {
-        width: 100%;
-        max-width: 30rem;
-    }
-}
-</style>
