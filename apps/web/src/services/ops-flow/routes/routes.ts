@@ -42,24 +42,29 @@ const opsFlowRoutes: RouteConfig = {
         },
         {
             path: 'board',
-            name: OPS_FLOW_ROUTE.BOARD._NAME,
-            meta: {
-                menuId: MENU_ID.TASK_BOARD,
-                translationId: () => taskManagementTemplateStore.templates.TaskBoard,
-                lsbVisible: true,
-            },
-            component: BoardPage as any,
-        },
-        {
-            path: 'board/task-create',
-            name: OPS_FLOW_ROUTE.BOARD.TASK_CREATE._NAME,
-            component: TaskCreatePage as any,
-        },
-        {
-            path: 'board/:taskId',
-            name: OPS_FLOW_ROUTE.BOARD.TASK_DETAIL._NAME,
-            props: true,
-            component: TaskDetailPage as any,
+            meta: { menuId: MENU_ID.TASK_BOARD, translationId: () => taskManagementTemplateStore.templates.TaskBoard },
+            component: { template: '<router-view />' },
+            children: [
+                {
+                    path: '/',
+                    name: OPS_FLOW_ROUTE.BOARD._NAME,
+                    meta: {
+                        lsbVisible: true,
+                    },
+                    component: BoardPage as any,
+                },
+                {
+                    path: 'task-create',
+                    name: OPS_FLOW_ROUTE.BOARD.TASK_CREATE._NAME,
+                    component: TaskCreatePage as any,
+                },
+                {
+                    path: 'board/:taskId',
+                    name: OPS_FLOW_ROUTE.BOARD.TASK_DETAIL._NAME,
+                    props: true,
+                    component: TaskDetailPage as any,
+                },
+            ],
         },
     ],
 };
