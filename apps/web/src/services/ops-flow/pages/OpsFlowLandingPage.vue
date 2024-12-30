@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router/composables';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 import {
-    PButton, PDivider, PSelectCard, PEmpty, PRadioGroup, PRadio, PDataLoader,
+    PButton, PHeading, PSelectCard, PEmpty, PRadioGroup, PRadio, PDataLoader,
 } from '@cloudforet/mirinae';
 
 import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
@@ -94,8 +94,18 @@ onMounted(async () => {
 
 <template>
     <div class="ops-flow-landing-page">
-        <div class="mb-6 text-center text-display-md font-bold">
-            {{ taskManagementTemplateStore.templates.TemplateName }}
+        <div class="mb-6 py-6 px-10 flex mobile:flex-col gap-10 items-center justify-center min-h-80 mobile:h-screen bg-image-blur">
+            <div class="max-w-96">
+                <p-heading class="mb-4">
+                    {{ taskManagementTemplateStore.templates.TemplateName }}
+                </p-heading>
+                <p class="text-paragraph-lg text-gray-600">
+                    {{ taskManagementTemplateStore.templates.landingDescription }}
+                </p>
+            </div>
+            <div class="max-w-96 mobile:w-96">
+                <img src="@/assets/images/landing/img_landing_service-desk_hero.png">
+            </div>
         </div>
         <p-data-loader :loading="loading"
                        :data="availableCategories"
@@ -103,32 +113,6 @@ onMounted(async () => {
                        class="min-h-72"
         >
             <div class="max-w-[712px] mx-auto">
-                <div class="mb-4 pt-4 flex justify-end">
-                    <!--                    <p-field-title label="Active Ticket" />-->
-                    <router-link custom
-                                 :to="getProperRouteLocation({
-                                     name: OPS_FLOW_ROUTE.BOARD._NAME,
-                                     query: {categoryId: category }
-                                 })"
-                    >
-                        <template #default="{navigate}">
-                            <p-button style-type="secondary"
-                                      size="sm"
-                                      class="capitalize"
-                                      @click="navigate"
-                            >
-                                {{ $t('OPSFLOW.TASK_BOARD.VIEW_ALL_TASKS', {tasks: taskManagementTemplateStore.templates.tasks}) }}
-                            </p-button>
-                        </template>
-                    </router-link>
-                </div>
-                <!--                <p-pane-layout class="mb-10 min-h-20 flex items-center justify-center">-->
-                <!--                    <div v-if="tasks.length" /> -->
-                <!--                    <p-empty v-else>-->
-                <!--                        No Active Tickets-->
-                <!--                    </p-empty>-->
-                <!--                </p-pane-layout>-->
-                <p-divider />
                 <div class="mt-10">
                     <p class="mb-6 text-display-md">
                         {{ taskManagementTemplateStore.templates.TaskCategory }}
@@ -184,6 +168,17 @@ onMounted(async () => {
 </template>
 
 <style lang="postcss" scoped>
+.bg-image-blur {
+    background-image: url("@/assets/images/img_blurred-background-min.png");
+    background-color: theme('colors.gray.100');
+    background-blend-mode: multiply;
+    background-repeat: no-repeat;
+    background-size: 130% auto;
+
+    @screen mobile {
+        background-size: 115% 240%;
+    }
+}
 .category-card {
     @apply w-[352px] py-4;
 }

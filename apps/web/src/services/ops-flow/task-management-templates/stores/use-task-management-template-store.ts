@@ -32,6 +32,7 @@ interface TaskManagementTemplate {
     taskType: string;
     task: string;
     tasks: string;
+    landingDescription?: string;
 }
 const messages: Record<SupportLanguage, TaskManagementTemplate> = {
     en: en as unknown as TaskManagementTemplate,

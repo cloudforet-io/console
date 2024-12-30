@@ -16,6 +16,7 @@
 		"TaskCategory": "지원 카테고리",
 		"TaskType": "요청 타입",
 		"TemplateName": "서비스 데스크",
+		"landingDescription": "지원 요청을 쉽게 제출하고 추적하세요. 아래에서 카테고리와 요청 유형을 선택하여 시작하세요. 계정 관리, 청구 문의, 서비스 요청 등 어떤 도움이 필요하든지, Service Desk가 필요한 지원을 제공합니다.",
 		"task": "티켓",
 		"taskType": "요청 타입",
 		"taskTypes": "요청 타입",
