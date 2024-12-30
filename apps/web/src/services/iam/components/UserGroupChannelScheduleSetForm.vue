@@ -1,44 +1,38 @@
 <script lang="ts" setup>
-import type {
-    ServiceChannelScheduleDayType,
-    ServiceChannelScheduleInfoType,
-} from '@/schema/alert-manager/service-channel/type';
+import { ref, watch, watchEffect } from 'vue';
+
+import { i18n } from '@/translations';
 
 import type { ScheduleSettingFormType } from '@/common/components/schedule-setting-form/schedule-setting-form';
 import ScheduleSettingForm from '@/common/components/schedule-setting-form/ScheduleSettingForm.vue';
 
 import { useNotificationChannelCreateFormStore } from '@/services/iam/store/notification-channel-create-form-store';
+import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
 const notificationChannelCreateFormStore = useNotificationChannelCreateFormStore();
+const notificationChannelCreateFormState = notificationChannelCreateFormStore.state;
+
+const userGroupPageStore = useUserGroupPageStore();
+const userGroupPageState = userGroupPageStore.state;
+
+const scheduleSettingTypeData = ref<ScheduleSettingFormType>();
 
 /* Component */
 const handleScheduleForm = (value: ScheduleSettingFormType) => {
-    // TODO: Plz check the type of value (to SY)
+    scheduleSettingTypeData.value = value;
+};
+
+watch(() => notificationChannelCreateFormState.scheduleInfo, (nv_schedule_info) => {
+    if (nv_schedule_info) {
+        scheduleSettingTypeData.value = nv_schedule_info;
+    }
+}, { deep: true, immediate: true });
+
+watchEffect(() => {
     notificationChannelCreateFormStore.$patch((_state) => {
-        _state.state.scheduleInfo = convertScheduleInfo(value);
+        _state.state.scheduleInfo = scheduleSettingTypeData.value;
     });
-};
-
-const convertScheduleInfo = (scheduleInfo: any): ServiceChannelScheduleInfoType => {
-    const defaultSchedule: ServiceChannelScheduleDayType = {
-        is_scheduled: false,
-        start: scheduleInfo.start,
-        end: scheduleInfo.end,
-    };
-
-    const scheduledDays = new Set(scheduleInfo.days);
-
-    return {
-        SCHEDULE_TYPE: scheduleInfo.type,
-        MON: { ...defaultSchedule, is_scheduled: scheduledDays.has('MON') },
-        TUE: { ...defaultSchedule, is_scheduled: scheduledDays.has('TUE') },
-        WED: { ...defaultSchedule, is_scheduled: scheduledDays.has('WED') },
-        THU: { ...defaultSchedule, is_scheduled: scheduledDays.has('THU') },
-        FRI: { ...defaultSchedule, is_scheduled: scheduledDays.has('FRI') },
-        SAT: { ...defaultSchedule, is_scheduled: scheduledDays.has('SAT') },
-        SUN: { ...defaultSchedule, is_scheduled: scheduledDays.has('SUN') },
-    };
-};
+});
 </script>
 
 <template>
@@ -46,6 +40,12 @@ const convertScheduleInfo = (scheduleInfo: any): ServiceChannelScheduleInfoType 
         <p class="text-2xl mb-4">
             {{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.SCHEDULE.TITLE') }}
         </p>
-        <schedule-setting-form @update-form="handleScheduleForm" />
+        <schedule-setting-form v-if="userGroupPageState.modal.title === i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.UPDATE_TITLE')"
+                               :schedule-form="scheduleSettingTypeData"
+                               @update-form="handleScheduleForm"
+        />
+        <schedule-setting-form v-else
+                               @update-form="handleScheduleForm"
+        />
     </div>
 </template>

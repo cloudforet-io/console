@@ -65,30 +65,22 @@ const handleConfirm = async () => {
     try {
         state.loading = true;
         if (userGroupPageState.modal.title === i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE')) {
-            const userListPerMode = notificationChannelCreateFormState.userInfo.type === 'USER'
-                ? { USER: notificationChannelCreateFormState.userInfo.value } : { USER_GROUP: notificationChannelCreateFormState.userInfo.value };
-
             await fetchCreateUserGroupChannel({
-                protocol_id: 'slack',
+                protocol_id: notificationChannelCreateFormState.selectedProtocol.protocol_id,
                 name: notificationChannelCreateFormState.channelName,
                 schedule: notificationChannelCreateFormState.scheduleInfo,
                 data: {
-                    FORWARD_TYPE: notificationChannelCreateFormState.userInfo.type,
-                    ...userListPerMode,
+                    ...notificationChannelCreateFormState.protocolSchemaForm,
                 },
                 tags: {},
-                user_group_id: userGroupPageGetters.selectedUserGroups[0].user_group_id ?? undefined,
+                user_group_id: userGroupPageGetters.selectedUserGroups[0].user_group_id,
             });
             emit('confirm');
         } else if (userGroupPageState.modal.title === i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.UPDATE_TITLE')) {
             await fetchUpdateUserGroupChannel({
                 channel_id: userGroupPageGetters.selectedUserGroupChannel[0].channel_id,
                 name: notificationChannelCreateFormState.channelName,
-                data: {
-                    FORWARD_TYPE: notificationChannelCreateFormState.userInfo.type,
-                    USER: notificationChannelCreateFormState.userInfo.type === 'USER' ? notificationChannelCreateFormState.userInfo.value : [],
-                    USER_GROUP: notificationChannelCreateFormState.userInfo.type === 'USER_GROUP' ? notificationChannelCreateFormState.userInfo.value : [],
-                },
+                data: {},
                 schedule: notificationChannelCreateFormState.scheduleInfo,
             });
             emit('confirm');
@@ -105,11 +97,20 @@ const handleConfirm = async () => {
 };
 
 const handleCancel = () => {
-    userGroupPageState.modal = {
-        type: USER_GROUP_MODAL_TYPE.CREATE_NOTIFICATIONS_FIRST,
-        title: i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE'),
-        themeColor: 'primary1',
-    };
+    if (userGroupPageState.modal.title === i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE')) {
+        notificationChannelCreateFormStore.initState();
+        userGroupPageState.modal = {
+            type: USER_GROUP_MODAL_TYPE.CREATE_NOTIFICATIONS_FIRST,
+            title: i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE'),
+            themeColor: 'primary1',
+        };
+    } else {
+        userGroupPageState.modal = {
+            type: '',
+            title: '',
+            themeColor: 'primary',
+        };
+    }
 };
 
 const handleClose = () => {
@@ -157,7 +158,9 @@ watch(() => notificationChannelCreateFormState, (nv_channel_state) => {
                         @close="handleClose"
         >
             <template #body>
-                <div class="flex flex-col gap-1 mb-8">
+                <div v-if="userGroupPageState.modal.title === i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE')"
+                     class="flex flex-col gap-1 mb-8"
+                >
                     <p class="text-xs">
                         <span>Step 2</span>
                         <span class="text-gray-500">/2</span>
@@ -177,7 +180,9 @@ watch(() => notificationChannelCreateFormState, (nv_channel_state) => {
                 <user-group-channel-set-input-form />
                 <user-group-channel-schedule-set-form />
             </template>
-            <template #close-button>
+            <template v-if="userGroupPageState.modal.title === i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE')"
+                      #close-button
+            >
                 <p-button icon-left="ic_arrow-left"
                           style-type="transparent"
                 >

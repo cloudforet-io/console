@@ -6,6 +6,9 @@ import { PButtonModal } from '@cloudforet/mirinae';
 
 import type { UserGroupDeleteUserGroupParameters } from '@/schema/identity/user-group/api-verbs/delete';
 import type { UserGroupModel } from '@/schema/identity/user-group/model';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -36,6 +39,7 @@ const handleConfirm = async () => {
         state.loading = true;
         await Promise.all(deletePromises);
         emit('confirm');
+        showSuccessMessage(i18n.t('IAM.USER_GROUP.MODAL.DELETE.SHOW_SUCCESS_MESSAGE'), '');
     } finally {
         state.loading = false;
         handleCancel();

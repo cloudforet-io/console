@@ -5,19 +5,10 @@ export const USER_GROUP_SEARCH_HANDLERS: KeyItemSet[] = [
         title: 'Properties',
         items: [
             { name: 'user_group_id', label: 'User Group ID' },
-            { name: 'description', label: 'Description' },
-            { name: 'notification', label: 'Notification' },
             { name: 'users', label: 'Users' },
+            { name: 'description', label: 'Description' },
             { name: 'created', label: 'Created', dataType: 'datetime' },
         ],
-    },
-    {
-        title: 'Advanced',
-        items: [{
-            name: 'tags',
-            label: 'Tags',
-            dataType: 'object',
-        }],
     },
 ];
 
@@ -33,7 +24,7 @@ export const USER_GROUP_USERS_SEARCH_HANDLERS: KeyItemSet[] = [
             { name: 'user_id', label: 'User ID' },
             { name: 'name', label: 'Name' },
             { name: 'auth_type', label: 'Auth Type' },
-            { name: 'last_activity', label: 'Last Activity' },
+            { name: 'last_accessed_at', label: 'Last Activity', dataType: 'datetime' },
         ],
     },
 ];
@@ -48,3 +39,13 @@ export const USER_GROUP_MODAL_TYPE = {
     CREATE_NOTIFICATIONS_SECOND: 'create_notifications_step2',
     DELETE_NOTIFICATION_CHANNEL: 'delete_notification_channel',
 };
+
+export const USER_GROUP_CHANNELS_SEARCH_HANDLERS: KeyItemSet[] = [
+    {
+        title: 'Properties',
+        items: [
+            { name: 'name', label: 'Name' },
+            { name: 'schedule', label: 'Schedule' },
+        ],
+    },
+];

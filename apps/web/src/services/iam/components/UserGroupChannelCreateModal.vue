@@ -10,6 +10,7 @@ import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-const
 import { useNotificationChannelCreateFormStore } from '@/services/iam/store/notification-channel-create-form-store';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
+
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 
@@ -19,7 +20,7 @@ const notificationChannelCreateFormState = notificationChannelCreateFormStore.st
 const isContinuePossible = ref<boolean>(false);
 
 /* Component */
-const handleConfirm = () => {
+const handleConfirm = async () => {
     userGroupPageState.modal = {
         type: USER_GROUP_MODAL_TYPE.CREATE_NOTIFICATIONS_SECOND,
         title: userGroupPageState.modal.title,
@@ -28,30 +29,21 @@ const handleConfirm = () => {
 };
 
 const handleCancel = () => {
-    isContinuePossible.value = false;
+    notificationChannelCreateFormStore.initState();
     userGroupPageState.modal = {
         type: '',
         title: '',
         themeColor: 'primary',
     };
-    notificationChannelCreateFormStore.initState();
 };
 
 /* Watcher */
 watch(() => notificationChannelCreateFormState.selectedProtocol, (nv_protocol) => {
-    isContinuePossible.value = !!nv_protocol;
-});
-// watch(() => userGroupPageState.modal.type, (nv_modal, ov_modal) => {
-//     if (nv_modal !== ov_modal && ov_modal !== USER_GROUP_MODAL_TYPE.CREATE_NOTIFICATIONS_SECOND) {
-//         isContinuePossible.value = false;
-//     } else if (ov_modal === USER_GROUP_MODAL_TYPE.CREATE_NOTIFICATIONS_SECOND) {
-//         isContinuePossible.value = true;
-//     }
-// });
+    isContinuePossible.value = !!nv_protocol.protocol_id;
+}, { deep: true, immediate: true });
 </script>
 
 <template>
-    <!--  TODO: update language pack with babel edit -->
     <p-button-modal size="md"
                     :header-title="userGroupPageState.modal.title"
                     :visible="userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.CREATE_NOTIFICATIONS_FIRST"

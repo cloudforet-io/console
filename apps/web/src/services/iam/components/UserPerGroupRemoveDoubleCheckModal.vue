@@ -6,6 +6,9 @@ import { PButtonModal } from '@cloudforet/mirinae';
 
 import type { UserGroupRemoveUsersParameters } from '@/schema/identity/user-group/api-verbs/remove-users';
 import type { UserGroupModel } from '@/schema/identity/user-group/model';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -34,6 +37,7 @@ const handleConfirm = async () => {
             users,
         });
         emit('confirm');
+        showSuccessMessage(i18n.t('IAM.USER_GROUP.MODAL.REMOVE_USER.SHOW_SUCCESS_MESSAGE'), '');
     } finally {
         state.loading = false;
         handleCancel();

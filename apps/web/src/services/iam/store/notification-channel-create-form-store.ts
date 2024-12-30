@@ -1,5 +1,4 @@
 import { reactive } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 
 import { defineStore } from 'pinia';
 
@@ -11,18 +10,23 @@ interface UserInfoType {
 }
 
 interface NotificationChannelCreateFormState {
-    currentStep: number;
-    selectedProtocol: string | { icon: string; label: TranslateResult | string; };
+    selectedProtocol: {
+      name: string;
+      protocol_id: string;
+    };
+    protocolSchemaForm: Record<string, any>;
     channelName: string;
-//     TODO: about channel info
     userInfo: UserInfoType;
     scheduleInfo: ServiceChannelScheduleInfoType;
 }
 
 export const useNotificationChannelCreateFormStore = defineStore('channel-create-form', () => {
     const state = reactive<NotificationChannelCreateFormState>({
-        currentStep: 1,
-        selectedProtocol: '',
+        selectedProtocol: {
+            name: '',
+            protocol_id: '',
+        },
+        protocolSchemaForm: {},
         channelName: '',
         userInfo: {
             type: 'ALL_MEMBER',
@@ -42,8 +46,11 @@ export const useNotificationChannelCreateFormStore = defineStore('channel-create
 
     const actions = {
         initState() {
-            state.currentStep = 1;
-            state.selectedProtocol = '';
+            state.selectedProtocol = {
+                name: '',
+                protocol_id: '',
+            };
+            state.protocolSchemaForm = {};
             state.channelName = '';
             state.userInfo = {
                 type: 'ALL_MEMBER',
@@ -59,9 +66,6 @@ export const useNotificationChannelCreateFormStore = defineStore('channel-create
                 SAT: { is_scheduled: false, start: 9, end: 18 },
                 SUN: { is_scheduled: false, start: 9, end: 18 },
             };
-        },
-        setSelectedProtocol(protocol: string | { icon: string; label: TranslateResult | string }) {
-            state.selectedProtocol = protocol;
         },
     };
 

@@ -63,9 +63,8 @@ const tableState = reactive({
     ]),
     valueHandlerMap: computed(() => ({
         user_group_id: makeDistinctValueHandler('identity.UserGroup', 'user_group_id', 'string'),
+        users: makeDistinctValueHandler('identity.UserGroup', 'users', 'string'),
         description: makeDistinctValueHandler('identity.UserGroup', 'description', 'string'),
-        notification: makeDistinctValueHandler('identity.UserGroup', 'notification', 'integer'),
-        users: makeDistinctValueHandler('identity.UserGroup', 'users', 'integer'),
         created: makeDistinctValueHandler('identity.UserGroup', 'created', 'datetime'),
         tags: makeDistinctValueHandler('identity.UserGroup', 'tags', 'object'),
     })),
