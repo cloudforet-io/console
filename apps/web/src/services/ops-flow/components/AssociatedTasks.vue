@@ -38,6 +38,7 @@ const fields = computed<DataTableField[]>(() => [
         >
             <template #col-name-format="{item}">
                 <board-task-name-field :task-id="item.task_id"
+                                       :workspace-id="item.workspace_id"
                                        :name="item.name"
                                        link-new-tab
                 />
