@@ -214,6 +214,7 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
     dateRange,
     errorMessage: errorMessage.value,
     widgetLoading: !!loading.value,
+    noData: computed(() => (state.data ? !state.data?.results?.length : false)),
 });
 
 watch(() => props.size, () => {
