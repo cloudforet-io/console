@@ -3,6 +3,9 @@ import { computed, reactive } from 'vue';
 
 import { PSelectCard, PLazyImg } from '@cloudforet/mirinae';
 
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
+
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import { useNotificationChannelCreateFormStore } from '@/services/iam/store/notification-channel-create-form-store';
@@ -13,9 +16,16 @@ const userGroupPageState = userGroupPageStore.state;
 
 const notificationChannelCreateFormStore = useNotificationChannelCreateFormStore();
 
+const allReferenceStore = useAllReferenceStore();
+const allReferenceGetters = allReferenceStore.getters;
+
+const storeState = reactive({
+    plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
+});
+
 const state = reactive({
     protocolList: computed<{ icon: string; label: string; value: string; }[]>(() => userGroupPageState.protocolList.map((protocol) => ({
-        icon: 'ic_notification-protocol_envelope',
+        icon: storeState.plugins[protocol.plugin_info.plugin_id]?.icon || '',
         label: protocol.name,
         value: protocol.protocol_id,
     }))),
@@ -41,7 +51,7 @@ const handleSelectChannel = (selectedProtocol) => {
                        :selected="state.selectedProtocol"
                        class="card"
                        :multi-selectable="false"
-                       show-select-marker
+                       :show-select-marker="false"
                        :value="channel"
                        @change="handleSelectChannel"
         >
@@ -74,7 +84,7 @@ const handleSelectChannel = (selectedProtocol) => {
             @apply flex items-center w-full;
             gap: 1rem;
             .image {
-                margin-top: 0.6rem;
+                margin-top: 0.8rem;
             }
         }
     }
