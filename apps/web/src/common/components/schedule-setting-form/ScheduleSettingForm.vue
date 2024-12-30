@@ -73,11 +73,18 @@ const initScheduleForm = () => {
     if (!props.scheduleForm) return;
     state.selectedRadioIdx = state.scheduleTypeList.findIndex((item) => item.name === props.scheduleForm?.SCHEDULE_TYPE) || 0;
 
-    const filteredSchedule: string[] = state.days.filter((day) => {
-        if (!props.scheduleForm) return [];
-        const schedule = props.scheduleForm[day.name];
-        return schedule?.is_scheduled;
-    }).map((i) => i.name);
+    let filteredSchedule: string[] = [];
+    if (state.selectedRadioIdx === 0) {
+        filteredSchedule = state.days.slice(0, 5).map((day) => day.name);
+    } else if (state.selectedRadioIdx === 1) {
+        filteredSchedule = state.days.map((day) => day.name);
+    } else {
+        filteredSchedule = state.days.filter((day) => {
+            if (!props.scheduleForm) return [];
+            const schedule = props.scheduleForm[day.name];
+            return schedule?.is_scheduled;
+        }).map((i) => i.name);
+    }
 
     state.selectedDayButton = filteredSchedule;
     state.start = props.scheduleForm[filteredSchedule[0]]?.start || 0;
