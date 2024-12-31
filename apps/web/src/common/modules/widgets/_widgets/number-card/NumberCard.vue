@@ -212,9 +212,9 @@ const queryResults = useQueries({
     ],
 });
 
-const loading = computed(() => queryResults.value?.[0].isLoading);
-const previousLoading = computed(() => queryResults.value?.[1].isLoading);
-const errorMessage = computed(() => queryResults.value?.[0].error?.message);
+const widgetLoading = computed<boolean>(() => queryResults.value?.[0].isLoading);
+const previousLoading = computed<string>(() => queryResults.value?.[1].isLoading);
+const errorMessage = computed<string>(() => queryResults.value?.[0].error?.message);
 
 const loadWidget = () => {
     state.runQueries = true;
@@ -222,8 +222,8 @@ const loadWidget = () => {
 
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange,
-    errorMessage: errorMessage.value,
-    widgetLoading: loading.value,
+    errorMessage,
+    widgetLoading,
     noData: computed(() => !state.currentValue && !state.previousValue),
 });
 
