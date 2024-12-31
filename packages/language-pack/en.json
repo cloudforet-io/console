@@ -4256,6 +4256,7 @@
 		"TARGET_LIST": "{target} List",
 		"TASK_BOARD": {
 			"AFTER": "After",
+			"ARCHIVED_TASK_DESC": "Archived - The {taskCategory} or {taskType} is no longer available in this workspace. It might have been unbound or deleted.",
 			"ASSIGN": "Assign",
 			"ASSIGN_TO": "Assign to",
 			"BEFORE": "Before",

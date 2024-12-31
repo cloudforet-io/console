@@ -31,6 +31,15 @@ interface UseTaskManagementPageStoreState {
     loadingAssociatedTasksToCategory: boolean;
 }
 
+interface UseTaskManagementPageStoreGetters {
+    targetPackage: PackageModel|undefined;
+    associatedCategoriesToPackage: TaskCategoryModel[];
+    associatedWorkspacesToPackage: WorkspaceItem[];
+    associatedTasksToCategory: TaskModel[];
+    targetCategory: TaskCategoryModel|undefined;
+    defaultPackage: PackageModel|undefined;
+}
+
 export const useTaskManagementPageStore = defineStore('task-management-page', () => {
     const packageStore = usePackageStore();
     const taskCategoryStore = useTaskCategoryStore();
@@ -50,7 +59,7 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
         associatedTasksToCategoryMap: {},
         loadingAssociatedTasksToCategory: false,
     });
-    const getters = {
+    const getters: UseTaskManagementPageStoreGetters = {
         targetPackage: computed<PackageModel|undefined>(() => packageStore.getters.packages.find((p) => p.package_id === state.targetPackageId)),
         associatedCategoriesToPackage: computed<DeepReadonly<TaskCategoryModel[]>>(() => taskCategoryStore.getters.taskCategories.filter((c) => c.package_id === state.targetPackageId)),
         associatedWorkspacesToPackage: computed<WorkspaceItem[]>(() => {
@@ -62,11 +71,16 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
         associatedTasksToCategory: computed<DeepReadonly<TaskModel[]>>(() => {
             if (!state.targetCategoryId) return [];
             const categoryId = state.targetCategoryId;
-            return state.associatedTasksToCategoryMap[categoryId] ?? [];
+            const packageId = getters.targetCategory?.package_id;
+            if (!packageId) return [];
+            const workspaceItems: WorkspaceItem[] = Object.values(workspaceReferenceStore.getters.workspaceItems);
+            const relatedWorkspaceIds = workspaceItems.filter((w) => w.data.packages?.includes(packageId)).map((w) => w.key);
+            const allTasks = state.associatedTasksToCategoryMap[categoryId] ?? [];
+            return allTasks.filter((t) => relatedWorkspaceIds.includes(t.workspace_id));
         }),
         targetCategory: computed<DeepReadonly<TaskCategoryModel>|undefined>(() => taskCategoryStore.getters.taskCategories.find((c) => c.category_id === state.targetCategoryId)),
         defaultPackage: computed<PackageModel|undefined>(() => packageStore.getters.packages.find((p) => p.is_default)),
-    };
+    } as unknown as UseTaskManagementPageStoreGetters; // HACK: to avoid type error
     const actions = {
         // support package
         openAddPackageForm() {

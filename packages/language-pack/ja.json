@@ -4256,6 +4256,7 @@
 		"TARGET_LIST": "",
 		"TASK_BOARD": {
 			"AFTER": "",
+			"ARCHIVED_TASK_DESC": "",
 			"ASSIGN": "",
 			"ASSIGN_TO": "",
 			"BEFORE": "",

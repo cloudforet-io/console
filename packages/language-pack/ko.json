@@ -4256,6 +4256,7 @@
 		"TARGET_LIST": "{target} 목록",
 		"TASK_BOARD": {
 			"AFTER": "변경 후",
+			"ARCHIVED_TASK_DESC": "보관됨(Archived) - 본 {taskCategory} 또는 {taskType}{particle} 더 이상 이 워크스페이스에서 지원되지 않습니다. 연결이 해제되었거나 삭제되었을 수 있습니다.",
 			"ASSIGN": "할당하기",
 			"ASSIGN_TO": "담당자 할당",
 			"BEFORE": "변경 전",
