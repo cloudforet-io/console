@@ -3,12 +3,16 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
+import { mapValues } from 'lodash';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButtonModal, PFieldGroup, PTextInput, PRadio, PRadioGroup, PPaneLayout, PLazyImg, PJsonSchemaForm,
 } from '@cloudforet/mirinae';
+import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-schema-form/type';
 
 import type { ServiceChannelUpdateParameters } from '@/schema/alert-manager/service-channel/api-verbs/update';
+import { SERVICE_CHANNEL_TYPE } from '@/schema/alert-manager/service-channel/constants';
 import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
 import type { MembersType } from '@/schema/alert-manager/service/type';
 import { i18n } from '@/translations';
@@ -109,10 +113,18 @@ const getProtocolInfo = (id: string): ProtocolInfo => {
         };
     }
     const protocol = storeState.notificationProtocolList.find((item) => item.protocol_id === id);
+    const schema = protocol?.plugin_info?.metadata.data.schema || {};
+    const disabledProperties: Record<string, JsonSchema> = mapValues(schema.properties, (property) => ({
+        ...property,
+        disabled: true,
+    }));
     return {
         name: protocol?.name || '',
         icon: protocol?.icon || '',
-        schema: protocol?.plugin_info?.metadata.data.schema || {},
+        schema: protocol?.plugin_info?.metadata.data_type === 'SECRET' ? {
+            ...protocol?.plugin_info?.metadata.data.schema,
+            properties: disabledProperties,
+        } : schema,
     };
 };
 const handleChangeRadio = () => {
@@ -164,6 +176,9 @@ watch(() => props.selectedItem, (selectedItem) => {
             state.selectedMemberItems = [...userList, ...userGroupList];
         }
         state.scheduleForm = selectedItem.schedule;
+        if (selectedItem.channel_type === SERVICE_CHANNEL_TYPE.DIRECT) {
+            state.schemaForm = selectedItem.data;
+        }
     }
 }, { immediate: true });
 </script>
