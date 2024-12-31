@@ -22,6 +22,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useQueryTags } from '@/common/composables/query-tags';
 
@@ -39,6 +40,7 @@ const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
 
 const { getProperRouteLocation } = useProperRouteLocation();
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const router = useRouter();
 
@@ -280,14 +282,16 @@ onMounted(async () => {
             <template #no-data>
                 <div class="pt-12">
                     <p-empty show-image
-                             show-button
+                             :show-button="hasReadWriteAccess"
                     >
                         <template #image>
                             <img src="@/assets/images/img_jellyocto-with-a-telescope.png"
                                  alt="empty-image"
                             >
                         </template>
-                        <template #button>
+                        <template v-if="hasReadWriteAccess"
+                                  #button
+                        >
                             <p-button icon-left="ic_plus_bold"
                                       @click="handleClickCreateButton"
                             >

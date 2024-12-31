@@ -30,9 +30,10 @@ const handleClickCreateButton = () => {
             <template #heading>
                 <p-heading :title="$t('MENU.ALERT_MANAGER_SERVICE')" />
             </template>
-            <template #extra>
-                <p-button v-if="hasReadWriteAccess"
-                          style-type="primary"
+            <template v-if="hasReadWriteAccess"
+                      #extra
+            >
+                <p-button style-type="primary"
                           icon-left="ic_plus_bold"
                           @click="handleClickCreateButton"
                 >
