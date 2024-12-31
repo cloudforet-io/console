@@ -186,12 +186,12 @@ const fields = computed<DataTableField[] >(() => [
     {
         name: 'name',
         label: i18n.t('OPSFLOW.TITLE') as string,
-        width: '13rem',
+        width: '18rem',
     },
     {
         name: 'description',
         label: i18n.t('OPSFLOW.DESCRIPTION') as string,
-        width: '15rem',
+        width: '20rem',
     },
     {
         name: 'task_type_id',
@@ -246,6 +246,7 @@ const fields = computed<DataTableField[] >(() => [
         >
             <template #col-name-format="{item}">
                 <board-task-name-field :task-id="item.task_id"
+                                       :workspace-id="item.workspace_id"
                                        :name="item.name"
                 />
             </template>

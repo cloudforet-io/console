@@ -4325,7 +4325,8 @@
 			"UNSUPPORTED_FIELD_TYPE": "지원되지 않는 필드 타입입니다.",
 			"VALUE_ARRAY": "값은 배열이어야 합니다.",
 			"VALUE_ONLY_ONE": "값은 하나여야 합니다.",
-			"VALUE_STRING": "값은 문자열이어야 합니다."
+			"VALUE_STRING": "값은 문자열이어야 합니다.",
+			"VALUE_TOO_LONG": "입력한 내용이 너무 깁니다. {length}자 이하로 작성해주세요."
 		},
 		"WORKSPACE": "워크스페이스"
 	},

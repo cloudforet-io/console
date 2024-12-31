@@ -49,6 +49,7 @@ export const useTaskFieldMetadataStore = defineStore('task-field-metadata', () =
             is_primary: true,
             options: {
                 example: i18n.t('OPSFLOW.FIELD_GENERATOR.TASK_TITLE', { task: taskManagementTemplateStore.templates.Task }) as string,
+                maxLength: 100,
             },
         },
         {
