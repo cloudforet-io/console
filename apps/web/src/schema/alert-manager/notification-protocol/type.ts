@@ -10,7 +10,7 @@ type NotificationProtocolPluginMetadataDataType = {
     schema: JsonSchema;
 };
 type NotificationProtocolPluginMetadataType = {
-    data_type: 'PLAIN_TEXT | SECRET';
+    data_type: 'PLAIN_TEXT' | 'SECRET';
     data: NotificationProtocolPluginMetadataDataType;
 };
 export type NotificationProtocolPluginInfoType = {

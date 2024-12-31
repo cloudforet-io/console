@@ -8,8 +8,6 @@ export interface AlertCreateParameters {
     rule?: string;
     image_url?: string;
     resources?: AlertResourcesType[];
-    provider?: string;
-    account?: string;
     additional_info?: Record<string, any>;
     service_id: string;
 }

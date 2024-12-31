@@ -126,7 +126,7 @@ const handleGoBackButton = () => {
                 <p class="flex-1 truncate">
                     <p-tooltip position="bottom"
                                tag="p"
-                               class="flex-1 truncate"
+                               class="desc truncate"
                                :contents="storeState.serviceInfo?.description || ''"
                     >
                         {{ storeState.serviceInfo?.description }}
@@ -154,6 +154,10 @@ const handleGoBackButton = () => {
         &:hover {
             @apply cursor-pointer;
         }
+    }
+    .desc {
+        width: fit-content;
+        max-width: 100%;
     }
 }
 </style>
