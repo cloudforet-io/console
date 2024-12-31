@@ -22,6 +22,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import { TASK_STATUS_LABELS } from '@/services/ops-flow/constants/task-status-label-constant';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 
@@ -32,9 +33,9 @@ const taskCategoryStore = useTaskCategoryStore();
 /* status type */
 const statusIdAndNames = computed<[id: string, name: string][]>(() => Object.values(taskCategoryPageStore.getters.statusOptions).flat().map((p) => [p.status_id, p.name]));
 const statusTypeItems = computed<SelectDropdownMenuItem[]>(() => [
-    { label: 'To-do', name: 'TODO' },
-    { label: 'In progress', name: 'IN_PROGRESS' },
-    { label: 'Completed', name: 'COMPLETED' },
+    { label: TASK_STATUS_LABELS.TODO, name: 'TODO' },
+    { label: TASK_STATUS_LABELS.IN_PROGRESS, name: 'IN_PROGRESS' },
+    { label: TASK_STATUS_LABELS.COMPLETED, name: 'COMPLETED' },
 ]);
 
 /* color chips */

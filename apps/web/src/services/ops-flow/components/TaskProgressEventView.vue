@@ -5,6 +5,7 @@ import { computed } from 'vue';
 import type { TaskField } from '@/schema/opsflow/_types/task-field-type';
 import type { EventAdditionalInfo, EventType } from '@/schema/opsflow/event/type';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useTimezoneDate } from '@/common/composables/timezone-date';
 
 import { TASK_STATUS_LABELS } from '@/services/ops-flow/constants/task-status-label-constant';
@@ -28,7 +29,11 @@ const fields = asyncComputed<TaskField[]>(async () => {
     if (taskMap) {
         return taskMap.fields;
     }
-    await taskTypeStore.getWithFullFields(props.taskTypeId);
+    try {
+        await taskTypeStore.getWithFullFields(props.taskTypeId);
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
     return taskTypeStore.state.fullFieldsItemMap[props.taskTypeId]?.fields ?? [];
 }, [], { lazy: true });
 const fieldNameMap = computed(() => {

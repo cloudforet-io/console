@@ -11,6 +11,7 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
 import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
 import type { TaskModel } from '@/schema/opsflow/task/model';
+import type { TaskStatusType } from '@/schema/opsflow/task/type';
 import { i18n } from '@/translations';
 
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
@@ -25,6 +26,7 @@ import { useCategoryField } from '@/services/ops-flow/composables/use-category-f
 import { useTaskAPI } from '@/services/ops-flow/composables/use-task-api';
 import { useTaskStatusField } from '@/services/ops-flow/composables/use-task-status-field';
 import { useTaskTypeField } from '@/services/ops-flow/composables/use-task-type-field';
+import { TASK_STATUS_LABELS } from '@/services/ops-flow/constants/task-status-label-constant';
 import { useTaskAssignStore } from '@/services/ops-flow/stores/task-assign-store';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
@@ -101,6 +103,7 @@ const {
 } = useTaskStatusField({
     categoryId: computed(() => taskContentFormGetters.currentCategory?.category_id),
 });
+const getStatusTypeLabel = (statusType?: TaskStatusType) => (statusType ? TASK_STATUS_LABELS[statusType] : '--');
 const changeStatus = async (statusId: string) => {
     try {
         if (!taskContentFormState.originTask) {
@@ -257,7 +260,9 @@ createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, (
                class="flex flex-wrap gap-4"
                :class="taskContentFormState.mode === 'create' ? '' : 'py-6 px-4'"
     >
-        <div class="base-form-top-wrapper">
+        <div v-if="!taskContentFormState.isArchivedTask"
+             class="base-form-top-wrapper"
+        >
             <div class="base-form-field-wrapper">
                 <p-field-group :label="taskManagementTemplateStore.templates.TaskCategory"
                                :style-type="taskContentFormState.mode === 'create' ? 'primary' : 'secondary'"
@@ -305,7 +310,11 @@ createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, (
                                :invalid="invalidState.status"
                                :invalid-text="invalidTexts.status"
                 >
-                    <p-select-dropdown :selected="selectedStatusItems"
+                    <template v-if="taskContentFormState.isArchivedTask">
+                        {{ getStatusTypeLabel(taskContentFormState.originTask?.status_type) }}
+                    </template>
+                    <p-select-dropdown v-else
+                                       :selected="selectedStatusItems"
                                        :handler="statusMenuItemsHandler"
                                        :invalid="invalidState.status"
                                        :readonly="!userStore.getters.isDomainAdmin || !taskContentFormGetters.currentCategory"
@@ -338,7 +347,7 @@ createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, (
                         >
                             {{ userStore.getters.isDomainAdmin ? $t('OPSFLOW.TASK_BOARD.ASSIGN_TO') : $t('OPSFLOW.ASSIGNEE') }}
                         </p-field-title>
-                        <p-button v-if="userStore.getters.isDomainAdmin"
+                        <p-button v-if="userStore.getters.isDomainAdmin && !taskContentFormState.isArchivedTask"
                                   size="sm"
                                   style-type="tertiary"
                                   @click="handleClickAssign"

@@ -20,7 +20,6 @@ const EVENT_PAGE_SIZE = 10;
 interface UseTaskDetailPageStoreState {
     // task
     task?: TaskModel;
-    isArchivedTask: boolean;
     visibleTaskDeleteModal: boolean;
     // events
     page: number;
@@ -35,6 +34,7 @@ interface UseTaskDetailPageStoreState {
 interface UseTaskDetailPageStoreGetters {
     // task
     task: TaskModel|undefined;
+    isArchivedTask: boolean;
     // form
     hasUnsavedChanges: boolean;
     isFormValid: boolean;
@@ -49,7 +49,6 @@ export const useTaskDetailPageStore = defineStore('task-detail-page', () => {
     const state = reactive<UseTaskDetailPageStoreState>({
         // task
         task: undefined,
-        isArchivedTask: false,
         visibleTaskDeleteModal: false,
         // events
         page: 1,
@@ -63,6 +62,7 @@ export const useTaskDetailPageStore = defineStore('task-detail-page', () => {
     const getters: UseTaskDetailPageStoreGetters = {
         // task
         task: computed<TaskModel|undefined>(() => taskContentFormStore.state.originTask),
+        isArchivedTask: computed<boolean>(() => taskContentFormStore.state.isArchivedTask),
         // form
         hasUnsavedChanges: computed<boolean>(() => taskContentFormStore.state.hasUnsavedChanges),
         isFormValid: computed<boolean>(() => taskContentFormStore.getters.isAllValid),

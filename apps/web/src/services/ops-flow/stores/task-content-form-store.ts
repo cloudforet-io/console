@@ -3,6 +3,8 @@ import { reactive, computed } from 'vue';
 import { isEmpty, isEqual } from 'lodash';
 import { defineStore } from 'pinia';
 
+import { APIError } from '@cloudforet/core-lib/space-connector/error';
+
 import type { FileModel } from '@/schema/file-manager/model';
 import type { TaskField } from '@/schema/opsflow/_types/task-field-type';
 import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
@@ -30,6 +32,7 @@ import {
 
 interface UseTaskContentFormStoreState {
     originTask?: TaskModel;
+    isArchivedTask: boolean;
     // base form
     currentCategoryId?: string;
     currentTaskType?: TaskTypeModel;
@@ -65,6 +68,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
 
     const state = reactive<UseTaskContentFormStoreState>({
         originTask: undefined,
+        isArchivedTask: false,
         // base form
         currentCategoryId: undefined,
         currentTaskType: undefined,
@@ -106,8 +110,9 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         isEditable: computed<boolean>(() => {
             if (state.mode === 'create') return true;
             if (!state.originTask) return true;
+            if (state.isArchivedTask) return false;
             if (userStore.getters.isDomainAdmin) return true;
-            if (state.originTask.created_by === userStore.state.userId) return true;
+            // if (state.originTask.created_by === userStore.state.userId) return true;
             return false;
         }),
     } as unknown as UseTaskContentFormStoreGetters; // HACK: to avoid type error
@@ -125,7 +130,15 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
                 if (taskTypeStore.state.fullFieldsItemMap[taskTypeId]) {
                     state.currentTaskType = taskTypeStore.state.fullFieldsItemMap[taskTypeId];
                 } else {
-                    state.currentTaskType = await taskTypeStore.getWithFullFields(taskTypeId);
+                    try {
+                        state.currentTaskType = await taskTypeStore.getWithFullFields(taskTypeId);
+                    } catch (e) {
+                        if (e instanceof APIError && e.status === 403) {
+                            state.isArchivedTask = true;
+                        } else {
+                            ErrorHandler.handleError(e);
+                        }
+                    }
                 }
             } else {
                 state.currentTaskType = undefined;

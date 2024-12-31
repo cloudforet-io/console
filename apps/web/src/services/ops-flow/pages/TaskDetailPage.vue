@@ -33,7 +33,7 @@ import {
 import type { TabItem } from '@cloudforet/mirinae/types/hooks/use-tab/type';
 
 import type { TaskModel } from '@/schema/opsflow/task/model';
-import { i18n as _i18n } from '@/translations';
+import { getParticle, i18n as _i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
 
@@ -190,6 +190,15 @@ defineExpose({ setPathFrom, checkTaskExist });
                 </p-button>
             </template>
         </p-heading-layout>
+        <p v-if="taskDetailPageStore.getters.isArchivedTask"
+           class="px-4 mb-6 text-label-md text-gray-600"
+        >
+            {{ $t('OPSFLOW.TASK_BOARD.ARCHIVED_TASK_DESC', {
+                taskCategory: taskManagementTemplateStore.templates.TaskCategory,
+                taskType: taskManagementTemplateStore.templates.TaskType,
+                particle: getParticle(taskManagementTemplateStore.templates.TaskType, 'topic')
+            }) }}
+        </p>
         <div class="mr-auto flex flex-wrap w-full gap-4">
             <div class="flex-1 w-full min-w-[600px] tablet:min-w-full">
                 <p-tab class="w-full"
