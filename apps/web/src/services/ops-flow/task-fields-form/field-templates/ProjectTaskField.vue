@@ -56,7 +56,8 @@ const handleProjectSelect = (selectedProjectIds: string[]) => {
                                  :project-group-selectable="isProjectGroupSelectable"
                                  :selected-project-ids="selected"
                                  :readonly="props.readonly"
-                                 appearance-type="badge"
+                                 :invalid="isInvalid"
+                                 appearance-type="stack"
                                  @update:selected-project-ids="handleProjectSelect"
         />
     </p-field-group>

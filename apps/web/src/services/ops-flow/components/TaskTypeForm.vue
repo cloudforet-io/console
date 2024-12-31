@@ -126,7 +126,7 @@ const createTaskType = async (categoryId: string) => {
             assignee_pool: assigneePool.value,
             description: description.value,
             category_id: categoryId,
-            fields: fields.value,
+            fields: fields.value.map((f) => ({ ...f, _field_id: undefined })),
         });
         showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_ADD_TARGET', { target: taskManagementTemplateStore.templates.TaskType }), '');
     } catch (e) {
