@@ -242,7 +242,7 @@ const refinedData = computed<Data>(() => {
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange,
     errorMessage,
-    widgetLoading,
+    widgetLoading: widgetLoading.value,
     noData: computed(() => (refinedData.value ? !(refinedData.value.results?.length) : false)),
 });
 

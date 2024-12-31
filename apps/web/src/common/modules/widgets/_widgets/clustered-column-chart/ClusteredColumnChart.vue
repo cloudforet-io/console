@@ -283,7 +283,7 @@ const loadWidget = () => {
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange,
     errorMessage,
-    widgetLoading,
+    widgetLoading: widgetLoading.value,
     noData: computed(() => (state.data ? !state.data?.results?.length : false)),
 });
 

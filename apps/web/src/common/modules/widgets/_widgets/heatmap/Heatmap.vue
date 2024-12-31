@@ -246,7 +246,7 @@ watch(() => state.data, (newData) => {
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange,
     errorMessage,
-    widgetLoading,
+    widgetLoading: widgetLoading.value,
     noData: computed(() => (state.data ? !state.data.results?.length : false)),
 });
 

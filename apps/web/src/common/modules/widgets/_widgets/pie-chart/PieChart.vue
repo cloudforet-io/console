@@ -268,7 +268,7 @@ const loadWidget = () => {
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange,
     errorMessage,
-    widgetLoading,
+    widgetLoading: widgetLoading.value,
 });
 
 watch(() => props.size, () => {
