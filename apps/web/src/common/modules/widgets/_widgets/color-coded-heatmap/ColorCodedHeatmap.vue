@@ -117,8 +117,8 @@ const queryResult = useQuery({
     staleTime: WIDGET_LOAD_STALE_TIME,
 });
 
-const loading = computed(() => queryResult.isLoading);
-const errorMessage = computed(() => queryResult.error?.value?.message);
+const widgetLoading = computed<boolean>(() => queryResult.isLoading);
+const errorMessage = computed<string>(() => queryResult.error?.value?.message);
 
 const refinedData = computed(() => {
     const data = queryResult.data?.value;
@@ -147,8 +147,8 @@ const refinedData = computed(() => {
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange,
-    errorMessage: errorMessage.value,
-    widgetLoading: loading.value,
+    errorMessage,
+    widgetLoading: widgetLoading.value,
     noData: computed(() => (refinedData.value ? !(refinedData.value?.length) : false)),
 });
 

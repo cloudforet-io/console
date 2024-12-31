@@ -218,8 +218,8 @@ const queryResult = useQuery({
     staleTime: WIDGET_LOAD_STALE_TIME,
 });
 
-const loading = computed(() => queryResult.isLoading);
-const errorMessage = computed(() => queryResult.error?.value?.message);
+const widgetLoading = computed<boolean>(() => queryResult.isLoading);
+const errorMessage = computed<string>(() => queryResult.error?.value?.message);
 
 /* Util */
 const getThreshold = (rawData: Data): number => {
@@ -282,8 +282,8 @@ const loadWidget = () => {
 
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange,
-    errorMessage: errorMessage.value,
-    widgetLoading: loading.value,
+    errorMessage,
+    widgetLoading: widgetLoading.value,
     noData: computed(() => (state.data ? !state.data?.results?.length : false)),
 });
 

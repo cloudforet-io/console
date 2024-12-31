@@ -69,7 +69,7 @@ export default class WidgetFieldValueManager {
         this.modifiedData.value = {
             ...this.modifiedData.value,
             [key]: {
-                value,
+                value: cloneDeep(value),
             },
         };
 

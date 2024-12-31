@@ -233,8 +233,8 @@ const queryResult = useQuery({
     staleTime: WIDGET_LOAD_STALE_TIME,
 });
 
-const loading = computed(() => queryResult.isLoading);
-const errorMessage = computed(() => queryResult.error?.value?.message);
+const widgetLoading = computed<boolean>(() => queryResult.isLoading);
+const errorMessage = computed<string>(() => queryResult.error?.value?.message);
 
 const drawChart = (rawData: Data|null) => {
     if (isEmpty(rawData)) return;
@@ -267,8 +267,8 @@ const loadWidget = () => {
 
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange,
-    errorMessage: errorMessage.value,
-    widgetLoading: loading.value,
+    errorMessage,
+    widgetLoading: widgetLoading.value,
 });
 
 watch(() => props.size, () => {
