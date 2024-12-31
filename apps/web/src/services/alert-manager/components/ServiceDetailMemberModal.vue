@@ -114,6 +114,10 @@ const state = reactive({
 });
 
 const handleClickInviteButton = () => {
+    state.selectedMemberItems = [
+        ...state.userList.map((i) => ({ type: 'USER', value: i })),
+        ...state.userGroupList.map((i) => ({ type: 'USER_GROUP', value: i })),
+    ];
     state.mode = 'invitation';
 };
 const handleClose = () => {
