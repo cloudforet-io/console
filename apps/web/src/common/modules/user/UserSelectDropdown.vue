@@ -244,7 +244,9 @@ watch([() => props.selectedId, () => props.selectedIds], ([newUserId, newUserIds
         <template v-if="props.appearanceType === 'stack'"
                   #dropdown-button
         >
-            <div class="flex flex-wrap py-1 gap-y-2">
+            <div v-if="state.selectedItems.length > 0"
+                 class="flex flex-wrap py-1 gap-y-2"
+            >
                 <p-tag v-for="(item, idx) in state.selectedItems"
                        :key="item.name"
                        :outline="!checkUserGroup(item.name)"
