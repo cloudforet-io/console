@@ -38,8 +38,8 @@ const taskTypeFields = computed<DataTableField[]>(() => [
 </script>
 
 <template>
-    <div class="py-6 px-4">
-        <p-heading-layout>
+    <div class="py-6">
+        <p-heading-layout class="px-4">
             <template #heading>
                 <p-heading heading-type="sub">
                     {{ taskManagementTemplateStore.templates.TaskType }}
@@ -59,7 +59,7 @@ const taskTypeFields = computed<DataTableField[]>(() => [
         </p-heading-layout>
         <i18n path="OPSFLOW.TASK_MANAGEMENT.TASK_TYPE.DESC"
               tag="p"
-              class="mt-2 mb-6 text-label-md text-gray-600 first-letter:capitalize"
+              class="px-4 mt-2 mb-6 text-label-md text-gray-600 first-letter:capitalize"
         >
             <!-- CAUTION: Do not remove the following comments. They are used to prevent auto-formatting of the template. -->
             <!-- In this case, template tags must be in a single line to prevent inserting unnecessary spaces. -->
