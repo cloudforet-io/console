@@ -1,4 +1,4 @@
-name: [Pull Request] Base Check
+name: "[Pull Request] Base Check"
 
 on:
   pull_request_target:
