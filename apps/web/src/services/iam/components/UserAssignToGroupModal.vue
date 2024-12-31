@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { reactive, ref } from 'vue';
+import { reactive, ref, watch } from 'vue';
 
 import { cloneDeep } from 'lodash';
 
@@ -11,6 +11,7 @@ import type { UserGroupAddUsersParameters } from '@/schema/identity/user-group/a
 import type { UserGroupModel } from '@/schema/identity/user-group/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import type { SelectedUserDropdownIdsType } from '@/common/modules/user/typte';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
@@ -21,7 +22,7 @@ const userPageGetters = userPageStore.getters;
 
 const emit = defineEmits<{(e: 'confirm'): void; }>();
 
-const selectedUserGroupIds = ref<{type: 'USER' | 'USER_GROUP'; value: string}[]>([]);
+const selectedUserGroupIds = ref<SelectedUserDropdownIdsType>([]);
 
 const state = reactive({
     loading: false,
@@ -54,10 +55,6 @@ const handleClose = () => {
     });
 };
 
-const handleSelectedIds = (value: { type: 'USER' | 'USER_GROUP'; value: string;}[]) => {
-    selectedUserGroupIds.value = value;
-};
-
 /* API */
 const fetchAssignToUserGroup = async (params: UserGroupAddUsersParameters) => {
     try {
@@ -69,7 +66,15 @@ const fetchAssignToUserGroup = async (params: UserGroupAddUsersParameters) => {
 };
 
 /* Watcher */
-
+watch([() => userPageGetters.selectedUsers, () => userPageState.users], ([nv_selected_users, nv_user_list]) => {
+    if (nv_selected_users.length === 1 && nv_user_list.length > 0) {
+        selectedUserGroupIds.value = nv_selected_users[0]?.user_group.map((userGroup) => ({
+            type: 'USER_GROUP',
+            value: userGroup.user_group_id,
+            label: userGroup.name,
+        }));
+    }
+}, { deep: true, immediate: true });
 </script>
 
 <template>
@@ -91,8 +96,8 @@ const fetchAssignToUserGroup = async (params: UserGroupAddUsersParameters) => {
                                       show-user-group-list
                                       appearance-type="stack"
                                       selection-type="multiple"
-                                      :selected-ids="selectedUserGroupIds"
-                                      @update:selected-ids="handleSelectedIds"
+                                      :selected-ids.sync="selectedUserGroupIds"
+                                      placeholder="select"
                 />
             </div>
         </template>
