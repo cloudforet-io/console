@@ -88,7 +88,7 @@ const handleUpdateRepeatCount = (_repeatCount: string) => {
                            shape="square"
                            name="ic_plus_bold"
                            style-type="tertiary"
-                           :disabled="state.proxyRules.length >= 5"
+                           :disabled="state.proxyRules.length >= 10"
                            @click="handleAddStep"
             />
         </div>
@@ -142,7 +142,8 @@ const handleUpdateRepeatCount = (_repeatCount: string) => {
                                                                                       @update:selected-ids="handleSelectChannelDropdown(idx, $event)"
                 />
             </p-card>
-            <p-text-button class="add-rule-button mt-4 mx-auto "
+            <p-text-button :disabled="state.proxyRules.length >= 10"
+                           class="add-rule-button mt-4 mx-auto "
                            icon-left="ic_plus_bold"
                            size="lg"
                            @click="handleAddStep"

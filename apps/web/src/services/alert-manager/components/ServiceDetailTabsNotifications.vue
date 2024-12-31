@@ -75,24 +75,26 @@ const tableState = reactive({
             type: 'item',
             name: 'ENABLE',
             label: _i18n.t('ALERT_MANAGER.ENABLE'),
-            disabled: state.selectedItem?.state === SERVICE_CHANNEL_STATE.ENABLED,
+            disabled: !state.selectedItem || state.selectedItem?.state === SERVICE_CHANNEL_STATE.ENABLED,
         },
         {
             type: 'item',
             name: 'DISABLE',
             label: _i18n.t('ALERT_MANAGER.DISABLED'),
-            disabled: state.selectedItem?.state === SERVICE_CHANNEL_STATE.DISABLED,
+            disabled: !state.selectedItem || state.selectedItem?.state === SERVICE_CHANNEL_STATE.DISABLED,
         },
         { type: 'divider' },
         {
             type: 'item',
             name: 'UPDATE',
             label: _i18n.t('ALERT_MANAGER.UPDATE'),
+            disabled: !state.selectedItem,
         },
         {
             type: 'item',
             name: 'DELETE',
             label: _i18n.t('ALERT_MANAGER.DELETE'),
+            disabled: !state.selectedItem,
         },
     ])),
     fields: NOTIFICATION_MANAGEMENT_TABLE_FIELDS,
@@ -255,9 +257,10 @@ onUnmounted(() => {
                     </template>
                 </p-heading-layout>
             </template>
-            <template #toolbox-left>
+            <template v-if="hasReadWriteAccess"
+                      #toolbox-left
+            >
                 <p-select-dropdown :menu="tableState.actionMenu"
-                                   :disabled="!state.selectedItem || !hasReadWriteAccess"
                                    reset-selection-on-menu-close
                                    :placeholder="$t('ALERT_MANAGER.ACTION')"
                                    @select="handleSelectDropdownItem"

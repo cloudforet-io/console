@@ -57,12 +57,13 @@ const tableState = reactive({
             type: 'item',
             name: 'STATE',
             label: _i18n.t('ALERT_MANAGER.ESCALATION_POLICY.IN_USE'),
-            disabled: state.selectedItem?.escalation_policy_id === storeState.defaultEscalationPolicyId,
+            disabled: !state.selectedItem || state.selectedItem?.escalation_policy_id === storeState.defaultEscalationPolicyId,
         },
         {
             type: 'item',
             name: 'DELETE',
             label: _i18n.t('ALERT_MANAGER.DELETE'),
+            disabled: !state.selectedItem || state.selectedItem?.escalation_policy_id === storeState.defaultEscalationPolicyId,
         },
     ])),
     fields: ESCALATION_POLICY_MANAGEMENT_TABLE_FIELDS,
@@ -206,7 +207,6 @@ watch(() => storeState.serviceId, (id) => {
                       #toolbox-left
             >
                 <p-select-dropdown :menu="tableState.actionMenu"
-                                   :disabled="!state.selectedItem"
                                    reset-selection-on-menu-close
                                    :placeholder="$t('ALERT_MANAGER.ACTION')"
                                    @select="handleActionModal"
