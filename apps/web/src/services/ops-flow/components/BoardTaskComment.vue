@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    ref, computed, onBeforeMount,
+    ref, computed, onBeforeMount, onUnmounted,
 } from 'vue';
 
 import {
@@ -43,7 +43,7 @@ const getAuthor = (item: CommentModel) => {
 const getSourceIcon = (item: CommentModel) => item.source?.icon ?? '';
 const getSourceName = (item: CommentModel) => item.source?.name ?? '';
 const getWritePermission = (item: CommentModel) => item.created_by === userId.value;
-const comments = computed<CommentModel[]>(() => commentStore.state.itemsByTaskId[props.taskId] ?? []);
+const comments = computed<CommentModel[]>(() => commentStore.comments ?? []);
 const commentItems = computed<CollapsibleItem<CommentModel>[]>(() => comments.value.map((comment) => ({
     title: comment.created_at,
     data: comment,
@@ -99,6 +99,11 @@ onBeforeMount(async () => {
             sort: [{ key: 'created_at', desc: true }],
         },
     });
+});
+
+onUnmounted(() => {
+    commentStore.$reset();
+    commentStore.$dispose();
 });
 </script>
 
