@@ -1,4 +1,4 @@
-import { computed, reactive } from 'vue';
+import { computed, reactive, onUnmounted } from 'vue';
 
 import { defineStore } from 'pinia';
 
@@ -14,10 +14,13 @@ import type { TaskModel } from '@/schema/opsflow/task/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
+
 const EVENT_PAGE_SIZE = 10;
 interface UseTaskDetailPageStoreState {
     // task
     task?: TaskModel;
+    isArchivedTask: boolean;
     visibleTaskDeleteModal: boolean;
     // events
     page: number;
@@ -30,14 +33,23 @@ interface UseTaskDetailPageStoreState {
 }
 
 interface UseTaskDetailPageStoreGetters {
+    // task
+    task: TaskModel|undefined;
+    // form
+    hasUnsavedChanges: boolean;
+    isFormValid: boolean;
+    isEditable: boolean;
+    // events
     firstLoadingEvents: boolean;
     hasMoreEvents: boolean;
 }
 
 export const useTaskDetailPageStore = defineStore('task-detail-page', () => {
+    const taskContentFormStore = useTaskContentFormStore();
     const state = reactive<UseTaskDetailPageStoreState>({
         // task
         task: undefined,
+        isArchivedTask: false,
         visibleTaskDeleteModal: false,
         // events
         page: 1,
@@ -49,6 +61,12 @@ export const useTaskDetailPageStore = defineStore('task-detail-page', () => {
         targetComment: undefined,
     });
     const getters: UseTaskDetailPageStoreGetters = {
+        // task
+        task: computed<TaskModel|undefined>(() => taskContentFormStore.state.originTask),
+        // form
+        hasUnsavedChanges: computed<boolean>(() => taskContentFormStore.state.hasUnsavedChanges),
+        isFormValid: computed<boolean>(() => taskContentFormStore.getters.isAllValid),
+        isEditable: computed<boolean>(() => taskContentFormStore.getters.isEditable),
         // events
         firstLoadingEvents: computed<boolean>(() => !state.events),
         hasMoreEvents: computed<boolean>(() => {
@@ -68,7 +86,10 @@ export const useTaskDetailPageStore = defineStore('task-detail-page', () => {
         // task
         setCurrentTask(task: TaskModel) {
             state.task = task;
+            taskContentFormStore.setCurrentTask(task);
+            taskContentFormStore.setMode('view');
         },
+        updateTask: taskContentFormStore.updateTask,
         openTaskDeleteModal() {
             state.visibleTaskDeleteModal = true;
         },
@@ -148,6 +169,11 @@ export const useTaskDetailPageStore = defineStore('task-detail-page', () => {
             state.targetComment = undefined;
         },
     };
+
+    onUnmounted(() => {
+        taskContentFormStore.$reset();
+        taskContentFormStore.$dispose();
+    });
     return {
         state,
         getters,

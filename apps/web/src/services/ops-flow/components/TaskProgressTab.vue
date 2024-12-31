@@ -60,7 +60,7 @@ onUnmounted(() => {
                 class="timeline"
             >
                 <div class="text-label-sm text-gray-600">
-                    <task-progress-event-view :task-type-id="taskDetailPageState.task?.task_type_id"
+                    <task-progress-event-view :task-type-id="taskDetailPageGetters.task?.task_type_id"
                                               :event-type="item.event_type"
                                               :additional-info="item.additional_info"
                     />

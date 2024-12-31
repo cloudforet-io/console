@@ -51,7 +51,6 @@ import TaskAssignModal from '@/services/ops-flow/components/TaskAssignModal.vue'
 import TaskDeleteModal from '@/services/ops-flow/components/TaskDeleteModal.vue';
 import { useTaskAPI } from '@/services/ops-flow/composables/use-task-api';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
-import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
 import { useTaskDetailPageStore } from '@/services/ops-flow/stores/task-detail-page-store';
 import {
     useTaskManagementTemplateStore,
@@ -68,9 +67,6 @@ const props = defineProps<{
 }>();
 
 const taskDetailPageStore = useTaskDetailPageStore();
-const taskContentFormStore = useTaskContentFormStore();
-const taskContentFormState = taskContentFormStore.state;
-const taskContentFormGetters = taskContentFormStore.getters;
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 const userStore = useUserStore();
 
@@ -118,7 +114,7 @@ const {
     confirmRouteLeave,
     stopRouteLeave,
 } = useConfirmRouteLeave({
-    passConfirmation: computed(() => !taskContentFormState.hasUnsavedChanges || hasUpdated.value),
+    passConfirmation: computed(() => !taskDetailPageStore.getters.hasUnsavedChanges || hasUpdated.value),
 });
 onBeforeRouteLeave(handleBeforeRouteLeave);
 
@@ -145,24 +141,22 @@ const handleUpdateActiveTab = (tab: 'content'|'progress') => {
 
 /* form button handling */
 const handleSaveChanges = async () => {
-    if (!taskContentFormGetters.isAllValid) return;
-    hasUpdated.value = await taskContentFormStore.updateTask();
+    if (!taskDetailPageStore.getters.isFormValid) return;
+    hasUpdated.value = await taskDetailPageStore.updateTask();
     // if (hasUpdated.value) goBack();
 };
 
 /* lifecycle */
 onUnmounted(() => {
-    taskContentFormStore.$reset();
-    taskContentFormStore.$dispose();
+    taskDetailPageStore.$reset();
+    taskDetailPageStore.$dispose();
 });
 watch(task, (t) => {
     if (!t) return; // route guard will get task and go back if task is not found
     if (route.hash === '#progress') {
         activeTab.value = 'progress';
     }
-    taskContentFormStore.setMode('view');
     if (task.value) {
-        taskContentFormStore.setCurrentTask(task.value);
         taskDetailPageStore.setCurrentTask(task.value);
     }
 });
@@ -210,7 +204,7 @@ defineExpose({ setPathFrom, checkTaskExist });
                         <task-progress-tab />
                     </template>
                 </p-tab>
-                <div v-if="activeTab === 'content' && taskContentFormGetters.isEditable"
+                <div v-if="activeTab === 'content' && taskDetailPageStore.getters.isEditable"
                      class="py-3 flex flex-wrap gap-1 justify-end"
                 >
                     <p-button style-type="transparent"
@@ -219,7 +213,7 @@ defineExpose({ setPathFrom, checkTaskExist });
                         {{ $t('COMMON.BUTTONS.CANCEL') }}
                     </p-button>
                     <p-button style-type="primary"
-                              :disabled="!taskContentFormState.hasUnsavedChanges || !taskContentFormGetters.isAllValid"
+                              :disabled="!taskDetailPageStore.getters.hasUnsavedChanges || !taskDetailPageStore.getters.isFormValid"
                               @click="handleSaveChanges"
                     >
                         {{ $t('COMMON.BUTTONS.CONFIRM') }}
