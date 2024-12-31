@@ -273,6 +273,7 @@ createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, (
                     <template #default="{invalid}">
                         <p-select-dropdown :selected="selectedCategoryItems"
                                            :handler="categoryMenuItemsHandler"
+                                           :page-size="10"
                                            :invalid="invalid"
                                            :readonly="taskContentFormState.mode === 'view'"
                                            block
@@ -291,6 +292,7 @@ createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, (
                     <template #default="{invalid}">
                         <p-select-dropdown :selected="selectedTaskTypeItems"
                                            :handler="taskTypeMenuItemsHandler"
+                                           :page-size="10"
                                            :invalid="invalid"
                                            :readonly="taskContentFormState.mode === 'view' || !taskContentFormGetters.currentCategory"
                                            block
@@ -316,6 +318,7 @@ createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, (
                     <p-select-dropdown v-else
                                        :selected="selectedStatusItems"
                                        :handler="statusMenuItemsHandler"
+                                       ::page-size="10"
                                        :invalid="invalidState.status"
                                        :readonly="!userStore.getters.isDomainAdmin || !taskContentFormGetters.currentCategory"
                                        block

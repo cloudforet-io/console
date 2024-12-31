@@ -136,7 +136,7 @@ const handleRequiredChange = (value: boolean) => {
 };
 
 /* other field properties */
-const isPrimary = ref<boolean>(false);
+const isPrimary = ref<boolean>(true);
 const isFolded = ref<boolean>(false);
 
 /* validation */

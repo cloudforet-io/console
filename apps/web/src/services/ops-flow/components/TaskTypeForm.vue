@@ -113,7 +113,7 @@ const handleClosed = () => {
 const updateTaskTypeFields = async (taskTypeId: string) => {
     await taskTypeStore.updateFields({
         task_type_id: taskTypeId,
-        fields: fields.value,
+        fields: fields.value.map((f) => ({ ...f, _field_id: undefined })),
         force: true,
     });
 };

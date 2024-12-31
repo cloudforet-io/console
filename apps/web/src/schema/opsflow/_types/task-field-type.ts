@@ -12,19 +12,23 @@ export type TaskFieldEnum = {
 export interface TaskFieldOptions { // union of all task field options
     example?: string;
     enums?: TaskFieldEnum[];
-    maxLength?: number;
+    max_length?: number;
+    match_pattern?: string;
 }
 
 /* task field options by type */
 interface TextTaskFieldOptions {
     example?: string;
-    maxLength?: number;
+    max_length?: number;
 }
 export interface ParagraphTaskFieldOptions {
     example?: string;
 }
 export interface DropdownTaskFieldOptions {
     enums: TaskFieldEnum[];
+}
+export interface ProjectTaskFieldOptions {
+    match_pattern?: string;
 }
 interface OtherTaskFieldOptions {
     [key: string]: never;
@@ -59,7 +63,11 @@ export interface DropdownTaskField extends BaseTaskField {
     field_type: 'DROPDOWN';
     options?: DropdownTaskFieldOptions;
 }
+export interface ProjectTaskField extends BaseTaskField {
+    field_type: 'PROJECT';
+    options?: ProjectTaskFieldOptions;
+}
 export interface OtherTaskField extends BaseTaskField {
-    field_type: Exclude<TaskFieldType, 'TEXT'|'PARAGRAPH'|'DROPDOWN'>;
+    field_type: Exclude<TaskFieldType, 'TEXT'|'PARAGRAPH'|'DROPDOWN'|'PROJECT'>;
     options: OtherTaskFieldOptions;
 }

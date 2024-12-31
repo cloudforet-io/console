@@ -52,15 +52,19 @@ export const useTaskFieldMetadataStore = defineStore('task-field-metadata', () =
             is_primary: true,
             options: {
                 example: i18n.t('OPSFLOW.FIELD_GENERATOR.TASK_TITLE', { task: taskManagementTemplateStore.templates.Task }) as string,
-                maxLength: 100,
+                max_length: 100,
             },
         },
         {
             field_id: DEFAULT_FIELD_ID_MAP.project,
             name: i18n.t('OPSFLOW.FIELD_GENERATOR.PROJECT') as string,
             field_type: 'PROJECT',
+            selection_type: 'SINGLE',
             is_required: true,
             is_primary: true,
+            options: {
+                match_pattern: '^project-',
+            },
         },
         {
             field_id: DEFAULT_FIELD_ID_MAP.description,
