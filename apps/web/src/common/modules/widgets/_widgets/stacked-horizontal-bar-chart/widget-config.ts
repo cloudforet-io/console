@@ -7,7 +7,7 @@ const stackedHorizontalBarChart: WidgetConfig = {
         title: 'Horizontal Bar Chart',
         sizes: ['md', 'full'],
         defaultValidationConfig: {
-            defaultMaxCount: 2,
+            defaultMaxCount: 1,
         },
     },
     requiredFieldsSchema: {

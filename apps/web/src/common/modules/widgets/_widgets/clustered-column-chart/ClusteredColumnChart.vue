@@ -18,7 +18,6 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { numberFormatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
@@ -51,25 +50,13 @@ import type { LegendValue } from '@/common/modules/widgets/_widget-fields/legend
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type { TooltipNumberFormatValue } from '@/common/modules/widgets/_widget-fields/tooltip-number-format/type';
 import type { XAxisValue } from '@/common/modules/widgets/_widget-fields/x-axis/type';
-import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
+import type { DateRange, WidgetData } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
 
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
-
-
-type StaticFieldData = ListResponse<{
-    [key: string]: string|number;
-}>;
-type DynamicFieldData = {
-    results?: Array<{
-        [key: string]: any;
-    }>;
-    total_count?: number;
-};
-type Data = StaticFieldData|DynamicFieldData;
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
@@ -85,7 +72,7 @@ const state = reactive({
     dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
 
     unitMap: computed<Record<string, string>>(() => widgetFrameProps.value.unitMap || {}),
-    data: null as Data | null,
+    data: computed<WidgetData | null>(() => queryResult.data?.value ?? null),
     chart: null as EChartsType | null,
     xAxisData: computed<string[]>(() => {
         if (!state.data?.results?.length) return [];
@@ -180,10 +167,10 @@ const widgetOptionsState = reactive({
 });
 
 /* Api */
-const fetchWidgetData = async (params: PrivateWidgetLoadParameters|PublicWidgetLoadParameters): Promise<Data> => {
+const fetchWidgetData = async (params: PrivateWidgetLoadParameters|PublicWidgetLoadParameters): Promise<WidgetData> => {
     const defaultFetcher = state.isPrivateWidget
-        ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
-        : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>;
+        ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, WidgetData>
+        : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, WidgetData>;
     const res = await defaultFetcher(params);
     return res;
 };
@@ -222,14 +209,14 @@ const widgetLoading = computed<boolean>(() => queryResult.isLoading);
 const errorMessage = computed<string>(() => queryResult.error?.value?.message);
 
 /* Util */
-const getThreshold = (rawData: Data): number => {
+const getThreshold = (rawData: WidgetData): number => {
     const maxNumber = rawData?.results?.reduce((max, obj) => {
         const values = Object.values(obj).filter((val) => typeof val === 'number');
         return Math.max(max, ...values);
     }, 0);
     return maxNumber * 0.08;
 };
-const drawChart = (rawData: Data|null) => {
+const drawChart = (rawData: WidgetData|null) => {
     if (isEmpty(rawData)) return;
 
     const _threshold = getThreshold(rawData);

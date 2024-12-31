@@ -77,7 +77,7 @@ const state = reactive({
         const dataFields: TableWidgetField[] = [];
         const comparisonFields = widgetOptionsState.tableColumnComparisonInfo?.fields ?? [];
 
-        (widgetOptionsState.dataFieldInfo?.data as string[])?.forEach((field) => {
+        (widgetOptionsState.dataFieldInfo?.data as string[] || [])?.forEach((field) => {
             dataFields.push({
                 name: field,
                 label: field,

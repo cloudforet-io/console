@@ -17,13 +17,7 @@ export type TableDataItem = Record<string, any>;
 
 
 
-export type StaticFieldData = ListResponse<{
+export type WidgetData = ListResponse<{
     [key: string]: string|number;
 }>;
-export type DynamicFieldData = {
-    results?: Array<{
-        [key: string]: any;
-    }>;
-    total_count?: number;
-};
 
