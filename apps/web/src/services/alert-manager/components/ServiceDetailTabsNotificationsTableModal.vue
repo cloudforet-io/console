@@ -54,6 +54,12 @@ const state = reactive({
 });
 
 const getProtocolInfo = (id: string): ProtocolInfo => {
+    if (id === 'forward') {
+        return {
+            name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.ASSOCIATED_MEMBER'),
+            icon: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/notifications_member.svg',
+        };
+    }
     const protocol = storeState.notificationProtocolList.find((item) => item.protocol_id === id);
     return {
         name: protocol?.name || '',
