@@ -160,21 +160,30 @@ watch(() => storeState.serviceId, async (serviceId) => {
                        @update:selected="handleUpdateSelectedUserItems"
     >
         <template #dropdown-button>
-            <div class="flex flex-wrap py-1 gap-y-2">
-                <p-tag v-for="(item, idx) in state.selectedItems"
-                       :key="item.name"
-                       outline
-                       class="tag border-none"
-                       selected
-                       @delete="handleTagDelete(idx)"
+            <div>
+                <div v-if="state.selectedItems.length > 0"
+                     class="flex flex-wrap py-1 gap-y-2"
                 >
-                    <div class="member-menu-item h-4">
-                        <p-avatar icon="ic_my-page_notifications-channel"
-                                  size="xs"
-                        />
-                        <span class="leading-4">{{ item.label }}</span>
-                    </div>
-                </p-tag>
+                    <p-tag v-for="(item, idx) in state.selectedItems"
+                           :key="item.name"
+                           outline
+                           class="tag border-none"
+                           selected
+                           @delete="handleTagDelete(idx)"
+                    >
+                        <div class="member-menu-item h-4">
+                            <p-avatar icon="ic_my-page_notifications-channel"
+                                      size="xs"
+                            />
+                            <span class="leading-4">{{ item.label }}</span>
+                        </div>
+                    </p-tag>
+                </div>
+                <span v-else
+                      class="text-gray-600"
+                >
+                    {{ $t('ALERT_MANAGER.ESCALATION_POLICY.SELECT') }}
+                </span>
             </div>
         </template>
         <template #menu-item--format="{ item }">
