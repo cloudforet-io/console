@@ -15,6 +15,8 @@ import type {
 } from '@/schema/alert-manager/user-group-channel/type';
 import { i18n } from '@/translations';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import UserGroupChannelScheduleSetForm from '@/services/iam/components/UserGroupChannelScheduleSetForm.vue';
@@ -73,6 +75,8 @@ const handleConfirm = async () => {
                 user_group_id: userGroupPageGetters.selectedUserGroups[0].user_group_id,
             });
             emit('confirm');
+            // TODO: update translation
+            showSuccessMessage('', 'UserGroupChannel Successfully Created');
         } else if (userGroupPageState.modal.title === i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.UPDATE_TITLE')) {
             await fetchUpdateUserGroupChannel({
                 channel_id: userGroupPageGetters.selectedUserGroupChannel[0].channel_id,
@@ -81,6 +85,8 @@ const handleConfirm = async () => {
                 schedule: notificationChannelCreateFormState.scheduleInfo,
             });
             emit('confirm');
+            // TODO: update translation
+            showSuccessMessage('', 'UserGroupChannel Successfully Updated');
         }
     } finally {
         state.loading = false;
