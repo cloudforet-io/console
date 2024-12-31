@@ -1,4 +1,4 @@
-name: Deploy Vercel Preview on Comment
+name: "[Pull Request] Deploy Vercel Preview on Comment"
 
 on:
   issue_comment:
