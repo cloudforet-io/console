@@ -8,7 +8,7 @@ import { getParticle, i18n } from '@/translations';
 import { useFieldValidator } from '@/common/composables/form-validator';
 
 import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
-import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 
 interface CategoryItem extends SelectDropdownMenuItem {

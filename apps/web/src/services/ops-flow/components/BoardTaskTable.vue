@@ -28,8 +28,8 @@ import BoardTaskDescriptionField from '@/services/ops-flow/components/BoardTaskD
 import BoardTaskFilters from '@/services/ops-flow/components/BoardTaskFilters.vue';
 import BoardTaskNameField from '@/services/ops-flow/components/BoardTaskNameField.vue';
 import { useTaskAPI } from '@/services/ops-flow/composables/use-task-api';
-import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
 import { useBoardPageStore } from '@/services/ops-flow/stores/board-page-store';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 import {
     useTaskManagementTemplateStore,

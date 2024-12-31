@@ -14,8 +14,8 @@ import ActionMenuButton from '@/common/components/buttons/ActionMenuButton.vue';
 
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
-import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';

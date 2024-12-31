@@ -9,7 +9,7 @@ import LSBTopTitle from '@/common/modules/navigations/new-lsb/LSBTopTitle.vue';
 import type { LSBRouterPredicate } from '@/common/modules/navigations/new-lsb/type';
 
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
-import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 
 const taskCategoryStore = useTaskCategoryStore();
 const taskCategoryGetters = taskCategoryStore.getters;

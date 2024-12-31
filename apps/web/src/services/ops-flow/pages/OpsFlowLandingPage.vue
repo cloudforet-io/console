@@ -19,7 +19,7 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 
 import { useTaskAPI } from '@/services/ops-flow/composables/use-task-api';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
-import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 import {
     useTaskManagementTemplateStore,

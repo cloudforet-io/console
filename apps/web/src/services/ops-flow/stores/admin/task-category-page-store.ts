@@ -14,7 +14,7 @@ import type { TaskStatusOption, TaskStatusOptions, TaskStatusType } from '@/sche
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useTaskAPI } from '@/services/ops-flow/composables/use-task-api';
-import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 
 interface UseTaskCategoryPageStoreState {

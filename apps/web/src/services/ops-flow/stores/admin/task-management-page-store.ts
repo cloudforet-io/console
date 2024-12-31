@@ -14,7 +14,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useTaskAPI } from '@/services/ops-flow/composables/use-task-api';
 import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
-import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 
 interface UseTaskManagementPageStoreState {
     // support package

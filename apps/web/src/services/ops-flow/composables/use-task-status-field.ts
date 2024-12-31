@@ -10,7 +10,7 @@ import { getParticle, i18n } from '@/translations';
 import { useFieldValidator } from '@/common/composables/form-validator';
 
 import { TASK_STATUS_LABELS } from '@/services/ops-flow/constants/task-status-label-constant';
-import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 
 const EMPTY_STATUS_OPTIONS = {
     TODO: [],
