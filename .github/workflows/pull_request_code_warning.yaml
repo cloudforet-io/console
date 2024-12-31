@@ -1,4 +1,4 @@
-name: "[PR] Code Warning"
+name: "[Pull Request] Code Warning"
 
 on:
   pull_request:

@@ -1,4 +1,4 @@
-name: "[Dispatch] Preview Deploy with Vercel"
+name: "[Dispatch] Deploy to specific vercel project"
 
 on:
   workflow_dispatch:
