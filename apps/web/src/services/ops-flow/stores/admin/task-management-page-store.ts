@@ -12,9 +12,9 @@ import { useWorkspaceReferenceStore } from '@/store/reference/workspace-referenc
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useTaskAPI } from '@/services/ops-flow/composables/use-task-api';
 import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
-import { useTaskStore } from '@/services/ops-flow/stores/task-store';
 
 interface UseTaskManagementPageStoreState {
     // support package
@@ -44,7 +44,7 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
     const packageStore = usePackageStore();
     const taskCategoryStore = useTaskCategoryStore();
     const workspaceReferenceStore = useWorkspaceReferenceStore();
-    const taskStore = useTaskStore();
+    const taskAPI = useTaskAPI();
     const state = reactive<UseTaskManagementPageStoreState>({
         // support package
         visiblePackageForm: false,
@@ -146,7 +146,7 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
                 return;
             }
             try {
-                const tasks = await taskStore.list({ category_id: categoryId });
+                const tasks = await taskAPI.list({ category_id: categoryId });
                 if (!tasks) return;
                 state.associatedTasksToCategoryMap = {
                     ...state.associatedTasksToCategoryMap,

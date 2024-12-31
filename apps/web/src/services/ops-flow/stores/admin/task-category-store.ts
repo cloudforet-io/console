@@ -25,7 +25,6 @@ interface UseTaskCategoryStoreState {
 interface UseTaskCategoryStoreGetters {
     loading: boolean;
     taskCategories: TaskCategoryModel[];
-    taskCategoriesIncludingDeleted: TaskCategoryModel[];
 }
 const DEFAULT_STATUS_OPTIONS: TaskCategoryCreateParameters['status_options'] = {
     TODO: [
@@ -52,12 +51,6 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
                 actions.list();
             }
             return state.items?.filter((item) => item.state !== 'DELETED') ?? [];
-        }),
-        taskCategoriesIncludingDeleted: computed<TaskCategoryModel[]>(() => {
-            if (state.items === undefined) {
-                actions.list();
-            }
-            return state.items ?? [];
         }),
     } as unknown as UseTaskCategoryStoreGetters; // HACK: to avoid type error
 

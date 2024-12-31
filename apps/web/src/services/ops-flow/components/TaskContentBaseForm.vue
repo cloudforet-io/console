@@ -22,12 +22,12 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import { useCategoryField } from '@/services/ops-flow/composables/use-category-field';
+import { useTaskAPI } from '@/services/ops-flow/composables/use-task-api';
 import { useTaskStatusField } from '@/services/ops-flow/composables/use-task-status-field';
 import { useTaskTypeField } from '@/services/ops-flow/composables/use-task-type-field';
 import { useTaskAssignStore } from '@/services/ops-flow/stores/task-assign-store';
 import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
 import { useTaskDetailPageStore } from '@/services/ops-flow/stores/task-detail-page-store';
-import { useTaskStore } from '@/services/ops-flow/stores/task-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
@@ -37,10 +37,10 @@ const taskContentFormState = taskContentFormStore.state;
 const taskContentFormGetters = taskContentFormStore.getters;
 const userReferenceStore = useUserReferenceStore();
 const taskAssignStore = useTaskAssignStore();
-const taskStore = useTaskStore();
 const taskDetailPageStore = useTaskDetailPageStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 const userStore = useUserStore();
+
 
 /* category */
 const {
@@ -89,6 +89,7 @@ const handleUpdateSelectedTaskType = async (items: SelectDropdownMenuItem[]) => 
 };
 
 /* status */
+const taskAPI = useTaskAPI();
 const {
     selectedStatusItems,
     taskStatusValidator,
@@ -103,7 +104,7 @@ const changeStatus = async (statusId: string) => {
         if (!taskContentFormState.originTask) {
             throw new Error('Origin task is not defined');
         }
-        await taskStore.changeStatus(taskContentFormState.originTask.task_id, statusId);
+        await taskAPI.changeStatus(taskContentFormState.originTask.task_id, statusId);
         showSuccessMessage(i18n.t('OPSFLOW.ALT_S_UPDATE_TARGET', { target: i18n.t('OPSFLOW.STATUS') }), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ALT_E_UPDATE_TARGET', { target: i18n.t('OPSFLOW.STATUS') }));

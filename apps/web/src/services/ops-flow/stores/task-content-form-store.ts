@@ -16,8 +16,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useTaskAPI } from '@/services/ops-flow/composables/use-task-api';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
-import { useTaskStore } from '@/services/ops-flow/stores/task-store';
 import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 import { DEFAULT_FIELD_ID_MAP } from '@/services/ops-flow/task-fields-configuration/constants/default-field-constant';
 import {
@@ -59,7 +59,6 @@ interface UseTaskContentFormStoreGetters {
 export const useTaskContentFormStore = defineStore('task-content-form', () => {
     const taskCategoryStore = useTaskCategoryStore();
     const taskTypeStore = useTaskTypeStore();
-    const taskStore = useTaskStore();
     const taskFieldMetadataStore = useTaskFieldMetadataStore();
     const taskManagementTemplateStore = useTaskManagementTemplateStore();
     const userStore = useUserStore();
@@ -112,6 +111,8 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
             return false;
         }),
     } as unknown as UseTaskContentFormStoreGetters; // HACK: to avoid type error
+
+    const taskAPI = useTaskAPI();
     const actions = {
         setCurrentCategoryId(categoryId?: string) {
             if (state.currentCategoryId === categoryId) return;
@@ -194,7 +195,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
             try {
                 if (!state.currentTaskType) throw new Error('Task type is not selected');
                 state.createTaskLoading = true;
-                state.originTask = await taskStore.create({
+                state.originTask = await taskAPI.create({
                     task_type_id: state.currentTaskType.task_type_id,
                     name: state.defaultData.title,
                     status_id: state.statusId as string,
@@ -216,7 +217,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         async updateTask() {
             try {
                 if (!state.originTask) throw new Error('Origin task is not defined');
-                await taskStore.update({
+                await taskAPI.update({
                     task_id: state.originTask.task_id,
                     name: state.defaultData.title,
                 });

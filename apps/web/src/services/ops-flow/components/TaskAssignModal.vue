@@ -18,16 +18,17 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useTaskAPI } from '@/services/ops-flow/composables/use-task-api';
 import { useTaskAssignStore } from '@/services/ops-flow/stores/task-assign-store';
 import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
 import { useTaskDetailPageStore } from '@/services/ops-flow/stores/task-detail-page-store';
-import { useTaskStore } from '@/services/ops-flow/stores/task-store';
 
 const userReferenceStore = useUserReferenceStore();
 const taskAssignStore = useTaskAssignStore();
-const taskStore = useTaskStore();
 const taskContentFormStore = useTaskContentFormStore();
 const taskDetailPageStore = useTaskDetailPageStore();
+
+const taskAPI = useTaskAPI();
 
 const fields: DataTableField[] = [
     { label: 'User ID', name: 'name' },
@@ -75,7 +76,7 @@ const updateTaskAssignee = async (): Promise<TaskModel|undefined> => {
     try {
         if (!taskAssignStore.state.taskId) throw new Error('task id is not defined');
         if (selectIndex.value.length === 0) throw new Error('assignee is not selected');
-        const newTask = await taskStore.changeAssignee(taskAssignStore.state.taskId, refinedUserItems.value[selectIndex.value[0]].name);
+        const newTask = await taskAPI.changeAssignee(taskAssignStore.state.taskId, refinedUserItems.value[selectIndex.value[0]].name);
         taskContentFormStore.setAssigneeToOriginTask(newTask.assignee);
         showSuccessMessage(i18n.t('OPSFLOW.ALT_S_ASSIGN'), '');
         return newTask;

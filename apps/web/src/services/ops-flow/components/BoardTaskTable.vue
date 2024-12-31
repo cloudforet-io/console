@@ -27,9 +27,9 @@ import ProjectLinkButton from '@/common/modules/project/ProjectLinkButton.vue';
 import BoardTaskDescriptionField from '@/services/ops-flow/components/BoardTaskDescriptionField.vue';
 import BoardTaskFilters from '@/services/ops-flow/components/BoardTaskFilters.vue';
 import BoardTaskNameField from '@/services/ops-flow/components/BoardTaskNameField.vue';
+import { useTaskAPI } from '@/services/ops-flow/composables/use-task-api';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
 import { useBoardPageStore } from '@/services/ops-flow/stores/board-page-store';
-import { useTaskStore } from '@/services/ops-flow/stores/task-store';
 import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 import {
     useTaskManagementTemplateStore,
@@ -38,13 +38,13 @@ import type { TaskFilters } from '@/services/ops-flow/types/task-filters-type';
 
 const boardPageStore = useBoardPageStore();
 const boardPageState = boardPageStore.state;
-const taskStore = useTaskStore();
 const taskTypeStore = useTaskTypeStore();
 const taskCategoryStore = useTaskCategoryStore();
 const userReferenceStore = useUserReferenceStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
 const loading = ref<boolean>(false);
+const taskAPI = useTaskAPI();
 const tasks = ref<TaskModel[]|undefined>(undefined);
 const categoriesById = ref<Record<string, TaskCategoryModel>>({});
 const taskTypesById = ref<Record<string, TaskTypeModel>>({});
@@ -105,7 +105,7 @@ const getQuery = (filters?: ConsoleFilter[]) => {
 const listTask = async (query: Query) => {
     try {
         loading.value = true;
-        const results = await taskStore.list({
+        const results = await taskAPI.list({
             query,
         });
         if (results) {

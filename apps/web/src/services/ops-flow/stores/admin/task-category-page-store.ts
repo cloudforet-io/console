@@ -13,8 +13,8 @@ import type { TaskStatusOption, TaskStatusOptions, TaskStatusType } from '@/sche
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useTaskAPI } from '@/services/ops-flow/composables/use-task-api';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
-import { useTaskStore } from '@/services/ops-flow/stores/task-store';
 import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 
 interface UseTaskCategoryPageStoreState {
@@ -52,7 +52,6 @@ interface UseTaskCategoryPageStoreGetters {
 export const useTaskCategoryPageStore = defineStore('task-category-page', () => {
     const taskCategoryStore = useTaskCategoryStore();
     const taskTypeStore = useTaskTypeStore();
-    const taskStore = useTaskStore();
     const state = reactive<UseTaskCategoryPageStoreState>({
         currentCategoryId: undefined,
         // status
@@ -112,6 +111,8 @@ export const useTaskCategoryPageStore = defineStore('task-category-page', () => 
             return state.associatedTasksToTypeMap[taskTypeId] ?? [];
         }),
     } as unknown as UseTaskCategoryPageStoreGetters;
+
+    const taskData = useTaskAPI();
     const actions = {
         setCurrentCategoryId(categoryId: string) {
             state.currentCategoryId = categoryId;
@@ -166,7 +167,7 @@ export const useTaskCategoryPageStore = defineStore('task-category-page', () => 
             }
 
             try {
-                const tasks = await taskStore.list({
+                const tasks = await taskData.list({
                     task_type_id: taskTypeId,
                 });
                 if (!tasks) return; // canceled

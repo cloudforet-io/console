@@ -17,9 +17,9 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
+import { useTaskAPI } from '@/services/ops-flow/composables/use-task-api';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
-import { useTaskStore } from '@/services/ops-flow/stores/task-store';
 import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 import {
     useTaskManagementTemplateStore,
@@ -32,7 +32,6 @@ const router = useRouter();
 const taskCategoryStore = useTaskCategoryStore();
 const taskTypeStore = useTaskTypeStore();
 const taskTypeState = taskTypeStore.state;
-const taskStore = useTaskStore();
 const userStore = useUserStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
@@ -53,6 +52,7 @@ const { forms: { category, taskType }, setForm, isAllValid } = useFormValidator(
         return !!val;
     },
 });
+const taskAPI = useTaskAPI();
 const tasks = ref<TaskModel[]>([]);
 const userId = computed(() => userStore.state.userId ?? '');
 const taskQueryHelper = new QueryHelper();
@@ -87,7 +87,7 @@ onMounted(async () => {
     await taskTypeStore.listByCategoryIds(allCategories.map((c) => c.category_id));
     availableCategories.value = allCategories.filter((c) => taskTypeState.itemsByCategoryId[c.category_id]?.length);
     setForm('category', availableCategories.value[0]?.category_id);
-    tasks.value = await taskStore.list({ query: taskQuery.value }) ?? [];
+    tasks.value = await taskAPI.list({ query: taskQuery.value }) ?? [];
     loading.value = false;
 });
 </script>

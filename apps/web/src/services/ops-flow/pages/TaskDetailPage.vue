@@ -49,10 +49,10 @@ import BoardTaskComment from '@/services/ops-flow/components/BoardTaskComment.vu
 import CommentDeleteModal from '@/services/ops-flow/components/CommentDeleteModal.vue';
 import TaskAssignModal from '@/services/ops-flow/components/TaskAssignModal.vue';
 import TaskDeleteModal from '@/services/ops-flow/components/TaskDeleteModal.vue';
+import { useTaskAPI } from '@/services/ops-flow/composables/use-task-api';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
 import { useTaskDetailPageStore } from '@/services/ops-flow/stores/task-detail-page-store';
-import { useTaskStore } from '@/services/ops-flow/stores/task-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
@@ -71,11 +71,11 @@ const taskDetailPageStore = useTaskDetailPageStore();
 const taskContentFormStore = useTaskContentFormStore();
 const taskContentFormState = taskContentFormStore.state;
 const taskContentFormGetters = taskContentFormStore.getters;
-const taskStore = useTaskStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 const userStore = useUserStore();
 
 /* task */
+const taskAPI = useTaskAPI();
 const task = ref<TaskModel|undefined>();
 
 /* route and query */
@@ -94,7 +94,7 @@ const checkTaskExist = async () => {
     try {
         loading.value = true;
         const taskId = props.taskId;
-        task.value = await taskStore.get(taskId);
+        task.value = await taskAPI.get(taskId);
         loading.value = false;
         return true;
     } catch (e: unknown) {
