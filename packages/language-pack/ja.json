@@ -1054,6 +1054,9 @@
 			"TIMEZONE": "タイムゾーン",
 			"TITLE": "個人情報"
 		},
+		"PROJECT_LINK_BUTTON": {
+			"NO_ROLE": ""
+		},
 		"PROJECT_SELECT_DROPDOWN": {
 			"CREAT_PROJECT": "作成",
 			"CURRENT": "現在",

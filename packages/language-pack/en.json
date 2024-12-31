@@ -1054,6 +1054,9 @@
 			"TIMEZONE": "Time Zone",
 			"TITLE": "Profile"
 		},
+		"PROJECT_LINK_BUTTON": {
+			"NO_ROLE": "Unauthorized Project"
+		},
 		"PROJECT_SELECT_DROPDOWN": {
 			"CREAT_PROJECT": "Create",
 			"CURRENT": "Current",

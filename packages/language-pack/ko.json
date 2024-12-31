@@ -1054,6 +1054,9 @@
 			"TIMEZONE": "타임존",
 			"TITLE": "개인 정보"
 		},
+		"PROJECT_LINK_BUTTON": {
+			"NO_ROLE": "권한 없는 프로젝트"
+		},
 		"PROJECT_SELECT_DROPDOWN": {
 			"CREAT_PROJECT": "생성",
 			"CURRENT": "현재 위치",

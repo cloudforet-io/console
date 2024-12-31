@@ -268,7 +268,9 @@ const fields = computed<DataTableField[] >(() => [
                 </p-badge>
             </template>
             <template #col-project_id-format="{value}">
-                <project-link-button :project-id="value" />
+                <project-link-button :project-id="value"
+                                     no-role-if-not-exists
+                />
             </template>
             <template #col-assignee-format="{value}">
                 {{ userReferenceStore.getters.userItems[value]?.label || userReferenceStore.getters.userItems[value]?.name || value }}
