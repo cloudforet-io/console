@@ -26,6 +26,7 @@ import { useTaskAPI } from '@/services/ops-flow/composables/use-task-api';
 import { useTaskStatusField } from '@/services/ops-flow/composables/use-task-status-field';
 import { useTaskTypeField } from '@/services/ops-flow/composables/use-task-type-field';
 import { useTaskAssignStore } from '@/services/ops-flow/stores/task-assign-store';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
 import { useTaskDetailPageStore } from '@/services/ops-flow/stores/task-detail-page-store';
 import {
@@ -40,6 +41,7 @@ const taskAssignStore = useTaskAssignStore();
 const taskDetailPageStore = useTaskDetailPageStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 const userStore = useUserStore();
+const taskCategoryStore = useTaskCategoryStore();
 
 
 /* category */
@@ -186,14 +188,14 @@ const initForViewMode = async (task?: TaskModel) => {
 
     if (!task) return;
     // set category
-    taskContentFormStore.setCurrentCategoryId(task.category_id);
     await setInitialCategory(task.category_id);
-    const category = taskContentFormGetters.currentCategory;
+    taskContentFormStore.setCurrentCategoryId(task.category_id);
     // set task type
     await taskContentFormStore.setCurrentTaskType(task.task_type_id);
     const taskType = taskContentFormState.currentTaskType;
     setInitialTaskType(taskType);
     // set status
+    const category = await taskCategoryStore.get(task.category_id);
     if (category) {
         const statusOption = category.status_options[task.status_type]?.find((status) => status.status_id === task.status_id);
         setInitialStatus(statusOption);
