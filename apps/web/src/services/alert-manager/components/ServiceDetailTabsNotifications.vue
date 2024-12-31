@@ -167,6 +167,7 @@ const handleExportExcel = async () => {
     await downloadExcel({
         url: '/alert-manager/service-channel/list',
         param: {
+            service_id: storeState.service.service_id,
             query: { ...notificationsListApiQueryHelper.data, only: ALERT_EXCEL_FIELDS.map((d) => d.key) },
         },
         fields: ALERT_EXCEL_FIELDS,

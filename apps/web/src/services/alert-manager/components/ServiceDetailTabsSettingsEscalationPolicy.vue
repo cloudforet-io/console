@@ -108,6 +108,7 @@ const handleExportExcel = async () => {
     await downloadExcel({
         url: '/alert-manager/escalation-policy/list',
         param: {
+            service_id: storeState.serviceId,
             query: { ...escalationPolicyListApiQueryHelper.data, only: ALERT_EXCEL_FIELDS.map((d) => d.key) },
         },
         fields: ALERT_EXCEL_FIELDS,

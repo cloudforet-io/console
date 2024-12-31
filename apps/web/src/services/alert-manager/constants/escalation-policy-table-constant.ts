@@ -24,7 +24,7 @@ export const ESCALATION_POLICY_MANAGEMENT_TABLE_HANDLER: AlertManagementTableHan
 };
 export const ALERT_EXCEL_FIELDS: ExcelDataField[] = [
     { key: 'name', name: 'Name' },
-    { key: 'repeat', name: 'Repeat Time' },
-    { key: 'rules', name: 'Connected Channel' },
+    { key: 'repeat.count', name: 'Repeat Time' },
+    { key: 'rules.channels', name: 'Connected Channel' },
     { key: 'created_at', name: 'Created' },
 ];
