@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 
 import {
-    PHeadingLayout, PHeading, PButton, PIconButton, PDataTable,
+    PHeadingLayout, PHeading, PButton, PIconButton, PDataTable, PBadge,
 } from '@cloudforet/mirinae';
 import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
@@ -24,6 +24,11 @@ const taskTypeFields = computed<DataTableField[]>(() => [
         name: 'name',
         label: _i18n.t('OPSFLOW.NAME') as string,
         width: '20%',
+    },
+    {
+        name: 'scope',
+        label: _i18n.t('OPSFLOW.SCOPE') as string,
+        width: '12%',
     },
     {
         name: 'description',
@@ -77,6 +82,13 @@ const taskTypeFields = computed<DataTableField[]>(() => [
                       :items="taskCategoryPageGetters.taskTypes"
                       :fields="taskTypeFields"
         >
+            <template #col-scope-format="{ value }">
+                <p-badge :style-type="value === 'WORKSPACE' ? 'secondary1' : 'primary'"
+                         badge-type="solid-outline"
+                >
+                    {{ $t(`OPSFLOW.${value ?? 'WORKSPACE'}`) }}
+                </p-badge>
+            </template>
             <template #col-buttons-format="{ item }">
                 <div class="flex justify-end">
                     <action-menu-button @edit="taskCategoryPageStore.openEditTaskTypeForm(item.task_type_id)"

@@ -4246,6 +4246,7 @@
 		"NO_AVAILABLE_TARGET": "No Available {target}",
 		"PACKAGE": "Package",
 		"PROJECT": "Project",
+		"SCOPE": "Scope",
 		"SET_AS_DEFAULT": "Set as Default",
 		"SHOW_MORE": "Show More",
 		"STATUS": "Status",

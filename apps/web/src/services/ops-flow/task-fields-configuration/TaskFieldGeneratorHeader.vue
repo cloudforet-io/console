@@ -1,7 +1,7 @@
 <script setup lang="ts">
-
-import { PI, PBadge, PIconButton } from '@cloudforet/mirinae';
-
+import {
+    PI, PBadge, PIconButton, PTooltip,
+} from '@cloudforet/mirinae';
 
 import TaskFieldTypeIcon from '@/services/ops-flow/task-fields-configuration/components/TaskFieldTypeIcon.vue';
 import type { TaskFieldTypeMetadata } from '@/services/ops-flow/task-fields-configuration/types/task-field-type-metadata-type';
@@ -29,9 +29,13 @@ const emit = defineEmits<{(event: 'update:is-folded', value: boolean): void
              class="flex-shrink-0 cursor-pointer mr-1"
              @click="emit('update:is-folded', !props.isFolded)"
         />
-        <task-field-type-icon class="flex-shrink-0"
-                              :icon="fieldMetadata.icon"
-        />
+        <p-tooltip :contents="props.fieldMetadata.name"
+                   position="bottom"
+        >
+            <task-field-type-icon class="flex-shrink-0"
+                                  :icon="fieldMetadata.icon"
+            />
+        </p-tooltip>
         <span class="flex-grow text-label-md pl-2">{{ props.name || fieldMetadata.name }}</span>
         <p-badge v-if="props.isRequired"
                  class="flex-shrink-0"

@@ -54,6 +54,7 @@ interface UseTaskContentFormStoreState {
 interface UseTaskContentFormStoreGetters {
     currentCategory: TaskCategoryModel|undefined;
     currentFields: TaskField[];
+    defaultFields: TaskField[];
     isDefaultFieldValid: boolean;
     isFieldValid: boolean;
     isAllValid: boolean;
@@ -97,9 +98,20 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
             const isViewMode = state.mode === 'view';
             return isViewMode ? fields : fields.filter((f) => f.is_primary || f.is_required);
         }),
+        defaultFields: computed<TaskField[]>(() => {
+            const scope = state.currentTaskType?.scope;
+            switch (scope) {
+            case 'WORKSPACE':
+                return taskFieldMetadataStore.getters.workspaceScopeDefaultFields;
+            case 'PROJECT':
+                return taskFieldMetadataStore.getters.projectScopeDefaultFields;
+            default:
+                return taskFieldMetadataStore.getters.workspaceScopeDefaultFields;
+            }
+        }),
         isDefaultFieldValid: computed<boolean>(() => {
             if (state.mode === 'view') return state.defaultDataValidationMap[DEFAULT_FIELD_ID_MAP.title] ?? true;
-            return taskFieldMetadataStore.getters.defaultFields.every((field) => state.defaultDataValidationMap[field.field_id]);
+            return getters.defaultFields.every((field) => state.defaultDataValidationMap[field.field_id]);
         }),
         isFieldValid: computed<boolean>(() => getters.currentFields?.every((field) => state.dataValidationMap[field.field_id]) ?? true),
         // overall
@@ -217,6 +229,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
                     data: isEmpty(state.data) ? undefined : state.data,
                     files: state.files.map((f) => f.file_id),
                     project_id: state.defaultData.project?.[0],
+                    resource_group: state.currentTaskType.scope,
                 });
                 showSuccessMessage(i18n.t('OPSFLOW.ALT_S_CREATE_TARGET', { target: taskManagementTemplateStore.templates.task }), '');
                 state.createTaskLoading = false;

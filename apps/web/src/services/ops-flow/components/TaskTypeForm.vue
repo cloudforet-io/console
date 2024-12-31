@@ -6,7 +6,7 @@ import {
 import { isEqual, cloneDeep } from 'lodash';
 
 import {
-    POverlayLayout, PFieldGroup, PTextInput, PButton, PTextarea,
+    POverlayLayout, PFieldGroup, PTextInput, PButton, PTextarea, PRadioGroup, PRadio,
 } from '@cloudforet/mirinae';
 
 import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
@@ -15,7 +15,7 @@ import { getParticle, i18n as _i18n } from '@/translations';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useFormValidator } from '@/common/composables/form-validator';
+import { useFieldValidator, useFormValidator } from '@/common/composables/form-validator';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
@@ -41,6 +41,19 @@ const title = computed(() => {
     return _i18n.t('OPSFLOW.ADD_TARGET', { target: taskManagementTemplateStore.templates.TaskType });
 });
 
+/* scope */
+type Scope = TaskTypeModel['scope'];
+const scopeValidator = useFieldValidator<Scope>('PROJECT', (val) => {
+    if (!val) {
+        return _i18n.t('OPSFLOW.VALIDATION.REQUIRED', {
+            topic: _i18n.t('OPSFLOW.SCOPE'),
+            particle: getParticle(_i18n.t('OPSFLOW.SCOPE') as string, 'topic'),
+        });
+    }
+    return true;
+});
+const { value: scope, setValue: setScope } = scopeValidator;
+
 /* task field configuration */
 const {
     taskFieldsValidator,
@@ -62,8 +75,9 @@ const {
     resetValidations,
 } = useFormValidator({
     name: '',
-    description: '',
+    scope: scopeValidator,
     assigneePool: [] as string[],
+    description: '',
     fields: taskFieldsValidator,
 }, {
     name(value: string) {
@@ -108,8 +122,9 @@ const createTaskType = async (categoryId: string) => {
     try {
         await taskTypeStore.create({
             name: name.value,
-            description: description.value,
+            scope: scope.value,
             assignee_pool: assigneePool.value,
+            description: description.value,
             category_id: categoryId,
             fields: fields.value,
         });
@@ -220,9 +235,29 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
                         />
                     </template>
                 </p-field-group>
+                <p-field-group v-if="!taskCategoryPageGetters.targetTaskType"
+                               :label="$t('OPSFLOW.SCOPE')"
+                               required
+                >
+                    <p-radio-group>
+                        <p-radio :selected="scope"
+                                 value="PROJECT"
+                                 @change="setScope"
+                        >
+                            {{ $t('OPSFLOW.PROJECT') }}
+                        </p-radio>
+                        <p-radio :selected="scope"
+                                 value="WORKSPACE"
+                                 @change="setScope"
+                        >
+                            {{ $t('OPSFLOW.WORKSPACE') }}
+                        </p-radio>
+                    </p-radio-group>
+                </p-field-group>
                 <p-field-group :label="$t('OPSFLOW.ASSIGNEE_POOL')">
                     <user-select-dropdown :selected-user-ids="assigneePool"
                                           selection-type="multiple"
+                                          block
                                           @update:user-ids="setForm('assigneePool', $event)"
                     />
                 </p-field-group>
@@ -239,6 +274,7 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
                                required
                 >
                     <task-fields-configuration class="mt-2"
+                                               :scope="scope"
                                                :fields="fields"
                                                :origin-fields="taskCategoryPageGetters.targetTaskType?.fields"
                                                @update:fields="setFields"

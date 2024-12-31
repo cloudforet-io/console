@@ -4246,6 +4246,7 @@
 		"NO_AVAILABLE_TARGET": "사용 가능한 {target} 없음",
 		"PACKAGE": "패키지",
 		"PROJECT": "프로젝트",
+		"SCOPE": "범위",
 		"SET_AS_DEFAULT": "기본으로 설정",
 		"SHOW_MORE": "더 보기",
 		"STATUS": "상태",

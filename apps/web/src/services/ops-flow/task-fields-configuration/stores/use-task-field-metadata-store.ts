@@ -15,7 +15,8 @@ import {
 interface UseTaskFieldMetadataGetters {
     taskFieldTypeMetadataMap: ComputedRef<Record<TaskFieldType, TaskFieldTypeMetadata>>;
     taskFieldTypeMetadataList: ComputedRef<TaskFieldTypeMetadata[]>;
-    defaultFields: ComputedRef<TaskField[]>;
+    workspaceScopeDefaultFields: ComputedRef<TaskField[]>;
+    projectScopeDefaultFields: ComputedRef<TaskField[]>;
 }
 export const useTaskFieldMetadataStore = defineStore('task-field-metadata', () => {
     const taskManagementTemplateStore = useTaskManagementTemplateStore();
@@ -39,6 +40,8 @@ export const useTaskFieldMetadataStore = defineStore('task-field-metadata', () =
         taskFieldTypeMetadataMap.value.DROPDOWN,
         taskFieldTypeMetadataMap.value.DATE,
         taskFieldTypeMetadataMap.value.PROJECT,
+        taskFieldTypeMetadataMap.value.SERVICE_ACCOUNT,
+        taskFieldTypeMetadataMap.value.ASSET,
     ]);
     const defaultFields = computed<TaskField[]>(() => [
         {
@@ -70,10 +73,12 @@ export const useTaskFieldMetadataStore = defineStore('task-field-metadata', () =
             },
         },
     ] as TaskField[]);
+    const workspaceScopeDefaultFields = computed<TaskField[]>(() => defaultFields.value.filter((field) => field.field_id !== DEFAULT_FIELD_ID_MAP.project));
     const getters: UseTaskFieldMetadataGetters = {
         taskFieldTypeMetadataMap,
         taskFieldTypeMetadataList,
-        defaultFields,
+        workspaceScopeDefaultFields,
+        projectScopeDefaultFields: defaultFields,
     };
 
     return {

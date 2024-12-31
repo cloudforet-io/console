@@ -5,7 +5,7 @@ import draggable from 'vuedraggable';
 import { PI } from '@cloudforet/mirinae';
 
 import type { TaskField } from '@/schema/opsflow/_types/task-field-type';
-
+import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -17,6 +17,7 @@ import type { MutableTaskField } from '@/services/ops-flow/task-fields-configura
 import type { TaskFieldTypeMetadata } from '@/services/ops-flow/task-fields-configuration/types/task-field-type-metadata-type';
 
 const props = defineProps<{
+    scope: TaskTypeModel['scope'];
     fields: MutableTaskField[];
     originFields?: TaskField[];
 }>();
@@ -28,6 +29,16 @@ const emit = defineEmits<{(event: 'update:fields', value: TaskField[]): void;
 const taskFieldMetadataStore = useTaskFieldMetadataStore();
 const taskFieldMetadataStoreGetters = taskFieldMetadataStore.getters;
 
+const defaultFields = computed<TaskField[]>(() => {
+    switch (props.scope) {
+    case 'WORKSPACE':
+        return taskFieldMetadataStoreGetters.workspaceScopeDefaultFields;
+    case 'PROJECT':
+        return taskFieldMetadataStoreGetters.projectScopeDefaultFields;
+    default:
+        return taskFieldMetadataStoreGetters.workspaceScopeDefaultFields;
+    }
+});
 const draggableFields = computed<MutableTaskField[]>({
     get() {
         return props.fields;
@@ -69,10 +80,10 @@ const handleFieldDeleteConfirm = () => {
         <div class="grid grid-cols-12 rounded-lg border border-gray-200">
             <div class="col-span-8 p-4 pl-2 rounded-l-lg bg-gray-100 border-r border-gray-200">
                 <div class="flex flex-col gap-2">
-                    <task-field-generator v-for="field in taskFieldMetadataStoreGetters.defaultFields"
+                    <task-field-generator v-for="field in defaultFields"
                                           :key="field.field_id"
                                           :field="field"
-                                          :all-fields="taskFieldMetadataStoreGetters.defaultFields"
+                                          :all-fields="defaultFields"
                     />
                 </div>
                 <div class="border-t border-gray-200 mt-4 pt-4">

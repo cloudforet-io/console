@@ -1,3 +1,4 @@
+import type { ResourceGroupType } from '@/schema/_common/type';
 import type { CommentType, MentionTargets, MentionSource } from '@/schema/opsflow/comment/type';
 
 export interface CommentModel {
@@ -10,6 +11,7 @@ export interface CommentModel {
     source?: MentionSource;
     reference_id?: string;
     task_id: string;
+    resource_group: Extract<ResourceGroupType, 'WORKSPACE' | 'PROJECT'>;
     project_id?: string;
     workspace_id?: string;
     domain_id: string;
