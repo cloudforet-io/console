@@ -16,8 +16,6 @@ export interface AlertModel {
     rule: string;
     image_url: string;
     resources: AlertResourcesType[];
-    provider: string;
-    account: string;
     additional_info: Record<string, any>;
     triggered_type: AlertTriggeredType;
     triggered_by: string;

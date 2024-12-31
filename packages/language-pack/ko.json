@@ -97,6 +97,7 @@
 			"NO_DATA": "",
 			"REPEAT": "반복",
 			"REPEAT_DESC": "",
+			"SELECT": "선택하기",
 			"SET_POLICY": "",
 			"STEP": "단계 {step}",
 			"TITLE": "에스컬레이션 정책",

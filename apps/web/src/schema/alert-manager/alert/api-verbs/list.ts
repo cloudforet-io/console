@@ -14,8 +14,6 @@ export interface AlertListParameters {
     urgency?: AlertUrgencyType;
     severity?: AlertSeverityType;
     resources?: AlertResourcesType[];
-    provider?: string;
-    account?: string;
     triggered_type?: AlertTriggeredType;
     triggered_by?: string;
     webhook_id?: string;

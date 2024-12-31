@@ -97,6 +97,7 @@
 			"NO_DATA": "No accessible escalation policy",
 			"REPEAT": "REPEAT",
 			"REPEAT_DESC": "Apply to all steps above",
+			"SELECT": "Select",
 			"SET_POLICY": "Set Escalation Rules",
 			"STEP": "Step {step}",
 			"TITLE": "Escalation Policy",

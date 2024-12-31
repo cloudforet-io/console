@@ -97,6 +97,7 @@
 			"NO_DATA": "",
 			"REPEAT": "繰り返す",
 			"REPEAT_DESC": "",
+			"SELECT": "選択する",
 			"SET_POLICY": "",
 			"STEP": "ステップ {step}",
 			"TITLE": "エスカレーションポリシー",
