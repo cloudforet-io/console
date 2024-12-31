@@ -49,15 +49,13 @@ import type { MissingValueValue } from '@/common/modules/widgets/_widget-fields/
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type { TooltipNumberFormatValue } from '@/common/modules/widgets/_widget-fields/tooltip-number-format/type';
 import type { XAxisValue } from '@/common/modules/widgets/_widget-fields/x-axis/type';
-import type { DateRange, DynamicFieldData, StaticFieldData } from '@/common/modules/widgets/types/widget-data-type';
+import type { DateRange, WidgetData } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
 
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
-
-type Data = StaticFieldData|DynamicFieldData;
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
@@ -72,7 +70,7 @@ const state = reactive({
     isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
     dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
 
-    data: computed<Data | null>(() => queryResult?.data?.value || null),
+    data: computed<WidgetData | null>(() => queryResult?.data?.value || null),
     chart: null as EChartsType | null,
     xAxisData: computed<string[]>(() => {
         if (!state.data?.results?.length) return [];
@@ -172,10 +170,10 @@ const widgetOptionsState = reactive({
 
 
 /* Api */
-const fetchWidgetData = async (params: PrivateWidgetLoadParameters|PublicWidgetLoadParameters): Promise<Data> => {
+const fetchWidgetData = async (params: PrivateWidgetLoadParameters|PublicWidgetLoadParameters): Promise<WidgetData> => {
     const defaultFetcher = state.isPrivateWidget
-        ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
-        : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>;
+        ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, WidgetData>
+        : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, WidgetData>;
     const res = await defaultFetcher(params);
     return res;
 };
@@ -214,7 +212,7 @@ const widgetLoading = computed<boolean>(() => queryResult.isLoading);
 const errorMessage = computed<string>(() => queryResult.error?.value?.message);
 
 /* Util */
-const drawChart = (rawData: Data|null) => {
+const drawChart = (rawData: WidgetData|null) => {
     if (isEmpty(rawData)) return;
 
     const _seriesData: any[] = [];

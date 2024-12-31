@@ -15,7 +15,6 @@ import NewMark from '@/common/components/marks/NewMark.vue';
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { WIDGET_COMPONENT_ICON_MAP } from '@/common/modules/widgets/_constants/widget-components-constant';
 import { CONSOLE_WIDGET_CONFIG } from '@/common/modules/widgets/_constants/widget-config-list-constant';
-import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import {
     getWidgetFieldComponent,
 } from '@/common/modules/widgets/_helpers/widget-component-helper';
@@ -94,13 +93,6 @@ const checkDefaultValidation = () => {
     const selectedChartType = widgetGenerateState.selectedWidgetName;
     const selectedDataTable = widgetGenerateGetters.selectedDataTable ?? {};
     if (!selectedDataTable?.options) return;
-    const removeDateField = (labelsInfo: Record<string, object>) => {
-        const _labelsInfo = cloneDeep(labelsInfo);
-        Object.values(DATE_FIELD).forEach((d) => {
-            delete _labelsInfo[d];
-        });
-        return _labelsInfo;
-    };
     switch (selectedChartType) {
     case 'geoMap': {
         const labelsInfo = cloneDeep(selectedDataTable.labels_info ?? {});
@@ -113,8 +105,7 @@ const checkDefaultValidation = () => {
     default:
         if (state.defaultValidationConfig) {
             const labelsInfo = cloneDeep(selectedDataTable.labels_info ?? {});
-            const labelsInfoWithoutDateField = removeDateField(labelsInfo);
-            const targetCount = Object.keys(labelsInfoWithoutDateField).length;
+            const targetCount = Object.keys(labelsInfo).length;
             state.errorModalCurrentType = 'default';
             if (targetCount < state.defaultValidationConfig?.defaultMaxCount) {
                 state.widgetDefaultValidationModalVisible = true;
