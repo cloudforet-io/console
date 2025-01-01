@@ -228,7 +228,9 @@ onBeforeMount(() => {
             <div class="py-4 pl-8 pr-2 border-gray-150"
                  :class="{ 'border-b': inputType === 'form' }"
             >
-                <div class="float-right flex justify-end gap-1 mb-4">
+                <div v-if="!isDefaultField"
+                     class="float-right flex justify-end gap-1 mb-4"
+                >
                     <template v-for="type in inputTypes">
                         <p-select-button :key="type.name"
                                          size="sm"
@@ -260,6 +262,7 @@ onBeforeMount(() => {
                             <span>
                                 <p-text-input :value="fieldId"
                                               :invalid="isFieldIdInvalid"
+                                              :readonly="isDefaultField"
                                               @update:value="setFieldId"
                                 />
                                 <changed-mark v-if="isFieldIdChanged" />
@@ -280,6 +283,7 @@ onBeforeMount(() => {
                         <p-text-input :value="name"
                                       :placeholder="props.field.name || fieldMetadata.name"
                                       :invalid="isNameInvalid"
+                                      :readonly="isDefaultField"
                                       @update:value="setName"
                         />
                     </p-field-group>
