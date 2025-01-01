@@ -127,23 +127,25 @@ watch(taskFilters, (newValue, oldValue) => {
                                  :block="false"
                                  @update:selected-project-ids="handleUpdateSelectedProjectIds"
         />
-        <user-select-dropdown multi-selectable
-                              :user-ids="selectedCreatedBy"
-                              :selection-label="$t('OPSFLOW.CREATED_BY')"
-                              style-type="rounded"
-                              appearance-type="badge"
-                              selection-type="multiple"
-                              :block="false"
-                              @update:user-ids="handleUpdateCreatedBy"
-        />
-        <user-select-dropdown multi-selectable
-                              :user-ids="selectedAssignee"
-                              :selection-label="$t('OPSFLOW.ASSIGNEE')"
-                              style-type="rounded"
-                              appearance-type="badge"
-                              selection-type="multiple"
-                              :block="false"
-                              @update:user-ids="handleUpdateAssignee"
-        />
+        <div>
+            <user-select-dropdown multi-selectable
+                                  :user-ids="selectedCreatedBy"
+                                  :selection-label="$t('OPSFLOW.CREATED_BY')"
+                                  style-type="rounded"
+                                  appearance-type="badge"
+                                  selection-type="multiple"
+                                  @update:user-ids="handleUpdateCreatedBy"
+            />
+        </div>
+        <div>
+            <user-select-dropdown multi-selectable
+                                  :user-ids="selectedAssignee"
+                                  :selection-label="$t('OPSFLOW.ASSIGNEE')"
+                                  style-type="rounded"
+                                  appearance-type="badge"
+                                  selection-type="multiple"
+                                  @update:user-ids="handleUpdateAssignee"
+            />
+        </div>
     </div>
 </template>
