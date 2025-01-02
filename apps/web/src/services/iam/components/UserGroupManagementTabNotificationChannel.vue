@@ -78,7 +78,6 @@ const tableState = reactive({
     }),
     valueHandlerMap: computed(() => ({
         name: makeDistinctValueHandler('alert_manager.UserGroupChannel', 'name'),
-        schedule: makeDistinctValueHandler('alert_manager.UserGroupChannel', 'schedule.SCHEDULE_TYPE'),
     })),
 });
 
