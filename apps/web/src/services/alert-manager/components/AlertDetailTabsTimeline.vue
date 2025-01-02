@@ -6,7 +6,7 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButton, PButtonModal, PCodeEditor, PToolbox, PHeading, PHeadingLayout, PDataLoader,
+    PButton, PButtonModal, PCodeEditor, PToolbox, PHeading, PHeadingLayout, PDataLoader, PDivider, PSelectStatus,
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -14,6 +14,7 @@ import type { AlertHistoryParameters } from '@/schema/alert-manager/alert/api-ve
 import { ALERT_EVENT_ACTION } from '@/schema/alert-manager/alert/constants';
 import type { AlertModel, AlertEventModel } from '@/schema/alert-manager/alert/model';
 import type { AlertEventActionType } from '@/schema/alert-manager/alert/type';
+import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
@@ -24,6 +25,7 @@ import VerticalTimelineItem from '@/common/components/vertical-timeline/Vertical
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useAlertDetailPageStore } from '@/services/alert-manager/stores/alert-detail-page-store';
+import type { AlertFilterType } from '@/services/alert-manager/types/alert-manager-type';
 
 type HistoryItemInfo = {
     title: string;
@@ -44,13 +46,30 @@ const storeState = reactive({
 const state = reactive({
     loading: true,
     historyList: [] as AlertEventModel[],
-    slicedHistoryList: computed<AlertEventModel[]>(() => state.historyList.slice(0, state.pageStart * state.pageLimit)),
+    slicedHistoryList: computed<AlertEventModel[]>(() => {
+        let _list = state.historyList;
+        if (filterState.selectedAction !== 'ALL') {
+            _list = state.historyList.filter((item) => item.action === filterState.selectedAction);
+        }
+        return _list.slice(0, state.pageStart * state.pageLimit);
+    }),
     pageStart: 1,
     pageLimit: 10,
     searchText: '',
     selectedItem: {} as any,
     modalVisible: false,
     isAlertVisible: false,
+});
+const filterState = reactive({
+    statusFields: computed<AlertFilterType[]>(() => ([
+        { label: i18n.t('ALERT_MANAGER.ALERTS.ALL'), name: 'ALL' },
+        { label: i18n.t('ALERT_MANAGER.ALERTS.TRIGGERED'), name: ALERT_EVENT_ACTION.TRIGGERED },
+        { label: i18n.t('ALERT_MANAGER.ALERTS.ACKNOWLEDGED'), name: ALERT_EVENT_ACTION.ACKNOWLEDGED },
+        { label: i18n.t('ALERT_MANAGER.ALERTS.RESOLVED'), name: ALERT_EVENT_ACTION.RESOLVED },
+        { label: i18n.t('ALERT_MANAGER.ALERTS.NOTIFIED'), name: ALERT_EVENT_ACTION.NOTIFIED },
+        { label: i18n.t('ALERT_MANAGER.ALERTS.EVENT_PUSHED'), name: ALERT_EVENT_ACTION.EVENT_PUSHED },
+    ])),
+    selectedAction: 'ALL',
 });
 
 const getCreatedByNames = (createdBy: string): string => {
@@ -70,6 +89,10 @@ const getItemInfo = (item: AlertEventActionType): HistoryItemInfo => {
         title: item.toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase()),
         styleType,
     };
+};
+const handleSelectAction = (value: string) => {
+    filterState.selectedAction = value;
+    state.pageStart = 1;
 };
 const handleChangeToolbox = async (options: any = {}) => {
     if (options.searchText) {
@@ -115,42 +138,59 @@ watch(() => storeState.alertInfo, async (alertInfo) => {
                 />
             </template>
         </p-heading-layout>
+        <p-toolbox search-type="plain"
+                   filters-visible
+                   :total-count="state.historyList.length"
+                   :page-size-changeable="false"
+                   :pagination-visible="false"
+                   @change="handleChangeToolbox"
+                   @refresh="handleChangeToolbox"
+        />
+        <div class="action-filter-wrapper">
+            <span class="font-bold">{{ $t('ALERT_MANAGER.ALERTS.TYPE') }}</span>
+            <p-divider class="divider"
+                       vertical
+            />
+            <p-select-status v-for="(item, idx) in filterState.statusFields"
+                             :key="idx"
+                             :selected="filterState.selectedAction"
+                             :value="item.name"
+                             class="text-gray-600"
+                             @change="handleSelectAction"
+            >
+                {{ item.label }}
+            </p-select-status>
+        </div>
         <p-data-loader :loading="state.loading"
                        :data="state.slicedHistoryList"
         >
-            <p-toolbox search-type="plain"
-                       filters-visible
-                       :total-count="state.historyList.length"
-                       :page-size-changeable="false"
-                       :pagination-visible="false"
-                       class="mb-3"
-                       @change="handleChangeToolbox"
-                       @refresh="handleChangeToolbox"
-            />
             <template v-if="state.slicedHistoryList.length > 0">
-                <vertical-timeline-item v-for="(item, idx) in state.slicedHistoryList"
-                                        :key="`history-item-${idx}`"
-                                        :title="getItemInfo(item.action).title"
-                                        :description="item.description"
-                                        :datetime="item.created_at"
-                                        :timezone="storeState.timezone"
-                                        :style-type="getItemInfo(item.action)?.styleType"
-                                        :is-last-item="idx === state.slicedHistoryList?.length - 1"
-                                        class="timeline"
-                >
-                    <template #top-right>
-                        <span class="ml-auto text-label-sm text-gray-600">
-                            {{ $t('ALERT_MANAGER.ALERTS.CREATED_BY', { user: getCreatedByNames(item.created_by) }) }}
-                        </span>
-                    </template>
-                </vertical-timeline-item>
+                <p-divider />
+                <div class="mt-4">
+                    <vertical-timeline-item v-for="(item, idx) in state.slicedHistoryList"
+                                            :key="`history-item-${idx}`"
+                                            :title="getItemInfo(item.action).title"
+                                            :description="item.description"
+                                            :datetime="item.created_at"
+                                            :timezone="storeState.timezone"
+                                            :style-type="getItemInfo(item.action)?.styleType"
+                                            :is-last-item="idx === state.slicedHistoryList?.length - 1"
+                    >
+                        <template #top-right>
+                            <span class="ml-auto text-label-sm text-gray-600">
+                                {{ $t('ALERT_MANAGER.ALERTS.CREATED_BY', { user: getCreatedByNames(item.created_by) }) }}
+                            </span>
+                        </template>
+                    </vertical-timeline-item>
+                </div>
             </template>
             <template #no-data>
                 <span class="pt-12">{{ $t('ALERT_MANAGER.ALERTS.NO_EVENT') }}</span>
             </template>
         </p-data-loader>
         <div class="flex justify-center mt-6">
-            <p-button v-if="state.historyList.length !== 0
+            <p-button v-if="state.slicedHistoryList.length > 0
+                          && state.historyList.length > 10
                           && state.historyList.length > state.slicedHistoryList.length"
                       icon-right="ic_chevron-down"
                       size="sm"
@@ -196,6 +236,16 @@ watch(() => storeState.alertInfo, async (alertInfo) => {
     }
     .code-block {
         min-height: 100%;
+    }
+    .action-filter-wrapper {
+        @apply flex items-center flex-wrap text-label-sm;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+        .divider {
+            height: 1rem;
+            padding-top: 0.25rem;
+            padding-bottom: 0.25rem;
+        }
     }
 }
 </style>
