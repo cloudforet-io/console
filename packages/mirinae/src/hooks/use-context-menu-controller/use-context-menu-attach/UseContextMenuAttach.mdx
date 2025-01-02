@@ -1,0 +1,44 @@
+{/* useContextMenuAttach.mdx */}
+
+import {Canvas, Meta, Controls} from '@storybook/blocks';
+
+import * as useContextMenuAttachStories from './use-context-menu-attach.stories';
+
+<Meta of={useContextMenuAttachStories}/>
+
+
+# useContextMenuAttach
+
+Handles attaching context menus to DOM elements dynamically based on interactions.
+
+## Type Declarations
+
+```typescript
+interface UseContextMenuAttachOptions<Item extends MenuItem = MenuItem> {
+    attachHandler?: Ref<MenuAttachHandler<Item>|undefined>; // custom handler
+    menu?: Ref<Item[]>;
+    searchText?: Ref<string>;
+    pageSize?: Ref<number|undefined>|number;
+    filterItems?: Ref<Item[]>;
+}
+
+interface UseContextMenuAttachReturns<Item> {
+    attachedMenu: Ref<Item[]>;
+    attachLoading: Ref<boolean>;
+    resetMenuAndPagination: () => void;
+    attachMenuItems: (resultIndex?: number) => Promise<void>;
+}
+```
+
+## Usage
+<br/>
+
+### Basic
+<Canvas of={useContextMenuAttachStories.Basic}/>
+
+### Playground
+<Canvas of={useContextMenuAttachStories.Playground}/>
+<Controls of={useContextMenuAttachStories.Playground}/>
+
+<br/>
+<br/>

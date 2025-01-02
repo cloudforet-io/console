@@ -16,7 +16,7 @@ export interface MenuAttachHandler<Item extends MenuItem = MenuItem> {
         MenuAttachHandlerRes<Item>|MenuAttachHandlerRes<Item>[];
 }
 
-interface UseContextMenuAttachOptions<Item extends MenuItem = MenuItem> {
+export interface UseContextMenuAttachOptions<Item extends MenuItem = MenuItem> {
     attachHandler?: Ref<MenuAttachHandler<Item>|undefined>; // custom handler
     menu?: Ref<Item[]>;
     searchText?: Ref<string>;
@@ -24,9 +24,16 @@ interface UseContextMenuAttachOptions<Item extends MenuItem = MenuItem> {
     filterItems?: Ref<Item[]>;
 }
 
+interface UseContextMenuAttachReturns<Item> {
+    attachedMenu: Ref<Item[]>;
+    attachLoading: Ref<boolean>;
+    resetMenuAndPagination: () => void;
+    attachMenuItems: (resultIndex?: number) => Promise<void>;
+}
+
 export const useContextMenuAttach = <Item extends MenuItem = MenuItem>({
     attachHandler: _attachHandler, menu, searchText, pageSize: _pageSize, filterItems,
-}: UseContextMenuAttachOptions<Item>) => {
+}: UseContextMenuAttachOptions<Item>): UseContextMenuAttachReturns<Item> => {
     const defaultAttachHandler: MenuAttachHandler<Item> = (inputText, _pageStart, _pageLimit) => {
         const allItems = menu?.value ?? [];
         if (_pageStart === undefined || _pageLimit === undefined) { // do not need to slice items
