@@ -66,5 +66,5 @@ export const WIDGET_COMPONENT_ICON_MAP: Record<WidgetConfigKey, string> = {
     gauge: 'ic_chart-gauge',
     colorCodedHeatmap: 'ic_chart-color-heatmap',
     colorCodedTableHeatmap: 'ic_chart-heatmap-table',
-    sankeyChart: 'ic_chart-sankey',
+    sankeyChart: 'ic_chart-sankey-chart',
 };
