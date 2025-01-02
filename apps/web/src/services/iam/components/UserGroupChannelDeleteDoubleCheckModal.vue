@@ -6,6 +6,9 @@ import { PButtonModal } from '@cloudforet/mirinae';
 
 import type { UserGroupChannelDeleteParameters } from '@/schema/alert-manager/user-group-channel/api-verbs/delete';
 import type { UserGroupChannelModel } from '@/schema/alert-manager/user-group-channel/model';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -31,6 +34,8 @@ const handleConfirm = async () => {
                 channel_id: userGroupPageGetters.selectedUserGroups[0].notification_channel[userGroupPageState.userGroupChannels.selectedIndices[0]].channel_id,
             });
             emit('confirm');
+            showSuccessMessage('', i18n.t('IAM.USER_GROUP.MODAL.DELETE.SHOW_SUCCESS_MESSAGE'));
+            userGroupPageState.userGroupChannels.selectedIndices = [];
         }
     } finally {
         state.loading = false;

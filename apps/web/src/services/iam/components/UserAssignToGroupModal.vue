@@ -9,6 +9,9 @@ import { PButtonModal } from '@cloudforet/mirinae';
 
 import type { UserGroupAddUsersParameters } from '@/schema/identity/user-group/api-verbs/add-users';
 import type { UserGroupModel } from '@/schema/identity/user-group/model';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { SelectedUserDropdownIdsType } from '@/common/modules/user/typte';
@@ -22,7 +25,7 @@ const userPageGetters = userPageStore.getters;
 
 const emit = defineEmits<{(e: 'confirm'): void; }>();
 
-const selectedUserGroupIds = ref<SelectedUserDropdownIdsType>([]);
+const selectedUserGroupIds = ref<SelectedUserDropdownIdsType[]>([]);
 
 const state = reactive({
     loading: false,
@@ -41,6 +44,7 @@ const handleConfirm = async () => {
         });
         await Promise.all(promises);
         emit('confirm');
+        showSuccessMessage('', i18n.t('IAM.USER.ASSIGN_TO_USER_GROUP.SUCCESS_MESSAGE'));
     } finally {
         state.loading = false;
         handleClose();
@@ -89,7 +93,7 @@ watch([() => userPageGetters.selectedUsers, () => userPageState.users], ([nv_sel
         <template #body>
             <div class="flex flex-col gap-1">
                 <span class="mb-2 text-gray-900 font-bold">
-                    {{ $t('IAM.USER.ASSIGN_TO_USER_GROUP') }}
+                    {{ $t('IAM.USER.ASSIGN_TO_USER_GROUP.TITLE') }}
                 </span>
                 <user-select-dropdown class="mb-48"
                                       :show-user-list="false"

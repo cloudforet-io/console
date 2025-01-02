@@ -7,6 +7,8 @@ import { PButtonModal } from '@cloudforet/mirinae';
 import type { UserGroupAddUsersParameters } from '@/schema/identity/user-group/api-verbs/add-users';
 import type { UserGroupModel } from '@/schema/identity/user-group/model';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { SelectedUserDropdownIdsType } from '@/common/modules/user/typte';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
@@ -46,6 +48,7 @@ const handleConfirm = async () => {
             users: selectedUserIds.value.map((user) => user.value),
         });
         emit('confirm');
+        showSuccessMessage('');
     } finally {
         state.loading = false;
         handleClose();
