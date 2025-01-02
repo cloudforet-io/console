@@ -2811,7 +2811,10 @@
 		},
 		"USER": {
 			"ADD": "Add",
-			"ASSIGN_TO_USER_GROUP": "Assign to User Group",
+			"ASSIGN_TO_USER_GROUP": {
+				"SUCCESS_MESSAGE": "User Group Assigned successfully in selected users",
+				"TITLE": "Assign to User Group"
+			},
 			"FORM": {
 				"ADD_TAG": "Add Tag",
 				"ADD_WORKSPACE": "New users will have access to",
@@ -3034,6 +3037,7 @@
 				"ADD_NEW_USER": {
 					"CANCEL": "Cancel",
 					"CONFIRM": "Confirm",
+					"SUCCESS_MESSAGE": "Users successfully added in this user group",
 					"TITLE": "Add Users to Selected User Group",
 					"USER": "User"
 				},
@@ -3071,8 +3075,10 @@
 						"SMS": "SMS",
 						"TELEGRAM": "Telegram"
 					},
+					"SUCCESS_MESSAGE": "User Group Channel successfully Created",
 					"TITLE": "Create Notification",
 					"UPDATE": "Update",
+					"UPDATE_SUCCESS_MESSAGE": "User Group Channel successfully Updated",
 					"UPDATE_TITLE": "Update Notification"
 				},
 				"CREATE_USER_GROUP": {
@@ -3082,17 +3088,20 @@
 					"GROUP_NAME": "Group Name",
 					"NOTIFICATION_CHANNEL": "Notification Channel",
 					"PROTOCOL": "Protocol",
+					"SUCCESS_MESSAGE": "User Group successfully Created",
 					"TITLE": "Create User Group",
 					"TOKEN": "Token",
 					"UPDATE": "Update",
+					"UPDATE_SUCCESS_MESSAGE": "User Group successfully Updated",
 					"UPDATE_TITLE": "Update User Group"
 				},
 				"DELETE": {
-					"SHOW_SUCCESS_MESSAGE": "UserGroup successfully Delete",
+					"SHOW_SUCCESS_MESSAGE": "User Group successfully Deleted",
 					"TITLE": "Are you sure you want to Delete User Group?"
 				},
 				"DELETE_CHANNEL": {
 					"DELETE": "Delete",
+					"SUCCESS_MESSAGE": "User Group Channel successfully Deleted",
 					"TITLE": "Are you sure you want to Delete Notification Channel from the selected user group?"
 				},
 				"REMOVE_USER": {
