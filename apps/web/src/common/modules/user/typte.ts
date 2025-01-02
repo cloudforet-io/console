@@ -1,4 +1,4 @@
-export type SelectedUserDropdownIdsType = {
+export type SelectedIdsType = {
     value: string;
     type: 'USER'|'USER_GROUP';
 };

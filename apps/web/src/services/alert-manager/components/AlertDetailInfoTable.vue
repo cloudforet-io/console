@@ -46,9 +46,9 @@ const tableState = reactive({
         { name: 'triggered_by', label: i18n.t('ALERT_MANAGER.ALERTS.TRIGGERED_BY'), copyValueFormatter: () => storeState.alertInfo.triggered_by },
         { name: 'service_id', label: i18n.t('ALERT_MANAGER.ALERTS.SERVICE'), disableCopy: true },
         { name: 'resources', label: i18n.t('ALERT_MANAGER.ALERTS.RESOURCE'), disableCopy: true },
-        { name: 'created_at', label: i18n.t('ALERT_MANAGER.ALERTS.CREATED'), disableCopy: true },
-        { name: 'acknowledged_at', label: i18n.t('ALERT_MANAGER.ALERTS.ACKNOWLEDGED'), disableCopy: true },
-        { name: 'resolved_at', label: i18n.t('ALERT_MANAGER.ALERTS.RESOLVED'), disableCopy: true },
+        { name: 'created_at', label: i18n.t('ALERT_MANAGER.ALERTS.CREATED_AT'), disableCopy: true },
+        { name: 'acknowledged_at', label: i18n.t('ALERT_MANAGER.ALERTS.ACKNOWLEDGED_AT'), disableCopy: true },
+        { name: 'resolved_at', label: i18n.t('ALERT_MANAGER.ALERTS.RESOLVED_AT'), disableCopy: true },
     ]),
 });
 
@@ -143,8 +143,8 @@ const getAssetInfo = (assetId: string) => {
                 {{ value || '--' }}
             </template>
             <template #data-service_id="{ value }">
-                <p-link v-if="storeState.serviceMap[value].label "
-                        :text="storeState.serviceMap[value].label"
+                <p-link v-if="storeState.serviceMap[value]?.label "
+                        :text="storeState.serviceMap[value]?.label"
                         :to="{
                             name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME,
                             params: {

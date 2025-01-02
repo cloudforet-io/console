@@ -28,6 +28,8 @@ export interface AlertModel {
     updated_at: string;
     acknowledged_at: string;
     resolved_at: string;
+    acknowledged_by: string,
+    resolved_by: string,
 }
 
 export interface AlertEventModel {
