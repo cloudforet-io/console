@@ -9,6 +9,6 @@ export interface TaskFieldFormProps<TField extends TaskField, TValue> {
 }
 export interface TaskFieldFormEmits<TValue> {
   (event: 'update:value', value: TValue): void;
-  (event: 'update:files', value: FileModel[]): void;
+  (event: 'update:file-ids', value: string[]): void;
   (event: 'update:is-valid', value: boolean): void;
 }

@@ -41,9 +41,9 @@ onUnmounted(() => {
                    :field="field"
                    :value="taskContentFormState.defaultData[field.field_id]"
                    :readonly="taskContentFormState.mode === 'view' ? !(taskContentFormGetters.isEditable && isEditableFieldInViewMode(field.field_id)) : false"
-                   :files="taskContentFormState.files"
+                   :files="taskContentFormState.originTask?.files"
                    @update:value="taskContentFormStore.setDefaultFieldData(field.field_id, $event)"
-                   @update:files="taskContentFormStore.setFiles"
+                   @update:file-ids="taskContentFormStore.setFileIds"
                    @update:is-valid="taskContentFormStore.setDefaultFieldValidation(field.field_id, $event)"
         />
         <!-- Dynamic Fields -->
@@ -53,9 +53,9 @@ onUnmounted(() => {
                    :field="field"
                    :value="taskContentFormState.data[field.field_id]"
                    :readonly="taskContentFormState.mode === 'view'"
-                   :files="taskContentFormState.files"
+                   :files="taskContentFormState.originTask?.files"
                    @update:value="taskContentFormStore.setFieldData(field.field_id, $event)"
-                   @update:files="taskContentFormStore.setFiles"
+                   @update:file-ids="taskContentFormStore.setFileIds"
                    @update:is-valid="taskContentFormStore.setFieldValidation(field.field_id, $event)"
         />
     </div>

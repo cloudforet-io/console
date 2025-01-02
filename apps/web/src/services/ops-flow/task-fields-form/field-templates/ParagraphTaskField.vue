@@ -7,10 +7,8 @@ import {
     PFieldGroup,
 } from '@cloudforet/mirinae';
 
-import type { FileModel } from '@/schema/file-manager/model';
 import type { ParagraphTaskField } from '@/schema/opsflow/_types/task-field-type';
 
-import type { Attachment } from '@/common/components/editor/extensions/image/type';
 import TextEditor from '@/common/components/editor/TextEditor.vue';
 import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 import { useFileAttachments } from '@/common/composables/file-attachments';
@@ -36,12 +34,10 @@ const {
 
 const { fileUploader } = useFileUploader();
 const { attachments } = useFileAttachments(toRef(props, 'files'));
-const handleUpdateAttachments = (newAttachments: Attachment<FileModel>[]) => {
+const handleUpdateAttachmentIds = (attachmentIds: string[]) => {
     const originFileIds = props.files.map((f) => f.file_id);
-    const newFileIds = newAttachments.map((a) => a.fileId);
-    if (isEqual(originFileIds, newFileIds)) return;
-    const files = newAttachments.map((a) => a.data as FileModel);
-    emit('update:files', files);
+    if (isEqual(originFileIds, attachmentIds)) return;
+    emit('update:file-ids', attachmentIds);
 };
 </script>
 
@@ -68,7 +64,7 @@ const handleUpdateAttachments = (newAttachments: Attachment<FileModel>[]) => {
                      :invalid="isInvalid"
                      content-type="markdown"
                      @update:value="updateFieldValue"
-                     @update:attachments="handleUpdateAttachments"
+                     @update:attachment-ids="handleUpdateAttachmentIds"
         />
     </p-field-group>
 </template>

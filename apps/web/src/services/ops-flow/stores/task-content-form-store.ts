@@ -5,7 +5,6 @@ import { defineStore } from 'pinia';
 
 import { APIError } from '@cloudforet/core-lib/space-connector/error';
 
-import type { FileModel } from '@/schema/file-manager/model';
 import type { TaskField } from '@/schema/opsflow/_types/task-field-type';
 import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
 import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
@@ -45,7 +44,7 @@ interface UseTaskContentFormStoreState {
     // task type field form
     data: Record<string, any>;
     dataValidationMap: Record<string, boolean>;
-    files: FileModel[];
+    fileIds: string[]; // for file upload
     // overall
     mode: 'create'|'view';
     hasUnsavedChanges: boolean;
@@ -82,7 +81,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         // task type field form
         data: {},
         dataValidationMap: {},
-        files: [],
+        fileIds: [],
         // overall
         mode: 'create',
         hasUnsavedChanges: false,
@@ -155,9 +154,10 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
             } else {
                 state.currentTaskType = undefined;
             }
-            state.data = {};
-            state.dataValidationMap = {};
-            state.files = [];
+            if (!state.originTask) {
+                state.data = {};
+                state.dataValidationMap = {};
+            }
         },
         setStatusId(statusId?: string) {
             state.statusId = statusId;
@@ -186,9 +186,9 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         setFieldValidation(fieldId: string, isValid: boolean) {
             state.dataValidationMap = { ...state.dataValidationMap, [fieldId]: isValid };
         },
-        setFiles(files: FileModel[]) {
-            state.hasUnsavedChanges = !isEqual(state.files, files);
-            state.files = files;
+        setFileIds(fileIds: string[]) {
+            state.hasUnsavedChanges = !isEqual(state.fileIds, fileIds);
+            state.fileIds = fileIds;
         },
         // overall
         setCurrentTask(task: TaskModel) {
@@ -203,6 +203,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
                 [DEFAULT_FIELD_ID_MAP.project]: task.project_id ? [task.project_id] : undefined,
             };
             state.data = task.data ?? {};
+            state.fileIds = task.files?.map((f) => f.file_id) ?? [];
             state.defaultDataValidationMap = {};
             state.dataValidationMap = {};
         },
@@ -211,7 +212,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
             state.defaultDataValidationMap = {};
             state.data = {};
             state.dataValidationMap = {};
-            state.files = [];
+            state.fileIds = [];
         },
         setMode(mode: 'create'|'view') {
             state.mode = mode;
@@ -227,7 +228,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
                     description: state.defaultData[DEFAULT_FIELD_ID_MAP.description] || undefined,
                     assignee: state.assignee || undefined,
                     data: isEmpty(state.data) ? undefined : state.data,
-                    files: state.files.map((f) => f.file_id),
+                    files: state.fileIds,
                     project_id: state.defaultData[DEFAULT_FIELD_ID_MAP.project]?.[0],
                     resource_group: state.currentTaskType.scope,
                 });
@@ -243,11 +244,12 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         async updateTask() {
             try {
                 if (!state.originTask) throw new Error('Origin task is not defined');
-                await taskAPI.update({
+                state.originTask = await taskAPI.update({
                     task_id: state.originTask.task_id,
                     name: state.defaultData[DEFAULT_FIELD_ID_MAP.title],
                 });
                 showSuccessMessage(i18n.t('OPSFLOW.ALT_S_UPDATE_TARGET', { target: taskManagementTemplateStore.templates.task }), '');
+                state.hasUnsavedChanges = false;
                 return true;
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ALT_E_UPDATE_TARGET', { target: taskManagementTemplateStore.templates.task }));
