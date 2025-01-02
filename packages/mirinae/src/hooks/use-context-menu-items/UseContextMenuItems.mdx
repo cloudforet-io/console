@@ -1,0 +1,48 @@
+{/* useContextMenuItems.mdx */}
+
+import {Canvas, Meta, Controls} from '@storybook/blocks';
+
+import * as useContextMenuItemsStories from './use-context-menu-items.stories';
+
+<Meta of={useContextMenuItemsStories}/>
+
+
+# useContextMenuItems
+
+Manages context menu items, providing reactive state and helpers for menu interaction.
+
+## Type Declarations
+
+```typescript
+interface UseContextMenuItemsOptions<Item extends MenuItem = MenuItem> extends
+    Omit<UseContextMenuAttachOptions<Item>, 'attachHandler'> {
+    useReorderBySelection?: boolean; // Whether to automatically reorder on initiateMenu().
+    selected?: Ref<Item[]>|ComputedRef<Item[]>|Item[]; // Items to be displayed at the top of the menu for emphasize or quick access of selected items.
+    useMenuFiltering?: boolean; // Whether to automatically filtering menu by searchText. works only with menu, not with handler.
+    hideHeaderWithoutItems?: Ref<boolean|undefined>|boolean;
+    handler?: UseContextMenuAttachOptions<Item>['attachHandler']; // See UseContextMenuAttachOptions.
+}
+
+interface UseContextMenuItemsReturns<Item extends MenuItem = MenuItem> {
+    refinedMenu: ComputedRef<Item[]>;
+    loading: Ref<boolean>;
+    initiateMenu: () => Promise<void>; // reset pagination, capture current items, and reattach menu items.
+    reloadMenu: () => Promise<void>; // reset pagination and reattach menu items.
+    showMoreMenu: () => Promise<void>; // attach more menu items.
+}
+```
+## Usage
+<br/>
+
+## Basic
+<Canvas of={useContextMenuItemsStories.Basic}/>
+
+## Reorder by Selection
+<Canvas of={useContextMenuItemsStories.ReorderBySelection}/>
+
+## Playground
+<Canvas of={useContextMenuItemsStories.Playground}/>
+<Controls of={useContextMenuItemsStories.Playground}/>
+
+<br/>
+<br/>

@@ -2,6 +2,7 @@ import type { Ref, UnwrapRef } from 'vue';
 import { computed, isRef, ref } from 'vue';
 
 import type { MenuItem } from '@/controls/context-menu/type';
+import { getTextHighlightRegex } from '@/utils';
 
 export interface MenuAttachHandlerRes<Item extends MenuItem = MenuItem> {
     results: Item[];
@@ -16,29 +17,43 @@ export interface MenuAttachHandler<Item extends MenuItem = MenuItem> {
         MenuAttachHandlerRes<Item>|MenuAttachHandlerRes<Item>[];
 }
 
-interface UseContextMenuAttachOptions<Item extends MenuItem = MenuItem> {
+export interface UseContextMenuAttachOptions<Item extends MenuItem = MenuItem> {
     attachHandler?: Ref<MenuAttachHandler<Item>|undefined>; // custom handler
-    menu?: Ref<Item[]>;
-    searchText?: Ref<string>;
-    pageSize?: Ref<number|undefined>|number;
-    filterItems?: Ref<Item[]>;
+    menu?: Ref<Item[]|undefined>; // required when to use default attach handler. one of menu or attachHandler is required.
+    searchText?: Ref<string>; // it will be passed to the attach handler as the argument, so the handler can filter the items based on this text.
+    pageSize?: Ref<number|undefined>|number; // required when to use show more button to attach items
+    filterItems?: Ref<Item[]>; // items to be filtered out from the attached menu
+}
+
+interface UseContextMenuAttachReturns<Item> {
+    attachedMenu: Ref<Item[]>; // the attached menu items.
+    attachLoading: Ref<boolean>;
+    resetMenuAndPagination: () => void;
+    attachMenuItems: (resultIndex?: number) => Promise<void>;
 }
 
 export const useContextMenuAttach = <Item extends MenuItem = MenuItem>({
     attachHandler: _attachHandler, menu, searchText, pageSize: _pageSize, filterItems,
-}: UseContextMenuAttachOptions<Item>) => {
+}: UseContextMenuAttachOptions<Item>): UseContextMenuAttachReturns<Item> => {
     const defaultAttachHandler: MenuAttachHandler<Item> = (inputText, _pageStart, _pageLimit) => {
         const allItems = menu?.value ?? [];
+        const filtered = allItems.filter((item) => getTextHighlightRegex(inputText).test(item.label as string|undefined ?? item.name ?? ''));
         if (_pageStart === undefined || _pageLimit === undefined) { // do not need to slice items
             return {
                 results: allItems,
                 more: false,
             };
         }
+        const _totalCount = _pageStart - 1 + Number(_pageLimit);
+        const _slicedResults = filtered.slice(_pageStart - 1, _totalCount);
         return {
-            results: allItems.slice(_pageStart - 1, _pageStart * _pageLimit),
-            more: _pageStart * _pageLimit < allItems.length + 1,
+            results: _slicedResults,
+            more: _totalCount < filtered.length,
         };
+        // return {
+        //     results: allItems.slice(_pageStart - 1, _pageStart * _pageLimit),
+        //     more: _pageStart * _pageLimit < allItems.length + 1,
+        // };
     };
     const attachHandler = computed<MenuAttachHandler<Item>>(() => {
         if (!_attachHandler?.value) return defaultAttachHandler;
