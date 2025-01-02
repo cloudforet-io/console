@@ -199,7 +199,7 @@ watch([() => state.chartData, () => chartContext.value, () => state.mapLoaded], 
         state.chart.setOption(state.chartOptions, true);
     }
 });
-watch(() => state.data, async (newData) => {
+watch([() => state.data, () => props.widgetOptions], async ([newData]) => {
     await loadMap();
     await drawChart(newData);
 });

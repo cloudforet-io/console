@@ -280,10 +280,9 @@ watch([() => state.chartData, () => chartContext.value], ([, chartCtx]) => {
         state.chart.setOption(state.chartOptions, true);
     }
 });
-watch(() => state.data, (newData) => {
+watch([() => state.data, () => props.widgetOptions], ([newData]) => {
     drawChart(newData);
 });
-
 useResizeObserver(chartContext, throttle(() => {
     state.chart?.resize();
 }, 500));
