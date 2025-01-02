@@ -77,7 +77,7 @@ const {
 const convertToSnakeCase = (str): string => {
     const cleanedInput = str.replace(/[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/g, '');
     return cleanedInput
-        .toLowerCase()
+        .toUpperCase()
         .split(' ')
         .filter((word) => word.trim() !== '')
         .join('_');
