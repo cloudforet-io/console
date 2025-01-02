@@ -1,4 +1,4 @@
-import type { InternalAxiosRequestConfig, CreateAxiosDefaults } from 'axios';
+import type { InternalAxiosRequestConfig, CreateAxiosDefaults, Axios } from 'axios';
 import axios from 'axios';
 import type { CustomAxiosRequestConfig } from 'axios-auth-refresh/dist/utils';
 import { camelCase } from 'lodash';
@@ -31,6 +31,12 @@ interface ApiHandler {
     <Params = any, Response = any>(params?: Params, config?: CustomAxiosRequestConfig): Promise<Response>;
     [key: string]: ApiHandler;
 }
+interface RestApiHandler {
+    post: Axios['post'];
+    get: Axios['get'];
+    put: Axios['put'];
+    delete: Axios['delete'];
+}
 const DEFAULT_MOCK_CONFIG: MockRequestConfig = Object.freeze({ mockMode: false });
 export class SpaceConnector {
     private static instance: SpaceConnector;
@@ -46,6 +52,8 @@ export class SpaceConnector {
     private _client: any = {};
 
     private _clientV2: any = {};
+
+    private _restClient: RestApiHandler;
 
     private static mockConfig: MockConfig;
 
@@ -69,9 +77,15 @@ export class SpaceConnector {
         SpaceConnector.isDevMode = devConfig?.enabled ?? false;
         this.tokenApi = tokenApi;
         this.serviceApi = new ServiceAPI(endpoints[0], this.tokenApi, apiSettings[0]);
-        this.serviceApiV2 = new ServiceAPI(endpoints[1], this.tokenApi, apiSettings[1]);
+        const serviceApiV2 = new ServiceAPI(endpoints[1], this.tokenApi, apiSettings[1]);
+        this.serviceApiV2 = serviceApiV2;
         this.afterCallApiMap = afterCallApiMap;
-        this.setApiTokenCheckInterval();
+        this._restClient = {
+            post: this.serviceApi.instance.post,
+            get: this.serviceApi.instance.get,
+            put: this.serviceApi.instance.put,
+            delete: this.serviceApi.instance.delete,
+        };
     }
 
     private setApiTokenCheckInterval() {
@@ -110,6 +124,13 @@ export class SpaceConnector {
             return SpaceConnector.instance._clientV2;
         }
         throw new Error('Not initialized client V2!');
+    }
+
+    static get restClient(): RestApiHandler {
+        if (SpaceConnector.instance) {
+            return SpaceConnector.instance._restClient;
+        }
+        throw new Error('Not initialized restClient!');
     }
 
     static setToken(accessToken: string, refreshToken?: string): void {
