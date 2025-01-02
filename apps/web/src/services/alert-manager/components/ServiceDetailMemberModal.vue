@@ -266,6 +266,7 @@ const fetcherChangeMembers = async (userData: string[], userGroupData: string[])
                                           use-fixed-menu-style
                                           excluded-hidden-ids
                                           :excluded-selected-ids="state.excludedSelectedIds"
+                                          :placeholder="$t('ALERT_MANAGER.SERVICE.MODAL_MEMBER_PLACEHOLDER')"
                                           @formatted-selected-ids="handleFormattedSelectedIds"
                     />
                 </div>
