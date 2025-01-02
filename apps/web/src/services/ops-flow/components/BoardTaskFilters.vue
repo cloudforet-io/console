@@ -119,6 +119,7 @@ watch(taskFilters, (newValue, oldValue) => {
         </p-select-dropdown>
         <project-select-dropdown multi-selectable
                                  project-selectable
+                                 :project-group-selectable="false"
                                  :selected-project-ids="selectedProjectIds"
                                  :selection-label="$t('OPSFLOW.PROJECT')"
                                  style-type="rounded"

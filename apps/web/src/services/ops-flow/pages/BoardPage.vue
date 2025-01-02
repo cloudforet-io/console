@@ -57,7 +57,7 @@ watch(() => route.query.categoryId, (categoryId) => {
                 </router-link>
             </template>
         </p-heading-layout>
-        <board-task-table />
+        <board-task-table :category-id="boardPageStore.state.currentCategoryId" />
     </div>
 </template>
 

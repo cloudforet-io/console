@@ -28,7 +28,6 @@ import BoardTaskDescriptionField from '@/services/ops-flow/components/BoardTaskD
 import BoardTaskFilters from '@/services/ops-flow/components/BoardTaskFilters.vue';
 import BoardTaskNameField from '@/services/ops-flow/components/BoardTaskNameField.vue';
 import { useTaskAPI } from '@/services/ops-flow/composables/use-task-api';
-import { useBoardPageStore } from '@/services/ops-flow/stores/board-page-store';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 import {
@@ -36,8 +35,11 @@ import {
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 import type { TaskFilters } from '@/services/ops-flow/types/task-filters-type';
 
-const boardPageStore = useBoardPageStore();
-const boardPageState = boardPageStore.state;
+const props = defineProps<{
+    categoryId?: string;
+    relatedAssets?: string[];
+    tag?: string;
+}>();
 const taskTypeStore = useTaskTypeStore();
 const taskCategoryStore = useTaskCategoryStore();
 const userReferenceStore = useUserReferenceStore();
@@ -96,7 +98,8 @@ const getQuery = (filters?: ConsoleFilter[]) => {
         .setMultiSortV2([toRaw(sort)])
         .setPage(pagination.page, pagination.size);
     if (search.value) queryHelper.addFilter({ v: search.value });
-    if (boardPageState.currentCategoryId) queryHelper.addFilter({ k: 'category_id', v: boardPageState.currentCategoryId, o: '=' });
+    if (props.categoryId) queryHelper.addFilter({ k: 'category_id', v: props.categoryId, o: '=' });
+    if (props.relatedAssets) queryHelper.addFilter({ k: 'related_assets', v: props.relatedAssets, o: '=' });
 
     return queryHelper.dataV2;
 };
@@ -152,7 +155,7 @@ const listCategoriesAndTaskTypes = async () => {
 };
 
 listCategoriesAndTaskTypes();
-watch(() => boardPageState.currentCategoryId, () => {
+watch(() => props.categoryId, () => {
     listTask(getQuery());
 }, { immediate: true });
 
@@ -222,7 +225,9 @@ const fields = computed<DataTableField[] >(() => [
 </script>
 
 <template>
-    <p-pane-layout class="pt-6">
+    <component :is="props.tag ? props.tag : PPaneLayout"
+               class="pt-6"
+    >
         <div class="px-4 pb-4">
             <p-toolbox class="mb-2"
                        :search-text="search"
@@ -234,7 +239,7 @@ const fields = computed<DataTableField[] >(() => [
             />
             <p-divider />
             <div class="mt-6">
-                <board-task-filters :category-id="boardPageState.currentCategoryId"
+                <board-task-filters :category-id="props.categoryId"
                                     @update="handleUpdateFilters"
                 />
             </div>
@@ -282,5 +287,5 @@ const fields = computed<DataTableField[] >(() => [
                 {{ getTimezoneDate(value) }}
             </template>
         </p-data-table>
-    </p-pane-layout>
+    </component>
 </template>

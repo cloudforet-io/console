@@ -40,7 +40,6 @@ export const useTaskFieldMetadataStore = defineStore('task-field-metadata', () =
         taskFieldTypeMetadataMap.value.DROPDOWN,
         taskFieldTypeMetadataMap.value.DATE,
         taskFieldTypeMetadataMap.value.PROJECT,
-        taskFieldTypeMetadataMap.value.SERVICE_ACCOUNT,
         taskFieldTypeMetadataMap.value.ASSET,
     ]);
     const defaultFields = computed<TaskField[]>(() => [

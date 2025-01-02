@@ -89,7 +89,6 @@ const handleUpdateSelected = (stepIdx: number, selected: DataSelectorItem[]) => 
                    no-spacing
     >
         <div v-if="props.readonly">
-            <!-- TODO: implement readonly mode -->
             {{ fieldValue.value ? fieldValue.value.join(', ') : '' }}
         </div>
         <div v-else
