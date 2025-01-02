@@ -89,7 +89,7 @@ const tableState = reactive({
             additionalFields.push(
                 { name: 'type', label: 'Type', sortable: false },
                 { name: 'role_binding', label: 'Role', sortable: false },
-                // { name: 'user_group', label: 'User Group', sortable: false },
+                { name: 'user_group', label: 'User Group', sortable: false },
             );
         }
         const baseFields = [
@@ -97,7 +97,6 @@ const tableState = reactive({
             { name: 'name', label: 'Name' },
             { name: 'state', label: 'State' },
             ...additionalFields,
-            { name: 'user_group', label: 'User Group', sortable: false },
             { name: 'tags', label: 'Tags', sortable: false },
             { name: 'auth_type', label: 'Auth Type' },
             { name: 'last_accessed_at', label: 'Last Activity' },
