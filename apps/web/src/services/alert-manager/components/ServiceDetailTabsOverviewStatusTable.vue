@@ -134,7 +134,7 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
 
 <template>
     <div class="service-detail-tabs-overview-status-table">
-        <div class="inner-contents p-2 bg-gray-100">
+        <div class="inner-contents p-4 bg-gray-100">
             <div class="flex">
                 <p-pane-layout v-for="(item, idx) in state.alertStatusInfo"
                                :key="`alert-status-${idx}`"
@@ -282,6 +282,7 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
     .inner-contents {
         min-width: 37.125rem;
         width: 100%;
+        border-radius: 0.375rem;
         .status {
             flex: 1;
             height: 9.375rem;
@@ -291,7 +292,7 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
             border-bottom-left-radius: 0;
             order: 1;
             &:hover {
-                @apply cursor-pointer;
+                @apply cursor-pointer bg-gray-150;
             }
             &:not(.selected) {
                 @apply bg-transparent border-b;
@@ -311,7 +312,7 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
             gap: 0.25rem;
         }
         .table-wrapper {
-            margin-top: -0.125rem;
+            margin-top: -0.063rem;
             padding-top: 1rem;
             padding-right: 1rem;
             padding-left: 1rem;
@@ -339,11 +340,11 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
                 }
             }
 
-            &.triggered {
+            &.TRIGGERED {
                 border-top-left-radius: 0;
             }
 
-            &.resolved {
+            &.RESOLVED {
                 border-top-right-radius: 0;
             }
         }
