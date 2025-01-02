@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, nextTick, onBeforeMount, onUnmounted, reactive, ref, watch,
+    computed, onBeforeMount, onUnmounted, reactive, ref, watch,
 } from 'vue';
 
 import { cloneDeep, isEqual } from 'lodash';
@@ -141,8 +141,8 @@ const reset = () => {
     dashboardDetailStore.setVars(state.varsSnapshot);
     dashboardDetailStore.setOptions(state.dashboardOptionsSnapshot);
 };
-const loadOverlayWidget = async () => {
-    await overlayWidgetRef?.value?.loadWidget();
+const loadOverlayWidget = () => {
+    overlayWidgetRef?.value?.loadWidget();
 };
 
 /* Event */
@@ -152,7 +152,7 @@ const handleChangeWidgetSize = (widgetSize: string) => {
 const handleUpdateWidgetOptions = async () => {
     if (state.selectedWidgetType === widgetGenerateState.selectedWidgetName) {
         await updateWidget();
-        await loadOverlayWidget();
+        loadOverlayWidget();
     } else {
         state.selectedWidgetType = widgetGenerateState.selectedWidgetName;
         await updateWidget();
@@ -179,14 +179,14 @@ watch(() => state.mounted, async (mounted) => {
         if (widgetGenerateState.widget?.state === 'CREATING') {
             await updateWidget();
         }
-        await loadOverlayWidget();
+        loadOverlayWidget();
         state.mounted = false;
     }
 });
-watch(() => dashboardDetailState.vars, async () => {
-    await nextTick();
-    await loadOverlayWidget();
-});
+// watch(() => dashboardDetailState.vars, async () => {
+//     await nextTick();
+//     loadOverlayWidget();
+// });
 
 onBeforeMount(() => {
     initSnapshot();
