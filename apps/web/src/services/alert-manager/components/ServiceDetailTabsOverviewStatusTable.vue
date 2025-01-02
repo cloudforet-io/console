@@ -302,6 +302,9 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
                 &:last-child {
                     border-right-color: transparent;
                 }
+                &:hover {
+                    @apply bg-gray-150;
+                }
             }
             &.no-right-border {
                 border-right-color: transparent;
