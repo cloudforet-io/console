@@ -40,8 +40,7 @@ const Template: Story = {
             <div>
                 <p-button @click="attachMenuItems()">Attach</p-button>
                 <p-button @click="resetMenuAndPagination()">Reset</p-button>
-                <p-context-menu ref="menuRef" 
-                                :loading="attachLoading"
+                <p-context-menu :loading="attachLoading"
                             :menu="attachedMenu" />
             </div>
         `,
@@ -49,7 +48,6 @@ const Template: Story = {
             const {
                 attachedMenu, attachLoading, resetMenuAndPagination, attachMenuItems,
             } = useContextMenuAttach({
-                // attachHandler: computed(() => props.attachHandler),
                 menu: computed(() => props.menu),
                 searchText: computed(() => props.searchText),
                 pageSize: computed(() => props.pageSize),
@@ -71,8 +69,7 @@ export const Basic: Story = {
                     <p-button @click="attachMenuItems()">Attach</p-button>
                     <p-button @click="resetMenuAndPagination()">Reset</p-button>
                 </div>
-                <p-context-menu ref="menuRef" 
-                                :loading="attachLoading"
+                <p-context-menu :loading="attachLoading"
                             :menu="attachedMenu" />
             </div>
         `,
