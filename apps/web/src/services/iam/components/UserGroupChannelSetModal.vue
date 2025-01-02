@@ -45,6 +45,7 @@ interface ChannelSetModalState {
 }
 
 const isCreateAble = ref<boolean>(false);
+const isSchemaValid = ref<boolean>(false);
 
 const state = reactive<ChannelSetModalState>({
     loading: false,
@@ -60,6 +61,10 @@ const state = reactive<ChannelSetModalState>({
 });
 
 /* Component */
+const handleSchemaValid = (value: boolean) => {
+    isSchemaValid.value = value;
+};
+
 const handleConfirm = async () => {
     try {
         state.loading = true;
@@ -139,8 +144,9 @@ const fetchUpdateUserGroupChannel = async (params: UserGroupChannelUpdateParamet
 };
 
 /* Watcher */
-watch(() => notificationChannelCreateFormState, (nv_channel_state) => {
-    isCreateAble.value = !!nv_channel_state.channelName;
+watch([() => notificationChannelCreateFormState, isSchemaValid], (nv_channel_state, nv_is_schema_valid) => {
+    // isCreateAble.value = !!nv_channel_state.channelName;
+    isCreateAble.value = !!(nv_channel_state && nv_is_schema_valid);
 }, { immediate: true, deep: true });
 </script>
 
@@ -150,7 +156,7 @@ watch(() => notificationChannelCreateFormState, (nv_channel_state) => {
                         :visible="userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.CREATE_NOTIFICATIONS_SECOND"
                         :header-title="userGroupPageState.modal.title"
                         :theme-color="userGroupPageState.modal.themeColor"
-                        :disabled="!isCreateAble"
+                        :disabled="!isSchemaValid"
                         @confirm="handleConfirm"
                         @cancel="handleCancel"
                         @close="handleClose"
@@ -165,7 +171,7 @@ watch(() => notificationChannelCreateFormState, (nv_channel_state) => {
                     </p>
                     <span class="text-gray-700 leading-4 text-sm">{{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.INFO') }}</span>
                 </div>
-                <user-group-channel-set-input-form />
+                <user-group-channel-set-input-form @update-valid="handleSchemaValid" />
                 <user-group-channel-schedule-set-form />
             </template>
             <template v-if="userGroupPageState.modal.title === i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE')"

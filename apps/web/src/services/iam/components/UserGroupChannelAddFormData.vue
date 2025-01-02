@@ -17,6 +17,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useNotificationChannelCreateFormStore } from '@/services/iam/store/notification-channel-create-form-store';
 
+const emit = defineEmits<{(e: 'update-valid', valid: boolean): void}>();
+
 const userStore = useUserStore();
 
 const notificationChannelCreateFormStore = useNotificationChannelCreateFormStore();
@@ -72,9 +74,15 @@ watch(() => state.schemaForm, (nv_schema_form) => {
 }, { immediate: true });
 
 /* Component */
+const handleSchemaValidate = (isValid: boolean) => {
+    state.isSchemaFormValid = isValid;
+};
+
 const handleSchemaFormChange = (isValid, form) => {
     state.isSchemaFormValid = isValid;
     state.schemaForm = form;
+
+    emit('update-valid', isValid);
 };
 </script>
 
@@ -86,6 +94,7 @@ const handleSchemaFormChange = (isValid, form) => {
                             :schema="state.schema"
                             :language="storeState.language"
                             uniform-width
+                            @validate="handleSchemaValidate"
                             @change="handleSchemaFormChange"
         />
     </div>
