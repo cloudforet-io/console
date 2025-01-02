@@ -92,9 +92,9 @@ const state = reactive({
             const user = storeState.userMap[i];
             return {
                 roleType: user?.data.roleInfo?.role_type,
-                label: user.label,
+                label: user?.label,
                 type: MEMBERS_TYPE.USER,
-                key: user.key,
+                key: user?.key,
             };
         });
         const userGroupList = storeState.serviceInfo.members.USER_GROUP.map((i) => {
@@ -231,7 +231,7 @@ const fetcherChangeMembers = async (userData: string[], userGroupData: string[])
                                                       size="sm"
                                             />
                                         </p>
-                                        <span>{{ item.label }}</span>
+                                        <span>{{ item?.label }}</span>
                                     </div>
                                     <p class="member-info-content">
                                         <span v-if="!state.isMobileSize && item.type === MEMBERS_TYPE.USER"
