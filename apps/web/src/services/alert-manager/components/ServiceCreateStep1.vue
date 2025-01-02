@@ -68,6 +68,10 @@ const {
         if (duplicatedName) {
             return i18n.t('ALERT_MANAGER.SERVICE.VALIDATION_KEY_UNIQUE');
         }
+        const regex = /^(?!-)[A-Z-]+(?<!-)$/;
+        if (!regex.test(value)) {
+            return i18n.t('ALERT_MANAGER.SERVICE.VALIDATION_KEY');
+        }
         return '';
     },
 });
@@ -81,7 +85,7 @@ const convertToSnakeCase = (str): string => {
         .toUpperCase()
         .split(' ')
         .filter((word) => word.trim() !== '')
-        .join('_');
+        .join('-');
 };
 
 const handleChangeInput = (label: 'name'|'key'|'description', value?: string) => {
