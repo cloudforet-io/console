@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core';
 import {
+    computed,
     onMounted, reactive, ref, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
@@ -42,6 +43,7 @@ const authTypeMenuItem = ref([
 const state = reactive({
     loading: false,
     menuVisible: false,
+    isNew: computed(() => userPageState.isAdminMode || userPageState.afterWorkspaceCreated),
     menuItems: [] as AddModalMenuItem[],
     selectedItems: [] as AddModalMenuItem[],
     independentUsersList: [] as SummaryWorkspaceUserModel[],
@@ -55,6 +57,7 @@ const validationState = reactive({
     userIdInvalidText: '' as TranslateResult,
 });
 
+
 /* Component */
 const hideMenu = () => {
     emit('change-input', { userList: state.selectedItems });
@@ -67,13 +70,15 @@ const handleClickTextInput = async () => {
 const handleChangeTextInput = (value: string) => {
     resetValidationState();
     formState.searchText = value;
-    if (!userPageState.isAdminMode || userPageState.afterWorkspaceCreated) {
+    if (!state.isNew) {
         fetchListUsers();
         state.menuVisible = true;
     }
 };
 const handleEnterTextInput = async () => {
     if (formState.searchText === '') return;
+    if (state.menuVisible) return;
+
     if (validateUserId()) {
         await getUserList();
     }
@@ -88,18 +93,17 @@ const handleSelectDropdownItem = (selected: AuthType|LocalType) => {
 };
 
 const getUserList = async () => {
-    let isNew = userPageState.isAdminMode || userPageState.afterWorkspaceCreated;
+    const isIndependentUser = state.independentUsersList.find((user) => user.user_id === formState.searchText);
+
     try {
         const trimmedText = formState.searchText.trim();
-        if (userPageState.isAdminMode || userPageState.afterWorkspaceCreated) {
+        if (state.isNew) {
             await fetchGetUsers(trimmedText);
         } else {
-            const isIndependentUser = state.independentUsersList.find((user) => user.user_id === formState.searchText);
-            isNew = !isIndependentUser;
             await fetchGetWorkspaceUsers(trimmedText);
         }
     } catch (e) {
-        addSelectedItem(isNew);
+        addSelectedItem(formState.searchText, !isIndependentUser);
         await hideMenu();
         formState.searchText = '';
         resetValidationState();
@@ -144,8 +148,11 @@ const clickOutside = () => {
     }
 };
 const handleSelectMenuItem = async (menuItem: AddModalMenuItem) => {
-    state.selectedItems.unshift(menuItem);
+    if (!state.selectedItems.some((item) => item.name === menuItem.name)) {
+        state.selectedItems.unshift(menuItem);
+    }
     await hideMenu();
+    resetValidationState();
 };
 const initAuthTypeList = async () => {
     if (domainStore.state.extendedAuthType !== undefined) {
@@ -155,17 +162,18 @@ const initAuthTypeList = async () => {
         ];
     }
 };
-const addSelectedItem = (isNew: boolean) => {
-    if (!formState.searchText) return;
-    const trimmedText = formState.searchText.trim();
+
+const addSelectedItem = (name : string, isNew: boolean) => {
+    if (!name) return;
+    const trimmedText = name.trim();
     if (state.selectedItems.some((item) => item.name === trimmedText && item.auth_type === formState.selectedMenuItem)) return;
 
     state.selectedItems.unshift({
-        user_id: trimmedText,
         label: trimmedText,
         name: trimmedText,
-        isNew,
+        user_id: trimmedText,
         auth_type: formState.selectedMenuItem,
+        isNew,
     });
 };
 
