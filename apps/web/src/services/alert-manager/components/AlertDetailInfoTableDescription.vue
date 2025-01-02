@@ -35,7 +35,7 @@ const handleClickEditModeButton = (value: boolean) => {
 const handleClickSaveButton = async () => {
     await alertDetailPageStore.updateAlertDetail({
         alert_id: props.alertId,
-        description: state.dataForUpdate,
+        description: state.dataForUpdate || ' ',
     });
 };
 

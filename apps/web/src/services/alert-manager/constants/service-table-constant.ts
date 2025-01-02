@@ -3,15 +3,15 @@ import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/ta
 
 export const SERVICE_ALERT_TABLE_FIELDS: DataTableFieldType[] = [
     {
-        name: 'title', label: 'Title', width: '50%', sortable: false,
+        name: 'title', label: 'Title', width: '50%',
     },
     {
-        name: 'status', label: 'Status', width: '15%', sortable: false,
+        name: 'status', label: 'Status', width: '15%',
     },
     {
-        name: 'urgency', label: 'Urgency', width: '15%', sortable: false,
+        name: 'urgency', label: 'Urgency', width: '15%',
     },
     {
-        name: 'created_at', label: 'Created', width: '20%', sortable: false,
+        name: 'created_at', label: 'Created', width: '20%',
     },
 ];

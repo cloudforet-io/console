@@ -74,8 +74,8 @@ const state = reactive({
         },
     ])),
     selectedRadioIdx: 0,
+    defaultMemberItems: [] as string[],
     selectedMemberItems: {} as Record<MembersType, string[]>,
-    isSchemaDataValid: false,
     isMemberDataValid: computed<boolean>(() => {
         if (state.selectedRadioIdx === 0) {
             return true;
@@ -87,7 +87,7 @@ const state = reactive({
     }),
     isAllFormValid: computed<boolean>(() => {
         if (!name.value) return false;
-        return isAllValid && (state.isForwardTypeProtocol ? state.isMemberDataValid : state.isSchemaDataValid);
+        return isAllValid && (state.isForwardTypeProtocol ? state.isMemberDataValid : true);
     }),
 });
 
@@ -133,13 +133,11 @@ const handleFormattedSelectedIds = (value: Record<MembersType, string[]>) => {
     state.selectedMemberItems = value;
 };
 const handleChangeRadio = () => {
+    state.defaultMemberItems = [];
     state.selectedMemberItems = {} as Record<MembersType, string[]>;
 };
 const handleScheduleForm = (form: ScheduleSettingFormType) => {
     state.scheduleForm = form;
-};
-const handleSchemaValidate = (isValid: boolean) => {
-    state.isSchemaDataValid = isValid;
 };
 
 const handleConfirm = async () => {
@@ -169,6 +167,7 @@ watch(() => props.selectedItem, (selectedItem) => {
     if (selectedItem) {
         setForm('name', selectedItem.name);
         state.selectedRadioIdx = state.radioMenuList.findIndex((item) => item.name === selectedItem?.data.FORWARD_TYPE);
+        state.defaultMemberItems = state.selectedRadioIdx === 1 ? props.selectedItem?.data.USER_GROUP || [] : props.selectedItem?.data.USER || [];
         state.scheduleForm = selectedItem.schedule;
         if (selectedItem.channel_type === SERVICE_CHANNEL_TYPE.DIRECT) {
             state.schemaForm = selectedItem.data;
@@ -240,7 +239,7 @@ watch(() => props.selectedItem, (selectedItem) => {
                                                       :show-category-title="false"
                                                       :show-user-group-list="state.selectedRadioIdx === 1"
                                                       :show-user-list="state.selectedRadioIdx === 2"
-                                                      :selected-ids="state.selectedRadioIdx === 1 ? props.selectedItem.data.USER_GROUP || [] : props.selectedItem.data.USER || []"
+                                                      :selected-ids="state.defaultMemberItems"
                                                       @formatted-selected-ids="handleFormattedSelectedIds"
                                 />
                             </div>
@@ -251,7 +250,6 @@ watch(() => props.selectedItem, (selectedItem) => {
                                         :schema="getProtocolInfo(props.selectedItem.protocol_id).schema"
                                         :language="storeState.language"
                                         uniform-width
-                                        @validate="handleSchemaValidate"
                     />
                 </p-pane-layout>
                 <div class="pt-2">

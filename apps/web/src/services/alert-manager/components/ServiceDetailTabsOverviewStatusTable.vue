@@ -3,6 +3,7 @@ import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PI, PPaneLayout, PTooltip, PFieldTitle, PSelectStatus, PIconButton, PDataTable, PBadge, PLink,
 } from '@cloudforet/mirinae';
@@ -83,7 +84,12 @@ const tableState = reactive({
     alertStateLabels: getAlertStateI18n(),
     urgencyLabels: getAlertUrgencyI18n(),
     totalCounts: 0,
+    sortBy: '',
+    sortDesc: false,
 });
+
+const alertListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
+    .setPage(1, 15);
 
 const handleClickStatus = (name: AlertStatusType) => {
     state.selectedStatus = name;
@@ -93,6 +99,12 @@ const handleSelectUrgency = (value: AlertUrgencyType) => {
     state.selectedUrgency = value;
     fetchAlertsList();
 };
+const handleChangeToolbox = async (sortBy:string, sortDesc:boolean) => {
+    tableState.sortBy = sortBy;
+    tableState.sortDesc = sortDesc;
+    alertListApiQueryHelper.setSort(sortBy, sortDesc);
+    await fetchAlertsList();
+};
 
 const fetchAlertsList = async () => {
     tableState.loading = true;
@@ -101,12 +113,7 @@ const fetchAlertsList = async () => {
             service_id: storeState.serviceInfo.service_id,
             status: state.selectedStatus,
             urgency: state.selectedUrgency === 'ALL' ? undefined : state.selectedUrgency as AlertUrgencyType,
-            query: {
-                page: {
-                    start: 1,
-                    limit: 15,
-                },
-            },
+            query: alertListApiQueryHelper.data,
         });
         tableState.alertsList = results || [];
         tableState.totalCounts = total_count || 0;
@@ -127,15 +134,15 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
 
 <template>
     <div class="service-detail-tabs-overview-status-table">
-        <div class="inner-contents p-2 bg-gray-100">
-            <div class="flex">
+        <div class="inner-contents p-4 bg-gray-100">
+            <div class="alert-status-card flex">
                 <p-pane-layout v-for="(item, idx) in state.alertStatusInfo"
                                :key="`alert-status-${idx}`"
                                class="status"
-                               :class="{
+                               :class="[item.name, {
                                    'selected': state.selectedStatus === item.name,
                                    'no-right-border': state.selectedStatus === state.alertStatusInfo[idx + 1]?.name
-                               }"
+                               }]"
                                @click="handleClickStatus(item.name)"
                 >
                     <p-field-title :label="item.status"
@@ -154,11 +161,11 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
                             </p-tooltip>
                         </template>
                     </p-field-title>
-                    <p class="text-display-xl">
+                    <p class="total text-display-xl">
                         {{ item.total }}
                     </p>
                     <div class="flex gap-3 mt-0.5">
-                        <div class="cnt-wrapper">
+                        <div class="high cnt-wrapper">
                             <p-i name="ic_error-filled"
                                  width="0.75rem"
                                  height="0.75rem"
@@ -207,10 +214,12 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
                               :loading="tableState.loading"
                               striped
                               :bordered="false"
+                              :sort-by.sync="tableState.sortBy"
+                              :sort-desc.sync="tableState.sortDesc"
                               :show-footer="tableState.totalCounts > tableState.alertsList.length"
-                              sort-by="created_at"
                               sortable
                               class="table"
+                              @changeSort="handleChangeToolbox"
                 >
                     <template #col-title-format="{ value, item }">
                         <p-link :to="{
@@ -273,6 +282,7 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
     .inner-contents {
         min-width: 37.125rem;
         width: 100%;
+        border-radius: 0.375rem;
         .status {
             flex: 1;
             height: 9.375rem;
@@ -282,7 +292,7 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
             border-bottom-left-radius: 0;
             order: 1;
             &:hover {
-                @apply cursor-pointer;
+                @apply cursor-pointer bg-gray-150;
             }
             &:not(.selected) {
                 @apply bg-transparent border-b;
@@ -296,13 +306,23 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
             &.no-right-border {
                 border-right-color: transparent;
             }
+            &.TRIGGERED {
+                .total {
+                    @apply text-red-500;
+                }
+                .cnt-wrapper {
+                    &.high {
+                        @apply text-red-500;
+                    }
+                }
+            }
         }
         .cnt-wrapper {
             @apply flex items-center text-label-md;
             gap: 0.25rem;
         }
         .table-wrapper {
-            margin-top: -0.125rem;
+            margin-top: -0.063rem;
             padding-top: 1rem;
             padding-right: 1rem;
             padding-left: 1rem;
@@ -330,11 +350,11 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
                 }
             }
 
-            &.triggered {
+            &.TRIGGERED {
                 border-top-left-radius: 0;
             }
 
-            &.resolved {
+            &.RESOLVED {
                 border-top-right-radius: 0;
             }
         }

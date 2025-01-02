@@ -36,6 +36,7 @@ const storeState = reactive({
     serviceListMap: computed<ServiceReferenceMap>(() => allReferenceGetters.service),
 });
 const state = reactive({
+    loading: false,
     isFocusedKey: false,
 });
 
@@ -68,6 +69,10 @@ const {
         if (duplicatedName) {
             return i18n.t('ALERT_MANAGER.SERVICE.VALIDATION_KEY_UNIQUE');
         }
+        const regex = /^(?!-)[A-Z-]+(?<!-)$/;
+        if (!regex.test(value)) {
+            return i18n.t('ALERT_MANAGER.SERVICE.VALIDATION_KEY');
+        }
         return '';
     },
 });
@@ -81,7 +86,7 @@ const convertToSnakeCase = (str): string => {
         .toUpperCase()
         .split(' ')
         .filter((word) => word.trim() !== '')
-        .join('_');
+        .join('-');
 };
 
 const handleChangeInput = (label: 'name'|'key'|'description', value?: string) => {
@@ -89,6 +94,7 @@ const handleChangeInput = (label: 'name'|'key'|'description', value?: string) =>
 };
 
 const handleCreateService = async () => {
+    state.loading = true;
     try {
         const createdServiceInfo = await SpaceConnector.clientV2.alertManager.service.create<ServiceCreateParameters, ServiceModel>({
             name: name.value,
@@ -104,6 +110,8 @@ const handleCreateService = async () => {
         serviceCreateFormStore.setCurrentStep(2);
     } catch (e) {
         ErrorHandler.handleError(e, true);
+    } finally {
+        state.loading = false;
     }
 };
 
@@ -117,6 +125,7 @@ watch(() => state.isFocusedKey, (isFocusedKey) => {
 <template>
     <service-create-step-container class="service-create-step1"
                                    :is-all-form-valid="isAllValid"
+                                   :loading="state.loading"
                                    @create="handleCreateService"
     >
         <div>

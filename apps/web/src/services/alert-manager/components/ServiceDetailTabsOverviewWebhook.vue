@@ -151,6 +151,7 @@ watch(() => storeState.serviceId, (serviceId) => {
         <p-divider class="bg-gray-150" />
         <div class="link-wrapper">
             <p-text-button style-type="highlight"
+                           icon-right="ic_arrow-right"
                            @click="handleRouteDetail"
             >
                 {{ $t('ALERT_MANAGER.SERVICE.DETAILS') }}

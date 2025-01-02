@@ -38,10 +38,11 @@ const storeState = reactive({
 const state = reactive({
     menuItems: computed<MenuItem[]>(() => [
         {
-            icon: 'ic_edit',
+            icon: 'ic_settings',
             name: 'edit',
-            label: i18n.t('ALERT_MANAGER.EDIT_NAME'),
+            label: i18n.t('ALERT_MANAGER.UPDATE'),
         },
+        { type: 'divider' },
         {
             icon: 'ic_delete',
             name: 'delete',
