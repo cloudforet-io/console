@@ -240,9 +240,10 @@ watch(() => route.query, async (query) => {
                                    :selection-label="$t('ALERT_MANAGER.ALERTS.SERVICE')"
                                    style-type="rounded"
                                    show-delete-all-button
+                                   selection-highlight
                                    use-fixed-menu-style
                                    :selected="filterState.selectedServiceId"
-                                   class="service-dropdown pt-6 pl-4"
+                                   class="service-dropdown mt-6 pl-4"
                                    @update:selected="handleSelectServiceDropdownItem"
                 />
             </template>
