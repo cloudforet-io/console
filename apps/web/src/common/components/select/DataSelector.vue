@@ -83,5 +83,8 @@ watch([() => props.menu, () => props.handler], () => {
 <style lang="postcss">
 .data-selector-context-menu {
     border: none;
+    min-height: 16rem;
+    max-height: 360px;
+    overflow-y: auto;
 }
 </style>
