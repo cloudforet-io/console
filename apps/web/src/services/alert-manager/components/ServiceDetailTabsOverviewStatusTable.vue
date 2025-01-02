@@ -135,14 +135,14 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
 <template>
     <div class="service-detail-tabs-overview-status-table">
         <div class="inner-contents p-4 bg-gray-100">
-            <div class="flex">
+            <div class="alert-status-card flex">
                 <p-pane-layout v-for="(item, idx) in state.alertStatusInfo"
                                :key="`alert-status-${idx}`"
                                class="status"
-                               :class="{
+                               :class="[item.name, {
                                    'selected': state.selectedStatus === item.name,
                                    'no-right-border': state.selectedStatus === state.alertStatusInfo[idx + 1]?.name
-                               }"
+                               }]"
                                @click="handleClickStatus(item.name)"
                 >
                     <p-field-title :label="item.status"
@@ -161,11 +161,11 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
                             </p-tooltip>
                         </template>
                     </p-field-title>
-                    <p class="text-display-xl">
+                    <p class="total text-display-xl">
                         {{ item.total }}
                     </p>
                     <div class="flex gap-3 mt-0.5">
-                        <div class="cnt-wrapper">
+                        <div class="high cnt-wrapper">
                             <p-i name="ic_error-filled"
                                  width="0.75rem"
                                  height="0.75rem"
@@ -305,6 +305,16 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
             }
             &.no-right-border {
                 border-right-color: transparent;
+            }
+            &.TRIGGERED {
+                .total {
+                    @apply text-red-500;
+                }
+                .cnt-wrapper {
+                    &.high {
+                        @apply text-red-500;
+                    }
+                }
             }
         }
         .cnt-wrapper {
