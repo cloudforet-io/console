@@ -103,10 +103,8 @@ const handleUpdateFields = (fields: MenuItem[]) => {
 <template>
     <div class="widget-field-tale-column-comparison">
         <div class="field-header">
-            <!--                TODO: apply translation-->
-            <!--                {{ $t('COMMON.WIDGETS.COMPARISON.COMPARISON') }}-->
             <p-field-title>
-                {{ $t('Table Column Comparison UI') }}
+                {{ $t('COMMON.WIDGETS.TABLE_COLUMN_COMPARISON.TABLE_COLUMN_COMPARISON') }}
                 <p-tooltip :contents="state.infoText">
                     <p-i name="ic_info-circle"
                          width="0.875rem"
@@ -160,8 +158,7 @@ const handleUpdateFields = (fields: MenuItem[]) => {
                     />
                 </p-field-group>
             </div>
-            <!--            TODO: apply translation after design fixed-->
-            <p-field-group :label="$t('Fields')"
+            <p-field-group :label="$t('COMMON.WIDGETS.TABLE_COLUMN_COMPARISON.FIELDS')"
                            class="w-full"
                            style-type="secondary"
                            required

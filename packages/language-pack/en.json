@@ -1496,6 +1496,10 @@
 				"INFO_TEXT": "This feature calculates subtotals based on granularity in group-by statistics. \nIt is not available for 'static fields'.",
 				"SUB_TOTAL": "Sub Total"
 			},
+			"TABLE_COLUMN_COMPARISON": {
+				"FIELDS": "Fields",
+				"TABLE_COLUMN_COMPARISON": "Table Column Comparison UI"
+			},
 			"TABLE_COLUMN_WIDTH": {
 				"AUTO": "Auto",
 				"FIX": "Fix",

@@ -139,6 +139,7 @@ const baseQueryKey = computed(() => [
         page: state.thisPage,
         pageSize: state.pageSize,
         granularity: widgetOptionsState.granularityInfo?.granularity,
+        groupBy: widgetOptionsState.groupByInfo?.data,
         dataTableId: state.dataTable?.data_table_id,
         dataTableOptions: JSON.stringify(sortObjectByKeys(state.dataTable?.options) ?? {}),
         vars: normalizeAndSerialize(props.dashboardVars),
@@ -152,6 +153,7 @@ const fullDataQueryKey = computed(() => [
         start: dateRange.value.start,
         end: dateRange.value.end,
         granularity: widgetOptionsState.granularityInfo?.granularity,
+        groupBy: widgetOptionsState.groupByInfo?.data,
         dataTableId: state.dataTable?.data_table_id,
         dataTableOptions: JSON.stringify(sortObjectByKeys(state.dataTable?.options) ?? {}),
         enabledTotal: !!widgetOptionsState.totalInfo?.toggleValue,
@@ -172,6 +174,7 @@ const queryResults = useQueries({
                     start: (state.pageSize * (state.thisPage - 1)) + 1,
                     limit: state.pageSize,
                 },
+                group_by: (widgetOptionsState.groupByInfo?.data as string[]) ?? [],
                 vars: props.dashboardVars,
                 granularity: widgetOptionsState.granularityInfo?.granularity,
             }),
@@ -189,6 +192,7 @@ const queryResults = useQueries({
                 widget_id: props.widgetId,
                 start: dateRange.value.start,
                 end: dateRange.value.end,
+                group_by: (widgetOptionsState.groupByInfo?.data as string[]) ?? [],
                 vars: props.dashboardVars,
                 granularity: widgetOptionsState.granularityInfo?.granularity,
             }),
@@ -242,7 +246,7 @@ const refinedData = computed<Data>(() => {
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange,
     errorMessage,
-    widgetLoading: widgetLoading.value,
+    widgetLoading,
     noData: computed(() => (refinedData.value ? !(refinedData.value.results?.length) : false)),
 });
 

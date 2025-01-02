@@ -1496,6 +1496,10 @@
 				"INFO_TEXT": "詳細な基準に基づいてグループ別統計で部分合計を計算できます。\nただし、フィールドが'静的フィールド'の場合は使用できません。",
 				"SUB_TOTAL": "小計"
 			},
+			"TABLE_COLUMN_COMPARISON": {
+				"FIELDS": "",
+				"TABLE_COLUMN_COMPARISON": ""
+			},
 			"TABLE_COLUMN_WIDTH": {
 				"AUTO": "オート",
 				"FIX": "固定",

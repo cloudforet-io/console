@@ -136,15 +136,12 @@ const getWidgetLoading = (widgetId: string) => {
 };
 const refreshAllWidget = debounce(async () => {
     dashboardDetailStore.setLoadingWidgets(true);
-    const loadWidgetPromises: WidgetExpose['loadWidget'][] = [];
 
     widgetRef.value.forEach((comp) => {
-        if (!comp || typeof comp.loadWidget() !== 'function') return false;
-        loadWidgetPromises.push(comp.loadWidget);
+        if (!comp) return false;
+        comp.loadWidget();
         return true;
     });
-
-    await Promise.allSettled(loadWidgetPromises);
 
     dashboardDetailStore.setLoadingWidgets(false);
 }, 150);
@@ -152,7 +149,6 @@ const loadAWidget = async (widgetId: string) => {
     if (!widgetId) return;
     widgetRef.value.forEach((comp) => {
         if (!comp || comp.$el.id !== widgetId) return;
-        if (typeof comp.loadWidget !== 'function') return;
         comp.loadWidget();
     });
 };

@@ -6,15 +6,12 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
-import type { Granularity } from '@/schema/dashboard/_types/widget-type';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PrivateWidgetUpdateParameters } from '@/schema/dashboard/private-widget/api-verbs/update';
 import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
 import type { DataTableAddParameters } from '@/schema/dashboard/public-data-table/api-verbs/add';
 import type { DataTableDeleteParameters } from '@/schema/dashboard/public-data-table/api-verbs/delete';
 import type { DataTableListParameters } from '@/schema/dashboard/public-data-table/api-verbs/list';
-import type { DataTableLoadParameters } from '@/schema/dashboard/public-data-table/api-verbs/load';
 import type { DataTableTransformParameters } from '@/schema/dashboard/public-data-table/api-verbs/transform';
 import type { DataTableUpdateParameters } from '@/schema/dashboard/public-data-table/api-verbs/update';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
@@ -72,10 +69,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         // Data Table
         selectedDataTableId: undefined as undefined | string,
         dataTables: [] as Partial<DataTableModel>[],
-        selectedPreviewGranularity: GRANULARITY.MONTHLY as Granularity,
         previewData: { results: [], total_count: 0 } as ListResponse<any>,
-        dataTableUpdating: false,
-        dataTableLoadLoading: false,
         dataTableCreateLoading: false,
         joinRestrictedMap: {} as JoinRestrictedMap, // Flag for handling Join type EXCEPTION RESTRICTION cases. (duplicated data field). Example - { '{dataTalbeId}': true, }
         allDataTableInvalidMap: {} as Record<string, boolean>, // Flag for handling all data table invalid cases. Example - { '{dataTalbeId}': true, }
@@ -190,12 +184,6 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const setWidgetValidMap = (widgetValidMap: Record<string, boolean>) => {
         state.widgetValidMap = widgetValidMap;
     };
-    const setSelectedPreviewGranularity = (granularity: Granularity) => {
-        state.selectedPreviewGranularity = granularity;
-    };
-    const setDataTableUpdating = (status: boolean) => {
-        state.dataTableUpdating = status;
-    };
     const setDataTableCreateLoading = (status: boolean) => {
         state.dataTableCreateLoading = status;
     };
@@ -220,8 +208,6 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         setSize,
         setWidgetFormValueMap,
         setWidgetValidMap,
-        setSelectedPreviewGranularity,
-        setDataTableUpdating,
         setJoinRestrictedMap,
         setAllDataTableInvalidMap,
         setDataTableCreateLoading,
@@ -391,42 +377,6 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 setAllDataTableInvalidMap(_allDataTableInvalidMap);
             } catch (e) {
                 ErrorHandler.handleError(e);
-            }
-        },
-        loadDataTable: async (loadParams: Partial<DataTableLoadParameters>) => {
-            const isPrivate = state.widgetId.startsWith('private');
-            const fetcher = isPrivate
-                ? SpaceConnector.clientV2.dashboard.privateDataTable.load<DataTableLoadParameters, ListResponse<Record<string, any>[]>>
-                : SpaceConnector.clientV2.dashboard.publicDataTable.load<DataTableLoadParameters, ListResponse<Record<string, any>[]>>;
-            try {
-                state.dataTableLoadLoading = true;
-                const _granularity = state.selectedPreviewGranularity || 'MONTHLY';
-                let _sort = loadParams.sort;
-                const dataTable = state.dataTables.find((_dataTable) => _dataTable.data_table_id === (loadParams.data_table_id || state.selectedDataTableId as string));
-                if (!_sort || (_sort && _sort.length === 0)) {
-                    const labelsInfoList = Object.keys(dataTable?.labels_info ?? {});
-                    if (labelsInfoList.includes('Date')) _sort = [{ key: 'Date', desc: false }];
-                }
-                const { results, total_count } = await fetcher({
-                    granularity: _granularity,
-                    page: {
-                        start: 1,
-                        limit: 15,
-                    },
-                    ...loadParams,
-                    sort: _sort,
-                    data_table_id: loadParams.data_table_id || state.selectedDataTableId as string, // for fetching without data_table_id
-                    vars: dashboardDetailGetters.dashboardInfo?.vars || {},
-                });
-                state.previewData = { results: results ?? [], total_count: total_count ?? 0 };
-                setDataTableLoadFailed(false);
-            } catch (e) {
-                state.previewData = { results: [], total_count: 0 };
-                setDataTableLoadFailed(true);
-                ErrorHandler.handleError(e);
-            } finally {
-                state.dataTableUpdating = false;
-                state.dataTableLoadLoading = false;
             }
         },
         updateWidget: async (updateParams: Partial<WidgetUpdateParameters>): Promise<WidgetModel|undefined> => {

@@ -269,8 +269,6 @@ const handleUpdateDataTable = async () => {
     if (result) {
         showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_SUCCESS'), '');
         widgetGenerateStore.setSelectedDataTableId(result.data_table_id);
-        widgetGenerateStore.setDataTableUpdating(true);
-        await widgetGenerateStore.loadDataTable({});
     }
     setTimeout(() => {
         state.loading = false;
