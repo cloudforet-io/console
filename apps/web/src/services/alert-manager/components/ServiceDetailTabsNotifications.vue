@@ -160,6 +160,7 @@ const handleSelectDropdownItem = (name: NotificationsModalType) => {
     modalState.type = name;
 };
 const handleChangeToolbox = async (options: any = {}) => {
+    if (options.sortBy !== undefined) notificationsListApiQueryHelper.setSort(options.sortBy, options.sortDesc);
     if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
     if (options.pageStart !== undefined) notificationsListApiQueryHelper.setPageStart(options.pageStart);
     if (options.pageLimit !== undefined) notificationsListApiQueryHelper.setPageLimit(options.pageLimit);

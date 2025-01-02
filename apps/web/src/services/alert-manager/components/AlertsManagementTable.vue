@@ -139,6 +139,7 @@ const handleSelectFilter = (type: 'status' | 'urgency', value: string) => {
     fetchAlertsList();
 };
 const handleChange = async (options: any = {}) => {
+    if (options.sortBy !== undefined) alertListApiQueryHelper.setSort(options.sortBy, options.sortDesc);
     if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
     if (options.pageStart !== undefined) alertListApiQueryHelper.setPageStart(options.pageStart);
     if (options.pageLimit !== undefined) alertListApiQueryHelper.setPageLimit(options.pageLimit);

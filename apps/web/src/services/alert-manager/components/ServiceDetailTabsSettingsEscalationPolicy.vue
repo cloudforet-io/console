@@ -100,6 +100,7 @@ const handleActionModal = (type: EscalationPolicyModalType) => {
     modalState.type = type;
 };
 const handleChangeToolbox = async (options: any = {}) => {
+    if (options.sortBy !== undefined) escalationPolicyListApiQueryHelper.setSort(options.sortBy, options.sortDesc);
     if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
     if (options.pageStart !== undefined) escalationPolicyListApiQueryHelper.setPageStart(options.pageStart);
     if (options.pageLimit !== undefined) escalationPolicyListApiQueryHelper.setPageLimit(options.pageLimit);

@@ -139,6 +139,7 @@ const handleSelectDropdownItem = (name: WebhookModalType) => {
     modalState.type = name;
 };
 const handleChangeToolbox = async (options: any = {}) => {
+    if (options.sortBy !== undefined) webhookListApiQueryHelper.setSort(options.sortBy, options.sortDesc);
     if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
     if (options.pageStart !== undefined) webhookListApiQueryHelper.setPageStart(options.pageStart);
     if (options.pageLimit !== undefined) webhookListApiQueryHelper.setPageLimit(options.pageLimit);
