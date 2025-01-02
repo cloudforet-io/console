@@ -54,7 +54,6 @@ const state = reactive({
 
 const tableState = reactive({
     fields: computed<DataTableFieldType[]>(() => [
-        { name: 'user_group_id', label: 'User Group ID' },
         { name: 'name', label: 'User Group Name' },
         { name: 'description', label: 'Description' },
         { name: 'notification_channel', label: 'Notification Channel' }, // TODO: get from other api

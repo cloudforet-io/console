@@ -128,7 +128,7 @@ watch(() => route.query, (query) => {
                                   :disabled="userPageGetters.selectedUsers.length === 0"
                                   @click="handleClickButton(USER_MODAL_TYPE.ASSIGN)"
                         >
-                            {{ $t('IAM.USER.ASSIGN_TO_USER_GROUP') }}
+                            {{ $t('IAM.USER.ASSIGN_TO_USER_GROUP.TITLE') }}
                         </p-button>
                         <p-button style-type="negative-secondary"
                                   :disabled="userPageGetters.selectedUsers.length === 0"

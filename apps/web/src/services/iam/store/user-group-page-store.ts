@@ -71,7 +71,7 @@ export const useUserGroupPageStore = defineStore('page-user-group', () => {
             list: [],
             pageStart: 1,
             pageLimit: 15,
-            selectedIndices: [0],
+            selectedIndices: [],
             searchFilters: [],
         },
         protocolList: [],
@@ -122,7 +122,7 @@ export const useUserGroupPageStore = defineStore('page-user-group', () => {
                 list: [],
                 pageStart: 1,
                 pageLimit: 15,
-                selectedIndices: [0],
+                selectedIndices: [],
                 searchFilters: [],
             };
             state.protocolList = [];

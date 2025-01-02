@@ -78,7 +78,6 @@ const tableState = reactive({
     }),
     valueHandlerMap: computed(() => ({
         name: makeDistinctValueHandler('alert_manager.UserGroupChannel', 'name'),
-        schedule: makeDistinctValueHandler('alert_manager.UserGroupChannel', 'schedule.SCHEDULE_TYPE'),
     })),
 });
 
@@ -169,11 +168,13 @@ watch(() => userGroupPageGetters.selectedUserGroups, async (nv_selected_user_gro
     }
 }, { deep: true, immediate: true });
 
-watch(() => tableState.items, (nv_items) => {
-    if (nv_items.length > 0) {
+watch([() => tableState.items, () => userGroupPageGetters.selectedUserGroupChannel], ([nv_items, nv_selected_item]) => {
+    if (nv_items.length > 0 && nv_selected_item.length === 1) {
         isDeleteAble.value = true;
+    } else if (nv_items.length === 0) {
+        isDeleteAble.value = false;
     }
-}, { immediate: true });
+}, { deep: true, immediate: true });
 
 /* API */
 const fetchListUserGroupChannel = async (params: UserGroupChannelListParameters) => {
@@ -242,6 +243,7 @@ onMounted(async () => {
                         </p-button>
                         <p-button style-type="tertiary"
                                   icon-left="ic_edit-text"
+                                  :disabled="!isDeleteAble"
                                   @click="handleUpdateModal('edit')"
                         >
                             {{ $t('IAM.USER_GROUP.TAB.NOTIFICATION_CHANNEL.EDIT') }}

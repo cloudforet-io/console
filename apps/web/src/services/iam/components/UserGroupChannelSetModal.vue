@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { PButtonModal, PI, PButton } from '@cloudforet/mirinae';
+import { PButtonModal, PButton } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import type { UserGroupChannelCreateParameters } from '@/schema/alert-manager/user-group-channel/api-verbs/create';
@@ -14,6 +14,8 @@ import type {
     UserGroupChannelScheduleInfoType,
 } from '@/schema/alert-manager/user-group-channel/type';
 import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -73,6 +75,7 @@ const handleConfirm = async () => {
                 user_group_id: userGroupPageGetters.selectedUserGroups[0].user_group_id,
             });
             emit('confirm');
+            showSuccessMessage('', i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.SUCCESS_MESSAGE'));
         } else if (userGroupPageState.modal.title === i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.UPDATE_TITLE')) {
             await fetchUpdateUserGroupChannel({
                 channel_id: userGroupPageGetters.selectedUserGroupChannel[0].channel_id,
@@ -81,6 +84,7 @@ const handleConfirm = async () => {
                 schedule: notificationChannelCreateFormState.scheduleInfo,
             });
             emit('confirm');
+            showSuccessMessage('', i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.UPDATE_SUCCESS_MESSAGE'));
         }
     } finally {
         state.loading = false;
@@ -160,16 +164,6 @@ watch(() => notificationChannelCreateFormState, (nv_channel_state) => {
                         <span class="text-gray-500">/2</span>
                     </p>
                     <span class="text-gray-700 leading-4 text-sm">{{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.INFO') }}</span>
-                    <div class="flex mt-8">
-                        <p-i name="ic_notification-protocol_users"
-                             width="2.5rem"
-                             height="2.5rem"
-                        />
-                        <p class="flex flex-col">
-                            <span class="text-lg">{{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.LIST.NOTIFY_TO_MEMBER') }}</span>
-                            <span class="text-xs text-gray-600">{{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.NOTIFY_TO_MEMBER_INFO') }}</span>
-                        </p>
-                    </div>
                 </div>
                 <user-group-channel-set-input-form />
                 <user-group-channel-schedule-set-form />

@@ -7,6 +7,9 @@ import { PButtonModal, PButton } from '@cloudforet/mirinae';
 import type { UserGroupCreateParameters } from '@/schema/identity/user-group/api-verbs/create';
 import type { UserGroupUpdateParameters } from '@/schema/identity/user-group/api-verbs/update';
 import type { UserGroupModel } from '@/schema/identity/user-group/model';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -45,6 +48,7 @@ const handleConfirm = async () => {
                 },
             });
             emit('confirm');
+            showSuccessMessage('', i18n.t('IAM.USER_GROUP.MODAL.CREATE_USER_GROUP.SUCCESS_MESSAGE'));
         } finally {
             state.loading = false;
             handleClose();
@@ -62,6 +66,7 @@ const handleConfirm = async () => {
                 },
             });
             emit('confirm');
+            showSuccessMessage('', i18n.t('IAM.USER_GROUP.MODAL.CREATE_USER_GROUP.UPDATE_SUCCESS_MESSAGE'));
         } finally {
             state.loading = false;
             handleClose();

@@ -2811,7 +2811,10 @@
 		},
 		"USER": {
 			"ADD": "作成",
-			"ASSIGN_TO_USER_GROUP": "",
+			"ASSIGN_TO_USER_GROUP": {
+				"SUCCESS_MESSAGE": "",
+				"TITLE": ""
+			},
 			"FORM": {
 				"ADD_TAG": "タグの追加",
 				"ADD_WORKSPACE": "ユーザーがアクセスできるワークスペース",
@@ -3034,6 +3037,7 @@
 				"ADD_NEW_USER": {
 					"CANCEL": "",
 					"CONFIRM": "",
+					"SUCCESS_MESSAGE": "",
 					"TITLE": "",
 					"USER": ""
 				},
@@ -3071,8 +3075,10 @@
 						"SMS": "",
 						"TELEGRAM": ""
 					},
+					"SUCCESS_MESSAGE": "",
 					"TITLE": "",
 					"UPDATE": "",
+					"UPDATE_SUCCESS_MESSAGE": "",
 					"UPDATE_TITLE": ""
 				},
 				"CREATE_USER_GROUP": {
@@ -3082,9 +3088,11 @@
 					"GROUP_NAME": "",
 					"NOTIFICATION_CHANNEL": "",
 					"PROTOCOL": "",
+					"SUCCESS_MESSAGE": "",
 					"TITLE": "",
 					"TOKEN": "",
 					"UPDATE": "",
+					"UPDATE_SUCCESS_MESSAGE": "",
 					"UPDATE_TITLE": ""
 				},
 				"DELETE": {
@@ -3093,6 +3101,7 @@
 				},
 				"DELETE_CHANNEL": {
 					"DELETE": "",
+					"SUCCESS_MESSAGE": "",
 					"TITLE": ""
 				},
 				"REMOVE_USER": {
