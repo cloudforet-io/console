@@ -7,11 +7,17 @@ import {
 
 import type { UseContextMenuItemsOptions } from './use-context-menu-items';
 
-export const getUseContextMenuItemsArgs = (): Args => () => {
+export const getUseContextMenuItemsArgs = (): Args => {
     const useContextMenuAttachArgs = getUseContextMenuAttachArgs();
+
+    // rename attachHandler to handler
     const handler = useContextMenuAttachArgs.attachHandler;
     delete useContextMenuAttachArgs.attachHandler;
     useContextMenuAttachArgs.handler = handler;
+
+    // remove filterItems
+    delete useContextMenuAttachArgs.filterItems;
+
     return {
         ...useContextMenuAttachArgs,
         useReorderBySelection: false,
@@ -26,9 +32,15 @@ export const getUseContextMenuItemsParameters = (): Parameters => ({});
 export const getUseContextMenuItemsArgTypes = (): ArgTypes<UseContextMenuItemsOptions> => {
     const useContextMenuAttachArgTypes: any = getUseContextMenuAttachArgTypes();
     const handlerArgType = { ...useContextMenuAttachArgTypes.attachHandler };
+
+    // rename attachHandler to handler
     handlerArgType.name = 'handler';
     delete useContextMenuAttachArgTypes.attachHandler;
     useContextMenuAttachArgTypes.handler = handlerArgType;
+
+    // remove filterItems
+    delete useContextMenuAttachArgTypes.filterItems;
+
     return {
         ...useContextMenuAttachArgTypes,
         useReorderBySelection: {

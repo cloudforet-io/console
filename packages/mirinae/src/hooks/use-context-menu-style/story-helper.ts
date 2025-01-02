@@ -2,7 +2,7 @@ import type { ArgTypes, Parameters, Args } from '@storybook/vue';
 
 import type { UseContextMenuStyleOptions } from './use-context-menu-style';
 
-export const getArgs = (): Args => ({
+export const getUseContextMenuStyleArgs = (): Args => ({
     useFixedMenuStyle: false,
     visibleMenu: false,
     targetRef: undefined,
@@ -11,9 +11,9 @@ export const getArgs = (): Args => ({
     menuWidth: 'auto',
 });
 
-export const getParameters = (): Parameters => ({});
+export const getUseContextMenuStyleParameters = (): Parameters => ({});
 
-export const getArgTypes = (): ArgTypes<UseContextMenuStyleOptions> => ({
+export const getUseContextMenuStyleArgTypes = (): ArgTypes<UseContextMenuStyleOptions> => ({
     useFixedMenuStyle: {
         name: 'useFixedMenuStyle',
         type: { name: 'boolean' },

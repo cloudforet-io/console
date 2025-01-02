@@ -26,9 +26,9 @@ interface UseContextMenuItemsOptions<Item extends MenuItem = MenuItem> extends
 interface UseContextMenuItemsReturns<Item extends MenuItem = MenuItem> {
     refinedMenu: ComputedRef<Item[]>;
     loading: Ref<boolean>;
-    initiateMenu: () => Promise<void>;
-    reloadMenu: () => Promise<void>;
-    showMoreMenu: () => Promise<void>;
+    initiateMenu: () => Promise<void>; // reset pagination, capture current items, and reattach menu items.
+    reloadMenu: () => Promise<void>; // reset pagination and reattach menu items.
+    showMoreMenu: () => Promise<void>; // attach more menu items.
 }
 ```
 ## Usage
@@ -36,6 +36,9 @@ interface UseContextMenuItemsReturns<Item extends MenuItem = MenuItem> {
 
 ## Basic
 <Canvas of={useContextMenuItemsStories.Basic}/>
+
+## Reorder by Selection
+<Canvas of={useContextMenuItemsStories.ReorderBySelection}/>
 
 ## Playground
 <Canvas of={useContextMenuItemsStories.Playground}/>

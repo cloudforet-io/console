@@ -8,7 +8,7 @@ export const getUseContextMenuAttachArgs = (): Args => ({
     attachHandler: undefined,
     menu: getContextMenuItems(),
     searchText: '',
-    pageSize: undefined,
+    pageSize: 3,
     filterItems: [],
 });
 
@@ -70,7 +70,7 @@ export const getUseContextMenuAttachArgTypes = (): ArgTypes<UseContextMenuAttach
             },
             category: 'options',
             defaultValue: {
-                summary: 'undefined',
+                summary: '10',
             },
         },
         control: 'number',

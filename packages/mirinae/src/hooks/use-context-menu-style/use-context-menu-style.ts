@@ -9,6 +9,10 @@ import {
 } from '@floating-ui/dom';
 import { throttle } from 'lodash';
 
+// HACK: This is the type definition of the context menu. Only defined exposed methods. This is to prevent type error due to vue2-vue3 incompatibility.
+interface ContextMenu {
+    focus: (position?: number) => void;
+}
 export interface UseContextMenuStyleOptions {
     /*
     Useful when used inside an element whose css position attribute value is fixed.
@@ -18,7 +22,7 @@ export interface UseContextMenuStyleOptions {
 
     visibleMenu?: Ref<boolean|undefined>;
     targetRef: Ref<Vue|HTMLElement|null>;
-    menuRef: Ref<Vue|HTMLElement|null>;
+    menuRef: Ref<ContextMenu|HTMLElement|null>;
 
      /* Required for context menu style */
     position?: Ref<'left'|'right'|undefined>|'left'|'right';

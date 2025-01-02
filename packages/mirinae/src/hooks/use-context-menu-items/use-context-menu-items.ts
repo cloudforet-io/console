@@ -12,7 +12,7 @@ import type { UseContextMenuAttachOptions } from '../use-context-menu-attach/use
 import { useContextMenuAttach } from '../use-context-menu-attach/use-context-menu-attach';
 
 export interface UseContextMenuItemsOptions<Item extends MenuItem = MenuItem> extends
-    Omit<UseContextMenuAttachOptions<Item>, 'attachHandler'> {
+    Omit<UseContextMenuAttachOptions<Item>, 'attachHandler'|'filterItems'> {
     useReorderBySelection?: boolean; // Whether to automatically reorder on initiateMenu().
     selected?: Ref<Item[]>|ComputedRef<Item[]>|Item[]; // Items to be displayed at the top of the menu for emphasize or quick access of selected items.
     useMenuFiltering?: boolean; // Whether to automatically filtering menu by searchText. works only with menu, not with handler.
@@ -23,9 +23,9 @@ export interface UseContextMenuItemsOptions<Item extends MenuItem = MenuItem> ex
 interface UseContextMenuItemsReturns<Item extends MenuItem = MenuItem> {
     refinedMenu: ComputedRef<Item[]>;
     loading: Ref<boolean>;
-    initiateMenu: () => Promise<void>;
-    reloadMenu: () => Promise<void>;
-    showMoreMenu: () => Promise<void>;
+    initiateMenu: () => Promise<void>; // reset pagination, capture current items, and reattach menu items.
+    reloadMenu: () => Promise<void>; // reset pagination and reattach menu items.
+    showMoreMenu: () => Promise<void>; // attach more menu items.
 }
 
 

@@ -7,7 +7,7 @@ import { getContextMenuItems } from '@/controls/context-menu/mock';
 import PContextMenu from '@/controls/context-menu/PContextMenu.vue';
 
 import {
-    getArgs, getArgTypes, getParameters,
+    getUseContextMenuStyleArgs, getUseContextMenuStyleArgTypes, getUseContextMenuStyleParameters,
 } from './story-helper';
 import type { UseContextMenuStyleOptions } from './use-context-menu-style';
 import { useContextMenuStyle } from './use-context-menu-style';
@@ -18,13 +18,13 @@ type UseContextMenuStylePropsAndCustomArgs = ComponentProps<UseContextMenuStyleO
 const meta : Meta<UseContextMenuStylePropsAndCustomArgs> = {
     title: 'Hooks/useContextMenuStyle',
     argTypes: {
-        ...getArgTypes(),
+        ...getUseContextMenuStyleArgTypes(),
     },
     parameters: {
-        ...getParameters(),
+        ...getUseContextMenuStyleParameters(),
     },
     args: {
-        ...getArgs(),
+        ...getUseContextMenuStyleArgs(),
     },
 };
 

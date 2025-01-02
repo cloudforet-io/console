@@ -38,8 +38,10 @@ const Template: Story = {
         components: { PContextMenu, PButton },
         template: `
             <div>
-                <p-button @click="attachMenuItems()">Attach</p-button>
-                <p-button @click="resetMenuAndPagination()">Reset</p-button>
+                 <div style="margin-bottom: 1rem;">
+                    <p-button @click="attachMenuItems()">Attach</p-button>
+                    <p-button @click="resetMenuAndPagination()">Reset Menu & Pagination</p-button>
+                 </div>
                 <p-context-menu :loading="attachLoading"
                             :menu="attachedMenu" />
             </div>
@@ -67,7 +69,7 @@ export const Basic: Story = {
             <div>
                 <div style="margin-bottom: 1rem;">
                     <p-button @click="attachMenuItems()">Attach</p-button>
-                    <p-button @click="resetMenuAndPagination()">Reset</p-button>
+                    <p-button @click="resetMenuAndPagination()">Reset Menu & Pagination</p-button>
                 </div>
                 <p-context-menu :loading="attachLoading"
                             :menu="attachedMenu" />
