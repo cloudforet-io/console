@@ -16,10 +16,10 @@ Handles attaching context menus to DOM elements dynamically based on interaction
 ```typescript
 interface UseContextMenuAttachOptions<Item extends MenuItem = MenuItem> {
     attachHandler?: Ref<MenuAttachHandler<Item>|undefined>; // custom handler
-    menu?: Ref<Item[]>;
-    searchText?: Ref<string>;
-    pageSize?: Ref<number|undefined>|number;
-    filterItems?: Ref<Item[]>;
+    menu?: Ref<Item[]>; // required when to use default attach handler. one of menu or attachHandler is required.
+    searchText?: Ref<string>; // it will be passed to the attach handler as the argument, so the handler can filter the items based on this text.
+    pageSize?: Ref<number|undefined>|number; // required when to use show more button to attach items
+    filterItems?: Ref<Item[]>; // items to be filtered out from the attached menu
 }
 
 interface UseContextMenuAttachReturns<Item> {

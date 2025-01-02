@@ -82,7 +82,7 @@ export const Basic: Story = {
                 attachedMenu, attachLoading, resetMenuAndPagination, attachMenuItems,
             } = useContextMenuAttach({
                 menu,
-                pageSize: 10,
+                pageSize: 3,
             });
             return {
                 attachedMenu, attachLoading, resetMenuAndPagination, attachMenuItems,
