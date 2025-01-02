@@ -3,7 +3,7 @@ import type { ArgTypes, Parameters, Args } from '@storybook/vue';
 import {
     getUseContextMenuAttachArgs,
     getUseContextMenuAttachArgTypes,
-} from '@/hooks/use-context-menu-controller/use-context-menu-attach/story-helper';
+} from '@/hooks/use-context-menu-attach/story-helper';
 
 import type { UseContextMenuItemsOptions } from './use-context-menu-items';
 
