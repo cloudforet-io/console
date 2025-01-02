@@ -3,6 +3,7 @@ import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PI, PPaneLayout, PTooltip, PFieldTitle, PSelectStatus, PIconButton, PDataTable, PBadge, PLink,
 } from '@cloudforet/mirinae';
@@ -83,7 +84,12 @@ const tableState = reactive({
     alertStateLabels: getAlertStateI18n(),
     urgencyLabels: getAlertUrgencyI18n(),
     totalCounts: 0,
+    sortBy: '',
+    sortDesc: false,
 });
+
+const alertListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
+    .setPage(1, 15);
 
 const handleClickStatus = (name: AlertStatusType) => {
     state.selectedStatus = name;
@@ -93,6 +99,12 @@ const handleSelectUrgency = (value: AlertUrgencyType) => {
     state.selectedUrgency = value;
     fetchAlertsList();
 };
+const handleChangeToolbox = async (sortBy:string, sortDesc:boolean) => {
+    tableState.sortBy = sortBy;
+    tableState.sortDesc = sortDesc;
+    alertListApiQueryHelper.setSort(sortBy, sortDesc);
+    await fetchAlertsList();
+};
 
 const fetchAlertsList = async () => {
     tableState.loading = true;
@@ -101,12 +113,7 @@ const fetchAlertsList = async () => {
             service_id: storeState.serviceInfo.service_id,
             status: state.selectedStatus,
             urgency: state.selectedUrgency === 'ALL' ? undefined : state.selectedUrgency as AlertUrgencyType,
-            query: {
-                page: {
-                    start: 1,
-                    limit: 15,
-                },
-            },
+            query: alertListApiQueryHelper.data,
         });
         tableState.alertsList = results || [];
         tableState.totalCounts = total_count || 0;
@@ -207,10 +214,12 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
                               :loading="tableState.loading"
                               striped
                               :bordered="false"
+                              :sort-by.sync="tableState.sortBy"
+                              :sort-desc.sync="tableState.sortDesc"
                               :show-footer="tableState.totalCounts > tableState.alertsList.length"
-                              sort-by="created_at"
                               sortable
                               class="table"
+                              @changeSort="handleChangeToolbox"
                 >
                     <template #col-title-format="{ value, item }">
                         <p-link :to="{

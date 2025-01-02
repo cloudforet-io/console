@@ -4,6 +4,7 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
+import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
@@ -16,6 +17,7 @@ import {
     PHeadingLayout,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
+import type { ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ServiceChannelListParameters } from '@/schema/alert-manager/service-channel/api-verbs/list';
@@ -44,7 +46,7 @@ import { SERVICE_TAB_HEIGHT } from '@/services/alert-manager/constants/common-co
 import {
     ALERT_EXCEL_FIELDS,
     NOTIFICATION_MANAGEMENT_TABLE_FIELDS,
-    NOTIFICATION_MANAGEMENT_TABLE_HANDLER,
+    NOTIFICATION_MANAGEMENT_TABLE_KEY_ITEMS_SETS,
 } from '@/services/alert-manager/constants/notification-table-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { useServiceCreateFormStore } from '@/services/alert-manager/stores/service-create-form-store';
@@ -98,6 +100,10 @@ const tableState = reactive({
         },
     ])),
     fields: NOTIFICATION_MANAGEMENT_TABLE_FIELDS,
+    valueHandlerMap: computed<ValueHandlerMap>(() => ({
+        name: makeDistinctValueHandler('alert_manager.ServiceChannel', 'name', 'string', [{ k: 'service_id', v: storeState.service.service_id, o: 'eq' }]),
+        state: makeEnumValueHandler(SERVICE_CHANNEL_STATE),
+    })),
 });
 const storeState = reactive({
     timezone: computed<string>(() => serviceDetailPageGetters.timezone),
@@ -127,7 +133,7 @@ const modalState = reactive({
 
 const notificationsListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
     .setPage(1, 15);
-const queryTagHelper = useQueryTags({ keyItemSets: NOTIFICATION_MANAGEMENT_TABLE_HANDLER.keyItemSets });
+const queryTagHelper = useQueryTags({ keyItemSets: NOTIFICATION_MANAGEMENT_TABLE_KEY_ITEMS_SETS });
 const { queryTags } = queryTagHelper;
 
 const getProtocolInfo = (id: string): ProtocolInfo => {
@@ -229,8 +235,8 @@ onUnmounted(() => {
                          :fields="tableState.fields"
                          :select-index="[state.selectIndex]"
                          :query-tags="queryTags"
-                         :key-item-sets="NOTIFICATION_MANAGEMENT_TABLE_HANDLER.keyItemSets"
-                         :value-handler-map="NOTIFICATION_MANAGEMENT_TABLE_HANDLER.valueHandlerMap"
+                         :key-item-sets="NOTIFICATION_MANAGEMENT_TABLE_KEY_ITEMS_SETS"
+                         :value-handler-map="tableState.valueHandlerMap"
                          :style="{height: `${props.tableHeight - SERVICE_TAB_HEIGHT}px`}"
                          @change="handleChangeToolbox"
                          @refresh="handleChangeToolbox()"

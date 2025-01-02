@@ -4,6 +4,7 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
+import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
@@ -16,6 +17,7 @@ import {
     PHeadingLayout,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
+import type { ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { WebhookListParameters } from '@/schema/alert-manager/webhook/api-verbs/list';
@@ -44,7 +46,7 @@ import { SERVICE_TAB_HEIGHT } from '@/services/alert-manager/constants/common-co
 import {
     ALERT_EXCEL_FIELDS,
     WEBHOOK_MANAGEMENT_TABLE_FIELDS,
-    WEBHOOK_MANAGEMENT_TABLE_HANDLER,
+    WEBHOOK_MANAGEMENT_TABLE_KEY_ITEMS_SETS,
 } from '@/services/alert-manager/constants/webhook-table-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
@@ -96,6 +98,11 @@ const tableState = reactive({
         },
     ])),
     fields: WEBHOOK_MANAGEMENT_TABLE_FIELDS,
+    valueHandlerMap: computed<ValueHandlerMap>(() => ({
+        name: makeDistinctValueHandler('alert_manager.Webhook', 'name', 'string', [{ k: 'service_id', v: storeState.serviceId, o: 'eq' }]),
+        state: makeEnumValueHandler(WEBHOOK_STATE),
+        'plugin_info.plugin_id': makeDistinctValueHandler('alert_manager.Webhook', 'plugin_info.plugin_id', 'string', [{ k: 'service_id', v: storeState.serviceId, o: 'eq' }]),
+    })),
 });
 const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => serviceDetailPageGetters.pluginsReferenceMap),
@@ -117,7 +124,7 @@ const modalState = reactive({
 
 const webhookListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
     .setPage(1, 15);
-const queryTagHelper = useQueryTags({ keyItemSets: WEBHOOK_MANAGEMENT_TABLE_HANDLER.keyItemSets });
+const queryTagHelper = useQueryTags({ keyItemSets: WEBHOOK_MANAGEMENT_TABLE_KEY_ITEMS_SETS });
 const { queryTags } = queryTagHelper;
 
 const handleCloseModal = () => {
@@ -212,8 +219,8 @@ onUnmounted(() => {
                          :fields="tableState.fields"
                          :select-index="[state.selectIndex]"
                          :query-tags="queryTags"
-                         :key-item-sets="WEBHOOK_MANAGEMENT_TABLE_HANDLER.keyItemSets"
-                         :value-handler-map="WEBHOOK_MANAGEMENT_TABLE_HANDLER.valueHandlerMap"
+                         :key-item-sets="WEBHOOK_MANAGEMENT_TABLE_KEY_ITEMS_SETS"
+                         :value-handler-map="tableState.valueHandlerMap"
                          :style="{height: `${props.tableHeight - SERVICE_TAB_HEIGHT}px`}"
                          @change="handleChangeToolbox"
                          @refresh="handleChangeToolbox()"
