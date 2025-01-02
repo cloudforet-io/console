@@ -79,8 +79,8 @@ const state = reactive({
             const _isSeparatedDate = widgetOptionsState.yAxisInfo?.data !== DATE_FIELD.DATE;
             return getWidgetDateFields(widgetOptionsState.granularityInfo?.granularity, state.widgetDateRange.start, state.widgetDateRange.end, _isSeparatedDate);
         }
-        const _yAxisData = state.data.results.map((d) => d[widgetOptionsState.yAxisInfo?.data as string] as string) || [];
-        return Array.from(new Set(_yAxisData));
+        const _yAxisData: string[] = state.data.results.map((d) => d[widgetOptionsState.yAxisInfo?.data as string] as string) || [];
+        return Array.from(new Set(_yAxisData)).reverse();
     }),
     chartData: [],
     chart: null as EChartsType | null,
