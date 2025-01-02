@@ -19,7 +19,7 @@ export interface MenuAttachHandler<Item extends MenuItem = MenuItem> {
 
 export interface UseContextMenuAttachOptions<Item extends MenuItem = MenuItem> {
     attachHandler?: Ref<MenuAttachHandler<Item>|undefined>; // custom handler
-    menu?: Ref<Item[]>; // required when to use default attach handler. one of menu or attachHandler is required.
+    menu?: Ref<Item[]|undefined>; // required when to use default attach handler. one of menu or attachHandler is required.
     searchText?: Ref<string>; // it will be passed to the attach handler as the argument, so the handler can filter the items based on this text.
     pageSize?: Ref<number|undefined>|number; // required when to use show more button to attach items
     filterItems?: Ref<Item[]>; // items to be filtered out from the attached menu
