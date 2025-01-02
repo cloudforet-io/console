@@ -13,13 +13,12 @@ import type {
     SelectDropdownMenuItem,
 } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
+import type { MembersType } from '@/schema/alert-manager/service/type';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { UserGroupReferenceMap } from '@/store/reference/user-group-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
-
-import type { SelectedUserDropdownIdsType } from '@/common/modules/user/typte';
 
 import { indigo } from '@/styles/colors';
 
@@ -35,8 +34,8 @@ type DropdownCategoriesType = {
 };
 
 const props = withDefaults(defineProps<{
-     selectedId?: SelectedUserDropdownIdsType;
-     selectedIds?: SelectedUserDropdownIdsType[];
+     selectedId?: string;
+     selectedIds?: string[];
      selectionType?: 'single'|'multiple';
      useFixedMenuStyle?: boolean;
      invalid?: boolean;
@@ -49,6 +48,7 @@ const props = withDefaults(defineProps<{
      showUserGroupList?: boolean;
      showCategoryTitle?: boolean;
      placeholder?: string;
+     excludedSelectedIds?: string[];
 }>(), {
     selectedId: undefined,
     selectedIds: undefined,
@@ -63,10 +63,12 @@ const props = withDefaults(defineProps<{
     showUserGroupList: true,
     showCategoryTitle: true,
     placeholder: 'Select',
+    excludedSelectedIds: undefined,
 });
 
-const emit = defineEmits<{(event: 'update:selected-ids', value: SelectedUserDropdownIdsType[]): void;
-    (event: 'update:selected-id', value?: SelectedUserDropdownIdsType): void;
+const emit = defineEmits<{(event: 'update:selected-id', value?: string): void;
+    (event: 'update:selected-ids', value: string[]): void;
+    (event: 'formatted-selected-ids', value: Record<MembersType, string[]>): void;
 }>();
 
 const allReferenceStore = useAllReferenceStore();
@@ -101,7 +103,10 @@ const state = reactive({
                 label: storeState.userReferenceMap[userId]?.label || storeState.userReferenceMap[userId]?.name || userId,
             }));
         }
-        return Object.values(storeState.userReferenceMap).map((u: UserReferenceMap[string]) => ({
+        const list = props.excludedSelectedIds
+            ? Object.values(storeState.userReferenceMap).filter((i) => !props.excludedSelectedIds?.includes(i.key))
+            : Object.values(storeState.userReferenceMap);
+        return list.map((u: UserReferenceMap[string]) => ({
             name: u.key,
             label: u.key,
             userName: u.name,
@@ -115,7 +120,10 @@ const state = reactive({
                 label: storeState.userGroupReferenceMap[userGroupId]?.label || storeState.userGroupReferenceMap[userGroupId]?.name || userGroupId,
             }));
         }
-        return Object.values(storeState.userGroupReferenceMap).map((u: UserGroupReferenceMap[string]) => ({
+        const list = props.excludedSelectedIds
+            ? Object.values(storeState.userGroupReferenceMap).filter((i) => !props.excludedSelectedIds?.includes(i.key))
+            : Object.values(storeState.userGroupReferenceMap);
+        return list.map((u: UserGroupReferenceMap[string]) => ({
             name: u.key,
             label: u.label,
             members: u.data.users?.length,
@@ -124,6 +132,7 @@ const state = reactive({
     selectedItems: [] as SelectDropdownMenuItem[],
 });
 
+const checkUserGroup = (id: string): boolean => state.allUserGroupItems.some((i) => i.name === id);
 const menuItemsHandler = (): AutocompleteHandler => async (keyword: string, pageStart = 1, pageLimit = 10, filters, resultIndex) => {
     const _totalCount = pageStart - 1 + pageLimit;
     const filterItems = (items: SelectDropdownMenuItem[]) => items.filter((item) => getTextHighlightRegex(keyword).test(item.name)).slice(pageStart - 1, _totalCount);
@@ -156,8 +165,8 @@ const menuItemsHandler = (): AutocompleteHandler => async (keyword: string, page
     });
 };
 
-const currentUserIds = computed<SelectedUserDropdownIdsType[]>(() => state.selectedItems.map((item) => ({ value: item.name, type: checkUserGroup(item.name) ? 'USER_GROUP' : 'USER' })));
-const currentUserId = computed<SelectedUserDropdownIdsType|undefined>(() => ({ value: state.selectedItems[0]?.name, type: checkUserGroup(state.selectedItems[0]?.name) ? 'USER_GROUP' : 'USER' }));
+const currentUserId = computed<string|undefined>(() => state.selectedItems[0]?.name);
+const currentUserIds = computed<string[]>(() => state.selectedItems.map((item) => item.name));
 
 const handleUpdateSelectedUserItems = (selectedUsers: SelectDropdownMenuItem[]) => {
     if (isEqual(selectedUsers, state.selectedItems)) return; // prevent unnecessary update
@@ -168,53 +177,64 @@ const handleUpdateSelectedUserItems = (selectedUsers: SelectDropdownMenuItem[]) 
     } else {
         if (isEqual(currentUserIds.value, props.selectedIds)) return; // prevent unnecessary update
         emit('update:selected-ids', currentUserIds.value);
+        emit('formatted-selected-ids', {
+            USER: currentUserIds.value.filter((i) => !checkUserGroup(i)),
+            USER_GROUP: currentUserIds.value.filter((i) => checkUserGroup(i)),
+        });
     }
 };
 const handleTagDelete = (idx: number) => {
     state.selectedItems.splice(idx, 1);
     emit('update:selected-ids', currentUserIds.value);
+    emit('formatted-selected-ids', {
+        USER: currentUserIds.value.filter((i) => !checkUserGroup(i)),
+        USER_GROUP: currentUserIds.value.filter((i) => checkUserGroup(i)),
+    });
 };
 
-const initSingleType = (_userId?: SelectedUserDropdownIdsType) => {
-    if (currentUserId?.value !== _userId?.value) {
-        const value = _userId?.value || '';
+const initSingleType = (_userId?: string) => {
+    if (currentUserId?.value !== _userId) {
+        const value = _userId || '';
         const label = (() => {
             if (props.showUserList && storeState.userReferenceMap[value]) {
-                return storeState.userReferenceMap[value]?.label ?? _userId?.value;
+                return storeState.userReferenceMap[value]?.label ?? _userId;
             }
             if (props.showUserGroupList && storeState.userGroupReferenceMap[value]) {
-                return storeState.userGroupReferenceMap[value]?.label ?? _userId?.value;
+                return storeState.userGroupReferenceMap[value]?.label ?? _userId;
             }
-            return _userId?.value;
+            return _userId;
         })();
 
-        state.selectedItems = _userId?.value
-            ? [{ name: _userId?.value, label }]
+        state.selectedItems = _userId
+            ? [{ name: _userId, label }]
             : [];
     }
 };
-const initMultipleType = (_userIds?: SelectedUserDropdownIdsType[]) => {
+const initMultipleType = (_userIds?: string[]) => {
     if (!Array.isArray(_userIds)) throw new Error('userIds should be an array');
     if (!isEqual(currentUserIds.value, _userIds)) {
         state.selectedItems = _userIds.map((userId) => {
             const label = (() => {
-                if (props.showUserList && storeState.userReferenceMap[userId.value]) {
-                    return storeState.userReferenceMap[userId.value]?.label ?? userId.value;
+                if (props.showUserList && storeState.userReferenceMap[userId]) {
+                    return storeState.userReferenceMap[userId]?.label ?? userId;
                 }
-                if (props.showUserGroupList && storeState.userGroupReferenceMap[userId.value]) {
-                    return storeState.userGroupReferenceMap[userId.value]?.label ?? userId.value;
+                if (props.showUserGroupList && storeState.userGroupReferenceMap[userId]) {
+                    return storeState.userGroupReferenceMap[userId]?.label ?? userId;
                 }
-                return userId.value;
+                return userId;
             })();
 
             return {
-                name: userId.value,
+                name: userId,
                 label,
             };
         });
+        emit('formatted-selected-ids', {
+            USER: currentUserIds.value.filter((i) => !checkUserGroup(i)),
+            USER_GROUP: currentUserIds.value.filter((i) => checkUserGroup(i)),
+        });
     }
 };
-const checkUserGroup = (id: string): boolean => state.allUserGroupItems.some((i) => i.name === id);
 
 watch([() => props.selectedId, () => props.selectedIds], ([newUserId, newUserIds]) => {
     if (props.selectionType === 'single') {

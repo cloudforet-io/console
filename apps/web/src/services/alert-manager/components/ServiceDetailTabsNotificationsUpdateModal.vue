@@ -25,7 +25,6 @@ import ScheduleSettingForm from '@/common/components/schedule-setting-form/Sched
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
-import type { SelectedUserDropdownIdsType } from '@/common/modules/user/typte';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
@@ -75,17 +74,20 @@ const state = reactive({
         },
     ])),
     selectedRadioIdx: 0,
-    selectedMemberItems: [] as SelectedUserDropdownIdsType[],
+    selectedMemberItems: {} as Record<MembersType, string[]>,
     isSchemaDataValid: false,
     isMemberDataValid: computed<boolean>(() => {
         if (state.selectedRadioIdx === 0) {
             return true;
         }
-        return state.selectedMemberItems.length > 0;
+        if (state.selectedRadioIdx === 1) {
+            return (state.selectedMemberItems.USER_GROUP || []).length > 0;
+        }
+        return (state.selectedMemberItems.USER || []).length > 0;
     }),
     isAllFormValid: computed<boolean>(() => {
         if (!name.value) return false;
-        return state.isForwardTypeProtocol ? state.isMemberDataValid : state.isSchemaDataValid;
+        return isAllValid && (state.isForwardTypeProtocol ? state.isMemberDataValid : state.isSchemaDataValid);
     }),
 });
 
@@ -127,8 +129,11 @@ const getProtocolInfo = (id: string): ProtocolInfo => {
         } : schema,
     };
 };
+const handleFormattedSelectedIds = (value: Record<MembersType, string[]>) => {
+    state.selectedMemberItems = value;
+};
 const handleChangeRadio = () => {
-    state.selectedMemberItems = [];
+    state.selectedMemberItems = {} as Record<MembersType, string[]>;
 };
 const handleScheduleForm = (form: ScheduleSettingFormType) => {
     state.scheduleForm = form;
@@ -146,8 +151,8 @@ const handleConfirm = async () => {
             schedule: state.scheduleForm,
             data: !state.isForwardTypeProtocol ? state.schemaForm : {
                 FORWARD_TYPE: state.radioMenuList[state.selectedRadioIdx].name,
-                USER_GROUP: state.selectedRadioIdx === 1 ? state.selectedMemberItems.map((item) => item.value) : undefined,
-                USER: state.selectedRadioIdx === 2 ? state.selectedMemberItems.map((item) => item.value) : undefined,
+                USER_GROUP: state.selectedRadioIdx === 1 ? state.selectedMemberItems.USER_GROUP : undefined,
+                USER: state.selectedRadioIdx === 2 ? state.selectedMemberItems.USER : undefined,
             },
         });
         showSuccessMessage(i18n.t('ALERT_MANAGER.SERVICE.ALT_S_UPDATE_SERVICE'), '');
@@ -164,17 +169,6 @@ watch(() => props.selectedItem, (selectedItem) => {
     if (selectedItem) {
         setForm('name', selectedItem.name);
         state.selectedRadioIdx = state.radioMenuList.findIndex((item) => item.name === selectedItem?.data.FORWARD_TYPE);
-        if (state.selectedRadioIdx !== 0) {
-            const userList: SelectedUserDropdownIdsType[] = selectedItem.data.USER?.map((i) => ({
-                type: 'USER',
-                value: i,
-            })) || [];
-            const userGroupList: SelectedUserDropdownIdsType[] = selectedItem.data.USER_GROUP?.map((i) => ({
-                type: 'USER_GROUP',
-                value: i,
-            })) || [];
-            state.selectedMemberItems = [...userList, ...userGroupList];
-        }
         state.scheduleForm = selectedItem.schedule;
         if (selectedItem.channel_type === SERVICE_CHANNEL_TYPE.DIRECT) {
             state.schemaForm = selectedItem.data;
@@ -188,7 +182,7 @@ watch(() => props.selectedItem, (selectedItem) => {
                     :header-title="$t('ALERT_MANAGER.NOTIFICATIONS.MODAL_UPDATE_TITLE')"
                     :visible.sync="state.proxyVisible"
                     :loading="state.loading"
-                    :disalbed="!isAllValid"
+                    :disabled="!state.isAllFormValid"
                     @confirm="handleConfirm"
     >
         <template #body>
@@ -246,7 +240,8 @@ watch(() => props.selectedItem, (selectedItem) => {
                                                       :show-category-title="false"
                                                       :show-user-group-list="state.selectedRadioIdx === 1"
                                                       :show-user-list="state.selectedRadioIdx === 2"
-                                                      :selected-ids.sync="state.selectedMemberItems"
+                                                      :selected-ids="state.selectedRadioIdx === 1 ? props.selectedItem.data.USER_GROUP || [] : props.selectedItem.data.USER || []"
+                                                      @formatted-selected-ids="handleFormattedSelectedIds"
                                 />
                             </div>
                         </template>
