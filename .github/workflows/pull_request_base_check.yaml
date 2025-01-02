@@ -1,5 +1,4 @@
-# .github/workflows/check-pull-request.yml
-name: Check Pull Request
+name: "[Pull Request] Base Check"
 
 on:
   pull_request_target:

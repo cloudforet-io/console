@@ -1,4 +1,4 @@
-name: "[PR] Review"
+name: "[Pull Request] Review"
 
 on:
   pull_request:
