@@ -163,9 +163,9 @@ const emptyState = reactive({
     }),
     description: computed(() => {
         if (!storeState.selectedDataTableId) return i18n.t('COMMON.WIDGETS.PREVIEW_TABLE_EMPTY_DESC');
+        if (queryResult.isError) return errorMessage.value;
         // if (storeState.dataTableLoadFailed && emptyState.isUnavailableDataTable) return i18n.t('DASHBOARDS.WIDGET.DATA_TABLE_LOAD_INVALID_GLOBAL_VARIABLE_DESC');
         if (!state.data?.results?.length) return i18n.t('DASHBOARDS.WIDGET.NO_DATA');
-        if (queryResult.isError) return errorMessage.value;
         return '';
     }),
 });
@@ -264,9 +264,10 @@ const queryResult = useQuery({
     }),
     enabled: computed(() => storeState.selectedDataTableId !== undefined),
     staleTime: WIDGET_LOAD_STALE_TIME,
+    retry: 2,
 });
 
-const dataTableLoading = computed<boolean>(() => queryResult.isLoading);
+const dataTableLoading = computed<boolean>(() => queryResult.isLoading.value || queryResult.isFetching.value);
 const errorMessage = computed<string>(() => queryResult.error?.value?.message);
 
 
