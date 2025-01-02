@@ -4,18 +4,21 @@ import {
     computed, onUnmounted, reactive, watch,
 } from 'vue';
 
+import { useQuery } from '@tanstack/vue-query';
 import bytes from 'bytes';
 import { sortBy } from 'lodash';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PToolbox, PI, PSelectDropdown, PEmpty, PSpinner,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
-import type { ToolboxOptions } from '@cloudforet/mirinae/src/controls/toolbox/type';
 import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { Page } from '@/schema/_common/type';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
+import type { DataTableLoadParameters } from '@/schema/dashboard/public-data-table/api-verbs/load';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import { i18n } from '@/translations';
 
@@ -23,7 +26,9 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
-import { REFERENCE_FIELD_MAP } from '@/common/modules/widgets/_constants/widget-constant';
+import { REFERENCE_FIELD_MAP, WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
+import { normalizeAndSerialize } from '@/common/modules/widgets/_helpers/global-variable-helper';
+import { sortObjectByKeys } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
@@ -33,6 +38,9 @@ import { gray, white } from '@/styles/colors';
 import { SIZE_UNITS } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import type { Granularity } from '@/services/cost-explorer/types/cost-explorer-query-type';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+
+
 
 
 interface PreviewTableField {
@@ -41,20 +49,23 @@ interface PreviewTableField {
     sortKey?: string;
 }
 
+type DataTableLoadData = ListResponse<{
+    [key: string]: string|number;
+}>;
+
+
 type DataTableModel = PublicDataTableModel|PrivateDataTableModel;
 
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 const widgetGenerateGetters = widgetGenerateStore.getters;
 const allReferenceStore = useAllReferenceStore();
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailGetters = dashboardDetailStore.getters;
 
 const storeState = reactive({
-    previewData: computed(() => widgetGenerateState.previewData),
     selectedDataTableId: computed<string|undefined>(() => widgetGenerateState.selectedDataTableId),
     selectedDataTable: computed<DataTableModel|undefined>(() => widgetGenerateGetters.selectedDataTable),
-    loading: computed<boolean>(() => widgetGenerateState.dataTableLoadLoading),
-    dataTableUpdating: computed(() => widgetGenerateState.dataTableUpdating),
-    selectedGranularity: computed<string>(() => widgetGenerateState.selectedPreviewGranularity),
     dataTableLoadFailed: computed(() => widgetGenerateState.dataTableLoadFailed),
     // reference
     project: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
@@ -64,15 +75,15 @@ const storeState = reactive({
 });
 
 const state = reactive({
-    data: undefined,
-    labelFields: computed<string[]>(() => (storeState.loading ? [] : sortWidgetTableFields(Object.keys(storeState.selectedDataTable?.labels_info ?? {})))),
-    dataFields: computed<string[]>(() => (storeState.loading ? [] : sortWidgetTableFields(Object.keys(storeState.selectedDataTable?.data_info ?? {})))),
+    data: computed<DataTableLoadData | null>(() => queryResult?.data?.value || null),
+    labelFields: computed<string[]>(() => (dataTableLoading.value === true ? [] : sortWidgetTableFields(Object.keys(storeState.selectedDataTable?.labels_info ?? {})))),
+    dataFields: computed<string[]>(() => (dataTableLoading.value === true ? [] : sortWidgetTableFields(Object.keys(storeState.selectedDataTable?.data_info ?? {})))),
     dataInfo: computed<DataInfo|undefined>(() => storeState.selectedDataTable?.data_info),
     isPivot: computed<boolean>(() => storeState.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
     isAutoTypeColumnPivot: computed<boolean>(() => state.isPivot && !!storeState.selectedDataTable?.options?.[DATA_TABLE_OPERATOR.PIVOT]?.limit),
     pivotSortKeys: computed<string[]>(() => (state.isPivot ? storeState.selectedDataTable?.sort_keys ?? [] : [])),
     fields: computed<PreviewTableField[]>(() => {
-        if (!storeState.selectedDataTableId || !storeState.previewData?.results?.length) {
+        if (!storeState.selectedDataTableId || !state.data?.results?.length) {
             return [{
                 type: 'DIVIDER',
                 name: '',
@@ -91,7 +102,7 @@ const state = reactive({
                 sortKey: key,
             }))
                 .filter((field) => {
-                    const _granularity = storeState.selectedGranularity;
+                    const _granularity = state.selectedGranularity;
                     if (state.labelFields.some((d) => d === 'Year' || d === 'Month' || d === 'Date')) {
                         if (_granularity === GRANULARITY.DAILY && (field.name === 'Year' || field.name === 'Month')) return false;
                         if (_granularity === GRANULARITY.MONTHLY && (field.name === 'Year' || field.name === 'Day')) return false;
@@ -128,50 +139,41 @@ const state = reactive({
             label: 'Yearly',
         },
     ])),
+    selectedGranularity: GRANULARITY.MONTHLY,
     dividerStyle: computed(() => ({
         padding: '0',
         width: '1px',
         'min-width': '1px',
-        backgroundColor: storeState.selectedDataTableId && storeState.previewData?.results?.length && !storeState.loading ? gray[900] : white,
+        backgroundColor: storeState.selectedDataTableId && state.data?.results?.length && !dataTableLoading.value ? gray[900] : white,
     })),
     thisPage: 1,
     pageSize: 15,
+    page: computed<Page|undefined>(() => {
+        if (state.thisPage || state.pageSize) return { start: 1 + ((state.thisPage - 1) * state.pageSize), limit: state.pageSize };
+        return undefined;
+    }),
 });
 
 const emptyState = reactive({
     isUnavailableDataTable: computed(() => storeState.selectedDataTable?.state === 'UNAVAILABLE'),
     title: computed(() => {
         if (!storeState.selectedDataTableId) return i18n.t('COMMON.WIDGETS.PREVIEW_TABLE_EMPTY_TITLE');
-        if (storeState.dataTableLoadFailed && emptyState.isUnavailableDataTable) return i18n.t('DASHBOARDS.WIDGET.DATA_TABLE_LOAD_INVALID_GLOBAL_VARIALBE_TITLE');
+        // if (storeState.dataTableLoadFailed && emptyState.isUnavailableDataTable) return i18n.t('DASHBOARDS.WIDGET.DATA_TABLE_LOAD_INVALID_GLOBAL_VARIALBE_TITLE');
         return '';
     }),
     description: computed(() => {
         if (!storeState.selectedDataTableId) return i18n.t('COMMON.WIDGETS.PREVIEW_TABLE_EMPTY_DESC');
-        if (storeState.dataTableLoadFailed && emptyState.isUnavailableDataTable) return i18n.t('DASHBOARDS.WIDGET.DATA_TABLE_LOAD_INVALID_GLOBAL_VARIABLE_DESC');
-        if (!storeState.previewData?.results?.length) return i18n.t('DASHBOARDS.WIDGET.NO_DATA');
+        // if (storeState.dataTableLoadFailed && emptyState.isUnavailableDataTable) return i18n.t('DASHBOARDS.WIDGET.DATA_TABLE_LOAD_INVALID_GLOBAL_VARIABLE_DESC');
+        if (!state.data?.results?.length) return i18n.t('DASHBOARDS.WIDGET.NO_DATA');
+        if (queryResult.isError) return errorMessage.value;
         return '';
     }),
 });
 /* Events */
 const handleSelectGranularity = async (granularity: Granularity) => {
-    if (!storeState.selectedDataTableId) return;
-    widgetGenerateStore.setSelectedPreviewGranularity(granularity);
-    await widgetGenerateStore.loadDataTable({
-        data_table_id: storeState.selectedDataTableId,
-    });
+    state.selectedGranularity = granularity;
 };
 
-const handleChangeToolbox = async (options: ToolboxOptions) => {
-    if (!storeState.selectedDataTableId) return;
-    let page = undefined as Page|undefined;
-    if (options.pageStart) page = { start: options.pageStart, limit: state.pageSize };
-    if (options.pageLimit) page = { start: 1, limit: state.pageSize };
-    await widgetGenerateStore.loadDataTable({
-        data_table_id: storeState.selectedDataTableId,
-        page,
-        sort: state.sortBy,
-    });
-};
 
 const handleClickSort = async (sortKey: string) => {
     let resultSortBy: { key: string; desc: boolean }[];
@@ -181,12 +183,12 @@ const handleClickSort = async (sortKey: string) => {
         resultSortBy = [{ key: sortKey, desc: true }];
     }
     state.sortBy = resultSortBy;
-    if (!storeState.selectedDataTableId) return;
-    await widgetGenerateStore.loadDataTable({
-        data_table_id: storeState.selectedDataTableId,
-        sort: resultSortBy,
-    });
     state.thisPage = 1;
+    // if (!storeState.selectedDataTableId) return;
+    // await widgetGenerateStore.loadDataTable({
+    //     data_table_id: storeState.selectedDataTableId,
+    //     sort: resultSortBy,
+    // });
 };
 
 /* Utils */
@@ -230,20 +232,50 @@ const getSortIcon = (field: PreviewTableField) => {
 //     return `( ${value} ${key} )`;
 // };
 
-watch(() => storeState.selectedDataTableId, async (dataTableId) => {
+const fetchWidgetData = async (params: DataTableLoadParameters): Promise<DataTableLoadData> => {
+    const defaultFetcher = storeState.selectedDataTableId?.startsWith('private')
+        ? SpaceConnector.clientV2.dashboard.privateDataTable.load<DataTableLoadParameters, DataTableLoadData>
+        : SpaceConnector.clientV2.dashboard.publicDataTable.load<DataTableLoadParameters, DataTableLoadData>;
+    const res = await defaultFetcher(params);
+    return res;
+};
+
+const queryKey = computed(() => [
+    'data-table-load',
+    storeState.selectedDataTableId,
+    {
+        granularity: state.selectedGranularity,
+        dataTableOptions: JSON.stringify(sortObjectByKeys(storeState.selectedDataTable?.options ?? {})),
+        sortBy: state.sortBy,
+        thisPage: state.thisPage,
+        pageSize: state.pageSize,
+        vars: normalizeAndSerialize(dashboardDetailGetters.dashboardInfo?.vars ?? {}),
+    },
+]);
+
+const queryResult = useQuery({
+    queryKey,
+    queryFn: () => fetchWidgetData({
+        data_table_id: storeState.selectedDataTableId,
+        granularity: state.selectedGranularity,
+        sort: state.sortBy,
+        page: state.page,
+        vars: dashboardDetailGetters.dashboardInfo?.vars,
+    }),
+    enabled: computed(() => storeState.selectedDataTableId !== undefined),
+    staleTime: WIDGET_LOAD_STALE_TIME,
+});
+
+const dataTableLoading = computed<boolean>(() => queryResult.isLoading);
+const errorMessage = computed<string>(() => queryResult.error?.value?.message);
+
+
+watch([() => storeState.selectedDataTableId, () => storeState.selectedDataTable], async ([dataTableId]) => {
     if (!dataTableId) return;
     state.thisPage = 1;
     state.sortBy = [];
-    widgetGenerateStore.setDataTableUpdating(true);
-    await widgetGenerateStore.loadDataTable({});
 }, { immediate: true });
 
-watch(() => storeState.dataTableUpdating, () => {
-    if (storeState.dataTableUpdating) {
-        state.thisPage = 1;
-        state.sortBy = [];
-    }
-});
 
 onUnmounted(() => {
     widgetGenerateStore.setDataTableLoadFailed(false);
@@ -259,8 +291,7 @@ onUnmounted(() => {
                    :page-size-options="[15, 30, 45]"
                    :page-size.sync="state.pageSize"
                    :this-page.sync="state.thisPage"
-                   :total-count="storeState.previewData.total_count"
-                   @change="handleChangeToolbox"
+                   :total-count="state.data?.total_count"
         >
             <template #left-area>
                 <div class="toolbox-left-wrapper">
@@ -279,7 +310,7 @@ onUnmounted(() => {
                         </div>
                         <p-select-dropdown class="granularity-dropdown"
                                            :menu="state.granularityItems"
-                                           :selected="widgetGenerateState.selectedPreviewGranularity"
+                                           :selected="state.selectedGranularity"
                                            use-fixed-menu-style
                                            @select="handleSelectGranularity"
                         />
@@ -312,7 +343,7 @@ onUnmounted(() => {
                 </tr>
             </thead>
             <tbody>
-                <tr v-if="storeState.loading"
+                <tr v-if="dataTableLoading === true"
                     class="no-data-wrapper"
                 >
                     <p-empty>
@@ -324,8 +355,8 @@ onUnmounted(() => {
                         </div>
                     </p-empty>
                 </tr>
-                <template v-else-if="storeState.selectedDataTableId && storeState.previewData?.results?.length">
-                    <tr v-for="(item, rowIdx) in storeState.previewData.results"
+                <template v-else-if="storeState.selectedDataTableId && state.data?.results?.length">
+                    <tr v-for="(item, rowIdx) in state.data.results"
                         :key="`tr-preview-${rowIdx}`"
                         :data-index="rowIdx"
                     >
@@ -346,11 +377,6 @@ onUnmounted(() => {
                     class="no-data-wrapper"
                 >
                     <p-empty class="preview-empty-contents">
-                        <!--                        <template #image>-->
-                        <!--                            <img src="@/assets/images/img_jellyocto-with-a-telescope.png"-->
-                        <!--                                 alt="image-preview-data-empty"-->
-                        <!--                            >-->
-                        <!--                        </template>-->
                         <template #default>
                             <p class="title">
                                 {{ emptyState.title }}
