@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-import dayjs from 'dayjs';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PCollapsibleList, PPaneLayout, PHeading, PTextarea, PSelectDropdown, PTextBeautifier, PHeadingLayout,
 } from '@cloudforet/mirinae';
+import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
@@ -83,6 +82,9 @@ const fetchNoteList = async () => {
     try {
         const { results } = await SpaceConnector.clientV2.alertManager.note.list<NoteListParameters, ListResponse<NoteModel>>({
             alert_id: storeState.alertInfo.alert_id,
+            query: {
+                sort: [{ key: 'created_at', desc: true }],
+            },
         });
         state.noteList = (results || []).map((d) => ({
             title: d.created_by,
@@ -137,7 +139,7 @@ watch(() => storeState.alertInfo.alert_id, async (id) => {
                     <div class="flex items-center justify-between w-full text-label-md">
                         <p>
                             <span class="text-blue-900 font-bold mr-0.5">{{ title }}</span>
-                            <span class="text-gray-400 text-label-sm">{{ dayjs.tz(state.noteList[index].created_at, storeState.timezone).format('MM/DD HH:mm') }}</span>
+                            <span class="text-gray-400 text-label-sm">{{ iso8601Formatter(state.noteList[index].created_at, storeState.timezone, 'MM/DD HH:mm') }}</span>
                         </p>
                         <p-select-dropdown style-type="icon-button"
                                            button-icon="ic_ellipsis-horizontal"
