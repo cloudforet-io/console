@@ -7,7 +7,7 @@ export const USER_GROUP_SEARCH_HANDLERS: KeyItemSet[] = [
             { name: 'user_group_id', label: 'User Group ID' },
             { name: 'users', label: 'Users' },
             { name: 'description', label: 'Description' },
-            { name: 'created', label: 'Created', dataType: 'datetime' },
+            { name: 'created_at', label: 'Created', dataType: 'datetime' },
         ],
     },
 ];

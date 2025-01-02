@@ -56,7 +56,7 @@ const tableState = reactive({
     fields: computed<DataTableFieldType[]>(() => [
         { name: 'name', label: 'User Group Name' },
         { name: 'description', label: 'Description' },
-        { name: 'notification_channel', label: 'Notification Channel' }, // TODO: get from other api
+        { name: 'notification_channel', label: 'Notification Channel' },
         { name: 'users', label: 'Users' },
         { name: 'created_at', label: 'Created' },
     ]),
@@ -64,7 +64,7 @@ const tableState = reactive({
         user_group_id: makeDistinctValueHandler('identity.UserGroup', 'user_group_id', 'string'),
         users: makeDistinctValueHandler('identity.UserGroup', 'users', 'string'),
         description: makeDistinctValueHandler('identity.UserGroup', 'description', 'string'),
-        created: makeDistinctValueHandler('identity.UserGroup', 'created', 'datetime'),
+        created: makeDistinctValueHandler('identity.UserGroup', 'created_at', 'datetime'),
         tags: makeDistinctValueHandler('identity.UserGroup', 'tags', 'object'),
     })),
 });
