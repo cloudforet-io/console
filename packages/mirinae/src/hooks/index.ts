@@ -1,5 +1,5 @@
 export * from './use-context-menu-controller/use-context-menu-controller';
-export * from './use-context-menu-style/use-context-menu-style';
+export * from '@/hooks/use-context-menu-controller/use-context-menu-style/use-context-menu-style';
 export * from './use-query-search/use-query-search';
 export * from './use-ignore-window-arrow-keydown-events/use-ignore-window-arrow-keydown-events';
 export * from './use-list-focus/use-list-focus';

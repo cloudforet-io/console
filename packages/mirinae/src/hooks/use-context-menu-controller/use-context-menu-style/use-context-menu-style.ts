@@ -1,7 +1,7 @@
 import {
     computed, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
-import type { Ref } from 'vue';
+import type { Ref, ComputedRef } from 'vue';
 import type Vue from 'vue';
 
 import {
@@ -9,23 +9,41 @@ import {
 } from '@floating-ui/dom';
 import { throttle } from 'lodash';
 
-interface UseContextMenuStyleOptions {
+export interface UseContextMenuStyleOptions {
+    /*
+    Useful when used inside an element whose css position attribute value is fixed.
+    It automatically check targetRef's position and adjust the context menu's position.
+     */
     useFixedMenuStyle?: Ref<boolean|undefined> | boolean;
+
     visibleMenu?: Ref<boolean|undefined>;
     targetRef: Ref<Vue|HTMLElement|null>;
     menuRef: Ref<Vue|HTMLElement|null>;
+
+     /* Required for context menu style */
     position?: Ref<'left'|'right'|undefined>|'left'|'right';
     menuWidth?: Ref<'target-width'|string|undefined>|'target-width'|string|undefined; // default is 'auto'.
     boundary?: Ref<string|undefined>|string; // it's not developed yet. if you want to use it, you can develop it with detectOverflow middleware.
 }
 
+interface UseContextMenuStyleReturns {
+    targetRef: Ref<Vue|HTMLElement|null>;
+    targetElement: ComputedRef<Element|null>;
+    menuRef: Ref<Vue|HTMLElement|null>;
+    menuElement: ComputedRef<Element|null>;
+    contextMenuStyle: Ref<Partial<CSSStyleDeclaration>>;
+}
+
 export const useContextMenuStyle = ({
     useFixedMenuStyle, visibleMenu, targetRef, menuRef, position, boundary, menuWidth,
-}: UseContextMenuStyleOptions) => {
+}: UseContextMenuStyleOptions): UseContextMenuStyleReturns => {
+    if (!targetRef) throw new Error('\'targetRef\' option must be given.');
+    if (!menuRef) throw new Error('\'menuRef\' option must be given.');
+
     const state = reactive({
         useFixedMenuStyle: useFixedMenuStyle ?? false,
-        visibleMenu,
-        position,
+        visibleMenu: visibleMenu ?? false,
+        position: position ?? 'left',
         menuWidth,
         boundary: boundary ?? undefined,
     });
@@ -163,5 +181,5 @@ export const useContextMenuStyle = ({
 
     return {
         ...toRefs(contextMenuFixedStyleState),
-    };
+    } as unknown as UseContextMenuStyleReturns;
 };
