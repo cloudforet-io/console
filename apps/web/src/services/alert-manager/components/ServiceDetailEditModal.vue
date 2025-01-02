@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
+import {
+    PButtonModal, PFieldGroup, PTextInput, PTextarea,
+} from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 
@@ -11,6 +13,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
+import type { Service } from '@/services/alert-manager/types/alert-manager-type';
 
 interface Props {
     visible: boolean;
@@ -27,22 +30,24 @@ const emit = defineEmits<{(e: 'update:visible'): void; }>();
 
 const storeState = reactive({
     serviceListMap: computed<ServiceReferenceMap>(() => serviceDetailPageGetters.serviceReferenceMap),
-    serviceName: computed<string>(() => serviceDetailPageGetters.serviceInfo.name),
+    service: computed<Service>(() => serviceDetailPageGetters.serviceInfo),
 });
 const state = reactive({
     loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
+    disabled: computed<boolean>(() => invalidState.name || (storeState.service.name === name.value && storeState.service.description === description.value)),
 });
 const {
     forms: {
         name,
+        description,
     },
     setForm,
     invalidState,
     invalidTexts,
-    isAllValid,
 } = useFormValidator({
-    name: storeState.serviceName,
+    name: storeState.service.name,
+    description: storeState.service.description,
 }, {
     name(value: string) {
         if (!value) return ' ';
@@ -57,7 +62,10 @@ const {
 const handleConfirm = async () => {
     state.loading = true;
     try {
-        await serviceDetailPageStore.updateServiceDetailData(name.value);
+        await serviceDetailPageStore.updateServiceDetailData({
+            name: name.value,
+            description: description.value || ' ',
+        });
     } finally {
         state.loading = false;
         handleClose();
@@ -75,7 +83,7 @@ const handleClose = () => {
                     :fade="true"
                     :backdrop="true"
                     :visible="state.proxyVisible"
-                    :disabled="!isAllValid"
+                    :disabled="state.disabled"
                     :loading="state.loading"
                     @confirm="handleConfirm"
                     @cancel="handleClose"
@@ -97,6 +105,13 @@ const handleClose = () => {
                                       @update:value="setForm('name', $event)"
                         />
                     </template>
+                </p-field-group>
+                <p-field-group :label="$t('ALERT_MANAGER.DESCRIPTION')"
+                               class="input-form"
+                >
+                    <p-textarea :value="description"
+                                @update:value="setForm('description', $event)"
+                    />
                 </p-field-group>
             </div>
         </template>
