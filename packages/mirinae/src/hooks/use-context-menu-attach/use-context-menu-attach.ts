@@ -32,6 +32,13 @@ interface UseContextMenuAttachReturns<Item> {
     attachMenuItems: (resultIndex?: number) => Promise<void>;
 }
 
+interface UseContextMenuAttachReturns<Item> {
+    attachedMenu: Ref<Item[]>;
+    attachLoading: Ref<boolean>;
+    resetMenuAndPagination: () => void;
+    attachMenuItems: (resultIndex?: number) => Promise<void>;
+}
+
 export const useContextMenuAttach = <Item extends MenuItem = MenuItem>({
     attachHandler: _attachHandler, menu, searchText, pageSize: _pageSize, filterItems,
 }: UseContextMenuAttachOptions<Item>): UseContextMenuAttachReturns<Item> => {
