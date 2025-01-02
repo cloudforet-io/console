@@ -282,7 +282,7 @@ watch([() => state.chartData, () => chartContext.value], ([, chartCtx]) => {
     }
 });
 
-watch(() => state.data, (newData) => {
+watch([() => state.data, () => props.widgetOptions], ([newData]) => {
     drawChart(newData);
 });
 
