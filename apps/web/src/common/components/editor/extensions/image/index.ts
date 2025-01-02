@@ -14,7 +14,7 @@ import { dropImagePlugin } from './plugins/drop-image';
  */
 const IMAGE_INPUT_REGEX = /!\[(.+|:?)\]\((\S+)(?:(?:\s+)["'](\S+)["'])?\)/;
 
-export const createImageExtension = (uploadFn: ImageUploader<any>, imgFileDataMap: Map<string, any>) => Node.create({
+export const createImageExtension = (uploadFn: ImageUploader) => Node.create({
     name: 'image',
     inline: true,
     group: 'inline',
@@ -74,6 +74,6 @@ export const createImageExtension = (uploadFn: ImageUploader<any>, imgFileDataMa
         ];
     },
     addProseMirrorPlugins() {
-        return [dropImagePlugin(uploadFn, imgFileDataMap)];
+        return [dropImagePlugin(uploadFn)];
     },
 });
