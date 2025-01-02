@@ -112,14 +112,11 @@ const state = reactive({
                 }
                 const _values = _params.map((p) => {
                     const _unit: string|undefined = state.unitMap[p.seriesName];
-                    // let _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.dataField, p.seriesName);
                     let _value = numberFormatter(p.value) || '';
                     if (widgetOptionsState.tooltipNumberFormatInfo?.toggleValue) {
                         _value = getFormattedNumber(p.value, p.seriesName, widgetOptionsState.numberFormatInfo, _unit);
                     }
-                    // if (_unit) _seriesName = `${_seriesName} (${_unit})`;
-                    // return `${p.marker} ${_seriesName}: <b>${_value}</b>`;
-                    return `${p.marker}: <b>${_value}</b>`;
+                    return `${p.marker} ${p.seriesName}: <b>${_value}</b>`;
                 });
                 return [_axisValue, ..._values].join('<br/>');
             },
