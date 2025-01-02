@@ -20,9 +20,7 @@ export const ALERT_MANAGEMENT_TABLE_FIELDS: DataTableFieldType[] = [
     { name: 'urgency', label: 'Urgency' },
     { name: 'triggered_type', label: 'Category' },
     { name: 'resources', label: 'Resource', width: '20rem' },
-    // { name: 'updated_by', label: 'Updated by' },
-    // { name: 'resolved_by', label: 'Resolved by' },
-    // { name: 'acknowledged by', label: 'Acknowledged by' },
+    { name: 'created_at', label: 'Created at' },
 ];
 export const ALERT_MANAGEMENT_TABLE_HANDLER: AlertManagementTableHandlerType = {
     keyItemSets: [{
