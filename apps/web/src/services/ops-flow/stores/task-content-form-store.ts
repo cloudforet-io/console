@@ -198,9 +198,9 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
             state.statusId = task.status_id;
             state.assignee = task.assignee;
             state.defaultData = {
-                title: task.name,
-                description: task.description,
-                project: task.project_id ? [task.project_id] : undefined,
+                [DEFAULT_FIELD_ID_MAP.title]: task.name,
+                [DEFAULT_FIELD_ID_MAP.description]: task.description,
+                [DEFAULT_FIELD_ID_MAP.project]: task.project_id ? [task.project_id] : undefined,
             };
             state.data = task.data ?? {};
             state.defaultDataValidationMap = {};
@@ -222,13 +222,13 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
                 state.createTaskLoading = true;
                 state.originTask = await taskAPI.create({
                     task_type_id: state.currentTaskType.task_type_id,
-                    name: state.defaultData.title,
+                    name: state.defaultData[DEFAULT_FIELD_ID_MAP.title],
                     status_id: state.statusId as string,
-                    description: state.defaultData.description || undefined,
+                    description: state.defaultData[DEFAULT_FIELD_ID_MAP.description] || undefined,
                     assignee: state.assignee || undefined,
                     data: isEmpty(state.data) ? undefined : state.data,
                     files: state.files.map((f) => f.file_id),
-                    project_id: state.defaultData.project?.[0],
+                    project_id: state.defaultData[DEFAULT_FIELD_ID_MAP.project]?.[0],
                     resource_group: state.currentTaskType.scope,
                 });
                 showSuccessMessage(i18n.t('OPSFLOW.ALT_S_CREATE_TARGET', { target: taskManagementTemplateStore.templates.task }), '');
@@ -245,7 +245,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
                 if (!state.originTask) throw new Error('Origin task is not defined');
                 await taskAPI.update({
                     task_id: state.originTask.task_id,
-                    name: state.defaultData.title,
+                    name: state.defaultData[DEFAULT_FIELD_ID_MAP.title],
                 });
                 showSuccessMessage(i18n.t('OPSFLOW.ALT_S_UPDATE_TARGET', { target: taskManagementTemplateStore.templates.task }), '');
                 return true;

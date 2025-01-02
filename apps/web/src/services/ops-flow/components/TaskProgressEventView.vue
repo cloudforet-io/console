@@ -10,6 +10,9 @@ import { useTimezoneDate } from '@/common/composables/timezone-date';
 
 import { TASK_STATUS_LABELS } from '@/services/ops-flow/constants/task-status-label-constant';
 import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
+import {
+    useTaskFieldMetadataStore,
+} from '@/services/ops-flow/task-fields-configuration/stores/use-task-field-metadata-store';
 
 const props = withDefaults(defineProps<{
     eventType: EventType;
@@ -22,6 +25,7 @@ const props = withDefaults(defineProps<{
 });
 
 const taskTypeStore = useTaskTypeStore();
+const taskFieldMetadataStore = useTaskFieldMetadataStore();
 
 const fields = asyncComputed<TaskField[]>(async () => {
     if (!props.taskTypeId) return [];
@@ -38,6 +42,9 @@ const fields = asyncComputed<TaskField[]>(async () => {
 }, [], { lazy: true });
 const fieldNameMap = computed(() => {
     const map: Record<string, string> = {};
+    taskFieldMetadataStore.getters.allDefaultFields.forEach((field) => {
+        map[field.field_id] = field.name;
+    });
     fields.value.forEach((field) => {
         map[field.field_id] = field.name;
     });
@@ -59,7 +66,7 @@ const { getTimezoneDate } = useTimezoneDate();
                 <div v-for="(d, idx) in props.additionalInfo.updated_data"
                      :key="idx"
                 >
-                    {{ $t('OPSFLOW.TASK_BOARD.FIELD') }}: {{ fieldNameMap[d.updated_field] }}<br>
+                    {{ $t('OPSFLOW.TASK_BOARD.FIELD') }}: {{ fieldNameMap[d.updated_field] ?? d.updated_field }}<br>
                     {{ $t('OPSFLOW.TASK_BOARD.CONTENT') }}: {{ d.updated_content }}
                 </div>
             </template>
