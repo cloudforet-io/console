@@ -102,6 +102,7 @@ const state = reactive({
             formatter: (params) => {
                 let _source = params.data.source as string;
                 let _target = params.data.target as string;
+                if (!_source || !_target) return '';
                 if (_source === DATE_FIELD.DATE) {
                     _source = dayjs.utc(_source).format(state.dateFormat);
                 } else {
