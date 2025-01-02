@@ -69,6 +69,7 @@ onMounted(() => {
                 <template #container="{ height }">
                     <p-tab :tabs="tabState.tabs"
                            :active-tab.sync="tabState.activeTab"
+                           class="tab"
                            :style="{ height: `${height}px` }"
                     >
                         <template #webhook>
@@ -96,3 +97,17 @@ onMounted(() => {
         </p-tab>
     </div>
 </template>
+
+<style scoped lang="postcss">
+.tab {
+    min-height: 32.625rem;
+}
+
+/* custom design-system component - p-horizontal-layout */
+:deep(.p-horizontal-layout) {
+    .horizontal-contents {
+        min-height: 32.625rem;
+        overflow: unset;
+    }
+}
+</style>

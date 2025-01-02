@@ -313,6 +313,7 @@ onUnmounted(() => {
 <style scoped lang="postcss">
 .service-detail-tabs-notifications {
     border: none;
+    min-height: 29.875rem;
     .col-channel {
         @apply flex items-center;
         gap: 0.5rem;

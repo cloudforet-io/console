@@ -307,6 +307,7 @@ onUnmounted(() => {
 
 <style scoped lang="postcss">
 .service-detail-tabs-webhook {
+    min-height: 29.875rem;
     border: none;
     .col-failed-requests {
         @apply text-red-500;
@@ -314,6 +315,13 @@ onUnmounted(() => {
     .col-type {
         @apply flex items-center;
         gap: 0.5rem;
+    }
+
+    /* custom design-system component - p-toolbox-table */
+    :deep(.p-toolbox-table) {
+        .p-data-table {
+            height: calc(100% - 44rem);
+        }
     }
 }
 </style>
