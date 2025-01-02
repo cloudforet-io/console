@@ -8,6 +8,7 @@ import { range, zipObject } from 'lodash';
 import {
     PFieldGroup, PRadioGroup, PRadio, PI, PSelectButton, PSelectDropdown,
 } from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { ServiceChannelScheduleType } from '@/schema/alert-manager/service-channel/type';
 import { i18n } from '@/translations';
@@ -59,6 +60,14 @@ const state = reactive({
     selectedDayButton: ['MON', 'TUE', 'WED', 'THU', 'FRI'] as DayType[],
     start: 0,
     end: 24,
+    startHourTimeList: computed<SelectDropdownMenuItem[]>(() => range(state.start, state.end).map((h) => ({
+        label: `${h.toString().padStart(2, '0')}:00`,
+        name: h.toString(),
+    }))),
+    endHourTimeList: computed<SelectDropdownMenuItem[]>(() => range(state.start, 25).map((h) => ({
+        label: `${h.toString().padStart(2, '0')}:00`,
+        name: h.toString(),
+    }))),
     scheduleDayForm: computed<Record<DayType, ScheduleFormDayType>>(() => {
         const refinedDays = state.days.map((day) => ({
             is_scheduled: state.selectedDayButton.includes(day.name),
@@ -90,10 +99,6 @@ const initScheduleForm = () => {
     state.start = props.scheduleForm[filteredSchedule[0]]?.start || 0;
     state.end = props.scheduleForm[filteredSchedule[0]]?.end || 24;
 };
-const generateHourlyTimeArray = () => range(0, 25).map((h) => ({
-    label: `${h.toString().padStart(2, '0')}:00`,
-    name: h,
-}));
 
 const handleSelectScheduleType = (type: ServiceChannelScheduleType) => {
     if (type === 'WEEK_DAY') {
@@ -169,13 +174,13 @@ onMounted(() => {
                 </p-select-button>
             </div>
             <div class="flex items-center gap-2">
-                <p-select-dropdown :menu="generateHourlyTimeArray()"
+                <p-select-dropdown :menu="state.startHourTimeList"
                                    :selected="state.start"
                                    placeholder="00:00"
                                    @select="handleSelectDropdown('start', $event)"
                 />
                 <span>{{ $t('COMMON.SCHEDULE_SETTING.TO') }}</span>
-                <p-select-dropdown :menu="generateHourlyTimeArray()"
+                <p-select-dropdown :menu="state.endHourTimeList"
                                    :selected="state.end"
                                    placeholder="24:00"
                                    @select="handleSelectDropdown('end', $event)"

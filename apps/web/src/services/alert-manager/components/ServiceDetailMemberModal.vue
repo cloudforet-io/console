@@ -25,7 +25,6 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useProxyValue } from '@/common/composables/proxy-state';
-import type { SelectedUserDropdownIdsType } from '@/common/modules/user/typte';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
 import { indigo } from '@/styles/colors';
@@ -92,31 +91,35 @@ const state = reactive({
         const userList = storeState.serviceInfo.members.USER.map((i) => {
             const user = storeState.userMap[i];
             return {
-                roleType: user.data.roleInfo?.role_type,
-                label: user.label,
+                roleType: user?.data.roleInfo?.role_type,
+                label: user?.label,
                 type: MEMBERS_TYPE.USER,
-                key: user.key,
+                key: user?.key,
             };
         });
         const userGroupList = storeState.serviceInfo.members.USER_GROUP.map((i) => {
             const userGroup = storeState.userGroupMap[i];
             return {
-                label: userGroup.name,
+                label: userGroup?.name || '',
                 type: MEMBERS_TYPE.USER_GROUP,
-                key: userGroup.key,
+                key: userGroup?.key,
             };
         });
         return [...userList, ...userGroupList];
     }),
     userList: computed<MemberInfoType[]>(() => state.memberList.filter((i) => i.type === 'USER').map((i) => i.key)),
     userGroupList: computed<MemberInfoType[]>(() => state.memberList.filter((i) => i.type === 'USER_GROUP').map((i) => i.key)),
-    selectedMemberItems: [] as SelectedUserDropdownIdsType[],
+    excludedSelectedIds: [] as string[],
+    formattedMemberItems: {} as Record<MembersType, string[]>,
 });
 
+const handleFormattedSelectedIds = (value: Record<MembersType, string[]>) => {
+    state.formattedMemberItems = value;
+};
 const handleClickInviteButton = () => {
-    state.selectedMemberItems = [
-        ...state.userList.map((i) => ({ type: 'USER', value: i })),
-        ...state.userGroupList.map((i) => ({ type: 'USER_GROUP', value: i })),
+    state.excludedSelectedIds = [
+        ...state.userList.map((i) => i),
+        ...state.userGroupList.map((i) => i),
     ];
     state.mode = 'invitation';
 };
@@ -141,21 +144,18 @@ const inviteMember = async () => {
     state.loading = true;
     try {
         const [defaultUserList, defaultUserGroupList] = partition(state.memberList, { type: 'USER' });
-        const [selectedUserList, selectedUserGroupList] = partition(state.selectedMemberItems, { type: 'USER' });
 
         const _defaultUserList = map(defaultUserList, 'key');
         const _defaultUserGroupList = map(defaultUserGroupList, 'key');
-        const _selectedUserList = map(selectedUserList, 'value');
-        const _selectedUserGroupList = map(selectedUserGroupList, 'value');
 
         await fetcherChangeMembers(
-            [..._defaultUserList, ..._selectedUserList],
-            [..._defaultUserGroupList, ..._selectedUserGroupList],
+            [..._defaultUserList, ...state.formattedMemberItems.USER],
+            [..._defaultUserGroupList, ...state.formattedMemberItems.USER_GROUP],
         );
     } finally {
         state.loading = false;
         state.mode = 'member';
-        state.selectedMemberItems = [];
+        state.excludedSelectedIds = [];
     }
 };
 
@@ -231,7 +231,7 @@ const fetcherChangeMembers = async (userData: string[], userGroupData: string[])
                                                       size="sm"
                                             />
                                         </p>
-                                        <span>{{ item.label }}</span>
+                                        <span>{{ item?.label }}</span>
                                     </div>
                                     <p class="member-info-content">
                                         <span v-if="!state.isMobileSize && item.type === MEMBERS_TYPE.USER"
@@ -264,7 +264,10 @@ const fetcherChangeMembers = async (userData: string[], userGroupData: string[])
                     <user-select-dropdown selection-type="multiple"
                                           appearance-type="stack"
                                           use-fixed-menu-style
-                                          :selected-ids.sync="state.selectedMemberItems"
+                                          excluded-hidden-ids
+                                          :excluded-selected-ids="state.excludedSelectedIds"
+                                          :placeholder="$t('ALERT_MANAGER.SERVICE.MODAL_MEMBER_PLACEHOLDER')"
+                                          @formatted-selected-ids="handleFormattedSelectedIds"
                     />
                 </div>
             </div>

@@ -39,6 +39,7 @@ const storeState = reactive({
     webhookName: computed<string>(() => serviceCreateFormState.webhookName || ''),
 });
 const state = reactive({
+    loading: false,
     form: {} as CreatedNotificationInfoType,
     formValid: false,
     isAllFormValid: computed<boolean>(() => {
@@ -72,6 +73,7 @@ const fetchCreateNotifications = async () => {
         service_id: storeState.createdServiceId,
         ...state.form,
     };
+    state.loading = true;
     try {
         await fetcher(state.isForwardTypeProtocol
             ? defaultParams
@@ -80,6 +82,8 @@ const fetchCreateNotifications = async () => {
         showSuccessMessage(i18n.t('ALERT_MANAGER.NOTIFICATIONS.ALT_S_CREATED'), '');
     } catch (e) {
         ErrorHandler.handleError(e, true);
+    } finally {
+        state.loading = false;
     }
 };
 
@@ -92,6 +96,7 @@ onUnmounted(() => {
     <service-create-step-container class="service-create-step3"
                                    :selected-item-id="storeState.selectedProtocol"
                                    :is-all-form-valid="state.isAllFormValid"
+                                   :loading="state.loading"
                                    @create="fetchCreateNotifications"
     >
         <notifications-create-type-selector v-if="storeState.currentSubStep === 1" />

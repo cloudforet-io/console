@@ -16,7 +16,6 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import type { ScheduleSettingFormType } from '@/common/components/schedule-setting-form/schedule-setting-form';
 import ScheduleSettingForm from '@/common/components/schedule-setting-form/ScheduleSettingForm.vue';
 import { useFormValidator } from '@/common/composables/form-validator';
-import type { SelectedUserDropdownIdsType } from '@/common/modules/user/typte';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
 import { useServiceCreateFormStore } from '@/services/alert-manager/stores/service-create-form-store';
@@ -54,13 +53,16 @@ const state = reactive({
         },
     ])),
     selectedRadioIdx: 0,
-    selectedMemberItems: [] as SelectedUserDropdownIdsType[],
+    selectedMemberItems: {} as Record<MembersType, string[]>,
     isSchemaDataValid: false,
     isMemberDataValid: computed<boolean>(() => {
         if (state.selectedRadioIdx === 0) {
             return true;
         }
-        return state.selectedMemberItems.length > 0;
+        if (state.selectedRadioIdx === 1) {
+            return (state.selectedMemberItems.USER_GROUP || []).length > 0;
+        }
+        return (state.selectedMemberItems.USER || []).length > 0;
     }),
 });
 
@@ -85,6 +87,9 @@ const {
     },
 });
 
+const handleFormattedSelectedIds = (value: Record<MembersType, string[]>) => {
+    state.selectedMemberItems = value;
+};
 const handleSchemaValidate = (isValid: boolean) => {
     state.isSchemaDataValid = isValid;
 };
@@ -92,7 +97,7 @@ const handleScheduleForm = (form: ScheduleSettingFormType) => {
     state.scheduleForm = form;
 };
 const handleChangeRadio = () => {
-    state.selectedMemberItems = [];
+    state.selectedMemberItems = {};
 };
 
 watch([() => name.value, () => state.scheduleForm, () => state.selectedRadioIdx, () => state.selectedMemberItems, () => state.schemaForm], (
@@ -105,8 +110,8 @@ watch([() => name.value, () => state.scheduleForm, () => state.selectedRadioIdx,
             schedule: scheduleForm,
             data: !state.isForwardTypeProtocol ? schemaForm : {
                 FORWARD_TYPE: state.radioMenuList[selectedRadioIdx].name,
-                USER_GROUP: selectedRadioIdx === 1 ? selectedMemberItems.map((item) => item.value) : undefined,
-                USER: selectedRadioIdx === 2 ? selectedMemberItems.map((item) => item.value) : undefined,
+                USER_GROUP: selectedRadioIdx === 1 ? selectedMemberItems.USER_GROUP : undefined,
+                USER: selectedRadioIdx === 2 ? selectedMemberItems.USER : undefined,
             },
         },
         isAllValid.value && (state.isForwardTypeProtocol ? state.isMemberDataValid : state.isSchemaDataValid),
@@ -174,7 +179,7 @@ watch([() => name.value, () => state.scheduleForm, () => state.selectedRadioIdx,
                                           :show-category-title="false"
                                           :show-user-group-list="state.selectedRadioIdx === 1"
                                           :show-user-list="state.selectedRadioIdx === 2"
-                                          :selected-ids.sync="state.selectedMemberItems"
+                                          @formatted-selected-ids="handleFormattedSelectedIds"
                     />
                 </div>
             </template>

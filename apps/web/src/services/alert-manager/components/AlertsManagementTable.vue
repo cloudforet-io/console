@@ -13,6 +13,7 @@ import {
 import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
+import { iso8601Formatter } from '@cloudforet/utils';
 
 import { ALERT_STATUS, ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
@@ -80,6 +81,7 @@ const state = reactive({
         return {
             ...alert,
             alert_number: number[number.length - 1],
+            created_at: iso8601Formatter(alert.created_at, storeState.timezone),
         };
     })),
     alertStateLabels: getAlertStateI18n(),
@@ -137,6 +139,7 @@ const handleSelectFilter = (type: 'status' | 'urgency', value: string) => {
     fetchAlertsList();
 };
 const handleChange = async (options: any = {}) => {
+    if (options.sortBy !== undefined) alertListApiQueryHelper.setSort(options.sortBy, options.sortDesc);
     if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
     if (options.pageStart !== undefined) alertListApiQueryHelper.setPageStart(options.pageStart);
     if (options.pageLimit !== undefined) alertListApiQueryHelper.setPageLimit(options.pageLimit);
@@ -240,9 +243,10 @@ watch(() => route.query, async (query) => {
                                    :selection-label="$t('ALERT_MANAGER.ALERTS.SERVICE')"
                                    style-type="rounded"
                                    show-delete-all-button
+                                   selection-highlight
                                    use-fixed-menu-style
                                    :selected="filterState.selectedServiceId"
-                                   class="service-dropdown pt-6 pl-4"
+                                   class="service-dropdown mt-6 pl-4"
                                    @update:selected="handleSelectServiceDropdownItem"
                 />
             </template>

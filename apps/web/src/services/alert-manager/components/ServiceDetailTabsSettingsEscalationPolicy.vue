@@ -3,6 +3,7 @@ import {
     reactive, computed, watch,
 } from 'vue';
 
+import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
@@ -15,6 +16,7 @@ import {
     PI,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
+import type { ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -40,7 +42,7 @@ import ServiceDetailTabsSettingsEscalationPolicyStateModal
     from '@/services/alert-manager/components/ServiceDetailTabsSettingsEscalationPolicyStateModal.vue';
 import {
     ALERT_EXCEL_FIELDS,
-    ESCALATION_POLICY_MANAGEMENT_TABLE_FIELDS, ESCALATION_POLICY_MANAGEMENT_TABLE_HANDLER,
+    ESCALATION_POLICY_MANAGEMENT_TABLE_FIELDS, ESCALATION_POLICY_MANAGEMENT_TABLE_KEY_ITEMS_SETS,
 } from '@/services/alert-manager/constants/escalation-policy-table-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
 import type { EscalationPolicyModalType } from '@/services/alert-manager/types/alert-manager-type';
@@ -67,6 +69,9 @@ const tableState = reactive({
         },
     ])),
     fields: ESCALATION_POLICY_MANAGEMENT_TABLE_FIELDS,
+    valueHandlerMap: computed<ValueHandlerMap>(() => ({
+        name: makeDistinctValueHandler('alert_manager.EscalationPolicy', 'name', 'string', [{ k: 'service_id', v: storeState.serviceId, o: 'eq' }]),
+    })),
 });
 const storeState = reactive({
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
@@ -87,7 +92,7 @@ const modalState = reactive({
 
 const escalationPolicyListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
     .setPage(1, 15);
-const queryTagHelper = useQueryTags({ keyItemSets: ESCALATION_POLICY_MANAGEMENT_TABLE_HANDLER.keyItemSets });
+const queryTagHelper = useQueryTags({ keyItemSets: ESCALATION_POLICY_MANAGEMENT_TABLE_KEY_ITEMS_SETS });
 const { queryTags } = queryTagHelper;
 
 const getConnectChannelCount = (rules: EscalationPolicyRulesType[]): number => {
@@ -100,6 +105,7 @@ const handleActionModal = (type: EscalationPolicyModalType) => {
     modalState.type = type;
 };
 const handleChangeToolbox = async (options: any = {}) => {
+    if (options.sortBy !== undefined) escalationPolicyListApiQueryHelper.setSort(options.sortBy, options.sortDesc);
     if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
     if (options.pageStart !== undefined) escalationPolicyListApiQueryHelper.setPageStart(options.pageStart);
     if (options.pageLimit !== undefined) escalationPolicyListApiQueryHelper.setPageLimit(options.pageLimit);
@@ -166,8 +172,8 @@ watch(() => storeState.serviceId, (id) => {
                          :fields="tableState.fields"
                          :select-index="[state.selectIndex]"
                          :query-tags="queryTags"
-                         :key-item-sets="ESCALATION_POLICY_MANAGEMENT_TABLE_HANDLER.keyItemSets"
-                         :value-handler-map="ESCALATION_POLICY_MANAGEMENT_TABLE_HANDLER.valueHandlerMap"
+                         :key-item-sets="ESCALATION_POLICY_MANAGEMENT_TABLE_KEY_ITEMS_SETS"
+                         :value-handler-map="tableState.valueHandlerMap"
                          @change="handleChangeToolbox"
                          @refresh="handleChangeToolbox()"
                          @export="handleExportExcel"

@@ -20,9 +20,7 @@ export const ALERT_MANAGEMENT_TABLE_FIELDS: DataTableFieldType[] = [
     { name: 'urgency', label: 'Urgency' },
     { name: 'triggered_type', label: 'Category' },
     { name: 'resources', label: 'Resource', width: '20rem' },
-    // { name: 'updated_by', label: 'Updated by' },
-    // { name: 'resolved_by', label: 'Resolved by' },
-    // { name: 'acknowledged by', label: 'Acknowledged by' },
+    { name: 'created_at', label: 'Created at' },
 ];
 export const ALERT_MANAGEMENT_TABLE_HANDLER: AlertManagementTableHandlerType = {
     keyItemSets: [{
@@ -44,12 +42,12 @@ export const ALERT_MANAGEMENT_TABLE_HANDLER: AlertManagementTableHandlerType = {
 export const ALERT_EXCEL_FIELDS: ExcelDataField[] = [
     { key: 'alert_id', name: 'No' },
     { key: 'title', name: 'Title' },
-    { key: 'status', name: 'State' },
+    { key: 'status', name: 'Status' },
     { key: 'service_id', name: 'Service' },
     { key: 'urgency', name: 'Urgency' },
     { key: 'triggered_type', name: 'Category' },
     { key: 'resources', name: 'Resource' },
-    // { key: 'updated_by', name: 'Updated by' },
+    { key: 'created_at', name: 'Created at' },
     // { key: 'resolved_by', name: 'Resolved by' },
     // { key: 'acknowledged_by', name: 'Acknowledged by' },
 ];

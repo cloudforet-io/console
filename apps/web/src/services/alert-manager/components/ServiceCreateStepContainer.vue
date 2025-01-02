@@ -21,11 +21,13 @@ type actionButtonType = {
 interface Props {
     isAllFormValid: boolean;
     selectedItemId?: string;
+    loading?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     isAllFormValid: false,
     selectedItemId: undefined,
+    loading: false,
 });
 
 const emit = defineEmits<{(e: 'create'): void}>();
@@ -182,6 +184,7 @@ const handleClickSkipButton = () => {
                       :style-type="state.actionButtonInfo?.type === 'set_up' ? 'primary' : 'substitutive'"
                       :icon-right="state.actionButtonInfo?.type === 'continue' ? 'ic_arrow-right' : undefined"
                       size="lg"
+                      :loading="props.loading"
                       @click="handleActionButton"
             >
                 {{ state.actionButtonInfo.label }}

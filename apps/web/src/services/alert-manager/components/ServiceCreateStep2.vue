@@ -31,6 +31,7 @@ const storeState = reactive({
     webhookVersion: computed<string|undefined>(() => serviceCreateFormState.webhookVersion || ''),
 });
 const state = reactive({
+    loading: false,
     isAllFormValid: computed<boolean>(() => {
         if (storeState.currentSubStep === 1) return storeState.selectedWebhookType?.plugin_id !== '';
         if (storeState.currentSubStep === 2) return storeState.webhookName !== '';
@@ -40,6 +41,7 @@ const state = reactive({
 });
 
 const handleCreateWebhook = async () => {
+    state.loading = true;
     try {
         state.succeedWebhook = await SpaceConnector.clientV2.alertManager.webhook.create<WebhookCreateParameters, WebhookModel>({
             name: storeState.webhookName,
@@ -53,6 +55,8 @@ const handleCreateWebhook = async () => {
         serviceCreateFormStore.setCurrentSubStep(3);
     } catch (e) {
         ErrorHandler.handleError(e, true);
+    } finally {
+        state.loading = false;
     }
 };
 
@@ -65,6 +69,7 @@ onUnmounted(() => {
     <service-create-step-container class="service-create-step2"
                                    :selected-item-id="storeState.selectedWebhookType?.plugin_id || ''"
                                    :is-all-form-valid="state.isAllFormValid"
+                                   :loading="state.loading"
                                    @create="handleCreateWebhook"
     >
         <webhook-create-type-selector v-if="storeState.currentSubStep === 1" />
