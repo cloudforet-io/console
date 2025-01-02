@@ -48,6 +48,7 @@ const props = withDefaults(defineProps<{
      showUserList?: boolean;
      showUserGroupList?: boolean;
      showCategoryTitle?: boolean;
+     placeholder?: string;
 }>(), {
     selectedId: undefined,
     selectedIds: undefined,
@@ -61,6 +62,7 @@ const props = withDefaults(defineProps<{
     showUserList: true,
     showUserGroupList: true,
     showCategoryTitle: true,
+    placeholder: 'Select',
 });
 
 const emit = defineEmits<{(event: 'update:selected-ids', value: SelectedUserDropdownIdsType[]): void;
@@ -239,6 +241,7 @@ watch([() => props.selectedId, () => props.selectedIds], ([newUserId, newUserIds
                        show-delete-all-button
                        :multi-selectable="props.selectionType === 'multiple'"
                        :appearance-type="props.appearanceType"
+                       :placeholder="props.placeholder"
                        @update:selected="handleUpdateSelectedUserItems"
     >
         <template v-if="props.appearanceType === 'stack'"

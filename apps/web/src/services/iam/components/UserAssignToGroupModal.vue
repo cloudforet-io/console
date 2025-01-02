@@ -101,7 +101,6 @@ watch([() => userPageGetters.selectedUsers, () => userPageState.users], ([nv_sel
                                       appearance-type="stack"
                                       selection-type="multiple"
                                       :selected-ids.sync="selectedUserGroupIds"
-                                      placeholder="select"
                 />
             </div>
         </template>
