@@ -15,6 +15,9 @@ import { ALERT_EVENT_ACTION } from '@/schema/alert-manager/alert/constants';
 import type { AlertModel, AlertEventModel } from '@/schema/alert-manager/alert/model';
 import type { AlertEventActionType } from '@/schema/alert-manager/alert/type';
 
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
+
 import { copyAnyData } from '@/lib/helper/copy-helper';
 
 import VerticalTimelineItem from '@/common/components/vertical-timeline/VerticalTimelineItem.vue';
@@ -22,20 +25,26 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useAlertDetailPageStore } from '@/services/alert-manager/stores/alert-detail-page-store';
 
+type HistoryItemInfo = {
+    title: string;
+    styleType?: string;
+};
+
 const alertDetailPageStore = useAlertDetailPageStore();
 const alertDetailPageState = alertDetailPageStore.state;
 const alertDetailPageGetters = alertDetailPageStore.getters;
+const allReferenceStore = useAllReferenceStore();
+const allReferenceGetters = allReferenceStore.getters;
 
 const storeState = reactive({
     alertInfo: computed<AlertModel>(() => alertDetailPageState.alertInfo),
     timezone: computed<string>(() => alertDetailPageGetters.timezone),
+    webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
 });
 const state = reactive({
     loading: true,
     historyList: [] as AlertEventModel[],
-    slicedHistoryList: computed<AlertEventModel[]>(() => state.historyList.filter((i) => i.alert_id === state.searchText)
-        .slice(0, state.pageStart * state.pageLimit)),
-    totalCount: computed<string>(() => state.historyList.length),
+    slicedHistoryList: computed<AlertEventModel[]>(() => state.historyList.slice(0, state.pageStart * state.pageLimit)),
     pageStart: 1,
     pageLimit: 10,
     searchText: '',
@@ -44,12 +53,23 @@ const state = reactive({
     isAlertVisible: false,
 });
 
-const getStyleInfo = (item: AlertEventActionType): string => {
-    if (item === ALERT_EVENT_ACTION.TRIGGERED) return 'red';
-    if (item === ALERT_EVENT_ACTION.ACKNOWLEDGED) return 'violet';
-    if (item === ALERT_EVENT_ACTION.RESOLVED) return 'green';
-    if (item === ALERT_EVENT_ACTION.NOTIFIED) return 'yellow';
-    return 'gray';
+const getCreatedByNames = (createdBy: string): string => {
+    if (createdBy.includes('webhook')) {
+        return storeState.webhook[createdBy].label || createdBy;
+    }
+    return createdBy;
+};
+const getItemInfo = (item: AlertEventActionType): HistoryItemInfo => {
+    let styleType: string|undefined;
+    if (item === ALERT_EVENT_ACTION.TRIGGERED) styleType = 'red';
+    if (item === ALERT_EVENT_ACTION.ACKNOWLEDGED) styleType = 'violet';
+    if (item === ALERT_EVENT_ACTION.RESOLVED) styleType = 'green';
+    if (item === ALERT_EVENT_ACTION.NOTIFIED) styleType = 'yellow';
+    if (item === ALERT_EVENT_ACTION.EVENT_PUSHED) styleType = 'gray';
+    return {
+        title: item.toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase()),
+        styleType,
+    };
 };
 const handleChangeToolbox = async (options: any = {}) => {
     if (options.searchText) {
@@ -100,7 +120,7 @@ watch(() => storeState.alertInfo, async (alertInfo) => {
         >
             <p-toolbox search-type="plain"
                        filters-visible
-                       :total-count="state.totalCount"
+                       :total-count="state.historyList.length"
                        :page-size-changeable="false"
                        :pagination-visible="false"
                        class="mb-3"
@@ -110,14 +130,20 @@ watch(() => storeState.alertInfo, async (alertInfo) => {
             <template v-if="state.slicedHistoryList.length > 0">
                 <vertical-timeline-item v-for="(item, idx) in state.slicedHistoryList"
                                         :key="`history-item-${idx}`"
-                                        :title="item.alert_id"
+                                        :title="getItemInfo(item.action).title"
                                         :description="item.description"
                                         :datetime="item.created_at"
                                         :timezone="storeState.timezone"
-                                        :style-type="getStyleInfo(item.action)"
+                                        :style-type="getItemInfo(item.action)?.styleType"
                                         :is-last-item="idx === state.slicedHistoryList?.length - 1"
                                         class="timeline"
-                />
+                >
+                    <template #top-right>
+                        <span class="ml-auto text-label-sm text-gray-600">
+                            {{ $t('ALERT_MANAGER.ALERTS.CREATED_BY', { user: getCreatedByNames(item.created_by) }) }}
+                        </span>
+                    </template>
+                </vertical-timeline-item>
             </template>
             <template #no-data>
                 <span class="pt-12">{{ $t('ALERT_MANAGER.ALERTS.NO_EVENT') }}</span>
