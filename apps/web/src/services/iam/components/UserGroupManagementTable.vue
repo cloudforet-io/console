@@ -12,7 +12,6 @@ import { PToolboxTable, PSelectDropdown } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
-import type { UserGroupListItemType } from '@/schema/identity/user-group/type';
 import { i18n } from '@/translations';
 
 import { useQueryTags } from '@/common/composables/query-tags';
@@ -46,22 +45,21 @@ const storeState = reactive({
 });
 
 const state = reactive({
-    userGroupItems: computed<UserGroupListItemType[]>(() => userGroupPageState.userGroups.map((userGroup) => ({
+    userGroupItems: computed(() => userGroupPageState.userGroups.map((userGroup) => ({
         ...userGroup,
-        notification_channel: userGroup.notification_channel?.length ?? 0,
     }))),
 });
 
 const tableState = reactive({
     fields: computed<DataTableFieldType[]>(() => [
         { name: 'name', label: 'User Group Name' },
-        { name: 'description', label: 'Description' },
-        { name: 'notification_channel', label: 'Notification Channel' },
+        { name: 'description', label: 'Description', width: '280px' },
+        { name: 'notification_channel', label: 'Notification Channel', sortable: true },
         { name: 'users', label: 'Users' },
         { name: 'created_at', label: 'Created' },
     ]),
     valueHandlerMap: computed(() => ({
-        user_group_id: makeDistinctValueHandler('identity.UserGroup', 'user_group_id', 'string'),
+        name: makeDistinctValueHandler('identity.UserGroup', 'name', 'string'),
         users: makeDistinctValueHandler('identity.UserGroup', 'users', 'string'),
         description: makeDistinctValueHandler('identity.UserGroup', 'description', 'string'),
         created: makeDistinctValueHandler('identity.UserGroup', 'created_at', 'datetime'),
@@ -83,7 +81,7 @@ const dropdownState = reactive({
             name: USER_GROUP_MODAL_TYPE.UPDATE, label: i18n.t('IAM.USER_GROUP.ACTION.UPDATE'), type: 'item', disabled: !editState.isEditable,
         },
         {
-            name: USER_GROUP_MODAL_TYPE.DELETE, label: i18n.t('IAM.USER_GROUP.ACTION.DELETE'), type: 'item', disabled: !editState.isRemoveAble,
+            name: USER_GROUP_MODAL_TYPE.DELETE, label: i18n.t('IAM.USER_GROUP.ACTION.DELETE'), type: 'item', disabled: !editState.isEditable,
         },
         {
             type: 'divider',
@@ -92,7 +90,6 @@ const dropdownState = reactive({
             name: USER_GROUP_MODAL_TYPE.ADD_NEW_USER, label: i18n.t('IAM.USER_GROUP.ACTION.ADD_NEW_USER'), type: 'item', disabled: !editState.isEditable,
         },
     ]),
-    // selectedMenuItems: [] as SelectDropdownMenuItem[],
 });
 
 /* Component */
@@ -187,6 +184,9 @@ onMounted(async () => {
                     reset-selection-on-menu-close
                     @select="handleSelectDropdown"
                 />
+            </template>
+            <template #col-notification_channel-format="{value}">
+                {{ Array.isArray(value) && value.length > 0 ? value.length : 0 }}
             </template>
             <template #col-users-format="{value}">
                 {{ Array.isArray(value) && value.length > 0 ? value.length : 0 }}
