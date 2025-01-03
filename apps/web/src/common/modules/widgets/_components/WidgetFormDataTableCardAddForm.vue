@@ -220,10 +220,13 @@ watch([
                        :invalid="validationState.dataFieldNameInvalid"
                        :invalid-text="validationState.dataFieldNameInvalidText"
         >
-            <p-text-input v-model="state.proxyDataFieldName"
-                          class="data-text-input"
-                          placeholder="Name"
-            />
+            <template #default="{invalid}">
+                <p-text-input v-model="state.proxyDataFieldName"
+                              class="data-text-input"
+                              :invalid="invalid"
+                              placeholder="Name"
+                />
+            </template>
         </p-field-group>
         <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.DATA_UNIT')">
             <p-text-input v-model="state.proxyDataUnit"
