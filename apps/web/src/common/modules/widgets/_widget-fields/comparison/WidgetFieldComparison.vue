@@ -1,10 +1,8 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, watch,
+    computed, reactive,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-
-import { cloneDeep } from 'lodash';
 
 import {
     PFieldTitle, PToggleButton, PFieldGroup, PSelectDropdown, PI, PTooltip,
@@ -14,49 +12,34 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dr
 import { i18n } from '@/translations';
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
-import { useProxyValue } from '@/common/composables/proxy-state';
-import { DEFAULT_COMPARISON_COLOR } from '@/common/modules/widgets/_constants/widget-field-constant';
-import { isDateField, isIncludingDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
+import { isIncludingDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
+import {
+    widgetFieldDefaultValueMap,
+} from '@/common/modules/widgets/_widget-field-value-manager/constant/default-value-registry';
 import type { ComparisonFormat, ComparisonValue, ComparisonOptions } from '@/common/modules/widgets/_widget-fields/comparison/type';
 import type { GroupByValue } from '@/common/modules/widgets/_widget-fields/group-by/type';
-import type { TableDataFieldValue } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
-import type { WidgetFieldComponentProps, WidgetFieldComponentEmit } from '@/common/modules/widgets/types/widget-field-type';
+import type {
+    WidgetFieldComponentProps,
+} from '@/common/modules/widgets/types/widget-field-type';
 
 
 
-const emit = defineEmits<WidgetFieldComponentEmit<ComparisonValue|undefined>>();
+const FIELD_KEY = 'comparison';
 
-const props = withDefaults(defineProps<WidgetFieldComponentProps<ComparisonOptions, ComparisonValue>>(), {
-    widgetFieldSchema: () => ({
-        options: {
-            toggle: false,
-        },
-    }),
-});
+const props = defineProps<WidgetFieldComponentProps<ComparisonOptions>>();
 
 const state = reactive({
-    toggleValue: false,
-    proxyValue: useProxyValue<ComparisonValue|undefined>('value', props, emit),
+    fieldValue: computed<ComparisonValue>(() => props.fieldManager.data[FIELD_KEY].value),
     disabled: computed<boolean>(() => { // NOTE: EXCEPTION FOR ONLY TABLE WIDGET
-        const tableDataField = props.allValueMap?.tableDataField as TableDataFieldValue;
-        if (!tableDataField) return false;
-        const _tableDataFieldFieldValue = tableDataField.fieldType === 'staticField' ? tableDataField.staticFieldInfo?.fieldValue : tableDataField.dynamicFieldInfo?.fieldValue;
-        const groupByField = props.allValueMap?.groupBy as GroupByValue;
-        return !Array.isArray(_tableDataFieldFieldValue) && isDateField(_tableDataFieldFieldValue)
-            || Array.isArray(_tableDataFieldFieldValue) && isIncludingDateField(_tableDataFieldFieldValue)
-            || Array.isArray(groupByField?.value) && isIncludingDateField(groupByField.value);
+        if (props.widgetConfig.widgetName !== 'table') return false;
+        const groupByField = props.fieldManager.data.groupBy.value as GroupByValue;
+        return Array.isArray(groupByField?.data) && isIncludingDateField(groupByField.data);
     }),
     infoText: computed<TranslateResult>(() => {
-        const tableDataField = props.allValueMap?.tableDataField as TableDataFieldValue;
-        if (tableDataField) return i18n.t('COMMON.WIDGETS.COMPARISON.INFO_TOOLTIP_TABLE');
+        if (props.widgetConfig.widgetName !== 'table') return i18n.t('COMMON.WIDGETS.COMPARISON.INFO_TOOLTIP_TABLE');
         return i18n.t('COMMON.WIDGETS.COMPARISON.INFO_TOOLTIP');
     }),
-    initialValue: computed<ComparisonValue>(() => ({
-        decreaseColor: DEFAULT_COMPARISON_COLOR.DECREASE,
-        increaseColor: DEFAULT_COMPARISON_COLOR.INCREASE,
-        format: 'all',
-        toggleValue: true,
-    })),
+    initialValue: computed<ComparisonValue>(() => widgetFieldDefaultValueMap.comparison),
     formatMenu: computed<SelectDropdownMenuItem[]>(() => [
         { label: i18n.t('COMMON.WIDGETS.COMPARISON.ALL'), name: 'all' },
         { label: `${i18n.t('COMMON.WIDGETS.COMPARISON.PERCENT')}(%)`, name: 'percent' },
@@ -64,46 +47,33 @@ const state = reactive({
     ]),
 });
 
-const handleUpdateColor = (key:string, color:string) => {
-    if (!state.proxyValue || !state.proxyValue?.toggleValue) return;
-    const clonedValue = cloneDeep(state.proxyValue);
-    clonedValue[key] = color;
-    state.proxyValue = clonedValue;
+const handleUpdateColor = (key:'decreaseColor'|'increaseColor', color:string) => {
+    props.fieldManager.setFieldValue(FIELD_KEY, {
+        ...state.fieldValue,
+        [key]: color,
+    });
 };
 const handleUpdateToggle = (value: boolean) => {
     if (value) {
-        state.proxyValue = cloneDeep(state.initialValue);
+        props.fieldManager.setFieldValue(FIELD_KEY, state.initialValue);
     } else {
-        state.proxyValue = {
+        props.fieldManager.setFieldValue(FIELD_KEY, {
             toggleValue: false,
-        };
+        });
     }
 };
 
 const handleUpdateFormat = (format: ComparisonFormat) => {
-    if (!state.proxyValue) return;
-    const clonedValue = cloneDeep(state.proxyValue);
-    clonedValue.format = format;
-    state.proxyValue = clonedValue;
+    props.fieldManager.setFieldValue(FIELD_KEY, {
+        ...state.fieldValue,
+        format,
+    });
 };
 
-const checkValue = ():boolean => {
-    if (state.proxyValue?.toggleValue) {
-        return !!state.proxyValue?.decreaseColor && !!state.proxyValue?.increaseColor && !!state.proxyValue?.format;
-    }
-    return true;
-};
-
-watch(() => state.proxyValue, (_value) => {
-    emit('update:is-valid', checkValue());
-    if (!_value && props.widgetFieldSchema?.options?.toggle) {
-        state.proxyValue = cloneDeep(state.initialValue);
-    }
-}, { immediate: true });
 </script>
 
 <template>
-    <div class="widget-field-total">
+    <div class="widget-field-comparison">
         <div class="field-header">
             <p-field-title>
                 {{ $t('COMMON.WIDGETS.COMPARISON.COMPARISON') }}
@@ -114,12 +84,12 @@ watch(() => state.proxyValue, (_value) => {
                     />
                 </p-tooltip>
             </p-field-title>
-            <p-toggle-button :value="state.proxyValue?.toggleValue"
+            <p-toggle-button :value="state.fieldValue?.toggleValue"
                              :disabled="state.disabled"
                              @change-toggle="handleUpdateToggle"
             />
         </div>
-        <template v-if="state.proxyValue?.toggleValue">
+        <template v-if="state.fieldValue?.toggleValue">
             <div class="compare-with-wrapper">
                 <p-field-group :label="$t('COMMON.WIDGETS.COMPARISON.COMPARE_WITH')"
                                class="left-part"
@@ -135,7 +105,7 @@ watch(() => state.proxyValue, (_value) => {
                                    style-type="secondary"
                                    required
                     >
-                        <color-input :value="state.proxyValue.decreaseColor"
+                        <color-input :value="state.fieldValue.decreaseColor"
                                      @update:value="(color) => handleUpdateColor('decreaseColor', color)"
                         />
                     </p-field-group>
@@ -143,7 +113,7 @@ watch(() => state.proxyValue, (_value) => {
                                    style-type="secondary"
                                    required
                     >
-                        <color-input :value="state.proxyValue.increaseColor"
+                        <color-input :value="state.fieldValue.increaseColor"
                                      @update:value="(color) => handleUpdateColor('increaseColor', color)"
                         />
                     </p-field-group>
@@ -155,7 +125,7 @@ watch(() => state.proxyValue, (_value) => {
                 >
                     <p-select-dropdown :menu="state.formatMenu"
                                        use-fixed-menu-style
-                                       :selected="state.proxyValue.format"
+                                       :selected="state.fieldValue.format"
                                        block
                                        @update:selected="(format) => handleUpdateFormat(format)"
                     />
@@ -166,7 +136,7 @@ watch(() => state.proxyValue, (_value) => {
 </template>
 
 <style lang="postcss" scoped>
-.widget-field-total {
+.widget-field-comparison {
     .field-header {
         @apply flex items-center gap-1 justify-between;
     }

@@ -3,35 +3,48 @@ import {
     computed, defineExpose, onMounted, reactive, watch,
 } from 'vue';
 
-import { intersection, isEqual } from 'lodash';
+import {
+    cloneDeep, intersection, isEmpty, isEqual,
+} from 'lodash';
 
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import { i18n } from '@/translations';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import getRandomId from '@/lib/random-id-generator';
 
 import WidgetFormDataTableCardAlertModal
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardAlertModal.vue';
 import WidgetFormDataTableCardFooter from '@/common/modules/widgets/_components/WidgetFormDataTableCardFooter.vue';
 import WidgetFormDataTableCardHeaderTitle
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardHeaderTitle.vue';
-import WidgetFormDataTableCardTransformForm
-    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformForm.vue';
+import WidgetFormDataTableCardTransformAddLabels
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformAddLabels.vue';
+import WidgetFormDataTableCardTransformConcatenate
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformConcatenate.vue';
+import WidgetFormDataTableCardTransformEvaluate
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformEvaluate.vue';
+import WidgetFormDataTableCardTransformJoin
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformJoin.vue';
+import WidgetFormDataTableCardTransformPivotForm
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformPivotForm.vue';
+import WidgetFormDataTableCardTransformQuery
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformQuery.vue';
+import WidgetFormDataTableCardTransformValueMapping
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformValueMapping.vue';
 import {
-    DATA_TABLE_TYPE, EVAL_EXPRESSION_TYPE,
+    DATA_TABLE_TYPE, type DATA_TABLE_OPERATOR, DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP,
 } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type {
-    DataTableAlertModalMode, QueryCondition, EvalExpressions, TransformDataTableInfo,
+    DataTableAlertModalMode, TransformDataTableInfo,
 } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
-    DataTableOperator, JoinType, ConcatOptions, JoinOptions, QueryOptions, EvalOptions,
+    DataTableOperator, QueryOptions, EvalOptions,
     DataTableTransformOptions,
-    EvaluateExpression,
+    AddLabelsOptions, PivotOptions,
+    JoinOptions, ValueMappingOptions, ConcatOptions,
 } from '@/common/modules/widgets/types/widget-model';
-
 
 
 
@@ -54,53 +67,17 @@ const storeState = reactive({
 
 const state = reactive({
     loading: false,
+    resetKey: Math.random(),
     dataTableId: computed(() => props.item.data_table_id),
     dataTableName: props.item.name ? props.item.name : `${props.item.operator} Data`,
-    applyDisabled: computed(() => {
-        const haveSavedName = !!originState.name;
-        const haveRequiredConcatOptions = haveSavedName && state.dataTableInfo.dataTables.length === 2 && !state.dataTableInfo.dataTables.includes(undefined);
-        const haveRequiredJoinOptions = haveSavedName && state.dataTableInfo.dataTables.length === 2 && !state.dataTableInfo.dataTables.includes(undefined) && joinState.joinType;
-        const haveRequiredQueryOptions = haveSavedName && !!state.dataTableInfo.dataTableId && queryState.conditions.filter((cond) => !!cond.value.trim()).length > 0;
-        const haveRequiredEvalOptions = haveSavedName && !!state.dataTableInfo.dataTableId && evalState.expressions.filter((expression) => !!expression.name && !!expression.expression).length > 0;
-        if (state.operator === 'CONCAT') return !haveRequiredConcatOptions;
-        if (state.operator === 'JOIN') return !haveRequiredJoinOptions;
-        if (state.operator === 'QUERY') return !haveRequiredQueryOptions;
-        if (state.operator === 'EVAL') return !haveRequiredEvalOptions;
-        return true;
+    applyDisabled: computed<boolean>(() => {
+        if (!originState.name) return true;
+        return invalidState[state.operator];
     }),
-    optionsChanged: computed(() => {
-        const dataTablesChanged = !isEqual(state.dataTableInfo.dataTables, originState.dataTableInfo.dataTables);
-        const dataTableIdChanged = state.dataTableInfo.dataTableId !== originState.dataTableInfo.dataTableId;
-        const joinTypeChanged = joinState.joinType !== originState.joinType;
-        const conditionsChanged = !isEqual(queryState.conditions.map((cond) => ({ value: cond.value })).filter((cond) => !!cond.value.trim().length), originState.conditions);
-        const expressionsChanged = !isEqual(evalState.expressions.map((expression) => ({
-            name: expression.name,
-            field_type: expression.fieldType,
-            expression: expression.expression,
-            ...(expression?.condition ? { condition: expression?.condition } : {}),
-            ...(expression?.else ? { else: expression?.else } : {}),
-        })).filter((expression) => !!expression.name && !!expression.expression), originState.expressions);
-        if (state.operator === 'CONCAT') return dataTablesChanged;
-        if (state.operator === 'JOIN') return dataTablesChanged || joinTypeChanged;
-        if (state.operator === 'QUERY') return dataTableIdChanged || conditionsChanged;
-        if (state.operator === 'EVAL') return dataTableIdChanged || expressionsChanged;
-        return false;
-    }),
+    optionsChanged: computed<boolean>(() => !isEqual(valueState[state.operator], originState[state.operator])),
     isUnsaved: computed(() => state.dataTableId.startsWith('UNSAVED-')),
     operator: computed(() => props.item.operator as DataTableOperator),
-    dataTableInfo: {
-        dataTables: [] as string[],
-        dataTableId: undefined,
-    } as TransformDataTableInfo,
     failStatus: false,
-    isLegacyDataTable: computed(() => {
-        if (state.operator === 'EVAL') return false;
-        const evalExpressions = (props.item.options as DataTableTransformOptions).EVAL?.expressions;
-        if (!evalExpressions?.length) return false;
-        const isLegacyEval = typeof evalExpressions[0] === 'string';
-        if (isLegacyEval) return true;
-        return false;
-    }),
     isUnavailable: computed<boolean>(() => props.item.state === 'UNAVAILABLE'),
 });
 
@@ -109,18 +86,23 @@ const modalState = reactive({
     mode: '' as DataTableAlertModalMode,
 });
 
-const joinState = reactive({
-    joinType: undefined as JoinType | undefined,
+const valueState = reactive({
+    PIVOT: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT,
+    CONCAT: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.CONCAT,
+    JOIN: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.JOIN,
+    EVAL: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.EVAL,
+    QUERY: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.QUERY,
+    ADD_LABELS: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.ADD_LABELS,
+    VALUE_MAPPING: DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.VALUE_MAPPING,
 });
-
-const queryState = reactive({
-    conditions: [{ key: getRandomId(), value: '' }] as QueryCondition[],
-});
-
-const evalState = reactive({
-    expressions: [{
-        key: getRandomId(), fieldType: EVAL_EXPRESSION_TYPE.DATA, name: '', expression: '', isCollapsed: false,
-    }] as EvalExpressions[],
+const invalidState = reactive({
+    PIVOT: false,
+    CONCAT: false,
+    JOIN: false,
+    EVAL: false,
+    QUERY: false,
+    ADD_LABELS: false,
+    VALUE_MAPPING: false,
 });
 
 const originState = reactive({
@@ -129,22 +111,36 @@ const originState = reactive({
         dataTables: props.item.options[state.operator]?.data_tables ?? [] as string[],
         dataTableId: props.item.options[state.operator]?.data_table_id as string,
     })),
-    joinType: computed(() => (props.item.options as DataTableTransformOptions).JOIN?.how as JoinType),
-    conditions: computed(() => ((props.item.options as DataTableTransformOptions).QUERY?.conditions ?? []).map((condition) => ({
-        value: condition,
-    }))),
-    expressions: computed<EvaluateExpression[]|string[]>(() => (props.item.options as DataTableTransformOptions).EVAL?.expressions ?? []),
+    CONCAT: computed<ConcatOptions|undefined>(() => props.item.options.CONCAT),
+    JOIN: computed<JoinOptions|undefined>(() => props.item.options.JOIN),
+    QUERY: computed<QueryOptions|undefined>(() => props.item.options.QUERY),
+    EVAL: computed<EvalOptions|undefined>(() => props.item.options.EVAL),
+    ADD_LABELS: computed<AddLabelsOptions|undefined>(() => props.item.options.ADD_LABELS),
+    VALUE_MAPPING: computed<ValueMappingOptions|undefined>(() => props.item.options.VALUE_MAPPING),
+    PIVOT: computed<PivotOptions|undefined>(() => {
+        const _pivot = (props.item.options as DataTableTransformOptions).PIVOT as PivotOptions|undefined;
+        if (!_pivot) return cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT);
+        return {
+            data_table_id: _pivot.data_table_id,
+            fields: _pivot.fields,
+            select: _pivot.select,
+            limit: _pivot.limit,
+            function: _pivot.function,
+            order_by: _pivot.order_by,
+        };
+    }),
 });
 
 const setFailStatus = (status: boolean) => {
     state.failStatus = status;
 };
 const updateDataTable = async (): Promise<DataTableModel|undefined> => {
-    const isValidDataTableId = state.dataTableInfo.dataTableId && storeState.dataTables.some((dataTable) => dataTable.data_table_id === state.dataTableInfo.dataTableId);
-    const isValidDataTables = state.dataTableInfo.dataTables.length === 2
-        && !state.dataTableInfo.dataTables.includes(undefined)
-        && storeState.dataTables.some((dataTable) => dataTable.data_table_id === state.dataTableInfo.dataTables[0])
-        && storeState.dataTables.some((dataTable) => dataTable.data_table_id === state.dataTableInfo.dataTables[1]);
+    const _targetDataTableId: string|undefined = valueState[state.operator].data_table_id;
+    const _targetDataTables: string[]|undefined = valueState[state.operator].data_tables;
+    const isValidDataTableId = _targetDataTableId && storeState.dataTables.some((dataTable) => dataTable.data_table_id === _targetDataTableId);
+    const isValidDataTables = _targetDataTables?.length === 2
+        && storeState.dataTables.some((dataTable) => dataTable.data_table_id === _targetDataTables[0])
+        && storeState.dataTables.some((dataTable) => dataTable.data_table_id === _targetDataTables[1]);
     if (!isValidDataTableId && !isValidDataTables) {
         showErrorMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_WARNING'), '');
         setFailStatus(true);
@@ -153,8 +149,8 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
 
     // Duplicated Data Field Handling in 'JOIN'
     if (state.operator === 'JOIN') {
-        const firstDataTable = storeState.dataTables.find((dataTable) => dataTable.data_table_id === state.dataTableInfo.dataTables[0]);
-        const secondDataTable = storeState.dataTables.find((dataTable) => dataTable.data_table_id === state.dataTableInfo.dataTables[1]);
+        const firstDataTable = storeState.dataTables.find((dataTable) => dataTable.data_table_id === valueState.JOIN.data_tables[0]);
+        const secondDataTable = storeState.dataTables.find((dataTable) => dataTable.data_table_id === valueState.JOIN.data_tables[1]);
         const firstDataFields = Object.keys(firstDataTable?.data_info ?? {});
         const secondDataFields = Object.keys(secondDataTable?.data_info ?? {});
         const duplicatedDataFields = intersection(firstDataFields, secondDataFields);
@@ -169,27 +165,26 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
         }
     }
     const firstUpdating = state.isUnsaved;
-    const concatOptions: ConcatOptions = {
-        data_tables: state.dataTableInfo.dataTables,
-    };
-    const joinOptions: JoinOptions = {
-        data_tables: state.dataTableInfo.dataTables,
-        how: joinState.joinType as JoinType,
-    };
-    const queryOptions: QueryOptions = {
-        data_table_id: state.dataTableInfo.dataTableId,
-        conditions: queryState.conditions.map((conditionInfo) => conditionInfo.value),
-    };
+    const concatOptions = cloneDeep(valueState.CONCAT);
+    const joinOptions = cloneDeep(valueState.JOIN);
+    const queryOptions = cloneDeep(valueState.QUERY);
+    const valueMappingOptions = cloneDeep(valueState.VALUE_MAPPING);
     const evalOptions: EvalOptions = {
-        data_table_id: state.dataTableInfo.dataTableId,
-        expressions: evalState.expressions.map((expressionInfo) => ({
-            name: expressionInfo.name,
-            field_type: expressionInfo.fieldType,
-            expression: expressionInfo.expression,
+        data_table_id: valueState.EVAL.data_table_id,
+        expressions: valueState.EVAL.expressions.map((expressionInfo) => ({
+            ...expressionInfo,
             ...(expressionInfo.condition && { condition: expressionInfo.condition }) || {},
-            ...(expressionInfo.else && { else: expressionInfo.else }) || {},
         })).filter((expressionInfo) => !!expressionInfo.name && !!expressionInfo.expression),
     };
+    const pivotOptions: PivotOptions = {
+        data_table_id: valueState.PIVOT.data_table_id ?? '',
+        fields: valueState.PIVOT.fields,
+        select: valueState.PIVOT.select,
+        limit: valueState.PIVOT.limit,
+        function: valueState.PIVOT.function,
+        order_by: valueState.PIVOT.order_by,
+    };
+    const addLabelsOptions = cloneDeep(valueState.ADD_LABELS);
     const options = () => {
         switch (state.operator) {
         case 'CONCAT':
@@ -200,6 +195,12 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
             return queryOptions;
         case 'EVAL':
             return evalOptions;
+        case 'PIVOT':
+            return pivotOptions;
+        case 'ADD_LABELS':
+            return addLabelsOptions;
+        case 'VALUE_MAPPING':
+            return valueMappingOptions;
         default:
             return {};
         }
@@ -268,8 +269,6 @@ const handleUpdateDataTable = async () => {
     if (result) {
         showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_SUCCESS'), '');
         widgetGenerateStore.setSelectedDataTableId(result.data_table_id);
-        widgetGenerateStore.setDataTableUpdating(true);
-        await widgetGenerateStore.loadDataTable({});
     }
     setTimeout(() => {
         state.loading = false;
@@ -278,18 +277,15 @@ const handleUpdateDataTable = async () => {
 
 /* Utils */
 const setInitialDataTableForm = () => {
-    // Initial Form Setting
-    state.dataTableInfo = originState.dataTableInfo;
-    joinState.joinType = originState.joinType;
-    queryState.conditions = originState.conditions.length ? originState.conditions.map((cond) => ({ ...cond, key: getRandomId() })) : [{ key: getRandomId(), value: '' }];
-    evalState.expressions = originState.expressions.length ? originState.expressions.map((expression) => ({
-        ...expression,
-        isCollapsed: false,
-        fieldType: expression.field_type,
-        key: getRandomId(),
-    })) : [{
-        key: getRandomId(), name: '', fieldType: EVAL_EXPRESSION_TYPE.DATA, expression: '', isCollapsed: false,
-    }];
+    valueState.CONCAT = !isEmpty(originState.CONCAT) ? cloneDeep(originState.CONCAT) : cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.CONCAT);
+    valueState.JOIN = !isEmpty(originState.JOIN) ? cloneDeep(originState.JOIN) : cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.JOIN);
+    valueState.QUERY = !isEmpty(originState.QUERY) ? cloneDeep(originState.QUERY) : cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.QUERY);
+    valueState.EVAL = !isEmpty(originState.EVAL) ? cloneDeep(originState.EVAL) : cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.EVAL);
+    valueState.ADD_LABELS = !isEmpty(originState.ADD_LABELS) ? cloneDeep(originState.ADD_LABELS) : cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.ADD_LABELS);
+    valueState.PIVOT = originState.PIVOT ? cloneDeep(originState.PIVOT) : cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT);
+    valueState.VALUE_MAPPING = !isEmpty(originState.VALUE_MAPPING) ? cloneDeep(originState.VALUE_MAPPING) : cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.VALUE_MAPPING);
+
+    state.resetKey = Math.random();
 };
 
 onMounted(() => {
@@ -321,20 +317,58 @@ defineExpose({
                                                       :data-type="DATA_TABLE_TYPE.TRANSFORMED"
                                                       :selected="props.selected"
                                                       :data-table-name.sync="state.dataTableName"
-                                                      :is-legacy-data-table="state.isLegacyDataTable"
             />
         </div>
-
-        <widget-form-data-table-card-transform-form :data-table-id="state.dataTableId"
-                                                    :operator="state.operator"
-                                                    :data-table-info.sync="state.dataTableInfo"
-                                                    :join-type.sync="joinState.joinType"
-                                                    :conditions.sync="queryState.conditions"
-                                                    :expressions.sync="evalState.expressions"
-                                                    :is-legacy-data-table="state.isLegacyDataTable"
+        <widget-form-data-table-card-transform-pivot-form v-if="state.operator === DATA_TABLE_OPERATOR.PIVOT"
+                                                          :key="`pivot-${state.resetKey}`"
+                                                          :base-data-table-id="state.dataTableId"
+                                                          :operator-options.sync="valueState.PIVOT"
+                                                          :invalid.sync="invalidState.PIVOT"
+                                                          :origin-data="props.item.options[state.operator]"
+        />
+        <widget-form-data-table-card-transform-concatenate v-if="state.operator === DATA_TABLE_OPERATOR.CONCAT"
+                                                           :key="`concat-${state.resetKey}`"
+                                                           :base-data-table-id="state.dataTableId"
+                                                           :operator-options.sync="valueState.CONCAT"
+                                                           :invalid.sync="invalidState.CONCAT"
+                                                           :origin-data="props.item.options[state.operator]"
+        />
+        <widget-form-data-table-card-transform-join v-else-if="state.operator === DATA_TABLE_OPERATOR.JOIN"
+                                                    :key="`join-${state.resetKey}`"
+                                                    :base-data-table-id="state.dataTableId"
+                                                    :operator-options.sync="valueState.JOIN"
+                                                    :invalid.sync="invalidState.JOIN"
+                                                    :origin-data="props.item.options[state.operator]"
+        />
+        <widget-form-data-table-card-transform-evaluate v-else-if="state.operator === DATA_TABLE_OPERATOR.EVAL"
+                                                        :key="`eval-${state.resetKey}`"
+                                                        :base-data-table-id="state.dataTableId"
+                                                        :operator-options.sync="valueState.EVAL"
+                                                        :invalid.sync="invalidState.EVAL"
+                                                        :origin-data="props.item.options[state.operator]"
+        />
+        <widget-form-data-table-card-transform-query v-else-if="state.operator === DATA_TABLE_OPERATOR.QUERY"
+                                                     :key="`query-${state.resetKey}`"
+                                                     :base-data-table-id="state.dataTableId"
+                                                     :operator-options.sync="valueState.QUERY"
+                                                     :invalid.sync="invalidState.QUERY"
+                                                     :origin-data="props.item.options[state.operator]"
+        />
+        <widget-form-data-table-card-transform-add-labels v-if="state.operator === DATA_TABLE_OPERATOR.ADD_LABELS"
+                                                          :key="`add-labels-${state.resetKey}`"
+                                                          :base-data-table-id="state.dataTableId"
+                                                          :operator-options.sync="valueState.ADD_LABELS"
+                                                          :invalid.sync="invalidState.ADD_LABELS"
+                                                          :origin-data="props.item.options[state.operator]"
+        />
+        <widget-form-data-table-card-transform-value-mapping v-if="state.operator === DATA_TABLE_OPERATOR.VALUE_MAPPING"
+                                                             :key="`value-mapping-${state.resetKey}`"
+                                                             :base-data-table-id="state.dataTableId"
+                                                             :operator-options.sync="valueState.VALUE_MAPPING"
+                                                             :invalid.sync="invalidState.VALUE_MAPPING"
+                                                             :origin-data="props.item.options[state.operator]"
         />
         <widget-form-data-table-card-footer :disabled="state.applyDisabled"
-                                            :is-legacy-data-table="state.isLegacyDataTable"
                                             :changed="state.optionsChanged"
                                             :loading="state.loading"
                                             @delete="handleClickDeleteDataTable"

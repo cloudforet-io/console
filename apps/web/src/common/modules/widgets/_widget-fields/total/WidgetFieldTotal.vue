@@ -1,76 +1,55 @@
 <script lang="ts" setup>
-import { onMounted, reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { PFieldTitle, PToggleButton, PCheckbox } from '@cloudforet/mirinae';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
 import type { TotalValue, TotalOptions } from '@/common/modules/widgets/_widget-fields/total/type';
-import type { WidgetFieldComponentProps, WidgetFieldComponentEmit } from '@/common/modules/widgets/types/widget-field-type';
+import type {
+    WidgetFieldComponentProps,
+} from '@/common/modules/widgets/types/widget-field-type';
 
 
-const emit = defineEmits<WidgetFieldComponentEmit<TotalValue|undefined>>();
+const FIELD_KEY = 'total';
 
-const props = withDefaults(defineProps<WidgetFieldComponentProps<TotalOptions, TotalValue>>(), {
-    widgetFieldSchema: () => ({
-        options: {
-            toggle: false,
-            default: false,
-        },
-    }),
-});
+const props = defineProps<WidgetFieldComponentProps<TotalOptions>>();
 
 const state = reactive({
-    proxyValue: useProxyValue('value', props, emit),
+    fieldValue: computed<TotalValue>(() => props.fieldManager.data[FIELD_KEY].value),
 });
 
 const handleUpdateValue = (value: boolean) => {
-    if (!state.proxyValue?.toggleValue) {
-        state.proxyValue = undefined;
-    } else {
-        state.proxyValue = {
-            ...state.proxyValue,
-            freeze: value,
-        };
-    }
-    emit('update:value', state.proxyValue);
+    props.fieldManager.setFieldValue(FIELD_KEY, {
+        ...state.fieldValue,
+        freeze: value,
+    });
 };
 const handleUpdateToggle = (value: boolean) => {
-    state.proxyValue = {
-        toggleValue: value,
-        freeze: props.widgetFieldSchema.options?.default ?? false,
-    };
-    if (value) emit('update:value', state.proxyValue);
-    else {
-        state.proxyValue = undefined;
-        emit('update:value', state.proxyValue);
+    if (value) {
+        props.fieldManager.setFieldValue(FIELD_KEY, {
+            toggleValue: true,
+            freeze: true,
+        });
+    } else {
+        props.fieldManager.setFieldValue(FIELD_KEY, {
+            toggleValue: false,
+        });
     }
 };
 
-onMounted(() => {
-    emit('update:is-valid', true);
-    if (!props.value) {
-        state.proxyValue = undefined;
-        return;
-    }
-    state.proxyValue = {
-        toggleValue: props.value.toggleValue ?? props.widgetFieldSchema.options?.toggle ?? false,
-        freeze: props.value.freeze ?? props.widgetFieldSchema.options?.default ?? false,
-    };
-});
 </script>
 
 <template>
     <div class="widget-field-total">
         <div class="field-header">
             <p-field-title>{{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.TOTAL') }}</p-field-title>
-            <p-toggle-button :value="state.proxyValue?.toggleValue"
+            <p-toggle-button :value="state.fieldValue?.toggleValue"
                              @update:value="handleUpdateToggle"
             />
         </div>
-        <div v-if="state.proxyValue?.toggleValue"
+        <div v-if="state.fieldValue?.toggleValue"
              class="contents"
         >
-            <p-checkbox :selected="state.proxyValue?.freeze"
+            <p-checkbox :selected="state.fieldValue?.freeze"
                         @change="handleUpdateValue"
             >
                 {{ $t('COMMON.WIDGETS.TOTAL.DESC') }}

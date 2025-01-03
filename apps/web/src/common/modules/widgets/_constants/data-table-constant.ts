@@ -1,3 +1,7 @@
+import type {
+    AddLabelsOptions,
+    ConcatOptions, EvalOptions, JoinOptions, PivotOptions, QueryOptions, ValueMappingOptions,
+} from '@/common/modules/widgets/types/widget-model';
 
 import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 
@@ -19,6 +23,9 @@ export const DATA_TABLE_OPERATOR = {
     QUERY: 'QUERY',
     // AGGREGATE: 'AGGREGATE',
     EVAL: 'EVAL',
+    PIVOT: 'PIVOT',
+    ADD_LABELS: 'ADD_LABELS',
+    VALUE_MAPPING: 'VALUE_MAPPING',
 } as const;
 
 export const JOIN_TYPE = {
@@ -31,7 +38,7 @@ export const JOIN_TYPE = {
 // NOTE: temporary solution for the global variable
 export const MANAGED_GLOBAL_VARIABLE = [GROUP_BY.WORKSPACE, GROUP_BY.PROJECT, GROUP_BY.SERVICE_ACCOUNT, GROUP_BY.REGION] as string[];
 
-export const EVAL_EXPRESSION_TYPE = {
+export const DATA_TABLE_FIELD_TYPE = {
     LABEL: 'LABEL',
     DATA: 'DATA',
 } as const;
@@ -65,3 +72,63 @@ export const DATA_TABLE_QUERY_OPERATOR = {
 } as const;
 
 export const KEYWORD_FILTER_DISABLED_KEYS = [GROUP_BY.PROJECT, GROUP_BY.WORKSPACE, GROUP_BY.SERVICE_ACCOUNT];
+
+export const DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP = {
+    PIVOT: {
+        data_table_id: undefined,
+        fields: {
+            labels: [],
+            data: undefined,
+            column: undefined,
+        },
+        select: undefined,
+        limit: 5,
+        function: 'sum',
+        order_by: {
+            type: 'key',
+            desc: false,
+        },
+    } as PivotOptions,
+    CONCAT: {
+        data_tables: [],
+    } as ConcatOptions,
+    JOIN: {
+        data_tables: [],
+        how: undefined,
+        left_keys: [''],
+        right_keys: [''],
+    } as JoinOptions,
+    EVAL: {
+        data_table_id: undefined,
+        expressions: [
+            {
+                name: '',
+                field_type: DATA_TABLE_FIELD_TYPE.DATA,
+                expression: '',
+            },
+        ],
+    } as EvalOptions,
+    QUERY: {
+        data_table_id: undefined,
+        conditions: [''],
+        // operator: 'AND',
+    } as QueryOptions,
+    ADD_LABELS: {
+        data_table_id: undefined,
+        labels: { '': '' },
+    } as AddLabelsOptions,
+    VALUE_MAPPING: {
+        data_table_id: undefined,
+        name: '',
+        field_type: DATA_TABLE_FIELD_TYPE.LABEL,
+        cases: [
+            {
+                key: '',
+                value: '',
+                operator: 'eq',
+                match: '',
+            },
+        ],
+        else: '',
+    } as ValueMappingOptions,
+};

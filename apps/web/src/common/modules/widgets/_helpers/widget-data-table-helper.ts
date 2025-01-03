@@ -1,6 +1,8 @@
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 
+import type { DataTableOptions } from '@/common/modules/widgets/types/widget-model';
+
 export const getDuplicatedDataTableName = (name: string, dataTables: Partial<PublicDataTableModel | PrivateDataTableModel>[]): string => {
     let _name = name;
     const _regex = /^(.*?)\s*\((\d+)\)$/i;
@@ -18,4 +20,24 @@ export const getDuplicatedDataTableName = (name: string, dataTables: Partial<Pub
         }
     }
     return _name;
+};
+
+export const isFieldNameValid = (fieldName: string, dataTable?: PublicDataTableModel|PrivateDataTableModel): boolean => {
+    if (!dataTable) return true;
+    const _dataInfoKeys = Object.keys(dataTable.data_info || {});
+    const _labelsInfoKeys = Object.keys(dataTable.labels_info || {});
+    const _keys = _dataInfoKeys.concat(_labelsInfoKeys);
+    return !_keys.includes(fieldName);
+};
+
+export const sortObjectByKeys = (obj: DataTableOptions): DataTableOptions => {
+    if (obj === null || typeof obj !== 'object') return obj;
+
+    const sorted = {} as DataTableOptions;
+    Object.keys(obj)
+        .sort()
+        .forEach((key) => {
+            sorted[key] = sortObjectByKeys(obj[key]);
+        });
+    return sorted;
 };

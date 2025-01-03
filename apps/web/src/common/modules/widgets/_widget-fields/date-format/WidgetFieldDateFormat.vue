@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive,
+    computed, reactive,
 } from 'vue';
 
 import { PFieldGroup, PSelectDropdown } from '@cloudforet/mirinae';
@@ -8,12 +8,13 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 
 import { i18n } from '@/translations';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
 import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import { getFormattedDate } from '@/common/modules/widgets/_helpers/widget-date-helper';
-import type { DateFormatValue, DateFormatOptions } from '@/common/modules/widgets/_widget-fields/date-format/type';
 import type {
-    WidgetFieldComponentEmit,
+    DateFormatOptions,
+    DateFormatValue,
+} from '@/common/modules/widgets/_widget-fields/date-format/type';
+import type {
     WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
@@ -24,33 +25,21 @@ const AUTO_DISPLAY_EXMAPLE_TEXT = '01 or 09 or 2020';
 const DATE_FORMAT_LABEL_MAP = {
     'Auto display by granularity': i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.DATE_FORMAT_AUTO_DISPLAY'),
 };
+const FIELD_KEY = 'dateFormat';
 
-const props = defineProps<WidgetFieldComponentProps<DateFormatOptions, DateFormatValue>>();
-const emit = defineEmits<WidgetFieldComponentEmit<DateFormatValue>>();
+const props = defineProps<WidgetFieldComponentProps<DateFormatOptions>>();
 const state = reactive({
+    fieldValue: computed<DateFormatValue>(() => props.fieldManager.data[FIELD_KEY].value),
     menuItems: computed<MenuItem[]>(() => Object.keys(DATE_FORMAT).map((d) => ({
         name: d,
         label: DATE_FORMAT_LABEL_MAP[d] ?? d,
     }))),
-    proxyValue: useProxyValue('value', props, emit),
-    selectedMenuItem: props.value?.value ?? props.widgetConfig?.optionalFieldsSchema.dateFormat?.options?.default ?? Object.keys(DATE_FORMAT)[0] as undefined | MenuItem[] | string,
 });
 
 /* Event */
 const handleUpdateSelect = (val: string|MenuItem[]) => {
-    state.selectedMenuItem = val;
-    state.proxyValue = {
-        value: val,
-    };
+    props.fieldManager.setFieldValue(FIELD_KEY, { format: val });
 };
-
-onMounted(() => {
-    emit('update:is-valid', true);
-    state.proxyValue = {
-        value: props.value?.value ?? props.widgetConfig?.optionalFieldsSchema.dateFormat?.options?.default ?? Object.keys(DATE_FORMAT)[0],
-    };
-});
-
 
 </script>
 
@@ -60,7 +49,7 @@ onMounted(() => {
                        required
         >
             <p-select-dropdown :menu="state.menuItems"
-                               :selected="state.selectedMenuItem"
+                               :selected="state.fieldValue.format"
                                use-fixed-menu-style
                                block
                                @update:selected="handleUpdateSelect"

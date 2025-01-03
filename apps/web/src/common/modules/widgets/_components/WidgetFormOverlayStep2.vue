@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, nextTick, onBeforeMount, onUnmounted, reactive, ref, watch,
+    computed, onBeforeMount, onUnmounted, reactive, ref, watch,
 } from 'vue';
 
 import { cloneDeep, isEqual } from 'lodash';
@@ -24,7 +24,7 @@ import { WIDGET_WIDTH_RANGE_LIST } from '@/common/modules/widgets/_constants/wid
 import { getWidgetComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
-import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
+import WidgetFieldValueManager from '@/common/modules/widgets/_widget-field-value-manager';
 import type { WidgetType } from '@/common/modules/widgets/types/widget-model';
 
 import DashboardToolsetDateDropdown from '@/services/dashboards/components/dashboard-detail/DashboardToolsetDateDropdown.vue';
@@ -53,8 +53,21 @@ const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 
+let fieldManager: WidgetFieldValueManager;
+
 const state = reactive({
     mounted: false,
+    fieldManager: computed<WidgetFieldValueManager>(() => {
+        if (!fieldManager) {
+            fieldManager = new WidgetFieldValueManager(
+                getWidgetConfig(widgetGenerateState.selectedWidgetName),
+                widgetGenerateGetters.selectedDataTable,
+                cloneDeep(widgetGenerateState.widget?.options) || {},
+            );
+        }
+        return fieldManager;
+    }),
+    value: computed(() => state.fieldManager?.data?.granularity),
     widgetConfig: computed(() => getWidgetConfig(widgetGenerateState.selectedWidgetName)),
     selectedWidgetType: widgetGenerateState.widget?.widget_type as WidgetType,
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
@@ -75,13 +88,13 @@ const state = reactive({
         return WIDGET_WIDTH_RANGE_LIST[state.widgetSize]?.[0] || 0;
     }),
     isWidgetFieldChanged: computed<boolean>(() => {
-        const _isOptionsChanged = isWidgetOptionsChanged(false, widgetGenerateState.widgetFormValueMap, widgetGenerateState.widget?.options || {});
+        const _isOptionsChanged = !isEqual(cloneDeep(state.fieldManager.data), widgetGenerateState.widget?.options);
         const _isTypeChanged = widgetGenerateState.selectedWidgetName !== widgetGenerateState.widget?.widget_type;
         emit('watch-options-changed', _isOptionsChanged || _isTypeChanged);
         return _isOptionsChanged || _isTypeChanged;
     }),
     disableApplyButton: computed<boolean>(() => {
-        if (!widgetGenerateGetters.isAllWidgetFormValid) return true;
+        if (!state.fieldManager?.validateAll()) return true;
         const _isWidgetInactive = widgetGenerateState.widget?.state === 'INACTIVE';
         return (!_isWidgetInactive && !state.isWidgetFieldChanged) || widgetOptionsInvalid.value;
     }),
@@ -102,14 +115,17 @@ const {
 /* Api */
 const updateWidget = async () => {
     const _isCreating = widgetGenerateState.widget?.state === 'CREATING';
-    await widgetGenerateStore.updateWidget({
+    const widget = await widgetGenerateStore.updateWidget({
         widget_id: widgetGenerateState.widgetId,
         size: widgetGenerateState.size,
         widget_type: widgetGenerateState.selectedWidgetName,
         data_table_id: widgetGenerateState.selectedDataTableId,
-        options: widgetGenerateState.widgetFormValueMap,
+        options: state.fieldManager.data,
         state: 'ACTIVE',
     });
+    if (widget) {
+        state.fieldManager.updateOriginData(cloneDeep(widget.options));
+    }
     if (_isCreating) {
         await dashboardStore.addWidgetToDashboard(dashboardDetailState.dashboardId || '', widgetGenerateState.widgetId);
     }
@@ -117,23 +133,6 @@ const updateWidget = async () => {
 
 
 /* Util */
-const isWidgetOptionsChanged = (
-    isChanged: boolean,
-    widgetForm: Record<string, WidgetFieldValues|undefined>,
-    widgetOptions: Record<string, WidgetFieldValues|undefined>,
-): boolean => {
-    if (isChanged) return true;
-    let _isChanged = false;
-    Object.entries(widgetForm).forEach(([k, v]) => {
-        if (_isChanged) return;
-        if (typeof v === 'object' && !Array.isArray(v)) {
-            _isChanged = isWidgetOptionsChanged(_isChanged, v, widgetOptions?.[k]);
-            return;
-        }
-        _isChanged = !isEqual(widgetOptions?.[k], v);
-    });
-    return _isChanged;
-};
 const initSnapshot = () => {
     state.varsSnapshot = cloneDeep(dashboardDetailState.vars);
     state.dashboardOptionsSnapshot = cloneDeep(dashboardDetailState.options);
@@ -142,11 +141,8 @@ const reset = () => {
     dashboardDetailStore.setVars(state.varsSnapshot);
     dashboardDetailStore.setOptions(state.dashboardOptionsSnapshot);
 };
-const loadOverlayWidget = async () => {
-    const res = await overlayWidgetRef?.value?.loadWidget();
-    if (typeof res === 'function') {
-        res('Please check the widget options.');
-    }
+const loadOverlayWidget = () => {
+    overlayWidgetRef?.value?.loadWidget();
 };
 
 /* Event */
@@ -154,11 +150,12 @@ const handleChangeWidgetSize = (widgetSize: string) => {
     state.selectedWidgetSize = widgetSize;
 };
 const handleUpdateWidgetOptions = async () => {
-    await updateWidget();
     if (state.selectedWidgetType === widgetGenerateState.selectedWidgetName) {
-        await loadOverlayWidget();
+        await updateWidget();
+        loadOverlayWidget();
     } else {
         state.selectedWidgetType = widgetGenerateState.selectedWidgetName;
+        await updateWidget();
         state.mounted = false;
     }
 };
@@ -182,14 +179,14 @@ watch(() => state.mounted, async (mounted) => {
         if (widgetGenerateState.widget?.state === 'CREATING') {
             await updateWidget();
         }
-        await loadOverlayWidget();
+        loadOverlayWidget();
         state.mounted = false;
     }
 });
-watch(() => dashboardDetailState.vars, async () => {
-    await nextTick();
-    await loadOverlayWidget();
-});
+// watch(() => dashboardDetailState.vars, async () => {
+//     await nextTick();
+//     loadOverlayWidget();
+// });
 
 onBeforeMount(() => {
     initSnapshot();
@@ -197,6 +194,7 @@ onBeforeMount(() => {
 onUnmounted(() => {
     reset();
 });
+
 </script>
 
 <template>
@@ -245,6 +243,7 @@ onUnmounted(() => {
                  :class="{ 'full-size': state.selectedWidgetSize === 'FULL' || widgetGenerateState.overlayType === 'EXPAND' }"
             >
                 <component :is="getWidgetComponent(state.selectedWidgetType)"
+                           :key="widgetGenerateState.selectedDataTableId"
                            ref="overlayWidgetRef"
                            :widget-name="widgetGenerateState.widget.widget_type"
                            :widget-id="widgetGenerateState.widget.widget_id"
@@ -262,9 +261,10 @@ onUnmounted(() => {
                 />
             </div>
         </div>
-        <widget-form-overlay-step2-widget-form v-if="widgetGenerateState.overlayType !== 'EXPAND'"
+        <widget-form-overlay-step2-widget-form v-if="widgetGenerateState.overlayType !== 'EXPAND' && !!state.fieldManager"
                                                :widget-validation-invalid="widgetOptionsInvalid"
                                                :widget-validation-invalid-text="widgetOptionsInvalidText"
+                                               :field-manager="state.fieldManager"
         />
         <portal to="apply-button">
             <p-button v-if="widgetGenerateState.overlayType !== 'EXPAND'"

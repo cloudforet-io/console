@@ -34,10 +34,10 @@ import {
     DATA_TABLE_TYPE,
 } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
-import type { AdditionalLabel, DataTableAlertModalMode } from '@/common/modules/widgets/types/widget-data-table-type';
+import type { DataTableAlertModalMode } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
-    AdditionalLabels, DateFormat, DataTableAddOptions,
-    DataTableQueryFilter,
+    DataTableAddOptions,
+    DataTableQueryFilter, TimeDiff,
 } from '@/common/modules/widgets/types/widget-model';
 
 interface Props {
@@ -110,13 +110,11 @@ const state = reactive({
         const filterChanged = !isEqual(state.filter, originDataState.filter);
         const dataTableNameChanged = state.dataFieldName !== originDataState.dataName;
         const dataUnitChanged = state.dataUnit !== originDataState.dataUnit;
-        const additionalLabelChanged = !isEqual(advancedOptionsState.additionalLabels.map(({ name, value }) => ({ name, value })), originDataState.additionalLabels);
-        const seperateDateChanged = advancedOptionsState.separateDate !== originDataState.separateDate;
         const timeDiffChanged = advancedOptionsState.selectedTimeDiff !== originDataState.timeDiff;
         const timeDiffDateChanged = advancedOptionsState.selectedTimeDiffDate !== originDataState.timeDiffDate;
 
         return sourceKeyChanged || groupByChanged || filterChanged || dataTableNameChanged || dataUnitChanged
-            || additionalLabelChanged || seperateDateChanged || timeDiffChanged || timeDiffDateChanged;
+            || timeDiffChanged || timeDiffDateChanged;
     }),
     failStatus: false,
     isUnavailable: computed<boolean>(() => props.item.state === 'UNAVAILABLE'),
@@ -127,10 +125,9 @@ const dataTableNameState = reactive({
 });
 
 const advancedOptionsState = reactive({
-    additionalLabels: [] as AdditionalLabel[],
-    separateDate: false,
     selectedTimeDiff: 'none',
     selectedTimeDiffDate: undefined as string|undefined,
+    timeDiffDataName: '' as string,
 });
 
 const validationState = reactive({
@@ -152,20 +149,19 @@ const originDataState = reactive({
     }),
     dataName: computed(() => (props.item.options as DataTableAddOptions).data_name ?? ''),
     dataUnit: computed(() => (props.item.options as DataTableAddOptions).data_unit ?? ''),
-    additionalLabels: computed(() => Object.entries(((props.item.options as DataTableAddOptions).additional_labels ?? {})).map(([key, value]) => ({
-        name: key,
-        value: value as string,
-    }))),
-    separateDate: computed(() => (props.item.options as DataTableAddOptions).date_format === 'SEPARATE'),
-    timeDiff: computed(() => {
+    timeDiff: computed<string>(() => {
         const timeDiff = (props.item.options as DataTableAddOptions).timediff;
-        const timeDiffKeys = Object.keys(timeDiff || {});
+        const timeDiffKeys = Object.keys(timeDiff || {}).filter((key) => key !== 'data_name');
         return timeDiffKeys.length ? timeDiffKeys[0] : 'none';
     }),
-    timeDiffDate: computed(() => {
+    timeDiffDate: computed<string|undefined>(() => {
         const timeDiff = (props.item.options as DataTableAddOptions).timediff;
-        const timeDiffKeys = Object.keys(timeDiff || {});
+        const timeDiffKeys = Object.keys(timeDiff || {}).filter((key) => key !== 'data_name');
         return timeDiffKeys.length ? `${-timeDiff[timeDiffKeys[0]]}` : undefined;
+    }),
+    timeDiffDataName: computed<string>(() => {
+        const timeDiff = (props.item.options as DataTableAddOptions).timediff;
+        return timeDiff?.data_name || '';
     }),
 });
 
@@ -178,6 +174,19 @@ const modalState = reactive({
 const setFailStatus = (status: boolean) => {
     state.failStatus = status;
 };
+const getTimeDiffValue = (): TimeDiff|undefined => {
+    if (advancedOptionsState.selectedTimeDiff === 'none' || !Number(advancedOptionsState.selectedTimeDiffDate)) return undefined;
+    const defaultFieldName = state.selectableSourceItems.find((source) => source.name === state.selectedSourceEndItem)?.label || '';
+    const timeDiffOptions = {
+        none: '',
+        months: 'month',
+        years: 'year',
+    };
+    return {
+        [advancedOptionsState.selectedTimeDiff]: -Number(advancedOptionsState.selectedTimeDiffDate),
+        data_name: advancedOptionsState.timeDiffDataName || `${defaultFieldName} (- ${advancedOptionsState.selectedTimeDiffDate} ${timeDiffOptions[advancedOptionsState.selectedTimeDiff]})`,
+    };
+};
 const updateDataTable = async (): Promise<DataTableModel|undefined> => {
     if (!state.dataFieldName.length) {
         showErrorMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_WARNING'), '');
@@ -185,10 +194,6 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
         return undefined;
     }
 
-    const additionalLabelsRequest = {} as AdditionalLabels;
-    advancedOptionsState.additionalLabels.filter((label) => label.name.length && label.value.length).forEach((label) => {
-        additionalLabelsRequest[label.name] = label.value;
-    });
     const domainOptions = state.sourceType === DATA_SOURCE_DOMAIN.COST
         ? { data_source_id: state.dataSourceId, data_key: state.selectedSourceEndItem }
         : { metric_id: state.selectedSourceEndItem };
@@ -226,13 +231,10 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
             filter: refinedFilter,
             data_name: state.dataFieldName,
             data_unit: state.dataUnit,
-            additional_labels: additionalLabelsRequest,
-            date_format: (advancedOptionsState.separateDate ? 'SEPARATE' : 'SINGLE') as DateFormat,
-            timediff: advancedOptionsState.selectedTimeDiff !== 'none' && Number(advancedOptionsState.selectedTimeDiffDate)
-                ? { [advancedOptionsState.selectedTimeDiff]: -Number(advancedOptionsState.selectedTimeDiffDate) }
-                : undefined,
+            timediff: getTimeDiffValue(),
         },
     };
+
     const result = await widgetGenerateStore.updateDataTable(updateParams);
 
     if (result) {
@@ -298,8 +300,6 @@ const handleUpdateDataTable = async () => {
     if (result) {
         showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_SUCCESS'), '');
         widgetGenerateStore.setSelectedDataTableId(state.dataTableId);
-        widgetGenerateStore.setDataTableUpdating(true);
-        await widgetGenerateStore.loadDataTable({});
     }
     setTimeout(() => {
         state.loading = false;
@@ -316,13 +316,9 @@ const setInitialDataTableForm = () => {
     state.dataUnit = originDataState.dataUnit;
 
     // Advanced Options
-    advancedOptionsState.additionalLabels = originDataState.additionalLabels.map((label) => ({
-        ...label,
-        key: getRandomId(),
-    }));
-    advancedOptionsState.separateDate = originDataState.separateDate;
     advancedOptionsState.selectedTimeDiff = originDataState.timeDiff;
     advancedOptionsState.selectedTimeDiffDate = originDataState.timeDiffDate;
+    advancedOptionsState.timeDiffDataName = originDataState.timeDiffDataName;
 };
 
 onMounted(() => {
@@ -339,9 +335,9 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
 
 
     // Advanced Options
-    advancedOptionsState.additionalLabels = [];
-    advancedOptionsState.separateDate = false;
     advancedOptionsState.selectedTimeDiff = 'none';
+    advancedOptionsState.selectedTimeDiffDate = undefined;
+    advancedOptionsState.timeDiffDataName = '';
 });
 
 // Validation
@@ -386,10 +382,9 @@ defineExpose({
                                               :filter.sync="state.filter"
                                               :data-field-name.sync="state.dataFieldName"
                                               :data-unit.sync="state.dataUnit"
-                                              :additional-labels.sync="advancedOptionsState.additionalLabels"
-                                              :separate-date.sync="advancedOptionsState.separateDate"
                                               :selected-time-diff.sync="advancedOptionsState.selectedTimeDiff"
                                               :selected-time-diff-date.sync="advancedOptionsState.selectedTimeDiffDate"
+                                              :time-diff-data-name.sync="advancedOptionsState.timeDiffDataName"
                                               :form-invalid.sync="validationState.dataTableApplyInvalid"
         />
         <widget-form-data-table-card-footer :disabled="validationState.dataTableApplyInvalid"

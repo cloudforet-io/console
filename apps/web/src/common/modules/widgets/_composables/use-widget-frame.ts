@@ -21,7 +21,9 @@ import { DATA_SOURCE_DOMAIN, DATA_TABLE_TYPE } from '@/common/modules/widgets/_c
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import type { DisplayAnnotationValue } from '@/common/modules/widgets/_widget-fields/display-annotation/type';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
-import type { WidgetFrameEmit, WidgetProps, WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
+import type {
+    WidgetEmit, WidgetProps, WidgetSize,
+} from '@/common/modules/widgets/types/widget-display-type';
 import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-field-type';
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { FullDataLink, WidgetFrameProps } from '@/common/modules/widgets/types/widget-frame-type';
@@ -35,9 +37,9 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 
 interface OverridableWidgetFrameState {
     dateRange?: DateRange | ComputedRef<DateRange>;
-    errorMessage?: string | ComputedRef<string>;
-    widgetLoading?: boolean | ComputedRef<boolean>;
-    noData?: boolean | ComputedRef<boolean>;
+    errorMessage?: ComputedRef<string|undefined>;
+    widgetLoading?: ComputedRef<boolean>;
+    noData?: ComputedRef<boolean>;
 }
 type DataTableModel = PublicDataTableModel | PrivateDataTableModel;
 const { getProperRouteLocation } = useProperRouteLocation();
@@ -134,18 +136,18 @@ const getFullDataLocation = (dataTable: DataTableModel, widgetOptions?: Record<W
 };
 export const useWidgetFrame = (
     props: UnwrapRef<WidgetProps>,
-    emit: WidgetFrameEmit,
+    emit: WidgetEmit,
     overrides: OverridableWidgetFrameState = {},
 ) => {
     const _state = reactive({
         widgetConfig: computed(() => getWidgetConfig(props.widgetName)),
-        showWidgetHeader: computed<boolean>(() => props.widgetOptions?.widgetHeader?.toggleValue || false),
+        showWidgetHeader: computed<boolean>(() => props.widgetOptions?.widgetHeader?.value?.toggleValue || false),
         title: computed(() => {
-            if (_state.showWidgetHeader) return props.widgetOptions?.widgetHeader?.title;
+            if (_state.showWidgetHeader) return props.widgetOptions?.widgetHeader?.value?.title;
             return undefined;
         }),
         description: computed(() => {
-            if (_state.showWidgetHeader) return props.widgetOptions?.widgetHeader?.description;
+            if (_state.showWidgetHeader) return props.widgetOptions?.widgetHeader?.value?.description;
             return undefined;
         }),
         size: computed<WidgetSize>(() => {
@@ -191,7 +193,7 @@ export const useWidgetFrame = (
             return overrides.noData?.value || false;
         }),
         annotation: computed<string|undefined>(() => {
-            const _displayAnnotation = props.widgetOptions?.displayAnnotation as DisplayAnnotationValue;
+            const _displayAnnotation = props.widgetOptions?.displayAnnotation?.value as DisplayAnnotationValue;
             if (!_displayAnnotation?.toggleValue) return undefined;
             return _displayAnnotation?.annotation;
         }),

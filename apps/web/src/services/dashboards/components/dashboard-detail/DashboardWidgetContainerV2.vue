@@ -87,7 +87,7 @@ const state = reactive({
     mountedWidgetMap: {} as Record<string, boolean>,
     intersectedWidgetMap: {} as Record<string, boolean>,
     isAllWidgetsMounted: computed<boolean>(() => Object.values(state.mountedWidgetMap).every((d) => d)),
-    refinedWidgetInfoList: undefined as RefinedWidgetInfo[]|undefined,
+    refinedWidgetInfoList: [] as RefinedWidgetInfo[],
     overlayType: 'EDIT' as 'EDIT' | 'EXPAND',
     showExpandOverlay: false,
     remountWidgetId: undefined as string|undefined,
@@ -100,7 +100,7 @@ const widgetDeleteState = reactive({
 
 /* Util */
 const { containerWidth } = useDashboardContainerWidth({ containerRef, observeResize: true });
-const getRefinedWidgetInfoList = (dashboardWidgets: Array<PublicWidgetModel|PrivateWidgetModel>): RefinedWidgetInfo[]|undefined => {
+const getRefinedWidgetInfoList = (dashboardWidgets: Array<PublicWidgetModel|PrivateWidgetModel>): RefinedWidgetInfo[] => {
     if (!dashboardWidgets.length) {
         return [];
     }
@@ -128,23 +128,20 @@ const getRefinedWidgetInfoList = (dashboardWidgets: Array<PublicWidgetModel|Priv
 
     return _refinedWidgets;
 };
-const getWidgetLoading = () => {
+const getWidgetLoading = (widgetId: string) => {
     // if (!dashboardDetailGetters.isAllVariablesInitialized) return true;
     if (!state.isAllWidgetsMounted) return true;
-    // if (!state.intersectedWidgetMap[widgetId]) return true;
+    if (!state.intersectedWidgetMap[widgetId]) return true;
     return false;
 };
 const refreshAllWidget = debounce(async () => {
     dashboardDetailStore.setLoadingWidgets(true);
-    const loadWidgetPromises: WidgetExpose['loadWidget'][] = [];
 
     widgetRef.value.forEach((comp) => {
-        if (!comp || typeof comp.loadWidget() !== 'function') return false;
-        loadWidgetPromises.push(comp.loadWidget);
+        if (!comp) return false;
+        comp.loadWidget();
         return true;
     });
-
-    await Promise.allSettled(loadWidgetPromises);
 
     dashboardDetailStore.setLoadingWidgets(false);
 }, 150);
@@ -152,7 +149,6 @@ const loadAWidget = async (widgetId: string) => {
     if (!widgetId) return;
     widgetRef.value.forEach((comp) => {
         if (!comp || comp.$el.id !== widgetId) return;
-        if (typeof comp.loadWidget !== 'function') return;
         comp.loadWidget();
     });
 };
@@ -264,9 +260,10 @@ const handleClickDeleteWidget = (widget: RefinedWidgetInfo) => {
     widgetDeleteState.targetWidget = widget;
     widgetDeleteState.visibleModal = true;
 };
-const handleOpenWidgetOverlay = (widget: RefinedWidgetInfo, overlayType: WidgetOverlayType) => {
+const handleOpenWidgetOverlay = async (widget: RefinedWidgetInfo, overlayType: WidgetOverlayType) => {
     widgetGenerateStore.setOverlayType(overlayType);
     widgetGenerateStore.setWidgetForm(widget);
+    await widgetGenerateStore.listDataTable();
     widgetGenerateStore.setOverlayStep(2);
     widgetGenerateStore.setShowOverlay(true);
 };
@@ -367,6 +364,10 @@ watch(() => containerWidth.value, (_containerWidth) => {
     if (!state.refinedWidgetInfoList?.length) return;
     state.refinedWidgetInfoList = getResizedWidgetInfoList(state.refinedWidgetInfoList, _containerWidth);
 });
+defineExpose({
+    refreshAllWidget,
+});
+
 
 /* Widget Intersection Observer */
 // eslint-disable-next-line no-undef
@@ -398,13 +399,26 @@ const stopWidgetRefWatch = watch([widgetRef, () => state.isAllWidgetsMounted], (
     });
 });
 
-
 onBeforeUnmount(() => {
     stopWidgetRefWatch();
     Object.values(widgetObserverMap).forEach((observer) => observer.disconnect());
 });
-defineExpose({
-    refreshAllWidget,
+const stopWidgetInfoWatch = watch(() => state.refinedWidgetInfoList, (widgetInfoList) => {
+    if (!widgetInfoList || !Array.isArray(widgetInfoList)) return;
+
+    const mountedWidgetMap = {};
+    const intersectedWidgetMap = {};
+    widgetInfoList.forEach((widget) => {
+        mountedWidgetMap[widget.widget_id] = state.mountedWidgetMap[widget.widget_id];
+        intersectedWidgetMap[widget.widget_id] = state.intersectedWidgetMap[widget.widget_id];
+    });
+    state.mountedWidgetMap = mountedWidgetMap;
+    state.intersectedWidgetMap = intersectedWidgetMap;
+}, {
+    immediate: true, deep: true,
+});
+onBeforeUnmount(() => {
+    stopWidgetInfoWatch();
 });
 </script>
 
@@ -420,7 +434,6 @@ defineExpose({
             <div class="widgets-wrapper">
                 <template v-for="(widget) in state.refinedWidgetInfoList">
                     <component :is="widget.component"
-                               v-if="widget.widget_id !== state.remountWidgetId"
                                :id="widget.widget_id"
                                :key="widget.widget_id"
                                ref="widgetRef"
@@ -432,7 +445,7 @@ defineExpose({
                                :width="widget.width"
                                :widget-options="widget.options"
                                :mode="displayStore.state.visibleSidebar ? 'edit-layout' : 'view'"
-                               :loading="getWidgetLoading()"
+                               :loading="getWidgetLoading(widget.widget_id)"
                                :dashboard-options="dashboardDetailState.options"
                                :dashboard-vars="dashboardDetailGetters.refinedVars"
                                :disable-refresh-on-variable-change="widgetGenerateState.showOverlay || dashboardDetailState.loadingDashboard"

@@ -1,12 +1,14 @@
-export interface CategoryByValue {
-    value: string;
-    count: number;
-}
+import type { FieldDataTargetType } from '@/common/modules/widgets/types/widget-field-type';
+
 
 export interface CategoryByOptions {
-    dataTarget?: string;
-    max?: number;
+    dataTarget: FieldDataTargetType;
+    max: number;
     defaultMaxCount: number;
-    defaultIndex?: number;
     excludeDateField?: boolean;
+}
+
+export interface CategoryByValue {
+    data?: string;
+    count: number;
 }

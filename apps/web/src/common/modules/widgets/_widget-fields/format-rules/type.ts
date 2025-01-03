@@ -1,16 +1,25 @@
 import type { FORMAT_RULE_TYPE } from '@/common/modules/widgets/_constants/widget-field-constant';
+import type { FieldDataTargetType } from '@/common/modules/widgets/types/widget-field-type';
 
-export interface FormatRulesValue {
+export interface ThresholdValue {
     text?: string;
-    threshold?: number;
+    number?: number;
     color: string;
 }
 
-export type FormatRulesType = typeof FORMAT_RULE_TYPE[keyof typeof FORMAT_RULE_TYPE];
-
-export interface FormatRulesOptions {
-    formatRulesType: FormatRulesType;
-    description?: string;
-    default?: FormatRulesValue[];
+export interface FormatRulesValue {
+    field?: string;
+    rules: ThresholdValue[];
     baseColor?: string;
 }
+
+export interface FormatRulesOptions {
+    useField?: boolean;
+    dataTarget?: FieldDataTargetType;
+    formatRulesType: FormatRulesType;
+    description?: string;
+    baseColor?: string;
+    default?: ThresholdValue[];
+}
+
+export type FormatRulesType = typeof FORMAT_RULE_TYPE[keyof typeof FORMAT_RULE_TYPE];

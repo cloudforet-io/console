@@ -1,19 +1,17 @@
 import { computed, reactive } from 'vue';
 
+import { cloneDeep } from 'lodash';
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
-import type { Granularity } from '@/schema/dashboard/_types/widget-type';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PrivateWidgetUpdateParameters } from '@/schema/dashboard/private-widget/api-verbs/update';
 import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
 import type { DataTableAddParameters } from '@/schema/dashboard/public-data-table/api-verbs/add';
 import type { DataTableDeleteParameters } from '@/schema/dashboard/public-data-table/api-verbs/delete';
 import type { DataTableListParameters } from '@/schema/dashboard/public-data-table/api-verbs/list';
-import type { DataTableLoadParameters } from '@/schema/dashboard/public-data-table/api-verbs/load';
 import type { DataTableTransformParameters } from '@/schema/dashboard/public-data-table/api-verbs/transform';
 import type { DataTableUpdateParameters } from '@/schema/dashboard/public-data-table/api-verbs/update';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
@@ -24,7 +22,11 @@ import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import getRandomId from '@/lib/random-id-generator';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
+import {
+    DATA_TABLE_OPERATOR,
+    DATA_TABLE_TYPE,
+    DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP,
+} from '@/common/modules/widgets/_constants/data-table-constant';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import { getDuplicatedDataTableName } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import { sanitizeWidgetOptions } from '@/common/modules/widgets/_helpers/widget-helper';
@@ -34,7 +36,7 @@ import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-fi
 import type {
     DataTableOperator,
     WidgetState,
-    DataTableTransformOptions,
+    DataTableTransformOptions, ConcatOptions, JoinOptions,
 } from '@/common/modules/widgets/types/widget-model';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
@@ -43,6 +45,11 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashbo
 type DataTableModel = PublicDataTableModel|PrivateDataTableModel;
 type WidgetModel = PublicWidgetModel|PrivateWidgetModel;
 type WidgetUpdateParameters = PublicWidgetUpdateParameters|PrivateWidgetUpdateParameters;
+interface DataTableReference {
+    data_table_id: string;
+    parents: string[];
+    children: string[];
+}
 export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const dashboardDetailStore = useDashboardDetailInfoStore();
     const dashboardDetailGetters = dashboardDetailStore.getters;
@@ -62,10 +69,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         // Data Table
         selectedDataTableId: undefined as undefined | string,
         dataTables: [] as Partial<DataTableModel>[],
-        selectedPreviewGranularity: GRANULARITY.MONTHLY as Granularity,
         previewData: { results: [], total_count: 0 } as ListResponse<any>,
-        dataTableUpdating: false,
-        dataTableLoadLoading: false,
         dataTableCreateLoading: false,
         joinRestrictedMap: {} as JoinRestrictedMap, // Flag for handling Join type EXCEPTION RESTRICTION cases. (duplicated data field). Example - { '{dataTalbeId}': true, }
         allDataTableInvalidMap: {} as Record<string, boolean>, // Flag for handling all data table invalid cases. Example - { '{dataTalbeId}': true, }
@@ -80,6 +84,73 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         }),
         widgetState: computed<WidgetState|undefined>(() => state.widget?.state),
         allDataTableInvalid: computed<boolean>(() => Object.values(state.allDataTableInvalidMap).some((invalid) => invalid)),
+        dataTableReferenceMap: computed<Record<string, DataTableReference>>(() => {
+            const referenceMap = {} as Record<string, DataTableReference>;
+            const savedDataTables = state.dataTables.filter((dataTable) => dataTable.data_table_id && !dataTable.data_table_id.startsWith('UNSAVED-')) as DataTableModel[];
+            const MULTIPE_DATA_TABLE_OPERATORS = [DATA_TABLE_OPERATOR.CONCAT, DATA_TABLE_OPERATOR.JOIN];
+            savedDataTables.forEach((dataTable) => {
+                if (!referenceMap[dataTable.data_table_id]) {
+                    referenceMap[dataTable.data_table_id] = setIniitialDataTableReferenceProperty(dataTable.data_table_id);
+                }
+
+                if (dataTable.data_type === DATA_TABLE_TYPE.TRANSFORMED) {
+                    if (MULTIPE_DATA_TABLE_OPERATORS.includes(dataTable.operator)) {
+                        const [firstReferenceDataTableId, secondReferenceDataTableId] = (dataTable.options[dataTable.operator] as ConcatOptions|JoinOptions).data_tables;
+                        if (!referenceMap[firstReferenceDataTableId]) {
+                            referenceMap[firstReferenceDataTableId] = setIniitialDataTableReferenceProperty(firstReferenceDataTableId);
+                        }
+                        if (!referenceMap[secondReferenceDataTableId]) {
+                            referenceMap[secondReferenceDataTableId] = setIniitialDataTableReferenceProperty(secondReferenceDataTableId);
+                        }
+                        referenceMap[firstReferenceDataTableId] = {
+                            ...referenceMap[firstReferenceDataTableId],
+                            children: [
+                                ...referenceMap[firstReferenceDataTableId].children,
+                                dataTable.data_table_id,
+                            ],
+                        };
+                        referenceMap[secondReferenceDataTableId] = {
+                            ...referenceMap[secondReferenceDataTableId],
+                            children: [
+                                ...referenceMap[secondReferenceDataTableId].children,
+                                dataTable.data_table_id,
+                            ],
+                        };
+                        referenceMap[dataTable.data_table_id] = {
+                            ...referenceMap[dataTable.data_table_id],
+                            parents: [
+                                firstReferenceDataTableId,
+                                secondReferenceDataTableId,
+                            ],
+                        };
+                    } else {
+                        const referenceDataTableId = dataTable.options[dataTable.operator].data_table_id;
+                        if (!referenceMap[referenceDataTableId]) {
+                            referenceMap[referenceDataTableId] = setIniitialDataTableReferenceProperty(referenceDataTableId);
+                        }
+                        referenceMap[referenceDataTableId] = {
+                            ...referenceMap[referenceDataTableId],
+                            children: [
+                                ...referenceMap[referenceDataTableId].children,
+                                dataTable.data_table_id,
+                            ],
+                        };
+                        referenceMap[dataTable.data_table_id] = {
+                            ...referenceMap[dataTable.data_table_id],
+                            parents: [referenceDataTableId],
+                        };
+                    }
+                }
+            });
+            return referenceMap;
+        }),
+    });
+
+    /* Helper */
+    const setIniitialDataTableReferenceProperty = (dataTableId: string): DataTableReference => ({
+        data_table_id: dataTableId,
+        parents: [],
+        children: [],
     });
 
     /* Mutations */
@@ -113,12 +184,6 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const setWidgetValidMap = (widgetValidMap: Record<string, boolean>) => {
         state.widgetValidMap = widgetValidMap;
     };
-    const setSelectedPreviewGranularity = (granularity: Granularity) => {
-        state.selectedPreviewGranularity = granularity;
-    };
-    const setDataTableUpdating = (status: boolean) => {
-        state.dataTableUpdating = status;
-    };
     const setDataTableCreateLoading = (status: boolean) => {
         state.dataTableCreateLoading = status;
     };
@@ -143,8 +208,6 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         setSize,
         setWidgetFormValueMap,
         setWidgetValidMap,
-        setSelectedPreviewGranularity,
-        setDataTableUpdating,
         setJoinRestrictedMap,
         setAllDataTableInvalidMap,
         setDataTableCreateLoading,
@@ -181,7 +244,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 const result = await fetcher(parameters);
                 state.dataTables.push(result);
                 return result;
-            } catch (e) {
+            } catch (e: any) {
                 setDataTableCreateLoading(false); // DataTable Loading Failed Case
                 showErrorMessage(e.message, e);
                 ErrorHandler.handleError(e);
@@ -211,25 +274,13 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         },
         createUnsavedTransformDataTable: (operatorType: DataTableOperator) => {
             const options = {
-                JOIN: {
-                    data_tables: [],
-                    how: undefined,
-                },
-                CONCAT: {
-                    data_tables: [],
-                },
-                AGGREGATE: {
-                    data_table_id: undefined,
-                    group_by: [],
-                },
-                QUERY: {
-                    data_table_id: undefined,
-                    conditions: [],
-                },
-                EVAL: {
-                    data_table_id: undefined,
-                    formulas: [],
-                },
+                JOIN: cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.JOIN),
+                CONCAT: cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.CONCAT),
+                QUERY: cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.QUERY),
+                EVAL: cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.EVAL),
+                PIVOT: cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT),
+                ADD_LABELS: cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.ADD_LABELS),
+                VALUE_MAPPING: cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.VALUE_MAPPING),
             };
             const unsavedTransformData = {
                 data_table_id: `UNSAVED-${getRandomId()}`,
@@ -238,7 +289,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 operator: operatorType,
                 options: {
                     [operatorType]: options[operatorType],
-                },
+                } as DataTableTransformOptions,
                 state: 'AVAILABLE',
             } as Partial<DataTableModel>;
             state.dataTables.push(unsavedTransformData);
@@ -268,35 +319,8 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 }
                 state.dataTables = state.dataTables.map((dataTable) => (dataTable.data_table_id === result.data_table_id ? result : dataTable));
 
-                // Update Referenced Transformed DataTable
-                if (!preventReferenceUpdating) {
-                    const referencedDataTableIds = [] as string[];
-                    state.dataTables.forEach((dataTable) => {
-                        const transformDataTalbeOptions = dataTable.options as DataTableTransformOptions;
-                        const isReferenced = dataTable.data_type === 'TRANSFORMED'
-                            && !dataTable?.data_table_id?.startsWith('UNSAVED-')
-                            && (
-                                transformDataTalbeOptions?.JOIN?.data_tables?.includes(updateParams.data_table_id)
-                                || transformDataTalbeOptions?.CONCAT?.data_tables?.includes(updateParams.data_table_id)
-                                || transformDataTalbeOptions?.QUERY?.data_table_id === updateParams.data_table_id
-                                || transformDataTalbeOptions?.EVAL?.data_table_id === updateParams.data_table_id
-                            );
-                        if (isReferenced) referencedDataTableIds.push(dataTable.data_table_id as string);
-                    });
-                    if (referencedDataTableIds.length) {
-                        await Promise.all(referencedDataTableIds.map((dataTableId) => {
-                            const dataTable = state.dataTables.find((_dataTable) => _dataTable.data_table_id === dataTableId) as PublicDataTableModel|PrivateDataTableModel;
-                            actions.updateDataTable({
-                                data_table_id: dataTable.data_table_id,
-                                name: dataTable.name,
-                                options: {
-                                    ...dataTable.options,
-                                },
-                            });
-                            return null;
-                        }));
-                    }
-                }
+                // Cascade Update Referenced Transformed DataTable
+                if (!preventReferenceUpdating) await actions.cascadeUpdateDataTable(result.data_table_id);
 
                 return result;
             } catch (e: any) {
@@ -304,6 +328,30 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 ErrorHandler.handleError(e);
                 return undefined;
             }
+        },
+        cascadeUpdateDataTable: async (dataTableId: string) => {
+            const isPrivate = state.widgetId.startsWith('private');
+            const fetcher = isPrivate
+                ? SpaceConnector.clientV2.dashboard.privateDataTable.update<DataTableUpdateParameters, DataTableModel>
+                : SpaceConnector.clientV2.dashboard.publicDataTable.update<DataTableUpdateParameters, DataTableModel>;
+
+            const children = getters.dataTableReferenceMap[dataTableId].children;
+            return children.reduce((chain, childId) => chain.then(async () => {
+                const currentDataTable = state.dataTables.find(
+                    (_dataTable) => _dataTable.data_table_id === childId,
+                ) as DataTableModel;
+
+                const result = await fetcher({
+                    data_table_id: childId,
+                    name: currentDataTable?.name,
+                    options: {
+                        ...(currentDataTable?.options ?? {}),
+                    },
+                });
+                state.dataTables = state.dataTables.map((dataTable) => (dataTable.data_table_id === result.data_table_id ? result : dataTable));
+
+                return actions.cascadeUpdateDataTable(childId);
+            }), Promise.resolve());
         },
         deleteDataTable: async (deleteParams: DataTableDeleteParameters, unsaved?: boolean) => {
             if (unsaved) {
@@ -331,60 +379,24 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 ErrorHandler.handleError(e);
             }
         },
-        loadDataTable: async (loadParams: Partial<DataTableLoadParameters>) => {
-            const isPrivate = state.widgetId.startsWith('private');
-            const fetcher = isPrivate
-                ? SpaceConnector.clientV2.dashboard.privateDataTable.load<DataTableLoadParameters, ListResponse<Record<string, any>[]>>
-                : SpaceConnector.clientV2.dashboard.publicDataTable.load<DataTableLoadParameters, ListResponse<Record<string, any>[]>>;
-            try {
-                state.dataTableLoadLoading = true;
-                const _granularity = state.selectedPreviewGranularity || 'MONTHLY';
-                let _sort = loadParams.sort;
-                const dataTable = state.dataTables.find((_dataTable) => _dataTable.data_table_id === (loadParams.data_table_id || state.selectedDataTableId as string));
-                if (!_sort || (_sort && _sort.length === 0)) {
-                    const labelsInfoList = Object.keys(dataTable?.labels_info ?? {});
-                    if (labelsInfoList.includes('Date')) _sort = [{ key: 'Date', desc: false }];
-                    else if (_granularity === 'DAILY') _sort = [{ key: 'Day', desc: false }];
-                    else if (_granularity === 'MONTHLY') _sort = [{ key: 'Month', desc: false }];
-                    else if (_granularity === 'YEARLY') _sort = [{ key: 'Year', desc: false }];
-                }
-                const { results, total_count } = await fetcher({
-                    granularity: _granularity,
-                    page: {
-                        start: 1,
-                        limit: 15,
-                    },
-                    ...loadParams,
-                    sort: _sort,
-                    data_table_id: loadParams.data_table_id || state.selectedDataTableId as string, // for fetching without data_table_id
-                    vars: dashboardDetailGetters.dashboardInfo?.vars || {},
-                });
-                state.previewData = { results: results ?? [], total_count: total_count ?? 0 };
-                setDataTableLoadFailed(false);
-            } catch (e) {
-                state.previewData = { results: [], total_count: 0 };
-                setDataTableLoadFailed(true);
-                ErrorHandler.handleError(e);
-            } finally {
-                state.dataTableUpdating = false;
-                state.dataTableLoadLoading = false;
-            }
-        },
-        updateWidget: async (updateParams: Partial<WidgetUpdateParameters>) => {
+        updateWidget: async (updateParams: Partial<WidgetUpdateParameters>): Promise<WidgetModel|undefined> => {
             const isPrivate = state.widgetId.startsWith('private');
             const fetcher = isPrivate
                 ? SpaceConnector.clientV2.dashboard.privateWidget.update<PrivateWidgetUpdateParameters, PrivateWidgetModel>
                 : SpaceConnector.clientV2.dashboard.publicWidget.update<PublicWidgetUpdateParameters, PublicWidgetModel>;
             const sanitizedOptions = sanitizeWidgetOptions(updateParams.options ?? {}, updateParams.widget_type ?? 'table');
             try {
-                state.widget = await fetcher({
+                const result = await fetcher({
                     widget_id: state.widgetId,
                     ...updateParams,
                     options: sanitizedOptions, // Sanitize Wrong Options
                 });
+                state.widget = result;
+                return result;
             } catch (e: any) {
                 showErrorMessage(e.message, e);
                 ErrorHandler.handleError(e);
+                return undefined;
             }
         },
         /* Step 2 */
@@ -400,13 +412,13 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             state.widgetFormValueMap = {};
             state.allDataTableInvalidMap = {};
         },
-        setWidgetForm: (widgetInfo?: WidgetModel) => {
+        setWidgetForm: (widgetInfo: WidgetModel) => {
             state.selectedWidgetName = widgetInfo?.widget_type || 'table';
-            const _widgetConfig = getWidgetConfig(widgetInfo?.widget_type || 'table');
+            const _widgetConfig = getWidgetConfig(widgetInfo.widget_type || 'table');
             state.widget = widgetInfo;
-            state.widgetId = widgetInfo?.widget_id || '';
+            state.widgetId = widgetInfo.widget_id;
             state.size = widgetInfo?.size || _widgetConfig?.meta?.sizes[0] || 'full';
-            state.selectedDataTableId = widgetInfo?.data_table_id || undefined;
+            state.selectedDataTableId = widgetInfo?.data_table_id;
             state.widgetFormValueMap = widgetInfo?.options || {};
         },
     };

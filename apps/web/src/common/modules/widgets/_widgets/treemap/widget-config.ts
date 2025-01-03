@@ -19,7 +19,6 @@ const treemap: WidgetConfig = {
                 dataTarget: 'labels_info',
                 defaultMaxCount: 20,
                 max: 30,
-                defaultIndex: 0,
             },
         },
     },
