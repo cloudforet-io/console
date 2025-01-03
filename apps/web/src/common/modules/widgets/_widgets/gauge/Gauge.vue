@@ -14,7 +14,6 @@ import { isEmpty, orderBy, throttle } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
@@ -35,6 +34,7 @@ import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/g
 import type { MaxValue } from '@/common/modules/widgets/_widget-fields/max/type';
 import type { MinValue } from '@/common/modules/widgets/_widget-fields/min/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
+import type { WidgetLoadResponse } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit,
     WidgetExpose,
@@ -42,10 +42,6 @@ import type {
 
 import { gray } from '@/styles/colors';
 
-
-type Data = ListResponse<{
-    [key: string]: string|number;
-}>;
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
@@ -61,7 +57,7 @@ const state = reactive({
     dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
 
     unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
-    data: computed<Data | null>(() => queryResult?.data?.value || null),
+    data: computed<WidgetLoadResponse | null>(() => queryResult?.data?.value || null),
     chart: null as EChartsType | null,
     chartData: undefined as undefined|number,
     chartOptions: computed<{series: GaugeSeriesOption[]}>(() => ({
@@ -138,10 +134,10 @@ const widgetOptionsState = reactive({
 
 
 /* Api */
-const fetchWidgetData = async (params: PrivateWidgetLoadParameters|PublicWidgetLoadParameters): Promise<Data> => {
+const fetchWidgetData = async (params: PrivateWidgetLoadParameters|PublicWidgetLoadParameters): Promise<WidgetLoadResponse> => {
     const defaultFetcher = state.isPrivateWidget
-        ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
-        : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>;
+        ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, WidgetLoadResponse>
+        : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, WidgetLoadResponse>;
     const res = await defaultFetcher(params);
     return res;
 };
@@ -176,7 +172,7 @@ const widgetLoading = computed<boolean>(() => queryResult.isLoading);
 const errorMessage = computed<string>(() => queryResult.error?.value?.message);
 
 /* Util */
-const drawChart = (rawData: Data|null) => {
+const drawChart = (rawData: WidgetLoadResponse|null) => {
     if (isEmpty(rawData)) return;
     state.chartData = rawData?.results?.[0]?.[widgetOptionsState.dataFieldInfo?.data as string] || 0;
 };
