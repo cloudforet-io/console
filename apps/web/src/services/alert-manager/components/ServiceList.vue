@@ -2,6 +2,8 @@
 import { computed, onMounted, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
+import { isEmpty } from 'lodash';
+
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -25,7 +27,7 @@ import { usePageEditableStatus } from '@/common/composables/page-editable-status
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useQueryTags } from '@/common/composables/query-tags';
 
-import { red } from '@/styles/colors';
+import { gray } from '@/styles/colors';
 
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/constants/common-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
@@ -189,79 +191,108 @@ onMounted(async () => {
                                @change="handleClickServiceItem(item.service_id)"
                 >
                     <div class="card-inner-wrapper">
-                        <p class="text-label-xl font-bold truncate">
-                            {{ item.name }}
-                        </p>
+                        <div class="flex items-center justify-between">
+                            <p class="flex-1 text-label-xl font-bold truncate">
+                                {{ item.name }}
+                            </p>
+                            <p-i name="ic_chevron-right"
+                                 width="1.5rem"
+                                 height="1.5rem"
+                                 :color="gray[500]"
+                            />
+                        </div>
                         <div class="contents">
-                            <div class="section alerts-wrapper">
-                                <div class="alerts">
-                                    <p class="title text-gray-700">
-                                        {{ $t('ALERT_MANAGER.SERVICE.OPEN_ALERTS') }}
-                                    </p>
-                                    <p class="count font-medium">
-                                        {{ (item?.alerts.TRIGGERED?.HIGH || 0) + (item?.alerts.TRIGGERED?.LOW || 0) + (item?.alerts.ACKNOWLEDGED?.HIGH || 0) + (item?.alerts.ACKNOWLEDGED?.LOW || 0) }}
-                                    </p>
-                                </div>
-                                <p-divider />
-                                <div class="alerts triggered text-red-500">
-                                    <p class="title">
-                                        {{ $t('ALERT_MANAGER.ALERTS.TRIGGERED') }}
-                                    </p>
-                                    <div class="triggered-info">
-                                        <p class="count">
-                                            {{ (item?.alerts.TRIGGERED?.HIGH || 0) + (item?.alerts.TRIGGERED?.LOW || 0) }}
+                            <div class="flex flex-col flex-1 gap-4">
+                                <div class="flex flex-col gap-3">
+                                    <div class="alerts">
+                                        <p class="title text-gray-700">
+                                            {{ $t('ALERT_MANAGER.SERVICE.OPEN_ALERTS') }}
                                         </p>
-                                        <div class="ml-2">
-                                            <p-i name="ic_error-filled"
-                                                 :color="red[400]"
-                                                 width="1rem"
-                                                 height="1rem"
-                                            />
-                                            <span class="text-gray-900 pl-1">{{ $t('ALERT_MANAGER.ALERTS.HIGH') }}:</span>
-                                            <span> {{ item?.alerts.TRIGGERED?.HIGH || 0 }}</span>
+                                        <p class="count font-medium">
+                                            {{ (item?.alerts.TRIGGERED?.HIGH || 0) + (item?.alerts.TRIGGERED?.LOW || 0)
+                                                + (item?.alerts.ACKNOWLEDGED?.HIGH || 0) + (item?.alerts.ACKNOWLEDGED?.LOW || 0) }}
+                                        </p>
+                                    </div>
+                                    <div v-if="isEmpty(item?.alerts.TRIGGERED) || (item?.alerts.TRIGGERED?.HIGH === 0 && !item?.alerts.TRIGGERED?.LOW === 0)
+                                             && isEmpty(item?.alerts.ACKNOWLEDGED) || (item?.alerts.ACKNOWLEDGED?.HIGH === 0 && item?.alerts.ACKNOWLEDGED?.LOW === 0)"
+                                         class="flex h-11 pl-2"
+                                    >
+                                        <div class="alerts healthy text-green-600">
+                                            <p class="title">
+                                                {{ $t('ALERT_MANAGER.ALERTS.HEALTHY') }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div v-else
+                                         class="flex justify-between pl-2 pr-2"
+                                    >
+                                        <div class="alerts triggered text-red-500">
+                                            <p class="title">
+                                                {{ $t('ALERT_MANAGER.ALERTS.TRIGGERED') }}
+                                            </p>
+                                            <div class="triggered-info">
+                                                <p class="count">
+                                                    {{ (item?.alerts.TRIGGERED?.HIGH || 0) + (item?.alerts.TRIGGERED?.LOW || 0) }}
+                                                </p>
+                                                <div class="ml-2 text-gray-700">
+                                                    <span class="pl-1">{{ $t('ALERT_MANAGER.ALERTS.HIGH') }}:</span>
+                                                    <span> {{ item?.alerts.TRIGGERED?.HIGH || 0 }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="alerts acknowledged text-gray-600">
+                                            <p class="title">
+                                                {{ $t('ALERT_MANAGER.ALERTS.ACKNOWLEDGED') }}
+                                            </p>
+                                            <div class="triggered-info">
+                                                <p class="count">
+                                                    {{ (item?.alerts.ACKNOWLEDGED?.HIGH || 0) + (item?.alerts.ACKNOWLEDGED?.LOW || 0) }}
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="section additional-info-wrapper">
-                                <div>
-                                    <p class="title">
-                                        {{ $t('ALERT_MANAGER.SERVICE.WEBHOOK', { cnt: item?.webhooks?.length || 0 }) }}
-                                    </p>
-                                    <div class="webhook-list">
-                                        <span v-for="(webhook, webhookIdx) in item.webhooks?.slice(0,5)"
-                                              :key="`webhook-item-${webhookIdx}`"
-                                              class="webhook"
-                                              @click.stop="handleClickWebhookItem(item.service_id, webhook)"
-                                        >
-                                            <p-lazy-img :src="getWebhookIcon(webhook)"
-                                                        error-icon="ic_webhook"
-                                                        width="0.875rem"
-                                                        height="0.875rem"
-                                                        class="icon"
-                                            />
-                                        </span>
-                                        <span class="webhook chevron"
-                                              @click.stop="handleClickWebhookItem(item.service_id)"
-                                        >
-                                            <p-i
-                                                name="ic_chevron-right"
-                                                width="1.125rem"
-                                                height="1.125rem"
-                                                color="inherit"
-                                            />
-                                        </span>
+                                <p-divider class="block mt-1 mb-1" />
+                                <div class="additional-info-wrapper">
+                                    <div>
+                                        <p class="title">
+                                            {{ $t('ALERT_MANAGER.SERVICE.WEBHOOK', { cnt: item?.webhooks?.length || 0 }) }}
+                                        </p>
+                                        <div class="flex items-center">
+                                            <span v-for="(webhook, webhookIdx) in item.webhooks?.slice(0,5)"
+                                                  :key="`webhook-item-${webhookIdx}`"
+                                                  class="webhook"
+                                                  @click.stop="handleClickWebhookItem(item.service_id, webhook)"
+                                            >
+                                                <p-lazy-img :src="getWebhookIcon(webhook)"
+                                                            error-icon="ic_webhook"
+                                                            width="0.875rem"
+                                                            height="0.875rem"
+                                                            class="icon"
+                                                />
+                                            </span>
+                                            <span class="webhook chevron"
+                                                  @click.stop="handleClickWebhookItem(item.service_id)"
+                                            >
+                                                <p-i
+                                                    name="ic_chevron-right"
+                                                    width="1.125rem"
+                                                    height="1.125rem"
+                                                    color="inherit"
+                                                />
+                                            </span>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="mt-4">
-                                    <p class="title">
-                                        {{ $t('ALERT_MANAGER.ESCALATION_POLICY.TITLE', { cnt: 11 }) }}
-                                    </p>
-                                    <p-text-button class="w-full"
-                                                   @click.stop="handleClickEscalationPolicy(item.service_id)"
-                                    >
-                                        <span class="truncate">{{ getEscalationPolicyName(item.escalation_policy_id) }}</span>
-                                    </p-text-button>
+                                    <div class="flex flex-col items-end">
+                                        <p class="title">
+                                            {{ $t('ALERT_MANAGER.ESCALATION_POLICY.TITLE', { cnt: 11 }) }}
+                                        </p>
+                                        <p-text-button @click.stop="handleClickEscalationPolicy(item.service_id)">
+                                            <p class="truncate text-blue-700 pr-1 pl-1">
+                                                {{ getEscalationPolicyName(item.escalation_policy_id) }}
+                                            </p>
+                                        </p-text-button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -308,65 +339,67 @@ onMounted(async () => {
             padding: 1.25rem 1.5rem 1.5rem;
             .card-inner-wrapper {
                 @apply flex flex-col w-full;
-                gap: 1.75rem;
+                gap: 1.25rem;
                 .contents {
                     @apply flex gap-8;
-                    .section {
-                        max-width: calc(50% - 1rem);
-                    }
-                    .alerts-wrapper {
-                        @apply flex flex-col;
-                        flex: 1;
-                        max-width: 12.25rem;
-                        gap: 0.75rem;
-                        .alerts {
-                            @apply relative flex flex-col;
-                            gap: 0.25rem;
-                            .title {
-                                @apply text-label-md;
+                    .alerts {
+                        @apply relative flex flex-col;
+                        gap: 0.25rem;
+                        width: calc(50% - 1rem);
+                        .title {
+                            @apply text-label-md;
+                        }
+                        .count {
+                            @apply text-display-md;
+                        }
+                        .triggered-info {
+                            @apply flex items-center;
+                        }
+                        &.triggered {
+                            padding-left: 1rem;
+                            &::before {
+                                @apply absolute bg-red-400;
+                                content: '';
+                                width: 0.063rem;
+                                height: 100%;
+                                top: 0;
+                                left: 0;
                             }
-                            .count {
-                                @apply text-display-md;
-                            }
-                            .triggered-info {
-                                @apply flex items-center;
-                            }
-                            &.triggered {
-                                padding-left: 0.625rem;
-                                &::before {
-                                    @apply absolute bg-red-500;
-                                    content: '';
-                                    width: 0.125rem;
-                                    height: 100%;
-                                    top: 0;
-                                    left: 0;
-                                }
+                        }
+                        &.healthy {
+                            @apply flex justify-center;
+                            padding-left: 1rem;
+                            &::before {
+                                @apply absolute bg-green-400;
+                                content: '';
+                                width: 0.063rem;
+                                height: 100%;
+                                top: 0;
+                                left: 0;
                             }
                         }
                     }
                     .additional-info-wrapper {
+                        @apply flex justify-between;
                         flex: 1;
                         .title {
                             @apply text-paragraph-md text-gray-600;
                         }
-                        .webhook-list {
-                            @apply flex items-center;
-                            .webhook {
-                                @apply flex items-center justify-center rounded-full bg-gray-100 border border-white ;
-                                width: 1.5rem;
-                                height: 1.5rem;
-                                &:hover {
-                                    @apply bg-blue-200;
-                                }
-                                & + .webhook {
-                                    margin-left: -0.25rem;
-                                }
-                                &.chevron {
-                                    @apply border-gray-200;
-                                }
-                                .icon {
-                                    margin-bottom: 0;
-                                }
+                        .webhook {
+                            @apply flex items-center justify-center rounded-full bg-gray-100 border border-white ;
+                            width: 1.5rem;
+                            height: 1.5rem;
+                            &:hover {
+                                @apply bg-blue-200;
+                            }
+                            & + .webhook {
+                                margin-left: -0.25rem;
+                            }
+                            &.chevron {
+                                @apply border-gray-200;
+                            }
+                            .icon {
+                                margin-bottom: 0;
                             }
                         }
                     }
