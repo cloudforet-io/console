@@ -27,6 +27,7 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
+import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { DATE_FIELD, WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
 import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import { normalizeAndSerialize } from '@/common/modules/widgets/_helpers/global-variable-helper';
@@ -71,7 +72,7 @@ const state = reactive({
     runQueries: false,
     isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
     dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
-    isPivot: computed(() => state.dataTable?.operator === 'PIVOT'),
+    isPivotDataTable: computed<boolean>(() => state.dataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
 
     data: computed<WidgetLoadResponse | null>(() => queryResult?.data?.value || null),
     xAxisData: computed<string[]>(() => {
@@ -195,7 +196,7 @@ const queryResult = useQuery({
         widget_id: props.widgetId,
         granularity: widgetOptionsState.granularityInfo?.granularity,
         group_by: widgetOptionsState.xAxisInfo?.data ? [widgetOptionsState.xAxisInfo?.data] : [],
-        sort: getWidgetLoadApiQuerySort(widgetOptionsState.xAxisInfo?.data as string, widgetOptionsState.dataFieldInfo?.data as string[], state.isPivot),
+        sort: getWidgetLoadApiQuerySort(widgetOptionsState.xAxisInfo?.data as string, widgetOptionsState.dataFieldInfo?.data as string[], state.isPivotDataTable),
         page: { start: 0, limit: widgetOptionsState.xAxisInfo?.count },
         vars: props.dashboardVars,
         ...getWidgetLoadApiQueryDateRange(widgetOptionsState.granularityInfo?.granularity, dateRange.value),
@@ -214,11 +215,11 @@ const drawChart = (rawData?: WidgetLoadResponse|null) => {
 
     const _seriesData: any[] = [];
     let _dataFields: string[] = widgetOptionsState.dataFieldInfo?.data as string[] || [];
-    if (state.isPivot) {
-        _dataFields = rawData.order?.filter((v) => widgetOptionsState.dataFieldInfo?.data?.includes(v)) || [];
+    if (state.isPivotDataTable) {
+        const _excludeFields = [...Object.keys(rawData?.labels_info), 'Sub Total'];
+        _dataFields = rawData?.order?.filter((v) => !_excludeFields.includes(v));
     }
     _dataFields.forEach((_dataField) => {
-        if (!widgetOptionsState.dataFieldInfo?.data?.includes(_dataField)) return;
         const _unit: string|undefined = state.unitMap[_dataField];
         _seriesData.push({
             name: _dataField,
