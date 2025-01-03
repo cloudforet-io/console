@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import {
+    reactive,
+} from 'vue';
 import draggable from 'vuedraggable';
 
 import { cloneDeep } from 'lodash';
 
 import {
-    PCard, PBadge, PIconButton, PI, PTextInput, PFieldGroup, PTextButton,
+    PBadge, PIconButton, PI, PTextInput, PFieldGroup, PTextButton,
 } from '@cloudforet/mirinae';
 
 import type { EscalationPolicyRulesType } from '@/schema/alert-manager/escalation-policy/type';
@@ -34,6 +36,7 @@ const emit = defineEmits<{(event: 'update:rules', rules: EscalationPolicyRulesTy
 const state = reactive({
     proxyRules: useProxyValue('rules', props, emit),
     proxyRepeatCount: useProxyValue('repeatCount', props, emit),
+    list: props.rules || [],
 });
 
 const handleSelectChannelDropdown = (idx: number, ids: string[]) => {
@@ -93,28 +96,31 @@ const handleUpdateRepeatCount = (_repeatCount: string) => {
                            @click="handleAddStep"
             />
         </div>
-        <draggable class="py-4 px-6"
-                   ghost-class="ghost"
-                   :list="state.proxyRules"
-        >
-            <p-card v-for="(rule, idx) in state.proxyRules"
-                    :key="`rule-${idx}`"
-                    class="card"
+        <div class="py-4 px-6">
+            <draggable v-model="state.proxyRules"
+                       ghost-class="ghost"
+                       handle=".handle"
+                       draggable=".card"
             >
-                <template #header>
-                    <div class="flex items-center">
-                        <p-i name="ic_drag-handle"
-                             width="1rem"
-                             height="1rem"
-                             :coler="gray[500]"
-                             class="drag-icon"
-                        />
-                        <p-badge badge-type="solid-outline"
-                                 style-type="gray500"
-                                 class="ml-1"
-                        >
-                            {{ $t('ALERT_MANAGER.ESCALATION_POLICY.STEP', { step: idx + 1}) }}
-                        </p-badge>
+                <div v-for="(rule, idx) in state.proxyRules"
+                     :key="`rule-${idx}`"
+                     class="card"
+                >
+                    <div class="header flex items-center p-2 bg-gray-150">
+                        <div>
+                            <p-i name="ic_drag-handle"
+                                 width="1rem"
+                                 height="1rem"
+                                 :coler="gray[500]"
+                                 class="handle handle-icon"
+                            />
+                            <p-badge badge-type="solid-outline"
+                                     style-type="gray500"
+                                     class="ml-1"
+                            >
+                                {{ $t('ALERT_MANAGER.ESCALATION_POLICY.STEP', { step: idx + 1}) }}
+                            </p-badge>
+                        </div>
                         <p-icon-button v-if="state.proxyRules.length > 1"
                                        class="ml-auto"
                                        name="ic_delete"
@@ -122,31 +128,34 @@ const handleUpdateRepeatCount = (_repeatCount: string) => {
                                        @click="handleDeleteRule(idx)"
                         />
                     </div>
-                </template>
-                <i18n path="ALERT_MANAGER.ESCALATION_POLICY.ESCALATES_AFTER"
-                      class="flex items-center gap-2"
-                >
-                    <template #minute>
-                        <p-field-group required
-                                       :invalid="rule.escalate_minutes < 0"
-                                       class="minute-form"
+                    <div class="content py-3 px-2 bg-white">
+                        <i18n path="ALERT_MANAGER.ESCALATION_POLICY.ESCALATES_AFTER"
+                              class="flex items-center gap-2"
                         >
-                            <template #default="{invalid}">
-                                <p-text-input v-model.number="rule.escalate_minutes"
-                                              type="number"
-                                              :min="0"
-                                              :invalid="invalid"
-                                              block
-                                />
+                            <template #minute>
+                                <p-field-group required
+                                               :invalid="rule.escalate_minutes < 0"
+                                               class="minute-form"
+                                >
+                                    <template #default="{invalid}">
+                                        <p-text-input v-model.number="rule.escalate_minutes"
+                                                      type="number"
+                                                      :min="0"
+                                                      :invalid="invalid"
+                                                      block
+                                        />
+                                    </template>
+                                </p-field-group>
                             </template>
-                        </p-field-group>
-                    </template>
-                </i18n>
-                <service-detail-tabs-settings-escalation-policy-form-channel-dropdown class="mt-2"
-                                                                                      :selected-ids="rule.channels"
-                                                                                      @update:selected-ids="handleSelectChannelDropdown(idx, $event)"
-                />
-            </p-card>
+                        </i18n>
+                        <service-detail-tabs-settings-escalation-policy-form-channel-dropdown :key="idx"
+                                                                                              class="mt-2"
+                                                                                              :selected-ids="rule.channels"
+                                                                                              @update:selected-ids="handleSelectChannelDropdown(idx, $event)"
+                        />
+                    </div>
+                </div>
+            </draggable>
             <p-text-button :disabled="state.proxyRules.length >= 10"
                            class="add-rule-button mt-4 mx-auto "
                            icon-left="ic_plus_bold"
@@ -155,7 +164,7 @@ const handleUpdateRepeatCount = (_repeatCount: string) => {
             >
                 {{ $t('ALERT_MANAGER.ESCALATION_POLICY.ADD_RULE') }}
             </p-text-button>
-        </draggable>
+        </div>
     </div>
 </template>
 
@@ -171,7 +180,22 @@ const handleUpdateRepeatCount = (_repeatCount: string) => {
         }
     }
     .card {
+        @apply border border-gray-200;
+        border-radius: 0.375rem;
         box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+        .header {
+            border-top-right-radius: 0.375rem;
+            border-top-left-radius: 0.375rem;
+            .handle-icon {
+                &:hover {
+                    @apply cursor-pointer;
+                }
+            }
+        }
+        .content {
+            border-bottom-right-radius: 0.375rem;
+            border-bottom-left-radius: 0.375rem;
+        }
         + .card {
             margin-top: 1rem;
         }
@@ -179,9 +203,12 @@ const handleUpdateRepeatCount = (_repeatCount: string) => {
             width: 6.5rem;
             margin-bottom: 0;
         }
-        .drag-icon {
-            &:hover {
-                @apply cursor-pointer;
+        &.sortable-chosen {
+            .header {
+                @apply bg-blue-200;
+            }
+            .content {
+                @apply bg-blue-200;
             }
         }
     }

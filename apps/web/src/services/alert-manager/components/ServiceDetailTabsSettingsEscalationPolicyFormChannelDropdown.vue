@@ -111,15 +111,13 @@ const handleTagDelete = (idx: number) => {
 };
 const initMultipleType = (_channelIds?: string[]) => {
     if (!Array.isArray(_channelIds)) return;
-    if (!isEqual(currentChannelIds.value, _channelIds)) {
-        state.selectedItems = _channelIds.map((channelId) => {
-            const channel = state.serviceChannelList.find((item) => item.name === channelId);
-            return {
-                name: channelId,
-                label: channel?.label ?? channelId,
-            };
-        });
-    }
+    state.selectedItems = _channelIds.map((channelId) => {
+        const channel = state.serviceChannelList.find((item) => item.name === channelId);
+        return {
+            name: channelId,
+            label: channel?.label ?? channelId,
+        };
+    });
 };
 
 const fetchServiceChannelList = async () => {
@@ -137,12 +135,14 @@ const fetchServiceChannelList = async () => {
     }
 };
 
+watch([() => props.selectedIds, () => state.serviceChannelList], async ([selectedIds, serviceChannelList]) => {
+    if (serviceChannelList.length > 0 && selectedIds) {
+        await initMultipleType(selectedIds);
+    }
+}, { immediate: true });
 watch(() => storeState.serviceId, async (serviceId) => {
     if (!serviceId) return;
     await fetchServiceChannelList();
-    if (props.selectedIds) {
-        await initMultipleType(props.selectedIds);
-    }
 }, { immediate: true });
 </script>
 
