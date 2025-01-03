@@ -93,77 +93,79 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="ops-flow-landing-page">
-        <div class="mb-6 py-6 px-10 flex mobile:flex-col gap-10 items-center justify-center min-h-80 mobile:h-screen bg-image-blur">
-            <div class="max-w-96">
-                <p-heading class="mb-4">
-                    {{ taskManagementTemplateStore.templates.TemplateName }}
-                </p-heading>
-                <p class="text-paragraph-lg text-gray-600">
-                    {{ taskManagementTemplateStore.templates.landingDescription }}
-                </p>
-            </div>
-            <div class="max-w-96 mobile:w-96">
-                <img src="@/assets/images/landing/img_landing_service-desk_hero.png">
-            </div>
-        </div>
-        <p-data-loader :loading="loading"
-                       :data="availableCategories"
-                       loader-backdrop-color="gray.100"
-                       class="min-h-72"
-        >
-            <div class="max-w-[712px] mx-auto">
-                <div class="mt-10">
-                    <p class="mb-6 text-display-md">
-                        {{ taskManagementTemplateStore.templates.TaskCategory }}
+    <div class="overflow-auto">
+        <div>
+            <div class="mb-6 py-6 px-10 flex mobile:flex-col gap-10 items-center justify-center min-h-80 mobile:h-screen bg-image-blur">
+                <div class="max-w-96">
+                    <p-heading class="mb-4">
+                        {{ taskManagementTemplateStore.templates.TemplateName }}
+                    </p-heading>
+                    <p class="text-paragraph-lg text-gray-600">
+                        {{ taskManagementTemplateStore.templates.landingDescription }}
                     </p>
-                    <div class="flex justify-center">
-                        <div class="grid grid-cols-2 gap-4 justify-center items-center">
-                            <p-select-card v-for="c in availableCategories"
-                                           :key="c.category_id"
-                                           class="category-card"
-                                           :label="c.name"
-                                           :value="c.category_id"
-                                           :selected="category"
-                                           @change="handleChangeCategory"
-                            />
+                </div>
+                <div class="max-w-96 mobile:w-96">
+                    <img src="@/assets/images/landing/img_landing_service-desk_hero.png">
+                </div>
+            </div>
+            <p-data-loader :loading="loading"
+                           :data="availableCategories"
+                           loader-backdrop-color="gray.100"
+                           class="min-h-72"
+            >
+                <div class="max-w-[712px] mx-auto">
+                    <div class="mt-10">
+                        <p class="mb-6 text-display-md">
+                            {{ taskManagementTemplateStore.templates.TaskCategory }}
+                        </p>
+                        <div class="flex justify-center">
+                            <div class="grid grid-cols-2 gap-4 justify-center items-center">
+                                <p-select-card v-for="c in availableCategories"
+                                               :key="c.category_id"
+                                               class="category-card"
+                                               :label="c.name"
+                                               :value="c.category_id"
+                                               :selected="category"
+                                               @change="handleChangeCategory"
+                                />
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="mt-10">
-                    <p class="mb-6 text-display-md">
-                        {{ taskManagementTemplateStore.templates.TaskType }}
-                    </p>
-                    <p-radio-group v-if="category">
-                        <p-radio v-for="t in taskTypeState.itemsByCategoryId[category]"
-                                 :key="t.task_type_id"
-                                 :value="t.task_type_id"
-                                 :selected="taskType"
-                                 @change="handleChangeTaskType"
+                    <div class="mt-10">
+                        <p class="mb-6 text-display-md">
+                            {{ taskManagementTemplateStore.templates.TaskType }}
+                        </p>
+                        <p-radio-group v-if="category">
+                            <p-radio v-for="t in taskTypeState.itemsByCategoryId[category]"
+                                     :key="t.task_type_id"
+                                     :value="t.task_type_id"
+                                     :selected="taskType"
+                                     @change="handleChangeTaskType"
+                            >
+                                {{ t.name }}
+                            </p-radio>
+                        </p-radio-group>
+                    </div>
+                    <div class="mt-10 flex justify-end">
+                        <p-button v-if="hasReadWriteAccess"
+                                  style-type="substitutive"
+                                  icon-right="ic_arrow-right"
+                                  :disabled="!isAllValid"
+                                  @click="goToTaskCreatePage"
                         >
-                            {{ t.name }}
-                        </p-radio>
-                    </p-radio-group>
+                            {{ $t('COMMON.BUTTONS.NEXT') }}
+                        </p-button>
+                    </div>
                 </div>
-                <div class="mt-10 flex justify-end">
-                    <p-button v-if="hasReadWriteAccess"
-                              style-type="substitutive"
-                              icon-right="ic_arrow-right"
-                              :disabled="!isAllValid"
-                              @click="goToTaskCreatePage"
+                <template #no-data>
+                    <p-empty class="my-20"
+                             show-image
                     >
-                        {{ $t('COMMON.BUTTONS.NEXT') }}
-                    </p-button>
-                </div>
-            </div>
-            <template #no-data>
-                <p-empty class="my-20"
-                         show-image
-                >
-                    {{ $t('OPSFLOW.NO_AVAILABLE_TARGET', {target: taskManagementTemplateStore.templates.TaskCategory }) }}
-                </p-empty>
-            </template>
-        </p-data-loader>
+                        {{ $t('OPSFLOW.NO_AVAILABLE_TARGET', {target: taskManagementTemplateStore.templates.TaskCategory }) }}
+                    </p-empty>
+                </template>
+            </p-data-loader>
+        </div>
     </div>
 </template>
 
