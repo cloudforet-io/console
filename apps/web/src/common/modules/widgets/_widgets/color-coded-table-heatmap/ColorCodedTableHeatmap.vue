@@ -21,6 +21,7 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
+import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { DATE_FIELD, WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
 import { normalizeAndSerialize } from '@/common/modules/widgets/_helpers/global-variable-helper';
 import { sortObjectByKeys } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
@@ -63,7 +64,7 @@ const state = reactive({
     runQueries: false,
     isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
     dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
-    isPivot: computed<boolean>(() => state.dataTable?.operator === 'PIVOT'),
+    isPivotDataTable: computed<boolean>(() => state.dataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
 
     data: computed<WidgetLoadResponse|undefined>(() => queryResult.data?.value),
     // unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
@@ -79,11 +80,11 @@ const state = reactive({
     }),
     yAxisData: computed<string[]>(() => {
         if (!state.data?.results?.length) return [];
-        let _dataFields: string[] = widgetOptionsState.dataFieldInfo?.data as string[] || [];
-        if (state.isPivot) {
-            _dataFields = state.data?.order?.filter((v) => widgetOptionsState.dataFieldInfo?.data?.includes(v)) || [];
+        if (state.isPivotDataTable) {
+            const _excludeFields = [...Object.keys(state.data?.labels_info), 'Sub Total'];
+            return state.data.order?.filter((v) => !_excludeFields.includes(v)) || [];
         }
-        return _dataFields;
+        return widgetOptionsState.dataFieldInfo?.data as string[] || [];
     }),
     legendList: [] as WidgetLegend[],
     widgetDateRange: computed<DateRange>(() => {

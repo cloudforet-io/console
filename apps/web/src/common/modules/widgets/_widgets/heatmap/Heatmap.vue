@@ -23,6 +23,7 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
+import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { DATE_FIELD, WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
 import { normalizeAndSerialize } from '@/common/modules/widgets/_helpers/global-variable-helper';
 import { sortObjectByKeys } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
@@ -46,6 +47,8 @@ import type { XAxisValue } from '@/common/modules/widgets/_widget-fields/x-axis/
 import type { DateRange, WidgetLoadResponse } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/common/modules/widgets/types/widget-display-type';
 
+
+
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
@@ -60,6 +63,7 @@ const state = reactive({
     runQueries: false,
     isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
     dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
+    isPivotDataTable: computed<boolean>(() => state.dataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
 
     data: computed<WidgetLoadResponse | null>(() => queryResult.data?.value ?? null),
     chart: null as EChartsType | null,
@@ -73,6 +77,10 @@ const state = reactive({
     }),
     yAxisData: computed<string[]>(() => {
         if (!state.data?.results?.length) return [];
+        if (state.isPivotDataTable) {
+            const _excludeFields = [...Object.keys(state.data?.labels_info), 'Sub Total'];
+            return state.data.order?.filter((v) => !_excludeFields.includes(v)) || [];
+        }
         return (widgetOptionsState.dataFieldInfo?.data ?? []) as string[];
     }),
     chartData: [],
