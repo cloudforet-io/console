@@ -2,7 +2,7 @@ export const ALERT_STATUS = {
     TRIGGERED: 'TRIGGERED',
     ACKNOWLEDGED: 'ACKNOWLEDGED',
     RESOLVED: 'RESOLVED',
-    ERROR: 'ERROR',
+    IGNORED: 'IGNORED',
 } as const;
 
 export const ALERT_URGENCY = {

@@ -20,7 +20,7 @@ import type { AlertModel } from '@/schema/alert-manager/alert/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
+import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
@@ -31,10 +31,10 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import { useQueryTags } from '@/common/composables/query-tags';
 import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
 
-import { red } from '@/styles/colors';
+import { gray, red } from '@/styles/colors';
 
 import {
-    alertStatusBadgeStyleTypeFormatter,
+    alertStatusBadgeStyleTypeFormatter, calculateTime,
     getAlertStateI18n,
     getAlertUrgencyI18n,
 } from '@/services/alert-manager/composables/alert-table-data';
@@ -47,7 +47,6 @@ import {
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { useAlertPageStore } from '@/services/alert-manager/stores/alert-page-store';
 import type { AlertFilterType } from '@/services/alert-manager/types/alert-manager-type';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 
 interface AlertItem extends AlertModel {
     alert_number: string;
@@ -66,7 +65,7 @@ const { getProperRouteLocation } = useProperRouteLocation();
 const route = useRoute();
 
 const storeState = reactive({
-    cloudServiceTypeInfo: computed<CloudServiceTypeReferenceMap>(() => allReferenceGetters.cloudServiceType),
+    webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
     serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => alertPageGetters.serviceDropdownList),
     totalCount: computed<number>(() => alertPageState.totalAlertCount),
     alertList: computed<AlertModel[]>(() => alertPageState.alertList),
@@ -95,7 +94,7 @@ const filterState = reactive({
         { label: i18n.t('ALERT_MANAGER.ALERTS.TRIGGERED'), name: ALERT_STATUS_FILTERS.TRIGGERED },
         { label: i18n.t('ALERT_MANAGER.ALERTS.ACKNOWLEDGED'), name: ALERT_STATUS_FILTERS.ACKNOWLEDGED },
         { label: i18n.t('ALERT_MANAGER.ALERTS.RESOLVED'), name: ALERT_STATUS_FILTERS.RESOLVED },
-        { label: i18n.t('ALERT_MANAGER.ALERTS.ERROR'), name: ALERT_STATUS_FILTERS.ERROR },
+        { label: i18n.t('ALERT_MANAGER.ALERTS.IGNORED'), name: ALERT_STATUS_FILTERS.IGNORED },
         { label: i18n.t('ALERT_MANAGER.ALERTS.ALL'), name: 'ALL' },
     ])),
     selectedStatusFilter: 'OPEN',
@@ -114,13 +113,11 @@ const filterQueryHelper = new QueryHelper();
 const queryTagHelper = useQueryTags({ keyItemSets: ALERT_MANAGEMENT_TABLE_HANDLER.keyItemSets });
 const { queryTags } = queryTagHelper;
 
-const getAssetInfo = (assetId: string) => {
-    const assetTypeData = storeState.cloudServiceTypeInfo[assetId]?.data;
-    return {
-        provider: assetTypeData?.provider,
-        group: assetTypeData?.group,
-        name: assetTypeData?.cloud_service_type_key,
-    };
+const getCreatedByNames = (id: string): string => {
+    if (id.includes('webhook')) {
+        return storeState.webhook[id].label || id;
+    }
+    return id;
 };
 const getServiceName = (id: string): TranslateResult => {
     if (storeState.serviceDropdownList.length === 0) return '';
@@ -285,6 +282,21 @@ watch(() => route.query, async (query) => {
                     </div>
                 </div>
             </template>
+            <template #col-service_id-format="{ value }">
+                <template v-if="value">
+                    <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                            new-tab
+                            :to="getProperRouteLocation({
+                                name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME,
+                                params: {
+                                    serviceId: value,
+                                },
+                            })"
+                    >
+                        {{ getServiceName(value) }}
+                    </p-link>
+                </template>
+            </template>
             <template #col-title-format="{ value, item }">
                 <template v-if="value">
                     <p-link highlight
@@ -309,50 +321,34 @@ watch(() => route.query, async (query) => {
                      width="1em"
                      height="1em"
                      class="mr-1"
-                     :color="value === ALERT_URGENCY.HIGH ? red[400] : red[200]"
+                     :color="value === ALERT_URGENCY.HIGH ? red[400] : gray[200]"
                 />
                 <span>{{ state.urgencyLabels[value] }}</span>
             </template>
-            <template #col-service_id-format="{ value }">
-                <template v-if="value">
-                    <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
-                            new-tab
-                            highlight
-                            :to="getProperRouteLocation({
-                                name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME,
-                                params: {
-                                    serviceId: value,
-                                },
-                            })"
+            <template #col-labels-format="{ value }">
+                <div class="flex gap-2">
+                    <p-badge v-for="(item, idx) in value?.slice(0, 3)"
+                             :key="`labels-${idx}`"
+                             badge-type="subtle"
+                             style-type="gray200"
+                             shape="square"
+                             class="label-item"
                     >
-                        {{ getServiceName(value) }}
-                    </p-link>
-                </template>
+                        <span>{{ item }}</span>
+                    </p-badge>
+                    <p-badge v-if="value?.length > 3"
+                             badge-type="subtle"
+                             style-type="blue200"
+                    >
+                        <span>+ {{ value?.length - 3 }}</span>
+                    </p-badge>
+                </div>
             </template>
-            <template #col-resources-format="{ value }">
-                <span v-if="(value ?? []).length === 0">
-                    --
-                </span>
-                <template v-else>
-                    <div v-for="(item, idx) in value.slice(0, 3)"
-                         :key="`resource-item-${idx}`"
-                         class="flex items-center gap-2"
-                    >
-                        <p class="resource-item truncate">
-                            {{ item?.name }}
-                        </p>
-                        <p-link :text="i18n.t('ALERT_MANAGER.ALERTS.VIEW')"
-                                :to="{
-                                    name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                                    params: getAssetInfo(item.asset_id)
-                                }"
-                                size="sm"
-                                highlight
-                                action-icon="internal-link"
-                                new-tab
-                        />
-                    </div>
-                </template>
+            <template #col-triggered_by-format="{ value }">
+                <span>{{ getCreatedByNames(value) }}</span>
+            </template>
+            <template #col-duration-format="{ item }">
+                <span>{{ calculateTime(item?.created_at, storeState.timezone) }}</span>
             </template>
         </p-toolbox-table>
         <custom-field-modal :visible="state.visibleCustomFieldModal"
@@ -374,6 +370,10 @@ watch(() => route.query, async (query) => {
         margin-bottom: -0.5rem;
         width: max-content;
     }
+    .label-item {
+        @apply truncate;
+        max-width: 9.875rem;
+    }
     .quick-filter-wrapper {
         .status-filter-wrapper {
             @apply flex items-center flex-wrap text-label-sm;
@@ -394,7 +394,6 @@ watch(() => route.query, async (query) => {
         }
 
         @screen mobile {
-            flex-direction: column;
             gap: 1rem;
             .status-filter-wrapper {
                 margin-top: 0;
@@ -404,9 +403,6 @@ watch(() => route.query, async (query) => {
                 }
             }
         }
-    }
-    .resource-item {
-        max-width: 14.75rem;
     }
 }
 </style>

@@ -42,7 +42,6 @@ const state = reactive({
             label: i18n.t('ALERT_MANAGER.DELETE'),
         },
     ]),
-    alertIdList: computed<string[]>(() => storeState.alertInfo.alert_id?.split('-') || []),
 });
 const modalState = reactive({
     modalVisible: false,
@@ -68,7 +67,6 @@ const handleSelectDropdownMenu = (type: ModalType) => {
                            @click-back-button="handleRouteBackButton"
                 >
                     <template #title-right-extra>
-                        <span class="text-label-xl text-gray-700 mr-2">NO. {{ state.alertIdList[state.alertIdList.length - 1] }}</span>
                         <p-select-dropdown v-if="hasReadWriteAccess"
                                            :menu="state.menuItems"
                                            style-type="icon-button"

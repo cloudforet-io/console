@@ -1,13 +1,10 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-import dayjs from 'dayjs';
-
 import {
     PPaneLayout, PSelectDropdown, PI, PBadge,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
-import { iso8601Formatter } from '@cloudforet/utils';
 
 import { ALERT_URGENCY, ALERT_STATUS } from '@/schema/alert-manager/alert/constants';
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
@@ -18,20 +15,23 @@ import { usePageEditableStatus } from '@/common/composables/page-editable-status
 
 import { red } from '@/styles/colors';
 
+import { calculateTime } from '@/services/alert-manager/composables/alert-table-data';
 import { useAlertDetailPageStore } from '@/services/alert-manager/stores/alert-detail-page-store';
 
 const alertDetailPageStore = useAlertDetailPageStore();
 const alertDetailPageState = alertDetailPageStore.state;
+const alertDetailPageGetters = alertDetailPageStore.getters;
 
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const storeState = reactive({
     alertInfo: computed<AlertModel>(() => alertDetailPageState.alertInfo),
+    timezone: computed<string>(() => alertDetailPageGetters.timezone),
 });
 const state = reactive({
     alertStatus: 'TRIGGERED',
     alertUrgency: 'HIGH',
-    duration: computed<string>(() => calculateTime(storeState.alertInfo?.created_at)),
+    duration: computed<string>(() => calculateTime(storeState.alertInfo?.created_at, storeState.timezone)),
 
     alertStateList: computed<SelectDropdownMenuItem[]>(() => ([
         { name: ALERT_STATUS.TRIGGERED, label: i18n.t('ALERT_MANAGER.ALERTS.TRIGGERED') },
@@ -43,17 +43,6 @@ const state = reactive({
         { name: ALERT_URGENCY.LOW, label: i18n.t('ALERT_MANAGER.ALERTS.LOW') },
     ])),
 });
-
-const calculateTime = (time):string => {
-    const today = dayjs().toISOString();
-    const createdTime = iso8601Formatter(time, 'UTC');
-    const todayTime = iso8601Formatter(today, 'UTC');
-    const timeForCalculate = dayjs(todayTime).diff(createdTime, 'minute');
-    const days = Math.floor((timeForCalculate / 1440) % 365);
-    const hours = Math.floor((timeForCalculate / 60) % 24);
-    const minutes = Math.floor(timeForCalculate % 60);
-    return `${days}d ${hours}h ${minutes}m`;
-};
 
 const handleChangeAlertState = async (alertState: AlertStatusType) => {
     await alertDetailPageStore.updateAlertDetail({
@@ -79,12 +68,12 @@ watch(() => alertDetailPageState.alertInfo, (alertInfo) => {
     <p-pane-layout class="alert-detail-summary flex flex-wrap gap-4 w-full">
         <div class="content-wrapper">
             <span class="title">{{ $t('ALERT_MANAGER.ALERTS.LABEL_STATUS') }}</span>
-            <p-badge v-if="state.alertStatus === ALERT_STATUS.ERROR"
+            <p-badge v-if="state.alertStatus === ALERT_STATUS.IGNORED"
                      style-type="alert"
                      badge-type="solid-outline"
                      class="mt-1.5"
             >
-                Error
+                {{ $t('ALERT_MANAGER.ALERTS.IGNORED') }}
             </p-badge>
             <p-select-dropdown v-else
                                :menu="state.alertStateList"
@@ -103,7 +92,7 @@ watch(() => alertDetailPageState.alertInfo, (alertInfo) => {
             <span class="title">{{ $t('ALERT_MANAGER.ALERTS.LABEL_URGENCY') }}</span>
             <p-select-dropdown :menu="state.alertUrgencyList"
                                :selected.sync="state.alertUrgency"
-                               :disabled="!hasReadWriteAccess || (state.alertStatus === ALERT_STATUS.ERROR)"
+                               :disabled="!hasReadWriteAccess || (state.alertStatus === ALERT_STATUS.IGNORED)"
                                class="state-dropdown"
                                @select="handleChangeAlertUrgency"
             >
