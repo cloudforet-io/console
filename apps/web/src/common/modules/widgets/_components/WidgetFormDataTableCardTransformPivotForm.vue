@@ -73,7 +73,7 @@ const state = reactive({
         if (!state.proxyOperatorOptions.fields?.labels?.length) return true;
         if (!state.proxyOperatorOptions.fields?.column) return true;
         if (!state.proxyOperatorOptions.fields?.data) return true;
-        if (!state.proxyOperatorOptions.select && !state.proxyOperatorOptions.limit) return true;
+        if (!state.proxyOperatorOptions.select && !state.proxyOperatorOptions.limit && state.proxyOperatorOptions?.fields?.column !== 'Date') return true;
         return false;
     }),
     columnFieldInvalid: computed<boolean>(() => {
@@ -132,6 +132,8 @@ const handleUpdateColumn = (value: string) => {
     if (value === 'Date') {
         state.selectedValueType = 'auto';
         selectInfo.value = undefined;
+        limitInfo.value = undefined;
+    } else if (state.selectedValueType === 'auto') {
         limitInfo.value = DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT.limit;
     }
 };
@@ -141,7 +143,7 @@ const handleChangeValueType = (value: string) => {
     state.selectedValueType = value;
     if (value === 'auto') {
         selectInfo.value = undefined;
-        limitInfo.value = DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT.limit;
+        limitInfo.value = fieldsInfo.value?.column === 'Date' ? undefined : DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT.limit;
     } else {
         selectInfo.value = [];
         limitInfo.value = undefined;
@@ -250,7 +252,11 @@ watch(() => state.invalid, (_invalid) => {
 }, { immediate: true });
 
 onMounted(() => {
-    state.selectedValueType = props.originData.limit !== undefined ? 'auto' : 'fixed';
+    if (props.originData?.fields?.column === 'Date') {
+        state.selectedValueType = 'auto';
+    } else {
+        state.selectedValueType = props.originData.limit !== undefined ? 'auto' : 'fixed';
+    }
 });
 
 </script>
@@ -319,7 +325,7 @@ onMounted(() => {
                                            @select="handleSelectDynamicFields"
                                            @clear-selection="handleSelectDynamicFields()"
                         />
-                        <p-text-input v-else
+                        <p-text-input v-else-if="state.proxyOperatorOptions.fields?.column !== 'Date'"
                                       type="number"
                                       class="dynamic-field-auto-count"
                                       :min="1"

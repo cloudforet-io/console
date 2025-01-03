@@ -46,13 +46,16 @@ const state = reactive({
             label: dataTable.name,
             name: dataTable.data_table_id,
             icon: dataTable.data_type === DATA_TABLE_TYPE.ADDED ? 'ic_service_data-sources' : 'ic_transform-data',
+            operator: dataTable.operator,
         }))),
     dataTableMenuItems: computed<MenuItem[]>(() => {
         const alreadySelected = state.secondarySelected && state.secondarySelected.length ? [{ ...state.secondarySelected[0], disabled: true, iconColor: gray[300] }] : [];
-        if (alreadySelected.length) {
+        const pivoted = state.baseMenuItems.filter((item) => item.operator === 'PIVOT').map((item) => ({ ...item, disabled: true, iconColor: gray[300] }));
+        if (alreadySelected.length || pivoted.length) {
             return [
-                ...state.baseMenuItems.filter((item) => item.name !== alreadySelected[0].name),
+                ...state.baseMenuItems.filter((item) => item.name !== alreadySelected[0]?.name && item.operator !== 'PIVOT'),
                 ...alreadySelected,
+                ...pivoted,
             ];
         }
         return state.baseMenuItems;
@@ -60,10 +63,12 @@ const state = reactive({
     selected: undefined as string|MenuItem[]|undefined,
     secondaryDataTableMenuItems: computed<MenuItem[]>(() => {
         const alreadySelected = state.selected && state.selected.length ? [{ ...state.selected[0], disabled: true, iconColor: gray[300] }] : [];
-        if (alreadySelected.length) {
+        const pivoted = state.baseMenuItems.filter((item) => item.operator === 'PIVOT').map((item) => ({ ...item, disabled: true, iconColor: gray[300] }));
+        if (alreadySelected.length || pivoted.length) {
             return [
-                ...state.baseMenuItems.filter((item) => item.name !== alreadySelected[0].name),
+                ...state.baseMenuItems.filter((item) => item.name !== alreadySelected[0]?.name && item.operator !== 'PIVOT'),
                 ...alreadySelected,
+                ...pivoted,
             ];
         }
         return state.baseMenuItems;

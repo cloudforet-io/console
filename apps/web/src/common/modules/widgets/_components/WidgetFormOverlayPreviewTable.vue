@@ -163,7 +163,7 @@ const emptyState = reactive({
     }),
     description: computed(() => {
         if (!storeState.selectedDataTableId) return i18n.t('COMMON.WIDGETS.PREVIEW_TABLE_EMPTY_DESC');
-        if (queryResult.isError) return errorMessage.value;
+        if (isError.value === true) return errorMessage.value;
         // if (storeState.dataTableLoadFailed && emptyState.isUnavailableDataTable) return i18n.t('DASHBOARDS.WIDGET.DATA_TABLE_LOAD_INVALID_GLOBAL_VARIABLE_DESC');
         if (!state.data?.results?.length) return i18n.t('DASHBOARDS.WIDGET.NO_DATA');
         return '';
@@ -184,11 +184,6 @@ const handleClickSort = async (sortKey: string) => {
     }
     state.sortBy = resultSortBy;
     state.thisPage = 1;
-    // if (!storeState.selectedDataTableId) return;
-    // await widgetGenerateStore.loadDataTable({
-    //     data_table_id: storeState.selectedDataTableId,
-    //     sort: resultSortBy,
-    // });
 };
 
 /* Utils */
@@ -268,6 +263,7 @@ const queryResult = useQuery({
 });
 
 const dataTableLoading = computed<boolean>(() => queryResult.isLoading.value || queryResult.isFetching.value);
+const isError = computed<boolean>(() => queryResult.isError.value);
 const errorMessage = computed<string>(() => queryResult.error?.value?.message);
 
 
