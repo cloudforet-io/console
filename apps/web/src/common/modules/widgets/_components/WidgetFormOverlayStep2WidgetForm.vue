@@ -96,7 +96,7 @@ const handleSelectDataTable = async (dataTableId: string) => {
 
     props.fieldManager.updateDataTableAndOriginData(selectedDataTable, {});
 
-    if (selectedDataTable.operator === DATA_TABLE_OPERATOR.PIVOT) {
+    if (selectedDataTable.operator === DATA_TABLE_OPERATOR.PIVOT && UNSUPPORTED_CHARTS_IN_PIVOT.includes(widgetGenerateState.selectedWidgetName)) {
         changeWidgetType('table');
     }
 };
