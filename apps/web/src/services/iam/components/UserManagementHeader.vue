@@ -124,7 +124,7 @@ watch(() => route.query, (query) => {
                     <div v-else-if="userPageGetters.isWorkspaceOwner"
                          class="toolbox"
                     >
-                        <p-button style-type="negative-secondary"
+                        <p-button style-type="tertiary"
                                   :disabled="userPageGetters.selectedUsers.length === 0"
                                   @click="handleClickButton(USER_MODAL_TYPE.ASSIGN)"
                         >
