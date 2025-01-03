@@ -39,7 +39,7 @@ const tableState = reactive({
         { name: 'service', label: 'Service' },
         { name: 'description', label: 'Description' },
     ],
-    items: computed(() => state.filteredServices.map((service) => ({
+    items: computed<{service: string; description: string}>(() => state.filteredServices.map((service) => ({
         service: service.name,
         description: service.description,
     }))),
