@@ -168,8 +168,8 @@ const queryResult = useQuery({
     staleTime: WIDGET_LOAD_STALE_TIME,
 });
 
-const widgetLoading = computed<boolean>(() => queryResult.isLoading);
-const errorMessage = computed<string>(() => queryResult.error?.value?.message);
+const widgetLoading = computed<boolean>(() => queryResult.isLoading.value);
+const errorMessage = computed<string|undefined>(() => queryResult.error?.value?.message);
 
 /* Util */
 const drawChart = (rawData: WidgetLoadResponse|null) => {
@@ -184,11 +184,11 @@ const loadWidget = () => {
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange,
     errorMessage,
-    widgetLoading: widgetLoading.value,
+    widgetLoading,
 });
 
 /* Watcher */
-watch([() => state.chartData, () => chartContext.value], ([, chartCtx]) => {
+watch([() => state.chartData, () => chartContext.value, () => props.widgetOptions], ([, chartCtx]) => {
     if (chartCtx) {
         state.chart = init(chartContext.value);
         state.chart.setOption(state.chartOptions, true);
