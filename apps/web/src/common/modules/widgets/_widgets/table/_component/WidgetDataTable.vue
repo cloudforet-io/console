@@ -132,7 +132,8 @@ const state = reactive({
 const getComparisonInfo = (fieldName: string) => `${fieldName} Compared to ${props.granularity || 'Previous'}`;
 const getField = (field: TableWidgetField): string => {
     if (field.fieldInfo?.type === 'dataField' && field.fieldInfo?.reference) {
-        return storeState[field.fieldInfo.reference][field.label]?.name || field.label || field.name;
+        const referenceKey = REFERENCE_FIELD_MAP[field.fieldInfo?.reference];
+        return storeState?.[referenceKey]?.[field.label]?.name || field.label || field.name;
     }
     if (field.fieldInfo?.type === 'dataField' && field.fieldInfo?.additionalType === 'dateFormat' && !!state.refinedDateFormat) {
         return getFormattedDate(field.name, state.refinedDateFormat);

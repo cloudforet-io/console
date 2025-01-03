@@ -52,6 +52,7 @@ import type {
 } from '@/common/modules/widgets/types/widget-display-type';
 import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
 
+const REFERENCE_FIELDS = ['Project', 'Workspace', 'Region', 'Service Account'];
 
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
@@ -79,6 +80,7 @@ const state = reactive({
         if (state.isPivotDataTable && refinedData.value) {
             const headers = refinedData.value?.order ?? [];
             const _dataFields: string[] = Object.keys(refinedData.value.data_info ?? {});
+            const columnFieldName = state.dataTable?.options?.PIVOT?.fields?.column;
             sortBy(_dataFields, (field) => {
                 const index = headers.indexOf(field);
                 return index === -1 ? Infinity : index;
@@ -91,6 +93,7 @@ const state = reactive({
                         fieldInfo: {
                             type: 'dataField',
                             unit: state.dataInfo?.[field]?.unit,
+                            reference: (columnFieldName && REFERENCE_FIELDS.includes(columnFieldName)) ? columnFieldName : undefined,
                         },
                     });
                 });
