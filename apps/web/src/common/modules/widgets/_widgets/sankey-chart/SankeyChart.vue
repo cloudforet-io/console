@@ -104,13 +104,9 @@ const state = reactive({
                 if (!_source || !_target) return '';
                 if (_sourceField === DATE_FIELD.DATE) {
                     _source = dayjs.utc(_source).format(state.dateFormat);
-                } else {
-                    getReferenceLabel(props.allReferenceTypeInfo, widgetOptionsState.sankeyDimensionsInfo?.data?.[0] as string, _source);
                 }
                 if (_targetField === DATE_FIELD.DATE) {
                     _target = dayjs.utc(_target).format(state.dateFormat);
-                } else {
-                    getReferenceLabel(props.allReferenceTypeInfo, widgetOptionsState.sankeyDimensionsInfo?.data?.[1] as string, _target);
                 }
                 let _value = numberFormatter(params.data.value) || '';
                 if (widgetOptionsState.tooltipNumberFormatInfo?.toggleValue) {
@@ -191,6 +187,8 @@ const drawChart = (rawData: WidgetLoadResponse|null) => {
     const _left = widgetOptionsState.sankeyDimensionsInfo?.data?.[0] as string;
     const _right = widgetOptionsState.sankeyDimensionsInfo?.data?.[1] as string;
     const _dataField = widgetOptionsState.dataFieldInfo?.data as string;
+    const _sourceField = widgetOptionsState.sankeyDimensionsInfo?.data?.[0] as string;
+    const _targetField = widgetOptionsState.sankeyDimensionsInfo?.data?.[1] as string;
     if (!_left || !_right || !_dataField) {
         state.links = [];
         state.chartData = [];
@@ -198,8 +196,8 @@ const drawChart = (rawData: WidgetLoadResponse|null) => {
     }
     rawData?.results?.forEach((d) => {
         _links.push({
-            source: d[_left] as string,
-            target: d[_right] as string,
+            source: getReferenceLabel(props.allReferenceTypeInfo, _sourceField, d[_left] as string),
+            target: getReferenceLabel(props.allReferenceTypeInfo, _targetField, d[_right] as string),
             value: d[_dataField] as number,
         });
     });

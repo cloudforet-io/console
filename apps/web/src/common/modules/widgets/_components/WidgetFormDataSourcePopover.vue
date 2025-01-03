@@ -139,19 +139,19 @@ const state = reactive({
             key: DATA_TABLE_OPERATOR.VALUE_MAPPING,
             name: 'Value Mapping',
             description: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.VALUE_MAPPING_DESC'),
-            icon: '', // TODO: Add icon
+            icon: 'ic_db-value-mapping',
         },
         {
             key: DATA_TABLE_OPERATOR.ADD_LABELS,
             name: 'Additional Labels',
             description: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.ADD_LABELS_DESC'),
-            icon: '', // TODO: Add icon
+            icon: 'ic_db-additional-labels',
         },
         {
             key: DATA_TABLE_OPERATOR.PIVOT,
             name: 'Pivot',
             description: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.PIVOT_DESC'),
-            icon: 'ic_db-pivot',
+            icon: 'ic_db-pivot-table',
         },
     ]),
 });
