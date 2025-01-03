@@ -61,6 +61,7 @@ const {
     hasTaskTypeOnly: true,
 });
 const handleUpdateSelectedCategory = (items: SelectDropdownMenuItem[]) => {
+    if (isEqual(items, selectedCategoryItems.value)) return;
     setForm('category', items); // set form for validation
     taskContentFormStore.setCurrentCategoryId(items[0].name); // set current category id to store for other fields
     const category = taskContentFormGetters.currentCategory;
