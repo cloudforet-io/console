@@ -27,6 +27,7 @@ import { SUB_TOTAL_NAME } from '@/common/modules/widgets/_constants/widget-field
 import { normalizeAndSerialize } from '@/common/modules/widgets/_helpers/global-variable-helper';
 import { sortObjectByKeys } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import {
+    getReferenceLabel,
     getWidgetDateFields, getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
@@ -68,6 +69,7 @@ const state = reactive({
     isPivotDataTable: computed<boolean>(() => state.dataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
 
     data: computed<WidgetLoadResponse|undefined>(() => queryResult.data?.value),
+    dataField: computed<string>(() => widgetOptionsState.dataFieldInfo?.data?.[0] || ''),
     // unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
     boxWidth: BOX_MIN_WIDTH,
     boxHeight: 0,
@@ -254,7 +256,7 @@ useResizeObserver(colorCodedTableRef, throttle(() => {
                      class="y-col"
                      :style="{'height': `${state.boxHeight}px`}"
                 >
-                    {{ yField }}
+                    {{ getReferenceLabel(props.allReferenceTypeInfo, state.dataField, yField) }}
                 </div>
             </div>
             <div class="x-axis-wrapper"
@@ -287,7 +289,7 @@ useResizeObserver(colorCodedTableRef, throttle(() => {
                         <div class="x-field-text">
                             <span class="x-field-col"
                                   :style="{'width': `${state.boxWidth}px`}"
-                            >{{ xField }}</span>
+                            >{{ getReferenceLabel(props.allReferenceTypeInfo, widgetOptionsState.xAxisInfo?.data, xField) }}</span>
                         </div>
                     </div>
                 </div>

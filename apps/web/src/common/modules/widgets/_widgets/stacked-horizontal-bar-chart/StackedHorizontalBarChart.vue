@@ -84,6 +84,7 @@ const state = reactive({
     chartData: [],
     chart: null as EChartsType | null,
     unitMap: computed<Record<string, string>>(() => widgetFrameProps.value.unitMap || {}),
+    dataField: computed<string>(() => widgetOptionsState.dataFieldInfo?.data?.[0] || ''),
     chartOptions: computed<BarSeriesOption>(() => ({
         color: MASSIVE_CHART_COLORS,
         legend: {
@@ -94,19 +95,22 @@ const state = reactive({
             icon: 'circle',
             itemWidth: 10,
             itemHeight: 10,
-            formatter: (val) => val,
+            formatter: (val) => {
+                if (state.isPivotDataTable) return getReferenceLabel(props.allReferenceTypeInfo, state.dataField, val);
+                return val;
+            },
         },
         tooltip: {
             formatter: (params) => {
                 const _params = Array.isArray(params) ? params : [params];
                 return _params.map((p) => {
                     const _unit: string|undefined = state.unitMap[p.seriesName];
+                    const _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.dataField, p.seriesName);
                     let _value = numberFormatter(p.value) || '';
                     if (widgetOptionsState.tooltipNumberFormatInfo?.toggleValue) {
                         _value = getFormattedNumber(p.value, p.seriesName, widgetOptionsState.numberFormatInfo, _unit);
                     }
-                    const _name = getReferenceLabel(props.allReferenceTypeInfo, widgetOptionsState.yAxisInfo?.data, params.name);
-                    return `${p.marker} ${_name}: <b>${_value}</b>`;
+                    return `${p.marker} ${_seriesName}: <b>${_value}</b>`;
                 }).join('<br>');
             },
         },

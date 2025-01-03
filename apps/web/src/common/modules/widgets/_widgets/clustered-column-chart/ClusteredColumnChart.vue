@@ -78,6 +78,7 @@ const state = reactive({
     unitMap: computed<Record<string, string>>(() => widgetFrameProps.value.unitMap || {}),
     data: computed<WidgetLoadResponse | null>(() => queryResult.data?.value ?? null),
     chart: null as EChartsType | null,
+    dataField: computed<string>(() => widgetOptionsState.dataFieldInfo?.data?.[0] || ''),
     xAxisData: computed<string[]>(() => {
         if (!state.data?.results?.length) return [];
         if (isDateField(widgetOptionsState.xAxisInfo?.data)) {
@@ -103,7 +104,10 @@ const state = reactive({
             icon: 'circle',
             itemWidth: 10,
             itemHeight: 10,
-            formatter: (val) => val,
+            formatter: (val) => {
+                if (state.isPivotDataTable) return getReferenceLabel(props.allReferenceTypeInfo, state.dataField, val);
+                return val;
+            },
         },
         tooltip: {
             trigger: 'axis',
@@ -116,11 +120,12 @@ const state = reactive({
                 }
                 const _values = _params.map((p) => {
                     const _unit: string|undefined = state.unitMap[p.seriesName];
+                    const _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.dataField, p.seriesName);
                     let _value = numberFormatter(p.value) || '';
                     if (widgetOptionsState.tooltipNumberFormatInfo?.toggleValue) {
                         _value = getFormattedNumber(p.value, p.seriesName, widgetOptionsState.numberFormatInfo, _unit);
                     }
-                    return `${p.marker} ${p.seriesName}: <b>${_value}</b>`;
+                    return `${p.marker} ${_seriesName}: <b>${_value}</b>`;
                 });
                 return [_axisValue, ..._values].join('<br/>');
             },

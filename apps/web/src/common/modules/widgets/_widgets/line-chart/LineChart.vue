@@ -76,6 +76,7 @@ const state = reactive({
 
     data: computed<WidgetLoadResponse | null>(() => queryResult?.data?.value || null),
     chart: null as EChartsType | null,
+    dataField: computed<string>(() => widgetOptionsState.dataFieldInfo?.data?.[0] || ''),
     xAxisData: computed<string[]>(() => {
         if (!state.data?.results?.length) return [];
         if (isDateField(widgetOptionsState.xAxisInfo?.data)) {
@@ -103,7 +104,10 @@ const state = reactive({
             icon: 'circle',
             itemWidth: 10,
             itemHeight: 10,
-            formatter: (val) => val,
+            formatter: (val) => {
+                if (state.isPivotDataTable) return getReferenceLabel(props.allReferenceTypeInfo, state.dataField, val);
+                return val;
+            },
         },
         tooltip: {
             trigger: 'axis',
@@ -116,7 +120,7 @@ const state = reactive({
                 }
                 const _values = _params.map((p) => {
                     const _unit: string|undefined = state.unitMap[p.seriesName];
-                    let _seriesName = getReferenceLabel(props.allReferenceTypeInfo, widgetOptionsState.dataFieldInfo?.data, p.seriesName);
+                    let _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.dataField, p.seriesName);
                     let _value = p.value ? numberFormatter(p.value) : undefined;
                     if (!_value) return undefined;
                     if (_unit) _seriesName = `${_seriesName} (${_unit})`;
