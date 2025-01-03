@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core';
 import {
-    computed,
     onMounted, reactive, ref, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
@@ -43,7 +42,6 @@ const authTypeMenuItem = ref([
 const state = reactive({
     loading: false,
     menuVisible: false,
-    isNew: computed(() => userPageState.isAdminMode || userPageState.afterWorkspaceCreated),
     menuItems: [] as AddModalMenuItem[],
     selectedItems: [] as AddModalMenuItem[],
     independentUsersList: [] as SummaryWorkspaceUserModel[],
@@ -69,7 +67,7 @@ const handleClickTextInput = async () => {
 const handleChangeTextInput = (value: string) => {
     resetValidationState();
     formState.searchText = value;
-    if (!state.isNew) {
+    if (!userPageState.isAdminMode || userPageState.afterWorkspaceCreated) {
         fetchListUsers();
         state.menuVisible = true;
     }
@@ -89,19 +87,19 @@ const handleSelectDropdownItem = (selected: AuthType|LocalType) => {
     formState.selectedMenuItem = selected;
     resetValidationState();
 };
-
 const getUserList = async () => {
-    const isIndependentUser = state.independentUsersList.find((user) => user.user_id === formState.searchText);
-
+    let isNew = userPageState.isAdminMode || userPageState.afterWorkspaceCreated;
     try {
         const trimmedText = formState.searchText.trim();
-        if (state.isNew) {
+        if (userPageState.isAdminMode || userPageState.afterWorkspaceCreated) {
             await fetchGetUsers(trimmedText);
         } else {
+            const isIndependentUser = state.independentUsersList.find((user) => user.user_id === formState.searchText);
+            isNew = !isIndependentUser;
             await fetchGetWorkspaceUsers(trimmedText);
         }
     } catch (e) {
-        addSelectedItem(formState.searchText, !isIndependentUser);
+        addSelectedItem(formState.searchText, isNew);
         hideMenu();
         formState.searchText = '';
         resetValidationState();
