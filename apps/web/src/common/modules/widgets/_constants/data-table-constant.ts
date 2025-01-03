@@ -129,7 +129,5 @@ export const DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP = {
                 match: '',
             },
         ],
-        else: undefined,
-        condition: undefined,
     } as ValueMappingOptions,
 };
