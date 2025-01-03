@@ -141,7 +141,7 @@ const time = computed(() => {
     }
     .vertical-item-detail {
         @apply text-paragraph-md;
-        padding: 0.75rem 1rem;
+        padding: 0.75rem 0.5rem;
         >.p-collapsible-panel {
             padding: 0;
         }

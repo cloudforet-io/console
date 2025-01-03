@@ -106,6 +106,15 @@ const handleClose = () => {
                         />
                     </template>
                 </p-field-group>
+                <p-field-group :label="$t('ALERT_MANAGER.SERVICE.LABEL_KEY')"
+                               class="input-form service-key"
+                               required
+                >
+                    <p-text-input :value="storeState.service.service_key"
+                                  readonly
+                                  block
+                    />
+                </p-field-group>
                 <p-field-group :label="$t('ALERT_MANAGER.DESCRIPTION')"
                                class="input-form"
                 >
@@ -117,3 +126,16 @@ const handleClose = () => {
         </template>
     </p-button-modal>
 </template>
+
+<style scoped lang="postcss">
+.service-detail-edit-modal {
+    .service-key {
+        /* custom design-system component - p-text-input */
+        :deep(.p-text-input) {
+            .input-container {
+                @apply border-gray-150;
+            }
+        }
+    }
+}
+</style>

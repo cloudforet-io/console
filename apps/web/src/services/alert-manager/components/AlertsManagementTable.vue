@@ -224,6 +224,7 @@ watch(() => route.query, async (query) => {
                          exportable
                          search-type="query"
                          sort-by="created_at"
+                         class="toolbox pb-10"
                          :sort-desc="true"
                          :query-tags="queryTags"
                          :loading="state.loading"
@@ -364,6 +365,9 @@ watch(() => route.query, async (query) => {
 
 <style scoped lang="postcss">
 .alert-data-table {
+    .toolbox {
+        border-radius: 0.375rem;
+    }
     .service-dropdown {
         margin-bottom: -0.5rem;
         width: max-content;

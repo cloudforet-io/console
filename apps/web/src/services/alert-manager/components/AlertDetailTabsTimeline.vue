@@ -6,7 +6,7 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButton, PButtonModal, PCodeEditor, PToolbox, PHeading, PHeadingLayout, PDataLoader, PDivider, PSelectStatus,
+    PButton, PButtonModal, PCodeEditor, PToolbox, PHeading, PHeadingLayout, PDataLoader, PDivider, PSelectStatus, PTextButton,
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -20,6 +20,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 
 import { copyAnyData } from '@/lib/helper/copy-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import VerticalTimelineItem from '@/common/components/vertical-timeline/VerticalTimelineItem.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -96,6 +97,9 @@ const getItemInfo = (item: AlertEventActionType): HistoryItemInfo => {
     };
 };
 
+const handleCloseModal = () => {
+    state.modalVisible = false;
+};
 const handleClickHistoryItem = (item: AlertEventModel) => {
     state.modalVisible = true;
     state.selectedItem = item;
@@ -114,6 +118,7 @@ const handleClickShowMore = async () => {
 
 const handleClickCopy = () => {
     copyAnyData(state.selectedItem);
+    showSuccessMessage(i18n.t('ALERT_MANAGER.ALERTS.COPIED'), '');
 };
 
 const fetchHistoryList = async () => {
@@ -183,14 +188,18 @@ watch(() => storeState.alertInfo, async (alertInfo) => {
                                             :timezone="storeState.timezone"
                                             :style-type="getItemInfo(item.action)?.styleType"
                                             :is-last-item="idx === state.slicedHistoryList?.length - 1"
-                                            @click="handleClickHistoryItem(item)"
                     >
                         <template #top-right>
                             <span class="ml-auto text-label-sm text-gray-600">
                                 {{ $t('ALERT_MANAGER.ALERTS.CREATED_BY', { user: getCreatedByNames(item.created_by) }) }}
                             </span>
                         </template>
-                        <span class="description text-label-sm text-gray-600">{{ item.description }}</span>
+                        <p-text-button style-type="highlight"
+                                       size="md"
+                                       @click="handleClickHistoryItem(item)"
+                        >
+                            {{ item.description }}
+                        </p-text-button>
                     </vertical-timeline-item>
                 </div>
             </template>
@@ -214,7 +223,9 @@ watch(() => storeState.alertInfo, async (alertInfo) => {
         <p-button-modal v-if="state.modalVisible"
                         :header-title="$t('ALERT_MANAGER.ALERTS.EVENT_DETAILS')"
                         size="lg"
+                        hide-footer-close-button
                         :visible.sync="state.modalVisible"
+                        @confirm="handleCloseModal"
         >
             <template #body>
                 <div class="event-detail-modal-content">
@@ -234,6 +245,9 @@ watch(() => storeState.alertInfo, async (alertInfo) => {
                         {{ $t('ALERT_MANAGER.ALERTS.COPY_ALL') }}
                     </p-button>
                 </div>
+            </template>
+            <template #confirm-button>
+                {{ $t('ALERT_MANAGER.ALERTS.OK') }}
             </template>
         </p-button-modal>
     </section>
@@ -255,11 +269,6 @@ watch(() => storeState.alertInfo, async (alertInfo) => {
             height: 1rem;
             padding-top: 0.25rem;
             padding-bottom: 0.25rem;
-        }
-    }
-    .description {
-        &:hover {
-            @apply text-secondary cursor-pointer;
         }
     }
 }
