@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    defineExpose, reactive, computed, onMounted,
+    defineExpose, reactive, computed, watch,
 } from 'vue';
 
 import { useQueries } from '@tanstack/vue-query';
@@ -283,10 +283,10 @@ const loadWidget = async () => {
 
 useWidgetInitAndRefresh({ props, emit, loadWidget });
 
-onMounted(async () => {
-    if (!props.dataTableId) return;
-    state.dataTable = await getWidgetDataTable(props.dataTableId);
-});
+watch(() => props.dataTableId, async (newDataTableId) => {
+    if (!newDataTableId) return;
+    state.dataTable = await getWidgetDataTable(newDataTableId);
+}, { immediate: true });
 defineExpose<WidgetExpose>({
     loadWidget,
 });

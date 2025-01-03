@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useElementSize, useResizeObserver } from '@vueuse/core';
 import {
-    computed, defineExpose, onMounted, reactive, ref,
+    computed, defineExpose, reactive, ref, watch,
 } from 'vue';
 
 import { useQueries } from '@tanstack/vue-query';
@@ -238,10 +238,10 @@ useResizeObserver(valueTextRef, throttle(() => {
     setValueTextFontSize();
 }, 500));
 useWidgetInitAndRefresh({ props, emit, loadWidget });
-onMounted(async () => {
-    if (!props.dataTableId) return;
-    state.dataTable = await getWidgetDataTable(props.dataTableId);
-});
+watch(() => props.dataTableId, async (newDataTableId) => {
+    if (!newDataTableId) return;
+    state.dataTable = await getWidgetDataTable(newDataTableId);
+}, { immediate: true });
 defineExpose<WidgetExpose>({
     loadWidget,
 });

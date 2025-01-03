@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useResizeObserver } from '@vueuse/core/index';
 import {
-    computed, defineExpose, onMounted, reactive, ref, watch,
+    computed, defineExpose, reactive, ref, watch,
 } from 'vue';
 
 import { useQuery } from '@tanstack/vue-query';
@@ -203,10 +203,10 @@ watch([() => state.data, () => props.widgetOptions], ([newData]) => {
 });
 
 useWidgetInitAndRefresh({ props, emit, loadWidget });
-onMounted(async () => {
-    if (!props.dataTableId) return;
-    state.dataTable = await getWidgetDataTable(props.dataTableId);
-});
+watch(() => props.dataTableId, async (newDataTableId) => {
+    if (!newDataTableId) return;
+    state.dataTable = await getWidgetDataTable(newDataTableId);
+}, { immediate: true });
 defineExpose<WidgetExpose>({
     loadWidget,
 });

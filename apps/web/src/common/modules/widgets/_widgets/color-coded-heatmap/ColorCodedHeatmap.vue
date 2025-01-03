@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, defineExpose, onMounted, reactive, watch,
+    computed, defineExpose, reactive, watch,
 } from 'vue';
 
 
@@ -172,10 +172,10 @@ watch(() => widgetOptionsState.formatRulesInfo, async () => {
 }, { immediate: true });
 
 useWidgetInitAndRefresh({ props, emit, loadWidget });
-onMounted(async () => {
-    if (!props.dataTableId) return;
-    state.dataTable = await getWidgetDataTable(props.dataTableId);
-});
+watch(() => props.dataTableId, async (newDataTableId) => {
+    if (!newDataTableId) return;
+    state.dataTable = await getWidgetDataTable(newDataTableId);
+}, { immediate: true });
 defineExpose<WidgetExpose>({
     loadWidget,
 });
