@@ -5,8 +5,8 @@ export interface EventModel {
     event_type: EventType;
     name: string;
     description: string;
-    user_type: 'USER'|'APP'; // TODO: replace with UserType
-    user_id: string;
+    created_type: string;
+    created_by: string;
     additional_info: EventAdditionalInfo;
     task_id: string;
     project_id: string;

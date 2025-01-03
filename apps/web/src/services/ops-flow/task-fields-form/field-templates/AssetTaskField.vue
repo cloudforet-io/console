@@ -30,7 +30,7 @@ const props = defineProps<TaskFieldFormProps<OtherTaskField, string[]>>();
 const emit = defineEmits<TaskFieldFormEmits<string[]>>();
 
 const {
-    fieldValue, updateFieldValue,
+    updateFieldValue,
     isInvalid, invalidText,
 } = useTaskFieldValidation(props, emit);
 
@@ -50,7 +50,7 @@ const steps = computed<Step[]>(() => [
         name: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.CATEGORY') as string,
         menu: cloudServiceTypeItems.value.map((item) => ({
             type: 'item',
-            name: item.key,
+            name: item.name,
             label: item.label,
             imageUrl: item.icon,
         })),
@@ -89,7 +89,7 @@ const handleUpdateSelected = (stepIdx: number, selected: DataSelectorItem[]) => 
                    no-spacing
     >
         <div v-if="props.readonly">
-            {{ fieldValue.value ? fieldValue.value.join(', ') : '' }}
+            {{ props.value ? props.value.join(', ') : '' }}
         </div>
         <div v-else
              class="mt-1 flex overflow-x-auto border border-gray-200 rounded-lg"

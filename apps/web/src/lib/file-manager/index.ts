@@ -12,7 +12,7 @@ type FileManagerResourceGroupType = Extract<ResourceGroupType, 'DOMAIN'|'WORKSPA
 
 const uploadFile = async (file: File, resourceGroup: FileManagerResourceGroupType): Promise<FileModel> => {
     const formData = new FormData();
-    formData.append('files', file);
+    formData.append('file', file);
 
     let resourceGroupPath: string;
     if (resourceGroup === 'DOMAIN') {
