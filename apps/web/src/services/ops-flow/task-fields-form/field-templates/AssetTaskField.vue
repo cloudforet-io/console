@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, onMounted } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PFieldGroup,
 } from '@cloudforet/mirinae';
 import type { MenuAttachHandler } from '@cloudforet/mirinae/types/hooks/use-context-menu-attach/use-context-menu-attach';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { CloudServiceListParameters } from '@/schema/inventory/cloud-service/api-verbs/list';
+import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import type { OtherTaskField } from '@/schema/opsflow/_types/task-field-type';
 import { i18n } from '@/translations';
 
@@ -19,6 +23,7 @@ import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-mode
 
 import DataSelector from '@/common/components/select/DataSelector.vue';
 import type { DataSelectorItem } from '@/common/components/select/type';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useTaskFieldValidation } from '@/services/ops-flow/task-fields-form/composables/use-task-field-validation';
 import type {
@@ -79,6 +84,26 @@ const handleUpdateSelected = (stepIdx: number, selected: DataSelectorItem[]) => 
         updateFieldValue(selected.map((item) => item.name));
     }
 };
+
+const assetNames = ref<string[]>([]);
+onMounted(async () => {
+    if (props.readonly && props.value) {
+        try {
+            const res = await SpaceConnector.clientV2.inventory.cloudService.list<CloudServiceListParameters, ListResponse<CloudServiceModel>>({
+                query: {
+                    only: ['cloud_service_id', 'name'],
+                    filter: [{
+                        k: 'cloud_service_id', v: props.value, o: 'in',
+                    }],
+                },
+            });
+            assetNames.value = res.results ? res.results.map((d) => d.name) : [];
+        } catch (e) {
+            ErrorHandler.handleError(e);
+            assetNames.value = props.value;
+        }
+    }
+});
 </script>
 
 <template>
@@ -89,7 +114,7 @@ const handleUpdateSelected = (stepIdx: number, selected: DataSelectorItem[]) => 
                    no-spacing
     >
         <div v-if="props.readonly">
-            {{ props.value ? props.value.join(', ') : '' }}
+            {{ assetNames ? assetNames.join(', ') : '' }}
         </div>
         <div v-else
              class="mt-1 flex overflow-x-auto border border-gray-200 rounded-lg"
