@@ -4,7 +4,7 @@ import { computed, watch } from 'vue';
 import { isEqual } from 'lodash';
 
 import {
-    PFieldTitle, PFieldGroup, PSelectDropdown, PPaneLayout, PButton, PBadge,
+    PFieldTitle, PFieldGroup, PSelectDropdown, PPaneLayout, PButton, PBadge, PSkeleton,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
@@ -45,6 +45,9 @@ const taskManagementTemplateStore = useTaskManagementTemplateStore();
 const userStore = useUserStore();
 const taskCategoryStore = useTaskCategoryStore();
 
+
+const isCreateMode = computed(() => taskContentFormState.mode.startsWith('create'));
+const isMinimalCreateMode = computed(() => taskContentFormState.mode === 'create-minimal');
 
 /* category */
 const {
@@ -120,7 +123,7 @@ const handleUpdateSelectedStatus = async (items: SelectDropdownMenuItem[]) => {
     if (taskContentFormState.statusId === statusId) return;
     taskContentFormStore.setStatusId(statusId);
     setSelectedStatusItems(items);
-    if (taskContentFormState.mode === 'view') {
+    if (!isCreateMode.value) { // only for view mode
         await changeStatus(statusId);
         await taskDetailPageStore.loadNewEvents();
     }
@@ -211,27 +214,27 @@ const initForViewMode = async (task?: TaskModel) => {
 const initForCreateMode = async (categoryId?: string, taskType?: TaskTypeModel) => {
     if (hasInitiated) return;
 
-    if (categoryId) {
-        await setInitialCategory(categoryId);
-        // init selected status
-        const category = taskContentFormGetters.currentCategory;
-        if (category) {
-            const defaultStatus = category.status_options.TODO.find((status) => status.is_default);
-            setInitialStatus(defaultStatus);
-            taskContentFormStore.setStatusId(defaultStatus?.status_id);
-        } else {
-            ErrorHandler.handleError(new Error('Failed to get category'));
-            hasInitiated = true;
-            return;
-        }
-        // init task type
-        if (taskType) setInitialTaskType(taskType);
+    if (!categoryId) return;
 
-        // reset validations
-        resetValidations();
-
+    await setInitialCategory(categoryId);
+    // init selected status
+    const category = taskContentFormGetters.currentCategory;
+    if (category) {
+        const defaultStatus = category.status_options.TODO.find((status) => status.is_default);
+        setInitialStatus(defaultStatus);
+        taskContentFormStore.setStatusId(defaultStatus?.status_id);
+    } else {
+        ErrorHandler.handleError(new Error('Failed to get category'));
         hasInitiated = true;
+        return;
     }
+    // init task type
+    if (taskType) setInitialTaskType(taskType);
+
+    // reset validations
+    resetValidations();
+
+    hasInitiated = true;
 };
 
 let viewModeInitWatchStop;
@@ -243,7 +246,7 @@ viewModeInitWatchStop = watch(() => taskContentFormState.originTask, async (task
         viewModeInitWatchStop = null;
         return;
     }
-    if (taskContentFormState.mode === 'view') await initForViewMode(task);
+    if (!isCreateMode.value) await initForViewMode(task);
 }, { immediate: true });
 createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, () => taskContentFormState.currentTaskType], async ([categoryId, taskType]) => {
     if (hasInitiated && createModeInitWatchStop) {
@@ -251,23 +254,29 @@ createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, (
         createModeInitWatchStop = undefined;
         return;
     }
-    if (taskContentFormState.mode === 'create') await initForCreateMode(categoryId, taskType);
+
+    if (isCreateMode.value) {
+        await initForCreateMode(categoryId);
+    } else if (isMinimalCreateMode.value) { // minimal create mode always has task type (from landing page)
+        if (!taskType) return;
+        await initForCreateMode(categoryId, taskType);
+    }
 }, { immediate: true });
 </script>
 
 <template>
-    <component :is="taskContentFormState.mode === 'create' ? 'div' : PPaneLayout"
+    <component :is="isCreateMode ? 'div' : PPaneLayout"
                class="flex flex-wrap gap-4"
-               :class="taskContentFormState.mode === 'create' ? '' : 'py-6 px-4'"
+               :class="isCreateMode ? '' : 'py-6 px-4'"
     >
         <div v-if="!taskContentFormState.isArchivedTask"
              class="base-form-top-wrapper"
         >
             <div class="base-form-field-wrapper">
                 <p-field-group :label="taskManagementTemplateStore.templates.TaskCategory"
-                               :style-type="taskContentFormState.mode === 'create' ? 'primary' : 'secondary'"
+                               :style-type="isCreateMode ? 'primary' : 'secondary'"
                                required
-                               :invalid="taskContentFormState.mode !== 'view' && invalidState.category"
+                               :invalid="isCreateMode && invalidState.category"
                                :invalid-text="invalidTexts.category"
                 >
                     <template #default="{invalid}">
@@ -275,7 +284,7 @@ createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, (
                                            :handler="categoryMenuItemsHandler"
                                            :page-size="10"
                                            :invalid="invalid"
-                                           :readonly="taskContentFormState.mode === 'view'"
+                                           :readonly="!isCreateMode"
                                            block
                                            @update:selected="handleUpdateSelectedCategory"
                         />
@@ -284,9 +293,9 @@ createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, (
             </div>
             <div class="base-form-field-wrapper">
                 <p-field-group :label="taskManagementTemplateStore.templates.TaskType"
-                               :style-type="taskContentFormState.mode === 'create' ? 'primary' : 'secondary'"
+                               :style-type="isCreateMode ? 'primary' : 'secondary'"
                                required
-                               :invalid="taskContentFormState.mode !== 'view' && invalidState.taskType"
+                               :invalid="!isCreateMode && invalidState.taskType"
                                :invalid-text="invalidTexts.taskType"
                 >
                     <template #default="{invalid}">
@@ -294,7 +303,7 @@ createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, (
                                            :handler="taskTypeMenuItemsHandler"
                                            :page-size="10"
                                            :invalid="invalid"
-                                           :readonly="taskContentFormState.mode === 'view' || !taskContentFormGetters.currentCategory"
+                                           :readonly="!isCreateMode || !taskContentFormGetters.currentCategory"
                                            block
                                            @update:selected="handleUpdateSelectedTaskType"
                         />
@@ -302,7 +311,7 @@ createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, (
                 </p-field-group>
             </div>
         </div>
-        <div v-if="taskContentFormState.mode !== 'create'"
+        <div v-if="!isCreateMode"
              class="base-form-top-wrapper"
         >
             <div class="base-form-field-wrapper">
@@ -312,7 +321,10 @@ createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, (
                                :invalid="invalidState.status"
                                :invalid-text="invalidTexts.status"
                 >
-                    <template v-if="taskContentFormState.isArchivedTask">
+                    <p-skeleton v-if="!taskContentFormState.hasTaskTypeLoaded"
+                                height="2rem"
+                    />
+                    <template v-else-if="taskContentFormState.isArchivedTask">
                         {{ getStatusTypeLabel(taskContentFormState.originTask?.status_type) }}
                     </template>
                     <p-select-dropdown v-else
@@ -343,7 +355,7 @@ createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, (
                 </p-field-group>
             </div>
             <div class="base-form-field-wrapper">
-                <div v-if="taskContentFormState.mode === 'view'">
+                <div v-if="!isCreateMode">
                     <div class="flex gap-2 items-center">
                         <p-field-title size="sm"
                                        color="gray"

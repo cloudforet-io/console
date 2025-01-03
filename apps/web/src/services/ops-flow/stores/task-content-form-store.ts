@@ -35,6 +35,7 @@ interface UseTaskContentFormStoreState {
     // base form
     currentCategoryId?: string;
     currentTaskType?: TaskTypeModel;
+    hasTaskTypeLoaded: boolean;
     statusId?: string;
     assignee?: string;
     isBaseFormValid: boolean;
@@ -46,7 +47,7 @@ interface UseTaskContentFormStoreState {
     dataValidationMap: Record<string, boolean>;
     fileIds: string[]; // for file upload
     // overall
-    mode: 'create'|'view';
+    mode: 'create'|'view'|'create-minimal';
     hasUnsavedChanges: boolean;
     createTaskLoading: boolean;
 }
@@ -72,6 +73,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         // base form
         currentCategoryId: undefined,
         currentTaskType: undefined,
+        hasTaskTypeLoaded: false,
         statusId: undefined,
         assignee: undefined,
         isBaseFormValid: false,
@@ -119,7 +121,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
             return state.isBaseFormValid && getters.isDefaultFieldValid && getters.isFieldValid;
         }),
         isEditable: computed<boolean>(() => {
-            if (state.mode === 'create') return true;
+            if (state.mode === 'create' || state.mode === 'create-minimal') return true;
             if (!state.originTask) return true;
             if (state.isArchivedTask) return false;
             if (userStore.getters.isDomainAdmin) return true;
@@ -136,7 +138,10 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
             state.currentTaskType = undefined;
         },
         async setCurrentTaskType(taskTypeId?: string) {
-            if (state.currentTaskType?.task_type_id === taskTypeId) return;
+            if (state.currentTaskType?.task_type_id === taskTypeId) {
+                state.hasTaskTypeLoaded = true;
+                return;
+            }
             if (taskTypeId) {
                 if (taskTypeStore.state.fullFieldsItemMap[taskTypeId]) {
                     state.currentTaskType = taskTypeStore.state.fullFieldsItemMap[taskTypeId];
@@ -158,6 +163,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
                 state.data = {};
                 state.dataValidationMap = {};
             }
+            state.hasTaskTypeLoaded = true;
         },
         setStatusId(statusId?: string) {
             state.statusId = statusId;
@@ -214,7 +220,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
             state.dataValidationMap = {};
             state.fileIds = [];
         },
-        setMode(mode: 'create'|'view') {
+        setMode(mode: 'create'|'view'|'create-minimal') {
             state.mode = mode;
         },
         async createTask(): Promise<TaskModel|undefined> {
