@@ -31,6 +31,7 @@ const storeState = reactive({
 });
 
 const state = reactive({
+    isPivotDataTable: computed<boolean>(() => storeState.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
     fieldValue: computed<DataFieldValue>(() => props.fieldManager.data[FIELD_KEY]?.value),
     multiselectable: computed(() => props.widgetFieldSchema?.options?.multiSelectable),
     menuItems: computed<MenuItem[]>(() => {
@@ -53,7 +54,6 @@ const state = reactive({
         }
         return (state.fieldValue.data as string) ?? state.menuItems[0]?.name;
     }),
-    isPivotDataTable: computed<boolean>(() => storeState.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
 });
 
 /* Event */
