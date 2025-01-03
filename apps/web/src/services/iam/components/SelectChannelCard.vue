@@ -38,6 +38,7 @@ const handleSelectChannel = (selectedProtocol) => {
         _state.state.selectedProtocol = {
             name: selectedProtocol.label,
             protocol_id: selectedProtocol.value,
+            icon: selectedProtocol.icon,
         };
     });
 };

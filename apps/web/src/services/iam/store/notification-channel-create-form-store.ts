@@ -8,6 +8,7 @@ interface NotificationChannelCreateFormState {
     selectedProtocol: {
       name: string;
       protocol_id: string;
+      icon: string;
     };
     protocolSchemaForm: Record<string, any>;
     channelName: string;
@@ -19,6 +20,7 @@ export const useNotificationChannelCreateFormStore = defineStore('channel-create
         selectedProtocol: {
             name: '',
             protocol_id: '',
+            icon: '',
         },
         protocolSchemaForm: {},
         channelName: '',
@@ -48,6 +50,7 @@ export const useNotificationChannelCreateFormStore = defineStore('channel-create
             state.selectedProtocol = {
                 name: '',
                 protocol_id: '',
+                icon: '',
             };
             state.protocolSchemaForm = {};
             state.channelName = '';
