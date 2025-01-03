@@ -6,7 +6,6 @@ import {
 
 import { useQuery } from '@tanstack/vue-query';
 import bytes from 'bytes';
-import { sortBy } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -81,7 +80,7 @@ const state = reactive({
     dataInfo: computed<DataInfo|undefined>(() => storeState.selectedDataTable?.data_info),
     isPivot: computed<boolean>(() => storeState.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
     isAutoTypeColumnPivot: computed<boolean>(() => state.isPivot && !!storeState.selectedDataTable?.options?.[DATA_TABLE_OPERATOR.PIVOT]?.limit),
-    pivotSortKeys: computed<string[]>(() => (state.isPivot ? storeState.selectedDataTable?.sort_keys ?? [] : [])),
+    // pivotSortKeys: computed<string[]>(() => (state.isPivot ? storeState.selectedDataTable?.sort_keys ?? [] : [])),
     fields: computed<PreviewTableField[]>(() => {
         if (!storeState.selectedDataTableId || !state.data?.results?.length) {
             return [{
@@ -90,13 +89,13 @@ const state = reactive({
             }];
         }
 
-        const sortBySortKeys = (targetArray: string[]): string[] => sortBy(targetArray, (item) => {
-            const index = state.pivotSortKeys.indexOf(item);
-            return index === -1 ? Infinity : index;
-        });
+        // const sortBySortKeys = (targetArray: string[]): string[] => sortBy(targetArray, (item) => {
+        //     const index = state.pivotSortKeys.indexOf(item);
+        //     return index === -1 ? Infinity : index;
+        // });
 
         return [
-            ...sortBySortKeys(state.labelFields).map((key) => ({
+            ...state.labelFields.map((key) => ({
                 type: 'LABEL',
                 name: key,
                 sortKey: key,
@@ -114,7 +113,7 @@ const state = reactive({
                 type: 'DIVIDER',
                 name: '',
             },
-            ...sortBySortKeys(state.dataFields).map((key) => ({
+            ...state.dataFields.map((key) => ({
                 type: 'DATA',
                 name: key,
             })),

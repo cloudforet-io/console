@@ -28,6 +28,7 @@ const table: WidgetConfig = {
         },
     },
     optionalFieldsSchema: {
+        subTotal: {},
         total: {
             options: {
                 toggle: false,

@@ -4,14 +4,14 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { sortBy } from 'lodash';
-
 import {
     PFieldTitle, PToggleButton, PFieldGroup, PSelectDropdown, PI, PTooltip,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
+import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
+import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import { i18n } from '@/translations';
 
 
@@ -36,6 +36,10 @@ const props = defineProps<WidgetFieldComponentProps<TableColumnComparisonOptions
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
 
+const storeState = reactive({
+    selectedDataTable: computed<PrivateDataTableModel|PublicDataTableModel|undefined>(() => widgetGenerateGetters.selectedDataTable),
+});
+
 const state = reactive({
     fieldValue: computed<TableColumnComparisonValue>(() => props.fieldManager.data[FIELD_KEY].value),
     infoText: computed<TranslateResult>(() => {
@@ -49,15 +53,8 @@ const state = reactive({
         { label: `${i18n.t('COMMON.WIDGETS.COMPARISON.PERCENT')}(%)`, name: 'percent' },
     ]),
     fieldMenuItems: computed<SelectDropdownMenuItem[]>(() => {
-        const isPivotDataTable = widgetGenerateGetters?.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT;
-        const pivotSortKeys = (widgetGenerateGetters.selectedDataTable?.sort_keys ?? []);
-
         const dataInfoList = Object.keys(widgetGenerateGetters.selectedDataTable?.data_info ?? {}) ?? [];
-        const sortedDataInfoList = sortBy(dataInfoList, (item) => {
-            const index = pivotSortKeys.indexOf(item);
-            return index === -1 ? Infinity : index;
-        });
-        return (isPivotDataTable ? sortedDataInfoList : dataInfoList).map((d) => ({
+        return dataInfoList.map((d) => ({
             name: d,
             label: d,
         }));
@@ -66,6 +63,7 @@ const state = reactive({
         name: item,
         label: item,
     }))),
+    isPivotDataTable: computed<boolean>(() => storeState.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
 });
 
 const handleUpdateColor = (key:'decreaseColor'|'increaseColor', color:string) => {
@@ -113,6 +111,7 @@ const handleUpdateFields = (fields: MenuItem[]) => {
                 </p-tooltip>
             </p-field-title>
             <p-toggle-button :value="state.fieldValue?.toggleValue"
+                             :disabled="state.isPivotDataTable"
                              @change-toggle="handleUpdateToggle"
             />
         </div>

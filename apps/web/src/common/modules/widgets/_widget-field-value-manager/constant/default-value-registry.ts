@@ -1,3 +1,4 @@
+import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import {
     COLOR_SCHEMA, DATA_FIELD_HEATMAP_COLOR, DATE_FORMAT, DEFAULT_COMPARISON_COLOR, NUMBER_FORMAT, TABLE_DEFAULT_MINIMUM_WIDTH, WIDGET_HEIGHT,
 } from '@/common/modules/widgets/_constants/widget-field-constant';
@@ -146,6 +147,13 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
         const dataFieldOptions = (_fieldsSchema.dataField?.options ?? {}) as DataFieldOptions;
 
         const result = widgetFieldDefaultValueMap.dataField;
+
+        const isPivotDataTable = dataTable.operator === DATA_TABLE_OPERATOR.PIVOT;
+        if (isPivotDataTable) { // if pivot dataTable, always multiSelectable
+            return {
+                data: [dataTable.options.PIVOT?.fields?.column],
+            };
+        }
 
         const fieldKeys = sortWidgetTableFields(Object.keys(dataTable?.data_info ?? {}));
 

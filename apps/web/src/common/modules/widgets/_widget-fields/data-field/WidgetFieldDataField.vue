@@ -3,10 +3,11 @@ import {
     computed, reactive,
 } from 'vue';
 
-import { sortBy } from 'lodash';
-
 import { PSelectDropdown, PFieldGroup } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
+
+import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
+import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 
 import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
@@ -25,31 +26,34 @@ const widgetGenerateGetters = widgetGenerateStore.getters;
 
 const validator = widgetValidatorRegistry[FIELD_KEY];
 
+const storeState = reactive({
+    selectedDataTable: computed<PrivateDataTableModel|PublicDataTableModel|undefined>(() => widgetGenerateGetters.selectedDataTable),
+});
+
 const state = reactive({
     fieldValue: computed<DataFieldValue>(() => props.fieldManager.data[FIELD_KEY]?.value),
     multiselectable: computed(() => props.widgetFieldSchema?.options?.multiSelectable),
     menuItems: computed<MenuItem[]>(() => {
-        const isPivotDataTable = widgetGenerateGetters?.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT;
-        const pivotSortKeys = (widgetGenerateGetters.selectedDataTable?.sort_keys ?? []);
-
         const dataInfoList = Object.keys(widgetGenerateGetters.selectedDataTable?.data_info ?? {}) ?? [];
-        const sortedDataInfoList = sortBy(dataInfoList, (item) => {
-            const index = pivotSortKeys.indexOf(item);
-            return index === -1 ? Infinity : index;
-        });
-        return (isPivotDataTable ? sortedDataInfoList : dataInfoList).map((d) => ({
-            name: d,
-            label: d,
-        }));
+        return dataInfoList.filter((field) => field !== 'Sub Total')
+            .map((d) => ({
+                name: d,
+                label: d,
+            }));
     }),
     invalid: computed<boolean>(() => !validator(state.fieldValue, props.widgetConfig)),
     selectedItem: computed<MenuItem[]|string|undefined>(() => {
+        if (state.isPivotDataTable) {
+            const dataName = storeState.selectedDataTable?.options.PIVOT?.fields?.column || '';
+            return convertToMenuItem([dataName]);
+        }
         if (!state.menuItems.length) return undefined;
         if (state.multiselectable) {
             return convertToMenuItem((state.fieldValue.data ?? []) as string[]);
         }
         return (state.fieldValue.data as string) ?? state.menuItems[0]?.name;
     }),
+    isPivotDataTable: computed<boolean>(() => storeState.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
 });
 
 /* Event */
@@ -75,6 +79,7 @@ const convertToMenuItem = (data: string[]) => data.map((d) => ({
                                :multi-selectable="state.multiselectable"
                                :show-select-marker="state.multiselectable"
                                :invalid="state.invalid"
+                               :disabled="state.isPivotDataTable"
                                appearance-type="badge"
                                block
                                @update:selected="handleChangeValue"

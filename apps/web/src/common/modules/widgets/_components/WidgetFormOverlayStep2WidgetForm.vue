@@ -7,12 +7,15 @@ import type { TranslateResult } from 'vue-i18n';
 import { cloneDeep } from 'lodash';
 
 import {
-    PFieldGroup, PSelectDropdown, PButton, PI, PButtonModal,
+    PFieldGroup, PSelectDropdown, PButton, PI, PButtonModal, PTooltip,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
+import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
+import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
+
 import NewMark from '@/common/components/marks/NewMark.vue';
-import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
+import { DATA_TABLE_OPERATOR, DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { WIDGET_COMPONENT_ICON_MAP } from '@/common/modules/widgets/_constants/widget-components-constant';
 import { CONSOLE_WIDGET_CONFIG } from '@/common/modules/widgets/_constants/widget-config-list-constant';
 import {
@@ -23,7 +26,7 @@ import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-g
 import type WidgetFieldValueManager from '@/common/modules/widgets/_widget-field-value-manager';
 import WidgetHeaderField from '@/common/modules/widgets/_widget-fields/header/WidgetHeaderField.vue';
 
-import { red } from '@/styles/colors';
+import { gray, red } from '@/styles/colors';
 
 
 const FORM_TITLE_MAP = {
@@ -40,6 +43,8 @@ interface Props {
     fieldManager: WidgetFieldValueManager;
 }
 
+type DataTableModel = PrivateDataTableModel|PublicDataTableModel;
+const UNSUPPORTED_CHARTS_IN_PIVOT = ['numberCard', 'gauge', 'geoMap', 'treemap', 'pieChart', 'colorCodedHeatmap', 'sankeyChart'];
 const props = defineProps<Props>();
 
 const widgetGenerateStore = useWidgetGenerateStore();
@@ -50,6 +55,8 @@ const state = reactive({
         name: d.widgetName,
         label: d.meta?.title || d.widgetName,
         icon: WIDGET_COMPONENT_ICON_MAP[d.widgetName ?? ''],
+        iconColor: UNSUPPORTED_CHARTS_IN_PIVOT.includes(d.widgetName) && widgetGenerateGetters.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT ? gray[300] : undefined,
+        disabled: UNSUPPORTED_CHARTS_IN_PIVOT.includes(d.widgetName) && widgetGenerateGetters.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT,
     }))),
     widgetConfig: computed(() => getWidgetConfig(widgetGenerateState.selectedWidgetName)),
     widgetConfigDependencies: computed<{[key:string]: string[]}>(() => state.widgetConfig.dependencies || {}),
@@ -71,7 +78,8 @@ const state = reactive({
         label: d.name,
         icon: d.data_type === DATA_TABLE_TYPE.TRANSFORMED ? 'ic_transform-data' : 'ic_service_data-sources',
     }))),
-    selectedDataTableId: computed(() => widgetGenerateState.selectedDataTableId),
+    selectedDataTableId: computed<string>(() => widgetGenerateState.selectedDataTableId),
+    selectedDataTable: computed<DataTableModel|undefined>(() => widgetGenerateGetters.selectedDataTable),
     errorModalCurrentType: undefined as 'default'|'geoMap'|undefined,
 });
 
@@ -87,8 +95,25 @@ const handleSelectDataTable = async (dataTableId: string) => {
     });
 
     props.fieldManager.updateDataTableAndOriginData(selectedDataTable, {});
+
+    // check if selected chart type is supported in pivot
+    if (selectedDataTable.operator === DATA_TABLE_OPERATOR.PIVOT && UNSUPPORTED_CHARTS_IN_PIVOT.includes(widgetGenerateState.selectedWidgetName)) {
+        changeWidgetType('table');
+    }
 };
 
+const handleSelectWidgetName = (widgetName: string) => {
+    changeWidgetType(widgetName);
+};
+const handleClickEditDataTable = () => {
+    widgetGenerateStore.setOverlayStep(1);
+    state.widgetDefaultValidationModalVisible = false;
+};
+const handleClickCollapsibleTitle = (collapsedTitle: string) => {
+    state.collapsedTitleMap[collapsedTitle] = !state.collapsedTitleMap[collapsedTitle];
+};
+
+/* Utils */
 const checkDefaultValidation = () => {
     const selectedChartType = widgetGenerateState.selectedWidgetName;
     const selectedDataTable = widgetGenerateGetters.selectedDataTable ?? {};
@@ -113,25 +138,14 @@ const checkDefaultValidation = () => {
         }
     }
 };
-
-const handleSelectWidgetName = (widgetName: string) => {
+const changeWidgetType = (widgetName: string) => {
     const _config = getWidgetConfig(widgetName);
     if (widgetName === widgetGenerateState.selectedWidgetName || !_config) return;
     widgetGenerateStore.setSelectedWidgetName(widgetName);
-
     widgetGenerateStore.setSize(_config.meta.sizes[0]);
-    widgetGenerateStore.setWidgetFormValueMap({});
-    widgetGenerateStore.setWidgetValidMap({});
 
     props.fieldManager.updateWidgetType(_config);
     checkDefaultValidation();
-};
-const handleClickEditDataTable = () => {
-    widgetGenerateStore.setOverlayStep(1);
-    state.widgetDefaultValidationModalVisible = false;
-};
-const handleClickCollapsibleTitle = (collapsedTitle: string) => {
-    state.collapsedTitleMap[collapsedTitle] = !state.collapsedTitleMap[collapsedTitle];
 };
 
 // const checkFormDependencies = (changedFieldName: string):string[] => state.widgetConfigDependencies[changedFieldName] || [];
@@ -188,6 +202,13 @@ onMounted(() => {
                              color="inherit"
                         />
                         <span>{{ state.chartTypeMenuItems.find((d) => d.name === widgetGenerateState.selectedWidgetName).label }}</span>
+                    </template>
+                    <template #menu-item--format="{item}">
+                        <p-tooltip :contents="item.disabled ? 'When a Pivot DataTable is selected, this chart type is unavailable.': undefined"
+                                   position="bottom"
+                        >
+                            <span>{{ item.label }}</span>
+                        </p-tooltip>
                     </template>
                 </p-select-dropdown>
             </p-field-group>
