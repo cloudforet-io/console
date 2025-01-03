@@ -194,12 +194,16 @@ watch(() => storeState.alertInfo, async (alertInfo) => {
                                 {{ $t('ALERT_MANAGER.ALERTS.CREATED_BY', { user: getCreatedByNames(item.created_by) }) }}
                             </span>
                         </template>
-                        <p-text-button style-type="highlight"
+                        <p-text-button v-if="item.action === ALERT_EVENT_ACTION.EVENT_PUSHED"
+                                       style-type="highlight"
                                        size="md"
                                        @click="handleClickHistoryItem(item)"
                         >
                             {{ item.description }}
                         </p-text-button>
+                        <span v-else>
+                            {{ item.description }}
+                        </span>
                     </vertical-timeline-item>
                 </div>
             </template>

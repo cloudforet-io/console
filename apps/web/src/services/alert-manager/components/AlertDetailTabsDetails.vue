@@ -28,7 +28,7 @@ const state = reactive({
         <p-heading-layout class="py-6 px-4">
             <template #heading>
                 <p-heading heading-type="sub"
-                           :title="$t('ALERT_MANAGER.ALERTS.BASE_INFO_TITLE')"
+                           :title="$t('ALERT_MANAGER.ALERTS.ADDITIONAL_INFO')"
                 />
             </template>
         </p-heading-layout>

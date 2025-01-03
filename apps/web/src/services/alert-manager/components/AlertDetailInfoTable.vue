@@ -15,6 +15,7 @@ import { i18n } from '@/translations';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
 import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
+import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 
 import AlertDetailInfoTableDescription from '@/services/alert-manager/components/AlertDetailInfoTableDescription.vue';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
@@ -33,6 +34,7 @@ const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 
 const storeState = reactive({
+    webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
     timezone: computed<string>(() => alertDetailPageGetters.timezone),
     alertInfo: computed<AlertModel>(() => alertDetailPageState.alertInfo),
     cloudServiceTypeInfo: computed<CloudServiceTypeReferenceMap>(() => allReferenceGetters.cloudServiceType),
@@ -40,6 +42,7 @@ const storeState = reactive({
 });
 const tableState = reactive({
     fields: computed<DefinitionField[]>(() => [
+        { name: 'alert_id', label: i18n.t('ALERT_MANAGER.ALERTS.ID') },
         { name: 'description', label: i18n.t('ALERT_MANAGER.ALERTS.DESC'), disableCopy: true },
         { name: 'rule', label: i18n.t('ALERT_MANAGER.ALERTS.RULE'), disableCopy: true },
         { name: 'severity', label: i18n.t('ALERT_MANAGER.ALERTS.SEVERITY'), disableCopy: true },
@@ -49,9 +52,16 @@ const tableState = reactive({
         { name: 'created_at', label: i18n.t('ALERT_MANAGER.ALERTS.CREATED_AT'), disableCopy: true },
         { name: 'acknowledged_at', label: i18n.t('ALERT_MANAGER.ALERTS.ACKNOWLEDGED_AT'), disableCopy: true },
         { name: 'resolved_at', label: i18n.t('ALERT_MANAGER.ALERTS.RESOLVED_AT'), disableCopy: true },
+        { name: 'labels', label: i18n.t('ALERT_MANAGER.ALERTS.LABEL'), disableCopy: true },
     ]),
 });
 
+const getCreatedByNames = (id: string): string => {
+    if (id.includes('webhook')) {
+        return storeState.webhook[id].label || id;
+    }
+    return id || '--';
+};
 const getBadgeInfo = (value: AlertSeverityType): BadgeInfo => {
     switch (value) {
     case ALERT_SEVERITY.CRITICAL:
@@ -140,7 +150,7 @@ const getAssetInfo = (assetId: string) => {
                 </template>
             </template>
             <template #data-triggered_by="{ value }">
-                {{ value || '--' }}
+                <span>{{ getCreatedByNames(value) }}</span>
             </template>
             <template #data-service_id="{ value }">
                 <p-link v-if="storeState.serviceMap[value]?.label "
@@ -169,6 +179,22 @@ const getAssetInfo = (assetId: string) => {
                 <span v-if="storeState.alertInfo.resolved_at"> {{ iso8601Formatter(value, storeState.timezone) }}</span>
                 <span v-else>--</span>
             </template>
+            <template #data-labels="{ value }">
+                <div class="flex gap-2">
+                    <div v-if="value.length > 0">
+                        <p-badge v-for="(item, idx) in value"
+                                 :key="`labels-${idx}`"
+                                 badge-type="subtle"
+                                 style-type="gray200"
+                                 shape="square"
+                                 class="label-item"
+                        >
+                            <span>{{ item }}</span>
+                        </p-badge>
+                    </div>
+                    <span v-else>--</span>
+                </div>
+            </template>
         </p-definition-table>
     </p-pane-layout>
 </template>
@@ -188,6 +214,10 @@ const getAssetInfo = (assetId: string) => {
                 height: 0.125rem;
             }
         }
+    }
+    .label-item {
+        @apply truncate;
+        max-width: 9.875rem;
     }
 }
 </style>
