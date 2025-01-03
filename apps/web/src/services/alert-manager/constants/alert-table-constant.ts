@@ -18,7 +18,6 @@ export const ALERT_MANAGEMENT_TABLE_FIELDS: DataTableFieldType[] = [
     { name: 'status', label: 'Status' },
     { name: 'service_id', label: 'Service' },
     { name: 'urgency', label: 'Urgency' },
-    { name: 'triggered_type', label: 'Category' },
     { name: 'resources', label: 'Resource', width: '20rem' },
     { name: 'created_at', label: 'Created at' },
 ];
@@ -28,14 +27,12 @@ export const ALERT_MANAGEMENT_TABLE_HANDLER: AlertManagementTableHandlerType = {
         items: [
             { name: 'alert_id', label: 'Alert ID' },
             { name: 'title', label: 'Title' },
-            { name: 'triggered_type', label: 'Category' },
             { name: 'resource.resource_type', label: 'Resource Name' },
         ],
     }],
     valueHandlerMap: {
         alert_id: makeDistinctValueHandler('alert_manager.Alert', 'alert_id'),
         title: makeDistinctValueHandler('alert_manager.Alert', 'title'),
-        triggered_type: makeDistinctValueHandler('alert_manager.Alert', 'triggered_type'),
         'resource.resource_type': makeDistinctValueHandler('alert_manager.Alert', 'resource.resource_type'),
     },
 };
@@ -45,9 +42,6 @@ export const ALERT_EXCEL_FIELDS: ExcelDataField[] = [
     { key: 'status', name: 'Status' },
     { key: 'service_id', name: 'Service' },
     { key: 'urgency', name: 'Urgency' },
-    { key: 'triggered_type', name: 'Category' },
     { key: 'resources', name: 'Resource' },
     { key: 'created_at', name: 'Created at' },
-    // { key: 'resolved_by', name: 'Resolved by' },
-    // { key: 'acknowledged_by', name: 'Acknowledged by' },
 ];

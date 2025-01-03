@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    reactive, computed, watch,
+    reactive, computed, watch, onUnmounted,
 } from 'vue';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
@@ -77,6 +77,7 @@ const storeState = reactive({
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
     defaultEscalationPolicyId: computed<string>(() => serviceDetailPageState.serviceInfo.escalation_policy_id),
     timezone: computed<string>(() => serviceDetailPageGetters.timezone),
+    selectedEscalationPolicyId: computed<string|undefined>(() => serviceDetailPageState.selectedEscalationPolicyId),
 });
 const state = reactive({
     loading: false,
@@ -95,6 +96,9 @@ const escalationPolicyListApiQueryHelper = new ApiQueryHelper().setSort('created
 const queryTagHelper = useQueryTags({ keyItemSets: ESCALATION_POLICY_MANAGEMENT_TABLE_KEY_ITEMS_SETS });
 const { queryTags } = queryTagHelper;
 
+const initSelectedEscalationPolicy = () => {
+    state.selectIndex = state.items.findIndex((item) => item.escalation_policy_id === storeState.selectedEscalationPolicyId);
+};
 const getConnectChannelCount = (rules: EscalationPolicyRulesType[]): number => {
     const allChannels = rules.flatMap((item) => item.channels);
     const uniqueChannels = new Set(allChannels);
@@ -152,10 +156,18 @@ const fetchEscalationPolicyList = async () => {
     }
 };
 
+watch([() => storeState.selectedEscalationPolicyId, () => state.items], ([id]) => {
+    if (!id) return;
+    initSelectedEscalationPolicy();
+}, { immediate: true });
 watch(() => storeState.serviceId, (id) => {
     if (!id) return;
     fetchEscalationPolicyList();
 }, { immediate: true });
+
+onUnmounted(() => {
+    serviceDetailPageStore.setSelectedEscalationPolicyId(undefined);
+});
 </script>
 
 <template>
