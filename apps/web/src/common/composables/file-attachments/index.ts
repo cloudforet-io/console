@@ -1,4 +1,3 @@
-import { computedAsync } from '@vueuse/core';
 import type { ComputedRef, Ref } from 'vue';
 import { computed } from 'vue';
 
@@ -11,7 +10,7 @@ import { getFileDownloadUrl } from '@/lib/file-manager';
 
 import type { Attachment } from '@/common/components/editor/extensions/image/type';
 
-export const useFileAttachments = (files: ComputedRef<FileModel[]>| Ref<FileModel[]>) => {
+export const useFileAttachments = (files: ComputedRef<FileModel[]>|Ref<FileModel[]>) => {
     const appContextStore = useAppContextStore();
     const appContextGetters = appContextStore.getters;
     const resourceGroup = computed<Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'>>(() => {
@@ -19,7 +18,7 @@ export const useFileAttachments = (files: ComputedRef<FileModel[]>| Ref<FileMode
         return 'WORKSPACE';
     });
 
-    const attachments = computedAsync<Attachment[]>(async (): Promise<Attachment[]> => {
+    const attachments = computed<Attachment[]>(() => {
         if (files.value.length === 0) return [];
 
         return files.value.map((file, idx) => ({
