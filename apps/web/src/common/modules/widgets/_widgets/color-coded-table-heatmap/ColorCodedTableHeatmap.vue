@@ -63,8 +63,9 @@ const state = reactive({
     runQueries: false,
     isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
     dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
+    isPivot: computed<boolean>(() => state.dataTable?.operator === 'PIVOT'),
 
-    data: computed<WidgetLoadResponse | null>(() => queryResult.data?.value),
+    data: computed<WidgetLoadResponse|undefined>(() => queryResult.data?.value),
     // unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
     boxWidth: BOX_MIN_WIDTH,
     boxHeight: 0,
@@ -78,7 +79,11 @@ const state = reactive({
     }),
     yAxisData: computed<string[]>(() => {
         if (!state.data?.results?.length) return [];
-        return (widgetOptionsState.dataFieldInfo?.data ?? []) as string[];
+        let _dataFields: string[] = widgetOptionsState.dataFieldInfo?.data as string[] || [];
+        if (state.isPivot) {
+            _dataFields = state.data?.order?.filter((v) => widgetOptionsState.dataFieldInfo?.data?.includes(v)) || [];
+        }
+        return _dataFields;
     }),
     legendList: [] as WidgetLegend[],
     widgetDateRange: computed<DateRange>(() => {
@@ -95,6 +100,7 @@ const widgetOptionsState = reactive({
     granularityInfo: computed<GranularityValue>(() => props.widgetOptions?.granularity?.value as GranularityValue),
     dataFieldInfo: computed<DataFieldValue>(() => props.widgetOptions?.dataField?.value as DataFieldValue),
     xAxisInfo: computed<XAxisValue>(() => props.widgetOptions?.xAxis?.value as XAxisValue),
+    xAxisCount: computed<number>(() => widgetOptionsState.xAxisInfo?.count || 0),
     formatRulesInfo: computed<FormatRulesValue>(() => props.widgetOptions?.formatRules?.value as FormatRulesValue),
     numberFormatInfo: computed<NumberFormatValue>(() => props.widgetOptions?.numberFormat?.value as NumberFormatValue),
 });
@@ -137,8 +143,8 @@ const queryResult = useQuery({
     staleTime: WIDGET_LOAD_STALE_TIME,
 });
 
-const widgetLoading = computed<boolean>(() => queryResult.isLoading);
-const errorMessage = computed<string>(() => queryResult.error?.value?.message);
+const widgetLoading = computed<boolean>(() => queryResult.isLoading.value);
+const errorMessage = computed<string|undefined>(() => queryResult.error?.value?.message);
 
 /* Util */
 const loadWidget = async () => {
@@ -203,13 +209,13 @@ useResizeObserver(colorCodedTableRef, throttle(() => {
     if (!_containerWidth || !_containerHeight) return;
 
     // width
-    const boxWidth = (_containerWidth - Y_AXIS_FIELD_WIDTH) / state.xAxisCount;
+    const boxWidth = (_containerWidth - Y_AXIS_FIELD_WIDTH) / widgetOptionsState.xAxisCount;
     if (boxWidth < BOX_MIN_WIDTH) state.boxWidth = BOX_MIN_WIDTH - 2;
     else state.boxWidth = boxWidth - 2;
 
     // height
-    const yAxisCount = state.yAxisData.length;
-    const boxHeight = _containerHeight / yAxisCount;
+    const yAxisCount = state.yAxisData.length || 1;
+    const boxHeight = (_containerHeight - 16) / yAxisCount;
     const padding = 20 / yAxisCount;
     if (boxHeight < 32) state.boxHeight = 32 - padding;
     else state.boxHeight = boxHeight - padding;
@@ -291,12 +297,12 @@ useResizeObserver(colorCodedTableRef, throttle(() => {
     .table-wrapper {
         display: flex;
         width: 100%;
-        height: 82%;
+        height: 95%;
         gap: 0.25rem;
         overflow: auto;
         margin-top: 1rem;
         &.overlay {
-            height: 90%;
+            height: 95%;
         }
         .y-axis-wrapper {
             .y-col {

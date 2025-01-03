@@ -14,7 +14,7 @@ import type {
 } from 'echarts/core';
 import type { LegendOption, EChartsOption } from 'echarts/types/dist/shared';
 import {
-    groupBy, isEmpty, orderBy, throttle, sumBy,
+    isEmpty, orderBy, throttle,
 } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -57,6 +57,8 @@ import type {
 } from '@/common/modules/widgets/types/widget-display-type';
 
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
+
+
 
 interface ChartData {
     name: string;
@@ -235,12 +237,12 @@ const drawChart = (rawData: WidgetLoadResponse|null) => {
     if (isEmpty(rawData)) return;
 
     // get chart data
-    const _groupByData = groupBy(rawData.results || [], widgetOptionsState.groupByInfo?.data);
-    let _refinedData: ChartData[] = Object.entries(_groupByData).map(([k, v]) => ({
-        name: k,
-        value: sumBy(v, widgetOptionsState.groupByInfo?.data as string),
+    const _groupByData = rawData?.results || [];
+    let _refinedData: ChartData[] = _groupByData.map((d) => ({
+        name: d[widgetOptionsState.groupByInfo?.data as string] as string,
+        value: d[widgetOptionsState.dataFieldInfo?.data as string] as number,
     }));
-    if (isDateField(state.groupByField)) {
+    if (isDateField(widgetOptionsState.groupByInfo?.data as string)) {
         _refinedData = orderBy(_refinedData, 'name', 'desc');
         _refinedData = _refinedData?.slice(0, widgetOptionsState.groupByInfo?.count);
     } else {

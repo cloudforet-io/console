@@ -69,6 +69,7 @@ const state = reactive({
     runQueries: false,
     isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
     dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
+    isPivot: computed<boolean>(() => state.dataTable?.operator === 'PIVOT'),
 
     data: computed<WidgetLoadResponse | null>(() => queryResult?.data?.value || null),
     chart: null as EChartsType | null,
@@ -199,7 +200,7 @@ const queryResult = useQuery({
         widget_id: props.widgetId,
         granularity: widgetOptionsState.granularityInfo?.granularity,
         group_by: widgetOptionsState.xAxisInfo?.data ? [widgetOptionsState.xAxisInfo?.data] : [],
-        sort: getWidgetLoadApiQuerySort(widgetOptionsState.xAxisInfo?.data as string, widgetOptionsState.dataFieldInfo?.data as string[]),
+        sort: getWidgetLoadApiQuerySort(widgetOptionsState.xAxisInfo?.data as string, widgetOptionsState.dataFieldInfo?.data as string[], state.isPivot),
         page: { start: 0, limit: widgetOptionsState.xAxisInfo?.count },
         vars: props.dashboardVars,
         ...getWidgetLoadApiQueryDateRange(widgetOptionsState.granularityInfo?.granularity, dateRange.value),
@@ -208,8 +209,8 @@ const queryResult = useQuery({
     staleTime: WIDGET_LOAD_STALE_TIME,
 });
 
-const widgetLoading = computed<boolean>(() => queryResult.isLoading);
-const errorMessage = computed<string>(() => queryResult.error?.value?.message);
+const widgetLoading = computed<boolean>(() => queryResult.isLoading.value);
+const errorMessage = computed<string|undefined>(() => queryResult.error?.value?.message);
 
 /* Util */
 const drawChart = (rawData: WidgetLoadResponse|null) => {
@@ -217,7 +218,11 @@ const drawChart = (rawData: WidgetLoadResponse|null) => {
 
     const _seriesData: any[] = [];
     const _defaultValue = widgetOptionsState.missingValueInfo?.type === 'lineToZero' ? 0 : undefined;
-    (widgetOptionsState.dataFieldInfo?.data as string[] ?? []).forEach((_dataField) => {
+    let _dataFields: string[] = widgetOptionsState.dataFieldInfo?.data as string[] || [];
+    if (state.isPivot) {
+        _dataFields = rawData.order?.filter((v) => widgetOptionsState.dataFieldInfo?.data?.includes(v)) || [];
+    }
+    _dataFields.forEach((_dataField) => {
         const _unit: string|undefined = state.unitMap[_dataField];
         _seriesData.push({
             name: _dataField,
@@ -258,7 +263,7 @@ watch([() => state.data, () => props.widgetOptions], ([newData]) => {
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange,
     errorMessage,
-    widgetLoading: widgetLoading.value,
+    widgetLoading,
     noData: computed(() => (state.data ? !state.data.results?.length : false)),
 });
 

@@ -36,9 +36,12 @@ export const getWidgetLoadApiQueryDateRange = (granularity: string, dateRange: D
     return dateRange;
 };
 
-export const getWidgetLoadApiQuerySort = (xAxisField: string, dataField: string[]): Query['sort'] => {
+export const getWidgetLoadApiQuerySort = (xAxisField: string, dataField: string[], isPivot?: boolean): Query['sort'] => {
     if (xAxisField === 'Date') {
         return [{ key: 'Date', desc: true }];
+    }
+    if (isPivot) {
+        return [{ key: 'Sub Total', desc: true }];
     }
     return dataField.map((field) => ({ key: field, desc: true }));
 };

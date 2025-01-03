@@ -37,7 +37,7 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 
 interface OverridableWidgetFrameState {
     dateRange?: DateRange | ComputedRef<DateRange>;
-    errorMessage?: string | ComputedRef<string>;
+    errorMessage?: string | ComputedRef<string|undefined>;
     widgetLoading?: boolean | ComputedRef<boolean>;
     noData?: boolean | ComputedRef<boolean>;
 }
