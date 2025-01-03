@@ -1,9 +1,12 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { computed, onMounted, reactive } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { PButtonModal } from '@cloudforet/mirinae';
+import { PTableCheckModal } from '@cloudforet/mirinae';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ServiceListParameters } from '@/schema/alert-manager/service/api-verbs/list';
+import type { ServiceModel } from '@/schema/alert-manager/service/model';
 import type { UserGroupDeleteUserGroupParameters } from '@/schema/identity/user-group/api-verbs/delete';
 import type { UserGroupModel } from '@/schema/identity/user-group/model';
 import { i18n } from '@/translations';
@@ -28,6 +31,18 @@ const storeState = reactive({
 
 const state = reactive({
     loading: false,
+    filteredServices: [] as ServiceModel[],
+});
+
+const tableState = reactive({
+    fields: [
+        { name: 'service', label: 'Service' },
+        { name: 'description', label: 'Description' },
+    ],
+    items: computed(() => state.filteredServices.map((service) => ({
+        service: service.name,
+        description: service.description,
+    }))),
 });
 
 /* Component */
@@ -63,15 +78,35 @@ const fetchDeleteUserGroup = async (params: UserGroupDeleteUserGroupParameters) 
         ErrorHandler.handleError(e);
     }
 };
+
+const fetchServiceList = async () => {
+    try {
+        const { results } = await SpaceConnector.clientV2.alertManager.service.list<ServiceListParameters, ListResponse<ServiceModel>>();
+        console.log(results);
+        if (results) {
+            const filteredResults = results.filter((result) => result.members.USER_GROUP !== undefined && result.members.USER_GROUP.length > 0);
+            state.filteredServices = filteredResults.filter((d) => d.members.USER_GROUP.includes(storeState.selectedUserGroupIds[0]));
+        }
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
+    }
+};
+
+/* Mounted */
+onMounted(async () => {
+    await fetchServiceList();
+});
 </script>
 
 <template>
-    <p-button-modal size="sm"
-                    :header-title="userGroupPageState.modal.title"
-                    :loading="state.loading"
-                    :visible="userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.DELETE"
-                    :theme-color="userGroupPageState.modal.themeColor"
-                    @confirm="handleConfirm"
-                    @cancel="handleCancel"
+    <p-table-check-modal size="sm"
+                         :header-title="userGroupPageState.modal.title"
+                         :loading="state.loading"
+                         :visible="userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.DELETE"
+                         :theme-color="userGroupPageState.modal.themeColor"
+                         :fields="tableState.fields"
+                         :items="tableState.items"
+                         @confirm="handleConfirm"
+                         @cancel="handleCancel"
     />
 </template>

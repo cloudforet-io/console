@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, reactive,
+    computed, onMounted, reactive,
 } from 'vue';
 
 import { cloneDeep, map } from 'lodash';
@@ -10,6 +10,9 @@ import {
     PStatus, PButtonModal, PDataTable,
 } from '@cloudforet/mirinae';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ServiceListParameters } from '@/schema/alert-manager/service/api-verbs/list';
+import type { ServiceModel } from '@/schema/alert-manager/service/model';
 import type { RoleBindingDeleteParameters } from '@/schema/identity/role-binding/api-verbs/delete';
 import type { UserDeleteParameters } from '@/schema/identity/user/api-verbs/delete';
 import type { UserDisableParameters } from '@/schema/identity/user/api-verbs/disable';
@@ -38,6 +41,7 @@ const state = reactive({
             { name: 'user_id', label: 'User ID' },
             { name: 'name', label: 'Name' },
             { name: 'state', label: 'State' },
+            { name: 'service', label: 'Service' },
         ];
         return userPageState.isAdminMode ? [
             ...baseField,
@@ -48,6 +52,14 @@ const state = reactive({
         ];
     }),
     isRemoveOnlyWorkspace: computed(() => userPageState.modal.visible === 'removeOnlyWorkspace'),
+    filteredServices: undefined,
+    filteredItems: [] as {
+      user_id?: string;
+      name?: string;
+      state?: string;
+      service?: string;
+      role_type?: string;
+    }[],
 });
 
 /* Component */
@@ -142,6 +154,37 @@ const disableUser = async (userId?: string): Promise<boolean> => {
         return false;
     }
 };
+const fetchServiceList = async () => {
+    try {
+        const { results } = await SpaceConnector.clientV2.alertManager.service.list<ServiceListParameters, ListResponse<ServiceModel>>();
+        if (results && results.length > 0) {
+            const filteredResults = results.filter((result) => result.members.USER !== undefined && result.members.USER.length > 0);
+            if (filteredResults && filteredResults.length > 0) {
+                filteredResults.forEach((d) => {
+                    const filtered = userPageGetters.selectedUsers.filter((selectedUser) => d.members.USER.includes(selectedUser?.user_id));
+                    if (filtered.length > 0) {
+                        filtered.forEach((filteredUser) => {
+                            state.filteredItems.push({
+                                user_id: filteredUser.user_id,
+                                name: filteredUser.name,
+                                state: filteredUser.state,
+                                role_type: filteredUser.role_type,
+                                service: d.name,
+                            });
+                        });
+                    }
+                });
+            }
+        }
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
+    }
+};
+
+/* Watcher */
+onMounted(async () => {
+    await fetchServiceList();
+});
 </script>
 
 <template>
@@ -157,7 +200,7 @@ const disableUser = async (userId?: string): Promise<boolean> => {
         <template #body>
             <p-data-table
                 :fields="state.fields"
-                :items="state.isRemoveOnlyWorkspace ? userPageGetters.selectedOnlyWorkspaceUsers : userPageGetters.selectedUsers"
+                :items="state.isRemoveOnlyWorkspace ? userPageGetters.selectedOnlyWorkspaceUsers : state.filteredItems"
             >
                 <template #col-state-format="{value}">
                     <p-status v-bind="userStateFormatter(value)"
