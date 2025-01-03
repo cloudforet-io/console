@@ -81,10 +81,10 @@ export class SpaceConnector {
         this.serviceApiV2 = serviceApiV2;
         this.afterCallApiMap = afterCallApiMap;
         this._restClient = {
-            post: this.serviceApi.instance.post,
-            get: this.serviceApi.instance.get,
-            put: this.serviceApi.instance.put,
-            delete: this.serviceApi.instance.delete,
+            post: serviceApiV2.instance.post,
+            get: serviceApiV2.instance.get,
+            put: serviceApiV2.instance.put,
+            delete: serviceApiV2.instance.delete,
         };
     }
 
