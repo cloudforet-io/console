@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { toRef } from 'vue';
+import { toRef, ref } from 'vue';
 
 import { isEqual } from 'lodash';
 
@@ -11,6 +11,7 @@ import type { ParagraphTaskField } from '@/schema/opsflow/_types/task-field-type
 
 import TextEditor from '@/common/components/editor/TextEditor.vue';
 import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
+import { useEditorContentTransformer } from '@/common/composables/editor-content-transformer';
 import { useFileAttachments } from '@/common/composables/file-attachments';
 import { useFileUploader } from '@/common/composables/file-uploader';
 
@@ -39,6 +40,13 @@ const handleUpdateAttachmentIds = (attachmentIds: string[]) => {
     if (isEqual(originFileIds, attachmentIds)) return;
     emit('update:file-ids', attachmentIds);
 };
+
+const editorContent = ref(fieldValue.value);
+const { transformEditorContent } = useEditorContentTransformer();
+const handleUpdateEditorContent = (val: string) => {
+    editorContent.value = val;
+    updateFieldValue(transformEditorContent(val));
+};
 </script>
 
 <template>
@@ -57,13 +65,13 @@ const handleUpdateAttachmentIds = (attachmentIds: string[]) => {
         />
         <text-editor v-else
                      class="my-1"
-                     :value="fieldValue"
+                     :value="editorContent"
                      :image-uploader="fileUploader"
                      :attachments="attachments"
                      :placeholder="props.field.options?.example"
                      :invalid="isInvalid"
                      content-type="markdown"
-                     @update:value="updateFieldValue"
+                     @update:value="handleUpdateEditorContent"
                      @update:attachment-ids="handleUpdateAttachmentIds"
         />
     </p-field-group>
