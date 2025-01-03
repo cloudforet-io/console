@@ -258,11 +258,8 @@ const refinedData = computed<WidgetLoadResponse|null>(() => {
     if (widgetOptionsState.totalInfo?.toggleValue) {
         const totalRowItem: TableDataItem = {
             [widgetOptionsState.groupByInfo?.data?.[0] ?? '']: 'Total',
+            ...(totalData?.results?.length ? totalData?.results[0] : {}),
         };
-        [...(totalData?.results ?? [])].forEach((d) => {
-            const fieldKey = Object.keys(d)[0];
-            totalRowItem[fieldKey] = d[fieldKey];
-        });
         refinedResults = [...refinedResults, totalRowItem];
     }
 
