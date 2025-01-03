@@ -20,6 +20,7 @@ import getRandomId from '@/lib/random-id-generator';
 import type {
 } from '@/common/modules/widgets/types/widget-field-value-type';
 import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
+import { SUB_TOTAL_NAME } from '@/common/modules/widgets/_constants/widget-field-constant';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type {
@@ -55,7 +56,7 @@ const state = reactive({
         const fieldList = sortWidgetTableFields(
             [
                 ...Object.keys(widgetGenerateGetters.selectedDataTable?.labels_info ?? {}),
-                ...((state.isPivotDataTable && columnFieldForPivot) ? [columnFieldForPivot, 'Sub Total'] : Object.keys(widgetGenerateGetters.selectedDataTable?.data_info ?? {})),
+                ...((state.isPivotDataTable && columnFieldForPivot) ? [columnFieldForPivot, SUB_TOTAL_NAME] : Object.keys(widgetGenerateGetters.selectedDataTable?.data_info ?? {})),
             ],
         ) ?? [];
         return fieldList.map((d) => ({

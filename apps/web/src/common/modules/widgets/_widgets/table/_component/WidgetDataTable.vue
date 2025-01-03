@@ -19,7 +19,7 @@ import { hexToRgba } from '@/lib/helper/color-convert-helper';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { REFERENCE_FIELD_MAP } from '@/common/modules/widgets/_constants/widget-constant';
 import {
-    DEFAULT_COMPARISON_COLOR,
+    DEFAULT_COMPARISON_COLOR, SUB_TOTAL_NAME,
     TABLE_DEFAULT_MINIMUM_WIDTH,
 } from '@/common/modules/widgets/_constants/widget-field-constant';
 import {
@@ -54,7 +54,6 @@ const HEATMAP_COLOR_HEX_MAP = {
     YELLOW: yellow[200],
     GREEN: green[200],
 };
-const SKIP_HEATMAP_FIELD = ['subTotal', 'comparison'];
 
 type TableDataValue = number | undefined | null;
 const TABLE_MISSING_VALUE_SYMBOL = '-';
@@ -127,7 +126,7 @@ const state = reactive({
             textOverflow: 'ellipsis',
         };
     }),
-    columnFieldForPivot: computed<string>(() => props.dataTable?.options?.PIVOT?.fields?.column),
+    columnFieldForPivot: computed<string|undefined>(() => props.dataTable?.options?.PIVOT?.fields?.column),
 });
 
 const getComparisonInfo = (fieldName: string) => `${fieldName} Compared to ${props.granularity || 'Previous'}`;
@@ -214,7 +213,7 @@ const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
     const BASE_OPACITY = 0.1;
     const _style: Record<string, string> = {};
     const heatmapSkipCondition = field.fieldInfo?.type === 'labelField'
-        || (field?.fieldInfo?.additionalType && SKIP_HEATMAP_FIELD.includes(field?.fieldInfo?.additionalType));
+        || field?.fieldInfo?.additionalType === 'comparison' || field.name === SUB_TOTAL_NAME;
     if (heatmapSkipCondition) return _style;
 
     const _dataField = field.name;
@@ -235,18 +234,10 @@ const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
     return _style;
 };
 
-// const getTimeDiffSubText = (field: TableWidgetField): string => {
-//     if (!props.dataInfo?.[field.name]) return '';
-//     const { timediff } = props.dataInfo[field.name];
-//     if (!timediff || !Object.entries(timediff ?? {}).length) return '';
-//     const [key, value] = Object.entries(timediff)[0];
-//     return `( ${value} ${key} )`;
-// };
-
 const getFieldMinWidth = (field: TableWidgetField): string|undefined => {
     const customWidthItem: CustomColumnWidthItem|undefined = props.customTableColumnWidthInfo?.widthInfos?.find((item) => {
         const labelKeys = Object.keys(props.dataTable?.labels_info ?? {});
-        if (props.isPivotDataTable && !labelKeys.includes(field.name) && field.name !== 'Sub Total') {
+        if (props.isPivotDataTable && !labelKeys.includes(field.name) && field.name !== SUB_TOTAL_NAME) {
             return item.fieldKey === state.columnFieldForPivot;
         }
         return item.fieldKey === field?.name;
@@ -287,13 +278,13 @@ const getFieldWidth = (field: TableWidgetField): string|undefined => {
                         }"
                         :class="{
                             'last-label': fieldColIndex === props.fields.filter((_field) => _field.fieldInfo?.type === 'labelField').length - 1,
-                            'sub-total-freeze': field.fieldInfo?.additionalType === 'subTotal' && props.subTotalInfo?.freeze,
+                            'sub-total-freeze': field.name === SUB_TOTAL_NAME && props.subTotalInfo?.freeze,
                         }"
                     >
                         <span class="th-contents"
                               :class="{
                                   'data-field': field.fieldInfo?.type === 'dataField',
-                                  'sub-total': field.fieldInfo?.additionalType === 'subTotal',
+                                  'sub-total': field.name === SUB_TOTAL_NAME,
                               }"
                         >
                             <span class="th-text"
@@ -331,8 +322,8 @@ const getFieldWidth = (field: TableWidgetField): string|undefined => {
                         :class="{
                             'link-item': field?.link,
                             'last-label': colIndex === props.fields.filter((_field) => _field.fieldInfo?.type === 'labelField').length - 1,
-                            'sub-total': field.fieldInfo?.additionalType === 'subTotal',
-                            'sub-total-freeze': field.fieldInfo?.additionalType === 'subTotal' && props.subTotalInfo?.freeze,
+                            'sub-total': field.name === SUB_TOTAL_NAME,
+                            'sub-total-freeze': field.name === SUB_TOTAL_NAME && props.subTotalInfo?.freeze,
                             'total': item[props.fields[0].name] === 'Total' && props.items?.length === rowIndex + 1,
                             'total-freeze': item[props.fields[0].name] === 'Total' && props.items?.length === rowIndex + 1 && props.totalInfo?.freeze,
                         }"

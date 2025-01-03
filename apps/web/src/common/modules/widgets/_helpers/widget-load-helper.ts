@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
+import { SUB_TOTAL_NAME } from '@/common/modules/widgets/_constants/widget-field-constant';
 import { getDateFormat, getTimeUnit } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 
@@ -41,7 +42,7 @@ export const getWidgetLoadApiQuerySort = (xAxisField: string, dataField: string[
         return [{ key: 'Date', desc: true }];
     }
     if (isPivot) {
-        return [{ key: 'Sub Total', desc: true }];
+        return [{ key: SUB_TOTAL_NAME, desc: true }];
     }
     return dataField.map((field) => ({ key: field, desc: true }));
 };

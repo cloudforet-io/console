@@ -108,3 +108,5 @@ export const WIDGET_HEIGHT = {
     default: 'default',
     full: 'full',
 };
+
+export const SUB_TOTAL_NAME = 'Sub Total';
