@@ -319,7 +319,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const groupByOptions = (_fieldsSchema.groupBy?.options ?? {}) as GroupByOptions;
 
-        const result = widgetFieldDefaultValueMap.categoryBy;
+        const result = widgetFieldDefaultValueMap.groupBy;
 
         let fieldKeys = sortWidgetTableFields(Object.keys(dataTable?.[groupByOptions.dataTarget] ?? {}));
         if (groupByOptions.fixedValue) {
