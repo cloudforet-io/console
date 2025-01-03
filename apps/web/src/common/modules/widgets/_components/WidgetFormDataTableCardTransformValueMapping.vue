@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { isEqual, random } from 'lodash';
+import { random } from 'lodash';
 
 import {
     PButton, PFieldGroup, PSelectButton, PTextInput, PSelectDropdown, PFieldTitle, PIconButton,
@@ -23,7 +23,6 @@ import {
     DATA_TABLE_FIELD_TYPE,
     DATA_TABLE_OPERATOR,
 } from '@/common/modules/widgets/_constants/data-table-constant';
-import { isFieldNameValid } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { TransformDataTableInfo, TransformDataTableProps } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { ValueMappingOptions } from '@/common/modules/widgets/types/widget-model';
@@ -55,6 +54,8 @@ const keyInfo = ref<string|undefined>(props.originData?.key);
 const casesInfo = ref<ValueMappingOptions['cases']>(props.originData?.cases || []);
 const elseInfo = ref<string|undefined>(props.originData?.else);
 const additionalConditionInfo = ref<string|undefined>(props.originData?.condition);
+
+
 
 const state = reactive({
     proxyOperatorOptions: useProxyValue<ValueMappingOptions>('operator-options', props, emit),
@@ -107,6 +108,11 @@ const getInvalidFieldNameText = (fieldName?: string): TranslateResult|undefined 
     if (!isFieldNameValid(fieldName, storeState.currentDataTable)) return i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.DUPLICATED_FIELD_NAME');
     return undefined;
 };
+const isFieldNameValid = (fieldName: string, dataTable?: PublicDataTableModel|PrivateDataTableModel): boolean => {
+    if (!dataTable) return true;
+    const _dataInfoKeys = Object.keys(dataTable.data_info || {});
+    return !_dataInfoKeys.includes(fieldName);
+};
 
 /* Event */
 const handleChangeFieldType = (fieldType: ValueMappingOptions['field_type']) => {
@@ -143,17 +149,10 @@ watch([dataTableInfo, fieldTypeInfo, fieldNameInfo, keyInfo, casesInfo, elseInfo
         field_type: _fieldTypeInfo,
         key: _keyInfo,
         cases: _casesInfo,
-        else: _elseInfo,
+        ...(_elseInfo && { else: _elseInfo }),
         ...(_additionalConditionInfo && { condition: _additionalConditionInfo }),
     };
 }, { deep: true, immediate: true });
-watch([fieldTypeInfo], (_curr, _prev) => {
-    if (!isEqual(_curr, _prev)) {
-        casesInfo.value = casesInfo.value.map((d) => ({
-            ...d,
-        }));
-    }
-});
 watch(() => state.invalid, (_invalid) => {
     emit('update:invalid', _invalid);
 }, { immediate: true });
