@@ -4,6 +4,7 @@ import {
 } from 'vue';
 
 import { useQueries } from '@tanstack/vue-query';
+import { sortBy } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Sort } from '@cloudforet/core-lib/space-connector/type';
@@ -20,6 +21,7 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
+import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
 import { normalizeAndSerialize } from '@/common/modules/widgets/_helpers/global-variable-helper';
 import { sortObjectByKeys } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
@@ -72,22 +74,44 @@ const state = reactive({
             (field) => ({ name: field, label: field, fieldInfo: { type: 'labelField', additionalType: field === 'Date' ? 'dateFormat' : undefined } }),
         ) ?? [];
         const dataFields: TableWidgetField[] = [];
-        const comparisonFields = widgetOptionsState.tableColumnComparisonInfo?.fields ?? [];
+        if (state.isPivotDataTable && refinedData.value) {
+            const headers = refinedData.value?.order ?? [];
+            const _dataFields: string[] = Object.keys(refinedData.value.data_info ?? {});
+            sortBy(_dataFields, (field) => {
+                const index = headers.indexOf(field);
+                return index === -1 ? Infinity : index;
+            })
+                .filter((field) => (widgetOptionsState.subTotalInfo?.toggleValue ? true : field !== 'Sub Total'))
+                .forEach((field) => {
+                    dataFields.push({
+                        name: field,
+                        label: field,
+                        fieldInfo: {
+                            type: 'dataField',
+                            unit: state.dataInfo?.[field]?.unit,
+                        },
+                    });
+                });
+        } else {
+            const comparisonFields = widgetOptionsState.tableColumnComparisonInfo?.fields ?? [];
 
-        (widgetOptionsState.dataFieldInfo?.data as string[] || [])?.forEach((field) => {
-            dataFields.push({
-                name: field,
-                label: field,
-                fieldInfo: {
-                    type: 'dataField',
-                    additionalType: comparisonFields.includes(field) ? 'comparison' : undefined,
-                    unit: state.dataInfo?.[field]?.unit,
-                },
-            });
-        });
+            (widgetOptionsState.dataFieldInfo?.data as string[] || [])
+                .forEach((field) => {
+                    dataFields.push({
+                        name: field,
+                        label: field,
+                        fieldInfo: {
+                            type: 'dataField',
+                            additionalType: comparisonFields.includes(field) ? 'comparison' : undefined,
+                            unit: state.dataInfo?.[field]?.unit,
+                        },
+                    });
+                });
+        }
         const basicFields = [...labelFields, ...dataFields];
         return basicFields;
     }),
+    isPivotDataTable: computed<boolean>(() => state.dataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
 });
 
 const widgetOptionsState = reactive({
@@ -105,7 +129,6 @@ const widgetOptionsState = reactive({
     tableColumnWidthInfo: computed<TableColumnWidthValue|undefined>(() => props.widgetOptions?.tableColumnWidth?.value as TableColumnWidthValue),
     customTableColumnWidthInfo: computed<CustomTableColumnWidthValue|undefined>(() => props.widgetOptions?.customTableColumnWidth?.value as CustomTableColumnWidthValue),
     missingValueInfo: computed<MissingValueValue|undefined>(() => props.widgetOptions?.missingValue?.value as MissingValueValue),
-
 });
 
 
