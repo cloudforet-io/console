@@ -43,11 +43,15 @@ let userListApiQuery = userListApiQueryHelper.data;
 const queryTagHelper = useQueryTags({ keyItemSets: USER_GROUP_USERS_SEARCH_HANDLERS });
 const { queryTags } = queryTagHelper;
 
+const storeState = reactive({
+    usersList: computed<UserListItemType[]>(() => userGroupPageState.users.list),
+});
+
 const state = reactive({
     loading: false,
     userItems: computed<UserListItemType[]>(() => {
-        if (userGroupPageState.users.list) {
-            return userGroupPageState.users.list.map((user) => ({
+        if (storeState.usersList) {
+            return storeState.usersList.map((user) => ({
                 user_id: user.user_id,
                 name: user.name,
                 auth_type: user.auth_type,
@@ -153,7 +157,7 @@ watch(() => userGroupPageGetters.selectedUserGroups, async (nv_selectedUserGroup
 }, { deep: true, immediate: true });
 
 watch(() => userGroupPageState.users, (nv_users) => {
-    if (nv_users.list && nv_users.list.length) nv_users.totalCount = nv_users.list.length;
+    if (nv_users.list && nv_users.list.length) nv_users.totalCount = nv_users.list.length ?? 0;
 }, { deep: true, immediate: true });
 </script>
 
@@ -193,8 +197,8 @@ watch(() => userGroupPageState.users, (nv_users) => {
                          searchable
                          selectable
                          multi-select
+                         sortable
                          sort-desc
-                         :refreshable="false"
                          :fields="tableState.fields"
                          :items="state.userItems"
                          :select-index="userGroupPageState.users.selectedIndices"
@@ -205,6 +209,7 @@ watch(() => userGroupPageState.users, (nv_users) => {
                          :loading="state.loading"
                          @select="handleSelect"
                          @change="handleChange"
+                         @refresh="handleChange()"
         >
             <template #col-last_accessed_at-format="{value, item}">
                 <span v-if="calculateTime(value, item.timezone) === -1">

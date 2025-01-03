@@ -341,7 +341,6 @@ onMounted(async () => {
                          sortable
                          sort-desc
                          :loading="state.loading"
-                         :refreshable="false"
                          :multi-select="false"
                          :key-item-sets="USER_GROUP_CHANNELS_SEARCH_HANDLERS"
                          :query-tags="queryTags"
@@ -351,6 +350,7 @@ onMounted(async () => {
                          :items="tableState.items"
                          @select="handleSelect"
                          @change="handleChange"
+                         @refresh="handleChange()"
         >
             <template #col-channel_id-format="{value}">
                 {{
