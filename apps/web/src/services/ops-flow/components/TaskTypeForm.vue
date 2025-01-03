@@ -122,7 +122,7 @@ const createTaskType = async (categoryId: string) => {
     try {
         await taskTypeStore.create({
             name: name.value,
-            scope: scope.value,
+            required_project: scope.value === 'PROJECT',
             assignee_pool: assigneePool.value,
             description: description.value,
             category_id: categoryId,
