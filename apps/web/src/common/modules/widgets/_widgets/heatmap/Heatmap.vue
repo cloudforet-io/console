@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useResizeObserver } from '@vueuse/core';
 import {
-    computed, defineExpose, onMounted, reactive, ref, watch,
+    computed, defineExpose, reactive, ref, watch,
 } from 'vue';
 
 import { useQuery } from '@tanstack/vue-query';
@@ -18,6 +18,7 @@ import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-tabl
 import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
+import { i18n } from '@/translations';
 
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
@@ -209,8 +210,11 @@ const queryResult = useQuery({
     staleTime: WIDGET_LOAD_STALE_TIME,
 });
 
-const widgetLoading = computed<boolean>(() => queryResult.isLoading);
-const errorMessage = computed<string>(() => queryResult.error?.value?.message);
+const widgetLoading = computed<boolean>(() => queryResult.isLoading.value);
+const errorMessage = computed<string>(() => {
+    if (!state.dataTable) return i18n.t('COMMON.WIDGETS.NO_DATA_TABLE_ERROR_MESSAGE');
+    return queryResult.error?.value?.message;
+});
 
 
 /* Util */
@@ -248,7 +252,7 @@ watch([() => state.data, () => props.widgetOptions], ([newData]) => {
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange,
     errorMessage,
-    widgetLoading: widgetLoading.value,
+    widgetLoading,
     noData: computed(() => (state.data ? !state.data.results?.length : false)),
 });
 
@@ -256,10 +260,10 @@ useResizeObserver(chartContext, throttle(() => {
     state.chart?.resize();
 }, 500));
 useWidgetInitAndRefresh({ props, emit, loadWidget });
-onMounted(async () => {
-    if (!props.dataTableId) return;
-    state.dataTable = await getWidgetDataTable(props.dataTableId);
-});
+watch(() => props.dataTableId, async (newDataTableId) => {
+    if (!newDataTableId) return;
+    state.dataTable = await getWidgetDataTable(newDataTableId);
+}, { immediate: true });
 defineExpose<WidgetExpose>({
     loadWidget,
 });

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useElementSize, useResizeObserver } from '@vueuse/core';
 import {
-    computed, defineExpose, onMounted, reactive, ref,
+    computed, defineExpose, reactive, ref, watch,
 } from 'vue';
 
 import { useQueries } from '@tanstack/vue-query';
@@ -218,7 +218,10 @@ const queryResults = useQueries({
 
 const widgetLoading = computed<boolean>(() => queryResults.value?.[0].isLoading);
 const previousLoading = computed<string>(() => queryResults.value?.[1].isLoading);
-const errorMessage = computed<string>(() => queryResults.value?.[0].error?.message);
+const errorMessage = computed<string>(() => {
+    if (!state.dataTable) return i18n.t('COMMON.WIDGETS.NO_DATA_TABLE_ERROR_MESSAGE');
+    return queryResults.value?.[0].error?.message;
+});
 
 const loadWidget = () => {
     state.runQueries = true;
@@ -235,10 +238,10 @@ useResizeObserver(valueTextRef, throttle(() => {
     setValueTextFontSize();
 }, 500));
 useWidgetInitAndRefresh({ props, emit, loadWidget });
-onMounted(async () => {
-    if (!props.dataTableId) return;
-    state.dataTable = await getWidgetDataTable(props.dataTableId);
-});
+watch(() => props.dataTableId, async (newDataTableId) => {
+    if (!newDataTableId) return;
+    state.dataTable = await getWidgetDataTable(newDataTableId);
+}, { immediate: true });
 defineExpose<WidgetExpose>({
     loadWidget,
 });

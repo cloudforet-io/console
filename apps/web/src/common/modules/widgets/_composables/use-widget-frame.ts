@@ -37,9 +37,9 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 
 interface OverridableWidgetFrameState {
     dateRange?: DateRange | ComputedRef<DateRange>;
-    errorMessage?: string | ComputedRef<string|undefined>;
-    widgetLoading?: boolean | ComputedRef<boolean>;
-    noData?: boolean | ComputedRef<boolean>;
+    errorMessage?: ComputedRef<string|undefined>;
+    widgetLoading?: ComputedRef<boolean>;
+    noData?: ComputedRef<boolean>;
 }
 type DataTableModel = PublicDataTableModel | PrivateDataTableModel;
 const { getProperRouteLocation } = useProperRouteLocation();

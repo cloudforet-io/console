@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useResizeObserver } from '@vueuse/core/index';
 import {
-    computed, defineExpose, onMounted, reactive, ref, watch,
+    computed, defineExpose, reactive, ref, watch,
 } from 'vue';
 
 import { useQuery } from '@tanstack/vue-query';
@@ -20,6 +20,7 @@ import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-tabl
 import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
+import { i18n } from '@/translations';
 
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
@@ -203,7 +204,10 @@ const queryResult = useQuery({
 });
 
 const widgetLoading = computed<boolean>(() => queryResult.isLoading.value);
-const errorMessage = computed<string|undefined>(() => queryResult.error?.value?.message);
+const errorMessage = computed<string|undefined>(() => {
+    if (!state.dataTable) return i18n.t('COMMON.WIDGETS.NO_DATA_TABLE_ERROR_MESSAGE');
+    return queryResult.error?.value?.message;
+});
 
 /* Util */
 const drawChart = (rawData?: WidgetLoadResponse|null) => {
@@ -268,10 +272,10 @@ useWidgetInitAndRefresh({ props, emit, loadWidget });
 useResizeObserver(chartContext, throttle(() => {
     state.chart?.resize();
 }, 500));
-onMounted(async () => {
-    if (!props.dataTableId) return;
-    state.dataTable = await getWidgetDataTable(props.dataTableId);
-});
+watch(() => props.dataTableId, async (newDataTableId) => {
+    if (!newDataTableId) return;
+    state.dataTable = await getWidgetDataTable(newDataTableId);
+}, { immediate: true });
 defineExpose<WidgetExpose>({
     loadWidget,
 });
