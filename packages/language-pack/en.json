@@ -1939,9 +1939,9 @@
 				"NAME_REQUIRED": "Please enter name.",
 				"NUMBER": "Number",
 				"NUMBER_INPUT": "Number Input",
-				"NUMBER_INPUT_INCONSISTENT_STEP_VALUE": "",
+				"NUMBER_INPUT_INCONSISTENT_STEP_VALUE": "The input value must match the step",
 				"NUMBER_INPUT_INVALID_STEP_VALUE": "The input value must match the step",
-				"NUMBER_INPUT_OUT_OF_RANGE_VALUE": "Enter a valid number (minof {min} max of {max})",
+				"NUMBER_INPUT_OUT_OF_RANGE_VALUE": "Enter a valid number (min of {min} max of {max})",
 				"NUMBER_INPUT_STEP_INFO": "The allowable input step is {step}",
 				"SELECTION_TYPE": "Selection Type",
 				"SINGLE_SELECT": "Single select",
@@ -2164,8 +2164,8 @@
 					"PROGRESS_BAR_DESCRIPTION_1": "The percentage is calculated as:",
 					"PROGRESS_BAR_DESCRIPTION_2": "[Basis Field ÷ Total Field x 100]",
 					"REQUIRED_FIELDS": "Required Fields",
-					"SANKEY_AXIS": "Sankey Axis",
-					"SANKEY_AXIS_WARNING": "There can be a maximum of 2 Sankey Axis.",
+					"SANKEY_AXIS": "Dimension",
+					"SANKEY_AXIS_WARNING": "There can be a maximum of 2 dimension.",
 					"STACK_BY": "Stack by",
 					"START": "Start",
 					"STATIC_FIELD": "Static Field",
@@ -2218,7 +2218,7 @@
 			"UNIT": "Unit",
 			"UPDATE_TITLE": "Update Widget",
 			"VALIDATION_PROPERTY_NOT_EXIST": "The previously selected variable from dashboard has been changed.",
-			"월": ""
+			"월": "Based on"
 		}
 	},
 	"HOME": {
