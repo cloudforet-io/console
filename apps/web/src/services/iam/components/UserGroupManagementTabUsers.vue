@@ -208,9 +208,12 @@ watch(() => userGroupPageState.users, (nv_users) => {
         >
             <template #col-last_accessed_at-format="{value, item}">
                 <span v-if="calculateTime(value, item.timezone) === -1">
-                    {{ $t('IAM.USER_GROUP.TAB.USERS.TODAY') }}
+                    -
                 </span>
                 <span v-else-if="calculateTime(value, item.timezone) === 0">
+                    {{ $t('IAM.USER_GROUP.TAB.USERS.TODAY') }}
+                </span>
+                <span v-else-if="calculateTime(value, item.timezone) === 1">
                     {{ $t('IAM.USER_GROUP.TAB.USERS.YESTERDAY') }}
                 </span>
                 <span v-else>

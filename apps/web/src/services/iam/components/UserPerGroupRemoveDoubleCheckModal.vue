@@ -37,7 +37,7 @@ const handleConfirm = async () => {
             users,
         });
         emit('confirm');
-        showSuccessMessage(i18n.t('IAM.USER_GROUP.MODAL.REMOVE_USER.SHOW_SUCCESS_MESSAGE'), '');
+        showSuccessMessage('', i18n.t('IAM.USER_GROUP.MODAL.REMOVE_USER.SHOW_SUCCESS_MESSAGE'));
     } finally {
         state.loading = false;
         handleCancel();
