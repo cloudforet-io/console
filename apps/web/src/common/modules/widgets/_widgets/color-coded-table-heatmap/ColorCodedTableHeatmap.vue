@@ -71,7 +71,7 @@ const state = reactive({
     boxHeight: 0,
     scrollHeight: 0,
     xAxisData: computed<string[]>(() => {
-        if (isDateField(state.xAxisField)) {
+        if (isDateField(widgetOptionsState.xAxisInfo?.data)) {
             const _isSeparatedDate = widgetOptionsState.xAxisInfo?.data !== DATE_FIELD.DATE;
             return getWidgetDateFields(widgetOptionsState.granularityInfo?.granularity, state.widgetDateRange.start, state.widgetDateRange.end, _isSeparatedDate);
         }
@@ -177,33 +177,7 @@ const getColor = (val: string|number): string => {
     });
     return _color;
 };
-
-/* Watcher */
-watch(() => widgetOptionsState.formatRulesInfo?.rules, async () => {
-    state.legendList = (widgetOptionsState.formatRulesInfo?.rules ?? [])?.map((d) => ({
-        name: d.text,
-        color: d.color,
-        disabled: false,
-    })) || [];
-}, { immediate: true });
-
-const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
-    dateRange,
-    errorMessage,
-    widgetLoading: widgetLoading.value,
-    noData: computed(() => (state.data ? !state.data?.results?.length : false)),
-});
-
-/* Lifecycle */
-useWidgetInitAndRefresh({ props, emit, loadWidget });
-onMounted(async () => {
-    if (!props.dataTableId) return;
-    state.dataTable = await getWidgetDataTable(props.dataTableId);
-});
-defineExpose<WidgetExpose>({
-    loadWidget,
-});
-useResizeObserver(colorCodedTableRef, throttle(() => {
+const resizeWidget = () => {
     const _containerWidth = colorCodedTableRef.value?.clientWidth;
     const _containerHeight = colorCodedTableRef.value?.clientHeight;
     if (!_containerWidth || !_containerHeight) return;
@@ -227,6 +201,38 @@ useResizeObserver(colorCodedTableRef, throttle(() => {
         if (_containerHeight < _scrollHeight) state.scrollHeight = `${_scrollHeight}px`;
         else state.scrollHeight = '100%';
     }
+};
+
+/* Watcher */
+watch(() => widgetOptionsState.formatRulesInfo?.rules, async () => {
+    state.legendList = (widgetOptionsState.formatRulesInfo?.rules ?? [])?.map((d) => ({
+        name: d.text,
+        color: d.color,
+        disabled: false,
+    })) || [];
+}, { immediate: true });
+
+const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
+    dateRange,
+    errorMessage,
+    widgetLoading: widgetLoading.value,
+    noData: computed(() => (state.data ? !state.data?.results?.length : false)),
+});
+watch(() => widgetOptionsState, () => {
+    resizeWidget();
+}, { deep: true });
+
+/* Lifecycle */
+useWidgetInitAndRefresh({ props, emit, loadWidget });
+onMounted(async () => {
+    if (!props.dataTableId) return;
+    state.dataTable = await getWidgetDataTable(props.dataTableId);
+});
+defineExpose<WidgetExpose>({
+    loadWidget,
+});
+useResizeObserver(colorCodedTableRef, throttle(() => {
+    resizeWidget();
 }, 500));
 </script>
 
@@ -273,7 +279,7 @@ useResizeObserver(colorCodedTableRef, throttle(() => {
                                        position="bottom"
                                        class="tooltip-wrapper"
                             >
-                                {{ targetValue(xField, yField, 'table') }}
+                                <span>{{ targetValue(xField, yField, 'table') }}</span>
                             </p-tooltip>
                         </div>
                         <div class="x-field-text">
