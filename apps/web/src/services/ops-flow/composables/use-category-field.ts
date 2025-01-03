@@ -3,6 +3,8 @@ import { computed, ref } from 'vue';
 import { getTextHighlightRegex } from '@cloudforet/mirinae';
 import type { AutocompleteHandler, SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
+import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
+import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
 import { getParticle, i18n } from '@/translations';
 
 import { useFieldValidator } from '@/common/composables/form-validator';
@@ -43,7 +45,33 @@ export const useCategoryField = ({
         categoryValidator.setValue(selectedCategories);
     };
 
-    const dropdownCategoryItems = ref<CategoryItem[]>([]);
+    const taskCategories = computed<TaskCategoryModel[]>(() => taskCategoryStore.getters.taskCategoriesIncludingDeleted);
+    const taskTypesByCategoryId = computed<Record<string, TaskTypeModel[]|undefined>>(() => taskTypeStore.state.itemsByCategoryId);
+    const preloadCategories = async () => {
+        await taskCategoryStore.list();
+        if (hasTaskTypeOnly) {
+            await taskTypeStore.listByCategoryIds(taskCategories.value.map((c) => c.category_id));
+        }
+    };
+
+    const dropdownCategoryItems = computed<CategoryItem[]>(() => {
+        if (hasTaskTypeOnly) {
+            return taskCategories.value.map((c) => {
+                const taskTypes = taskTypesByCategoryId.value[c.category_id];
+                return {
+                    name: c.category_id,
+                    label: c.name,
+                    disabled: !taskTypes || taskTypes.length === 0,
+                    packageId: c.package_id,
+                };
+            });
+        }
+        return taskCategories.value.map((c) => ({
+            name: c.category_id,
+            label: c.name,
+            packageId: c.package_id,
+        }) || []);
+    });
     const categoryItemsByPackage = computed<Record<string, CategoryItem[]>>(() => {
         const map: Record<string, CategoryItem[]> = {};
         dropdownCategoryItems.value.forEach((item) => {
@@ -56,29 +84,7 @@ export const useCategoryField = ({
         return map;
     });
 
-    const loadDropdownCategoryItems = async (): Promise<CategoryItem[]> => {
-        const taskCategories = await taskCategoryStore.list() ?? [];
-
-        if (hasTaskTypeOnly) {
-            await taskTypeStore.listByCategoryIds(taskCategories.map((c) => c.category_id));
-            return taskCategories.map((c) => {
-                const taskTypes = taskTypeStore.state.itemsByCategoryId[c.category_id];
-                return {
-                    name: c.category_id,
-                    label: c.name,
-                    disabled: !taskTypes || taskTypes.length === 0,
-                    packageId: c.package_id,
-                };
-            });
-        }
-        return taskCategoryStore.getters.taskCategories.map((c) => ({
-            name: c.category_id,
-            label: c.name,
-            packageId: c.package_id,
-        }) || []);
-    };
-    const categoryMenuItemsHandler: AutocompleteHandler = async (keyword: string, pageStart = 1, pageLimit = 10) => {
-        dropdownCategoryItems.value = await loadDropdownCategoryItems();
+    const categoryMenuItemsHandler: AutocompleteHandler = (keyword: string, pageStart = 1, pageLimit = 10) => {
         const filteredItems = dropdownCategoryItems.value.filter((item) => getTextHighlightRegex(keyword).test(item.label as string));
         const _totalCount = pageStart - 1 + Number(pageLimit);
         const _slicedResults = filteredItems.slice(pageStart - 1, _totalCount);
@@ -89,13 +95,11 @@ export const useCategoryField = ({
     };
 
     const prevSelectedCategoryItems = ref<CategoryItem[]>([]);
-    const setInitialCategoriesByPackageId = async (packageId?: string) => {
-        dropdownCategoryItems.value = await loadDropdownCategoryItems();
+    const setInitialCategoriesByPackageId = (packageId?: string) => {
         prevSelectedCategoryItems.value = packageId ? categoryItemsByPackage.value[packageId] ?? [] : [];
         categoryValidator.setValue(prevSelectedCategoryItems.value);
     };
-    const setInitialCategory = async (categoryId: string) => {
-        dropdownCategoryItems.value = await loadDropdownCategoryItems();
+    const setInitialCategory = (categoryId: string) => {
         prevSelectedCategoryItems.value = taskCategoryStore.getters.taskCategoriesIncludingDeleted.filter((c) => c.category_id === categoryId).map((c) => ({
             name: c.category_id,
             label: c.name,
@@ -162,6 +166,7 @@ export const useCategoryField = ({
     };
 
     return {
+        preloadCategories,
         selectedCategoryItems,
         selectedCategoryIds,
         categoryValidator,

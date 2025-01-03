@@ -1,5 +1,7 @@
 import type { ComputedRef } from 'vue';
-import { reactive, computed, onUnmounted } from 'vue';
+import {
+    reactive, computed, onUnmounted, onMounted,
+} from 'vue';
 
 import { defineStore } from 'pinia';
 
@@ -24,6 +26,10 @@ export const useBoardPageStore = defineStore('board-page', () => {
             state.currentCategoryId = categoryId;
         },
     };
+
+    onMounted(() => {
+        if (!taskCategoryStore.state.loading) taskCategoryStore.list();
+    });
 
     const disposeSelf = () => {
         const store = useBoardPageStore();

@@ -1,4 +1,4 @@
-import { reactive, computed } from 'vue';
+import { reactive, computed, onMounted } from 'vue';
 
 import { isEmpty, isEqual } from 'lodash';
 import { defineStore } from 'pinia';
@@ -264,6 +264,9 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         },
     };
 
+    onMounted(() => {
+        if (!taskCategoryStore.state.loading) taskCategoryStore.list();
+    });
 
 
     return {

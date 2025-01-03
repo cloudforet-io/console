@@ -51,6 +51,7 @@ const isMinimalCreateMode = computed(() => taskContentFormState.mode === 'create
 
 /* category */
 const {
+    preloadCategories,
     selectedCategoryItems,
     categoryValidator,
     categoryMenuItemsHandler,
@@ -194,7 +195,8 @@ const initForViewMode = async (task?: TaskModel) => {
 
     if (!task) return;
     // set category
-    await setInitialCategory(task.category_id);
+    await preloadCategories();
+    setInitialCategory(task.category_id);
     taskContentFormStore.setCurrentCategoryId(task.category_id);
     // set task type
     await taskContentFormStore.setCurrentTaskType(task.task_type_id);
@@ -216,7 +218,8 @@ const initForCreateMode = async (categoryId?: string, taskType?: TaskTypeModel) 
 
     if (!categoryId) return;
 
-    await setInitialCategory(categoryId);
+    await preloadCategories();
+    setInitialCategory(categoryId);
     // init selected status
     const category = taskContentFormGetters.currentCategory;
     if (category) {

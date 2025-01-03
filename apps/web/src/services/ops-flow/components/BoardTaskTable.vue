@@ -48,7 +48,13 @@ const taskManagementTemplateStore = useTaskManagementTemplateStore();
 const loading = ref<boolean>(false);
 const taskAPI = useTaskAPI();
 const tasks = ref<TaskModel[]|undefined>(undefined);
-const categoriesById = ref<Record<string, TaskCategoryModel>>({});
+const categoriesById = computed<Record<string, TaskCategoryModel>>(() => {
+    const map = {} as Record<string, TaskCategoryModel>;
+    taskCategoryStore.getters.taskCategoriesIncludingDeleted.forEach((category) => {
+        map[category.category_id] = category;
+    });
+    return map;
+});
 const taskTypesById = ref<Record<string, TaskTypeModel>>({});
 
 
@@ -130,26 +136,16 @@ const listCategoriesAndTaskTypes = async () => {
             query: { only: ['task_type_id', 'name'] },
         }),
     ]);
-    results.forEach((result, idx) => {
+    results.forEach((result) => {
         if (result.status === 'fulfilled') {
-            if (idx === 0) { // category case
-                const categories = result.value;
-                if (categories) {
-                    categories.forEach((category) => {
-                        categoriesById.value[category.category_id] = category;
-                    });
-                }
-            } else { // type case
-                const taskTypes = result.value;
-                if (taskTypes) {
-                    taskTypes.forEach((taskType) => {
-                        taskTypesById.value[taskType.task_type_id] = taskType;
-                    });
-                }
+            const taskTypes = result.value;
+            if (taskTypes) {
+                taskTypes.forEach((taskType) => {
+                    taskTypesById.value[taskType.task_type_id] = taskType;
+                });
             }
         }
     });
-    categoriesById.value = { ...categoriesById.value };
     taskTypesById.value = { ...taskTypesById.value };
     hasCategoriesAndTypesLoaded = true;
 };

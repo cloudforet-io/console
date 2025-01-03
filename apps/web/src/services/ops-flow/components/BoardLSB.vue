@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { onMounted } from 'vue';
+
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import LSBContainer from '@/common/modules/navigations/new-lsb/LSBContainer.vue';
 import LSBDivider from '@/common/modules/navigations/new-lsb/LSBDivider.vue';
@@ -15,6 +17,10 @@ const taskCategoryStore = useTaskCategoryStore();
 const taskCategoryGetters = taskCategoryStore.getters;
 const { getProperRouteLocation } = useProperRouteLocation();
 const predicate: LSBRouterPredicate = (to, currentRoute) => to.query?.categoryId === currentRoute.query.categoryId;
+
+onMounted(() => {
+    taskCategoryStore.list();
+});
 </script>
 
 <template>
