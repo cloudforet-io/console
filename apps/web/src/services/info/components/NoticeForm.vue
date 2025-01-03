@@ -27,6 +27,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { emptyHtmlRegExp } from '@/common/components/editor/extensions/image/helper';
 import type { Attachment } from '@/common/components/editor/extensions/image/type';
 import TextEditor from '@/common/components/editor/TextEditor.vue';
+import { useEditorContentTransformer } from '@/common/composables/editor-content-transformer';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFileUploader } from '@/common/composables/file-uploader';
 import { useFormValidator } from '@/common/composables/form-validator';
@@ -92,10 +93,11 @@ const {
     },
 });
 
+const { transformEditorContent } = useEditorContentTransformer();
 const formData = computed<Omit<PostUpdateParameters, 'post_id'>>(() => ({
     title: noticeTitle.value,
     writer: writerName.value,
-    contents: contents.value,
+    contents: transformEditorContent(contents.value, 'html'),
     files: state.attachments.map(({ fileId }) => fileId) as string[],
     options: {
         is_pinned: state.isPinned,

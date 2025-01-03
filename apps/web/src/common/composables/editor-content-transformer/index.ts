@@ -34,15 +34,15 @@ export const useEditorContentTransformer = (op?: {
         });
     };
 
-    const transformEditorContent = (content: string): string => {
-        if (contentType === 'markdown') {
+    const transformEditorContent = (content: string, _contentType: 'html'|'markdown'): string => {
+        if (_contentType === 'markdown') {
             return transformMarkdownContent(content);
         }
         return transformHtmlContent(content);
     };
 
 
-    const transformedEditorContent = computed(() => transformEditorContent(value ? value.value : ''));
+    const transformedEditorContent = computed(() => transformEditorContent(value ? value.value : '', contentType));
 
     return {
         transformedEditorContent,

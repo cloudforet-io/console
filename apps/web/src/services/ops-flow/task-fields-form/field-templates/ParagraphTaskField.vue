@@ -45,7 +45,7 @@ const editorContent = ref(fieldValue.value);
 const { transformEditorContent } = useEditorContentTransformer();
 const handleUpdateEditorContent = (val: string) => {
     editorContent.value = val;
-    updateFieldValue(transformEditorContent(val));
+    updateFieldValue(transformEditorContent(val, 'markdown'));
 };
 </script>
 
