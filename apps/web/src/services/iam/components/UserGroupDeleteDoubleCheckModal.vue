@@ -82,7 +82,6 @@ const fetchDeleteUserGroup = async (params: UserGroupDeleteUserGroupParameters) 
 const fetchServiceList = async () => {
     try {
         const { results } = await SpaceConnector.clientV2.alertManager.service.list<ServiceListParameters, ListResponse<ServiceModel>>();
-        console.log(results);
         if (results) {
             const filteredResults = results.filter((result) => result.members.USER_GROUP !== undefined && result.members.USER_GROUP.length > 0);
             state.filteredServices = filteredResults.filter((d) => d.members.USER_GROUP.includes(storeState.selectedUserGroupIds[0]));

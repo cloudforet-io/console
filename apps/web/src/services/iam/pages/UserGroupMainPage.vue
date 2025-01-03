@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { onUnmounted } from 'vue';
+
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PHorizontalLayout } from '@cloudforet/mirinae';
 
@@ -37,6 +39,10 @@ const refreshUserGroupList = async () => {
         userGroupPageState.loading = false;
     }
 };
+
+onUnmounted(() => {
+    userGroupPageStore.reset();
+});
 </script>
 
 <template>

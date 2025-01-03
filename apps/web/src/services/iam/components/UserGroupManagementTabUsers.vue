@@ -16,6 +16,7 @@ import { i18n } from '@/translations';
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import { calculateTime } from '@/services/iam/composables/refined-table-data';
+import { makeUserValueHandler } from '@/services/iam/composables/user-data-helper';
 import {
     USER_GROUP_MODAL_TYPE,
     USER_GROUP_USERS_SEARCH_HANDLERS,
@@ -42,11 +43,15 @@ let userListApiQuery = userListApiQueryHelper.data;
 const queryTagHelper = useQueryTags({ keyItemSets: USER_GROUP_USERS_SEARCH_HANDLERS });
 const { queryTags } = queryTagHelper;
 
+const storeState = reactive({
+    usersList: computed<UserListItemType[]>(() => userGroupPageState.users.list),
+});
+
 const state = reactive({
     loading: false,
     userItems: computed<UserListItemType[]>(() => {
-        if (userGroupPageState.users.list) {
-            return userGroupPageState.users.list.map((user) => ({
+        if (storeState.usersList) {
+            return storeState.usersList.map((user) => ({
                 user_id: user.user_id,
                 name: user.name,
                 auth_type: user.auth_type,
@@ -67,8 +72,8 @@ const tableState = reactive({
         { name: 'last_accessed_at', label: 'Last Activity' },
     ]),
     valueHandlerMap: computed(() => ({
-        user_id: makeDistinctValueHandler('identity.WorkspaceUser', 'user_id'),
-        name: makeDistinctValueHandler('identity.WorkspaceUser', 'name', 'string', [{ k: 'name', v: '', o: 'not' }]),
+        user_id: makeUserValueHandler('identity.WorkspaceUser', 'user_id', 'string', userGroupPageGetters.selectedUserGroups[0].users, [], 50),
+        name: makeUserValueHandler('identity.WorkspaceUser', 'name', 'string', userGroupPageState.users.list.map((user) => user.name), [{ k: 'name', v: '', o: 'not' }], 50),
         auth_type: makeDistinctValueHandler('identity.WorkspaceUser', 'auth_type'),
         last_accessed_at: makeDistinctValueHandler('identity.WorkspaceUser', 'last_accessed_at', 'datetime'),
     })),
@@ -152,7 +157,7 @@ watch(() => userGroupPageGetters.selectedUserGroups, async (nv_selectedUserGroup
 }, { deep: true, immediate: true });
 
 watch(() => userGroupPageState.users, (nv_users) => {
-    if (nv_users.list && nv_users.list.length) nv_users.totalCount = nv_users.list.length;
+    if (nv_users.list && nv_users.list.length) nv_users.totalCount = nv_users.list.length ?? 0;
 }, { deep: true, immediate: true });
 </script>
 
@@ -192,6 +197,7 @@ watch(() => userGroupPageState.users, (nv_users) => {
                          searchable
                          selectable
                          multi-select
+                         sortable
                          sort-desc
                          :fields="tableState.fields"
                          :items="state.userItems"
@@ -203,12 +209,16 @@ watch(() => userGroupPageState.users, (nv_users) => {
                          :loading="state.loading"
                          @select="handleSelect"
                          @change="handleChange"
+                         @refresh="handleChange()"
         >
             <template #col-last_accessed_at-format="{value, item}">
                 <span v-if="calculateTime(value, item.timezone) === -1">
-                    {{ $t('IAM.USER_GROUP.TAB.USERS.TODAY') }}
+                    -
                 </span>
                 <span v-else-if="calculateTime(value, item.timezone) === 0">
+                    {{ $t('IAM.USER_GROUP.TAB.USERS.TODAY') }}
+                </span>
+                <span v-else-if="calculateTime(value, item.timezone) === 1">
                     {{ $t('IAM.USER_GROUP.TAB.USERS.YESTERDAY') }}
                 </span>
                 <span v-else>

@@ -105,7 +105,7 @@ const fetchAddUsers = async (params: UserGroupAddUsersParameters) => {
 .user-group-management-add-users-modal {
     min-height: 34.875rem;
     .modal-contents {
-        @apply flex flex-col bg-primary-4 rounded-md;
+        @apply flex flex-col;
         margin-bottom: 9rem;
         padding: 1rem;
         gap: 1rem;

@@ -45,7 +45,7 @@ export const USER_GROUP_CHANNELS_SEARCH_HANDLERS: KeyItemSet[] = [
         title: 'Properties',
         items: [
             { name: 'name', label: 'Name' },
-            { name: 'schedule', label: 'Schedule' },
+            // { name: 'schedule', label: 'Schedule' },
         ],
     },
 ];
