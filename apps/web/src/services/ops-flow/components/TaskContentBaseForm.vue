@@ -254,13 +254,10 @@ createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, (
         createModeInitWatchStop = undefined;
         return;
     }
+    if (!isCreateMode.value) return;
+    if (isMinimalCreateMode.value && !taskType) return; // minimal create is from landing page. task type is already selected and must be initialized.
 
-    if (isCreateMode.value) {
-        await initForCreateMode(categoryId);
-    } else if (isMinimalCreateMode.value) { // minimal create mode always has task type (from landing page)
-        if (!taskType) return;
-        await initForCreateMode(categoryId, taskType);
-    }
+    await initForCreateMode(categoryId, taskType);
 }, { immediate: true });
 </script>
 
