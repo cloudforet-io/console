@@ -16,6 +16,7 @@ import { i18n } from '@/translations';
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import { calculateTime } from '@/services/iam/composables/refined-table-data';
+import { makeUserValueHandler } from '@/services/iam/composables/user-data-helper';
 import {
     USER_GROUP_MODAL_TYPE,
     USER_GROUP_USERS_SEARCH_HANDLERS,
@@ -67,8 +68,8 @@ const tableState = reactive({
         { name: 'last_accessed_at', label: 'Last Activity' },
     ]),
     valueHandlerMap: computed(() => ({
-        user_id: makeDistinctValueHandler('identity.WorkspaceUser', 'user_id'),
-        name: makeDistinctValueHandler('identity.WorkspaceUser', 'name', 'string', [{ k: 'name', v: '', o: 'not' }]),
+        user_id: makeUserValueHandler('identity.WorkspaceUser', 'user_id', 'string', userGroupPageGetters.selectedUserGroups[0].users, [], 50),
+        name: makeUserValueHandler('identity.WorkspaceUser', 'name', 'string', userGroupPageState.users.list.map((user) => user.name), [{ k: 'name', v: '', o: 'not' }], 50),
         auth_type: makeDistinctValueHandler('identity.WorkspaceUser', 'auth_type'),
         last_accessed_at: makeDistinctValueHandler('identity.WorkspaceUser', 'last_accessed_at', 'datetime'),
     })),
@@ -193,6 +194,7 @@ watch(() => userGroupPageState.users, (nv_users) => {
                          selectable
                          multi-select
                          sort-desc
+                         :refreshable="false"
                          :fields="tableState.fields"
                          :items="state.userItems"
                          :select-index="userGroupPageState.users.selectedIndices"
