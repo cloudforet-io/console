@@ -111,12 +111,7 @@ const state = reactive({
     protocolIcon: '',
 });
 
-const totalCount = computed<number>(() => {
-    if (userGroupPageGetters.selectedUserGroups && userGroupPageGetters.selectedUserGroups[0].notification_channel) {
-        return userGroupPageGetters.selectedUserGroups[0].notification_channel.length;
-    }
-    return 0;
-});
+const totalCount = ref(0);
 
 /* Component */
 const handleChange = async (options: any = {}) => {
@@ -148,12 +143,6 @@ const handleChange = async (options: any = {}) => {
         state.loading = false;
     }
 };
-
-watch(isScheduleTagged, (nv_scheduled_tag) => {
-    if (nv_scheduled_tag) {
-        isScheduleTagged.value = false;
-    }
-}, { immediate: true });
 
 const handleSelect = async (index: number[]) => {
     userGroupPageState.userGroupChannels.selectedIndices = index;
@@ -218,6 +207,19 @@ const handleUpdateModal = async (modalType: string) => {
 };
 
 /* Watcher */
+watch(isScheduleTagged, (nv_scheduled_tag) => {
+    if (nv_scheduled_tag) {
+        isScheduleTagged.value = false;
+    }
+}, { immediate: true });
+
+watch(() => userGroupPageGetters.selectedUserGroups, () => {
+    if (userGroupPageGetters.selectedUserGroups && userGroupPageGetters.selectedUserGroups[0].notification_channel) {
+        return userGroupPageGetters.selectedUserGroups[0].notification_channel.length;
+    }
+    return 0;
+}, { deep: true, immediate: true });
+
 watch(() => userGroupPageGetters.selectedUserGroups, async (nv_selected_user_group, ov_selected_user_group) => {
     if (nv_selected_user_group !== ov_selected_user_group && nv_selected_user_group[0].user_group_id) {
         try {
@@ -237,14 +239,6 @@ watch([() => tableState.items, () => userGroupPageGetters.selectedUserGroupChann
     }
 }, { deep: true, immediate: true });
 
-// watch(() => userGroupPageState.userGroupChannels.selectedIndices, async (nv_selected_channel) => {
-//     if (nv_selected_channel.length === 1) {
-//         await fetchGetNotificationProtocol({
-//           protocol_id:
-//         });
-//     }
-// }, { deep: true, immediate: true });
-
 /* API */
 const fetchGetNotificationProtocol = async (params: NotificationProtocolGetParameters) => {
     try {
@@ -263,6 +257,7 @@ const fetchListUserGroupChannel = async (params: UserGroupChannelListParameters)
     try {
         const { results } = await SpaceConnector.clientV2.alertManager.userGroupChannel.list<UserGroupChannelListParameters, ListResponse<UserGroupChannelModel>>(params);
         userGroupPageState.userGroupChannels.list = results;
+        totalCount.value = results.length;
     } catch (e) {
         ErrorHandler.handleError(e, true);
     }
