@@ -204,6 +204,8 @@ export function makeEnumValueHandler(
             }, [] as ValueItem[]);
         }
 
+        console.log(res, totalCount);
+
         return {
             results: res,
             totalCount,

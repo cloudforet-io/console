@@ -3102,7 +3102,7 @@
 				},
 				"DELETE": {
 					"SHOW_SUCCESS_MESSAGE": "User Group successfully Deleted",
-					"TITLE": "Are you sure you want to Delete User Group?"
+					"TITLE": "This group includes the following service."
 				},
 				"DELETE_CHANNEL": {
 					"DELETE": "Delete",

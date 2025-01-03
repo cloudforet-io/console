@@ -95,15 +95,19 @@ const apiQuery = new ApiQueryHelper();
 const listProtocol = async () => {
     try {
         state.loading = true;
-        if (props.projectId) {
-            apiQuery.setFilters([])
-                .setSort('protocol_type');
-        } else {
-            apiQuery.setFilters([{ k: 'protocol_type', o: '=', v: 'EXTERNAL' }]);
-        }
-        const res = await SpaceConnector.clientV2.notification.protocol.list<ProtocolListParameters, ListResponse<ProtocolModel>>({
+        // if (props.projectId) {
+        //     apiQuery.setFilters([])
+        //         .setSort('protocol_state');
+        // } else {
+        //     apiQuery.setFilters([{ k: 'protocol_state', o: '=', v: 'ENABLED' }]);
+        // }
+        // const res = await SpaceConnector.clientV2.notification.protocol.list<ProtocolListParameters, ListResponse<ProtocolModel>>({
+        //     query: apiQuery.data,
+        // });
+        const res = await SpaceConnector.clientV2.alertManager.notificationProtocol.list<ProtocolListParameters, ListResponse<ProtocolModel>>({
             query: apiQuery.data,
         });
+        console.log(res);
         state.protocolResp = res.results ?? [];
     } catch (e) {
         ErrorHandler.handleError(e);

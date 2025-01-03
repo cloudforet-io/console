@@ -1,8 +1,8 @@
+import type { MEMBERS_TYPE } from '@/schema/identity/user-group/constants';
 import type {
-    NotificationChannelPerUserGroupModel,
     UserGroupModel,
 } from '@/schema/identity/user-group/model';
 
 export type UserGroupListItemType = Partial<UserGroupModel>;
 
-export type NotificationChannelListPerUserGroupItemType = Partial<NotificationChannelPerUserGroupModel>;
+export type MembersType = typeof MEMBERS_TYPE[keyof typeof MEMBERS_TYPE];

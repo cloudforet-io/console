@@ -3,7 +3,9 @@ import {
     computed, onMounted, reactive, ref, watch,
 } from 'vue';
 
-import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
+import {
+    makeDistinctValueHandler,
+} from '@cloudforet/core-lib/component-util/query-search';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -12,14 +14,20 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { NotificationProtocolGetParameters } from '@/schema/alert-manager/notification-protocol/api-verbs/get';
 import type { NotificationProtocolListParameters } from '@/schema/alert-manager/notification-protocol/api-verbs/list';
 import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
 import type { UserGroupChannelGetParameters } from '@/schema/alert-manager/user-group-channel/api-verbs/get';
 import type { UserGroupChannelListParameters } from '@/schema/alert-manager/user-group-channel/api-verbs/list';
 import { USER_GROUP_CHANNEL_SCHEDULE_TYPE } from '@/schema/alert-manager/user-group-channel/constants';
 import type { UserGroupChannelModel } from '@/schema/alert-manager/user-group-channel/model';
-import type { UserGroupChannelScheduleInfoType } from '@/schema/alert-manager/user-group-channel/type';
+import type {
+    UserGroupChannelScheduleType,
+} from '@/schema/alert-manager/user-group-channel/type';
 import { i18n } from '@/translations';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
@@ -43,6 +51,9 @@ const userGroupPageGetters = userGroupPageStore.getters;
 
 const notificationChannelCreateFormStore = useNotificationChannelCreateFormStore();
 
+const allReferenceStore = useAllReferenceStore();
+const allReferenceGetters = allReferenceStore.getters;
+
 const channelListApiQueryHelper = new ApiQueryHelper()
     .setPageStart(userGroupPageState.userGroupChannels.pageStart)
     .setSort('name', true);
@@ -55,12 +66,16 @@ const { queryTags } = queryTagHelper;
 interface ChannelItem {
   name: string;
   channel_id: string;
-  schedule: UserGroupChannelScheduleInfoType;
+  // schedule: UserGroupChannelScheduleInfoType;
+  SCHEDULE_TYPE: UserGroupChannelScheduleType;
   details?: any;
 }
 
 const isDeleteAble = ref<boolean>(false);
-const channelList = ref<any>();
+
+const storeState = reactive({
+    plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
+});
 
 const tableState = reactive({
     fields: computed(() => [
@@ -73,17 +88,24 @@ const tableState = reactive({
         return channels.map((channel) => ({
             name: channel.name,
             channel_id: channel.protocol_id,
-            schedule: channel.schedule,
+            schedule: channel.schedule.SCHEDULE_TYPE,
         }));
     }),
     valueHandlerMap: computed(() => ({
         name: makeDistinctValueHandler('alert_manager.UserGroupChannel', 'name'),
+        // schedule: makeEnumValueHandler({
+        //     WEEKDAYS: 'Weekdays',
+        //     EVERYDAY: 'Everyday',
+        //     CUSTOM: 'Custom',
+        // }),
+        schedule: makeDistinctValueHandler('alert_manager.UserGroupChannel', 'schedule.SCHEDULE_TYPE'),
     })),
 });
 
 const state = reactive({
     loading: false,
     channelName: '',
+    protocolIcon: '',
 });
 
 const totalCount = computed<number>(() => {
@@ -123,30 +145,42 @@ const handleUpdateModal = async (modalType: string) => {
         });
         if (result) {
             const {
-                protocol_id, name, schedule,
+                protocol_id, schedule, name,
             } = result;
 
-            notificationChannelCreateFormStore.$patch((_state) => {
-                _state.state.selectedProtocol.protocol_id = protocol_id;
-                _state.state.channelName = name;
-                _state.state.scheduleInfo = {
-                    SCHEDULE_TYPE: schedule.SCHEDULE_TYPE,
-                    TIMEZONE: schedule.TIMEZONE,
-                    MON: schedule.MON,
-                    TUE: schedule.TUE,
-                    WED: schedule.WED,
-                    THU: schedule.THU,
-                    FRI: schedule.FRI,
-                    SAT: schedule.SAT,
-                    SUN: schedule.SUN,
-                };
-            });
+            if (protocol_id) {
+                const protocolResult = await fetchGetNotificationProtocol({
+                    protocol_id,
+                });
+
+                if (protocolResult && storeState.plugins[protocolResult.plugin_info.plugin_id] !== undefined) {
+                    state.protocolIcon = storeState.plugins[protocolResult.plugin_info.plugin_id]?.icon || '';
+
+                    notificationChannelCreateFormStore.$patch((_state) => {
+                        _state.state.selectedProtocol.protocol_id = protocol_id;
+                        _state.state.selectedProtocol.icon = storeState.plugins[protocolResult.plugin_info.plugin_id]?.icon || '';
+                        _state.state.selectedProtocol.name = protocolResult.name;
+                        _state.state.channelName = name;
+                        _state.state.scheduleInfo = {
+                            SCHEDULE_TYPE: schedule.SCHEDULE_TYPE,
+                            TIMEZONE: schedule.TIMEZONE,
+                            MON: schedule.MON,
+                            TUE: schedule.TUE,
+                            WED: schedule.WED,
+                            THU: schedule.THU,
+                            FRI: schedule.FRI,
+                            SAT: schedule.SAT,
+                            SUN: schedule.SUN,
+                        };
+                    });
+                    userGroupPageStore.updateModalSettings({
+                        type: USER_GROUP_MODAL_TYPE.CREATE_NOTIFICATIONS_SECOND,
+                        title: i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.UPDATE_TITLE'),
+                        themeColor: 'primary1',
+                    });
+                }
+            }
         }
-        userGroupPageStore.updateModalSettings({
-            type: USER_GROUP_MODAL_TYPE.CREATE_NOTIFICATIONS_SECOND,
-            title: i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.UPDATE_TITLE'),
-            themeColor: 'primary1',
-        });
     } else if (modalType === 'delete') {
         userGroupPageStore.updateModalSettings({
             type: USER_GROUP_MODAL_TYPE.DELETE_NOTIFICATION_CHANNEL,
@@ -176,12 +210,32 @@ watch([() => tableState.items, () => userGroupPageGetters.selectedUserGroupChann
     }
 }, { deep: true, immediate: true });
 
+// watch(() => userGroupPageState.userGroupChannels.selectedIndices, async (nv_selected_channel) => {
+//     if (nv_selected_channel.length === 1) {
+//         await fetchGetNotificationProtocol({
+//           protocol_id:
+//         });
+//     }
+// }, { deep: true, immediate: true });
+
 /* API */
+const fetchGetNotificationProtocol = async (params: NotificationProtocolGetParameters) => {
+    try {
+        return await SpaceConnector.clientV2.alertManager.notificationProtocol.get<NotificationProtocolGetParameters, NotificationProtocolModel>(params);
+        // notificationChannelCreateFormStore.$patch((_state) => {
+        //     _state.state.selectedProtocol.icon = result.plugin_info.plugin_id;
+        //     _state.state.selectedProtocol.name = result.name;
+        // });
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
+        return null;
+    }
+};
+
 const fetchListUserGroupChannel = async (params: UserGroupChannelListParameters) => {
     try {
         const { results } = await SpaceConnector.clientV2.alertManager.userGroupChannel.list<UserGroupChannelListParameters, ListResponse<UserGroupChannelModel>>(params);
         userGroupPageState.userGroupChannels.list = results;
-        channelList.value = results;
     } catch (e) {
         ErrorHandler.handleError(e, true);
     }
@@ -278,29 +332,29 @@ onMounted(async () => {
         >
             <template #col-channel_id-format="{value}">
                 {{
-                    userGroupPageState.protocolList.filter(protocol => protocol.protocol_id === value)[0]?.name
+                    userGroupPageState.protocolList?.filter(protocol => protocol.protocol_id === value)[0]?.name
                 }}
             </template>
             <template #col-schedule-format="{value}">
-                <p-badge v-if="value.SCHEDULE_TYPE === USER_GROUP_CHANNEL_SCHEDULE_TYPE.CUSTOM"
+                <p-badge v-if="value === USER_GROUP_CHANNEL_SCHEDULE_TYPE.CUSTOM"
                          badge-type="solid-outline"
                          style-type="alert"
                 >
                     {{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.SCHEDULE.CUSTOM') }}
                 </p-badge>
-                <p-badge v-else-if="value.SCHEDULE_TYPE === USER_GROUP_CHANNEL_SCHEDULE_TYPE.ALL_DAY"
+                <p-badge v-else-if="value === USER_GROUP_CHANNEL_SCHEDULE_TYPE.ALL_DAY"
                          badge-type="solid-outline"
                          style-type="indigo500"
                 >
                     {{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.SCHEDULE.EVERYDAY') }}
                 </p-badge>
-                <p-badge v-else-if="value.SCHEDULE_TYPE === USER_GROUP_CHANNEL_SCHEDULE_TYPE.WEEK_DAY"
+                <p-badge v-else-if="value === USER_GROUP_CHANNEL_SCHEDULE_TYPE.WEEK_DAY"
                          badge-type="solid-outline"
                          style-type="secondary1"
                 >
                     {{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.SCHEDULE.WEEKDAYS') }}
                 </p-badge>
-                <p-badge v-else-if="value.SCHEDULE_TYPE === USER_GROUP_CHANNEL_SCHEDULE_TYPE.WEEKEND"
+                <p-badge v-else-if="value === USER_GROUP_CHANNEL_SCHEDULE_TYPE.WEEKEND"
                          badge-type="solid-outline"
                          style-type="gray500"
                 >

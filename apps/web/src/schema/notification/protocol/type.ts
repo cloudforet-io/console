@@ -20,5 +20,6 @@ export interface ProtocolPluginInfo {
     version: string;
     options: Record<string, any>;
     metadata: ProtocolPluginMetadata;
+    secret_id?: string;
     upgrade_mode: ProtocolPluginUpgradeMode;
 }

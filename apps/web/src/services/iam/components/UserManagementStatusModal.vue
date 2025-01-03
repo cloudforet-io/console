@@ -10,6 +10,9 @@ import {
     PStatus, PButtonModal, PDataTable,
 } from '@cloudforet/mirinae';
 
+// import type { ListResponse } from '@/schema/_common/api-verbs/list';
+// import type { ServiceListParameters } from '@/schema/alert-manager/service/api-verbs/list';
+// import type { ServiceModel } from '@/schema/alert-manager/service/model';
 import type { RoleBindingDeleteParameters } from '@/schema/identity/role-binding/api-verbs/delete';
 import type { UserDeleteParameters } from '@/schema/identity/user/api-verbs/delete';
 import type { UserDisableParameters } from '@/schema/identity/user/api-verbs/disable';
@@ -48,6 +51,7 @@ const state = reactive({
         ];
     }),
     isRemoveOnlyWorkspace: computed(() => userPageState.modal.visible === 'removeOnlyWorkspace'),
+    filteredServices: undefined,
 });
 
 /* Component */
@@ -142,6 +146,19 @@ const disableUser = async (userId?: string): Promise<boolean> => {
         return false;
     }
 };
+// const fetchServiceList = async () => {
+//     try {
+//         const { results } = await SpaceConnector.clientV2.alertManager.service.list<ServiceListParameters, ListResponse<ServiceModel>>();
+//         if (results) {
+//             const filteredResults = results.filter((result) => result.members.USER !== undefined && result.members.USER_GROUP.length > 0);
+//             filteredResults.forEach((d) => {
+//                 userPageGetters.selectedUsers.filter((selectedUser) => d.members.USER.includes(selectedUser.user_id));
+//             });
+//         }
+//     } catch (e) {
+//         ErrorHandler.handleError(e, true);
+//     }
+// };
 </script>
 
 <template>

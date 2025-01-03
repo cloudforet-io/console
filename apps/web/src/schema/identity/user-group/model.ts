@@ -12,10 +12,3 @@ export interface UserGroupModel {
     created_at: string;
     notification_channel: UserGroupChannelModel[];
 }
-
-export interface NotificationChannelPerUserGroupModel {
-    name: string;
-    channel: 'email' | 'sms' | 'ms_teams' | 'slack' | 'kakao_talk' | 'telegram' | 'notify_to_member_channel';
-    schedule: 'custom' | 'every_day' | 'weekdays'
-    details: string[];
-}
