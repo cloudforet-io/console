@@ -48,6 +48,11 @@ const state = reactive({
     historyList: [] as AlertEventModel[],
     slicedHistoryList: computed<AlertEventModel[]>(() => {
         let _list = state.historyList;
+        if (filterState.searchText) {
+            _list = state.historyList.filter((item) => item.description.toLowerCase().includes(filterState.searchText.toLowerCase()));
+        } else {
+            _list = state.historyList;
+        }
         if (filterState.selectedAction !== 'ALL') {
             _list = state.historyList.filter((item) => item.action === filterState.selectedAction);
         }
@@ -55,7 +60,6 @@ const state = reactive({
     }),
     pageStart: 1,
     pageLimit: 10,
-    searchText: '',
     selectedItem: {} as any,
     modalVisible: false,
     isAlertVisible: false,
@@ -70,6 +74,7 @@ const filterState = reactive({
         { label: i18n.t('ALERT_MANAGER.ALERTS.EVENT_PUSHED'), name: ALERT_EVENT_ACTION.EVENT_PUSHED },
     ])),
     selectedAction: 'ALL',
+    searchText: '',
 });
 
 const getCreatedByNames = (createdBy: string): string => {
@@ -90,22 +95,25 @@ const getItemInfo = (item: AlertEventActionType): HistoryItemInfo => {
         styleType,
     };
 };
+
+const handleClickHistoryItem = (item: AlertEventModel) => {
+    state.modalVisible = true;
+    state.selectedItem = item;
+};
 const handleSelectAction = (value: string) => {
     filterState.selectedAction = value;
     state.pageStart = 1;
 };
-const handleChangeToolbox = async (options: any = {}) => {
-    if (options.searchText) {
-        state.searchText = options.searchText;
-        state.pageStart = 1;
-    }
+const handleChangeToolbox = async (value: string) => {
+    filterState.searchText = value;
+    state.pageStart = 1;
 };
 const handleClickShowMore = async () => {
     state.pageStart += 1;
 };
 
 const handleClickCopy = () => {
-    copyAnyData(state.selectedItem.raw_data);
+    copyAnyData(state.selectedItem);
 };
 
 const fetchHistoryList = async () => {
@@ -143,8 +151,9 @@ watch(() => storeState.alertInfo, async (alertInfo) => {
                    :total-count="state.historyList.length"
                    :page-size-changeable="false"
                    :pagination-visible="false"
-                   @change="handleChangeToolbox"
-                   @refresh="handleChangeToolbox"
+                   :search-text="filterState.searchText"
+                   @update:search-text="handleChangeToolbox"
+                   @refresh="fetchHistoryList()"
         />
         <div class="action-filter-wrapper">
             <span class="font-bold">{{ $t('ALERT_MANAGER.ALERTS.TYPE') }}</span>
@@ -170,17 +179,18 @@ watch(() => storeState.alertInfo, async (alertInfo) => {
                     <vertical-timeline-item v-for="(item, idx) in state.slicedHistoryList"
                                             :key="`history-item-${idx}`"
                                             :title="getItemInfo(item.action).title"
-                                            :description="item.description"
                                             :datetime="item.created_at"
                                             :timezone="storeState.timezone"
                                             :style-type="getItemInfo(item.action)?.styleType"
                                             :is-last-item="idx === state.slicedHistoryList?.length - 1"
+                                            @click="handleClickHistoryItem(item)"
                     >
                         <template #top-right>
                             <span class="ml-auto text-label-sm text-gray-600">
                                 {{ $t('ALERT_MANAGER.ALERTS.CREATED_BY', { user: getCreatedByNames(item.created_by) }) }}
                             </span>
                         </template>
+                        <span class="description text-label-sm text-gray-600">{{ item.description }}</span>
                     </vertical-timeline-item>
                 </div>
             </template>
@@ -245,6 +255,11 @@ watch(() => storeState.alertInfo, async (alertInfo) => {
             height: 1rem;
             padding-top: 0.25rem;
             padding-bottom: 0.25rem;
+        }
+    }
+    .description {
+        &:hover {
+            @apply text-secondary cursor-pointer;
         }
     }
 }
