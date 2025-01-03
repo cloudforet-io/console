@@ -50,7 +50,7 @@ import type { LegendValue } from '@/common/modules/widgets/_widget-fields/legend
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type { TooltipNumberFormatValue } from '@/common/modules/widgets/_widget-fields/tooltip-number-format/type';
 import type { XAxisValue } from '@/common/modules/widgets/_widget-fields/x-axis/type';
-import type { DateRange, WidgetData } from '@/common/modules/widgets/types/widget-data-type';
+import type { DateRange, WidgetLoadResponse } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
@@ -72,7 +72,7 @@ const state = reactive({
     dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
 
     unitMap: computed<Record<string, string>>(() => widgetFrameProps.value.unitMap || {}),
-    data: computed<WidgetData | null>(() => queryResult.data?.value ?? null),
+    data: computed<WidgetLoadResponse | null>(() => queryResult.data?.value ?? null),
     chart: null as EChartsType | null,
     xAxisData: computed<string[]>(() => {
         if (!state.data?.results?.length) return [];
@@ -164,10 +164,10 @@ const widgetOptionsState = reactive({
 });
 
 /* Api */
-const fetchWidgetData = async (params: PrivateWidgetLoadParameters|PublicWidgetLoadParameters): Promise<WidgetData> => {
+const fetchWidgetData = async (params: PrivateWidgetLoadParameters|PublicWidgetLoadParameters): Promise<WidgetLoadResponse> => {
     const defaultFetcher = state.isPrivateWidget
-        ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, WidgetData>
-        : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, WidgetData>;
+        ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, WidgetLoadResponse>
+        : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, WidgetLoadResponse>;
     const res = await defaultFetcher(params);
     return res;
 };
@@ -206,14 +206,14 @@ const widgetLoading = computed<boolean>(() => queryResult.isLoading);
 const errorMessage = computed<string>(() => queryResult.error?.value?.message);
 
 /* Util */
-const getThreshold = (rawData: WidgetData): number => {
+const getThreshold = (rawData: WidgetLoadResponse): number => {
     const maxNumber = rawData?.results?.reduce((max, obj) => {
         const values = Object.values(obj).filter((val) => typeof val === 'number');
         return Math.max(max, ...values);
     }, 0);
     return maxNumber * 0.08;
 };
-const drawChart = (rawData: WidgetData|null) => {
+const drawChart = (rawData: WidgetLoadResponse|null) => {
     if (isEmpty(rawData)) return;
 
     const _threshold = getThreshold(rawData);

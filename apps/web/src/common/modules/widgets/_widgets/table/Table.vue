@@ -9,7 +9,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Sort } from '@cloudforet/core-lib/space-connector/type';
 import { PPagination } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
 import type { PrivateWidgetLoadSumParameters } from '@/schema/dashboard/private-widget/api-verbs/load-sum';
@@ -42,15 +41,13 @@ import type { TotalValue } from '@/common/modules/widgets/_widget-fields/total/t
 import WidgetDataTable from '@/common/modules/widgets/_widgets/table/_component/WidgetDataTable.vue';
 import type { TableWidgetField } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
-    TableDataItem,
+    TableDataItem, WidgetLoadResponse,
 } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
 import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
 
-
-type Data = ListResponse<TableDataItem>;
 
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
@@ -113,18 +110,18 @@ const widgetOptionsState = reactive({
 
 
 
-const fetchWidgetData = async (params: PrivateWidgetLoadParameters|PublicWidgetLoadParameters): Promise<Data> => {
+const fetchWidgetData = async (params: PrivateWidgetLoadParameters|PublicWidgetLoadParameters): Promise<WidgetLoadResponse> => {
     const defaultFetcher = state.isPrivateWidget
-        ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
-        : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>;
+        ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, WidgetLoadResponse>
+        : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, WidgetLoadResponse>;
     const res = await defaultFetcher(params);
     return res;
 };
 
-const fetchWidgetSumData = async (params: PrivateWidgetLoadSumParameters|PublicWidgetLoadSumParameters): Promise<Data> => {
+const fetchWidgetSumData = async (params: PrivateWidgetLoadSumParameters|PublicWidgetLoadSumParameters): Promise<WidgetLoadResponse> => {
     const defaultFetcher = state.isPrivateWidget
-        ? SpaceConnector.clientV2.dashboard.privateWidget.loadSum<PrivateWidgetLoadSumParameters, Data>
-        : SpaceConnector.clientV2.dashboard.publicWidget.loadSum<PublicWidgetLoadSumParameters, Data>;
+        ? SpaceConnector.clientV2.dashboard.privateWidget.loadSum<PrivateWidgetLoadSumParameters, WidgetLoadResponse>
+        : SpaceConnector.clientV2.dashboard.publicWidget.loadSum<PublicWidgetLoadSumParameters, WidgetLoadResponse>;
     const res = await defaultFetcher(params);
     return res;
 };
@@ -212,7 +209,7 @@ const widgetLoading = computed<boolean>(() => queryResults.value?.[0].isLoading)
 const errorMessage = computed<string>(() => queryResults.value?.[0].error?.message as string);
 
 
-const refinedData = computed<Data>(() => {
+const refinedData = computed<WidgetLoadResponse|null>(() => {
     const data = queryResults.value?.[0].data;
     const totalData = queryResults.value?.[1].data;
 

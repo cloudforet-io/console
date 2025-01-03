@@ -18,7 +18,6 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { numberFormatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
@@ -46,6 +45,7 @@ import type { DisplaySeriesLabelValue } from '@/common/modules/widgets/_widget-f
 import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/granularity/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type { TooltipNumberFormatValue } from '@/common/modules/widgets/_widget-fields/tooltip-number-format/type';
+import type { WidgetLoadResponse } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
@@ -54,9 +54,6 @@ import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
 
 
-type Data = ListResponse<{
-    [key: string]: string|number;
-}>;
 interface ChartData {
     name: string;
     value: number;
@@ -74,7 +71,7 @@ const state = reactive({
     isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
     dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
 
-    data: computed<Data | null>(() => queryResult?.data?.value || null),
+    data: computed<WidgetLoadResponse | null>(() => queryResult?.data?.value || null),
     chart: null as EChartsType | null,
     chartData: [] as ChartData[],
     unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[widgetOptionsState.dataFieldInfo?.data as string]),
@@ -137,10 +134,10 @@ const widgetOptionsState = reactive({
 });
 
 /* Util */
-const fetchWidgetData = async (params: PrivateWidgetLoadParameters|PublicWidgetLoadParameters): Promise<Data> => {
+const fetchWidgetData = async (params: PrivateWidgetLoadParameters|PublicWidgetLoadParameters): Promise<WidgetLoadResponse> => {
     const defaultFetcher = state.isPrivateWidget
-        ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
-        : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>;
+        ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, WidgetLoadResponse>
+        : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, WidgetLoadResponse>;
     const res = await defaultFetcher(params);
     return res;
 };
@@ -178,7 +175,7 @@ const queryResult = useQuery({
 const widgetLoading = computed<boolean>(() => queryResult.isLoading);
 const errorMessage = computed<string>(() => queryResult.error?.value?.message);
 
-const drawChart = (rawData: Data|null) => {
+const drawChart = (rawData: WidgetLoadResponse|null) => {
     if (isEmpty(rawData)) return;
 
     const _categoryByData = groupBy(rawData.results || [], widgetOptionsState.categoryByInfo?.data);

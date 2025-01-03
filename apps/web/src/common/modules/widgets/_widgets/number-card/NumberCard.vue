@@ -13,7 +13,6 @@ import {
 } from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PrivateWidgetLoadSumParameters } from '@/schema/dashboard/private-widget/api-verbs/load-sum';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
@@ -38,18 +37,13 @@ import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/g
 import type { IconValue } from '@/common/modules/widgets/_widget-fields/icon/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type { WidgetHeightValue } from '@/common/modules/widgets/_widget-fields/widget-height/type';
-import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
+import type { DateRange, WidgetLoadResponse } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
 
 import { gray } from '@/styles/colors';
 
-
-
-type Data = ListResponse<{
-    [key: string]: string|number;
-}>;
 
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
@@ -67,8 +61,8 @@ const state = reactive({
     dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
     previousLoading: false,
 
-    data: computed<Data | null>(() => queryResults.value?.[0].data || null),
-    previousData: computed<Data | null>(() => queryResults.value?.[1]?.data || null),
+    data: computed<WidgetLoadResponse | null>(() => queryResults.value?.[0].data || null),
+    previousData: computed<WidgetLoadResponse | null>(() => queryResults.value?.[1]?.data || null),
     unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[widgetOptionsState.dataFieldInfo?.data as string]),
     previousValue: computed<number>(() => state.previousData?.results?.[0]?.[widgetOptionsState.dataFieldInfo?.data as string] ?? 0),
     currentValue: computed<number>(() => state.data?.results?.[0]?.[widgetOptionsState.dataFieldInfo?.data as string] ?? 0),
@@ -149,10 +143,10 @@ const setValueTextFontSize = debounce(() => {
 }, 300);
 
 /* Api */
-const fetchWidgetData = async (params: PrivateWidgetLoadSumParameters|PublicWidgetLoadSumParameters): Promise<Data> => {
+const fetchWidgetData = async (params: PrivateWidgetLoadSumParameters|PublicWidgetLoadSumParameters): Promise<WidgetLoadResponse> => {
     const defaultFetcher = state.isPrivateWidget
-        ? SpaceConnector.clientV2.dashboard.privateWidget.loadSum<PrivateWidgetLoadSumParameters, Data>
-        : SpaceConnector.clientV2.dashboard.publicWidget.loadSum<PublicWidgetLoadSumParameters, Data>;
+        ? SpaceConnector.clientV2.dashboard.privateWidget.loadSum<PrivateWidgetLoadSumParameters, WidgetLoadResponse>
+        : SpaceConnector.clientV2.dashboard.publicWidget.loadSum<PublicWidgetLoadSumParameters, WidgetLoadResponse>;
     const res = await defaultFetcher(params);
     return res;
 };

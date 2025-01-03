@@ -43,7 +43,7 @@ import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/dat
 import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/granularity/type';
 import type { LegendValue } from '@/common/modules/widgets/_widget-fields/legend/type';
 import type { XAxisValue } from '@/common/modules/widgets/_widget-fields/x-axis/type';
-import type { DateRange, WidgetData } from '@/common/modules/widgets/types/widget-data-type';
+import type { DateRange, WidgetLoadResponse } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/common/modules/widgets/types/widget-display-type';
 
 const props = defineProps<WidgetProps>();
@@ -61,7 +61,7 @@ const state = reactive({
     isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
     dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
 
-    data: computed<WidgetData | null>(() => queryResult.data?.value ?? null),
+    data: computed<WidgetLoadResponse | null>(() => queryResult.data?.value ?? null),
     chart: null as EChartsType | null,
     xAxisData: computed<string[]>(() => {
         if (!state.data?.results?.length) return [];
@@ -164,10 +164,10 @@ const widgetOptionsState = reactive({
 });
 
 /* Api */
-const fetchWidgetData = async (params: PrivateWidgetLoadParameters|PublicWidgetLoadParameters): Promise<WidgetData> => {
+const fetchWidgetData = async (params: PrivateWidgetLoadParameters|PublicWidgetLoadParameters): Promise<WidgetLoadResponse> => {
     const defaultFetcher = state.isPrivateWidget
-        ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, WidgetData>
-        : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, WidgetData>;
+        ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, WidgetLoadResponse>
+        : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, WidgetLoadResponse>;
     const res = await defaultFetcher(params);
     return res;
 };
@@ -205,7 +205,7 @@ const errorMessage = computed<string>(() => queryResult.error?.value?.message);
 
 
 /* Util */
-const getFieldData = (rawData: WidgetData): any[] => {
+const getFieldData = (rawData: WidgetLoadResponse): any[] => {
     const _seriesData: any[] = [];
     state.xAxisData.forEach((x, xIdx) => {
         state.yAxisData.forEach((y, yIdx) => {
@@ -215,7 +215,7 @@ const getFieldData = (rawData: WidgetData): any[] => {
     });
     return _seriesData;
 };
-const drawChart = (rawData: WidgetData|null) => {
+const drawChart = (rawData: WidgetLoadResponse|null) => {
     if (isEmpty(rawData)) return;
     state.chartData = getFieldData(rawData);
 };
