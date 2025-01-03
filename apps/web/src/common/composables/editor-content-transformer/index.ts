@@ -14,7 +14,7 @@ export const useEditorContentTransformer = (op?: {
         const pattern = new RegExp(`${baseUri}/files/[^/]+/(file-[^?]+)\\?token=.*`);
         const match = url.match(pattern);
         if (match && match[1]) {
-            return `{${match[1]}}`; // Extract only the fileId and return it in the format {fileId}.
+            return `<${match[1]}>`; // Extract only the fileId and return it in the format <fileId>.
         }
         return url;
     };
