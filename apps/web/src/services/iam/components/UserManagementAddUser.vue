@@ -55,9 +55,9 @@ const validationState = reactive({
     userIdInvalidText: '' as TranslateResult,
 });
 
+
 /* Component */
 const hideMenu = () => {
-    emit('change-input', { userList: state.selectedItems });
     state.menuVisible = false;
 };
 const handleClickTextInput = async () => {
@@ -74,6 +74,7 @@ const handleChangeTextInput = (value: string) => {
 };
 const handleEnterTextInput = async () => {
     if (formState.searchText === '') return;
+
     if (validateUserId()) {
         await getUserList();
     }
@@ -86,7 +87,6 @@ const handleSelectDropdownItem = (selected: AuthType|LocalType) => {
     formState.selectedMenuItem = selected;
     resetValidationState();
 };
-
 const getUserList = async () => {
     let isNew = userPageState.isAdminMode || userPageState.afterWorkspaceCreated;
     try {
@@ -99,8 +99,8 @@ const getUserList = async () => {
             await fetchGetWorkspaceUsers(trimmedText);
         }
     } catch (e) {
-        addSelectedItem(isNew);
-        await hideMenu();
+        addSelectedItem(formState.searchText, isNew);
+        hideMenu();
         formState.searchText = '';
         resetValidationState();
     }
@@ -144,8 +144,11 @@ const clickOutside = () => {
     }
 };
 const handleSelectMenuItem = async (menuItem: AddModalMenuItem) => {
-    state.selectedItems.unshift(menuItem);
-    await hideMenu();
+    if (!state.selectedItems.some((item) => item.name === menuItem.name)) {
+        state.selectedItems.unshift(menuItem);
+    }
+    hideMenu();
+    resetValidationState();
 };
 const initAuthTypeList = async () => {
     if (domainStore.state.extendedAuthType !== undefined) {
@@ -155,18 +158,21 @@ const initAuthTypeList = async () => {
         ];
     }
 };
-const addSelectedItem = (isNew: boolean) => {
-    if (!formState.searchText) return;
-    const trimmedText = formState.searchText.trim();
+
+const addSelectedItem = (name : string, isNew: boolean) => {
+    if (!name) return;
+    const trimmedText = name.trim();
     if (state.selectedItems.some((item) => item.name === trimmedText && item.auth_type === formState.selectedMenuItem)) return;
 
     state.selectedItems.unshift({
-        user_id: trimmedText,
         label: trimmedText,
         name: trimmedText,
-        isNew,
+        user_id: trimmedText,
         auth_type: formState.selectedMenuItem,
+        isNew,
     });
+
+    emit('change-input', { userList: state.selectedItems });
 };
 
 /* API */
@@ -260,7 +266,6 @@ onMounted(() => {
                                class="user-id-input"
                                :class="{'invalid': invalid}"
                                @click="handleClickTextInput"
-                               @blur="handleEnterTextInput"
                                @keyup.enter="handleEnterTextInput"
                                @input="handleChangeTextInput($event.target.value)"
                         >
