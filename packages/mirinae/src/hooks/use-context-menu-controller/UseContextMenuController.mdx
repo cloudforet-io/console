@@ -1,0 +1,54 @@
+{/* useContextMenuController.mdx */}
+
+import {Canvas, Meta, Controls} from '@storybook/blocks';
+
+import * as useContextMenuControllerStories from './use-context-menu-controller.stories';
+
+<Meta of={useContextMenuControllerStories}/>
+
+
+# useContextMenuController
+
+The main hook controlling the context menu, integrating item management and style.
+
+## Type Declarations
+
+```typescript
+interface UseContextMenuControllerOptions<Item extends MenuItem = MenuItem> extends
+    Omit<UseContextMenuStyleOptions, 'visibleMenu'|'menuRef'|'useFixedMenuStyle'>,
+    UseContextMenuItemsOptions<Item> {
+    visibleMenu?: Ref<boolean>|boolean; // used for visibility control. related to fixed style feature and focusing feature. give this option or use returned value.
+    contextMenuRef: UseContextMenuStyleOptions['menuRef'];
+    useFixedStyle?: UseContextMenuStyleOptions['useFixedMenuStyle'];
+}
+
+interface UseContextMenuControllerReturns {
+    visibleMenu: Ref<boolean>;
+    refinedMenu: ReturnType<typeof useContextMenuItems>['refinedMenu'];
+    contextMenuStyle: ReturnType<typeof useContextMenuStyle>['contextMenuStyle'];
+    loading: ReturnType<typeof useContextMenuItems>['loading'];
+    showContextMenu: () => void;
+    hideContextMenu: () => void;
+    toggleContextMenu: () => void;
+    focusOnContextMenu: FocusOnContextMenu;
+    initiateMenu: ReturnType<typeof useContextMenuItems>['initiateMenu'];
+    reloadMenu: ReturnType<typeof useContextMenuItems>['reloadMenu'];
+    showMoreMenu: ReturnType<typeof useContextMenuItems>['showMoreMenu'];
+}
+```
+
+## Usage
+<br/>
+
+### Basic
+<Canvas of={useContextMenuControllerStories.Basic}/>
+
+### Reorder by Selection
+<Canvas of={useContextMenuControllerStories.ReorderBySelection}/>
+
+### Playground
+<Canvas of={useContextMenuControllerStories.Playground}/>
+<Controls of={useContextMenuControllerStories.Playground}/>
+
+<br/>
+<br/>

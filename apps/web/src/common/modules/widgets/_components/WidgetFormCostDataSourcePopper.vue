@@ -1,13 +1,8 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive, toRef, watch,
+    computed, reactive, watch,
 } from 'vue';
 
-import { debounce } from 'lodash';
-
-import {
-    PFieldTitle, PContextMenu, useContextMenuController,
-} from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
@@ -24,6 +19,7 @@ import {
     getVariableModelMenuHandler,
 } from '@/lib/variable-models/variable-model-menu-handler';
 
+import DataSelector from '@/common/components/select/DataSelector.vue';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 
@@ -52,7 +48,6 @@ const state = reactive({
         };
         return getVariableModelMenuHandler([variableModelInfo]);
     }),
-    dataSourceSearchText: '',
     // data type
     dataTypeMenuItems: computed<MenuItem[]>(() => {
         if (!state.selectedDataSource.length) return [];
@@ -69,37 +64,16 @@ const state = reactive({
             { type: 'item', name: 'usage_quantity', label: 'Usage' },
             ...(additionalMenuItems || []),
         ];
-        return dataTypeItems.filter((d) => d.label.toLowerCase().includes(state.dataTypeSearchText.toLowerCase()));
+        return dataTypeItems;
     }),
-    dataTypeSearchText: '',
     selectedDataType: [] as MenuItem[],
-});
-const {
-    refinedMenu,
-    initiateMenu,
-    reloadMenu,
-} = useContextMenuController({
-    targetRef: toRef(state, 'targetRef'),
-    searchText: toRef(state, 'dataSourceSearchText'),
-    handler: toRef(state, 'dataSourceMenuHandler'),
-    selected: toRef(state, 'selectedDataSource'),
-    pageSize: 10,
 });
 
 /* Event */
-const handleUpdateCostDataSourceSearchText = debounce((text: string) => {
-    state.dataSourceSearchText = text;
-    reloadMenu();
-}, 200);
-const handleSelectDataSource = () => {
+const handleSelectDataSource = (items: MenuItem[]) => {
+    state.selectedDataSource = items;
     state.selectedDataType = [];
 };
-
-onMounted(() => {
-    state.selectedDataSource = [];
-    state.selectedDataType = [];
-    initiateMenu();
-});
 
 /* Watcher */
 watch(() => state.selectedDataSource, (val) => {
@@ -113,27 +87,15 @@ watch(() => state.selectedDataType, (val) => {
 <template>
     <div class="widget-form-cost-data-source-popper">
         <div class="data-source-select-col">
-            <p-field-title class="field-title"
-                           :label="i18n.t('Data Source')"
-                           required
-            />
-            <p-context-menu :menu="refinedMenu"
-                            :search-text="state.dataSourceSearchText"
-                            searchable
-                            :selected.sync="state.selectedDataSource"
-                            @update:search-text="handleUpdateCostDataSourceSearchText"
-                            @select="handleSelectDataSource"
+            <data-selector :label="i18n.t('Data Source')"
+                           :handler="state.dataSourceMenuHandler"
+                           @update:selected="handleSelectDataSource"
             />
         </div>
         <div class="data-source-select-col">
-            <p-field-title class="field-title"
-                           :label="i18n.t('Data Type')"
-                           required
-            />
-            <p-context-menu :menu="state.dataTypeMenuItems"
-                            :search-text.sync="state.dataTypeSearchText"
-                            searchable
-                            :selected.sync="state.selectedDataType"
+            <data-selector :label="i18n.t('Data Type')"
+                           :menu="state.dataTypeMenuItems"
+                           @update:selected="state.selectedDataType = $event"
             />
         </div>
     </div>
@@ -151,17 +113,9 @@ watch(() => state.selectedDataType, (val) => {
         gap: 0.5rem;
         width: 16rem;
         padding: 0.75rem 0;
-        .field-title {
-            padding: 0 0.75rem;
-        }
         &:last-child {
             @apply border-r-0;
         }
     }
-}
-
-/* custom design-system component - p-context-menu */
-:deep(.p-context-menu) {
-    border: none;
 }
 </style>
