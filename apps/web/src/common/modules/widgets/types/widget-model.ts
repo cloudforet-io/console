@@ -118,13 +118,13 @@ export interface ValueMappingOptions {
     data_table_id?: string;
     name: string;
     field_type?: DataTableFieldType; // default LABEL
+    key?: string;
     cases: ValueMappingCase[];
-    else: string;
+    else?: string;
     condition?: string;
 }
 
 export interface ValueMappingCase {
-    key: string;
     value: string;
     operator: 'eq' | 'regex';
     match: string;

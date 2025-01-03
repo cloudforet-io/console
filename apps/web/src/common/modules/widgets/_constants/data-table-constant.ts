@@ -120,15 +120,16 @@ export const DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP = {
     VALUE_MAPPING: {
         data_table_id: undefined,
         name: '',
+        key: undefined,
         field_type: DATA_TABLE_FIELD_TYPE.LABEL,
         cases: [
             {
-                key: '',
                 value: '',
                 operator: 'eq',
                 match: '',
             },
         ],
-        else: '',
+        else: undefined,
+        condition: undefined,
     } as ValueMappingOptions,
 };

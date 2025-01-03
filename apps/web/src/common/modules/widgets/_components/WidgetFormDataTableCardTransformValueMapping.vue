@@ -51,8 +51,9 @@ const dataTableInfo = ref<TransformDataTableInfo>({
 });
 const fieldTypeInfo = ref<ValueMappingOptions['field_type']>(props.originData?.field_type || DATA_TABLE_FIELD_TYPE.LABEL);
 const fieldNameInfo = ref<string>(props.originData?.name || '');
+const keyInfo = ref<string|undefined>(props.originData?.key);
 const casesInfo = ref<ValueMappingOptions['cases']>(props.originData?.cases || []);
-const elseInfo = ref<string>(props.originData?.else);
+const elseInfo = ref<string|undefined>(props.originData?.else);
 const additionalConditionInfo = ref<string|undefined>(props.originData?.condition);
 
 const state = reactive({
@@ -60,10 +61,11 @@ const state = reactive({
     invalid: computed<boolean>(() => {
         if (!state.proxyOperatorOptions?.data_table_id) return true;
         if (!fieldNameInfo.value) return true;
+        if (!fieldTypeInfo.value) return true;
+        if (!keyInfo.value) return true;
         if (!isFieldNameValid(fieldNameInfo.value, storeState.currentDataTable)) return true;
-        if (!elseInfo.value) return true;
         if (casesInfo.value.length === 0) return true;
-        if (!casesInfo.value.every((d) => !!d.key && !!d.operator && !!d.match && !!d.value)) return true;
+        if (!casesInfo.value.every((d) => !!d.operator && !!d.match && !!d.value)) return true;
         return false;
     }),
     fieldTypeMenuItems: computed<MenuItem[]>(() => [
@@ -112,7 +114,6 @@ const handleChangeFieldType = (fieldType: ValueMappingOptions['field_type']) => 
 };
 const handleClickAddCase = () => {
     casesInfo.value.push({
-        key: '',
         value: '',
         operator: 'eq',
         match: '',
@@ -125,21 +126,22 @@ const handleClickExpand = (idx: number) => {
     state.expandCaseMap[idx] = !state.expandCaseMap[idx];
     state.expandCaseMap = { ...state.expandCaseMap };
 };
-const handleUpdateBasedOn = (idx: number, key: string) => {
-    casesInfo.value[idx].key = key;
+const handleUpdateBasedOn = (key: string) => {
+    keyInfo.value = key;
 };
 const handleUpdateOperator = (idx: number, operator: 'eq'|'regex') => {
     casesInfo.value[idx].operator = operator;
 };
 
 // Update operator options
-watch([dataTableInfo, fieldTypeInfo, fieldNameInfo, casesInfo, elseInfo, additionalConditionInfo], (
-    [_dataTableInfo, _fieldTypeInfo, _fieldNameInfo, _casesInfo, _elseInfo, _additionalConditionInfo],
+watch([dataTableInfo, fieldTypeInfo, fieldNameInfo, keyInfo, casesInfo, elseInfo, additionalConditionInfo], (
+    [_dataTableInfo, _fieldTypeInfo, _fieldNameInfo, _keyInfo, _casesInfo, _elseInfo, _additionalConditionInfo],
 ) => {
     state.proxyOperatorOptions = {
         data_table_id: _dataTableInfo.dataTableId,
         name: _fieldNameInfo,
         field_type: _fieldTypeInfo,
+        key: _keyInfo,
         cases: _casesInfo,
         else: _elseInfo,
         ...(_additionalConditionInfo && { condition: _additionalConditionInfo }),
@@ -149,7 +151,6 @@ watch([fieldTypeInfo], (_curr, _prev) => {
     if (!isEqual(_curr, _prev)) {
         casesInfo.value = casesInfo.value.map((d) => ({
             ...d,
-            key: '',
         }));
     }
 });
@@ -191,6 +192,16 @@ watch(() => state.invalid, (_invalid) => {
                 />
             </template>
         </p-field-group>
+        <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.BASED_ON')"
+                       style-type="secondary"
+                       required
+        >
+            <p-select-dropdown :menu="state.basedOnMenuItems"
+                               :selected="keyInfo"
+                               block
+                               @update:selected="handleUpdateBasedOn"
+            />
+        </p-field-group>
         <p-field-title :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.CASES')"
                        required
                        class="mb-1"
@@ -213,16 +224,7 @@ watch(() => state.invalid, (_invalid) => {
                                    @click="handleClickExpand(cIdx)"
                     />
                 </div>
-                <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.BASED_ON')"
-                               style-type="secondary"
-                               required
-                >
-                    <p-select-dropdown :menu="state.basedOnMenuItems"
-                                       :selected="_case.key"
-                                       block
-                                       @update:selected="handleUpdateBasedOn(cIdx, $event)"
-                    />
-                </p-field-group>
+
                 <div class="grid grid-cols-12 gap-2">
                     <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.MATCHES_WITH')"
                                    style-type="secondary"
@@ -263,9 +265,7 @@ watch(() => state.invalid, (_invalid) => {
                 {{ $t('COMMON.WIDGETS.DATA_TABLE.FORM.ADD_CASE') }}
             </p-button>
         </div>
-        <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.ELSE')"
-                       required
-        >
+        <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.ELSE')">
             <p-text-input v-model="elseInfo"
                           block
             />
