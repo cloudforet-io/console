@@ -74,8 +74,6 @@ const _getSharedDataTableInfoList = (widgetDataTablesMap: Record<string, DataTab
             data_type: dt.data_type,
             source_type: dt.source_type,
             operator: dt.operator,
-            labels_info: dt.labels_info,
-            data_info: dt.data_info,
             options: dt.options,
         };
         if (dt.data_type === DATA_TABLE_TYPE.TRANSFORMED) {
