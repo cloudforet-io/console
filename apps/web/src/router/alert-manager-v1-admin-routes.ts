@@ -6,6 +6,7 @@ import adminCostExplorerRoutes from '@/services/cost-explorer/routes/admin/route
 import adminDashboardsRoutes from '@/services/dashboards/routes/admin/routes';
 import adminIamRoutes from '@/services/iam/routes/admin/routes';
 import adminInfoRoute from '@/services/info/routes/admin/routes';
+import adminOpsFlowRoutes from '@/services/ops-flow/routes/admin/routes';
 import adminWorkspaceHomeRoutes from '@/services/workspace-home/routes/admin/routes';
 
 
@@ -17,4 +18,5 @@ export const alertManagerV1AdminRoutes: RouteConfig[] = [
     adminIamRoutes,
     adminAdvancedRoutes,
     adminInfoRoute,
+    adminOpsFlowRoutes,
 ];

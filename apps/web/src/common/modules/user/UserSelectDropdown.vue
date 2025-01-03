@@ -37,13 +37,16 @@ const props = withDefaults(defineProps<{
      selectedId?: string;
      selectedIds?: string[];
      selectionType?: 'single'|'multiple';
+     appearanceType?: 'badge'|'stack';
+     styleType?: string;
+     block?: boolean;
      useFixedMenuStyle?: boolean;
+     selectionLabel?: string;
      invalid?: boolean;
      disabled?: boolean;
      readonly?: boolean;
      userPool?: string[];
      userGroupPool?: string[];
-     appearanceType?: 'badge'|'stack';
      showUserList?: boolean;
      showUserGroupList?: boolean;
      showCategoryTitle?: boolean;
@@ -53,12 +56,16 @@ const props = withDefaults(defineProps<{
     selectedId: undefined,
     selectedIds: undefined,
     selectionType: 'single',
+    appearanceType: 'stack',
+    styleType: undefined,
+    block: undefined,
     useFixedMenuStyle: false,
+    selectionLabel: undefined,
     invalid: false,
     disabled: false,
+    readonly: false,
     userPool: undefined,
     userGroupPool: undefined,
-    appearanceType: 'badge',
     showUserList: true,
     showUserGroupList: true,
     showCategoryTitle: true,
@@ -134,7 +141,7 @@ const state = reactive({
 
 const checkUserGroup = (id: string): boolean => state.allUserGroupItems.some((i) => i.name === id);
 const menuItemsHandler = (): AutocompleteHandler => async (keyword: string, pageStart = 1, pageLimit = 10, filters, resultIndex) => {
-    const _totalCount = pageStart - 1 + pageLimit;
+    const _totalCount = Number((pageStart - 1 || 0) + pageLimit);
     const filterItems = (items: SelectDropdownMenuItem[]) => items.filter((item) => getTextHighlightRegex(keyword).test(item.name)).slice(pageStart - 1, _totalCount);
 
     if (resultIndex === undefined) {
@@ -149,7 +156,7 @@ const menuItemsHandler = (): AutocompleteHandler => async (keyword: string, page
             }
             return {
                 results: _slicedItems,
-                more: _totalCount < items.length,
+                more: pageLimit <= _slicedItems.length - 1 && _totalCount < items.length,
             };
         });
     }
@@ -160,7 +167,7 @@ const menuItemsHandler = (): AutocompleteHandler => async (keyword: string, page
         if (i !== resultIndex) return { results: [], title: c.title };
         return {
             results: _slicedItems,
-            more: _totalCount < items.length,
+            more: pageLimit <= _slicedItems.length - 1 && _totalCount < items.length,
         };
     });
 };
@@ -248,20 +255,23 @@ watch([() => props.selectedId, () => props.selectedIds], ([newUserId, newUserIds
 </script>
 
 <template>
-    <p-select-dropdown show-select-marker
-                       class="user-select-dropdown"
+    <p-select-dropdown class="user-select-dropdown"
+                       page-size="10"
+                       show-select-marker
+                       is-filterable
+                       show-delete-all-button
                        :selected="state.selectedItems"
                        :handler="menuItemsHandler()"
-                       is-filterable
+                       :selection-label="props.selectionLabel"
                        :invalid="props.invalid"
                        :disabled="props.disabled"
                        :readonly="props.readonly"
-                       page-size="10"
                        :use-fixed-menu-style="props.useFixedMenuStyle"
-                       show-delete-all-button
                        :multi-selectable="props.selectionType === 'multiple'"
                        :appearance-type="props.appearanceType"
+                       :style-type="props.styleType"
                        :placeholder="props.placeholder"
+                       :block="props.block"
                        @update:selected="handleUpdateSelectedUserItems"
     >
         <template v-if="props.appearanceType === 'stack'"
@@ -306,11 +316,13 @@ watch([() => props.selectedId, () => props.selectedIds], ([newUserId, newUserIds
                               size="xs"
                     />
                 </div>
-                <span>{{ item.label }}</span>
-                <span class="text-gray-500">
+                <p class="label truncate">
+                    {{ item.label }}
+                </p>
+                <p class="text-gray-500">
                     <span v-if="checkUserGroup(item.name)">({{ item?.members || 0 }} {{ $t('ALERT_MANAGER.ALERTS.MEMBERS') }})</span>
                     <span v-else-if="item?.userName">({{ item?.userName }})</span>
-                </span>
+                </p>
             </div>
         </template>
     </p-select-dropdown>
