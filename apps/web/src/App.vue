@@ -85,7 +85,7 @@ const showsBrowserRecommendation = () => {
     if (currentPath === `/${EXTERNAL_PAGE_ROUTE.COST_REPORT_DETAIL._NAME}`) return false;
     return (!supportsBrowser() && !LocalStorageAccessor.getItem('showBrowserRecommendation'));
 };
-
+console.log('Vercel Test');
 watch(() => route.path, () => {
     state.notificationEmailModalVisible = route.path !== '/'
         && state.routeScope !== 'EXCLUDE_AUTH'
