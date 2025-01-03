@@ -306,6 +306,8 @@ defineExpose<WidgetExpose>({
                                    :sub-total-info="widgetOptionsState.subTotalInfo"
                                    :total-info="widgetOptionsState.totalInfo"
                                    :granularity="widgetOptionsState.granularityInfo?.granularity"
+                                   :is-pivot-data-table="state.isPivotDataTable"
+                                   :data-table="state.dataTable"
                                    :data-info="state.dataInfo"
                                    :date-format-info="widgetOptionsState.dateFormatInfo"
                                    :number-format-info="widgetOptionsState.numberFormatInfo"

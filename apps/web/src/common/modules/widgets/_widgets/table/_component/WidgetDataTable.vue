@@ -7,6 +7,9 @@ import type { Query } from '@cloudforet/core-lib/space-connector/type';
 import { PI, PTooltip } from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';
 
+import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
+import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
+
 import type { Currency } from '@/store/display/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
@@ -24,7 +27,10 @@ import {
     getRefinedDateFormatByGranularity,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
-import type { CustomTableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
+import type {
+    CustomColumnWidthItem,
+    CustomTableColumnWidthValue,
+} from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
 import type { DataFieldHeatmapColorValue } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
 import type { DateFormatValue } from '@/common/modules/widgets/_widget-fields/date-format/type';
 import type { MissingValueValue } from '@/common/modules/widgets/_widget-fields/missing-value/type';
@@ -64,6 +70,8 @@ interface Props {
   thisPage: number;
   dataField?: string[];
   granularity?: string;
+  isPivotDataTable?: boolean;
+  dataTable?: PublicDataTableModel|PrivateDataTableModel;
   // optional field info
   tableColumnComparisonInfo?: TableColumnComparisonValue;
   subTotalInfo?: TotalValue;
@@ -119,6 +127,7 @@ const state = reactive({
             textOverflow: 'ellipsis',
         };
     }),
+    columnFieldForPivot: computed<string>(() => props.dataTable?.options?.PIVOT?.fields?.column),
 });
 
 const getComparisonInfo = (fieldName: string) => `${fieldName} Compared to ${props.granularity || 'Previous'}`;
@@ -208,17 +217,16 @@ const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
         || (field?.fieldInfo?.additionalType && SKIP_HEATMAP_FIELD.includes(field?.fieldInfo?.additionalType));
     if (heatmapSkipCondition) return _style;
 
-    let _dataField = '';
+    const _dataField = field.name;
     let _value = 0;
-    const minValue = state.linearInterpolationValueMap[field.name].min;
-    const maxValue = state.linearInterpolationValueMap[field.name].max;
+    const minValue = state.linearInterpolationValueMap[_dataField].min;
+    const maxValue = state.linearInterpolationValueMap[_dataField].max;
     const absGapValue = maxValue - minValue;
     _value = item[field.name] || 0;
-    _dataField = field.name;
 
 
     const opacity = absGapValue !== 0 ? (BASE_OPACITY + (0.9 * ((_value - minValue) / absGapValue))) : BASE_OPACITY;
-    const _colorInfo = props.dataFieldHeatmapColorInfo?.[_dataField]?.colorInfo;
+    const _colorInfo = props.dataFieldHeatmapColorInfo?.[(props.isPivotDataTable && state.columnFieldForPivot) ? state.columnFieldForPivot : _dataField]?.colorInfo;
     if (_colorInfo && _colorInfo !== 'NONE') {
         const rgbaString = hexToRgba(HEATMAP_COLOR_HEX_MAP[_colorInfo], opacity);
         if (rgbaString) _style.backgroundColor = rgbaString;
@@ -236,7 +244,15 @@ const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
 // };
 
 const getFieldMinWidth = (field: TableWidgetField): string|undefined => {
-    const customWidth: string|number|undefined = props.customTableColumnWidthInfo?.widthInfos?.find((item) => item.fieldKey === field?.name)?.width;
+    const customWidthItem: CustomColumnWidthItem|undefined = props.customTableColumnWidthInfo?.widthInfos?.find((item) => {
+        const labelKeys = Object.keys(props.dataTable?.labels_info ?? {});
+        if (props.isPivotDataTable && !labelKeys.includes(field.name) && field.name !== 'Sub Total') {
+            return item.fieldKey === state.columnFieldForPivot;
+        }
+        return item.fieldKey === field?.name;
+    });
+
+    const customWidth: string|number|undefined = customWidthItem?.width;
 
     const minimumWidth = props.tableColumnWidthInfo?.minimumWidth ?? TABLE_DEFAULT_MINIMUM_WIDTH;
     const fixedWidth = props.tableColumnWidthInfo?.widthType === 'fixed' ? props.tableColumnWidthInfo?.fixedWidth : undefined;
