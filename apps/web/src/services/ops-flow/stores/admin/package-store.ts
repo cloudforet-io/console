@@ -87,6 +87,7 @@ export const usePackageStore = defineStore('package', () => {
     };
     const disposeSelf = () => {
         const store = usePackageStore();
+        store.$reset();
         store.$dispose();
     };
     const appContextStore = useAppContextStore();

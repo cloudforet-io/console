@@ -1,5 +1,5 @@
 import type { DeepReadonly } from 'vue';
-import { reactive, computed } from 'vue';
+import { reactive, computed, onUnmounted } from 'vue';
 
 import { defineStore } from 'pinia';
 
@@ -162,6 +162,15 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
             state.associatedTasksToCategoryMap = {};
         },
     };
+
+    const disposeSelf = () => {
+        const store = useTaskManagementPageStore();
+        store.$reset();
+        store.$dispose();
+    };
+    onUnmounted(() => {
+        disposeSelf();
+    });
     return {
         state,
         getters,
