@@ -136,7 +136,7 @@ const handleRequiredChange = (value: boolean) => {
 };
 
 /* other field properties */
-const isPrimary = ref<boolean>(false);
+const isPrimary = ref<boolean>(true);
 const isFolded = ref<boolean>(false);
 
 /* validation */
@@ -207,7 +207,7 @@ onBeforeMount(() => {
     options.value = props.field.options ?? {};
     isOptionsValid.value = false;
     isRequired.value = props.field.is_required ?? isDefaultField.value;
-    isPrimary.value = props.field.is_required ? true : (props.field.is_primary ?? isDefaultField.value);
+    isPrimary.value = props.field.is_primary ?? true;
     isFolded.value = isDefaultField.value;
     jsonCode.value = JSON.stringify(props.field);
 });
