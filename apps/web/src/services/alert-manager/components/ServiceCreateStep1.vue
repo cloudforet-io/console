@@ -69,7 +69,7 @@ const {
         if (duplicatedName) {
             return i18n.t('ALERT_MANAGER.SERVICE.VALIDATION_KEY_UNIQUE');
         }
-        const regex = /^(?!-)[A-Z-]+(?<!-)$/;
+        const regex = /^(?!-)[A-Z0-9-]+(?<!-)$/;
         if (!regex.test(value)) {
             return i18n.t('ALERT_MANAGER.SERVICE.VALIDATION_KEY');
         }
