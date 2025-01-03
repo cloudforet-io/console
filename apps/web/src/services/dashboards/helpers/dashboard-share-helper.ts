@@ -78,8 +78,8 @@ const _getSharedDataTableInfoList = (widgetDataTablesMap: Record<string, DataTab
         };
         if (dt.data_type === DATA_TABLE_TYPE.TRANSFORMED) {
             if (dt.operator === 'JOIN' || dt.operator === 'CONCAT') {
-                const _dataTableIds = dt.options[dt.operator].data_tables;
-                const _dataTableIndices = _dataTableIds.map((dtId) => _dataTables.findIndex((d) => d.data_table_id === dtId));
+                const _dataTableIds = dt.options[dt.operator]?.data_tables;
+                const _dataTableIndices = _dataTableIds?.map((dtId) => _dataTables.findIndex((d) => d.data_table_id === dtId));
                 _sharedDataTable.options = {
                     [dt.operator]: {
                         ...dt.options[dt.operator],
@@ -87,7 +87,7 @@ const _getSharedDataTableInfoList = (widgetDataTablesMap: Record<string, DataTab
                     },
                 };
             } else if (dt.operator === 'EVAL' || dt.operator === 'QUERY' || dt.operator === 'PIVOT' || dt.operator === 'VALUE_MAPPING' || dt.operator === 'ADD_LABELS') {
-                const _dataTableId = dt.options[dt.operator].data_table_id;
+                const _dataTableId = dt.options[dt.operator]?.data_table_id;
                 const _dataTableIdx = _dataTables.findIndex((d) => d.data_table_id === _dataTableId);
                 _sharedDataTable.options = {
                     [dt.operator]: {
