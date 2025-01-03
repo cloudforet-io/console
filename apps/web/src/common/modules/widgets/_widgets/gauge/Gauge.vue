@@ -178,10 +178,7 @@ const errorMessage = computed<string|undefined>(() => {
 /* Util */
 const drawChart = (rawData: WidgetLoadResponse|null) => {
     if (isEmpty(rawData)) return;
-    // HACK: Change the code below when the backend data is modified
-    // state.chartData = rawData?.results?.[0]?.[widgetOptionsState.dataFieldInfo?.data as string] || 0;
-    const _targetData = state.data?.results?.find((d) => !!d[widgetOptionsState.dataFieldInfo?.data as string]);
-    state.chartData = _targetData?.[widgetOptionsState.dataFieldInfo?.data as string] || 0;
+    state.chartData = rawData?.results?.[0]?.[widgetOptionsState.dataFieldInfo?.data as string] || 0;
 };
 const loadWidget = () => {
     state.runQueries = true;
