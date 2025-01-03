@@ -111,7 +111,7 @@ const state = reactive({
                 }
                 let _value = numberFormatter(params.data.value) || '';
                 if (widgetOptionsState.tooltipNumberFormatInfo?.toggleValue) {
-                    _value = getFormattedNumber(params.data.value, widgetOptionsState.dataFieldInfo?.data as string, widgetOptionsState.numberFormatInfo, state.unit);
+                    _value = getFormattedNumber(params.data.value, widgetOptionsState.numberFormatInfo?.[widgetOptionsState.dataFieldInfo?.data as string], state.unit);
                 }
                 return `${_source} - ${_target}: <b>${_value}</b>`;
             },

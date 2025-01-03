@@ -89,12 +89,12 @@ const state = reactive({
                     distance: -55,
                     color: gray[700],
                     fontSize: 12,
-                    formatter: (val) => getFormattedNumber(val, widgetOptionsState.dataFieldInfo?.data as string, widgetOptionsState.numberFormatInfo, state.unit),
+                    formatter: (val) => getFormattedNumber(val, widgetOptionsState.numberFormatInfo?.[widgetOptionsState.dataFieldInfo?.data as string], state.unit),
                 },
                 detail: {
                     offsetCenter: [0, 0],
                     fontSize: 32,
-                    formatter: (val) => getFormattedNumber(val, widgetOptionsState.dataFieldInfo?.data as string, widgetOptionsState.numberFormatInfo, state.unit),
+                    formatter: (val) => getFormattedNumber(val, widgetOptionsState.numberFormatInfo?.[widgetOptionsState.dataFieldInfo?.data as string], state.unit),
                     color: gray[700],
                 },
                 data: [

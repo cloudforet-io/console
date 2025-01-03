@@ -5,6 +5,11 @@ import {
     PFieldTitle, PToggleButton, PI, PTooltip, PCheckbox,
 } from '@cloudforet/mirinae';
 
+import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
+import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
+
+import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
+import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { SubTotalOptions, SubTotalValue } from '@/common/modules/widgets/_widget-fields/sub-total/type';
 import type {
     WidgetFieldComponentProps,
@@ -14,8 +19,15 @@ import type {
 const FIELD_KEY = 'subTotal';
 
 const props = defineProps<WidgetFieldComponentProps<SubTotalOptions>>();
+const widgetGenerateStore = useWidgetGenerateStore();
+const widgetGenerateGetters = widgetGenerateStore.getters;
+
+const storeState = reactive({
+    selectedDataTable: computed<PrivateDataTableModel|PublicDataTableModel|undefined>(() => widgetGenerateGetters.selectedDataTable),
+});
 
 const state = reactive({
+    isPivotDataTable: computed<boolean>(() => storeState.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
     fieldValue: computed<SubTotalValue>(() => props.fieldManager.data[FIELD_KEY].value),
     disabled: computed(() => false),
 });
@@ -54,7 +66,7 @@ const handleUpdateToggle = (value: boolean) => {
                 </p-tooltip>
             </p-field-title>
             <p-toggle-button :value="state.fieldValue?.toggleValue"
-                             :disabled="state.disabled"
+                             :disabled="!state.isPivotDataTable"
                              @update:value="handleUpdateToggle"
             />
         </div>

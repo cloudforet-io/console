@@ -112,7 +112,10 @@ const state = reactive({
                     let _seriesName = getReferenceLabel(props.allReferenceTypeInfo, (widgetOptionsState.dataFieldInfo?.data as string[]) ?? [], p.seriesName);
                     let _value = numberFormatter(p.value) || '';
                     if (widgetOptionsState.tooltipNumberFormatInfo?.toggleValue) {
-                        _value = getFormattedNumber(p.value, p.seriesName, widgetOptionsState.numberFormatInfo, _unit);
+                        const columnFieldForPivot = state.dataTable?.options.PIVOT?.fields?.column;
+                        const fieldName = (state.isPivotDataTable && columnFieldForPivot) ? columnFieldForPivot : p.seriesName;
+                        const numberFormat = widgetOptionsState.numberFormatInfo[fieldName];
+                        _value = getFormattedNumber(p.value, numberFormat, _unit);
                     }
                     if (_unit) _seriesName = `${_seriesName} (${_unit})`;
                     let _name = getReferenceLabel(props.allReferenceTypeInfo, widgetOptionsState.xAxisInfo?.data, params.name);
@@ -235,8 +238,12 @@ const drawChart = (rawData?: WidgetLoadResponse|null) => {
                 position: widgetOptionsState.displaySeriesLabelInfo?.position,
                 rotate: widgetOptionsState.displaySeriesLabelInfo?.rotate,
                 fontSize: 10,
-                formatter: (p) => getFormattedNumber(p.value, _dataField, widgetOptionsState.numberFormatInfo, _unit)
-                ,
+                formatter: (p) => {
+                    const columnFieldForPivot = state.dataTable?.options.PIVOT?.fields?.column;
+                    const fieldName = (state.isPivotDataTable && columnFieldForPivot) ? columnFieldForPivot : _dataField;
+                    const numberFormat = widgetOptionsState.numberFormatInfo[fieldName];
+                    return getFormattedNumber(p.value, numberFormat, _unit);
+                },
             },
         });
     });

@@ -76,7 +76,7 @@ const state = reactive({
         const _targetData = state.data?.results?.find((d) => !!d[widgetOptionsState.dataFieldInfo?.data as string]);
         return _targetData?.[widgetOptionsState.dataFieldInfo?.data as string] || 0;
     }),
-    valueText: computed<string|undefined>(() => getFormattedNumber(state.currentValue, widgetOptionsState.dataFieldInfo?.data as string, widgetOptionsState.numberFormatInfo, state.unit)),
+    valueText: computed<string|undefined>(() => getFormattedNumber(state.currentValue, widgetOptionsState.numberFormatInfo?.[widgetOptionsState.dataFieldInfo?.data as string], state.unit)),
 
     iconName: computed<string|undefined>(() => widgetOptionsState.iconInfo?.icon?.name),
     iconColor: computed<string|undefined>(() => widgetOptionsState.iconInfo?.color),

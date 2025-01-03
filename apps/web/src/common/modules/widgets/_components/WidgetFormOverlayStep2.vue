@@ -243,6 +243,7 @@ onUnmounted(() => {
                  :class="{ 'full-size': state.selectedWidgetSize === 'FULL' || widgetGenerateState.overlayType === 'EXPAND' }"
             >
                 <component :is="getWidgetComponent(state.selectedWidgetType)"
+                           :key="widgetGenerateState.selectedDataTableId"
                            ref="overlayWidgetRef"
                            :widget-name="widgetGenerateState.widget.widget_type"
                            :widget-id="widgetGenerateState.widget.widget_id"
