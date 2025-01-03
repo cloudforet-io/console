@@ -27,9 +27,9 @@ const state = reactive({
         if (props.operator === 'JOIN') return { name: 'Join', icon: 'ic_join' };
         if (props.operator === 'QUERY') return { name: 'Query', icon: 'ic_db-where' };
         if (props.operator === 'EVAL') return { name: 'Evaluate', icon: 'ic_db-evaluation' };
-        if (props.operator === 'PIVOT') return { name: 'Pivot', icon: '' }; // TODO: Add icon
-        if (props.operator === 'VALUE_MAPPING') return { name: 'Value Mapping', icon: '' }; // TODO: Add icon
-        if (props.operator === 'ADD_LABELS') return { name: 'Add Labels', icon: '' }; // TODO: Add icon
+        if (props.operator === 'PIVOT') return { name: 'Pivot', icon: 'ic_db-pivot-table' };
+        if (props.operator === 'VALUE_MAPPING') return { name: 'Value Mapping', icon: 'ic_db-value-mapping' };
+        if (props.operator === 'ADD_LABELS') return { name: 'Additional Labels', icon: 'ic_db-additional-labels' };
         return { name: '', icon: '' };
     }),
 });
