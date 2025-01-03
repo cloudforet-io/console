@@ -10,38 +10,39 @@ export const ALERT_STATUS_FILTERS = {
     TRIGGERED: 'TRIGGERED',
     ACKNOWLEDGED: 'ACKNOWLEDGED',
     RESOLVED: 'RESOLVED',
-    ERROR: 'ERROR',
+    IGNORED: 'IGNORED',
 } as const;
 export const ALERT_MANAGEMENT_TABLE_FIELDS: DataTableFieldType[] = [
-    { name: 'alert_number', label: 'No' },
+    { name: 'service_id', label: 'Service' },
     { name: 'title', label: 'Title', width: '20rem' },
     { name: 'status', label: 'Status' },
-    { name: 'service_id', label: 'Service' },
     { name: 'urgency', label: 'Urgency' },
-    { name: 'resources', label: 'Resource', width: '20rem' },
+    { name: 'labels', label: 'Label' },
+    { name: 'triggered_by', label: 'Triggered by' },
+    { name: 'duration', label: 'Duration' },
     { name: 'created_at', label: 'Created at' },
 ];
 export const ALERT_MANAGEMENT_TABLE_HANDLER: AlertManagementTableHandlerType = {
     keyItemSets: [{
         title: 'Properties',
         items: [
-            { name: 'alert_id', label: 'Alert ID' },
             { name: 'title', label: 'Title' },
-            { name: 'resource.resource_type', label: 'Resource Name' },
+            { name: 'labels', label: 'Label' },
+            { name: 'triggered_by', label: 'Triggered by' },
         ],
     }],
     valueHandlerMap: {
-        alert_id: makeDistinctValueHandler('alert_manager.Alert', 'alert_id'),
         title: makeDistinctValueHandler('alert_manager.Alert', 'title'),
-        'resource.resource_type': makeDistinctValueHandler('alert_manager.Alert', 'resource.resource_type'),
+        labels: makeDistinctValueHandler('alert_manager.Alert', 'labels'),
+        triggered_by: makeDistinctValueHandler('alert_manager.Alert', 'triggered_by'),
     },
 };
 export const ALERT_EXCEL_FIELDS: ExcelDataField[] = [
-    { key: 'alert_id', name: 'No' },
+    { key: 'service_id', name: 'Service' },
     { key: 'title', name: 'Title' },
     { key: 'status', name: 'Status' },
-    { key: 'service_id', name: 'Service' },
     { key: 'urgency', name: 'Urgency' },
-    { key: 'resources', name: 'Resource' },
+    { key: 'labels', name: 'Label' },
+    { key: 'triggered_by', name: 'Triggered by' },
     { key: 'created_at', name: 'Created at' },
 ];
