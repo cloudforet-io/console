@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router/composables';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 import {
-    PButton, PDivider, PSelectCard, PEmpty, PRadioGroup, PRadio, PDataLoader,
+    PButton, PHeading, PSelectCard, PEmpty, PRadioGroup, PRadio, PDataLoader,
 } from '@cloudforet/mirinae';
 
 import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
@@ -14,11 +14,12 @@ import type { TaskModel } from '@/schema/opsflow/task/model';
 import { useUserStore } from '@/store/user/user-store';
 
 import { useFormValidator } from '@/common/composables/form-validator';
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
+import { useTaskAPI } from '@/services/ops-flow/composables/use-task-api';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
-import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
-import { useTaskStore } from '@/services/ops-flow/stores/task-store';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 import {
     useTaskManagementTemplateStore,
@@ -31,11 +32,12 @@ const router = useRouter();
 const taskCategoryStore = useTaskCategoryStore();
 const taskTypeStore = useTaskTypeStore();
 const taskTypeState = taskTypeStore.state;
-const taskStore = useTaskStore();
 const userStore = useUserStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
 const { getProperRouteLocation } = useProperRouteLocation();
+
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const loading = ref(true);
 const availableCategories = ref<TaskCategoryModel[]>([]);
@@ -50,6 +52,7 @@ const { forms: { category, taskType }, setForm, isAllValid } = useFormValidator(
         return !!val;
     },
 });
+const taskAPI = useTaskAPI();
 const tasks = ref<TaskModel[]>([]);
 const userId = computed(() => userStore.state.userId ?? '');
 const taskQueryHelper = new QueryHelper();
@@ -75,110 +78,109 @@ const goToTaskCreatePage = () => {
 
 onMounted(async () => {
     loading.value = true;
-    const allCategories = await taskCategoryStore.list(true);
-    if (!allCategories || !allCategories.length) {
+    let allCategories = await taskCategoryStore.list(true) ?? [];
+    allCategories = allCategories.filter((c) => c.state !== 'DELETED');
+    if (!allCategories.length) {
         loading.value = false;
         return;
     }
     await taskTypeStore.listByCategoryIds(allCategories.map((c) => c.category_id));
     availableCategories.value = allCategories.filter((c) => taskTypeState.itemsByCategoryId[c.category_id]?.length);
     setForm('category', availableCategories.value[0]?.category_id);
-    tasks.value = await taskStore.list({ query: taskQuery.value }) ?? [];
+    tasks.value = await taskAPI.list({ query: taskQuery.value }) ?? [];
     loading.value = false;
 });
 </script>
 
 <template>
-    <div class="ops-flow-landing-page">
-        <div class="mb-6 text-center text-display-md font-bold">
-            {{ taskManagementTemplateStore.templates.TemplateName }}
-        </div>
-        <p-data-loader :loading="loading"
-                       :data="availableCategories"
-                       loader-backdrop-color="gray.100"
-                       class="min-h-72"
-        >
-            <div class="max-w-[712px] mx-auto">
-                <div class="mb-4 pt-4 flex justify-end">
-                    <!--                    <p-field-title label="Active Ticket" />-->
-                    <router-link custom
-                                 :to="getProperRouteLocation({
-                                     name: OPS_FLOW_ROUTE.BOARD._NAME,
-                                     query: {categoryId: category }
-                                 })"
-                    >
-                        <template #default="{navigate}">
-                            <p-button style-type="secondary"
-                                      size="sm"
-                                      class="capitalize"
-                                      @click="navigate"
-                            >
-                                {{ $t('OPSFLOW.TASK_BOARD.VIEW_ALL_TASKS', {tasks: taskManagementTemplateStore.templates.tasks}) }}
-                            </p-button>
-                        </template>
-                    </router-link>
-                </div>
-                <!--                <p-pane-layout class="mb-10 min-h-20 flex items-center justify-center">-->
-                <!--                    <div v-if="tasks.length" /> -->
-                <!--                    <p-empty v-else>-->
-                <!--                        No Active Tickets-->
-                <!--                    </p-empty>-->
-                <!--                </p-pane-layout>-->
-                <p-divider />
-                <div class="mt-10">
-                    <p class="mb-6 text-display-md">
-                        {{ taskManagementTemplateStore.templates.TaskCategory }}
+    <div class="overflow-auto">
+        <div>
+            <div class="mb-6 py-6 px-10 flex mobile:flex-col gap-10 items-center justify-center min-h-80 mobile:h-screen bg-image-blur">
+                <div class="max-w-96">
+                    <p-heading class="mb-4">
+                        {{ taskManagementTemplateStore.templates.TemplateName }}
+                    </p-heading>
+                    <p class="text-paragraph-lg text-gray-600">
+                        {{ taskManagementTemplateStore.templates.landingDescription }}
                     </p>
-                    <div class="flex justify-center">
-                        <div class="grid grid-cols-2 gap-4 justify-center items-center">
-                            <p-select-card v-for="c in availableCategories"
-                                           :key="c.category_id"
-                                           class="category-card"
-                                           :label="c.name"
-                                           :value="c.category_id"
-                                           :selected="category"
-                                           @change="handleChangeCategory"
-                            />
-                        </div>
-                    </div>
                 </div>
-                <div class="mt-10">
-                    <p class="mb-6 text-display-md">
-                        {{ taskManagementTemplateStore.templates.TaskType }}
-                    </p>
-                    <p-radio-group v-if="category">
-                        <p-radio v-for="t in taskTypeState.itemsByCategoryId[category]"
-                                 :key="t.task_type_id"
-                                 :value="t.task_type_id"
-                                 :selected="taskType"
-                                 @change="handleChangeTaskType"
-                        >
-                            {{ t.name }}
-                        </p-radio>
-                    </p-radio-group>
-                </div>
-                <div class="mt-10 flex justify-end">
-                    <p-button style-type="substitutive"
-                              icon-right="ic_arrow-right"
-                              :disabled="!isAllValid"
-                              @click="goToTaskCreatePage"
-                    >
-                        {{ $t('COMMON.BUTTONS.NEXT') }}
-                    </p-button>
+                <div class="max-w-96 mobile:w-96">
+                    <img src="@/assets/images/landing/img_landing_service-desk_hero.png">
                 </div>
             </div>
-            <template #no-data>
-                <p-empty class="my-20"
-                         show-image
-                >
-                    {{ $t('OPSFLOW.NO_AVAILABLE_TARGET', {target: taskManagementTemplateStore.templates.TaskCategory }) }}
-                </p-empty>
-            </template>
-        </p-data-loader>
+            <p-data-loader :loading="loading"
+                           :data="availableCategories"
+                           loader-backdrop-color="gray.100"
+                           class="min-h-72"
+            >
+                <div class="max-w-[712px] mx-auto">
+                    <div class="mt-10">
+                        <p class="mb-6 text-display-md">
+                            {{ taskManagementTemplateStore.templates.TaskCategory }}
+                        </p>
+                        <div class="flex justify-center">
+                            <div class="grid grid-cols-2 gap-4 justify-center items-center">
+                                <p-select-card v-for="c in availableCategories"
+                                               :key="c.category_id"
+                                               class="category-card"
+                                               :label="c.name"
+                                               :value="c.category_id"
+                                               :selected="category"
+                                               @change="handleChangeCategory"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-10">
+                        <p class="mb-6 text-display-md">
+                            {{ taskManagementTemplateStore.templates.TaskType }}
+                        </p>
+                        <p-radio-group v-if="category">
+                            <p-radio v-for="t in taskTypeState.itemsByCategoryId[category]"
+                                     :key="t.task_type_id"
+                                     :value="t.task_type_id"
+                                     :selected="taskType"
+                                     @change="handleChangeTaskType"
+                            >
+                                {{ t.name }}
+                            </p-radio>
+                        </p-radio-group>
+                    </div>
+                    <div class="mt-10 flex justify-end">
+                        <p-button v-if="hasReadWriteAccess"
+                                  style-type="substitutive"
+                                  icon-right="ic_arrow-right"
+                                  :disabled="!isAllValid"
+                                  @click="goToTaskCreatePage"
+                        >
+                            {{ $t('COMMON.BUTTONS.NEXT') }}
+                        </p-button>
+                    </div>
+                </div>
+                <template #no-data>
+                    <p-empty class="my-20"
+                             show-image
+                    >
+                        {{ $t('OPSFLOW.NO_AVAILABLE_TARGET', {target: taskManagementTemplateStore.templates.TaskCategory }) }}
+                    </p-empty>
+                </template>
+            </p-data-loader>
+        </div>
     </div>
 </template>
 
 <style lang="postcss" scoped>
+.bg-image-blur {
+    background-image: url("@/assets/images/img_blurred-background-min.png");
+    background-color: theme('colors.gray.100');
+    background-blend-mode: multiply;
+    background-repeat: no-repeat;
+    background-size: 130% auto;
+
+    @screen mobile {
+        background-size: 115% 240%;
+    }
+}
 .category-card {
     @apply w-[352px] py-4;
 }

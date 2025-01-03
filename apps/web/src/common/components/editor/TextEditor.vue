@@ -15,7 +15,7 @@ import { Editor, EditorContent } from '@tiptap/vue-2';
 import { Markdown } from 'tiptap-markdown';
 
 import { createImageExtension } from '@/common/components/editor/extensions/image';
-import { getAttachments, setAttachmentsToContents } from '@/common/components/editor/extensions/image/helper';
+import { getAttachmentIds, setAttachmentsToContents } from '@/common/components/editor/extensions/image/helper';
 import type { Attachment, ImageUploader } from '@/common/components/editor/extensions/image/type';
 import MenuBar from '@/common/components/editor/MenuBar.vue';
 
@@ -23,8 +23,8 @@ import { loadMonospaceFonts } from '@/styles/fonts';
 
 interface Props {
     value?: string;
-    imageUploader?: ImageUploader<any>;
-    attachments?: Attachment<any>[];
+    imageUploader?: ImageUploader;
+    attachments?: Attachment[];
     invalid?: boolean;
     placeholder?: string;
     contentType?: 'html'|'markdown';
@@ -40,14 +40,12 @@ const props = withDefaults(defineProps<Props>(), {
     showUndoRedoButtons: true,
 });
 const emit = defineEmits<{(e: 'update:value', value: string): void;
-    (e: 'update:attachments', attachments: Attachment<any>[]): void;
+    (e: 'update:attachment-ids', attachmentIds: string[]): void;
 }>();
 
 loadMonospaceFonts();
 
 const editor = shallowRef<null|Editor>(null);
-
-const imgFileDataMap = new Map();
 
 const getExtensions = (): AnyExtension[] => {
     const extensions: AnyExtension[] = [
@@ -82,7 +80,7 @@ const getExtensions = (): AnyExtension[] => {
 
     // add image extension if imageUploader is provided
     if (props.imageUploader) {
-        extensions.push(createImageExtension(props.imageUploader, imgFileDataMap));
+        extensions.push(createImageExtension(props.imageUploader));
     }
     return extensions;
 };
@@ -100,7 +98,7 @@ onMounted(() => {
                 content = editor.value.storage.markdown.getMarkdown() ?? '';
             }
             emit('update:value', content);
-            emit('update:attachments', getAttachments<any>(editor.value, imgFileDataMap));
+            emit('update:attachment-ids', getAttachmentIds(editor.value));
         },
     });
 });

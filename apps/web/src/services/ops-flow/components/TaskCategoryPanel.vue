@@ -14,8 +14,8 @@ import ActionMenuButton from '@/common/components/buttons/ActionMenuButton.vue';
 
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
-import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
@@ -31,18 +31,18 @@ const state = reactive({
         {
             name: 'name',
             label: _i18n.t('OPSFLOW.NAME') as string,
-            width: '20%',
+            width: '30%',
         },
         {
             name: 'package',
             label: _i18n.t('OPSFLOW.PACKAGE') as string,
-            width: '10%',
+            width: '25%',
             sortable: true,
         },
         {
             name: 'description',
             label: _i18n.t('OPSFLOW.DESCRIPTION') as string,
-            width: '60%',
+            width: '45%',
         },
         {
             name: 'buttons',

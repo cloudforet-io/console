@@ -9,8 +9,17 @@ export type TaskFieldEnum = {
     key: string;
     name: string;
 };
+export interface TaskFieldOptions { // union of all task field options
+    example?: string;
+    enums?: TaskFieldEnum[];
+    max_length?: number;
+    match_pattern?: string;
+}
+
+/* task field options by type */
 interface TextTaskFieldOptions {
     example?: string;
+    max_length?: number;
 }
 export interface ParagraphTaskFieldOptions {
     example?: string;
@@ -18,10 +27,13 @@ export interface ParagraphTaskFieldOptions {
 export interface DropdownTaskFieldOptions {
     enums: TaskFieldEnum[];
 }
+export interface ProjectTaskFieldOptions {
+    match_pattern?: string;
+}
 interface OtherTaskFieldOptions {
     [key: string]: never;
 }
-export type TaskFieldOptions = TextTaskFieldOptions | ParagraphTaskFieldOptions | DropdownTaskFieldOptions | OtherTaskFieldOptions;
+
 
 /* task field */
 interface BaseTaskField {
@@ -33,6 +45,12 @@ interface BaseTaskField {
     is_required?: boolean;
     is_primary?: boolean; // whether to display field during task creation
 }
+export interface TaskField extends BaseTaskField { // union of all task fields
+    field_type: TaskFieldType;
+    options?: TaskFieldOptions;
+}
+
+/* task fields by type */
 export interface TextTaskField extends BaseTaskField {
     field_type: 'TEXT';
     options?: TextTaskFieldOptions;
@@ -45,7 +63,11 @@ export interface DropdownTaskField extends BaseTaskField {
     field_type: 'DROPDOWN';
     options?: DropdownTaskFieldOptions;
 }
-export interface OtherTaskField extends BaseTaskField {
-    field_type: Exclude<TaskFieldType, 'TEXT'|'PARAGRAPH'|'DROPDOWN'>;
+export interface ProjectTaskField extends BaseTaskField {
+    field_type: 'PROJECT';
+    options?: ProjectTaskFieldOptions;
 }
-export type TaskField = TextTaskField | ParagraphTaskField | DropdownTaskField | OtherTaskField;
+export interface OtherTaskField extends BaseTaskField {
+    field_type: Exclude<TaskFieldType, 'TEXT'|'PARAGRAPH'|'DROPDOWN'|'PROJECT'>;
+    options: OtherTaskFieldOptions;
+}

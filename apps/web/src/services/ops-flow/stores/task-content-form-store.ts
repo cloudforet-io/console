@@ -3,7 +3,8 @@ import { reactive, computed } from 'vue';
 import { isEmpty, isEqual } from 'lodash';
 import { defineStore } from 'pinia';
 
-import type { FileModel } from '@/schema/file-manager/model';
+import { APIError } from '@cloudforet/core-lib/space-connector/error';
+
 import type { TaskField } from '@/schema/opsflow/_types/task-field-type';
 import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
 import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
@@ -16,8 +17,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
-import { useTaskStore } from '@/services/ops-flow/stores/task-store';
+import { useTaskAPI } from '@/services/ops-flow/composables/use-task-api';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 import { DEFAULT_FIELD_ID_MAP } from '@/services/ops-flow/task-fields-configuration/constants/default-field-constant';
 import {
@@ -30,9 +31,11 @@ import {
 
 interface UseTaskContentFormStoreState {
     originTask?: TaskModel;
+    isArchivedTask: boolean;
     // base form
     currentCategoryId?: string;
     currentTaskType?: TaskTypeModel;
+    hasTaskTypeLoaded: boolean;
     statusId?: string;
     assignee?: string;
     isBaseFormValid: boolean;
@@ -42,15 +45,16 @@ interface UseTaskContentFormStoreState {
     // task type field form
     data: Record<string, any>;
     dataValidationMap: Record<string, boolean>;
-    files: FileModel[];
+    fileIds: string[]; // for file upload
     // overall
-    mode: 'create'|'view';
+    mode: 'create'|'view'|'create-minimal';
     hasUnsavedChanges: boolean;
     createTaskLoading: boolean;
 }
 interface UseTaskContentFormStoreGetters {
     currentCategory: TaskCategoryModel|undefined;
     currentFields: TaskField[];
+    defaultFields: TaskField[];
     isDefaultFieldValid: boolean;
     isFieldValid: boolean;
     isAllValid: boolean;
@@ -59,16 +63,17 @@ interface UseTaskContentFormStoreGetters {
 export const useTaskContentFormStore = defineStore('task-content-form', () => {
     const taskCategoryStore = useTaskCategoryStore();
     const taskTypeStore = useTaskTypeStore();
-    const taskStore = useTaskStore();
     const taskFieldMetadataStore = useTaskFieldMetadataStore();
     const taskManagementTemplateStore = useTaskManagementTemplateStore();
     const userStore = useUserStore();
 
     const state = reactive<UseTaskContentFormStoreState>({
         originTask: undefined,
+        isArchivedTask: false,
         // base form
         currentCategoryId: undefined,
         currentTaskType: undefined,
+        hasTaskTypeLoaded: false,
         statusId: undefined,
         assignee: undefined,
         isBaseFormValid: false,
@@ -78,7 +83,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         // task type field form
         data: {},
         dataValidationMap: {},
-        files: [],
+        fileIds: [],
         // overall
         mode: 'create',
         hasUnsavedChanges: false,
@@ -94,9 +99,20 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
             const isViewMode = state.mode === 'view';
             return isViewMode ? fields : fields.filter((f) => f.is_primary || f.is_required);
         }),
+        defaultFields: computed<TaskField[]>(() => {
+            const scope = state.currentTaskType?.scope;
+            switch (scope) {
+            case 'WORKSPACE':
+                return taskFieldMetadataStore.getters.workspaceScopeDefaultFields;
+            case 'PROJECT':
+                return taskFieldMetadataStore.getters.projectScopeDefaultFields;
+            default:
+                return taskFieldMetadataStore.getters.workspaceScopeDefaultFields;
+            }
+        }),
         isDefaultFieldValid: computed<boolean>(() => {
             if (state.mode === 'view') return state.defaultDataValidationMap[DEFAULT_FIELD_ID_MAP.title] ?? true;
-            return taskFieldMetadataStore.getters.defaultFields.every((field) => state.defaultDataValidationMap[field.field_id]);
+            return getters.defaultFields.every((field) => state.defaultDataValidationMap[field.field_id]);
         }),
         isFieldValid: computed<boolean>(() => getters.currentFields?.every((field) => state.dataValidationMap[field.field_id]) ?? true),
         // overall
@@ -105,33 +121,49 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
             return state.isBaseFormValid && getters.isDefaultFieldValid && getters.isFieldValid;
         }),
         isEditable: computed<boolean>(() => {
-            if (state.mode === 'create') return true;
+            if (state.mode === 'create' || state.mode === 'create-minimal') return true;
             if (!state.originTask) return true;
+            if (state.isArchivedTask) return false;
             if (userStore.getters.isDomainAdmin) return true;
-            if (state.originTask.created_by === userStore.state.userId) return true;
+            // if (state.originTask.created_by === userStore.state.userId) return true;
             return false;
         }),
     } as unknown as UseTaskContentFormStoreGetters; // HACK: to avoid type error
+
+    const taskAPI = useTaskAPI();
     const actions = {
-        async setCurrentCategoryId(categoryId?: string) {
+        setCurrentCategoryId(categoryId?: string) {
             if (state.currentCategoryId === categoryId) return;
             state.currentCategoryId = categoryId;
             state.currentTaskType = undefined;
         },
         async setCurrentTaskType(taskTypeId?: string) {
-            if (state.currentTaskType?.task_type_id === taskTypeId) return;
+            if (state.currentTaskType?.task_type_id === taskTypeId) {
+                state.hasTaskTypeLoaded = true;
+                return;
+            }
             if (taskTypeId) {
                 if (taskTypeStore.state.fullFieldsItemMap[taskTypeId]) {
                     state.currentTaskType = taskTypeStore.state.fullFieldsItemMap[taskTypeId];
                 } else {
-                    state.currentTaskType = await taskTypeStore.getWithFullFields(taskTypeId);
+                    try {
+                        state.currentTaskType = await taskTypeStore.getWithFullFields(taskTypeId);
+                    } catch (e) {
+                        if (e instanceof APIError && e.status === 403) {
+                            state.isArchivedTask = true;
+                        } else {
+                            ErrorHandler.handleError(e);
+                        }
+                    }
                 }
             } else {
                 state.currentTaskType = undefined;
             }
-            state.data = {};
-            state.dataValidationMap = {};
-            state.files = [];
+            if (!state.originTask) {
+                state.data = {};
+                state.dataValidationMap = {};
+            }
+            state.hasTaskTypeLoaded = true;
         },
         setStatusId(statusId?: string) {
             state.statusId = statusId;
@@ -160,9 +192,9 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         setFieldValidation(fieldId: string, isValid: boolean) {
             state.dataValidationMap = { ...state.dataValidationMap, [fieldId]: isValid };
         },
-        setFiles(files: FileModel[]) {
-            state.hasUnsavedChanges = !isEqual(state.files, files);
-            state.files = files;
+        setFileIds(fileIds: string[]) {
+            state.hasUnsavedChanges = !isEqual(state.fileIds, fileIds);
+            state.fileIds = fileIds;
         },
         // overall
         setCurrentTask(task: TaskModel) {
@@ -172,11 +204,12 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
             state.statusId = task.status_id;
             state.assignee = task.assignee;
             state.defaultData = {
-                title: task.name,
-                description: task.description,
-                project: task.project_id ? [task.project_id] : undefined,
+                [DEFAULT_FIELD_ID_MAP.title]: task.name,
+                [DEFAULT_FIELD_ID_MAP.description]: task.description,
+                [DEFAULT_FIELD_ID_MAP.project]: task.project_id ? [task.project_id] : undefined,
             };
             state.data = task.data ?? {};
+            state.fileIds = task.files?.map((f) => f.file_id) ?? [];
             state.defaultDataValidationMap = {};
             state.dataValidationMap = {};
         },
@@ -185,42 +218,44 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
             state.defaultDataValidationMap = {};
             state.data = {};
             state.dataValidationMap = {};
-            state.files = [];
+            state.fileIds = [];
         },
-        setMode(mode: 'create'|'view') {
+        setMode(mode: 'create'|'view'|'create-minimal') {
             state.mode = mode;
         },
-        async createTask() {
+        async createTask(): Promise<TaskModel|undefined> {
             try {
                 if (!state.currentTaskType) throw new Error('Task type is not selected');
                 state.createTaskLoading = true;
-                state.originTask = await taskStore.create({
+                state.originTask = await taskAPI.create({
                     task_type_id: state.currentTaskType.task_type_id,
-                    name: state.defaultData.title,
+                    name: state.defaultData[DEFAULT_FIELD_ID_MAP.title],
                     status_id: state.statusId as string,
-                    description: state.defaultData.description || undefined,
+                    description: state.defaultData[DEFAULT_FIELD_ID_MAP.description] || undefined,
                     assignee: state.assignee || undefined,
                     data: isEmpty(state.data) ? undefined : state.data,
-                    files: state.files.map((f) => f.file_id),
-                    project_id: state.defaultData.project?.[0],
+                    files: state.fileIds,
+                    project_id: state.defaultData[DEFAULT_FIELD_ID_MAP.project]?.[0],
+                    resource_group: state.currentTaskType.scope,
                 });
                 showSuccessMessage(i18n.t('OPSFLOW.ALT_S_CREATE_TARGET', { target: taskManagementTemplateStore.templates.task }), '');
                 state.createTaskLoading = false;
-                return true;
+                return state.originTask;
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ALT_E_CREATE_TARGET', { target: taskManagementTemplateStore.templates.task }));
                 state.createTaskLoading = false;
-                return false;
+                return undefined;
             }
         },
         async updateTask() {
             try {
                 if (!state.originTask) throw new Error('Origin task is not defined');
-                await taskStore.update({
+                state.originTask = await taskAPI.update({
                     task_id: state.originTask.task_id,
-                    name: state.defaultData.title,
+                    name: state.defaultData[DEFAULT_FIELD_ID_MAP.title],
                 });
                 showSuccessMessage(i18n.t('OPSFLOW.ALT_S_UPDATE_TARGET', { target: taskManagementTemplateStore.templates.task }), '');
+                state.hasUnsavedChanges = false;
                 return true;
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ALT_E_UPDATE_TARGET', { target: taskManagementTemplateStore.templates.task }));

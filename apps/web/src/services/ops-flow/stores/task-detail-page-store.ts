@@ -1,4 +1,4 @@
-import { computed, reactive } from 'vue';
+import { computed, reactive, onUnmounted } from 'vue';
 
 import { defineStore } from 'pinia';
 
@@ -10,13 +10,16 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CommentModel } from '@/schema/opsflow/comment/model';
 import type { EventListParameters } from '@/schema/opsflow/event/api-verbs/list';
 import type { EventModel } from '@/schema/opsflow/event/model';
+import type { TaskModel } from '@/schema/opsflow/task/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
 
 const EVENT_PAGE_SIZE = 10;
 interface UseTaskDetailPageStoreState {
     // task
-    taskId?: string;
+    task?: TaskModel;
     visibleTaskDeleteModal: boolean;
     // events
     page: number;
@@ -29,14 +32,23 @@ interface UseTaskDetailPageStoreState {
 }
 
 interface UseTaskDetailPageStoreGetters {
+    // task
+    task: TaskModel|undefined;
+    isArchivedTask: boolean;
+    // form
+    hasUnsavedChanges: boolean;
+    isFormValid: boolean;
+    isEditable: boolean;
+    // events
     firstLoadingEvents: boolean;
     hasMoreEvents: boolean;
 }
 
 export const useTaskDetailPageStore = defineStore('task-detail-page', () => {
+    const taskContentFormStore = useTaskContentFormStore();
     const state = reactive<UseTaskDetailPageStoreState>({
         // task
-        taskId: undefined,
+        task: undefined,
         visibleTaskDeleteModal: false,
         // events
         page: 1,
@@ -48,6 +60,13 @@ export const useTaskDetailPageStore = defineStore('task-detail-page', () => {
         targetComment: undefined,
     });
     const getters: UseTaskDetailPageStoreGetters = {
+        // task
+        task: computed<TaskModel|undefined>(() => taskContentFormStore.state.originTask),
+        isArchivedTask: computed<boolean>(() => taskContentFormStore.state.isArchivedTask),
+        // form
+        hasUnsavedChanges: computed<boolean>(() => taskContentFormStore.state.hasUnsavedChanges),
+        isFormValid: computed<boolean>(() => taskContentFormStore.getters.isAllValid),
+        isEditable: computed<boolean>(() => taskContentFormStore.getters.isEditable),
         // events
         firstLoadingEvents: computed<boolean>(() => !state.events),
         hasMoreEvents: computed<boolean>(() => {
@@ -65,9 +84,12 @@ export const useTaskDetailPageStore = defineStore('task-detail-page', () => {
     const fetchEventList = getCancellableFetcher<EventListParameters, ListResponse<EventModel>>(SpaceConnector.clientV2.opsflow.event.list);
     const actions = {
         // task
-        setCurrentTaskId(taskId: string) {
-            state.taskId = taskId;
+        setCurrentTask(task: TaskModel) {
+            state.task = task;
+            taskContentFormStore.setCurrentTask(task);
+            taskContentFormStore.setMode('view');
         },
+        updateTask: taskContentFormStore.updateTask,
         openTaskDeleteModal() {
             state.visibleTaskDeleteModal = true;
         },
@@ -77,7 +99,7 @@ export const useTaskDetailPageStore = defineStore('task-detail-page', () => {
         // events
         async loadNewEvents() {
             try {
-                if (!state.taskId) throw new Error('Task ID is not set');
+                if (!state.task) throw new Error('Task is not set');
                 if (!state.events?.length) {
                     await actions.listEvents();
                     return;
@@ -88,7 +110,7 @@ export const useTaskDetailPageStore = defineStore('task-detail-page', () => {
                 }]);
 
                 const res = await fetchEventList({
-                    task_id: state.taskId,
+                    task_id: state.task.task_id,
                     query: loadMoreEventsQueryHelper.dataV2,
                 });
                 if (res.status === 'succeed') {
@@ -101,7 +123,7 @@ export const useTaskDetailPageStore = defineStore('task-detail-page', () => {
         },
         async listEvents() {
             try {
-                if (!state.taskId) throw new Error('Task ID is not set');
+                if (!state.task) throw new Error('Task is not set');
                 state.loadingEvents = true;
                 if (state.lastTotalCount && state.events && state.events.length >= state.lastTotalCount) {
                     state.loadingEvents = false;
@@ -110,7 +132,7 @@ export const useTaskDetailPageStore = defineStore('task-detail-page', () => {
 
                 listEventsQueryHelper.setPage(state.page, EVENT_PAGE_SIZE);
                 const res = await fetchEventList({
-                    task_id: state.taskId,
+                    task_id: state.task.task_id,
                     query: listEventsQueryHelper.dataV2,
                 });
                 if (res.status === 'succeed') {
@@ -147,6 +169,11 @@ export const useTaskDetailPageStore = defineStore('task-detail-page', () => {
             state.targetComment = undefined;
         },
     };
+
+    onUnmounted(() => {
+        taskContentFormStore.$reset();
+        taskContentFormStore.$dispose();
+    });
     return {
         state,
         getters,

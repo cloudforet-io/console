@@ -1,7 +1,6 @@
-export interface Attachment<Data = never> {
+export interface Attachment {
     downloadUrl: string;
     fileId: string;
-    data?: Data;
 }
 
-export type ImageUploader<Data = never> = (image: File) => Promise<Attachment<Data>>;
+export type ImageUploader = (image: File) => Promise<Attachment>;

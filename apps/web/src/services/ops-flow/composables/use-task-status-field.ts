@@ -9,7 +9,8 @@ import { getParticle, i18n } from '@/translations';
 
 import { useFieldValidator } from '@/common/composables/form-validator';
 
-import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
+import { TASK_STATUS_LABELS } from '@/services/ops-flow/constants/task-status-label-constant';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 
 const EMPTY_STATUS_OPTIONS = {
     TODO: [],
@@ -57,17 +58,17 @@ export const useTaskStatusField = ({
     const loadAllStatusItems = async () => {
         const statusOptions = await getStatusOptions();
         const items: StatusItem[] = [];
-        items.push({ type: 'header', label: 'To-do', name: 'to-do' });
+        items.push({ type: 'header', label: TASK_STATUS_LABELS.TODO, name: 'to-do' });
         items.push({ type: 'divider', name: 'todo-div' });
         statusOptions.TODO.forEach((status) => {
             items.push({ name: status.status_id, label: status.name, color: status.color });
         });
-        items.push({ type: 'header', label: 'In progress', name: 'in-progress' });
+        items.push({ type: 'header', label: TASK_STATUS_LABELS.IN_PROGRESS, name: 'in-progress' });
         items.push({ type: 'divider', name: 'in-progress-div' });
         statusOptions.IN_PROGRESS.forEach((status) => {
             items.push({ name: status.status_id, label: status.name, color: status.color });
         });
-        items.push({ type: 'header', label: 'Completed', name: 'completed' });
+        items.push({ type: 'header', label: TASK_STATUS_LABELS.COMPLETED, name: 'completed' });
         items.push({ type: 'divider', name: 'completed-div' });
         statusOptions.COMPLETED.forEach((status) => {
             items.push({ name: status.status_id, label: status.name, color: status.color });

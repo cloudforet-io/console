@@ -1,61 +1,56 @@
-import axios from 'axios';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ResourceGroupType } from '@/schema/_common/type';
-import type { FileAddParameters } from '@/schema/file-manager/api-verbs/add';
-import type {
-    FileGetDownloadUrlParameters,
-} from '@/schema/file-manager/api-verbs/get-download-url';
 import type { FileModel } from '@/schema/file-manager/model';
 
 import type { Attachment } from '@/common/components/editor/extensions/image/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-type FileManagerResourceGroupType = Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'SYSTEM'>;
+type FileManagerResourceGroupType = Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'USER'>;
 
-interface UploadedFile extends FileModel {
-    upload_url: string;
-    upload_options: object;
-}
-const getUploadInfo = async (file: File, resourceGroup: FileManagerResourceGroupType, domainOrWorkspaceId: string): Promise<UploadedFile> => {
-    const params: FileAddParameters = {
-        name: file.name,
-        resource_group: resourceGroup,
-    };
-    if (resourceGroup === 'DOMAIN') params.domain_id = domainOrWorkspaceId;
-    else if (resourceGroup === 'WORKSPACE') params.workspace_id = domainOrWorkspaceId;
-    const result = await SpaceConnector.clientV2.fileManager.file.add<FileAddParameters, FileModel>(params);
-    if (!result.upload_url || !result.upload_options) throw new Error('[File Manager] No upload info in response of add file api');
-    return result as UploadedFile;
-};
 
-const uploadFile = async (uploadUrl: string, options: object, file: File) => {
+const uploadFile = async (file: File, resourceGroup: FileManagerResourceGroupType): Promise<FileModel> => {
     const formData = new FormData();
-    Object.keys(options).forEach((key) => {
-        formData.append(key, options[key]);
+    formData.append('files', file);
+
+    let resourceGroupPath: string;
+    if (resourceGroup === 'DOMAIN') {
+        resourceGroupPath = 'domain';
+    } else if (resourceGroup === 'WORKSPACE') {
+        resourceGroupPath = 'workspace';
+    } else if (resourceGroup === 'USER') {
+        resourceGroupPath = 'user';
+    } else { resourceGroupPath = 'public'; }
+
+    const response = await SpaceConnector.restClient.post(`/files/${resourceGroupPath}/upload`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
     });
-    formData.append('file', file);
-    await axios.post(uploadUrl, formData);
+    return response.data;
 };
 
-export const getUploadedFile = async (fileId: string): Promise<FileModel> => {
-    const result = await SpaceConnector.clientV2.fileManager.file.getDownloadUrl<FileGetDownloadUrlParameters, FileModel>({
-        file_id: fileId,
-    });
-    if (!result.download_url) throw new Error('[File Manager] No download url in response of update file state api');
-    return result;
+export const getFileDownloadUrl = (fileId: string, resourceGroup: FileManagerResourceGroupType): string => {
+    const baseUri = SpaceConnector.restClient.getUri();
+
+    let resourceGroupPath: string;
+    if (resourceGroup === 'DOMAIN') {
+        resourceGroupPath = 'domain';
+    } else if (resourceGroup === 'WORKSPACE') {
+        resourceGroupPath = 'workspace';
+    } else if (resourceGroup === 'USER') {
+        resourceGroupPath = 'user';
+    } else { resourceGroupPath = 'public'; }
+
+    return `${baseUri}/files/${resourceGroupPath}/${fileId}?token=${SpaceConnector.getAccessToken()}`;
 };
-export const uploadFileAndGetFileInfo = async (file: File, resourceGroup: FileManagerResourceGroupType, domainOrWorkspaceId: string): Promise<Attachment<FileModel>> => {
+export const uploadFileAndGetFileInfo = async (file: File, resourceGroup: FileManagerResourceGroupType): Promise<Attachment> => {
     try {
-        const uploadInfo = await getUploadInfo(file, resourceGroup, domainOrWorkspaceId);
-        await uploadFile(uploadInfo.upload_url, uploadInfo.upload_options, file);
-        const fileModel = await getUploadedFile(uploadInfo.file_id);
+        const fileModel = await uploadFile(file, resourceGroup);
         return {
-            downloadUrl: fileModel.download_url as string,
+            downloadUrl: getFileDownloadUrl(fileModel.file_id, resourceGroup),
             fileId: fileModel.file_id,
-            data: fileModel,
         };
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -65,3 +60,4 @@ export const uploadFileAndGetFileInfo = async (file: File, resourceGroup: FileMa
         };
     }
 };
+

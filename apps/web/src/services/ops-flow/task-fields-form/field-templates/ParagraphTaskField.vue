@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { toRef } from 'vue';
+import { toRef, ref } from 'vue';
 
 import { isEqual } from 'lodash';
 
@@ -7,12 +7,11 @@ import {
     PFieldGroup,
 } from '@cloudforet/mirinae';
 
-import type { FileModel } from '@/schema/file-manager/model';
 import type { ParagraphTaskField } from '@/schema/opsflow/_types/task-field-type';
 
-import type { Attachment } from '@/common/components/editor/extensions/image/type';
 import TextEditor from '@/common/components/editor/TextEditor.vue';
 import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
+import { useEditorContentTransformer } from '@/common/composables/editor-content-transformer';
 import { useFileAttachments } from '@/common/composables/file-attachments';
 import { useFileUploader } from '@/common/composables/file-uploader';
 
@@ -36,12 +35,17 @@ const {
 
 const { fileUploader } = useFileUploader();
 const { attachments } = useFileAttachments(toRef(props, 'files'));
-const handleUpdateAttachments = (newAttachments: Attachment<FileModel>[]) => {
+const handleUpdateAttachmentIds = (attachmentIds: string[]) => {
     const originFileIds = props.files.map((f) => f.file_id);
-    const newFileIds = newAttachments.map((a) => a.fileId);
-    if (isEqual(originFileIds, newFileIds)) return;
-    const files = newAttachments.map((a) => a.data as FileModel);
-    emit('update:files', files);
+    if (isEqual(originFileIds, attachmentIds)) return;
+    emit('update:file-ids', attachmentIds);
+};
+
+const editorContent = ref(fieldValue.value);
+const { transformEditorContent } = useEditorContentTransformer();
+const handleUpdateEditorContent = (val: string) => {
+    editorContent.value = val;
+    updateFieldValue(transformEditorContent(val));
 };
 </script>
 
@@ -61,14 +65,14 @@ const handleUpdateAttachments = (newAttachments: Attachment<FileModel>[]) => {
         />
         <text-editor v-else
                      class="my-1"
-                     :value="fieldValue"
+                     :value="editorContent"
                      :image-uploader="fileUploader"
                      :attachments="attachments"
                      :placeholder="props.field.options?.example"
                      :invalid="isInvalid"
                      content-type="markdown"
-                     @update:value="updateFieldValue"
-                     @update:attachments="handleUpdateAttachments"
+                     @update:value="handleUpdateEditorContent"
+                     @update:attachment-ids="handleUpdateAttachmentIds"
         />
     </p-field-group>
 </template>

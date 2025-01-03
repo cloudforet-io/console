@@ -1,4 +1,4 @@
-import type { InternalAxiosRequestConfig, CreateAxiosDefaults } from 'axios';
+import type { InternalAxiosRequestConfig, CreateAxiosDefaults, Axios } from 'axios';
 import axios from 'axios';
 import type { CustomAxiosRequestConfig } from 'axios-auth-refresh/dist/utils';
 import { camelCase } from 'lodash';
@@ -47,6 +47,8 @@ export class SpaceConnector {
 
     private _clientV2: any = {};
 
+    private _restClient: Axios;
+
     private static mockConfig: MockConfig;
 
     private static authConfig: AuthConfig;
@@ -69,9 +71,10 @@ export class SpaceConnector {
         SpaceConnector.isDevMode = devConfig?.enabled ?? false;
         this.tokenApi = tokenApi;
         this.serviceApi = new ServiceAPI(endpoints[0], this.tokenApi, apiSettings[0]);
-        this.serviceApiV2 = new ServiceAPI(endpoints[1], this.tokenApi, apiSettings[1]);
+        const serviceApiV2 = new ServiceAPI(endpoints[1], this.tokenApi, apiSettings[1]);
+        this.serviceApiV2 = serviceApiV2;
         this.afterCallApiMap = afterCallApiMap;
-        this.setApiTokenCheckInterval();
+        this._restClient = serviceApiV2.instance;
     }
 
     private setApiTokenCheckInterval() {
@@ -110,6 +113,13 @@ export class SpaceConnector {
             return SpaceConnector.instance._clientV2;
         }
         throw new Error('Not initialized client V2!');
+    }
+
+    static get restClient(): Axios {
+        if (SpaceConnector.instance) {
+            return SpaceConnector.instance._restClient;
+        }
+        throw new Error('Not initialized restClient!');
     }
 
     static setToken(accessToken: string, refreshToken?: string): void {

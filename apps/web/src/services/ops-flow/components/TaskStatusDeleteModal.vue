@@ -14,7 +14,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import TaskStatusBadge from '@/services/ops-flow/components/TaskStatusBadge.vue';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
-import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';

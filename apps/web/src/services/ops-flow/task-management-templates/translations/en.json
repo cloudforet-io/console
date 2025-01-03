@@ -16,6 +16,7 @@
 		"TaskCategory": "Support Category",
 		"TaskType": "Request Type",
 		"TemplateName": "Service Desk",
+		"landingDescription": "Easily submit and track your support requests. Select a category and request type below to get started. Whether you need help with account management, billing inquiries, or service requests, Service Desk provides the support you need.",
 		"task": "ticket",
 		"taskType": "request type",
 		"taskTypes": "request types",

@@ -130,8 +130,7 @@ watch([loading, () => props.userId, () => props.userIds], ([_loading, newUserId,
 </script>
 
 <template>
-    <p-select-dropdown class="user-select-dropdown"
-                       show-select-marker
+    <p-select-dropdown show-select-marker
                        :selected="selectedUserItems"
                        :handler="userMenuItemsHandler"
                        :page-size="10"
@@ -149,9 +148,3 @@ watch([loading, () => props.userId, () => props.userIds], ([_loading, newUserId,
                        @update:selected="handleUpdateSelectedUserItems"
     />
 </template>
-
-<style scoped lang="postcss">
-.user-select-dropdown {
-    width: fit-content;
-}
-</style>

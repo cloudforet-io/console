@@ -5,23 +5,23 @@ import type { Attachment } from '@/common/components/editor/extensions/image/typ
 // such as <p></p>
 export const emptyHtmlRegExp = /<[^/>][^>]*><\/[^>]+>/;
 
-export const getAttachments = <FileData>(editor: Editor, imgFileDataMap: Map<string, FileData>): Attachment<FileData>[] => {
+export const getAttachmentIds = (editor: Editor): string[] => {
     const contentsEl = editor.contentComponent?.$el;
     if (!contentsEl) return [];
     const imageElements = contentsEl.getElementsByTagName('img');
     return Array.from(imageElements)
         .reduce((results, imageElement) => {
             const fileId = imageElement.getAttribute('file-id');
-            const downloadUrl = imageElement.getAttribute('src');
-            if (fileId && downloadUrl) {
-                results.push({ fileId, downloadUrl, data: imgFileDataMap.get(fileId) });
+            const src = imageElement.getAttribute('src');
+            if (fileId && src) {
+                results.push(fileId);
             }
 
             return results;
-        }, [] as Attachment<FileData>[]);
+        }, [] as string[]);
 };
 
-export const setAttachmentsToContents = (contents: string, attachments: Attachment<any>[]): string => {
+export const setAttachmentsToContents = (contents: string, attachments: Attachment[]): string => {
     if (attachments.length === 0) return contents;
 
     const contentsEl = document.createElement('div');
