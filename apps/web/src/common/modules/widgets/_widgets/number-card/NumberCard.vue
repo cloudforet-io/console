@@ -168,8 +168,8 @@ const comparisonQueryKey = computed(() => [
     'widget-load-number-card-comparison',
     props.widgetId,
     {
-        start: dateRange.value.start,
-        end: dateRange.value.end,
+        start: state.comparisonDateRange.start,
+        end: state.comparisonDateRange.end,
         granularity: widgetOptionsState.granularityInfo?.granularity,
         dataTableId: state.dataTable?.data_table_id,
         dataTableOptions: JSON.stringify(sortObjectByKeys(state.dataTable?.options) ?? {}),
