@@ -73,7 +73,7 @@ const state = reactive({
         if (!state.proxyOperatorOptions.fields?.labels?.length) return true;
         if (!state.proxyOperatorOptions.fields?.column) return true;
         if (!state.proxyOperatorOptions.fields?.data) return true;
-        if (!state.proxyOperatorOptions.select && !state.proxyOperatorOptions.limit && state.proxyOperatorOptions?.fields?.column !== 'Date') return true;
+        if (!state.proxyOperatorOptions.select?.length && !state.proxyOperatorOptions.limit && state.proxyOperatorOptions?.fields?.column !== 'Date') return true;
         return false;
     }),
     columnFieldInvalid: computed<boolean>(() => {
@@ -150,15 +150,8 @@ const handleChangeValueType = (value: string) => {
     }
 };
 
-const handleSelectDynamicFields = (value?: MenuItem) => {
-    if (!value || !value.name) {
-        selectInfo.value = [];
-        return;
-    }
-    selectInfo.value = [
-        ...(selectInfo.value ?? []),
-        value.name,
-    ];
+const handleSelectDynamicFields = (value?: MenuItem[]) => {
+    selectInfo.value = value?.map((item) => item.name as string) ?? [];
 };
 const handleUpdateLimit = (value: string) => {
     limitInfo.value = parseInt(value);
@@ -316,14 +309,15 @@ onMounted(() => {
                                            :menu="state.dynamicFieldItems"
                                            :selected="state.selectedDynamicFieldMenuItems"
                                            :loading="state.dynamicFieldLoading"
+                                           :invalid="!state.selectedDynamicFieldMenuItems.length"
                                            use-fixed-menu-style
                                            multi-selectable
                                            appearance-type="badge"
                                            show-select-marker
                                            show-clear-selection
                                            block
-                                           @select="handleSelectDynamicFields"
-                                           @clear-selection="handleSelectDynamicFields()"
+                                           @update:selected="handleSelectDynamicFields"
+                                           @clear-selection="handleSelectDynamicFields([])"
                         />
                         <p-text-input v-else-if="state.proxyOperatorOptions.fields?.column !== 'Date'"
                                       type="number"
