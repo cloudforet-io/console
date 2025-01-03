@@ -31,12 +31,6 @@ interface ApiHandler {
     <Params = any, Response = any>(params?: Params, config?: CustomAxiosRequestConfig): Promise<Response>;
     [key: string]: ApiHandler;
 }
-interface RestApiHandler {
-    post: Axios['post'];
-    get: Axios['get'];
-    put: Axios['put'];
-    delete: Axios['delete'];
-}
 const DEFAULT_MOCK_CONFIG: MockRequestConfig = Object.freeze({ mockMode: false });
 export class SpaceConnector {
     private static instance: SpaceConnector;
@@ -53,7 +47,7 @@ export class SpaceConnector {
 
     private _clientV2: any = {};
 
-    private _restClient: RestApiHandler;
+    private _restClient: Axios;
 
     private static mockConfig: MockConfig;
 
@@ -80,12 +74,7 @@ export class SpaceConnector {
         const serviceApiV2 = new ServiceAPI(endpoints[1], this.tokenApi, apiSettings[1]);
         this.serviceApiV2 = serviceApiV2;
         this.afterCallApiMap = afterCallApiMap;
-        this._restClient = {
-            post: serviceApiV2.instance.post,
-            get: serviceApiV2.instance.get,
-            put: serviceApiV2.instance.put,
-            delete: serviceApiV2.instance.delete,
-        };
+        this._restClient = serviceApiV2.instance;
     }
 
     private setApiTokenCheckInterval() {
@@ -126,7 +115,7 @@ export class SpaceConnector {
         throw new Error('Not initialized client V2!');
     }
 
-    static get restClient(): RestApiHandler {
+    static get restClient(): Axios {
         if (SpaceConnector.instance) {
             return SpaceConnector.instance._restClient;
         }
