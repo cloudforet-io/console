@@ -95,9 +95,12 @@ const {
 onBeforeRouteLeave(handleBeforeRouteLeave);
 
 /* form button handling */
+const creating = ref(false);
 const handleConfirm = async () => {
     if (!taskContentFormGetters.isAllValid) return;
+    creating.value = true;
     createdTask.value = await taskContentFormStore.createTask();
+    creating.value = false;
     if (createdTask.value) {
         goBack();
     }
@@ -147,11 +150,13 @@ defineExpose({ setPathFrom });
         </p-pane-layout>
         <div class="py-3 flex flex-wrap gap-1 justify-end">
             <p-button style-type="transparent"
+                      :disabled="creating"
                       @click="goBack()"
             >
                 {{ $t('COMMON.BUTTONS.CANCEL') }}
             </p-button>
             <p-button style-type="primary"
+                      :loading="creating"
                       :disabled="!taskContentFormGetters.isAllValid"
                       @click="handleConfirm"
             >
