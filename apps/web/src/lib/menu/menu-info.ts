@@ -269,7 +269,7 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.OPS_FLOW,
         routeName: OPS_FLOW_ROUTE._NAME,
         translationId: 'MENU.OPS_FLOW',
-        icon: 'ic_gnb_bell', // TODO: change icon
+        icon: 'ic_service_board',
     },
     [MENU_ID.OPS_FLOW_LANDING]: {
         menuId: MENU_ID.OPS_FLOW_LANDING,

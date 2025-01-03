@@ -35,7 +35,9 @@ const handleUpdate = (val: string[]) => {
                    :invalid-text="invalidText"
                    no-spacing
     >
-        <p-datetime-picker class="my-1"
+        <!-- NOTE: key is required to re-render the component when readonly prop is changed -->
+        <p-datetime-picker :key="`datetime-picker-${props.readonly}`"
+                           class="my-1"
                            :selected-dates="selectedDates"
                            :invalid="isInvalid"
                            :readonly="props.readonly"

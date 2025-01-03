@@ -17,7 +17,8 @@ import type {
 
 type NotRef<T> = T extends Ref<any> ? never : T;
 const stringValidatorTypes: TaskFieldType[] = ['TEXT', 'PARAGRAPH', 'DATE'];
-const stringArrayValidatorTypes: TaskFieldType[] = ['LABELS', 'DROPDOWN', 'USER', 'PROJECT']; // , 'PROVIDER', 'SERVICE_ACCOUNT', 'ASSET'];
+const stringArrayValidatorTypes: TaskFieldType[] = ['LABELS', 'DROPDOWN', 'USER', 'ASSET', 'SERVICE_ACCOUNT']; // , 'PROVIDER'];
+const stringOrStringArrayValidatorTypes: TaskFieldType[] = ['PROJECT'];
 export const useTaskFieldValidation = <TField extends TaskField, TValue>(
     props: TaskFieldFormProps<TField, NotRef<TValue>>,
     emit: TaskFieldFormEmits<TValue>,
@@ -25,15 +26,21 @@ export const useTaskFieldValidation = <TField extends TaskField, TValue>(
     const stringValidator: ValidatorFn<TValue> = (val): string|boolean => {
         if (val === undefined || val === null) {
             if (props.field.is_required) {
-                return i18n.t('OPSFLOW.VALIDATION.FIELD_REQUIRED');
+                return i18n.t('OPSFLOW.VALIDATION.FIELD_REQUIRED') as string;
             }
             return true;
         }
         if (typeof val !== 'string') {
-            return i18n.t('OPSFLOW.VALIDATION.VALUE_STRING');
+            return i18n.t('OPSFLOW.VALIDATION.VALUE_STRING') as string;
         }
         if (props.field.is_required && val.trim() === '') {
-            return i18n.t('OPSFLOW.VALIDATION.FIELD_REQUIRED');
+            return i18n.t('OPSFLOW.VALIDATION.FIELD_REQUIRED') as string;
+        }
+        if (typeof props.field.options?.max_length === 'number' && val.length > props.field.options.max_length) {
+            return i18n.t('OPSFLOW.VALIDATION.VALUE_TOO_LONG', { length: props.field.options.max_length }) as string;
+        }
+        if (props.field.options?.match_pattern && !new RegExp(props.field.options.match_pattern).test(val)) {
+            return i18n.t('OPSFLOW.VALIDATION.INVALID_FORMAT', { format: props.field.options.match_pattern }) as string;
         }
         return true;
     };
@@ -41,28 +48,49 @@ export const useTaskFieldValidation = <TField extends TaskField, TValue>(
     const stringArrayValidator: ValidatorFn<TValue> = (val): string|boolean => {
         if (val === undefined || val === null) {
             if (props.field.is_required) {
-                return i18n.t('OPSFLOW.VALIDATION.FIELD_REQUIRED');
+                return i18n.t('OPSFLOW.VALIDATION.FIELD_REQUIRED') as string;
             }
             return true;
         }
         if (!Array.isArray(val)) {
-            return i18n.t('OPSFLOW.VALIDATION.VALUE_ARRAY');
+            return i18n.t('OPSFLOW.VALIDATION.VALUE_ARRAY') as string;
         }
         // SINGLE case
         if (!props.field.selection_type || props.field.selection_type === 'SINGLE') {
             if (val.length > 1) {
-                return i18n.t('OPSFLOW.VALIDATION.VALUE_ONLY_ONE');
+                return i18n.t('OPSFLOW.VALIDATION.VALUE_ONLY_ONE') as string;
             }
             if (props.field.is_required && val.length === 0) {
-                return i18n.t('OPSFLOW.VALIDATION.FIELD_REQUIRED');
+                return i18n.t('OPSFLOW.VALIDATION.FIELD_REQUIRED') as string;
+            }
+            if (props.field.options?.match_pattern && !new RegExp(props.field.options.match_pattern).test(val[0])) {
+                return i18n.t('OPSFLOW.VALIDATION.INVALID_FORMAT', { format: props.field.options.match_pattern }) as string;
             }
             return true;
         }
         // MULTI case
         if (props.field.is_required && val.length === 0) {
-            return i18n.t('OPSFLOW.VALIDATION.FIELD_REQUIRED');
+            return i18n.t('OPSFLOW.VALIDATION.FIELD_REQUIRED') as string;
+        }
+        if (props.field.options?.match_pattern) {
+            const pattern = props.field.options.match_pattern;
+            const invalidValues = val.filter((v) => !new RegExp(pattern).test(v));
+            if (invalidValues.length > 0) {
+                return i18n.t('OPSFLOW.VALIDATION.INVALID_FORMAT', { format: props.field.options.match_pattern }) as string;
+            }
         }
         return true;
+    };
+
+    const stringOrStringArrayValidator: ValidatorFn<TValue> = (val): string|boolean => {
+        if (props.field.selection_type === 'MULTI') {
+            if (!Array.isArray(val)) {
+                return i18n.t('OPSFLOW.VALIDATION.VALUE_ARRAY') as string;
+            }
+            return stringArrayValidator(val) as string;
+        }
+        // SINGLE case
+        return stringValidator(val) as string;
     };
 
 
@@ -76,6 +104,9 @@ export const useTaskFieldValidation = <TField extends TaskField, TValue>(
         }
         if (stringArrayValidatorTypes.includes(props.field.field_type)) {
             return stringArrayValidator(val);
+        }
+        if (stringOrStringArrayValidatorTypes.includes(props.field.field_type)) {
+            return stringOrStringArrayValidator(val);
         }
         ErrorHandler.handleError(new Error(`Unsupported field type: ${props.field.field_type}`));
         return i18n.t('OPSFLOW.VALIDATION.UNSUPPORTED_FIELD_TYPE');

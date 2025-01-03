@@ -20,7 +20,7 @@ const deleteComment = async () => {
         if (!taskDetailPageStore.state.targetComment) throw new Error('targetComment is not defined');
         loading.value = true;
         await commentStore.delete(taskDetailPageStore.state.targetComment.comment_id);
-        showSuccessMessage(i18n.t('OPSFLOW.ALT_S_DELETE_TARGET', { target: i18n.t('OPSFLOW.TASK_BOARD.COMMENT') }));
+        showSuccessMessage(i18n.t('OPSFLOW.ALT_S_DELETE_TARGET', { target: i18n.t('OPSFLOW.TASK_BOARD.COMMENT') }) as string, '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ERR_S_DELETE_TARGET', { target: i18n.t('OPSFLOW.TASK_BOARD.COMMENT') }));
     } finally {

@@ -1,17 +1,14 @@
 <script setup lang="ts">
 import { PCollapsiblePanel, PLink } from '@cloudforet/mirinae';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
-
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 
 const props = defineProps<{
+    workspaceId: string;
     taskId: string;
     name: string;
     linkNewTab?: boolean;
 }>();
-
-const { getProperRouteLocation } = useProperRouteLocation();
 
 </script>
 
@@ -20,10 +17,13 @@ const { getProperRouteLocation } = useProperRouteLocation();
                          :line-clamp="1"
     >
         <p-link :text="props.name"
-                :to="getProperRouteLocation({
+                :to="{
                     name: OPS_FLOW_ROUTE.BOARD.TASK_DETAIL._NAME,
-                    params: {taskId: props.taskId},
-                })"
+                    params: {
+                        workspaceId: props.workspaceId,
+                        taskId: props.taskId,
+                    },
+                }"
                 :highlight="!props.linkNewTab"
                 :action-icon="props.linkNewTab ? 'internal-link' : 'none'"
                 :new-tab="props.linkNewTab"

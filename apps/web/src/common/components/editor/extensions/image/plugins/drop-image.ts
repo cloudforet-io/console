@@ -7,7 +7,7 @@ const LOADING_IMAGE_NODE = {
     'data-loading': true,
     style: 'max-width: 2rem; max-height: 2rem;',
 };
-export const dropImagePlugin = (upload: ImageUploader<any>, imgFileDataMap: Map<string, any>) => new Plugin({
+export const dropImagePlugin = (upload: ImageUploader) => new Plugin({
     props: {
         handleDOMEvents: {
             paste: (view, _event: Event) => {
@@ -29,8 +29,7 @@ export const dropImagePlugin = (upload: ImageUploader<any>, imgFileDataMap: Map<
                             view.dispatch(loadingTransaction);
 
                             // upload and replace the loading node with the uploaded image node
-                            upload(image).then(({ downloadUrl, fileId, data }) => {
-                                if (data) imgFileDataMap.set(fileId, data);
+                            upload(image).then(({ downloadUrl, fileId }) => {
                                 const node = schema.nodes.image.create({
                                     src: downloadUrl,
                                     'file-id': fileId,
@@ -88,8 +87,7 @@ export const dropImagePlugin = (upload: ImageUploader<any>, imgFileDataMap: Map<
                         view.dispatch(loadingTransaction);
 
                         // upload and replace the loading node with the uploaded image node
-                        const { downloadUrl, fileId, data } = await upload(image);
-                        if (data) imgFileDataMap.set(fileId, data);
+                        const { downloadUrl, fileId } = await upload(image);
                         const node = schema.nodes.image.create({
                             src: downloadUrl,
                             'file-id': fileId,

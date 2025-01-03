@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import type { TaskDeleteParameters } from '@/schema/opsflow/task/api-verbs/delete';
+import type { TaskModel } from '@/schema/opsflow/task/model';
 import { getParticle, i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -9,26 +13,27 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useTaskDetailPageStore } from '@/services/ops-flow/stores/task-detail-page-store';
-import { useTaskStore } from '@/services/ops-flow/stores/task-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
+
 const emit = defineEmits<{(event: 'deleted'): void;
 }>();
 const taskDetailPageStore = useTaskDetailPageStore();
-const taskStore = useTaskStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 const loading = ref<boolean>(false);
 
 let hasDeleted = false;
 const deleteTask = async () => {
     try {
-        if (!taskDetailPageStore.state.taskId) throw new Error('taskId is not defined');
+        if (!taskDetailPageStore.getters.task) throw new Error('task is not defined');
         loading.value = true;
-        await taskStore.delete(taskDetailPageStore.state.taskId);
+        await SpaceConnector.clientV2.opsflow.task.delete<TaskDeleteParameters, TaskModel>({
+            task_id: taskDetailPageStore.getters.task.task_id,
+        });
         hasDeleted = true;
-        showSuccessMessage(i18n.t('OPSFLOW.ALT_S_DELETE_TARGET', { target: taskManagementTemplateStore.templates.Task }));
+        showSuccessMessage(i18n.t('OPSFLOW.ALT_S_DELETE_TARGET', { target: taskManagementTemplateStore.templates.Task }) as string, '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ERR_S_DELETE_TARGET', { target: taskManagementTemplateStore.templates.Task }));
     } finally {

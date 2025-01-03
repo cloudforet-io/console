@@ -7,7 +7,7 @@ import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vu
 import type { DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
 import type { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import type { DynamicLayoutBaseProps, DynamicLayoutFieldHandler, DynamicLayoutTypeOptions } from '@/data-display/dynamic/dynamic-layout/type';
-import type { ItemOptions, DynamicLayoutType } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { ItemOptions } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import PHeading from '@/data-display/heading/PHeading.vue';
 import { DEFINITION_TABLE_STYLE_TYPE } from '@/data-display/tables/definition-table/config';
@@ -18,7 +18,6 @@ import { I18nConnector } from '@/translations';
 // NOTE: Due to the vue version issue of mirinae, it is not possible to define a type with generics using defineProps.
 interface Props extends DynamicLayoutBaseProps {
     name: string;
-    type: DynamicLayoutType;
     options: ItemOptions;
     data?: any;
     typeOptions?: DynamicLayoutTypeOptions;

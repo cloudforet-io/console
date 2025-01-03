@@ -9,8 +9,9 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import TaskStatusList from '@/services/ops-flow/components/TaskStatusList.vue';
+import { TASK_STATUS_LABELS } from '@/services/ops-flow/constants/task-status-label-constant';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
-import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 
 const taskCategoryPageStore = useTaskCategoryPageStore();
 const taskCategoryStore = useTaskCategoryStore();
@@ -19,9 +20,9 @@ const taskStatusTree = computed<{
     key: TaskStatusType,
     name: string,
 }[]>(() => [
-    { key: 'TODO', name: 'To-do' },
-    { key: 'IN_PROGRESS', name: 'In Progress' },
-    { key: 'COMPLETED', name: 'Completed' },
+    { key: 'TODO', name: TASK_STATUS_LABELS.TODO },
+    { key: 'IN_PROGRESS', name: TASK_STATUS_LABELS.IN_PROGRESS },
+    { key: 'COMPLETED', name: TASK_STATUS_LABELS.COMPLETED },
 ]);
 
 const handleUpdateItems = async (statusType: TaskStatusType, items: TaskStatusOption[]) => {

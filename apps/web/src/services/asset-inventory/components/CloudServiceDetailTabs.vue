@@ -6,7 +6,7 @@ import { get } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PDynamicLayout, PTab, PEmpty, PTextButton, PI,
+    PDynamicLayout, PTab, PEmpty, PTextButton, PI, PHeading,
 } from '@cloudforet/mirinae';
 import type { DynamicLayoutFieldHandler } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type';
 
@@ -15,8 +15,10 @@ import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service
 import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import { i18n } from '@/translations';
 
+import { useDisplayStore } from '@/store/display/display-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
+import { MENU_ID } from '@/lib/menu/config';
 import type { Reference } from '@/lib/reference/type';
 
 
@@ -37,6 +39,10 @@ import CloudServiceLogTab
 import CloudServiceTagsPanel
     from '@/services/asset-inventory/components/CloudServiceTagsPanel.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import BoardTaskTable from '@/services/ops-flow/components/BoardTaskTable.vue';
+import {
+    useTaskManagementTemplateStore,
+} from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 interface Props {
@@ -54,6 +60,8 @@ const props = defineProps<Props>();
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
+const displayStore = useDisplayStore();
+const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
 const router = useRouter();
 
@@ -72,16 +80,25 @@ const singleItemTabState = reactive({
                 { name: 'log', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_LOG') },
             );
         }
+        if (displayStore.getters.availableAdvancedServices[MENU_ID.OPS_FLOW]) {
+            defaultTabs.push({ name: 'task', label: taskManagementTemplateStore.templates.Task });
+        }
         return defaultTabs;
     }),
     activeTab: 'detail',
 });
 
 const multiItemTabState = reactive({
-    tabs: computed(() => ([
-        { name: 'data', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_SELECTED_DATA') },
-        { name: 'monitoring', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_MONITORING') },
-    ])),
+    tabs: computed(() => {
+        const defaultTabs = [
+            { name: 'data', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_SELECTED_DATA') },
+            { name: 'monitoring', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_MONITORING') },
+        ];
+        if (displayStore.getters.availableAdvancedServices[MENU_ID.OPS_FLOW]) {
+            defaultTabs.push({ name: 'task', label: taskManagementTemplateStore.templates.Task });
+        }
+        return defaultTabs;
+    }),
     activeTab: 'data',
 });
 
@@ -163,6 +180,17 @@ const monitoringState: MonitoringProps = reactive({
         <template #monitoring>
             <monitoring :resources="monitoringState.resources" />
         </template>
+        <template #task>
+            <p-heading class="py-6 px-4"
+                       heading-type="sub"
+            >
+                {{ taskManagementTemplateStore.templates.Task }}
+            </p-heading>
+            <board-task-table :key="tableState.selectedItems[0].cloud_service_id"
+                              tag="div"
+                              :related-assets="[tableState.selectedItems[0].cloud_service_id]"
+            />
+        </template>
     </p-tab>
     <p-tab v-else-if="props.selectedIndex > 1"
            :tabs="multiItemTabState.tabs"
@@ -216,6 +244,12 @@ const monitoringState: MonitoringProps = reactive({
         </template>
         <template #monitoring>
             <monitoring :resources="monitoringState.resources" />
+        </template>
+        <template #task>
+            <board-task-table :key="tableState.selectedItems.map((d) => d.cloud_service_id).join(',')"
+                              tag="div"
+                              :related-assets="tableState.selectedItems.map(d => d.cloud_service_id)"
+            />
         </template>
     </p-tab>
     <p-empty v-else
