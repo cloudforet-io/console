@@ -1,12 +1,13 @@
 <script lang="ts" setup>
 import {
-    reactive, ref, watch,
+    computed, reactive, ref, watch,
 } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { PButtonModal, PButton } from '@cloudforet/mirinae';
+import { PButtonModal, PButton, PLazyImg } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
+import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
 import type { UserGroupChannelCreateParameters } from '@/schema/alert-manager/user-group-channel/api-verbs/create';
 import type { UserGroupChannelUpdateParameters } from '@/schema/alert-manager/user-group-channel/api-verbs/update';
 import type { UserGroupChannelModel } from '@/schema/alert-manager/user-group-channel/model';
@@ -15,6 +16,7 @@ import type {
 } from '@/schema/alert-manager/user-group-channel/type';
 import { i18n } from '@/translations';
 
+import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -41,11 +43,18 @@ interface ChannelSetModalState {
     userMode: MenuItem;
     users: {type: 'USER' | 'USER_GROUP'; value: string;}[];
   };
+  selectedProtocolData?: NotificationProtocolModel | undefined,
   scheduleInfo: UserGroupChannelScheduleInfoType;
 }
 
 const isCreateAble = ref<boolean>(false);
 const isSchemaValid = ref<boolean>(false);
+
+const storeState = reactive({
+    protocolIcon: computed<string>(() => notificationChannelCreateFormState.selectedProtocol.icon),
+    protocolName: computed<string>(() => notificationChannelCreateFormState.selectedProtocol.name),
+    protocolId: computed<string>(() => notificationChannelCreateFormState.selectedProtocol.protocol_id),
+});
 
 const state = reactive<ChannelSetModalState>({
     loading: false,
@@ -57,6 +66,7 @@ const state = reactive<ChannelSetModalState>({
         },
         users: [],
     },
+    selectedProtocolData: {},
     scheduleInfo: notificationChannelCreateFormState.scheduleInfo,
 });
 
@@ -170,6 +180,17 @@ watch([() => notificationChannelCreateFormState, isSchemaValid], (nv_channel_sta
                         <span class="text-gray-500">/2</span>
                     </p>
                     <span class="text-gray-700 leading-4 text-sm">{{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.INFO') }}</span>
+                </div>
+                <div class="flex items-center gap-4 mb-8">
+                    <p-lazy-img :src="assetUrlConverter(storeState.protocolIcon)"
+                                width="4rem"
+                                height="4rem"
+                                error-icon="ic_notification-protocol_envelope"
+                    />
+                    <div class="flex flex-col gap-0.5">
+                        <span class="text-lg font-medium">{{ storeState.protocolName }}</span>
+                        <span class="text-xs font-normal text-gray-600">{{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.NOTIFY_TO_MEMBER_INFO') }}</span>
+                    </div>
                 </div>
                 <user-group-channel-set-input-form @update-valid="handleSchemaValid" />
                 <user-group-channel-schedule-set-form />
