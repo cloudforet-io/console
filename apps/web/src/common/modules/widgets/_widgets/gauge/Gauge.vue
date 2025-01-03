@@ -57,7 +57,10 @@ const state = reactive({
     isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
     dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
 
-    unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
+    unit: computed<string|undefined>(() => {
+        if (!widgetOptionsState.dataFieldInfo?.data) return undefined;
+        return widgetFrameProps.value.unitMap?.[widgetOptionsState.dataFieldInfo.data as string];
+    }),
     data: computed<WidgetLoadResponse | null>(() => queryResult?.data?.value || null),
     chart: null as EChartsType | null,
     chartData: undefined as undefined|number,
@@ -178,10 +181,7 @@ const errorMessage = computed<string|undefined>(() => {
 /* Util */
 const drawChart = (rawData: WidgetLoadResponse|null) => {
     if (isEmpty(rawData)) return;
-    // HACK: Change the code below when the backend data is modified
-    // state.chartData = rawData?.results?.[0]?.[widgetOptionsState.dataFieldInfo?.data as string] || 0;
-    const _targetData = state.data?.results?.find((d) => !!d[widgetOptionsState.dataFieldInfo?.data as string]);
-    state.chartData = _targetData?.[widgetOptionsState.dataFieldInfo?.data as string] || 0;
+    state.chartData = rawData?.results?.[0]?.[widgetOptionsState.dataFieldInfo?.data as string] || 0;
 };
 const loadWidget = () => {
     state.runQueries = true;
