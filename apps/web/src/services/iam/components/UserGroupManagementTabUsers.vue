@@ -43,6 +43,7 @@ const queryTagHelper = useQueryTags({ keyItemSets: USER_GROUP_USERS_SEARCH_HANDL
 const { queryTags } = queryTagHelper;
 
 const state = reactive({
+    loading: false,
     userItems: computed<UserListItemType[]>(() => {
         if (userGroupPageState.users.list) {
             return userGroupPageState.users.list.map((user) => ({
@@ -106,32 +107,43 @@ const handleChange = async (options: any = {}) => {
 
     if (options.pageStart !== undefined) userGroupPageState.users.pageStart = options.pageStart;
     if (options.pageLimit !== undefined) userGroupPageState.users.pageLimit = options.pageLimit;
-    await userGroupPageStore.listUsers({ query: userListApiQuery });
-    const usersIdList: string[] | undefined = userGroupPageGetters.selectedUserGroups[0].users;
-    if (usersIdList && usersIdList.length > 0 && userGroupPageState.users.list && userGroupPageState.users.list.length > 0 && usersIdList && usersIdList.length > 0) {
-        userGroupPageState.users.list = userGroupPageState.users.list.filter((user) => {
-            if (user.user_id) return usersIdList.includes(user.user_id);
-            return false;
-        });
-    } else {
-        userGroupPageState.users.list = [];
-        userGroupPageState.users.totalCount = 0;
+    try {
+        state.loading = true;
+        await userGroupPageStore.listUsers({ query: userListApiQuery });
+        const usersIdList: string[] | undefined = userGroupPageGetters.selectedUserGroups[0].users;
+        if (usersIdList && usersIdList.length > 0 && userGroupPageState.users.list && userGroupPageState.users.list.length > 0 && usersIdList && usersIdList.length > 0) {
+            userGroupPageState.users.list = userGroupPageState.users.list.filter((user) => {
+                if (user.user_id) return usersIdList.includes(user.user_id);
+                return false;
+            });
+        } else {
+            userGroupPageState.users.list = [];
+            userGroupPageState.users.totalCount = 0;
+        }
+    } finally {
+        state.loading = false;
     }
 };
 
 /* Watcher */
 watch(() => userGroupPageGetters.selectedUserGroups, async (nv_selectedUserGroups) => {
     if (nv_selectedUserGroups.length === 1) {
-        const usersIdList: string[] | undefined = nv_selectedUserGroups[0].users;
-        await userGroupPageStore.listUsers({
-            query: userListApiQuery,
-        });
+        if (Object.keys(nv_selectedUserGroups[0]).includes('users')) {
+            const usersIdList: string[] | undefined = nv_selectedUserGroups[0].users;
 
-        if (usersIdList && usersIdList.length > 0 && userGroupPageState.users.list && userGroupPageState.users.list.length > 0 && usersIdList && usersIdList.length > 0) {
-            userGroupPageState.users.list = userGroupPageState.users.list.filter((user) => {
-                if (user.user_id) return usersIdList.includes(user.user_id);
-                return false;
+            await userGroupPageStore.listUsers({
+                query: userListApiQuery,
             });
+
+            if (usersIdList && usersIdList.length > 0 && userGroupPageState.users.list && userGroupPageState.users.list.length > 0 && usersIdList && usersIdList.length > 0) {
+                userGroupPageState.users.list = userGroupPageState.users.list.filter((user) => {
+                    if (user.user_id) return usersIdList.includes(user.user_id);
+                    return false;
+                });
+            } else {
+                userGroupPageState.users.list = [];
+                userGroupPageState.users.totalCount = 0;
+            }
         } else {
             userGroupPageState.users.list = [];
             userGroupPageState.users.totalCount = 0;
@@ -188,6 +200,7 @@ watch(() => userGroupPageState.users, (nv_users) => {
                          :query-tags="queryTags"
                          :value-handler-map="tableState.valueHandlerMap"
                          :total-count="state.userItemTotalCount"
+                         :loading="state.loading"
                          @select="handleSelect"
                          @change="handleChange"
         >

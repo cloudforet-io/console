@@ -1,12 +1,13 @@
 <script lang="ts" setup>
 import {
-    reactive, ref, watch,
+    computed, reactive, ref, watch,
 } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { PButtonModal, PButton } from '@cloudforet/mirinae';
+import { PButtonModal, PButton, PLazyImg } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
+import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
 import type { UserGroupChannelCreateParameters } from '@/schema/alert-manager/user-group-channel/api-verbs/create';
 import type { UserGroupChannelUpdateParameters } from '@/schema/alert-manager/user-group-channel/api-verbs/update';
 import type { UserGroupChannelModel } from '@/schema/alert-manager/user-group-channel/model';
@@ -15,6 +16,7 @@ import type {
 } from '@/schema/alert-manager/user-group-channel/type';
 import { i18n } from '@/translations';
 
+import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -41,10 +43,18 @@ interface ChannelSetModalState {
     userMode: MenuItem;
     users: {type: 'USER' | 'USER_GROUP'; value: string;}[];
   };
+  selectedProtocolData?: NotificationProtocolModel | undefined,
   scheduleInfo: UserGroupChannelScheduleInfoType;
 }
 
 const isCreateAble = ref<boolean>(false);
+const isSchemaValid = ref<boolean>(false);
+
+const storeState = reactive({
+    protocolIcon: computed<string>(() => notificationChannelCreateFormState.selectedProtocol.icon),
+    protocolName: computed<string>(() => notificationChannelCreateFormState.selectedProtocol.name),
+    protocolId: computed<string>(() => notificationChannelCreateFormState.selectedProtocol.protocol_id),
+});
 
 const state = reactive<ChannelSetModalState>({
     loading: false,
@@ -56,10 +66,15 @@ const state = reactive<ChannelSetModalState>({
         },
         users: [],
     },
+    selectedProtocolData: {},
     scheduleInfo: notificationChannelCreateFormState.scheduleInfo,
 });
 
 /* Component */
+const handleSchemaValid = (value: boolean) => {
+    isSchemaValid.value = value;
+};
+
 const handleConfirm = async () => {
     try {
         state.loading = true;
@@ -139,8 +154,9 @@ const fetchUpdateUserGroupChannel = async (params: UserGroupChannelUpdateParamet
 };
 
 /* Watcher */
-watch(() => notificationChannelCreateFormState, (nv_channel_state) => {
-    isCreateAble.value = !!nv_channel_state.channelName;
+watch([() => notificationChannelCreateFormState, isSchemaValid], (nv_channel_state, nv_is_schema_valid) => {
+    // isCreateAble.value = !!nv_channel_state.channelName;
+    isCreateAble.value = !!(nv_channel_state && nv_is_schema_valid);
 }, { immediate: true, deep: true });
 </script>
 
@@ -150,7 +166,7 @@ watch(() => notificationChannelCreateFormState, (nv_channel_state) => {
                         :visible="userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.CREATE_NOTIFICATIONS_SECOND"
                         :header-title="userGroupPageState.modal.title"
                         :theme-color="userGroupPageState.modal.themeColor"
-                        :disabled="!isCreateAble"
+                        :disabled="!isSchemaValid"
                         @confirm="handleConfirm"
                         @cancel="handleCancel"
                         @close="handleClose"
@@ -165,7 +181,18 @@ watch(() => notificationChannelCreateFormState, (nv_channel_state) => {
                     </p>
                     <span class="text-gray-700 leading-4 text-sm">{{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.INFO') }}</span>
                 </div>
-                <user-group-channel-set-input-form />
+                <div class="flex items-center gap-4 mb-8">
+                    <p-lazy-img :src="assetUrlConverter(storeState.protocolIcon)"
+                                width="4rem"
+                                height="4rem"
+                                error-icon="ic_notification-protocol_envelope"
+                    />
+                    <div class="flex flex-col gap-0.5">
+                        <span class="text-lg font-medium">{{ storeState.protocolName }}</span>
+                        <span class="text-xs font-normal text-gray-600">{{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.NOTIFY_TO_MEMBER_INFO') }}</span>
+                    </div>
+                </div>
+                <user-group-channel-set-input-form @update-valid="handleSchemaValid" />
                 <user-group-channel-schedule-set-form />
             </template>
             <template v-if="userGroupPageState.modal.title === i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE')"

@@ -59,7 +59,7 @@ watch(() => notificationChannelCreateFormState.selectedProtocol, (nv_protocol) =
                     <span>Step 1</span>
                     <span class="text-gray-500">/2</span>
                 </p>
-                <span class="text-gray-700 leading-4 text-sm">Configure teh notifications to ensure you are promptly informed of any alerts or incidents as they occur.</span>
+                <span class="text-gray-700 leading-4 text-sm">{{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.INFO') }}</span>
             </div>
             <select-channel-card />
         </template>

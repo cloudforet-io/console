@@ -17,6 +17,8 @@ import UserGroupChannelAddFormData from '@/services/iam/components/UserGroupChan
 import { useNotificationChannelCreateFormStore } from '@/services/iam/store/notification-channel-create-form-store';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
+const emit = defineEmits<{(e: 'update-valid', valid: boolean): void}>();
+
 const notificationChannelCreateFormStore = useNotificationChannelCreateFormStore();
 const notificationChannelCreateFormState = notificationChannelCreateFormStore.state;
 
@@ -44,13 +46,26 @@ const state = reactive<ChannelInfo & UserModeInfo>({
     users: [],
 });
 
+const validateState = reactive({
+    channelName: false,
+    schemaValid: false,
+});
+
 /* Component */
 const handleChangeChannelName = (value: string) => {
     state.channelName = value;
     notificationChannelCreateFormState.channelName = value;
 };
 
+const handleUpdateValid = (value: boolean) => {
+    validateState.schemaValid = value;
+};
+
 /* Watcher */
+watch(() => state.channelName, (nv_channel_name) => {
+    validateState.channelName = !!nv_channel_name;
+}, { immediate: true });
+
 watch(() => state, (nv_state) => {
     notificationChannelCreateFormStore.$patch((_state) => {
         _state.state.channelName = nv_state.channelName;
@@ -72,6 +87,14 @@ watch(() => state.selectedProtocolData, (nv_selected_protocol_data) => {
 watch(() => state.channelData, (nv_channel_data) => {
     if (nv_channel_data) {
         state.channelInput = Object.keys(nv_channel_data);
+    }
+}, { deep: true, immediate: true });
+
+watch(() => validateState, (nv_validate_state) => {
+    if (nv_validate_state.schemaValid && nv_validate_state.channelName) {
+        emit('update-valid', true);
+    } else {
+        emit('update-valid', false);
     }
 }, { deep: true, immediate: true });
 
@@ -98,12 +121,16 @@ onMounted(async () => {
     <div class="flex flex-col bg-white">
         <p-field-group :label="$t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.CHANNEL_NAME')"
                        required
+                       :invalid="!validateState.channelName"
+                       invalid-text="channel name is required field"
         >
             <p-text-input block
                           :value="state.channelName"
                           @update:value="handleChangeChannelName"
             />
         </p-field-group>
-        <user-group-channel-add-form-data v-if="userGroupPageState.modal.title === $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE')" />
+        <user-group-channel-add-form-data v-if="userGroupPageState.modal.title === $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE')"
+                                          @update-valid="handleUpdateValid"
+        />
     </div>
 </template>

@@ -1,16 +1,17 @@
 <script lang="ts" setup>
-import { reactive, ref, watch } from 'vue';
+import { reactive, watch } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal } from '@cloudforet/mirinae';
 
 import type { UserGroupAddUsersParameters } from '@/schema/identity/user-group/api-verbs/add-users';
 import type { UserGroupModel } from '@/schema/identity/user-group/model';
+import type { MembersType } from '@/schema/identity/user-group/type';
+import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import type { SelectedUserDropdownIdsType } from '@/common/modules/user/typte';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
 import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-constant';
@@ -22,20 +23,19 @@ const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 const userGroupPageGetters = userGroupPageStore.getters;
 
-const selectedUserIds = ref<SelectedUserDropdownIdsType[]>([]);
-
 const state = reactive({
     loading: false,
     selectedUserIds: undefined,
+    excludedSelectedIds: [],
+    formattedMemberItems: {} as Record<MembersType, string[]>,
 });
 
 /* Watcher */
-watch(() => userGroupPageGetters.selectedUserGroups[0].users, (nv_user_list) => {
-    if (nv_user_list && nv_user_list.length > 0) {
-        selectedUserIds.value = nv_user_list.map((user) => ({
-            type: 'USER',
-            value: user,
-        }));
+watch(() => userGroupPageGetters.selectedUserGroups, (nv_selected_user_group) => {
+    if (nv_selected_user_group.length === 1 && nv_selected_user_group[0].users) {
+        state.excludedSelectedIds = nv_selected_user_group[0].users;
+    } else if (nv_selected_user_group.length === 1 && !Object.keys(nv_selected_user_group[0]).includes('users')) {
+        state.excludedSelectedIds = [];
     }
 }, { deep: true, immediate: true });
 
@@ -45,10 +45,10 @@ const handleConfirm = async () => {
     try {
         await fetchAddUsers({
             user_group_id: userGroupPageGetters.selectedUserGroups[0].user_group_id,
-            users: selectedUserIds.value.map((user) => user.value),
+            users: state.formattedMemberItems.USER,
         });
         emit('confirm');
-        showSuccessMessage('');
+        showSuccessMessage('', i18n.t('IAM.USER_GROUP.MODAL.ADD_NEW_USER.SUCCESS_MESSAGE'));
     } finally {
         state.loading = false;
         handleClose();
@@ -57,6 +57,10 @@ const handleConfirm = async () => {
 
 const handleClose = () => {
     userGroupPageState.modal.type = '';
+};
+
+const handleFormattedSelectedIds = (value: Record<MembersType, string[]>) => {
+    state.formattedMemberItems = value;
 };
 
 /* API */
@@ -87,8 +91,10 @@ const fetchAddUsers = async (params: UserGroupAddUsersParameters) => {
                                       :show-user-group-list="false"
                                       appearance-type="stack"
                                       selection-type="multiple"
-                                      :selected-ids.sync="selectedUserIds"
-                                      placeholder="select"
+                                      use-fixed-menu-style
+                                      excluded-hidden-ids
+                                      :excluded-selected-ids="state.excludedSelectedIds"
+                                      @formatted-selected-ids="handleFormattedSelectedIds"
                 />
             </div>
         </template>
