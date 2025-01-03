@@ -88,6 +88,7 @@ const state = reactive({
     chartData: [],
     chart: null as EChartsType | null,
     unitMap: computed<Record<string, string>>(() => widgetFrameProps.value.unitMap || {}),
+    dataField: computed<string>(() => widgetOptionsState.dataFieldInfo?.data?.[0] || ''),
     chartOptions: computed<BarSeriesOption>(() => ({
         color: MASSIVE_CHART_COLORS,
         grid: {
@@ -103,14 +104,17 @@ const state = reactive({
             icon: 'circle',
             itemWidth: 10,
             itemHeight: 10,
-            formatter: (val) => val,
+            formatter: (val) => {
+                if (state.isPivotDataTable) return getReferenceLabel(props.allReferenceTypeInfo, state.dataField, val);
+                return val;
+            },
         },
         tooltip: {
             formatter: (params) => {
                 const _params = Array.isArray(params) ? params : [params];
                 return _params.map((p) => {
                     const _unit: string|undefined = state.unitMap[p.seriesName];
-                    let _seriesName = getReferenceLabel(props.allReferenceTypeInfo, (widgetOptionsState.dataFieldInfo?.data as string[]) ?? [], p.seriesName);
+                    let _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.dataField, p.seriesName);
                     let _value = numberFormatter(p.value) || '';
                     if (widgetOptionsState.tooltipNumberFormatInfo?.toggleValue) {
                         const columnFieldForPivot = state.dataTable?.options.PIVOT?.fields?.column;

@@ -99,13 +99,15 @@ const state = reactive({
             formatter: (params) => {
                 let _source = params.data.source as string;
                 let _target = params.data.target as string;
+                const _sourceField = widgetOptionsState.sankeyDimensionsInfo?.data?.[0] as string;
+                const _targetField = widgetOptionsState.sankeyDimensionsInfo?.data?.[1] as string;
                 if (!_source || !_target) return '';
-                if (_source === DATE_FIELD.DATE) {
+                if (_sourceField === DATE_FIELD.DATE) {
                     _source = dayjs.utc(_source).format(state.dateFormat);
                 } else {
                     getReferenceLabel(props.allReferenceTypeInfo, widgetOptionsState.sankeyDimensionsInfo?.data?.[0] as string, _source);
                 }
-                if (_target === DATE_FIELD.DATE) {
+                if (_targetField === DATE_FIELD.DATE) {
                     _target = dayjs.utc(_target).format(state.dateFormat);
                 } else {
                     getReferenceLabel(props.allReferenceTypeInfo, widgetOptionsState.sankeyDimensionsInfo?.data?.[1] as string, _target);

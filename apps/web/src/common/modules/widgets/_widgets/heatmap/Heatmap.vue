@@ -68,6 +68,7 @@ const state = reactive({
     isPivotDataTable: computed<boolean>(() => state.dataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
 
     data: computed<WidgetLoadResponse | null>(() => queryResult.data?.value ?? null),
+    dataField: computed<string>(() => widgetOptionsState.dataFieldInfo?.data?.[0] || ''),
     chart: null as EChartsType | null,
     xAxisData: computed<string[]>(() => {
         if (!state.data?.results?.length) return [];
@@ -113,7 +114,10 @@ const state = reactive({
                 show: true,
             },
             axisLabel: {
-                formatter: (val) => val,
+                formatter: (val) => {
+                    if (state.isPivotDataTable) return getReferenceLabel(props.allReferenceTypeInfo, state.dataField, val);
+                    return val;
+                },
             },
         },
         tooltip: {
