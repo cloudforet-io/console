@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
+import draggable from 'vuedraggable';
 
 import { cloneDeep } from 'lodash';
 
@@ -92,7 +93,10 @@ const handleUpdateRepeatCount = (_repeatCount: string) => {
                            @click="handleAddStep"
             />
         </div>
-        <div class="py-4 px-6">
+        <draggable class="py-4 px-6"
+                   ghost-class="ghost"
+                   :list="state.proxyRules"
+        >
             <p-card v-for="(rule, idx) in state.proxyRules"
                     :key="`rule-${idx}`"
                     class="card"
@@ -103,6 +107,7 @@ const handleUpdateRepeatCount = (_repeatCount: string) => {
                              width="1rem"
                              height="1rem"
                              :coler="gray[500]"
+                             class="drag-icon"
                         />
                         <p-badge badge-type="solid-outline"
                                  style-type="gray500"
@@ -150,7 +155,7 @@ const handleUpdateRepeatCount = (_repeatCount: string) => {
             >
                 {{ $t('ALERT_MANAGER.ESCALATION_POLICY.ADD_RULE') }}
             </p-text-button>
-        </div>
+        </draggable>
     </div>
 </template>
 
@@ -173,6 +178,11 @@ const handleUpdateRepeatCount = (_repeatCount: string) => {
         .minute-form {
             width: 6.5rem;
             margin-bottom: 0;
+        }
+        .drag-icon {
+            &:hover {
+                @apply cursor-pointer;
+            }
         }
     }
     .add-rule-button {
