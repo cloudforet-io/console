@@ -180,8 +180,10 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
                                  height="0.75rem"
                                  :color="red[200]"
                             />
-                            <span>{{ $t('ALERT_MANAGER.ALERTS.LOW') }}:</span>
-                            <span>{{ item.low }}</span>
+                            <p class="flex gap-1 text-gray-700">
+                                <span>{{ $t('ALERT_MANAGER.ALERTS.LOW') }}:</span>
+                                <span>{{ item.low }}</span>
+                            </p>
                         </div>
                     </div>
                 </p-pane-layout>

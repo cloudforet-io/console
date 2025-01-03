@@ -119,9 +119,9 @@ const getAssetInfo = (assetId: string) => {
                     --
                 </span>
                 <template v-else>
-                    <div v-for="(item, idx) in value.slice(0, 3)"
+                    <div v-for="(item, idx) in value"
                          :key="`resource-item-${idx}`"
-                         class="flex items-center justify-between"
+                         class="resource-item-wrapper flex items-center justify-between"
                     >
                         <p class="resource-item truncate">
                             {{ item?.name }}
@@ -131,7 +131,7 @@ const getAssetInfo = (assetId: string) => {
                                     name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                                     params: getAssetInfo(item.asset_id)
                                 }"
-                                size="sm"
+                                size="md"
                                 highlight
                                 action-icon="internal-link"
                                 new-tab
@@ -151,7 +151,7 @@ const getAssetInfo = (assetId: string) => {
                                 serviceId: value
                             }
                         }"
-                        size="sm"
+                        size="md"
                         highlight
                         action-icon="internal-link"
                         new-tab
@@ -172,3 +172,22 @@ const getAssetInfo = (assetId: string) => {
         </p-definition-table>
     </p-pane-layout>
 </template>
+
+<style scoped lang="postcss">
+.alert-detail-info-table {
+    .resource-item-wrapper {
+        & + .resource-item-wrapper {
+            @apply relative;
+            margin-top: 1rem;
+            &::before {
+                @apply absolute border-t border-gray-200;
+                content: '';
+                top: -0.5rem;
+                left: 0;
+                width: 100%;
+                height: 0.125rem;
+            }
+        }
+    }
+}
+</style>

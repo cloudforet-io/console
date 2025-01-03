@@ -99,7 +99,10 @@ const handleClickServiceItem = (id: string) => {
         },
     }));
 };
-const handleClickEscalationPolicy = (id: string) => {
+const handleClickEscalationPolicy = (id: string, escalationPolicyId: string) => {
+    if (id) {
+        serviceDetailPageStore.setSelectedEscalationPolicyId(escalationPolicyId);
+    }
     router.push(getProperRouteLocation({
         name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME,
         params: {
@@ -208,7 +211,7 @@ onMounted(async () => {
                                         <p class="title text-gray-700">
                                             {{ $t('ALERT_MANAGER.SERVICE.OPEN_ALERTS') }}
                                         </p>
-                                        <p class="count font-medium">
+                                        <p class="text-display-md font-medium">
                                             {{ (item?.alerts.TRIGGERED?.HIGH || 0) + (item?.alerts.TRIGGERED?.LOW || 0)
                                                 + (item?.alerts.ACKNOWLEDGED?.HIGH || 0) + (item?.alerts.ACKNOWLEDGED?.LOW || 0) }}
                                         </p>
@@ -234,7 +237,7 @@ onMounted(async () => {
                                                 <p class="count">
                                                     {{ (item?.alerts.TRIGGERED?.HIGH || 0) + (item?.alerts.TRIGGERED?.LOW || 0) }}
                                                 </p>
-                                                <div class="ml-2 text-gray-700">
+                                                <div class="ml-2 text-label-sm text-gray-700">
                                                     <span class="pl-1">{{ $t('ALERT_MANAGER.ALERTS.HIGH') }}:</span>
                                                     <span> {{ item?.alerts.TRIGGERED?.HIGH || 0 }}</span>
                                                 </div>
@@ -283,11 +286,11 @@ onMounted(async () => {
                                             </span>
                                         </div>
                                     </div>
-                                    <div class="flex flex-col items-end">
+                                    <div class="flex flex-col gap-1 items-end">
                                         <p class="title">
                                             {{ $t('ALERT_MANAGER.ESCALATION_POLICY.TITLE', { cnt: 11 }) }}
                                         </p>
-                                        <p-text-button @click.stop="handleClickEscalationPolicy(item.service_id)">
+                                        <p-text-button @click.stop="handleClickEscalationPolicy(item.service_id, item.escalation_policy_id)">
                                             <p class="truncate text-blue-700 pr-1 pl-1">
                                                 {{ getEscalationPolicyName(item.escalation_policy_id) }}
                                             </p>
@@ -337,6 +340,7 @@ onMounted(async () => {
             width: 28rem;
             max-width: 28rem;
             padding: 1.25rem 1.5rem 1.5rem;
+            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
             .card-inner-wrapper {
                 @apply flex flex-col w-full;
                 gap: 1.25rem;
@@ -346,11 +350,19 @@ onMounted(async () => {
                         @apply relative flex flex-col;
                         gap: 0.25rem;
                         width: calc(50% - 1rem);
+                        &::before {
+                            @apply absolute;
+                            content: '';
+                            width: 0.063rem;
+                            height: 100%;
+                            top: 0;
+                            left: 0;
+                        }
                         .title {
-                            @apply text-label-md;
+                            @apply text-label-md font-medium;
                         }
                         .count {
-                            @apply text-display-md;
+                            @apply text-display-sm;
                         }
                         .triggered-info {
                             @apply flex items-center;
@@ -358,24 +370,20 @@ onMounted(async () => {
                         &.triggered {
                             padding-left: 1rem;
                             &::before {
-                                @apply absolute bg-red-400;
-                                content: '';
-                                width: 0.063rem;
-                                height: 100%;
-                                top: 0;
-                                left: 0;
+                                @apply bg-red-400;
+                            }
+                        }
+                        &.acknowledged {
+                            padding-left: 1rem;
+                            &::before {
+                                @apply bg-gray-300;
                             }
                         }
                         &.healthy {
                             @apply flex justify-center;
                             padding-left: 1rem;
                             &::before {
-                                @apply absolute bg-green-400;
-                                content: '';
-                                width: 0.063rem;
-                                height: 100%;
-                                top: 0;
-                                left: 0;
+                                @apply bg-green-400;
                             }
                         }
                     }

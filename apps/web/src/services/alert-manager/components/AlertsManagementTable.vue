@@ -252,9 +252,9 @@ watch(() => route.query, async (query) => {
                 />
             </template>
             <template #toolbox-bottom>
-                <div class="quick-filter-wrapper flex justify-between mr-4 mb-4 ml-4">
+                <div class="quick-filter-wrapper flex flex-col mr-4 mb-4 ml-4 gap-2">
                     <div class="status-filter-wrapper">
-                        <span>{{ $t('ALERT_MANAGER.STATUS') }}</span>
+                        <span class="label">{{ $t('ALERT_MANAGER.STATUS') }}</span>
                         <p-divider class="divider"
                                    vertical
                         />
@@ -262,13 +262,14 @@ watch(() => route.query, async (query) => {
                                          :key="idx"
                                          :selected="filterState.selectedStatusFilter"
                                          :value="item.name"
+                                         class="status"
                                          @change="handleSelectFilter('status', item.name)"
                         >
                             {{ item.label }}
                         </p-select-status>
                     </div>
                     <div class="status-filter-wrapper">
-                        <span>{{ $t('ALERT_MANAGER.ALERTS.LABEL_URGENCY') }}</span>
+                        <span class="label">{{ $t('ALERT_MANAGER.ALERTS.LABEL_URGENCY') }}</span>
                         <p-divider class="divider"
                                    vertical
                         />
@@ -276,6 +277,7 @@ watch(() => route.query, async (query) => {
                                          :key="idx"
                                          :selected="filterState.selectedUrgencyFilter"
                                          :value="item.name"
+                                         class="status"
                                          @change="handleSelectFilter('urgency', item.name)"
                         >
                             {{ item.label }}
@@ -374,13 +376,20 @@ watch(() => route.query, async (query) => {
     }
     .quick-filter-wrapper {
         .status-filter-wrapper {
-            @apply flex items-center flex-wrap text-label-md text-gray-600;
+            @apply flex items-center flex-wrap text-label-sm;
             gap: 0.75rem;
-            margin-top: -0.5rem;
+            padding-top: 0.125rem;
+            padding-bottom: 0.125rem;
+            .label {
+                @apply font-bold;
+            }
             .divider {
                 height: 1rem;
                 padding-top: 0.25rem;
                 padding-bottom: 0.25rem;
+            }
+            .status {
+                @apply text-label-md;
             }
         }
 
