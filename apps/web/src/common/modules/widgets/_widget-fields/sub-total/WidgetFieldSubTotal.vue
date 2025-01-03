@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PFieldTitle, PToggleButton, PI, PTooltip,
+    PFieldTitle, PToggleButton, PI, PTooltip, PCheckbox,
 } from '@cloudforet/mirinae';
 
 import type { SubTotalOptions, SubTotalValue } from '@/common/modules/widgets/_widget-fields/sub-total/type';
@@ -20,12 +20,12 @@ const state = reactive({
     disabled: computed(() => false),
 });
 
-// const handleUpdateValue = (value: boolean) => {
-//     props.fieldManager.setFieldValue(FIELD_KEY, {
-//         ...state.fieldValue,
-//         freeze: value,
-//     });
-// };
+const handleUpdateValue = (value: boolean) => {
+    props.fieldManager.setFieldValue(FIELD_KEY, {
+        ...state.fieldValue,
+        freeze: value,
+    });
+};
 const handleUpdateToggle = (value: boolean) => {
     if (value) {
         props.fieldManager.setFieldValue(FIELD_KEY, {
@@ -58,15 +58,15 @@ const handleUpdateToggle = (value: boolean) => {
                              @update:value="handleUpdateToggle"
             />
         </div>
-        <!--        <div v-if="state.fieldValue?.toggleValue"-->
-        <!--             class="contents"-->
-        <!--        >-->
-        <!--            <p-checkbox :selected="state.fieldValue?.freeze"-->
-        <!--                        @change="handleUpdateValue"-->
-        <!--            >-->
-        <!--                {{ $t('COMMON.WIDGETS.TOTAL.SUB_TOTAL_DESC') }}-->
-        <!--            </p-checkbox>-->
-        <!--        </div>-->
+        <div v-if="state.fieldValue?.toggleValue"
+             class="contents"
+        >
+            <p-checkbox :selected="state.fieldValue?.freeze"
+                        @change="handleUpdateValue"
+            >
+                {{ $t('COMMON.WIDGETS.TOTAL.SUB_TOTAL_DESC') }}
+            </p-checkbox>
+        </div>
     </div>
 </template>
 

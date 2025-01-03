@@ -29,7 +29,7 @@ import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { DATE_FIELD, WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
-import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
+import { DATE_FORMAT, SUB_TOTAL_NAME } from '@/common/modules/widgets/_constants/widget-field-constant';
 import { normalizeAndSerialize } from '@/common/modules/widgets/_helpers/global-variable-helper';
 import { sortObjectByKeys } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import {
@@ -240,7 +240,7 @@ const drawChart = (rawData: WidgetLoadResponse|null) => {
     const _seriesData: any[] = [];
     let _dataFields: string[] = widgetOptionsState.dataFieldInfo?.data as string[] || [];
     if (state.isPivotDataTable) {
-        const _excludeFields = [...Object.keys(rawData?.labels_info), 'Sub Total'];
+        const _excludeFields = [...Object.keys(rawData?.labels_info), SUB_TOTAL_NAME];
         _dataFields = rawData?.order?.filter((v) => !_excludeFields.includes(v));
     }
     _dataFields.forEach((field) => {

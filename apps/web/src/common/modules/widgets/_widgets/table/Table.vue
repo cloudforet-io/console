@@ -23,6 +23,7 @@ import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
+import { SUB_TOTAL_NAME } from '@/common/modules/widgets/_constants/widget-field-constant';
 import { normalizeAndSerialize } from '@/common/modules/widgets/_helpers/global-variable-helper';
 import { sortObjectByKeys } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import { getWidgetDataTable } from '@/common/modules/widgets/_helpers/widget-helper';
@@ -81,7 +82,7 @@ const state = reactive({
                 const index = headers.indexOf(field);
                 return index === -1 ? Infinity : index;
             })
-                .filter((field) => (widgetOptionsState.subTotalInfo?.toggleValue ? true : field !== 'Sub Total'))
+                .filter((field) => (widgetOptionsState.subTotalInfo?.toggleValue ? true : field !== SUB_TOTAL_NAME))
                 .forEach((field) => {
                     dataFields.push({
                         name: field,
