@@ -64,8 +64,18 @@ const state = reactive({
     data: computed<WidgetLoadResponse | null>(() => queryResults.value?.[0].data || null),
     previousData: computed<WidgetLoadResponse | null>(() => queryResults.value?.[1]?.data || null),
     unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[widgetOptionsState.dataFieldInfo?.data as string]),
-    previousValue: computed<number>(() => state.previousData?.results?.[0]?.[widgetOptionsState.dataFieldInfo?.data as string] ?? 0),
-    currentValue: computed<number>(() => state.data?.results?.[0]?.[widgetOptionsState.dataFieldInfo?.data as string] ?? 0),
+    previousValue: computed<number>(() => {
+        // HACK: Change the code below when the backend data is modified
+        // return state.previousData?.results?.[0]?.[widgetOptionsState.dataFieldInfo?.data as string] ?? 0;
+        const _targetData = state.previousData?.results?.find((d) => !!d[widgetOptionsState.dataFieldInfo?.data as string]);
+        return _targetData?.[widgetOptionsState.dataFieldInfo?.data as string] || 0;
+    }),
+    currentValue: computed<number>(() => {
+        // HACK: Change the code below when the backend data is modified
+        // return state.data?.results?.[0]?.[widgetOptionsState.dataFieldInfo?.data as string] ?? 0;
+        const _targetData = state.data?.results?.find((d) => !!d[widgetOptionsState.dataFieldInfo?.data as string]);
+        return _targetData?.[widgetOptionsState.dataFieldInfo?.data as string] || 0;
+    }),
     valueText: computed<string|undefined>(() => getFormattedNumber(state.currentValue, widgetOptionsState.dataFieldInfo?.data as string, widgetOptionsState.numberFormatInfo, state.unit)),
 
     iconName: computed<string|undefined>(() => widgetOptionsState.iconInfo?.icon?.name),
