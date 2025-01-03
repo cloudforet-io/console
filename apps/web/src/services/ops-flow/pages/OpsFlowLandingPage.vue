@@ -146,7 +146,7 @@ onMounted(async () => {
                             </p-radio>
                         </p-radio-group>
                     </div>
-                    <div class="mt-10 flex justify-end">
+                    <div class="my-10 flex justify-end">
                         <p-button v-if="hasReadWriteAccess"
                                   style-type="substitutive"
                                   icon-right="ic_arrow-right"
