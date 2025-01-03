@@ -20,6 +20,7 @@ import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-tabl
 import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
+import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { RegionReferenceMap } from '@/store/reference/region-reference-store';
@@ -150,8 +151,11 @@ const queryResult = useQuery({
     staleTime: WIDGET_LOAD_STALE_TIME,
 });
 
-const widgetLoading = computed<boolean>(() => queryResult.isLoading);
-const errorMessage = computed<string>(() => queryResult.error?.value?.message);
+const widgetLoading = computed<boolean>(() => queryResult.isLoading.value);
+const errorMessage = computed<string>(() => {
+    if (!state.dataTable) return i18n.t('COMMON.WIDGETS.NO_DATA_TABLE_ERROR_MESSAGE');
+    return queryResult.error?.value?.message;
+});
 
 /* Util */
 const loadMap = async () => {
@@ -189,7 +193,7 @@ const loadWidget = async () => {
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange,
     errorMessage,
-    widgetLoading: widgetLoading.value,
+    widgetLoading,
 });
 
 /* Watcher */

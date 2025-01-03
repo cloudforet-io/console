@@ -1402,6 +1402,7 @@
 				"LINE_TO_ZERO": "Line to Zero",
 				"MISSING_VALUE": "Missing Value"
 			},
+			"NO_DATA_TABLE_ERROR_MESSAGE": "No data table is bound to the widget.",
 			"NO_DATA_TO_DISPLAY": "No Data to Display",
 			"NUMBER_CARD": {
 				"LESS_THAN_PREVIOUS_DAY": "less than previous day",

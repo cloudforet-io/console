@@ -218,7 +218,10 @@ const queryResults = useQueries({
 
 const widgetLoading = computed<boolean>(() => queryResults.value?.[0].isLoading);
 const previousLoading = computed<string>(() => queryResults.value?.[1].isLoading);
-const errorMessage = computed<string>(() => queryResults.value?.[0].error?.message);
+const errorMessage = computed<string>(() => {
+    if (!state.dataTable) return i18n.t('COMMON.WIDGETS.NO_DATA_TABLE_ERROR_MESSAGE');
+    return queryResults.value?.[0].error?.message;
+});
 
 const loadWidget = () => {
     state.runQueries = true;

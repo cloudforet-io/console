@@ -16,6 +16,7 @@ import type { PrivateWidgetLoadSumParameters } from '@/schema/dashboard/private-
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
 import type { PublicWidgetLoadSumParameters } from '@/schema/dashboard/public-widget/api-verbs/load-sum';
+import { i18n } from '@/translations';
 
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
@@ -228,7 +229,10 @@ const queryResults = useQueries({
 });
 
 const widgetLoading = computed<boolean>(() => queryResults.value?.[0].isLoading);
-const errorMessage = computed<string>(() => queryResults.value?.[0].error?.message as string);
+const errorMessage = computed<string>(() => {
+    if (!state.dataTable) return i18n.t('COMMON.WIDGETS.NO_DATA_TABLE_ERROR_MESSAGE');
+    return queryResults.value?.[0].error?.message as string;
+});
 
 
 const refinedData = computed<WidgetLoadResponse|null>(() => {
