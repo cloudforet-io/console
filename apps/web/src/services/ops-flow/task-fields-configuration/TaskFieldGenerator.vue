@@ -57,7 +57,7 @@ const taskManagementTemplateStore = useTaskManagementTemplateStore();
 const fieldMetadata = computed<TaskFieldTypeMetadata>(() => taskFieldMetadataStoreGetters.taskFieldTypeMetadataMap[props.field.field_type]);
 const optionsComponent = computed<ReturnType<typeof defineAsyncComponent>|undefined>(() => COMPONENT_MAP[props.field.field_type]);
 
-const isDefaultField = computed(() => !!DEFAULT_FIELD_ID_MAP[props.field.field_id]);
+const isDefaultField = computed(() => Object.values(DEFAULT_FIELD_ID_MAP).includes(props.field.field_id));
 
 /* input type */
 const inputTypes = computed<{ name: string; label: string; }[]>(() => [
