@@ -56,7 +56,7 @@ export const useCategoryField = ({
 
     const dropdownCategoryItems = computed<CategoryItem[]>(() => {
         if (hasTaskTypeOnly) {
-            return taskCategories.value.map((c) => {
+            return taskCategories.value.filter((c) => c.state !== 'DELETED').map((c) => {
                 const taskTypes = taskTypesByCategoryId.value[c.category_id];
                 return {
                     name: c.category_id,
