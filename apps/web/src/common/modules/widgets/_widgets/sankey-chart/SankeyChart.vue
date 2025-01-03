@@ -44,7 +44,7 @@ import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/dat
 import type { DisplaySeriesLabelValue } from '@/common/modules/widgets/_widget-fields/display-series-label/type';
 import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/granularity/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
-import type { SankeyAxisValue } from '@/common/modules/widgets/_widget-fields/sankey-axis/type';
+import type { SankeyDimensionsValue } from '@/common/modules/widgets/_widget-fields/sankey-dimensions/type';
 import type { TooltipNumberFormatValue } from '@/common/modules/widgets/_widget-fields/tooltip-number-format/type';
 import type { WidgetLoadResponse } from '@/common/modules/widgets/types/widget-data-type';
 import type {
@@ -102,12 +102,12 @@ const state = reactive({
                 if (_source === DATE_FIELD.DATE) {
                     _source = dayjs.utc(_source).format(state.dateFormat);
                 } else {
-                    getReferenceLabel(props.allReferenceTypeInfo, widgetOptionsState.sankeyAxisInfo?.data?.[0] as string, _source);
+                    getReferenceLabel(props.allReferenceTypeInfo, widgetOptionsState.sankeyDimensionsInfo?.data?.[0] as string, _source);
                 }
                 if (_target === DATE_FIELD.DATE) {
                     _target = dayjs.utc(_target).format(state.dateFormat);
                 } else {
-                    getReferenceLabel(props.allReferenceTypeInfo, widgetOptionsState.sankeyAxisInfo?.data?.[1] as string, _target);
+                    getReferenceLabel(props.allReferenceTypeInfo, widgetOptionsState.sankeyDimensionsInfo?.data?.[1] as string, _target);
                 }
                 let _value = numberFormatter(params.data.value) || '';
                 if (widgetOptionsState.tooltipNumberFormatInfo?.toggleValue) {
@@ -126,7 +126,7 @@ const state = reactive({
 const widgetOptionsState = reactive({
     granularityInfo: computed<GranularityValue>(() => props.widgetOptions?.granularity?.value as GranularityValue),
     dataFieldInfo: computed<DataFieldValue>(() => props.widgetOptions?.dataField?.value as DataFieldValue),
-    sankeyAxisInfo: computed<SankeyAxisValue|undefined>(() => props.widgetOptions?.sankeyAxis?.value as SankeyAxisValue),
+    sankeyDimensionsInfo: computed<SankeyDimensionsValue|undefined>(() => props.widgetOptions?.sankeyDimensions?.value as SankeyDimensionsValue),
     dateFormatInfo: computed<DateFormatValue>(() => props.widgetOptions?.dateFormat?.value as DateFormatValue),
     numberFormatInfo: computed<NumberFormatValue>(() => props.widgetOptions?.numberFormat?.value as NumberFormatValue),
     tooltipNumberFormatInfo: computed<TooltipNumberFormatValue>(() => props.widgetOptions?.tooltipNumberFormat?.value as TooltipNumberFormatValue),
@@ -153,8 +153,8 @@ const queryKey = computed(() => [
         granularity: widgetOptionsState.granularityInfo?.granularity,
         dataTableId: state.dataTable?.data_table_id,
         dataTableOptions: JSON.stringify(sortObjectByKeys(state.dataTable?.options) ?? {}),
-        sankeyAxis: widgetOptionsState.sankeyAxisInfo?.data,
-        count: widgetOptionsState.sankeyAxisInfo?.count,
+        sankeyDimensions: widgetOptionsState.sankeyDimensionsInfo?.data,
+        count: widgetOptionsState.sankeyDimensionsInfo?.count,
         vars: normalizeAndSerialize(props.dashboardVars),
     },
 ]);
@@ -164,9 +164,9 @@ const queryResult = useQuery({
     queryFn: () => fetchWidgetData({
         widget_id: props.widgetId,
         granularity: widgetOptionsState.granularityInfo?.granularity,
-        group_by: widgetOptionsState.sankeyAxisInfo?.data,
-        sort: getWidgetLoadApiQuerySort(widgetOptionsState.sankeyAxisInfo?.data?.[0] as string, [widgetOptionsState.dataFieldInfo?.data as string]),
-        page: { start: 0, limit: widgetOptionsState.sankeyAxisInfo?.count ?? 0 },
+        group_by: widgetOptionsState.sankeyDimensionsInfo?.data,
+        sort: getWidgetLoadApiQuerySort(widgetOptionsState.sankeyDimensionsInfo?.data?.[0] as string, [widgetOptionsState.dataFieldInfo?.data as string]),
+        page: { start: 0, limit: widgetOptionsState.sankeyDimensionsInfo?.count ?? 0 },
         vars: props.dashboardVars,
         ...getWidgetLoadApiQueryDateRange(widgetOptionsState.granularityInfo?.granularity, dateRange.value),
     }),
@@ -182,8 +182,8 @@ const drawChart = (rawData: WidgetLoadResponse|null) => {
 
     const _dataSet = new Set<string>();
     const _links: SankeySeriesOption['links'] = [];
-    const _left = widgetOptionsState.sankeyAxisInfo?.data?.[0] as string;
-    const _right = widgetOptionsState.sankeyAxisInfo?.data?.[1] as string;
+    const _left = widgetOptionsState.sankeyDimensionsInfo?.data?.[0] as string;
+    const _right = widgetOptionsState.sankeyDimensionsInfo?.data?.[1] as string;
     const _dataField = widgetOptionsState.dataFieldInfo?.data as string;
     if (!_left || !_right || !_dataField) {
         state.links = [];

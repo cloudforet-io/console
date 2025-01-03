@@ -19,7 +19,7 @@ import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-g
 import {
     widgetValidatorRegistry,
 } from '@/common/modules/widgets/_widget-field-value-manager/constant/validator-registry';
-import type { SankeyAxisOptions, SankeyAxisValue } from '@/common/modules/widgets/_widget-fields/sankey-axis/type';
+import type { SankeyDimensionsOptions, SankeyDimensionsValue } from '@/common/modules/widgets/_widget-fields/sankey-dimensions/type';
 import type {
     WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
@@ -27,8 +27,8 @@ import type {
 
 
 const FIELD_COUNT = 2;
-const FIELD_KEY = 'sankeyAxis';
-const props = defineProps<WidgetFieldComponentProps<SankeyAxisOptions>>();
+const FIELD_KEY = 'sankeyDimensions';
+const props = defineProps<WidgetFieldComponentProps<SankeyDimensionsOptions>>();
 
 const validator = widgetValidatorRegistry[FIELD_KEY];
 
@@ -36,7 +36,7 @@ const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
 
 const state = reactive({
-    fieldValue: computed<SankeyAxisValue>(() => props.fieldManager.data[FIELD_KEY].value),
+    fieldValue: computed<SankeyDimensionsValue>(() => props.fieldManager.data[FIELD_KEY].value),
     max: computed<number|undefined>(() => props.widgetFieldSchema?.options?.max),
     menuItems: computed<SelectDropdownMenuItem[]>(() => {
         if (!widgetGenerateGetters.selectedDataTable) return [];
@@ -53,7 +53,7 @@ const state = reactive({
     isValid: computed<boolean>(() => validator(state.fieldValue, props.widgetConfig)),
     isMaxValid: computed<boolean>(() => state.fieldValue?.count <= state.max),
     tooltipDesc: computed<TranslateResult>(() => i18n.t('COMMON.WIDGETS.MAX_ITEMS_DESC', {
-        fieldName: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.SANKEY_AXIS'),
+        fieldName: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.DIMENSIONS'),
         max: state.max,
     })),
 });
@@ -68,7 +68,7 @@ const handleSelectAxis = (val: SelectDropdownMenuItem) => {
         return;
     }
     if (state.fieldValue.data?.length >= FIELD_COUNT) {
-        showErrorMessage(i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.SANKEY_AXIS_WARNING'), '');
+        showErrorMessage(i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.DIMENSIONS_WARNING'), '');
         props.fieldManager.setFieldValue(FIELD_KEY, state.fieldValue);
         return;
     }
@@ -86,7 +86,7 @@ const handleUpdateCount = (val: number) => {
 
 <template>
     <div class="widget-field-x-axis">
-        <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.SANKEY_AXIS')"
+        <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.DIMENSIONS')"
                        required
         >
             <div class="field-form-wrapper">

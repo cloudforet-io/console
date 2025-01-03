@@ -21,7 +21,7 @@ import type { MinOptions } from '@/common/modules/widgets/_widget-fields/min/typ
 import type { MissingValueOptions } from '@/common/modules/widgets/_widget-fields/missing-value/type';
 import type { NumberFormatOptions, NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type { PieChartTypeOptions } from '@/common/modules/widgets/_widget-fields/pie-chart-type/type';
-import type { SankeyAxisOptions } from '@/common/modules/widgets/_widget-fields/sankey-axis/type';
+import type { SankeyDimensionsOptions } from '@/common/modules/widgets/_widget-fields/sankey-dimensions/type';
 import type { StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
 import type { SubTotalOptions } from '@/common/modules/widgets/_widget-fields/sub-total/type';
 import type { TableColumnComparisonOptions } from '@/common/modules/widgets/_widget-fields/table-column-comparison/type';
@@ -132,7 +132,7 @@ export const widgetFieldDefaultValueMap: DefaultValueRegistry = {
     widgetHeight: {
         type: WIDGET_HEIGHT.default,
     },
-    sankeyAxis: {
+    sankeyDimensions: {
         data: [],
     },
 } as const;
@@ -496,13 +496,13 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
         }
         return widgetFieldDefaultValueMap.widgetHeight;
     },
-    sankeyAxis: (widgetConfig) => {
+    sankeyDimensions: (widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
-        const sankeyAxisOptions = (_fieldsSchema.sankeyAxis?.options ?? {}) as SankeyAxisOptions;
+        const sankeyDimensionsOptions = (_fieldsSchema.sankeyDimensions?.options ?? {}) as SankeyDimensionsOptions;
 
         return {
             data: [],
-            count: sankeyAxisOptions.defaultMaxCount,
+            count: sankeyDimensionsOptions.defaultMaxCount,
         };
     },
 };
