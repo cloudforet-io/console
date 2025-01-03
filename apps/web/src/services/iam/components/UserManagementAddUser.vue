@@ -60,7 +60,6 @@ const validationState = reactive({
 
 /* Component */
 const hideMenu = () => {
-    emit('change-input', { userList: state.selectedItems });
     state.menuVisible = false;
 };
 const handleClickTextInput = async () => {
@@ -77,7 +76,6 @@ const handleChangeTextInput = (value: string) => {
 };
 const handleEnterTextInput = async () => {
     if (formState.searchText === '') return;
-    if (state.menuVisible) return;
 
     if (validateUserId()) {
         await getUserList();
@@ -104,7 +102,7 @@ const getUserList = async () => {
         }
     } catch (e) {
         addSelectedItem(formState.searchText, !isIndependentUser);
-        await hideMenu();
+        hideMenu();
         formState.searchText = '';
         resetValidationState();
     }
@@ -151,7 +149,7 @@ const handleSelectMenuItem = async (menuItem: AddModalMenuItem) => {
     if (!state.selectedItems.some((item) => item.name === menuItem.name)) {
         state.selectedItems.unshift(menuItem);
     }
-    await hideMenu();
+    hideMenu();
     resetValidationState();
 };
 const initAuthTypeList = async () => {
@@ -175,6 +173,8 @@ const addSelectedItem = (name : string, isNew: boolean) => {
         auth_type: formState.selectedMenuItem,
         isNew,
     });
+
+    emit('change-input', { userList: state.selectedItems });
 };
 
 /* API */
@@ -268,7 +268,6 @@ onMounted(() => {
                                class="user-id-input"
                                :class="{'invalid': invalid}"
                                @click="handleClickTextInput"
-                               @blur="handleEnterTextInput"
                                @keyup.enter="handleEnterTextInput"
                                @input="handleChangeTextInput($event.target.value)"
                         >
