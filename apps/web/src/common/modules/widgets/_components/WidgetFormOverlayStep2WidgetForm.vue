@@ -96,6 +96,7 @@ const handleSelectDataTable = async (dataTableId: string) => {
 
     props.fieldManager.updateDataTableAndOriginData(selectedDataTable, {});
 
+    // check if selected chart type is supported in pivot
     if (selectedDataTable.operator === DATA_TABLE_OPERATOR.PIVOT && UNSUPPORTED_CHARTS_IN_PIVOT.includes(widgetGenerateState.selectedWidgetName)) {
         changeWidgetType('table');
     }
