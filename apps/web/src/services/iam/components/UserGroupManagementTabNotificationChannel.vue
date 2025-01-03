@@ -218,16 +218,16 @@ const handleUpdateModal = async (modalType: string) => {
 };
 
 /* Watcher */
-// watch(() => userGroupPageGetters.selectedUserGroups, async (nv_selected_user_group, ov_selected_user_group) => {
-//     if (nv_selected_user_group !== ov_selected_user_group && nv_selected_user_group[0].user_group_id) {
-//         try {
-//             state.loading = true;
-//             await fetchListUserGroupChannel({ user_group_id: nv_selected_user_group[0].user_group_id, query: channelListApiQuery });
-//         } finally {
-//             state.loading = false;
-//         }
-//     }
-// }, { deep: true, immediate: true });
+watch(() => userGroupPageGetters.selectedUserGroups, async (nv_selected_user_group, ov_selected_user_group) => {
+    if (nv_selected_user_group !== ov_selected_user_group && nv_selected_user_group[0].user_group_id) {
+        try {
+            state.loading = true;
+            await fetchListUserGroupChannel({ user_group_id: nv_selected_user_group[0].user_group_id, query: channelListApiQuery });
+        } finally {
+            state.loading = false;
+        }
+    }
+}, { deep: true, immediate: true });
 
 watch([() => tableState.items, () => userGroupPageGetters.selectedUserGroupChannel], ([nv_items, nv_selected_item]) => {
     if (nv_items.length > 0 && nv_selected_item.length === 1) {
