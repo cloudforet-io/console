@@ -150,7 +150,9 @@ const valueFormatter = (value: TableDataValue, field: TableWidgetField, numberFo
     const _unit = field.fieldInfo?.unit;
     // const dataField = field.name?.replace('comparison_', '');
     if (isPercentage) return `${numberFormatter(_value)}%`;
-    return getFormattedNumber(_value, field.name, numberFormatInfo, _unit);
+
+    const fieldName = props.isPivotDataTable && state.columnFieldForPivot ? state.columnFieldForPivot : field.name;
+    return getFormattedNumber(_value, numberFormatInfo?.[fieldName], _unit);
 };
 
 const getValue = (item: TableDataItem, field: TableWidgetField) => {

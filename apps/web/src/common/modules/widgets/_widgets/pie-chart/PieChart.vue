@@ -141,7 +141,7 @@ const state = reactive({
                 }
                 let _value = numberFormatter(params.value) || '';
                 if (widgetOptionsState.tooltipNumberFormatInfo?.toggleValue) {
-                    _value = getFormattedNumber(params.value, widgetOptionsState.dataFieldInfo?.data as string, widgetOptionsState.numberFormatInfo, state.unit);
+                    _value = getFormattedNumber(params.value, widgetOptionsState.numberFormatInfo?.[widgetOptionsState.dataFieldInfo?.data as string], state.unit);
                 }
                 if (state.unit) _name = `${_name} (${state.unit})`;
                 return `${params.marker} ${_name}: <b>${_value}</b>`;
@@ -164,7 +164,7 @@ const state = reactive({
                         if (widgetOptionsState.displaySeriesLabelInfo?.format === 'percent') {
                             return `${p.percent}%`;
                         }
-                        return getFormattedNumber(p.value, widgetOptionsState.dataFieldInfo?.data as string, widgetOptionsState.numberFormatInfo, state.unit);
+                        return getFormattedNumber(p.value, widgetOptionsState.numberFormatInfo?.[widgetOptionsState.dataFieldInfo?.data as string], state.unit);
                     },
                 },
                 data: state.chartData,

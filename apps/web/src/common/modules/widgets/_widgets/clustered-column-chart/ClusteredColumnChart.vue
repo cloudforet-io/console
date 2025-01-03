@@ -118,7 +118,10 @@ const state = reactive({
                     const _unit: string|undefined = state.unitMap[p.seriesName];
                     let _value = numberFormatter(p.value) || '';
                     if (widgetOptionsState.tooltipNumberFormatInfo?.toggleValue) {
-                        _value = getFormattedNumber(p.value, p.seriesName, widgetOptionsState.numberFormatInfo, _unit);
+                        const columnFieldForPivot = state.dataTable?.options.PIVOT?.fields?.column;
+                        const fieldName = (state.isPivotDataTable && columnFieldForPivot) ? columnFieldForPivot : p.seriesName;
+                        const numberFormat = widgetOptionsState.numberFormatInfo[fieldName];
+                        _value = getFormattedNumber(p.value, numberFormat, _unit);
                     }
                     return `${p.marker} ${p.seriesName}: <b>${_value}</b>`;
                 });
@@ -257,7 +260,10 @@ const drawChart = (rawData: WidgetLoadResponse|null) => {
                 fontSize: 10,
                 formatter: (p) => {
                     if (p.value < _threshold) return '';
-                    return getFormattedNumber(p.value, field, widgetOptionsState.numberFormatInfo, _unit);
+                    const columnFieldForPivot = state.dataTable?.options.PIVOT?.fields?.column;
+                    const fieldName = (state.isPivotDataTable && columnFieldForPivot) ? columnFieldForPivot : p.seriesName;
+                    const numberFormat = widgetOptionsState.numberFormatInfo[fieldName];
+                    return getFormattedNumber(p.value, numberFormat, _unit);
                 },
             },
             data: state.xAxisData.map((d) => {

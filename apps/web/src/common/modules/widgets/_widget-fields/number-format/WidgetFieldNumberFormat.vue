@@ -9,14 +9,18 @@ import {
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import { customNumberFormatter } from '@cloudforet/utils';
 
+import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
+import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import { i18n } from '@/translations';
 
+import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { NUMBER_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { NumberFormat, NumberFormatValue, NumberFormatOptions } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type {
     WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
+
 
 
 const SAMPLE_NUMBER = 7564613647;
@@ -33,10 +37,22 @@ const FIELD_KEY = 'numberFormat';
 const props = defineProps<WidgetFieldComponentProps<NumberFormatOptions>>();
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
+
+const storeState = reactive({
+    selectedDataTable: computed<PrivateDataTableModel|PublicDataTableModel|undefined>(() => widgetGenerateGetters.selectedDataTable),
+});
+
 const state = reactive({
+    isPivotDataTable: computed<boolean>(() => storeState.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
     isInitiated: false,
     fieldValue: computed<NumberFormatValue>(() => props.fieldManager.data[FIELD_KEY].value),
-    dataFieldList: computed<string[]>(() => Object.keys(widgetGenerateGetters.selectedDataTable?.data_info ?? {}) ?? []),
+    dataFieldList: computed<string[]>(() => {
+        const columnFieldForPivot = storeState.selectedDataTable?.options.PIVOT?.fields?.column;
+        if (state.isPivotDataTable && columnFieldForPivot) {
+            return [columnFieldForPivot];
+        }
+        return Object.keys(widgetGenerateGetters.selectedDataTable?.data_info ?? {}) ?? [];
+    }),
     menuItems: computed<SelectDropdownMenuItem[]>(() => [
         {
             name: NUMBER_FORMAT.AUTO,

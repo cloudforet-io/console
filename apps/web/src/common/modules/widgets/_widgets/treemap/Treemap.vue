@@ -108,7 +108,7 @@ const state = reactive({
                     fontSize: 10,
                     formatter: (p) => {
                         if (widgetOptionsState.displaySeriesLabelInfo?.toggleValue) {
-                            return `${p.name}\n\n${getFormattedNumber(p.value, widgetOptionsState.dataFieldInfo?.data as string, widgetOptionsState.numberFormatInfo, state.unit)}`;
+                            return `${p.name}\n\n${getFormattedNumber(p.value, widgetOptionsState.numberFormatInfo?.[widgetOptionsState.dataFieldInfo?.data as string], state.unit)}`;
                         }
                         return p.name;
                     },

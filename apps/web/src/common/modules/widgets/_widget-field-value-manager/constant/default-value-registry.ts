@@ -402,11 +402,14 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
     numberFormat: (widgetConfig, dataTable) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const numberFormatOptions = (_fieldsSchema.numberFormat?.options ?? {}) as NumberFormatOptions;
+        const isPivotDataTable = dataTable.operator === DATA_TABLE_OPERATOR.PIVOT;
+        const columnFieldForPivot = dataTable.options.PIVOT?.fields?.column as string;
 
         const dataKeys = Object.keys(dataTable?.data_info ?? {}) as string[];
+        const fieldKeys = isPivotDataTable ? [columnFieldForPivot] : dataKeys;
 
         const result: NumberFormatValue = widgetFieldDefaultValueMap.numberFormat;
-        dataKeys.forEach((key) => {
+        fieldKeys.forEach((key) => {
             result[key] = {
                 format: numberFormatOptions.default ?? NUMBER_FORMAT.AUTO,
             };

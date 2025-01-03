@@ -162,7 +162,10 @@ const targetValue = (xField?: string, yField?: string, format?: 'table'|'tooltip
     if (!_targetVal) return format === 'table' ? '--' : '';
     if (!format) return _targetVal;
     if (format === 'table') {
-        const _formattedVal = getFormattedNumber(_targetVal, _field, widgetOptionsState.numberFormatInfo);
+        const columnFieldForPivot = state.dataTable?.options.PIVOT?.fields?.column;
+        const fieldName = (state.isPivotDataTable && columnFieldForPivot) ? columnFieldForPivot : _field;
+        const numberFormat = widgetOptionsState.numberFormatInfo[fieldName];
+        const _formattedVal = getFormattedNumber(_targetVal, numberFormat);
         if ((_formattedVal.length * 6.5) > state.boxWidth) return '...';
         return _formattedVal;
     }
