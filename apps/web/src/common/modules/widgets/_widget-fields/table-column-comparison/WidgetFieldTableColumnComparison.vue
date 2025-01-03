@@ -41,6 +41,7 @@ const storeState = reactive({
 });
 
 const state = reactive({
+    isPivotDataTable: computed<boolean>(() => storeState.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
     fieldValue: computed<TableColumnComparisonValue>(() => props.fieldManager.data[FIELD_KEY].value),
     infoText: computed<TranslateResult>(() => {
         if (props.widgetConfig.widgetName !== 'table') return i18n.t('COMMON.WIDGETS.COMPARISON.INFO_TOOLTIP_TABLE');
@@ -63,7 +64,6 @@ const state = reactive({
         name: item,
         label: item,
     }))),
-    isPivotDataTable: computed<boolean>(() => storeState.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
 });
 
 const handleUpdateColor = (key:'decreaseColor'|'increaseColor', color:string) => {

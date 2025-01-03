@@ -12,10 +12,14 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 
 
 
+import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
+import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
+
 import getRandomId from '@/lib/random-id-generator';
 
 import type {
 } from '@/common/modules/widgets/types/widget-field-value-type';
+import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type {
@@ -35,15 +39,23 @@ const props = defineProps<WidgetFieldComponentProps<undefined>>();
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
 
+const storeState = reactive({
+    selectedDataTable: computed<PrivateDataTableModel|PublicDataTableModel|undefined>(() => widgetGenerateGetters.selectedDataTable),
+});
+
 const state = reactive({
+    isPivotDataTable: computed<boolean>(() => storeState.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
     fieldValue: computed<CustomTableColumnWidthValue>(() => props.fieldManager.data[FIELD_KEY].value),
     customWidthItems: [] as CustomWidthFieldItem[],
     allFieldList: computed<MenuItem[]>(() => {
         if (!widgetGenerateGetters.selectedDataTable) return [];
+
+        const columnFieldForPivot = storeState.selectedDataTable?.options.PIVOT?.fields?.column;
+
         const fieldList = sortWidgetTableFields(
             [
                 ...Object.keys(widgetGenerateGetters.selectedDataTable?.labels_info ?? {}),
-                ...Object.keys(widgetGenerateGetters.selectedDataTable?.data_info ?? {}),
+                ...((state.isPivotDataTable && columnFieldForPivot) ? [columnFieldForPivot, 'Sub Total'] : Object.keys(widgetGenerateGetters.selectedDataTable?.data_info ?? {})),
             ],
         ) ?? [];
         return fieldList.map((d) => ({

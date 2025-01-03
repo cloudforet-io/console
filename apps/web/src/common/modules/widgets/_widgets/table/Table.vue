@@ -173,7 +173,6 @@ const fullDataQueryKey = computed(() => [
         start: dateRange.value.start,
         end: dateRange.value.end,
         granularity: widgetOptionsState.granularityInfo?.granularity,
-        groupBy: widgetOptionsState.groupByInfo?.data,
         dataTableId: state.dataTable?.data_table_id,
         dataTableOptions: JSON.stringify(sortObjectByKeys(state.dataTable?.options) ?? {}),
         enabledTotal: !!widgetOptionsState.totalInfo?.toggleValue,
@@ -212,7 +211,6 @@ const queryResults = useQueries({
                 widget_id: props.widgetId,
                 start: dateRange.value.start,
                 end: dateRange.value.end,
-                group_by: (widgetOptionsState.groupByInfo?.data as string[]) ?? [],
                 vars: props.dashboardVars,
                 granularity: widgetOptionsState.granularityInfo?.granularity,
             }),
@@ -306,6 +304,8 @@ defineExpose<WidgetExpose>({
                                    :sub-total-info="widgetOptionsState.subTotalInfo"
                                    :total-info="widgetOptionsState.totalInfo"
                                    :granularity="widgetOptionsState.granularityInfo?.granularity"
+                                   :is-pivot-data-table="state.isPivotDataTable"
+                                   :data-table="state.dataTable"
                                    :data-info="state.dataInfo"
                                    :date-format-info="widgetOptionsState.dateFormatInfo"
                                    :number-format-info="widgetOptionsState.numberFormatInfo"

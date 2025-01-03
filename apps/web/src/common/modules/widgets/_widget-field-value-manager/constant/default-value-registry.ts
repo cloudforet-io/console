@@ -284,11 +284,14 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
     dataFieldHeatmapColor: (widgetConfig, dataTable) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const dataFieldheatmapColorOptions = (_fieldsSchema.dataFieldHeatmapColor?.options ?? {}) as DataFieldHeatmapColorOptions;
+        const isPivotDataTable = dataTable.operator === DATA_TABLE_OPERATOR.PIVOT;
+        const columnFieldForPivot = dataTable.options.PIVOT?.fields?.column as string;
 
         const dataKeys = Object.keys(dataTable?.data_info ?? {}) as string[];
+        const fieldKeys = isPivotDataTable ? [columnFieldForPivot] : dataKeys;
 
         const result: DataFieldHeatmapColorValue = widgetFieldDefaultValueMap.dataFieldHeatmapColor;
-        dataKeys.forEach((key) => {
+        fieldKeys.forEach((key) => {
             result[key] = {
                 colorInfo: dataFieldheatmapColorOptions?.default ?? DATA_FIELD_HEATMAP_COLOR.NONE.key,
             };
