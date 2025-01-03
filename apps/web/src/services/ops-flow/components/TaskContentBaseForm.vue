@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watch, onMounted } from 'vue';
+import { computed, watch } from 'vue';
 
 import { isEqual } from 'lodash';
 
@@ -242,35 +242,32 @@ const initForCreateMode = async (categoryId?: string, taskType?: TaskTypeModel) 
 let viewModeInitWatchStop;
 let createModeInitWatchStop;
 
-let hasCategoriesLoaded = false;
 viewModeInitWatchStop = watch(() => taskContentFormState.originTask, async (task) => {
-    if (!hasCategoriesLoaded) return;
-
     if (hasInitiated && viewModeInitWatchStop) {
         viewModeInitWatchStop();
         viewModeInitWatchStop = null;
         return;
     }
-    if (!isCreateMode.value) await initForViewMode(task);
-});
-createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, () => taskContentFormState.currentTaskType], async ([categoryId, taskType]) => {
-    if (!hasCategoriesLoaded) return;
 
+    await preloadCategories();
+
+    if (!isCreateMode.value) await initForViewMode(task);
+}, { immediate: true });
+createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, () => taskContentFormState.currentTaskType], async ([categoryId, taskType]) => {
     if (hasInitiated && createModeInitWatchStop) {
         createModeInitWatchStop();
         createModeInitWatchStop = undefined;
         return;
     }
+
+    await preloadCategories();
+
     if (!isCreateMode.value) return;
     if (isMinimalCreateMode.value && !taskType) return; // minimal create is from landing page. task type is already selected and must be initialized.
 
     await initForCreateMode(categoryId, taskType);
-});
+}, { immediate: true });
 
-onMounted(async () => {
-    await preloadCategories();
-    hasCategoriesLoaded = true;
-});
 </script>
 
 <template>
