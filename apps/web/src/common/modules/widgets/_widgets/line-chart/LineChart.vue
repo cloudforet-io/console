@@ -254,6 +254,7 @@ const drawChart = (rawData: WidgetLoadResponse|null) => {
                 rotate: widgetOptionsState.displaySeriesLabelInfo?.rotate,
                 fontSize: 10,
                 formatter: (p) => {
+                    if (!p.value) return '';
                     const columnFieldForPivot = state.dataTable?.options.PIVOT?.fields?.column;
                     const fieldName = (state.isPivotDataTable && columnFieldForPivot) ? columnFieldForPivot : _dataFields;
                     const numberFormat = widgetOptionsState.numberFormatInfo[fieldName];
