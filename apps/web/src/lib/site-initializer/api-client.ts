@@ -322,7 +322,7 @@ const getAfterCallApiMap = () => ({
     '/alert-manager/service/create': () => {
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();
-        allReferenceStore.load('service', { force: true });
+        allReferenceStore.sync('service');
     },
     '/alert-manager/service/delete': () => {
         useAllReferenceStore(pinia);
@@ -333,6 +333,21 @@ const getAfterCallApiMap = () => ({
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();
         allReferenceStore.sync('service', data);
+    },
+    '/alert-manager/webhook/create': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('webhook', data);
+    },
+    '/alert-manager/webhook/delete': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.load('webhook', data);
+    },
+    '/alert-manager/webhook/update': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('webhook', data);
     },
 });
 

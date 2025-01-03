@@ -15,11 +15,10 @@ import type { EscalationPolicyListParameters } from '@/schema/alert-manager/esca
 import type { EscalationPolicyModel } from '@/schema/alert-manager/escalation-policy/model';
 import type { ServiceListParameters } from '@/schema/alert-manager/service/api-verbs/list';
 import type { ServiceModel } from '@/schema/alert-manager/service/model';
-import type { WebhookListParameters } from '@/schema/alert-manager/webhook/api-verbs/list';
-import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
+import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
@@ -58,13 +57,13 @@ const SERVICE_SEARCH_HANDLER: AlertManagementTableHandlerType = {
 
 const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
+    webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
 });
 const state = reactive({
     loading: true,
     totalCount: 0,
     serviceList: [] as ServiceModel[],
     escalationPolicyList: [] as EscalationPolicyModel[],
-    webhookList: [] as WebhookModel[],
 });
 
 const serviceListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
@@ -73,7 +72,7 @@ const queryTagHelper = useQueryTags({ keyItemSets: SERVICE_SEARCH_HANDLER.keyIte
 const { queryTags } = queryTagHelper;
 
 const getWebhookIcon = (id: string): string|undefined => {
-    const webhook = state.webhookList.find((item) => item.webhook_id === id);
+    const webhook = storeState.webhook[id].data;
     if (!webhook) return undefined;
     return storeState.plugins[webhook.plugin_info.plugin_id]?.icon || '';
 };
@@ -158,19 +157,9 @@ const fetchEscalationPolicy = async () => {
         state.escalationPolicyList = [];
     }
 };
-const fetchWebhookList = async () => {
-    try {
-        const { results } = await SpaceConnector.clientV2.alertManager.webhook.list<WebhookListParameters, ListResponse<WebhookModel>>();
-        state.webhookList = results || [];
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.webhookList = [];
-    }
-};
 
 onMounted(async () => {
     await fetchEscalationPolicy();
-    await fetchWebhookList();
     await fetchServiceList();
 });
 </script>
