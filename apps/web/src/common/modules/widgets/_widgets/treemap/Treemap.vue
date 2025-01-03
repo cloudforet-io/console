@@ -12,7 +12,7 @@ import type {
     EChartsType,
 } from 'echarts/core';
 import {
-    groupBy, isEmpty, orderBy, sumBy, throttle,
+    isEmpty, orderBy, throttle,
 } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -178,11 +178,10 @@ const errorMessage = computed<string>(() => queryResult.error?.value?.message);
 const drawChart = (rawData: WidgetLoadResponse|null) => {
     if (isEmpty(rawData)) return;
 
-    const _categoryByData = groupBy(rawData.results || [], widgetOptionsState.categoryByInfo?.data);
-    let _refinedData: ChartData[] = Object.entries(_categoryByData).map(([k, v]) => ({
-        name: k,
-        value: sumBy(v, widgetOptionsState.dataFieldInfo?.data as string),
-    }));
+    let _refinedData: ChartData[] = rawData?.results?.map((d) => ({
+        name: d[widgetOptionsState.categoryByInfo?.data as string],
+        value: d[widgetOptionsState.dataFieldInfo?.data as string],
+    })) || [];
     if (isDateField(widgetOptionsState.categoryByInfo?.data)) {
         _refinedData = orderBy(_refinedData, 'name', 'desc');
         _refinedData = _refinedData?.slice(0, widgetOptionsState.categoryByInfo?.count);
