@@ -53,7 +53,7 @@ const state = reactive({
 const tableState = reactive({
     fields: computed<DataTableFieldType[]>(() => [
         { name: 'name', label: 'User Group Name' },
-        { name: 'description', label: 'Description', width: '280px' },
+        { name: 'description', label: 'Description', width: '480px' },
         { name: 'notification_channel', label: 'Notification Channel', sortable: true },
         { name: 'users', label: 'Users' },
         { name: 'created_at', label: 'Created' },
