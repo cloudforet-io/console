@@ -10,8 +10,10 @@ import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/typ
 
 import type { NotificationProtocolGetParameters } from '@/schema/alert-manager/notification-protocol/api-verbs/get';
 import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
+import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useFormValidator } from '@/common/composables/form-validator';
 
 import UserGroupChannelAddFormData from '@/services/iam/components/UserGroupChannelAddFormData.vue';
 import { useNotificationChannelCreateFormStore } from '@/services/iam/store/notification-channel-create-form-store';
@@ -47,29 +49,36 @@ const state = reactive<ChannelInfo & UserModeInfo>({
 });
 
 const validateState = reactive({
-    channelName: false,
     schemaValid: false,
 });
 
-/* Component */
-const handleChangeChannelName = (value: string) => {
-    state.channelName = value;
-    notificationChannelCreateFormState.channelName = value;
-};
+const {
+    forms: {
+        channelName,
+    },
+    setForm,
+    invalidState,
+} = useFormValidator({
+    channelName: notificationChannelCreateFormState.channelName,
+}, {
+    channelName(value: string) {
+        if (!value) return ' ';
+        if (value.length >= 40) {
+            return i18n.t('ALERT_MANAGER.NOTIFICATIONS.NAME_INVALID_TEXT');
+        }
+        return '';
+    },
+});
 
+/* Component */
 const handleUpdateValid = (value: boolean) => {
     validateState.schemaValid = value;
 };
 
 /* Watcher */
-watch(() => state.channelName, (nv_channel_name) => {
-    validateState.channelName = !!nv_channel_name;
-}, { immediate: true });
-
-watch(() => state, (nv_state) => {
+watch(() => channelName, (nv_channel_name) => {
     notificationChannelCreateFormStore.$patch((_state) => {
-        _state.state.channelName = nv_state.channelName;
-        // _state.state.userInfo.type = nv_state.userMode
+        _state.state.channelName = nv_channel_name;
     });
 }, { immediate: true, deep: true });
 
@@ -91,7 +100,7 @@ watch(() => state.channelData, (nv_channel_data) => {
 }, { deep: true, immediate: true });
 
 watch(() => validateState, (nv_validate_state) => {
-    if (nv_validate_state.schemaValid && nv_validate_state.channelName) {
+    if (nv_validate_state.schemaValid && invalidState) {
         emit('update-valid', true);
     } else {
         emit('update-valid', false);
@@ -121,13 +130,15 @@ onMounted(async () => {
     <div class="flex flex-col bg-white">
         <p-field-group :label="$t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.CHANNEL_NAME')"
                        required
-                       :invalid="!validateState.channelName"
-                       invalid-text="channel name is required field"
+                       :invalid="!invalidState.channelName"
         >
-            <p-text-input block
-                          :value="state.channelName"
-                          @update:value="handleChangeChannelName"
-            />
+            <template #default="{invalid}">
+                <p-text-input block
+                              :value="channelName"
+                              :invalid="!invalid"
+                              @update:value="setForm('channelName', $event)"
+                />
+            </template>
         </p-field-group>
         <user-group-channel-add-form-data v-if="userGroupPageState.modal.title === $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE')"
                                           @update-valid="handleUpdateValid"
