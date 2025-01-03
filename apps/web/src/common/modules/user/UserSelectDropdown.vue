@@ -144,10 +144,21 @@ const menuItemsHandler = (): AutocompleteHandler => async (keyword: string, page
     const _totalCount = Number((pageStart - 1 || 0) + pageLimit);
     const filterItems = (items: SelectDropdownMenuItem[]) => items.filter((item) => getTextHighlightRegex(keyword).test(item.name)).slice(pageStart - 1, _totalCount);
 
+    if (state.allUserItems.length === 0 && state.allUserGroupItems.length === 0) {
+        return {
+            results: [],
+        };
+    }
+
     if (resultIndex === undefined) {
         return state.dropdownCategories.map((c, idx) => {
             const items = c.key === 'user' ? state.allUserItems : state.allUserGroupItems;
             const _slicedItems = filterItems(items);
+            if (_slicedItems.length === 0) {
+                return {
+                    results: [],
+                };
+            }
             if (props.showCategoryTitle) {
                 _slicedItems.unshift({ type: 'header', label: c.title, name: 'header' });
             }
