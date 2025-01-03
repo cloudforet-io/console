@@ -235,7 +235,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
                     assignee: state.assignee || undefined,
                     data: isEmpty(state.data) ? undefined : state.data,
                     files: state.fileIds,
-                    project_id: state.defaultData[DEFAULT_FIELD_ID_MAP.project]?.[0],
+                    project_id: state.defaultData[DEFAULT_FIELD_ID_MAP.project],
                     resource_group: state.currentTaskType.scope,
                 });
                 showSuccessMessage(i18n.t('OPSFLOW.ALT_S_CREATE_TARGET', { target: taskManagementTemplateStore.templates.task }), '');
