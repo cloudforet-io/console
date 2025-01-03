@@ -136,7 +136,6 @@ export const useUserGroupPageStore = defineStore('page-user-group', () => {
             try {
                 const { results = [], total_count = 0 } = await SpaceConnector.clientV2.identity.userGroup.list<UserGroupListParameters, ListResponse<UserGroupModel>>(params);
 
-                // TODO: need test after getting real data
                 const userGroupIdToChannelMap = await this.fetchUserGroupChannels(results.map((result) => result.user_group_id));
 
                 state.userGroups = results.map((item) => {
@@ -147,7 +146,6 @@ export const useUserGroupPageStore = defineStore('page-user-group', () => {
                     };
                 }) || [];
                 state.totalCount = total_count ?? 0;
-                state.selectedIndices = [];
             } catch (e) {
                 ErrorHandler.handleError(e, true);
                 state.userGroups = [];
