@@ -14,7 +14,7 @@ const sankeyChart: WidgetConfig = {
         granularity: {},
         dateRange: {},
         dataField: {},
-        sankeyAxis: {
+        sankeyDimensions: {
             options: {
                 defaultMaxCount: 10,
                 max: 31,

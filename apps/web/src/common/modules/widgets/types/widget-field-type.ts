@@ -16,7 +16,7 @@ import type { MinOptions } from '@/common/modules/widgets/_widget-fields/min/typ
 import type { MissingValueOptions } from '@/common/modules/widgets/_widget-fields/missing-value/type';
 import type { NumberFormatOptions } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type { PieChartTypeOptions } from '@/common/modules/widgets/_widget-fields/pie-chart-type/type';
-import type { SankeyAxisOptions } from '@/common/modules/widgets/_widget-fields/sankey-axis/type';
+import type { SankeyDimensionsOptions } from '@/common/modules/widgets/_widget-fields/sankey-dimensions/type';
 import type { StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
 import type { SubTotalOptions } from '@/common/modules/widgets/_widget-fields/sub-total/type';
 import type { TableColumnComparisonOptions } from '@/common/modules/widgets/_widget-fields/table-column-comparison/type';
@@ -36,7 +36,7 @@ export type WidgetFieldOptions = DataFieldOptions | XAxisOptions | YAxisOptions
     | ComparisonOptions | ColorSchemaOptions | PieChartTypeOptions | DateFormatOptions | TableColumnComparisonOptions
     | NumberFormatOptions | DataFieldHeatmapColorOptions | TextWrapOptions | TableColumnWidthOptions
     | MissingValueOptions | WidgetHeightOptions | DisplaySeriesLabelOptions | DateRangeOptions
-    | TooltipNumberFormatOptions | SankeyAxisOptions;
+    | TooltipNumberFormatOptions | SankeyDimensionsOptions;
 
 export interface WidgetFieldSchema<FieldOption=WidgetFieldOptions> {
     options?: Partial<FieldOption>;
@@ -55,7 +55,7 @@ export type WidgetFieldName = 'dataField' | 'tableDataField' | 'xAxis' | 'yAxis'
     | 'dateFormat' | 'numberFormat' | 'tooltipNumberFormat' | 'dataFieldHeatmapColor'
     | 'displayAnnotation' | 'displaySeriesLabel' | 'textWrap' | 'tableColumnWidth' | 'customTableColumnWidth'
     | 'missingValue' | 'widgetHeight'
-    | 'widgetHeader' | 'sankeyAxis';
+    | 'widgetHeader' | 'sankeyDimensions';
 
 
 export interface WidgetFieldComponentProps<FieldOptions> {
