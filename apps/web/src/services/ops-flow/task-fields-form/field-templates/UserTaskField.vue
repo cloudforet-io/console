@@ -31,11 +31,13 @@ const {
                    no-spacing
     >
         <user-select-dropdown class="my-1"
-                              :user-ids="fieldValue"
+                              :selected-ids="fieldValue"
                               selection-type="multiple"
+                              appearance-type="badge"
+                              :show-user-group-list="false"
                               :invalid="isInvalid"
                               :readonly="props.readonly"
-                              @update:user-ids="updateFieldValue"
+                              @update:selected-ids="updateFieldValue"
         />
     </p-field-group>
 </template>

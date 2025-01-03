@@ -130,22 +130,26 @@ watch(taskFilters, (newValue, oldValue) => {
         />
         <div>
             <user-select-dropdown multi-selectable
-                                  :user-ids="selectedCreatedBy"
+                                  use-fixed-menu-style
+                                  :selected-ids="selectedCreatedBy"
                                   :selection-label="$t('OPSFLOW.CREATED_BY')"
                                   style-type="rounded"
+                                  :show-user-group-list="false"
                                   appearance-type="badge"
                                   selection-type="multiple"
-                                  @update:user-ids="handleUpdateCreatedBy"
+                                  @update:selected-ids="handleUpdateCreatedBy"
             />
         </div>
         <div>
             <user-select-dropdown multi-selectable
-                                  :user-ids="selectedAssignee"
+                                  use-fixed-menu-style
+                                  :selected-ids="selectedAssignee"
                                   :selection-label="$t('OPSFLOW.ASSIGNEE')"
                                   style-type="rounded"
+                                  :show-user-group-list="false"
                                   appearance-type="badge"
                                   selection-type="multiple"
-                                  @update:user-ids="handleUpdateAssignee"
+                                  @update:selected-ids="handleUpdateAssignee"
             />
         </div>
     </div>
