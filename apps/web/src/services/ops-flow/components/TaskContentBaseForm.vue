@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watch } from 'vue';
+import { computed, watch, onMounted } from 'vue';
 
 import { isEqual } from 'lodash';
 
@@ -195,7 +195,6 @@ const initForViewMode = async (task?: TaskModel) => {
 
     if (!task) return;
     // set category
-    await preloadCategories();
     setInitialCategory(task.category_id);
     taskContentFormStore.setCurrentCategoryId(task.category_id);
     // set task type
@@ -218,7 +217,6 @@ const initForCreateMode = async (categoryId?: string, taskType?: TaskTypeModel) 
 
     if (!categoryId) return;
 
-    await preloadCategories();
     setInitialCategory(categoryId);
     // init selected status
     const category = taskContentFormGetters.currentCategory;
@@ -243,15 +241,20 @@ const initForCreateMode = async (categoryId?: string, taskType?: TaskTypeModel) 
 let viewModeInitWatchStop;
 let createModeInitWatchStop;
 
+let hasCategoriesLoaded = false;
 viewModeInitWatchStop = watch(() => taskContentFormState.originTask, async (task) => {
+    if (!hasCategoriesLoaded) return;
+
     if (hasInitiated && viewModeInitWatchStop) {
         viewModeInitWatchStop();
         viewModeInitWatchStop = null;
         return;
     }
     if (!isCreateMode.value) await initForViewMode(task);
-}, { immediate: true });
+});
 createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, () => taskContentFormState.currentTaskType], async ([categoryId, taskType]) => {
+    if (!hasCategoriesLoaded) return;
+
     if (hasInitiated && createModeInitWatchStop) {
         createModeInitWatchStop();
         createModeInitWatchStop = undefined;
@@ -261,7 +264,12 @@ createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, (
     if (isMinimalCreateMode.value && !taskType) return; // minimal create is from landing page. task type is already selected and must be initialized.
 
     await initForCreateMode(categoryId, taskType);
-}, { immediate: true });
+});
+
+onMounted(async () => {
+    await preloadCategories();
+    hasCategoriesLoaded = true;
+});
 </script>
 
 <template>
