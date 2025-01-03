@@ -133,6 +133,8 @@ const handleUpdateColumn = (value: string) => {
         state.selectedValueType = 'auto';
         selectInfo.value = undefined;
         limitInfo.value = undefined;
+    } else if (state.selectedValueType === 'auto') {
+        limitInfo.value = DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT.limit;
     }
 };
 
@@ -141,7 +143,7 @@ const handleChangeValueType = (value: string) => {
     state.selectedValueType = value;
     if (value === 'auto') {
         selectInfo.value = undefined;
-        limitInfo.value = DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT.limit;
+        limitInfo.value = fieldsInfo.value?.column === 'Date' ? undefined : DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT.limit;
     } else {
         selectInfo.value = [];
         limitInfo.value = undefined;
@@ -250,7 +252,11 @@ watch(() => state.invalid, (_invalid) => {
 }, { immediate: true });
 
 onMounted(() => {
-    state.selectedValueType = props.originData.limit !== undefined ? 'auto' : 'fixed';
+    if (props.originData?.fields?.column === 'Date') {
+        state.selectedValueType = 'auto';
+    } else {
+        state.selectedValueType = props.originData.limit !== undefined ? 'auto' : 'fixed';
+    }
 });
 
 </script>
