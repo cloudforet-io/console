@@ -31,7 +31,7 @@ import type { ValueMappingOptions } from '@/common/modules/widgets/types/widget-
 
 type DataTableModel = PublicDataTableModel|PrivateDataTableModel;
 
-const COMPONENT_RANDOM_KEY = `add-labels-${random()}`;
+const COMPONENT_RANDOM_KEY = `value-mapping-${random()}`;
 
 const props = defineProps<TransformDataTableProps<ValueMappingOptions>>();
 const emit = defineEmits<{(e: 'update:operator-options', value: ValueMappingOptions): void;

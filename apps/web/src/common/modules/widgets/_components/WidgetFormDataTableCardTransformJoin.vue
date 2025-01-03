@@ -29,7 +29,7 @@ interface OnKeyItem {
     leftKey?: string;
     rightKey?: string;
 }
-const COMPONENT_RANDOM_KEY = `add-labels-${random()}`;
+const COMPONENT_RANDOM_KEY = `join-${random()}`;
 const props = defineProps<TransformDataTableProps<JoinOptions>>();
 const emit = defineEmits<{(e: 'update:operator-options', value: JoinOptions): void;
     (e: 'update:invalid', value: boolean): void;
