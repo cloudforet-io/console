@@ -25,6 +25,7 @@ import {
     useTaskFieldMetadataStore,
 } from '@/services/ops-flow/task-fields-configuration/stores/use-task-field-metadata-store';
 import type { DefaultTaskFieldId } from '@/services/ops-flow/task-fields-configuration/types/task-field-type-metadata-type';
+import type { References } from '@/services/ops-flow/task-fields-form/types/task-field-form-type';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
@@ -59,6 +60,7 @@ interface UseTaskContentFormStoreGetters {
     isFieldValid: boolean;
     isAllValid: boolean;
     isEditable: boolean;
+    references: References;
 }
 export const useTaskContentFormStore = defineStore('task-content-form', () => {
     const taskCategoryStore = useTaskCategoryStore();
@@ -102,7 +104,8 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         defaultFields: computed<TaskField[]>(() => {
             const projectRequired = state.currentTaskType?.required_project;
             if (projectRequired) return taskFieldMetadataStore.getters.projectScopeDefaultFields;
-            return taskFieldMetadataStore.getters.workspaceScopeDefaultFields;
+            return taskFieldMetadataStore.getters.projectScopeDefaultFields;
+            // return taskFieldMetadataStore.getters.workspaceScopeDefaultFields;
         }),
         isDefaultFieldValid: computed<boolean>(() => {
             if (state.mode === 'view') return state.defaultDataValidationMap[DEFAULT_FIELD_ID_MAP.title] ?? true;
@@ -121,6 +124,12 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
             if (userStore.getters.isDomainAdmin) return true;
             // if (state.originTask.created_by === userStore.state.userId) return true;
             return false;
+        }),
+        references: computed<References>(() => {
+            const projectRequired = state.currentTaskType?.required_project;
+            return {
+                project_id: projectRequired ? state.defaultData[DEFAULT_FIELD_ID_MAP.project] : '*',
+            };
         }),
     } as unknown as UseTaskContentFormStoreGetters; // HACK: to avoid type error
 

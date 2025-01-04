@@ -8,11 +8,12 @@ import type { Attachment } from '@/common/components/editor/extensions/image/typ
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-const uploadFile = async (file: File, resourceGroup: FileManagerResourceGroupType): Promise<FileModel> => {
+const uploadFile = async (file: File, resourceGroup: FileManagerResourceGroupType, resourceId?: string): Promise<FileModel> => {
     const formData = new FormData();
     formData.append('file', file);
 
     let resourceGroupPath: string;
+    let params = '';
     if (resourceGroup === 'DOMAIN') {
         resourceGroupPath = 'domain';
     } else if (resourceGroup === 'WORKSPACE') {
@@ -21,9 +22,10 @@ const uploadFile = async (file: File, resourceGroup: FileManagerResourceGroupTyp
         resourceGroupPath = 'user';
     } else if (resourceGroup === 'PROJECT') {
         resourceGroupPath = 'project';
+        params = `?project_id=${resourceId || '*'}`;
     } else { resourceGroupPath = 'public'; }
 
-    const response = await SpaceConnector.restClient.post(`/files/${resourceGroupPath}/upload`, formData, {
+    const response = await SpaceConnector.restClient.post(`/files/${resourceGroupPath}/upload${params}`, formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
@@ -31,10 +33,11 @@ const uploadFile = async (file: File, resourceGroup: FileManagerResourceGroupTyp
     return response.data;
 };
 
-export const getFileDownloadUrl = (fileId: string, resourceGroup: FileManagerResourceGroupType): string => {
+export const getFileDownloadUrl = (fileId: string, resourceGroup: FileManagerResourceGroupType, resourceId?: string): string => {
     const baseUri = SpaceConnector.restClient.getUri();
 
     let resourceGroupPath: string;
+    let extraParams = '';
     if (resourceGroup === 'DOMAIN') {
         resourceGroupPath = 'domain';
     } else if (resourceGroup === 'WORKSPACE') {
@@ -43,15 +46,17 @@ export const getFileDownloadUrl = (fileId: string, resourceGroup: FileManagerRes
         resourceGroupPath = 'user';
     } else if (resourceGroup === 'PROJECT') {
         resourceGroupPath = 'project';
+        extraParams = `&project_id=${resourceId || '*'}`;
     } else { resourceGroupPath = 'public'; }
 
-    return `${baseUri}/files/${resourceGroupPath}/${fileId}?token=${SpaceConnector.getAccessToken()}`;
+    return `${baseUri}/files/${resourceGroupPath}/${fileId}?token=${SpaceConnector.getAccessToken()}${extraParams}`;
 };
-export const uploadFileAndGetFileInfo = async (file: File, resourceGroup: FileManagerResourceGroupType): Promise<Attachment> => {
+export const uploadFileAndGetFileInfo = async (file: File, resourceGroup: FileManagerResourceGroupType, resourceId?: string): Promise<Attachment> => {
     try {
-        const fileModel = await uploadFile(file, resourceGroup);
+        const fileModel = await uploadFile(file, resourceGroup, resourceId);
+        console.debug('fileModel', fileModel);
         return {
-            downloadUrl: getFileDownloadUrl(fileModel.file_id, resourceGroup),
+            downloadUrl: getFileDownloadUrl(fileModel.file_id, resourceGroup, resourceId),
             fileId: fileModel.file_id,
         };
     } catch (e) {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watch } from 'vue';
+import { watch, computed } from 'vue';
 
 import {
     PFieldGroup,
@@ -19,27 +19,32 @@ import type {
 } from '@/services/ops-flow/task-fields-form/types/task-field-form-type';
 
 
-const props = withDefaults(defineProps<TaskFieldFormProps<ParagraphTaskField, string>>(), {
+const props = withDefaults(defineProps<TaskFieldFormProps<ParagraphTaskField, string|undefined>>(), {
     files: () => [],
 });
 
-const emit = defineEmits<TaskFieldFormEmits<string>>();
+const emit = defineEmits<TaskFieldFormEmits<string|undefined>>();
 
 const {
     fieldValue, updateFieldValue,
     isInvalid, invalidText,
 } = useTaskFieldValidation(props, emit);
 
-const { fileUploader } = useFileUploader();
+const resourceId = computed(() => props.references?.project_id);
+const { fileUploader } = useFileUploader({
+    resourceGroup: 'PROJECT',
+    resourceId,
+});
 const {
     contents,
     editorContents,
     fileIds,
 } = useEditorContentTransformer({
-    contents: fieldValue,
+    contents: computed(() => fieldValue.value ?? ''),
     contentType: 'markdown',
     resourceGroup: 'PROJECT',
     fileIds: props.files.map((f) => f.file_id),
+    resourceId: computed(() => props.references?.project_id),
 });
 
 watch(contents, updateFieldValue);

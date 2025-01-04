@@ -29,11 +29,13 @@ export const useEditorContentTransformer = (op: {
     contentType: 'html'|'markdown'|Ref<'html'|'markdown'>;
     fileIds?: string[]|Ref<string[]>|Readonly<Ref<string[]>>;
     resourceGroup: FileManagerResourceGroupType|Ref<FileManagerResourceGroupType>;
+    resourceId?: string|Ref<string|undefined>;
 }) => {
     const contents = getRef<string>(op.contents ?? '');
     const fileIds = getRef<string[]>(op.fileIds ?? []);
     const contentType = isRef(op.contentType) ? op.contentType : ref<'html'|'markdown'>(op.contentType);
     const resourceGroup = isRef(op.resourceGroup) ? op.resourceGroup : ref<FileManagerResourceGroupType>(op.resourceGroup);
+    const resourceId = getRef<string|undefined>(op.resourceId);
 
     const baseUri = SpaceConnector.restClient.getUri();
 
@@ -68,7 +70,7 @@ export const useEditorContentTransformer = (op: {
 
     const htmlFileImagePattern = /<img\s+[^>]*src="<(file-[^"]+)>"[^>]*>/g;
     const transformHtmlContentForView = (content: string): string => content.replace(htmlFileImagePattern, (match, url) => {
-        const newUrl = getFileDownloadUrl(replaceImageUrl(url), resourceGroup.value);
+        const newUrl = getFileDownloadUrl(replaceImageUrl(url), resourceGroup.value, resourceId.value);
         return match.replace(url, newUrl);
     });
 
@@ -97,12 +99,14 @@ export const useEditorContentTransformer = (op: {
         editorContents.value = newContents;
     };
 
+    // When contents(from server) is changed, update editorContents(view data)
     watch(contents, (c) => {
         const ec = transformEditorContentForView(c);
         if (editorContents.value !== ec) {
             editorContents.value = ec;
         }
     });
+    // When editorContents(view data) is changed by input, update contents(for server)
     debouncedWatch(editorContents, (ec) => {
         const c = transformEditorContentForUpload(ec);
         if (contents.value !== c) {
@@ -114,6 +118,10 @@ export const useEditorContentTransformer = (op: {
         }
     }, { debounce: 250 });
 
+    // When resourceGroup or resourceId is changed, update editorContents(view data)
+    watch([resourceGroup, resourceId], () => {
+        editorContents.value = transformEditorContentForView(contents.value);
+    });
     return {
         editorContents,
         contents,
