@@ -1,13 +1,11 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ResourceGroupType } from '@/schema/_common/type';
 import type { FileModel } from '@/schema/file-manager/model';
+
+import type { FileManagerResourceGroupType } from '@/lib/file-manager/type';
 
 import type { Attachment } from '@/common/components/editor/extensions/image/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
-
-type FileManagerResourceGroupType = Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'USER'>;
 
 
 const uploadFile = async (file: File, resourceGroup: FileManagerResourceGroupType): Promise<FileModel> => {
@@ -21,6 +19,8 @@ const uploadFile = async (file: File, resourceGroup: FileManagerResourceGroupTyp
         resourceGroupPath = 'workspace';
     } else if (resourceGroup === 'USER') {
         resourceGroupPath = 'user';
+    } else if (resourceGroup === 'PROJECT') {
+        resourceGroupPath = 'project';
     } else { resourceGroupPath = 'public'; }
 
     const response = await SpaceConnector.restClient.post(`/files/${resourceGroupPath}/upload`, formData, {
@@ -41,6 +41,8 @@ export const getFileDownloadUrl = (fileId: string, resourceGroup: FileManagerRes
         resourceGroupPath = 'workspace';
     } else if (resourceGroup === 'USER') {
         resourceGroupPath = 'user';
+    } else if (resourceGroup === 'PROJECT') {
+        resourceGroupPath = 'project';
     } else { resourceGroupPath = 'public'; }
 
     return `${baseUri}/files/${resourceGroupPath}/${fileId}?token=${SpaceConnector.getAccessToken()}`;
@@ -55,7 +57,7 @@ export const uploadFileAndGetFileInfo = async (file: File, resourceGroup: FileMa
     } catch (e) {
         ErrorHandler.handleError(e);
         return {
-            downloadUrl: `${window.location.origin}/images/no-image.png`,
+            downloadUrl: '',
             fileId: '',
         };
     }
