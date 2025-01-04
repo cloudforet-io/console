@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { toRef, ref } from 'vue';
-
-import { isEqual } from 'lodash';
+import { watch } from 'vue';
 
 import {
     PFieldGroup,
@@ -12,7 +10,6 @@ import type { ParagraphTaskField } from '@/schema/opsflow/_types/task-field-type
 import TextEditor from '@/common/components/editor/TextEditor.vue';
 import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 import { useEditorContentTransformer } from '@/common/composables/editor-content-transformer';
-import { useFileAttachments } from '@/common/composables/file-attachments';
 import { useFileUploader } from '@/common/composables/file-uploader';
 
 import { useTaskFieldValidation } from '@/services/ops-flow/task-fields-form/composables/use-task-field-validation';
@@ -34,19 +31,21 @@ const {
 } = useTaskFieldValidation(props, emit);
 
 const { fileUploader } = useFileUploader();
-const { attachments } = useFileAttachments(toRef(props, 'files'));
-const handleUpdateAttachmentIds = (attachmentIds: string[]) => {
-    const originFileIds = props.files.map((f) => f.file_id);
-    if (isEqual(originFileIds, attachmentIds)) return;
-    emit('update:file-ids', attachmentIds);
-};
+const {
+    contents,
+    editorContents,
+    fileIds,
+} = useEditorContentTransformer({
+    contents: fieldValue,
+    contentType: 'markdown',
+    resourceGroup: 'PROJECT',
+    fileIds: props.files.map((f) => f.file_id),
+});
 
-const editorContent = ref(fieldValue.value);
-const { transformEditorContent } = useEditorContentTransformer();
-const handleUpdateEditorContent = (val: string) => {
-    editorContent.value = val;
-    updateFieldValue(transformEditorContent(val, 'markdown'));
-};
+watch(contents, updateFieldValue);
+watch(fileIds, (ids) => {
+    emit('update:file-ids', ids);
+});
 </script>
 
 <template>
@@ -58,21 +57,18 @@ const handleUpdateEditorContent = (val: string) => {
     >
         <text-editor-viewer v-if="props.readonly"
                             class="my-1"
-                            :contents="fieldValue"
-                            :attachments="attachments"
+                            :contents="editorContents"
                             show-in-box
                             content-type="markdown"
         />
         <text-editor v-else
                      class="my-1"
-                     :value="editorContent"
+                     :value="editorContents"
                      :image-uploader="fileUploader"
-                     :attachments="attachments"
                      :placeholder="props.field.options?.example"
                      :invalid="isInvalid"
                      content-type="markdown"
-                     @update:value="handleUpdateEditorContent"
-                     @update:attachment-ids="handleUpdateAttachmentIds"
+                     @update:value="editorContents = $event"
         />
     </p-field-group>
 </template>

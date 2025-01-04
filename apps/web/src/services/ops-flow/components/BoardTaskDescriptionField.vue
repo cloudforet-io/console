@@ -6,14 +6,19 @@ import { PCollapsiblePanel } from '@cloudforet/mirinae';
 import type { FileModel } from '@/schema/file-manager/model';
 
 import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
+import { useEditorContentTransformer } from '@/common/composables/editor-content-transformer';
 
 const props = defineProps<{
     description?: string;
     files?: FileModel[];
 }>();
 
-const attachments = computed(() => props.files?.map((d) => ({ fileId: d.file_id, downloadUrl: d.download_url })));
 
+const { editorContents } = useEditorContentTransformer({
+    contents: computed(() => props.description ?? ''),
+    contentType: 'markdown',
+    resourceGroup: 'PROJECT',
+});
 </script>
 
 <template>
@@ -21,8 +26,7 @@ const attachments = computed(() => props.files?.map((d) => ({ fileId: d.file_id,
                          class="task-desc-field"
                          :line-clamp="1"
     >
-        <text-editor-viewer :contents="props.description"
-                            :attachments="attachments"
+        <text-editor-viewer :contents="editorContents"
                             content-type="markdown"
         />
     </p-collapsible-panel>

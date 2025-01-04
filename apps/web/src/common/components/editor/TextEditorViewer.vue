@@ -1,29 +1,27 @@
 <script setup lang="ts">
-import { computed, toRef } from 'vue';
+import {
+    computed, watch, nextTick, ref, toRef,
+} from 'vue';
 
 import DOMPurify from 'dompurify';
 
 import { useMarkdown } from '@cloudforet/mirinae';
 
-import { setAttachmentsToContents } from '@/common/components/editor/extensions/image/helper';
-import type { Attachment } from '@/common/components/editor/extensions/image/type';
-
 import { loadMonospaceFonts } from '@/styles/fonts';
 
 interface Props {
     contents?: string;
-    attachments?: Attachment[];
     showInBox?: boolean
     contentType?: 'html'|'markdown';
 }
 const props = withDefaults(defineProps<Props>(), {
     contents: '',
-    attachments: () => [],
     showInBox: false,
     contentType: 'html',
 });
 
 loadMonospaceFonts();
+
 const { sanitizedHtml } = useMarkdown({
     value: toRef(props, 'contents'),
     inlineCodeClass: 'inline-code',
@@ -33,13 +31,28 @@ const refinedContents = computed(() => {
         return sanitizedHtml.value;
     }
     const sanitized = DOMPurify.sanitize(props.contents);
-    return setAttachmentsToContents(sanitized, props.attachments);
+    return sanitized;
+});
+
+const htmlContainer = ref<null|HTMLElement>(null);
+const addErrorHandlers = (container: HTMLElement) => {
+    container.querySelectorAll('img').forEach((img) => {
+        img.onerror = () => {
+            img.setAttribute('error', 'true');
+        };
+    });
+};
+watch([refinedContents, htmlContainer], async ([, container]) => {
+    if (!container) return;
+    await nextTick();
+    addErrorHandlers(container);
 });
 </script>
 
 <template>
     <!--        eslint-disable-next-line vue/no-v-html-->
-    <div class="text-editor-contents"
+    <div ref="htmlContainer"
+         class="text-editor-contents"
          :class="{'contents-box': props.showInBox}"
          v-html="refinedContents"
     />

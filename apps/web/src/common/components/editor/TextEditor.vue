@@ -15,8 +15,7 @@ import { Editor, EditorContent } from '@tiptap/vue-2';
 import { Markdown } from 'tiptap-markdown';
 
 import { createImageExtension } from '@/common/components/editor/extensions/image';
-import { getAttachmentIds, setAttachmentsToContents } from '@/common/components/editor/extensions/image/helper';
-import type { Attachment, ImageUploader } from '@/common/components/editor/extensions/image/type';
+import type { ImageUploader } from '@/common/components/editor/extensions/image/type';
 import MenuBar from '@/common/components/editor/MenuBar.vue';
 
 import { loadMonospaceFonts } from '@/styles/fonts';
@@ -24,7 +23,6 @@ import { loadMonospaceFonts } from '@/styles/fonts';
 interface Props {
     value?: string;
     imageUploader?: ImageUploader;
-    attachments?: Attachment[];
     invalid?: boolean;
     placeholder?: string;
     contentType?: 'html'|'markdown';
@@ -33,14 +31,12 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     value: '',
     imageUploader: undefined,
-    attachments: () => [],
     invalid: false,
     placeholder: '',
     contentType: 'html',
     showUndoRedoButtons: true,
 });
 const emit = defineEmits<{(e: 'update:value', value: string): void;
-    (e: 'update:attachment-ids', attachmentIds: string[]): void;
 }>();
 
 loadMonospaceFonts();
@@ -87,7 +83,7 @@ const getExtensions = (): AnyExtension[] => {
 
 onMounted(() => {
     editor.value = new Editor({
-        content: setAttachmentsToContents(props.value, props.attachments),
+        content: props.value,
         extensions: getExtensions(),
         onUpdate: () => {
             let content = '';
@@ -98,7 +94,6 @@ onMounted(() => {
                 content = editor.value.storage.markdown.getMarkdown() ?? '';
             }
             emit('update:value', content);
-            emit('update:attachment-ids', getAttachmentIds(editor.value));
         },
     });
 });
@@ -107,18 +102,18 @@ onBeforeUnmount(() => {
     if (editor.value) editor.value.destroy();
 });
 
-watch([() => props.value, () => props.attachments], ([value, attachments], prev) => {
+watch(() => props.value, (value) => {
     if (!editor.value) return;
-    let isSame;
+
+    let contents: string;
     if (props.contentType === 'html') {
-        isSame = editor.value.getHTML() === value;
+        contents = editor.value?.getHTML() ?? '';
     } else {
-        isSame = editor.value.storage.markdown.getMarkdown() === value;
+        contents = editor.value.storage.markdown.getMarkdown() ?? '';
     }
-    if (isSame) return;
-    let newContents = value;
-    if (attachments !== prev[1]) newContents = setAttachmentsToContents(value, attachments);
-    editor.value.commands.setContent(newContents, false);
+    if (contents === value) return; // prevent infinite loop.
+
+    editor.value.commands.setContent(value, false);
 });
 </script>
 

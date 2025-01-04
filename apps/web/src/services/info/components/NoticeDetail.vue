@@ -17,7 +17,6 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { PostListParameters } from '@/schema/board/post/api-verbs/list';
 import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
 import type { PostModel } from '@/schema/board/post/model';
-import type { FileModel } from '@/schema/file-manager/model';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -26,8 +25,8 @@ import { useNoticeStore } from '@/store/notice';
 import { useUserStore } from '@/store/user/user-store';
 
 import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
+import { useEditorContentTransformer } from '@/common/composables/editor-content-transformer';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useFileAttachments } from '@/common/composables/file-attachments';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
@@ -81,8 +80,16 @@ const state = reactive({
     popoverVisible: false,
 });
 
-const files = computed<FileModel[]>(() => state.noticePostData?.files ?? []);
-const { attachments } = useFileAttachments(files);
+const {
+    editorContents,
+} = useEditorContentTransformer({
+    contents: computed(() => state.noticePostData?.contents ?? ''),
+    contentType: 'html',
+    resourceGroup: computed(() => {
+        if (!state.noticePostData) return 'PUBLIC';
+        return state.noticePostData.resource_group;
+    }),
+});
 
 /* Api */
 const getNextPostData = async (createdAt: string) => {
@@ -240,9 +247,7 @@ watch(() => props.postId, (postId) => {
                 <div v-if="state.noticePostData"
                      class="text-editor-wrapper"
                 >
-                    <text-editor-viewer :contents="state.noticePostData.contents"
-                                        :attachments="attachments"
-                    />
+                    <text-editor-viewer :contents="editorContents" />
                 </div>
             </p-data-loader>
         </p-pane-layout>

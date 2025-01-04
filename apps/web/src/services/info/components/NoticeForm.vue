@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, reactive, watch, toRef,
+} from 'vue';
 
 import {
     PButton,
@@ -25,7 +27,6 @@ import { useUserStore } from '@/store/user/user-store';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import { emptyHtmlRegExp } from '@/common/components/editor/extensions/image/helper';
-import type { Attachment } from '@/common/components/editor/extensions/image/type';
 import TextEditor from '@/common/components/editor/TextEditor.vue';
 import { useEditorContentTransformer } from '@/common/composables/editor-content-transformer';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -60,7 +61,7 @@ const storeState = reactive({
 const state = reactive({
     isPinned: false,
     isPopup: false,
-    attachments: [] as Attachment[],
+    fileIds: [] as string[],
 });
 const workspaceState = reactive({
     selectedItems: [] as WorkspaceDropdownMenuItem[],
@@ -93,19 +94,31 @@ const {
     },
 });
 
-const { transformEditorContent } = useEditorContentTransformer();
+const resourceGroup = computed(() => (workspaceState.selectedRadioIdx === 0 ? 'DOMAIN' : 'WORKSPACE'));
+const { fileUploader } = useFileUploader({ resourceGroup });
+const {
+    contents: uploadContents,
+    editorContents,
+} = useEditorContentTransformer({
+    contentType: 'html',
+    resourceGroup,
+    fileIds: toRef(state, 'fileIds'), // auto update to state.fileIds
+    contents,
+});
+watch(uploadContents, (d) => {
+    setForm('contents', d);
+});
 const formData = computed<Omit<PostUpdateParameters, 'post_id'>>(() => ({
     title: noticeTitle.value,
     writer: writerName.value,
-    contents: transformEditorContent(contents.value, 'html'),
-    files: state.attachments.map(({ fileId }) => fileId) as string[],
+    contents: contents.value,
+    files: state.fileIds,
     options: {
         is_pinned: state.isPinned,
         is_popup: state.isPopup,
     },
 }));
 
-const { fileUploader } = useFileUploader();
 const { getProperRouteLocation } = useProperRouteLocation();
 
 
@@ -155,7 +168,7 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
     // INIT STATES
     state.isPinned = notice?.options?.is_pinned ?? false;
     state.isPopup = notice?.options?.is_popup ?? false;
-    state.attachments = notice?.files?.map((file) => ({ fileId: file.file_id, downloadUrl: file.download_url ?? '' })) ?? [];
+    state.fileIds = notice?.files?.map((file) => file.file_id) ?? [];
     setForm('writerName', notice?.writer ?? storeState.userName);
     setForm('noticeTitle', notice?.title ?? '');
     setForm('contents', notice?.contents ?? '');
@@ -242,11 +255,10 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
                                :invalid-text="invalidTexts.contents"
                 >
                     <template #default="{invalid}">
-                        <text-editor :value="contents"
-                                     :attachments.sync="state.attachments"
+                        <text-editor :value="editorContents"
                                      :image-uploader="fileUploader"
                                      :invalid="invalid"
-                                     @update:value="(d) => setForm('contents', d)"
+                                     @update:value="editorContents = $event"
                         />
                     </template>
                 </p-field-group>
