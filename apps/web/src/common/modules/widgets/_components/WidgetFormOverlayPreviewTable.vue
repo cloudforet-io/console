@@ -26,8 +26,12 @@ import type { ProjectReferenceMap } from '@/store/reference/project-reference-st
 
 import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { REFERENCE_FIELD_MAP, WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
-import { normalizeAndSerialize } from '@/common/modules/widgets/_helpers/global-variable-helper';
-import { sortObjectByKeys } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
+import {
+    normalizeAndSerializeVars,
+} from '@/common/modules/widgets/_helpers/global-variable-helper';
+import {
+    normalizeAndSerializeDataTableOptions,
+} from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
@@ -239,11 +243,12 @@ const queryKey = computed(() => [
     storeState.selectedDataTableId,
     {
         granularity: state.selectedGranularity,
-        dataTableOptions: JSON.stringify(sortObjectByKeys(storeState.selectedDataTable?.options ?? {})),
+        dataTableOptions: normalizeAndSerializeDataTableOptions(storeState.selectedDataTable?.options),
+        dataTables: normalizeAndSerializeDataTableOptions((widgetGenerateState.dataTables || []).map((d) => d?.options || {})),
         sortBy: state.sortBy,
         thisPage: state.thisPage,
         pageSize: state.pageSize,
-        vars: normalizeAndSerialize(dashboardDetailGetters.dashboardInfo?.vars ?? {}),
+        vars: normalizeAndSerializeVars(dashboardDetailGetters.dashboardInfo?.vars ?? {}),
     },
 ]);
 
