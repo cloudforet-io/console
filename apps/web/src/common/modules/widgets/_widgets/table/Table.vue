@@ -241,7 +241,7 @@ const queryResults = useQueries({
     ],
 });
 
-const widgetLoading = computed<boolean>(() => queryResults.value?.[0].isLoading);
+const widgetLoading = computed<boolean>(() => queryResults.value?.[0].isLoading || queryResults.value?.[0].isRefetching);
 const errorMessage = computed<string>(() => {
     if (!state.dataTable) return i18n.t('COMMON.WIDGETS.NO_DATA_TABLE_ERROR_MESSAGE');
     return queryResults.value?.[0].error?.message as string;
@@ -280,15 +280,19 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
     dateRange,
     errorMessage,
     widgetLoading,
-    noData: computed(() => (refinedData.value ? !(refinedData.value.results?.length) : false)),
+    noData: computed(() => (queryResults.value?.[0].data ? !(queryResults.value?.[0].data?.results?.length) : false)),
 });
 
 const handleUpdateThisPage = async (newPage: number) => {
     state.thisPage = newPage;
 };
 
-const loadWidget = async () => {
+const loadWidget = async (forceLoad?: boolean) => {
     state.runQueries = true;
+    if (forceLoad) {
+        queryResults.value?.[0].refetch();
+        queryResults.value?.[1].refetch();
+    }
 };
 
 useWidgetInitAndRefresh({ props, emit, loadWidget });

@@ -236,7 +236,7 @@ const queryResult = useQuery({
     staleTime: WIDGET_LOAD_STALE_TIME,
 });
 
-const widgetLoading = computed<boolean>(() => queryResult.isLoading.value);
+const widgetLoading = computed<boolean>(() => queryResult.isLoading.value || queryResult.isRefetching.value);
 const errorMessage = computed<string>(() => {
     if (!state.dataTable) return i18n.t('COMMON.WIDGETS.NO_DATA_TABLE_ERROR_MESSAGE');
     return queryResult.error?.value?.message;
@@ -267,8 +267,9 @@ const drawChart = (rawData: WidgetLoadResponse|null) => {
     state.chartData = _refinedData;
 };
 
-const loadWidget = () => {
+const loadWidget = (forceLoad?: boolean) => {
     state.runQueries = true;
+    if (forceLoad) queryResult.refetch();
 };
 
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
