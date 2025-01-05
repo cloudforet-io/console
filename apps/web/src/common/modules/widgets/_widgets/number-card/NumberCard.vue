@@ -24,8 +24,12 @@ import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-wi
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
-import { normalizeAndSerialize } from '@/common/modules/widgets/_helpers/global-variable-helper';
-import { sortObjectByKeys } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
+import {
+    normalizeAndSerializeVars,
+} from '@/common/modules/widgets/_helpers/global-variable-helper';
+import {
+    normalizeAndSerializeDataTableOptions,
+} from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import {
     getPreviousDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
@@ -159,8 +163,9 @@ const baseQueryKey = computed(() => [
         end: dateRange.value.end,
         granularity: widgetOptionsState.granularityInfo?.granularity,
         dataTableId: state.dataTable?.data_table_id,
-        dataTableOptions: JSON.stringify(sortObjectByKeys(state.dataTable?.options) ?? {}),
-        vars: normalizeAndSerialize(props.dashboardVars),
+        dataTableOptions: normalizeAndSerializeDataTableOptions(state.dataTable?.options || {}),
+        dataTables: normalizeAndSerializeDataTableOptions((props.dataTables || []).map((d) => d?.options || {})),
+        vars: normalizeAndSerializeVars(props.dashboardVars),
     },
 ]);
 
@@ -172,8 +177,9 @@ const comparisonQueryKey = computed(() => [
         end: state.comparisonDateRange.end,
         granularity: widgetOptionsState.granularityInfo?.granularity,
         dataTableId: state.dataTable?.data_table_id,
-        dataTableOptions: JSON.stringify(sortObjectByKeys(state.dataTable?.options) ?? {}),
-        vars: normalizeAndSerialize(props.dashboardVars),
+        dataTableOptions: normalizeAndSerializeDataTableOptions(state.dataTable?.options || {}),
+        dataTables: normalizeAndSerializeDataTableOptions((props.dataTables || []).map((d) => d?.options || {})),
+        vars: normalizeAndSerializeVars(props.dashboardVars),
     },
 ]);
 
@@ -206,15 +212,19 @@ const queryResults = useQueries({
     ],
 });
 
-const widgetLoading = computed<boolean>(() => queryResults.value?.[0].isLoading);
+const widgetLoading = computed<boolean>(() => queryResults.value?.[0].isLoading || queryResults.value?.[0].isRefetching);
 const previousLoading = computed<string>(() => queryResults.value?.[1].isLoading);
 const errorMessage = computed<string>(() => {
     if (!state.dataTable) return i18n.t('COMMON.WIDGETS.NO_DATA_TABLE_ERROR_MESSAGE');
     return queryResults.value?.[0].error?.message;
 });
 
-const loadWidget = () => {
+const loadWidget = (forceLoad?: boolean) => {
     state.runQueries = true;
+    if (forceLoad) {
+        queryResults.value?.[0].refetch();
+        queryResults.value?.[1].refetch();
+    }
 };
 
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {

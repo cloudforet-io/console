@@ -30,8 +30,12 @@ import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-wi
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
-import { normalizeAndSerialize } from '@/common/modules/widgets/_helpers/global-variable-helper';
-import { sortObjectByKeys } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
+import {
+    normalizeAndSerializeVars,
+} from '@/common/modules/widgets/_helpers/global-variable-helper';
+import {
+    normalizeAndSerializeDataTableOptions,
+} from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import { getWidgetDataTable } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
 import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
@@ -131,9 +135,10 @@ const queryKey = computed(() => [
         end: dateRange.value.end,
         granularity: widgetOptionsState.granularityInfo?.granularity,
         dataTableId: state.dataTable?.data_table_id,
-        dataTableOptions: JSON.stringify(sortObjectByKeys(state.dataTable?.options) ?? {}),
+        dataTableOptions: normalizeAndSerializeDataTableOptions(state.dataTable?.options || {}),
+        dataTables: normalizeAndSerializeDataTableOptions((props.dataTables || []).map((d) => d?.options || {})),
         groupBy: widgetOptionsState.groupByInfo?.data,
-        vars: normalizeAndSerialize(props.dashboardVars),
+        vars: normalizeAndSerializeVars(props.dashboardVars),
     },
 ]);
 
@@ -151,7 +156,7 @@ const queryResult = useQuery({
     staleTime: WIDGET_LOAD_STALE_TIME,
 });
 
-const widgetLoading = computed<boolean>(() => queryResult.isLoading.value);
+const widgetLoading = computed<boolean>(() => queryResult.isLoading.value || queryResult.isRefetching.value);
 const errorMessage = computed<string>(() => {
     if (!state.dataTable) return i18n.t('COMMON.WIDGETS.NO_DATA_TABLE_ERROR_MESSAGE');
     return queryResult.error?.value?.message;
@@ -186,8 +191,9 @@ const drawChart = async (rawData: WidgetLoadResponse|null) => {
 
     state.chartData = _seriesData;
 };
-const loadWidget = async () => {
+const loadWidget = (forceLoad?: boolean) => {
     state.runQueries = true;
+    if (forceLoad) queryResult.refetch();
 };
 
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {

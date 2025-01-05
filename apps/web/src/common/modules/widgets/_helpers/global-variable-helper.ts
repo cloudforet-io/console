@@ -8,7 +8,7 @@ export const isGlobalVariableFormat = (value: string | MenuItem[]): boolean => {
     return regex.test(value);
 };
 
-export const normalizeAndSerialize = (obj: DashboardVars = {}): string => {
+export const normalizeAndSerializeVars = (obj: DashboardVars = {}): string => {
     const sortedKeys = Object.keys(obj).sort();
 
     const normalizedObj: DashboardVars = sortedKeys.reduce((acc, key) => {

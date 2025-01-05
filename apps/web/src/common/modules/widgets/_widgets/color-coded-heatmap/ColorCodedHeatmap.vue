@@ -25,8 +25,12 @@ import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-wi
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
-import { normalizeAndSerialize } from '@/common/modules/widgets/_helpers/global-variable-helper';
-import { sortObjectByKeys } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
+import {
+    normalizeAndSerializeVars,
+} from '@/common/modules/widgets/_helpers/global-variable-helper';
+import {
+    normalizeAndSerializeDataTableOptions,
+} from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import {
     getReferenceLabel,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
@@ -41,6 +45,7 @@ import type { GroupByValue } from '@/common/modules/widgets/_widget-fields/group
 import type { WidgetLoadResponse } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/common/modules/widgets/types/widget-display-type';
 import type { WidgetLegend } from '@/common/modules/widgets/types/widget-legend-typs';
+import type { DataTableOptions } from '@/common/modules/widgets/types/widget-model';
 
 
 const BOX_MIN_WIDTH = 112;
@@ -90,9 +95,10 @@ const queryKey = computed(() => [
         end: dateRange.value.end,
         granularity: widgetOptionsState.granularityInfo?.granularity,
         dataTableId: state.dataTable?.data_table_id,
-        dataTableOptions: JSON.stringify(sortObjectByKeys(state.dataTable?.options) ?? {}),
+        dataTableOptions: normalizeAndSerializeDataTableOptions(state.dataTable?.options as DataTableOptions),
+        dataTables: normalizeAndSerializeDataTableOptions((props.dataTables || []).map((d) => d?.options || {})),
         groupBy: [widgetOptionsState.groupByInfo?.data as string, widgetOptionsState.formatRulesInfo?.field as string],
-        vars: normalizeAndSerialize(props.dashboardVars),
+        vars: normalizeAndSerializeVars(props.dashboardVars),
     },
 ]);
 
@@ -114,7 +120,7 @@ const queryResult = useQuery({
     staleTime: WIDGET_LOAD_STALE_TIME,
 });
 
-const widgetLoading = computed<boolean>(() => queryResult.isLoading.value);
+const widgetLoading = computed<boolean>(() => queryResult.isLoading.value || queryResult.isRefetching.value);
 const errorMessage = computed<string|undefined>(() => {
     if (!state.dataTable) return i18n.t('COMMON.WIDGETS.NO_DATA_TABLE_ERROR_MESSAGE');
     return queryResult.error?.value?.message;
@@ -153,8 +159,9 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
 });
 
 /* Util */
-const loadWidget = () => {
+const loadWidget = (forceLoad?: boolean) => {
     state.runQueries = true;
+    if (forceLoad) queryResult.refetch();
 };
 const getColor = (val: string, field: string): string => {
     const _label = getReferenceLabel(props.allReferenceTypeInfo, field, val);

@@ -25,8 +25,12 @@ import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/u
 import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
 import { SUB_TOTAL_NAME } from '@/common/modules/widgets/_constants/widget-field-constant';
-import { normalizeAndSerialize } from '@/common/modules/widgets/_helpers/global-variable-helper';
-import { sortObjectByKeys } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
+import {
+    normalizeAndSerializeVars,
+} from '@/common/modules/widgets/_helpers/global-variable-helper';
+import {
+    normalizeAndSerializeDataTableOptions,
+} from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import { getWidgetDataTable } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { CustomTableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
 import type { DataFieldHeatmapColorValue } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
@@ -136,8 +140,12 @@ const widgetOptionsState = reactive({
     missingValueInfo: computed<MissingValueValue|undefined>(() => props.widgetOptions?.missingValue?.value as MissingValueValue),
 });
 
-
-
+const getTableDefaultSortBy = (_sortBy: Sort[]) => {
+    if (!!_sortBy.length || !widgetOptionsState.dataFieldInfo?.data?.length) return _sortBy;
+    if (state.isPivotDataTable) return [{ key: 'Sub Total', desc: true }];
+    const defaultSortBy = [{ key: (widgetOptionsState.dataFieldInfo?.data as string[])?.[0], desc: true }];
+    return defaultSortBy;
+};
 const fetchWidgetData = async (params: PrivateWidgetLoadParameters|PublicWidgetLoadParameters): Promise<WidgetLoadResponse> => {
     const defaultFetcher = state.isPrivateWidget
         ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, WidgetLoadResponse>
@@ -166,8 +174,9 @@ const baseQueryKey = computed(() => [
         granularity: widgetOptionsState.granularityInfo?.granularity,
         groupBy: widgetOptionsState.groupByInfo?.data,
         dataTableId: state.dataTable?.data_table_id,
-        dataTableOptions: JSON.stringify(sortObjectByKeys(state.dataTable?.options) ?? {}),
-        vars: normalizeAndSerialize(props.dashboardVars),
+        dataTableOptions: normalizeAndSerializeDataTableOptions(state.dataTable?.options || {}),
+        dataTables: normalizeAndSerializeDataTableOptions((props.dataTables || []).map((d) => d?.options || {})),
+        vars: normalizeAndSerializeVars(props.dashboardVars),
     },
 ]);
 
@@ -179,9 +188,10 @@ const fullDataQueryKey = computed(() => [
         end: dateRange.value.end,
         granularity: widgetOptionsState.granularityInfo?.granularity,
         dataTableId: state.dataTable?.data_table_id,
-        dataTableOptions: JSON.stringify(sortObjectByKeys(state.dataTable?.options) ?? {}),
+        dataTableOptions: normalizeAndSerializeDataTableOptions(state.dataTable?.options || {}),
+        dataTables: normalizeAndSerializeDataTableOptions((props.dataTables || []).map((d) => d?.options || {})),
         enabledTotal: !!widgetOptionsState.totalInfo?.toggleValue,
-        vars: normalizeAndSerialize(props.dashboardVars),
+        vars: normalizeAndSerializeVars(props.dashboardVars),
     },
 ]);
 
@@ -193,7 +203,7 @@ const queryResults = useQueries({
                 widget_id: props.widgetId,
                 start: dateRange.value.start,
                 end: dateRange.value.end,
-                sort: state.sortBy,
+                sort: getTableDefaultSortBy(state.sortBy),
                 page: {
                     start: (state.pageSize * (state.thisPage - 1)) + 1,
                     limit: state.pageSize,
@@ -231,7 +241,7 @@ const queryResults = useQueries({
     ],
 });
 
-const widgetLoading = computed<boolean>(() => queryResults.value?.[0].isLoading);
+const widgetLoading = computed<boolean>(() => queryResults.value?.[0].isLoading || queryResults.value?.[0].isRefetching);
 const errorMessage = computed<string>(() => {
     if (!state.dataTable) return i18n.t('COMMON.WIDGETS.NO_DATA_TABLE_ERROR_MESSAGE');
     return queryResults.value?.[0].error?.message as string;
@@ -270,15 +280,19 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
     dateRange,
     errorMessage,
     widgetLoading,
-    noData: computed(() => (refinedData.value ? !(refinedData.value.results?.length) : false)),
+    noData: computed(() => (queryResults.value?.[0].data ? !(queryResults.value?.[0].data?.results?.length) : false)),
 });
 
 const handleUpdateThisPage = async (newPage: number) => {
     state.thisPage = newPage;
 };
 
-const loadWidget = async () => {
+const loadWidget = async (forceLoad?: boolean) => {
     state.runQueries = true;
+    if (forceLoad) {
+        queryResults.value?.[0].refetch();
+        queryResults.value?.[1].refetch();
+    }
 };
 
 useWidgetInitAndRefresh({ props, emit, loadWidget });

@@ -2,6 +2,8 @@ import type {
     DashboardOptions,
     DashboardVars,
 } from '@/schema/dashboard/_types/dashboard-type';
+import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
+import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 
 import type { WIDGET_SIZE } from '@/common/modules/widgets/_constants/widget-display-constant';
 import type { WidgetFieldValue } from '@/common/modules/widgets/_widget-field-value-manager/type';
@@ -10,6 +12,7 @@ import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-fi
 import type { WidgetState } from '@/common/modules/widgets/types/widget-model';
 
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
+
 
 
 export type WidgetSize = typeof WIDGET_SIZE[keyof typeof WIDGET_SIZE];
@@ -24,6 +27,7 @@ export interface WidgetProps {
     size?: WidgetSize;
     width?: number;
     widgetOptions?: Record<WidgetFieldName, WidgetFieldValue<WidgetFieldValues>>;
+    dataTables?: (PublicDataTableModel|PrivateDataTableModel)[];
     //
     mode?: 'overlay'|'view';
     // from dashboard

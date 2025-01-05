@@ -139,7 +139,7 @@ const refreshAllWidget = debounce(async () => {
 
     widgetRef.value.forEach((comp) => {
         if (!comp) return false;
-        comp.loadWidget();
+        comp.loadWidget(true);
         return true;
     });
 
@@ -149,7 +149,7 @@ const loadAWidget = async (widgetId: string) => {
     if (!widgetId) return;
     widgetRef.value.forEach((comp) => {
         if (!comp || comp.$el.id !== widgetId) return;
-        comp.loadWidget();
+        comp.loadWidget(true);
     });
 };
 const getResizedWidgetInfoList = (widgetInfoList: RefinedWidgetInfo[], _containerWidth: number): RefinedWidgetInfo[] => {
