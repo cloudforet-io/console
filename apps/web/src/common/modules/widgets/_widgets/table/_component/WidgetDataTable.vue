@@ -170,9 +170,9 @@ const getValue = (item: TableDataItem, field: TableWidgetField) => {
     }
     const itemValue = item[field.name];
     if (field.fieldInfo?.additionalType === 'comparison') {
-        if (item[props.fields[0].name] === 'Total') return valueFormatter(itemValue, field, props.numberFormatInfo);
-        if (props.tableColumnComparisonInfo?.format === 'fixed') return valueFormatter(itemValue, field, props.numberFormatInfo);
-        if (props.tableColumnComparisonInfo?.format === 'percent') return valueFormatter(itemValue, field, props.numberFormatInfo, true);
+        if (item[props.fields[0].name] === 'Total') return valueFormatter(Math.abs(itemValue || 0), field, props.numberFormatInfo);
+        if (props.tableColumnComparisonInfo?.format === 'fixed') return valueFormatter(Math.abs(itemValue || 0), field, props.numberFormatInfo);
+        if (props.tableColumnComparisonInfo?.format === 'percent') return valueFormatter(Math.abs(itemValue || 0), field, props.numberFormatInfo, true);
         // if (props.tableColumnComparisonInfo?.format === 'all') return `${valueFormatter(fixedValue, field)} (${numberFormatter(percentageValue)}%)`;
         return '-';
     }
