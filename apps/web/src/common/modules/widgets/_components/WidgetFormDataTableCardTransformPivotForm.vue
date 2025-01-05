@@ -129,8 +129,8 @@ const handleUpdateColumn = (value: string) => {
         column: value,
         labels: labelKeys.filter((key) => key !== value),
     };
+    state.selectedValueType = 'auto';
     if (value === 'Date') {
-        state.selectedValueType = 'auto';
         selectInfo.value = undefined;
         limitInfo.value = undefined;
     } else if (state.selectedValueType === 'auto') {
