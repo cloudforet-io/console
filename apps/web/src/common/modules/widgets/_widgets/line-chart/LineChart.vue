@@ -239,8 +239,8 @@ const drawChart = (rawData: WidgetLoadResponse|null) => {
     const _defaultValue = widgetOptionsState.missingValueInfo?.type === 'lineToZero' ? 0 : undefined;
     let _dataFields: string[] = widgetOptionsState.dataFieldInfo?.data as string[] || [];
     if (state.isPivotDataTable) {
-        const _excludeFields = [...Object.keys(rawData?.labels_info), SUB_TOTAL_NAME];
-        _dataFields = rawData?.order?.filter((v) => !_excludeFields.includes(v));
+        const _excludeFields = [...Object.keys(rawData?.labels_info ?? {}), SUB_TOTAL_NAME];
+        _dataFields = rawData?.order?.filter((v) => !_excludeFields.includes(v)) || [];
     }
     _dataFields.forEach((_dataField) => {
         const _unit: string|undefined = state.unitMap[_dataField];

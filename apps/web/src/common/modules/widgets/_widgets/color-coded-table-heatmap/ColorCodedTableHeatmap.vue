@@ -89,7 +89,7 @@ const state = reactive({
     yAxisData: computed<string[]>(() => {
         if (!state.data?.results?.length) return [];
         if (state.isPivotDataTable) {
-            const _excludeFields = [...Object.keys(state.data?.labels_info), SUB_TOTAL_NAME];
+            const _excludeFields = [...Object.keys(state.data?.labels_info ?? {}), SUB_TOTAL_NAME];
             return state.data.order?.filter((v) => !_excludeFields.includes(v)) || [];
         }
         return widgetOptionsState.dataFieldInfo?.data as string[] || [];
