@@ -252,6 +252,7 @@ onUnmounted(() => {
                            :size="state.widgetSize"
                            :width="state.widgetWidth"
                            :widget-options="widgetGenerateState.widget.options"
+                           :data-tables="widgetGenerateState.dataTables"
                            :dashboard-options="dashboardDetailState.options"
                            :dashboard-vars="dashboardDetailGetters.refinedVars"
                            :all-reference-type-info="state.allReferenceTypeInfo"

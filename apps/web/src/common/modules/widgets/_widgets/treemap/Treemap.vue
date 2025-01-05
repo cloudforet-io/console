@@ -30,8 +30,12 @@ import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD, WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
 import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
-import { normalizeAndSerialize } from '@/common/modules/widgets/_helpers/global-variable-helper';
-import { sortObjectByKeys } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
+import {
+    normalizeAndSerializeVars,
+} from '@/common/modules/widgets/_helpers/global-variable-helper';
+import {
+    normalizeAndSerializeDataTableOptions,
+} from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import {
     getReferenceLabel,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
@@ -151,10 +155,11 @@ const queryKey = computed(() => [
         end: dateRange.value.end,
         granularity: widgetOptionsState.granularityInfo?.granularity,
         dataTableId: state.dataTable?.data_table_id,
-        dataTableOptions: JSON.stringify(sortObjectByKeys(state.dataTable?.options) ?? {}),
+        dataTableOptions: normalizeAndSerializeDataTableOptions(state.dataTable?.options || {}),
+        dataTables: normalizeAndSerializeDataTableOptions((props.dataTables || []).map((d) => d?.options || {})),
         groupBy: widgetOptionsState.categoryByInfo?.data,
         count: widgetOptionsState.categoryByInfo?.count,
-        vars: normalizeAndSerialize(props.dashboardVars),
+        vars: normalizeAndSerializeVars(props.dashboardVars),
     },
 ]);
 
