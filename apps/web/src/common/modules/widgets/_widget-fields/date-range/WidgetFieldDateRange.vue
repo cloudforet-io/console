@@ -274,10 +274,10 @@ watch(() => state.granularity, () => {
                         <div v-if="state.fieldValue?.options?.value === 'custom'"
                              class="custom-advanced-range-selector"
                         >
-                            <div class="select-wrapper">
+                            <div class="select-wrapper flex gap-2">
                                 <!--Inherit CASE-->
                                 <template v-if="state.fieldValue?.inherit">
-                                    <p-field-group class="selector-field-group"
+                                    <p-field-group class="selector-field-group-custom"
                                                    required
                                     >
                                         <template #label>
@@ -295,14 +295,14 @@ watch(() => state.granularity, () => {
                                                            @select="handleSelectCustomValue('start', $event)"
                                         />
                                     </p-field-group>
-                                    <p-field-group class="selector-field-group"
+                                    <p-field-group class="selector-field-group-custom"
                                                    required
                                     >
                                         <template #label>
                                             <span class="field-label">
                                                 {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.END') }}
                                                 <span class="granularity-unit">
-                                                    ({{ GRANULARITY_UNIT_MAP[state.granularity]?.sigular }})
+                                                    ({{ GRANULARITY_UNIT_MAP[state.granularity]?.singular }})
                                                 </span>
                                             </span>
                                         </template>
@@ -416,100 +416,87 @@ watch(() => state.granularity, () => {
                         <div v-else-if="state.fieldValue?.options?.value === 'advanced'"
                              class="custom-advanced-range-selector"
                         >
-                            <div class="select-wrapper">
-                                <p-field-group class="selector-field-group"
-                                               required
-                                >
-                                    <template #label>
+                            <div class="select-wrapper flex gap-2 flex-col">
+                                <div class="selector-field-group-advanced rounded-lg">
+                                    <div class="selector-header flex gap-1 items-center bg-gray-100 rounded-t-lg">
                                         <span class="field-label">
-                                            {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.START') }}
+                                            {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.START') }} :
                                         </span>
-                                    </template>
-                                    <div class="advanced-field-content">
-                                        <div class="range-preview">
+                                        <span class="range-preview">
                                             {{ dateRange.start }}
-                                        </div>
-                                        <div class="advanced-content-wrapper">
-                                            <div class="operator">
-                                                <span>Today</span>
-                                                <p-select-dropdown class="advanced-selector"
-                                                                   :menu="state.advancedOperatorMenuItems"
-                                                                   :selected="state.fieldValue?.options?.start_operator"
-                                                                   :invalid="checkInvalidCustomValue(state.fieldValue, state.granularity).invalid"
-                                                                   @update:selected="handleSelectAdvancedOperator('start_operator', $event)"
-                                                >
-                                                    <template #dropdown-button="item">
-                                                        <div class="selected">
-                                                            <p-i :name="item?.icon"
-                                                                 width="1rem"
-                                                                 height="1rem"
-                                                            />
-                                                            <span>{{ item?.label }}</span>
-                                                        </div>
-                                                    </template>
-                                                </p-select-dropdown>
-                                            </div>
-                                            <div class="value">
-                                                <p-text-input class="advanced-input"
-                                                              type="number"
-                                                              :value="state.fieldValue?.options?.start"
-                                                              :invalid="checkInvalidCustomValue(state.fieldValue, state.granularity).invalid"
-                                                              @update:value="handleUpdateAdvancedValue('start', $event)"
-                                                />
-                                                <span>{{ GRANULARITY_UNIT_MAP[state.granularity]?.plural }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </p-field-group>
-                                <p-field-group class="selector-field-group"
-                                               required
-                                >
-                                    <template #label>
-                                        <span class="field-label">
-                                            {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.END') }}
                                         </span>
-                                    </template>
+                                    </div>
                                     <div class="advanced-field-content">
-                                        <div class="range-preview">
-                                            {{ dateRange.end }}
-                                        </div>
-                                        <div class="advanced-content-wrapper">
-                                            <div class="operator">
-                                                <span>Today</span>
-                                                <p-select-dropdown class="advanced-selector"
-                                                                   :menu="state.advancedOperatorMenuItems"
-                                                                   :selected="state.fieldValue?.options?.end_operator"
-                                                                   :invalid="checkInvalidCustomValue(state.fieldValue, state.granularity).invalid"
-                                                                   @update:selected="handleSelectAdvancedOperator('end_operator', $event)"
-                                                >
-                                                    <template #dropdown-button="item">
-                                                        <div class="selected">
-                                                            <p-i :name="item?.icon"
-                                                                 width="1rem"
-                                                                 height="1rem"
-                                                            />
-                                                            <span>{{ item?.label }}</span>
-                                                        </div>
-                                                    </template>
-                                                </p-select-dropdown>
-                                            </div>
-                                            <div class="value">
-                                                <p-text-input class="advanced-input"
-                                                              type="number"
-                                                              :value="state.fieldValue?.options?.end"
-                                                              :invalid="checkInvalidCustomValue(state.fieldValue, state.granularity).invalid"
-                                                              @update:value="handleUpdateAdvancedValue('end', $event)"
-                                                />
-                                                <span>{{ GRANULARITY_UNIT_MAP[state.granularity]?.plural }}</span>
-                                            </div>
+                                        <div class="advanced-content-wrapper flex gap-1 items-center">
+                                            <p-select-dropdown class="advanced-selector"
+                                                               :menu="state.advancedOperatorMenuItems"
+                                                               :selected="state.fieldValue?.options?.start_operator"
+                                                               :invalid="checkInvalidCustomValue(state.fieldValue, state.granularity).invalid"
+                                                               @update:selected="handleSelectAdvancedOperator('start_operator', $event)"
+                                            >
+                                                <template #dropdown-button="item">
+                                                    <div class="selected">
+                                                        <p-i :name="item?.icon"
+                                                             width="1rem"
+                                                             height="1rem"
+                                                        />
+                                                        <span>{{ item?.label }}</span>
+                                                    </div>
+                                                </template>
+                                            </p-select-dropdown>
+                                            <p-text-input class="advanced-input"
+                                                          type="number"
+                                                          size="md"
+                                                          :value="state.fieldValue?.options?.start"
+                                                          :invalid="checkInvalidCustomValue(state.fieldValue, state.granularity).invalid"
+                                                          @update:value="handleUpdateAdvancedValue('start', $event)"
+                                            />
+                                            <span class="granularity-unit">{{ GRANULARITY_UNIT_MAP[state.granularity]?.plural }}</span>
                                         </div>
                                     </div>
-                                </p-field-group>
+                                </div>
+                                <div class="selector-field-group-advanced  rounded-lg">
+                                    <div class="selector-header flex gap-1 items-center bg-gray-100 rounded-t-lg">
+                                        <span class="field-label">
+                                            {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.END') }} :
+                                        </span>
+                                        <span class="range-preview">
+                                            {{ dateRange.end }}
+                                        </span>
+                                    </div>
+                                    <div class="advanced-field-content">
+                                        <div class="advanced-content-wrapper flex gap-1 items-center">
+                                            <p-select-dropdown class="advanced-selector"
+                                                               :menu="state.advancedOperatorMenuItems"
+                                                               :selected="state.fieldValue?.options?.end_operator"
+                                                               :invalid="checkInvalidCustomValue(state.fieldValue, state.granularity).invalid"
+                                                               @update:selected="handleSelectAdvancedOperator('end_operator', $event)"
+                                            >
+                                                <template #dropdown-button="item">
+                                                    <div class="selected">
+                                                        <p-i :name="item?.icon"
+                                                             width="1rem"
+                                                             height="1rem"
+                                                        />
+                                                        <span>{{ item?.label }}</span>
+                                                    </div>
+                                                </template>
+                                            </p-select-dropdown>
+                                            <p-text-input class="advanced-input"
+                                                          type="number"
+                                                          :value="state.fieldValue?.options?.end"
+                                                          :invalid="checkInvalidCustomValue(state.fieldValue, state.granularity).invalid"
+                                                          @update:value="handleUpdateAdvancedValue('end', $event)"
+                                            />
+                                            <span class="granularity-unit">{{ GRANULARITY_UNIT_MAP[state.granularity]?.plural }}</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <p v-if="checkInvalidCustomValue(state.fieldValue, state.granularity).invalid"
                                class="invalid-text"
                             >
-                                checkInvalidCustomValue(state.fieldValue, state.granularity).text }}
+                                {{ checkInvalidCustomValue(state.fieldValue, state.granularity).text }}
                             </p>
                         </div>
                         <div v-else
@@ -554,8 +541,7 @@ watch(() => state.granularity, () => {
                 }
                 .custom-advanced-range-selector {
                     .select-wrapper {
-                        @apply flex gap-2;
-                        .selector-field-group {
+                        .selector-field-group-custom {
                             width: calc(50% - 0.25rem);
                             .field-label {
                                 @apply text-label-sm text-gray-900 font-bold;
@@ -563,22 +549,23 @@ watch(() => state.granularity, () => {
                                     @apply text-gray-500 font-normal;
                                 }
                             }
+                        }
+                        .selector-field-group-advanced {
+                            width: 100%;
+                            .selector-header {
+                                padding: 0.5rem 0.75rem;
+                                .field-label {
+                                    @apply text-label-sm text-gray-900 font-bold;
+                                }
+                                .range-preview {
+                                    @apply text-label-md text-gray-900;
+                                }
+                            }
                             .advanced-field-content {
                                 @apply rounded-l;
-                                .range-preview {
-                                    @apply bg-gray-100 text-label-md text-gray-900 rounded-t-lg;
-                                    padding: 0.375rem 0.75rem;
-                                }
                                 .advanced-content-wrapper {
                                     @apply border border-gray-150 rounded-b-lg;
                                     padding: 0.75rem 0.5rem;
-                                    .operator {
-                                        @apply flex items-center gap-1 flex-wrap;
-                                        margin-bottom: 0.25rem;
-                                    }
-                                    .value {
-                                        @apply flex items-center gap-1 flex-wrap;
-                                    }
                                     .advanced-selector {
                                         @apply flex-1;
                                         .selected {
@@ -588,6 +575,9 @@ watch(() => state.granularity, () => {
                                     .advanced-input {
                                         @apply flex-1;
                                         min-width: 6.5rem;
+                                    }
+                                    .granularity-unit {
+                                        @apply text-label-md text-gray-900;
                                     }
                                 }
                             }
@@ -620,5 +610,12 @@ watch(() => state.granularity, () => {
 /* custom design-system component - p-datetime-picker */
 :deep(.p-datetime-picker) {
     width: 100%;
+}
+
+/* custom design-system component - p-field-group */
+:deep(.p-text-input) {
+    .input-container {
+        max-height: 2rem;
+    }
 }
 </style>

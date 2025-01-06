@@ -6,7 +6,7 @@ import type { TranslateResult } from 'vue-i18n';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButton, PPopover, PSelectCard, PI,
+    PButton, PPopover, PSelectCard, PI, PDivider,
 } from '@cloudforet/mirinae';
 import { POPOVER_TRIGGER } from '@cloudforet/mirinae/src/data-display/popover/type';
 
@@ -149,7 +149,7 @@ const state = reactive({
         },
         {
             key: DATA_TABLE_OPERATOR.PIVOT,
-            name: 'Pivot',
+            name: 'Pivot Table',
             description: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.PIVOT_DESC'),
             icon: 'ic_db-pivot-table',
         },
@@ -388,61 +388,70 @@ watch(() => state.showPopover, (val) => {
             <div v-else
                  class="data-source-popper-operator-wrapper"
             >
-                <div class="left-part">
-                    <div class="part-title">
-                        {{ i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.MERGE') }}
-                    </div>
-                    <p-select-card v-for="(operatorInfo) in state.operatorInfoList.slice(0, 2)"
-                                   :key="operatorInfo.key"
-                                   value="operatorKey"
-                                   label="a"
-                                   block
-                                   @click="handleClickOperator(operatorInfo.key)"
-                    >
-                        <div class="operator-card-contents">
-                            <p-i :name="operatorInfo.icon"
-                                 width="1rem"
-                                 height="1rem"
-                                 color="inherit"
-                            />
-                            <div class="contents-wrapper">
-                                <p class="name">
-                                    {{ operatorInfo.name }}
-                                </p>
-                                <p class="description">
-                                    {{ operatorInfo.description }}
-                                </p>
-                            </div>
+                <div class="conetent">
+                    <div class="content-header flex items-center justify-between">
+                        <div class="part-title">
+                            {{ i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.MERGE') }}
                         </div>
-                    </p-select-card>
-                </div>
-                <div class="right-part">
-                    <div class="part-title">
-                        {{ i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.TRANSFORMATIONS') }}
-                    </div>
-                    <p-select-card v-for="(operatorInfo) in state.operatorInfoList.slice(2)"
-                                   :key="operatorInfo.key"
-                                   value="operatorKey"
-                                   label="a"
-                                   block
-                                   @click="handleClickOperator(operatorInfo.key)"
-                    >
-                        <div class="operator-card-contents">
-                            <p-i :name="operatorInfo.icon"
-                                 width="1rem"
-                                 height="1rem"
-                                 color="inherit"
-                            />
-                            <div class="contents-wrapper">
-                                <p class="name">
-                                    {{ operatorInfo.name }}
-                                </p>
-                                <p class="description">
-                                    {{ operatorInfo.description }}
-                                </p>
-                            </div>
+                        <div class="part-title">
+                            {{ i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.TRANSFORMATIONS') }}
                         </div>
-                    </p-select-card>
+                    </div>
+                    <div class="content-part flex">
+                        <div class="left-part">
+                            <p-select-card v-for="(operatorInfo) in state.operatorInfoList.slice(0, 2)"
+                                           :key="operatorInfo.key"
+                                           value="operatorKey"
+                                           label="a"
+                                           block
+                                           @click="handleClickOperator(operatorInfo.key)"
+                            >
+                                <div class="operator-card-contents">
+                                    <p-i :name="operatorInfo.icon"
+                                         width="1rem"
+                                         height="1rem"
+                                         color="inherit"
+                                    />
+                                    <div class="contents-wrapper">
+                                        <p class="name">
+                                            {{ operatorInfo.name }}
+                                        </p>
+                                        <p class="description">
+                                            {{ operatorInfo.description }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </p-select-card>
+                        </div>
+                        <p-divider class="content-divider"
+                                   vertical
+                        />
+                        <div class="right-part">
+                            <p-select-card v-for="(operatorInfo) in state.operatorInfoList.slice(2)"
+                                           :key="operatorInfo.key"
+                                           value="operatorKey"
+                                           label="a"
+                                           block
+                                           @click="handleClickOperator(operatorInfo.key)"
+                            >
+                                <div class="operator-card-contents">
+                                    <p-i :name="operatorInfo.icon"
+                                         width="1rem"
+                                         height="1rem"
+                                         color="inherit"
+                                    />
+                                    <div class="contents-wrapper">
+                                        <p class="name">
+                                            {{ operatorInfo.name }}
+                                        </p>
+                                        <p class="description">
+                                            {{ operatorInfo.description }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </p-select-card>
+                        </div>
+                    </div>
                 </div>
             </div>
         </template>
@@ -489,34 +498,52 @@ watch(() => state.showPopover, (val) => {
         padding: 1rem;
     }
     .data-source-popper-operator-wrapper {
-        @apply grid grid-cols-12;
         //display: flex;
         //flex-direction: column;
-        gap: 0.5rem;
-        width: 43rem;
+        width: 43.5rem;
         padding: 1rem;
 
-        .left-part, .right-part {
-            @apply col-span-6;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        .part-title {
-            @apply text-label-sm text-gray-700;
-            font-weight: bold;
-        }
+        .conetent {
+            width: 100%;
+            height: 24rem;
 
-        .operator-card-contents {
-            @apply flex gap-1;
-            .contents-wrapper {
-                width: calc(100% - 1.25rem);
-                .name {
-                    @apply text-label-md font-bold text-gray-900;
-                    margin-bottom: 0.25rem;
+            .content-header {
+                .part-title {
+                    @apply text-label-sm text-gray-700;
+                    width: calc(50% - 0.25rem);
+                    font-weight: bold;
                 }
-                .description {
-                    @apply text-label-md text-gray-500;
+                padding-bottom: 0.5rem;
+            }
+
+            .content-part {
+                overflow-y: scroll;
+                max-height: 22.5rem;
+                height: auto;
+
+                .left-part, .right-part {
+                    height: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.5rem;
+                }
+                .content-divider {
+                    margin: 0 1.125rem;
+                    height: 30.125rem;
+                }
+            }
+
+            .operator-card-contents {
+                @apply flex gap-1;
+                .contents-wrapper {
+                    width: calc(100% - 1.25rem);
+                    .name {
+                        @apply text-label-md font-bold text-gray-900;
+                        margin-bottom: 0.25rem;
+                    }
+                    .description {
+                        @apply text-label-md text-gray-500;
+                    }
                 }
             }
         }
@@ -596,6 +623,7 @@ watch(() => state.showPopover, (val) => {
 
 /* custom design-system component - p-select-card */
 :deep(.p-select-card) {
+    height: 5.625rem;
     padding: 1rem;
     .select-card-contents {
         @apply flex justify-start items-center;
