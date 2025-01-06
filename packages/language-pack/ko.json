@@ -112,7 +112,7 @@
 			"STEP": "단계 {step}",
 			"TITLE": "에스컬레이션 정책",
 			"USER": "사용자",
-			"USER_GROUP": "유저 그룹"
+			"USER_GROUP": "사용자 그룹"
 		},
 		"EVENT_RULE": {
 			"RULES_ON_THIS_PROJECT": "이 서비스 규칙",
@@ -137,8 +137,8 @@
 			"HIGH_NOTIFICATIONS_ONLY": "긴급 알림만 받기",
 			"MODAL_DELETE_BUTTON": "알림 삭제",
 			"MODAL_DELETE_TITLE": "이 알림 채널을 삭제하시겠습니까?",
-			"MODAL_DISABLE_TITLE": "선택한 알림을 비활성화 하시겠습니까?",
-			"MODAL_ENABLE_TITLE": "선택한 알림을 활성화 하시겠습니까?",
+			"MODAL_DISABLE_TITLE": "선택한 알림 채널을 비활성화 하시겠습니까?",
+			"MODAL_ENABLE_TITLE": "선택한 알림 채널을 활성화 하시겠습니까?",
 			"MODAL_UPDATE_TITLE": "알림 수정",
 			"MONDAY": "월요일",
 			"NAME_INVALID_TEXT": "40글자 미만으로 입력해주세요.",
@@ -156,7 +156,7 @@
 			"SUNDAY": "일요일",
 			"THURSDAY": "목요일",
 			"TIME": "시간",
-			"TITLE": "알람",
+			"TITLE": "알",
 			"TOPIC": "토픽",
 			"TUESDAY": "화요일",
 			"USER": "사용자",
@@ -205,7 +205,7 @@
 			"TITLE": "서비스",
 			"TOTAL_ALERTS": "전체 얼럿",
 			"USER": "사용자",
-			"USER_GROUP": "유저 그룹",
+			"USER_GROUP": "사용자 그룹",
 			"VALIDATION_KEY": "대문자, 숫자, 하이픈만 허용됩니다.",
 			"VALIDATION_KEY_UNIQUE": "동일한 이름의 키가 이미 존재합니다. ",
 			"VALIDATION_NAME_UNIQUE": "동일한 이름의 서비스가 이미 존재합니다.",
@@ -455,7 +455,7 @@
 						"TYPE": "알림선택",
 						"UNIT": "기준",
 						"USER": "사용자",
-						"USER_GROUP": "유저 그룹",
+						"USER_GROUP": "사용자 그룹",
 						"WARNING": "경고"
 					},
 					"MONTHLY_PLANNING": "월별 예산 계획",
@@ -1390,7 +1390,7 @@
 		},
 		"USER_SELECT_DROPDOWN": {
 			"USER": "사용자",
-			"USER_GROUP": "유저 그룹"
+			"USER_GROUP": "사용자 그룹"
 		},
 		"WIDGETS": {
 			"ACTUAL": "실제 크기",
@@ -2830,8 +2830,8 @@
 		"USER": {
 			"ADD": "생성",
 			"ASSIGN_TO_USER_GROUP": {
-				"SUCCESS_MESSAGE": "선택한 사용자에게 유저 그룹 할당 완료",
-				"TITLE": "유저 그룹 할당"
+				"SUCCESS_MESSAGE": "선택한 사용자에게 사용자 그룹 할당 완료",
+				"TITLE": "사용자 그룹 할당"
 			},
 			"FORM": {
 				"ADD_TAG": "태그 추가",
@@ -2886,7 +2886,7 @@
 				"ADMINISTRATOR": "관리자 ",
 				"ALT_S_CHANGE_ROLE": "워크스페이스 역할(Role) 수정 완료",
 				"ASSIGNED_ROLES": "할당된 역할(Role)",
-				"ASSIGNED_USER_GROUP": "할당된 유저 그룹",
+				"ASSIGNED_USER_GROUP": "할당된 사용자 그룹",
 				"ASSOCIATED_PROJECTS": "연결된 프로젝트",
 				"ASSOCIATED_WORKSPACE": "연결된 워크스페이스",
 				"BASE_INFORMATION": "기본 정보",
@@ -2918,6 +2918,7 @@
 					"ALT_S_ENABLE_USER": "사용자 활성화 완료",
 					"ALT_S_REMOVE_USER": "해당 워크스페이스로부터 사용자 제거 완료",
 					"ALT_S_UPDATE_USER": "사용자 업데이트 완료",
+					"ASSIGN_TITLE": "선택한 사용자를 사용자 그룹에 추가",
 					"CAN_NOT_REMOVE_USER_TITLE": "선택한 유저는 제거가 불가합니다. ",
 					"CREATE_TITLE": "사용자 추가",
 					"DELETE_DESC": "선택한 사용자를 삭제하시겠습니까?",
@@ -3055,8 +3056,8 @@
 				"ADD_NEW_USER": {
 					"CANCEL": "취소",
 					"CONFIRM": "확인",
-					"SUCCESS_MESSAGE": "유저 그룹에 사용자 추가 완료",
-					"TITLE": "선택한 유저 그룹에 사용자 추가",
+					"SUCCESS_MESSAGE": "사용자 그룹에 사용자 추가 완료",
+					"TITLE": "선택한 사용자 그룹에 사용자 추가",
 					"USER": "사용자"
 				},
 				"CREATE_CHANNEL": {
@@ -3080,7 +3081,7 @@
 							"ALL_MEMBERS": "이 서비스의 모든 멤버",
 							"SPECIFIC_USER": "특정 유저",
 							"TITLE": "사용자",
-							"USER_GROUP": "유저 그룹"
+							"USER_GROUP": "사용자 그룹"
 						}
 					},
 					"GO_BACK": "뒤로가기",
@@ -3093,10 +3094,10 @@
 						"SMS": "SMS",
 						"TELEGRAM": "Telegram"
 					},
-					"SUCCESS_MESSAGE": "유저 그룹 채널 생성 완료",
+					"SUCCESS_MESSAGE": "사용자 그룹 채널 생성 완료",
 					"TITLE": "알림 생성",
 					"UPDATE": "수정",
-					"UPDATE_SUCCESS_MESSAGE": "유저 그룹 채널 수정 완료",
+					"UPDATE_SUCCESS_MESSAGE": "사용자 그룹 채널 수정 완료",
 					"UPDATE_TITLE": "알림 수정"
 				},
 				"CREATE_USER_GROUP": {
@@ -3106,25 +3107,25 @@
 					"GROUP_NAME": "그룹 이름",
 					"NOTIFICATION_CHANNEL": "알림 채널",
 					"PROTOCOL": "Protocol",
-					"SUCCESS_MESSAGE": "유저 그룹 생성 완료",
-					"TITLE": "유저 그룹 생성",
+					"SUCCESS_MESSAGE": "사용자 그룹 생성 완료",
+					"TITLE": "사용자 그룹 생성",
 					"TOKEN": "Token",
 					"UPDATE": "수정",
-					"UPDATE_SUCCESS_MESSAGE": "유저 그룹 수정 완료",
-					"UPDATE_TITLE": "유저 그룹 수정"
+					"UPDATE_SUCCESS_MESSAGE": "사용자 그룹 수정 완료",
+					"UPDATE_TITLE": "사용자 그룹 수정"
 				},
 				"DELETE": {
-					"SHOW_SUCCESS_MESSAGE": "유저 그룹 삭제 완료",
-					"TITLE": "이 유저 그룹을 삭제하시겠습니까? "
+					"SHOW_SUCCESS_MESSAGE": "사용자 그룹 삭제 완료",
+					"TITLE": "이 사용자 그룹을 삭제하시겠습니까? "
 				},
 				"DELETE_CHANNEL": {
 					"DELETE": "삭제",
-					"SUCCESS_MESSAGE": "유저 그룹 채널 삭제 완료",
-					"TITLE": "선택한 유저 그룹에서 알림 채널을 삭제하시겠습니까?"
+					"SUCCESS_MESSAGE": "사용자 그룹 채널 삭제 완료",
+					"TITLE": "선택한 사용자 그룹에서 알림 채널을 삭제하시겠습니까?"
 				},
 				"REMOVE_USER": {
-					"SHOW_SUCCESS_MESSAGE": "해당 유저 그룹에서 사용자 제거 완료",
-					"TITLE": "다음의 사용자들을 유저 그룹에서 부터 제거하시겠습니까? "
+					"SHOW_SUCCESS_MESSAGE": "해당 사용자 그룹에서 사용자 제거 완료",
+					"TITLE": "다음의 사용자들을 사용자 그룹에서 부터 제거하시겠습니까? "
 				}
 			},
 			"TAB": {
@@ -3143,7 +3144,7 @@
 					"YESTERDAY": "어제"
 				}
 			},
-			"TITLE": "유저 그룹"
+			"TITLE": "사용자 그룹"
 		},
 		"WORKSPACES": {
 			"ACTION": "작업",
@@ -4496,7 +4497,7 @@
 					"REPEAT": "반복",
 					"REPEAT_AFTER": "{minute}분 후 반복",
 					"REPEAT_ALL": "전체 반복",
-					"REPEAT_LABEL_HELP_TEXT": "위 스텝들 모두 적용",
+					"REPEAT_LABEL_HELP_TEXT": "아래 스텝들 모두 적용",
 					"RESOLVED": "완료",
 					"RESOURCE_GROUP": "리소스 그룹",
 					"RULE": "규칙",
