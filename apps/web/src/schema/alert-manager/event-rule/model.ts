@@ -17,6 +17,7 @@ export interface EventRuleModel {
     actions: EventRuleActionsType;
     options: EventRuleOptions;
     tags: Tags;
+    webhook_id: string;
     service_id: string;
     workspace_id: string;
     domain_id: string;

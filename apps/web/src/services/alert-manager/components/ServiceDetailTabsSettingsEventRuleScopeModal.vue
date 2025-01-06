@@ -28,20 +28,23 @@ interface Props {
     visible: boolean;
     scope?: EventRuleScopeType;
     selectedWebhook: string;
+    showFormCard: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
     scope: EVENT_RULE_SCOPE.GLOBAL,
     selectedWebhook: '',
+    showFormCard: false,
 });
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 
-const emit = defineEmits<{(e: 'update:visible', value: string): void;
-    (e: 'update:selected-webhook', value: string): void;
-    (e: 'update:scope', value?: EventRuleScopeType): void;
+const emit = defineEmits<{(e: 'update:visible'): void;
+    (e: 'update:selected-webhook'): void;
+    (e: 'update:scope'): void;
+    (e: 'update:show-form-card'): void;
 }>();
 
 const storeState = reactive({
@@ -54,6 +57,7 @@ const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     proxySelectedWebhook: useProxyValue('selectedWebhook', props, emit),
     proxySelectedScope: useProxyValue('scope', props, emit),
+    proxyShowFormCard: useProxyValue('showFormCard', props, emit),
     webhookDropdownList: computed<SelectDropdownMenuItem[]>(() => Object.values(storeState.webhook).map((i) => ({
         name: i.key,
         label: i.label,
@@ -89,11 +93,11 @@ const handleClickCard = () => {
 };
 const handleClickConfirm = () => {
     state.proxyVisible = false;
+    state.proxyShowFormCard = true;
 };
 
 onMounted(() => {
     if (props.visible) {
-        state.proxySelectedScope = EVENT_RULE_SCOPE.GLOBAL;
         state.proxySelectedWebhook = '';
     }
 });

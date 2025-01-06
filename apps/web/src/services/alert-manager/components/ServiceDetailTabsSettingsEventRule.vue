@@ -2,17 +2,21 @@
 import { computed, reactive, watch } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { PDataLoader, PButton } from '@cloudforet/mirinae';
+import { PButton } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { EventRuleListParameters } from '@/schema/alert-manager/event-rule/api-verbs/list';
+import { EVENT_RULE_SCOPE } from '@/schema/alert-manager/event-rule/constant';
 import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
-import type { EventRuleScopeType } from '@/schema/alert-manager/event-rule/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import ServiceDetailTabsSettingsEventRuleFormCard
+    from '@/services/alert-manager/components/ServiceDetailTabsSettingsEventRuleFormCard.vue';
 import ServiceDetailTabsSettingsEventRuleScopeModal
     from '@/services/alert-manager/components/ServiceDetailTabsSettingsEventRuleScopeModal.vue';
+import ServiceDetailTabsSettingsEventRuleSidebar
+    from '@/services/alert-manager/components/ServiceDetailTabsSettingsEventRuleSidebar.vue';
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
 
 const serviceDetailPageStore = useServiceDetailPageStore();
@@ -24,11 +28,13 @@ const storeState = reactive({
 const state = reactive({
     loading: true,
     items: [] as EventRuleModel[],
-    selectedScope: undefined as EventRuleScopeType|undefined,
+    selectedScope: EVENT_RULE_SCOPE.GLOBAL,
     selectedWebhook: '',
+    hideSidebar: false,
 });
 const modalState = reactive({
     visible: false,
+    showFormCard: false,
 });
 
 const handleClickAddRule = () => {
@@ -58,31 +64,39 @@ watch(() => storeState.serviceId, (id) => {
 
 <template>
     <div class="service-detail-tabs-settings-event-rule pt-6 pb-10">
-        <p-data-loader :loading="state.loading"
-                       :data="true"
+        <div v-if="state.items.length === 0 && !modalState.showFormCard"
+             class="w-full flex flex-col items-center justify-center gap-6 pt-10 pb-10 border border-gray-300 rounded-xl"
         >
-            {{ state.items }}
-            <template #no-data>
-                <div class="w-full flex flex-col gap-6 pt-10 pb-10 border border-gray-300 rounded-xl">
-                    <p class="text-label-xl text-gray-900">
-                        {{ $t('ALERT_MANAGER.EVENT_RULE.NO_DATA_TITLE') }}
-                    </p>
-                    <p class="text-paragraph-md text-gray-500 whitespace-pre-wrap">
-                        {{ $t('ALERT_MANAGER.EVENT_RULE.NO_DATA_HELP_TEXT') }}
-                    </p>
-                    <p-button icon-left="ic_plus_bold"
-                              class="self-start mx-auto"
-                              @click="handleClickAddRule"
-                    >
-                        {{ $t('ALERT_MANAGER.EVENT_RULE.NO_DATA_ADD_RULE') }}
-                    </p-button>
-                </div>
-            </template>
-        </p-data-loader>
+            <p class="text-label-xl text-gray-900">
+                {{ $t('ALERT_MANAGER.EVENT_RULE.NO_DATA_TITLE') }}
+            </p>
+            <p class="text-paragraph-md text-gray-500 whitespace-pre-wrap text-center">
+                {{ $t('ALERT_MANAGER.EVENT_RULE.NO_DATA_HELP_TEXT') }}
+            </p>
+            <p-button icon-left="ic_plus_bold"
+                      class="self-start mx-auto"
+                      @click="handleClickAddRule"
+            >
+                {{ $t('ALERT_MANAGER.EVENT_RULE.NO_DATA_ADD_RULE') }}
+            </p-button>
+        </div>
+        <div v-else
+             class="flex gap-1"
+        >
+            <service-detail-tabs-settings-event-rule-sidebar v-if="state.items.length > 0"
+                                                             :hide-sidebar.sync="state.hideSidebar"
+                                                             :items="state.items"
+            />
+            <service-detail-tabs-settings-event-rule-form-card :selected-webhook="state.selectedWebhook"
+                                                               :selected-scope="state.selectedScope"
+                                                               class="flex-1"
+            />
+        </div>
         <service-detail-tabs-settings-event-rule-scope-modal v-if="modalState.visible"
                                                              :visible.sync="modalState.visible"
                                                              :scope.sync="state.selectedScope"
                                                              :selected-webhook.sync="state.selectedWebhook"
+                                                             :show-form-card.sync="modalState.showFormCard"
         />
     </div>
 </template>
