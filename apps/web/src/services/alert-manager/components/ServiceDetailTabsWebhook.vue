@@ -202,6 +202,7 @@ watch([() => storeState.selectedWebhookId, () => state.items], ([selectedWebhook
 
 onUnmounted(() => {
     serviceDetailPageStore.setSelectedWebhookId(undefined);
+    serviceDetailPageStore.setCurrentTab(undefined);
 });
 </script>
 

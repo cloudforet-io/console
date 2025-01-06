@@ -10,6 +10,8 @@ import { NOTIFICATION_URGENCY, RECOVERY_MODE } from '@/schema/alert-manager/serv
 import type { NotificationUrgencyType, RecoveryModeType } from '@/schema/alert-manager/service/type';
 import { i18n } from '@/translations';
 
+import { replaceUrlQuery } from '@/lib/router-query-string';
+
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
 import { red } from '@/styles/colors';
@@ -98,12 +100,15 @@ const getAutoRecovery = (): CardValueInfoType|undefined => {
 };
 const handleClickEditButton = (type: ServiceDetailSettingCardType) => {
     if (type === SERVICE_SETTING_CARD.EVENT_RULE) {
-        serviceDetailPageStore.setSettingMode('eventRule');
+        replaceUrlQuery({
+            mode: 'eventRule',
+        });
         return;
     }
     state.selectModalVisible = true;
     state.modalType = type;
 };
+
 </script>
 
 <template>

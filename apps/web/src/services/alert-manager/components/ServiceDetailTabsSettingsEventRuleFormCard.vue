@@ -73,6 +73,11 @@ const getWebhookIcon = (): string|undefined => {
             :header="$t('ALERT_MANAGER.EVENT_RULE.CREATE_FORM_TITLE')"
             class="service-detail-tabs-settings-event-rule-form-card"
     >
+        <template #header>
+            <p>
+                <span class="font-bold">{{ $t('ALERT_MANAGER.EVENT_RULE.CREATE_FORM_TITLE') }}</span>
+            </p>
+        </template>
         <div class="form-wrapper flex flex-col gap-6">
             <div class="flex flex-col gap-3">
                 <div class="input-form-wrapper">

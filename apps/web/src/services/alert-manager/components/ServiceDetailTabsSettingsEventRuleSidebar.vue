@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
-import { computed, reactive } from 'vue';
+import { computed, onMounted, reactive } from 'vue';
 
 import {
     PPaneLayout, PI, PSearch, PTreeView, PLazyImg, screens,
@@ -13,9 +13,14 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 
+import { replaceUrlQuery } from '@/lib/router-query-string';
+
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import type { TreeNode } from '@/services/project/tree/type';
+import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/constants/common-constant';
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
+import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
+import type { TreeNode, TreeDisplayMap } from '@/services/project/tree/type';
 
 interface Props {
     hideSidebar: boolean;
@@ -29,6 +34,8 @@ const props = withDefaults(defineProps<Props>(), {
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
+const serviceDetailPageStore = useServiceDetailPageStore();
+const serviceDetailPageState = serviceDetailPageStore.state;
 
 const { width } = useWindowSize();
 
@@ -36,6 +43,7 @@ const emit = defineEmits<{(e: 'update:hide-sidebar', value: string): void;
 }>();
 
 const storeState = reactive({
+    serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
     plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
 });
@@ -53,7 +61,6 @@ const state = reactive({
                         data: {
                             id: cur,
                             name: cur,
-                            to: {},
                         },
                         children: [],
                     };
@@ -64,7 +71,17 @@ const state = reactive({
                         data: {
                             id: 'global',
                             name: i18n.t('ALERT_MANAGER.EVENT_RULE.GLOBAL'),
-                            to: {},
+                            to: {
+                                name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME,
+                                params: {
+                                    serviceId: storeState.serviceId,
+                                },
+                                query: {
+                                    tab: SERVICE_DETAIL_TABS.SETTINGS,
+                                    mode: 'eventRule',
+                                    webhookId: 'global',
+                                },
+                            },
                         },
                         children: [],
                     };
@@ -79,7 +96,18 @@ const state = reactive({
                 data: {
                     id: item.event_rule_id,
                     name: item.name,
-                    to: {},
+                    to: {
+                        name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME,
+                        params: {
+                            serviceId: storeState.serviceId,
+                        },
+                        query: {
+                            tab: SERVICE_DETAIL_TABS.SETTINGS,
+                            mode: 'eventRule',
+                            webhookId: item.webhook_id || 'global',
+                            eventRuleId: item.event_rule_id,
+                        },
+                    },
                 },
                 children: undefined,
             };
@@ -92,13 +120,25 @@ const state = reactive({
                         data: {
                             id: item.webhook_id,
                             name: item.webhook_id,
-                            to: {},
+                            to: {
+                                name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME,
+                                params: {
+                                    serviceId: storeState.serviceId,
+                                },
+                                query: {
+                                    tab: SERVICE_DETAIL_TABS.SETTINGS,
+                                    mode: 'eventRule',
+                                    webhookId: item.webhook_id,
+                                    eventRuleId: item.event_rule_id,
+                                },
+                            },
                         },
                         children: [],
                     };
                 }
                 eventRuleMap[item.webhook_id].children?.push(treeNode);
             } else {
+                eventRuleMap.global.data.to.query.eventRuleId = item.event_rule_id;
                 eventRuleMap.global.children?.push(treeNode);
             }
         });
@@ -106,8 +146,20 @@ const state = reactive({
         return Object.values(eventRuleMap);
     }),
     selectedTreeId: undefined as string|undefined,
+    treeDisplayMap: {} as TreeDisplayMap,
 });
 
+const updateTreeDisplayMap = (id: string, isOpen: boolean) => {
+    const displayMap = { ...state.treeDisplayMap };
+    displayMap[id] = { isOpen };
+
+    state.treeDisplayMap = displayMap;
+};
+const handleClickItem = (value: TreeNode) => {
+    if (value.depth === 0) {
+        updateTreeDisplayMap(value.id, !state.treeDisplayMap[value.id].isOpen);
+    }
+};
 const getWebhookIcon = (id: string): string|undefined => {
     const webhook = storeState.webhook[id].data;
     if (!webhook) return undefined;
@@ -119,6 +171,16 @@ const clickResizer = () => {
 const handleSearchInput = (value: string) => {
     state.searchValue = value;
 };
+
+onMounted(async () => {
+    state.selectedTreeId = props.items[0].event_rule_id;
+    const webhook = props.items[0].webhook_id || 'global';
+    await updateTreeDisplayMap(webhook, true);
+    await replaceUrlQuery({
+        webhookId: webhook,
+        eventRuleId: state.selectedTreeId,
+    });
+});
 </script>
 
 <template>
@@ -138,7 +200,9 @@ const handleSearchInput = (value: string) => {
                           @update:value="handleSearchInput"
                 />
                 <p-tree-view :tree-data="state.treeList"
+                             :tree-display-map="state.treeDisplayMap"
                              :selected-id="state.selectedTreeId"
+                             @click-item="handleClickItem"
                 >
                     <template #content="{ node }">
                         <div class="pt-2 pb-2 text-label-md">

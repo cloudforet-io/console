@@ -19,6 +19,8 @@ import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-st
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
+
 type CardType = {
     name: EventRuleScopeType;
     label: TranslateResult;
@@ -40,6 +42,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
+const serviceDetailPageStore = useServiceDetailPageStore();
 
 const emit = defineEmits<{(e: 'update:visible'): void;
     (e: 'update:selected-webhook'): void;
@@ -54,7 +57,6 @@ const storeState = reactive({
 const state = reactive({
     loading: false,
     dropdownLoading: false,
-    proxyVisible: useProxyValue('visible', props, emit),
     proxySelectedWebhook: useProxyValue('selectedWebhook', props, emit),
     proxySelectedScope: useProxyValue('scope', props, emit),
     proxyShowFormCard: useProxyValue('showFormCard', props, emit),
@@ -83,7 +85,7 @@ const getWebhookIcon = (id: string): string|undefined => {
 };
 const handleClickCancel = () => {
     state.proxySelectedScope = undefined;
-    state.proxyVisible = false;
+    serviceDetailPageStore.setEventRuleScopeModalVisible(false);
 };
 const handleUpdateSelectWebhook = (value: string) => {
     state.proxySelectedWebhook = value;
@@ -92,8 +94,8 @@ const handleClickCard = () => {
     state.proxySelectedWebhook = '';
 };
 const handleClickConfirm = () => {
-    state.proxyVisible = false;
     state.proxyShowFormCard = true;
+    serviceDetailPageStore.setEventRuleScopeModalVisible(false);
 };
 
 onMounted(() => {
@@ -107,7 +109,7 @@ onMounted(() => {
     <p-button-modal class="service-detail-tabs-settings-event-rule-scope-modal"
                     :header-title="$t('ALERT_MANAGER.EVENT_RULE.MODAL_SCOPE_TITLE')"
                     size="sm"
-                    :visible="state.proxyVisible"
+                    :visible="props.visible"
                     :loading="state.loading"
                     :disabled="state.proxySelectedScope === EVENT_RULE_SCOPE.WEBHOOK && !state.proxySelectedWebhook"
                     @confirm="handleClickConfirm"

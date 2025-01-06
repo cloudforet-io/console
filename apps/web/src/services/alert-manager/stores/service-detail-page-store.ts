@@ -6,6 +6,8 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { EventRuleListParameters } from '@/schema/alert-manager/event-rule/api-verbs/list';
+import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
 import type { NotificationProtocolListParameters } from '@/schema/alert-manager/notification-protocol/api-verbs/list';
 import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
 import type { ServiceDeleteParameters } from '@/schema/alert-manager/service/api-verbs/delete';
@@ -27,23 +29,22 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/constants/common-constant';
 import type {
     ServiceDetailTabsType,
     Service,
     ProtocolCardItemType,
-    SettingModeType,
 } from '@/services/alert-manager/types/alert-manager-type';
 
 interface ServiceFormStoreState {
     loading: boolean;
-    currentTab: ServiceDetailTabsType;
+    currentTab?: ServiceDetailTabsType;
     serviceInfo: ServiceModel;
     notificationProtocolList: ProtocolCardItemType[];
     selectedWebhookId?: string;
     selectedNotificationId?: string;
     selectedEscalationPolicyId?: string;
-    settingMode: SettingModeType
+    eventRuleList: EventRuleModel[];
+    eventRuleScopeModalVisible: boolean;
 }
 interface ServiceFormStoreGetters {
     serviceInfo: ComputedRef<Service>;
@@ -63,13 +64,14 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
 
     const state = reactive<ServiceFormStoreState>({
         loading: false,
-        currentTab: SERVICE_DETAIL_TABS.OVERVIEW,
+        currentTab: undefined,
         serviceInfo: {} as ServiceModel,
         notificationProtocolList: [],
         selectedWebhookId: undefined,
         selectedNotificationId: undefined,
         selectedEscalationPolicyId: undefined,
-        settingMode: 'settings',
+        eventRuleList: [],
+        eventRuleScopeModalVisible: false,
     });
 
     const getters = reactive<ServiceFormStoreGetters>({
@@ -108,7 +110,7 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
     });
 
     const mutations = {
-        setCurrentTab(currentTab: ServiceDetailTabsType) {
+        setCurrentTab(currentTab?: ServiceDetailTabsType) {
             state.currentTab = currentTab;
         },
         setSelectedWebhookId(id?: string) {
@@ -120,21 +122,22 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
         setSelectedEscalationPolicyId(id?: string) {
             state.selectedEscalationPolicyId = id;
         },
-        setSettingMode(mode: SettingModeType) {
-            state.settingMode = mode;
+        setEventRuleScopeModalVisible(visible: boolean) {
+            state.eventRuleScopeModalVisible = visible;
         },
     };
 
     const actions = {
         initState() {
             state.loading = false;
-            state.currentTab = SERVICE_DETAIL_TABS.OVERVIEW;
+            state.currentTab = undefined;
             state.serviceInfo = {} as ServiceModel;
             state.notificationProtocolList = [];
             state.selectedWebhookId = undefined;
             state.selectedNotificationId = undefined;
             state.selectedEscalationPolicyId = undefined;
-            state.settingMode = 'settings';
+            state.eventRuleList = [];
+            state.eventRuleScopeModalVisible = false;
         },
         async fetchServiceDetailData(id: string) {
             state.loading = true;
@@ -185,6 +188,16 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.notificationProtocolList = [];
+            }
+        },
+        async fetchEventRuleList(params?: EventRuleListParameters) {
+            try {
+                const { results } = await SpaceConnector.clientV2.alertManager.eventRule.list<EventRuleListParameters, ListResponse<EventRuleModel>>(params);
+                state.eventRuleList = results || [];
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.eventRuleList = [];
+                throw e;
             }
         },
     };

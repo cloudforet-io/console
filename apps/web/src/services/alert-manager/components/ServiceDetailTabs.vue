@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
-
-import { isEqual } from 'lodash';
 
 import {
     PHorizontalLayout, PTab,
@@ -26,7 +24,7 @@ import ServiceDetailTabsWebhookDetailTabs
     from '@/services/alert-manager/components/ServiceDetailTabsWebhookDetailTabs.vue';
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/constants/common-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
-import type { ServiceDetailTabsType, SettingModeType } from '@/services/alert-manager/types/alert-manager-type';
+import type { ServiceDetailTabsType } from '@/services/alert-manager/types/alert-manager-type';
 
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
@@ -41,35 +39,37 @@ const tabState = reactive({
         { label: i18n.t('ALERT_MANAGER.NOTIFICATIONS.TITLE'), name: SERVICE_DETAIL_TABS.NOTIFICATIONS },
         { label: i18n.t('ALERT_MANAGER.SERVICE.SETTINGS'), name: SERVICE_DETAIL_TABS.SETTINGS },
     ])),
-    activeTab: SERVICE_DETAIL_TABS.OVERVIEW as ServiceDetailTabsType,
+    activeTab: undefined as ServiceDetailTabsType|undefined,
 });
 const storeState = reactive({
-    currentTab: computed<ServiceDetailTabsType>(() => serviceDetailPageState.currentTab),
+    currentTab: computed<ServiceDetailTabsType|undefined>(() => serviceDetailPageState.currentTab),
     selectedWebhookId: computed<string|undefined>(() => serviceDetailPageState.selectedWebhookId),
     selectedNotificationId: computed<string|undefined>(() => serviceDetailPageState.selectedNotificationId),
-    settingMode: computed<SettingModeType>(() => serviceDetailPageState.settingMode),
+});
+const state = reactive({
+    isSettingMode: computed<boolean>(() => route.query?.mode !== 'eventRule'),
 });
 
-watch(() => tabState.activeTab, (activeTab) => {
-    serviceDetailPageStore.setCurrentTab(activeTab);
-    serviceDetailPageStore.setSettingMode('settings');
-    replaceUrlQuery({
-        tab: activeTab,
-        status: undefined,
-        urgency: undefined,
-    });
-});
-watch(() => storeState.currentTab, (currentTab) => {
-    if (isEqual(tabState.activeTab, currentTab)) return;
-    tabState.activeTab = currentTab;
-});
-
-onMounted(() => {
-    if (route.query.tab) {
-        tabState.activeTab = route.query.tab as ServiceDetailTabsType;
+watch(() => route.query.tab, (tab) => {
+    if (tab) {
+        tabState.activeTab = tab as ServiceDetailTabsType;
     } else {
         tabState.activeTab = SERVICE_DETAIL_TABS.OVERVIEW;
     }
+}, { immediate: true });
+watch(() => storeState.currentTab, async (currentTab) => {
+    if (!currentTab) return;
+    tabState.activeTab = currentTab;
+});
+watch(() => tabState.activeTab, (activeTab) => {
+    replaceUrlQuery({
+        tab: activeTab,
+        urgency: activeTab !== SERVICE_DETAIL_TABS.ALERTS ? undefined : route.query?.urgency,
+        status: activeTab !== SERVICE_DETAIL_TABS.ALERTS ? undefined : route.query?.status,
+        mode: activeTab !== SERVICE_DETAIL_TABS.SETTINGS ? undefined : route.query?.mode,
+        webhookId: activeTab !== SERVICE_DETAIL_TABS.SETTINGS ? undefined : route.query?.webhookId,
+        eventRuleId: activeTab !== SERVICE_DETAIL_TABS.SETTINGS ? undefined : route.query?.eventRuleId,
+    });
 });
 </script>
 
@@ -101,7 +101,7 @@ onMounted(() => {
                :tabs="tabState.tabs"
                :active-tab.sync="tabState.activeTab"
                class="tab"
-               :class="{'event-rule': storeState.settingMode === 'eventRule'}"
+               :class="{'event-rule': !state.isSettingMode}"
         >
             <template #overview>
                 <service-detail-tabs-overview />
