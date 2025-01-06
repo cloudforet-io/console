@@ -3,6 +3,8 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
+import { reduce } from 'lodash';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PDataTable, PButtonModal, PBadge } from '@cloudforet/mirinae';
 
@@ -109,19 +111,21 @@ watch([() => storeState.serviceList, () => storeState.selectedUserGroupList], ([
             }
         });
         if (list.length > 0) {
-            tableState.filteredItems = Object.values(list.reduce((acc, cur) => {
-                if (!acc[cur.user_group]) {
-                    acc[cur.user_group] = {
-                        user_group: cur.user_group,
-                        service: [],
-                        description: cur.description,
-                    };
-                }
-                if (cur.service !== undefined) {
-                    acc[cur.user_group].service.push(cur.service);
-                }
-                return acc;
-            }, {}));
+            tableState.filteredItems = Object.values(
+                reduce(list, (acc, cur) => {
+                    if (!acc[cur.user_group]) {
+                        acc[cur.user_group] = {
+                            user_group: cur.user_group,
+                            service: [],
+                            description: cur.description,
+                        };
+                    }
+                    if (cur.service !== undefined) {
+                        acc[cur.user_group].service.push(cur.service);
+                    }
+                    return acc;
+                }, {}),
+            );
         }
     }
 }, { deep: true, immediate: true });
@@ -142,7 +146,7 @@ watch([() => storeState.serviceList, () => storeState.selectedUserGroupList], ([
             >
                 <template #col-service-format="{value}">
                     <div v-if="value.length > 0">
-                        <span v-for="(v, i) in value"
+                        <span v-for="(service, i) in value"
                               :key="i"
                               class="mr-2"
                         >
@@ -150,13 +154,13 @@ watch([() => storeState.serviceList, () => storeState.selectedUserGroupList], ([
                                      badge-type="gray200"
                                      shape="square"
                             >
-                                {{ v }}
+                                {{ service }}
                             </p-badge>
                             <p-badge v-else-if="i >= 3"
                                      badge-type="blue700"
                                      shape="round"
                             >
-                                {{ value.length - i }}
+                                {{ service.length - i }}
                             </p-badge>
                         </span>
                     </div>
