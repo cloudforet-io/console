@@ -18,7 +18,6 @@ const heatmap: WidgetConfig = {
                 dataTarget: 'labels_info',
                 defaultMaxCount: 10,
                 max: 10,
-                defaultIndex: 0,
             },
         },
         dataField: {

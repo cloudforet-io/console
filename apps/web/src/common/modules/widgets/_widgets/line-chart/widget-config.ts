@@ -6,6 +6,9 @@ const lineChart: WidgetConfig = {
     meta: {
         title: 'Line Chart',
         sizes: ['md', 'full'],
+        defaultValidationConfig: {
+            defaultMaxCount: 1,
+        },
     },
     requiredFieldsSchema: {
         granularity: {},

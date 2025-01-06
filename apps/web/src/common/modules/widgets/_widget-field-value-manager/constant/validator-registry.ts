@@ -137,9 +137,10 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
         if (groupByOptions.fixedValue && fieldValue.data !== groupByOptions.fixedValue) return false;
         if (groupByOptions.hideCount && !!fieldValue.count) return false;
         if (!groupByOptions.hideCount && groupByOptions.max && groupByOptions.defaultMaxCount && (!fieldValue.count || fieldValue.count > groupByOptions.max)) return false;
-        if (groupByOptions.multiSelectable && (!Array.isArray(fieldValue.data) || !fieldValue.data.length)) return false;
+        if (groupByOptions.multiSelectable && !Array.isArray(fieldValue.data)) return false;
         if (groupByOptions.excludeDateField && fieldValue.data === 'Date') return false;
-        return !!fieldValue.data;
+        // return !!fieldValue.data;
+        return true;
     },
     sankeyDimensions: (fieldValue: SankeyDimensionsValue, widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);

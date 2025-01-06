@@ -6,6 +6,9 @@ const clusteredColumnChart: WidgetConfig = {
     meta: {
         title: 'Clustered Column Chart',
         sizes: ['md', 'full'],
+        defaultValidationConfig: {
+            defaultMaxCount: 1,
+        },
     },
     requiredFieldsSchema: {
         granularity: {},
