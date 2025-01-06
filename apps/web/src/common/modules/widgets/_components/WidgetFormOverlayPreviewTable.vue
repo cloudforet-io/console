@@ -213,13 +213,13 @@ const getValue = (item, field: PreviewTableField) => {
 };
 
 const getSortIcon = (field: PreviewTableField) => {
-    if (field.type === 'LABEL') {
-        if (!state.sortBy.some((d) => d.key === field.sortKey || d.key === field.name)) {
-            return 'ic_caret-down';
-        }
-        return state.sortBy[0]?.desc ? 'ic_caret-down-filled' : 'ic_caret-up-filled';
+    // if (field.type === 'LABEL') {
+    if (!state.sortBy.some((d) => d.key === field.sortKey || d.key === field.name)) {
+        return 'ic_caret-down';
     }
-    return '';
+    return state.sortBy[0]?.desc ? 'ic_caret-down-filled' : 'ic_caret-up-filled';
+    // }
+    // return '';
 };
 
 // const getTimeDiffSubText = (field: PreviewTableField): string => {
@@ -334,8 +334,7 @@ onUnmounted(() => {
                             <!--                            <span v-if="state.dataInfo?.[field.name]?.timediff"-->
                             <!--                                  class="timediff-sub-text"-->
                             <!--                            >{{ getTimeDiffSubText(field) }}</span>-->
-                            <p-i v-if="field.type === 'LABEL'"
-                                 :name="getSortIcon(field)"
+                            <p-i :name="getSortIcon(field)"
                                  class="sort-icon"
                                  @click="handleClickSort(field.name)"
                             />
@@ -428,11 +427,6 @@ onUnmounted(() => {
         .sort-icon {
             @apply text-gray-500 float-right my-px;
             &:hover { cursor: pointer; }
-        }
-        &:last-child {
-            .th-contents:not(.has-icon) {
-                padding-right: 1rem;
-            }
         }
     }
 
