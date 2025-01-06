@@ -5,14 +5,19 @@ import {
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PHeadingLayout, PHeading, PButton, PToolboxTable,
 } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
+import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 import { i18n } from '@/translations';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import { calculateTime } from '@/services/iam/composables/refined-table-data';
@@ -62,6 +67,8 @@ const state = reactive({
         return [];
     }),
     userItemTotalCount: computed<number>(() => userGroupPageState.users.totalCount),
+    filteredUserList: [] as UserListItemType[],
+    totalCount: 0,
 });
 
 const tableState = reactive({
@@ -71,9 +78,10 @@ const tableState = reactive({
         { name: 'auth_type', label: 'Auth Type' },
         { name: 'last_accessed_at', label: 'Last Activity' },
     ]),
+    items: [] as { user_id: string; name: string; auth_type: string; last_accessed_at: string;}[],
     valueHandlerMap: computed(() => ({
         user_id: makeUserValueHandler('identity.WorkspaceUser', 'user_id', 'string', userGroupPageGetters.selectedUserGroups[0].users, [], 50),
-        name: makeUserValueHandler('identity.WorkspaceUser', 'name', 'string', userGroupPageState.users.list.map((user) => user.name), [{ k: 'name', v: '', o: 'not' }], 50),
+        name: makeUserValueHandler('identity.WorkspaceUser', 'name', 'string', state.filteredUserList.map((user) => user.name), [{ k: 'name', v: '', o: 'not' }], 50),
         auth_type: makeDistinctValueHandler('identity.WorkspaceUser', 'auth_type'),
         last_accessed_at: makeDistinctValueHandler('identity.WorkspaceUser', 'last_accessed_at', 'datetime'),
     })),
@@ -104,55 +112,68 @@ const handleRemoveUser = () => {
 
 const handleChange = async (options: any = {}) => {
     userListApiQuery = getApiQueryWithToolboxOptions(userListApiQueryHelper, options) ?? userListApiQuery;
-    if (options.queryTags !== undefined) {
-        userGroupPageStore.$patch((_state) => {
-            _state.state.users.searchFilters = userListApiQueryHelper.filters;
-        });
-    }
 
     if (options.pageStart !== undefined) userGroupPageState.users.pageStart = options.pageStart;
     if (options.pageLimit !== undefined) userGroupPageState.users.pageLimit = options.pageLimit;
     try {
         state.loading = true;
-        await userGroupPageStore.listUsers({ query: userListApiQuery });
+
         const usersIdList: string[] | undefined = userGroupPageGetters.selectedUserGroups[0].users;
-        if (usersIdList && usersIdList.length > 0 && userGroupPageState.users.list && userGroupPageState.users.list.length > 0 && usersIdList && usersIdList.length > 0) {
-            userGroupPageState.users.list = userGroupPageState.users.list.filter((user) => {
-                if (user.user_id) return usersIdList.includes(user.user_id);
-                return false;
-            });
-        } else {
-            userGroupPageState.users.list = [];
-            userGroupPageState.users.totalCount = 0;
-        }
+
+        userListApiQueryHelper.setFilters([
+            { k: 'user_id', v: usersIdList, o: '' },
+        ]);
+        await fetchWorkspaceUserList({
+            query: userListApiQueryHelper.data,
+        });
     } finally {
         state.loading = false;
     }
 };
 
+/* API */
+const fetchWorkspaceUserList = async (params: WorkspaceUserListParameters) => {
+    try {
+        const { results, total_count } = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>(params);
+        state.filteredUserList = results ?? [];
+        userGroupPageState.users.list = results;
+        state.totalCount = total_count ?? 0;
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
+    }
+};
+
 /* Watcher */
-watch(() => userGroupPageGetters.selectedUserGroups, async (nv_selectedUserGroups) => {
-    if (nv_selectedUserGroups.length === 1) {
-        if (Object.keys(nv_selectedUserGroups[0]).includes('users')) {
-            const usersIdList: string[] | undefined = nv_selectedUserGroups[0].users;
+watch(() => userGroupPageGetters.selectedUserGroups, async (nv_selectedUserGroups, ov_selectedUserGroups) => {
+    if (nv_selectedUserGroups !== ov_selectedUserGroups && nv_selectedUserGroups.length === 1) {
+        const usersIdList: string[] | undefined = nv_selectedUserGroups[0].users;
 
-            await userGroupPageStore.listUsers({
-                query: userListApiQuery,
+        userListApiQueryHelper.setFilters([
+            { k: 'user_id', v: usersIdList, o: '' },
+        ]);
+
+        try {
+            state.loading = true;
+            await fetchWorkspaceUserList({
+                query: userListApiQueryHelper.data,
             });
-
-            if (usersIdList && usersIdList.length > 0 && userGroupPageState.users.list && userGroupPageState.users.list.length > 0 && usersIdList && usersIdList.length > 0) {
-                userGroupPageState.users.list = userGroupPageState.users.list.filter((user) => {
-                    if (user.user_id) return usersIdList.includes(user.user_id);
-                    return false;
-                });
-            } else {
-                userGroupPageState.users.list = [];
-                userGroupPageState.users.totalCount = 0;
-            }
-        } else {
-            userGroupPageState.users.list = [];
-            userGroupPageState.users.totalCount = 0;
+        } finally {
+            state.loading = false;
         }
+    }
+}, { deep: true, immediate: true });
+
+watch(() => state.filteredUserList, (nv_filtered_user_list) => {
+    if (nv_filtered_user_list) {
+        tableState.items = nv_filtered_user_list.map((user) => ({
+            user_id: user.user_id,
+            name: user.name,
+            auth_type: user.auth_type,
+            last_accessed_at: user.last_accessed_at,
+        }));
+        userGroupPageStore.$patch((_state) => {
+            _state.state.users.totalCount = nv_filtered_user_list.length;
+        });
     }
 }, { deep: true, immediate: true });
 
@@ -200,12 +221,12 @@ watch(() => userGroupPageState.users, (nv_users) => {
                          sortable
                          sort-desc
                          :fields="tableState.fields"
-                         :items="state.userItems"
+                         :items="tableState.items"
                          :select-index="userGroupPageState.users.selectedIndices"
                          :key-item-sets="USER_GROUP_USERS_SEARCH_HANDLERS"
                          :query-tags="queryTags"
                          :value-handler-map="tableState.valueHandlerMap"
-                         :total-count="state.userItemTotalCount"
+                         :total-count="state.totalCount"
                          :loading="state.loading"
                          @select="handleSelect"
                          @change="handleChange"
