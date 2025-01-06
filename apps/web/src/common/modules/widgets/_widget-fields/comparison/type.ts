@@ -4,7 +4,7 @@ export interface ComparisonValue {
     decreaseColor?: string;
     increaseColor?: string;
     format?: ComparisonFormat;
-    toggleValue?: boolean;
+    toggleValue: boolean;
 }
 
 export interface ComparisonOptions {

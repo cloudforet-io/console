@@ -17,7 +17,12 @@ const lineChart: WidgetConfig = {
                 max: 31,
             },
         },
-        tableDataField: {},
+        dataField: {
+            options: {
+                multiSelectable: true,
+                allSelected: true,
+            },
+        },
     },
     optionalFieldsSchema: {
         legend: {

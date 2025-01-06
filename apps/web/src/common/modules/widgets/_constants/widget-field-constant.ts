@@ -1,13 +1,10 @@
 import { green, red } from '@/styles/colors';
 
 export const FORMAT_RULE_TYPE = {
-    threshold: 'threshold',
+    numberThreshold: 'numberThreshold',
     percentThreshold: 'percentThreshold',
-} as const;
-
-export const ADVANCED_FORMAT_RULE_TYPE = {
     textThreshold: 'textThreshold',
-    field: 'field',
+    textNumberThreshold: 'textNumberThreshold',
 } as const;
 
 export const COLOR_SCHEMA = {
@@ -111,3 +108,5 @@ export const WIDGET_HEIGHT = {
     default: 'default',
     full: 'full',
 };
+
+export const SUB_TOTAL_NAME = 'Sub Total';

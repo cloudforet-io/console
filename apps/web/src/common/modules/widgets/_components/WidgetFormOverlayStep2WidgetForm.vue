@@ -7,25 +7,26 @@ import type { TranslateResult } from 'vue-i18n';
 import { cloneDeep } from 'lodash';
 
 import {
-    PFieldGroup, PSelectDropdown, PButton, PI, PButtonModal,
+    PFieldGroup, PSelectDropdown, PButton, PI, PButtonModal, PTooltip,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
+import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
+import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
+
 import NewMark from '@/common/components/marks/NewMark.vue';
-import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
+import { DATA_TABLE_OPERATOR, DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { WIDGET_COMPONENT_ICON_MAP } from '@/common/modules/widgets/_constants/widget-components-constant';
 import { CONSOLE_WIDGET_CONFIG } from '@/common/modules/widgets/_constants/widget-config-list-constant';
-import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
-import { getWidgetFieldComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
+import {
+    getWidgetFieldComponent,
+} from '@/common/modules/widgets/_helpers/widget-component-helper';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
+import type WidgetFieldValueManager from '@/common/modules/widgets/_widget-field-value-manager';
 import WidgetHeaderField from '@/common/modules/widgets/_widget-fields/header/WidgetHeaderField.vue';
-import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
-import type { DataTableAddOptions } from '@/common/modules/widgets/types/widget-model';
 
-import { red } from '@/styles/colors';
-
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+import { gray, red } from '@/styles/colors';
 
 
 const FORM_TITLE_MAP = {
@@ -34,25 +35,28 @@ const FORM_TITLE_MAP = {
     REQUIRED_FIELDS: 'REQUIRED_FIELDS',
     OPTIONAL_FIELDS: 'OPTIONAL_FIELDS',
 };
-const DATE_CONFIG_FIELD_KEYS = ['granularity', 'dateRange', 'dateAggregationOptions'];
+const DATE_CONFIG_FIELD_KEYS = ['granularity', 'dateRange'];
 
 interface Props {
     widgetValidationInvalid?: boolean;
     widgetValidationInvalidText?: string|TranslateResult;
+    fieldManager: WidgetFieldValueManager;
 }
 
+type DataTableModel = PrivateDataTableModel|PublicDataTableModel;
+const UNSUPPORTED_CHARTS_IN_PIVOT = ['numberCard', 'gauge', 'geoMap', 'treemap', 'pieChart', 'colorCodedHeatmap', 'sankeyChart'];
 const props = defineProps<Props>();
 
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 const widgetGenerateGetters = widgetGenerateStore.getters;
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
 const state = reactive({
     chartTypeMenuItems: computed<MenuItem[]>(() => Object.values(CONSOLE_WIDGET_CONFIG).map((d) => ({
         name: d.widgetName,
         label: d.meta?.title || d.widgetName,
         icon: WIDGET_COMPONENT_ICON_MAP[d.widgetName ?? ''],
+        iconColor: UNSUPPORTED_CHARTS_IN_PIVOT.includes(d.widgetName) && widgetGenerateGetters.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT ? gray[300] : undefined,
+        disabled: UNSUPPORTED_CHARTS_IN_PIVOT.includes(d.widgetName) && widgetGenerateGetters.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT,
     }))),
     widgetConfig: computed(() => getWidgetConfig(widgetGenerateState.selectedWidgetName)),
     widgetConfigDependencies: computed<{[key:string]: string[]}>(() => state.widgetConfig.dependencies || {}),
@@ -74,76 +78,32 @@ const state = reactive({
         label: d.name,
         icon: d.data_type === DATA_TABLE_TYPE.TRANSFORMED ? 'ic_transform-data' : 'ic_service_data-sources',
     }))),
-    selectedDataTableId: computed(() => widgetGenerateState.selectedDataTableId),
-    errorModalCurrentType: undefined as 'default'|'geoMap'| 'progressCard'|undefined,
+    selectedDataTableId: computed<string>(() => widgetGenerateState.selectedDataTableId),
+    selectedDataTable: computed<DataTableModel|undefined>(() => widgetGenerateGetters.selectedDataTable),
+    errorModalCurrentType: undefined as 'default'|'geoMap'|undefined,
 });
 
 
 /* Event */
 const handleSelectDataTable = async (dataTableId: string) => {
+    const selectedDataTable = widgetGenerateState.dataTables.find((d) => d.data_table_id === dataTableId);
+    if (!selectedDataTable) return;
     widgetGenerateStore.setSelectedDataTableId(dataTableId);
     await widgetGenerateStore.updateWidget({
         data_table_id: dataTableId,
         state: 'INACTIVE',
     });
-};
 
-const checkDefaultValidation = () => {
-    const selectedChartType = widgetGenerateState.selectedWidgetName;
-    const selectedDataTable = widgetGenerateGetters.selectedDataTable ?? {};
-    if (!selectedDataTable?.options) return;
-    const removeDateField = (labelsInfo: Record<string, object>) => {
-        const _labelsInfo = cloneDeep(labelsInfo);
-        Object.values(DATE_FIELD).forEach((d) => {
-            delete _labelsInfo[d];
-        });
-        return _labelsInfo;
-    };
-    switch (selectedChartType) {
-    case 'geoMap': {
-        const groupBySelection = (selectedDataTable?.options as DataTableAddOptions)?.group_by ?? [];
-        const filteredSelection = groupBySelection.filter((item) => (item?.name === 'Region'));
-        if (filteredSelection.length === 0) {
-            state.errorModalCurrentType = 'geoMap';
-            state.widgetDefaultValidationModalVisible = true;
-        }
-        break;
-    }
-    case 'progressCard': {
-        const dataInfo = selectedDataTable.data_info ?? {};
-        if (Object.keys(dataInfo).length < 2) {
-            state.errorModalCurrentType = 'progressCard';
-            state.widgetDefaultValidationModalVisible = true;
-        }
-        break;
-    }
-    default:
-        if (state.defaultValidationConfig) {
-            const labelsInfo = cloneDeep(selectedDataTable.labels_info ?? {});
-            const labelsInfoWithoutDateField = removeDateField(labelsInfo);
-            const targetCount = Object.keys(labelsInfoWithoutDateField).length;
-            state.errorModalCurrentType = 'default';
-            if (targetCount < state.defaultValidationConfig?.defaultMaxCount) {
-                state.widgetDefaultValidationModalVisible = true;
-            }
-        }
-    }
-};
+    props.fieldManager.updateDataTableAndOriginData(selectedDataTable, {});
 
-const handleShowErrorModal = (value:number|undefined) => {
-    state.widgetDefaultValidationModalVisible = true;
-    state.formErrorModalValue = value;
+    // check if selected chart type is supported in pivot
+    if (selectedDataTable.operator === DATA_TABLE_OPERATOR.PIVOT && UNSUPPORTED_CHARTS_IN_PIVOT.includes(widgetGenerateState.selectedWidgetName)) {
+        changeWidgetType('table');
+    }
 };
 
 const handleSelectWidgetName = (widgetName: string) => {
-    if (widgetName === widgetGenerateState.selectedWidgetName) return;
-    widgetGenerateStore.setSelectedWidgetName(widgetName);
-
-    const _config = getWidgetConfig(widgetName);
-    widgetGenerateStore.setSize(_config.meta.sizes[0]);
-    widgetGenerateStore.setWidgetFormValueMap({});
-    widgetGenerateStore.setWidgetValidMap({});
-    checkDefaultValidation();
+    changeWidgetType(widgetName);
 };
 const handleClickEditDataTable = () => {
     widgetGenerateStore.setOverlayStep(1);
@@ -153,24 +113,42 @@ const handleClickCollapsibleTitle = (collapsedTitle: string) => {
     state.collapsedTitleMap[collapsedTitle] = !state.collapsedTitleMap[collapsedTitle];
 };
 
-const checkFormDependencies = (changedFieldName: string):string[] => state.widgetConfigDependencies[changedFieldName] || [];
-const handleUpdateFieldValue = (fieldName: string, value: WidgetFieldValues) => {
-    const _valueMap = cloneDeep(widgetGenerateState.widgetFormValueMap);
-    _valueMap[fieldName] = value;
-    const changedOptions = checkFormDependencies(fieldName);
-    const isValueChanged = (JSON.stringify(value) !== JSON.stringify(widgetGenerateState.widgetFormValueMap[fieldName]));
-    if (changedOptions.length && isValueChanged) {
-        changedOptions.forEach((option) => {
-            _valueMap[option] = undefined;
-        });
+/* Utils */
+const checkDefaultValidation = () => {
+    const selectedChartType = widgetGenerateState.selectedWidgetName;
+    const selectedDataTable = widgetGenerateGetters.selectedDataTable ?? {};
+    if (!selectedDataTable?.options) return;
+    switch (selectedChartType) {
+    case 'geoMap': {
+        const labelsInfo = cloneDeep(selectedDataTable.labels_info ?? {});
+        if (!Object.keys(labelsInfo).includes('Region')) {
+            state.errorModalCurrentType = 'geoMap';
+            state.widgetDefaultValidationModalVisible = true;
+        }
+        break;
     }
-    widgetGenerateStore.setWidgetFormValueMap(_valueMap);
+    default:
+        if (state.defaultValidationConfig) {
+            const labelsInfo = cloneDeep(selectedDataTable.labels_info ?? {});
+            const targetCount = Object.keys(labelsInfo).length;
+            state.errorModalCurrentType = 'default';
+            if (targetCount < state.defaultValidationConfig?.defaultMaxCount) {
+                state.widgetDefaultValidationModalVisible = true;
+            }
+        }
+    }
 };
-const handleUpdateFieldValidation = (fieldName: string, isValid: boolean) => {
-    const _validMap = cloneDeep(widgetGenerateState.widgetValidMap);
-    _validMap[fieldName] = isValid;
-    widgetGenerateStore.setWidgetValidMap(_validMap);
+const changeWidgetType = (widgetName: string) => {
+    const _config = getWidgetConfig(widgetName);
+    if (widgetName === widgetGenerateState.selectedWidgetName || !_config) return;
+    widgetGenerateStore.setSelectedWidgetName(widgetName);
+    widgetGenerateStore.setSize(_config.meta.sizes[0]);
+
+    props.fieldManager.updateWidgetType(_config);
+    checkDefaultValidation();
 };
+
+// const checkFormDependencies = (changedFieldName: string):string[] => state.widgetConfigDependencies[changedFieldName] || [];
 
 onMounted(() => {
     checkDefaultValidation();
@@ -225,16 +203,20 @@ onMounted(() => {
                         />
                         <span>{{ state.chartTypeMenuItems.find((d) => d.name === widgetGenerateState.selectedWidgetName).label }}</span>
                     </template>
+                    <template #menu-item--format="{item}">
+                        <p-tooltip :contents="item.disabled ? 'When a Pivot DataTable is selected, this chart type is unavailable.': undefined"
+                                   position="bottom"
+                        >
+                            <span>{{ item.label }}</span>
+                        </p-tooltip>
+                    </template>
                 </p-select-dropdown>
             </p-field-group>
         </div>
         <!-- widget header -->
-        <widget-header-field :key="`widget-header-${widgetGenerateState.selectedWidgetName}`"
-                             :value="widgetGenerateState.widgetFormValueMap.widgetHeader"
-                             :widget-config="state.widgetConfig"
-                             :is-valid="widgetGenerateState.widgetValidMap.widgetHeader"
-                             @update:value="handleUpdateFieldValue('widgetHeader', $event)"
-                             @update:is-valid="handleUpdateFieldValidation('widgetHeader', $event)"
+        <widget-header-field :widget-config="state.widgetConfig"
+                             :widget-id="widgetGenerateState.widgetId"
+                             :field-manager="props.fieldManager"
         />
         <!-- Date Config -->
         <div class="form-group-wrapper"
@@ -257,16 +239,9 @@ onMounted(() => {
                     <component :is="getWidgetFieldComponent(fieldName)"
                                :key="`${fieldName}-${widgetGenerateState.selectedWidgetName}`"
                                :widget-field-schema="fieldSchema"
-                               :data-table="widgetGenerateGetters.selectedDataTable"
-                               :widget-id="widgetGenerateState.widgetId"
-                               :date-range="dashboardDetailState.options.date_range"
-                               :all-value-map="widgetGenerateState.widgetFormValueMap"
-                               :value="widgetGenerateState.widgetFormValueMap[fieldName]"
-                               :is-valid="widgetGenerateState.widgetValidMap[fieldName]"
                                :widget-config="state.widgetConfig"
-                               @update:value="handleUpdateFieldValue(fieldName, $event)"
-                               @update:is-valid="handleUpdateFieldValidation(fieldName, $event)"
-                               @show-error-modal="handleShowErrorModal"
+                               :widget-id="widgetGenerateState.widgetId"
+                               :field-manager="props.fieldManager"
                     />
                 </template>
             </div>
@@ -307,16 +282,9 @@ onMounted(() => {
                     <component :is="getWidgetFieldComponent(fieldName)"
                                :key="`${fieldName}-${widgetGenerateState.selectedWidgetName}`"
                                :widget-field-schema="fieldSchema"
-                               :data-table="widgetGenerateGetters.selectedDataTable"
-                               :widget-id="widgetGenerateState.widgetId"
-                               :date-range="dashboardDetailState.options.date_range"
-                               :all-value-map="widgetGenerateState.widgetFormValueMap"
-                               :value="widgetGenerateState.widgetFormValueMap[fieldName]"
-                               :is-valid="widgetGenerateState.widgetValidMap[fieldName]"
                                :widget-config="state.widgetConfig"
-                               @update:value="handleUpdateFieldValue(fieldName, $event)"
-                               @update:is-valid="handleUpdateFieldValidation(fieldName, $event)"
-                               @show-error-modal="handleShowErrorModal"
+                               :widget-id="widgetGenerateState.widgetId"
+                               :field-manager="props.fieldManager"
                     />
                 </template>
             </div>
@@ -342,13 +310,9 @@ onMounted(() => {
                     <component :is="getWidgetFieldComponent(fieldName)"
                                :key="`${fieldName}-${widgetGenerateState.selectedWidgetName}`"
                                :widget-field-schema="fieldSchema"
-                               :data-table="widgetGenerateGetters.selectedDataTable"
-                               :all-value-map="widgetGenerateState.widgetFormValueMap"
-                               :value="widgetGenerateState.widgetFormValueMap[fieldName]"
-                               :is-valid="widgetGenerateState.widgetValidMap[fieldName]"
                                :widget-config="state.widgetConfig"
-                               @update:value="handleUpdateFieldValue(fieldName, $event)"
-                               @update:is-valid="handleUpdateFieldValidation(fieldName, $event)"
+                               :widget-id="widgetGenerateState.widgetId"
+                               :field-manager="props.fieldManager"
                     />
                 </template>
             </div>
@@ -362,9 +326,6 @@ onMounted(() => {
             <template #body>
                 <p v-if="state.errorModalCurrentType === 'geoMap'">
                     {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.VALIDATION_MODAL.GEO_MAP_DESC') }}
-                </p>
-                <p v-else-if="state.errorModalCurrentType === 'progressCard'">
-                    {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.VALIDATION_MODAL.PROGRESS_CARD_DESC') }}
                 </p>
                 <p v-else>
                     {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.VALIDATION_MODAL.DESC', {

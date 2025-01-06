@@ -4,8 +4,6 @@ import Vue, {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { cloneDeep } from 'lodash';
-
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PButton, PHeading, PHorizontalLayout, PHeadingLayout,
@@ -76,15 +74,15 @@ const handleCreateWorkspace = () => {
 
 const handleConfirm = async ({ id, name }: {id: string, name: string}) => {
     userPageStore.$patch((_state) => {
-        _state.state.modal.type = USER_MODAL_TYPE.ADD;
-        _state.state.modal.title = i18n.t('IAM.USER.MAIN.MODAL.INVITE_TITLE', { workspace_name: name }) as string;
-        _state.state.modal.themeColor = 'primary';
         _state.state.afterWorkspaceCreated = true;
         _state.state.createdWorkspaceId = id;
-        _state.state.modal.visible = {
-            add: true,
-        };
-        _state.state.modal = cloneDeep(_state.state.modal);
+    });
+
+    userPageStore.updateModalSettings({
+        type: USER_MODAL_TYPE.ADD,
+        title: i18n.t('IAM.USER.MAIN.MODAL.INVITE_TITLE', { workspace_name: name }) as string,
+        themeColor: 'primary',
+        modalVisibleType: 'add',
     });
 };
 

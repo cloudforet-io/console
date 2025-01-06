@@ -11,13 +11,8 @@ import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-vi
 import type { BoardSet } from '@cloudforet/mirinae/types/data-display/board/type';
 
 import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
-import type { FolderModel } from '@/schema/dashboard/_types/folder-type';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { DashboardTemplateModel } from '@/schema/repository/dashboard-template/model';
 import { i18n } from '@/translations';
-
-import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useUserStore } from '@/store/user/user-store';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
@@ -25,7 +20,6 @@ import DashboardCreateBlankBoardItem from '@/services/dashboards/components/dash
 import type { FilterLabelItem } from '@/services/dashboards/components/dashboard-create/DashboardCreateStep1SearchFilter.vue';
 import DashboardCreateStep1SearchFilter from '@/services/dashboards/components/dashboard-create/DashboardCreateStep1SearchFilter.vue';
 import DashboardFolderTree from '@/services/dashboards/components/dashboard-folder/DashboardFolderTree.vue';
-import { getDashboardTreeData } from '@/services/dashboards/helpers/dashboard-tree-data-helper';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
@@ -37,17 +31,11 @@ const emit = defineEmits<{(e: 'click-next'): void }>();
 const router = useRouter();
 const { getProperRouteLocation } = useProperRouteLocation();
 
-const appContextStore = useAppContextStore();
 const dashboardCreatePageStore = useDashboardCreatePageStore();
 const dashboardCreatePageState = dashboardCreatePageStore.state;
 const dashboardCreatePageGetters = dashboardCreatePageStore.getters;
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlGetters = dashboardPageControlStore.getters;
-const userStore = useUserStore();
-const storeState = reactive({
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    isWorkspaceMember: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
-});
 const state = reactive({
     templates: [] as DashboardTemplateModel[],
     blankTemplate: computed<BoardSet[]>(() => ([{
@@ -70,19 +58,6 @@ const state = reactive({
             });
         });
         return results;
-    }),
-    existingDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => {
-        let _allFolderItems: FolderModel[] = dashboardPageControlGetters.allFolderItems;
-        let _allDashboardItems: DashboardModel[] = dashboardPageControlGetters.allDashboardItems;
-        if (storeState.isWorkspaceMember) {
-            _allFolderItems = dashboardPageControlGetters.privateFolderItems;
-            _allDashboardItems = dashboardPageControlGetters.privateDashboardItems;
-        }
-        const _filteredDashboardItems: DashboardModel[] = getFilteredTemplates(_allDashboardItems, filterState.inputValue, filterState.selectedLabels, filterState.selectedProviders);
-        return getDashboardTreeData(_allFolderItems, _filteredDashboardItems).filter((d) => {
-            if (d.data.type === 'FOLDER') return !!d.children?.length;
-            return true;
-        });
     }),
     allExistingLabels: computed<string[]>(() => {
         const _ootbTemplates = getFilteredTemplates(dashboardCreatePageState.dashboardTemplates, '', [], []);
@@ -183,7 +158,7 @@ onMounted(() => {
                                        disable-link
                                        @update:selectedIdMap="dashboardCreatePageStore.setSelectedOotbIdMap"
                 />
-                <p-empty v-if="!state.ootbTemplateTreeData.length && !state.existingDashboardTreeData.length"
+                <p-empty v-if="!state.ootbTemplateTreeData.length"
                          show-image
                          class="empty-template"
                 >

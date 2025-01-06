@@ -7,7 +7,7 @@ const stackedHorizontalBarChart: WidgetConfig = {
         title: 'Horizontal Bar Chart',
         sizes: ['md', 'full'],
         defaultValidationConfig: {
-            defaultMaxCount: 2,
+            defaultMaxCount: 1,
         },
     },
     requiredFieldsSchema: {
@@ -22,7 +22,12 @@ const stackedHorizontalBarChart: WidgetConfig = {
                 excludeDateField: true,
             },
         },
-        tableDataField: {},
+        dataField: {
+            options: {
+                multiSelectable: true,
+                allSelected: true,
+            },
+        },
     },
     optionalFieldsSchema: {
         legend: {

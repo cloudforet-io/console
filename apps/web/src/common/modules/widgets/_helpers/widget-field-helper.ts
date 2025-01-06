@@ -1,6 +1,7 @@
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
+import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 import type { DateFieldType } from '@/common/modules/widgets/types/widget-data-type';
 
 
@@ -25,3 +26,8 @@ export const getInitialSelectedMenuItem = (menuItems: MenuItem[], data: string[]
 
 export const isDateField = (fieldName?: DateFieldType) => fieldName && Object.values(DATE_FIELD).includes(fieldName);
 export const isIncludingDateField = (fieldNames: string[]) => Object.values(DATE_FIELD).some((field) => fieldNames.includes(field));
+
+export const integrateFieldsSchema = (requiredFieldsSchema: WidgetConfig['requiredFieldsSchema'], optionalFieldsSchema: WidgetConfig['optionalFieldsSchema']) => ({
+    ...requiredFieldsSchema,
+    ...optionalFieldsSchema,
+});

@@ -13,24 +13,22 @@ const table: WidgetConfig = {
     requiredFieldsSchema: {
         granularity: {},
         dateRange: {},
-        tableDataField: {},
+        dataField: {
+            options: {
+                multiSelectable: true,
+                allSelected: true,
+            },
+        },
         groupBy: {
             options: {
                 dataTarget: 'labels_info',
                 multiSelectable: true,
                 hideCount: true,
-                defaultIndex: 0,
             },
         },
     },
     optionalFieldsSchema: {
-        comparison: {},
-        subTotal: {
-            options: {
-                toggle: false,
-                default: true,
-            },
-        },
+        subTotal: {},
         total: {
             options: {
                 toggle: false,
@@ -48,6 +46,7 @@ const table: WidgetConfig = {
         //     },
         // },
         dateFormat: {},
+        tableColumnComparison: {},
         numberFormat: {
             options: {
                 default: NUMBER_FORMAT.FULL_NUMBER,
@@ -58,7 +57,7 @@ const table: WidgetConfig = {
         tableColumnWidth: {},
         customTableColumnWidth: {},
         displayAnnotation: {},
-        // missingValue: {},
+        missingValue: {},
     },
     dependencies: {
         groupBy: ['comparison', 'customTableColumnWidth'],

@@ -7,6 +7,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PFieldGroup, PJsonSchemaForm, PTextInput,
 } from '@cloudforet/mirinae';
+import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-schema-form/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
@@ -27,7 +28,7 @@ import type { BaseInformationForm, ProjectForm } from '@/services/asset-inventor
 
 
 interface Props {
-    schema: any;
+    schema: JsonSchema;
     mode: 'CREATE' | 'UPDATE';
 }
 

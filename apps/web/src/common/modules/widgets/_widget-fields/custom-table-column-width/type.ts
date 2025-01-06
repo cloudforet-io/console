@@ -4,10 +4,5 @@ export type CustomColumnWidthItem = {
 };
 
 export interface CustomTableColumnWidthValue {
-    toggleValue: boolean;
-    value?: CustomColumnWidthItem[];
-}
-
-export interface CustomTableColumnWidthOptions {
-    toggle?: boolean;
+    widthInfos?: CustomColumnWidthItem[];
 }

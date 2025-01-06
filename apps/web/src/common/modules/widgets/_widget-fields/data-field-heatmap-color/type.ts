@@ -2,12 +2,12 @@ import type { DATA_FIELD_HEATMAP_COLOR } from '@/common/modules/widgets/_constan
 
 export type DataFieldHeatmapColor = keyof typeof DATA_FIELD_HEATMAP_COLOR;
 
-export interface DataFieldHeatmapColorValue {
-    [key: string]: {
-        value: DataFieldHeatmapColor;
-    };
-}
-
 export interface DataFieldHeatmapColorOptions {
     default?: DataFieldHeatmapColor;
+}
+
+export interface DataFieldHeatmapColorValue {
+    [key: string]: {
+        colorInfo: DataFieldHeatmapColor;
+    };
 }

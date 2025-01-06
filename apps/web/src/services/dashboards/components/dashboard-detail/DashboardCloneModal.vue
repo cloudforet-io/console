@@ -33,7 +33,6 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { getSharedDashboardLayouts } from '@/services/dashboards/helpers/dashboard-share-helper';
-import { migrateLegacyWidgetOptions } from '@/services/dashboards/helpers/widget-migration-helper';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 
@@ -111,7 +110,7 @@ const listDashboardWidgets = async (dashboardId: string): Promise<WidgetModel[]>
         const res = await fetcher<PublicWidgetListParameters|PrivateWidgetListParameters, ListResponse<WidgetModel>>({
             dashboard_id: dashboardId,
         });
-        return migrateLegacyWidgetOptions(res.results || []);
+        return res.results || [];
     } catch (e) {
         ErrorHandler.handleError(e);
         return [];
