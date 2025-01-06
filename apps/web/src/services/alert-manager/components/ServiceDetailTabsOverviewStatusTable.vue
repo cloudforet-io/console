@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import { useRouter } from 'vue-router/composables';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PI, PPaneLayout, PTooltip, PFieldTitle, PSelectStatus, PIconButton, PDataTable, PBadge, PLink,
+    PI, PPaneLayout, PTooltip, PFieldTitle, PSelectStatus, PIconButton, PDataTable, PBadge, PTextButton,
 } from '@cloudforet/mirinae';
 import type { ValueItem } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import { iso8601Formatter } from '@cloudforet/utils';
@@ -18,7 +19,10 @@ import type { AlertStatusType, AlertUrgencyType } from '@/schema/alert-manager/a
 import { SERVICE_ALERTS_TYPE } from '@/schema/alert-manager/service/constants';
 import { i18n } from '@/translations';
 
+import { replaceUrlQuery } from '@/lib/router-query-string';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { red } from '@/styles/colors';
 
@@ -26,10 +30,12 @@ import {
     alertStatusBadgeStyleTypeFormatter,
     getAlertStateI18n, getAlertUrgencyI18n,
 } from '@/services/alert-manager/composables/alert-table-data';
+import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/constants/common-constant';
 import { SERVICE_ALERT_TABLE_FIELDS } from '@/services/alert-manager/constants/service-table-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
 import type { Service } from '@/services/alert-manager/types/alert-manager-type';
+
 
 type AlertStatusInfoType = {
     status: TranslateResult,
@@ -41,6 +47,10 @@ type AlertStatusInfoType = {
 
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
+
+const { getProperRouteLocation } = useProperRouteLocation();
+
+const router = useRouter();
 
 const storeState = reactive({
     serviceInfo: computed<Service>(() => serviceDetailPageGetters.serviceInfo),
@@ -91,6 +101,23 @@ const tableState = reactive({
 const alertListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
     .setPage(1, 15);
 
+const handleRouteAlerts = (id: string) => {
+    router.push(getProperRouteLocation({
+        name: ALERT_MANAGER_ROUTE.ALERTS.DETAIL._NAME,
+        params: {
+            alertId: id,
+            serviceId: storeState.serviceInfo.service_id,
+        },
+    }));
+};
+const handleRouteAlertsTab = async () => {
+    await serviceDetailPageStore.setCurrentTab(SERVICE_DETAIL_TABS.ALERTS);
+    await replaceUrlQuery({
+        tab: SERVICE_DETAIL_TABS.ALERTS,
+        status: state.selectedStatus,
+        urgency: state.selectedUrgency,
+    });
+};
 const handleClickStatus = (name: AlertStatusType) => {
     state.selectedStatus = name;
     fetchAlertsList();
@@ -224,13 +251,9 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
                               @changeSort="handleChangeToolbox"
                 >
                     <template #col-title-format="{ value, item }">
-                        <p-link :to="{
-                            name: ALERT_MANAGER_ROUTE.ALERTS.DETAIL._NAME,
-                            params: { alertId: item.alert_id }
-                        }"
-                        >
-                            <span class="title-link">{{ value }}</span>
-                        </p-link>
+                        <p-text-button @click="handleRouteAlerts(item.alert_id)">
+                            {{ value }}
+                        </p-text-button>
                     </template>
                     <template #col-status-format="{value}">
                         <p-badge :style-type="alertStatusBadgeStyleTypeFormatter(value)"
@@ -256,19 +279,12 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
                         <td class="w-full table-cell bg-white text-label-sm font-normal text-center pt-2 pb-2"
                             :colspan="SERVICE_ALERT_TABLE_FIELDS.length"
                         >
-                            <p-link highlight
-                                    :to="{
-                                        name: ALERT_MANAGER_ROUTE.ALERTS._NAME,
-                                        query: {
-                                            serviceId: storeState.serviceInfo.service_id,
-                                            status: state.selectedStatus,
-                                            urgency: state.selectedUrgency,
-                                        }
-                                    }"
-                                    new-tab
+                            <p-text-button style-type="highlight"
+                                           class="ml-auto mr-auto"
+                                           @click="handleRouteAlertsTab"
                             >
                                 {{ $t('ALERT_MANAGER.SERVICE.VIEW_ALL_OPEN_ALERTS') }}
-                            </p-link>
+                            </p-text-button>
                         </td>
                     </template>
                 </p-data-table>

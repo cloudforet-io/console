@@ -44,17 +44,16 @@ import {
 } from '@/services/alert-manager/constants/alert-table-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { useAlertPageStore } from '@/services/alert-manager/stores/alert-page-store';
+import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
 import type { AlertFilterType } from '@/services/alert-manager/types/alert-manager-type';
-
-interface AlertItem extends AlertModel {
-    alert_number: string;
-}
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const alertPageStore = useAlertPageStore();
 const alertPageState = alertPageStore.state;
 const alertPageGetters = alertPageStore.getters;
+const serviceDetailPageStore = useServiceDetailPageStore();
+const serviceDetailPageState = serviceDetailPageStore.state;
 const userStore = useUserStore();
 const userState = userStore.state;
 
@@ -62,6 +61,7 @@ const route = useRoute();
 
 const storeState = reactive({
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
+    serviceId: computed<string>(() => serviceDetailPageState.serviceInfo?.service_id),
     serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => alertPageGetters.serviceDropdownList),
     totalCount: computed<number>(() => alertPageState.totalAlertCount),
     alertList: computed<AlertModel[]>(() => alertPageState.alertList),
@@ -70,18 +70,16 @@ const storeState = reactive({
 const state = reactive({
     loading: false,
     visibleCustomFieldModal: false,
+    isServicePage: computed<boolean>(() => route.name === ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME),
 
-    refinedAlertList: computed<AlertItem[]>(() => storeState.alertList.map((alert) => {
-        const number = alert.alert_id.split('-');
-        return {
-            ...alert,
-            alert_number: number[number.length - 1],
-            created_at: iso8601Formatter(alert.created_at, storeState.timezone),
-        };
-    })),
+    refinedAlertList: computed<AlertModel[]>(() => storeState.alertList.map((alert) => ({
+        ...alert,
+        created_at: iso8601Formatter(alert.created_at, storeState.timezone),
+    }))),
     alertStateLabels: getAlertStateI18n(),
     urgencyLabels: getAlertUrgencyI18n(),
-    fields: ALERT_MANAGEMENT_TABLE_FIELDS,
+    defaultFields: computed<DataTableFieldType[]>(() => (state.isServicePage ? ALERT_MANAGEMENT_TABLE_FIELDS : [{ name: 'service_id', label: 'Service' }, ...ALERT_MANAGEMENT_TABLE_FIELDS])),
+    fields: route.name === ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME ? ALERT_MANAGEMENT_TABLE_FIELDS : [{ name: 'service_id', label: 'Service' }, ...ALERT_MANAGEMENT_TABLE_FIELDS],
 });
 const filterState = reactive({
     selectedServiceId: '',
@@ -170,7 +168,10 @@ const fetchAlertsList = async () => {
         if (filterState.selectedUrgencyFilter !== 'ALL') {
             filterQueryHelper.addFilter({ k: 'urgency', v: filterState.selectedUrgencyFilter, o: '=' });
         }
-        if (filterState.selectedServiceId) {
+
+        if (state.isServicePage) {
+            filterQueryHelper.addFilter({ k: 'service_id', v: storeState.serviceId, o: '=' });
+        } else if (filterState.selectedServiceId) {
             filterQueryHelper.addFilter({ k: 'service_id', v: filterState.selectedServiceId, o: '=' });
         }
 
@@ -189,17 +190,19 @@ const fetchAlertsList = async () => {
     }
 };
 
+watch(() => storeState.serviceId, async (serviceId) => {
+    if (state.isServicePage && serviceId) {
+        filterState.selectedServiceId = serviceId;
+        await fetchAlertsList();
+    }
+});
 watch(() => route.query, async (query) => {
     const { serviceId, status, urgency } = query;
-    if (serviceId) {
+    if (!state.isServicePage) {
         filterState.selectedServiceId = serviceId as string;
     }
-    if (status) {
-        filterState.selectedStatusFilter = status as string;
-    }
-    if (urgency) {
-        filterState.selectedUrgencyFilter = urgency as string;
-    }
+    filterState.selectedStatusFilter = status as string || 'OPEN';
+    filterState.selectedUrgencyFilter = urgency as string || 'ALL';
 
     try {
         state.loading = true;
@@ -218,6 +221,7 @@ watch(() => route.query, async (query) => {
                          search-type="query"
                          sort-by="created_at"
                          class="toolbox pb-10"
+                         :class="{'is-service-page': state.isServicePage}"
                          :sort-desc="true"
                          :query-tags="queryTags"
                          :loading="state.loading"
@@ -232,7 +236,9 @@ watch(() => route.query, async (query) => {
                          @refresh="fetchAlertsList"
                          @export="handleExportToExcel"
         >
-            <template #toolbox-top>
+            <template v-if="!state.isServicePage"
+                      #toolbox-top
+            >
                 <p-select-dropdown :menu="storeState.serviceDropdownList"
                                    :selection-label="$t('ALERT_MANAGER.ALERTS.SERVICE')"
                                    style-type="rounded"
@@ -288,7 +294,10 @@ watch(() => route.query, async (query) => {
                     <p-link highlight
                             :to="{
                                 name: ALERT_MANAGER_ROUTE.ALERTS.DETAIL._NAME,
-                                params: { alertId: item.alert_id }
+                                params: {
+                                    alertId: item.alert_id,
+                                    serviceId: state.isServicePage ? storeState.serviceId : undefined,
+                                }
                             }"
                     >
                         <span class="title-link">{{ value }}</span>
@@ -338,8 +347,8 @@ watch(() => route.query, async (query) => {
             </template>
         </p-toolbox-table>
         <custom-field-modal :visible="state.visibleCustomFieldModal"
-                            resource-type="alertManager.alert"
-                            :default-field="ALERT_MANAGEMENT_TABLE_FIELDS"
+                            :resource-type="state.isServicePage ? 'service.alert' : 'alertManager.alert'"
+                            :default-field="state.defaultFields"
                             @update:visible="handleVisibleCustomFieldModal"
                             @complete="fetchAlertsList"
                             @custom-field-loaded="handleCustomFieldUpdate"
@@ -351,6 +360,9 @@ watch(() => route.query, async (query) => {
 .alert-data-table {
     .toolbox {
         border-radius: 0.375rem;
+        &.is-service-page {
+            border: none;
+        }
     }
     .service-dropdown {
         margin-bottom: -0.5rem;

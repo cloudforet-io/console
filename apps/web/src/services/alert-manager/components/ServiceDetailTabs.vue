@@ -4,6 +4,8 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
+import { isEqual } from 'lodash';
+
 import {
     PHorizontalLayout, PTab,
 } from '@cloudforet/mirinae';
@@ -13,6 +15,7 @@ import { i18n } from '@/translations';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
+import AlertsManagementTable from '@/services/alert-manager/components/AlertsManagementTable.vue';
 import ServiceDetailTabsNotifications from '@/services/alert-manager/components/ServiceDetailTabsNotifications.vue';
 import ServiceDetailTabsNotificationsDetailTabs
     from '@/services/alert-manager/components/ServiceDetailTabsNotificationsDetailTabs.vue';
@@ -33,6 +36,7 @@ const route = useRoute();
 const tabState = reactive({
     tabs: computed<TabItem[]>(() => ([
         { label: i18n.t('ALERT_MANAGER.SERVICE.OVERVIEW'), name: SERVICE_DETAIL_TABS.OVERVIEW },
+        { label: i18n.t('ALERT_MANAGER.ALERTS.TITLE'), name: SERVICE_DETAIL_TABS.ALERTS },
         { label: i18n.t('ALERT_MANAGER.WEBHOOK.TITLE'), name: SERVICE_DETAIL_TABS.WEBHOOK },
         { label: i18n.t('ALERT_MANAGER.NOTIFICATIONS.TITLE'), name: SERVICE_DETAIL_TABS.NOTIFICATIONS },
         { label: i18n.t('ALERT_MANAGER.SERVICE.SETTINGS'), name: SERVICE_DETAIL_TABS.SETTINGS },
@@ -47,17 +51,22 @@ const storeState = reactive({
 
 watch(() => tabState.activeTab, (activeTab) => {
     serviceDetailPageStore.setCurrentTab(activeTab);
-    replaceUrlQuery('tab', activeTab);
+    replaceUrlQuery({
+        tab: activeTab,
+        status: undefined,
+        urgency: undefined,
+    });
 });
 watch(() => storeState.currentTab, (currentTab) => {
+    if (isEqual(tabState.activeTab, currentTab)) return;
     tabState.activeTab = currentTab;
 });
 
 onMounted(() => {
     if (route.query.tab) {
-        serviceDetailPageStore.setCurrentTab(route.query.tab as ServiceDetailTabsType);
+        tabState.activeTab = route.query.tab as ServiceDetailTabsType;
     } else {
-        serviceDetailPageStore.setCurrentTab(SERVICE_DETAIL_TABS.OVERVIEW);
+        tabState.activeTab = SERVICE_DETAIL_TABS.OVERVIEW;
     }
 });
 </script>
@@ -90,6 +99,9 @@ onMounted(() => {
         >
             <template #overview>
                 <service-detail-tabs-overview />
+            </template>
+            <template #alerts>
+                <alerts-management-table />
             </template>
             <template #settings>
                 <service-detail-tabs-settings />

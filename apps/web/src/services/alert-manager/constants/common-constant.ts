@@ -2,9 +2,9 @@ import * as styles from '@/styles/colors';
 
 export const SERVICE_DETAIL_TABS = {
     OVERVIEW: 'overview',
+    ALERTS: 'alerts',
     WEBHOOK: 'webhook',
     NOTIFICATIONS: 'notifications',
-    EVENT_RULE: 'event_rule',
     SETTINGS: 'settings',
 } as const;
 export const SERVICE_SETTING_CARD = {
