@@ -53,7 +53,6 @@ export const getFileDownloadUrl = (fileId: string, resourceGroup: FileManagerRes
 export const uploadFileAndGetFileInfo = async (file: File, resourceGroup: FileManagerResourceGroupType, resourceId?: string): Promise<Attachment> => {
     try {
         const fileModel = await uploadFile(file, resourceGroup, resourceId);
-        console.debug('fileModel', fileModel);
         return {
             downloadUrl: getFileDownloadUrl(fileModel.file_id, resourceGroup),
             fileId: fileModel.file_id,

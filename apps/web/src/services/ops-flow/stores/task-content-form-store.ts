@@ -209,7 +209,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
             state.defaultData = {
                 [DEFAULT_FIELD_ID_MAP.title]: task.name,
                 [DEFAULT_FIELD_ID_MAP.description]: task.description,
-                [DEFAULT_FIELD_ID_MAP.project]: task.project_id ? [task.project_id] : undefined,
+                [DEFAULT_FIELD_ID_MAP.project]: task.project_id,
             };
             state.data = task.data ?? {};
             state.fileIds = task.files?.map((f) => f.file_id) ?? [];
