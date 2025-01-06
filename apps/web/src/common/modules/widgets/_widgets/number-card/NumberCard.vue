@@ -23,7 +23,9 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
+import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
+import { SUB_TOTAL_NAME } from '@/common/modules/widgets/_constants/widget-field-constant';
 import {
     normalizeAndSerializeVars,
 } from '@/common/modules/widgets/_helpers/global-variable-helper';
@@ -64,12 +66,19 @@ const state = reactive({
     isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
     dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
     previousLoading: false,
+    isPivotDataTable: computed<boolean>(() => state.dataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
 
     data: computed<WidgetLoadResponse | null>(() => queryResults.value?.[0].data || null),
     previousData: computed<WidgetLoadResponse | null>(() => queryResults.value?.[1]?.data || null),
     unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[widgetOptionsState.dataFieldInfo?.data as string]),
-    previousValue: computed<number>(() => state.previousData?.results?.[0]?.[widgetOptionsState.dataFieldInfo?.data as string] ?? 0),
-    currentValue: computed<number>(() => state.data?.results?.[0]?.[widgetOptionsState.dataFieldInfo?.data as string] ?? 0),
+    previousValue: computed<number>(() => {
+        if (state.isPivotDataTable) return state.previousData?.results?.[0]?.[SUB_TOTAL_NAME] ?? 0;
+        return state.previousData?.results?.[0]?.[widgetOptionsState.dataFieldInfo?.data as string] ?? 0;
+    }),
+    currentValue: computed<number>(() => {
+        if (state.isPivotDataTable) return state.data?.results?.[0]?.[SUB_TOTAL_NAME] ?? 0;
+        return state.data?.results?.[0]?.[widgetOptionsState.dataFieldInfo?.data as string] ?? 0;
+    }),
     valueText: computed<string|undefined>(() => getFormattedNumber(state.currentValue, widgetOptionsState.numberFormatInfo?.[widgetOptionsState.dataFieldInfo?.data as string], state.unit)),
 
     iconName: computed<string|undefined>(() => widgetOptionsState.iconInfo?.icon?.name),

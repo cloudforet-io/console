@@ -1,3 +1,5 @@
+import { cloneDeep } from 'lodash';
+
 import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import {
     COLOR_SCHEMA, DATA_FIELD_HEATMAP_COLOR, DATE_FORMAT, DEFAULT_COMPARISON_COLOR, NUMBER_FORMAT, TABLE_DEFAULT_MINIMUM_WIDTH, WIDGET_HEIGHT,
@@ -146,7 +148,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const dataFieldOptions = (_fieldsSchema.dataField?.options ?? {}) as DataFieldOptions;
 
-        const result = widgetFieldDefaultValueMap.dataField;
+        const result = cloneDeep(widgetFieldDefaultValueMap.dataField);
 
         const isPivotDataTable = dataTable.operator === DATA_TABLE_OPERATOR.PIVOT;
         if (isPivotDataTable) { // if pivot dataTable, always multiSelectable
@@ -170,7 +172,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const formatRulesOptions = (_fieldsSchema.formatRules?.options ?? {}) as FormatRulesOptions;
 
-        let result = widgetFieldDefaultValueMap.formatRules;
+        let result = cloneDeep(widgetFieldDefaultValueMap.formatRules);
 
         if (formatRulesOptions.default || formatRulesOptions.baseColor) {
             result = {
@@ -192,7 +194,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const categoryByOptions = (_fieldsSchema.categoryBy?.options ?? {}) as CategoryByOptions;
 
-        const result = widgetFieldDefaultValueMap.categoryBy;
+        const result = cloneDeep(widgetFieldDefaultValueMap.categoryBy);
 
         const fieldKeys = sortWidgetTableFields(Object.keys(dataTable?.[categoryByOptions.dataTarget] ?? {}));
 
@@ -206,7 +208,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const stackByOptions = (_fieldsSchema.stackBy?.options ?? {}) as StackByOptions;
 
-        const result = widgetFieldDefaultValueMap.categoryBy;
+        const result = cloneDeep(widgetFieldDefaultValueMap.categoryBy);
 
         const fieldKeys = sortWidgetTableFields(Object.keys(dataTable?.[stackByOptions.dataTarget] ?? {}));
 
@@ -220,7 +222,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const xAxisOptions = (_fieldsSchema.xAxis?.options ?? {}) as XAxisOptions;
 
-        const result = widgetFieldDefaultValueMap.categoryBy;
+        const result = cloneDeep(widgetFieldDefaultValueMap.categoryBy);
 
         const fieldKeys = sortWidgetTableFields(Object.keys(dataTable?.[xAxisOptions.dataTarget] ?? {}));
 
@@ -234,7 +236,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const yAxisOptions = (_fieldsSchema.yAxis?.options ?? {}) as YAxisOptions;
 
-        const result = widgetFieldDefaultValueMap.categoryBy;
+        const result = cloneDeep(widgetFieldDefaultValueMap.categoryBy);
 
         const fieldKeys = sortWidgetTableFields(Object.keys(dataTable?.[yAxisOptions.dataTarget] ?? {}));
 
@@ -254,14 +256,14 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
                 colorValue: COLOR_SCHEMA[colorSchemaOptions.default],
             };
         }
-        return widgetFieldDefaultValueMap.colorSchema;
+        return cloneDeep(widgetFieldDefaultValueMap.colorSchema);
     },
     comparison: (widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const comparisonOptions = (_fieldsSchema.comparison?.options ?? {}) as ComparisonOptions;
 
         if (comparisonOptions.toggle) {
-            return widgetFieldDefaultValueMap.comparison;
+            return cloneDeep(widgetFieldDefaultValueMap.comparison);
         }
 
         return {
@@ -273,14 +275,14 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
         const tableColumnComparisonOptions = (_fieldsSchema.tableColumnComparison?.options ?? {}) as TableColumnComparisonOptions;
 
         if (tableColumnComparisonOptions.toggle) {
-            return widgetFieldDefaultValueMap.tableColumnComparison;
+            return cloneDeep(widgetFieldDefaultValueMap.tableColumnComparison);
         }
 
         return {
             toggleValue: false,
         };
     },
-    customTableColumnWidth: () => widgetFieldDefaultValueMap.customTableColumnWidth,
+    customTableColumnWidth: () => cloneDeep(widgetFieldDefaultValueMap.customTableColumnWidth),
     dataFieldHeatmapColor: (widgetConfig, dataTable) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const dataFieldheatmapColorOptions = (_fieldsSchema.dataFieldHeatmapColor?.options ?? {}) as DataFieldHeatmapColorOptions;
@@ -290,7 +292,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
         const dataKeys = Object.keys(dataTable?.data_info ?? {}) as string[];
         const fieldKeys = isPivotDataTable ? [columnFieldForPivot] : dataKeys;
 
-        const result: DataFieldHeatmapColorValue = widgetFieldDefaultValueMap.dataFieldHeatmapColor;
+        const result: DataFieldHeatmapColorValue = cloneDeep(widgetFieldDefaultValueMap.dataFieldHeatmapColor);
         fieldKeys.forEach((key) => {
             result[key] = {
                 colorInfo: dataFieldheatmapColorOptions?.default ?? DATA_FIELD_HEATMAP_COLOR.NONE.key,
@@ -309,17 +311,17 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
             };
         }
 
-        return widgetFieldDefaultValueMap.dateFormat;
+        return cloneDeep(widgetFieldDefaultValueMap.dateFormat);
     },
-    dateRange: () => widgetFieldDefaultValueMap.dateRange,
-    displayAnnotation: () => widgetFieldDefaultValueMap.displayAnnotation,
-    displaySeriesLabel: () => widgetFieldDefaultValueMap.displaySeriesLabel,
-    granularity: () => widgetFieldDefaultValueMap.granularity,
+    dateRange: () => cloneDeep(widgetFieldDefaultValueMap.dateRange),
+    displayAnnotation: () => cloneDeep(widgetFieldDefaultValueMap.displayAnnotation),
+    displaySeriesLabel: () => cloneDeep(widgetFieldDefaultValueMap.displaySeriesLabel),
+    granularity: () => cloneDeep(widgetFieldDefaultValueMap.granularity),
     groupBy: (widgetConfig, dataTable) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const groupByOptions = (_fieldsSchema.groupBy?.options ?? {}) as GroupByOptions;
 
-        const result = widgetFieldDefaultValueMap.groupBy;
+        const result = cloneDeep(widgetFieldDefaultValueMap.groupBy);
 
         let fieldKeys = sortWidgetTableFields(Object.keys(dataTable?.[groupByOptions.dataTarget] ?? {}));
         if (groupByOptions.fixedValue) {
@@ -336,12 +338,12 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
 
         return result;
     },
-    widgetHeader: () => widgetFieldDefaultValueMap.widgetHeader,
+    widgetHeader: () => cloneDeep(widgetFieldDefaultValueMap.widgetHeader),
     icon: (widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const iconOptions = (_fieldsSchema.icon?.options ?? {}) as IconOptions;
 
-        const initialValue = widgetFieldDefaultValueMap.icon;
+        const initialValue = cloneDeep(widgetFieldDefaultValueMap.icon);
 
         if (iconOptions.toggle) {
             const defaultIcon = ICON_FIELD_ITEMS.find((item) => item.name === iconOptions.default);
@@ -358,7 +360,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const legendOptions = (_fieldsSchema.legend?.options ?? {}) as LegendOptions;
 
-        const initialValue = widgetFieldDefaultValueMap.legend;
+        const initialValue = cloneDeep(widgetFieldDefaultValueMap.legend);
 
         if (legendOptions.toggle) {
             return {
@@ -377,7 +379,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
                 max: maxOptions.default,
             };
         }
-        return widgetFieldDefaultValueMap.max;
+        return cloneDeep(widgetFieldDefaultValueMap.max);
     },
     min: (widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
@@ -388,7 +390,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
                 min: minOptions.default,
             };
         }
-        return widgetFieldDefaultValueMap.min;
+        return cloneDeep(widgetFieldDefaultValueMap.min);
     },
     missingValue: (widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
@@ -399,7 +401,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
                 type: missingValueOptions.default,
             };
         }
-        return widgetFieldDefaultValueMap.missingValue;
+        return cloneDeep(widgetFieldDefaultValueMap.missingValue);
     },
     numberFormat: (widgetConfig, dataTable) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
@@ -410,7 +412,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
         const dataKeys = Object.keys(dataTable?.data_info ?? {}) as string[];
         const fieldKeys = isPivotDataTable ? [columnFieldForPivot] : dataKeys;
 
-        const result: NumberFormatValue = widgetFieldDefaultValueMap.numberFormat;
+        const result: NumberFormatValue = cloneDeep(widgetFieldDefaultValueMap.numberFormat);
         fieldKeys.forEach((key) => {
             result[key] = {
                 format: numberFormatOptions.default ?? NUMBER_FORMAT.AUTO,
@@ -428,7 +430,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
             };
         }
 
-        return widgetFieldDefaultValueMap.pieChartType;
+        return cloneDeep(widgetFieldDefaultValueMap.pieChartType);
     },
     subTotal: (widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
@@ -441,7 +443,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
             };
         }
 
-        return widgetFieldDefaultValueMap.subTotal;
+        return cloneDeep(widgetFieldDefaultValueMap.subTotal);
     },
     total: (widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
@@ -454,13 +456,13 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
             };
         }
 
-        return widgetFieldDefaultValueMap.total;
+        return cloneDeep(widgetFieldDefaultValueMap.total);
     },
     tableColumnWidth: (widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const tableColumnWidthOptions = (_fieldsSchema.tableColumnWidth?.options ?? {}) as TableColumnWidthOptions;
 
-        const initialValue = widgetFieldDefaultValueMap.tableColumnWidth;
+        const initialValue = cloneDeep(widgetFieldDefaultValueMap.tableColumnWidth);
 
         if (tableColumnWidthOptions.defaultMinimumWidth || tableColumnWidthOptions.defaultFixedWidth) {
             return {
@@ -480,7 +482,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
                 toggleValue: true,
             };
         }
-        return widgetFieldDefaultValueMap.textWrap;
+        return cloneDeep(widgetFieldDefaultValueMap.textWrap);
     },
     tooltipNumberFormat: (widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
@@ -491,7 +493,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
                 toggleValue: true,
             };
         }
-        return widgetFieldDefaultValueMap.tooltipNumberFormat;
+        return cloneDeep(widgetFieldDefaultValueMap.tooltipNumberFormat);
     },
     widgetHeight: (widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
@@ -502,7 +504,7 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
                 type: widgetHeightOptions.default,
             };
         }
-        return widgetFieldDefaultValueMap.widgetHeight;
+        return cloneDeep(widgetFieldDefaultValueMap.widgetHeight);
     },
     sankeyDimensions: (widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);

@@ -18,6 +18,7 @@ import NewMark from '@/common/components/marks/NewMark.vue';
 import { DATA_TABLE_OPERATOR, DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { WIDGET_COMPONENT_ICON_MAP } from '@/common/modules/widgets/_constants/widget-components-constant';
 import { CONSOLE_WIDGET_CONFIG } from '@/common/modules/widgets/_constants/widget-config-list-constant';
+import { UNSUPPORTED_CHARTS_IN_PIVOT } from '@/common/modules/widgets/_constants/widget-constant';
 import {
     getWidgetFieldComponent,
 } from '@/common/modules/widgets/_helpers/widget-component-helper';
@@ -44,7 +45,6 @@ interface Props {
 }
 
 type DataTableModel = PrivateDataTableModel|PublicDataTableModel;
-const UNSUPPORTED_CHARTS_IN_PIVOT = ['numberCard', 'gauge', 'geoMap', 'treemap', 'pieChart', 'colorCodedHeatmap', 'sankeyChart'];
 const props = defineProps<Props>();
 
 const widgetGenerateStore = useWidgetGenerateStore();
@@ -154,7 +154,9 @@ const changeWidgetType = (widgetName: string) => {
 // const checkFormDependencies = (changedFieldName: string):string[] => state.widgetConfigDependencies[changedFieldName] || [];
 
 onMounted(() => {
-    checkDefaultValidation();
+    if (widgetGenerateGetters.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT && UNSUPPORTED_CHARTS_IN_PIVOT.includes(widgetGenerateState.selectedWidgetName)) {
+        changeWidgetType('table');
+    } else checkDefaultValidation();
 });
 </script>
 
