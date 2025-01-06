@@ -1,7 +1,7 @@
-export interface MissingValueValue {
-    value: string;
+export interface MissingValueOptions {
+    default?: 'lineToZero' | 'lineBreaks';
 }
 
-export interface MissingValueOptions {
-    default?: string;
+export interface MissingValueValue {
+    type: 'lineToZero' | 'lineBreaks';
 }

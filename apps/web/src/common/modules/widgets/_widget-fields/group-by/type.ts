@@ -1,15 +1,14 @@
 export interface GroupByValue {
-    value?: string | string[];
+    data?: string | string[];
     count?: number;
 }
 
 export interface GroupByOptions {
-    dataTarget?: string;
+    dataTarget: string;
     multiSelectable?: boolean;
     hideCount?: boolean;
     max?: number;
-    defaultMaxCount: number;
-    defaultIndex?: number;
+    defaultMaxCount?: number;
     excludeDateField?: boolean;
     fixedValue?: string;
 }

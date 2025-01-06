@@ -28,3 +28,12 @@ export const DATE_RANGE_YEARLY_VALUE_MAP = {
 } as const;
 
 export const DATE_RANGE_YEARLY_VALUES = Object.keys(DATE_RANGE_YEARLY_VALUE_MAP);
+
+export const DATE_RANGE_ADVANCED_OPERATOR_MAP = {
+    ADD: 'ADD',
+    SUBSTRACT: 'SUBSTRACT',
+} as const;
+
+export const MONTHLY_ENABLED_VALUES = ['auto', ...DATE_RANGE_MONTHLY_VALUES, 'custom', 'advanced'];
+export const DAILY_ENABLED_VALUES = ['auto', ...DATE_RANGE_DAILY_VALUES, 'custom', 'advanced'];
+export const YEARLY_ENABLED_VALUES = ['auto', ...DATE_RANGE_YEARLY_VALUES, 'custom', 'advanced'];

@@ -5,7 +5,7 @@ import {
     computed, reactive, ref, watch,
 } from 'vue';
 
-import { PI, PContextMenu } from '@cloudforet/mirinae';
+import { PI, PContextMenu, PFieldTitle } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -31,7 +31,7 @@ const widgetGenerateState = widgetGenerateStore.state;
 
 const storeState = reactive({
     dataTables: computed(() => widgetGenerateState.dataTables),
-    isJoinRestriced: computed<boolean|undefined>(() => widgetGenerateState.joinRestrictedMap[props.dataTableId]),
+    isJoinRestricted: computed<boolean|undefined>(() => widgetGenerateState.joinRestrictedMap[props.dataTableId]),
 });
 
 
@@ -46,29 +46,34 @@ const state = reactive({
             label: dataTable.name,
             name: dataTable.data_table_id,
             icon: dataTable.data_type === DATA_TABLE_TYPE.ADDED ? 'ic_service_data-sources' : 'ic_transform-data',
+            operator: dataTable.operator,
         }))),
     dataTableMenuItems: computed<MenuItem[]>(() => {
         const alreadySelected = state.secondarySelected && state.secondarySelected.length ? [{ ...state.secondarySelected[0], disabled: true, iconColor: gray[300] }] : [];
-        if (alreadySelected.length) {
+        const pivoted = state.baseMenuItems.filter((item) => item.operator === 'PIVOT').map((item) => ({ ...item, disabled: true, iconColor: gray[300] }));
+        if (alreadySelected.length || pivoted.length) {
             return [
-                ...state.baseMenuItems.filter((item) => item.name !== alreadySelected[0].name),
+                ...state.baseMenuItems.filter((item) => item.name !== alreadySelected[0]?.name && item.operator !== 'PIVOT'),
                 ...alreadySelected,
+                ...pivoted,
             ];
         }
         return state.baseMenuItems;
     }),
-    selected: props.operator === 'JOIN' || props.operator === 'CONCAT' ? props.dataTableInfo?.dataTables?.[0] : props.dataTableInfo?.dataTableId ?? undefined as string|MenuItem[]|undefined,
+    selected: undefined as string|MenuItem[]|undefined,
     secondaryDataTableMenuItems: computed<MenuItem[]>(() => {
         const alreadySelected = state.selected && state.selected.length ? [{ ...state.selected[0], disabled: true, iconColor: gray[300] }] : [];
-        if (alreadySelected.length) {
+        const pivoted = state.baseMenuItems.filter((item) => item.operator === 'PIVOT').map((item) => ({ ...item, disabled: true, iconColor: gray[300] }));
+        if (alreadySelected.length || pivoted.length) {
             return [
-                ...state.baseMenuItems.filter((item) => item.name !== alreadySelected[0].name),
+                ...state.baseMenuItems.filter((item) => item.name !== alreadySelected[0]?.name && item.operator !== 'PIVOT'),
                 ...alreadySelected,
+                ...pivoted,
             ];
         }
         return state.baseMenuItems;
     }),
-    secondarySelected: props.dataTableInfo?.dataTables?.[1] ?? undefined as string|MenuItem[]|undefined,
+    secondarySelected: undefined as string|MenuItem[]|undefined,
 });
 const containerRef = ref<HTMLElement|null>(null);
 const secondContainerRef = ref<HTMLElement|null>(null);
@@ -135,10 +140,11 @@ watch(() => props.dataTableInfo, (newVal) => {
             state.secondarySelected = _secondarySelected ? [_secondarySelected] : undefined;
             return;
         }
+
         const _selected = state.dataTableMenuItems.find((item) => item.name === newVal.dataTableId);
         state.selected = _selected ? [_selected] : undefined;
     }
-});
+}, { immediate: true });
 
 </script>
 
@@ -151,6 +157,13 @@ watch(() => props.dataTableInfo, (newVal) => {
             <div ref="containerRef"
                  class="dropdown-container"
             >
+                <p-field-title v-if="props.operator === 'JOIN'"
+                               size="sm"
+                               color="gray"
+                               class="join-table-text"
+                >
+                    {{ $t('COMMON.WIDGETS.DATA_TABLE.FORM.LEFT_TABLE') }}
+                </p-field-title>
                 <div ref="targetRef"
                      :class="{'select-button': true,
                               selected: !!state.selected,
@@ -187,11 +200,19 @@ watch(() => props.dataTableInfo, (newVal) => {
                  ref="secondContainerRef"
                  class="dropdown-container"
             >
+                <p-field-title v-if="props.operator === 'JOIN'"
+                               size="sm"
+                               color="gray"
+                               class="join-table-text"
+                >
+                    {{ $t('COMMON.WIDGETS.DATA_TABLE.FORM.RIGHT_TABLE') }}
+                </p-field-title>
                 <div ref="targetRef"
                      :class="{'select-button': true,
                               selected: !!state.secondarySelected,
                               error: (state.secondarySelected && !storeState.dataTables.some((dataTable) => dataTable.data_table_id === state.secondarySelected?.[0]?.name))
-                                  || storeState.isJoinRestriced
+                                  || storeState.isJoinRestricted,
+                              [props.operator]: true
                      }"
                      @click="handleClickSelectButton(true)"
                 >
@@ -236,6 +257,9 @@ watch(() => props.dataTableInfo, (newVal) => {
 
         .dropdown-container {
             @apply relative;
+            .join-table-text {
+                margin-bottom: 0.125rem;
+            }
             .select-button {
                 @apply flex justify-between items-center bg-gray-100 border border-gray-300 rounded-xl w-full cursor-pointer;
                 border-left-width: 0.375rem;
@@ -260,6 +284,9 @@ watch(() => props.dataTableInfo, (newVal) => {
 
                 &.selected {
                     @apply bg-indigo-100 border-indigo-400;
+                    &.JOIN {
+                        @apply bg-peacock-100 border-peacock-400;
+                    }
                     .text {
                         @apply text-gray-800;
                     }

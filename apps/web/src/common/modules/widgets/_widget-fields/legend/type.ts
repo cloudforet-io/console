@@ -4,6 +4,6 @@ export interface LegendValue {
 }
 
 export interface LegendOptions { // toggle button
-    default?: boolean;
+    toggle?: boolean;
     showPositionField?: boolean;
 }

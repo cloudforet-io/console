@@ -1,57 +1,34 @@
 <script lang="ts" setup>
-import { onMounted, reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { PFieldTitle, PToggleButton } from '@cloudforet/mirinae';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
 import type { TextWrapValue, TextWrapOptions } from '@/common/modules/widgets/_widget-fields/text-wrap/type';
 import type {
     WidgetFieldComponentProps,
-    WidgetFieldComponentEmit,
 } from '@/common/modules/widgets/types/widget-field-type';
 
+const FIELD_KEY = 'textWrap';
 
-const emit = defineEmits<WidgetFieldComponentEmit<TextWrapValue|undefined>>();
-
-const props = withDefaults(defineProps<WidgetFieldComponentProps<TextWrapOptions, TextWrapValue>>(), {
-    widgetFieldSchema: () => ({
-        options: {
-            toggle: false,
-            default: false,
-        },
-    }),
-});
+const props = defineProps<WidgetFieldComponentProps<TextWrapOptions>>();
 
 const state = reactive({
-    proxyValue: useProxyValue('value', props, emit),
+    fieldValue: computed<TextWrapValue>(() => props.fieldManager.data[FIELD_KEY].value),
 });
 
 const handleUpdateToggle = (value: boolean) => {
-    state.proxyValue = {
+    props.fieldManager.setFieldValue(FIELD_KEY, {
         toggleValue: value,
-    };
-    if (!value) {
-        state.proxyValue = undefined;
-    }
+    });
 };
 
-onMounted(() => {
-    emit('update:is-valid', true);
-    if (!props.value) {
-        state.proxyValue = undefined;
-        return;
-    }
-    state.proxyValue = {
-        toggleValue: props.value?.toggleValue ?? props.widgetFieldSchema.options?.toggle ?? false,
-    };
-});
 </script>
 
 <template>
     <div class="widget-field-text-wrap">
         <div class="field-header">
             <p-field-title>{{ $t('COMMON.WIDGETS.TEXT_WRAP.TEXT_WRAP') }}</p-field-title>
-            <p-toggle-button :value="state.proxyValue?.toggleValue"
+            <p-toggle-button :value="state.fieldValue?.toggleValue"
                              @update:value="handleUpdateToggle"
             />
         </div>

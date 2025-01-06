@@ -167,6 +167,7 @@ const handleSelectControlButton = (id: string, item: MenuItem) => {
                                                size="sm"
                                                menu-position="left"
                                                reset-selection-on-menu-close
+                                               use-fixed-menu-style
                                                @select="handleSelectControlButton(node.data.id, $event)"
                             />
                             <favorite-button v-if="node.data.type === 'DASHBOARD' && !props.readonlyMode"

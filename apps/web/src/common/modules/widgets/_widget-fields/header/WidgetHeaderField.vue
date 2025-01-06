@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive,
 } from 'vue';
 
 import {
@@ -9,22 +9,25 @@ import {
 
 import { i18n } from '@/translations';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
+import {
+    widgetValidatorRegistry,
+} from '@/common/modules/widgets/_widget-field-value-manager/constant/validator-registry';
 import type { WidgetHeaderValue } from '@/common/modules/widgets/_widget-fields/header/type';
-import type { WidgetFieldComponentEmit, WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
+import type {
+    WidgetFieldComponentProps,
+} from '@/common/modules/widgets/types/widget-field-type';
 
+const FIELD_KEY = 'widgetHeader';
 
+const props = defineProps<WidgetFieldComponentProps<undefined>>();
 
-const emit = defineEmits<WidgetFieldComponentEmit<WidgetHeaderValue|undefined>>();
-const props = defineProps<WidgetFieldComponentProps<undefined, WidgetHeaderValue>>();
+const validator = widgetValidatorRegistry[FIELD_KEY];
+
 const state = reactive({
-    proxyValue: useProxyValue('value', props, emit),
-    isWidgetTitleValid: computed<boolean>(() => {
-        if (!state.proxyValue?.toggleValue) return true;
-        return !!state.proxyValue?.title?.trim();
-    }),
+    fieldValue: computed<WidgetHeaderValue>(() => props.fieldManager.data[FIELD_KEY].value),
+    invalid: computed(() => !validator(state.fieldValue, props.widgetConfig)),
     titleInvalidText: computed(() => {
-        if (!state.proxyValue?.title?.trim()?.length) {
+        if (state.invalid) {
             return i18n.t('COMMON.WIDGETS.WIDGET_TITLE_REQUIRED');
         }
         return undefined;
@@ -32,37 +35,38 @@ const state = reactive({
 });
 
 /* Event */
-const handleToggleWidgetHeader = () => {
-    const _toggleValue = !state.proxyValue?.toggleValue;
-    emit('update:value', {
-        toggleValue: _toggleValue,
-        title: _toggleValue ? props.widgetConfig?.meta?.title : undefined,
-        description: undefined,
-    });
+const handleToggleWidgetHeader = (value: boolean) => {
+    console.debug('[[HEADER]] - toggle', value);
+    if (value) {
+        props.fieldManager.setFieldValue(FIELD_KEY, {
+            toggleValue: true,
+            title: props.widgetConfig?.meta?.title,
+            description: undefined,
+        });
+    } else {
+        props.fieldManager.setFieldValue(FIELD_KEY, {
+            toggleValue: false,
+            title: undefined,
+            description: undefined,
+        });
+    }
 };
 const handleUpdateValue = (key: string, value: string) => {
-    state.proxyValue = {
-        ...state.proxyValue,
+    console.debug('[[HEADER]] - value', key, value);
+
+    props.fieldManager.setFieldValue(FIELD_KEY, {
+        ...state.fieldValue,
         [key]: value?.trim() || '',
-    };
-    emit('update:value', state.proxyValue);
+    });
 };
 
-/* Watcher */
-watch(() => state.isWidgetTitleValid, (isValid) => {
-    emit('update:is-valid', isValid);
-}, { immediate: true });
-
-onMounted(() => {
-    emit('update:is-valid', true);
-});
 </script>
 <template>
     <div class="form-group-wrapper"
-         :class="{ 'collapsed': !state.proxyValue?.toggleValue }"
+         :class="{ 'collapsed': !state.fieldValue?.toggleValue }"
     >
         <div class="title-wrapper flex justify-between align-middle"
-             :class="{ 'disabled': !state.proxyValue?.toggleValue }"
+             :class="{ 'disabled': !state.fieldValue?.toggleValue }"
         >
             <div class="left-part">
                 <p-i name="ic_chevron-down"
@@ -74,7 +78,7 @@ onMounted(() => {
                 <span>{{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.WIDGET_HEADER') }}</span>
             </div>
             <div class="right-part flex">
-                <p-toggle-button :value="state.proxyValue?.toggleValue"
+                <p-toggle-button :value="state.fieldValue?.toggleValue"
                                  @update:value="handleToggleWidgetHeader"
                 />
             </div>
@@ -82,18 +86,18 @@ onMounted(() => {
         <div class="form-wrapper">
             <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.TITLE')"
                            :invalid-text="state.titleInvalidText"
-                           :invalid="!state.isWidgetTitleValid"
+                           :invalid="state.invalid"
                            required
             >
                 <template #default="{invalid}">
-                    <p-text-input :value="state.proxyValue?.title"
+                    <p-text-input :value="state.fieldValue?.title"
                                   :invalid="invalid"
                                   @update:value="handleUpdateValue('title', $event)"
                     />
                 </template>
             </p-field-group>
             <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.DESCRIPTION')">
-                <p-textarea :value="state.proxyValue?.description"
+                <p-textarea :value="state.fieldValue?.description"
                             @update:value="handleUpdateValue('description', $event)"
                 />
             </p-field-group>

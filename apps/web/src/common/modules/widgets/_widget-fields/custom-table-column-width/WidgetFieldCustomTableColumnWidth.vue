@@ -1,53 +1,69 @@
 <script lang="ts" setup>
 import {
     computed,
-    onMounted, reactive, watch,
+    onMounted, reactive,
 } from 'vue';
 
-import { sortBy } from 'lodash';
 
 import {
-    PFieldTitle, PTextInput, PIconButton, PButton, PSelectDropdown, PToggleButton,
+    PFieldTitle, PTextInput, PIconButton, PButton, PSelectDropdown,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 
 
+import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
+import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
+
 import getRandomId from '@/lib/random-id-generator';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
-import type { CustomColumnWidthItem, CustomTableColumnWidthValue, CustomTableColumnWidthOptions } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
-import type {
-    WidgetFieldComponentEmit,
-    WidgetFieldComponentProps,
-} from '@/common/modules/widgets/types/widget-field-type';
 import type {
 } from '@/common/modules/widgets/types/widget-field-value-type';
+import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
+import { SUB_TOTAL_NAME } from '@/common/modules/widgets/_constants/widget-field-constant';
+import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
+import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
+import type {
+    CustomColumnWidthItem,
+    CustomTableColumnWidthValue,
+} from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
+import type {
+    WidgetFieldComponentProps,
+} from '@/common/modules/widgets/types/widget-field-type';
 
 interface CustomWidthFieldItem extends CustomColumnWidthItem {
     key: string;
 }
+const FIELD_KEY = 'customTableColumnWidth';
 
-const props = defineProps<WidgetFieldComponentProps<CustomTableColumnWidthOptions, CustomTableColumnWidthValue>>();
-const emit = defineEmits<WidgetFieldComponentEmit<CustomTableColumnWidthValue>>();
+const props = defineProps<WidgetFieldComponentProps<undefined>>();
+const widgetGenerateStore = useWidgetGenerateStore();
+const widgetGenerateGetters = widgetGenerateStore.getters;
+
+const storeState = reactive({
+    selectedDataTable: computed<PrivateDataTableModel|PublicDataTableModel|undefined>(() => widgetGenerateGetters.selectedDataTable),
+});
+
 const state = reactive({
-    proxyValue: useProxyValue<CustomTableColumnWidthValue>('value', props, emit),
-    // Custom
+    isPivotDataTable: computed<boolean>(() => storeState.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
+    fieldValue: computed<CustomTableColumnWidthValue>(() => props.fieldManager.data[FIELD_KEY].value),
     customWidthItems: [] as CustomWidthFieldItem[],
-    dataFieldType: computed(() => props.allValueMap?.tableDataField?.fieldType ?? 'dynamicField'),
-    labelFieldList: computed<string[]>(() => (props.allValueMap?.groupBy?.value as string[]) ?? []),
-    dataFieldList: computed<string[]>(() => {
-        if (!props.allValueMap?.tableDataField?.value) return [];
-        if (state.dataFieldType === 'dynamicField') return [props.allValueMap?.tableDataField?.value];
-        return props.allValueMap?.tableDataField?.value as string[];
-    }),
     allFieldList: computed<MenuItem[]>(() => {
-        const allField = [...state.labelFieldList, ...state.dataFieldList, 'Sub Total'];
-        return sortBy(allField.map((item) => ({
-            name: item === 'Sub Total' ? 'sub_total' : item,
-            label: item,
-            disabled: state.customWidthItems.some((customWidthItem) => customWidthItem.fieldKey === item),
-        })));
+        if (!widgetGenerateGetters.selectedDataTable) return [];
+
+        const columnFieldForPivot = storeState.selectedDataTable?.options.PIVOT?.fields?.column;
+
+        const fieldList = sortWidgetTableFields(
+            [
+                ...Object.keys(widgetGenerateGetters.selectedDataTable?.labels_info ?? {}),
+                ...((state.isPivotDataTable && columnFieldForPivot) ? [columnFieldForPivot, SUB_TOTAL_NAME] : Object.keys(widgetGenerateGetters.selectedDataTable?.data_info ?? {})),
+            ],
+        ) ?? [];
+        return fieldList.map((d) => ({
+            name: d,
+            label: d,
+            disabled: state.customWidthItems.some((customWidthItem) => customWidthItem.fieldKey === d),
+        }));
     }),
 });
 
@@ -56,17 +72,10 @@ const convertAndApplyCustomWidthInfo = (value: CustomWidthFieldItem[]) => {
         fieldKey: item.fieldKey,
         width: item.width,
     }));
-    state.proxyValue = {
-        ...state.proxyValue,
-        value: convertedValue,
-    };
-};
-const checkValue = () => {
-    if (state.proxyValue?.value?.length) {
-        if (state.proxyValue.value.some((item) => item.fieldKey === undefined)) return false;
-        if (state.proxyValue.value.some((item) => item.width === undefined || item.width === 0)) return false;
-    }
-    return true;
+
+    props.fieldManager.setFieldValue(FIELD_KEY, {
+        widthInfos: convertedValue,
+    });
 };
 
 /* Event */
@@ -113,43 +122,13 @@ const handleChangeCustomFieldWidth = (key: string, value: number) => {
     convertAndApplyCustomWidthInfo(state.customWidthItems);
 };
 
-const handleUpdateToggle = (value: boolean) => {
-    state.proxyValue = {
-        toggleValue: value,
-    };
-    if (!value) {
-        state.proxyValue = undefined;
-    }
-};
-
-watch(() => props.value, (changed) => {
-    if (changed === undefined) {
-        state.proxyValue = {
-            toggleValue: false,
-        };
-        state.customWidthItems = [];
-        emit('update:is-valid', true);
-    } else emit('update:is-valid', checkValue());
-});
-
 
 onMounted(() => {
-    emit('update:is-valid', true);
-    if (props.value?.toggleValue) {
-        state.proxyValue = {
-            toggleValue: props.value.toggleValue,
-            value: props.value?.value ?? [],
-        };
-        state.customWidthItems = state.proxyValue.value.map((item) => ({
-            key: getRandomId(),
-            fieldKey: item.fieldKey,
-            width: item.width,
-        }));
-    } else {
-        state.proxyValue = {
-            toggleValue: false,
-        };
-    }
+    state.customWidthItems = state.fieldValue.widthInfos.map((item) => ({
+        key: getRandomId(),
+        fieldKey: item.fieldKey,
+        width: item.width,
+    }));
 });
 
 
@@ -159,16 +138,11 @@ onMounted(() => {
     <div class="widget-field-custom-table-column-width">
         <div class="field-header">
             <p-field-title>{{ $t('COMMON.WIDGETS.CUSTOM_TABLE_COLUMN_WIDTH.CUSTOM_TABLE_COLUMN_WIDTH') }}</p-field-title>
-            <p-toggle-button :value="state.proxyValue?.toggleValue"
-                             @update:value="handleUpdateToggle"
-            />
         </div>
         <p class="description">
             {{ $t('COMMON.WIDGETS.CUSTOM_TABLE_COLUMN_WIDTH.DESCRIPTION') }}
         </p>
-        <div v-if="state.proxyValue?.toggleValue"
-             class="field-contents-wrapper"
-        >
+        <div class="field-contents-wrapper">
             <div class="contents-box">
                 <div v-if="state.customWidthItems.length"
                      class="field-title-wrapper"

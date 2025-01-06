@@ -21,7 +21,12 @@ const heatmap: WidgetConfig = {
                 defaultIndex: 0,
             },
         },
-        tableDataField: {},
+        dataField: {
+            options: {
+                multiSelectable: true,
+                allSelected: true,
+            },
+        },
         colorSchema: {},
     },
     optionalFieldsSchema: {

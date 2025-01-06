@@ -4,6 +4,7 @@ import {
     computed, defineExpose, reactive, ref, watch,
 } from 'vue';
 
+import { useQuery } from '@tanstack/vue-query';
 import dayjs from 'dayjs';
 import type { BarSeriesOption } from 'echarts/charts';
 import type { EChartsType } from 'echarts/core';
@@ -13,109 +14,111 @@ import {
 } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import { numberFormatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
+import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
+import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
+import { i18n } from '@/translations';
 
-import type { APIErrorToast } from '@/common/composables/error/errorHandler';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
-import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
-import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
+import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
+import { DATE_FIELD, WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
+import { DATE_FORMAT, SUB_TOTAL_NAME } from '@/common/modules/widgets/_constants/widget-field-constant';
 import {
-    getReferenceLabel, getRefinedDynamicFieldData,
+    normalizeAndSerializeVars,
+} from '@/common/modules/widgets/_helpers/global-variable-helper';
+import {
+    normalizeAndSerializeDataTableOptions,
+} from '@/common/modules/widgets/_helpers/widget-data-table-helper';
+import {
+    getReferenceLabel,
     getWidgetDateFields,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
-import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
+import { getFormattedNumber, getWidgetDataTable } from '@/common/modules/widgets/_helpers/widget-helper';
 import {
-    getWidgetLoadApiQuery,
-    getWidgetLoadApiQueryDateRange,
+    getWidgetLoadApiQueryDateRange, getWidgetLoadApiQuerySort,
 } from '@/common/modules/widgets/_helpers/widget-load-helper';
+import type { DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
 import type { DateFormatValue } from '@/common/modules/widgets/_widget-fields/date-format/type';
 import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { DisplaySeriesLabelValue } from '@/common/modules/widgets/_widget-fields/display-series-label/type';
+import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/granularity/type';
 import type { LegendValue } from '@/common/modules/widgets/_widget-fields/legend/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
-import type { TableDataFieldValue } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
 import type { TooltipNumberFormatValue } from '@/common/modules/widgets/_widget-fields/tooltip-number-format/type';
 import type { YAxisValue } from '@/common/modules/widgets/_widget-fields/y-axis/type';
-import type { DateRange, DynamicFieldData, StaticFieldData } from '@/common/modules/widgets/types/widget-data-type';
+import type { DateRange, WidgetLoadResponse } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/common/modules/widgets/types/widget-display-type';
 
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
 
-type Data = ListResponse<{
-    [key: string]: string|number;
-}>;
+
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
 const { dateRange } = useWidgetDateRange({
-    dateRangeFieldValue: computed(() => (props.widgetOptions?.dateRange as DateRangeValue)),
+    dateRangeFieldValue: computed(() => (props.widgetOptions?.dateRange?.value as DateRangeValue)),
     baseOnDate: computed(() => props.dashboardOptions?.date_range?.end),
-    granularity: computed<string>(() => props.widgetOptions?.granularity as string),
+    granularity: computed<GranularityValue>(() => props.widgetOptions?.granularity?.value as GranularityValue),
 });
 const chartContext = ref<HTMLElement|null>(null);
 const state = reactive({
-    loading: false,
-    errorMessage: undefined as string|undefined,
-    data: null as Data | null,
+    runQueries: false,
+    isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
+    dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
+    isPivotDataTable: computed<boolean>(() => state.dataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
+
+    data: computed<WidgetLoadResponse | null>(() => queryResult?.data?.value || null),
     yAxisData: computed<string[]>(() => {
         if (!state.data?.results?.length) return [];
-        if (isDateField(state.yAxisField)) {
-            const _isSeparatedDate = state.yAxisField !== DATE_FIELD.DATE;
-            return getWidgetDateFields(state.granularity, state.widgetDateRange.start, state.widgetDateRange.end, _isSeparatedDate);
+        if (isDateField(widgetOptionsState.yAxisInfo?.data)) {
+            const _isSeparatedDate = widgetOptionsState.yAxisInfo?.data !== DATE_FIELD.DATE;
+            return getWidgetDateFields(widgetOptionsState.granularityInfo?.granularity, state.widgetDateRange.start, state.widgetDateRange.end, _isSeparatedDate);
         }
-        return state.data.results.map((d) => d[state.yAxisField] as string) || [];
+        const _yAxisData: string[] = state.data.results.map((d) => d[widgetOptionsState.yAxisInfo?.data as string] as string) || [];
+        return Array.from(new Set(_yAxisData)).reverse();
     }),
     chartData: [],
     chart: null as EChartsType | null,
     unitMap: computed<Record<string, string>>(() => widgetFrameProps.value.unitMap || {}),
+    dataField: computed<string>(() => widgetOptionsState.dataFieldInfo?.data?.[0] || ''),
     chartOptions: computed<BarSeriesOption>(() => ({
         color: MASSIVE_CHART_COLORS,
         legend: {
             type: 'scroll',
-            show: state.showLegends,
+            show: widgetOptionsState.legendInfo?.toggleValue,
             bottom: 0,
             left: 0,
             icon: 'circle',
             itemWidth: 10,
             itemHeight: 10,
             formatter: (val) => {
-                if (state.dataField === DATE_FIELD.DATE) return dayjs.utc(val).format(state.dateFormat);
-                return getReferenceLabel(props.allReferenceTypeInfo, state.dataField, val);
+                if (state.isPivotDataTable) return getReferenceLabel(props.allReferenceTypeInfo, state.dataField, val);
+                return val;
             },
         },
         tooltip: {
             formatter: (params) => {
                 const _params = Array.isArray(params) ? params : [params];
                 return _params.map((p) => {
-                    const _unit: string|undefined = state.unitMap[state.dynamicFieldInfo?.criteria || p.seriesName];
-                    let _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.dataField, p.seriesName);
+                    const _unit: string|undefined = state.unitMap[p.seriesName];
+                    const _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.dataField, p.seriesName);
                     let _value = numberFormatter(p.value) || '';
-                    if (state.tooltipNumberFormat?.toggleValue) {
-                        if (state.dataFieldInfo?.fieldType === 'staticField') {
-                            _value = getFormattedNumber(p.value, p.seriesName, state.numberFormat, _unit);
-                        } else {
-                            _value = getFormattedNumber(p.value, state.dynamicFieldInfo?.criteria, state.numberFormat, _unit);
-                        }
+                    if (widgetOptionsState.tooltipNumberFormatInfo?.toggleValue) {
+                        const columnFieldForPivot = state.dataTable?.options.PIVOT?.fields?.column;
+                        const fieldName = (state.isPivotDataTable && columnFieldForPivot) ? columnFieldForPivot : p.seriesName;
+                        const numberFormat = widgetOptionsState.numberFormatInfo[fieldName];
+                        _value = getFormattedNumber(p.value, numberFormat, _unit);
                     }
-                    if (state.dataField === DATE_FIELD.DATE) {
-                        _seriesName = dayjs.utc(_seriesName).format(state.dateFormat);
-                    }
-                    if (_unit) _seriesName = `${_seriesName} (${_unit})`;
-                    const _name = getReferenceLabel(props.allReferenceTypeInfo, state.yAxisField, params.name);
-                    return `${_seriesName}<br>${p.marker} ${_name}: <b>${_value}</b>`;
+                    return `${p.marker} ${_seriesName}: <b>${_value}</b>`;
                 }).join('<br>');
             },
         },
@@ -138,176 +141,132 @@ const state = reactive({
                     if (state.yAxisField === DATE_FIELD.DATE) {
                         return dayjs.utc(val).format(state.dateFormat);
                     }
-                    return getReferenceLabel(props.allReferenceTypeInfo, state.yAxisField, val);
+                    return getReferenceLabel(props.allReferenceTypeInfo, widgetOptionsState.yAxisInfo?.data, val);
                 },
             },
         },
         series: state.chartData,
     })),
-    // required fields
-    granularity: computed<string>(() => props.widgetOptions?.granularity as string),
-    yAxisField: computed<string>(() => (props.widgetOptions?.yAxis as YAxisValue)?.value),
-    yAxisCount: computed<number>(() => (props.widgetOptions?.yAxis as YAxisValue)?.count),
-    dataFieldInfo: computed<TableDataFieldValue>(() => props.widgetOptions?.tableDataField as TableDataFieldValue),
-    dynamicFieldInfo: computed<TableDataFieldValue['dynamicFieldInfo']>(() => state.dataFieldInfo?.dynamicFieldInfo),
-    staticFieldInfo: computed<TableDataFieldValue['staticFieldInfo']>(() => state.dataFieldInfo?.staticFieldInfo),
-    dataField: computed<string|string[]|undefined>(() => {
-        if (state.dataFieldInfo?.fieldType === 'staticField') return state.staticFieldInfo?.fieldValue;
-        return state.dynamicFieldInfo?.fieldValue;
-    }),
-    dynamicFieldValue: computed<string[]>(() => state.dynamicFieldInfo?.fixedValue || []),
     widgetDateRange: computed<DateRange>(() => {
         let _start = dateRange.value.start;
         let _end = dateRange.value.end;
-        if (isDateField(state.yAxisField)) {
-            [_start, _end] = getWidgetDateRange(state.granularity, _end, state.yAxisCount);
-        } else if (isDateField(state.dataField)) {
-            let subtract = state.dynamicFieldInfo.count;
-            if (state.dynamicFieldInfo?.valueType === 'fixed') {
-                if (state.granularity === GRANULARITY.YEARLY) subtract = 3;
-                if (state.granularity === GRANULARITY.MONTHLY) subtract = 12;
-                if (state.granularity === GRANULARITY.DAILY) subtract = 30;
-            }
-            [_start, _end] = getWidgetDateRange(state.granularity, _end, subtract);
+        if (isDateField(widgetOptionsState.yAxisInfo?.data)) {
+            [_start, _end] = getWidgetDateRange(widgetOptionsState.granularityInfo?.granularity, _end, widgetOptionsState.yAxisInfo?.count);
         }
         return { start: _start, end: _end };
     }),
-    // optional fields
-    showLegends: computed<boolean>(() => (props.widgetOptions?.legend as LegendValue)?.toggleValue),
     dateFormat: computed<string|undefined>(() => {
-        const _dateFormat = (props.widgetOptions?.dateFormat as DateFormatValue)?.value || 'MMM DD, YYYY';
-        return DATE_FORMAT?.[_dateFormat]?.[state.granularity];
+        const _dateFormat = (props.widgetOptions?.dateFormat?.value as DateFormatValue)?.format || 'MMM DD, YYYY';
+        return DATE_FORMAT?.[_dateFormat]?.[widgetOptionsState.granularityInfo?.granularity];
     }),
-    numberFormat: computed<NumberFormatValue>(() => props.widgetOptions?.numberFormat as NumberFormatValue),
-    tooltipNumberFormat: computed<TooltipNumberFormatValue>(() => props.widgetOptions?.tooltipNumberFormat as TooltipNumberFormatValue),
-    displaySeriesLabel: computed(() => (props.widgetOptions?.displaySeriesLabel as DisplaySeriesLabelValue)),
 });
-const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
-    dateRange,
-    errorMessage: computed(() => state.errorMessage),
-    widgetLoading: computed(() => state.loading),
-    noData: computed(() => (state.data ? !state.data.results?.length : false)),
+
+const widgetOptionsState = reactive({
+    granularityInfo: computed<GranularityValue>(() => props.widgetOptions?.granularity?.value as GranularityValue),
+    yAxisInfo: computed<YAxisValue>(() => props.widgetOptions?.yAxis?.value as YAxisValue),
+    dataFieldInfo: computed<DataFieldValue>(() => props.widgetOptions?.dataField?.value as DataFieldValue),
+    legendInfo: computed<LegendValue>(() => props.widgetOptions?.legend?.value as LegendValue),
+    dateFormatInfo: computed<DateFormatValue>(() => props.widgetOptions?.dateFormat?.value as DateFormatValue),
+    numberFormatInfo: computed<NumberFormatValue>(() => props.widgetOptions?.numberFormat?.value as NumberFormatValue),
+    tooltipNumberFormatInfo: computed<TooltipNumberFormatValue>(() => props.widgetOptions?.tooltipNumberFormat?.value as TooltipNumberFormatValue),
+    displaySeriesLabelInfo: computed<DisplaySeriesLabelValue>(() => props.widgetOptions?.displaySeriesLabel?.value as DisplaySeriesLabelValue),
 });
 
 /* Api */
-const privateWidgetFetcher = getCancellableFetcher<PrivateWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.privateWidget.load);
-const publicWidgetFetcher = getCancellableFetcher<PublicWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.publicWidget.load);
-const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
-    if (props.widgetState === 'INACTIVE') return undefined;
-    try {
-        state.loading = true;
-        const _isPrivate = props.widgetId.startsWith('private');
-        const _fetcher = _isPrivate ? privateWidgetFetcher : publicWidgetFetcher;
-        const { status, response } = await _fetcher({
-            widget_id: props.widgetId,
-            query: {
-                granularity: state.granularity,
-                ...(!isDateField(state.yAxisField) && { page: { start: 1, limit: state.yAxisCount } }),
-                ...getWidgetLoadApiQueryDateRange(state.granularity, dateRange.value),
-                ...getWidgetLoadApiQuery(state.dataFieldInfo, state.yAxisField),
-            },
-            vars: props.dashboardVars,
-        });
-        if (status === 'succeed') {
-            state.errorMessage = undefined;
-            state.loading = false;
-            return response;
-        }
-        return undefined;
-    } catch (e: any) {
-        state.loading = false;
-        state.errorMessage = e.message;
-        ErrorHandler.handleError(e);
-        return ErrorHandler.makeAPIErrorToast(e);
-    }
+const fetchWidgetData = async (params: PrivateWidgetLoadParameters|PublicWidgetLoadParameters): Promise<WidgetLoadResponse> => {
+    const defaultFetcher = state.isPrivateWidget
+        ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, WidgetLoadResponse>
+        : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, WidgetLoadResponse>;
+    const res = await defaultFetcher(params);
+    return res;
 };
+
+const queryKey = computed(() => [
+    'widget-load-stacked-horizontal-bar-chart',
+    props.widgetId,
+    {
+        start: dateRange.value.start,
+        end: dateRange.value.end,
+        granularity: widgetOptionsState.granularityInfo?.granularity,
+        dataTableId: state.dataTable?.data_table_id,
+        dataTableOptions: normalizeAndSerializeDataTableOptions(state.dataTable?.options || {}),
+        dataTables: normalizeAndSerializeDataTableOptions((props.dataTables || []).map((d) => d?.options || {})),
+        groupBy: widgetOptionsState.yAxisInfo?.data,
+        count: widgetOptionsState.yAxisInfo?.count,
+        vars: normalizeAndSerializeVars(props.dashboardVars),
+    },
+]);
+
+const queryResult = useQuery({
+    queryKey,
+    queryFn: () => fetchWidgetData({
+        widget_id: props.widgetId,
+        granularity: widgetOptionsState.granularityInfo?.granularity,
+        group_by: widgetOptionsState.yAxisInfo?.data ? [widgetOptionsState.yAxisInfo?.data] : [],
+        sort: getWidgetLoadApiQuerySort(widgetOptionsState.yAxisInfo?.data as string, widgetOptionsState.dataFieldInfo?.data as string[], state.isPivotDataTable),
+        page: { start: 0, limit: widgetOptionsState.yAxisInfo?.count },
+        vars: props.dashboardVars,
+        ...getWidgetLoadApiQueryDateRange(widgetOptionsState.granularityInfo?.granularity, dateRange.value),
+    }),
+    enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable && state.runQueries),
+    staleTime: WIDGET_LOAD_STALE_TIME,
+});
+
+const widgetLoading = computed<boolean>(() => queryResult.isLoading.value || queryResult.isRefetching.value);
+const errorMessage = computed<string|undefined>(() => {
+    if (!state.dataTable) return i18n.t('COMMON.WIDGETS.NO_DATA_TABLE_ERROR_MESSAGE');
+    return queryResult.error?.value?.message;
+});
 
 /* Util */
-const getDynamicFieldData = (rawData: DynamicFieldData, threshold: number): any[] => {
-    // get refined data and series fields
-    const [_refinedResults, _seriesFields] = getRefinedDynamicFieldData(rawData, state.dynamicFieldInfo, state.yAxisField);
-    const _unit: string|undefined = state.unitMap[state.dynamicFieldInfo?.criteria];
+const drawChart = (rawData?: WidgetLoadResponse|null) => {
+    if (isEmpty(rawData)) return;
 
-    // get chart data
     const _seriesData: any[] = [];
-    _seriesFields.forEach((field) => {
-        const _data: number[] = [];
-        state.yAxisData.forEach((d) => {
-            const _result = _refinedResults.find((result) => result[state.yAxisField] === d);
-            const _value = _result?.[state.dynamicFieldInfo?.criteria].find((v) => v[state.dataField] === field);
-            _data.push(_value?.value || 0);
-        });
-        _seriesData.push({
-            name: field,
-            type: 'bar',
-            stack: true,
-            barMaxWidth: 50,
-            label: {
-                show: !!state.displaySeriesLabel?.toggleValue,
-                position: state.displaySeriesLabel?.position,
-                rotate: state.displaySeriesLabel?.rotate,
-                fontSize: 10,
-                formatter: (p) => {
-                    if (p.value < threshold) return '';
-                    return getFormattedNumber(p.value, state.dataField, state.numberFormat, _unit);
-                },
-            },
-            data: _data,
-        });
-    });
+    let _dataFields: string[] = widgetOptionsState.dataFieldInfo?.data as string[] || [];
 
-    return _seriesData;
-};
-const getStaticFieldData = (rawData: StaticFieldData, threshold: number): any[] => {
-    const _seriesData: any[] = [];
-    state.dataField.forEach((field) => {
-        const _unit: string|undefined = state.unitMap[field];
+    if (state.isPivotDataTable) {
+        const _excludeFields = [...Object.keys(rawData?.labels_info ?? {}), SUB_TOTAL_NAME];
+        _dataFields = rawData?.order?.filter((v) => !_excludeFields.includes(v)) || [];
+    }
+    _dataFields.forEach((_dataField) => {
+        const _unit: string|undefined = state.unitMap[_dataField];
         _seriesData.push({
-            name: field,
+            name: _dataField,
             type: 'bar',
             stack: true,
             barMaxWidth: 50,
             data: state.yAxisData.map((d) => {
-                const _data = rawData.results?.find((v) => v[state.yAxisField] === d);
-                return _data ? _data[field] : 0;
+                const _data = rawData.results?.find((v) => v[widgetOptionsState.yAxisInfo?.data as string] === d);
+                return _data?.[_dataField] || 0;
             }),
             label: {
-                show: !!state.displaySeriesLabel?.toggleValue,
-                position: state.displaySeriesLabel?.position,
-                rotate: state.displaySeriesLabel?.rotate,
+                show: !!widgetOptionsState.displaySeriesLabelInfo?.toggleValue,
+                position: widgetOptionsState.displaySeriesLabelInfo?.position,
+                rotate: widgetOptionsState.displaySeriesLabelInfo?.rotate,
                 fontSize: 10,
                 formatter: (p) => {
-                    if (p.value < threshold) return '';
-                    return getFormattedNumber(p.value, field, state.numberFormat, _unit);
+                    if (!p.value) return '';
+                    const columnFieldForPivot = state.dataTable?.options.PIVOT?.fields?.column;
+                    const fieldName = (state.isPivotDataTable && columnFieldForPivot) ? columnFieldForPivot : _dataField;
+                    const numberFormat = widgetOptionsState.numberFormatInfo[fieldName];
+                    return getFormattedNumber(p.value, numberFormat, _unit);
                 },
             },
         });
     });
-    return _seriesData;
-};
-const drawChart = (rawData?: Data|null) => {
-    if (isEmpty(rawData)) return;
-
-    const _maxTotalCount = rawData?.results?.[0]?.[`_total_${state.dataField}`] ?? 0;
-    const _threshold = _maxTotalCount * 0.08;
-
-    // get converted chart data
-    let _seriesData: any[];
-    if (state.dataFieldInfo?.fieldType === 'staticField') {
-        _seriesData = getStaticFieldData(rawData, _threshold);
-    } else {
-        _seriesData = getDynamicFieldData(rawData, _threshold);
-    }
     state.chartData = _seriesData;
 };
-const loadWidget = async (): Promise<Data|APIErrorToast> => {
-    const res = await fetchWidget();
-    if (!res) return state.data;
-    if (typeof res === 'function') return res;
-    state.data = res;
-    drawChart(state.data);
-    return state.data;
+const loadWidget = (forceLoad?: boolean) => {
+    state.runQueries = true;
+    if (forceLoad) queryResult.refetch();
 };
+const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
+    dateRange,
+    errorMessage,
+    widgetLoading,
+    noData: computed(() => (state.data ? !state.data.results?.length : false)),
+});
 
 /* Watcher */
 watch([() => state.chartData, () => chartContext.value], ([, chartCtx]) => {
@@ -316,12 +275,20 @@ watch([() => state.chartData, () => chartContext.value], ([, chartCtx]) => {
         state.chart.setOption(state.chartOptions, true);
     }
 });
+watch([() => state.data, () => props.widgetOptions], ([newData]) => {
+    drawChart(newData);
+});
+
 
 useWidgetInitAndRefresh({ props, emit, loadWidget });
 useResizeObserver(chartContext, throttle(() => {
     state.chart?.resize();
 }, 500));
-defineExpose<WidgetExpose<Data>>({
+watch(() => props.dataTableId, async (newDataTableId) => {
+    if (!newDataTableId) return;
+    state.dataTable = await getWidgetDataTable(newDataTableId);
+}, { immediate: true });
+defineExpose<WidgetExpose>({
     loadWidget,
 });
 </script>

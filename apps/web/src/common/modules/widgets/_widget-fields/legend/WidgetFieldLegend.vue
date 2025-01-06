@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import {
     PFieldGroup, PFieldTitle, PToggleButton, PSelectDropdown,
@@ -7,23 +7,21 @@ import {
 
 import { i18n } from '@/translations';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
+import {
+    widgetFieldDefaultValueMap,
+} from '@/common/modules/widgets/_widget-field-value-manager/constant/default-value-registry';
 import type { LegendValue, LegendOptions } from '@/common/modules/widgets/_widget-fields/legend/type';
-import type { WidgetFieldComponentProps, WidgetFieldComponentEmit } from '@/common/modules/widgets/types/widget-field-type';
+import type {
+    WidgetFieldComponentProps,
+} from '@/common/modules/widgets/types/widget-field-type';
 
+const FIELD_KEY = 'legend';
 
-const emit = defineEmits<WidgetFieldComponentEmit<LegendValue>>();
-const props = withDefaults(defineProps<WidgetFieldComponentProps<LegendOptions, LegendValue>>(), {
-    widgetFieldSchema: () => ({
-        options: {
-            default: false,
-        },
-    }),
-});
+const props = defineProps<WidgetFieldComponentProps<LegendOptions>>();
 
 const state = reactive({
-    proxyValue: useProxyValue<LegendValue>('value', props, emit),
-    showPositionField: computed<boolean>(() => !!props.widgetFieldSchema.options?.showPositionField),
+    fieldValue: computed<LegendValue>(() => props.fieldManager.data[FIELD_KEY].value),
+    showPositionField: computed<boolean>(() => !!props.widgetFieldSchema?.options?.showPositionField),
     positionMenuItems: computed(() => ([
         { name: 'right', label: i18n.t('COMMON.WIDGETS.LEGEND.RIGHT') },
         { name: 'left', label: i18n.t('COMMON.WIDGETS.LEGEND.LEFT') },
@@ -34,46 +32,34 @@ const state = reactive({
 
 const handleUpdateToggleValue = (val: boolean) => {
     if (val) {
-        state.proxyValue = {
-            toggleValue: val,
-            position: state.showPositionField ? 'right' : undefined,
-        };
+        props.fieldManager.setFieldValue(FIELD_KEY, {
+            toggleValue: true,
+            position: state.showPositionField ? widgetFieldDefaultValueMap.legend.position : undefined,
+        });
     } else {
-        state.proxyValue = {
-            toggleValue: val,
-            position: undefined,
-        };
+        props.fieldManager.setFieldValue(FIELD_KEY, {
+            toggleValue: false,
+        });
     }
 };
 const handleSelectPosition = (val: 'right'|'bottom'|'left'|'top') => {
-    state.proxyValue = {
-        ...state.proxyValue,
+    props.fieldManager.setFieldValue(FIELD_KEY, {
+        ...state.fieldValue,
         position: val,
-    };
+    });
 };
 
-onMounted(() => {
-    emit('update:is-valid', true);
-    const _toggleValue = props.value?.toggleValue ?? props.widgetFieldSchema.options?.default ?? false;
-    let _position = props.value?.position;
-    if (_toggleValue && state.showPositionField && !_position) {
-        _position = 'right';
-    }
-    const _value: LegendValue = { toggleValue: _toggleValue };
-    if (_position) _value.position = _position;
-    state.proxyValue = _value;
-});
 </script>
 
 <template>
     <div class="widget-field-legend">
         <div class="top-part">
             <p-field-title>{{ $t('COMMON.WIDGETS.LEGEND.LEGEND') }}</p-field-title>
-            <p-toggle-button :value="state.proxyValue?.toggleValue"
+            <p-toggle-button :value="state.fieldValue?.toggleValue"
                              @update:value="handleUpdateToggleValue"
             />
         </div>
-        <p-field-group v-if="props.widgetFieldSchema.options?.showPositionField"
+        <p-field-group v-if="state.fieldValue?.toggleValue && props.widgetFieldSchema?.options?.showPositionField"
                        :label="$t('COMMON.WIDGETS.LEGEND.POSITION')"
                        style-type="secondary"
                        class="position-wrapper"
@@ -81,7 +67,7 @@ onMounted(() => {
             <p-select-dropdown use-fixed-menu-style
                                reset-selection-on-menu-close
                                :menu="state.positionMenuItems"
-                               :selected="state.proxyValue?.position"
+                               :selected="state.fieldValue?.position"
                                block
                                @select="handleSelectPosition"
             />
