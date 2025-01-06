@@ -39,7 +39,7 @@ const {
     fileIds,
 } = useEditorContentTransformer({
     contents: computed(() => fieldValue.value ?? ''),
-    contentType: 'markdown',
+    contentsType: 'markdown',
     resourceGroup: 'PROJECT',
     fileIds: props.files.map((f) => f.file_id),
 });
@@ -61,7 +61,7 @@ watch(fileIds, (ids) => {
                             class="my-1"
                             :contents="editorContents"
                             show-in-box
-                            content-type="markdown"
+                            contents-type="markdown"
         />
         <text-editor v-else
                      class="my-1"
@@ -69,7 +69,7 @@ watch(fileIds, (ids) => {
                      :image-uploader="fileUploader"
                      :placeholder="props.field.options?.example"
                      :invalid="isInvalid"
-                     content-type="markdown"
+                     contents-type="markdown"
                      @update:value="editorContents = $event"
         />
     </p-field-group>

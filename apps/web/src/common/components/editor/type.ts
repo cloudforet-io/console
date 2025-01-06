@@ -1,1 +1,1 @@
-export type TextEditorContentType = 'html' | 'markdown' | 'plain';
+export type TextEditorContentsType = 'html' | 'markdown' | 'plain';

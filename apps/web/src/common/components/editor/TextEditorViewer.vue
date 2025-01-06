@@ -7,19 +7,19 @@ import DOMPurify from 'dompurify';
 
 import { useMarkdown } from '@cloudforet/mirinae';
 
-import type { TextEditorContentType } from '@/common/components/editor/type';
+import type { TextEditorContentsType } from '@/common/components/editor/type';
 
 import { loadMonospaceFonts } from '@/styles/fonts';
 
 interface Props {
     contents?: string;
     showInBox?: boolean
-    contentType?: TextEditorContentType;
+    contentsType?: TextEditorContentsType;
 }
 const props = withDefaults(defineProps<Props>(), {
     contents: '',
     showInBox: false,
-    contentType: 'plain',
+    contentsType: 'plain',
 });
 
 loadMonospaceFonts();
@@ -29,9 +29,9 @@ const { sanitizedHtml } = useMarkdown({
     inlineCodeClass: 'inline-code',
 });
 const refinedContents = computed(() => {
-    if (props.contentType === 'markdown') {
+    if (props.contentsType === 'markdown') {
         return sanitizedHtml.value;
-    } if (props.contentType === 'html') {
+    } if (props.contentsType === 'html') {
         return DOMPurify.sanitize(props.contents);
     }
     // plain

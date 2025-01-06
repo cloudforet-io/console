@@ -8,6 +8,8 @@ import { isEqual } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ContentsType } from '@/schema/_common/type';
+
 import { getFileDownloadUrl } from '@/lib/file-manager';
 import type { FileManagerResourceGroupType } from '@/lib/file-manager/type';
 
@@ -24,16 +26,18 @@ const getRef = <T>(v: T|Ref<T>|Readonly<Ref<T>>): Ref<T> => {
     }
     return ref<T>(v) as Ref<T>;
 };
+const decodeHtmlEntities = (encodedHtml: string): string => new DOMParser().parseFromString(encodedHtml, 'text/html').documentElement.textContent ?? '';
+
 export const useEditorContentTransformer = (op: {
     contents?: string|Ref<string>|Readonly<Ref<string>>;
-    contentType: 'html'|'markdown'|Ref<'html'|'markdown'>;
+    contentsType: ContentsType|Ref<ContentsType>;
     fileIds?: string[]|Ref<string[]>|Readonly<Ref<string[]>>;
     resourceGroup: FileManagerResourceGroupType|Ref<FileManagerResourceGroupType>;
     resourceId?: string|Ref<string|undefined>;
 }) => {
     const contents = getRef<string>(op.contents ?? '');
     const fileIds = getRef<string[]>(op.fileIds ?? []);
-    const contentType = isRef(op.contentType) ? op.contentType : ref<'html'|'markdown'>(op.contentType);
+    const contentsType = isRef(op.contentsType) ? op.contentsType : ref<ContentsType>(op.contentsType);
     const resourceGroup = isRef(op.resourceGroup) ? op.resourceGroup : ref<FileManagerResourceGroupType>(op.resourceGroup);
     const resourceId = getRef<string|undefined>(op.resourceId);
 
@@ -62,17 +66,20 @@ export const useEditorContentTransformer = (op: {
     };
 
     const transformEditorContentForUpload = (content: string): string => {
-        if (contentType.value === 'markdown') {
+        if (contentsType.value === 'markdown') {
             return transformMarkdownContentForUpload(content);
         }
         return transformHtmlContentForUpload(content);
     };
 
     const htmlFileImagePattern = /<img\s+[^>]*src="<(file-[^"]+)>"[^>]*>/g;
-    const transformHtmlContentForView = (content: string): string => content.replace(htmlFileImagePattern, (match, url) => {
-        const newUrl = getFileDownloadUrl(replaceImageUrl(url), resourceGroup.value);
-        return match.replace(url, newUrl);
-    });
+    const transformHtmlContentForView = (content: string): string => {
+        const decodedHtml = decodeHtmlEntities(content);
+        return decodedHtml.replace(htmlFileImagePattern, (match, url) => {
+            const newUrl = getFileDownloadUrl(replaceImageUrl(url), resourceGroup.value);
+            return match.replace(url, newUrl);
+        });
+    };
 
     const markdownFileImagePattern = /!\[([^\]]*)\]\(<(file-[^>]+)>\)/g;
     const transformMarkdownContentForView = (content: string): string => {
@@ -81,14 +88,14 @@ export const useEditorContentTransformer = (op: {
     };
 
     const transformEditorContentForView = (content: string): string => {
-        if (contentType.value === 'markdown') {
+        if (contentsType.value === 'markdown') {
             return transformMarkdownContentForView(content);
         }
         return transformHtmlContentForView(content);
     };
 
     const getFileIdsFromContents = (content: string): string[] => {
-        if (contentType.value === 'markdown') {
+        if (contentsType.value === 'markdown') {
             return Array.from(content.matchAll(markdownFileImagePattern)).map((match) => match[2]);
         }
         return Array.from(content.matchAll(htmlFileImagePattern)).map((match) => match[1]);

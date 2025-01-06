@@ -115,7 +115,7 @@ onUnmounted(() => {
         />
         <div class="mb-3">
             <text-editor :placeholder="$t('OPSFLOW.TASK_BOARD.COMMENT')"
-                         content-type="markdown"
+                         contents-type="markdown"
                          :show-undo-redo-buttons="false"
                          :value="contents"
                          :style="{minHeight: '5rem'}"
@@ -162,7 +162,7 @@ onUnmounted(() => {
             </template>
             <template #default="{data}">
                 <div :class="{'pl-10': !!data.source}">
-                    <text-editor-viewer content-type="markdown"
+                    <text-editor-viewer contents-type="markdown"
                                         :contents="data.comment"
                     />
                 </div>

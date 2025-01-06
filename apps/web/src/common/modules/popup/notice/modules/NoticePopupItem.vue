@@ -32,7 +32,7 @@ const {
     editorContents,
 } = useEditorContentTransformer({
     contents: computed(() => (props.item ? props.item.contents : '')),
-    contentType: 'html',
+    contentsType: computed(() => (props.item ? props.item.contents_type : 'markdown')),
     resourceGroup: computed(() => {
         if (!props.item) return 'PUBLIC';
         return props.item.resource_group;
@@ -68,7 +68,7 @@ const handleClose = async (neverShowPopup?: boolean): Promise<void> => {
             </div>
             <p-divider class="!my-4" />
             <text-editor-viewer :contents="editorContents"
-                                :content-type="props.item ? props.item.contents_type : 'markdown'"
+                                :contents-type="props.item ? props.item.contents_type : 'markdown'"
             />
         </template>
         <template #footer-extra>

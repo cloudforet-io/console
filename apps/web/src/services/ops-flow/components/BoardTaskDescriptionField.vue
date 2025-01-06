@@ -16,7 +16,7 @@ const props = defineProps<{
 
 const { editorContents } = useEditorContentTransformer({
     contents: computed(() => props.description ?? ''),
-    contentType: 'markdown',
+    contentsType: 'markdown',
     resourceGroup: 'PROJECT',
 });
 </script>
@@ -27,7 +27,7 @@ const { editorContents } = useEditorContentTransformer({
                          :line-clamp="1"
     >
         <text-editor-viewer :contents="editorContents"
-                            content-type="markdown"
+                            contents-type="markdown"
         />
     </p-collapsible-panel>
 </template>

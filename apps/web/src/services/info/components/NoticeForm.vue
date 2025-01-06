@@ -15,7 +15,7 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 
 import { SpaceRouter } from '@/router';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
-import type { ResourceGroupType } from '@/schema/_common/type';
+import type { ContentsType, ResourceGroupType } from '@/schema/_common/type';
 import type { PostUpdateParameters } from '@/schema/board/post/api-verbs/update';
 import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
@@ -94,14 +94,14 @@ const {
     },
 });
 
-const contentType = ref('markdown');
+const contentsType = ref<ContentsType>('markdown');
 const resourceGroup = computed(() => (workspaceState.selectedRadioIdx === 0 ? 'DOMAIN' : 'WORKSPACE'));
 const { fileUploader } = useFileUploader({ resourceGroup });
 const {
     contents: uploadContents,
     editorContents,
 } = useEditorContentTransformer({
-    contentType,
+    contentsType,
     resourceGroup,
     fileIds: toRef(state, 'fileIds'), // auto update to state.fileIds
     contents,
@@ -173,7 +173,7 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
     setForm('writerName', notice?.writer ?? storeState.userName);
     setForm('noticeTitle', notice?.title ?? '');
     setForm('contents', notice?.contents ?? '');
-    contentType.value = notice?.contents_type ?? 'markdown';
+    contentsType.value = notice?.contents_type ?? 'markdown';
 
     if (notice?.workspaces?.includes('*')) {
         workspaceState.selectedRadioIdx = 0;
@@ -260,7 +260,7 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
                         <text-editor :value="editorContents"
                                      :image-uploader="fileUploader"
                                      :invalid="invalid"
-                                     :content-type="contentType"
+                                     :contents-type="contentsType"
                                      @update:value="editorContents = $event"
                         />
                     </template>

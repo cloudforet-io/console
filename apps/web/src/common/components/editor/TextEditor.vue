@@ -14,9 +14,12 @@ import type { AnyExtension } from '@tiptap/vue-2';
 import { Editor, EditorContent } from '@tiptap/vue-2';
 import { Markdown } from 'tiptap-markdown';
 
+import { PTextarea } from '@cloudforet/mirinae';
+
 import { createImageExtension } from '@/common/components/editor/extensions/image';
 import type { ImageUploader } from '@/common/components/editor/extensions/image/type';
 import MenuBar from '@/common/components/editor/MenuBar.vue';
+import type { TextEditorContentsType } from '@/common/components/editor/type';
 
 import { loadMonospaceFonts } from '@/styles/fonts';
 
@@ -25,7 +28,7 @@ interface Props {
     imageUploader?: ImageUploader;
     invalid?: boolean;
     placeholder?: string;
-    contentType?: 'html'|'markdown';
+    contentsType?: TextEditorContentsType;
     showUndoRedoButtons?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
@@ -33,7 +36,7 @@ const props = withDefaults(defineProps<Props>(), {
     imageUploader: undefined,
     invalid: false,
     placeholder: '',
-    contentType: 'html',
+    contentsType: 'html',
     showUndoRedoButtons: true,
 });
 const emit = defineEmits<{(e: 'update:value', value: string): void;
@@ -64,13 +67,13 @@ const getExtensions = (): AnyExtension[] => {
     ];
 
     // add extensions based on content type
-    if (props.contentType === 'html') {
+    if (props.contentsType === 'html') {
         extensions.push(Color);
         extensions.push(TextAlign.configure({
             types: ['heading', 'paragraph'],
         }));
     }
-    if (props.contentType === 'markdown') {
+    if (props.contentsType === 'markdown') {
         extensions.push(Markdown);
     }
 
@@ -88,7 +91,7 @@ onMounted(() => {
         onUpdate: () => {
             let content = '';
             if (!editor.value) return;
-            if (props.contentType === 'html') {
+            if (props.contentsType === 'html') {
                 content = editor.value?.getHTML() ?? '';
             } else {
                 content = editor.value.storage.markdown.getMarkdown() ?? '';
@@ -106,7 +109,7 @@ watch(() => props.value, (value) => {
     if (!editor.value) return;
 
     let contents: string;
-    if (props.contentType === 'html') {
+    if (props.contentsType === 'html') {
         contents = editor.value?.getHTML() ?? '';
     } else {
         contents = editor.value.storage.markdown.getMarkdown() ?? '';
@@ -118,19 +121,27 @@ watch(() => props.value, (value) => {
 </script>
 
 <template>
-    <div v-if="editor"
-         class="text-editor"
-         :class="{invalid: props.invalid}"
-    >
-        <menu-bar :editor="editor"
-                  :use-color="props.contentType === 'html'"
-                  :use-text-align="props.contentType === 'html'"
-                  :use-image="!!props.imageUploader"
-                  :show-undo-redo-buttons="props.showUndoRedoButtons"
+    <div>
+        <p-textarea v-if="props.contentsType === 'plain'"
+                    :value="props.value"
+                    :placeholder="props.placeholder"
+                    :invalid="props.invalid"
+                    @update:value="emit('update:value', $event)"
         />
-        <editor-content class="editor-content"
-                        :editor="editor"
-        />
+        <div v-else-if="editor"
+             class="text-editor"
+             :class="{invalid: props.invalid}"
+        >
+            <menu-bar :editor="editor"
+                      :use-color="props.contentsType === 'html'"
+                      :use-text-align="props.contentsType === 'html'"
+                      :use-image="!!props.imageUploader"
+                      :show-undo-redo-buttons="props.showUndoRedoButtons"
+            />
+            <editor-content class="editor-content"
+                            :editor="editor"
+            />
+        </div>
     </div>
 </template>
 
