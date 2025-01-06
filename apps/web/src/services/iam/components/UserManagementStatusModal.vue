@@ -1,23 +1,23 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive,
+    computed, reactive, watch,
 } from 'vue';
 
 import { cloneDeep, map } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PStatus, PButtonModal, PDataTable,
+    PStatus, PButtonModal, PDataTable, PBadge,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { ServiceListParameters } from '@/schema/alert-manager/service/api-verbs/list';
-import type { ServiceModel } from '@/schema/alert-manager/service/model';
 import type { RoleBindingDeleteParameters } from '@/schema/identity/role-binding/api-verbs/delete';
 import type { UserDeleteParameters } from '@/schema/identity/user/api-verbs/delete';
 import type { UserDisableParameters } from '@/schema/identity/user/api-verbs/disable';
 import type { UserEnableParameters } from '@/schema/identity/user/api-verbs/enable';
 import { i18n } from '@/translations';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -26,13 +26,22 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useRoleFormatter, userStateFormatter } from '@/services/iam/composables/refined-table-data';
 import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
+import type { UserListItemType } from '@/services/iam/types/user-type';
 
 
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
 const userPageGetters = userPageStore.getters;
 
+const allReferenceStore = useAllReferenceStore();
+const allReferenceGetters = allReferenceStore.getters;
+
 const emit = defineEmits<{(e: 'confirm'): void; }>();
+
+const storeState = reactive({
+    serviceList: computed<ServiceReferenceMap>(() => allReferenceGetters.service),
+    selectedUsers: computed(() => userPageGetters.selectedUsers),
+});
 
 const state = reactive({
     loading: false,
@@ -53,20 +62,15 @@ const state = reactive({
     }),
     isRemoveOnlyWorkspace: computed(() => userPageState.modal.visible === 'removeOnlyWorkspace'),
     filteredServices: undefined,
-    filteredItems: [] as {
-      user_id?: string;
-      name?: string;
-      state?: string;
-      service?: string;
-      role_type?: string;
-    }[],
+    filteredItems: [],
+    filteredUniqueItems: [],
 });
 
 /* Component */
 const checkModalConfirm = async () => {
     let responses: boolean[] = [];
     let languagePrefix = 'DELETE';
-    const items = state.isRemoveOnlyWorkspace ? userPageGetters.selectedOnlyWorkspaceUsers : userPageGetters.selectedUsers;
+    const items = state.isRemoveOnlyWorkspace ? userPageGetters.selectedOnlyWorkspaceUsers : state.filteredUniqueItems;
     state.loading = true;
 
     try {
@@ -102,6 +106,7 @@ const checkModalConfirm = async () => {
     }
 };
 const handleClose = () => {
+    state.filteredItems = [];
     userPageStore.$patch((_state) => {
         _state.state.modal.visible = undefined;
         _state.state.modal = cloneDeep(_state.state.modal);
@@ -154,37 +159,41 @@ const disableUser = async (userId?: string): Promise<boolean> => {
         return false;
     }
 };
-const fetchServiceList = async () => {
-    try {
-        const { results } = await SpaceConnector.clientV2.alertManager.service.list<ServiceListParameters, ListResponse<ServiceModel>>();
-        if (results && results.length > 0) {
-            const filteredResults = results.filter((result) => result.members.USER !== undefined && result.members.USER.length > 0);
-            if (filteredResults && filteredResults.length > 0) {
-                filteredResults.forEach((d) => {
-                    const filtered = userPageGetters.selectedUsers.filter((selectedUser) => d.members.USER.includes(selectedUser?.user_id));
-                    if (filtered.length > 0) {
-                        filtered.forEach((filteredUser) => {
-                            state.filteredItems.push({
-                                user_id: filteredUser.user_id,
-                                name: filteredUser.name,
-                                state: filteredUser.state,
-                                role_type: filteredUser.role_type,
-                                service: d.name,
+
+/* Watcher */
+watch([() => storeState.serviceList, () => storeState.selectedUsers], ([nv_service_list, nv_selected_users]) => {
+    if (nv_service_list) {
+        const list: UserListItemType[] | (UserListItemType & { service: string })[] = [];
+        Object.values(nv_service_list).forEach((service) => {
+            if (service && service.data && service.data.members) {
+                nv_selected_users.forEach((selectedUser) => {
+                    if (Object.keys(service.data.members).includes('USER')) {
+                        if (selectedUser.user_id && service.data.members.USER.includes(selectedUser.user_id)) {
+                            list.push({
+                                ...selectedUser,
+                                service: service.label,
                             });
-                        });
+                        }
+                    } else {
+                        list.push(selectedUser);
                     }
                 });
             }
+        });
+        if (list.length > 0) {
+            state.filteredUniqueItems = Object.values(list.reduce((acc, cur) => {
+                if (!acc[cur.user_id]) {
+                    const { user_id, ...rest } = cur;
+                    acc[cur.user_id] = { user_id, service: [], ...rest };
+                }
+                if (cur.service !== undefined) {
+                    acc[cur.user_id].service.push(cur.service);
+                }
+                return acc;
+            }, {}));
         }
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
     }
-};
-
-/* Watcher */
-onMounted(async () => {
-    await fetchServiceList();
-});
+}, { deep: true, immediate: true });
 </script>
 
 <template>
@@ -200,12 +209,34 @@ onMounted(async () => {
         <template #body>
             <p-data-table
                 :fields="state.fields"
-                :items="state.isRemoveOnlyWorkspace ? userPageGetters.selectedOnlyWorkspaceUsers : state.filteredItems"
+                :items="state.isRemoveOnlyWorkspace ? userPageGetters.selectedOnlyWorkspaceUsers : state.filteredUniqueItems"
             >
                 <template #col-state-format="{value}">
                     <p-status v-bind="userStateFormatter(value)"
                               class="capitalize"
                     />
+                </template>
+                <template #col-service-format="{value}">
+                    <div v-if="value.length > 0">
+                        <span v-for="(v, i) in value"
+                              :key="i"
+                              class="mr-2"
+                        >
+                            <p-badge v-if="i < 3"
+                                     badge-type="gray200"
+                                     shape="square"
+                            >
+                                {{ v }}
+                            </p-badge>
+                            <p-badge v-else-if="i >= 3"
+                                     badge-type="blue700"
+                                     shape="round"
+                            >
+                                {{ value.length - i }}
+                            </p-badge>
+                        </span>
+                    </div>
+                    <div v-else />
                 </template>
                 <template #col-role_id-format="{value}">
                     <span v-if="!value">--</span>

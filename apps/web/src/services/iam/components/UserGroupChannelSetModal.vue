@@ -189,7 +189,6 @@ watch([() => notificationChannelCreateFormState, isSchemaValid], (nv_channel_sta
                     />
                     <div class="flex flex-col gap-0.5">
                         <span class="text-lg font-medium">{{ storeState.protocolName }}</span>
-                        <span class="text-xs font-normal text-gray-600">{{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.NOTIFY_TO_MEMBER_INFO') }}</span>
                     </div>
                 </div>
                 <user-group-channel-set-input-form @update-valid="handleSchemaValid" />

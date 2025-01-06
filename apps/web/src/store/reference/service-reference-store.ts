@@ -55,7 +55,7 @@ export const useServiceReferenceStore = defineStore('reference-service', () => {
 
         const params: ServiceListParameters = {
             query: {
-                only: ['name', 'service_id', 'service_key'],
+                only: ['name', 'service_id', 'service_key', 'members'],
             },
         };
 
