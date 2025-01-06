@@ -149,7 +149,7 @@ const state = reactive({
         },
         {
             key: DATA_TABLE_OPERATOR.PIVOT,
-            name: 'Pivot',
+            name: 'Pivot Table',
             description: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.PIVOT_DESC'),
             icon: 'ic_db-pivot-table',
         },
