@@ -131,11 +131,11 @@ onMounted(async () => {
                                                @change="handleChangeCategory"
                                 >
                                     <div class="w-full px-6 text-center">
-                                        <p class="truncate font-bold">
+                                        <p class="text-label-md font-bold truncate">
                                             {{ c.name }}
                                         </p>
                                         <p class="mt-1 truncate text-label-md text-gray-500">
-                                            {{ c.description }}
+                                            {{ c.description }}&zwnj;
                                         </p>
                                     </div>
                                 </p-select-card>
@@ -159,11 +159,11 @@ onMounted(async () => {
                                                @change="handleChangeTaskType"
                                 >
                                     <div class="w-full px-6 text-center">
-                                        <p class="truncate font-bold">
+                                        <p class="text-label-md font-bold truncate">
                                             {{ t.name }}
                                         </p>
                                         <p class="mt-1 truncate text-label-md text-gray-500">
-                                            {{ t.description }}
+                                            {{ t.description }}&zwnj;
                                         </p>
                                     </div>
                                 </p-select-card>
