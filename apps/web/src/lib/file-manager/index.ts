@@ -11,7 +11,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 const uploadFile = async (file: File, resourceGroup: FileManagerResourceGroupType, resourceId?: string): Promise<FileModel> => {
     const formData = new FormData();
     formData.append('file', file);
-
+    // TODO: Remove after test is done
+    console.log('file', file);
     let resourceGroupPath: string;
     let params = '';
     if (resourceGroup === 'DOMAIN') {
