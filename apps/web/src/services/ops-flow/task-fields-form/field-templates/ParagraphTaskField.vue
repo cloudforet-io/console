@@ -32,7 +32,6 @@ const {
 
 const { fileUploader } = useFileUploader({
     resourceGroup: 'PROJECT',
-    resourceId: '*',
 });
 const {
     contents,
@@ -43,7 +42,6 @@ const {
     contentType: 'markdown',
     resourceGroup: 'PROJECT',
     fileIds: props.files.map((f) => f.file_id),
-    resourceId: '*',
 });
 
 watch(contents, updateFieldValue);
