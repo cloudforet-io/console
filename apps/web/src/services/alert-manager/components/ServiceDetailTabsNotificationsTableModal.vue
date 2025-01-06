@@ -46,9 +46,9 @@ const state = reactive({
     loading: false,
     headerTitle: computed<TranslateResult>(() => {
         if (props.selectedItem?.state === WEBHOOK_STATE.ENABLED) {
-            return i18n.t('ALERT_MANAGER.WEBHOOK.MODAL_DISABLE_TITLE');
+            return i18n.t('ALERT_MANAGER.NOTIFICATIONS.MODAL_DISABLE_TITLE');
         }
-        return i18n.t('ALERT_MANAGER.WEBHOOK.MODAL_ENABLE_TITLE');
+        return i18n.t('ALERT_MANAGER.NOTIFICATIONS.MODAL_ENABLE_TITLE');
     }),
     proxyVisible: useProxyValue('visible', props, emit),
 });

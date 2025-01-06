@@ -64,7 +64,7 @@ const state = reactive({
         label: `${h.toString().padStart(2, '0')}:00`,
         name: h.toString(),
     }))),
-    endHourTimeList: computed<SelectDropdownMenuItem[]>(() => range(state.start, 25).map((h) => ({
+    endHourTimeList: computed<SelectDropdownMenuItem[]>(() => range(Number(state.start) + 1, 25).map((h) => ({
         label: `${h.toString().padStart(2, '0')}:00`,
         name: h.toString(),
     }))),

@@ -3,7 +3,6 @@
 		"ACTION": "作業",
 		"ALERTS": {
 			"ACKNOWLEDGED": "確認",
-			"ACKNOWLEDGED_AT": "確認時間",
 			"ADDITIONAL_INFO": "追加情報",
 			"ADD_NOTE": "ノート追加",
 			"ALL": "合計",
@@ -19,7 +18,6 @@
 			"COPIED": "コピーしました",
 			"COPY_ALL": "全てコピー",
 			"CREATED": "作成",
-			"CREATED_AT": "作成時間",
 			"CREATED_BY": "作成者: {user}",
 			"CREATE_ALERT": "アラート作成",
 			"CRITICAL": "警告",
@@ -54,7 +52,6 @@
 			"OK": "はい",
 			"OPEN": "発生",
 			"RESOLVED": "完了",
-			"RESOLVED_AT": "解決時間",
 			"RESOURCE": "リソース",
 			"RESPONDER": "回答者",
 			"RULE": "ルール",
@@ -116,7 +113,6 @@
 		},
 		"EVENT_RULE": {
 			"RULES_ON_THIS_PROJECT": "このサービスのルール",
-			"RULE_SET": "ルール設定",
 			"TITLE": "イベントルール"
 		},
 		"NOTIFICATIONS": {
@@ -137,7 +133,7 @@
 			"HIGH_NOTIFICATIONS_ONLY": "緊急度の高い通知のみ",
 			"MODAL_DELETE_BUTTON": "通知を削除",
 			"MODAL_DELETE_TITLE": "この通知チャネルを削除しますか？",
-			"MODAL_DISABLE_TITLE": "選択した通知を無効にしてもよろしいですか？",
+			"MODAL_DISABLE_TITLE": "選択した通知チャンネルを無効にしますか？",
 			"MODAL_ENABLE_TITLE": "選択した通知を有効にしてもよろしいですか？",
 			"MODAL_UPDATE_TITLE": "通知の編集",
 			"MONDAY": "月曜日",
@@ -2918,6 +2914,7 @@
 					"ALT_S_ENABLE_USER": "ユーザー有効化完了",
 					"ALT_S_REMOVE_USER": "このワークスペースからユーザーが正常に削除されました",
 					"ALT_S_UPDATE_USER": "ユーザー更新完了",
+					"ASSIGN_TITLE": "選択したユーザーをユーザーグループに追加",
 					"CAN_NOT_REMOVE_USER_TITLE": "選択されたユーザーは削除できません。",
 					"CREATE_TITLE": "ユーザー追加",
 					"DELETE_DESC": "選択したユーザーを削除しますか？ |選択したユーザーを全部削除しますか？",
@@ -4496,7 +4493,7 @@
 					"REPEAT": "繰り返す",
 					"REPEAT_AFTER": "{minute}分後で繰り返す",
 					"REPEAT_ALL": "すべて繰り返す",
-					"REPEAT_LABEL_HELP_TEXT": "上記のすべてのステップにApplyする",
+					"REPEAT_LABEL_HELP_TEXT": "以下のステップをすべて適用します",
 					"RESOLVED": "完了",
 					"RESOURCE_GROUP": "リソースグループ",
 					"RULE": "ルール",

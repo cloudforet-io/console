@@ -11,7 +11,6 @@ import {
     PToolboxTable, PSelectDropdown, PLink, PBadge, PI, PSelectStatus, PDivider,
 } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
@@ -27,7 +26,6 @@ import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useQueryTags } from '@/common/composables/query-tags';
 import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
 
@@ -59,8 +57,6 @@ const alertPageState = alertPageStore.state;
 const alertPageGetters = alertPageStore.getters;
 const userStore = useUserStore();
 const userState = userStore.state;
-
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const route = useRoute();
 
@@ -284,17 +280,7 @@ watch(() => route.query, async (query) => {
             </template>
             <template #col-service_id-format="{ value }">
                 <template v-if="value">
-                    <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
-                            new-tab
-                            :to="getProperRouteLocation({
-                                name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME,
-                                params: {
-                                    serviceId: value,
-                                },
-                            })"
-                    >
-                        {{ getServiceName(value) }}
-                    </p-link>
+                    <span>{{ getServiceName(value) }}</span>
                 </template>
             </template>
             <template #col-title-format="{ value, item }">

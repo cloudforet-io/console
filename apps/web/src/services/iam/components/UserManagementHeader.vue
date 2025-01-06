@@ -78,7 +78,7 @@ const handleClickButton = (type: string) => {
     }); break;
     case USER_MODAL_TYPE.ASSIGN: userPageStore.updateModalSettings({
         type,
-        title: 'Add Selected Users to User Groups',
+        title: i18n.t('IAM.USER.MAIN.MODAL.ASSIGN_TITLE'),
         themeColor: 'primary',
         modalVisibleType: 'assignToUserGroup',
     }); break;

@@ -20,7 +20,7 @@ export const ALERT_MANAGEMENT_TABLE_FIELDS: DataTableFieldType[] = [
     { name: 'labels', label: 'Label' },
     { name: 'triggered_by', label: 'Triggered by' },
     { name: 'duration', label: 'Duration' },
-    { name: 'created_at', label: 'Created at' },
+    { name: 'created_at', label: 'Created' },
 ];
 export const ALERT_MANAGEMENT_TABLE_HANDLER: AlertManagementTableHandlerType = {
     keyItemSets: [{
@@ -44,5 +44,5 @@ export const ALERT_EXCEL_FIELDS: ExcelDataField[] = [
     { key: 'urgency', name: 'Urgency' },
     { key: 'labels', name: 'Label' },
     { key: 'triggered_by', name: 'Triggered by' },
-    { key: 'created_at', name: 'Created at' },
+    { key: 'created_at', name: 'Created' },
 ];
