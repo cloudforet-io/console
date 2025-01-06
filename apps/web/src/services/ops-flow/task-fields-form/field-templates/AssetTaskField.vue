@@ -133,11 +133,24 @@ const handleUpdateSelected = (stepIdx: number, selected: DataSelectorItem[]) => 
 };
 
 const { getProperRouteLocation } = useProperRouteLocation();
+
+interface RelatedAssetInfo {
+    provider: string; group: string; type: string
+}
 type RelatedAsset= Partial<Pick<CloudServiceModel, 'cloud_service_group'|'cloud_service_type'|'provider'|'name'>> & Pick<CloudServiceModel, 'cloud_service_id'>;
-const getIcon = (asset: RelatedAsset): string|undefined => {
-    const key = `${asset.provider}.${asset.cloud_service_group}.${asset.cloud_service_type}`;
+const getIcon = (asset: RelatedAssetInfo): string|undefined => {
+    const key = `${asset.provider}.${asset.group}.${asset.type}`;
     return cloudServiceTypeItems.value.find((item) => item.data.cloud_service_type_key === key)?.icon;
 };
+const relatedAssetInfo = computed<{ provider: string; group: string; type: string}|undefined>(() => {
+    const asset = relatedAssets.value[0];
+    if (!asset) return undefined;
+    return {
+        provider: asset.provider,
+        group: asset.cloud_service_group,
+        type: asset.cloud_service_type,
+    };
+});
 const relatedAssets = ref<RelatedAsset[]>([]);
 const loading = ref(false);
 const error = ref<unknown|null>(null);
@@ -217,36 +230,40 @@ onMounted(async () => {
         <div v-else
              class="pt-1"
         >
-            <div v-for="asset in relatedAssets"
-                 :key="asset.cloud_service_id"
-                 class="flex items-center gap-1"
-            >
-                <p-lazy-img :src="getIcon(asset)"
+            <div class="flex items-center gap-1">
+                <p-lazy-img :src="getIcon(relatedAssetInfo)"
                             :loading="loading"
                             width="1.25rem"
                             height="1.25rem"
                 />
-                <p-link v-if="!error"
-                        new-tab
-                        highlight
-                        action-icon="internal-link"
-                        :to="getProperRouteLocation({
-                            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                            params: {
-                                provider: asset.provider,
-                                group: asset.cloud_service_group,
-                                name: asset.cloud_service_type,
-                            },
-                            query: {
-                                cloudServiceId: asset.cloud_service_id,
-                            },
-                        })"
+                <span class="pl-1 text-label-md">{{ relatedAssetInfo.group }} > {{ relatedAssetInfo.type }}</span>
+            </div>
+            <div class="mt-1 flex flex-wrap gap-1">
+                <div v-for="asset in relatedAssets"
+                     :key="asset.cloud_service_id"
                 >
-                    <span class="pl-1 text-label-md">{{ asset.cloud_service_group }} > {{ asset.cloud_service_type }} > {{ asset.name }}</span>
-                </p-link>
-                <span v-else
-                      class="pl-1 text-label-md"
-                >{{ asset.cloud_service_id }}</span>
+                    <p-link v-if="!error"
+                            new-tab
+                            highlight
+                            action-icon="internal-link"
+                            :to="getProperRouteLocation({
+                                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                                params: {
+                                    provider: asset.provider,
+                                    group: asset.cloud_service_group,
+                                    name: asset.cloud_service_type,
+                                },
+                                query: {
+                                    cloudServiceId: asset.cloud_service_id,
+                                },
+                            })"
+                    >
+                        <span class="pl-1 text-label-md">{{ asset.name }} ({{ asset.cloud_service_id }})</span>
+                    </p-link>
+                    <span v-else
+                          class="pl-1 text-label-md"
+                    >{{ asset.cloud_service_id }}</span>
+                </div>
             </div>
         </div>
     </p-field-group>
