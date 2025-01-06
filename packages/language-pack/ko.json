@@ -799,7 +799,7 @@
 			"HEADING1": "개요 1",
 			"HEADING2": "개요 2",
 			"HEADING3": "개요 3",
-			"NORMAL_TEXT": "바탕 글"
+			"NORMAL_TEXT": "본문"
 		},
 		"ERROR": {
 			"403_MSG": "이 페이지에 접근할 권한이 없습니다.",
@@ -4238,6 +4238,7 @@
 		"ASSIGNEE": "담당자",
 		"ASSIGNEE_POOL": "담당자 풀",
 		"CATEGORY": "카테고리",
+		"COLOR": "색상",
 		"CREATED_AT": "생성일",
 		"CREATED_BY": "생성자",
 		"CREATE_TARGET": "{target} 생성",
@@ -4292,6 +4293,7 @@
 		"STATUS_COMPLETED": "완료됨",
 		"STATUS_IN_PROGRESS": "진행 중",
 		"STATUS_TODO": "할 일",
+		"STATUS_TYPE": "상태 타입",
 		"SUPPORT_PACKAGE": "지원 패키지",
 		"TARGET_LIST": "{target} 목록",
 		"TASK_BOARD": {

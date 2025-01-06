@@ -42,7 +42,7 @@ const title = computed(() => {
 });
 
 /* scope */
-type Scope = TaskTypeModel['scope'];
+type Scope = 'PROJECT'|'WORKSPACE';
 const scopeValidator = useFieldValidator<Scope>('PROJECT', (val) => {
     if (!val) {
         return _i18n.t('OPSFLOW.VALIDATION.REQUIRED', {

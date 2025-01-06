@@ -4238,6 +4238,7 @@
 		"ASSIGNEE": "Assignee",
 		"ASSIGNEE_POOL": "Assignee Pool",
 		"CATEGORY": "Category",
+		"COLOR": "Color",
 		"CREATED_AT": "Created At",
 		"CREATED_BY": "Created By",
 		"CREATE_TARGET": "Create {target}",
@@ -4292,6 +4293,7 @@
 		"STATUS_COMPLETED": "Completed",
 		"STATUS_IN_PROGRESS": "In Progress",
 		"STATUS_TODO": "To-do",
+		"STATUS_TYPE": "Status Type",
 		"SUPPORT_PACKAGE": "Support Package",
 		"TARGET_LIST": "{target} List",
 		"TASK_BOARD": {

@@ -4238,6 +4238,7 @@
 		"ASSIGNEE": "",
 		"ASSIGNEE_POOL": "",
 		"CATEGORY": "",
+		"COLOR": "",
 		"CREATED_AT": "",
 		"CREATED_BY": "",
 		"CREATE_TARGET": "",
@@ -4292,6 +4293,7 @@
 		"STATUS_COMPLETED": "",
 		"STATUS_IN_PROGRESS": "",
 		"STATUS_TODO": "",
+		"STATUS_TYPE": "",
 		"SUPPORT_PACKAGE": "",
 		"TARGET_LIST": "",
 		"TASK_BOARD": {
