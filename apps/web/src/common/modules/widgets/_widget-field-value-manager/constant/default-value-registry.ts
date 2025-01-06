@@ -326,7 +326,9 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
             fieldKeys = fieldKeys.filter((key) => key === groupByOptions.fixedValue);
         }
 
-        result.data = groupByOptions.multiSelectable ? [fieldKeys?.[0]] : fieldKeys?.[0];
+        if (fieldKeys.length === 0) {
+            result.data = groupByOptions.multiSelectable ? [] : undefined;
+        } else result.data = groupByOptions.multiSelectable ? [fieldKeys?.[0]] : fieldKeys?.[0];
 
         if (!groupByOptions.hideCount) {
             result.count = groupByOptions.defaultMaxCount ? groupByOptions.defaultMaxCount : 5;

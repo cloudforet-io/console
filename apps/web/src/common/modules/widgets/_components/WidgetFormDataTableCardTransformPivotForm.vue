@@ -70,14 +70,13 @@ const state = reactive({
     }),
     invalid: computed<boolean>(() => {
         if (!state.proxyOperatorOptions.data_table_id) return true;
-        if (!state.proxyOperatorOptions.fields?.labels?.length) return true;
         if (!state.proxyOperatorOptions.fields?.column) return true;
         if (!state.proxyOperatorOptions.fields?.data) return true;
         if (!state.proxyOperatorOptions.select?.length && !state.proxyOperatorOptions.limit && state.proxyOperatorOptions?.fields?.column !== 'Date') return true;
         return false;
     }),
     columnFieldInvalid: computed<boolean>(() => {
-        if (state.labelFieldItems.length === 1) return true;
+        if (!state.labelFieldItems.length) return true;
         return false;
     }),
     valueTypeItems: computed<MenuItem[]>(() => [

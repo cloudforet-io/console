@@ -2148,6 +2148,7 @@
 					"DATE_RANGE_INVALID_RANGE_TEXT": "시작 날짜는 종료 날짜보다 이전이어야 합니다.",
 					"DEPRECATED_OPTION": "지원 중지된 옵션",
 					"DESCRIPTION": "설명",
+					"DIMENSIONS": "",
 					"DYNAMIC_FIELD": "변동 데이터 필드",
 					"EDIT_DATA": "데이터 수정",
 					"END": "종료",

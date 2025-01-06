@@ -18,7 +18,6 @@ const stackedHorizontalBarChart: WidgetConfig = {
                 dataTarget: 'labels_info',
                 defaultMaxCount: 4,
                 max: 8,
-                defaultIndex: 0,
                 excludeDateField: true,
             },
         },

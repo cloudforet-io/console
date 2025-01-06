@@ -6,6 +6,9 @@ const stackedAreaChart: WidgetConfig = {
     meta: {
         title: 'Area Chart',
         sizes: ['md', 'full'],
+        defaultValidationConfig: {
+            defaultMaxCount: 1,
+        },
     },
     requiredFieldsSchema: {
         granularity: {},

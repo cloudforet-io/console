@@ -5,6 +5,7 @@ import {
 } from 'vue';
 
 import {
+    debounce,
     isArray,
     isEmpty, unset,
 } from 'lodash';
@@ -113,6 +114,7 @@ const state = reactive({
         metric_id: props.sourceId,
     })),
     selectedItemsMap: getInitialSelectedItemsMap() as Record<string, DataTableQueryFilterForDropdown>,
+    searchText: '',
 });
 const assetFilterState = reactive({
     refinedLabelKeys: computed(() => {
@@ -133,21 +135,26 @@ const {
     showContextMenu,
     hideContextMenu,
     initiateMenu,
-    // reloadMenu,
+    reloadMenu,
     showMoreMenu,
 } = useContextMenuController({
     targetRef,
     contextMenuRef,
-    // useFixedStyle: true,
+    useMenuFiltering: true,
     useReorderBySelection: true,
     menu: toRef(state, 'filterItems'),
     selected: toRef(state, 'selectedItems'),
+    searchText: toRef(state, 'searchText'),
     pageSize: 10,
 });
 onClickOutside(containerRef, hideContextMenu);
 
 
 /* Event */
+const handleUpdateSearchText = debounce((text: string) => {
+    state.searchText = text;
+    reloadMenu();
+}, 200);
 const handleUpdateFilter = (filterKey: string, filter: DataTableQueryFilterForDropdown) => {
     state.selectedItemsMap[filterKey] = { ...filter };
 
@@ -368,12 +375,14 @@ onMounted(() => {
                                 :loading="state.loading"
                                 :menu="refinedMenu"
                                 :selected="state.selectedItems"
+                                searchable
                                 multi-selectable
                                 show-select-marker
                                 show-clear-selection
                                 @select="handleSelectAddFilterMenuItem"
                                 @clear-selection="handleClearAddFilterMenuItems"
                                 @click-show-more="handleClickShowMore"
+                                @update:search-text="handleUpdateSearchText"
                 />
             </div>
         </div>
