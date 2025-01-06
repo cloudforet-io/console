@@ -63,7 +63,7 @@ const state = reactive({
             return baseCondition;
         }
         const baseCondition = state.userList.length === 0 || isEmpty(state.role);
-        if (state.localUserItem.length > 0 && !state.isResetPassword) {
+        if (state.resetPasswordVisible && !state.isResetPassword) {
             return state.password === '' || baseCondition;
         }
         return baseCondition;
