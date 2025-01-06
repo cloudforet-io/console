@@ -219,7 +219,7 @@ onMounted(async () => {
                                 name: asset.data.cloud_service_type,
                             },
                             query: {
-                                cloudServiceId: asset.name,
+                                filters: [JSON.stringify([asset.name, 'cloud_service_id'])],
                             },
                         })"
                 >
@@ -254,7 +254,7 @@ onMounted(async () => {
                                     name: asset.cloud_service_type,
                                 },
                                 query: {
-                                    cloudServiceId: asset.cloud_service_id,
+                                    filters: [JSON.stringify([asset.cloud_service_id, 'cloud_service_id'])],
                                 },
                             })"
                     >
