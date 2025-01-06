@@ -113,8 +113,25 @@
 			"USER_GROUP": "사용자 그룹"
 		},
 		"EVENT_RULE": {
+			"ALWAYS": "항상",
+			"CREATE_FORM_TITLE": "",
+			"DESC": "",
+			"GLOBAL": "",
+			"GLOBAL_SCOPE": "",
+			"LABEL_NAME": "",
+			"LABEL_SCOPE": "",
+			"MODAL_SCOPE_DESC": "",
+			"MODAL_SCOPE_TITLE": "",
+			"NAME_REQUIRED": "",
+			"NO_DATA_ADD_RULE": "규칙 추가",
+			"NO_DATA_HELP_TEXT": "이벤트 규칙을 추가하려면, 아래 버튼을 클릭하세요.",
+			"NO_DATA_TITLE": "",
 			"RULES_ON_THIS_PROJECT": "이 서비스 규칙",
-			"TITLE": "이벤트 규칙"
+			"SELECT_WEBHOOK": "",
+			"SET_CONDITION": "",
+			"SIDE_BAR_TITLE": "",
+			"TITLE": "이벤트 규칙",
+			"WEBHOOK_SCOPE": ""
 		},
 		"NOTIFICATIONS": {
 			"ALL_MEMBER": "이 서비스의 모든 멤버",

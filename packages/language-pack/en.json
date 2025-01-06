@@ -113,8 +113,25 @@
 			"USER_GROUP": "User Group"
 		},
 		"EVENT_RULE": {
+			"ALWAYS": "Always",
+			"CREATE_FORM_TITLE": "Add Event Rule",
+			"DESC": "Event rules are excuted in ascending order.",
+			"GLOBAL": "Global",
+			"GLOBAL_SCOPE": "Global Event Rule",
+			"LABEL_NAME": "Event Rule Name",
+			"LABEL_SCOPE": "Selected Event Rule Scope",
+			"MODAL_SCOPE_DESC": "The event rule scope can be set only once when it is created.",
+			"MODAL_SCOPE_TITLE": "Event Rule Scope",
+			"NAME_REQUIRED": "Please enter name",
+			"NO_DATA_ADD_RULE": "Add Rule",
+			"NO_DATA_HELP_TEXT": "To add event rules:\nClick the add button below.",
+			"NO_DATA_TITLE": "No event rules",
 			"RULES_ON_THIS_PROJECT": "Rules on This Service",
-			"TITLE": "Event Rule"
+			"SELECT_WEBHOOK": "Select Webhook",
+			"SET_CONDITION": "Set Condition",
+			"SIDE_BAR_TITLE": "List of Rule Sets",
+			"TITLE": "Event Rule",
+			"WEBHOOK_SCOPE": "Base on a Webhook"
 		},
 		"NOTIFICATIONS": {
 			"ALL_MEMBER": "All Members in Service",

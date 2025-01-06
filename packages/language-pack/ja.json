@@ -113,8 +113,25 @@
 			"USER_GROUP": "ユーザーグループ"
 		},
 		"EVENT_RULE": {
+			"ALWAYS": "常に",
+			"CREATE_FORM_TITLE": "",
+			"DESC": "",
+			"GLOBAL": "",
+			"GLOBAL_SCOPE": "",
+			"LABEL_NAME": "",
+			"LABEL_SCOPE": "",
+			"MODAL_SCOPE_DESC": "",
+			"MODAL_SCOPE_TITLE": "",
+			"NAME_REQUIRED": "",
+			"NO_DATA_ADD_RULE": "ルールを追加",
+			"NO_DATA_HELP_TEXT": "イベントルールを追加するには、以下の「追加」ボタンを押してください。",
+			"NO_DATA_TITLE": "",
 			"RULES_ON_THIS_PROJECT": "このサービスのルール",
-			"TITLE": "イベントルール"
+			"SELECT_WEBHOOK": "",
+			"SET_CONDITION": "",
+			"SIDE_BAR_TITLE": "",
+			"TITLE": "イベントルール",
+			"WEBHOOK_SCOPE": ""
 		},
 		"NOTIFICATIONS": {
 			"ALL_MEMBER": "サービス内のすべてのメンバー",
