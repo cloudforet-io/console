@@ -19,7 +19,6 @@ const colorCodedHeatmap: WidgetConfig = {
             options: {
                 dataTarget: 'labels_info',
                 hideCount: true,
-                defaultIndex: 0,
                 excludeDateField: true,
             },
         },
