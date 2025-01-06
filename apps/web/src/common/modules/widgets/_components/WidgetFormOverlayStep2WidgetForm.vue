@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { cloneDeep } from 'lodash';
+import { cloneDeep, sortBy } from 'lodash';
 
 import {
     PFieldGroup, PSelectDropdown, PButton, PI, PButtonModal, PTooltip,
@@ -36,7 +36,7 @@ const FORM_TITLE_MAP = {
     REQUIRED_FIELDS: 'REQUIRED_FIELDS',
     OPTIONAL_FIELDS: 'OPTIONAL_FIELDS',
 };
-const DATE_CONFIG_FIELD_KEYS = ['granularity', 'dateRange', 'dateFormat'];
+const DATE_CONFIG_FIELD_KEYS = ['granularity', 'dateFormat', 'dateRange'];
 
 interface Props {
     widgetValidationInvalid?: boolean;
@@ -63,10 +63,14 @@ const state = reactive({
     defaultValidationConfig: computed(() => state.widgetConfig.meta?.defaultValidationConfig),
     widgetDefaultValidationModalVisible: false,
     formErrorModalValue: undefined as number|undefined,
-    widgetDateConfigSchemaMap: computed(() => Object.entries({
-        ...state.widgetConfig.requiredFieldsSchema,
-        ...state.widgetConfig.optionalFieldsSchema,
-    }).filter(([key]) => DATE_CONFIG_FIELD_KEYS.includes(key))),
+    widgetDateConfigSchemaMap: computed(() => {
+        const dateConfigFields = Object.entries({
+            ...state.widgetConfig.requiredFieldsSchema,
+            ...state.widgetConfig.optionalFieldsSchema,
+        })
+            .filter(([key]) => DATE_CONFIG_FIELD_KEYS.includes(key));
+        return sortBy(dateConfigFields, ([key]) => DATE_CONFIG_FIELD_KEYS.indexOf(key));
+    }),
     widgetRequiredFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.requiredFieldsSchema).filter(([key]) => !DATE_CONFIG_FIELD_KEYS.includes(key))),
     widgetOptionalFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.optionalFieldsSchema).filter(([key]) => !DATE_CONFIG_FIELD_KEYS.includes(key))),
     // display
