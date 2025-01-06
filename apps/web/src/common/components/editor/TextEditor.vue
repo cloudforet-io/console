@@ -121,7 +121,7 @@ watch(() => props.value, (value) => {
 </script>
 
 <template>
-    <div>
+    <div class="text-editor">
         <p-textarea v-if="props.contentsType === 'plain'"
                     :value="props.value"
                     :placeholder="props.placeholder"
@@ -129,7 +129,7 @@ watch(() => props.value, (value) => {
                     @update:value="emit('update:value', $event)"
         />
         <div v-else-if="editor"
-             class="text-editor"
+             class="editor"
              :class="{invalid: props.invalid}"
         >
             <menu-bar :editor="editor"
@@ -148,7 +148,7 @@ watch(() => props.value, (value) => {
 <style lang="postcss">
 @import './text-editor-nodes.pcss';
 .text-editor {
-    > .editor-content {
+    > .editor .editor-content {
         .ProseMirror {
             @mixin all-nodes-style;
             min-height: inherit;
@@ -172,26 +172,18 @@ watch(() => props.value, (value) => {
 .text-editor {
     @apply bg-white border border-gray-200 rounded-lg;
     min-height: 356px;
-    > .editor-content {
+    > .editor {
         min-height: inherit;
-        padding: 0.75rem 1rem 1.125rem 1rem;
+        > .editor-content {
+            min-height: inherit;
+            padding: 0.75rem 1rem 1.125rem 1rem;
+        }
+        &:focus-within {
+            @apply border-secondary;
+        }
+        &.invalid {
+            @apply border-alert;
+        }
     }
-    &:focus-within {
-        @apply border-secondary;
-    }
-    &.invalid {
-        @apply border-alert;
-    }
-    >.suggestion-list {
-        @apply absolute;
-        z-index: 10;
-    }
-}
-</style>
-
-<style lang="postcss">
-.mention {
-    @apply bg-violet-150 text-violet-600 rounded-md;
-    padding: 0 2px;
 }
 </style>
