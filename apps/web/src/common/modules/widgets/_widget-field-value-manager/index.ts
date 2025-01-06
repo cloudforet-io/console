@@ -48,7 +48,6 @@ export default class WidgetFieldValueManager {
         dataTable: PublicDataTableModel|PrivateDataTableModel,
         originData: WidgetFieldValueMap,
     ) {
-        console.debug('WidgetFieldValueManager.constructor()', widgetConfig, dataTable, originData);
         this.widgetConfig = widgetConfig;
         this.dataTable = dataTable;
         this.widgetInvalid = !dataTable;

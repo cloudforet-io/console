@@ -6,7 +6,7 @@ import type { TranslateResult } from 'vue-i18n';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButton, PPopover, PSelectCard, PI,
+    PButton, PPopover, PSelectCard, PI, PDivider,
 } from '@cloudforet/mirinae';
 import { POPOVER_TRIGGER } from '@cloudforet/mirinae/src/data-display/popover/type';
 
@@ -397,7 +397,7 @@ watch(() => state.showPopover, (val) => {
                             {{ i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.TRANSFORMATIONS') }}
                         </div>
                     </div>
-                    <div class="content-part">
+                    <div class="content-part flex">
                         <div class="left-part">
                             <p-select-card v-for="(operatorInfo) in state.operatorInfoList.slice(0, 2)"
                                            :key="operatorInfo.key"
@@ -423,6 +423,9 @@ watch(() => state.showPopover, (val) => {
                                 </div>
                             </p-select-card>
                         </div>
+                        <p-divider class="content-divider"
+                                   vertical
+                        />
                         <div class="right-part">
                             <p-select-card v-for="(operatorInfo) in state.operatorInfoList.slice(2)"
                                            :key="operatorInfo.key"
@@ -497,7 +500,7 @@ watch(() => state.showPopover, (val) => {
     .data-source-popper-operator-wrapper {
         //display: flex;
         //flex-direction: column;
-        width: 43rem;
+        width: 43.5rem;
         padding: 1rem;
 
         .conetent {
@@ -514,15 +517,19 @@ watch(() => state.showPopover, (val) => {
             }
 
             .content-part {
-                @apply grid grid-cols-12;
+                overflow-y: scroll;
                 max-height: 22.5rem;
-                overflow: auto;
-                gap: 0.5rem;
+                height: auto;
+
                 .left-part, .right-part {
-                    @apply col-span-6;
+                    height: 100%;
                     display: flex;
                     flex-direction: column;
                     gap: 0.5rem;
+                }
+                .content-divider {
+                    margin: 0 1.125rem;
+                    height: 30.125rem;
                 }
             }
 
@@ -616,6 +623,7 @@ watch(() => state.showPopover, (val) => {
 
 /* custom design-system component - p-select-card */
 :deep(.p-select-card) {
+    height: 5.625rem;
     padding: 1rem;
     .select-card-contents {
         @apply flex justify-start items-center;
