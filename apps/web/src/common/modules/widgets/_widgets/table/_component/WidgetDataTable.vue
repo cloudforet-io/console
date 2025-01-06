@@ -327,8 +327,8 @@ const getFieldWidth = (field: TableWidgetField): string|undefined => {
                             'last-label': colIndex === props.fields.filter((_field) => _field.fieldInfo?.type === 'labelField').length - 1,
                             'sub-total': field.name === SUB_TOTAL_NAME,
                             'sub-total-freeze': field.name === SUB_TOTAL_NAME && props.subTotalInfo?.freeze,
-                            'total': item[props.fields[0].name] === 'Total' && props.items?.length === rowIndex + 1,
-                            'total-freeze': item[props.fields[0].name] === 'Total' && props.items?.length === rowIndex + 1 && props.totalInfo?.freeze,
+                            'total': (item[props.fields[0].name] === 'Total' || props.totalInfo?.toggleValue) && props.items?.length === rowIndex + 1,
+                            'total-freeze': (item[props.fields[0].name] === 'Total' || props.totalInfo?.toggleValue) && props.items?.length === rowIndex + 1 && props.totalInfo?.freeze,
                         }"
                         :style="{
                             minWidth: getFieldMinWidth(field),
