@@ -2145,6 +2145,7 @@
 					"DATE_RANGE_INVALID_RANGE_TEXT": "The start date must be earlier than the end date.",
 					"DEPRECATED_OPTION": "Deprecated Option",
 					"DESCRIPTION": "Description",
+					"DIMENSIONS": "Dimensions",
 					"DYNAMIC_FIELD": "Dynamic Field",
 					"EDIT_DATA": "Edit Data",
 					"END": "End",

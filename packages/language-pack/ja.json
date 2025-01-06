@@ -2145,6 +2145,7 @@
 					"DATE_RANGE_INVALID_RANGE_TEXT": "開始日は終了日より前である必要があります。",
 					"DEPRECATED_OPTION": "非推奨オプション",
 					"DESCRIPTION": "説明",
+					"DIMENSIONS": "",
 					"DYNAMIC_FIELD": "ダイナミックフィールド",
 					"EDIT_DATA": "データを編集",
 					"END": "終了",
