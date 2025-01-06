@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import { useRouter } from 'vue-router/composables';
 
 import {
     PHeading, PHeadingLayout, PCard, PIconButton, PI,
@@ -11,6 +12,7 @@ import type { NotificationUrgencyType, RecoveryModeType } from '@/schema/alert-m
 import { i18n } from '@/translations';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { red } from '@/styles/colors';
 
@@ -18,8 +20,10 @@ import ServiceDetailTabsSettingsEscalationPolicy
     from '@/services/alert-manager/components/ServiceDetailTabsSettingsEscalationPolicy.vue';
 import ServiceDetailTabsSettingsModal from '@/services/alert-manager/components/ServiceDetailTabsSettingsUpdateModal.vue';
 import { SERVICE_SETTING_CARD } from '@/services/alert-manager/constants/common-constant';
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
 import type { ServiceDetailSettingCardType, Service } from '@/services/alert-manager/types/alert-manager-type';
+
 
 type CardItemType = {
     title: TranslateResult,
@@ -34,7 +38,10 @@ type CardValueInfoType = {
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
+const router = useRouter();
+
 const { hasReadWriteAccess } = usePageEditableStatus();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
     serviceInfo: computed<Service>(() => serviceDetailPageGetters.serviceInfo),
@@ -97,7 +104,12 @@ const getAutoRecovery = (): CardValueInfoType|undefined => {
     }
 };
 const handleClickEditButton = (type: ServiceDetailSettingCardType) => {
-    if (type === SERVICE_SETTING_CARD.RULE_SET) return;
+    if (type === SERVICE_SETTING_CARD.RULE_SET) {
+        router.push(getProperRouteLocation({
+            name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL.EVENT_RULE._NAME,
+        }));
+        return;
+    }
     state.selectModalVisible = true;
     state.modalType = type;
 };
