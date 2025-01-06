@@ -70,7 +70,7 @@ export const useEditorContentTransformer = (op: {
 
     const htmlFileImagePattern = /<img\s+[^>]*src="<(file-[^"]+)>"[^>]*>/g;
     const transformHtmlContentForView = (content: string): string => content.replace(htmlFileImagePattern, (match, url) => {
-        const newUrl = getFileDownloadUrl(replaceImageUrl(url), resourceGroup.value, resourceId.value);
+        const newUrl = getFileDownloadUrl(replaceImageUrl(url), resourceGroup.value);
         return match.replace(url, newUrl);
     });
 

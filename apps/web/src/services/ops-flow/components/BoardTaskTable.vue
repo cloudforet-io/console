@@ -105,7 +105,7 @@ const getQuery = (filters?: ConsoleFilter[]) => {
         .setPage(pagination.page, pagination.size);
     if (search.value) queryHelper.addFilter({ v: search.value });
     if (props.categoryId) queryHelper.addFilter({ k: 'category_id', v: props.categoryId, o: '=' });
-    if (props.relatedAssets) queryHelper.addFilter({ k: 'related_assets', v: props.relatedAssets, o: '=' });
+    if (props.relatedAssets) queryHelper.addFilter({ k: 'related_asset_id', v: props.relatedAssets, o: '=' });
 
     return queryHelper.dataV2;
 };

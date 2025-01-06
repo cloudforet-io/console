@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, reactive, watch, toRef,
+    computed, reactive, watch, toRef, ref,
 } from 'vue';
 
 import {
@@ -94,13 +94,14 @@ const {
     },
 });
 
+const contentType = ref('markdown');
 const resourceGroup = computed(() => (workspaceState.selectedRadioIdx === 0 ? 'DOMAIN' : 'WORKSPACE'));
 const { fileUploader } = useFileUploader({ resourceGroup });
 const {
     contents: uploadContents,
     editorContents,
 } = useEditorContentTransformer({
-    contentType: 'html',
+    contentType,
     resourceGroup,
     fileIds: toRef(state, 'fileIds'), // auto update to state.fileIds
     contents,
@@ -172,6 +173,7 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
     setForm('writerName', notice?.writer ?? storeState.userName);
     setForm('noticeTitle', notice?.title ?? '');
     setForm('contents', notice?.contents ?? '');
+    contentType.value = notice?.contents_type ?? 'markdown';
 
     if (notice?.workspaces?.includes('*')) {
         workspaceState.selectedRadioIdx = 0;
@@ -258,6 +260,7 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
                         <text-editor :value="editorContents"
                                      :image-uploader="fileUploader"
                                      :invalid="invalid"
+                                     :content-type="contentType"
                                      @update:value="editorContents = $event"
                         />
                     </template>

@@ -80,11 +80,12 @@ const state = reactive({
     popoverVisible: false,
 });
 
+const contentType = computed(() => state.noticePostData?.contents_type ?? 'markdown');
 const {
     editorContents,
 } = useEditorContentTransformer({
     contents: computed(() => state.noticePostData?.contents ?? ''),
-    contentType: 'html',
+    contentType,
     resourceGroup: computed(() => {
         if (!state.noticePostData) return 'PUBLIC';
         return state.noticePostData.resource_group;
@@ -247,7 +248,9 @@ watch(() => props.postId, (postId) => {
                 <div v-if="state.noticePostData"
                      class="text-editor-wrapper"
                 >
-                    <text-editor-viewer :contents="editorContents" />
+                    <text-editor-viewer :contents="editorContents"
+                                        :content-type="contentType"
+                    />
                 </div>
             </p-data-loader>
         </p-pane-layout>

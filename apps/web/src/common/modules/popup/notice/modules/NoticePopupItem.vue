@@ -67,7 +67,9 @@ const handleClose = async (neverShowPopup?: boolean): Promise<void> => {
                 <span class="notice-popup-author">{{ iso8601Formatter(item.updated_at, userStore.state.timezone) }} · {{ item.writer }}</span>
             </div>
             <p-divider class="!my-4" />
-            <text-editor-viewer :contents="editorContents" />
+            <text-editor-viewer :contents="editorContents"
+                                :content-type="props.item ? props.item.contents_type : 'markdown'"
+            />
         </template>
         <template #footer-extra>
             <p-button style-type="tertiary"

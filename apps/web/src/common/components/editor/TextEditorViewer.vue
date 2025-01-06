@@ -7,17 +7,19 @@ import DOMPurify from 'dompurify';
 
 import { useMarkdown } from '@cloudforet/mirinae';
 
+import type { TextEditorContentType } from '@/common/components/editor/type';
+
 import { loadMonospaceFonts } from '@/styles/fonts';
 
 interface Props {
     contents?: string;
     showInBox?: boolean
-    contentType?: 'html'|'markdown';
+    contentType?: TextEditorContentType;
 }
 const props = withDefaults(defineProps<Props>(), {
     contents: '',
     showInBox: false,
-    contentType: 'html',
+    contentType: 'plain',
 });
 
 loadMonospaceFonts();
@@ -29,9 +31,11 @@ const { sanitizedHtml } = useMarkdown({
 const refinedContents = computed(() => {
     if (props.contentType === 'markdown') {
         return sanitizedHtml.value;
+    } if (props.contentType === 'html') {
+        return DOMPurify.sanitize(props.contents);
     }
-    const sanitized = DOMPurify.sanitize(props.contents);
-    return sanitized;
+    // plain
+    return props.contents;
 });
 
 const htmlContainer = ref<null|HTMLElement>(null);

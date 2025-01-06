@@ -6,6 +6,7 @@ export interface TaskModel {
     name: string;
     status_id: string;
     status_type: TaskStatusType;
+    related_assets?: string[];
     priority: TaskPriority;
     description: string;
     data: Record<string, any>;

@@ -33,11 +33,10 @@ const uploadFile = async (file: File, resourceGroup: FileManagerResourceGroupTyp
     return response.data;
 };
 
-export const getFileDownloadUrl = (fileId: string, resourceGroup: FileManagerResourceGroupType, resourceId?: string): string => {
+export const getFileDownloadUrl = (fileId: string, resourceGroup: FileManagerResourceGroupType): string => {
     const baseUri = SpaceConnector.restClient.getUri();
 
     let resourceGroupPath: string;
-    let extraParams = '';
     if (resourceGroup === 'DOMAIN') {
         resourceGroupPath = 'domain';
     } else if (resourceGroup === 'WORKSPACE') {
@@ -46,17 +45,16 @@ export const getFileDownloadUrl = (fileId: string, resourceGroup: FileManagerRes
         resourceGroupPath = 'user';
     } else if (resourceGroup === 'PROJECT') {
         resourceGroupPath = 'project';
-        extraParams = `&project_id=${resourceId || '*'}`;
     } else { resourceGroupPath = 'public'; }
 
-    return `${baseUri}/files/${resourceGroupPath}/${fileId}?token=${SpaceConnector.getAccessToken()}${extraParams}`;
+    return `${baseUri}/files/${resourceGroupPath}/${fileId}?token=${SpaceConnector.getAccessToken()}`;
 };
 export const uploadFileAndGetFileInfo = async (file: File, resourceGroup: FileManagerResourceGroupType, resourceId?: string): Promise<Attachment> => {
     try {
         const fileModel = await uploadFile(file, resourceGroup, resourceId);
         console.debug('fileModel', fileModel);
         return {
-            downloadUrl: getFileDownloadUrl(fileModel.file_id, resourceGroup, resourceId),
+            downloadUrl: getFileDownloadUrl(fileModel.file_id, resourceGroup),
             fileId: fileModel.file_id,
         };
     } catch (e) {
