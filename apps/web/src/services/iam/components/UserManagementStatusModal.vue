@@ -220,12 +220,19 @@ watch([() => storeState.serviceList, () => storeState.selectedUsers], ([nv_servi
                     <div v-if="value.length > 0">
                         <span v-for="(v, i) in value"
                               :key="i"
-                              class="mr-1"
+                              class="mr-2"
                         >
-                            <p-badge badge-type="gray200"
+                            <p-badge v-if="i < 3"
+                                     badge-type="gray200"
                                      shape="square"
                             >
                                 {{ v }}
+                            </p-badge>
+                            <p-badge v-else-if="i >= 3"
+                                     badge-type="blue700"
+                                     shape="round"
+                            >
+                                {{ value.length - i }}
                             </p-badge>
                         </span>
                     </div>
