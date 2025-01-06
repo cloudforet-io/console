@@ -3,7 +3,6 @@
 		"ACTION": "작업",
 		"ALERTS": {
 			"ACKNOWLEDGED": "확인",
-			"ACKNOWLEDGED_AT": "확인 시간",
 			"ADDITIONAL_INFO": "추가 정보",
 			"ADD_NOTE": "노트 추가",
 			"ALL": "전체",
@@ -19,7 +18,6 @@
 			"COPIED": "복사됨",
 			"COPY_ALL": "모두 복사",
 			"CREATED": "생성 ",
-			"CREATED_AT": "생성 시간",
 			"CREATED_BY": "생성자: {user}",
 			"CREATE_ALERT": "얼럿 생성",
 			"CRITICAL": "위험 경고",
@@ -54,7 +52,6 @@
 			"OK": "확인",
 			"OPEN": "오픈",
 			"RESOLVED": "완료",
-			"RESOLVED_AT": "완료 시간",
 			"RESOURCE": "리소스",
 			"RESPONDER": "응답자",
 			"RULE": "규칙",
@@ -116,7 +113,6 @@
 		},
 		"EVENT_RULE": {
 			"RULES_ON_THIS_PROJECT": "이 서비스 규칙",
-			"RULE_SET": "규칙 설정",
 			"TITLE": "이벤트 규칙"
 		},
 		"NOTIFICATIONS": {

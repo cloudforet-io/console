@@ -3,7 +3,6 @@
 		"ACTION": "作業",
 		"ALERTS": {
 			"ACKNOWLEDGED": "確認",
-			"ACKNOWLEDGED_AT": "確認時間",
 			"ADDITIONAL_INFO": "追加情報",
 			"ADD_NOTE": "ノート追加",
 			"ALL": "合計",
@@ -19,7 +18,6 @@
 			"COPIED": "コピーしました",
 			"COPY_ALL": "全てコピー",
 			"CREATED": "作成",
-			"CREATED_AT": "作成時間",
 			"CREATED_BY": "作成者: {user}",
 			"CREATE_ALERT": "アラート作成",
 			"CRITICAL": "警告",
@@ -54,7 +52,6 @@
 			"OK": "はい",
 			"OPEN": "発生",
 			"RESOLVED": "完了",
-			"RESOLVED_AT": "解決時間",
 			"RESOURCE": "リソース",
 			"RESPONDER": "回答者",
 			"RULE": "ルール",
@@ -116,7 +113,6 @@
 		},
 		"EVENT_RULE": {
 			"RULES_ON_THIS_PROJECT": "このサービスのルール",
-			"RULE_SET": "ルール設定",
 			"TITLE": "イベントルール"
 		},
 		"NOTIFICATIONS": {

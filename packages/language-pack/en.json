@@ -3,7 +3,6 @@
 		"ACTION": "Action",
 		"ALERTS": {
 			"ACKNOWLEDGED": "Acknowledged",
-			"ACKNOWLEDGED_AT": "Acknowledged at",
 			"ADDITIONAL_INFO": "Additional Information",
 			"ADD_NOTE": "Add Note",
 			"ALL": "All",
@@ -19,7 +18,6 @@
 			"COPIED": "Copied",
 			"COPY_ALL": "Copy All",
 			"CREATED": "Created",
-			"CREATED_AT": "Created at",
 			"CREATED_BY": "created by: {user}",
 			"CREATE_ALERT": "Create Alert",
 			"CRITICAL": "Critical",
@@ -54,7 +52,6 @@
 			"OK": "OK",
 			"OPEN": "Open",
 			"RESOLVED": "Resolved",
-			"RESOLVED_AT": "Resolved at",
 			"RESOURCE": "Resources",
 			"RESPONDER": "Responder",
 			"RULE": "Rule",
@@ -116,7 +113,6 @@
 		},
 		"EVENT_RULE": {
 			"RULES_ON_THIS_PROJECT": "Rules on This Service",
-			"RULE_SET": "Rule Set",
 			"TITLE": "Event Rule"
 		},
 		"NOTIFICATIONS": {

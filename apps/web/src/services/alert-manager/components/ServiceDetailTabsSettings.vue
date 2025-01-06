@@ -52,7 +52,7 @@ const state = reactive({
             type: SERVICE_SETTING_CARD.AUTO_RECOVERY,
         },
         {
-            title: i18n.t('ALERT_MANAGER.EVENT_RULE.RULE_SET'),
+            title: i18n.t('ALERT_MANAGER.EVENT_RULE.TITLE'),
             type: SERVICE_SETTING_CARD.RULE_SET,
         },
     ]),
