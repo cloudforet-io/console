@@ -134,6 +134,7 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
             state.selectedWebhookId = undefined;
             state.selectedNotificationId = undefined;
             state.selectedEscalationPolicyId = undefined;
+            state.settingMode = 'settings';
         },
         async fetchServiceDetailData(id: string) {
             state.loading = true;

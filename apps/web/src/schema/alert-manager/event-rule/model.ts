@@ -4,11 +4,13 @@ import type {
     EventRuleConditionsPolicyType,
     EventRuleConditionsType,
     EventRuleOptions,
+    EventRuleScopeType,
 } from '@/schema/alert-manager/event-rule/type';
 
 export interface EventRuleModel {
     event_rule_id: string;
     name: string;
+    scope: EventRuleScopeType;
     order: number;
     conditions: EventRuleConditionsType[];
     conditions_policy: EventRuleConditionsPolicyType;

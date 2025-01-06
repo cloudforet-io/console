@@ -8,3 +8,8 @@ export const EVENT_RULE_URGENCY = {
     HIGH: 'HIGH',
     LOW: 'LOW',
 } as const;
+
+export const EVENT_RULE_SCOPE = {
+    GLOBAL: 'GLOBAL',
+    WEBHOOK: 'WEBHOOK',
+};

@@ -1,7 +1,8 @@
-import type { EVENT_RULE_CONDITIONS_POLICY, EVENT_RULE_URGENCY } from '@/schema/alert-manager/event-rule/constant';
+import type { EVENT_RULE_CONDITIONS_POLICY, EVENT_RULE_URGENCY, EVENT_RULE_SCOPE } from '@/schema/alert-manager/event-rule/constant';
 
 export type EventRuleConditionsPolicyType = typeof EVENT_RULE_CONDITIONS_POLICY[keyof typeof EVENT_RULE_CONDITIONS_POLICY];
 export type EventRuleUrgencyType = typeof EVENT_RULE_URGENCY[keyof typeof EVENT_RULE_URGENCY];
+export type EventRuleScopeType = typeof EVENT_RULE_SCOPE[keyof typeof EVENT_RULE_SCOPE];
 
 export type EventRuleConditionsType = {
     key: 'title' | 'description' | 'rule' | 'severity' | 'resource' | 'account' | 'webhook_id' | 'project_id' | 'additional_info';
