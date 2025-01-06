@@ -118,7 +118,7 @@ export const useEditorContentTransformer = (op: {
         const c = transformEditorContentForUpload(ec);
         if (contents.value !== c) {
             contents.value = c;
-            const newFileIds = getFileIdsFromContents(ec);
+            const newFileIds = getFileIdsFromContents(c);
             if (!isEqual(fileIds.value, newFileIds)) {
                 fileIds.value = newFileIds;
             }

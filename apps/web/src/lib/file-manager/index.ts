@@ -23,7 +23,7 @@ const uploadFile = async (file: File, resourceGroup: FileManagerResourceGroupTyp
         resourceGroupPath = 'user';
     } else if (resourceGroup === 'PROJECT') {
         resourceGroupPath = 'project';
-        params = `?project_id=${resourceId || ''}`;
+        params = resourceId ? `?project_id=${resourceId}` : '';
     } else { resourceGroupPath = 'public'; }
 
     const response = await SpaceConnector.restClient.post(`/files/${resourceGroupPath}/upload${params}`, formData, {

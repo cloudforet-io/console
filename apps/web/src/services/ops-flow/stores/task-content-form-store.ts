@@ -104,8 +104,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         defaultFields: computed<TaskField[]>(() => {
             const projectRequired = state.currentTaskType?.require_project;
             if (projectRequired) return taskFieldMetadataStore.getters.projectScopeDefaultFields;
-            return taskFieldMetadataStore.getters.projectScopeDefaultFields;
-            // return taskFieldMetadataStore.getters.workspaceScopeDefaultFields;
+            return taskFieldMetadataStore.getters.workspaceScopeDefaultFields;
         }),
         isDefaultFieldValid: computed<boolean>(() => {
             if (state.mode === 'view') return state.defaultDataValidationMap[DEFAULT_FIELD_ID_MAP.title] ?? true;
