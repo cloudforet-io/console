@@ -30,10 +30,9 @@ const {
     isInvalid, invalidText,
 } = useTaskFieldValidation(props, emit);
 
-const resourceId = computed(() => props.references?.project_id);
 const { fileUploader } = useFileUploader({
     resourceGroup: 'PROJECT',
-    resourceId,
+    resourceId: '*',
 });
 const {
     contents,
@@ -44,7 +43,7 @@ const {
     contentType: 'markdown',
     resourceGroup: 'PROJECT',
     fileIds: props.files.map((f) => f.file_id),
-    resourceId: computed(() => props.references?.project_id),
+    resourceId: '*',
 });
 
 watch(contents, updateFieldValue);

@@ -102,7 +102,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
             return isViewMode ? fields : fields.filter((f) => f.is_primary || f.is_required);
         }),
         defaultFields: computed<TaskField[]>(() => {
-            const projectRequired = state.currentTaskType?.required_project;
+            const projectRequired = state.currentTaskType?.require_project;
             if (projectRequired) return taskFieldMetadataStore.getters.projectScopeDefaultFields;
             return taskFieldMetadataStore.getters.projectScopeDefaultFields;
             // return taskFieldMetadataStore.getters.workspaceScopeDefaultFields;
@@ -126,7 +126,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
             return false;
         }),
         references: computed<References>(() => {
-            const projectRequired = state.currentTaskType?.required_project;
+            const projectRequired = state.currentTaskType?.require_project;
             return {
                 project_id: projectRequired ? state.defaultData[DEFAULT_FIELD_ID_MAP.project] : '*',
             };
@@ -238,7 +238,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
                     assignee: state.assignee || undefined,
                     data: isEmpty(state.data) ? undefined : state.data,
                     files: state.fileIds,
-                    project_id: state.currentTaskType.required_project ? state.defaultData[DEFAULT_FIELD_ID_MAP.project] : '*',
+                    project_id: state.currentTaskType.require_project ? state.defaultData[DEFAULT_FIELD_ID_MAP.project] : '*',
                 });
                 showSuccessMessage(i18n.t('OPSFLOW.ALT_S_CREATE_TARGET', { target: taskManagementTemplateStore.templates.task }), '');
                 state.createTaskLoading = false;
