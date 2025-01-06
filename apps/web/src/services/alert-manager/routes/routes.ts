@@ -15,6 +15,7 @@ const ServiceDetailPage = () => import('@/services/alert-manager/pages/ServiceDe
 const ServiceCreatePage = () => import('@/services/alert-manager/pages/ServiceCreatePage.vue');
 const ServiceDetailWebhookCreatePage = () => import('@/services/alert-manager/pages/ServiceDetailWebhookCreatePage.vue');
 const ServiceDetailNotificationsCreatePage = () => import('@/services/alert-manager/pages/ServiceDetailNotificationsCreatePage.vue');
+const ServiceDetailEventRulePage = () => import('@/services/alert-manager/pages/ServiceDetailEventRulePage.vue');
 const AlertsMainPage = () => import('@/services/alert-manager/pages/AlertsMainPage.vue');
 const AlertsDetailPage = () => import('@/services/alert-manager/pages/AlertsDetailPage.vue');
 
@@ -75,6 +76,12 @@ const alertManagerRoute: RouteConfig = {
                             props: true,
                             meta: { centeredLayout: true },
                             component: ServiceDetailNotificationsCreatePage as any,
+                        },
+                        {
+                            path: 'event-rule',
+                            name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL.EVENT_RULE._NAME,
+                            props: true,
+                            component: ServiceDetailEventRulePage as any,
                         },
                     ],
                 },
