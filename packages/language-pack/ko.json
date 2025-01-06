@@ -4263,6 +4263,7 @@
 			"FIELD_REQUIRED": "이 필드는 필수입니다",
 			"FORM": "폼 입력",
 			"GLOBAL": "글로벌",
+			"GROUP_TYPE": "그룹 > 타입",
 			"JSON": "JSON 입력",
 			"KEY": "키",
 			"LABELS": "라벨",

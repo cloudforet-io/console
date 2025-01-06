@@ -4263,6 +4263,7 @@
 			"FIELD_REQUIRED": "This Field is Required",
 			"FORM": "Form Input",
 			"GLOBAL": "Global",
+			"GROUP_TYPE": "Group > Type",
 			"JSON": "JSON Input",
 			"KEY": "Key",
 			"LABELS": "Labels",
