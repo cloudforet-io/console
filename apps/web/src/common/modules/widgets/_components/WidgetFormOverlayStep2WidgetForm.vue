@@ -35,7 +35,7 @@ const FORM_TITLE_MAP = {
     REQUIRED_FIELDS: 'REQUIRED_FIELDS',
     OPTIONAL_FIELDS: 'OPTIONAL_FIELDS',
 };
-const DATE_CONFIG_FIELD_KEYS = ['granularity', 'dateRange'];
+const DATE_CONFIG_FIELD_KEYS = ['granularity', 'dateRange', 'dateFormat'];
 
 interface Props {
     widgetValidationInvalid?: boolean;
@@ -63,9 +63,12 @@ const state = reactive({
     defaultValidationConfig: computed(() => state.widgetConfig.meta?.defaultValidationConfig),
     widgetDefaultValidationModalVisible: false,
     formErrorModalValue: undefined as number|undefined,
-    widgetDateConfigSchemaMap: computed(() => Object.entries(state.widgetConfig.requiredFieldsSchema).filter(([key]) => DATE_CONFIG_FIELD_KEYS.includes(key))),
+    widgetDateConfigSchemaMap: computed(() => Object.entries({
+        ...state.widgetConfig.requiredFieldsSchema,
+        ...state.widgetConfig.optionalFieldsSchema,
+    }).filter(([key]) => DATE_CONFIG_FIELD_KEYS.includes(key))),
     widgetRequiredFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.requiredFieldsSchema).filter(([key]) => !DATE_CONFIG_FIELD_KEYS.includes(key))),
-    widgetOptionalFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.optionalFieldsSchema)),
+    widgetOptionalFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.optionalFieldsSchema).filter(([key]) => !DATE_CONFIG_FIELD_KEYS.includes(key))),
     // display
     collapsedTitleMap: {
         [FORM_TITLE_MAP.DATE_CONFIG]: false,
