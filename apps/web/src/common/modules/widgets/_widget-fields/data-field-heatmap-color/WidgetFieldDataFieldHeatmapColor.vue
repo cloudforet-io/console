@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, reactive, watch,
+    computed, reactive,
 } from 'vue';
 
 import {
@@ -9,23 +9,44 @@ import {
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 
+import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
+import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import { i18n } from '@/translations';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
+import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { DATA_FIELD_HEATMAP_COLOR } from '@/common/modules/widgets/_constants/widget-field-constant';
-import type { DataFieldHeatmapColor, DataFieldHeatmapColorValue, DataFieldHeatmapColorOptions } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
+import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
+import type {
+    DataFieldHeatmapColor,
+    DataFieldHeatmapColorOptions,
+    DataFieldHeatmapColorValue,
+} from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
 import type {
     WidgetFieldComponentProps,
-    WidgetFieldComponentEmit,
 } from '@/common/modules/widgets/types/widget-field-type';
 
 
-const emit = defineEmits<WidgetFieldComponentEmit<DataFieldHeatmapColorValue>>();
-const props = defineProps<WidgetFieldComponentProps<DataFieldHeatmapColorOptions, DataFieldHeatmapColorValue>>();
+const FIELD_KEY = 'dataFieldHeatmapColor';
+
+const props = defineProps<WidgetFieldComponentProps<DataFieldHeatmapColorOptions>>();
+const widgetGenerateStore = useWidgetGenerateStore();
+const widgetGenerateGetters = widgetGenerateStore.getters;
+
+const storeState = reactive({
+    selectedDataTable: computed<PrivateDataTableModel|PublicDataTableModel|undefined>(() => widgetGenerateGetters.selectedDataTable),
+});
+
 const state = reactive({
+    isPivotDataTable: computed<boolean>(() => storeState.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
     isInitiated: false,
-    proxyValue: useProxyValue<DataFieldHeatmapColorValue|undefined>('value', props, emit),
-    dataFieldList: computed<string[]>(() => Object.keys(props.dataTable?.data_info ?? {}) ?? []),
+    fieldValue: computed<DataFieldHeatmapColorValue>(() => props.fieldManager.data[FIELD_KEY].value),
+    dataFieldList: computed<string[]>(() => {
+        const columnFieldForPivot = storeState.selectedDataTable?.options.PIVOT?.fields?.column;
+        if (state.isPivotDataTable && columnFieldForPivot) {
+            return [columnFieldForPivot];
+        }
+        return Object.keys(widgetGenerateGetters.selectedDataTable?.data_info ?? {}) ?? [];
+    }),
     menuItems: computed<SelectDropdownMenuItem[]>(() => Object.entries(DATA_FIELD_HEATMAP_COLOR).map(([key, value]) => {
         if (key === DATA_FIELD_HEATMAP_COLOR.NONE.key) {
             return {
@@ -41,32 +62,20 @@ const state = reactive({
 });
 
 /* Util */
-const getDataFieldHeatmapColor = (colorKey: DataFieldHeatmapColor) => DATA_FIELD_HEATMAP_COLOR[colorKey].key.toLowerCase();
+const getDataFieldHeatmapColor = (colorKey: DataFieldHeatmapColor): string => {
+    if (!colorKey) return '';
+    return DATA_FIELD_HEATMAP_COLOR[colorKey].key.toLowerCase();
+};
 
 /* Event */
 const handleSelectMenuItem = (dataField: string, selected: DataFieldHeatmapColor) => {
-    state.proxyValue = {
-        ...state.proxyValue,
+    props.fieldManager.setFieldValue(FIELD_KEY, {
+        ...state.fieldValue,
         [dataField]: {
-            value: selected,
+            colorInfo: selected,
         },
-    };
-};
-
-/* Watcher */
-watch(() => state.proxyValue, () => {
-    emit('update:is-valid', true);
-}, { immediate: true });
-watch(() => state.dataFieldList, (dataFieldList) => {
-    if (!dataFieldList.length) return;
-    const _proxyValue: DataFieldHeatmapColorValue = {};
-    dataFieldList.forEach((d) => {
-        _proxyValue[d] = {
-            value: state.proxyValue?.[d]?.value ?? props.widgetConfig?.optionalFieldsSchema.dataFieldHeatmapColor?.options?.default ?? DATA_FIELD_HEATMAP_COLOR.NONE.key,
-        };
     });
-    state.proxyValue = _proxyValue;
-}, { immediate: true });
+};
 
 </script>
 
@@ -86,7 +95,7 @@ watch(() => state.dataFieldList, (dataFieldList) => {
                         <p-select-dropdown use-fixed-menu-style
                                            reset-selection-on-menu-close
                                            :menu="state.menuItems"
-                                           :selected="state.proxyValue?.[dataField]?.value"
+                                           :selected="state.fieldValue?.[dataField]?.colorInfo"
                                            block
                                            @select="handleSelectMenuItem(dataField, $event)"
                         >
@@ -116,7 +125,7 @@ watch(() => state.dataFieldList, (dataFieldList) => {
                                    use-fixed-menu-style
                                    reset-selection-on-menu-close
                                    :menu="state.menuItems"
-                                   :selected="state.proxyValue?.[dataField]?.value"
+                                   :selected="state.fieldValue?.[dataField]?.colorInfo"
                                    block
                                    @select="handleSelectMenuItem(dataField, $event)"
                 >

@@ -2,14 +2,17 @@ import type {
     DashboardOptions,
     DashboardVars,
 } from '@/schema/dashboard/_types/dashboard-type';
+import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
+import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 
-import type { APIErrorToast } from '@/common/composables/error/errorHandler';
 import type { WIDGET_SIZE } from '@/common/modules/widgets/_constants/widget-display-constant';
+import type { WidgetFieldValue } from '@/common/modules/widgets/_widget-field-value-manager/type';
 import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-field-type';
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { WidgetState } from '@/common/modules/widgets/types/widget-model';
 
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
+
 
 
 export type WidgetSize = typeof WIDGET_SIZE[keyof typeof WIDGET_SIZE];
@@ -23,7 +26,8 @@ export interface WidgetProps {
     description?: string;
     size?: WidgetSize;
     width?: number;
-    widgetOptions?: Record<WidgetFieldName, WidgetFieldValues>;
+    widgetOptions?: Record<WidgetFieldName, WidgetFieldValue<WidgetFieldValues>>;
+    dataTables?: (PublicDataTableModel|PrivateDataTableModel)[];
     //
     mode?: 'overlay'|'view';
     // from dashboard
@@ -42,18 +46,12 @@ export interface WidgetEmit {
     (event: 'click-delete'): void;
     (event: 'click-edit'): void;
     (event: 'toggle-size', size: WidgetSize): void;
-}
-
-export interface WidgetFrameEmit {
-    (event: 'click-expand'): void;
-    (event: 'click-delete'): void;
-    (event: 'click-edit'): void;
+    // for only widget frame
     (event: 'click-clone'): void;
-    (event: 'toggle-size', size: WidgetSize): void;
 }
 
 export type WidgetOverlayType = 'ADD'|'EDIT'|'EXPAND';
 
-export interface WidgetExpose<Data = any> {
-    loadWidget: (...args: any) => Promise<Data|APIErrorToast>;
+export interface WidgetExpose {
+    loadWidget: (...args: any) => Promise<void>|void;
 }

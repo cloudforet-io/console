@@ -57,7 +57,6 @@ const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 const state = reactive({
-    loading: true,
     currentPath: computed(() => route.fullPath),
     publicV2DashboardMenuSet: computed(() => getDashboardMenuSet(dashboardPageControlGetters.publicDashboardItems)),
     privateV2DashboardMenuSet: computed(() => getDashboardMenuSet(dashboardPageControlGetters.privateDashboardItems)),

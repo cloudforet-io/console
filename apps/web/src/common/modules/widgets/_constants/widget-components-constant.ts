@@ -46,9 +46,9 @@ export const WIDGET_COMPONENTS: Record<WidgetConfigKey, AsyncComponent> = {
     colorCodedTableHeatmap: () => ({
         component: import('@/common/modules/widgets/_widgets/color-coded-table-heatmap/ColorCodedTableHeatmap.vue'),
     }),
-    // progressCard: () => ({
-    //     component: import('@/common/modules/widgets/_widgets/progress-card/ProgressCard.vue'),
-    // }),
+    sankeyChart: () => ({
+        component: import('@/common/modules/widgets/_widgets/sankey-chart/SankeyChart.vue'),
+    }),
 };
 
 export const WIDGET_COMPONENT_ICON_MAP: Record<WidgetConfigKey, string> = {
@@ -66,5 +66,5 @@ export const WIDGET_COMPONENT_ICON_MAP: Record<WidgetConfigKey, string> = {
     gauge: 'ic_chart-gauge',
     colorCodedHeatmap: 'ic_chart-color-heatmap',
     colorCodedTableHeatmap: 'ic_chart-heatmap-table',
-    // progressCard: 'ic_chart-progress-card',
+    sankeyChart: 'ic_chart-sankey-chart',
 };

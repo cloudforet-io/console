@@ -1,11 +1,9 @@
 import type { Component } from 'vue';
 
-import advancedFormatRules from '@/common/modules/widgets/_widget-fields/advanced-format-rules/WidgetFieldAdvancedFormatRules.vue';
 import categoryBy from '@/common/modules/widgets/_widget-fields/category-by/WidgetFieldCategoryBy.vue';
 import colorSchema from '@/common/modules/widgets/_widget-fields/color-schema/WidgetFieldColorSchema.vue';
 import comparison from '@/common/modules/widgets/_widget-fields/comparison/WidgetFieldComparison.vue';
 import customTableColumnWidth from '@/common/modules/widgets/_widget-fields/custom-table-column-width/WidgetFieldCustomTableColumnWidth.vue';
-import dateAggregationOptions from '@/common/modules/widgets/_widget-fields/data-aggregation-options/WidgetFieldDateAggregationOptions.vue';
 import dataFieldHeatmapColor from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/WidgetFieldDataFieldHeatmapColor.vue';
 import dataField from '@/common/modules/widgets/_widget-fields/data-field/WidgetFieldDataField.vue';
 import dateFormat from '@/common/modules/widgets/_widget-fields/date-format/WidgetFieldDateFormat.vue';
@@ -17,17 +15,16 @@ import granularity from '@/common/modules/widgets/_widget-fields/granularity/Wid
 import groupBy from '@/common/modules/widgets/_widget-fields/group-by/WidgetFieldGroupBy.vue';
 import icon from '@/common/modules/widgets/_widget-fields/icon/WidgetFieldIcon.vue';
 import legend from '@/common/modules/widgets/_widget-fields/legend/WidgetFieldLegend.vue';
-import lineBy from '@/common/modules/widgets/_widget-fields/line-by/WidgetFieldLineBy.vue';
 import max from '@/common/modules/widgets/_widget-fields/max/WidgetFieldMax.vue';
 import min from '@/common/modules/widgets/_widget-fields/min/WidgetFieldMin.vue';
 import missingValue from '@/common/modules/widgets/_widget-fields/missing-value/WidgetFieldMissingValue.vue';
 import numberFormat from '@/common/modules/widgets/_widget-fields/number-format/WidgetFieldNumberFormat.vue';
 import pieChartType from '@/common/modules/widgets/_widget-fields/pie-chart-type/WidgetFieldPieChartType.vue';
-import progressBar from '@/common/modules/widgets/_widget-fields/progress-bar/WidgetFieldProgressBar.vue';
+import sankeyDimensions from '@/common/modules/widgets/_widget-fields/sankey-dimensions/WidgetFieldSankeyDimensions.vue';
 import stackBy from '@/common/modules/widgets/_widget-fields/stack-by/WidgetFieldStackBy.vue';
 import subTotal from '@/common/modules/widgets/_widget-fields/sub-total/WidgetFieldSubTotal.vue';
+import tableColumnComparison from '@/common/modules/widgets/_widget-fields/table-column-comparison/WidgetFieldTableColumnComparison.vue';
 import tableColumnWidth from '@/common/modules/widgets/_widget-fields/table-column-width/WidgetFieldTableColumnWidth.vue';
-import tableDataField from '@/common/modules/widgets/_widget-fields/table-data-field/WidgetFieldTableDataField.vue';
 import textWrap from '@/common/modules/widgets/_widget-fields/text-wrap/WidgetFieldTextWrap.vue';
 import tooltipNumberFormat from '@/common/modules/widgets/_widget-fields/tooltip-number-format/WidgetFieldTooltipNumberFormat.vue';
 import total from '@/common/modules/widgets/_widget-fields/total/WidgetFieldTotal.vue';
@@ -39,25 +36,21 @@ import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-fiel
 
 export const WIDGET_FIELD_COMPONENTS: Record<Partial<WidgetFieldName>, Component> = {
     dateRange,
-    dateAggregationOptions,
     dataField,
-    tableDataField,
     xAxis,
     yAxis,
     stackBy,
-    lineBy,
     groupBy,
     categoryBy,
     min,
     max,
     formatRules,
-    advancedFormatRules,
     legend,
-    progressBar,
     icon,
     subTotal,
     total,
     comparison,
+    tableColumnComparison,
     granularity,
     colorSchema,
     pieChartType,
@@ -72,4 +65,5 @@ export const WIDGET_FIELD_COMPONENTS: Record<Partial<WidgetFieldName>, Component
     missingValue,
     widgetHeight,
     tooltipNumberFormat,
+    sankeyDimensions,
 };

@@ -1,93 +1,81 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive,
 } from 'vue';
 
 import { cloneDeep } from 'lodash';
 
 import {
-    PButton, PFieldGroup, PIconButton, PTextInput,
+    PButton, PFieldGroup, PIconButton, PTextInput, PSelectDropdown,
 } from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
-import { FORMAT_RULE_TYPE } from '@/common/modules/widgets/_constants/widget-field-constant';
-import type { FormatRulesValue, FormatRulesType, FormatRulesOptions } from '@/common/modules/widgets/_widget-fields/format-rules/type';
+import {
+    FORMAT_RULE_TYPE,
+} from '@/common/modules/widgets/_constants/widget-field-constant';
+import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
+import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
+import { widgetValidatorRegistry } from '@/common/modules/widgets/_widget-field-value-manager/constant/validator-registry';
 import type {
-    WidgetFieldComponentEmit,
+    FormatRulesValue, FormatRulesOptions, ThresholdValue, FormatRulesType,
+
+} from '@/common/modules/widgets/_widget-fields/format-rules/type';
+import type {
     WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
-import { violet } from '@/styles/colors';
 
+const FIELD_KEY = 'formatRules';
 
-const props = withDefaults(defineProps<WidgetFieldComponentProps<FormatRulesOptions, FormatRulesValue[]>>(), {
-    widgetFieldSchema: () => ({}),
-});
+const props = defineProps<WidgetFieldComponentProps<FormatRulesOptions>>();
+const widgetGenerateStore = useWidgetGenerateStore();
+const widgetGenerateGetters = widgetGenerateStore.getters;
 
-const BASE_THRESHOLD = 0;
-const DEFAULT_BASE_COLOR = violet[400];
+const validator = widgetValidatorRegistry[FIELD_KEY];
 
-const emit = defineEmits<WidgetFieldComponentEmit<FormatRulesValue[]>>();
 const state = reactive({
-    customValue: [],
-    baseColor: DEFAULT_BASE_COLOR,
-    value: computed(() => cloneDeep([{ threshold: BASE_THRESHOLD, color: state.baseColor }, ...state.customValue])),
-    type: computed<FormatRulesType>(() => props.widgetFieldSchema.options?.formatRulesType ?? FORMAT_RULE_TYPE.threshold),
-    fieldNameValidationList: [],
-    isAllValid: computed(() => state.fieldNameValidationList.every((valid:boolean) => valid)),
-});
-
-/* Util */
-const getInitialFormatRulesValue = (): FormatRulesValue => ({
-    threshold: undefined,
-    color: props.widgetFieldSchema?.options?.baseColor ?? violet[400],
+    fieldValue: computed<FormatRulesValue>(() => props.fieldManager.data[FIELD_KEY].value),
+    type: computed<FormatRulesType>(() => props.widgetFieldSchema?.options?.formatRulesType as FormatRulesType),
+    invalid: computed(() => !validator(state.fieldValue, props.widgetConfig)),
+    selectedField: computed<string|undefined>(() => {
+        if (props.widgetFieldSchema?.options?.useField) {
+            return state.fieldValue.field;
+        }
+        return undefined;
+    }),
+    menuItems: computed<MenuItem[]>(() => {
+        const dataTarget = props.widgetFieldSchema?.options?.dataTarget;
+        if (!widgetGenerateGetters.selectedDataTable || !dataTarget) return [];
+        const dataInfoList = sortWidgetTableFields(Object.keys(widgetGenerateGetters.selectedDataTable?.[dataTarget] ?? {})) ?? [];
+        return dataInfoList.map((d) => ({
+            name: d,
+            label: d,
+        }));
+    }),
 });
 
 /* Event */
 const handleClickAddRule = () => {
-    state.customValue = [...state.customValue, getInitialFormatRulesValue()];
-    state.fieldNameValidationList = [...state.fieldNameValidationList, undefined];
+    const _newRule: ThresholdValue = { number: undefined, text: undefined, color: state.fieldValue.baseColor };
+    props.fieldManager.setFieldValue(FIELD_KEY, { ...state.fieldValue, rules: [...state.fieldValue.rules, _newRule] });
 };
 const handleDelete = (idx: number) => {
-    const _customValue = cloneDeep(state.customValue);
-    _customValue.splice(idx, 1);
-    state.customValue = _customValue;
-    const updatedCustomValue = cloneDeep(state.fieldNameValidationList);
-    updatedCustomValue.splice(idx, 1);
-    state.fieldNameValidationList = updatedCustomValue;
+    const _rules = cloneDeep(state.fieldValue.rules);
+    _rules.splice(idx, 1);
+    props.fieldManager.setFieldValue(FIELD_KEY, { ...state.fieldValue, rules: _rules });
 };
-const handleFormatRuleInput = (idx: number|string, key: 'threshold'|'color', val: string) => {
-    const _customValue = cloneDeep(state.customValue);
-    _customValue[idx][key] = val;
-    state.customValue = _customValue;
-    const updatedFieldNameValidationList = cloneDeep(state.fieldNameValidationList);
-    updatedFieldNameValidationList[idx] = !!val;
-    state.fieldNameValidationList = updatedFieldNameValidationList;
+const handleFormatRuleInput = (idx: number|string, key: 'text'|'number'|'color', val: string) => {
+    const _rules = cloneDeep(state.fieldValue.rules);
+    _rules[idx][key] = key === 'number' ? parseFloat(val) : val;
+    props.fieldManager.setFieldValue(FIELD_KEY, { ...state.fieldValue, rules: _rules });
 };
-
 const handleBaseColor = (val: string) => {
-    state.baseColor = val;
+    props.fieldManager.setFieldValue(FIELD_KEY, { ...state.fieldValue, baseColor: val });
 };
-
-/* Watcher */
-watch(() => state.isAllValid, (isValid) => {
-    emit('update:is-valid', isValid);
-}, { immediate: true });
-
-watch(() => state.value, (value) => {
-    emit('update:value', value);
-});
-
-onMounted(() => {
-    state.baseColor = props.value?.[0].color ?? props.widgetFieldSchema.options?.baseColor ?? DEFAULT_BASE_COLOR;
-    const baseRemovedValue = (props.value ?? props.widgetFieldSchema.options?.default ?? []).filter((fm) => fm.threshold !== BASE_THRESHOLD);
-    state.customValue = baseRemovedValue;
-    state.fieldNameValidationList = (state.customValue ?? []).map((fm) => {
-        if (fm.threshold === undefined) return undefined;
-        return !!fm.threshold;
-    }) ?? [];
-    emit('update:value', state.value);
-});
+const handleUpdateField = (val: string) => {
+    props.fieldManager.setFieldValue(FIELD_KEY, { ...state.fieldValue, field: val });
+};
 
 </script>
 
@@ -96,9 +84,25 @@ onMounted(() => {
         <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.FORMAT_RULES')"
                        required
         >
-            <template #help>
+            <template v-if="props.widgetFieldSchema?.options?.description"
+                      #help
+            >
                 <span>{{ $t(props.widgetFieldSchema?.options?.description) }}</span>
             </template>
+            <p-field-group v-if="props.widgetFieldSchema?.options?.useField"
+                           :label="$t('COMMON.WIDGETS.FIELD')"
+                           style-type="secondary"
+                           required
+                           class="pb-1"
+            >
+                <p-select-dropdown :menu="state.menuItems"
+                                   :selected="state.selectedField"
+                                   use-fixed-menu-style
+                                   :invalid="state.selectedField === undefined"
+                                   block
+                                   @update:selected="handleUpdateField"
+                />
+            </p-field-group>
             <div class="format-rules-wrapper">
                 <p-button icon-left="ic_plus_bold"
                           style-type="tertiary"
@@ -108,27 +112,44 @@ onMounted(() => {
                     {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.ADD_RULE') }}
                 </p-button>
                 <div class="custom-menu-box">
-                    <div v-for="(formatRule, idx) in state.customValue"
-                         :key="idx"
+                    <div v-for="(rule, idx) in state.fieldValue.rules"
+                         :key="`advanced-format-rule-${rule.color}-${idx}`"
                          class="format-rules-input-wrapper"
                     >
-                        <p-field-group required>
-                            <p-text-input :value="formatRule.threshold"
-                                          type="number"
-                                          :name="`format-rule-threshold-${idx}`"
-                                          :min="0"
-                                          :invalid="state.fieldNameValidationList[idx] === false"
-                                          @update:value="handleFormatRuleInput(idx, 'threshold', $event)"
+                        <div class="left-part"
+                             :class="[state.type === FORMAT_RULE_TYPE.textNumberThreshold ? 'grid-cols-2' : 'grid-cols-1']"
+                        >
+                            <p-field-group v-if="state.type === FORMAT_RULE_TYPE.textNumberThreshold || state.type === FORMAT_RULE_TYPE.textThreshold"
+                                           required
                             >
-                                <template v-if="state.type === FORMAT_RULE_TYPE.percentThreshold"
-                                          #input-right
+                                <p-text-input :value="rule.text"
+                                              :invalid="!rule.text?.length"
+                                              placeholder="text"
+                                              @update:value="handleFormatRuleInput(idx, 'text', $event)"
+                                />
+                            </p-field-group>
+                            <p-field-group v-if="state.type === FORMAT_RULE_TYPE.textNumberThreshold
+                                               || state.type === FORMAT_RULE_TYPE.numberThreshold
+                                               || state.type === FORMAT_RULE_TYPE.percentThreshold"
+                                           required
+                            >
+                                <p-text-input :value="rule.number"
+                                              type="number"
+                                              :min="0"
+                                              placeholder="3000"
+                                              :invalid="Number.isNaN(rule.number)"
+                                              @update:value="handleFormatRuleInput(idx, 'number', $event)"
                                 >
-                                    %
-                                </template>
-                            </p-text-input>
-                        </p-field-group>
+                                    <template v-if="state.type === FORMAT_RULE_TYPE.percentThreshold"
+                                              #input-right
+                                    >
+                                        %
+                                    </template>
+                                </p-text-input>
+                            </p-field-group>
+                        </div>
                         <div class="right-part">
-                            <color-input :value="formatRule.color"
+                            <color-input :value="rule.color"
                                          class="color-input"
                                          @update:value="handleFormatRuleInput(idx, 'color', $event)"
                             />
@@ -149,7 +170,7 @@ onMounted(() => {
                         <span class="base-label">{{ $t('COMMON.WIDGETS.FORMAT_RULES.BASE') }}</span>
                     </p-text-input>
                     <div class="right-part">
-                        <color-input :value="state.baseColor"
+                        <color-input :value="state.fieldValue.baseColor"
                                      class="color-input"
                                      @update:value="handleBaseColor"
                         />
@@ -162,7 +183,6 @@ onMounted(() => {
 </template>
 
 <style lang="postcss" scoped>
-
 .format-rules-wrapper {
     @apply bg-gray-100 rounded-md;
     padding: 0.5rem;
@@ -180,9 +200,12 @@ onMounted(() => {
 
         .base-label {
             @apply text-label-md;
-            line-height: 1.09375rem;
         }
 
+        .left-part {
+            @apply grid gap-2;
+            width: 100%;
+        }
         .right-part {
             @apply flex gap-2 items-center;
             .color-input {
@@ -207,6 +230,5 @@ onMounted(() => {
     margin-bottom: 0;
     width: 100%;
     flex-shrink: 1;
-    padding: 0;
 }
 </style>

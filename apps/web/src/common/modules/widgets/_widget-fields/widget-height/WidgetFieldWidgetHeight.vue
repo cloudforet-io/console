@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive,
+    computed, reactive,
 } from 'vue';
 
 import {
@@ -8,20 +8,22 @@ import {
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
 import { WIDGET_HEIGHT } from '@/common/modules/widgets/_constants/widget-field-constant';
-import type { WidgetHeightValue, WidgetHeightOptions } from '@/common/modules/widgets/_widget-fields/widget-height/type';
 import type {
-    WidgetFieldComponentEmit,
+    WidgetHeightOptions,
+    WidgetHeightValue,
+} from '@/common/modules/widgets/_widget-fields/widget-height/type';
+import type {
     WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
-const emit = defineEmits<WidgetFieldComponentEmit<WidgetHeightValue|undefined>>();
+const FIELD_KEY = 'widgetHeight';
 
-const props = withDefaults(defineProps<WidgetFieldComponentProps<WidgetHeightOptions, WidgetHeightValue>>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<WidgetHeightOptions>>(), {
 });
 
 const state = reactive({
+    fieldValue: computed<WidgetHeightValue>(() => props.fieldManager.data[FIELD_KEY].value),
     widgetHeightMenuItems: computed<MenuItem[]>(() => [
         {
             name: WIDGET_HEIGHT.default,
@@ -32,26 +34,14 @@ const state = reactive({
             label: '100%',
         },
     ]),
-    proxyValue: useProxyValue('value', props, emit),
 });
 
-const handleChangeWidgetHeight = (value: boolean) => {
-    if (!state.proxyValue?.value) {
-        state.proxyValue = undefined;
-    } else {
-        state.proxyValue = {
-            value,
-        };
-    }
-    emit('update:value', state.proxyValue);
+const handleChangeWidgetHeight = (value: WidgetHeightValue['type']) => {
+    props.fieldManager.setFieldValue(FIELD_KEY, {
+        type: value,
+    });
 };
 
-onMounted(() => {
-    emit('update:is-valid', true);
-    state.proxyValue = {
-        value: props.value?.value ?? props.widgetFieldSchema?.options?.default ?? WIDGET_HEIGHT.default,
-    };
-});
 </script>
 
 <template>
@@ -64,7 +54,7 @@ onMounted(() => {
                                  :key="`select-button-${selectItem.name}`"
                                  :value="selectItem.name"
                                  style-type="secondary"
-                                 :selected="state.proxyValue?.value"
+                                 :selected="state.fieldValue?.type"
                                  @change="handleChangeWidgetHeight"
                 >
                     {{ selectItem.label }}

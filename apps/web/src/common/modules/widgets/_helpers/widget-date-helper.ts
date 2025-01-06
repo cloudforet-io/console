@@ -1,12 +1,9 @@
 import type { ManipulateType } from 'dayjs';
 import dayjs from 'dayjs';
-import { orderBy, sum } from 'lodash';
 
 import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
-import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import type { DateFormat } from '@/common/modules/widgets/_widget-fields/date-format/type';
-import type { TableDataFieldValue } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
-import type { DateRange, DynamicFieldData } from '@/common/modules/widgets/types/widget-data-type';
+import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 
@@ -157,103 +154,4 @@ export const getFormattedDate = (date: string, dateFormat: string): string => {
     const dateFormatsWithMMM = Object.values(DATE_FORMAT['MMM DD, YYYY']) as string[];
     if (dateFormatsWithMMM.includes(dateFormat)) return dayjs.utc(date).locale('en').format(dateFormat);
     return dayjs.utc(date).format(dateFormat);
-};
-
-
-export const getRefinedDynamicFieldData = (rawData: DynamicFieldData, dynamicFieldInfo: TableDataFieldValue['dynamicFieldInfo'], xAxisField: string): [any[], string[]] => {
-    if (!rawData?.results?.length) return [[], []];
-
-    const valueType = dynamicFieldInfo?.valueType;
-    const valueCount = dynamicFieldInfo?.count || 0;
-    const criteria = dynamicFieldInfo?.criteria as string;
-    const dataField = dynamicFieldInfo?.fieldValue as string;
-    const dynamicFieldValue = dynamicFieldInfo?.fixedValue || [];
-
-    const _refinedResults: any[] = [];
-    let _seriesFields: string[] = [];
-    if (valueType === 'fixed') {
-        let _etcExists = false;
-        rawData.results.forEach((result) => {
-            const _filteredData = (result[criteria] || []).filter((d) => dynamicFieldValue.includes(d[dataField]));
-
-            // etc data
-            const _etcData = (result[criteria] || []).filter((d) => !dynamicFieldValue.includes(d[dataField]));
-            const _etcValueSum = sum(_etcData.map((v) => v.value || 0));
-            if (_etcValueSum > 0) _etcExists = true;
-
-            _refinedResults.push({
-                ...result,
-                [criteria]: [
-                    ..._filteredData,
-                    { [dataField]: 'etc', value: _etcValueSum },
-                ],
-            });
-        });
-        _seriesFields = [...dynamicFieldValue];
-        if (_etcExists) _seriesFields.push('etc');
-    } else {
-        let _etcExists = false;
-        const _seriesFieldsSet = new Set<string>();
-
-        rawData.results?.forEach((result) => {
-            let _refinedData: any[] = [];
-            if (isDateField(dataField)) {
-                _refinedData = orderBy(result[criteria], dataField, 'desc') ?? [];
-            } else {
-                _refinedData = orderBy(result[criteria], 'value', 'desc') ?? [];
-            }
-            _refinedData = _refinedData.slice(0, valueCount);
-            _refinedData.forEach((v) => {
-                _seriesFieldsSet.add(v[dataField]);
-            });
-            _seriesFields = Array.from(_seriesFieldsSet);
-            if (isDateField(dataField)) _seriesFields.sort();
-
-            // etc data
-            const _etcData = (result[criteria] || []).filter((d) => !_seriesFields.includes(d[dataField]));
-            const _etcValueSum = sum(_etcData.map((v) => v.value || 0));
-            if (_etcValueSum > 0) _etcExists = true;
-
-            _refinedResults.push({
-                [criteria]: [
-                    ..._refinedData,
-                    { [dataField]: 'etc', value: _etcValueSum },
-                ],
-                [xAxisField]: result[xAxisField],
-            });
-        });
-
-
-        if (!isDateField(dataField) && _etcExists) _seriesFields.push('etc');
-    }
-
-    return [_refinedResults, _seriesFields];
-};
-export const getRefinedHeatmapDynamicFieldData = (rawData: DynamicFieldData, dynamicFieldInfo: TableDataFieldValue['dynamicFieldInfo']): string[] => {
-    if (!rawData?.results?.length) return [];
-
-    const valueType = dynamicFieldInfo?.valueType;
-    const valueCount = dynamicFieldInfo?.count || 0;
-    const criteria = dynamicFieldInfo?.criteria as string;
-    const dataField = dynamicFieldInfo?.fieldValue as string;
-    const dynamicFieldValue = dynamicFieldInfo?.fixedValue || [];
-
-    let _seriesFields: string[] = [];
-    if (valueType === 'fixed') {
-        _seriesFields = [...dynamicFieldValue];
-    } else {
-        const _subTotalResults: Record<string, number> = {};
-        rawData.results.forEach((result) => {
-            if (!Array.isArray(result[criteria])) return;
-            result[criteria]?.forEach((d) => {
-                if (d[dataField] in _subTotalResults) {
-                    _subTotalResults[d[dataField]] += d.value;
-                } else {
-                    _subTotalResults[d[dataField]] = d.value;
-                }
-            });
-        });
-        _seriesFields = orderBy(Object.entries(_subTotalResults), 1, 'desc').slice(0, valueCount).map(([k]) => k);
-    }
-    return _seriesFields;
 };

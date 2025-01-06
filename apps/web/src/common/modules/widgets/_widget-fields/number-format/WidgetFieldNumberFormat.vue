@@ -9,15 +9,18 @@ import {
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import { customNumberFormatter } from '@cloudforet/utils';
 
+import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
+import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import { i18n } from '@/translations';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
+import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { NUMBER_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
+import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { NumberFormat, NumberFormatValue, NumberFormatOptions } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type {
     WidgetFieldComponentProps,
-    WidgetFieldComponentEmit,
 } from '@/common/modules/widgets/types/widget-field-type';
+
 
 
 const SAMPLE_NUMBER = 7564613647;
@@ -29,12 +32,27 @@ const SAMPLE_FORMAT_LIST = [
     { format: '#,##0,"천"', sample: 1234000 },
     { format: '#,##0,,"백만"', sample: 1234000000 },
 ];
-const emit = defineEmits<WidgetFieldComponentEmit<NumberFormatValue>>();
-const props = defineProps<WidgetFieldComponentProps<NumberFormatOptions, NumberFormatValue>>();
+const FIELD_KEY = 'numberFormat';
+
+const props = defineProps<WidgetFieldComponentProps<NumberFormatOptions>>();
+const widgetGenerateStore = useWidgetGenerateStore();
+const widgetGenerateGetters = widgetGenerateStore.getters;
+
+const storeState = reactive({
+    selectedDataTable: computed<PrivateDataTableModel|PublicDataTableModel|undefined>(() => widgetGenerateGetters.selectedDataTable),
+});
+
 const state = reactive({
+    isPivotDataTable: computed<boolean>(() => storeState.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
     isInitiated: false,
-    proxyValue: useProxyValue<NumberFormatValue|undefined>('value', props, emit),
-    dataFieldList: computed<string[]>(() => Object.keys(props.dataTable?.data_info ?? {}) ?? []),
+    fieldValue: computed<NumberFormatValue>(() => props.fieldManager.data[FIELD_KEY].value),
+    dataFieldList: computed<string[]>(() => {
+        const columnFieldForPivot = storeState.selectedDataTable?.options.PIVOT?.fields?.column;
+        if (state.isPivotDataTable && columnFieldForPivot) {
+            return [columnFieldForPivot];
+        }
+        return Object.keys(widgetGenerateGetters.selectedDataTable?.data_info ?? {}) ?? [];
+    }),
     menuItems: computed<SelectDropdownMenuItem[]>(() => [
         {
             name: NUMBER_FORMAT.AUTO,
@@ -67,11 +85,12 @@ const state = reactive({
     customModalVisible: false as boolean,
     customTargetDataField: '' as string,
     customNumberFormat: '#,##0' as string,
+    numberFormatHelpLink: computed<string>(() => ''), // TODO: add link
 });
 
 /* Util */
 const getDropdownButtonText = (label: string, dataField: string): string => {
-    const _customNumberFormat = state.proxyValue?.[dataField]?.customNumberFormat;
+    const _customNumberFormat = state.fieldValue?.[dataField]?.customNumberFormat;
     if (_customNumberFormat) {
         return `${label} (${_customNumberFormat})`;
     }
@@ -90,50 +109,35 @@ const handleSelectMenuItem = (dataField: string, selected: NumberFormat) => {
     if (selected === NUMBER_FORMAT.CUSTOM) {
         state.customTargetDataField = dataField;
         state.customModalVisible = true;
-        if (state.proxyValue?.[dataField]?.format === NUMBER_FORMAT.CUSTOM) {
-            state.customNumberFormat = state.proxyValue?.[dataField]?.customNumberFormat ?? '#,##0';
+        if (state.fieldValue?.[dataField]?.format === NUMBER_FORMAT.CUSTOM) {
+            state.customNumberFormat = state.fieldValue?.[dataField]?.customNumberFormat ?? '#,##0';
         }
         return;
     }
-    state.proxyValue = {
-        ...state.proxyValue,
+    props.fieldManager.setFieldValue(FIELD_KEY, {
+        ...state.fieldValue,
         [dataField]: {
             format: selected,
         },
-    };
+    });
 };
 const handleCancelCustomModal = () => {
     state.customModalVisible = false;
 };
 const handleConfirmCustomModal = () => {
-    state.proxyValue = {
-        ...state.proxyValue,
+    props.fieldManager.setFieldValue(FIELD_KEY, {
+        ...state.fieldValue,
         [state.customTargetDataField]: {
             format: NUMBER_FORMAT.CUSTOM,
             customNumberFormat: state.customNumberFormat,
         },
-    };
+    });
     state.customModalVisible = false;
 };
 const handleClickSampleFormat = (format: string) => {
     state.customNumberFormat = format;
 };
 
-/* Watcher */
-watch(() => state.proxyValue, () => {
-    emit('update:is-valid', true);
-}, { immediate: true });
-watch(() => state.dataFieldList, (dataFieldList) => {
-    if (!dataFieldList.length) return;
-    const _proxyValue: NumberFormatValue = {};
-    dataFieldList.forEach((d) => {
-        _proxyValue[d] = {
-            format: state.proxyValue?.[d]?.format ?? props.widgetConfig?.optionalFieldsSchema.numberFormat?.options?.default ?? NUMBER_FORMAT.AUTO,
-            customNumberFormat: state.proxyValue?.[d]?.customNumberFormat ?? undefined,
-        };
-    });
-    state.proxyValue = _proxyValue;
-}, { immediate: true });
 watch(() => state.customModalVisible, (modalVisible) => {
     if (!modalVisible) state.customNumberFormat = '#,##0';
 });
@@ -155,7 +159,7 @@ watch(() => state.customModalVisible, (modalVisible) => {
                         <p-select-dropdown use-fixed-menu-style
                                            reset-selection-on-menu-close
                                            :menu="state.menuItems"
-                                           :selected="state.proxyValue?.[dataField]?.format"
+                                           :selected="state.fieldValue?.[dataField]?.format"
                                            block
                                            @select="handleSelectMenuItem(dataField, $event)"
                         >
@@ -172,7 +176,7 @@ watch(() => state.customModalVisible, (modalVisible) => {
                                    use-fixed-menu-style
                                    reset-selection-on-menu-close
                                    :menu="state.menuItems"
-                                   :selected="state.proxyValue?.[dataField]?.format"
+                                   :selected="state.fieldValue?.[dataField]?.format"
                                    block
                                    @select="handleSelectMenuItem(dataField, $event)"
                 >
@@ -214,7 +218,7 @@ watch(() => state.customModalVisible, (modalVisible) => {
                         <p class="sample-text">
                             {{ $t('COMMON.WIDGETS.NUMBER_FORMAT.SAMPLE') }}: {{ getFormattedNumber(state.customNumberFormat) }}
                         </p>
-                        <!--HACK: To be activated after guide completion-->
+                        <!--                        TODO: To be activated after guide completion-->
                         <!--                        <p-link :href="state.numberFormatHelpLink"-->
                         <!--                                :action-icon="ACTION_ICON.EXTERNAL_LINK"-->
                         <!--                                highlight-->

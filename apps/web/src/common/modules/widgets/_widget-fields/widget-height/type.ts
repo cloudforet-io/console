@@ -3,7 +3,7 @@ import type { WIDGET_HEIGHT } from '@/common/modules/widgets/_constants/widget-f
 
 export type WidgetHeightType = keyof typeof WIDGET_HEIGHT; // for Number Card Widget
 export interface WidgetHeightValue {
-    value: WidgetHeightType;
+    type: WidgetHeightType;
 }
 
 
