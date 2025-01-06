@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
-import { useRouter } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PHeadingLayout, PHeading, PSelectDropdown } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
@@ -22,6 +22,7 @@ const alertDetailPageStore = useAlertDetailPageStore();
 const alertDetailPageState = alertDetailPageStore.state;
 
 const router = useRouter();
+const route = useRoute();
 
 const { getProperRouteLocation } = useProperRouteLocation();
 const { hasReadWriteAccess } = usePageEditableStatus();
@@ -49,9 +50,11 @@ const modalState = reactive({
 });
 
 const handleRouteBackButton = () => {
-    router.push(getProperRouteLocation({
-        name: ALERT_MANAGER_ROUTE.ALERTS._NAME,
-    }));
+    const serviceId = route.params?.serviceId;
+    const location = serviceId
+        ? { name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME, params: { serviceId } }
+        : { name: ALERT_MANAGER_ROUTE.ALERTS._NAME };
+    router.push(getProperRouteLocation(location));
 };
 const handleSelectDropdownMenu = (type: ModalType) => {
     modalState.modalVisible = true;

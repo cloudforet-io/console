@@ -13,7 +13,6 @@ export const ALERT_STATUS_FILTERS = {
     IGNORED: 'IGNORED',
 } as const;
 export const ALERT_MANAGEMENT_TABLE_FIELDS: DataTableFieldType[] = [
-    { name: 'service_id', label: 'Service' },
     { name: 'title', label: 'Title', width: '20rem' },
     { name: 'status', label: 'Status' },
     { name: 'urgency', label: 'Urgency' },

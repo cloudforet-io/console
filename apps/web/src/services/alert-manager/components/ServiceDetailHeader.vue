@@ -3,7 +3,7 @@ import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PHeading, PHeadingLayout, PSelectDropdown, PLink, PI, PTooltip,
+    PHeading, PHeadingLayout, PSelectDropdown, PI, PTooltip,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
 
@@ -87,19 +87,6 @@ const handleGoBackButton = () => {
                             />
                         </template>
                     </p-heading>
-                </template>
-                <template #extra>
-                    <p-link :to="{
-                                name: ALERT_MANAGER_ROUTE.ALERTS._NAME,
-                                query: {
-                                    serviceId: storeState.serviceInfo.service_id,
-                                }
-                            }"
-                            action-icon="internal-link"
-                            new-tab
-                            class="pr-0.5 text-label-md"
-                            :text="$t('ALERT_MANAGER.SERVICE.SHOW_IN_ALERTS')"
-                    />
                 </template>
             </p-heading-layout>
             <div class="flex items-center pl-10 text-label-sm gap-2">

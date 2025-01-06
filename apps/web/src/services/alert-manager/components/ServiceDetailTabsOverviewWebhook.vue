@@ -121,9 +121,15 @@ watch(() => storeState.serviceId, (serviceId) => {
                             <p class="text-label-md leading-8 truncate">
                                 {{ item.name }}
                             </p>
-                            <p class="text-label-sm text-gray-700 pb-1">
-                                {{ $t('ALERT_MANAGER.WEBHOOK.REQUEST', { cnt: item.requests.total || 0 }) }}
-                            </p>
+                            <div class="text-label-sm text-gray-700">
+                                <p>
+                                    {{ $t('ALERT_MANAGER.WEBHOOK.REQUEST') }}
+                                </p>
+                                <p class="flex gap-2">
+                                    <span>{{ $t('ALERT_MANAGER.WEBHOOK.TOTAL', { cnt: item.requests.total || 0 }) }}</span>
+                                    <span class="text-red-400">{{ $t('ALERT_MANAGER.WEBHOOK.FAILED', { cnt: item.requests.error || 0 }) }}</span>
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -188,9 +194,9 @@ watch(() => storeState.serviceId, (serviceId) => {
             }
             .item {
                 @apply flex items-start border border-gray-150;
-                width: 11.5rem;
-                min-width: 11.5rem;
-                padding: 0.375rem 0.5rem;
+                width: 16rem;
+                min-width: 16rem;
+                padding: 0.5rem 0.5rem 0.75rem;
                 border-radius: 0.75rem;
                 &:hover {
                     @apply border border-secondary cursor-pointer;
