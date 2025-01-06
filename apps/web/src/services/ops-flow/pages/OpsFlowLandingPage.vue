@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router/composables';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 import {
-    PButton, PHeading, PSelectCard, PEmpty, PRadioGroup, PRadio, PDataLoader,
+    PButton, PHeading, PSelectCard, PEmpty, PDataLoader,
 } from '@cloudforet/mirinae';
 
 import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
@@ -63,7 +63,7 @@ const taskQuery = computed<Query>(() => taskQueryHelper.setFilters([
 const handleChangeCategory = async (value: string) => {
     setForm('category', value);
     await taskTypeStore.listByCategoryId(value);
-    setForm('taskType', taskTypeState.itemsByCategoryId[value]?.[0]?.task_type_id);
+    setForm('taskType', '');
 };
 const handleChangeTaskType = (value: string) => {
     setForm('taskType', value);
@@ -86,7 +86,7 @@ onMounted(async () => {
     }
     await taskTypeStore.listByCategoryIds(allCategories.map((c) => c.category_id));
     availableCategories.value = allCategories.filter((c) => taskTypeState.itemsByCategoryId[c.category_id]?.length);
-    setForm('category', availableCategories.value[0]?.category_id);
+    setForm('category', '');
     tasks.value = await taskAPI.list({ query: taskQuery.value }) ?? [];
     loading.value = false;
 });
@@ -104,8 +104,11 @@ onMounted(async () => {
                         {{ taskManagementTemplateStore.templates.landingDescription }}
                     </p>
                 </div>
-                <div class="max-w-96 mobile:w-96">
-                    <img src="@/assets/images/landing/img_landing_service-desk_hero.png">
+                <div class="max-w-96 mobile:w-96 flex justify-center">
+                    <img src="/images/opsflow-landing/img_landing_service-desk_hero.png"
+                         srcset="/images/opsflow-landing/img_landing_service-desk_hero@2x.png 2x,
+                         /images/opsflow-landing/img_landing_service-desk_hero@3x.png 3x"
+                    >
                 </div>
             </div>
             <p-data-loader :loading="loading"
@@ -122,29 +125,50 @@ onMounted(async () => {
                             <div class="grid grid-cols-2 gap-4 justify-center items-center">
                                 <p-select-card v-for="c in availableCategories"
                                                :key="c.category_id"
-                                               class="category-card"
-                                               :label="c.name"
+                                               class="select-card"
                                                :value="c.category_id"
                                                :selected="category"
                                                @change="handleChangeCategory"
-                                />
+                                >
+                                    <div class="w-full px-6 text-center">
+                                        <p class="truncate font-bold">
+                                            {{ c.name }}
+                                        </p>
+                                        <p class="mt-1 truncate text-label-md text-gray-500">
+                                            {{ c.description }}
+                                        </p>
+                                    </div>
+                                </p-select-card>
                             </div>
                         </div>
                     </div>
-                    <div class="mt-10">
+                    <div v-if="category"
+                         class="mt-10"
+                    >
                         <p class="mb-6 text-display-md">
                             {{ taskManagementTemplateStore.templates.TaskType }}
                         </p>
-                        <p-radio-group v-if="category">
-                            <p-radio v-for="t in taskTypeState.itemsByCategoryId[category]"
-                                     :key="t.task_type_id"
-                                     :value="t.task_type_id"
-                                     :selected="taskType"
-                                     @change="handleChangeTaskType"
-                            >
-                                {{ t.name }}
-                            </p-radio>
-                        </p-radio-group>
+                        <div class="flex justify-center">
+                            <div class="grid grid-cols-2 gap-4 justify-center items-center">
+                                <p-select-card v-for="t in taskTypeState.itemsByCategoryId[category]"
+                                               :key="t.task_type_id"
+                                               class="select-card"
+                                               :label="t.name"
+                                               :value="t.task_type_id"
+                                               :selected="taskType"
+                                               @change="handleChangeTaskType"
+                                >
+                                    <div class="w-full px-6 text-center">
+                                        <p class="truncate font-bold">
+                                            {{ t.name }}
+                                        </p>
+                                        <p class="mt-1 truncate text-label-md text-gray-500">
+                                            {{ t.description }}
+                                        </p>
+                                    </div>
+                                </p-select-card>
+                            </div>
+                        </div>
                     </div>
                     <div class="my-10 flex justify-end">
                         <p-button v-if="hasReadWriteAccess"
@@ -181,8 +205,11 @@ onMounted(async () => {
         background-size: 115% 240%;
     }
 }
-.category-card {
-    @apply w-[352px] py-4;
+.select-card {
+    width: 352px;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    height: 4.5rem;
 }
 </style>
 

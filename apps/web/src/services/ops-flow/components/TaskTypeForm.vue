@@ -123,7 +123,6 @@ const updateTaskTypeFields = async (taskTypeId: string) => {
 
 const createTaskType = async (categoryId: string) => {
     try {
-        debugger;
         await taskTypeStore.create({
             name: name.value,
             require_project: scope.value === 'PROJECT',
