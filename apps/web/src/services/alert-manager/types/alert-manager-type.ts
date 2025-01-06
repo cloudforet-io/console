@@ -42,6 +42,7 @@ export type createHeaderInfoByStep = {
 export interface Service extends ServiceModel {
     alerts: Record<AlertsType, AlertsInfoType>;
 }
+export type SettingModeType = 'eventRule' | 'settings';
 
 export type CreatedNotificationInfoType = {
     name?: string;

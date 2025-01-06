@@ -13,9 +13,6 @@ export const ALERT_MANAGER_ROUTE = Object.freeze({
             NOTIFICATIONS: {
                 CREATE: { _NAME: `${MENU_ID.ALERT_MANAGER}.${MENU_ID.SERVICE}.detail.notification.create` },
             },
-            EVENT_RULE: {
-                _NAME: `${MENU_ID.ALERT_MANAGER}.${MENU_ID.SERVICE}.detail.event-rule`,
-            },
         },
     },
     ALERTS: {

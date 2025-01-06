@@ -28,7 +28,12 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/constants/common-constant';
-import type { ServiceDetailTabsType, Service, ProtocolCardItemType } from '@/services/alert-manager/types/alert-manager-type';
+import type {
+    ServiceDetailTabsType,
+    Service,
+    ProtocolCardItemType,
+    SettingModeType,
+} from '@/services/alert-manager/types/alert-manager-type';
 
 interface ServiceFormStoreState {
     loading: boolean;
@@ -38,6 +43,7 @@ interface ServiceFormStoreState {
     selectedWebhookId?: string;
     selectedNotificationId?: string;
     selectedEscalationPolicyId?: string;
+    settingMode: SettingModeType
 }
 interface ServiceFormStoreGetters {
     serviceInfo: ComputedRef<Service>;
@@ -63,6 +69,7 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
         selectedWebhookId: undefined,
         selectedNotificationId: undefined,
         selectedEscalationPolicyId: undefined,
+        settingMode: 'settings',
     });
 
     const getters = reactive<ServiceFormStoreGetters>({
@@ -112,6 +119,9 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
         },
         setSelectedEscalationPolicyId(id?: string) {
             state.selectedEscalationPolicyId = id;
+        },
+        setSettingMode(mode: SettingModeType) {
+            state.settingMode = mode;
         },
     };
 

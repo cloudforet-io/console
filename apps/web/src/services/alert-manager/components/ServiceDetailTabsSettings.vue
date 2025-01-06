@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import { useRouter } from 'vue-router/composables';
 
 import {
     PHeading, PHeadingLayout, PCard, PIconButton, PI,
@@ -12,7 +11,6 @@ import type { NotificationUrgencyType, RecoveryModeType } from '@/schema/alert-m
 import { i18n } from '@/translations';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { red } from '@/styles/colors';
 
@@ -20,10 +18,8 @@ import ServiceDetailTabsSettingsEscalationPolicy
     from '@/services/alert-manager/components/ServiceDetailTabsSettingsEscalationPolicy.vue';
 import ServiceDetailTabsSettingsModal from '@/services/alert-manager/components/ServiceDetailTabsSettingsUpdateModal.vue';
 import { SERVICE_SETTING_CARD } from '@/services/alert-manager/constants/common-constant';
-import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
 import type { ServiceDetailSettingCardType, Service } from '@/services/alert-manager/types/alert-manager-type';
-
 
 type CardItemType = {
     title: TranslateResult,
@@ -38,10 +34,7 @@ type CardValueInfoType = {
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
-const router = useRouter();
-
 const { hasReadWriteAccess } = usePageEditableStatus();
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
     serviceInfo: computed<Service>(() => serviceDetailPageGetters.serviceInfo),
@@ -60,7 +53,7 @@ const state = reactive({
         },
         {
             title: i18n.t('ALERT_MANAGER.EVENT_RULE.TITLE'),
-            type: SERVICE_SETTING_CARD.RULE_SET,
+            type: SERVICE_SETTING_CARD.EVENT_RULE,
         },
     ]),
     notificationPolicy: computed<NotificationUrgencyType>(() => storeState.serviceInfo.options.notification_urgency),
@@ -104,10 +97,8 @@ const getAutoRecovery = (): CardValueInfoType|undefined => {
     }
 };
 const handleClickEditButton = (type: ServiceDetailSettingCardType) => {
-    if (type === SERVICE_SETTING_CARD.RULE_SET) {
-        router.push(getProperRouteLocation({
-            name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL.EVENT_RULE._NAME,
-        }));
+    if (type === SERVICE_SETTING_CARD.EVENT_RULE) {
+        serviceDetailPageStore.setSettingMode('eventRule');
         return;
     }
     state.selectModalVisible = true;
@@ -143,7 +134,7 @@ const handleClickEditButton = (type: ServiceDetailSettingCardType) => {
                         </div>
                         <div class="flex items-center justify-center h-12 bg-gray-100 rounded-md">
                             <div class="flex items-center gap-2">
-                                <p-i v-if="item.type !== SERVICE_SETTING_CARD.RULE_SET"
+                                <p-i v-if="item.type !== SERVICE_SETTING_CARD.EVENT_RULE"
                                      class="icon"
                                      :name="getCardValueInfo(item.type)?.icon"
                                      :color="getCardValueInfo(item.type)?.iconColor || 'inherit'"

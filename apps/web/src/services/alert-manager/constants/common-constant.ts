@@ -10,7 +10,7 @@ export const SERVICE_DETAIL_TABS = {
 export const SERVICE_SETTING_CARD = {
     NOTIFICATION_POLICY: 'notification_policy',
     AUTO_RECOVERY: 'auto_recovery',
-    RULE_SET: 'rule_set',
+    EVENT_RULE: 'event_rule',
 } as const;
 export const SERVICE_TAB_HEIGHT = 44;
 

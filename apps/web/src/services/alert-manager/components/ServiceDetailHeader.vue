@@ -20,11 +20,12 @@ import ServiceDetailEditModal from '@/services/alert-manager/components/ServiceD
 import ServiceDetailMemberModal from '@/services/alert-manager/components/ServiceDetailMemberModal.vue';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
-import type { Service } from '@/services/alert-manager/types/alert-manager-type';
+import type { Service, SettingModeType } from '@/services/alert-manager/types/alert-manager-type';
 
 type ModalType = 'edit' | 'delete' | 'member';
 
 const serviceDetailPageStore = useServiceDetailPageStore();
+const serviceDetailPageState = serviceDetailPageStore.state;
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const router = useRouter();
@@ -33,6 +34,7 @@ const { getProperRouteLocation } = useProperRouteLocation();
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const storeState = reactive({
+    settingMode: computed<SettingModeType>(() => serviceDetailPageState.settingMode),
     serviceInfo: computed<Service>(() => serviceDetailPageGetters.serviceInfo),
 });
 const state = reactive({
@@ -49,6 +51,12 @@ const state = reactive({
             label: i18n.t('ALERT_MANAGER.DELETE'),
         },
     ]),
+    headingTitle: computed(() => {
+        if (storeState.settingMode === 'settings') {
+            return storeState.serviceInfo.name || '';
+        }
+        return i18n.t('ALERT_MANAGER.EVENT_RULE.TITLE');
+    }),
 });
 const modalState = reactive({
     modalVisible: false,
@@ -60,7 +68,11 @@ const handleActionModal = (type: ModalType) => {
     modalState.type = type;
 };
 const handleGoBackButton = () => {
-    router.push(getProperRouteLocation({ name: ALERT_MANAGER_ROUTE.SERVICE._NAME }));
+    if (storeState.settingMode === 'settings') {
+        router.push(getProperRouteLocation({ name: ALERT_MANAGER_ROUTE.SERVICE._NAME }));
+        return;
+    }
+    serviceDetailPageStore.setSettingMode('settings');
 };
 </script>
 
@@ -69,14 +81,13 @@ const handleGoBackButton = () => {
         <div class="flex flex-col pb-6 gap-1">
             <p-heading-layout>
                 <template #heading>
-                    <p-heading :title="storeState.serviceInfo.name || ''"
+                    <p-heading :title="state.headingTitle"
                                show-back-button
                                @click-back-button="handleGoBackButton"
                     >
-                        <template v-if="hasReadWriteAccess"
-                                  #title-right-extra
-                        >
-                            <p-select-dropdown :menu="state.menuItems"
+                        <template #title-right-extra>
+                            <p-select-dropdown v-if="hasReadWriteAccess && storeState.settingMode === 'settings'"
+                                               :menu="state.menuItems"
                                                style-type="icon-button"
                                                button-icon="ic_ellipsis-horizontal"
                                                use-fixed-menu-style
@@ -85,11 +96,23 @@ const handleGoBackButton = () => {
                                                size="sm"
                                                @select="handleActionModal"
                             />
+                            <div v-else
+                                 class="inline-flex items-center gap-1 text-gray-700 text-label-sm"
+                            >
+                                <p-i name="ic_info-circle"
+                                     class="title-tooltip"
+                                     height="0.875rem"
+                                     width="0.875rem"
+                                />
+                                <span>{{ $t('ALERT_MANAGER.EVENT_RULE.DESC') }}</span>
+                            </div>
                         </template>
                     </p-heading>
                 </template>
             </p-heading-layout>
-            <div class="flex items-center pl-10 text-label-sm gap-2">
+            <div v-if="storeState.settingMode === 'settings'"
+                 class="flex items-center pl-10 text-label-sm gap-2"
+            >
                 <div class="service-member flex items-center text-gray-700 gap-0.5"
                      @click="handleActionModal('member')"
                 >
