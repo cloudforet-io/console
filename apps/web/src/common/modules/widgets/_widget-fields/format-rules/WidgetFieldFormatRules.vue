@@ -38,6 +38,19 @@ const state = reactive({
     fieldValue: computed<FormatRulesValue>(() => props.fieldManager.data[FIELD_KEY].value),
     type: computed<FormatRulesType>(() => props.widgetFieldSchema?.options?.formatRulesType as FormatRulesType),
     invalid: computed(() => !validator(state.fieldValue, props.widgetConfig)),
+    fieldInvalid: computed(() => {
+        if (!props.widgetFieldSchema?.options?.useField) return false;
+        if (state.fieldValue.field === undefined) return true;
+        const dependentField = props.widgetFieldSchema?.options?.dependentField;
+        const dependentValue: string|string[]|undefined = props.fieldManager.data[dependentField]?.value?.data;
+        if (dependentField && dependentValue) {
+            if (Array.isArray(dependentValue)) {
+                return dependentValue.includes(state.fieldValue.field);
+            }
+            return dependentValue === state.fieldValue.field;
+        }
+        return false;
+    }),
     selectedField: computed<string|undefined>(() => {
         if (props.widgetFieldSchema?.options?.useField) {
             return state.fieldValue.field;
@@ -98,7 +111,7 @@ const handleUpdateField = (val: string) => {
                 <p-select-dropdown :menu="state.menuItems"
                                    :selected="state.selectedField"
                                    use-fixed-menu-style
-                                   :invalid="state.selectedField === undefined"
+                                   :invalid="state.fieldInvalid"
                                    block
                                    @update:selected="handleUpdateField"
                 />

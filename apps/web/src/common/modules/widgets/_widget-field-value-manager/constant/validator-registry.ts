@@ -50,11 +50,22 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
         }
         return !!fieldValue.data;
     },
-    formatRules: (fieldValue: FormatRulesValue, widgetConfig) => {
+    formatRules: (fieldValue: FormatRulesValue, widgetConfig, allValueMap) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const formatRulesOptions = (_fieldsSchema.formatRules?.options ?? {}) as FormatRulesOptions;
         const type = formatRulesOptions.formatRulesType;
 
+        if (formatRulesOptions.useField) {
+            if (formatRulesOptions.dependentField) {
+                const dependentValue: string|string[]|undefined = allValueMap?.[formatRulesOptions.dependentField]?.value?.data;
+                if (!dependentValue) return !!fieldValue.field;
+                if (Array.isArray(dependentValue)) {
+                    return !dependentValue.includes(fieldValue.field);
+                }
+                return dependentValue !== fieldValue.field;
+            }
+            return !!fieldValue.field;
+        }
         if (type === FORMAT_RULE_TYPE.textThreshold) {
             return fieldValue.rules.every((d) => !!d.text && !!d.color);
         }
@@ -63,9 +74,6 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
         }
         if (type === FORMAT_RULE_TYPE.textNumberThreshold) {
             return fieldValue.rules.every((d) => !!d.text && !!d.number && !!d.color);
-        }
-        if (formatRulesOptions.useField) {
-            return !!fieldValue.field;
         }
         return true;
     },
