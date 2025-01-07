@@ -24,7 +24,6 @@ import WidgetFormDataTableCardTransformFormWrapper
 import WidgetFormDataTableGlobalVariableViewButton
     from '@/common/modules/widgets/_components/WidgetFormDataTableGlobalVariableViewButton.vue';
 import { DATA_TABLE_FIELD_TYPE, DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
-import { isFieldNameValid } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { TransformDataTableInfo, TransformDataTableProps } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { EvalOptions } from '@/common/modules/widgets/types/widget-model';
@@ -87,6 +86,12 @@ const getInvalidFieldNameText = (fieldName?: string): TranslateResult|undefined 
     if (!isFieldNameValid(fieldName, storeState.currentDataTable)) return i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.DUPLICATED_FIELD_NAME');
     return undefined;
 };
+const isFieldNameValid = (fieldName: string, dataTable?: PublicDataTableModel|PrivateDataTableModel): boolean => {
+    if (!dataTable) return true;
+    const _dataInfoKeys = Object.keys(dataTable.data_info || {});
+    return !_dataInfoKeys.includes(fieldName);
+};
+
 
 /* Events */
 const handleToggleExpressionCard = (idx: number) => {
