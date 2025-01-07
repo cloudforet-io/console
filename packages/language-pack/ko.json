@@ -4360,6 +4360,7 @@
 			"TEMPLATE_TYPE": "템플릿 타입"
 		},
 		"TITLE": "제목",
+		"TOTAL_DURATION": "총 소요 시간",
 		"VALIDATION": {
 			"DUPLICATED": "이미 존재하는 {field}입니다",
 			"ENUM_KEY_DUPLICATED": "중복된 키가 존재합니다.",

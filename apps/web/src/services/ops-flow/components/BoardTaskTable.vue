@@ -84,7 +84,7 @@ const getStatusStyleType = (category: TaskCategoryModel|undefined, statusId: str
     }
     return statusOption.color;
 };
-const { getTimezoneDate } = useTimezoneDate();
+const { getTimezoneDate, getDuration } = useTimezoneDate();
 
 /* query */
 const search = ref<string>('');
@@ -210,6 +210,10 @@ const fields = computed<DataTableField[] >(() => [
         name: 'created_at',
         label: i18n.t('OPSFLOW.CREATED_AT') as string,
     },
+    {
+        name: 'total_duration',
+        label: i18n.t('OPSFLOW.TOTAL_DURATION') as string,
+    },
 ]);
 
 </script>
@@ -270,6 +274,14 @@ const fields = computed<DataTableField[] >(() => [
             </template>
             <template #col-created_at-format="{value}">
                 {{ getTimezoneDate(value) }}
+            </template>
+            <template #col-total_duration-format="{item}">
+                <template v-if="item.status_type === 'COMPLETED'">
+                    {{ getDuration(item.created_at, item.completed_at) }}
+                </template>
+                <template v-else>
+                    {{ getDuration(item.created_at) }}
+                </template>
             </template>
         </p-data-table>
     </component>

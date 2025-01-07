@@ -4360,6 +4360,7 @@
 			"TEMPLATE_TYPE": "Template Type"
 		},
 		"TITLE": "Title",
+		"TOTAL_DURATION": "Total Duration",
 		"VALIDATION": {
 			"DUPLICATED": "{topic} already exists",
 			"ENUM_KEY_DUPLICATED": "Duplicate key found.",
