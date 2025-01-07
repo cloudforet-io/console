@@ -23,15 +23,13 @@ const storeState = reactive({
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
     modalVisible: computed<boolean>(() => serviceDetailPageState.eventRuleScopeModalVisible),
     items: computed<EventRuleModel[]>(() => serviceDetailPageState.eventRuleList),
+    showEventRuleFormCard: computed<boolean>(() => serviceDetailPageState.showEventRuleFormCard),
 });
 const state = reactive({
     loading: true,
     selectedScope: EVENT_RULE_SCOPE.GLOBAL,
     selectedWebhook: '',
     hideSidebar: false,
-});
-const modalState = reactive({
-    showFormCard: false,
 });
 
 const handleClickAddRule = () => {
@@ -54,14 +52,14 @@ watch(() => storeState.serviceId, async (id) => {
 <template>
     <div class="service-detail-tabs-settings-event-rule pt-6 pb-10">
         <p-data-loader :loading="state.loading"
-                       :data="!modalState.showFormCard ? storeState.items : true"
+                       :data="!storeState.showEventRuleFormCard ? storeState.items : true"
         >
             <div class="flex gap-1">
                 <service-detail-tabs-settings-event-rule-sidebar v-if="storeState.items.length > 0"
                                                                  :hide-sidebar.sync="state.hideSidebar"
                                                                  :items="storeState.items"
                 />
-                <service-detail-tabs-settings-event-rule-form-card v-if="modalState.showFormCard"
+                <service-detail-tabs-settings-event-rule-form-card v-if="storeState.showEventRuleFormCard"
                                                                    :selected-webhook="state.selectedWebhook"
                                                                    :selected-scope="state.selectedScope"
                                                                    class="flex-1"
@@ -91,7 +89,6 @@ watch(() => storeState.serviceId, async (id) => {
                                                              :visible="storeState.modalVisible"
                                                              :scope.sync="state.selectedScope"
                                                              :selected-webhook.sync="state.selectedWebhook"
-                                                             :show-form-card.sync="modalState.showFormCard"
         />
     </div>
 </template>

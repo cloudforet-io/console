@@ -45,6 +45,7 @@ interface ServiceFormStoreState {
     selectedEscalationPolicyId?: string;
     eventRuleList: EventRuleModel[];
     eventRuleScopeModalVisible: boolean;
+    showEventRuleFormCard: boolean;
 }
 interface ServiceFormStoreGetters {
     serviceInfo: ComputedRef<Service>;
@@ -72,6 +73,7 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
         selectedEscalationPolicyId: undefined,
         eventRuleList: [],
         eventRuleScopeModalVisible: false,
+        showEventRuleFormCard: false,
     });
 
     const getters = reactive<ServiceFormStoreGetters>({
@@ -125,6 +127,9 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
         setEventRuleScopeModalVisible(visible: boolean) {
             state.eventRuleScopeModalVisible = visible;
         },
+        setShowEventRuleFormCard(visible: boolean) {
+            state.showEventRuleFormCard = visible;
+        },
     };
 
     const actions = {
@@ -138,6 +143,7 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
             state.selectedEscalationPolicyId = undefined;
             state.eventRuleList = [];
             state.eventRuleScopeModalVisible = false;
+            state.showEventRuleFormCard = false;
         },
         async fetchServiceDetailData(id: string) {
             state.loading = true;

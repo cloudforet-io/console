@@ -30,19 +30,18 @@ interface Props {
     visible: boolean;
     scope?: EventRuleScopeType;
     selectedWebhook: string;
-    showFormCard: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
     scope: EVENT_RULE_SCOPE.GLOBAL,
     selectedWebhook: '',
-    showFormCard: false,
 });
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
+const serviceDetailPageState = serviceDetailPageStore.state;
 
 const emit = defineEmits<{(e: 'update:visible'): void;
     (e: 'update:selected-webhook'): void;
@@ -53,13 +52,13 @@ const emit = defineEmits<{(e: 'update:visible'): void;
 const storeState = reactive({
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
     plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
+    showEventRuleFormCard: computed<boolean>(() => serviceDetailPageState.showEventRuleFormCard),
 });
 const state = reactive({
     loading: false,
     dropdownLoading: false,
     proxySelectedWebhook: useProxyValue('selectedWebhook', props, emit),
     proxySelectedScope: useProxyValue('scope', props, emit),
-    proxyShowFormCard: useProxyValue('showFormCard', props, emit),
     webhookDropdownList: computed<SelectDropdownMenuItem[]>(() => Object.values(storeState.webhook).map((i) => ({
         name: i.key,
         label: i.label,
@@ -94,8 +93,8 @@ const handleClickCard = () => {
     state.proxySelectedWebhook = '';
 };
 const handleClickConfirm = () => {
-    state.proxyShowFormCard = true;
     serviceDetailPageStore.setEventRuleScopeModalVisible(false);
+    serviceDetailPageStore.setShowEventRuleFormCard(true);
 };
 
 onMounted(() => {

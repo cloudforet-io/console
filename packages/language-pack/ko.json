@@ -129,6 +129,7 @@
 			"CHANGE_TITLE": "",
 			"CHANGE_URGENCY": "",
 			"CREATE_FORM_TITLE": "",
+			"DELETE_MODAL_DESC": "이 이벤트 규칙을 삭제하시겠습니까?",
 			"DESC": "",
 			"EXECUTE_ACTIONS": "",
 			"GLOBAL": "",

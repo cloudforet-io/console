@@ -4,7 +4,7 @@ import { useRoute } from 'vue-router/composables';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PCard, PFieldTitle, PFieldGroup, PDataLoader, PDivider, PLazyImg, PI,
+    PCard, PFieldTitle, PFieldGroup, PDataLoader, PDivider, PLazyImg, PI, PIconButton,
 } from '@cloudforet/mirinae';
 
 import type { EventRuleGetParameters } from '@/schema/alert-manager/event-rule/api-verbs/get';
@@ -19,6 +19,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { gray } from '@/styles/colors';
 
+import ServiceDetailTabsSettingsEventRuleDeleteModal
+    from '@/services/alert-manager/components/ServiceDetailTabsSettingsEventRuleDeleteModal.vue';
 import {
     getActionSettingTypeI18n,
     getActionSettingI18n,
@@ -62,12 +64,16 @@ const state = reactive({
 
         return result;
     }),
+    modalVisible: false,
 });
 
 const getWebhookIcon = (): string|undefined => {
     const webhook = storeState.webhook[state.eventRule?.webhook_id]?.data;
     if (!webhook) return undefined;
     return storeState.plugins[webhook.plugin_info.plugin_id]?.icon || '';
+};
+const handleDeleteEventRule = () => {
+    state.modalVisible = true;
 };
 
 const fetchEventRuleInfo = async () => {
@@ -98,9 +104,18 @@ watch(() => route.query?.eventRuleId, (eventRuleId) => {
     >
         <p-card :header="$t('ALERT_MANAGER.EVENT_RULE.TITLE')">
             <template #header>
-                <p>
+                <div class="flex items-center justify-between">
                     <span class="font-bold">{{ $t('ALERT_MANAGER.EVENT_RULE.TITLE') }}</span>
-                </p>
+                    <div class="flex items-center gap-2">
+                        <p-icon-button name="ic_edit"
+                                       style-type="transparent"
+                        />
+                        <p-icon-button name="ic_delete"
+                                       style-type="transparent"
+                                       @click="handleDeleteEventRule"
+                        />
+                    </div>
+                </div>
             </template>
             <div class="flex flex-col gap-4 py-1 px-4">
                 <div class="form-wrapper">
@@ -238,6 +253,10 @@ watch(() => route.query?.eventRuleId, (eventRuleId) => {
                 </div>
             </div>
         </p-card>
+        <service-detail-tabs-settings-event-rule-delete-modal v-if="state.modalVisible"
+                                                              :id="state.eventRule.event_rule_id"
+                                                              :visible.sync="state.modalVisible"
+        />
     </p-data-loader>
 </template>
 

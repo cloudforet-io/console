@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PCard, PFieldTitle, PFieldGroup, PTextInput, PDivider, PLazyImg, PI, PSelectButton,
+    PCard, PFieldTitle, PFieldGroup, PTextInput, PDivider, PLazyImg, PI, PSelectButton, PIconButton,
 } from '@cloudforet/mirinae';
 
 import { EVENT_RULE_CONDITIONS_POLICY, EVENT_RULE_SCOPE } from '@/schema/alert-manager/event-rule/constant';
@@ -15,8 +15,9 @@ import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-st
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import { gray } from '@/styles/colors';
+import { gray, white } from '@/styles/colors';
 
+import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
 import type { EventRuleConditionPolicyButtonType } from '@/services/alert-manager/types/alert-manager-type';
 
 interface Props {
@@ -31,6 +32,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
+const serviceDetailPageStore = useServiceDetailPageStore();
 
 const storeState = reactive({
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
@@ -66,6 +68,10 @@ const getWebhookIcon = (): string|undefined => {
     if (!webhook) return undefined;
     return storeState.plugins[webhook.plugin_info.plugin_id]?.icon || '';
 };
+
+const handleDeleteForm = () => {
+    serviceDetailPageStore.setShowEventRuleFormCard(false);
+};
 </script>
 
 <template>
@@ -74,9 +80,14 @@ const getWebhookIcon = (): string|undefined => {
             class="service-detail-tabs-settings-event-rule-form-card"
     >
         <template #header>
-            <p>
+            <div class="flex items-center justify-between">
                 <span class="font-bold">{{ $t('ALERT_MANAGER.EVENT_RULE.CREATE_FORM_TITLE') }}</span>
-            </p>
+                <p-icon-button name="ic_delete"
+                               style-type="transparent"
+                               :color="white"
+                               @click="handleDeleteForm"
+                />
+            </div>
         </template>
         <div class="form-wrapper flex flex-col gap-6">
             <div class="flex flex-col gap-3">

@@ -1,35 +1,36 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
-import { useRouter } from 'vue-router/composables';
+import { computed, reactive } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal } from '@cloudforet/mirinae';
 
-import { i18n } from '@/translations';
+import type { EventRuleDeleteParameters } from '@/schema/alert-manager/event-rule/api-verbs/delete';
 
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
 
 interface Props {
     visible: boolean;
+    id?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
+    id: '',
 });
 
 const serviceDetailPageStore = useServiceDetailPageStore();
+const serviceDetailPageState = serviceDetailPageStore.state;
 
-const router = useRouter();
+const emit = defineEmits<{(e: 'update:visible'): void;
+    (e: 'update:visible'): void;
+}>();
 
-const { getProperRouteLocation } = useProperRouteLocation();
-
-const emit = defineEmits<{(e: 'update:visible'): void; }>();
-
+const storeState = reactive({
+    serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
+});
 const state = reactive({
     loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
@@ -37,9 +38,14 @@ const state = reactive({
 const handleConfirm = async () => {
     state.loading = true;
     try {
-        await serviceDetailPageStore.deleteServiceDetailData();
-        await router.push(getProperRouteLocation({ name: ALERT_MANAGER_ROUTE.SERVICE._NAME }));
-        showSuccessMessage(i18n.t('ALERT_MANAGER.SERVICE.ALT_S_DELETE_SERVICE'), '');
+        await SpaceConnector.clientV2.alertManager.eventRule.delete<EventRuleDeleteParameters>({
+            event_rule_id: props.id,
+        });
+        await serviceDetailPageStore.fetchEventRuleList({
+            service_id: storeState.serviceId,
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
     } finally {
         state.loading = false;
         handleClose();
@@ -51,8 +57,8 @@ const handleClose = () => {
 </script>
 
 <template>
-    <p-button-modal class="service-detail-delete-modal"
-                    :header-title="$t('ALERT_MANAGER.SERVICE.MODAL_DELETE_TITLE')"
+    <p-button-modal class="service-detail-tabs-settings-event-rule-delete-modal"
+                    :header-title="$t('ALERT_MANAGER.EVENT_RULE.DELETE_MODAL_DESC')"
                     size="sm"
                     theme-color="alert"
                     :fade="true"

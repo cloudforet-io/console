@@ -129,6 +129,7 @@
 			"CHANGE_TITLE": "",
 			"CHANGE_URGENCY": "",
 			"CREATE_FORM_TITLE": "",
+			"DELETE_MODAL_DESC": "このイベントルールを削除しますか？",
 			"DESC": "",
 			"EXECUTE_ACTIONS": "",
 			"GLOBAL": "",
