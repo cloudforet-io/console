@@ -17,6 +17,10 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import { gray, white } from '@/styles/colors';
 
+import ServiceDetailTabsSettingsEventRuleActionForm
+    from '@/services/alert-manager/components/ServiceDetailTabsSettingsEventRuleActionForm.vue';
+import ServiceDetailTabsSettingsEventRuleConditionForm
+    from '@/services/alert-manager/components/ServiceDetailTabsSettingsEventRuleConditionForm.vue';
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
 import type { EventRuleConditionPolicyButtonType } from '@/services/alert-manager/types/alert-manager-type';
 
@@ -44,6 +48,14 @@ const state = reactive({
         { name: EVENT_RULE_CONDITIONS_POLICY.ANY, label: i18n.t('ALERT_MANAGER.EVENT_RULE.SET_CONDITION') },
     ]),
     selectedPolicyButton: EVENT_RULE_CONDITIONS_POLICY.ALWAYS as EventRuleConditionsPolicyType,
+    conditionsPolicy: 'ALL' as EventRuleConditionsPolicyType,
+    conditions: [
+        {
+            key: 'title',
+            value: '',
+            operator: 'contain',
+        },
+    ],
 });
 
 const {
@@ -69,6 +81,15 @@ const getWebhookIcon = (): string|undefined => {
     return storeState.plugins[webhook.plugin_info.plugin_id]?.icon || '';
 };
 
+const handleSelectPolicyButton = () => {
+    state.conditions = [
+        {
+            key: 'title',
+            value: '',
+            operator: 'contain',
+        },
+    ];
+};
 const handleDeleteForm = () => {
     serviceDetailPageStore.setShowEventRuleFormCard(false);
 };
@@ -89,8 +110,8 @@ const handleDeleteForm = () => {
                 />
             </div>
         </template>
-        <div class="form-wrapper flex flex-col gap-6">
-            <div class="flex flex-col gap-3">
+        <div class="content-wrapper flex flex-col gap-6">
+            <div class="form-wrapper">
                 <div class="input-form-wrapper">
                     <p-field-title class="field-title"
                                    :label="$t('ALERT_MANAGER.EVENT_RULE.LABEL_NAME')"
@@ -148,20 +169,23 @@ const handleDeleteForm = () => {
                 </div>
                 <p-divider class="divider" />
             </div>
-            <div class="flex flex-col gap-3">
+            <div class="form-wrapper">
                 <div class="flex gap-2">
                     <p-select-button v-for="(item, index) in state.conditionPolicy"
                                      :key="`condition-policy-${index}`"
                                      v-model="state.selectedPolicyButton"
                                      :value="item.name"
+                                     @change="handleSelectPolicyButton"
                     >
                         {{ item.label }}
                     </p-select-button>
                 </div>
                 <div v-if="state.selectedPolicyButton === EVENT_RULE_CONDITIONS_POLICY.ANY"
-                     class="border-4 border-gray-100 rounded-xl py-4 px-6"
+                     class="border-section py-4 px-6"
                 >
-                    set policy area
+                    <service-detail-tabs-settings-event-rule-condition-form :conditions-policy.sync="state.conditionsPolicy"
+                                                                            :conditions.sync="state.conditions"
+                    />
                 </div>
             </div>
             <div class="flex items-center justify-center h-6 bg-gray-100 rounded-xl">
@@ -171,29 +195,45 @@ const handleDeleteForm = () => {
                      :color="gray[300]"
                 />
             </div>
+            <div class="flex flex-col gap-2">
+                <p-field-title :label="$t('ALERT_MANAGER.EVENT_RULE.EXECUTE_ACTIONS')"
+                               size="lg"
+                               required
+                               font-weight="regular"
+                />
+                <div class="border-section">
+                    <service-detail-tabs-settings-event-rule-action-form />
+                </div>
+            </div>
         </div>
     </p-card>
 </template>
 
 <style scoped>
 .service-detail-tabs-settings-event-rule-form-card {
-    .form-wrapper {
+    .content-wrapper {
         padding: 1.25rem 1.125rem;
-        .field-title {
-            width: 15rem;
-        }
-        .input-form-wrapper {
-            @apply flex items-center gap-6;
-            .input-form {
-                @apply flex-1;
-                margin-bottom: 0;
-                .scope-wrapper {
-                    @apply flex items-center gap-1;
+        .form-wrapper {
+            @apply flex flex-col gap-3;
+            .field-title {
+                width: 15rem;
+            }
+            .input-form-wrapper {
+                @apply flex items-center gap-6;
+                .input-form {
+                    @apply flex-1;
+                    margin-bottom: 0;
+                    .scope-wrapper {
+                        @apply flex items-center gap-1;
+                    }
                 }
             }
+            .divider {
+                margin-top: 0.25rem;
+            }
         }
-        .divider {
-            margin-top: 0.25rem;
+        .border-section {
+            @apply border-4 border-gray-100 rounded-xl;
         }
     }
 }

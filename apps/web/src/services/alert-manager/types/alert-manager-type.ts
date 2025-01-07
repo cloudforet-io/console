@@ -4,7 +4,11 @@ import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-s
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
 import type { AlertStatusType, AlertUrgencyType } from '@/schema/alert-manager/alert/type';
-import type { EventRuleConditionsPolicyType } from '@/schema/alert-manager/event-rule/type';
+import type {
+    EventRuleConditionsPolicyType,
+    EventRuleConditionsKeyType,
+    EventRuleConditionsOperatorType,
+} from '@/schema/alert-manager/event-rule/type';
 import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
 import type { ServiceChannelDataType, ServiceChannelScheduleInfoType } from '@/schema/alert-manager/service-channel/type';
 import type { ServiceModel } from '@/schema/alert-manager/service/model';
@@ -46,7 +50,6 @@ export type createHeaderInfoByStep = {
 export interface Service extends ServiceModel {
     alerts: Record<AlertsType, AlertsInfoType>;
 }
-export type SettingModeType = 'eventRule' | 'settings';
 
 export type CreatedNotificationInfoType = {
     name?: string;
@@ -83,3 +86,15 @@ export type EventRuleActionsItemValueType = {
     name: string;
 };
 export type EventRuleActionsItemType = Record<EventRuleSettingsType, EventRuleActionsItemValueType[]>;
+export type EventRuleConditionOperatorsType = {
+    name: EventRuleConditionsOperatorType;
+    label: TranslateResult;
+};
+export type EventRuleConditionKeyType = {
+    name: EventRuleConditionsKeyType;
+    label: TranslateResult;
+};
+export type EventRuleActionsToggleType = {
+    name: string;
+    label: TranslateResult;
+};

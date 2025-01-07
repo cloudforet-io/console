@@ -5,7 +5,7 @@ export type EventRuleConditionsPolicyType = typeof EVENT_RULE_CONDITIONS_POLICY[
 export type EventRuleUrgencyType = typeof EVENT_RULE_URGENCY[keyof typeof EVENT_RULE_URGENCY];
 export type EventRuleScopeType = typeof EVENT_RULE_SCOPE[keyof typeof EVENT_RULE_SCOPE];
 
-export type EventRuleConditionsKeyType = 'title' | 'description' | 'rule' | 'severity' | 'resource' | 'account' | 'webhook_id' | 'project_id' | 'additional_info';
+export type EventRuleConditionsKeyType = 'title' | 'description' | 'rule' | 'severity' | 'account' | 'additional_info' | 'labels' | 'period';
 export type EventRuleConditionsOperatorType = 'eq' | 'contain' | 'not' | 'not_contain';
 
 export type EventRuleConditionsType = {
