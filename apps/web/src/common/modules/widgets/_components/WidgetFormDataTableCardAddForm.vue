@@ -49,7 +49,7 @@ interface Props {
     /* Validation */
     formInvalid: boolean;
 }
-const MAX_GROUP_BY_COUNT = 3;
+const MAX_GROUP_BY_COUNT = 5;
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:filter', value: Record<string, string[]>): void;
     (e: 'update:selected-group-by-items', value: any[]): void;
