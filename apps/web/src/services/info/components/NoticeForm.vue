@@ -97,7 +97,7 @@ const {
 });
 
 const contentsType = ref<ContentsType>('markdown');
-const resourceGroup = computed(() => (workspaceState.selectedRadioIdx === 0 ? 'DOMAIN' : 'WORKSPACE'));
+const resourceGroup = 'DOMAIN';
 const { fileUploader } = useFileUploader({ resourceGroup });
 const {
     contents: uploadContents,
