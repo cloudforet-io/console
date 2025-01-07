@@ -4330,7 +4330,7 @@
 				"DESC": "이는 {tasks}의 유형을 그룹화한 것입니다. 사용자는 {task}{taskObjectParticle} 제출할 때 적절한 카테고리를 선택하여 담당자가 {tasks}{tasksObjectParticle} 더 효율적으로 관리할 수 있도록 돕습니다."
 			},
 			"ENABLE_LANDING": "랜딩 페이지 활성화",
-			"ENABLE_LANDING_DESC": "랜딩페이지를 사용하면 어떻게 되는지 Description",
+			"ENABLE_LANDING_DESC": "OpsFlow 보드 아래에 랜딩 페이지가 표시됩니다.",
 			"PACKAGE": {
 				"ADDED": "추가됨",
 				"AFFECTED_DESC": "영향 받는 {workspace}와 {category}는 다음과 같습니다.",
