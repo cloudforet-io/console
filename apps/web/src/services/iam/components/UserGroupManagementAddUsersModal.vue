@@ -52,6 +52,9 @@ const handleConfirm = async () => {
     } finally {
         state.loading = false;
         handleClose();
+        userGroupPageStore.$patch((_state) => {
+            _state.state.users.selectedIndices = [];
+        });
     }
 };
 
