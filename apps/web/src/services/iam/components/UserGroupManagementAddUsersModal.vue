@@ -52,6 +52,9 @@ const handleConfirm = async () => {
     } finally {
         state.loading = false;
         handleClose();
+        userGroupPageStore.$patch((_state) => {
+            _state.state.users.selectedIndices = [];
+        });
     }
 };
 
@@ -86,9 +89,10 @@ const fetchAddUsers = async (params: UserGroupAddUsersParameters) => {
         <template #body>
             <div class="modal-contents">
                 <p>{{ $t('IAM.USER_GROUP.MODAL.ADD_NEW_USER.USER') }}</p>
-                <user-select-dropdown class="mb-48"
+                <user-select-dropdown class="mb-48 h-46"
                                       show-user-list
                                       :show-user-group-list="false"
+                                      :show-category-title="false"
                                       appearance-type="stack"
                                       selection-type="multiple"
                                       use-fixed-menu-style
@@ -103,12 +107,13 @@ const fetchAddUsers = async (params: UserGroupAddUsersParameters) => {
 
 <style scoped lang="postcss">
 .user-group-management-add-users-modal {
-    min-height: 34.875rem;
     .modal-contents {
         @apply flex flex-col;
+        height: 22rem;
         margin-bottom: 9rem;
         padding: 1rem;
         gap: 1rem;
+        overflow: auto;
     }
 }
 </style>

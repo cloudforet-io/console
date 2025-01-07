@@ -41,6 +41,9 @@ const handleConfirm = async () => {
     } finally {
         state.loading = false;
         handleCancel();
+        userGroupPageStore.$patch((_state) => {
+            _state.state.users.selectedIndices = [];
+        });
     }
 };
 

@@ -5,7 +5,6 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal, PButton, PLazyImg } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
 import type { UserGroupChannelCreateParameters } from '@/schema/alert-manager/user-group-channel/api-verbs/create';
@@ -38,11 +37,7 @@ const emit = defineEmits<{(e: 'confirm'): void; }>();
 
 interface ChannelSetModalState {
   loading: boolean;
-  userInfo: {
-    channelName: string;
-    userMode: MenuItem;
-    users: {type: 'USER' | 'USER_GROUP'; value: string;}[];
-  };
+  channelName: string;
   selectedProtocolData?: NotificationProtocolModel | undefined,
   scheduleInfo: UserGroupChannelScheduleInfoType;
 }
@@ -58,21 +53,22 @@ const storeState = reactive({
 
 const state = reactive<ChannelSetModalState>({
     loading: false,
-    userInfo: {
-        channelName: '',
-        userMode: {
-            label: '',
-            name: '',
-        },
-        users: [],
-    },
+    channelName: '',
     selectedProtocolData: {},
     scheduleInfo: notificationChannelCreateFormState.scheduleInfo,
 });
 
 /* Component */
+const handleChannelName = (value: string) => {
+    state.channelName = value;
+};
+
 const handleSchemaValid = (value: boolean) => {
-    isSchemaValid.value = value;
+    if (userGroupPageState.modal.title === i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE')) {
+        isSchemaValid.value = value;
+    } else {
+        isSchemaValid.value = true;
+    }
 };
 
 const handleConfirm = async () => {
@@ -81,7 +77,7 @@ const handleConfirm = async () => {
         if (userGroupPageState.modal.title === i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE')) {
             await fetchCreateUserGroupChannel({
                 protocol_id: notificationChannelCreateFormState.selectedProtocol.protocol_id,
-                name: notificationChannelCreateFormState.channelName,
+                name: state.channelName,
                 schedule: notificationChannelCreateFormState.scheduleInfo,
                 data: {
                     ...notificationChannelCreateFormState.protocolSchemaForm,
@@ -94,7 +90,7 @@ const handleConfirm = async () => {
         } else if (userGroupPageState.modal.title === i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.UPDATE_TITLE')) {
             await fetchUpdateUserGroupChannel({
                 channel_id: userGroupPageGetters.selectedUserGroupChannel[0].channel_id,
-                name: notificationChannelCreateFormState.channelName,
+                name: state.channelName,
                 data: {},
                 schedule: notificationChannelCreateFormState.scheduleInfo,
             });
@@ -114,12 +110,12 @@ const handleConfirm = async () => {
 
 const handleCancel = () => {
     if (userGroupPageState.modal.title === i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE')) {
-        notificationChannelCreateFormStore.initState();
         userGroupPageState.modal = {
             type: USER_GROUP_MODAL_TYPE.CREATE_NOTIFICATIONS_FIRST,
             title: i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE'),
             themeColor: 'primary1',
         };
+        notificationChannelCreateFormStore.initState();
     } else {
         handleClose();
     }
@@ -191,7 +187,9 @@ watch([() => notificationChannelCreateFormState, isSchemaValid], (nv_channel_sta
                         <span class="text-lg font-medium">{{ storeState.protocolName }}</span>
                     </div>
                 </div>
-                <user-group-channel-set-input-form @update-valid="handleSchemaValid" />
+                <user-group-channel-set-input-form @update-channel-name="handleChannelName"
+                                                   @update-valid="handleSchemaValid"
+                />
                 <user-group-channel-schedule-set-form />
             </template>
             <template v-if="userGroupPageState.modal.title === i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE')"
