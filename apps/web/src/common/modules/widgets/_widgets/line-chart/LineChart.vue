@@ -261,8 +261,9 @@ const drawChart = (rawData: WidgetLoadResponse|null) => {
                 formatter: (p) => {
                     if (!p.value) return '';
                     const columnFieldForPivot = state.dataTable?.options.PIVOT?.fields?.column;
-                    const fieldName = (state.isPivotDataTable && columnFieldForPivot) ? columnFieldForPivot : _dataFields;
+                    const fieldName = (state.isPivotDataTable && columnFieldForPivot) ? columnFieldForPivot : _dataField;
                     const numberFormat = widgetOptionsState.numberFormatInfo[fieldName];
+
                     return getFormattedNumber(p.value, numberFormat, _unit);
                 },
             },
