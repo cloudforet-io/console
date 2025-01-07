@@ -526,6 +526,20 @@ watch(() => state.showPopover, (val) => {
                     display: flex;
                     flex-direction: column;
                     gap: 0.5rem;
+
+                    /* custom design-system component - p-select-card */
+                    :deep(.p-select-card) {
+                        height: 5.625rem;
+                        padding: 1rem;
+                        .select-card-contents {
+                            @apply flex justify-start items-center;
+                            flex-direction: row;
+                            .p-lazy-img {
+                                margin-right: 0.25rem;
+                                margin-bottom: 0;
+                            }
+                        }
+                    }
                 }
                 .content-divider {
                     margin: 0 1.125rem;
@@ -623,7 +637,6 @@ watch(() => state.showPopover, (val) => {
 
 /* custom design-system component - p-select-card */
 :deep(.p-select-card) {
-    height: 5.625rem;
     padding: 1rem;
     .select-card-contents {
         @apply flex justify-start items-center;
