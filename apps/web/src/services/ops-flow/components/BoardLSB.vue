@@ -41,7 +41,7 @@ onMounted(() => {
             }) }}</span>
         </l-s-b-router-button>
         <l-s-b-divider />
-        <l-s-b-top-title>{{ $t('OPSFLOW.CATEGORY') }}</l-s-b-top-title>
+        <l-s-b-top-title>{{ taskManagementTemplateStore.templates.TaskCategory }}</l-s-b-top-title>
         <l-s-b-loading-spinner :loading="taskCategoryGetters.loading" />
         <l-s-b-router-item v-for="(category, idx) in taskCategoryGetters.taskCategories"
                            :id="`${category.category_id}-${idx}`"

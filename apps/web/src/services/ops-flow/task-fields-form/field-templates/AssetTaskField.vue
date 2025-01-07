@@ -55,9 +55,14 @@ interface CloudDataSelectorItem extends DataSelectorItem {
     imageUrl?: string;
 }
 
-const cloudServiceOptions = computed<Record<string, string>>(() => ({
-    cloud_service_type: selectedStates.value[0]?.[0]?.data.name, // cloud service type name
-}));
+const cloudServiceOptions = computed<Record<string, any>>(() => {
+    if (!relatedAssetInfo.value) return {};
+    return {
+        provider: relatedAssetInfo.value.provider,
+        cloud_service_group: relatedAssetInfo.value.group,
+        cloud_service_type: relatedAssetInfo.value.type,
+    };
+});
 const cloudServiceHandler = getVariableModelMenuHandler<CloudServiceModel>(
     [{ variableModel: new VariableModelFactory({ type: 'MANAGED', managedModelKey: 'cloud_service' }) }],
     cloudServiceOptions,
@@ -67,19 +72,22 @@ const cloudServiceHandler = getVariableModelMenuHandler<CloudServiceModel>(
 type Step = {
     name: string;
 } & ({ menu?: CloudDataSelectorItem[]; } | { handler?: MenuAttachHandler<CloudDataSelectorItem>; });
+const step1Menu = computed<CloudDataSelectorItem[]>(() => cloudServiceTypeItems.value.map((item) => ({
+    name: item.key,
+    label: item.label,
+    imageUrl: item.icon,
+    data: item,
+})));
+const emptyMenu = [];
 const steps = computed<Step[]>(() => [
     {
         name: i18n.t('OPSFLOW.FIELD_GENERATOR.GROUP_TYPE') as string,
-        menu: cloudServiceTypeItems.value.map((item) => ({
-            name: item.key,
-            label: item.label,
-            imageUrl: item.icon,
-            data: item,
-        })),
+        menu: step1Menu.value,
     },
     {
         name: i18n.t('OPSFLOW.NAME') as string,
-        handler: cloudServiceHandler,
+        menu: emptyMenu,
+        handler: relatedAssetInfo.value ? cloudServiceHandler : undefined,
     },
 ]);
 const selectedStates = ref<CloudDataSelectorItem[][]>([]);
@@ -95,7 +103,7 @@ const handleUpdateSearchKey = (stepIdx: number) => {
         return d;
     });
 };
-const handleUpdateSelected = (stepIdx: number, selected: DataSelectorItem[]) => {
+const handleUpdateSelected = (stepIdx: number, selected: CloudDataSelectorItem[]) => {
     selectedStates.value.splice(stepIdx, 1, selected);
 
     if (stepIdx === steps.value.length - 1) {
@@ -114,9 +122,9 @@ const getIcon = (asset: RelatedAssetInfo): string|undefined => {
     const key = `${asset.provider}.${asset.group}.${asset.type}`;
     return cloudServiceTypeItems.value.find((item) => item.data.cloud_service_type_key === key)?.icon;
 };
-const relatedAssetInfo = computed<{ provider: string; group: string; type: string}|undefined>(() => {
+const relatedAssetInfo = computed<RelatedAssetInfo|undefined>(() => {
     if (props.readonly) {
-        const asset = relatedAssets.value[0];
+        const asset = relatedAssets.value[0] as CloudServiceModel|undefined;
         if (!asset) return undefined;
         return {
             provider: asset.provider,
@@ -126,7 +134,7 @@ const relatedAssetInfo = computed<{ provider: string; group: string; type: strin
     }
     const selected = selectedStates.value[0];
     if (!selected?.[0]) return undefined;
-    const item = selected[0].data;
+    const item = selected[0].data as CloudServiceTypeItem;
     const [provider, group, type] = item.data.cloud_service_type_key.split('.');
     return {
         provider,

@@ -4330,7 +4330,7 @@
 				"DESC": "This groups types of {tasks}. Users select the appropriate category when submitting a {task}, helping the assignee manage {tasks} more efficiently."
 			},
 			"ENABLE_LANDING": "Enable Landing Page",
-			"ENABLE_LANDING_DESC": "Landing Page Description...",
+			"ENABLE_LANDING_DESC": "The landing page will be displayed under the OpsFlow.",
 			"PACKAGE": {
 				"ADDED": "Added",
 				"AFFECTED_DESC": "The affected {workspace} and {category} are as follows.",

@@ -28,7 +28,7 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
 
     #response: ListResponse<T> = { results: [] };
 
-    #fetcher?: ReturnType<typeof getCancellableFetcher<object, { results?: T[]; total_count?: number }>>;
+    #fetcher?: ReturnType<typeof getCancellableFetcher<object, { results?: T[]|string[]; total_count?: number }>>;
 
     constructor(config: VariableModelConstructorConfig = {}) {
         if (config.key) this._meta.key = config.key;
@@ -77,7 +77,7 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
         return [this._meta.idKey, this._meta.nameKey];
     }
 
-    #getFetcher(dataKey?: string): ReturnType<typeof getCancellableFetcher<object, { results?: T[]; total_count?: number }>>|undefined {
+    #getFetcher(dataKey?: string): ReturnType<typeof getCancellableFetcher<object, { results?: T[]|string[]; total_count?: number }>>|undefined {
         if (!this._meta.resourceType) return undefined;
         const apiPath = this._meta.resourceType.split('.').map((d) => camelCase(d));
 
@@ -150,7 +150,7 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
                 v: query.search ?? '',
                 o: '' as ConsoleFilterOperator,
             }));
-            apiQueryHelper.addFilter(...searchFilters);
+            apiQueryHelper.setOrFilters(searchFilters);
         }
         if (query.start !== undefined && query.limit !== undefined) {
             apiQueryHelper.setPage(query.start, query.limit);
@@ -216,7 +216,7 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
                     const _presetValues = presetValues;
                     const _resultsWithPreset = [
                         ...(query.start === 1 ? (_presetValues ?? []).map((d) => ({ name: d, key: d })) : []),
-                        ...(response.results?.filter((d) => !_presetValues?.includes(d)).map((d) => ({ key: d, name: d })) ?? []),
+                        ...((response.results as string[])?.filter((d) => !_presetValues?.includes(d)).map((d) => ({ key: d, name: d })) ?? []),
                     ];
 
                     this.#response = {

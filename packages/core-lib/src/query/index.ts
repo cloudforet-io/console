@@ -225,7 +225,7 @@ export class QueryHelper {
 
     setOrFilters(orFilters: Required<ConsoleFilter>[]): this {
         orFilters.forEach((f) => {
-            if (f.k === undefined || f.o === undefined || f.o === '') {
+            if (f.k === undefined || f.o === undefined) {
                 throw new Error('QueryHelper: orFilter must have key and operator');
             }
         });
@@ -240,7 +240,7 @@ export class QueryHelper {
 
     addOrFilter(...orFilters: Required<ConsoleFilter>[]): this {
         orFilters.forEach((f) => {
-            if (f.k === undefined || f.o === undefined || f.o === '') {
+            if (f.k === undefined || f.o === undefined) {
                 throw new Error('QueryHelper: orFilter must have key and operator');
             }
         });
