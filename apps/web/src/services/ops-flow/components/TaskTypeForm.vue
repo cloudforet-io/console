@@ -42,7 +42,7 @@ const title = computed(() => {
 });
 
 /* scope */
-type Scope = TaskTypeModel['scope'];
+type Scope = 'PROJECT'|'WORKSPACE';
 const scopeValidator = useFieldValidator<Scope>('PROJECT', (val) => {
     if (!val) {
         return _i18n.t('OPSFLOW.VALIDATION.REQUIRED', {
@@ -53,6 +53,9 @@ const scopeValidator = useFieldValidator<Scope>('PROJECT', (val) => {
     return true;
 });
 const { value: scope, setValue: setScope } = scopeValidator;
+const handleChangeScope = (val: Scope) => {
+    setScope(val);
+};
 
 /* task field configuration */
 const {
@@ -122,7 +125,7 @@ const createTaskType = async (categoryId: string) => {
     try {
         await taskTypeStore.create({
             name: name.value,
-            scope: scope.value,
+            require_project: scope.value === 'PROJECT',
             assignee_pool: assigneePool.value,
             description: description.value,
             category_id: categoryId,
@@ -192,6 +195,7 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
         await nextTick(); // wait for closing animation
         setForm({
             name: '',
+            scope: 'PROJECT',
             description: '',
             assigneePool: [],
         });
@@ -204,6 +208,7 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
         initialTaskType = cloneDeep(target);
         setForm({
             name: target.name,
+            scope: target.require_project ? 'PROJECT' : 'WORKSPACE',
             description: target.description,
             assigneePool: target.assignee_pool,
         });
@@ -242,13 +247,13 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
                     <p-radio-group>
                         <p-radio :selected="scope"
                                  value="PROJECT"
-                                 @change="setScope"
+                                 @change="handleChangeScope"
                         >
                             {{ $t('OPSFLOW.PROJECT') }}
                         </p-radio>
                         <p-radio :selected="scope"
                                  value="WORKSPACE"
-                                 @change="setScope"
+                                 @change="handleChangeScope"
                         >
                             {{ $t('OPSFLOW.WORKSPACE') }}
                         </p-radio>

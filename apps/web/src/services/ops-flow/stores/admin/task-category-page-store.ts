@@ -1,7 +1,7 @@
 import { asyncComputed } from '@vueuse/core';
 import type { DeepReadonly } from 'vue';
 import {
-    reactive, computed,
+    reactive, computed, onUnmounted, onMounted,
 } from 'vue';
 
 import { defineStore } from 'pinia';
@@ -215,6 +215,20 @@ export const useTaskCategoryPageStore = defineStore('task-category-page', () => 
             state.targetTaskTypeId = undefined;
         },
     };
+
+    onMounted(() => {
+        if (!taskCategoryStore.state.loading) taskCategoryStore.list();
+    });
+
+
+    const disposeSelf = () => {
+        const store = useTaskCategoryPageStore();
+        store.$reset();
+        store.$dispose();
+    };
+    onUnmounted(() => {
+        disposeSelf();
+    });
     return {
         state,
         getters,

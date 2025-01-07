@@ -30,12 +30,12 @@ export const dropImagePlugin = (upload: ImageUploader) => new Plugin({
 
                             // upload and replace the loading node with the uploaded image node
                             upload(image).then(({ downloadUrl, fileId }) => {
-                                const node = schema.nodes.image.create({
+                                const imageNode = schema.nodes.image.create({
                                     src: downloadUrl,
                                     'file-id': fileId,
                                 });
                                 const loadingPos = view.state.selection.anchor - 1; // get the position of the loading node
-                                const transaction = view.state.tr.setNodeMarkup(loadingPos, schema.nodes.image, node.attrs);
+                                const transaction = view.state.tr.setNodeMarkup(loadingPos, schema.nodes.image, imageNode.attrs);
                                 view.dispatch(transaction);
                             });
                         }
@@ -88,12 +88,12 @@ export const dropImagePlugin = (upload: ImageUploader) => new Plugin({
 
                         // upload and replace the loading node with the uploaded image node
                         const { downloadUrl, fileId } = await upload(image);
-                        const node = schema.nodes.image.create({
+                        const imageNode = schema.nodes.image.create({
                             src: downloadUrl,
                             'file-id': fileId,
                         });
                         const loadingPos = view.state.selection.anchor - 1; // get the position of the loading node
-                        const transaction = view.state.tr.setNodeMarkup(loadingPos, schema.nodes.image, node.attrs);
+                        const transaction = view.state.tr.setNodeMarkup(loadingPos, schema.nodes.image, imageNode.attrs);
                         view.dispatch(transaction);
                     } else {
                         reader.onload = (readerEvent) => {

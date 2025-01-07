@@ -4221,7 +4221,7 @@
 	},
 	"OPSFLOW": {
 		"ADD_TARGET": "Add {target}",
-		"ALL_CATEGORIES": "All Categories",
+		"ALL_TASKS": "All {tasks}",
 		"ALT_E_ADD_TARGET": "Failed to add {target}",
 		"ALT_E_ASSIGN": "Failed to assign member",
 		"ALT_E_CHANGE_DEFAULT_TARGET": "Failed to update {target} as default",
@@ -4239,6 +4239,7 @@
 		"ASSIGNEE": "Assignee",
 		"ASSIGNEE_POOL": "Assignee Pool",
 		"CATEGORY": "Category",
+		"COLOR": "Color",
 		"CREATED_AT": "Created At",
 		"CREATED_BY": "Created By",
 		"CREATE_TARGET": "Create {target}",
@@ -4262,6 +4263,7 @@
 			"FIELD_REQUIRED": "This Field is Required",
 			"FORM": "Form Input",
 			"GLOBAL": "Global",
+			"GROUP_TYPE": "Group > Type",
 			"JSON": "JSON Input",
 			"KEY": "Key",
 			"LABELS": "Labels",
@@ -4293,6 +4295,7 @@
 		"STATUS_COMPLETED": "Completed",
 		"STATUS_IN_PROGRESS": "In Progress",
 		"STATUS_TODO": "To-do",
+		"STATUS_TYPE": "Status Type",
 		"SUPPORT_PACKAGE": "Support Package",
 		"TARGET_LIST": "{target} List",
 		"TASK_BOARD": {
@@ -4357,6 +4360,7 @@
 			"TEMPLATE_TYPE": "Template Type"
 		},
 		"TITLE": "Title",
+		"TOTAL_DURATION": "Total Duration",
 		"VALIDATION": {
 			"DUPLICATED": "{topic} already exists",
 			"ENUM_KEY_DUPLICATED": "Duplicate key found.",

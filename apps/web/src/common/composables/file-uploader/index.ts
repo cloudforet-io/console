@@ -1,22 +1,21 @@
-import { computed } from 'vue';
-
-import type { ResourceGroupType } from '@/schema/_common/type';
-
-import { useAppContextStore } from '@/store/app-context/app-context-store';
+import type { Ref } from 'vue';
+import { isRef } from 'vue';
 
 import { uploadFileAndGetFileInfo } from '@/lib/file-manager';
+import type { FileManagerResourceGroupType } from '@/lib/file-manager/type';
 
 
-export const useFileUploader = () => {
-    const appContextStore = useAppContextStore();
-    const appContextGetters = appContextStore.getters;
-    const resourceGroup = computed<Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'>>(() => {
-        if (appContextGetters.isAdminMode) return 'DOMAIN';
-        return 'WORKSPACE';
-    });
-    return {
-        fileUploader(file: File) {
-            return uploadFileAndGetFileInfo(file, resourceGroup.value);
-        },
-    };
-};
+export const useFileUploader = ({
+    resourceGroup, resourceId,
+}: {
+    resourceGroup: FileManagerResourceGroupType|Ref<FileManagerResourceGroupType>;
+    resourceId?: string|Ref<string|undefined>;
+}) => ({
+    fileUploader(file: File) {
+        return uploadFileAndGetFileInfo(
+            file,
+            isRef(resourceGroup) ? resourceGroup.value : resourceGroup,
+            isRef(resourceId) ? resourceId.value : resourceId,
+        );
+    },
+});

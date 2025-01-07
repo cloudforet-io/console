@@ -799,7 +799,7 @@
 			"HEADING1": "개요 1",
 			"HEADING2": "개요 2",
 			"HEADING3": "개요 3",
-			"NORMAL_TEXT": "바탕 글"
+			"NORMAL_TEXT": "본문"
 		},
 		"ERROR": {
 			"403_MSG": "이 페이지에 접근할 권한이 없습니다.",
@@ -4221,7 +4221,7 @@
 	},
 	"OPSFLOW": {
 		"ADD_TARGET": "{target} 추가",
-		"ALL_CATEGORIES": "모든 카테고리",
+		"ALL_TASKS": "모든 {tasks}",
 		"ALT_E_ADD_TARGET": "{target} 추가 실패",
 		"ALT_E_ASSIGN": "담당자 할당 실패",
 		"ALT_E_CHANGE_DEFAULT_TARGET": "{target} 기본값 변경 실패",
@@ -4239,6 +4239,7 @@
 		"ASSIGNEE": "담당자",
 		"ASSIGNEE_POOL": "담당자 풀",
 		"CATEGORY": "카테고리",
+		"COLOR": "색상",
 		"CREATED_AT": "생성일",
 		"CREATED_BY": "생성자",
 		"CREATE_TARGET": "{target} 생성",
@@ -4262,6 +4263,7 @@
 			"FIELD_REQUIRED": "이 필드는 필수입니다",
 			"FORM": "폼 입력",
 			"GLOBAL": "글로벌",
+			"GROUP_TYPE": "그룹 > 타입",
 			"JSON": "JSON 입력",
 			"KEY": "키",
 			"LABELS": "라벨",
@@ -4293,6 +4295,7 @@
 		"STATUS_COMPLETED": "완료됨",
 		"STATUS_IN_PROGRESS": "진행 중",
 		"STATUS_TODO": "할 일",
+		"STATUS_TYPE": "상태 타입",
 		"SUPPORT_PACKAGE": "지원 패키지",
 		"TARGET_LIST": "{target} 목록",
 		"TASK_BOARD": {
@@ -4357,6 +4360,7 @@
 			"TEMPLATE_TYPE": "템플릿 타입"
 		},
 		"TITLE": "제목",
+		"TOTAL_DURATION": "총 소요 시간",
 		"VALIDATION": {
 			"DUPLICATED": "이미 존재하는 {field}입니다",
 			"ENUM_KEY_DUPLICATED": "중복된 키가 존재합니다.",

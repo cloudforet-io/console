@@ -24,7 +24,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useTimezoneDate } from '@/common/composables/timezone-date';
 import ProjectLinkButton from '@/common/modules/project/ProjectLinkButton.vue';
 
-import BoardTaskDescriptionField from '@/services/ops-flow/components/BoardTaskDescriptionField.vue';
 import BoardTaskFilters from '@/services/ops-flow/components/BoardTaskFilters.vue';
 import BoardTaskNameField from '@/services/ops-flow/components/BoardTaskNameField.vue';
 import { useTaskAPI } from '@/services/ops-flow/composables/use-task-api';
@@ -48,7 +47,13 @@ const taskManagementTemplateStore = useTaskManagementTemplateStore();
 const loading = ref<boolean>(false);
 const taskAPI = useTaskAPI();
 const tasks = ref<TaskModel[]|undefined>(undefined);
-const categoriesById = ref<Record<string, TaskCategoryModel>>({});
+const categoriesById = computed<Record<string, TaskCategoryModel>>(() => {
+    const map = {} as Record<string, TaskCategoryModel>;
+    taskCategoryStore.getters.taskCategoriesIncludingDeleted.forEach((category) => {
+        map[category.category_id] = category;
+    });
+    return map;
+});
 const taskTypesById = ref<Record<string, TaskTypeModel>>({});
 
 
@@ -79,7 +84,7 @@ const getStatusStyleType = (category: TaskCategoryModel|undefined, statusId: str
     }
     return statusOption.color;
 };
-const { getTimezoneDate } = useTimezoneDate();
+const { getTimezoneDate, getDuration } = useTimezoneDate();
 
 /* query */
 const search = ref<string>('');
@@ -99,7 +104,7 @@ const getQuery = (filters?: ConsoleFilter[]) => {
         .setPage(pagination.page, pagination.size);
     if (search.value) queryHelper.addFilter({ v: search.value });
     if (props.categoryId) queryHelper.addFilter({ k: 'category_id', v: props.categoryId, o: '=' });
-    if (props.relatedAssets) queryHelper.addFilter({ k: 'related_assets', v: props.relatedAssets, o: '=' });
+    if (props.relatedAssets) queryHelper.addFilter({ k: 'related_asset_id', v: props.relatedAssets, o: '=' });
 
     return queryHelper.dataV2;
 };
@@ -130,26 +135,16 @@ const listCategoriesAndTaskTypes = async () => {
             query: { only: ['task_type_id', 'name'] },
         }),
     ]);
-    results.forEach((result, idx) => {
+    results.forEach((result) => {
         if (result.status === 'fulfilled') {
-            if (idx === 0) { // category case
-                const categories = result.value;
-                if (categories) {
-                    categories.forEach((category) => {
-                        categoriesById.value[category.category_id] = category;
-                    });
-                }
-            } else { // type case
-                const taskTypes = result.value;
-                if (taskTypes) {
-                    taskTypes.forEach((taskType) => {
-                        taskTypesById.value[taskType.task_type_id] = taskType;
-                    });
-                }
+            const taskTypes = result.value;
+            if (taskTypes) {
+                taskTypes.forEach((taskType) => {
+                    taskTypesById.value[taskType.task_type_id] = taskType;
+                });
             }
         }
     });
-    categoriesById.value = { ...categoriesById.value };
     taskTypesById.value = { ...taskTypesById.value };
     hasCategoriesAndTypesLoaded = true;
 };
@@ -189,12 +184,7 @@ const fields = computed<DataTableField[] >(() => [
     {
         name: 'name',
         label: i18n.t('OPSFLOW.TITLE') as string,
-        width: '18rem',
-    },
-    {
-        name: 'description',
-        label: i18n.t('OPSFLOW.DESCRIPTION') as string,
-        width: '20rem',
+        width: '30rem',
     },
     {
         name: 'task_type_id',
@@ -219,6 +209,10 @@ const fields = computed<DataTableField[] >(() => [
     {
         name: 'created_at',
         label: i18n.t('OPSFLOW.CREATED_AT') as string,
+    },
+    {
+        name: 'total_duration',
+        label: i18n.t('OPSFLOW.TOTAL_DURATION') as string,
     },
 ]);
 
@@ -255,11 +249,6 @@ const fields = computed<DataTableField[] >(() => [
                                        :name="item.name"
                 />
             </template>
-            <template #col-description-format="{item}">
-                <board-task-description-field :description="item.description"
-                                              :files="item.files"
-                />
-            </template>
             <template #col-task_type_id-format="{value}">
                 {{ getTaskTypeName(value) }}
             </template>
@@ -285,6 +274,14 @@ const fields = computed<DataTableField[] >(() => [
             </template>
             <template #col-created_at-format="{value}">
                 {{ getTimezoneDate(value) }}
+            </template>
+            <template #col-total_duration-format="{item}">
+                <template v-if="item.status_type === 'COMPLETED'">
+                    {{ getDuration(item.created_at, item.completed_at) }}
+                </template>
+                <template v-else>
+                    {{ getDuration(item.created_at) }}
+                </template>
             </template>
         </p-data-table>
     </component>

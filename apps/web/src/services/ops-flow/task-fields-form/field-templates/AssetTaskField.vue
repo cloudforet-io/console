@@ -1,15 +1,22 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, onMounted } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PFieldGroup,
+    PFieldGroup, PLink, PLazyImg,
 } from '@cloudforet/mirinae';
 import type { MenuAttachHandler } from '@cloudforet/mirinae/types/hooks/use-context-menu-attach/use-context-menu-attach';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { CloudServiceListParameters } from '@/schema/inventory/cloud-service/api-verbs/list';
+import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import type { OtherTaskField } from '@/schema/opsflow/_types/task-field-type';
 import { i18n } from '@/translations';
 
-import type { CloudServiceTypeItem } from '@/store/reference/cloud-service-type-reference-store';
+import type {
+    CloudServiceTypeItem,
+    CloudServiceTypeReferenceMap,
+} from '@/store/reference/cloud-service-type-reference-store';
 import {
     useCloudServiceTypeReferenceStore,
 } from '@/store/reference/cloud-service-type-reference-store';
@@ -19,7 +26,10 @@ import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-mode
 
 import DataSelector from '@/common/components/select/DataSelector.vue';
 import type { DataSelectorItem } from '@/common/components/select/type';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useTaskFieldValidation } from '@/services/ops-flow/task-fields-form/composables/use-task-field-validation';
 import type {
     TaskFieldFormEmits,
@@ -30,37 +40,49 @@ const props = defineProps<TaskFieldFormProps<OtherTaskField, string[]>>();
 const emit = defineEmits<TaskFieldFormEmits<string[]>>();
 
 const {
-    fieldValue, updateFieldValue,
+    updateFieldValue,
     isInvalid, invalidText,
 } = useTaskFieldValidation(props, emit);
 
 const cloudServiceTypeReferenceStore = useCloudServiceTypeReferenceStore();
-const cloudServiceTypeItems = computed<CloudServiceTypeItem[]>(() => Object.values(cloudServiceTypeReferenceStore.getters.cloudServiceTypeItems));
+
+
+const cloudServiceTypeReferenceMap = computed<CloudServiceTypeReferenceMap>(() => cloudServiceTypeReferenceStore.getters.cloudServiceTypeItems);
+const cloudServiceTypeItems = computed<CloudServiceTypeItem[]>(() => Object.values(cloudServiceTypeReferenceMap.value));
+
+interface CloudDataSelectorItem extends DataSelectorItem {
+    data: CloudServiceModel|CloudServiceTypeItem;
+    imageUrl?: string;
+}
 
 const cloudServiceOptions = computed<Record<string, string>>(() => ({
-    cloud_service_type: selectedStates.value[0]?.[0]?.name,
+    cloud_service_type: selectedStates.value[0]?.[0]?.data.name, // cloud service type name
 }));
-const cloudServiceHandler = getVariableModelMenuHandler([{ variableModel: new VariableModelFactory({ type: 'MANAGED', managedModelKey: 'cloud_service' }) }], cloudServiceOptions);
+const cloudServiceHandler = getVariableModelMenuHandler<CloudServiceModel>(
+    [{ variableModel: new VariableModelFactory({ type: 'MANAGED', managedModelKey: 'cloud_service' }) }],
+    cloudServiceOptions,
+);
+
 
 type Step = {
     name: string;
-} & ({ menu?: DataSelectorItem[]; } | { handler?: MenuAttachHandler<DataSelectorItem>; });
+} & ({ menu?: CloudDataSelectorItem[]; } | { handler?: MenuAttachHandler<CloudDataSelectorItem>; });
 const steps = computed<Step[]>(() => [
     {
-        name: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.CATEGORY') as string,
+        name: i18n.t('OPSFLOW.FIELD_GENERATOR.GROUP_TYPE') as string,
         menu: cloudServiceTypeItems.value.map((item) => ({
-            type: 'item',
             name: item.key,
             label: item.label,
             imageUrl: item.icon,
+            data: item,
         })),
     },
     {
-        name: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.CATEGORY') as string,
+        name: i18n.t('OPSFLOW.NAME') as string,
         handler: cloudServiceHandler,
     },
 ]);
-const selectedStates = ref<DataSelectorItem[][]>([]);
+const selectedStates = ref<CloudDataSelectorItem[][]>([]);
 
 const getStepKey = (idx: number): string => {
     if (idx === 0) return '--';
@@ -68,17 +90,76 @@ const getStepKey = (idx: number): string => {
     return selectedStates.value[idx - 1].map((d) => d.name).join(', ');
 };
 const handleUpdateSearchKey = (stepIdx: number) => {
-    if (stepIdx === 0) {
-        selectedStates.value.splice(stepIdx, 1, []);
-    }
+    selectedStates.value = selectedStates.value.map((d, idx) => {
+        if (idx > stepIdx) return [];
+        return d;
+    });
 };
 const handleUpdateSelected = (stepIdx: number, selected: DataSelectorItem[]) => {
     selectedStates.value.splice(stepIdx, 1, selected);
 
     if (stepIdx === steps.value.length - 1) {
         updateFieldValue(selected.map((item) => item.name));
+        relatedAssets.value = selected.map((item) => item.data as CloudServiceModel);
     }
 };
+
+const { getProperRouteLocation } = useProperRouteLocation();
+
+interface RelatedAssetInfo {
+    provider: string; group: string; type: string; icon?: string;
+}
+type RelatedAsset= Partial<Pick<CloudServiceModel, 'cloud_service_group'|'cloud_service_type'|'provider'|'name'>> & Pick<CloudServiceModel, 'cloud_service_id'>;
+const getIcon = (asset: RelatedAssetInfo): string|undefined => {
+    const key = `${asset.provider}.${asset.group}.${asset.type}`;
+    return cloudServiceTypeItems.value.find((item) => item.data.cloud_service_type_key === key)?.icon;
+};
+const relatedAssetInfo = computed<{ provider: string; group: string; type: string}|undefined>(() => {
+    if (props.readonly) {
+        const asset = relatedAssets.value[0];
+        if (!asset) return undefined;
+        return {
+            provider: asset.provider,
+            group: asset.cloud_service_group,
+            type: asset.cloud_service_type,
+        };
+    }
+    const selected = selectedStates.value[0];
+    if (!selected?.[0]) return undefined;
+    const item = selected[0].data;
+    const [provider, group, type] = item.data.cloud_service_type_key.split('.');
+    return {
+        provider,
+        group,
+        type,
+        icon: item.icon,
+    };
+});
+const relatedAssets = ref<RelatedAsset[]>([]);
+const loading = ref(false);
+const error = ref<unknown|null>(null);
+onMounted(async () => {
+    if (props.readonly && props.value) {
+        try {
+            loading.value = true;
+            const res = await SpaceConnector.clientV2.inventory.cloudService.list<CloudServiceListParameters, ListResponse<CloudServiceModel>>({
+                query: {
+                    only: ['cloud_service_id', 'cloud_service_type', 'cloud_service_group', 'provider', 'name'],
+                    filter: [{
+                        k: 'cloud_service_id', v: props.value, o: 'in',
+                    }],
+                },
+            });
+            relatedAssets.value = res.results ?? [];
+        } catch (e) {
+            ErrorHandler.handleError(e);
+            error.value = e;
+            relatedAssets.value = props.value.map((cloudServiceId) => ({ cloud_service_id: cloudServiceId }));
+        } finally {
+            loading.value = false;
+        }
+    }
+});
 </script>
 
 <template>
@@ -88,24 +169,63 @@ const handleUpdateSelected = (stepIdx: number, selected: DataSelectorItem[]) => 
                    :invalid-text="invalidText"
                    no-spacing
     >
-        <div v-if="props.readonly">
-            {{ fieldValue.value ? fieldValue.value.join(', ') : '' }}
-        </div>
-        <div v-else
-             class="mt-1 flex overflow-x-auto border border-gray-200 rounded-lg"
-             :class="{'border-red-500': isInvalid}"
-        >
-            <div v-for="(step, idx) in steps"
-                 :key="idx"
-                 class="flex-1 data-select-col"
+        <div v-if="!props.readonly">
+            <div class="mt-1 flex overflow-x-auto border border-gray-200 rounded-lg"
+                 :class="{'border-red-500': isInvalid}"
             >
-                <data-selector :key="getStepKey(idx)"
-                               :label="step.name"
-                               :menu="step.menu"
-                               :handler="step.handler"
-                               @update:search-text="handleUpdateSearchKey(idx, $event)"
-                               @update:selected="handleUpdateSelected(idx, $event)"
+                <div v-for="(step, idx) in steps"
+                     :key="idx"
+                     class="flex-1 data-select-col"
+                >
+                    <data-selector :key="getStepKey(idx)"
+                                   :label="step.name"
+                                   :menu="step.menu"
+                                   :handler="step.handler"
+                                   :multi-selectable="idx === steps.length - 1"
+                                   :show-select-marker="idx === steps.length - 1"
+                                   @update:search-text="handleUpdateSearchKey(idx, $event)"
+                                   @update:selected="handleUpdateSelected(idx, $event)"
+                    />
+                </div>
+            </div>
+        </div>
+        <div v-if="relatedAssetInfo"
+             class="pt-1"
+        >
+            <div class="flex items-center gap-1">
+                <p-lazy-img :src="getIcon(relatedAssetInfo)"
+                            :loading="loading"
+                            width="1.25rem"
+                            height="1.25rem"
                 />
+                <span class="pl-1 text-label-md">{{ relatedAssetInfo.group }} > {{ relatedAssetInfo.type }}</span>
+            </div>
+            <div class="mt-1 flex flex-wrap gap-1">
+                <div v-for="asset in relatedAssets"
+                     :key="asset.cloud_service_id"
+                >
+                    <p-link v-if="!error"
+                            new-tab
+                            highlight
+                            action-icon="internal-link"
+                            :to="getProperRouteLocation({
+                                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                                params: {
+                                    provider: asset.provider,
+                                    group: asset.cloud_service_group,
+                                    name: asset.cloud_service_type,
+                                },
+                                query: {
+                                    filters: [JSON.stringify([asset.cloud_service_id, 'cloud_service_id'])],
+                                },
+                            })"
+                    >
+                        <span class="pl-1 text-label-md">{{ asset.name }} ({{ asset.cloud_service_id }})</span>
+                    </p-link>
+                    <span v-else
+                          class="pl-1 text-label-md"
+                    >{{ asset.cloud_service_id }}</span>
+                </div>
             </div>
         </div>
     </p-field-group>

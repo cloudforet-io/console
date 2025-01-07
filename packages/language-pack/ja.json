@@ -4221,7 +4221,7 @@
 	},
 	"OPSFLOW": {
 		"ADD_TARGET": "",
-		"ALL_CATEGORIES": "",
+		"ALL_TASKS": "",
 		"ALT_E_ADD_TARGET": "",
 		"ALT_E_ASSIGN": "",
 		"ALT_E_CHANGE_DEFAULT_TARGET": "",
@@ -4239,6 +4239,7 @@
 		"ASSIGNEE": "",
 		"ASSIGNEE_POOL": "",
 		"CATEGORY": "",
+		"COLOR": "",
 		"CREATED_AT": "",
 		"CREATED_BY": "",
 		"CREATE_TARGET": "",
@@ -4262,6 +4263,7 @@
 			"FIELD_REQUIRED": "",
 			"FORM": "",
 			"GLOBAL": "",
+			"GROUP_TYPE": "",
 			"JSON": "",
 			"KEY": "",
 			"LABELS": "",
@@ -4293,6 +4295,7 @@
 		"STATUS_COMPLETED": "",
 		"STATUS_IN_PROGRESS": "",
 		"STATUS_TODO": "",
+		"STATUS_TYPE": "",
 		"SUPPORT_PACKAGE": "",
 		"TARGET_LIST": "",
 		"TASK_BOARD": {
@@ -4357,6 +4360,7 @@
 			"TEMPLATE_TYPE": ""
 		},
 		"TITLE": "",
+		"TOTAL_DURATION": "",
 		"VALIDATION": {
 			"DUPLICATED": "",
 			"ENUM_KEY_DUPLICATED": "",

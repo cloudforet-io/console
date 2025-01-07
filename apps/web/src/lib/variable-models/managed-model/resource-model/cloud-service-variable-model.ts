@@ -15,7 +15,12 @@ export default class CloudServiceVariableModel extends ResourceVariableModel<Clo
         resourceType: 'inventory.CloudService',
         idKey: 'cloud_service_id',
         nameKey: 'name',
+        _only: ['cloud_service_id', 'name', 'provider', 'cloud_service_group', 'cloud_service_type'],
     };
+
+    nameFormatter(data): string {
+        return `${data[this._meta.nameKey]} (${data[this._meta.idKey]})`;
+    }
 
     constructor(config: VariableModelConstructorConfig = {}) {
         super(config);

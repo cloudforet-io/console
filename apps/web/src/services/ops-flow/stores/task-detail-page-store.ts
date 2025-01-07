@@ -170,7 +170,13 @@ export const useTaskDetailPageStore = defineStore('task-detail-page', () => {
         },
     };
 
+    const disposeSelf = () => {
+        const store = useTaskDetailPageStore();
+        store.$reset();
+        store.$dispose();
+    };
     onUnmounted(() => {
+        disposeSelf();
         taskContentFormStore.$reset();
         taskContentFormStore.$dispose();
     });

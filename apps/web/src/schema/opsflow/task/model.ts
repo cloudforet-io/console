@@ -1,4 +1,3 @@
-import type { ResourceGroupType } from '@/schema/_common/type';
 import type { FileModel } from '@/schema/file-manager/model';
 import type { TaskPriority, TaskStatusType } from '@/schema/opsflow/task/type';
 
@@ -7,6 +6,7 @@ export interface TaskModel {
     name: string;
     status_id: string;
     status_type: TaskStatusType;
+    related_assets?: string[];
     priority: TaskPriority;
     description: string;
     data: Record<string, any>;
@@ -14,8 +14,7 @@ export interface TaskModel {
     assignee: string;
     task_type_id: string;
     category_id: string;
-    project_id?: string;
-    resource_group: Extract<ResourceGroupType, 'WORKSPACE' | 'PROJECT'>;
+    project_id: string;
     workspace_id: string;
     domain_id: string;
     created_by: string;
