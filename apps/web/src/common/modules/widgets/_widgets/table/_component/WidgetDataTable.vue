@@ -216,7 +216,7 @@ const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
     const BASE_OPACITY = 0.1;
     const _style: Record<string, string> = {};
     const heatmapSkipCondition = field.fieldInfo?.type === 'labelField'
-        || field?.fieldInfo?.additionalType === 'comparison' || field.name === SUB_TOTAL_NAME;
+        || field.name === SUB_TOTAL_NAME;
     if (heatmapSkipCondition) return _style;
 
     const _dataField = field.name;
