@@ -1255,6 +1255,7 @@
 					"ADD_LABELS_DESC": "Add labels to enhance data clarity.",
 					"ADD_RULE": "Add Rule",
 					"ADVANCED_OPTIONS": "Advanced Options",
+					"AGGREGATE_DESC": "Combine and group label fields using aggregation",
 					"ALT_E_ADD_GROUP_BY": "There can be a maximum of 3 group-by options.",
 					"BASED_ON": "Based On",
 					"CASES": "Cases",
@@ -1329,6 +1330,8 @@
 			},
 			"DEFAULT_WIDTH": "Default Width",
 			"DELETE": "Delete",
+			"DIMENSIONS": "Dimensions",
+			"DIMENSIONS_DESC": "Select up to 3 options to customize your view.",
 			"DISPLAY_ANNOTATION": {
 				"DISPLAY_ANNOTATION": "Additional Info",
 				"INVALID_VALUE": "Please enter info.",

@@ -1255,6 +1255,7 @@
 					"ADD_LABELS_DESC": "データの明確性を高めるためにラベルを追加してください。",
 					"ADD_RULE": "ルール追加",
 					"ADVANCED_OPTIONS": "詳細オプション",
+					"AGGREGATE_DESC": "ラベルフィールドを結合およびグループ化して集計します。",
 					"ALT_E_ADD_GROUP_BY": "最大で3つのグループ化オプションを選択できます。",
 					"BASED_ON": "基準",
 					"CASES": "ケース",
@@ -1329,6 +1330,8 @@
 			},
 			"DEFAULT_WIDTH": "デフォルト幅",
 			"DELETE": "削除",
+			"DIMENSIONS": "",
+			"DIMENSIONS_DESC": "",
 			"DISPLAY_ANNOTATION": {
 				"DISPLAY_ANNOTATION": "追加情報",
 				"INVALID_VALUE": "情報を入力してください。",

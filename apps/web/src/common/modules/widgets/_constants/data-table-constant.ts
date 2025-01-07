@@ -1,6 +1,7 @@
 import type {
     AddLabelsOptions,
     ConcatOptions, EvalOptions, JoinOptions, PivotOptions, QueryOptions, ValueMappingOptions,
+    AggregateOptions,
 } from '@/common/modules/widgets/types/widget-model';
 
 import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
@@ -21,7 +22,7 @@ export const DATA_TABLE_OPERATOR = {
     CONCAT: 'CONCAT',
     JOIN: 'JOIN',
     QUERY: 'QUERY',
-    // AGGREGATE: 'AGGREGATE',
+    AGGREGATE: 'AGGREGATE',
     EVAL: 'EVAL',
     PIVOT: 'PIVOT',
     ADD_LABELS: 'ADD_LABELS',
@@ -113,6 +114,11 @@ export const DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP = {
         conditions: [''],
         // operator: 'AND',
     } as QueryOptions,
+    AGGREGATE: {
+        data_table_id: undefined,
+        group_by: [],
+        function: {},
+    } as AggregateOptions,
     ADD_LABELS: {
         data_table_id: undefined,
         labels: { '': '' },
