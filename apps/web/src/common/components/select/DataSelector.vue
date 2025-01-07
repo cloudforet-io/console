@@ -56,8 +56,7 @@ onMounted(() => {
     initiateMenu();
 });
 
-watch([() => props.menu, () => props.handler], ([m, h]) => {
-    console.debug('DataSelector: menu or handler changed', m, h);
+watch([() => props.menu, () => props.handler], () => {
     selected.value = [];
     emit('update:selected', selected.value);
     initiateMenu();
