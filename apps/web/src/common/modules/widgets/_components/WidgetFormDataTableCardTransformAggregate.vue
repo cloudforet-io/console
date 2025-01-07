@@ -38,6 +38,7 @@ const dataTableInfo = ref<TransformDataTableInfo>({
     dataTableId: props.originData?.data_table_id,
 });
 const groupByInfo = ref<AggregateOptions['group_by']>(cloneDeep(props.originData.group_by));
+const functionInfo = ref<AggregateOptions['function']>(cloneDeep(props.originData.function));
 const storeState = reactive({
     dataTables: computed(() => widgetGenerateState.dataTables),
 });
@@ -79,10 +80,11 @@ const handleUpdateSelectGroupBy = (selectedItem: SelectDropdownMenuItem, isSelec
 };
 
 /* Watcher */
-watch([dataTableInfo, groupByInfo], ([_dataTableInfo, _groupByInfo]) => {
+watch([dataTableInfo, groupByInfo, functionInfo], ([_dataTableInfo, _groupByInfo, _functionInfo]) => {
     state.proxyOperatorOptions = {
         data_table_id: _dataTableInfo.dataTableId,
         group_by: _groupByInfo,
+        function: _functionInfo,
     };
 }, { deep: true, immediate: true });
 watch(() => state.invalid, (_invalid) => {
