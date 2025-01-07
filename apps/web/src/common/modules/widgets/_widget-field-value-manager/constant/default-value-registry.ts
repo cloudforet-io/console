@@ -90,7 +90,9 @@ export const widgetFieldDefaultValueMap: DefaultValueRegistry = {
     },
     groupBy: {},
     widgetHeader: {
-        toggleValue: false,
+        toggleValue: true,
+        title: '',
+        description: '',
     },
     icon: {
         toggleValue: true,
@@ -338,7 +340,14 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
 
         return result;
     },
-    widgetHeader: () => cloneDeep(widgetFieldDefaultValueMap.widgetHeader),
+    widgetHeader: (widgetConfig) => {
+        const result = cloneDeep(widgetFieldDefaultValueMap.widgetHeader);
+
+        return {
+            ...result,
+            title: widgetConfig.meta.title,
+        };
+    },
     icon: (widgetConfig) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const iconOptions = (_fieldsSchema.icon?.options ?? {}) as IconOptions;

@@ -155,8 +155,6 @@ const changeWidgetType = (widgetName: string) => {
     checkDefaultValidation();
 };
 
-// const checkFormDependencies = (changedFieldName: string):string[] => state.widgetConfigDependencies[changedFieldName] || [];
-
 onMounted(() => {
     if (widgetGenerateGetters.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT && UNSUPPORTED_CHARTS_IN_PIVOT.includes(widgetGenerateState.selectedWidgetName)) {
         changeWidgetType('table');

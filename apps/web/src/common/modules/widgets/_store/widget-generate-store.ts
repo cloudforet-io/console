@@ -315,7 +315,14 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                         vars: dashboardDetailGetters.dashboardInfo?.vars || {},
                     });
                     if (state.widget?.state === 'ACTIVE') {
-                        await actions.updateWidget({ state: 'INACTIVE' });
+                        await actions.updateWidget({
+                            state: 'INACTIVE',
+                            options: {
+                                widgetHeader: {
+                                    ...state.widget?.options?.widgetHeader,
+                                },
+                            },
+                        });
                     }
                 }
                 state.dataTables = state.dataTables.map((dataTable) => (dataTable.data_table_id === result.data_table_id ? result : dataTable));
