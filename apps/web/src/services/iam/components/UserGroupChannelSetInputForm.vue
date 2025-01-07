@@ -19,7 +19,7 @@ import UserGroupChannelAddFormData from '@/services/iam/components/UserGroupChan
 import { useNotificationChannelCreateFormStore } from '@/services/iam/store/notification-channel-create-form-store';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
-const emit = defineEmits<{(e: 'update-valid', valid: boolean): void}>();
+const emit = defineEmits(['update-valid', 'update-channel-name']);
 
 const notificationChannelCreateFormStore = useNotificationChannelCreateFormStore();
 const notificationChannelCreateFormState = notificationChannelCreateFormStore.state;
@@ -40,7 +40,7 @@ interface UserModeInfo {
 }
 
 const state = reactive<ChannelInfo & UserModeInfo>({
-    channelName: notificationChannelCreateFormState.channelName,
+    channelName: '',
     channelData: {},
     channelInput: {},
     selectedProtocolData: {},
@@ -59,7 +59,7 @@ const {
     setForm,
     invalidState,
 } = useFormValidator({
-    channelName: notificationChannelCreateFormState.channelName,
+    channelName: userGroupPageState.modal.title === i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE') ? '' : notificationChannelCreateFormState.channelName,
 }, {
     channelName(value: string) {
         if (!value) return ' ';
@@ -77,10 +77,10 @@ const handleUpdateValid = (value: boolean) => {
 
 /* Watcher */
 watch(() => channelName, (nv_channel_name) => {
-    notificationChannelCreateFormStore.$patch((_state) => {
-        _state.state.channelName = nv_channel_name;
-    });
-}, { immediate: true, deep: true });
+    if (nv_channel_name) {
+        emit('update-channel-name', nv_channel_name);
+    }
+}, { immediate: true });
 
 watch(() => state.selectedProtocolData, (nv_selected_protocol_data) => {
     if (nv_selected_protocol_data) {
