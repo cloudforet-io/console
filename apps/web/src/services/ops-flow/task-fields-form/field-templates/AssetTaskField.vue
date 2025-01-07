@@ -118,7 +118,7 @@ const { getProperRouteLocation } = useProperRouteLocation();
 interface RelatedAssetInfo {
     provider: string; group: string; type: string; icon?: string;
 }
-type RelatedAsset = Partial<Pick<CloudServiceModel, 'cloud_service_group'|'cloud_service_type'|'provider'|'name'|'reference.resource_id'>> & Pick<CloudServiceModel, 'cloud_service_id'>;
+type RelatedAsset = Partial<Pick<CloudServiceModel, 'cloud_service_group'|'cloud_service_type'|'provider'|'name'|'reference'>> & Pick<CloudServiceModel, 'cloud_service_id'>;
 const getIcon = (asset: RelatedAssetInfo): string|undefined => {
     const key = `${asset.provider}.${asset.group}.${asset.type}`;
     return cloudServiceTypeItems.value.find((item) => item.data.cloud_service_type_key === key)?.icon;
