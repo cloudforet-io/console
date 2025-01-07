@@ -24,7 +24,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useTimezoneDate } from '@/common/composables/timezone-date';
 import ProjectLinkButton from '@/common/modules/project/ProjectLinkButton.vue';
 
-import BoardTaskDescriptionField from '@/services/ops-flow/components/BoardTaskDescriptionField.vue';
 import BoardTaskFilters from '@/services/ops-flow/components/BoardTaskFilters.vue';
 import BoardTaskNameField from '@/services/ops-flow/components/BoardTaskNameField.vue';
 import { useTaskAPI } from '@/services/ops-flow/composables/use-task-api';
@@ -185,12 +184,7 @@ const fields = computed<DataTableField[] >(() => [
     {
         name: 'name',
         label: i18n.t('OPSFLOW.TITLE') as string,
-        width: '18rem',
-    },
-    {
-        name: 'description',
-        label: i18n.t('OPSFLOW.DESCRIPTION') as string,
-        width: '20rem',
+        width: '30rem',
     },
     {
         name: 'task_type_id',
@@ -249,11 +243,6 @@ const fields = computed<DataTableField[] >(() => [
                 <board-task-name-field :task-id="item.task_id"
                                        :workspace-id="item.workspace_id"
                                        :name="item.name"
-                />
-            </template>
-            <template #col-description-format="{item}">
-                <board-task-description-field :description="item.description"
-                                              :files="item.files"
                 />
             </template>
             <template #col-task_type_id-format="{value}">
