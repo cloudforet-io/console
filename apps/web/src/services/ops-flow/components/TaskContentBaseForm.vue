@@ -4,12 +4,14 @@ import { computed, watch } from 'vue';
 import { isEqual } from 'lodash';
 
 import {
-    PFieldTitle, PFieldGroup, PSelectDropdown, PPaneLayout, PButton, PBadge,
+    PFieldTitle, PFieldGroup, PSelectDropdown, PPaneLayout, PButton, PBadge, PSkeleton,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
 import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
+import type { TaskModel } from '@/schema/opsflow/task/model';
+import type { TaskStatusType } from '@/schema/opsflow/task/type';
 import { i18n } from '@/translations';
 
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
@@ -21,12 +23,14 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import { useCategoryField } from '@/services/ops-flow/composables/use-category-field';
+import { useTaskAPI } from '@/services/ops-flow/composables/use-task-api';
 import { useTaskStatusField } from '@/services/ops-flow/composables/use-task-status-field';
 import { useTaskTypeField } from '@/services/ops-flow/composables/use-task-type-field';
+import { TASK_STATUS_LABELS } from '@/services/ops-flow/constants/task-status-label-constant';
 import { useTaskAssignStore } from '@/services/ops-flow/stores/task-assign-store';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
 import { useTaskDetailPageStore } from '@/services/ops-flow/stores/task-detail-page-store';
-import { useTaskStore } from '@/services/ops-flow/stores/task-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
@@ -36,13 +40,18 @@ const taskContentFormState = taskContentFormStore.state;
 const taskContentFormGetters = taskContentFormStore.getters;
 const userReferenceStore = useUserReferenceStore();
 const taskAssignStore = useTaskAssignStore();
-const taskStore = useTaskStore();
 const taskDetailPageStore = useTaskDetailPageStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 const userStore = useUserStore();
+const taskCategoryStore = useTaskCategoryStore();
+
+
+const isCreateMode = computed(() => taskContentFormState.mode.startsWith('create'));
+const isMinimalCreateMode = computed(() => taskContentFormState.mode === 'create-minimal');
 
 /* category */
 const {
+    preloadCategories,
     selectedCategoryItems,
     categoryValidator,
     categoryMenuItemsHandler,
@@ -52,6 +61,7 @@ const {
     hasTaskTypeOnly: true,
 });
 const handleUpdateSelectedCategory = (items: SelectDropdownMenuItem[]) => {
+    if (isEqual(items, selectedCategoryItems.value)) return;
     setForm('category', items); // set form for validation
     taskContentFormStore.setCurrentCategoryId(items[0].name); // set current category id to store for other fields
     const category = taskContentFormGetters.currentCategory;
@@ -88,6 +98,7 @@ const handleUpdateSelectedTaskType = async (items: SelectDropdownMenuItem[]) => 
 };
 
 /* status */
+const taskAPI = useTaskAPI();
 const {
     selectedStatusItems,
     taskStatusValidator,
@@ -97,12 +108,13 @@ const {
 } = useTaskStatusField({
     categoryId: computed(() => taskContentFormGetters.currentCategory?.category_id),
 });
+const getStatusTypeLabel = (statusType?: TaskStatusType) => (statusType ? TASK_STATUS_LABELS[statusType] : '--');
 const changeStatus = async (statusId: string) => {
     try {
         if (!taskContentFormState.originTask) {
             throw new Error('Origin task is not defined');
         }
-        await taskStore.changeStatus(taskContentFormState.originTask.task_id, statusId);
+        await taskAPI.changeStatus(taskContentFormState.originTask.task_id, statusId);
         showSuccessMessage(i18n.t('OPSFLOW.ALT_S_UPDATE_TARGET', { target: i18n.t('OPSFLOW.STATUS') }), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ALT_E_UPDATE_TARGET', { target: i18n.t('OPSFLOW.STATUS') }));
@@ -113,7 +125,7 @@ const handleUpdateSelectedStatus = async (items: SelectDropdownMenuItem[]) => {
     if (taskContentFormState.statusId === statusId) return;
     taskContentFormStore.setStatusId(statusId);
     setSelectedStatusItems(items);
-    if (taskContentFormState.mode === 'view') {
+    if (!isCreateMode.value) { // only for view mode
         await changeStatus(statusId);
         await taskDetailPageStore.loadNewEvents();
     }
@@ -176,85 +188,136 @@ const initRelatedFieldsByTaskTypeSelection = (category: TaskCategoryModel, taskT
     taskContentFormStore.setStatusId(defaultStatus?.status_id);
 };
 
-/* initiation for 'view' mode */
-watch([() => taskContentFormState.originTask, () => taskContentFormGetters.currentCategory, () => taskContentFormState.currentTaskType], async ([task, category, taskType]) => {
-    if (taskContentFormState.mode !== 'view' || !task || !category || !taskType) return;
-    // set category
-    setInitialCategory(task.category_id);
-    // set task type
-    setInitialTaskType(taskType);
-    // set status
-    const statusOption = category.status_options[task.status_type]?.find((status) => status.status_id === task.status_id);
-    setInitialStatus(statusOption);
-}, { immediate: true });
-
-/* initiation for 'create' mode with initial category, task type */
 let hasInitiated = false;
-watch([() => taskContentFormState.currentCategoryId, () => taskContentFormState.currentTaskType], async ([categoryId, taskType]) => {
+
+/* initiation for 'view' mode */
+const initForViewMode = async (task?: TaskModel) => {
     if (hasInitiated) return;
 
-    if (taskContentFormState.mode === 'create' && categoryId) {
-        await setInitialCategory(categoryId);
-        // init selected status
-        const category = taskContentFormGetters.currentCategory;
-        if (category) {
-            const defaultStatus = category.status_options.TODO.find((status) => status.is_default);
-            setInitialStatus(defaultStatus);
-            taskContentFormStore.setStatusId(defaultStatus?.status_id);
-        } else {
-            ErrorHandler.handleError(new Error('Failed to get category'));
-        }
-        // init task type
-        if (taskType) setInitialTaskType(taskType);
-
-        // reset validations
-        resetValidations();
+    if (!task) return;
+    // set category
+    setInitialCategory(task.category_id);
+    taskContentFormStore.setCurrentCategoryId(task.category_id);
+    // set task type
+    await taskContentFormStore.setCurrentTaskType(task.task_type_id);
+    const taskType = taskContentFormState.currentTaskType;
+    setInitialTaskType(taskType);
+    // set status
+    const category = await taskCategoryStore.get(task.category_id);
+    if (category) {
+        const statusOption = category.status_options[task.status_type]?.find((status) => status.status_id === task.status_id);
+        setInitialStatus(statusOption);
     }
 
     hasInitiated = true;
+};
+
+/* initiation for 'create' mode with initial category, task type */
+const initForCreateMode = async (categoryId?: string, taskType?: TaskTypeModel) => {
+    if (hasInitiated) return;
+
+    if (!categoryId) return;
+
+    setInitialCategory(categoryId);
+    // init selected status
+    const category = taskContentFormGetters.currentCategory;
+    if (category) {
+        const defaultStatus = category.status_options.TODO.find((status) => status.is_default);
+        setInitialStatus(defaultStatus);
+        taskContentFormStore.setStatusId(defaultStatus?.status_id);
+    } else {
+        ErrorHandler.handleError(new Error('Failed to get category'));
+        hasInitiated = true;
+        return;
+    }
+    // init task type
+    if (taskType) setInitialTaskType(taskType);
+
+    // reset validations
+    resetValidations();
+
+    hasInitiated = true;
+};
+
+let viewModeInitWatchStop;
+let createModeInitWatchStop;
+
+viewModeInitWatchStop = watch(() => taskContentFormState.originTask, async (task) => {
+    if (hasInitiated && viewModeInitWatchStop) {
+        viewModeInitWatchStop();
+        viewModeInitWatchStop = null;
+        return;
+    }
+
+    await preloadCategories();
+
+    if (!isCreateMode.value) await initForViewMode(task);
 }, { immediate: true });
+createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, () => taskContentFormState.currentTaskType], async ([categoryId, taskType]) => {
+    if (hasInitiated && createModeInitWatchStop) {
+        createModeInitWatchStop();
+        createModeInitWatchStop = undefined;
+        return;
+    }
+
+    await preloadCategories();
+
+    if (!isCreateMode.value) return;
+    if (isMinimalCreateMode.value && !taskType) return; // minimal create is from landing page. task type is already selected and must be initialized.
+
+    await initForCreateMode(categoryId, taskType);
+}, { immediate: true });
+
 </script>
 
 <template>
-    <component :is="taskContentFormState.mode === 'create' ? 'div' : PPaneLayout"
+    <component :is="isCreateMode ? 'div' : PPaneLayout"
                class="flex flex-wrap gap-4"
-               :class="taskContentFormState.mode === 'create' ? '' : 'py-6 px-4'"
+               :class="isCreateMode ? '' : 'py-6 px-4'"
     >
-        <div class="base-form-top-wrapper">
+        <div v-if="!taskContentFormState.isArchivedTask"
+             class="base-form-top-wrapper"
+        >
             <div class="base-form-field-wrapper">
                 <p-field-group :label="taskManagementTemplateStore.templates.TaskCategory"
-                               :style-type="taskContentFormState.mode === 'create' ? 'primary' : 'secondary'"
+                               :style-type="isCreateMode ? 'primary' : 'secondary'"
                                required
-                               :invalid="invalidState.category"
+                               :invalid="isCreateMode && invalidState.category"
                                :invalid-text="invalidTexts.category"
                 >
-                    <p-select-dropdown :selected="selectedCategoryItems"
-                                       :handler="categoryMenuItemsHandler"
-                                       :invalid="invalidState.category"
-                                       :readonly="taskContentFormState.mode === 'view'"
-                                       block
-                                       @update:selected="handleUpdateSelectedCategory"
-                    />
+                    <template #default="{invalid}">
+                        <p-select-dropdown :selected="selectedCategoryItems"
+                                           :handler="categoryMenuItemsHandler"
+                                           :page-size="10"
+                                           :invalid="invalid"
+                                           :readonly="!isCreateMode"
+                                           block
+                                           @update:selected="handleUpdateSelectedCategory"
+                        />
+                    </template>
                 </p-field-group>
             </div>
             <div class="base-form-field-wrapper">
                 <p-field-group :label="taskManagementTemplateStore.templates.TaskType"
-                               :style-type="taskContentFormState.mode === 'create' ? 'primary' : 'secondary'"
+                               :style-type="isCreateMode ? 'primary' : 'secondary'"
                                required
-                               :invalid="invalidState.taskType"
+                               :invalid="!isCreateMode && invalidState.taskType"
                                :invalid-text="invalidTexts.taskType"
                 >
-                    <p-select-dropdown :selected="selectedTaskTypeItems"
-                                       :handler="taskTypeMenuItemsHandler"
-                                       :invalid="invalidState.taskType"
-                                       :readonly="taskContentFormState.mode === 'view' || !taskContentFormGetters.currentCategory"
-                                       block
-                                       @update:selected="handleUpdateSelectedTaskType"
-                    />
+                    <template #default="{invalid}">
+                        <p-select-dropdown :selected="selectedTaskTypeItems"
+                                           :handler="taskTypeMenuItemsHandler"
+                                           :page-size="10"
+                                           :invalid="invalid"
+                                           :readonly="!isCreateMode || !taskContentFormGetters.currentCategory"
+                                           block
+                                           @update:selected="handleUpdateSelectedTaskType"
+                        />
+                    </template>
                 </p-field-group>
             </div>
         </div>
-        <div v-if="taskContentFormState.mode !== 'create'"
+        <div v-if="!isCreateMode"
              class="base-form-top-wrapper"
         >
             <div class="base-form-field-wrapper">
@@ -264,15 +327,24 @@ watch([() => taskContentFormState.currentCategoryId, () => taskContentFormState.
                                :invalid="invalidState.status"
                                :invalid-text="invalidTexts.status"
                 >
-                    <p-select-dropdown :selected="selectedStatusItems"
+                    <p-skeleton v-if="!taskContentFormState.hasTaskTypeLoaded"
+                                height="2rem"
+                    />
+                    <template v-else-if="taskContentFormState.isArchivedTask">
+                        {{ getStatusTypeLabel(taskContentFormState.originTask?.status_type) }}
+                    </template>
+                    <p-select-dropdown v-else
+                                       :selected="selectedStatusItems"
                                        :handler="statusMenuItemsHandler"
+                                       ::page-size="10"
                                        :invalid="invalidState.status"
                                        :readonly="!userStore.getters.isDomainAdmin || !taskContentFormGetters.currentCategory"
                                        block
                                        @update:selected="handleUpdateSelectedStatus"
                     >
                         <template #dropdown-button="item">
-                            <p-badge badge-type="subtle"
+                            <p-badge v-if="item.label"
+                                     badge-type="subtle"
                                      :style-type="item.color"
                             >
                                 {{ item.label }}
@@ -289,14 +361,14 @@ watch([() => taskContentFormState.currentCategoryId, () => taskContentFormState.
                 </p-field-group>
             </div>
             <div class="base-form-field-wrapper">
-                <div v-if="taskContentFormState.mode === 'view'">
+                <div v-if="!isCreateMode">
                     <div class="flex gap-2 items-center">
                         <p-field-title size="sm"
                                        color="gray"
                         >
                             {{ userStore.getters.isDomainAdmin ? $t('OPSFLOW.TASK_BOARD.ASSIGN_TO') : $t('OPSFLOW.ASSIGNEE') }}
                         </p-field-title>
-                        <p-button v-if="userStore.getters.isDomainAdmin"
+                        <p-button v-if="userStore.getters.isDomainAdmin && !taskContentFormState.isArchivedTask"
                                   size="sm"
                                   style-type="tertiary"
                                   @click="handleClickAssign"

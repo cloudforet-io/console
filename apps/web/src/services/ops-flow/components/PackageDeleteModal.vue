@@ -16,8 +16,7 @@ import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/tas
 const taskManagementPageStore = useTaskManagementPageStore();
 const packageStore = usePackageStore();
 
-const deletable = computed(() => !taskManagementPageStore.getters.associatedCategoriesToPackage.length
-        && !taskManagementPageStore.getters.associatedWorkspacesToPackage.length);
+const deletable = computed(() => !taskManagementPageStore.getters.associatedCategoriesToPackage.length);
 const headerTitle = computed(() => (deletable.value
     ? _i18n.t('OPSFLOW.DELETE_TARGET_CONFIRMATION', {
         object: _i18n.t('OPSFLOW.PACKAGE'),

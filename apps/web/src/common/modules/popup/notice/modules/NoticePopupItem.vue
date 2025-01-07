@@ -1,16 +1,12 @@
 <script setup lang="ts">
-import { computedAsync } from '@vueuse/core';
-import { reactive } from 'vue';
+import { reactive, computed } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButtonModal, PDivider, PButton,
 } from '@cloudforet/mirinae';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { PostGetParameters } from '@/schema/board/post/api-verbs/get';
 import type { PostModel } from '@/schema/board/post/model';
-import type { FileModel } from '@/schema/file-manager/model';
 
 import { useNoticeStore } from '@/store/notice';
 import { useUserStore } from '@/store/user/user-store';
@@ -18,8 +14,7 @@ import { useUserStore } from '@/store/user/user-store';
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
 
 import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useFileAttachments } from '@/common/composables/file-attachments';
+import { useEditorContentTransformer } from '@/common/composables/editor-content-transformer';
 
 const props = withDefaults(defineProps<{
     popupIndex: number|string;
@@ -33,20 +28,16 @@ const userStore = useUserStore();
 const state = reactive({
     popupVisible: true,
 });
-const files = computedAsync<FileModel[]>(async () => {
-    const notice = props.item;
-    if (!notice) return [];
-    try {
-        const result: PostModel = await SpaceConnector.clientV2.board.post.get<PostGetParameters, PostModel>({
-            post_id: notice.post_id,
-        });
-        return result.files;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return [];
-    }
+const {
+    editorContents,
+} = useEditorContentTransformer({
+    contents: computed(() => (props.item ? props.item.contents : '')),
+    contentsType: computed(() => (props.item ? props.item.contents_type : 'markdown')),
+    resourceGroup: computed(() => {
+        if (!props.item) return 'PUBLIC';
+        return props.item.resource_group;
+    }),
 });
-const { attachments } = useFileAttachments(files);
 
 const handleClose = async (neverShowPopup?: boolean): Promise<void> => {
     state.popupVisible = false;
@@ -58,26 +49,26 @@ const handleClose = async (neverShowPopup?: boolean): Promise<void> => {
 </script>
 
 <template>
-    <p-button-modal :visible="state.popupVisible"
+    <p-button-modal :visible="state.popupVisible && !!props.item"
                     :backdrop="false"
                     hide-header
                     hide-header-close-button
                     hide-footer-close-button
                     size="md"
-                    :absolute="props.popupIndex * 1.5 + (isMobile() ? 0.75 : 7.5)"
+                    :absolute="Number(props.popupIndex) * 1.5 + (isMobile() ? 0.75 : 7.5)"
                     class="notice-popup"
                     @confirm="handleClose"
     >
         <template #body>
             <h1 class="notice-popup-title">
-                {{ item.title }}
+                {{ props.item ? props.item.title : '' }}
             </h1>
             <div class="notice-popup-info">
                 <span class="notice-popup-author">{{ iso8601Formatter(item.updated_at, userStore.state.timezone) }} · {{ item.writer }}</span>
             </div>
             <p-divider class="!my-4" />
-            <text-editor-viewer :contents="item.contents"
-                                :attachments="attachments"
+            <text-editor-viewer :contents="editorContents"
+                                :contents-type="props.item ? props.item.contents_type : 'markdown'"
             />
         </template>
         <template #footer-extra>

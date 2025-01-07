@@ -23,26 +23,20 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useAdvancedMenuDisplay } from '@/store/display/composables/use-advanced-menu-display';
 import { SIDEBAR_TYPE } from '@/store/display/constant';
 import type {
     DisplayMenu, DisplayStoreState, SidebarProps, SidebarType,
     DisplayStoreGetters,
 } from '@/store/display/type';
-import { useDomainStore } from '@/store/domain/domain-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import config from '@/lib/config';
 import type { Menu, MenuId, MenuInfo } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 import { ADMIN_MENU_LIST, MENU_LIST } from '@/lib/menu/menu-architecture';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import {
-    useTaskManagementTemplateStore,
-} from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
-
 
 const verbose = false;
 const filterMenuByRoute = (menuList: DisplayMenu[], router: VueRouter): DisplayMenu[] => menuList.reduce((results, _menu) => {
@@ -82,22 +76,10 @@ const filterMenuByAccessPermission = (menuList: DisplayMenu[], pagePermissionLis
     return results;
 }, [] as DisplayMenu[]);
 
-const taskManagementTemplateStore = useTaskManagementTemplateStore();
 const getDisplayMenuList = (menuList: Menu[], isAdminMode?: boolean, currentWorkspaceId?: string): DisplayMenu[] => menuList.map((d) => {
     const menuInfo: MenuInfo = MENU_INFO_MAP[d.id];
     const routeName = isAdminMode ? makeAdminRouteName(MENU_INFO_MAP[d.id].routeName) : MENU_INFO_MAP[d.id].routeName;
-    let label = i18n.t(menuInfo.translationId);
-    let hideOnGNB = d.hideOnGNB;
-    let hideOnSiteMap = d.hideOnSiteMap;
-
-    // Apply templates of task management (ops-flow)
-    if (d.id === MENU_ID.OPS_FLOW_LANDING) {
-        label = taskManagementTemplateStore.templates.TemplateName;
-        hideOnGNB = taskManagementTemplateStore.state.templateId === 'default' || !taskManagementTemplateStore.state.enableLanding;
-        hideOnSiteMap = taskManagementTemplateStore.state.templateId === 'default' || !taskManagementTemplateStore.state.enableLanding;
-    } else if (d.id === MENU_ID.TASK_BOARD) {
-        label = taskManagementTemplateStore.templates.TaskBoard;
-    }
+    const label = i18n.t(menuInfo.translationId);
 
     return {
         ...d,
@@ -106,16 +88,12 @@ const getDisplayMenuList = (menuList: Menu[], isAdminMode?: boolean, currentWork
         icon: menuInfo.icon,
         highlightTag: menuInfo.highlightTag,
         to: { name: routeName, params: { workspaceId: currentWorkspaceId } },
-        hideOnGNB,
-        hideOnSiteMap,
         subMenuList: d.subMenuList ? getDisplayMenuList(d.subMenuList, isAdminMode, currentWorkspaceId) : [],
     } as DisplayMenu;
 });
 
-const ADVANCED_SERVICE_NAMES: string[] = [MENU_ID.OPS_FLOW];
 export const useDisplayStore = defineStore('display-store', () => {
     const userStore = useUserStore();
-    const domainStore = useDomainStore();
 
     const state = reactive<DisplayStoreState>({
         visibleSidebar: false,
@@ -128,6 +106,7 @@ export const useDisplayStore = defineStore('display-store', () => {
         gnbNotificationLastReadTime: '',
     });
 
+    const advancedMenuDisplay = useAdvancedMenuDisplay();
     const getters = reactive<DisplayStoreGetters>({
         hasUncheckedNotifications: computed<boolean>(() => !!(state.uncheckedNotificationCount && state.uncheckedNotificationCount > 0)),
         isHandbookVisible: computed<boolean>(() => state.visibleSidebar && (state.sidebarType === SIDEBAR_TYPE.handbook)),
@@ -159,6 +138,7 @@ export const useDisplayStore = defineStore('display-store', () => {
             }
             return { styleType: 'primary', disableButton: false, size: 'md' };
         }),
+        availableAdvancedServices: advancedMenuDisplay.availableAdvancedServices,
     });
 
     /* Mutations */
@@ -347,15 +327,8 @@ export const useDisplayStore = defineStore('display-store', () => {
             });
         }
 
-        const advanceService: Record<string, string[]>|undefined = config.get('ADVANCED_SERVICE');
-        if (advanceService) {
-            _allGnbMenuList = _allGnbMenuList.filter((menu) => {
-                if (ADVANCED_SERVICE_NAMES.includes(menu.id as string)) {
-                    return advanceService[menu.id]?.includes(domainStore.state.domainId);
-                }
-                return true;
-            });
-        }
+        // advanced service menu display
+        _allGnbMenuList = advancedMenuDisplay.refineGNBMenuList(_allGnbMenuList);
 
         return _allGnbMenuList;
     };

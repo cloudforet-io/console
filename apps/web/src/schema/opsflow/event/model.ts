@@ -1,12 +1,13 @@
-import type { EventType } from '@/schema/opsflow/event/type';
+import type { EventType, EventAdditionalInfo } from '@/schema/opsflow/event/type';
 
 export interface EventModel {
     event_id: string;
     event_type: EventType;
     name: string;
     description: string;
-    user_type: 'USER'|'APP'; // TODO: replace with UserType
-    user_id: string;
+    created_type: string;
+    created_by: string;
+    additional_info: EventAdditionalInfo;
     task_id: string;
     project_id: string;
     workspace_id: string;

@@ -25,6 +25,7 @@ interface UseTaskCategoryStoreState {
 interface UseTaskCategoryStoreGetters {
     loading: boolean;
     taskCategories: TaskCategoryModel[];
+    taskCategoriesIncludingDeleted: TaskCategoryModel[];
 }
 const DEFAULT_STATUS_OPTIONS: TaskCategoryCreateParameters['status_options'] = {
     TODO: [
@@ -37,6 +38,7 @@ const DEFAULT_STATUS_OPTIONS: TaskCategoryCreateParameters['status_options'] = {
         { name: 'Done', color: 'green200', is_default: true },
     ],
 };
+
 export const useTaskCategoryStore = defineStore('task-category', () => {
     const state = reactive<UseTaskCategoryStoreState>({
         loading: false,
@@ -45,18 +47,8 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
 
     const getters: UseTaskCategoryStoreGetters = {
         loading: computed<boolean>(() => state.loading),
-        taskCategories: computed<TaskCategoryModel[]>(() => {
-            if (state.items === undefined) {
-                actions.list();
-            }
-            return state.items?.filter((item) => item.state !== 'DELETED') ?? [];
-        }),
-        taskCategoriesIncludingDeleted: computed<TaskCategoryModel[]>(() => {
-            if (state.items === undefined) {
-                actions.list();
-            }
-            return state.items ?? [];
-        }),
+        taskCategories: computed<TaskCategoryModel[]>(() => state.items?.filter((item) => item.state !== 'DELETED') ?? []),
+        taskCategoriesIncludingDeleted: computed<TaskCategoryModel[]>(() => state.items ?? []),
     } as unknown as UseTaskCategoryStoreGetters; // HACK: to avoid type error
 
     const fetchList = getCancellableFetcher<TaskCategoryListParameters, ListResponse<TaskCategoryModel>>(SpaceConnector.clientV2.opsflow.taskCategory.list);
@@ -83,14 +75,14 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
                 ...params,
                 status_options: DEFAULT_STATUS_OPTIONS,
             });
-            state.items?.push(response);
+            state.items = state.items ? [...state.items, response] : [response];
             return response;
         },
         async update(params: TaskCategoryUpdateParameters) {
             const response = await SpaceConnector.clientV2.opsflow.taskCategory.update<TaskCategoryUpdateParameters, TaskCategoryModel>(params);
             const item = state.items?.find((c) => c.category_id === response.category_id);
             if (item) {
-                Object.assign(item, response);
+                state.items = state.items?.map((c) => (c.category_id === response.category_id ? response : c));
             }
             return response;
         },

@@ -5,6 +5,7 @@ export interface TaskTypeModel {
     task_type_id: string;
     name: string;
     description: string;
+    require_project: boolean;
     fields: TaskField[];
     assignee_pool?: string[];
     tags: Tags;

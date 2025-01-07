@@ -137,7 +137,7 @@ const fetchBookmarkFolderList = async () => {
         if (state.scope === BOOKMARK_TYPE.USER) {
             fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.userConfig.list);
         } else if (storeState.isAdminMode || state.scope === BOOKMARK_TYPE.WORKSPACE) {
-            fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.publicConfig.list);
+            fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.sharedConfig.list);
         }
         const { status, response } = await fetcher({
             query: bookmarkListApiQuery.data,

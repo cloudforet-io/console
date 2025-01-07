@@ -1,5 +1,7 @@
 import type { DeepReadonly } from 'vue';
-import { reactive, computed } from 'vue';
+import {
+    reactive, computed, onUnmounted, onMounted,
+} from 'vue';
 
 import { defineStore } from 'pinia';
 
@@ -12,9 +14,9 @@ import { useWorkspaceReferenceStore } from '@/store/reference/workspace-referenc
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useTaskAPI } from '@/services/ops-flow/composables/use-task-api';
 import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
-import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
-import { useTaskStore } from '@/services/ops-flow/stores/task-store';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 
 interface UseTaskManagementPageStoreState {
     // support package
@@ -31,11 +33,20 @@ interface UseTaskManagementPageStoreState {
     loadingAssociatedTasksToCategory: boolean;
 }
 
+interface UseTaskManagementPageStoreGetters {
+    targetPackage: PackageModel|undefined;
+    associatedCategoriesToPackage: TaskCategoryModel[];
+    associatedWorkspacesToPackage: WorkspaceItem[];
+    associatedTasksToCategory: TaskModel[];
+    targetCategory: TaskCategoryModel|undefined;
+    defaultPackage: PackageModel|undefined;
+}
+
 export const useTaskManagementPageStore = defineStore('task-management-page', () => {
     const packageStore = usePackageStore();
     const taskCategoryStore = useTaskCategoryStore();
     const workspaceReferenceStore = useWorkspaceReferenceStore();
-    const taskStore = useTaskStore();
+    const taskAPI = useTaskAPI();
     const state = reactive<UseTaskManagementPageStoreState>({
         // support package
         visiblePackageForm: false,
@@ -50,7 +61,7 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
         associatedTasksToCategoryMap: {},
         loadingAssociatedTasksToCategory: false,
     });
-    const getters = {
+    const getters: UseTaskManagementPageStoreGetters = {
         targetPackage: computed<PackageModel|undefined>(() => packageStore.getters.packages.find((p) => p.package_id === state.targetPackageId)),
         associatedCategoriesToPackage: computed<DeepReadonly<TaskCategoryModel[]>>(() => taskCategoryStore.getters.taskCategories.filter((c) => c.package_id === state.targetPackageId)),
         associatedWorkspacesToPackage: computed<WorkspaceItem[]>(() => {
@@ -62,11 +73,16 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
         associatedTasksToCategory: computed<DeepReadonly<TaskModel[]>>(() => {
             if (!state.targetCategoryId) return [];
             const categoryId = state.targetCategoryId;
-            return state.associatedTasksToCategoryMap[categoryId] ?? [];
+            const packageId = getters.targetCategory?.package_id;
+            if (!packageId) return [];
+            const workspaceItems: WorkspaceItem[] = Object.values(workspaceReferenceStore.getters.workspaceItems);
+            const relatedWorkspaceIds = workspaceItems.filter((w) => w.data.packages?.includes(packageId)).map((w) => w.key);
+            const allTasks = state.associatedTasksToCategoryMap[categoryId] ?? [];
+            return allTasks.filter((t) => relatedWorkspaceIds.includes(t.workspace_id));
         }),
         targetCategory: computed<DeepReadonly<TaskCategoryModel>|undefined>(() => taskCategoryStore.getters.taskCategories.find((c) => c.category_id === state.targetCategoryId)),
         defaultPackage: computed<PackageModel|undefined>(() => packageStore.getters.packages.find((p) => p.is_default)),
-    };
+    } as unknown as UseTaskManagementPageStoreGetters; // HACK: to avoid type error
     const actions = {
         // support package
         openAddPackageForm() {
@@ -132,7 +148,7 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
                 return;
             }
             try {
-                const tasks = await taskStore.list({ category_id: categoryId });
+                const tasks = await taskAPI.list({ category_id: categoryId });
                 if (!tasks) return;
                 state.associatedTasksToCategoryMap = {
                     ...state.associatedTasksToCategoryMap,
@@ -144,7 +160,24 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
                 state.loadingAssociatedTasksToCategory = false;
             }
         },
+        flushAssociatedTasksToCategoryMap() {
+            state.associatedTasksToCategoryMap = {};
+        },
     };
+
+    onMounted(() => {
+        if (!taskCategoryStore.state.loading) taskCategoryStore.list();
+    });
+
+
+    const disposeSelf = () => {
+        const store = useTaskManagementPageStore();
+        store.$reset();
+        store.$dispose();
+    };
+    onUnmounted(() => {
+        disposeSelf();
+    });
     return {
         state,
         getters,

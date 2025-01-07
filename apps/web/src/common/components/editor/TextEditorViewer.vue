@@ -1,45 +1,62 @@
 <script setup lang="ts">
-import { computed, toRef } from 'vue';
+import {
+    computed, watch, nextTick, ref, toRef,
+} from 'vue';
 
 import DOMPurify from 'dompurify';
 
 import { useMarkdown } from '@cloudforet/mirinae';
 
-import { setAttachmentsToContents } from '@/common/components/editor/extensions/image/helper';
-import type { Attachment } from '@/common/components/editor/extensions/image/type';
+import type { TextEditorContentsType } from '@/common/components/editor/type';
 
 import { loadMonospaceFonts } from '@/styles/fonts';
 
 interface Props {
     contents?: string;
-    attachments?: Attachment[];
     showInBox?: boolean
-    contentType?: 'html'|'markdown';
+    contentsType?: TextEditorContentsType;
 }
 const props = withDefaults(defineProps<Props>(), {
     contents: '',
-    attachments: () => [],
     showInBox: false,
-    contentType: 'html',
+    contentsType: 'plain',
 });
 
 loadMonospaceFonts();
+
 const { sanitizedHtml } = useMarkdown({
     value: toRef(props, 'contents'),
     inlineCodeClass: 'inline-code',
 });
 const refinedContents = computed(() => {
-    if (props.contentType === 'markdown') {
+    if (props.contentsType === 'markdown') {
         return sanitizedHtml.value;
+    } if (props.contentsType === 'html') {
+        return DOMPurify.sanitize(props.contents);
     }
-    const sanitized = DOMPurify.sanitize(props.contents);
-    return setAttachmentsToContents(sanitized, props.attachments);
+    // plain
+    return props.contents;
+});
+
+const htmlContainer = ref<null|HTMLElement>(null);
+const addErrorHandlers = (container: HTMLElement) => {
+    container.querySelectorAll('img').forEach((img) => {
+        img.onerror = () => {
+            img.setAttribute('error', 'true');
+        };
+    });
+};
+watch([refinedContents, htmlContainer], async ([, container]) => {
+    if (!container) return;
+    await nextTick();
+    addErrorHandlers(container);
 });
 </script>
 
 <template>
     <!--        eslint-disable-next-line vue/no-v-html-->
-    <div class="text-editor-contents"
+    <div ref="htmlContainer"
+         class="text-editor-contents"
          :class="{'contents-box': props.showInBox}"
          v-html="refinedContents"
     />

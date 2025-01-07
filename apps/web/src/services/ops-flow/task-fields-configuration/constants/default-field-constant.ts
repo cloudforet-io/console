@@ -1,7 +1,7 @@
 export const DEFAULT_FIELD_ID_MAP = {
-    title: 'title',
+    title: 'name',
     description: 'description',
-    project: 'project',
+    project: 'project_id',
 } as const;
 export const MULTI_SELECTION_FIELD_TYPES = [
     'DROPDOWN',

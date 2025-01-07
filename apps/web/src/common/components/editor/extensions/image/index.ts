@@ -1,4 +1,4 @@
-import { Node, nodeInputRule } from '@tiptap/core';
+import { Node, nodeInputRule, mergeAttributes } from '@tiptap/core';
 
 import type { ImageUploader } from '@/common/components/editor/extensions/image/type';
 
@@ -14,21 +14,24 @@ import { dropImagePlugin } from './plugins/drop-image';
  */
 const IMAGE_INPUT_REGEX = /!\[(.+|:?)\]\((\S+)(?:(?:\s+)["'](\S+)["'])?\)/;
 
-export const createImageExtension = (uploadFn: ImageUploader<any>, imgFileDataMap: Map<string, any>) => Node.create({
+export const createImageExtension = (uploadFn: ImageUploader) => Node.create({
     name: 'image',
     inline: true,
     group: 'inline',
     draggable: true,
-    addAttributes: () => ({
-        src: {},
-        alt: { default: null },
-        title: { default: null },
-        'file-id': {},
-        'data-loading': { default: false }, // for loading spinner
-        style: { default: null }, // for loading spinner
-        width: { default: 'auto' },
-        height: { default: 'auto' },
-    }),
+    addAttributes() {
+        return {
+            src: {},
+            alt: { default: null },
+            title: { default: null },
+            'file-id': {},
+            'data-loading': { default: false }, // for loading spinner
+            style: { default: null }, // for loading spinner
+            width: { default: 'auto' },
+            height: { default: 'auto' },
+            error: { default: null },
+        };
+    },
     parseHTML: () => [
         {
             tag: 'img[src]',
@@ -43,12 +46,16 @@ export const createImageExtension = (uploadFn: ImageUploader<any>, imgFileDataMa
                     style: element.getAttribute('style'),
                     width: element.getAttribute('width'),
                     height: element.getAttribute('height'),
+                    error: element.getAttribute('error'),
                 };
             },
         },
     ],
-    renderHTML: ({ HTMLAttributes }) => ['img', HTMLAttributes],
-
+    renderHTML({ HTMLAttributes }) {
+        return ['img', mergeAttributes(HTMLAttributes, {
+            onerror: "this.setAttribute('error', 'true')",
+        })];
+    },
     // eslint-disable-next-line no-unused-vars
     addCommands(this: any) {
         return (attrs) => (state, dispatch) => {
@@ -74,6 +81,6 @@ export const createImageExtension = (uploadFn: ImageUploader<any>, imgFileDataMa
         ];
     },
     addProseMirrorPlugins() {
-        return [dropImagePlugin(uploadFn, imgFileDataMap)];
+        return [dropImagePlugin(uploadFn)];
     },
 });

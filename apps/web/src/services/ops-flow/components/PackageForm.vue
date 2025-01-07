@@ -53,6 +53,7 @@ const handleUpdateWorkspaces = (items: SelectDropdownMenuItem[]) => {
 
 /* category */
 const {
+    preloadCategories,
     selectedCategoryItems,
     categoryMenuItemsHandler,
     categoryValidator,
@@ -193,7 +194,8 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
         });
         workspaceType.value = 'unset';
         await setInitialWorkspaces();
-        await setInitialCategoriesByPackageId();
+        await preloadCategories();
+        setInitialCategoriesByPackageId();
         resetValidations();
         return;
     }
@@ -208,7 +210,8 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
         } else {
             workspaceType.value = 'unset';
         }
-        await setInitialCategoriesByPackageId(targetPackage.package_id);
+        await preloadCategories();
+        setInitialCategoriesByPackageId(targetPackage.package_id);
     }
 });
 </script>

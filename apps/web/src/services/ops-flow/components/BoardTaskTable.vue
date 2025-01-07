@@ -24,29 +24,36 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useTimezoneDate } from '@/common/composables/timezone-date';
 import ProjectLinkButton from '@/common/modules/project/ProjectLinkButton.vue';
 
-import BoardTaskDescriptionField from '@/services/ops-flow/components/BoardTaskDescriptionField.vue';
 import BoardTaskFilters from '@/services/ops-flow/components/BoardTaskFilters.vue';
 import BoardTaskNameField from '@/services/ops-flow/components/BoardTaskNameField.vue';
-import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
-import { useBoardPageStore } from '@/services/ops-flow/stores/board-page-store';
-import { useTaskStore } from '@/services/ops-flow/stores/task-store';
+import { useTaskAPI } from '@/services/ops-flow/composables/use-task-api';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 import type { TaskFilters } from '@/services/ops-flow/types/task-filters-type';
 
-const boardPageStore = useBoardPageStore();
-const boardPageState = boardPageStore.state;
-const taskStore = useTaskStore();
+const props = defineProps<{
+    categoryId?: string;
+    relatedAssets?: string[];
+    tag?: string;
+}>();
 const taskTypeStore = useTaskTypeStore();
 const taskCategoryStore = useTaskCategoryStore();
 const userReferenceStore = useUserReferenceStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
 const loading = ref<boolean>(false);
+const taskAPI = useTaskAPI();
 const tasks = ref<TaskModel[]|undefined>(undefined);
-const categoriesById = ref<Record<string, TaskCategoryModel>>({});
+const categoriesById = computed<Record<string, TaskCategoryModel>>(() => {
+    const map = {} as Record<string, TaskCategoryModel>;
+    taskCategoryStore.getters.taskCategoriesIncludingDeleted.forEach((category) => {
+        map[category.category_id] = category;
+    });
+    return map;
+});
 const taskTypesById = ref<Record<string, TaskTypeModel>>({});
 
 
@@ -77,7 +84,7 @@ const getStatusStyleType = (category: TaskCategoryModel|undefined, statusId: str
     }
     return statusOption.color;
 };
-const { getTimezoneDate } = useTimezoneDate();
+const { getTimezoneDate, getDuration } = useTimezoneDate();
 
 /* query */
 const search = ref<string>('');
@@ -96,7 +103,8 @@ const getQuery = (filters?: ConsoleFilter[]) => {
         .setMultiSortV2([toRaw(sort)])
         .setPage(pagination.page, pagination.size);
     if (search.value) queryHelper.addFilter({ v: search.value });
-    if (boardPageState.currentCategoryId) queryHelper.addFilter({ k: 'category_id', v: boardPageState.currentCategoryId, o: '=' });
+    if (props.categoryId) queryHelper.addFilter({ k: 'category_id', v: props.categoryId, o: '=' });
+    if (props.relatedAssets) queryHelper.addFilter({ k: 'related_asset_id', v: props.relatedAssets, o: '=' });
 
     return queryHelper.dataV2;
 };
@@ -105,7 +113,7 @@ const getQuery = (filters?: ConsoleFilter[]) => {
 const listTask = async (query: Query) => {
     try {
         loading.value = true;
-        const results = await taskStore.list({
+        const results = await taskAPI.list({
             query,
         });
         if (results) {
@@ -127,32 +135,22 @@ const listCategoriesAndTaskTypes = async () => {
             query: { only: ['task_type_id', 'name'] },
         }),
     ]);
-    results.forEach((result, idx) => {
+    results.forEach((result) => {
         if (result.status === 'fulfilled') {
-            if (idx === 0) { // category case
-                const categories = result.value;
-                if (categories) {
-                    categories.forEach((category) => {
-                        categoriesById.value[category.category_id] = category;
-                    });
-                }
-            } else { // type case
-                const taskTypes = result.value;
-                if (taskTypes) {
-                    taskTypes.forEach((taskType) => {
-                        taskTypesById.value[taskType.task_type_id] = taskType;
-                    });
-                }
+            const taskTypes = result.value;
+            if (taskTypes) {
+                taskTypes.forEach((taskType) => {
+                    taskTypesById.value[taskType.task_type_id] = taskType;
+                });
             }
         }
     });
-    categoriesById.value = { ...categoriesById.value };
     taskTypesById.value = { ...taskTypesById.value };
     hasCategoriesAndTypesLoaded = true;
 };
 
 listCategoriesAndTaskTypes();
-watch(() => boardPageState.currentCategoryId, () => {
+watch(() => props.categoryId, () => {
     listTask(getQuery());
 }, { immediate: true });
 
@@ -186,12 +184,7 @@ const fields = computed<DataTableField[] >(() => [
     {
         name: 'name',
         label: i18n.t('OPSFLOW.TITLE') as string,
-        width: '13rem',
-    },
-    {
-        name: 'description',
-        label: i18n.t('OPSFLOW.DESCRIPTION') as string,
-        width: '15rem',
+        width: '30rem',
     },
     {
         name: 'task_type_id',
@@ -217,12 +210,18 @@ const fields = computed<DataTableField[] >(() => [
         name: 'created_at',
         label: i18n.t('OPSFLOW.CREATED_AT') as string,
     },
+    {
+        name: 'total_duration',
+        label: i18n.t('OPSFLOW.TOTAL_DURATION') as string,
+    },
 ]);
 
 </script>
 
 <template>
-    <p-pane-layout class="pt-6">
+    <component :is="props.tag ? props.tag : PPaneLayout"
+               class="pt-6"
+    >
         <div class="px-4 pb-4">
             <p-toolbox class="mb-2"
                        :search-text="search"
@@ -234,7 +233,7 @@ const fields = computed<DataTableField[] >(() => [
             />
             <p-divider />
             <div class="mt-6">
-                <board-task-filters :category-id="boardPageState.currentCategoryId"
+                <board-task-filters :category-id="props.categoryId"
                                     @update="handleUpdateFilters"
                 />
             </div>
@@ -246,12 +245,8 @@ const fields = computed<DataTableField[] >(() => [
         >
             <template #col-name-format="{item}">
                 <board-task-name-field :task-id="item.task_id"
+                                       :workspace-id="item.workspace_id"
                                        :name="item.name"
-                />
-            </template>
-            <template #col-description-format="{item}">
-                <board-task-description-field :description="item.description"
-                                              :files="item.files"
                 />
             </template>
             <template #col-task_type_id-format="{value}">
@@ -267,7 +262,9 @@ const fields = computed<DataTableField[] >(() => [
                 </p-badge>
             </template>
             <template #col-project_id-format="{value}">
-                <project-link-button :project-id="value" />
+                <project-link-button :project-id="value"
+                                     no-role-if-not-exists
+                />
             </template>
             <template #col-assignee-format="{value}">
                 {{ userReferenceStore.getters.userItems[value]?.label || userReferenceStore.getters.userItems[value]?.name || value }}
@@ -278,6 +275,14 @@ const fields = computed<DataTableField[] >(() => [
             <template #col-created_at-format="{value}">
                 {{ getTimezoneDate(value) }}
             </template>
+            <template #col-total_duration-format="{item}">
+                <template v-if="item.status_type === 'COMPLETED'">
+                    {{ getDuration(item.created_at, item.completed_at) }}
+                </template>
+                <template v-else>
+                    {{ getDuration(item.created_at) }}
+                </template>
+            </template>
         </p-data-table>
-    </p-pane-layout>
+    </component>
 </template>

@@ -1,19 +1,15 @@
 <script setup lang="ts">
-import { toRef } from 'vue';
-
-import { isEqual } from 'lodash';
+import { watch, computed } from 'vue';
 
 import {
     PFieldGroup,
 } from '@cloudforet/mirinae';
 
-import type { FileModel } from '@/schema/file-manager/model';
 import type { ParagraphTaskField } from '@/schema/opsflow/_types/task-field-type';
 
-import type { Attachment } from '@/common/components/editor/extensions/image/type';
 import TextEditor from '@/common/components/editor/TextEditor.vue';
 import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
-import { useFileAttachments } from '@/common/composables/file-attachments';
+import { useEditorContentTransformer } from '@/common/composables/editor-content-transformer';
 import { useFileUploader } from '@/common/composables/file-uploader';
 
 import { useTaskFieldValidation } from '@/services/ops-flow/task-fields-form/composables/use-task-field-validation';
@@ -23,26 +19,35 @@ import type {
 } from '@/services/ops-flow/task-fields-form/types/task-field-form-type';
 
 
-const props = withDefaults(defineProps<TaskFieldFormProps<ParagraphTaskField, string>>(), {
+const props = withDefaults(defineProps<TaskFieldFormProps<ParagraphTaskField, string|undefined>>(), {
     files: () => [],
 });
 
-const emit = defineEmits<TaskFieldFormEmits<string>>();
+const emit = defineEmits<TaskFieldFormEmits<string|undefined>>();
 
 const {
     fieldValue, updateFieldValue,
     isInvalid, invalidText,
 } = useTaskFieldValidation(props, emit);
 
-const { fileUploader } = useFileUploader();
-const { attachments } = useFileAttachments(toRef(props, 'files'));
-const handleUpdateAttachments = (newAttachments: Attachment<FileModel>[]) => {
-    const originFileIds = props.files.map((f) => f.file_id);
-    const newFileIds = newAttachments.map((a) => a.fileId);
-    if (isEqual(originFileIds, newFileIds)) return;
-    const files = newAttachments.map((a) => a.data as FileModel);
-    emit('update:files', files);
-};
+const { fileUploader } = useFileUploader({
+    resourceGroup: 'PROJECT',
+});
+const {
+    contents,
+    editorContents,
+    fileIds,
+} = useEditorContentTransformer({
+    contents: computed(() => fieldValue.value ?? ''),
+    contentsType: 'markdown',
+    resourceGroup: 'PROJECT',
+    fileIds: props.files.map((f) => f.file_id),
+});
+
+watch(contents, updateFieldValue);
+watch(fileIds, (ids) => {
+    emit('update:file-ids', ids);
+});
 </script>
 
 <template>
@@ -54,21 +59,18 @@ const handleUpdateAttachments = (newAttachments: Attachment<FileModel>[]) => {
     >
         <text-editor-viewer v-if="props.readonly"
                             class="my-1"
-                            :contents="fieldValue"
-                            :attachments="attachments"
+                            :contents="editorContents"
                             show-in-box
-                            content-type="markdown"
+                            contents-type="markdown"
         />
         <text-editor v-else
                      class="my-1"
-                     :value="fieldValue"
+                     :value="editorContents"
                      :image-uploader="fileUploader"
-                     :attachments="attachments"
                      :placeholder="props.field.options?.example"
                      :invalid="isInvalid"
-                     content-type="markdown"
-                     @update:value="updateFieldValue"
-                     @update:attachments="handleUpdateAttachments"
+                     contents-type="markdown"
+                     @update:value="editorContents = $event"
         />
     </p-field-group>
 </template>

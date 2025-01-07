@@ -5,7 +5,7 @@ import draggable from 'vuedraggable';
 import { PI } from '@cloudforet/mirinae';
 
 import type { TaskField } from '@/schema/opsflow/_types/task-field-type';
-
+import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -13,10 +13,12 @@ import TaskFieldDeleteModal from '@/services/ops-flow/components/TaskFieldDelete
 import AddTaskFieldButton from '@/services/ops-flow/task-fields-configuration/components/AddTaskFieldButton.vue';
 import { useTaskFieldMetadataStore } from '@/services/ops-flow/task-fields-configuration/stores/use-task-field-metadata-store';
 import TaskFieldGenerator from '@/services/ops-flow/task-fields-configuration/TaskFieldGenerator.vue';
+import type { MutableTaskField } from '@/services/ops-flow/task-fields-configuration/types/mutable-task-field-type';
 import type { TaskFieldTypeMetadata } from '@/services/ops-flow/task-fields-configuration/types/task-field-type-metadata-type';
 
 const props = defineProps<{
-    fields: TaskField[];
+    scope: TaskTypeModel['scope'];
+    fields: MutableTaskField[];
     originFields?: TaskField[];
 }>();
 const emit = defineEmits<{(event: 'update:fields', value: TaskField[]): void;
@@ -27,7 +29,17 @@ const emit = defineEmits<{(event: 'update:fields', value: TaskField[]): void;
 const taskFieldMetadataStore = useTaskFieldMetadataStore();
 const taskFieldMetadataStoreGetters = taskFieldMetadataStore.getters;
 
-const draggableFields = computed<TaskField[]>({
+const defaultFields = computed<TaskField[]>(() => {
+    switch (props.scope) {
+    case 'WORKSPACE':
+        return taskFieldMetadataStoreGetters.workspaceScopeDefaultFields;
+    case 'PROJECT':
+        return taskFieldMetadataStoreGetters.projectScopeDefaultFields;
+    default:
+        return taskFieldMetadataStoreGetters.workspaceScopeDefaultFields;
+    }
+});
+const draggableFields = computed<MutableTaskField[]>({
     get() {
         return props.fields;
     },
@@ -37,14 +49,14 @@ const draggableFields = computed<TaskField[]>({
 });
 
 const visibleFieldDeleteModal = ref<boolean>(false);
-const fieldDeleteTarget = ref<{ field: TaskField, index: number } | undefined>();
-const handleFieldDelete = (field: TaskField, idx: number) => {
+const fieldDeleteTarget = ref<{ field: MutableTaskField, index: number } | undefined>();
+const handleFieldDelete = (field: MutableTaskField, idx: number) => {
     if (!props.originFields) { // if it is creation mode
-        emit('remove-field', field.field_id, idx);
+        emit('remove-field', field._field_id, idx);
         return;
     }
-    if (!props.originFields.find((f) => f.field_id === field.field_id)) { // if it is newly added field
-        emit('remove-field', field.field_id, idx);
+    if (!props.originFields.find((f) => f.field_id === field._field_id)) { // if it is newly added field
+        emit('remove-field', field._field_id, idx);
         return;
     }
     fieldDeleteTarget.value = { field, index: idx };
@@ -57,7 +69,7 @@ const handleFieldDeleteConfirm = () => {
         return;
     }
     visibleFieldDeleteModal.value = false;
-    emit('remove-field', fieldDeleteTarget.value.field.field_id, fieldDeleteTarget.value.index);
+    emit('remove-field', fieldDeleteTarget.value.field._field_id, fieldDeleteTarget.value.index);
     fieldDeleteTarget.value = undefined;
 };
 
@@ -68,9 +80,10 @@ const handleFieldDeleteConfirm = () => {
         <div class="grid grid-cols-12 rounded-lg border border-gray-200">
             <div class="col-span-8 p-4 pl-2 rounded-l-lg bg-gray-100 border-r border-gray-200">
                 <div class="flex flex-col gap-2">
-                    <task-field-generator v-for="field in taskFieldMetadataStoreGetters.defaultFields"
+                    <task-field-generator v-for="field in defaultFields"
                                           :key="field.field_id"
                                           :field="field"
+                                          :all-fields="defaultFields"
                     />
                 </div>
                 <div class="border-t border-gray-200 mt-4 pt-4">
@@ -81,7 +94,7 @@ const handleFieldDeleteConfirm = () => {
                                class="flex flex-col gap-2"
                     >
                         <div v-for="(field, idx) in draggableFields"
-                             :key="field.field_id"
+                             :key="field._field_id"
                              class="draggable-generator flex"
                         >
                             <span class="drag-handle flex-shrink-0 inline-flex items-center justify-center h-9 pr-2">
@@ -92,9 +105,10 @@ const handleFieldDeleteConfirm = () => {
                             </span>
                             <task-field-generator class="flex-grow"
                                                   :field="field"
+                                                  :all-fields="draggableFields"
                                                   @delete="handleFieldDelete(field, idx)"
                                                   @update:field="draggableFields[idx] = $event"
-                                                  @update:is-valid="emit('update-field-validation', field.field_id, $event)"
+                                                  @update:is-valid="emit('update-field-validation', field._field_id, $event)"
                             />
                         </div>
                     </draggable>

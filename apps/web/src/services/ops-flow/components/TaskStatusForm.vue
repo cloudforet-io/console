@@ -16,14 +16,16 @@ import type {
     TaskStatusOption, TaskStatusOptions,
     TaskStatusType,
 } from '@/schema/opsflow/task/type';
+import { getParticle, i18n as _i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import { TASK_STATUS_LABELS } from '@/services/ops-flow/constants/task-status-label-constant';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
-import { useTaskCategoryStore } from '@/services/ops-flow/stores/admin/task-category-store';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 
 const taskCategoryPageStore = useTaskCategoryPageStore();
 const taskCategoryPageState = taskCategoryPageStore.state;
@@ -32,9 +34,9 @@ const taskCategoryStore = useTaskCategoryStore();
 /* status type */
 const statusIdAndNames = computed<[id: string, name: string][]>(() => Object.values(taskCategoryPageStore.getters.statusOptions).flat().map((p) => [p.status_id, p.name]));
 const statusTypeItems = computed<SelectDropdownMenuItem[]>(() => [
-    { label: 'To-do', name: 'TODO' },
-    { label: 'In progress', name: 'IN_PROGRESS' },
-    { label: 'Completed', name: 'COMPLETED' },
+    { label: TASK_STATUS_LABELS.TODO, name: 'TODO' },
+    { label: TASK_STATUS_LABELS.IN_PROGRESS, name: 'IN_PROGRESS' },
+    { label: TASK_STATUS_LABELS.COMPLETED, name: 'COMPLETED' },
 ]);
 
 /* color chips */
@@ -51,10 +53,21 @@ const {
     color: TASK_STATUS_COLOR_NAMES[0] as TaskStatusColorName,
 }, {
     name(value: string) {
-        if (!value.trim().length) return 'Name is required';
-        if (value.length > 50) return 'Name should be less than 50 characters';
+        if (!value.trim().length) {
+            return _i18n.t('OPSFLOW.VALIDATION.REQUIRED', {
+                topic: _i18n.t('OPSFLOW.NAME'),
+                particle: getParticle(_i18n.t('OPSFLOW.NAME') as string, 'topic'),
+            });
+        }
+        if (value.length > 50) {
+            return _i18n.t('OPSFLOW.VALIDATION.LENGTH_MAX', {
+                topic: _i18n.t('OPSFLOW.NAME'),
+                particle: getParticle(_i18n.t('OPSFLOW.NAME') as string, 'topic'),
+                length: 50,
+            });
+        }
         const statusId = taskCategoryPageStore.getters.targetStatusOption?.data.status_id;
-        if (statusIdAndNames.value.some((p) => p[1] === value && p[0] !== statusId)) return 'Name already exists';
+        if (statusIdAndNames.value.some((p) => p[1] === value && p[0] !== statusId)) return _i18n.t('OPSFLOW.VALIDATION.DUPLICATED', { topic: _i18n.t('OPSFLOW.NAME') });
         return true;
     },
 });
@@ -168,13 +181,17 @@ watch([() => taskCategoryPageState.visibleStatusForm, () => taskCategoryPageStor
 </script>
 
 <template>
-    <p-overlay-layout :title="taskCategoryPageStore.getters.targetStatusOption ? 'Edit Status' : 'Add Status'"
+    <p-overlay-layout :title="taskCategoryPageStore.getters.targetStatusOption ? $t('OPSFLOW.EDIT_TARGET', {
+                          target: $t('OPSFLOW.STATUS'),
+                      }) : $t('OPSFLOW.ADD_TARGET', {
+                          target: $t('OPSFLOW.STATUS'),
+                      })"
                       :visible="taskCategoryPageState.visibleStatusForm"
                       @close="handleCancelOrClose"
     >
         <template #default>
             <div class="p-6 w-full">
-                <p-field-group label="Name"
+                <p-field-group :label="$t('OPSFLOW.NAME')"
                                required
                                :invalid="!loading && invalidState.name"
                                :invalid-text="invalidTexts.name"
@@ -188,7 +205,7 @@ watch([() => taskCategoryPageState.visibleStatusForm, () => taskCategoryPageStor
                     </template>
                 </p-field-group>
                 <p-field-group v-if="!taskCategoryPageStore.getters.targetStatusOption?.data?.is_default"
-                               label="Status Type"
+                               :label="$t('OPSFLOW.STATUS_TYPE')"
                                required
                                :invalid="!loading && invalidState.statusType"
                                :invalid-text="invalidTexts.statusType"
@@ -202,7 +219,7 @@ watch([() => taskCategoryPageState.visibleStatusForm, () => taskCategoryPageStor
                         />
                     </template>
                 </p-field-group>
-                <p-field-group label="Color"
+                <p-field-group :label="$t('OPSFLOW.COLOR')"
                                required
                                :invalid="invalidState.color"
                                :invalid-text="invalidTexts.color"

@@ -1,5 +1,5 @@
 import type { MenuItem } from '@/controls/context-menu/type';
-import type { MenuAttachHandler, MenuAttachHandlerRes } from '@/hooks/use-context-menu-controller/use-context-menu-attach';
+import type { MenuAttachHandler, MenuAttachHandlerRes } from '@/hooks/use-context-menu-attach/use-context-menu-attach';
 
 export interface SelectDropdownMenuItem extends MenuItem {
     name: string;

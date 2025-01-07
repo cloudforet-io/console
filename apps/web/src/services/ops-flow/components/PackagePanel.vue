@@ -22,7 +22,7 @@ const state = reactive({
         {
             name: 'name',
             label: _i18n.t('OPSFLOW.NAME') as string,
-            width: '20%',
+            width: '30%',
         },
         {
             name: 'description',

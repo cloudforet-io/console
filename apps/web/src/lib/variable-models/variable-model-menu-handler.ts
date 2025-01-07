@@ -1,4 +1,7 @@
-import type { AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
+import type { Ref } from 'vue';
+import { isRef } from 'vue';
+
+import type { MenuAttachHandler } from '@cloudforet/mirinae/types/hooks/use-context-menu-attach/use-context-menu-attach';
 
 import type { VariableModel } from '@/lib/variable-models/_base/types';
 
@@ -15,7 +18,13 @@ const _getTitle = (modelInfo: VariableModelMenuHandlerInfo) => {
     return _dataKey ? modelInfo.variableModel[_dataKey].name : modelInfo.variableModel._meta?.name;
 };
 
-export const getVariableModelMenuHandler = (variableModelInfoList: VariableModelMenuHandlerInfo[], options: Record<string, any> = {}): AutocompleteHandler => {
+type Options = Record<string, any>;
+interface Item<T> {
+    label: string;
+    name: string;
+    data: T;
+}
+export const getVariableModelMenuHandler = <T=any>(variableModelInfoList: VariableModelMenuHandlerInfo[], options: Options|Ref<Options> = {}): MenuAttachHandler<Item<T>> => {
     const _variableModelInfoList = variableModelInfoList;
     return async (inputText: string, pageStart, pageLimit, filters, resultIndex) => {
         const _query = {
@@ -23,7 +32,7 @@ export const getVariableModelMenuHandler = (variableModelInfoList: VariableModel
             limit: pageLimit ?? 10,
             search: inputText,
             filters: filters?.length ? filters.map((f) => f.name as string) : undefined,
-            options,
+            options: isRef<Options>(options) ? options.value : options,
         };
 
         // if resultIndex is empty, it means that the handler is called for the first time. so, we need to call all variableModels' list().
@@ -38,6 +47,7 @@ export const getVariableModelMenuHandler = (variableModelInfoList: VariableModel
                 results: result.results.map((d) => ({
                     name: d.key,
                     label: d.name,
+                    data: d.data,
                 })),
                 more: result.more,
                 title: _getTitle(_variableModelInfoList[resIndex]),
@@ -64,7 +74,7 @@ export const getVariableModelMenuHandler = (variableModelInfoList: VariableModel
             if (i !== resultIndex) return { results: [], title: _getTitle(modelInfo) };
             return {
                 results: response.results.map((d) => ({
-                    name: d.key, label: d.name,
+                    name: d.key, label: d.name, data: d.data,
                 })),
                 more: response.more,
                 title: _getTitle(modelInfo),

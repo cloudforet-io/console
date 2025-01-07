@@ -144,6 +144,12 @@
         &.ProseMirror-selectednode, &:active {
             outline: theme('colors.blue.300') solid 2px;
         }
+        &:not([src]),
+        &[src=""],
+        &[src^="data:image/"]:not([src*=","]),
+        &[error="true"] {
+            content: url('/images/no-image.png');
+        }
     }
 
     /* code block */

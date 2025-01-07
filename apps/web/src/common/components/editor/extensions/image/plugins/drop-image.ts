@@ -7,7 +7,7 @@ const LOADING_IMAGE_NODE = {
     'data-loading': true,
     style: 'max-width: 2rem; max-height: 2rem;',
 };
-export const dropImagePlugin = (upload: ImageUploader<any>, imgFileDataMap: Map<string, any>) => new Plugin({
+export const dropImagePlugin = (upload: ImageUploader) => new Plugin({
     props: {
         handleDOMEvents: {
             paste: (view, _event: Event) => {
@@ -29,14 +29,13 @@ export const dropImagePlugin = (upload: ImageUploader<any>, imgFileDataMap: Map<
                             view.dispatch(loadingTransaction);
 
                             // upload and replace the loading node with the uploaded image node
-                            upload(image).then(({ downloadUrl, fileId, data }) => {
-                                if (data) imgFileDataMap.set(fileId, data);
-                                const node = schema.nodes.image.create({
+                            upload(image).then(({ downloadUrl, fileId }) => {
+                                const imageNode = schema.nodes.image.create({
                                     src: downloadUrl,
                                     'file-id': fileId,
                                 });
                                 const loadingPos = view.state.selection.anchor - 1; // get the position of the loading node
-                                const transaction = view.state.tr.setNodeMarkup(loadingPos, schema.nodes.image, node.attrs);
+                                const transaction = view.state.tr.setNodeMarkup(loadingPos, schema.nodes.image, imageNode.attrs);
                                 view.dispatch(transaction);
                             });
                         }
@@ -88,14 +87,13 @@ export const dropImagePlugin = (upload: ImageUploader<any>, imgFileDataMap: Map<
                         view.dispatch(loadingTransaction);
 
                         // upload and replace the loading node with the uploaded image node
-                        const { downloadUrl, fileId, data } = await upload(image);
-                        if (data) imgFileDataMap.set(fileId, data);
-                        const node = schema.nodes.image.create({
+                        const { downloadUrl, fileId } = await upload(image);
+                        const imageNode = schema.nodes.image.create({
                             src: downloadUrl,
                             'file-id': fileId,
                         });
                         const loadingPos = view.state.selection.anchor - 1; // get the position of the loading node
-                        const transaction = view.state.tr.setNodeMarkup(loadingPos, schema.nodes.image, node.attrs);
+                        const transaction = view.state.tr.setNodeMarkup(loadingPos, schema.nodes.image, imageNode.attrs);
                         view.dispatch(transaction);
                     } else {
                         reader.onload = (readerEvent) => {

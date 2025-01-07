@@ -139,22 +139,17 @@ export const useTaskTypeStore = defineStore('task-type', () => {
             if (state.fullFieldsItemMap[taskTypeId] && !force) {
                 return state.fullFieldsItemMap[taskTypeId];
             }
-            try {
-                const result = await fetchGet({
-                    task_type_id: taskTypeId,
-                    include_category_fields: true,
-                });
-                if (result.status === 'succeed') {
-                    state.fullFieldsItemMap = {
-                        ...state.fullFieldsItemMap,
-                        [taskTypeId]: result.response,
-                    };
-                }
-                return result.response;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                return undefined;
+            const result = await fetchGet({
+                task_type_id: taskTypeId,
+                include_category_fields: true,
+            });
+            if (result.status === 'succeed') {
+                state.fullFieldsItemMap = {
+                    ...state.fullFieldsItemMap,
+                    [taskTypeId]: result.response,
+                };
             }
+            return result.response;
         },
         async delete(taskTypeId: string, categoryId?: string) {
             await SpaceConnector.clientV2.opsflow.taskType.delete<TaskTypeDeleteParameters, TaskTypeModel>({
