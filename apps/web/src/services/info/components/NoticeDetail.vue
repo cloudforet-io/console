@@ -249,7 +249,7 @@ watch(() => props.postId, (postId) => {
                      class="text-editor-wrapper"
                 >
                     <text-editor-viewer :contents="editorContents"
-                                        :contents-type="contentType"
+                                        :contents-type="contentsType"
                     />
                 </div>
             </p-data-loader>

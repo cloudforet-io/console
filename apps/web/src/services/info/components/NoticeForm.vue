@@ -3,6 +3,8 @@ import {
     computed, reactive, watch, toRef, ref,
 } from 'vue';
 
+import { isEqual } from 'lodash';
+
 import {
     PButton,
     PCheckbox,
@@ -152,8 +154,17 @@ const handleCreateNotice = async () => {
 };
 const handleEditNotice = async () => {
     try {
+        const originData = noticeDetailState.post;
+        if (!originData) throw new Error('Origin data is not found');
+        const postData: Omit<PostUpdateParameters, 'post_id'> = {};
+        if (originData.title !== formData.value.title) postData.title = formData.value.title;
+        if (originData.writer !== formData.value.writer) postData.writer = formData.value.writer;
+        if (originData.contents !== formData.value.contents) postData.contents = formData.value.contents;
+        if (!isEqual(originData.files, formData.value.files)) postData.files = formData.value.files;
+        if (!isEqual(originData.options, formData.value.options)) postData.options = formData.value.options;
+
         await noticeDetailStore.updateNoticePost({
-            ...formData.value,
+            ...postData,
             workspaces: workspaceState.selectedRadioIdx === 0 ? [] : workspaceState.selectedItems.map((item) => item.name),
         });
         showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_UPDATE_NOTICE'), '');
