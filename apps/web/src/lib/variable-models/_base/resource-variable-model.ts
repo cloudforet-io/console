@@ -26,9 +26,9 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
         nameKey: 'name',
     };
 
-    #response: ListResponse = { results: [] };
+    #response: ListResponse<T> = { results: [] };
 
-    #fetcher?: ReturnType<typeof getCancellableFetcher<object, { results?: string[]; total_count?: number }>>;
+    #fetcher?: ReturnType<typeof getCancellableFetcher<object, { results?: T[]; total_count?: number }>>;
 
     constructor(config: VariableModelConstructorConfig = {}) {
         if (config.key) this._meta.key = config.key;
@@ -39,7 +39,7 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
         this.#fetcher = this.#getFetcher();
     }
 
-    nameFormatter(data: any): string {
+    nameFormatter(data: T): string {
         return data[this._meta.nameKey];
     }
 
@@ -77,7 +77,7 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
         return [this._meta.idKey, this._meta.nameKey];
     }
 
-    #getFetcher(dataKey?: string): ReturnType<typeof getCancellableFetcher<object, { results?: string[]; total_count?: number }>>|undefined {
+    #getFetcher(dataKey?: string): ReturnType<typeof getCancellableFetcher<object, { results?: T[]; total_count?: number }>>|undefined {
         if (!this._meta.resourceType) return undefined;
         const apiPath = this._meta.resourceType.split('.').map((d) => camelCase(d));
 
@@ -150,7 +150,7 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
                 v: query.search ?? '',
                 o: '' as ConsoleFilterOperator,
             }));
-            apiQueryHelper.setFilters(searchFilters);
+            apiQueryHelper.addFilter(...searchFilters);
         }
         if (query.start !== undefined && query.limit !== undefined) {
             apiQueryHelper.setPage(query.start, query.limit);
@@ -170,7 +170,7 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
         };
     }
 
-    async list(query: ListQuery = {}): Promise<ListResponse> {
+    async list(query: ListQuery = {}): Promise<ListResponse<T>> {
         try {
             if (!this.#fetcher) {
                 this.#fetcher = this.#getFetcher();
@@ -185,7 +185,7 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
                     more = (query.start * query.limit) < response.total_count;
                 }
                 this.#response = {
-                    results: response.results ? response.results.map((d) => ({ key: d[this._meta.idKey], name: this.nameFormatter(d) })) : [],
+                    results: response.results ? response.results.map((d) => ({ key: d[this._meta.idKey], name: this.nameFormatter(d), data: d })) : [],
                     more,
                 };
             }
@@ -196,7 +196,7 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
         }
     }
 
-    stat(dataKey: string, presetValues?: string[]): (query?: ListQuery) => Promise<ListResponse> {
+    stat(dataKey: string, presetValues?: string[]): (query?: ListQuery) => Promise<ListResponse<T>> {
         const _dataKey = dataKey;
         return async (query: ListQuery = {}) => {
             try {
@@ -220,7 +220,7 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
                     ];
 
                     this.#response = {
-                        results: _presetValues ? _resultsWithPreset : (response.results ?? []).map((d) => ({ key: d, name: d })),
+                        results: _presetValues ? _resultsWithPreset : (response.results ?? []).map((d) => ({ key: d, name: d, data: d })),
                         more,
                     };
                 }

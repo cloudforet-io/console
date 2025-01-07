@@ -77,12 +77,13 @@ export interface ListQuery {
     filters?: string[]; // to filter selected items
     options?: Record<string, any>; // for custom options by config
 }
-export interface ListResponse {
-    results: Value[];
+export interface ListResponse<T=any> {
+    results: Value<T>[];
     more?: boolean;
 }
-export interface Value {
+export interface Value<T=any> {
     key: string;
     name: string;
+    data?: T;
 }
 
