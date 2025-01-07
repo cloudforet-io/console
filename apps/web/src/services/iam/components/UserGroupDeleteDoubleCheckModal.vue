@@ -61,7 +61,7 @@ const handleConfirm = async () => {
         state.loading = true;
         await Promise.all(deletePromises);
         emit('confirm');
-        showSuccessMessage(i18n.t('IAM.USER_GROUP.MODAL.DELETE.SHOW_SUCCESS_MESSAGE'), '');
+        showSuccessMessage('', i18n.t('IAM.USER_GROUP.MODAL.DELETE.SHOW_SUCCESS_MESSAGE'));
     } finally {
         state.loading = false;
         handleCancel();
