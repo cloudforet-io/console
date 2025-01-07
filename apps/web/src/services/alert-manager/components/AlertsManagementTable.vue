@@ -5,6 +5,7 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 import { useRoute } from 'vue-router/composables';
 
+import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
@@ -62,7 +63,6 @@ const route = useRoute();
 const storeState = reactive({
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo?.service_id),
-    serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => alertPageGetters.serviceDropdownList),
     totalCount: computed<number>(() => alertPageState.totalAlertCount),
     alertList: computed<AlertModel[]>(() => alertPageState.alertList),
     timezone: computed<string>(() => userState.timezone || ''),
@@ -82,6 +82,7 @@ const state = reactive({
     fields: route.name === ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME ? ALERT_MANAGEMENT_TABLE_FIELDS : [{ name: 'service_id', label: 'Service' }, ...ALERT_MANAGEMENT_TABLE_FIELDS],
 });
 const filterState = reactive({
+    serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => alertPageGetters.serviceDropdownList),
     selectedServiceId: '',
     statusFields: computed<AlertFilterType[]>(() => ([
         { label: i18n.t('ALERT_MANAGER.ALERTS.OPEN'), name: ALERT_STATUS_FILTERS.OPEN },
@@ -92,12 +93,14 @@ const filterState = reactive({
         { label: i18n.t('ALERT_MANAGER.ALERTS.ALL'), name: 'ALL' },
     ])),
     selectedStatusFilter: 'OPEN',
-    urgencyFields: computed<AlertFilterType[]>(() => ([
+    urgencyFields: computed<SelectDropdownMenuItem[]>(() => ([
         { label: i18n.t('ALERT_MANAGER.ALERTS.ALL'), name: 'ALL' },
         { label: i18n.t('ALERT_MANAGER.ALERTS.HIGH'), name: ALERT_URGENCY.HIGH },
         { label: i18n.t('ALERT_MANAGER.ALERTS.LOW'), name: ALERT_URGENCY.LOW },
     ])),
     selectedUrgencyFilter: 'ALL',
+    labelHandler: computed(() => makeDistinctValueHandler('alert_manager.Alert', 'labels')),
+    selectedLabels: [] as SelectDropdownMenuItem[],
 });
 
 const alertListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
@@ -114,8 +117,12 @@ const getCreatedByNames = (id: string): string => {
     return id;
 };
 const getServiceName = (id: string): TranslateResult => {
-    if (storeState.serviceDropdownList.length === 0) return '';
-    return storeState.serviceDropdownList.find((i) => i.name === id)?.label || '';
+    if (filterState.serviceDropdownList.length === 0) return '';
+    return filterState.serviceDropdownList.find((i) => i.name === id)?.label || '';
+};
+const handleSelectLabelsItem = (value: SelectDropdownMenuItem[]) => {
+    filterState.selectedLabels = value;
+    fetchAlertsList();
 };
 const handleSelectServiceDropdownItem = (id: string) => {
     filterState.selectedServiceId = id;
@@ -167,6 +174,9 @@ const fetchAlertsList = async () => {
         }
         if (filterState.selectedUrgencyFilter !== 'ALL') {
             filterQueryHelper.addFilter({ k: 'urgency', v: filterState.selectedUrgencyFilter, o: '=' });
+        }
+        if (filterState.selectedLabels.length > 0) {
+            filterQueryHelper.addFilter({ k: 'labels', v: filterState.selectedLabels.map((i) => i.name), o: '=' });
         }
 
         if (state.isServicePage) {
@@ -239,16 +249,51 @@ watch(() => route.query, async (query) => {
             <template v-if="!state.isServicePage"
                       #toolbox-top
             >
-                <p-select-dropdown :menu="storeState.serviceDropdownList"
-                                   :selection-label="$t('ALERT_MANAGER.ALERTS.SERVICE')"
-                                   style-type="rounded"
-                                   show-delete-all-button
-                                   selection-highlight
-                                   use-fixed-menu-style
-                                   :selected="filterState.selectedServiceId"
-                                   class="service-dropdown mt-6 pl-4"
-                                   @update:selected="handleSelectServiceDropdownItem"
-                />
+                <div class="filter-wrapper flex items-center gap-2 mt-6 ml-4">
+                    <p-select-dropdown :menu="filterState.urgencyFields"
+                                       :selection-label="$t('ALERT_MANAGER.ALERTS.LABEL_URGENCY')"
+                                       style-type="rounded"
+                                       use-fixed-menu-style
+                                       :selected="filterState.selectedUrgencyFilter"
+                                       class="service-dropdown"
+                                       @update:selected="handleSelectFilter('urgency', $event)"
+                    >
+                        <template #menu-item--format="{ item }">
+                            <p-i v-if="item.name !== 'ALL'"
+                                 :name="item.name === ALERT_URGENCY.HIGH ? 'ic_error-filled' : 'ic_warning-filled'"
+                                 width="1em"
+                                 height="1em"
+                                 class="mr-1"
+                                 :color="item.name === ALERT_URGENCY.HIGH ? red[400] : gray[200]"
+                            />
+                            <span>{{ item.label }}</span>
+                        </template>
+                    </p-select-dropdown>
+                    <p-divider vertical
+                               class="divider"
+                    />
+                    <p-select-dropdown :menu="filterState.serviceDropdownList"
+                                       :selection-label="$t('ALERT_MANAGER.ALERTS.SERVICE')"
+                                       style-type="rounded"
+                                       show-delete-all-button
+                                       selection-highlight
+                                       use-fixed-menu-style
+                                       :selected="filterState.selectedServiceId"
+                                       class="service-dropdown"
+                                       @update:selected="handleSelectServiceDropdownItem"
+                    />
+                    <p-select-dropdown :selection-label="$t('ALERT_MANAGER.ALERTS.LABEL')"
+                                       :handler="filterState.labelHandler"
+                                       style-type="rounded"
+                                       appearance-type="stack"
+                                       show-delete-all-button
+                                       selection-highlight
+                                       use-fixed-menu-style
+                                       :selected="filterState.selectedLabels"
+                                       class="service-dropdown"
+                                       @update:selected="handleSelectLabelsItem"
+                    />
+                </div>
             </template>
             <template #toolbox-bottom>
                 <div class="quick-filter-wrapper flex flex-col mr-4 mb-4 ml-4 gap-2">
@@ -263,21 +308,6 @@ watch(() => route.query, async (query) => {
                                          :value="item.name"
                                          class="status"
                                          @change="handleSelectFilter('status', item.name)"
-                        >
-                            {{ item.label }}
-                        </p-select-status>
-                    </div>
-                    <div class="status-filter-wrapper">
-                        <span class="label">{{ $t('ALERT_MANAGER.ALERTS.LABEL_URGENCY') }}</span>
-                        <p-divider class="divider"
-                                   vertical
-                        />
-                        <p-select-status v-for="(item, idx) in filterState.urgencyFields"
-                                         :key="idx"
-                                         :selected="filterState.selectedUrgencyFilter"
-                                         :value="item.name"
-                                         class="status"
-                                         @change="handleSelectFilter('urgency', item.name)"
                         >
                             {{ item.label }}
                         </p-select-status>
@@ -364,13 +394,17 @@ watch(() => route.query, async (query) => {
             border: none;
         }
     }
-    .service-dropdown {
-        margin-bottom: -0.5rem;
-        width: max-content;
-    }
     .label-item {
         @apply truncate;
         max-width: 9.875rem;
+    }
+    .filter-wrapper {
+        .divider {
+            height: 1.375rem;
+        }
+        .service-dropdown {
+            width: max-content;
+        }
     }
     .quick-filter-wrapper {
         .status-filter-wrapper {

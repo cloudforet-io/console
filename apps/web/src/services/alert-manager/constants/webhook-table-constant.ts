@@ -34,3 +34,9 @@ export const WEBHOOK_DEFINITION_FIELDS: DataTableFieldType[] = [
     { name: 'webhook_id', label: 'Webhook ID' },
     { name: 'webhook_url', label: 'Webhook URL' },
 ];
+
+export const WEBHOOK_ERROR_LIST_TABLE_FIELDS: DataTableFieldType[] = [
+    { name: 'number', label: 'No.' },
+    { name: 'message', label: 'Error Message' },
+    { name: 'created_at', label: 'Created' },
+];

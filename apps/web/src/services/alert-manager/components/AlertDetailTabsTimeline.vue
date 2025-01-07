@@ -201,7 +201,9 @@ watch(() => storeState.alertInfo, async (alertInfo) => {
                         >
                             {{ item.description }}
                         </p-text-button>
-                        <span v-else>
+                        <span v-else
+                              class="text-gray-700"
+                        >
                             {{ item.description }}
                         </span>
                     </vertical-timeline-item>

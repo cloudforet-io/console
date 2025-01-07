@@ -14,3 +14,15 @@ export interface WebhookModel {
     workspace_id: string;
     domain_id: string;
 }
+
+
+export interface WebhookListErrorsModel {
+    error_id: string;
+    message: string;
+    raw_data: Record<string, any>;
+    domain_id: string;
+    workspace_id: string;
+    service_id: string;
+    webhook_id: string;
+    created_at: string;
+}
