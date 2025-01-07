@@ -251,11 +251,17 @@ const handleClickEscalationPolicy = (id: string, escalationPolicyId: string) => 
 <style scoped lang="postcss">
 .service-list-content {
     .collapsible-title {
-        height: 1.5rem;
+        width: fit-content;
+        height: 2rem;
         cursor: pointer;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.25rem;
+        padding: 0.375rem 0.75rem 0.375rem 0.25rem;
         .arrow-button {
             transition: transform 0.3s ease-in-out;
+        }
+        &:hover {
+            @apply bg-gray-150;
+            border-radius: 0.25rem;
         }
     }
     .collapsible-contents {
@@ -306,22 +312,20 @@ const handleClickEscalationPolicy = (id: string, escalationPolicyId: string) => 
                     &.triggered {
                         padding-left: 1rem;
                         &::before {
-                            @apply absolute bg-red-400;
+                            @apply absolute bg-red-400 h-11;
                             content: '';
                             width: 0.063rem;
-                            height: 100%;
-                            top: 0;
+                            top: calc(50% - 1.375rem);
                             left: 0;
                         }
                     }
                     &.acknowledged {
                         padding-left: 1rem;
                         &::before {
-                            @apply absolute bg-gray-300;
+                            @apply absolute bg-gray-300 h-11;
                             content: '';
                             width: 0.063rem;
-                            height: 100%;
-                            top: 0;
+                            top: calc(50% - 1.375rem);
                             left: 0;
                         }
                     }

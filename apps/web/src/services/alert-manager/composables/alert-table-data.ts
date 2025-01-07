@@ -37,7 +37,7 @@ export const alertStatusBadgeStyleTypeFormatter = (alertState) => {
         style = 'gray200';
         break;
     case ALERT_STATUS.IGNORED:
-        style = 'red200';
+        style = 'peacock200';
         break;
     default: style = '';
         break;

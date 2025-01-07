@@ -95,10 +95,8 @@ const time = computed(() => {
     position: relative;
     min-height: 3.25rem;
     margin-left: 0.575rem;
-    padding-left: 1.375rem;
+    padding-left: 1.875rem;
     padding-top: 0.75rem;
-    border-left-width: 0.5rem;
-    border-color: theme('colors.gray.150');
     width: calc(100% - 0.575rem);
     >.top-wrapper {
         display: flex;
@@ -114,15 +112,26 @@ const time = computed(() => {
         gap: 0.75rem;
         text-align: right;
     }
+    &::after {
+        position: absolute;
+        content: " ";
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 0.5rem;
+        background-color: theme('colors.gray.150');
+        z-index: 0;
+    }
     &::before {
         position: absolute;
         border-radius: theme('borderRadius.full');
-        left: -0.7rem;
-        top: 1rem;
+        left: -0.25rem;
+        top: calc(50% - 0.5rem);
         content: " ";
         height: 1rem;
         width: 1rem;
         border-width: 4px;
+        z-index: 1;
     }
     &.gray {
         @mixin timeline-item-style gray, theme('colors.gray.800'), theme('colors.gray.600'), theme('colors.gray.200');
@@ -144,6 +153,18 @@ const time = computed(() => {
         padding: 0.75rem 0.5rem;
         >.p-collapsible-panel {
             padding: 0;
+        }
+    }
+    &:first-child {
+        &::after {
+            border-top-right-radius: 0.625rem;
+            border-top-left-radius: 0.625rem;
+        }
+    }
+    &:last-child {
+        &::after {
+            border-bottom-right-radius: 0.625rem;
+            border-bottom-left-radius: 0.625rem;
         }
     }
 }

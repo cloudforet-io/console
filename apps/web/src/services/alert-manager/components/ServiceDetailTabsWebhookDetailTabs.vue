@@ -7,34 +7,43 @@ import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PHeadingLayout, PTab, PHeading, PDefinitionTable, PStatus, PLazyImg, PMarkdown, PBadge,
+    PHeadingLayout, PTab, PHeading, PDefinitionTable, PStatus, PLazyImg, PMarkdown, PBadge, PDataTable,
 } from '@cloudforet/mirinae';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { WebhookGetParameters } from '@/schema/alert-manager/webhook/api-verbs/get';
-import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
+import type { WebhookListErrorSParameters } from '@/schema/alert-manager/webhook/api-verbs/list-errors';
+import type { WebhookModel, WebhookListErrorsModel } from '@/schema/alert-manager/webhook/model';
 import type { PluginGetParameters } from '@/schema/repository/plugin/api-verbs/get';
 import type { PluginModel } from '@/schema/repository/plugin/model';
 import type { RepositoryListParameters } from '@/schema/repository/repository/api-verbs/list';
 import type { RepositoryModel } from '@/schema/repository/repository/model';
 import { i18n } from '@/translations';
 
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { alertManagerStateFormatter } from '@/services/alert-manager/composables/refined-table-data';
 import { WEBHOOK_DETAIL_TABS } from '@/services/alert-manager/constants/common-constant';
-import { WEBHOOK_DEFINITION_FIELDS } from '@/services/alert-manager/constants/webhook-table-constant';
+import {
+    WEBHOOK_DEFINITION_FIELDS,
+    WEBHOOK_ERROR_LIST_TABLE_FIELDS,
+} from '@/services/alert-manager/constants/webhook-table-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
 import type { WebhookDetailTabsType } from '@/services/alert-manager/types/alert-manager-type';
 
+const allReferenceStore = useAllReferenceStore();
+const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const storeState = reactive({
+    cloudServiceTypeInfo: computed<CloudServiceTypeReferenceMap>(() => allReferenceGetters.cloudServiceType),
     language: computed<string>(() => serviceDetailPageGetters.language),
     plugins: computed<PluginReferenceMap>(() => serviceDetailPageGetters.pluginsReferenceMap),
     selectedWebhookId: computed<string|undefined>(() => serviceDetailPageState.selectedWebhookId),
@@ -47,6 +56,7 @@ const tabState = reactive({
         if (state.selectedPlugin?.docs && !isEmpty(state.selectedPlugin?.docs)) {
             defaultTabs.push({ label: i18n.t('ALERT_MANAGER.WEBHOOK.HELP'), name: WEBHOOK_DETAIL_TABS.HELP });
         }
+        defaultTabs.push({ label: i18n.t('ALERT_MANAGER.WEBHOOK.ERROR'), name: WEBHOOK_DETAIL_TABS.ERROR });
         return defaultTabs;
     }),
     activeWebhookDetailTab: WEBHOOK_DETAIL_TABS.DETAIL as WebhookDetailTabsType,
@@ -54,6 +64,13 @@ const tabState = reactive({
 const state = reactive({
     webhookInfo: {} as WebhookModel,
     selectedPlugin: {} as PluginModel,
+    errorListLoading: false,
+    errorList: [] as WebhookListErrorsModel[],
+    refinedErrorList: computed<WebhookListErrorsModel[]>(() => state.errorList.map((i, idx) => ({
+        number: idx + 1,
+        ...i,
+    }))),
+    errorTotalCount: 0,
 });
 
 const fetchWebhookDetail = async (selectedId: string) => {
@@ -64,6 +81,22 @@ const fetchWebhookDetail = async (selectedId: string) => {
     } catch (e) {
         ErrorHandler.handleError(e);
         state.webhookInfo = {} as WebhookModel;
+    }
+};
+const fetchWebhookErrorList = async (selectedId: string) => {
+    state.errorListLoading = true;
+    try {
+        const { results, total_count } = await SpaceConnector.clientV2.alertManager.webhook.listErrors<WebhookListErrorSParameters, ListResponse<WebhookListErrorsModel>>({
+            webhook_id: selectedId,
+        });
+        state.errorList = results || [];
+        state.errorTotalCount = total_count || 0;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.errorList = [];
+        state.errorTotalCount = 0;
+    } finally {
+        state.errorListLoading = false;
     }
 };
 const getRepositoryID = async () => {
@@ -92,6 +125,7 @@ watch(() => state.webhookInfo.plugin_info?.plugin_id, async (pluginId) => {
 watch(() => storeState.selectedWebhookId, async (selectedId) => {
     if (!selectedId) return;
     await fetchWebhookDetail(selectedId);
+    await fetchWebhookErrorList(selectedId);
 }, { immediate: true });
 </script>
 
@@ -101,39 +135,45 @@ watch(() => storeState.selectedWebhookId, async (selectedId) => {
            :active-tab.sync="tabState.activeWebhookDetailTab"
            class="service-detail-tabs-webhook-detail-tabs"
     >
-        <template #detail>
-            <p-heading-layout>
-                <template #heading>
-                    <p-heading class="pt-8 px-4 pb-4"
-                               heading-type="sub"
-                               :title="$t('ALERT_MANAGER.WEBHOOK.BASE_INFO_TITLE')"
-                    />
-                </template>
-            </p-heading-layout>
-            <p-definition-table :fields="WEBHOOK_DEFINITION_FIELDS"
-                                :data="state.webhookInfo"
-                                :skeleton-rows="4"
-                                block
-            >
-                <template #data-state="{data}">
-                    <p-status class="capitalize"
-                              v-bind="alertManagerStateFormatter(data)"
-                    />
-                </template>
-                <template #data-plugin_info.plugin_id="{value}">
-                    <div class="col-type inline-flex items-center">
-                        <p-lazy-img :src="state.selectedPlugin ? state.selectedPlugin.tags?.icon : 'ic_webhook'"
-                                    error-icon="ic_webhook"
-                                    width="1rem"
-                                    height="1rem"
-                                    class="mr-2"
+        <template v-if="tabState.activeWebhookDetailTab === WEBHOOK_DETAIL_TABS.DETAIL"
+                  #detail
+        >
+            <div>
+                <p-heading-layout>
+                    <template #heading>
+                        <p-heading class="pt-8 px-4 pb-4"
+                                   heading-type="sub"
+                                   :title="$t('ALERT_MANAGER.WEBHOOK.BASE_INFO_TITLE')"
                         />
-                        <span class="name">{{ state.selectedPlugin ? state.selectedPlugin?.name : value }}</span>
-                    </div>
-                </template>
-            </p-definition-table>
+                    </template>
+                </p-heading-layout>
+                <p-definition-table :fields="WEBHOOK_DEFINITION_FIELDS"
+                                    :data="state.webhookInfo"
+                                    :skeleton-rows="4"
+                                    block
+                >
+                    <template #data-state="{data}">
+                        <p-status class="capitalize"
+                                  v-bind="alertManagerStateFormatter(data)"
+                        />
+                    </template>
+                    <template #data-plugin_info.plugin_id="{value}">
+                        <div class="col-type inline-flex items-center">
+                            <p-lazy-img :src="state.selectedPlugin ? state.selectedPlugin.tags?.icon : 'ic_webhook'"
+                                        error-icon="ic_webhook"
+                                        width="1rem"
+                                        height="1rem"
+                                        class="mr-2"
+                            />
+                            <span class="name">{{ state.selectedPlugin ? state.selectedPlugin?.name : value }}</span>
+                        </div>
+                    </template>
+                </p-definition-table>
+            </div>
         </template>
-        <template #help>
+        <template v-if="tabState.activeWebhookDetailTab === WEBHOOK_DETAIL_TABS.HELP"
+                  #help
+        >
             <div class="pt-8 pr-4 pl-4">
                 <div class="flex gap-4">
                     <p-lazy-img :src="state.selectedPlugin ? state.selectedPlugin.tags?.icon : 'ic_webhook'"
@@ -164,6 +204,30 @@ watch(() => storeState.selectedWebhookId, async (selectedId) => {
                                 class="bg-violet-100 p-4 rounded-md	overflow-x-auto"
                     />
                 </div>
+            </div>
+        </template>
+        <template v-if="tabState.activeWebhookDetailTab === WEBHOOK_DETAIL_TABS.ERROR"
+                  #error
+        >
+            <div>
+                <p-heading-layout>
+                    <template #heading>
+                        <p-heading :title="$t('ALERT_MANAGER.WEBHOOK.ERROR_LIST')"
+                                   use-total-count
+                                   :total-count="state.errorTotalCount"
+                                   heading-type="sub"
+                                   class="pt-8 px-4 pb-4"
+                        />
+                    </template>
+                </p-heading-layout>
+                <p-data-table :items="state.refinedErrorList"
+                              :fields="WEBHOOK_ERROR_LIST_TABLE_FIELDS"
+                              :loading="state.errorListLoading"
+                >
+                    <template #col-message-format="{ value }">
+                        {{ value }}
+                    </template>
+                </p-data-table>
             </div>
         </template>
     </p-tab>

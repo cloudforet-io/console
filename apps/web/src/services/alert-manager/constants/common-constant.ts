@@ -17,6 +17,7 @@ export const SERVICE_TAB_HEIGHT = 44;
 export const WEBHOOK_DETAIL_TABS = {
     DETAIL: 'detail',
     HELP: 'help',
+    ERROR: 'error',
 } as const;
 
 export const ALERT_MANAGER_STATE_COLOR = {
