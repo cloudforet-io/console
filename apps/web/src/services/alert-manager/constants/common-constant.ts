@@ -34,3 +34,9 @@ export const NOTIFICATIONS_DETAIL_TABS = {
     DETAIL: 'detail',
 } as const;
 
+export const EVENT_RULE_SETTINGS_TYPE = {
+    ASSET: 'asset',
+    ALERT: 'alert',
+    SERVICE: 'service',
+} as const;
+

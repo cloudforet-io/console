@@ -14,6 +14,7 @@ import type {
     SERVICE_DETAIL_TABS,
     WEBHOOK_DETAIL_TABS,
     SERVICE_SETTING_CARD,
+    EVENT_RULE_SETTINGS_TYPE,
 } from '@/services/alert-manager/constants/common-constant';
 
 export type ServiceDetailTabsType = typeof SERVICE_DETAIL_TABS[keyof typeof SERVICE_DETAIL_TABS];
@@ -21,6 +22,8 @@ export type ServiceDetailSettingCardType = typeof SERVICE_SETTING_CARD[keyof typ
 
 export type WebhookDetailTabsType = typeof WEBHOOK_DETAIL_TABS[keyof typeof WEBHOOK_DETAIL_TABS];
 export type WebhookModalType = 'UPDATE' | 'ENABLE' | 'DISABLE' | 'DELETE';
+
+export type EventRuleSettingsType = typeof EVENT_RULE_SETTINGS_TYPE[keyof typeof EVENT_RULE_SETTINGS_TYPE];
 
 export type AlertFilterType = {
     label: TranslateResult;
@@ -74,3 +77,9 @@ export type EventRuleConditionPolicyButtonType = {
     label: TranslateResult,
     name: EventRuleConditionsPolicyType
 };
+export type EventRuleActionsItemValueType = {
+    value: any;
+    label: TranslateResult;
+    name: string;
+};
+export type EventRuleActionsItemType = Record<EventRuleSettingsType, EventRuleActionsItemValueType[]>;

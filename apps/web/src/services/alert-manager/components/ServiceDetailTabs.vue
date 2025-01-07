@@ -80,7 +80,8 @@ watch(() => tabState.activeTab, (activeTab) => {
         >
             <p-horizontal-layout :height="522">
                 <template #container="{ height }">
-                    <p-tab :tabs="tabState.tabs"
+                    <p-tab :key="i18n.locale"
+                           :tabs="tabState.tabs"
                            :active-tab.sync="tabState.activeTab"
                            class="tab"
                            :style="{ height: `${height}px` }"
@@ -98,6 +99,7 @@ watch(() => tabState.activeTab, (activeTab) => {
             <service-detail-tabs-notifications-detail-tabs v-else-if="tabState.activeTab === SERVICE_DETAIL_TABS.NOTIFICATIONS && storeState.selectedNotificationId" />
         </div>
         <p-tab v-else
+               :key="i18n.locale"
                :tabs="tabState.tabs"
                :active-tab.sync="tabState.activeTab"
                class="tab"
