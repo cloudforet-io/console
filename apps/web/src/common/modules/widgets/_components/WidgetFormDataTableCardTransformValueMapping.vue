@@ -136,7 +136,37 @@ const handleUpdateBasedOn = (key: string) => {
     keyInfo.value = key;
 };
 const handleUpdateOperator = (idx: number, operator: 'eq'|'regex') => {
-    casesInfo.value[idx].operator = operator;
+    const prevCases = [...casesInfo.value];
+    casesInfo.value = [
+        ...prevCases.slice(0, idx),
+        {
+            ...prevCases[idx],
+            operator,
+        },
+        ...prevCases.slice(idx + 1),
+    ];
+};
+const handleUpdatePattern = (idx: number, pattern: string) => {
+    const prevCases = [...casesInfo.value];
+    casesInfo.value = [
+        ...prevCases.slice(0, idx),
+        {
+            ...prevCases[idx],
+            match: pattern,
+        },
+        ...prevCases.slice(idx + 1),
+    ];
+};
+const handleUpdateValue = (idx: number, value: string) => {
+    const prevCases = [...casesInfo.value];
+    casesInfo.value = [
+        ...prevCases.slice(0, idx),
+        {
+            ...prevCases[idx],
+            value,
+        },
+        ...prevCases.slice(idx + 1),
+    ];
 };
 
 // Update operator options
@@ -242,8 +272,9 @@ watch(() => state.invalid, (_invalid) => {
                                    required
                                    class="col-span-8"
                     >
-                        <p-text-input v-model="_case.match"
+                        <p-text-input :value="_case.match"
                                       block
+                                      @update:value="handleUpdatePattern(cIdx, $event)"
                         />
                     </p-field-group>
                 </div>
@@ -251,8 +282,9 @@ watch(() => state.invalid, (_invalid) => {
                                style-type="secondary"
                                required
                 >
-                    <p-text-input v-model="_case.value"
+                    <p-text-input :value="_case.value"
                                   block
+                                  @update:value="handleUpdateValue(cIdx, $event)"
                     />
                 </p-field-group>
             </div>
