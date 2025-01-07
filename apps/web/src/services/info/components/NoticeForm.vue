@@ -160,7 +160,9 @@ const handleEditNotice = async () => {
         if (originData.title !== formData.value.title) postData.title = formData.value.title;
         if (originData.writer !== formData.value.writer) postData.writer = formData.value.writer;
         if (originData.contents !== formData.value.contents) postData.contents = formData.value.contents;
-        if (!isEqual(originData.files, formData.value.files)) postData.files = formData.value.files;
+        if (!isEqual(originData.files, formData.value.files)) {
+            postData.files = formData.value.files?.filter((f) => !!f);
+        }
         if (!isEqual(originData.options, formData.value.options)) postData.options = formData.value.options;
 
         await noticeDetailStore.updateNoticePost({
