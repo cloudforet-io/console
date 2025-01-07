@@ -203,7 +203,7 @@ const getUniqueValues = (data: Record<string, string>[], key: string): string[] 
 };
 
 // Reset with changing data table
-watch(dataTableInfo, (_dataTableInfo) => {
+watch([dataTableInfo, () => state.selectedDataTable], ([_dataTableInfo]) => {
     if (_dataTableInfo.dataTableId) {
         const defaultData = cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT);
         state.selectedValueType = 'auto';
