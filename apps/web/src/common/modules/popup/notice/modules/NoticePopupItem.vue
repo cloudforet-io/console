@@ -34,10 +34,7 @@ const {
 } = useEditorContentTransformer({
     contents: computed(() => (props.item ? props.item.contents : '')),
     contentsType,
-    resourceGroup: computed(() => {
-        if (!props.item) return 'PUBLIC';
-        return props.item.resource_group;
-    }),
+    resourceGroup: 'DOMAIN',
 });
 
 const handleClose = async (neverShowPopup?: boolean): Promise<void> => {
