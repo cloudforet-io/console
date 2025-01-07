@@ -103,8 +103,8 @@ export const useWidgetDateRange = (options: UseWidgetDateRangeOptions): UseWidge
                 }
             } else if (relativeDateRangeValue === 'lastQuarter') {
                 if (thisMonth >= 1 && thisMonth <= 3) {
-                    _start = `${thisYear}-10-01`;
-                    _end = `${thisYear}-12-31`;
+                    _start = `${thisYear - 1}-10-01`;
+                    _end = `${thisYear - 1}-12-31`;
                 } else if (thisMonth >= 4 && thisMonth <= 6) {
                     _start = `${thisYear}-01-01`;
                     _end = `${thisYear}-03-31`;
