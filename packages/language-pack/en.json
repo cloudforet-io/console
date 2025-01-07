@@ -223,6 +223,8 @@
 			"COPY_WEBHOOK_URL": "Copy the Webhook URL",
 			"CREATE_DESC": "Now, Copy the Webhook URL and follow {guide}",
 			"CREATE_SUCCESS_TITLE": "Webhook Successfully Created!",
+			"ERROR": "Error",
+			"ERROR_LIST": "Error List",
 			"FAILED": "Failed: {cnt}",
 			"GUIDE": "the Guide",
 			"HELP": "Help",
