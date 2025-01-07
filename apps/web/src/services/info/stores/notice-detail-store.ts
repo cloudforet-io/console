@@ -24,6 +24,7 @@ export const useNoticeDetailStore = defineStore('notice-detail', () => {
     const actions = {
         getNoticePost: async (postId: string) => {
             try {
+                if (state.loading) return;
                 state.loading = true;
                 const result = await SpaceConnector.clientV2.board.post.get<PostGetParameters, PostModel>({
                     post_id: postId,
