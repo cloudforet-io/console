@@ -90,11 +90,11 @@ watch([() => userPageGetters.selectedUsers, () => userPageState.users], ([nv_sel
                     @close="handleClose"
     >
         <template #body>
-            <div class="flex flex-col gap-1">
+            <div class="modal-contents">
                 <span class="mb-2 text-gray-900 font-bold">
                     {{ $t('IAM.USER.ASSIGN_TO_USER_GROUP.TITLE') }}
                 </span>
-                <user-select-dropdown class="mb-48"
+                <user-select-dropdown class="mb-48 h-46"
                                       :show-user-list="false"
                                       show-user-group-list
                                       appearance-type="stack"
@@ -108,3 +108,11 @@ watch([() => userPageGetters.selectedUsers, () => userPageState.users], ([nv_sel
         </template>
     </p-button-modal>
 </template>
+
+<style scoped lang="postcss">
+.modal-contents {
+    @apply flex flex-col gap-1;
+    height: 22rem;
+    overflow: auto;
+}
+</style>
