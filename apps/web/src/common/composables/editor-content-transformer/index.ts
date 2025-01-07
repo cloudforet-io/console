@@ -47,7 +47,7 @@ export const useEditorContentTransformer = (op: {
         const pattern = new RegExp(`${baseUri}/files/[^/]+/(file-[^?]+)\\?token=.*`);
         const match = url.match(pattern);
         // Extract only the fileId and return it in the format <fileId>.
-        return match?.[1] ? `<${match[1]}>` : url;
+        return match?.[1] ? `@@${match[1]}@@` : url;
     };
 
     const transformHtmlContentForUpload = (content: string): string => {
@@ -72,7 +72,7 @@ export const useEditorContentTransformer = (op: {
         return transformHtmlContentForUpload(content);
     };
 
-    const htmlFileImagePattern = /<img\s+[^>]*src="<(file-[^"]+)>"[^>]*>/g;
+    const htmlFileImagePattern = /<img\s+[^>]*src="@@(file-.+?)@@"[^>]*>/g;
     const transformHtmlContentForView = (content: string): string => {
         const decodedHtml = decodeHtmlEntities(content);
         return decodedHtml.replace(htmlFileImagePattern, (match, url) => {
@@ -81,9 +81,10 @@ export const useEditorContentTransformer = (op: {
         });
     };
 
-    const markdownFileImagePattern = /!\[([^\]]*)\]\(<(file-[^>]+)>\)/g;
+    const markdownFileImagePattern = /!\[([^\]]*)\]\(@@(file-.+?)@@\)/g;
     const transformMarkdownContentForView = (content: string): string => {
-        const result = content.replace(markdownFileImagePattern, (match, altText, fileId) => `![${altText}](${getFileDownloadUrl(fileId, resourceGroup.value)})`);
+        const decodedMarkdown = decodeHtmlEntities(content);
+        const result = decodedMarkdown.replace(markdownFileImagePattern, (match, altText, fileId) => `![${altText}](${getFileDownloadUrl(fileId, resourceGroup.value)})`);
         return result;
     };
 
@@ -123,10 +124,10 @@ export const useEditorContentTransformer = (op: {
                 fileIds.value = newFileIds;
             }
         }
-    }, { debounce: 250 });
+    }, { debounce: 300 });
 
     // When resourceGroup or resourceId is changed, update editorContents(view data)
-    watch([resourceGroup, resourceId], () => {
+    watch([resourceGroup, resourceId, contentsType], () => {
         editorContents.value = transformEditorContentForView(contents.value);
     });
     return {

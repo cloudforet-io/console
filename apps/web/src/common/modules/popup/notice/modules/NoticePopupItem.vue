@@ -28,11 +28,12 @@ const userStore = useUserStore();
 const state = reactive({
     popupVisible: true,
 });
+const contentsType = computed(() => (props.item ? props.item.contents_type ?? 'markdown' : 'markdown'));
 const {
     editorContents,
 } = useEditorContentTransformer({
     contents: computed(() => (props.item ? props.item.contents : '')),
-    contentsType: computed(() => (props.item ? props.item.contents_type : 'markdown')),
+    contentsType,
     resourceGroup: computed(() => {
         if (!props.item) return 'PUBLIC';
         return props.item.resource_group;
@@ -68,7 +69,7 @@ const handleClose = async (neverShowPopup?: boolean): Promise<void> => {
             </div>
             <p-divider class="!my-4" />
             <text-editor-viewer :contents="editorContents"
-                                :contents-type="props.item ? props.item.contents_type : 'markdown'"
+                                :contents-type="contentsType"
             />
         </template>
         <template #footer-extra>
