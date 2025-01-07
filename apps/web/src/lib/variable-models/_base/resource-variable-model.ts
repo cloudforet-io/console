@@ -150,7 +150,7 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
                 v: query.search ?? '',
                 o: '' as ConsoleFilterOperator,
             }));
-            apiQueryHelper.addFilter(...searchFilters);
+            apiQueryHelper.setOrFilters(searchFilters);
         }
         if (query.start !== undefined && query.limit !== undefined) {
             apiQueryHelper.setPage(query.start, query.limit);
