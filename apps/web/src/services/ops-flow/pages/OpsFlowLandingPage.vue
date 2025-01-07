@@ -135,7 +135,7 @@ onMounted(async () => {
                                             {{ c.name }}
                                         </p>
                                         <p class="mt-1 truncate text-label-md text-gray-500">
-                                            {{ c.description }}&zwnj;
+                                            {{ c.description }}
                                         </p>
                                     </div>
                                 </p-select-card>
@@ -163,7 +163,7 @@ onMounted(async () => {
                                             {{ t.name }}
                                         </p>
                                         <p class="mt-1 truncate text-label-md text-gray-500">
-                                            {{ t.description }}&zwnj;
+                                            {{ t.description }}
                                         </p>
                                     </div>
                                 </p-select-card>
