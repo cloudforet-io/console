@@ -86,10 +86,7 @@ const {
 } = useEditorContentTransformer({
     contents: computed(() => state.noticePostData?.contents ?? ''),
     contentsType,
-    resourceGroup: computed(() => {
-        if (!state.noticePostData) return 'PUBLIC';
-        return state.noticePostData.resource_group;
-    }),
+    resourceGroup: 'DOMAIN',
 });
 
 /* Api */
