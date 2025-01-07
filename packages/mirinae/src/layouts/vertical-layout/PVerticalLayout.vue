@@ -11,11 +11,11 @@ import screens from '@/styles/screens.cjs';
 const MOBILE_WIDTH = '312';
 
 interface Props {
-    height?: string;
-    initWidth?: number;
-    minWidth?: number;
-    maxWidth?: number;
-    enableDoubleClickResize? : boolean;
+  height?: string;
+  initWidth?: number;
+  minWidth?: number;
+  maxWidth?: number;
+  enableDoubleClickResize? : boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -60,7 +60,11 @@ const state = reactive({
     })),
     resizerStyle: computed(() => ({
         left: `${state.width}px`,
-        'border-left-width': state.hide ? 0 : '1px',
+        width: 'fit-content',
+    })),
+    resizerLineStyle: computed(() => ({
+    // eslint-disable-next-line no-nested-ternary
+        width: state.hide ? 0 : state.isHover ? '2px' : '1px',
     })),
     mainStyle: computed(() => ({
         width: state.isMobileSize ? '100%' : `calc( 100% - ${state.width}px )`,
@@ -97,17 +101,17 @@ const isResizing = (event) => {
             resize(width);
         }
         state.clientX = event.clientX;
-        state.isHover = true;
+        // state.isHover = true;
     }
 };
 const endResizing = () => {
     state.resizing = false;
     state.clientX = null;
-    state.isHover = false;
+    // state.isHover = false;
 };
 const startResizing = () => {
     state.resizing = true;
-    state.isHover = true;
+    // state.isHover = true;
 };
 
 /* Toggle hide Sidebar */
@@ -168,6 +172,9 @@ onBeforeMount(() => {
     detectWindowResizing();
 });
 
+function test() {
+    state.isHover = !state.isHover;
+}
 </script>
 
 <template>
@@ -186,9 +193,12 @@ onBeforeMount(() => {
                     name="sidebar"
                     v-bind="{width: Number(state.width), hide: state.hide, transition: state.transition, height: props.height}"
                 />
+                <button @click="test">
+                    toggle
+                </button>
             </div>
         </div>
-        <div class="resizer-container line"
+        <div class="resizer-container"
              :class="{transition: state.transition, hover: state.isHover}"
              :style="state.resizerStyle"
              @mousedown="startResizing"
@@ -197,28 +207,36 @@ onBeforeMount(() => {
              @mouseenter="state.isHover = true"
              @mouseleave="state.isHover = false"
         >
-            <p-tooltip :contents="state.hide ? $t('COMPONENT.VERTICAL_LAYOUT.EXPAND') : $t('COMPONENT.VERTICAL_LAYOUT.COLLAPSE')"
-                       position="right"
-                       :class="{hide: state.hide}"
-                       class="resizer"
-                       @click="handleSidebarToggle"
+            <div class="resizer-content"
+                 :class="{hover: state.isHover}"
             >
-                <span class="resizer-button">
-                    <slot name="resizer-button">
-                        <p-i width="1.5rem"
-                             height="1.5rem"
-                             :name="state.hide ? 'ic_chevron-right' : 'ic_chevron-left'"
-                             color="inherit"
-                        />
-                    </slot>
-                </span>
-            </p-tooltip>
-            <div
-                v-if="enableDoubleClickResize"
-                class="controller"
-                :class="{hover: state.isHover && !state.hide}"
-                @dblclick="handleControllerDoubleClick"
-            />
+                <div class="line"
+                     :class="{hover: state.isHover}"
+                     :style="state.resizerLineStyle"
+                />
+                <p-tooltip :contents="state.hide ? $t('COMPONENT.VERTICAL_LAYOUT.EXPAND') : $t('COMPONENT.VERTICAL_LAYOUT.COLLAPSE')"
+                           position="right"
+                           :class="{hide: state.hide}"
+                           class="resizer"
+                           @click="handleSidebarToggle"
+                >
+                    <span class="resizer-button">
+                        <slot name="resizer-button">
+                            <p-i width="1.5rem"
+                                 height="1.5rem"
+                                 :name="state.hide ? 'ic_chevron-right' : 'ic_chevron-left'"
+                                 color="inherit"
+                            />
+                        </slot>
+                    </span>
+                </p-tooltip>
+                <div
+                    v-if="enableDoubleClickResize"
+                    class="controller"
+                    :class="{hover: state.isHover && !state.hide}"
+                    @dblclick="handleControllerDoubleClick"
+                />
+            </div>
         </div>
         <div
             class="main"
@@ -258,71 +276,85 @@ onBeforeMount(() => {
         }
     }
     > .resizer-container {
-        display: flex;
-        align-items: flex-start;
-        justify-content: center;
         position: absolute;
         top: 0;
         height: 100%;
         width: 0;
         z-index: 1;
-        &.transition {
-            transition: left 0.2s;
-        }
-        &.line {
-            @apply border-gray-200;
-            background-color: transparent;
-            &.hover {
-                @apply border-blue-500;
-                cursor: ew-resize;
+        border: none;
+        .resizer-content {
+            position: relative;
+            height: 100%;
+            width: fit-content;
+            .transition {
+                transition: left 0.2s;
             }
-        }
-        .resizer {
-            @apply absolute flex items-center justify-center bg-white border border-gray-300 rounded-full text-gray-600 cursor-pointer;
-            width: 1.5rem;
-            height: 1.5rem;
-            margin-top: 1.25rem;
-            font-size: 1.5rem;
-            font-weight: 600;
-            z-index: 1;
-            cursor: col-resize;
-            &.hide {
-                @apply bg-white justify-end;
-                left: -1px;
-                width: 1.25rem;
-                margin-right: -0.25rem;
-                border-top-left-radius: 50%;
-                border-bottom-left-radius: 50%;
-                border-left: 0;
-                .resizer-button > svg {
-                    margin-right: -0.125rem;
-                }
+            .line {
+                position: absolute;
+                height: 100%;
+
+                @apply bg-gray-200;
                 &.hover {
-                    @apply text-secondary;
-                    width: 2.5rem;
+                    @apply bg-blue-600;
+                    cursor: ew-resize;
+                    transform: translateX(-25%);
+                }
+            }
+            .resizer {
+                @apply absolute flex items-center justify-center bg-white border border-gray-300 rounded-full text-gray-600 cursor-pointer;
+                width: 1.5rem;
+                height: 1.5rem;
+                margin-top: 1.25rem;
+                top: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 1.5rem;
+                font-weight: 600;
+                z-index: 1;
+                cursor: col-resize;
+                &.hide {
+                    @apply bg-white justify-end;
+                    left: -1px;
+                    width: 1.25rem;
+                    margin-right: -0.25rem;
+                    border-top-left-radius: 50%;
+                    border-bottom-left-radius: 50%;
+                    border-left: 0;
+                    transform: translateX(0);
                     .resizer-button > svg {
-                        margin-right: 0;
+                        margin-right: -0.125rem;
+                    }
+                    &:hover {
+                        @apply text-secondary;
+                        width: 2.5rem;
+                        .resizer-button > svg {
+                            margin-right: 0;
+                        }
                     }
                 }
-            }
-            &:hover {
-                @apply bg-blue-200 cursor-pointer;
+                &:hover {
+                    @apply bg-blue-200 cursor-pointer;
+                }
             }
         }
+
         .controller {
             @apply absolute border border-gray-300 rounded-md bg-white;
             width: 0.4rem;
             height: 1.5rem;
             top: calc(50% - 1.5rem / 2);
-            opacity: 0;
+            opacity: 1;
+            left: 50%;
+            transform: translateX(-50%);
 
             &.hover {
-                @apply border-blue-500;
+                @apply border-blue-600;
                 opacity: 1;
             }
             &:hover {
                 @apply bg-blue-200;
                 opacity: 1;
+                width: 0.6rem;
                 cursor: col-resize;
             }
         }
