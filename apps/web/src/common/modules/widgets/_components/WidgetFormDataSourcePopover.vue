@@ -136,6 +136,12 @@ const state = reactive({
             icon: 'ic_db-where',
         },
         {
+            key: DATA_TABLE_OPERATOR.AGGREGATE,
+            name: 'Aggregate',
+            description: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.AGGREGATE_DESC'),
+            icon: 'ic_db-dimensions',
+        },
+        {
             key: DATA_TABLE_OPERATOR.VALUE_MAPPING,
             name: 'Value Mapping',
             description: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.VALUE_MAPPING_DESC'),

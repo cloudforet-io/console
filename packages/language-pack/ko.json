@@ -1255,6 +1255,7 @@
 					"ADD_LABELS_DESC": "데이터의 명확성을 높이기 위해 레이블을 추가하세요.",
 					"ADD_RULE": "규칙 추가",
 					"ADVANCED_OPTIONS": "고급 설정 옵션",
+					"AGGREGATE_DESC": "레이블 필드를 결합하고 그룹화하여 집계합니다.",
 					"ALT_E_ADD_GROUP_BY": "Group-by는 최대 3개까지만 선택이 가능합니다.",
 					"BASED_ON": "기준",
 					"CASES": "조건",
@@ -1329,6 +1330,8 @@
 			},
 			"DEFAULT_WIDTH": "기본 너비",
 			"DELETE": "삭제",
+			"DIMENSIONS": "",
+			"DIMENSIONS_DESC": "",
 			"DISPLAY_ANNOTATION": {
 				"DISPLAY_ANNOTATION": "부가 정보 표시",
 				"INVALID_VALUE": "추가로 표시할 내용을 입력해주세요.",
