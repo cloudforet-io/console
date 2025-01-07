@@ -7,7 +7,7 @@ import type { AlertStatusType, AlertUrgencyType } from '@/schema/alert-manager/a
 import type {
     EventRuleConditionsPolicyType,
     EventRuleConditionsKeyType,
-    EventRuleConditionsOperatorType,
+    EventRuleConditionsOperatorType, EventRuleUrgencyType,
 } from '@/schema/alert-manager/event-rule/type';
 import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
 import type { ServiceChannelDataType, ServiceChannelScheduleInfoType } from '@/schema/alert-manager/service-channel/type';
@@ -97,4 +97,8 @@ export type EventRuleConditionKeyType = {
 export type EventRuleActionsToggleType = {
     name: string;
     label: TranslateResult;
+};
+export type EventRuleActionsUrgencyRadioType = {
+    label: TranslateResult;
+    name: EventRuleUrgencyType | 'NO_SET';
 };

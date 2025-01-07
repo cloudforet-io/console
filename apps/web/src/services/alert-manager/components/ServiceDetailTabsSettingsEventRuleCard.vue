@@ -181,7 +181,7 @@ watch(() => route.query?.eventRuleId, (eventRuleId) => {
                                        required
                         >
                             <span class="help-text">{{ $t('ALERT_MANAGER.EVENT_RULE.ALWAYS_HELP_TEXT') }}</span>
-                            <span class="text-gray-500 pl-1">{{ $t('ALERT_MANAGER.EVENT_RULE.ALWAYS_DESC') }}</span>
+                            <span class="text-gray-500 pl-1">({{ $t('ALERT_MANAGER.EVENT_RULE.ALWAYS_DESC') }})</span>
                         </p-field-group>
                     </div>
                     <div v-else

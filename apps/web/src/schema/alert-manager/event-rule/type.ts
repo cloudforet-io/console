@@ -15,8 +15,8 @@ export type EventRuleConditionsType = {
 };
 
 type EventRuleActionsMatchAssetType = {
-    rule: Record<string, any>;
-    asset_types: string[];
+    rule?: Record<string, any>;
+    asset_types?: string[];
 };
 
 export type EventRuleActionsType = {
