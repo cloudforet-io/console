@@ -5,6 +5,7 @@ import {
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
+import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
@@ -115,14 +116,19 @@ const handleChange = async (options: any = {}) => {
 
     if (options.pageStart !== undefined) userGroupPageState.users.pageStart = options.pageStart;
     if (options.pageLimit !== undefined) userGroupPageState.users.pageLimit = options.pageLimit;
+
     try {
         state.loading = true;
 
         const usersIdList: string[] | undefined = userGroupPageGetters.selectedUserGroups[0].users;
 
-        userListApiQueryHelper.setFilters([
-            { k: 'user_id', v: usersIdList, o: '' },
-        ]);
+        const searchQueryTagHelper = new QueryHelper().setKeyItemSets(USER_GROUP_USERS_SEARCH_HANDLERS);
+
+        if (options.queryTags) {
+            searchQueryTagHelper.setFiltersAsQueryTag(options.queryTags);
+        }
+
+        userListApiQueryHelper.setFilters([{ k: 'user_id', v: usersIdList, o: '' }, ...searchQueryTagHelper.filters]);
         await fetchWorkspaceUserList({
             query: userListApiQueryHelper.data,
         });
