@@ -63,8 +63,9 @@ const cloudServiceOptions = computed<Record<string, any>>(() => {
         cloud_service_type: relatedAssetInfo.value.type,
     };
 });
+const cloudServiceVariableModel = new VariableModelFactory({ type: 'MANAGED', managedModelKey: 'cloud_service' });
 const cloudServiceHandler = getVariableModelMenuHandler<CloudServiceModel>(
-    [{ variableModel: new VariableModelFactory({ type: 'MANAGED', managedModelKey: 'cloud_service' }) }],
+    [{ variableModel: cloudServiceVariableModel }],
     cloudServiceOptions,
 );
 
@@ -117,7 +118,7 @@ const { getProperRouteLocation } = useProperRouteLocation();
 interface RelatedAssetInfo {
     provider: string; group: string; type: string; icon?: string;
 }
-type RelatedAsset= Partial<Pick<CloudServiceModel, 'cloud_service_group'|'cloud_service_type'|'provider'|'name'>> & Pick<CloudServiceModel, 'cloud_service_id'>;
+type RelatedAsset = Partial<Pick<CloudServiceModel, 'cloud_service_group'|'cloud_service_type'|'provider'|'name'|'reference.resource_id'>> & Pick<CloudServiceModel, 'cloud_service_id'>;
 const getIcon = (asset: RelatedAssetInfo): string|undefined => {
     const key = `${asset.provider}.${asset.group}.${asset.type}`;
     return cloudServiceTypeItems.value.find((item) => item.data.cloud_service_type_key === key)?.icon;
@@ -152,7 +153,7 @@ onMounted(async () => {
             loading.value = true;
             const res = await SpaceConnector.clientV2.inventory.cloudService.list<CloudServiceListParameters, ListResponse<CloudServiceModel>>({
                 query: {
-                    only: ['cloud_service_id', 'cloud_service_type', 'cloud_service_group', 'provider', 'name'],
+                    only: ['cloud_service_id', 'cloud_service_type', 'cloud_service_group', 'provider', 'name', 'reference.resource_id'],
                     filter: [{
                         k: 'cloud_service_id', v: props.value, o: 'in',
                     }],
@@ -228,7 +229,7 @@ onMounted(async () => {
                                 },
                             })"
                     >
-                        <span class="pl-1 text-label-md">{{ asset.name }} ({{ asset.cloud_service_id }})</span>
+                        <span class="pl-1 text-label-md">{{ asset.name }} ({{ asset.reference.resource_id }})</span>
                     </p-link>
                     <span v-else
                           class="pl-1 text-label-md"
