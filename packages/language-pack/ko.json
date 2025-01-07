@@ -4221,7 +4221,7 @@
 	},
 	"OPSFLOW": {
 		"ADD_TARGET": "{target} 추가",
-		"ALL_CATEGORIES": "모든 카테고리",
+		"ALL_TASKS": "모든 {tasks}",
 		"ALT_E_ADD_TARGET": "{target} 추가 실패",
 		"ALT_E_ASSIGN": "담당자 할당 실패",
 		"ALT_E_CHANGE_DEFAULT_TARGET": "{target} 기본값 변경 실패",
