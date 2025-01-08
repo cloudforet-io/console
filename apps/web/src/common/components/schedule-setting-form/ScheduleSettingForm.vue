@@ -60,7 +60,7 @@ const state = reactive({
     selectedDayButton: ['MON', 'TUE', 'WED', 'THU', 'FRI'] as DayType[],
     start: 0,
     end: 24,
-    startHourTimeList: computed<SelectDropdownMenuItem[]>(() => range(state.start, state.end).map((h) => ({
+    startHourTimeList: computed<SelectDropdownMenuItem[]>(() => range(0, state.end).map((h) => ({
         label: `${h.toString().padStart(2, '0')}:00`,
         name: h.toString(),
     }))),
@@ -176,13 +176,13 @@ onMounted(() => {
             <div class="flex items-center gap-2">
                 <p-select-dropdown :menu="state.startHourTimeList"
                                    :selected="state.start"
-                                   placeholder="00:00"
+                                   :placeholder="state.startHourTimeList[state.start].label"
                                    @select="handleSelectDropdown('start', $event)"
                 />
                 <span>{{ $t('COMMON.SCHEDULE_SETTING.TO') }}</span>
                 <p-select-dropdown :menu="state.endHourTimeList"
                                    :selected="state.end"
-                                   placeholder="24:00"
+                                   :placeholder="state.endHourTimeList[state.end - state.start - 1].label"
                                    @select="handleSelectDropdown('end', $event)"
                 />
             </div>
