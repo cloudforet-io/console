@@ -17,6 +17,7 @@ export type EventRuleConditionsType = {
 type EventRuleActionsMatchAssetType = {
     rule?: Record<string, string | number | boolean>;
     asset_types?: string[];
+    create_temporary_asset?: boolean;
 };
 
 export type EventRuleActionsType = {

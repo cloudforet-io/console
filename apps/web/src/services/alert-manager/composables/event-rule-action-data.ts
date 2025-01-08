@@ -28,7 +28,7 @@ export const getActionSettingI18n = (): ComputedRef<EventRuleActionsSettingMap> 
 
     match_asset: {
         type: EVENT_RULE_SETTINGS_TYPE.ASSET,
-        label: i18n.t('ALERT_MANAGER.EVENT_RULE.ASSET_SCOPE'),
+        label: i18n.t('ALERT_MANAGER.EVENT_RULE.ASSET_TYPE'),
         name: 'match_asset',
     },
 

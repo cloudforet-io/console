@@ -1,21 +1,16 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
-import { useRoute } from 'vue-router/composables';
+import { computed, reactive } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PCard, PFieldTitle, PFieldGroup, PDataLoader, PDivider, PLazyImg, PI, PIconButton,
 } from '@cloudforet/mirinae';
 
-import type { EventRuleGetParameters } from '@/schema/alert-manager/event-rule/api-verbs/get';
 import { EVENT_RULE_CONDITIONS_POLICY, EVENT_RULE_SCOPE } from '@/schema/alert-manager/event-rule/constant';
 import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { gray } from '@/styles/colors';
 
@@ -27,25 +22,31 @@ import {
 } from '@/services/alert-manager/composables/event-rule-action-data';
 import type { EventRuleActionsItemValueType, EventRuleActionsItemType } from '@/services/alert-manager/types/alert-manager-type';
 
+interface Props {
+    eventRule?: EventRuleModel;
+    loading: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    eventRule: () => ({} as EventRuleModel),
+    loading: true,
+});
+
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
-
-const route = useRoute();
 
 const storeState = reactive({
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
     plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
 });
 const state = reactive({
-    loading: true,
-    eventRule: {} as EventRuleModel,
     actionSetting: getActionSettingI18n(),
     actionSettingType: getActionSettingTypeI18n(),
     actions: computed<EventRuleActionsItemType>(() => {
         const result = {} as EventRuleActionsItemType;
 
-        if (state.eventRule.actions) {
-            Object.entries(state.eventRule.actions).forEach(([actionKey, actionValue]) => {
+        if (props.eventRule.actions) {
+            Object.entries(props.eventRule.actions).forEach(([actionKey, actionValue]) => {
                 const setting = state.actionSetting[actionKey];
 
                 if (setting && actionValue) {
@@ -70,39 +71,19 @@ const state = reactive({
 });
 
 const getWebhookIcon = (): string|undefined => {
-    const webhook = storeState.webhook[state.eventRule?.webhook_id]?.data;
+    const webhook = storeState.webhook[props.eventRule?.webhook_id]?.data;
     if (!webhook) return undefined;
     return storeState.plugins[webhook.plugin_info.plugin_id]?.icon || '';
 };
 const handleDeleteEventRule = () => {
     state.modalVisible = true;
 };
-
-const fetchEventRuleInfo = async () => {
-    state.loading = true;
-    try {
-        state.eventRule = await SpaceConnector.clientV2.alertManager.eventRule.get<EventRuleGetParameters, EventRuleModel>({
-            event_rule_id: route.query?.eventRuleId as string,
-        });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.eventRule = {} as EventRuleModel;
-    } finally {
-        state.loading = false;
-    }
-};
-
-watch(() => route.query?.eventRuleId, (eventRuleId) => {
-    if (eventRuleId) {
-        fetchEventRuleInfo();
-    }
-}, { immediate: true });
 </script>
 
 <template>
     <p-data-loader class="service-detail-tabs-settings-event-rule-card"
-                   :loading="state.loading"
-                   :data="state.eventRule"
+                   :loading="props.loading"
+                   :data="props.eventRule"
     >
         <p-card :header="$t('ALERT_MANAGER.EVENT_RULE.TITLE')">
             <template #header>
@@ -131,7 +112,7 @@ watch(() => route.query?.eventRuleId, (eventRuleId) => {
                             <p-field-group class="input-form"
                                            required
                             >
-                                <span>{{ state.eventRule.name }}</span>
+                                <span>{{ props.eventRule.name }}</span>
                             </p-field-group>
                         </div>
                         <div class="input-form-wrapper">
@@ -143,7 +124,7 @@ watch(() => route.query?.eventRuleId, (eventRuleId) => {
                             <p-field-group class="input-form scope">
                                 <div class="flex items-center gap-1 text-label-md">
                                     <span class="text-label-lg text-gray-500">{{ $t('ALERT_MANAGER.EVENT_RULE.WEBHOOK_SCOPE') }}: </span>
-                                    <p v-if="state.eventRule.scope === EVENT_RULE_SCOPE.GLOBAL"
+                                    <p v-if="props.eventRule.scope === EVENT_RULE_SCOPE.GLOBAL"
                                        class="scope-wrapper"
                                     >
                                         <p-i name="ic_globe-filled"
@@ -162,7 +143,7 @@ watch(() => route.query?.eventRuleId, (eventRuleId) => {
                                                     height="1rem"
                                                     class="icon"
                                         />
-                                        <span>{{ storeState.webhook[state.eventRule.webhook_id]?.label }}</span>
+                                        <span>{{ storeState.webhook[props.eventRule.webhook_id]?.label }}</span>
                                     </p>
                                 </div>
                             </p-field-group>
@@ -171,7 +152,7 @@ watch(() => route.query?.eventRuleId, (eventRuleId) => {
                     </div>
                 </div>
                 <div class="form-wrapper">
-                    <div v-if="state.eventRule.conditions_policy === EVENT_RULE_CONDITIONS_POLICY.ALWAYS"
+                    <div v-if="props.eventRule.conditions_policy === EVENT_RULE_CONDITIONS_POLICY.ALWAYS"
                          class="input-form-wrapper"
                     >
                         <p-field-title :label="$t('ALERT_MANAGER.EVENT_RULE.ALWAYS')"
@@ -189,7 +170,7 @@ watch(() => route.query?.eventRuleId, (eventRuleId) => {
                     <div v-else
                          class="input-form-wrapper"
                     >
-                        <p-field-title :label="state.eventRule.conditions_policy === EVENT_RULE_CONDITIONS_POLICY.ANY
+                        <p-field-title :label="props.eventRule.conditions_policy === EVENT_RULE_CONDITIONS_POLICY.ANY
                                            ? $t('ALERT_MANAGER.EVENT_RULE.ANY')
                                            : $t('ALERT_MANAGER.EVENT_RULE.ALL')"
                                        size="lg"
@@ -242,12 +223,12 @@ watch(() => route.query?.eventRuleId, (eventRuleId) => {
                                        class="divider"
                             />
                         </div>
-                        <div v-if="state.eventRule.options">
+                        <div v-if="props.eventRule.options">
                             <p-divider class="divider" />
                             <ul class="action-list">
                                 <li>
                                     <span class="text-label-md text-gray-700">{{ $t('ALERT_MANAGER.EVENT_RULE.THEN_STOP_PROCESSING') }}</span>
-                                    <span class="text-paragraph-md text-blue-800 ml-2">{{ state.eventRule?.options?.stop_processing }}</span>
+                                    <span class="text-paragraph-md text-blue-800 ml-2">{{ props.eventRule?.options?.stop_processing }}</span>
                                 </li>
                             </ul>
                         </div>
@@ -256,7 +237,7 @@ watch(() => route.query?.eventRuleId, (eventRuleId) => {
             </div>
         </p-card>
         <service-detail-tabs-settings-event-rule-delete-modal v-if="state.modalVisible"
-                                                              :id="state.eventRule.event_rule_id"
+                                                              :id="props.eventRule.event_rule_id"
                                                               :visible.sync="state.modalVisible"
         />
     </p-data-loader>

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
+import { isEmpty } from 'lodash';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PCard, PFieldTitle, PFieldGroup, PTextInput, PDivider, PLazyImg, PI, PSelectButton, PIconButton, PCheckbox, PButton,
@@ -66,11 +68,28 @@ const state = reactive({
     ],
     stopProcessing: false,
     actions: undefined as EventRuleActionsType|undefined,
-    isAllValid: computed<boolean>(() => isAllValid.value
-            && (state.selectedPolicyButton === EVENT_RULE_CONDITIONS_POLICY.ALWAYS ? true : state.conditions.every((condition) => condition.value.trim() !== ''))
-            && (state.actions ? Object.values(state.actions).every((action) => !!action) : true)),
+    isAllValid: computed<boolean>(() => {
+        if (!isAllValid.value) return false;
+
+        if (state.selectedPolicyButton !== EVENT_RULE_CONDITIONS_POLICY.ALWAYS) {
+            const areConditionsValid = state.conditions.every((condition) => condition.value.trim() !== '');
+            if (!areConditionsValid) return false;
+        }
+
+        if (state.actions) {
+            if (state.actions.match_asset?.create_temporary_asset) {
+                const matchAssetValid = state.actions.match_asset.asset_types.length > 0 && !isEmpty(state.actions.match_asset.rule);
+                if (!matchAssetValid) return false;
+            }
+            if (state.actions.change_title !== undefined) {
+                return state.actions.change_title !== '';
+            }
+        }
+
+        return true;
+    }),
     refinedData: computed<EventRuleCreateParameters>(() => ({
-        name: name.value,
+        name: name.value.trim(),
         scope: props.selectedScope || EVENT_RULE_SCOPE.GLOBAL,
         conditions: state.selectedPolicyButton === EVENT_RULE_CONDITIONS_POLICY.ALWAYS
             ? undefined

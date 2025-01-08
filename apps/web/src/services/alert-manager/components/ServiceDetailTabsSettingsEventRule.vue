@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButton, PDataLoader } from '@cloudforet/mirinae';
 
+import type { EventRuleGetParameters } from '@/schema/alert-manager/event-rule/api-verbs/get';
 import { EVENT_RULE_SCOPE } from '@/schema/alert-manager/event-rule/constant';
 import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import ServiceDetailTabsSettingsEventRuleCard
     from '@/services/alert-manager/components/ServiceDetailTabsSettingsEventRuleCard.vue';
@@ -21,6 +26,8 @@ import { useServiceDetailPageStore } from '@/services/alert-manager/stores/servi
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 
+const route = useRoute();
+
 const storeState = reactive({
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
     modalVisible: computed<boolean>(() => serviceDetailPageState.eventRuleScopeModalVisible),
@@ -29,15 +36,35 @@ const storeState = reactive({
 });
 const state = reactive({
     loading: true,
+    eventRuleInfoLoading: false,
     selectedScope: EVENT_RULE_SCOPE.GLOBAL,
     selectedWebhook: '',
     hideSidebar: false,
+    eventRule: {} as EventRuleModel,
 });
 
 const handleClickAddRule = () => {
     serviceDetailPageStore.setEventRuleScopeModalVisible(true);
 };
 
+const fetchEventRuleInfo = async () => {
+    state.eventRuleInfoLoading = true;
+    try {
+        state.eventRule = await SpaceConnector.clientV2.alertManager.eventRule.get<EventRuleGetParameters, EventRuleModel>({
+            event_rule_id: route.query?.eventRuleId as string,
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.eventRule = {} as EventRuleModel;
+    } finally {
+        state.eventRuleInfoLoading = false;
+    }
+};
+watch(() => route.query?.eventRuleId, (eventRuleId) => {
+    if (eventRuleId) {
+        fetchEventRuleInfo();
+    }
+}, { immediate: true });
 watch(() => storeState.items, (items) => {
     if (!items.length) return;
     replaceUrlQuery({
@@ -72,8 +99,10 @@ watch(() => storeState.serviceId, async (id) => {
                                                                    :selected-scope="state.selectedScope"
                                                                    class="flex-1"
                 />
-                <service-detail-tabs-settings-event-rule-card v-else
+                <service-detail-tabs-settings-event-rule-card v-else-if="state.eventRule.event_rule_id"
                                                               class="flex-1"
+                                                              :event-rule="state.eventRule"
+                                                              :loading="state.eventRuleInfoLoading"
                 />
             </div>
             <template #no-data>
