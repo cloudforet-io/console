@@ -59,8 +59,15 @@ const state = reactive({
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
     proxyHideSidebar: useProxyValue('hideSidebar', props, emit),
     searchValue: '',
+    filteredItems: computed<EventRuleModel[]>(() => {
+        if (!state.searchValue) return props.items;
+        return props.items.filter((item) => {
+            const searchValue = state.searchValue.toLowerCase();
+            return item.name.toLowerCase().includes(searchValue);
+        });
+    }),
     treeList: computed<TreeNode[]>(() => {
-        const eventRuleMap: { [key: string]: TreeNode } = props.items.flatMap((item) => item.webhook_id)
+        const eventRuleMap: { [key: string]: TreeNode } = state.filteredItems.flatMap((item) => item.webhook_id)
             .reduce((acc, cur) => {
                 if (cur) {
                     acc[cur] = {
@@ -97,7 +104,7 @@ const state = reactive({
                 return acc;
             }, {} as { [key: string]: TreeNode });
 
-        props.items?.forEach((item) => {
+        state.filteredItems?.forEach((item) => {
             const treeNode: TreeNode = {
                 id: item.event_rule_id || '',
                 depth: 1,
@@ -159,8 +166,8 @@ const state = reactive({
 
 const initSidebar = async () => {
     if (route.query?.eventRuleId) return;
-    state.selectedTreeId = props.items[0].event_rule_id;
-    const scope = props.items[0].webhook_id || 'global';
+    state.selectedTreeId = state.filteredItems[0].event_rule_id;
+    const scope = state.filteredItems[0].webhook_id || 'global';
     await updateTreeDisplayMap(scope, true);
     await replaceUrlQuery({
         webhookId: scope,
@@ -190,6 +197,15 @@ const clickResizer = () => {
 };
 const handleSearchInput = (value: string) => {
     state.searchValue = value;
+
+    state.filteredItems.forEach((item) => {
+        const scope = item.webhook_id || 'global';
+        const shouldOpen = scope === 'global' || !!value;
+
+        if (state.treeDisplayMap[scope]?.isOpen !== shouldOpen) {
+            updateTreeDisplayMap(scope, shouldOpen);
+        }
+    });
 };
 
 watch([() => storeState.showEventRuleFormCard, () => storeState.isEventRuleEditMode], ([showEventRuleFormCard, isEventRuleEditMode]) => {
@@ -204,7 +220,7 @@ watch([() => storeState.eventRuleInfo.event_rule_id, () => route.query?.eventRul
         updateTreeDisplayMap(scope, true);
     }
 }, { immediate: true });
-watch(() => props.items, (items) => {
+watch(() => state.filteredItems, (items) => {
     if (!items.length) return;
     initSidebar();
 }, { immediate: true });
