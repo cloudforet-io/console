@@ -30,7 +30,7 @@
 			"HEALTHY": "정상",
 			"HIGH": "높음",
 			"ID": "아이디",
-			"IGNORED": "",
+			"IGNORED": "제외",
 			"INFO": "Info",
 			"LABEL": "레이블",
 			"LABEL_NAME": "얼럿 이름",

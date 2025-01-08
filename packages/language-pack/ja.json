@@ -30,7 +30,7 @@
 			"HEALTHY": "正常",
 			"HIGH": "高い",
 			"ID": "ID",
-			"IGNORED": "",
+			"IGNORED": "無視",
 			"INFO": "Info",
 			"LABEL": "ラベル",
 			"LABEL_NAME": "アラート名",
