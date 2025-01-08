@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
+import { isEmpty } from 'lodash';
+
 import {
     PCard, PFieldTitle, PFieldGroup, PDataLoader, PDivider, PLazyImg, PI, PIconButton,
 } from '@cloudforet/mirinae';
@@ -97,6 +99,12 @@ const state = reactive({
                                 value: matchAssetValue.rule,
                             });
                         }
+                    } else if (actionKey === 'add_additional_info') {
+                        result[type].push({
+                            label: i18n.t('ALERT_MANAGER.ALERTS.ADDITIONAL_INFO'),
+                            name: 'add_additional_info',
+                            value: actionValue,
+                        });
                     } else {
                         result[type].push({
                             label,
@@ -261,9 +269,10 @@ const handleDeleteEventRule = () => {
                                    required
                                    class="field-title"
                     />
-                    <div class="border-section gap-2">
+                    <div class="border-section">
                         <div v-for="(type, idx) in Object.keys(state.actions)"
                              :key="`setting-${type}-action-${idx}`"
+                             class="settings-wrapper"
                         >
                             <div class="settings-section">
                                 <p-field-title :label="state.actionSettingType[type]"
@@ -285,20 +294,37 @@ const handleDeleteEventRule = () => {
                                     <p>
                                         <span class="text-label-md text-gray-700">{{ action.label }}</span>
                                         <span class="text-paragraph-md text-blue-800 ml-2">
-                                            <span v-if="action.name === 'change_service'">{{ storeState.service[action.value]?.label || action.value }}</span>
-                                            <span v-else-if="action.name === 'rule'">
+                                            <template v-if="action.name === 'change_service'">
+                                                {{ storeState.service[action.value]?.label || action.value }}
+                                            </template>
+                                            <template v-else-if="action.name === 'rule'">
                                                 <span class="font-bold">{{ Object.keys(action.value)[0] }}: </span>
                                                 <span>{{ Object.values(action.value)[0] }}</span>
-                                            </span>
-                                            <span v-else-if="action.name === 'change_urgency'">
+                                            </template>
+                                            <template v-else-if="action.name === 'change_urgency'">
                                                 {{ action.value === EVENT_RULE_URGENCY.HIGH ? $t('ALERT_MANAGER.EVENT_RULE.HIGH') : $t('ALERT_MANAGER.EVENT_RULE.LOW') }}
-                                            </span>
-                                            <span v-else-if="action.name === 'change_status'">
+                                            </template>
+                                            <template v-else-if="action.name === 'change_status'">
                                                 {{ action.value === ALERT_STATUS.IGNORED ? $t('ALERT_MANAGER.ALERTS.IGNORED') : $t('ALERT_MANAGER.ALERTS.TRIGGERED') }}
-                                            </span>
-                                            <span v-else-if="action.name === 'change_escalation_policy'">{{ storeState.escalationPolicy[action.value]?.label || action.value }}</span>
-                                            <span v-else-if="action.name === 'set_labels'">{{ action.value.join(', ') }}</span>
-                                            <span v-else>{{ action.value }}</span>
+                                            </template>
+                                            <template v-else-if="action.name === 'change_escalation_policy'">
+                                                {{ storeState.escalationPolicy[action.value]?.label || action.value }}
+                                            </template>
+                                            <template v-else-if="action.name === 'set_labels'">
+                                                {{ action.value.join(', ') }}
+                                            </template>
+                                            <template v-else-if="action.name === 'add_additional_info'">
+                                                <span v-for="([key, value], infoIdx) in Object.entries(action.value)"
+                                                      :key="`additional-info-${key}`"
+                                                >
+                                                    <span class="font-bold">{{ key }}: </span>
+                                                    <span>{{ value }}</span>
+                                                    <span v-if="infoIdx < Object.entries(action.value).length - 1">, </span>
+                                                </span>
+                                            </template>
+                                            <template v-else>
+                                                {{ action.value }}
+                                            </template>
                                         </span>
                                     </p>
                                 </div>
@@ -308,7 +334,7 @@ const handleDeleteEventRule = () => {
                             />
                         </div>
                         <div v-if="props.eventRule.options">
-                            <p-divider v-if="props.eventRule.actions && Object.values(props.eventRule.actions).every((key) => key)"
+                            <p-divider v-if="!isEmpty(state.actions)"
                                        class="divider option"
                             />
                             <div class="action-list">
@@ -360,15 +386,20 @@ const handleDeleteEventRule = () => {
         }
         .border-section {
             @apply flex flex-col border-4 border-gray-100 rounded-xl mt-1 py-2 px-4;
-            .settings-section {
-                @apply flex flex-col;
+            .settings-wrapper {
+                .settings-section {
+                    @apply flex flex-col;
+                }
+                & + .settings-wrapper {
+                    margin-top: 0.5rem;
+                }
             }
         }
         .help-text {
             @apply text-gray-900;
         }
         .divider {
-            margin-top: 0.75rem;
+            margin-top: 0.5rem;
             &.option {
                 margin-bottom: 0.5rem;
             }

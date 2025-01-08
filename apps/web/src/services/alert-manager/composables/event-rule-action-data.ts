@@ -47,10 +47,10 @@ export const getActionSettingI18n = (): ComputedRef<EventRuleActionsSettingMap> 
         label: i18n.t('ALERT_MANAGER.EVENT_RULE.CHANGE_ESCALATION_POLICY'),
         name: 'change_escalation_policy',
     },
-    additional_info: {
+    add_additional_info: {
         type: EVENT_RULE_SETTINGS_TYPE.ALERT,
         label: i18n.t('ALERT_MANAGER.EVENT_RULE.ADD_ADDITIONAL_INFO'),
-        name: 'additional_info',
+        name: 'add_additional_info',
     },
     change_status: {
         type: EVENT_RULE_SETTINGS_TYPE.ALERT,
