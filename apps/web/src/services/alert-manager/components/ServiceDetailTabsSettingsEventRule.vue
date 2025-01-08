@@ -63,6 +63,7 @@ const fetchEventRuleInfo = async () => {
 watch(() => route.query?.eventRuleId, (eventRuleId) => {
     if (eventRuleId) {
         fetchEventRuleInfo();
+        serviceDetailPageStore.setShowEventRuleFormCard(false);
     }
 }, { immediate: true });
 watch(() => storeState.items, (items) => {

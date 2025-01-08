@@ -5,11 +5,21 @@ import {
     PCard, PFieldTitle, PFieldGroup, PDataLoader, PDivider, PLazyImg, PI, PIconButton,
 } from '@cloudforet/mirinae';
 
-import { EVENT_RULE_CONDITIONS_POLICY, EVENT_RULE_SCOPE } from '@/schema/alert-manager/event-rule/constant';
+import { ALERT_STATUS } from '@/schema/alert-manager/alert/constants';
+import {
+    EVENT_RULE_CONDITIONS_POLICY,
+    EVENT_RULE_SCOPE,
+    EVENT_RULE_URGENCY,
+} from '@/schema/alert-manager/event-rule/constant';
 import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
+import type { EventRuleActionsMatchAssetType, EventRuleActionsType } from '@/schema/alert-manager/event-rule/type';
+import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
+import type { EscalationPolicyReferenceMap } from '@/store/reference/escalation-policy-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
+import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
 import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 
 import { gray } from '@/styles/colors';
@@ -38,6 +48,9 @@ const allReferenceGetters = allReferenceStore.getters;
 const storeState = reactive({
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
     plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
+    service: computed<ServiceReferenceMap>(() => allReferenceGetters.service),
+    cloudServiceType: computed<CloudServiceTypeReferenceMap>(() => allReferenceGetters.cloudServiceType),
+    escalationPolicy: computed<EscalationPolicyReferenceMap>(() => allReferenceGetters.escalationPolicy),
 });
 const state = reactive({
     actionSetting: getActionSettingI18n(),
@@ -45,8 +58,20 @@ const state = reactive({
     actions: computed<EventRuleActionsItemType>(() => {
         const result = {} as EventRuleActionsItemType;
 
+        const actionOrder: (keyof EventRuleActionsType)[] = [
+            'change_service',
+            'match_asset',
+            'change_title',
+            'change_status',
+            'change_urgency',
+            'change_escalation_policy',
+            'set_labels',
+            'add_additional_info',
+        ];
+
         if (props.eventRule.actions) {
-            Object.entries(props.eventRule.actions).forEach(([actionKey, actionValue]) => {
+            actionOrder.forEach((actionKey) => {
+                const actionValue = props.eventRule.actions[actionKey];
                 const setting = state.actionSetting[actionKey];
 
                 if (setting && actionValue) {
@@ -56,11 +81,29 @@ const state = reactive({
                         result[type] = [] as EventRuleActionsItemValueType[];
                     }
 
-                    result[type].push({
-                        label,
-                        name,
-                        value: actionValue,
-                    });
+                    if (actionKey === 'match_asset' && typeof actionValue === 'object') {
+                        const matchAssetValue = actionValue as EventRuleActionsMatchAssetType;
+                        if (matchAssetValue.asset_types) {
+                            result[type].push({
+                                label: i18n.t('ALERT_MANAGER.EVENT_RULE.ASSET_TYPE'),
+                                name: 'asset_types',
+                                value: matchAssetValue.asset_types.map((i) => storeState.cloudServiceType[i].label).join(', '),
+                            });
+                        }
+                        if (matchAssetValue.rule) {
+                            result[type].push({
+                                label: i18n.t('ALERT_MANAGER.EVENT_RULE.POLICY'),
+                                name: 'rule',
+                                value: matchAssetValue.rule,
+                            });
+                        }
+                    } else {
+                        result[type].push({
+                            label,
+                            name,
+                            value: actionValue,
+                        });
+                    }
                 }
             });
         }
@@ -168,20 +211,41 @@ const handleDeleteEventRule = () => {
                         </p-field-group>
                     </div>
                     <div v-else
-                         class="input-form-wrapper"
+                         class="flex flex-col gap-1"
                     >
-                        <p-field-title :label="props.eventRule.conditions_policy === EVENT_RULE_CONDITIONS_POLICY.ANY
-                                           ? $t('ALERT_MANAGER.EVENT_RULE.ANY')
-                                           : $t('ALERT_MANAGER.EVENT_RULE.ALL')"
-                                       size="lg"
-                                       required
-                                       class="field-title"
-                        />
-                        <p-field-group class="input-form"
-                                       required
-                        >
-                            <span class="help-text">{{ $t('ALERT_MANAGER.EVENT_RULE.OF_THE_FOLLOWING_ARE_MET') }}</span>
-                        </p-field-group>
+                        <div class="input-form-wrapper">
+                            <p-field-title :label="props.eventRule.conditions_policy === EVENT_RULE_CONDITIONS_POLICY.ANY
+                                               ? $t('ALERT_MANAGER.EVENT_RULE.ANY')
+                                               : $t('ALERT_MANAGER.EVENT_RULE.ALL')"
+                                           size="lg"
+                                           required
+                                           class="field-title"
+                            />
+                            <p-field-group class="input-form"
+                                           required
+                            >
+                                <span class="help-text">{{ $t('ALERT_MANAGER.EVENT_RULE.OF_THE_FOLLOWING_ARE_MET') }}</span>
+                            </p-field-group>
+                        </div>
+                        <div class="border-section">
+                            <div v-for="(condition, idx) in props.eventRule.conditions"
+                                 :key="`action-${idx}`"
+                                 class="action-list"
+                            >
+                                <div class="dot">
+                                    <p-i name="ic_dot"
+                                         width="0.25rem"
+                                         height="0.25rem"
+                                         color="inherit"
+                                    />
+                                </div>
+                                <p class="flex gap-1 text-paragraph-md text-gray-700">
+                                    <span class="text-blue-800">{{ condition.key }}</span>
+                                    <span>{{ condition.operator }}</span>
+                                    <span class="text-blue-800">{{ condition.value }}</span>
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="flex items-center justify-center h-6 bg-gray-100 rounded-xl">
@@ -197,7 +261,7 @@ const handleDeleteEventRule = () => {
                                    required
                                    class="field-title"
                     />
-                    <div class="border-section">
+                    <div class="border-section gap-2">
                         <div v-for="(type, idx) in Object.keys(state.actions)"
                              :key="`setting-${type}-action-${idx}`"
                         >
@@ -207,30 +271,61 @@ const handleDeleteEventRule = () => {
                                                required
                                                class="field-title"
                                 />
-                                <ul v-for="(action, actionIdx) in state.actions[type]"
-                                    :key="`action-${actionIdx}`"
-                                    class="action-list"
+                                <div v-for="(action, actionIdx) in state.actions[type]"
+                                     :key="`action-${actionIdx}`"
+                                     class="action-list"
                                 >
-                                    <li>
+                                    <div class="dot">
+                                        <p-i name="ic_dot"
+                                             width="0.25rem"
+                                             height="0.25rem"
+                                             color="inherit"
+                                        />
+                                    </div>
+                                    <p>
                                         <span class="text-label-md text-gray-700">{{ action.label }}</span>
                                         <span class="text-paragraph-md text-blue-800 ml-2">
-                                            <span>{{ action.value }}</span>
+                                            <span v-if="action.name === 'change_service'">{{ storeState.service[action.value]?.label || action.value }}</span>
+                                            <span v-else-if="action.name === 'rule'">
+                                                <span class="font-bold">{{ Object.keys(action.value)[0] }}: </span>
+                                                <span>{{ Object.values(action.value)[0] }}</span>
+                                            </span>
+                                            <span v-else-if="action.name === 'change_urgency'">
+                                                {{ action.value === EVENT_RULE_URGENCY.HIGH ? $t('ALERT_MANAGER.EVENT_RULE.HIGH') : $t('ALERT_MANAGER.EVENT_RULE.LOW') }}
+                                            </span>
+                                            <span v-else-if="action.name === 'change_status'">
+                                                {{ action.value === ALERT_STATUS.IGNORED ? $t('ALERT_MANAGER.ALERTS.IGNORED') : $t('ALERT_MANAGER.ALERTS.TRIGGERED') }}
+                                            </span>
+                                            <span v-else-if="action.name === 'change_escalation_policy'">{{ storeState.escalationPolicy[action.value]?.label || action.value }}</span>
+                                            <span v-else-if="action.name === 'set_labels'">{{ action.value.join(', ') }}</span>
+                                            <span v-else>{{ action.value }}</span>
                                         </span>
-                                    </li>
-                                </ul>
+                                    </p>
+                                </div>
                             </div>
                             <p-divider v-if="idx !== Object.keys(state.actions).length - 1"
                                        class="divider"
                             />
                         </div>
                         <div v-if="props.eventRule.options">
-                            <p-divider class="divider" />
-                            <ul class="action-list">
-                                <li>
+                            <p-divider v-if="props.eventRule.actions && Object.values(props.eventRule.actions).every((key) => key)"
+                                       class="divider option"
+                            />
+                            <div class="action-list">
+                                <div class="dot">
+                                    <p-i name="ic_dot"
+                                         width="0.25rem"
+                                         height="0.25rem"
+                                         color="inherit"
+                                    />
+                                </div>
+                                <p>
                                     <span class="text-label-md text-gray-700">{{ $t('ALERT_MANAGER.EVENT_RULE.THEN_STOP_PROCESSING') }}</span>
-                                    <span class="text-paragraph-md text-blue-800 ml-2">{{ props.eventRule?.options?.stop_processing }}</span>
-                                </li>
-                            </ul>
+                                    <span class="text-paragraph-md text-blue-800 ml-2">
+                                        {{ props.eventRule?.options?.stop_processing ? $t('ALERT_MANAGER.EVENT_RULE.TRUE') : $t('ALERT_MANAGER.EVENT_RULE.FALSE') }}
+                                    </span>
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -264,17 +359,9 @@ const handleDeleteEventRule = () => {
             padding-bottom: 0.375rem;
         }
         .border-section {
-            @apply flex flex-col gap-2 border-4 border-gray-100 rounded-xl mt-1 py-2 px-4;
+            @apply flex flex-col border-4 border-gray-100 rounded-xl mt-1 py-2 px-4;
             .settings-section {
                 @apply flex flex-col;
-                .action-list {
-                    @apply pt-0.5 pb-0.5;
-                    list-style: disc;
-
-                    li {
-                        margin-left: 1.5rem;
-                    }
-                }
             }
         }
         .help-text {
@@ -282,6 +369,18 @@ const handleDeleteEventRule = () => {
         }
         .divider {
             margin-top: 0.75rem;
+            &.option {
+                margin-bottom: 0.5rem;
+            }
+        }
+
+        .action-list {
+            @apply flex pt-0.5 pb-0.5 gap-1;
+            .dot {
+                @apply flex items-center justify-center;
+                width: 1.5rem;
+                height: 1.5rem;
+            }
         }
     }
 }

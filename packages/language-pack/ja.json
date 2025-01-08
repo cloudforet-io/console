@@ -141,6 +141,7 @@
 			"DOES_NOT_EQUAL": "does not equal",
 			"EQUALS": "equals",
 			"EXECUTE_ACTIONS": "",
+			"FALSE": "",
 			"GLOBAL": "",
 			"GLOBAL_SCOPE": "",
 			"HIGH": "高い",
@@ -176,6 +177,7 @@
 			"STOP_PROCESSING": "",
 			"THEN_STOP_PROCESSING": "その後、作業は停止する",
 			"TITLE": "イベントルール",
+			"TRUE": "",
 			"WEBHOOK_SCOPE": ""
 		},
 		"NOTIFICATIONS": {

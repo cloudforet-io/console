@@ -141,6 +141,7 @@
 			"DOES_NOT_EQUAL": "does not equal",
 			"EQUALS": "equals",
 			"EXECUTE_ACTIONS": "Execute These Actions",
+			"FALSE": "False",
 			"GLOBAL": "Global",
 			"GLOBAL_SCOPE": "Global Event Rule",
 			"HIGH": "High",
@@ -176,6 +177,7 @@
 			"STOP_PROCESSING": "Stop Processing",
 			"THEN_STOP_PROCESSING": "Then stop processing",
 			"TITLE": "Event Rule",
+			"TRUE": "True",
 			"WEBHOOK_SCOPE": "Base on a Webhook"
 		},
 		"NOTIFICATIONS": {
