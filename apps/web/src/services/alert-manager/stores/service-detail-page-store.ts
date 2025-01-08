@@ -106,6 +106,7 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
                     RESOLVED: getAlerts(SERVICE_ALERTS_TYPE.RESOLVED),
                     TOTAL: getAlerts(SERVICE_ALERTS_TYPE.TOTAL),
                 },
+                rules: state.eventRuleList.length,
             };
         }),
         pluginsReferenceMap: computed(() => allReferenceGetters.plugin),

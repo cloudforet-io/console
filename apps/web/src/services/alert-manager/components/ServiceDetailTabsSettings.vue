@@ -60,8 +60,6 @@ const state = reactive({
     ]),
     notificationPolicy: computed<NotificationUrgencyType>(() => storeState.serviceInfo.options.notification_urgency),
     autoRecovery: computed<RecoveryModeType>(() => storeState.serviceInfo.options.recovery_mode),
-    // TODO: temp data
-    ruleSet: 0,
 });
 
 const getCardValueInfo = (type: ServiceDetailSettingCardType): CardValueInfoType|undefined => {
@@ -108,7 +106,6 @@ const handleClickEditButton = (type: ServiceDetailSettingCardType) => {
     state.selectModalVisible = true;
     state.modalType = type;
 };
-
 </script>
 
 <template>
@@ -146,7 +143,7 @@ const handleClickEditButton = (type: ServiceDetailSettingCardType) => {
                                      height="1rem"
                                      width="1rem"
                                 />
-                                <b v-else>{{ state.ruleSet }}</b>
+                                <b v-else>{{ storeState.serviceInfo.rules }}</b>
                                 <span class="text-label-md">{{ getCardValueInfo(item.type).text }}</span>
                             </div>
                         </div>
