@@ -101,17 +101,17 @@ const isResizing = (event) => {
             resize(width);
         }
         state.clientX = event.clientX;
-        // state.isHover = true;
+        state.isHover = true;
     }
 };
 const endResizing = () => {
     state.resizing = false;
     state.clientX = null;
-    // state.isHover = false;
+    state.isHover = false;
 };
 const startResizing = () => {
     state.resizing = true;
-    // state.isHover = true;
+    state.isHover = true;
 };
 
 /* Toggle hide Sidebar */
@@ -213,7 +213,14 @@ function test() {
                 <div class="line"
                      :class="{hover: state.isHover}"
                      :style="state.resizerLineStyle"
-                />
+                >
+                    <div
+                        v-if="enableDoubleClickResize"
+                        class="controller"
+                        :class="{hover: state.isHover && !state.hide}"
+                        @dblclick="handleControllerDoubleClick"
+                    />
+                </div>
                 <p-tooltip :contents="state.hide ? $t('COMPONENT.VERTICAL_LAYOUT.EXPAND') : $t('COMPONENT.VERTICAL_LAYOUT.COLLAPSE')"
                            position="right"
                            :class="{hide: state.hide}"
@@ -230,12 +237,6 @@ function test() {
                         </slot>
                     </span>
                 </p-tooltip>
-                <div
-                    v-if="enableDoubleClickResize"
-                    class="controller"
-                    :class="{hover: state.isHover && !state.hide}"
-                    @dblclick="handleControllerDoubleClick"
-                />
             </div>
         </div>
         <div
@@ -268,7 +269,6 @@ function test() {
         flex-direction: column;
         justify-content: stretch;
 
-        /* flex-grow: 1; */
         overflow-x: hidden;
         overflow-y: auto;
         &.transition {
@@ -286,18 +286,20 @@ function test() {
             position: relative;
             height: 100%;
             width: fit-content;
+            display: flex;
+            justify-content: center;
             .transition {
                 transition: left 0.2s;
             }
             .line {
+                @apply bg-gray-200;
                 position: absolute;
                 height: 100%;
-
-                @apply bg-gray-200;
                 &.hover {
                     @apply bg-blue-600;
                     cursor: ew-resize;
-                    transform: translateX(-25%);
+                    left: 50%;
+                    transform: translateX(-50%);
                 }
             }
             .resizer {
@@ -306,8 +308,6 @@ function test() {
                 height: 1.5rem;
                 margin-top: 1.25rem;
                 top: 0;
-                left: 50%;
-                transform: translateX(-50%);
                 font-size: 1.5rem;
                 font-weight: 600;
                 z-index: 1;
@@ -320,7 +320,6 @@ function test() {
                     border-top-left-radius: 50%;
                     border-bottom-left-radius: 50%;
                     border-left: 0;
-                    transform: translateX(0);
                     .resizer-button > svg {
                         margin-right: -0.125rem;
                     }
@@ -336,26 +335,24 @@ function test() {
                     @apply bg-blue-200 cursor-pointer;
                 }
             }
-        }
-
-        .controller {
-            @apply absolute border border-gray-300 rounded-md bg-white;
-            width: 0.4rem;
-            height: 1.5rem;
-            top: calc(50% - 1.5rem / 2);
-            opacity: 1;
-            left: 50%;
-            transform: translateX(-50%);
-
-            &.hover {
-                @apply border-blue-600;
-                opacity: 1;
-            }
-            &:hover {
-                @apply bg-blue-200;
-                opacity: 1;
-                width: 0.6rem;
-                cursor: col-resize;
+            .controller {
+                @apply absolute border border-gray-300 rounded-md bg-white;
+                width: 0.4rem;
+                height: 1.5rem;
+                top: calc(50% - 1.5rem / 2);
+                opacity: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                &.hover {
+                    @apply border-blue-600;
+                    opacity: 1;
+                }
+                &:hover {
+                    @apply bg-blue-200;
+                    opacity: 1;
+                    width: 0.6rem;
+                    cursor: col-resize;
+                }
             }
         }
     }
