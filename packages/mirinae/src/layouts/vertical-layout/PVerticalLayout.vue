@@ -11,11 +11,11 @@ import screens from '@/styles/screens.cjs';
 const MOBILE_WIDTH = '312';
 
 interface Props {
-  height?: string;
-  initWidth?: number;
-  minWidth?: number;
-  maxWidth?: number;
-  enableDoubleClickResize? : boolean;
+    height?: string;
+    initWidth?: number;
+    minWidth?: number;
+    maxWidth?: number;
+    enableDoubleClickResize? : boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
