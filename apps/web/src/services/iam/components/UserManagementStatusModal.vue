@@ -51,6 +51,7 @@ const state = reactive({
             { name: 'name', label: 'Name' },
             { name: 'state', label: 'State' },
             { name: 'service', label: 'Service' },
+            { name: 'user_group', label: 'User Group' },
         ];
         return userPageState.isAdminMode ? [
             ...baseField,
@@ -163,7 +164,7 @@ const disableUser = async (userId?: string): Promise<boolean> => {
 /* Watcher */
 watch([() => storeState.serviceList, () => storeState.selectedUsers], ([nv_service_list, nv_selected_users]) => {
     if (nv_service_list) {
-        const list: UserListItemType[] | (UserListItemType & { service: string })[] = [];
+        const list: UserListItemType[] | (UserListItemType & { service: string; })[] = [];
         Object.values(nv_service_list).forEach((service) => {
             if (service && service.data && service.data.members) {
                 nv_selected_users.forEach((selectedUser) => {
@@ -218,7 +219,7 @@ watch([() => storeState.serviceList, () => storeState.selectedUsers], ([nv_servi
                 </template>
                 <template #col-service-format="{value}">
                     <div v-if="value.length > 0">
-                        <span v-for="(v, i) in value"
+                        <span v-for="(service, i) in value"
                               :key="i"
                               class="mr-2"
                         >
@@ -226,13 +227,36 @@ watch([() => storeState.serviceList, () => storeState.selectedUsers], ([nv_servi
                                      badge-type="gray200"
                                      shape="square"
                             >
-                                {{ v }}
+                                {{ service }}
                             </p-badge>
                             <p-badge v-else-if="i >= 3"
-                                     badge-type="blue700"
+                                     badge-type="blue300"
                                      shape="round"
                             >
-                                {{ value.length - i }}
+
+                                + {{ value.length - i }}
+                            </p-badge>
+                        </span>
+                    </div>
+                    <div v-else />
+                </template>
+                <template #col-user_group-format="{value}">
+                    <div v-if="value.length > 0">
+                        <span v-for="(userGroup, i) in value"
+                              :key="i"
+                              class="mr-2"
+                        >
+                            <p-badge v-if="i < 3"
+                                     badge-type="gray200"
+                                     shape="square"
+                            >
+                                {{ userGroup.name }}
+                            </p-badge>
+                            <p-badge v-else-if="i >= 3"
+                                     badge-type="blue300"
+                                     shape="round"
+                            >
+                                + {{ value.length - i }}
                             </p-badge>
                         </span>
                     </div>
