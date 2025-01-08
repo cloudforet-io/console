@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import { isEmpty } from 'lodash';
 
@@ -10,6 +10,7 @@ import {
 
 import type { EventRuleCreateParameters } from '@/schema/alert-manager/event-rule/api-verbs/create';
 import { EVENT_RULE_CONDITIONS_POLICY, EVENT_RULE_SCOPE } from '@/schema/alert-manager/event-rule/constant';
+import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
 import type { EventRuleScopeType, EventRuleConditionsPolicyType, EventRuleActionsType } from '@/schema/alert-manager/event-rule/type';
 import { i18n } from '@/translations';
 
@@ -34,11 +35,15 @@ import type { EventRuleConditionPolicyButtonType } from '@/services/alert-manage
 interface Props {
     selectedWebhook: string;
     selectedScope?: EventRuleScopeType;
+    isEditMode: boolean;
+    eventRule?: EventRuleModel;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     selectedWebhook: '',
     selectedScope: undefined,
+    isEditMode: false,
+    eventRule: () => ({} as EventRuleModel),
 });
 
 const allReferenceStore = useAllReferenceStore();
@@ -164,6 +169,21 @@ const handleAddButton = async () => {
         state.loading = false;
     }
 };
+
+watch(() => props.isEditMode, (isEditMode) => {
+    if (!isEditMode) return;
+    setForm('name', props.eventRule.name || 'Event_Rule_Name');
+    state.selectedPolicyButton = props.eventRule.conditions_policy === EVENT_RULE_CONDITIONS_POLICY.ALWAYS
+        ? EVENT_RULE_CONDITIONS_POLICY.ALWAYS
+        : EVENT_RULE_CONDITIONS_POLICY.ANY;
+    state.conditionsPolicy = props.eventRule.conditions_policy;
+    state.conditions = props.eventRule.conditions || [{
+        key: 'title',
+        value: '',
+        operator: 'contain',
+    }];
+    state.stopProcessing = props.eventRule.options?.stop_processing || false;
+}, { immediate: true });
 </script>
 
 <template>
@@ -173,7 +193,7 @@ const handleAddButton = async () => {
     >
         <template #header>
             <div class="flex items-center justify-between">
-                <span class="font-bold">{{ $t('ALERT_MANAGER.EVENT_RULE.CREATE_FORM_TITLE') }}</span>
+                <span class="font-bold">{{ props.isEditMode ? $t('ALERT_MANAGER.EVENT_RULE.EDIT_FORM_TITLE ') : $t('ALERT_MANAGER.EVENT_RULE.CREATE_FORM_TITLE') }}</span>
                 <p-icon-button name="ic_delete"
                                style-type="transparent"
                                :color="white"
@@ -281,7 +301,9 @@ const handleAddButton = async () => {
                                    font-weight="regular"
                     />
                     <div class="border-section">
-                        <service-detail-tabs-settings-event-rule-action-form @change-form="handleChangeActionForm" />
+                        <service-detail-tabs-settings-event-rule-action-form :actions="state.actions"
+                                                                             @change-form="handleChangeActionForm"
+                        />
                     </div>
                 </div>
             </div>

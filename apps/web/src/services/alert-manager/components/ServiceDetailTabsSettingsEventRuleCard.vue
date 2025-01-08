@@ -24,6 +24,8 @@ import type { PluginReferenceMap } from '@/store/reference/plugin-reference-stor
 import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
 import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 
+import { useProxyValue } from '@/common/composables/proxy-state';
+
 import { gray } from '@/styles/colors';
 
 import ServiceDetailTabsSettingsEventRuleDeleteModal
@@ -32,20 +34,26 @@ import {
     getActionSettingTypeI18n,
     getActionSettingI18n,
 } from '@/services/alert-manager/composables/event-rule-action-data';
+import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
 import type { EventRuleActionsItemValueType, EventRuleActionsItemType } from '@/services/alert-manager/types/alert-manager-type';
 
 interface Props {
     eventRule?: EventRuleModel;
     loading: boolean;
+    isEditMode: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     eventRule: () => ({} as EventRuleModel),
     loading: true,
+    isEditMode: false,
 });
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
+const serviceDetailPageStore = useServiceDetailPageStore();
+
+const emit = defineEmits<{(e: 'update:is-edit-mode'): void}>();
 
 const storeState = reactive({
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
@@ -55,6 +63,7 @@ const storeState = reactive({
     escalationPolicy: computed<EscalationPolicyReferenceMap>(() => allReferenceGetters.escalationPolicy),
 });
 const state = reactive({
+    proxyIsEditMode: useProxyValue('isEditMode', props, emit),
     actionSetting: getActionSettingI18n(),
     actionSettingType: getActionSettingTypeI18n(),
     actions: computed<EventRuleActionsItemType>(() => {
@@ -126,6 +135,11 @@ const getWebhookIcon = (): string|undefined => {
     if (!webhook) return undefined;
     return storeState.plugins[webhook.plugin_info.plugin_id]?.icon || '';
 };
+
+const handleEditEventRule = () => {
+    serviceDetailPageStore.setShowEventRuleFormCard(true);
+    state.proxyIsEditMode = true;
+};
 const handleDeleteEventRule = () => {
     state.modalVisible = true;
 };
@@ -143,6 +157,7 @@ const handleDeleteEventRule = () => {
                     <div class="flex items-center gap-2">
                         <p-icon-button name="ic_edit"
                                        style-type="transparent"
+                                       @click="handleEditEventRule"
                         />
                         <p-icon-button name="ic_delete"
                                        style-type="transparent"

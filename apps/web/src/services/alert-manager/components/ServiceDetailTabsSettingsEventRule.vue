@@ -41,6 +41,7 @@ const state = reactive({
     selectedWebhook: '',
     hideSidebar: false,
     eventRule: {} as EventRuleModel,
+    isEditMode: false,
 });
 
 const handleClickAddRule = () => {
@@ -96,14 +97,17 @@ watch(() => storeState.serviceId, async (id) => {
                                                                  :items="storeState.items"
                 />
                 <service-detail-tabs-settings-event-rule-form-card v-if="storeState.showEventRuleFormCard"
-                                                                   :selected-webhook="state.selectedWebhook"
-                                                                   :selected-scope="state.selectedScope"
+                                                                   :selected-webhook="state.isEditMode ? state.eventRule.webhook_id : state.selectedWebhook"
+                                                                   :selected-scope="state.isEditMode ? state.eventRule.scope : state.selectedScope"
+                                                                   :event-rule="state.eventRule"
+                                                                   :is-edit-mode="state.isEditMode"
                                                                    class="flex-1"
                 />
                 <service-detail-tabs-settings-event-rule-card v-else-if="state.eventRule.event_rule_id"
                                                               class="flex-1"
                                                               :event-rule="state.eventRule"
                                                               :loading="state.eventRuleInfoLoading"
+                                                              :is-edit-mode.sync="state.isEditMode"
                 />
             </div>
             <template #no-data>

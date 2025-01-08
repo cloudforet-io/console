@@ -139,6 +139,7 @@
 			"DESC": "Event rules are excuted in ascending order.",
 			"DOES_NOT_CONTAIN": "does not contain",
 			"DOES_NOT_EQUAL": "does not equal",
+			"EDIT_FORM_TITLE ": "Edit Event Rule",
 			"EQUALS": "equals",
 			"EXECUTE_ACTIONS": "Execute These Actions",
 			"FALSE": "False",
