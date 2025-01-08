@@ -10,6 +10,8 @@ import { NOTIFICATION_URGENCY, RECOVERY_MODE } from '@/schema/alert-manager/serv
 import type { NotificationUrgencyType, RecoveryModeType } from '@/schema/alert-manager/service/type';
 import { i18n } from '@/translations';
 
+import { replaceUrlQuery } from '@/lib/router-query-string';
+
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
 import { red } from '@/styles/colors';
@@ -53,13 +55,11 @@ const state = reactive({
         },
         {
             title: i18n.t('ALERT_MANAGER.EVENT_RULE.TITLE'),
-            type: SERVICE_SETTING_CARD.RULE_SET,
+            type: SERVICE_SETTING_CARD.EVENT_RULE,
         },
     ]),
     notificationPolicy: computed<NotificationUrgencyType>(() => storeState.serviceInfo.options.notification_urgency),
     autoRecovery: computed<RecoveryModeType>(() => storeState.serviceInfo.options.recovery_mode),
-    // TODO: temp data
-    ruleSet: 0,
 });
 
 const getCardValueInfo = (type: ServiceDetailSettingCardType): CardValueInfoType|undefined => {
@@ -97,7 +97,12 @@ const getAutoRecovery = (): CardValueInfoType|undefined => {
     }
 };
 const handleClickEditButton = (type: ServiceDetailSettingCardType) => {
-    if (type === SERVICE_SETTING_CARD.RULE_SET) return;
+    if (type === SERVICE_SETTING_CARD.EVENT_RULE) {
+        replaceUrlQuery({
+            mode: 'eventRule',
+        });
+        return;
+    }
     state.selectModalVisible = true;
     state.modalType = type;
 };
@@ -131,14 +136,14 @@ const handleClickEditButton = (type: ServiceDetailSettingCardType) => {
                         </div>
                         <div class="flex items-center justify-center h-12 bg-gray-100 rounded-md">
                             <div class="flex items-center gap-2">
-                                <p-i v-if="item.type !== SERVICE_SETTING_CARD.RULE_SET"
+                                <p-i v-if="item.type !== SERVICE_SETTING_CARD.EVENT_RULE"
                                      class="icon"
                                      :name="getCardValueInfo(item.type)?.icon"
                                      :color="getCardValueInfo(item.type)?.iconColor || 'inherit'"
                                      height="1rem"
                                      width="1rem"
                                 />
-                                <b v-else>{{ state.ruleSet }}</b>
+                                <b v-else>{{ storeState.serviceInfo.rules }}</b>
                                 <span class="text-label-md">{{ getCardValueInfo(item.type).text }}</span>
                             </div>
                         </div>

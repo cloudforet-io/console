@@ -26,7 +26,8 @@ const tabState = reactive({
 </script>
 
 <template>
-    <p-tab :tabs="tabState.tabs"
+    <p-tab :key="i18n.locale"
+           :tabs="tabState.tabs"
            :active-tab.sync="tabState.activeTab"
     >
         <template #detail>

@@ -10,7 +10,7 @@ export const SERVICE_DETAIL_TABS = {
 export const SERVICE_SETTING_CARD = {
     NOTIFICATION_POLICY: 'notification_policy',
     AUTO_RECOVERY: 'auto_recovery',
-    RULE_SET: 'rule_set',
+    EVENT_RULE: 'event_rule',
 } as const;
 export const SERVICE_TAB_HEIGHT = 44;
 
@@ -33,5 +33,11 @@ export const ALERT_MANAGER_STATE_COLOR = {
 
 export const NOTIFICATIONS_DETAIL_TABS = {
     DETAIL: 'detail',
+} as const;
+
+export const EVENT_RULE_SETTINGS_TYPE = {
+    ASSET: 'asset',
+    ALERT: 'alert',
+    SERVICE: 'service',
 } as const;
 

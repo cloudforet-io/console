@@ -218,6 +218,7 @@ watch(() => storeState.service.service_id, (id) => {
 
 onUnmounted(() => {
     serviceDetailPageStore.setSelectedNotificationId(undefined);
+    serviceDetailPageStore.setCurrentTab(undefined);
 });
 </script>
 
