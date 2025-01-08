@@ -165,9 +165,9 @@ const disableUser = async (userId?: string): Promise<boolean> => {
 watch([() => storeState.serviceList, () => storeState.selectedUsers], ([nv_service_list, nv_selected_users]) => {
     if (nv_service_list) {
         const list: UserListItemType[] | (UserListItemType & { service: string; })[] = [];
-        Object.values(nv_service_list).forEach((service) => {
-            if (service && service.data && service.data.members) {
-                nv_selected_users.forEach((selectedUser) => {
+        nv_selected_users.forEach((selectedUser) => {
+            Object.values(nv_service_list).forEach((service) => {
+                if (service && service.data && service.data.members) {
                     if (Object.keys(service.data.members).includes('USER')) {
                         if (selectedUser.user_id && service.data.members.USER.includes(selectedUser.user_id)) {
                             list.push({
@@ -178,8 +178,9 @@ watch([() => storeState.serviceList, () => storeState.selectedUsers], ([nv_servi
                     } else {
                         list.push(selectedUser);
                     }
-                });
-            }
+                }
+            });
+            list.push(selectedUser);
         });
         if (list.length > 0) {
             state.filteredUniqueItems = Object.values(list.reduce((acc, cur) => {
