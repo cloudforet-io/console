@@ -90,9 +90,9 @@ const fetchDeleteUserGroup = async (params: UserGroupDeleteUserGroupParameters) 
 watch([() => storeState.serviceList, () => storeState.selectedUserGroupList], ([nv_service_list, nv_user_group_list]) => {
     if (nv_service_list) {
         const list: any = [];
-        Object.values(nv_service_list).forEach((service) => {
-            if (service && service.data && service.data.members) {
-                nv_user_group_list.forEach((userGroup) => {
+        nv_user_group_list.forEach((userGroup) => {
+            Object.values(nv_service_list).forEach((service) => {
+                if (service && service.data && service.data.members) {
                     if (Object.keys(service.data.members).includes('USER_GROUP')) {
                         if (service.data.members.USER_GROUP.includes(userGroup.user_group_id)) {
                             list.push({
@@ -107,8 +107,12 @@ watch([() => storeState.serviceList, () => storeState.selectedUserGroupList], ([
                             description: userGroup.description,
                         });
                     }
-                });
-            }
+                }
+            });
+            list.push({
+                user_group: userGroup.name,
+                description: userGroup.description,
+            });
         });
         if (list.length > 0) {
             tableState.filteredItems = Object.values(
