@@ -9,6 +9,7 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { EventRuleCreateParameters } from '@/schema/alert-manager/event-rule/api-verbs/create';
+import type { EventRuleUpdateParameters } from '@/schema/alert-manager/event-rule/api-verbs/update';
 import { EVENT_RULE_CONDITIONS_POLICY, EVENT_RULE_SCOPE } from '@/schema/alert-manager/event-rule/constant';
 import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
 import type { EventRuleScopeType, EventRuleConditionsPolicyType, EventRuleActionsType } from '@/schema/alert-manager/event-rule/type';
@@ -19,6 +20,7 @@ import type { PluginReferenceMap } from '@/store/reference/plugin-reference-stor
 import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
@@ -35,15 +37,11 @@ import type { EventRuleConditionPolicyButtonType } from '@/services/alert-manage
 interface Props {
     selectedWebhook: string;
     selectedScope?: EventRuleScopeType;
-    isEditMode: boolean;
-    eventRule?: EventRuleModel;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     selectedWebhook: '',
     selectedScope: undefined,
-    isEditMode: false,
-    eventRule: () => ({} as EventRuleModel),
 });
 
 const allReferenceStore = useAllReferenceStore();
@@ -53,6 +51,8 @@ const serviceDetailPageState = serviceDetailPageStore.state;
 
 const storeState = reactive({
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
+    isEventRuleEditMode: computed<boolean>(() => serviceDetailPageState.isEventRuleEditMode),
+    eventRuleInfo: computed<EventRuleModel>(() => serviceDetailPageState.eventRuleInfo),
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
     plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
 });
@@ -128,6 +128,33 @@ const {
     },
 });
 
+const initializeState = () => {
+    setForm('name', 'Event_Rule_Name');
+    state.selectedPolicyButton = EVENT_RULE_CONDITIONS_POLICY.ALWAYS;
+    state.conditionsPolicy = 'ALL';
+    state.conditions = [{
+        key: 'title',
+        value: '',
+        operator: 'contain',
+    }];
+    state.stopProcessing = false;
+};
+
+const updateStateFromEventRuleInfo = () => {
+    const eventRuleInfo = storeState.eventRuleInfo;
+
+    setForm('name', eventRuleInfo.name || 'Event_Rule_Name');
+    state.selectedPolicyButton = eventRuleInfo.conditions_policy === EVENT_RULE_CONDITIONS_POLICY.ALWAYS
+        ? EVENT_RULE_CONDITIONS_POLICY.ALWAYS
+        : EVENT_RULE_CONDITIONS_POLICY.ANY;
+    state.conditionsPolicy = eventRuleInfo.conditions_policy;
+    state.conditions = eventRuleInfo.conditions || [{
+        key: 'title',
+        value: '',
+        operator: 'contain',
+    }];
+    state.stopProcessing = eventRuleInfo.options?.stop_processing || false;
+};
 const getWebhookIcon = (): string|undefined => {
     if (!props.selectedWebhook) return undefined;
     const webhook = storeState.webhook[props.selectedWebhook]?.data;
@@ -153,36 +180,54 @@ const handleSelectPolicyButton = () => {
 const handleDeleteForm = () => {
     serviceDetailPageStore.setShowEventRuleFormCard(false);
 };
-
 const handleAddButton = async () => {
     state.loading = true;
     try {
-        await SpaceConnector.clientV2.alertManager.eventRule.create<EventRuleCreateParameters>(state.refinedData);
-        showSuccessMessage(i18n.t('ALERT_MANAGER.EVENT_RULE.ALT_S_CREATE_EVENT_RULE'), '');
+        const method = storeState.isEventRuleEditMode ? 'update' : 'create';
+        const response = await fetchEventRule(method);
         await serviceDetailPageStore.fetchEventRuleList({
             service_id: storeState.serviceId,
         });
-        handleDeleteForm();
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
+        await handleDeleteForm();
+        await replaceUrlQuery({
+            webhookId: response.webhook_id || 'global',
+            eventRuleId: response.event_rule_id,
+        });
     } finally {
         state.loading = false;
     }
 };
 
-watch(() => props.isEditMode, (isEditMode) => {
-    if (!isEditMode) return;
-    setForm('name', props.eventRule.name || 'Event_Rule_Name');
-    state.selectedPolicyButton = props.eventRule.conditions_policy === EVENT_RULE_CONDITIONS_POLICY.ALWAYS
-        ? EVENT_RULE_CONDITIONS_POLICY.ALWAYS
-        : EVENT_RULE_CONDITIONS_POLICY.ANY;
-    state.conditionsPolicy = props.eventRule.conditions_policy;
-    state.conditions = props.eventRule.conditions || [{
-        key: 'title',
-        value: '',
-        operator: 'contain',
-    }];
-    state.stopProcessing = props.eventRule.options?.stop_processing || false;
+const fetchEventRule = async (method: 'create' | 'update') => {
+    try {
+        let response;
+        if (method === 'create') {
+            response = await SpaceConnector.clientV2.alertManager.eventRule.create<EventRuleCreateParameters>(state.refinedData);
+            showSuccessMessage(i18n.t('ALERT_MANAGER.EVENT_RULE.ALT_S_CREATE_EVENT_RULE'), '');
+        } else {
+            response = await SpaceConnector.clientV2.alertManager.eventRule.update<EventRuleUpdateParameters>({
+                event_rule_id: storeState.eventRuleInfo.event_rule_id,
+                name: state.refinedData.name,
+                conditions: state.refinedData.conditions,
+                conditions_policy: state.refinedData.conditions_policy,
+                actions: state.refinedData.actions,
+                options: state.refinedData.options,
+            });
+            showSuccessMessage(i18n.t('ALERT_MANAGER.EVENT_RULE.ALT_S_UPDATE_EVENT_RULE'), '');
+        }
+        return response;
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
+        throw e;
+    }
+};
+
+watch(() => storeState.isEventRuleEditMode, (isEventRuleEditMode) => {
+    if (!isEventRuleEditMode) {
+        initializeState();
+    } else {
+        updateStateFromEventRuleInfo();
+    }
 }, { immediate: true });
 </script>
 
@@ -193,7 +238,7 @@ watch(() => props.isEditMode, (isEditMode) => {
     >
         <template #header>
             <div class="flex items-center justify-between">
-                <span class="font-bold">{{ props.isEditMode ? $t('ALERT_MANAGER.EVENT_RULE.EDIT_FORM_TITLE ') : $t('ALERT_MANAGER.EVENT_RULE.CREATE_FORM_TITLE') }}</span>
+                <span class="font-bold">{{ storeState.isEventRuleEditMode ? $t('ALERT_MANAGER.EVENT_RULE.EDIT_FORM_TITLE ') : $t('ALERT_MANAGER.EVENT_RULE.CREATE_FORM_TITLE') }}</span>
                 <p-icon-button name="ic_delete"
                                style-type="transparent"
                                :color="white"
@@ -325,7 +370,7 @@ watch(() => props.isEditMode, (isEditMode) => {
                           :loading="state.loading"
                           @click="handleAddButton"
                 >
-                    {{ $t('COMMON.BUTTONS.ADD') }}
+                    {{ storeState.isEventRuleEditMode ? $t('ALERT_MANAGER.EVENT_RULE.SAVE') : $t('COMMON.BUTTONS.ADD') }}
                 </p-button>
             </div>
         </div>

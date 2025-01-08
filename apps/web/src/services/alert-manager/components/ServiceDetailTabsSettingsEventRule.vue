@@ -2,16 +2,12 @@
 import { computed, reactive, watch } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButton, PDataLoader } from '@cloudforet/mirinae';
 
-import type { EventRuleGetParameters } from '@/schema/alert-manager/event-rule/api-verbs/get';
 import { EVENT_RULE_SCOPE } from '@/schema/alert-manager/event-rule/constant';
 import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import ServiceDetailTabsSettingsEventRuleCard
     from '@/services/alert-manager/components/ServiceDetailTabsSettingsEventRuleCard.vue';
@@ -33,6 +29,8 @@ const storeState = reactive({
     modalVisible: computed<boolean>(() => serviceDetailPageState.eventRuleScopeModalVisible),
     items: computed<EventRuleModel[]>(() => serviceDetailPageState.eventRuleList),
     showEventRuleFormCard: computed<boolean>(() => serviceDetailPageState.showEventRuleFormCard),
+    isEventRuleEditMode: computed<boolean>(() => serviceDetailPageState.isEventRuleEditMode),
+    eventRuleInfo: computed<EventRuleModel>(() => serviceDetailPageState.eventRuleInfo),
 });
 const state = reactive({
     loading: true,
@@ -40,8 +38,6 @@ const state = reactive({
     selectedScope: EVENT_RULE_SCOPE.GLOBAL,
     selectedWebhook: '',
     hideSidebar: false,
-    eventRule: {} as EventRuleModel,
-    isEditMode: false,
 });
 
 const handleClickAddRule = () => {
@@ -51,16 +47,14 @@ const handleClickAddRule = () => {
 const fetchEventRuleInfo = async () => {
     state.eventRuleInfoLoading = true;
     try {
-        state.eventRule = await SpaceConnector.clientV2.alertManager.eventRule.get<EventRuleGetParameters, EventRuleModel>({
+        await serviceDetailPageStore.fetchEventRuleInfo({
             event_rule_id: route.query?.eventRuleId as string,
         });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.eventRule = {} as EventRuleModel;
     } finally {
         state.eventRuleInfoLoading = false;
     }
 };
+
 watch(() => route.query?.eventRuleId, (eventRuleId) => {
     if (eventRuleId) {
         fetchEventRuleInfo();
@@ -97,17 +91,13 @@ watch(() => storeState.serviceId, async (id) => {
                                                                  :items="storeState.items"
                 />
                 <service-detail-tabs-settings-event-rule-form-card v-if="storeState.showEventRuleFormCard"
-                                                                   :selected-webhook="state.isEditMode ? state.eventRule.webhook_id : state.selectedWebhook"
-                                                                   :selected-scope="state.isEditMode ? state.eventRule.scope : state.selectedScope"
-                                                                   :event-rule="state.eventRule"
-                                                                   :is-edit-mode="state.isEditMode"
+                                                                   :selected-webhook="storeState.isEventRuleEditMode ? storeState.eventRuleInfo.webhook_id : state.selectedWebhook"
+                                                                   :selected-scope="storeState.isEventRuleEditMode ? storeState.eventRuleInfo.scope : state.selectedScope"
                                                                    class="flex-1"
                 />
-                <service-detail-tabs-settings-event-rule-card v-else-if="state.eventRule.event_rule_id"
+                <service-detail-tabs-settings-event-rule-card v-else-if="storeState.eventRuleInfo.event_rule_id"
                                                               class="flex-1"
-                                                              :event-rule="state.eventRule"
                                                               :loading="state.eventRuleInfoLoading"
-                                                              :is-edit-mode.sync="state.isEditMode"
                 />
             </div>
             <template #no-data>

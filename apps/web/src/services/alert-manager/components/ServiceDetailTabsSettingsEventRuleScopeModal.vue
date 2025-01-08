@@ -17,6 +17,8 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 
+import { replaceUrlQuery } from '@/lib/router-query-string';
+
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
@@ -95,6 +97,11 @@ const handleClickCard = () => {
 const handleClickConfirm = () => {
     serviceDetailPageStore.setEventRuleScopeModalVisible(false);
     serviceDetailPageStore.setShowEventRuleFormCard(true);
+    serviceDetailPageStore.setIsEventRuleEditMode(false);
+    replaceUrlQuery({
+        webhookId: undefined,
+        eventRuleId: undefined,
+    });
 };
 
 onMounted(() => {

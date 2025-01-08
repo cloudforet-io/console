@@ -5,31 +5,39 @@ import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PFieldTitle,
-    PFieldGroup,
-    PToggleButton,
-    PSelectDropdown,
-    PLink,
     PBadge,
+    PButton,
     PDivider,
-    PTextInput,
+    PFieldGroup,
+    PFieldTitle,
+    PI,
+    PIconButton,
+    PLink,
     PRadio,
     PRadioGroup,
-    PI, PButton, PIconButton,
+    PSelectDropdown,
+    PTextInput,
+    PToggleButton,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import type { InputItem } from '@cloudforet/mirinae/types/controls/input/text-input/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { ALERT_STATUS } from '@/schema/alert-manager/alert/constants';
+import type { AlertStatusType } from '@/schema/alert-manager/alert/type';
 import type { EscalationPolicyListParameters } from '@/schema/alert-manager/escalation-policy/api-verbs/list';
 import type { EscalationPolicyModel } from '@/schema/alert-manager/escalation-policy/model';
 import { EVENT_RULE_URGENCY } from '@/schema/alert-manager/event-rule/constant';
-import type { EventRuleActionsType } from '@/schema/alert-manager/event-rule/type';
+import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
+import type {
+    EventRuleActionsType,
+    EventRuleUrgencyType,
+} from '@/schema/alert-manager/event-rule/type';
 import type { ServiceModel } from '@/schema/alert-manager/service/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
 
 import type { TagItem } from '@/common/components/forms/tags-input-group/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -40,11 +48,10 @@ import { getActionSettingTypeI18n } from '@/services/alert-manager/composables/e
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
 import type {
-    EventRuleActionsToggleType,
-    EventRuleSettingsType,
-    EventRuleActionsUrgencyRadioType,
     EscalationPolicyRadioType,
-    EventRuleActionsDataType,
+    EventRuleActionsToggleType,
+    EventRuleActionsUrgencyRadioType,
+    EventRuleSettingsType,
 } from '@/services/alert-manager/types/alert-manager-type';
 
 const allReferenceStore = useAllReferenceStore();
@@ -55,7 +62,10 @@ const serviceDetailPageState = serviceDetailPageStore.state;
 const emit = defineEmits<{(e: 'change-form', form: EventRuleActionsType): void}>();
 
 const storeState = reactive({
+    cloudServiceType: computed<CloudServiceTypeReferenceMap>(() => allReferenceGetters.cloudServiceType),
     service: computed<ServiceModel>(() => serviceDetailPageState.serviceInfo),
+    isEventRuleEditMode: computed<boolean>(() => serviceDetailPageState.isEventRuleEditMode),
+    eventRuleInfo: computed<EventRuleModel>(() => serviceDetailPageState.eventRuleInfo),
     serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => Object.values(allReferenceGetters.service).map((i) => ({
         name: i.name,
         label: i.label,
@@ -65,7 +75,6 @@ const storeState = reactive({
         label: i.label,
     }))),
 });
-
 const state = reactive({
     actionSettingType: getActionSettingTypeI18n(),
     actions: computed<Record<EventRuleSettingsType, EventRuleActionsToggleType[]>>(() => ({
@@ -118,24 +127,88 @@ const state = reactive({
         { label: i18n.t('ALERT_MANAGER.EVENT_RULE.HIGH'), name: EVENT_RULE_URGENCY.HIGH },
         { label: i18n.t('ALERT_MANAGER.EVENT_RULE.LOW'), name: EVENT_RULE_URGENCY.LOW },
     ]),
-    selectedActions: {} as EventRuleActionsDataType,
+    escalationPolicyDropdownList: [] as SelectDropdownMenuItem[],
+});
+const formState = reactive({
+    selectedActions: {} as EventRuleActionsType,
     selectedServiceId: storeState.service.service_id,
     selectedAssetList: [] as SelectDropdownMenuItem[],
-    selectedStatusRadio: ALERT_STATUS.IGNORED,
-    selectedUrgencyRadio: EVENT_RULE_URGENCY.HIGH,
-    escalationPolicyDropdownList: [] as SelectDropdownMenuItem[],
+    selectedStatusRadio: ALERT_STATUS.IGNORED as AlertStatusType,
+    selectedUrgencyRadio: EVENT_RULE_URGENCY.HIGH as EventRuleUrgencyType,
     selectedEscalationPolicyId: '',
     labels: [] as InputItem[],
     additionalInfoTags: [{ key: '', value: '' }] as TagItem[],
     rule: { key: '', value: '' } as TagItem,
 });
 
+const initializeState = (): void => {
+    formState.selectedActions = {} as EventRuleActionsType;
+    formState.selectedServiceId = storeState.service.service_id;
+    formState.selectedAssetList = [];
+    formState.rule = { key: '', value: '' };
+    formState.selectedStatusRadio = ALERT_STATUS.IGNORED;
+    formState.selectedUrgencyRadio = EVENT_RULE_URGENCY.HIGH;
+    formState.selectedEscalationPolicyId = '';
+    formState.labels = [];
+    formState.additionalInfoTags = [{ key: '', value: '' }];
+};
+const updateStateFromEventRuleInfo = (): void => {
+    const actions = storeState.eventRuleInfo.actions;
+    if (!actions) return;
+
+    formState.selectedActions = {} as EventRuleActionsType;
+
+    if (actions.change_service) {
+        formState.selectedActions.change_service = actions.change_service;
+        formState.selectedServiceId = actions.change_service;
+    }
+
+    if (actions.match_asset?.create_temporary_asset) {
+        formState.selectedActions.match_asset = {
+            asset_types: [],
+            rule: {},
+            create_temporary_asset: true,
+        };
+        formState.rule = {
+            key: Object.keys(actions.match_asset?.rule || {})[0] || '',
+            value: Object.values(actions.match_asset?.rule || {})[0] || '',
+        };
+        formState.selectedAssetList = (actions.match_asset?.asset_types || []).map((type) => ({
+            name: type,
+            label: storeState.cloudServiceType[type]?.label || '',
+        }));
+    }
+
+    if (actions.change_title) formState.selectedActions.change_title = actions.change_title;
+    if (actions.change_status) {
+        formState.selectedActions.change_status = actions.change_status;
+        formState.selectedStatusRadio = actions.change_status;
+    }
+    if (actions.change_urgency) {
+        formState.selectedActions.change_urgency = actions.change_urgency;
+        formState.selectedUrgencyRadio = actions.change_urgency;
+    }
+    if (actions.change_escalation_policy) {
+        formState.selectedActions.change_escalation_policy = actions.change_escalation_policy;
+        formState.selectedEscalationPolicyId = actions.change_escalation_policy;
+    }
+    if (actions.set_labels) {
+        formState.selectedActions.set_labels = actions.set_labels;
+        formState.labels = actions.set_labels.map((label) => ({ name: label }));
+    }
+    if (actions.add_additional_info) {
+        formState.additionalInfoTags = Object.entries(actions.add_additional_info).map(([key, value]) => ({
+            key,
+            value,
+        }));
+    }
+};
 const handleUpdateValue = (action: string, value: boolean) => {
-    const _actions = cloneDeep(state.selectedActions);
+    const _actions = cloneDeep(formState.selectedActions);
 
     if (value) {
         const actionDefaults: Record<string, any> = {
-            change_service: state.selectedServiceId,
+            change_service: formState.selectedServiceId,
             change_status: ALERT_STATUS.IGNORED,
             change_urgency: EVENT_RULE_URGENCY.HIGH,
             match_asset: {
@@ -148,38 +221,38 @@ const handleUpdateValue = (action: string, value: boolean) => {
         _actions[action] = actionDefaults[action] ?? '';
     } else if (action === 'match_asset') {
         _actions[action] = { create_temporary_asset: false };
-        state.selectedAssetList = [];
-        state.rule = { key: '', value: '' };
+        formState.selectedAssetList = [];
+        formState.rule = { key: '', value: '' };
     } else {
         delete _actions[action];
     }
 
-    state.selectedActions = _actions;
+    formState.selectedActions = _actions;
 };
 const handleSelectAction = (action: string, value: any) => {
     if (action === 'set_labels') {
-        state.selectedActions[action] = value.map((item) => item.name);
+        formState.selectedActions[action] = value.map((item) => item.name);
         return;
     }
-    state.selectedActions[action] = value;
+    formState.selectedActions[action] = value;
 };
 const handleAddTagPair = () => {
-    state.additionalInfoTags.push({ key: '', value: '' });
+    formState.additionalInfoTags.push({ key: '', value: '' });
 };
 const handleDeleteTagPair = (idx: number) => {
-    const _items = [...state.additionalInfoTags];
+    const _items = [...formState.additionalInfoTags];
     _items.splice(idx, 1);
-    state.additionalInfoTags = _items;
+    formState.additionalInfoTags = _items;
 };
 const handleInputTagKey = (idx, val) => {
-    const _items = [...state.additionalInfoTags];
+    const _items = [...formState.additionalInfoTags];
     _items[idx].key = val;
-    state.additionalInfoTags = _items;
+    formState.additionalInfoTags = _items;
 };
 const handleInputTagValue = (idx, val) => {
-    const _items = [...state.additionalInfoTags];
+    const _items = [...formState.additionalInfoTags];
     _items[idx].value = val;
-    state.additionalInfoTags = _items;
+    formState.additionalInfoTags = _items;
 };
 
 const fetchEscalationPolicyList = async () => {
@@ -197,10 +270,8 @@ const fetchEscalationPolicyList = async () => {
     }
 };
 
-watch([() => state.selectedActions, () => state.additionalInfoTags, () => state.rule, () => state.selectedAssetList], (
-    [selectedActions, additionalInfoTags, rule, selectedAssetList],
-) => {
-    const _actions: EventRuleActionsType = Object.entries(selectedActions)
+watch(() => formState, () => {
+    const _actions: EventRuleActionsType = Object.entries(formState.selectedActions)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
         .filter(([_, value]) => {
             if (Array.isArray(value)) return value.length > 0;
@@ -213,22 +284,21 @@ watch([() => state.selectedActions, () => state.additionalInfoTags, () => state.
         }, {} as EventRuleActionsType);
 
     if (_actions.match_asset?.create_temporary_asset) {
-        _actions.change_status = state.selectedStatusRadio;
-        if (rule.value && rule.key) {
+        if (formState.rule.value && formState.rule.key) {
             _actions.match_asset = {
                 ..._actions.match_asset,
-                rule: { [rule.key]: rule.value },
+                rule: { [formState.rule.key]: formState.rule.value },
             };
         }
-        if (selectedAssetList.length > 0) {
+        if (formState.selectedAssetList.length > 0) {
             _actions.match_asset = {
                 ..._actions.match_asset,
-                asset_types: selectedAssetList.map((item) => item.name),
+                asset_types: formState.selectedAssetList.map((item) => item.name),
             };
         }
     }
 
-    const validAdditionalInfoTags = additionalInfoTags.filter(
+    const validAdditionalInfoTags = formState.additionalInfoTags.filter(
         (item) => item.key.toString().trim() !== '' && item.value.toString().trim() !== '',
     );
     if (validAdditionalInfoTags.length > 0) {
@@ -240,6 +310,13 @@ watch([() => state.selectedActions, () => state.additionalInfoTags, () => state.
 
     emit('change-form', _actions);
 }, { immediate: true, deep: true });
+watch(() => storeState.isEventRuleEditMode, (isEditMode) => {
+    if (isEditMode) {
+        updateStateFromEventRuleInfo();
+    } else {
+        initializeState();
+    }
+}, { immediate: true });
 watch(() => storeState.service.service_id, (id) => {
     if (!id) return;
     fetchEscalationPolicyList();
@@ -264,14 +341,14 @@ watch(() => storeState.service.service_id, (id) => {
                 >
                     <div class="flex items-start w-full">
                         <div class="toggle-wrapper flex items-center gap-2 mr-2">
-                            <p-toggle-button :value="!!state.selectedActions[action.name]"
+                            <p-toggle-button :value="!!formState.selectedActions[action.name]"
                                              @update:value="handleUpdateValue(action.name, $event)"
                             />
                             <p-field-title font-weight="regular">
                                 {{ action.label }}
                             </p-field-title>
                         </div>
-                        <div v-if="state.selectedActions[action.name] !== undefined"
+                        <div v-if="formState.selectedActions[action.name] !== undefined"
                              class="input-wrapper"
                         >
                             <div v-if="action.name === 'change_service'"
@@ -280,7 +357,7 @@ watch(() => storeState.service.service_id, (id) => {
                                 <p-select-dropdown :menu="storeState.serviceDropdownList"
                                                    use-fixed-menu-style
                                                    block
-                                                   :selected.sync="state.selectedServiceId"
+                                                   :selected.sync="formState.selectedServiceId"
                                                    @update:selected="handleSelectAction(action.name, $event)"
                                 />
                                 <p class="text-label-md pl-1">
@@ -301,7 +378,7 @@ watch(() => storeState.service.service_id, (id) => {
                             </div>
                             <p-text-input v-if="action.name === 'change_title'"
                                           block
-                                          :value="state.selectedActions[action.name]"
+                                          :value="formState.selectedActions[action.name]"
                                           @update:value="handleSelectAction(action.name, $event)"
                             />
                             <div v-if="action.name === 'change_status'"
@@ -310,7 +387,7 @@ watch(() => storeState.service.service_id, (id) => {
                                 <p-radio-group>
                                     <p-radio v-for="(item, statusIdx) in state.statusRadioMenuList"
                                              :key="`change-status-${statusIdx}`"
-                                             v-model="state.selectedStatusRadio"
+                                             v-model="formState.selectedStatusRadio"
                                              :value="item.name"
                                              @change="handleSelectAction(action.name, $event)"
                                     >
@@ -319,7 +396,7 @@ watch(() => storeState.service.service_id, (id) => {
                                         </span>
                                     </p-radio>
                                 </p-radio-group>
-                                <p v-if="state.selectedStatusRadio === ALERT_STATUS.IGNORED"
+                                <p v-if="formState.selectedStatusRadio === ALERT_STATUS.IGNORED"
                                    class="flex items-center gap-1 text-gray-500 text-label-sm"
                                 >
                                     <p-i name="ic_warning-filled"
@@ -335,7 +412,7 @@ watch(() => storeState.service.service_id, (id) => {
                             >
                                 <p-radio v-for="(item, urgencyIdx) in state.urgencyRadioMenuList"
                                          :key="`change-status-${urgencyIdx}`"
-                                         v-model="state.selectedUrgencyRadio"
+                                         v-model="formState.selectedUrgencyRadio"
                                          :value="item.name"
                                          @change="handleSelectAction(action.name, $event)"
                                 >
@@ -346,7 +423,7 @@ watch(() => storeState.service.service_id, (id) => {
                             </p-radio-group>
                         </div>
                     </div>
-                    <div v-if="action.name === 'match_asset' && state.selectedActions[action.name]?.create_temporary_asset">
+                    <div v-if="action.name === 'match_asset' && formState.selectedActions[action.name]?.create_temporary_asset">
                         <div class="field-group flex items-center mt-3">
                             <p-field-title font-weight="regular"
                                            class="field-title toggle-wrapper"
@@ -359,25 +436,25 @@ watch(() => storeState.service.service_id, (id) => {
                                                class="asset-dropdown"
                                                multi-selectable
                                                show-delete-all-button
-                                               :selected.sync="state.selectedAssetList"
+                                               :selected.sync="formState.selectedAssetList"
                             >
                                 <template #dropdown-button>
-                                    <div v-if="state.selectedAssetList.length > 0"
+                                    <div v-if="formState.selectedAssetList.length > 0"
                                          class="dropdown-button-wrapper flex gap-1"
                                     >
                                         <p class="flex-1 truncate">
-                                            <span v-for="(asset, assetIdx) in state.selectedAssetList"
+                                            <span v-for="(asset, assetIdx) in formState.selectedAssetList"
                                                   :key="`selected-asset-${assetIdx}`"
                                             >
                                                 {{ asset.label }}
-                                                <span v-if="assetIdx !== state.selectedAssetList.length - 1">, </span>
+                                                <span v-if="assetIdx !== formState.selectedAssetList.length - 1">, </span>
                                             </span>
                                         </p>
-                                        <p-badge v-if="state.selectedAssetList.length > 1"
+                                        <p-badge v-if="formState.selectedAssetList.length > 1"
                                                  style-type="blue200"
                                                  badge-type="subtle"
                                         >
-                                            + {{ state.selectedAssetList.length - 1 }}
+                                            + {{ formState.selectedAssetList.length - 1 }}
                                         </p-badge>
                                     </div>
                                     <span v-else
@@ -394,12 +471,12 @@ watch(() => storeState.service.service_id, (id) => {
                             </p-field-title>
                             <div class="flex flex-1 gap-2 items-center">
                                 <p-field-group class="input-box">
-                                    <p-text-input v-model="state.rule.key"
+                                    <p-text-input v-model="formState.rule.key"
                                                   block
                                     />
                                 </p-field-group>
                                 <p-field-group class="input-box">
-                                    <p-text-input v-model="state.rule.value"
+                                    <p-text-input v-model="formState.rule.value"
                                                   block
                                     />
                                 </p-field-group>
@@ -437,20 +514,20 @@ watch(() => storeState.service.service_id, (id) => {
                                                    use-fixed-menu-style
                                                    block
                                                    show-delete-all-button
-                                                   :selected.sync="state.selectedEscalationPolicyId"
+                                                   :selected.sync="formState.selectedEscalationPolicyId"
                                                    @update:selected="handleSelectAction(item.name, $event)"
                                 />
                                 <p-text-input v-if="item.name === 'set_labels'"
                                               multi-input
                                               appearance-type="stack"
-                                              :selected.sync="state.labels"
+                                              :selected.sync="formState.labels"
                                               block
                                               @update:selected="handleSelectAction(item.name, $event)"
                                 />
                                 <div v-if="item.name === 'add_additional_info'"
                                      class="flex flex-col gap-3"
                                 >
-                                    <div v-for="(tag, tagIdx) in state.additionalInfoTags"
+                                    <div v-for="(tag, tagIdx) in formState.additionalInfoTags"
                                          :key="`tag-${tagIdx}`"
                                          class="flex gap-2 items-center"
                                     >

@@ -49,6 +49,9 @@ const emit = defineEmits<{(e: 'update:hide-sidebar', value: string): void;
 
 const storeState = reactive({
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
+    showEventRuleFormCard: computed<boolean>(() => serviceDetailPageState.showEventRuleFormCard),
+    isEventRuleEditMode: computed<boolean>(() => serviceDetailPageState.isEventRuleEditMode),
+    eventRuleInfo: computed<EventRuleModel>(() => serviceDetailPageState.eventRuleInfo),
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
     plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
 });
@@ -154,6 +157,16 @@ const state = reactive({
     treeDisplayMap: {} as TreeDisplayMap,
 });
 
+const initSidebar = async () => {
+    if (route.query?.eventRuleId) return;
+    state.selectedTreeId = props.items[0].event_rule_id;
+    const scope = props.items[0].webhook_id || 'global';
+    await updateTreeDisplayMap(scope, true);
+    await replaceUrlQuery({
+        webhookId: scope,
+        eventRuleId: state.selectedTreeId,
+    });
+};
 const updateTreeDisplayMap = (id: string, isOpen: boolean) => {
     const displayMap = { ...state.treeDisplayMap };
     displayMap[id] = { isOpen };
@@ -179,21 +192,21 @@ const handleSearchInput = (value: string) => {
     state.searchValue = value;
 };
 
-watch(() => route.query?.eventRuleId, (eventRuleId) => {
-    if (eventRuleId) {
-        state.selectedTreeId = eventRuleId as string;
+watch([() => storeState.showEventRuleFormCard, () => storeState.isEventRuleEditMode], ([showEventRuleFormCard, isEventRuleEditMode]) => {
+    if (!showEventRuleFormCard && !isEventRuleEditMode) {
+        initSidebar();
     }
 });
-
-watch(() => props.items, async (items) => {
+watch([() => storeState.eventRuleInfo.event_rule_id, () => route.query?.eventRuleId], ([dataId, routeId]) => {
+    state.selectedTreeId = routeId as string;
+    if (routeId && dataId) {
+        const scope = storeState.eventRuleInfo.webhook_id || 'global';
+        updateTreeDisplayMap(scope, true);
+    }
+}, { immediate: true });
+watch(() => props.items, (items) => {
     if (!items.length) return;
-    state.selectedTreeId = items[0].event_rule_id;
-    const webhook = items[0].webhook_id || 'global';
-    await updateTreeDisplayMap(webhook, true);
-    await replaceUrlQuery({
-        webhookId: webhook,
-        eventRuleId: state.selectedTreeId,
-    });
+    initSidebar();
 }, { immediate: true });
 </script>
 

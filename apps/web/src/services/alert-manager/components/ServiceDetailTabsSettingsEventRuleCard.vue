@@ -24,8 +24,6 @@ import type { PluginReferenceMap } from '@/store/reference/plugin-reference-stor
 import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
 import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
-
 import { gray } from '@/styles/colors';
 
 import ServiceDetailTabsSettingsEventRuleDeleteModal
@@ -38,22 +36,17 @@ import { useServiceDetailPageStore } from '@/services/alert-manager/stores/servi
 import type { EventRuleActionsItemValueType, EventRuleActionsItemType } from '@/services/alert-manager/types/alert-manager-type';
 
 interface Props {
-    eventRule?: EventRuleModel;
     loading: boolean;
-    isEditMode: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    eventRule: () => ({} as EventRuleModel),
     loading: true,
-    isEditMode: false,
 });
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
-
-const emit = defineEmits<{(e: 'update:is-edit-mode'): void}>();
+const serviceDetailPageState = serviceDetailPageStore.state;
 
 const storeState = reactive({
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
@@ -61,9 +54,9 @@ const storeState = reactive({
     service: computed<ServiceReferenceMap>(() => allReferenceGetters.service),
     cloudServiceType: computed<CloudServiceTypeReferenceMap>(() => allReferenceGetters.cloudServiceType),
     escalationPolicy: computed<EscalationPolicyReferenceMap>(() => allReferenceGetters.escalationPolicy),
+    eventRuleInfo: computed<EventRuleModel>(() => serviceDetailPageState.eventRuleInfo),
 });
 const state = reactive({
-    proxyIsEditMode: useProxyValue('isEditMode', props, emit),
     actionSetting: getActionSettingI18n(),
     actionSettingType: getActionSettingTypeI18n(),
     actions: computed<EventRuleActionsItemType>(() => {
@@ -80,9 +73,9 @@ const state = reactive({
             'add_additional_info',
         ];
 
-        if (props.eventRule.actions) {
+        if (storeState.eventRuleInfo.actions) {
             actionOrder.forEach((actionKey) => {
-                const actionValue = props.eventRule.actions[actionKey];
+                const actionValue = storeState.eventRuleInfo.actions[actionKey];
                 const setting = state.actionSetting[actionKey];
 
                 if (setting && actionValue) {
@@ -131,14 +124,14 @@ const state = reactive({
 });
 
 const getWebhookIcon = (): string|undefined => {
-    const webhook = storeState.webhook[props.eventRule?.webhook_id]?.data;
+    const webhook = storeState.webhook[storeState.eventRuleInfo?.webhook_id]?.data;
     if (!webhook) return undefined;
     return storeState.plugins[webhook.plugin_info.plugin_id]?.icon || '';
 };
 
 const handleEditEventRule = () => {
     serviceDetailPageStore.setShowEventRuleFormCard(true);
-    state.proxyIsEditMode = true;
+    serviceDetailPageStore.setIsEventRuleEditMode(true);
 };
 const handleDeleteEventRule = () => {
     state.modalVisible = true;
@@ -148,7 +141,7 @@ const handleDeleteEventRule = () => {
 <template>
     <p-data-loader class="service-detail-tabs-settings-event-rule-card"
                    :loading="props.loading"
-                   :data="props.eventRule"
+                   :data="storeState.eventRuleInfo"
     >
         <p-card :header="$t('ALERT_MANAGER.EVENT_RULE.TITLE')">
             <template #header>
@@ -178,7 +171,7 @@ const handleDeleteEventRule = () => {
                             <p-field-group class="input-form"
                                            required
                             >
-                                <span>{{ props.eventRule.name }}</span>
+                                <span>{{ storeState.eventRuleInfo.name }}</span>
                             </p-field-group>
                         </div>
                         <div class="input-form-wrapper">
@@ -190,7 +183,7 @@ const handleDeleteEventRule = () => {
                             <p-field-group class="input-form scope">
                                 <div class="flex items-center gap-1 text-label-md">
                                     <span class="text-label-lg text-gray-500">{{ $t('ALERT_MANAGER.EVENT_RULE.WEBHOOK_SCOPE') }}: </span>
-                                    <p v-if="props.eventRule.scope === EVENT_RULE_SCOPE.GLOBAL"
+                                    <p v-if="storeState.eventRuleInfo.scope === EVENT_RULE_SCOPE.GLOBAL"
                                        class="scope-wrapper"
                                     >
                                         <p-i name="ic_globe-filled"
@@ -209,7 +202,7 @@ const handleDeleteEventRule = () => {
                                                     height="1rem"
                                                     class="icon"
                                         />
-                                        <span>{{ storeState.webhook[props.eventRule.webhook_id]?.label }}</span>
+                                        <span>{{ storeState.webhook[storeState.eventRuleInfo.webhook_id]?.label }}</span>
                                     </p>
                                 </div>
                             </p-field-group>
@@ -218,7 +211,7 @@ const handleDeleteEventRule = () => {
                     </div>
                 </div>
                 <div class="form-wrapper">
-                    <div v-if="props.eventRule.conditions_policy === EVENT_RULE_CONDITIONS_POLICY.ALWAYS"
+                    <div v-if="storeState.eventRuleInfo.conditions_policy === EVENT_RULE_CONDITIONS_POLICY.ALWAYS"
                          class="input-form-wrapper"
                     >
                         <p-field-title :label="$t('ALERT_MANAGER.EVENT_RULE.ALWAYS')"
@@ -237,7 +230,7 @@ const handleDeleteEventRule = () => {
                          class="flex flex-col gap-1"
                     >
                         <div class="input-form-wrapper">
-                            <p-field-title :label="props.eventRule.conditions_policy === EVENT_RULE_CONDITIONS_POLICY.ANY
+                            <p-field-title :label="storeState.eventRuleInfo.conditions_policy === EVENT_RULE_CONDITIONS_POLICY.ANY
                                                ? $t('ALERT_MANAGER.EVENT_RULE.ANY')
                                                : $t('ALERT_MANAGER.EVENT_RULE.ALL')"
                                            size="lg"
@@ -251,7 +244,7 @@ const handleDeleteEventRule = () => {
                             </p-field-group>
                         </div>
                         <div class="border-section">
-                            <div v-for="(condition, idx) in props.eventRule.conditions"
+                            <div v-for="(condition, idx) in storeState.eventRuleInfo.conditions"
                                  :key="`action-${idx}`"
                                  class="action-list"
                             >
@@ -348,7 +341,7 @@ const handleDeleteEventRule = () => {
                                        class="divider"
                             />
                         </div>
-                        <div v-if="props.eventRule.options">
+                        <div v-if="storeState.eventRuleInfo.options">
                             <p-divider v-if="!isEmpty(state.actions)"
                                        class="divider option"
                             />
@@ -363,7 +356,7 @@ const handleDeleteEventRule = () => {
                                 <p>
                                     <span class="text-label-md text-gray-700">{{ $t('ALERT_MANAGER.EVENT_RULE.THEN_STOP_PROCESSING') }}</span>
                                     <span class="text-paragraph-md text-blue-800 ml-2">
-                                        {{ props.eventRule?.options?.stop_processing ? $t('ALERT_MANAGER.EVENT_RULE.TRUE') : $t('ALERT_MANAGER.EVENT_RULE.FALSE') }}
+                                        {{ storeState.eventRuleInfo?.options?.stop_processing ? $t('ALERT_MANAGER.EVENT_RULE.TRUE') : $t('ALERT_MANAGER.EVENT_RULE.FALSE') }}
                                     </span>
                                 </p>
                             </div>
@@ -373,7 +366,6 @@ const handleDeleteEventRule = () => {
             </div>
         </p-card>
         <service-detail-tabs-settings-event-rule-delete-modal v-if="state.modalVisible"
-                                                              :id="props.eventRule.event_rule_id"
                                                               :visible.sync="state.modalVisible"
         />
     </p-data-loader>

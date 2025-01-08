@@ -102,17 +102,3 @@ export type EventRuleActionsUrgencyRadioType = {
     label: TranslateResult;
     name: EventRuleUrgencyType | 'NO_SET';
 };
-export type EventRuleActionsDataType = {
-    // service settings
-    change_service?: string;
-    // asset settings
-    rule?: Record<string, string | number | boolean>;
-    asset_types?: string[];
-    // alert settings
-    change_title?: string;
-    change_urgency?: EventRuleUrgencyType;
-    change_escalation_policy?: string;
-    add_additional_info?: object;
-    change_status?: AlertStatusType;
-    set_labels: string[];
-};
