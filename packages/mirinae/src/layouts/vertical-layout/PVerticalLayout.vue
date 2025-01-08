@@ -171,10 +171,6 @@ documentEventMount('resize', detectWindowResizing);
 onBeforeMount(() => {
     detectWindowResizing();
 });
-
-function test() {
-    state.isHover = !state.isHover;
-}
 </script>
 
 <template>
@@ -193,9 +189,6 @@ function test() {
                     name="sidebar"
                     v-bind="{width: Number(state.width), hide: state.hide, transition: state.transition, height: props.height}"
                 />
-                <button @click="test">
-                    toggle
-                </button>
             </div>
         </div>
         <div class="resizer-container"
