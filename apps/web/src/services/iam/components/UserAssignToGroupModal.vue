@@ -94,8 +94,7 @@ watch([() => userPageGetters.selectedUsers, () => userPageState.users], ([nv_sel
                 <span class="mb-2 text-gray-900 font-bold">
                     {{ $t('IAM.USER.ASSIGN_TO_USER_GROUP.TITLE') }}
                 </span>
-                <user-select-dropdown class="mb-48 h-46"
-                                      :show-user-list="false"
+                <user-select-dropdown :show-user-list="false"
                                       show-user-group-list
                                       appearance-type="stack"
                                       selection-type="multiple"

@@ -89,8 +89,7 @@ const fetchAddUsers = async (params: UserGroupAddUsersParameters) => {
         <template #body>
             <div class="modal-contents">
                 <p>{{ $t('IAM.USER_GROUP.MODAL.ADD_NEW_USER.USER') }}</p>
-                <user-select-dropdown class="mb-48 h-46"
-                                      show-user-list
+                <user-select-dropdown show-user-list
                                       :show-user-group-list="false"
                                       :show-category-title="false"
                                       appearance-type="stack"
