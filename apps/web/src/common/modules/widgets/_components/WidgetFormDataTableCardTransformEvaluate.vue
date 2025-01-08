@@ -67,8 +67,8 @@ const state = reactive({
     globalVariablePopperVisible: false,
     invalid: computed<boolean>(() => {
         if (!state.proxyOperatorOptions.data_table_id) return true;
-        const fieldNames = expressionsInfo.value.map((d) => d.name);
-        if (fieldNames.length !== new Set(fieldNames).size) return true;
+        // const fieldNames = expressionsInfo.value.map((d) => d.name);
+        // if (fieldNames.length !== new Set(fieldNames).size) return true;
         if (!expressionsInfo.value.every((d) => !!d.name && !!d.expression)) return true;
         if (expressionsInfo.value.some((d) => !isFieldNameValid(d.name, storeState.currentDataTable))) return true;
         return false;
