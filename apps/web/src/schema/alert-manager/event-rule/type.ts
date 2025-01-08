@@ -15,7 +15,7 @@ export type EventRuleConditionsType = {
 };
 
 type EventRuleActionsMatchAssetType = {
-    rule?: Record<string, any>;
+    rule?: Record<string, string | number | boolean>;
     asset_types?: string[];
 };
 
@@ -28,7 +28,7 @@ export type EventRuleActionsType = {
     change_title?: string;
     change_urgency?: EventRuleUrgencyType;
     change_escalation_policy?: string;
-    additional_info?: object;
+    add_additional_info?: object;
     change_status?: AlertStatusType;
     set_labels: string[];
 };

@@ -6,6 +6,8 @@ import { PButton, PDataLoader } from '@cloudforet/mirinae';
 import { EVENT_RULE_SCOPE } from '@/schema/alert-manager/event-rule/constant';
 import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
 
+import { replaceUrlQuery } from '@/lib/router-query-string';
+
 import ServiceDetailTabsSettingsEventRuleCard
     from '@/services/alert-manager/components/ServiceDetailTabsSettingsEventRuleCard.vue';
 import ServiceDetailTabsSettingsEventRuleFormCard
@@ -36,6 +38,13 @@ const handleClickAddRule = () => {
     serviceDetailPageStore.setEventRuleScopeModalVisible(true);
 };
 
+watch(() => storeState.items, (items) => {
+    if (!items.length) return;
+    replaceUrlQuery({
+        webhookId: items[0].webhook_id || 'global',
+        eventRuleId: items[0].event_rule_id,
+    });
+});
 watch(() => storeState.serviceId, async (id) => {
     if (!id) return;
     try {
@@ -54,9 +63,8 @@ watch(() => storeState.serviceId, async (id) => {
         <p-data-loader :loading="state.loading"
                        :data="!storeState.showEventRuleFormCard ? storeState.items : true"
         >
-            <div class="flex gap-1">
-                <service-detail-tabs-settings-event-rule-sidebar v-if="storeState.items.length > 0"
-                                                                 :hide-sidebar.sync="state.hideSidebar"
+            <div class="content-wrapper flex gap-1">
+                <service-detail-tabs-settings-event-rule-sidebar :hide-sidebar.sync="state.hideSidebar"
                                                                  :items="storeState.items"
                 />
                 <service-detail-tabs-settings-event-rule-form-card v-if="storeState.showEventRuleFormCard"
@@ -92,3 +100,11 @@ watch(() => storeState.serviceId, async (id) => {
         />
     </div>
 </template>
+
+<style scoped lang="postcss">
+.service-detail-tabs-settings-event-rule {
+    .content-wrapper {
+        align-items: flex-start;
+    }
+}
+</style>

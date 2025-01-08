@@ -83,7 +83,7 @@ const state = reactive({
             stop_processing: state.stopProcessing,
         },
         service_id: storeState.serviceId,
-        webhook_id: props.selectedWebhook,
+        webhook_id: props.selectedScope === EVENT_RULE_SCOPE.GLOBAL ? undefined : props.selectedWebhook,
     })),
 });
 

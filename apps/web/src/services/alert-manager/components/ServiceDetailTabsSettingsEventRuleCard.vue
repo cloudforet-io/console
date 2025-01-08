@@ -44,23 +44,25 @@ const state = reactive({
     actions: computed<EventRuleActionsItemType>(() => {
         const result = {} as EventRuleActionsItemType;
 
-        Object.entries(state.eventRule.actions).forEach(([actionKey, actionValue]) => {
-            const setting = state.actionSetting[actionKey];
+        if (state.eventRule.actions) {
+            Object.entries(state.eventRule.actions).forEach(([actionKey, actionValue]) => {
+                const setting = state.actionSetting[actionKey];
 
-            if (setting && actionValue) {
-                const { type, label, name } = setting;
+                if (setting && actionValue) {
+                    const { type, label, name } = setting;
 
-                if (!result[type]) {
-                    result[type] = [] as EventRuleActionsItemValueType[];
+                    if (!result[type]) {
+                        result[type] = [] as EventRuleActionsItemValueType[];
+                    }
+
+                    result[type].push({
+                        label,
+                        name,
+                        value: actionValue,
+                    });
                 }
-
-                result[type].push({
-                    label,
-                    name,
-                    value: actionValue,
-                });
-            }
-        });
+            });
+        }
 
         return result;
     }),

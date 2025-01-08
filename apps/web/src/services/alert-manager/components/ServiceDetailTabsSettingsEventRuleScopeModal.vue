@@ -100,6 +100,7 @@ const handleClickConfirm = () => {
 onMounted(() => {
     if (props.visible) {
         state.proxySelectedWebhook = '';
+        state.proxySelectedScope = EVENT_RULE_SCOPE.GLOBAL;
     }
 });
 </script>

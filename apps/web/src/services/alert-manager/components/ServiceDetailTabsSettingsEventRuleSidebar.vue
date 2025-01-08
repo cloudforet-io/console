@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
-import { computed, onMounted, reactive } from 'vue';
+import {
+    computed, reactive, watch,
+} from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import {
     PPaneLayout, PI, PSearch, PTreeView, PLazyImg, screens,
@@ -38,6 +41,8 @@ const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 
 const { width } = useWindowSize();
+
+const route = useRoute();
 
 const emit = defineEmits<{(e: 'update:hide-sidebar', value: string): void;
 }>();
@@ -158,6 +163,8 @@ const updateTreeDisplayMap = (id: string, isOpen: boolean) => {
 const handleClickItem = (value: TreeNode) => {
     if (value.depth === 0) {
         updateTreeDisplayMap(value.id, !state.treeDisplayMap[value.id].isOpen);
+    } else {
+        state.selectedTreeId = value.id;
     }
 };
 const getWebhookIcon = (id: string): string|undefined => {
@@ -172,15 +179,22 @@ const handleSearchInput = (value: string) => {
     state.searchValue = value;
 };
 
-onMounted(async () => {
-    state.selectedTreeId = props.items[0].event_rule_id;
-    const webhook = props.items[0].webhook_id || 'global';
+watch(() => route.query?.eventRuleId, (eventRuleId) => {
+    if (eventRuleId) {
+        state.selectedTreeId = eventRuleId as string;
+    }
+});
+
+watch(() => props.items, async (items) => {
+    if (!items.length) return;
+    state.selectedTreeId = items[0].event_rule_id;
+    const webhook = items[0].webhook_id || 'global';
     await updateTreeDisplayMap(webhook, true);
     await replaceUrlQuery({
         webhookId: webhook,
         eventRuleId: state.selectedTreeId,
     });
-});
+}, { immediate: true });
 </script>
 
 <template>
@@ -199,7 +213,8 @@ onMounted(async () => {
                           :value="state.searchValue"
                           @update:value="handleSearchInput"
                 />
-                <p-tree-view :tree-data="state.treeList"
+                <p-tree-view v-if="state.treeList.length > 0"
+                             :tree-data="state.treeList"
                              :tree-display-map="state.treeDisplayMap"
                              :selected-id="state.selectedTreeId"
                              @click-item="handleClickItem"
@@ -230,6 +245,11 @@ onMounted(async () => {
                         </div>
                     </template>
                 </p-tree-view>
+                <span v-else
+                      class="text-label-md text-gray-500"
+                >
+                    {{ $t('ALERT_MANAGER.EVENT_RULE.NO_DATA_TITLE') }}
+                </span>
             </div>
         </p-pane-layout>
         <div v-if="state.isMobileSize"
@@ -248,6 +268,7 @@ onMounted(async () => {
 <style scoped lang="postcss">
 .service-detail-tabs-settings-event-rule-side-bar {
     @apply flex;
+    min-height: 23.125rem;
     .sidebar {
         width: 15rem;
         min-height: 23.125rem;
