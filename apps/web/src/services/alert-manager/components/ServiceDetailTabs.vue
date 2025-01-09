@@ -15,13 +15,13 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import AlertsManagementTable from '@/services/alert-manager/components/AlertsManagementTable.vue';
 import ServiceDetailTabsNotifications from '@/services/alert-manager/components/ServiceDetailTabsNotifications.vue';
-import ServiceDetailTabsNotificationsDetailTabs
-    from '@/services/alert-manager/components/ServiceDetailTabsNotificationsDetailTabs.vue';
+import ServiceDetailTabsNotificationsDetail
+    from '@/services/alert-manager/components/ServiceDetailTabsNotificationsDetail.vue';
 import ServiceDetailTabsOverview from '@/services/alert-manager/components/ServiceDetailTabsOverview.vue';
 import ServiceDetailTabsSettingsContainer from '@/services/alert-manager/components/ServiceDetailTabsSettingsContainer.vue';
 import ServiceDetailTabsWebhook from '@/services/alert-manager/components/ServiceDetailTabsWebhook.vue';
-import ServiceDetailTabsWebhookDetailTabs
-    from '@/services/alert-manager/components/ServiceDetailTabsWebhookDetailTabs.vue';
+import ServiceDetailTabsWebhookDetail
+    from '@/services/alert-manager/components/ServiceDetailTabsWebhookDetail.vue';
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/constants/common-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
 import type { ServiceDetailTabsType } from '@/services/alert-manager/types/alert-manager-type';
@@ -95,8 +95,8 @@ watch(() => tabState.activeTab, (activeTab) => {
                     </p-tab>
                 </template>
             </p-horizontal-layout>
-            <service-detail-tabs-webhook-detail-tabs v-if="tabState.activeTab === SERVICE_DETAIL_TABS.WEBHOOK && storeState.selectedWebhookId" />
-            <service-detail-tabs-notifications-detail-tabs v-else-if="tabState.activeTab === SERVICE_DETAIL_TABS.NOTIFICATIONS && storeState.selectedNotificationId" />
+            <service-detail-tabs-webhook-detail v-if="tabState.activeTab === SERVICE_DETAIL_TABS.WEBHOOK && storeState.selectedWebhookId" />
+            <service-detail-tabs-notifications-detail v-else-if="tabState.activeTab === SERVICE_DETAIL_TABS.NOTIFICATIONS && storeState.selectedNotificationId" />
         </div>
         <p-tab v-else
                :key="i18n.locale"

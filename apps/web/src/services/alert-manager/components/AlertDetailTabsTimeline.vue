@@ -11,9 +11,9 @@ import {
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { AlertHistoryParameters } from '@/schema/alert-manager/alert/api-verbs/history';
-import { ALERT_EVENT_ACTION } from '@/schema/alert-manager/alert/constants';
-import type { AlertModel, AlertEventModel } from '@/schema/alert-manager/alert/model';
-import type { AlertEventActionType } from '@/schema/alert-manager/alert/type';
+import { ALERT_HISTORY_ACTION } from '@/schema/alert-manager/alert/constants';
+import type { AlertModel, AlertHistoryModel } from '@/schema/alert-manager/alert/model';
+import type { AlertHistoryActionType } from '@/schema/alert-manager/alert/type';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -46,8 +46,8 @@ const storeState = reactive({
 });
 const state = reactive({
     loading: true,
-    historyList: [] as AlertEventModel[],
-    slicedHistoryList: computed<AlertEventModel[]>(() => {
+    historyList: [] as AlertHistoryModel[],
+    slicedHistoryList: computed<AlertHistoryModel[]>(() => {
         let _list = state.historyList;
         if (filterState.searchText) {
             _list = state.historyList.filter((item) => item.description.toLowerCase().includes(filterState.searchText.toLowerCase()));
@@ -68,11 +68,11 @@ const state = reactive({
 const filterState = reactive({
     statusFields: computed<AlertFilterType[]>(() => ([
         { label: i18n.t('ALERT_MANAGER.ALERTS.ALL'), name: 'ALL' },
-        { label: i18n.t('ALERT_MANAGER.ALERTS.TRIGGERED'), name: ALERT_EVENT_ACTION.TRIGGERED },
-        { label: i18n.t('ALERT_MANAGER.ALERTS.ACKNOWLEDGED'), name: ALERT_EVENT_ACTION.ACKNOWLEDGED },
-        { label: i18n.t('ALERT_MANAGER.ALERTS.RESOLVED'), name: ALERT_EVENT_ACTION.RESOLVED },
-        { label: i18n.t('ALERT_MANAGER.ALERTS.NOTIFIED'), name: ALERT_EVENT_ACTION.NOTIFIED },
-        { label: i18n.t('ALERT_MANAGER.ALERTS.EVENT_PUSHED'), name: ALERT_EVENT_ACTION.EVENT_PUSHED },
+        { label: i18n.t('ALERT_MANAGER.ALERTS.TRIGGERED'), name: ALERT_HISTORY_ACTION.TRIGGERED },
+        { label: i18n.t('ALERT_MANAGER.ALERTS.ACKNOWLEDGED'), name: ALERT_HISTORY_ACTION.ACKNOWLEDGED },
+        { label: i18n.t('ALERT_MANAGER.ALERTS.RESOLVED'), name: ALERT_HISTORY_ACTION.RESOLVED },
+        { label: i18n.t('ALERT_MANAGER.ALERTS.NOTIFIED'), name: ALERT_HISTORY_ACTION.NOTIFIED },
+        { label: i18n.t('ALERT_MANAGER.ALERTS.EVENT_PUSHED'), name: ALERT_HISTORY_ACTION.EVENT_PUSHED },
     ])),
     selectedAction: 'ALL',
     searchText: '',
@@ -84,13 +84,13 @@ const getCreatedByNames = (createdBy: string): string => {
     }
     return createdBy;
 };
-const getItemInfo = (item: AlertEventActionType): HistoryItemInfo => {
+const getItemInfo = (item: AlertHistoryActionType): HistoryItemInfo => {
     let styleType: string|undefined;
-    if (item === ALERT_EVENT_ACTION.TRIGGERED) styleType = 'red';
-    if (item === ALERT_EVENT_ACTION.ACKNOWLEDGED) styleType = 'violet';
-    if (item === ALERT_EVENT_ACTION.RESOLVED) styleType = 'green';
-    if (item === ALERT_EVENT_ACTION.NOTIFIED) styleType = 'yellow';
-    if (item === ALERT_EVENT_ACTION.EVENT_PUSHED) styleType = 'gray';
+    if (item === ALERT_HISTORY_ACTION.TRIGGERED) styleType = 'red';
+    if (item === ALERT_HISTORY_ACTION.ACKNOWLEDGED) styleType = 'violet';
+    if (item === ALERT_HISTORY_ACTION.RESOLVED) styleType = 'green';
+    if (item === ALERT_HISTORY_ACTION.NOTIFIED) styleType = 'yellow';
+    if (item === ALERT_HISTORY_ACTION.EVENT_PUSHED) styleType = 'gray';
     return {
         title: item.toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase()),
         styleType,
@@ -100,7 +100,7 @@ const getItemInfo = (item: AlertEventActionType): HistoryItemInfo => {
 const handleCloseModal = () => {
     state.modalVisible = false;
 };
-const handleClickHistoryItem = (item: AlertEventModel) => {
+const handleClickHistoryItem = (item: AlertHistoryModel) => {
     state.modalVisible = true;
     state.selectedItem = item;
 };
@@ -124,7 +124,7 @@ const handleClickCopy = () => {
 const fetchHistoryList = async () => {
     state.loading = true;
     try {
-        const { results } = await SpaceConnector.clientV2.alertManager.alert.history<AlertHistoryParameters, ListResponse<AlertEventModel>>({
+        const { results } = await SpaceConnector.clientV2.alertManager.alert.history<AlertHistoryParameters, ListResponse<AlertHistoryModel>>({
             alert_id: storeState.alertInfo.alert_id,
         });
         state.historyList = results || [];
@@ -195,7 +195,7 @@ watch(() => storeState.alertInfo, async (alertInfo) => {
                                 {{ $t('ALERT_MANAGER.ALERTS.CREATED_BY', { user: getCreatedByNames(item.created_by) }) }}
                             </span>
                         </template>
-                        <p-text-button v-if="item.action === ALERT_EVENT_ACTION.EVENT_PUSHED"
+                        <p-text-button v-if="item.action === ALERT_HISTORY_ACTION.EVENT_PUSHED"
                                        style-type="highlight"
                                        size="md"
                                        @click="handleClickHistoryItem(item)"

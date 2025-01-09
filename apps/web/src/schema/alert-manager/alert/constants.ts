@@ -22,7 +22,7 @@ export const ALERT_TRIGGERED_TYPE = {
     WEBHOOK: 'WEBHOOK',
 } as const;
 
-export const ALERT_EVENT_ACTION = {
+export const ALERT_HISTORY_ACTION = {
     TRIGGERED: 'TRIGGERED',
     ACKNOWLEDGED: 'ACKNOWLEDGED',
     RESOLVED: 'RESOLVED',
