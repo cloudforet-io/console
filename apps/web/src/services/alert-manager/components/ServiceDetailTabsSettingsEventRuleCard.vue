@@ -24,6 +24,8 @@ import type { PluginReferenceMap } from '@/store/reference/plugin-reference-stor
 import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
 import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
+
 import { gray } from '@/styles/colors';
 
 import ServiceDetailTabsSettingsEventRuleDeleteModal
@@ -47,6 +49,8 @@ const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
+
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const storeState = reactive({
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
@@ -73,7 +77,6 @@ const state = reactive({
             'add_additional_info',
         ];
 
-        console.log(storeState.eventRuleInfo);
         if (storeState.eventRuleInfo.actions) {
             actionOrder.forEach((actionKey) => {
                 const actionValue = storeState.eventRuleInfo.actions[actionKey];
@@ -153,7 +156,9 @@ const handleDeleteEventRule = () => {
             <template #header>
                 <div class="flex items-center justify-between">
                     <span class="font-bold">{{ $t('ALERT_MANAGER.EVENT_RULE.TITLE') }}</span>
-                    <div class="flex items-center gap-2">
+                    <div v-if="hasReadWriteAccess"
+                         class="flex items-center gap-2"
+                    >
                         <p-icon-button name="ic_edit"
                                        style-type="transparent"
                                        @click="handleEditEventRule"

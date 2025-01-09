@@ -127,7 +127,7 @@ const handleClickEditButton = (type: ServiceDetailSettingCardType) => {
                     <div class="py-3 px-0.5">
                         <div class="flex items-center justify-between mb-6">
                             <span class="text-label-xl">{{ item.title }}</span>
-                            <p-icon-button v-if="hasReadWriteAccess"
+                            <p-icon-button v-if="hasReadWriteAccess || (!hasReadWriteAccess && item.type === SERVICE_SETTING_CARD.EVENT_RULE)"
                                            name="ic_edit"
                                            width="2rem"
                                            height="2rem"

@@ -28,6 +28,7 @@ import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-servi
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import TagsOverlay from '@/common/modules/tags/tags-panel/modules/TagsOverlay.vue';
 import { sortTableItems } from '@/common/utils/table-sort';
 
@@ -45,6 +46,8 @@ const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
+
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const storeState = reactive({
     cloudServiceTypeInfo: computed<CloudServiceTypeReferenceMap>(() => allReferenceGetters.cloudServiceType),
@@ -292,7 +295,9 @@ watch(() => storeState.selectedWebhookId, async () => {
                                    heading-type="sub"
                         />
                     </template>
-                    <template #extra>
+                    <template v-if="hasReadWriteAccess"
+                              #extra
+                    >
                         <p-button style-type="secondary"
                                   icon-left="ic_edit"
                                   @click="handleEditMessageFormat(true)"
