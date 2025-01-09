@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import {
-    computed, reactive,
+    computed, reactive, watch,
 } from 'vue';
 
 import { cloneDeep, map } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PStatus, PButtonModal, PDataTable,
+    PStatus, PButtonModal, PDataTable, PBadge,
 } from '@cloudforet/mirinae';
 
 import type { RoleBindingDeleteParameters } from '@/schema/identity/role-binding/api-verbs/delete';
@@ -16,6 +16,9 @@ import type { UserDisableParameters } from '@/schema/identity/user/api-verbs/dis
 import type { UserEnableParameters } from '@/schema/identity/user/api-verbs/enable';
 import { i18n } from '@/translations';
 
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -23,13 +26,22 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useRoleFormatter, userStateFormatter } from '@/services/iam/composables/refined-table-data';
 import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
+import type { UserListItemType } from '@/services/iam/types/user-type';
 
 
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
 const userPageGetters = userPageStore.getters;
 
+const allReferenceStore = useAllReferenceStore();
+const allReferenceGetters = allReferenceStore.getters;
+
 const emit = defineEmits<{(e: 'confirm'): void; }>();
+
+const storeState = reactive({
+    serviceList: computed<ServiceReferenceMap>(() => allReferenceGetters.service),
+    selectedUsers: computed(() => userPageGetters.selectedUsers),
+});
 
 const state = reactive({
     loading: false,
@@ -38,6 +50,8 @@ const state = reactive({
             { name: 'user_id', label: 'User ID' },
             { name: 'name', label: 'Name' },
             { name: 'state', label: 'State' },
+            { name: 'service', label: 'Service' },
+            { name: 'user_group', label: 'User Group' },
         ];
         return userPageState.isAdminMode ? [
             ...baseField,
@@ -48,13 +62,16 @@ const state = reactive({
         ];
     }),
     isRemoveOnlyWorkspace: computed(() => userPageState.modal.visible === 'removeOnlyWorkspace'),
+    filteredServices: undefined,
+    filteredItems: [],
+    filteredUniqueItems: [],
 });
 
 /* Component */
 const checkModalConfirm = async () => {
     let responses: boolean[] = [];
     let languagePrefix = 'DELETE';
-    const items = state.isRemoveOnlyWorkspace ? userPageGetters.selectedOnlyWorkspaceUsers : userPageGetters.selectedUsers;
+    const items = state.isRemoveOnlyWorkspace ? userPageGetters.selectedOnlyWorkspaceUsers : state.filteredUniqueItems;
     state.loading = true;
 
     try {
@@ -90,6 +107,7 @@ const checkModalConfirm = async () => {
     }
 };
 const handleClose = () => {
+    state.filteredItems = [];
     userPageStore.$patch((_state) => {
         _state.state.modal.visible = undefined;
         _state.state.modal = cloneDeep(_state.state.modal);
@@ -142,6 +160,42 @@ const disableUser = async (userId?: string): Promise<boolean> => {
         return false;
     }
 };
+
+/* Watcher */
+watch([() => storeState.serviceList, () => storeState.selectedUsers], ([nv_service_list, nv_selected_users]) => {
+    if (nv_service_list) {
+        const list: UserListItemType[] | (UserListItemType & { service: string; })[] = [];
+        nv_selected_users.forEach((selectedUser) => {
+            Object.values(nv_service_list).forEach((service) => {
+                if (service && service.data && service.data.members) {
+                    if (Object.keys(service.data.members).includes('USER')) {
+                        if (selectedUser.user_id && service.data.members.USER.includes(selectedUser.user_id)) {
+                            list.push({
+                                ...selectedUser,
+                                service: service.label,
+                            });
+                        }
+                    } else {
+                        list.push(selectedUser);
+                    }
+                }
+            });
+            list.push(selectedUser);
+        });
+        if (list.length > 0) {
+            state.filteredUniqueItems = Object.values(list.reduce((acc, cur) => {
+                if (!acc[cur.user_id]) {
+                    const { user_id, ...rest } = cur;
+                    acc[cur.user_id] = { user_id, service: [], ...rest };
+                }
+                if (cur.service !== undefined) {
+                    acc[cur.user_id].service.push(cur.service);
+                }
+                return acc;
+            }, {}));
+        }
+    }
+}, { deep: true, immediate: true });
 </script>
 
 <template>
@@ -149,7 +203,7 @@ const disableUser = async (userId?: string): Promise<boolean> => {
                     :header-title="userPageState.modal.title"
                     :theme-color="userPageState.modal.themeColor"
                     :loading="state.loading"
-                    modal-size="md"
+                    size="md"
                     @confirm="checkModalConfirm"
                     @close="handleClose"
                     @cancel="handleClose"
@@ -157,12 +211,57 @@ const disableUser = async (userId?: string): Promise<boolean> => {
         <template #body>
             <p-data-table
                 :fields="state.fields"
-                :items="state.isRemoveOnlyWorkspace ? userPageGetters.selectedOnlyWorkspaceUsers : userPageGetters.selectedUsers"
+                :items="state.isRemoveOnlyWorkspace ? userPageGetters.selectedOnlyWorkspaceUsers : state.filteredUniqueItems"
             >
                 <template #col-state-format="{value}">
                     <p-status v-bind="userStateFormatter(value)"
                               class="capitalize"
                     />
+                </template>
+                <template #col-service-format="{value}">
+                    <div v-if="value.length > 0">
+                        <span v-for="(service, i) in value"
+                              :key="i"
+                              class="mr-2"
+                        >
+                            <p-badge v-if="i < 3"
+                                     badge-type="gray200"
+                                     shape="square"
+                            >
+                                {{ service }}
+                            </p-badge>
+                            <p-badge v-else-if="i >= 3"
+                                     badge-type="blue300"
+                                     shape="round"
+                            >
+
+                                + {{ value.length - i }}
+                            </p-badge>
+                        </span>
+                    </div>
+                    <div v-else />
+                </template>
+                <template #col-user_group-format="{value}">
+                    <div v-if="value.length > 0">
+                        <span v-for="(userGroup, i) in value"
+                              :key="i"
+                              class="mr-2"
+                        >
+                            <p-badge v-if="i < 3"
+                                     badge-type="gray200"
+                                     shape="square"
+                            >
+                                {{ userGroup.name }}
+                            </p-badge>
+                            <p-badge v-else-if="i >= 3"
+                                     badge-type="blue300"
+                                     shape="round"
+                            >
+                                + {{ value.length - i }}
+                            </p-badge>
+                        </span>
+                    </div>
+                    <div v-else />
                 </template>
                 <template #col-role_id-format="{value}">
                     <span v-if="!value">--</span>

@@ -260,10 +260,12 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
                     </p-radio-group>
                 </p-field-group>
                 <p-field-group :label="$t('OPSFLOW.ASSIGNEE_POOL')">
-                    <user-select-dropdown :selected-user-ids="assigneePool"
+                    <user-select-dropdown :selected-ids="assigneePool"
+                                          appearance-type="stack"
+                                          :show-user-group-list="false"
                                           selection-type="multiple"
                                           block
-                                          @update:user-ids="setForm('assigneePool', $event)"
+                                          @update:selected-ids="setForm('assigneePool', $event)"
                     />
                 </p-field-group>
                 <p-field-group :label="$t('OPSFLOW.DESCRIPTION')">

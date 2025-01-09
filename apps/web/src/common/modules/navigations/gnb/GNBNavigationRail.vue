@@ -31,7 +31,7 @@ import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 interface GNBMenuType extends DisplayMenu {
-    type: string;
+    type?: string;
     name?: string;
     disabled?: boolean;
 }
@@ -70,7 +70,7 @@ const state = reactive({
         const allMenuList = displayStore.getAllMenuList(route);
         const menuList = allMenuList.filter((d) => !d.hideOnGNB);
         if (state.isInit && isEmpty(storeState.costDataSource)) {
-            results = refinedMenuList(menuList, MENU_ID.COST_EXPLORER);
+            results = removeCostExplorerFromMenuList(menuList);
         } else results = menuList;
         return results;
     }),
@@ -128,14 +128,14 @@ const convertGNBMenuToMenuItem = (menuList: DisplayMenu[], menuType: ContextMenu
     });
     return results;
 };
-const refinedMenuList = (list, value) => {
-    const index = list.findIndex((d) => d.id === value);
+const removeCostExplorerFromMenuList = (list: GNBMenuType[]) => {
+    const index = list.findIndex((d) => d.id === MENU_ID.COST_EXPLORER);
     if (index !== -1) {
         const item = list.splice(index, 1)[0];
         list.push({
             ...item,
             disabled: true,
-            subMenuList: [{}],
+            subMenuList: [],
         });
     }
     return list;

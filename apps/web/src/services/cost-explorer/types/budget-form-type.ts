@@ -1,3 +1,5 @@
+import type { TranslateResult } from 'vue-i18n';
+
 import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 
 
@@ -20,3 +22,8 @@ export interface BudgetAmountPlanInfo {
     start: BudgetModel['start'];
     end: BudgetModel['end'];
 }
+
+export type BudgetNotificationsTargetType = {
+    label: TranslateResult,
+    name: 'ALL' | 'USER_GROUP' | 'USER'
+};

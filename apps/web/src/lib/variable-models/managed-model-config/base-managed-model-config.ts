@@ -21,12 +21,13 @@ import RegionVariableModel from '@/lib/variable-models/managed-model/resource-mo
 import RoleVariableModel from '@/lib/variable-models/managed-model/resource-model/role-variable-model';
 import SecretVariableModel from '@/lib/variable-models/managed-model/resource-model/secret-variable-model';
 import ServiceAccountVariableModel from '@/lib/variable-models/managed-model/resource-model/service-account-variable-model';
+import ServiceVariableModel from '@/lib/variable-models/managed-model/resource-model/service-variable-model';
 import UnifiedCostVariableModel from '@/lib/variable-models/managed-model/resource-model/unified-cost-variable-model';
+import UserGroupVariableModel from '@/lib/variable-models/managed-model/resource-model/user-group-variable-model';
 import UserVariableModel from '@/lib/variable-models/managed-model/resource-model/user-variable-model';
 import WebhookVariableModel from '@/lib/variable-models/managed-model/resource-model/webhook-variable-model';
 import WorkspaceGroupVariableModel from '@/lib/variable-models/managed-model/resource-model/workspace-group-variable-model';
 import WorkspaceVariableModel from '@/lib/variable-models/managed-model/resource-model/workspace-variable-model';
-
 
 export const ENUM_VARIABLE_MODELS = {
     granularity: GranularityVariableModel,
@@ -47,6 +48,7 @@ const RESOURCE_VARIABLE_MODELS = {
     secret: SecretVariableModel,
     service_account: ServiceAccountVariableModel,
     user: UserVariableModel,
+    user_group: UserGroupVariableModel,
     webhook: WebhookVariableModel,
     workspace: WorkspaceVariableModel,
     workspace_group: WorkspaceGroupVariableModel,
@@ -54,6 +56,7 @@ const RESOURCE_VARIABLE_MODELS = {
     unified_cost: UnifiedCostVariableModel,
     metric_data: MetricDataVariableModel,
     role: RoleVariableModel,
+    service: ServiceVariableModel,
 } as const;
 const CUSTOM_RESOURCE_VARIABLE_MODELS = {
     cost_additional_info_key: CostAdditionalInfoKeyVariableModel,

@@ -33,7 +33,11 @@ const state = reactive({
     pageStart: 1,
     isLaptopSize: computed<boolean>(() => width.value < screens.laptop.max),
     starredServiceItem: computed<StarredServiceItem[]>(() => (state.isLaptopSize ? STARRED_SERVICE_ITEMS.slice(0, 2) : STARRED_SERVICE_ITEMS)),
-    slicedFavoriteMenuList: computed<FavoriteItem[]>(() => storeState.favoriteMenuList.slice((state.pageStart - 1) * 10, state.pageStart * 10)),
+    excludedCloudServiceTypeFavoriteMenuList: computed<FavoriteItem[]>(() => storeState.favoriteMenuList.filter(
+        (item) => (FAVORITE_TYPE.CLOUD_SERVICE !== item.itemType && FAVORITE_TYPE.SECURITY !== item.itemType),
+    )),
+    slicedFavoriteMenuList: computed<FavoriteItem[]>(() => state.excludedCloudServiceTypeFavoriteMenuList.slice((state.pageStart - 1) * 10, state.pageStart * 10)),
+    isFavoriteMenuListExist: computed<boolean>(() => state.excludedCloudServiceTypeFavoriteMenuList.length > 0),
 });
 const dropdownState = reactive({
     dropdownMenuList: computed<SelectDropdownMenuItem[]>(() => {
@@ -55,19 +59,14 @@ const dropdownState = reactive({
                 name: FAVORITE_TYPE.PROJECT, label: i18n.t('MENU.PROJECT'), type: CONTEXT_MENU_TYPE.item,
             });
         }
-        if (favoriteGetters.cloudServiceItems.length) {
-            results.push({
-                name: FAVORITE_TYPE.CLOUD_SERVICE, label: i18n.t('MENU.ASSET_INVENTORY_CLOUD_SERVICE'), type: CONTEXT_MENU_TYPE.item,
-            });
-        }
-        if (favoriteGetters.securityItems.length) {
-            results.push({
-                name: FAVORITE_TYPE.SECURITY, label: i18n.t('MENU.ASSET_INVENTORY_SECURITY'), type: CONTEXT_MENU_TYPE.item,
-            });
-        }
         if (favoriteGetters.costAnalysisItems.length) {
             results.push({
                 name: FAVORITE_TYPE.COST_ANALYSIS, label: i18n.t('MENU.COST_EXPLORER_COST_ANALYSIS'), type: CONTEXT_MENU_TYPE.item,
+            });
+        }
+        if (favoriteGetters.serviceItems.length) {
+            results.push({
+                name: FAVORITE_TYPE.SERVICE, label: i18n.t('MENU.ALERT_MANAGER_SERVICE'), type: CONTEXT_MENU_TYPE.item,
             });
         }
         return results;
@@ -106,7 +105,7 @@ watch(() => dropdownState.selectedItem, async (selectedItem) => {
                 />
             </div>
         </div>
-        <div v-if="storeState.favoriteMenuList.length > 0"
+        <div v-if="state.isFavoriteMenuListExist"
              class="suggestion-list-wrapper"
         >
             <user-configs-item v-for="(item) in state.slicedFavoriteMenuList"

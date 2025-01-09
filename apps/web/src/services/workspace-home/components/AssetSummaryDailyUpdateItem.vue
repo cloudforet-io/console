@@ -12,7 +12,7 @@ import type { PageAccessMap } from '@/lib/access-control/config';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { MENU_ID } from '@/lib/menu/config';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import type { CloudServiceData } from '@/services/workspace-home/types/workspace-home-type';
 
 
@@ -54,7 +54,7 @@ const state = reactive({
         createdCount: props.item.created_count,
         deletedCount: props.item.deleted_count,
         createdHref: {
-            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+            name: ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL._NAME,
             params: {
                 metricId: 'metric-managed-created-count',
                 groupBy: props.item.provider,
@@ -63,7 +63,7 @@ const state = reactive({
             },
         },
         deletedHref: {
-            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+            name: ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL._NAME,
             params: {
                 metricId: 'metric-managed-deleted-count',
                 groupBy: props.item.provider,

@@ -44,7 +44,8 @@ const state = reactive({
     noteInput: '',
     noteList: [] as NoteModel[],
     loading: true,
-    timezone: computed<string|undefined>(() => userStore.state.timezone),
+    timezone: computed(() => userStore.state.timezone),
+    userId: computed(() => userStore.state.userId),
     menuItems: computed(() => [
         {
             label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE_TAB.DELETE'), name: 'delete',

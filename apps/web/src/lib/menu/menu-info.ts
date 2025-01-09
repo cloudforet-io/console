@@ -2,8 +2,9 @@ import type { MenuId, MenuInfo } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
 import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
+import { ALERT_MANAGER_ROUTE_V1 } from '@/services/alert-manager-v1/routes/route-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
@@ -35,43 +36,43 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
     },
     [MENU_ID.ASSET_INVENTORY]: {
         menuId: MENU_ID.ASSET_INVENTORY,
-        routeName: ASSET_INVENTORY_ROUTE._NAME,
+        routeName: ASSET_INVENTORY_ROUTE_V1._NAME,
         translationId: 'MENU.ASSET_INVENTORY',
         icon: 'ic_service_asset-inventory',
     },
     [MENU_ID.CLOUD_SERVICE]: {
         menuId: MENU_ID.CLOUD_SERVICE,
-        routeName: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
+        routeName: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE._NAME,
         translationId: 'MENU.ASSET_INVENTORY_CLOUD_SERVICE',
         icon: 'ic_service_cloud-service',
     },
     [MENU_ID.SERVER]: {
         menuId: MENU_ID.SERVER,
-        routeName: ASSET_INVENTORY_ROUTE.SERVER._NAME,
+        routeName: ASSET_INVENTORY_ROUTE_V1.SERVER._NAME,
         translationId: 'MENU.ASSET_INVENTORY_SERVER',
         icon: 'ic_service_server',
     },
     [MENU_ID.SECURITY]: {
         menuId: MENU_ID.SECURITY,
-        routeName: ASSET_INVENTORY_ROUTE.SECURITY._NAME,
+        routeName: ASSET_INVENTORY_ROUTE_V1.SECURITY._NAME,
         translationId: 'MENU.ASSET_INVENTORY_SECURITY',
         icon: 'ic_service_security',
     },
     [MENU_ID.METRIC_EXPLORER]: {
         menuId: MENU_ID.METRIC_EXPLORER,
-        routeName: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER._NAME,
+        routeName: ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER._NAME,
         translationId: 'MENU.ASSET_INVENTORY_METRIC_EXPLORER',
         icon: 'ic_service_metric-explorer',
     },
     [MENU_ID.COLLECTOR]: {
         menuId: MENU_ID.COLLECTOR,
-        routeName: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME,
+        routeName: ASSET_INVENTORY_ROUTE_V1.COLLECTOR._NAME,
         translationId: 'MENU.ASSET_INVENTORY_COLLECTOR',
         icon: 'ic_service_collector',
     },
     [MENU_ID.SERVICE_ACCOUNT]: {
         menuId: MENU_ID.SERVICE_ACCOUNT,
-        routeName: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
+        routeName: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT._NAME,
         translationId: 'MENU.ASSET_INVENTORY_SERVICE_ACCOUNT',
         icon: 'ic_service_service-account',
     },
@@ -123,29 +124,37 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         translationId: 'COST_EXPLORER.CURRENCY_CONVERTER',
         highlightTag: 'new',
     },
+    // NOTE: v1 menu
+    [MENU_ID.ALERT_MANAGER_DASHBOARD]: {
+        menuId: MENU_ID.ALERT_MANAGER_DASHBOARD,
+        routeName: ALERT_MANAGER_ROUTE_V1.DASHBOARD._NAME,
+        translationId: 'MENU.ALERT_MANAGER_DASHBOARD',
+        icon: 'ic_service_alert-dashboard',
+    },
+    // NOTE: v1 menu
+    [MENU_ID.ESCALATION_POLICY]: {
+        menuId: MENU_ID.ESCALATION_POLICY,
+        routeName: ALERT_MANAGER_ROUTE_V1.ESCALATION_POLICY._NAME,
+        translationId: 'MENU.ALERT_MANAGER_ESCALATION_POLICY',
+        icon: 'ic_service_escalation-policy',
+    },
     [MENU_ID.ALERT_MANAGER]: {
         menuId: MENU_ID.ALERT_MANAGER,
         routeName: ALERT_MANAGER_ROUTE._NAME,
         translationId: 'MENU.ALERT_MANAGER',
-        icon: 'ic_service_alert-manager',
-    },
-    [MENU_ID.ALERT_MANAGER_DASHBOARD]: {
-        menuId: MENU_ID.ALERT_MANAGER_DASHBOARD,
-        routeName: ALERT_MANAGER_ROUTE.DASHBOARD._NAME,
-        translationId: 'MENU.ALERT_MANAGER_DASHBOARD',
-        icon: 'ic_service_alert-dashboard',
-    },
-    [MENU_ID.ALERT]: {
-        menuId: MENU_ID.ALERT,
-        routeName: ALERT_MANAGER_ROUTE.ALERT._NAME,
-        translationId: 'MENU.ALERT_MANAGER_ALERT',
         icon: 'ic_service_alert',
     },
-    [MENU_ID.ESCALATION_POLICY]: {
-        menuId: MENU_ID.ESCALATION_POLICY,
-        routeName: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME,
-        translationId: 'MENU.ALERT_MANAGER_ESCALATION_POLICY',
-        icon: 'ic_service_escalation-policy',
+    [MENU_ID.SERVICE]: {
+        menuId: MENU_ID.SERVICE,
+        routeName: ALERT_MANAGER_ROUTE.SERVICE._NAME,
+        translationId: 'MENU.ALERT_MANAGER_SERVICE',
+        icon: 'ic_service_alert-dashboard',
+    },
+    [MENU_ID.ALERTS]: {
+        menuId: MENU_ID.ALERTS,
+        routeName: ALERT_MANAGER_ROUTE.ALERTS._NAME,
+        translationId: 'MENU.ALERT_MANAGER_ALERTS',
+        icon: 'ic_service_alert',
     },
     [MENU_ID.IAM]: {
         menuId: MENU_ID.IAM,
@@ -158,6 +167,12 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         routeName: IAM_ROUTE.USER._NAME,
         translationId: 'MENU.ADMINISTRATION_USER',
         icon: 'ic_service_user',
+    },
+    [MENU_ID.USER_GROUP]: {
+        menuId: MENU_ID.USER_GROUP,
+        routeName: IAM_ROUTE.USER_GROUP._NAME,
+        translationId: 'MENU.ADMINISTRATION_USER_GROUP',
+        icon: 'ic_member',
     },
     [MENU_ID.ROLE]: {
         menuId: MENU_ID.ROLE,

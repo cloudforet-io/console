@@ -100,7 +100,7 @@ const handleConfirm = async () => {
                     :header-title="state.modalStyle.title"
                     :theme-color="state.modalStyle.theme"
                     :loading="state.loading"
-                    modal-size="md"
+                    size="md"
                     :enable-scroll="true"
                     class="role-state-modal"
                     @confirm="handleConfirm"

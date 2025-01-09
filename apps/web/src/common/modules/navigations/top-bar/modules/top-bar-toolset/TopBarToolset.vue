@@ -9,6 +9,8 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDomainStore } from '@/store/domain/domain-store';
 import { useUserStore } from '@/store/user/user-store';
 
+import config from '@/lib/config';
+
 import TopBarAdminToggleButton from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-admin-toggle-button/TopBarAdminToggleButton.vue';
 import TopBarFavorite
     from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-favorite/TopBarFavorite.vue';
@@ -18,7 +20,6 @@ import TopBarNotice
     from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-notice/TopBarNotice.vue';
 import TopBarNotifications from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-notifications/TopBarNotifications.vue';
 import TopBarProfile from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-profile/TopBarProfile.vue';
-
 
 const props = withDefaults(defineProps<{
     openedMenu?: string|null;
@@ -43,6 +44,7 @@ const state = reactive({
         const extraMenu = domainStore.getters.domainExtraMenu;
         return extraMenu?.title;
     }),
+    isAlertManagerVersionV2: computed<boolean>(() => (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainStore.state.domainId)),
 });
 
 const hideMenu = () => {
@@ -70,7 +72,7 @@ const updateOpenedMenu = (menu: string, visible: boolean) => {
                               :visible="props.openedMenu === 'favorite'"
                               @update:visible="updateOpenedMenu('favorite', $event)"
             />
-            <top-bar-notifications v-if="!state.isAdminMode && !state.isGrantLoading"
+            <top-bar-notifications v-if="!state.isAlertManagerVersionV2 && !state.isAdminMode && !state.isGrantLoading"
                                    :visible="props.openedMenu === 'notifications'"
                                    @update:visible="updateOpenedMenu('notifications', $event)"
             />

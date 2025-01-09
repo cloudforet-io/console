@@ -13,7 +13,7 @@ import type { PageAccessMap } from '@/lib/access-control/config';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { MENU_ID } from '@/lib/menu/config';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import type { ProviderResourceDataItem } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {
@@ -47,7 +47,7 @@ const handleClickButton = (type: string) => {
     else target = `metric-managed-${type}-count`;
 
     router.push({
-        name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+        name: ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL._NAME,
         params: { metricId: target, groupBy: props.item.key },
     });
 };

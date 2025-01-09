@@ -61,7 +61,7 @@ const handleSwitchModal = () => {
                     :theme-color="userPageState.modal.themeColor"
                     :loading="state.loading"
                     disabled
-                    modal-size="md"
+                    size="md"
                     @cancel="handleClose"
                     @close="handleClose"
     >

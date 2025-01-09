@@ -5,7 +5,7 @@ import { defineStore } from 'pinia';
 
 import type { TreeDisplayMap } from '@/services/project/tree/type';
 
-export const useProjectTreeStore = defineStore('project-tree', () => {
+export const useProjectTreeStore = defineStore('project-v1-tree', () => {
     const state = reactive({
         treeDisplayMap: {} as TreeDisplayMap,
     });

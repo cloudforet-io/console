@@ -11,6 +11,7 @@ import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-sou
 import type { MetricReferenceMap, MetricReferenceItem } from '@/store/reference/metric-reference-store';
 import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/reference/project-reference-store';
+import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
 
 import { getAllSuggestionMenuList } from '@/lib/helper/menu-suggestion-helper';
 
@@ -332,6 +333,32 @@ export const convertWorkspaceConfigToReferenceData = (config: ConfigData[]|null,
                 name: menu.workspace_id,
                 label: menu.name,
                 tags: menu.tags,
+            });
+        }
+    });
+    return results;
+};
+
+export const convertServiceConfigToReferenceData = (config: ConfigData[]|null, map: ServiceReferenceMap): ReferenceData[] => {
+    const results: ReferenceData[] = [];
+    if (!config) return results;
+
+    const _map = Object.values(map).map((i) => i.data);
+    config.forEach((d) => {
+        const resource = find(_map, { service_id: d.itemId });
+        if (resource) {
+            results.push({
+                ...d,
+                itemType: FAVORITE_TYPE.SERVICE,
+                itemId: resource.service_id,
+                name: resource.service_id,
+                label: resource.name,
+                icon: 'ic_service_alert',
+            });
+        } else {
+            results.push({
+                ...d,
+                isDeleted: !resource,
             });
         }
     });

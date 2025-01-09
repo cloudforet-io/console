@@ -1,0 +1,164 @@
+<script setup lang="ts">
+import { computed, onMounted, reactive } from 'vue';
+import { useRouter } from 'vue-router/composables';
+
+import { isEmpty } from 'lodash';
+
+import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PToolbox, PDataLoader, PEmpty, PButton,
+} from '@cloudforet/mirinae';
+import type { ToolboxOptions } from '@cloudforet/mirinae/src/controls/toolbox/type';
+
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { EscalationPolicyListParameters } from '@/schema/alert-manager/escalation-policy/api-verbs/list';
+import type { EscalationPolicyModel } from '@/schema/alert-manager/escalation-policy/model';
+import type { ServiceListParameters } from '@/schema/alert-manager/service/api-verbs/list';
+import type { ServiceModel } from '@/schema/alert-manager/service/model';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import { useQueryTags } from '@/common/composables/query-tags';
+
+import ServiceListContent from '@/services/alert-manager/components/ServiceListContent.vue';
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
+import type { AlertManagementTableHandlerType } from '@/services/alert-manager/types/alert-manager-type';
+
+const pageSizeOptions = [15, 30, 45];
+
+const { getProperRouteLocation } = useProperRouteLocation();
+const { hasReadWriteAccess } = usePageEditableStatus();
+
+const router = useRouter();
+
+const SERVICE_SEARCH_HANDLER: AlertManagementTableHandlerType = {
+    keyItemSets: [{
+        title: 'Properties',
+        items: [
+            { name: 'name', label: 'Name' },
+        ],
+    }],
+    valueHandlerMap: {
+        name: makeDistinctValueHandler('alert_manager.Service', 'name'),
+    },
+};
+
+const state = reactive({
+    loading: true,
+    totalCount: 0,
+    serviceList: [] as ServiceModel[],
+    alertServiceList: computed<ServiceModel[]>(() => state.serviceList.filter((item) => !isEmpty(item?.alerts.TRIGGERED) || !isEmpty(item?.alerts.ACKNOWLEDGED))),
+    healthyServiceList: computed<ServiceModel[]>(() => state.serviceList.filter((item) => isEmpty(item?.alerts.TRIGGERED) && isEmpty(item?.alerts.ACKNOWLEDGED))),
+    escalationPolicyList: [] as EscalationPolicyModel[],
+});
+
+const serviceListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
+    .setPage(1, 15);
+const queryTagHelper = useQueryTags({ keyItemSets: SERVICE_SEARCH_HANDLER.keyItemSets });
+const { queryTags } = queryTagHelper;
+
+const handleChangeToolbox = async (options: ToolboxOptions) => {
+    if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
+    if (options.pageStart !== undefined) serviceListApiQueryHelper.setPageStart(options.pageStart);
+    if (options.pageLimit !== undefined) serviceListApiQueryHelper.setPageLimit(options.pageLimit);
+    await fetchServiceList();
+};
+const handleClickCreateButton = () => {
+    router.push(getProperRouteLocation({
+        name: ALERT_MANAGER_ROUTE.SERVICE.CREATE._NAME,
+    }));
+};
+
+const fetchServiceList = async () => {
+    state.loading = true;
+    try {
+        serviceListApiQueryHelper.setFilters([
+            ...queryTagHelper.filters.value,
+        ]);
+        const { results, total_count } = await SpaceConnector.clientV2.alertManager.service.list<ServiceListParameters, ListResponse<ServiceModel>>({
+            query: serviceListApiQueryHelper.data,
+            details: true,
+        });
+        state.serviceList = results || [];
+        state.totalCount = total_count || 0;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.serviceList = [];
+        state.totalCount = 0;
+    } finally {
+        state.loading = false;
+    }
+};
+const fetchEscalationPolicy = async () => {
+    try {
+        const { results } = await SpaceConnector.clientV2.alertManager.escalationPolicy.list<EscalationPolicyListParameters, ListResponse<EscalationPolicyModel>>();
+        state.escalationPolicyList = results || [];
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.escalationPolicyList = [];
+    }
+};
+
+onMounted(async () => {
+    await fetchEscalationPolicy();
+    await fetchServiceList();
+});
+</script>
+
+<template>
+    <div class="service-list flex flex-col gap-2">
+        <p-toolbox search-type="query"
+                   searchable
+                   filters-visible
+                   :page-size-options="pageSizeOptions"
+                   :page-size="15"
+                   :query-tags="queryTags"
+                   :key-item-sets="SERVICE_SEARCH_HANDLER.keyItemSets"
+                   :value-handler-map="SERVICE_SEARCH_HANDLER.valueHandlerMap"
+                   :total-count="state.totalCount"
+                   @change="handleChangeToolbox"
+                   @refresh="fetchServiceList"
+        />
+        <p-data-loader :loading="state.loading"
+                       :data="state.serviceList"
+                       loader-backdrop-color="transparent"
+        >
+            <div class="flex flex-col gap-4">
+                <service-list-content :list="state.alertServiceList"
+                                      :escalation-policy-list="state.escalationPolicyList"
+                                      type="alert"
+                />
+                <service-list-content :list="state.healthyServiceList"
+                                      :escalation-policy-list="state.escalationPolicyList"
+                                      type="healthy"
+                />
+            </div>
+            <template #no-data>
+                <div class="pt-12">
+                    <p-empty show-image
+                             :show-button="hasReadWriteAccess"
+                    >
+                        <template #image>
+                            <img src="@/assets/images/img_jellyocto-with-a-telescope.png"
+                                 alt="empty-image"
+                            >
+                        </template>
+                        <template v-if="hasReadWriteAccess"
+                                  #button
+                        >
+                            <p-button icon-left="ic_plus_bold"
+                                      @click="handleClickCreateButton"
+                            >
+                                {{ $t('ALERT_MANAGER.SERVICE.NO_DATA') }}
+                            </p-button>
+                        </template>
+                        {{ $t('ALERT_MANAGER.SERVICE.NO_DATA') }}
+                    </p-empty>
+                </div>
+            </template>
+        </p-data-loader>
+    </div>
+</template>

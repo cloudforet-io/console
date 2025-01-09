@@ -16,6 +16,8 @@ import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 import { i18n } from '@/translations';
 
+import { useDomainStore } from '@/store/domain/domain-store';
+
 import { PAGE_ACCESS } from '@/lib/access-control/config';
 import {
     getPageAccessMapFromRawData,
@@ -39,6 +41,7 @@ interface DetailMenuItems {
 
 const rolePageStore = useRolePageStore();
 const rolePageState = rolePageStore.$state;
+const domainStore = useDomainStore();
 
 const detailMenuItems = computed<DetailMenuItems[]>(() => [
     { name: 'page_access', label: i18n.t('IAM.ROLE.DETAIL.PAGE_ACCESS') as string },
@@ -139,9 +142,9 @@ watch(() => state.selectedRole.role_id, async (roleId) => {
         : roleId;
 
     await getRoleDetailData(selectedRoleId);
-    state.pageAccessDataList = getPageAccessMenuListByRoleType(state.data.role_type);
+    state.pageAccessDataList = getPageAccessMenuListByRoleType(state.data.role_type, domainStore.state.domainId);
 
-    const pageAccessPermissionMap = getPageAccessMapFromRawData(state.pageAccess);
+    const pageAccessPermissionMap = getPageAccessMapFromRawData(state.pageAccess, domainStore.state.domainId);
 
     Object.entries(pageAccessPermissionMap).forEach(([itemId, accessible]) => {
         if (!itemId) return;

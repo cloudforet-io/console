@@ -76,6 +76,12 @@ const handleClickButton = (type: string) => {
         themeColor: 'primary',
         modalVisibleType: 'add',
     }); break;
+    case USER_MODAL_TYPE.ASSIGN: userPageStore.updateModalSettings({
+        type,
+        title: i18n.t('IAM.USER.MAIN.MODAL.ASSIGN_TITLE'),
+        themeColor: 'primary',
+        modalVisibleType: 'assignToUserGroup',
+    }); break;
     default: break;
     }
 };
@@ -118,6 +124,12 @@ watch(() => route.query, (query) => {
                     <div v-else-if="userPageGetters.isWorkspaceOwner"
                          class="toolbox"
                     >
+                        <p-button style-type="tertiary"
+                                  :disabled="userPageGetters.selectedUsers.length === 0"
+                                  @click="handleClickButton(USER_MODAL_TYPE.ASSIGN)"
+                        >
+                            {{ $t('IAM.USER.ASSIGN_TO_USER_GROUP.TITLE') }}
+                        </p-button>
                         <p-button style-type="negative-secondary"
                                   :disabled="userPageGetters.selectedUsers.length === 0"
                                   @click="handleClickButton(USER_MODAL_TYPE.REMOVE)"

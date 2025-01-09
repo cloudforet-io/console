@@ -24,7 +24,7 @@ import { red } from '@/styles/colors';
 import {
     ALERT_SEVERITY_COLORS,
     ALERT_SEVERITY_LABELS,
-} from '@/services/alert-manager/constants/alert-constant';
+} from '@/services/alert-manager-v1/constants/alert-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 
@@ -127,7 +127,7 @@ const calculateTime = (time) => {
 const handleRouteToSignInWithRedirectPath = () => {
     if (SpaceConnector.getRefreshToken()) {
         router.push({
-            name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME,
+            name: ALERT_MANAGER_ROUTE.ALERTS.DETAIL._NAME,
             params: {
                 id: state.alertData?.alert_id,
                 workspaceId: state.alertData?.workspace_id,

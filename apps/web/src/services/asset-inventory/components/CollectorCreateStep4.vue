@@ -141,7 +141,7 @@ const handleClickCreateButton = async () => {
             exclude_service_accounts: collectorFormState.serviceAccounts,
         };
         Object.assign(params.secret_filter ?? {}, serviceAccountParams);
-        const res:CollectorModel = await SpaceConnector.clientV2.inventory.collector.create<CollectorCreateParameters, CollectorModel>(params);
+        const res:CollectorModel = await SpaceConnector.clientV2.inventoryV2.collector.create<CollectorCreateParameters, CollectorModel>(params);
         state.createdCollectorId = res?.collector_id;
         state.visibleCreateCompleteModal = true;
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_CREATE_COLLECTOR'), '');
@@ -166,7 +166,7 @@ const handleConfirmCreateCollector = async () => {
         state.collectLoading = true;
         // After the collector created, if the user clicks the collect button, the collector will be executed.
         if (state.createdCollectorId) {
-            await SpaceConnector.clientV2.inventory.collector.collect<CollectorCollectParameters, JobModel>({
+            await SpaceConnector.clientV2.inventoryV2.collector.collect<CollectorCollectParameters, JobModel>({
                 collector_id: state.createdCollectorId,
             });
         } else {

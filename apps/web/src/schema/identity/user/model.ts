@@ -39,3 +39,8 @@ export interface UserSummaryModel {
     name: string;
     state: UserState;
 }
+
+export interface UserGroupPerUserModel {
+    user_group_id: string;
+    name: string;
+}
