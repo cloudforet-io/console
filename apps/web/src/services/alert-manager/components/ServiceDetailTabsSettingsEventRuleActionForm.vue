@@ -287,7 +287,6 @@ watch(() => formState, () => {
             return acc;
         }, {} as EventRuleActionsType);
 
-    console.log({ _actions }, formState.selectedTempAssetRadio);
     if (_actions.match_asset) {
         if (formState.rule.value && formState.rule.key) {
             _actions.match_asset = {

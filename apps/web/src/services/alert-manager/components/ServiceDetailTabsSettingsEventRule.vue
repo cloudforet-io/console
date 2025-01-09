@@ -43,7 +43,6 @@ const handleClickAddRule = () => {
 };
 
 const fetchEventRuleInfo = async () => {
-    console.log('fetchEventRuleInfo', route.query?.eventRuleId);
     state.eventRuleInfoLoading = true;
     try {
         await serviceDetailPageStore.fetchEventRuleInfo({
@@ -55,7 +54,6 @@ const fetchEventRuleInfo = async () => {
 };
 
 watch(() => route.query?.eventRuleId, (eventRuleId) => {
-    console.log({ eventRuleId });
     if (eventRuleId) {
         fetchEventRuleInfo();
     }
