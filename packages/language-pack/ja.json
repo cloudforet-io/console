@@ -272,7 +272,7 @@
 			"USER": "ユーザー",
 			"USER_GROUP": "ユーザーグループ",
 			"VALIDATION_KEY": "大文字、数字、ハイフンのみ使用できます。",
-			"VALIDATION_KEY_HYPHEN": "",
+			"VALIDATION_KEY_HYPHEN": "最初の文字としてハイフンは使用できません。",
 			"VALIDATION_KEY_UNIQUE": "同じ名前のキーがすでに存在します。",
 			"VALIDATION_NAME_UNIQUE": "同じ名前のサービスはすでに存在します。",
 			"VIEW_ALL_OPEN_ALERTS": "全ての発生アラートを見る",
