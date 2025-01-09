@@ -1,9 +1,10 @@
-import type { ResourceGroupType } from '@/schema/_common/type';
+import type { ResourceGroupType, ContentsType } from '@/schema/_common/type';
 import type { PostBoardType } from '@/schema/board/post/type';
 import type { FileModel } from '@/schema/file-manager/model';
 
 export interface PostModel {
     board_type: PostBoardType;
+    contents_type: ContentsType;
     post_id: string;
     category: string;
     title: string;

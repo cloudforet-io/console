@@ -51,6 +51,7 @@ const isMinimalCreateMode = computed(() => taskContentFormState.mode === 'create
 
 /* category */
 const {
+    preloadCategories,
     selectedCategoryItems,
     categoryValidator,
     categoryMenuItemsHandler,
@@ -60,6 +61,7 @@ const {
     hasTaskTypeOnly: true,
 });
 const handleUpdateSelectedCategory = (items: SelectDropdownMenuItem[]) => {
+    if (isEqual(items, selectedCategoryItems.value)) return;
     setForm('category', items); // set form for validation
     taskContentFormStore.setCurrentCategoryId(items[0].name); // set current category id to store for other fields
     const category = taskContentFormGetters.currentCategory;
@@ -194,7 +196,7 @@ const initForViewMode = async (task?: TaskModel) => {
 
     if (!task) return;
     // set category
-    await setInitialCategory(task.category_id);
+    setInitialCategory(task.category_id);
     taskContentFormStore.setCurrentCategoryId(task.category_id);
     // set task type
     await taskContentFormStore.setCurrentTaskType(task.task_type_id);
@@ -216,7 +218,7 @@ const initForCreateMode = async (categoryId?: string, taskType?: TaskTypeModel) 
 
     if (!categoryId) return;
 
-    await setInitialCategory(categoryId);
+    setInitialCategory(categoryId);
     // init selected status
     const category = taskContentFormGetters.currentCategory;
     if (category) {
@@ -246,6 +248,9 @@ viewModeInitWatchStop = watch(() => taskContentFormState.originTask, async (task
         viewModeInitWatchStop = null;
         return;
     }
+
+    await preloadCategories();
+
     if (!isCreateMode.value) await initForViewMode(task);
 }, { immediate: true });
 createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, () => taskContentFormState.currentTaskType], async ([categoryId, taskType]) => {
@@ -255,13 +260,14 @@ createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, (
         return;
     }
 
-    if (isCreateMode.value) {
-        await initForCreateMode(categoryId);
-    } else if (isMinimalCreateMode.value) { // minimal create mode always has task type (from landing page)
-        if (!taskType) return;
-        await initForCreateMode(categoryId, taskType);
-    }
+    await preloadCategories();
+
+    if (!isCreateMode.value) return;
+    if (isMinimalCreateMode.value && !taskType) return; // minimal create is from landing page. task type is already selected and must be initialized.
+
+    await initForCreateMode(categoryId, taskType);
 }, { immediate: true });
+
 </script>
 
 <template>

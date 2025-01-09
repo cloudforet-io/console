@@ -1132,7 +1132,7 @@
 			"HEADING1": "개요 1",
 			"HEADING2": "개요 2",
 			"HEADING3": "개요 3",
-			"NORMAL_TEXT": "바탕 글"
+			"NORMAL_TEXT": "본문"
 		},
 		"ERROR": {
 			"403_MSG": "이 페이지에 접근할 권한이 없습니다.",
@@ -1608,7 +1608,8 @@
 					"ADD_LABELS_DESC": "데이터의 명확성을 높이기 위해 레이블을 추가하세요.",
 					"ADD_RULE": "규칙 추가",
 					"ADVANCED_OPTIONS": "고급 설정 옵션",
-					"ALT_E_ADD_GROUP_BY": "Group-by는 최대 3개까지만 선택이 가능합니다.",
+					"AGGREGATE_DESC": "레이블 필드를 결합하고 그룹화하여 집계합니다.",
+					"ALT_E_ADD_GROUP_BY": "Group-by는 최대 5개까지만 선택이 가능합니다.",
 					"BASED_ON": "기준",
 					"CASES": "조건",
 					"CONCAT_DESC": "여러 테이블을 하나로 결합합니다.",
@@ -1644,7 +1645,7 @@
 					"FIELD_TYPE": "필드 타입",
 					"FILTERS": "필터",
 					"GROUP_BY": "그룹별 통계(Group by)",
-					"GROUP_BY_HELP_TEXT": "최대 3개의 옵션을 선택하여 보기를 원하는 방식으로 설정하세요.",
+					"GROUP_BY_HELP_TEXT": "최대 5개의 옵션을 선택하여 보기를 원하는 방식으로 설정하세요.",
 					"JOIN_DESC": "공통 열을 기준으로 다른 테이블의 행을 병합합니다.",
 					"LEFT_KEY": "왼쪽 키",
 					"LEFT_TABLE": "왼쪽 테이블",
@@ -1682,6 +1683,8 @@
 			},
 			"DEFAULT_WIDTH": "기본 너비",
 			"DELETE": "삭제",
+			"DIMENSIONS": "",
+			"DIMENSIONS_DESC": "",
 			"DISPLAY_ANNOTATION": {
 				"DISPLAY_ANNOTATION": "부가 정보 표시",
 				"INVALID_VALUE": "추가로 표시할 내용을 입력해주세요.",
@@ -2501,6 +2504,7 @@
 					"DATE_RANGE_INVALID_RANGE_TEXT": "시작 날짜는 종료 날짜보다 이전이어야 합니다.",
 					"DEPRECATED_OPTION": "지원 중지된 옵션",
 					"DESCRIPTION": "설명",
+					"DIMENSIONS": "",
 					"DYNAMIC_FIELD": "변동 데이터 필드",
 					"EDIT_DATA": "데이터 수정",
 					"END": "종료",
@@ -4693,7 +4697,7 @@
 	},
 	"OPSFLOW": {
 		"ADD_TARGET": "{target} 추가",
-		"ALL_CATEGORIES": "모든 카테고리",
+		"ALL_TASKS": "모든 {tasks}",
 		"ALT_E_ADD_TARGET": "{target} 추가 실패",
 		"ALT_E_ASSIGN": "담당자 할당 실패",
 		"ALT_E_CHANGE_DEFAULT_TARGET": "{target} 기본값 변경 실패",
@@ -4711,6 +4715,7 @@
 		"ASSIGNEE": "담당자",
 		"ASSIGNEE_POOL": "담당자 풀",
 		"CATEGORY": "카테고리",
+		"COLOR": "색상",
 		"CREATED_AT": "생성일",
 		"CREATED_BY": "생성자",
 		"CREATE_TARGET": "{target} 생성",
@@ -4734,6 +4739,7 @@
 			"FIELD_REQUIRED": "이 필드는 필수입니다",
 			"FORM": "폼 입력",
 			"GLOBAL": "글로벌",
+			"GROUP_TYPE": "그룹 > 타입",
 			"JSON": "JSON 입력",
 			"KEY": "키",
 			"LABELS": "라벨",
@@ -4765,6 +4771,7 @@
 		"STATUS_COMPLETED": "완료됨",
 		"STATUS_IN_PROGRESS": "진행 중",
 		"STATUS_TODO": "할 일",
+		"STATUS_TYPE": "상태 타입",
 		"SUPPORT_PACKAGE": "지원 패키지",
 		"TARGET_LIST": "{target} 목록",
 		"TASK_BOARD": {
@@ -4796,7 +4803,7 @@
 				"DESC": "이는 {tasks}의 유형을 그룹화한 것입니다. 사용자는 {task}{taskObjectParticle} 제출할 때 적절한 카테고리를 선택하여 담당자가 {tasks}{tasksObjectParticle} 더 효율적으로 관리할 수 있도록 돕습니다."
 			},
 			"ENABLE_LANDING": "랜딩 페이지 활성화",
-			"ENABLE_LANDING_DESC": "랜딩페이지를 사용하면 어떻게 되는지 Description",
+			"ENABLE_LANDING_DESC": "OpsFlow 메뉴 아래에 랜딩 페이지가 표시됩니다.",
 			"PACKAGE": {
 				"ADDED": "추가됨",
 				"AFFECTED_DESC": "영향 받는 {workspace}와 {category}는 다음과 같습니다.",
@@ -4829,6 +4836,7 @@
 			"TEMPLATE_TYPE": "템플릿 타입"
 		},
 		"TITLE": "제목",
+		"TOTAL_DURATION": "총 소요 시간",
 		"VALIDATION": {
 			"DUPLICATED": "이미 존재하는 {field}입니다",
 			"ENUM_KEY_DUPLICATED": "중복된 키가 존재합니다.",

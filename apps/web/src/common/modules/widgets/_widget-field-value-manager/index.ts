@@ -48,7 +48,6 @@ export default class WidgetFieldValueManager {
         dataTable: PublicDataTableModel|PrivateDataTableModel,
         originData: WidgetFieldValueMap,
     ) {
-        console.debug('WidgetFieldValueManager.constructor()', widgetConfig, dataTable, originData);
         this.widgetConfig = widgetConfig;
         this.dataTable = dataTable;
         this.widgetInvalid = !dataTable;
@@ -117,14 +116,20 @@ export default class WidgetFieldValueManager {
 
     updateWidgetType(newWidgetConfig: WidgetConfig): void {
         this.updateWidgetConfig(newWidgetConfig);
-        this.updateModifiedData(WidgetFieldValueManager.applyDefaultValue({}, newWidgetConfig, this.dataTable));
+        const originDataWithExistingHeaderValue = {
+            widgetHeader: this.originData.value.widgetHeader,
+        };
+        this.updateModifiedData(WidgetFieldValueManager.applyDefaultValue(originDataWithExistingHeaderValue, newWidgetConfig, this.dataTable));
         this.validationErrors = {};
     }
 
     updateDataTableAndOriginData(dataTable: PublicDataTableModel|PrivateDataTableModel, data: WidgetFieldValueMap): void {
         this.dataTable = dataTable;
-        this.originData.value = { ...data };
-        this.updateModifiedData(WidgetFieldValueManager.applyDefaultValue(data, this.widgetConfig, dataTable));
+        this.originData.value = {
+            ...data,
+            widgetHeader: this.originData.value.widgetHeader,
+        };
+        this.updateModifiedData(WidgetFieldValueManager.applyDefaultValue(this.originData.value, this.widgetConfig, dataTable));
         this.validationErrors = {};
     }
 }

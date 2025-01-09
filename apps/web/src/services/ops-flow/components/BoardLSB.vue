@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { onMounted } from 'vue';
+
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import LSBContainer from '@/common/modules/navigations/new-lsb/LSBContainer.vue';
 import LSBDivider from '@/common/modules/navigations/new-lsb/LSBDivider.vue';
@@ -10,11 +12,19 @@ import type { LSBRouterPredicate } from '@/common/modules/navigations/new-lsb/ty
 
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
+import {
+    useTaskManagementTemplateStore,
+} from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
 const taskCategoryStore = useTaskCategoryStore();
 const taskCategoryGetters = taskCategoryStore.getters;
+const taskManagementTemplateStore = useTaskManagementTemplateStore();
 const { getProperRouteLocation } = useProperRouteLocation();
 const predicate: LSBRouterPredicate = (to, currentRoute) => to.query?.categoryId === currentRoute.query.categoryId;
+
+onMounted(() => {
+    taskCategoryStore.list();
+});
 </script>
 
 <template>
@@ -26,10 +36,12 @@ const predicate: LSBRouterPredicate = (to, currentRoute) => to.query?.categoryId
                              })"
                              :predicate="predicate"
         >
-            {{ $t('OPSFLOW.ALL_CATEGORIES') }}
+            <span class="capitalize">{{ $t('OPSFLOW.ALL_TASKS', {
+                tasks: taskManagementTemplateStore.templates.tasks
+            }) }}</span>
         </l-s-b-router-button>
         <l-s-b-divider />
-        <l-s-b-top-title>{{ $t('OPSFLOW.CATEGORY') }}</l-s-b-top-title>
+        <l-s-b-top-title>{{ taskManagementTemplateStore.templates.TaskCategory }}</l-s-b-top-title>
         <l-s-b-loading-spinner :loading="taskCategoryGetters.loading" />
         <l-s-b-router-item v-for="(category, idx) in taskCategoryGetters.taskCategories"
                            :id="`${category.category_id}-${idx}`"

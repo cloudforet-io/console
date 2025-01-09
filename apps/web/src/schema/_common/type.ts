@@ -6,3 +6,5 @@ export interface Page {
     start: number;
     limit: number;
 }
+
+export type ContentsType = 'html' | 'markdown' | 'plain';

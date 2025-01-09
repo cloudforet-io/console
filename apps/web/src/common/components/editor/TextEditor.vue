@@ -14,33 +14,32 @@ import type { AnyExtension } from '@tiptap/vue-2';
 import { Editor, EditorContent } from '@tiptap/vue-2';
 import { Markdown } from 'tiptap-markdown';
 
+import { PTextarea } from '@cloudforet/mirinae';
+
 import { createImageExtension } from '@/common/components/editor/extensions/image';
-import { getAttachmentIds, setAttachmentsToContents } from '@/common/components/editor/extensions/image/helper';
-import type { Attachment, ImageUploader } from '@/common/components/editor/extensions/image/type';
+import type { ImageUploader } from '@/common/components/editor/extensions/image/type';
 import MenuBar from '@/common/components/editor/MenuBar.vue';
+import type { TextEditorContentsType } from '@/common/components/editor/type';
 
 import { loadMonospaceFonts } from '@/styles/fonts';
 
 interface Props {
     value?: string;
     imageUploader?: ImageUploader;
-    attachments?: Attachment[];
     invalid?: boolean;
     placeholder?: string;
-    contentType?: 'html'|'markdown';
+    contentsType?: TextEditorContentsType;
     showUndoRedoButtons?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
     value: '',
     imageUploader: undefined,
-    attachments: () => [],
     invalid: false,
     placeholder: '',
-    contentType: 'html',
+    contentsType: 'html',
     showUndoRedoButtons: true,
 });
 const emit = defineEmits<{(e: 'update:value', value: string): void;
-    (e: 'update:attachment-ids', attachmentIds: string[]): void;
 }>();
 
 loadMonospaceFonts();
@@ -68,13 +67,13 @@ const getExtensions = (): AnyExtension[] => {
     ];
 
     // add extensions based on content type
-    if (props.contentType === 'html') {
+    if (props.contentsType === 'html') {
         extensions.push(Color);
         extensions.push(TextAlign.configure({
             types: ['heading', 'paragraph'],
         }));
     }
-    if (props.contentType === 'markdown') {
+    if (props.contentsType === 'markdown') {
         extensions.push(Markdown);
     }
 
@@ -87,18 +86,17 @@ const getExtensions = (): AnyExtension[] => {
 
 onMounted(() => {
     editor.value = new Editor({
-        content: setAttachmentsToContents(props.value, props.attachments),
+        content: props.value,
         extensions: getExtensions(),
         onUpdate: () => {
             let content = '';
             if (!editor.value) return;
-            if (props.contentType === 'html') {
+            if (props.contentsType === 'html') {
                 content = editor.value?.getHTML() ?? '';
             } else {
                 content = editor.value.storage.markdown.getMarkdown() ?? '';
             }
             emit('update:value', content);
-            emit('update:attachment-ids', getAttachmentIds(editor.value));
         },
     });
 });
@@ -107,42 +105,50 @@ onBeforeUnmount(() => {
     if (editor.value) editor.value.destroy();
 });
 
-watch([() => props.value, () => props.attachments], ([value, attachments], prev) => {
+watch(() => props.value, (value) => {
     if (!editor.value) return;
-    let isSame;
-    if (props.contentType === 'html') {
-        isSame = editor.value.getHTML() === value;
+
+    let contents: string;
+    if (props.contentsType === 'html') {
+        contents = editor.value?.getHTML() ?? '';
     } else {
-        isSame = editor.value.storage.markdown.getMarkdown() === value;
+        contents = editor.value.storage.markdown.getMarkdown() ?? '';
     }
-    if (isSame) return;
-    let newContents = value;
-    if (attachments !== prev[1]) newContents = setAttachmentsToContents(value, attachments);
-    editor.value.commands.setContent(newContents, false);
+    if (contents === value) return; // prevent infinite loop.
+
+    editor.value.commands.setContent(value, false);
 });
 </script>
 
 <template>
-    <div v-if="editor"
-         class="text-editor"
-         :class="{invalid: props.invalid}"
-    >
-        <menu-bar :editor="editor"
-                  :use-color="props.contentType === 'html'"
-                  :use-text-align="props.contentType === 'html'"
-                  :use-image="!!props.imageUploader"
-                  :show-undo-redo-buttons="props.showUndoRedoButtons"
+    <div class="text-editor">
+        <p-textarea v-if="props.contentsType === 'plain'"
+                    :value="props.value"
+                    :placeholder="props.placeholder"
+                    :invalid="props.invalid"
+                    @update:value="emit('update:value', $event)"
         />
-        <editor-content class="editor-content"
-                        :editor="editor"
-        />
+        <div v-else-if="editor"
+             class="editor"
+             :class="{invalid: props.invalid}"
+        >
+            <menu-bar :editor="editor"
+                      :use-color="props.contentsType === 'html'"
+                      :use-text-align="props.contentsType === 'html'"
+                      :use-image="!!props.imageUploader"
+                      :show-undo-redo-buttons="props.showUndoRedoButtons"
+            />
+            <editor-content class="editor-content"
+                            :editor="editor"
+            />
+        </div>
     </div>
 </template>
 
 <style lang="postcss">
 @import './text-editor-nodes.pcss';
 .text-editor {
-    > .editor-content {
+    > .editor .editor-content {
         .ProseMirror {
             @mixin all-nodes-style;
             min-height: inherit;
@@ -166,26 +172,18 @@ watch([() => props.value, () => props.attachments], ([value, attachments], prev)
 .text-editor {
     @apply bg-white border border-gray-200 rounded-lg;
     min-height: 356px;
-    > .editor-content {
+    > .editor {
         min-height: inherit;
-        padding: 0.75rem 1rem 1.125rem 1rem;
+        > .editor-content {
+            min-height: inherit;
+            padding: 0.75rem 1rem 1.125rem 1rem;
+        }
+        &:focus-within {
+            @apply border-secondary;
+        }
+        &.invalid {
+            @apply border-alert;
+        }
     }
-    &:focus-within {
-        @apply border-secondary;
-    }
-    &.invalid {
-        @apply border-alert;
-    }
-    >.suggestion-list {
-        @apply absolute;
-        z-index: 10;
-    }
-}
-</style>
-
-<style lang="postcss">
-.mention {
-    @apply bg-violet-150 text-violet-600 rounded-md;
-    padding: 0 2px;
 }
 </style>

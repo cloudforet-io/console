@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { cloneDeep } from 'lodash';
+import { cloneDeep, sortBy } from 'lodash';
 
 import {
     PFieldGroup, PSelectDropdown, PButton, PI, PButtonModal, PTooltip,
@@ -18,6 +18,7 @@ import NewMark from '@/common/components/marks/NewMark.vue';
 import { DATA_TABLE_OPERATOR, DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { WIDGET_COMPONENT_ICON_MAP } from '@/common/modules/widgets/_constants/widget-components-constant';
 import { CONSOLE_WIDGET_CONFIG } from '@/common/modules/widgets/_constants/widget-config-list-constant';
+import { UNSUPPORTED_CHARTS_IN_PIVOT } from '@/common/modules/widgets/_constants/widget-constant';
 import {
     getWidgetFieldComponent,
 } from '@/common/modules/widgets/_helpers/widget-component-helper';
@@ -35,7 +36,7 @@ const FORM_TITLE_MAP = {
     REQUIRED_FIELDS: 'REQUIRED_FIELDS',
     OPTIONAL_FIELDS: 'OPTIONAL_FIELDS',
 };
-const DATE_CONFIG_FIELD_KEYS = ['granularity', 'dateRange'];
+const DATE_CONFIG_FIELD_KEYS = ['granularity', 'dateFormat', 'dateRange'];
 
 interface Props {
     widgetValidationInvalid?: boolean;
@@ -44,7 +45,6 @@ interface Props {
 }
 
 type DataTableModel = PrivateDataTableModel|PublicDataTableModel;
-const UNSUPPORTED_CHARTS_IN_PIVOT = ['numberCard', 'gauge', 'geoMap', 'treemap', 'pieChart', 'colorCodedHeatmap', 'sankeyChart'];
 const props = defineProps<Props>();
 
 const widgetGenerateStore = useWidgetGenerateStore();
@@ -63,9 +63,16 @@ const state = reactive({
     defaultValidationConfig: computed(() => state.widgetConfig.meta?.defaultValidationConfig),
     widgetDefaultValidationModalVisible: false,
     formErrorModalValue: undefined as number|undefined,
-    widgetDateConfigSchemaMap: computed(() => Object.entries(state.widgetConfig.requiredFieldsSchema).filter(([key]) => DATE_CONFIG_FIELD_KEYS.includes(key))),
+    widgetDateConfigSchemaMap: computed(() => {
+        const dateConfigFields = Object.entries({
+            ...state.widgetConfig.requiredFieldsSchema,
+            ...state.widgetConfig.optionalFieldsSchema,
+        })
+            .filter(([key]) => DATE_CONFIG_FIELD_KEYS.includes(key));
+        return sortBy(dateConfigFields, ([key]) => DATE_CONFIG_FIELD_KEYS.indexOf(key));
+    }),
     widgetRequiredFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.requiredFieldsSchema).filter(([key]) => !DATE_CONFIG_FIELD_KEYS.includes(key))),
-    widgetOptionalFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.optionalFieldsSchema)),
+    widgetOptionalFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.optionalFieldsSchema).filter(([key]) => !DATE_CONFIG_FIELD_KEYS.includes(key))),
     // display
     collapsedTitleMap: {
         [FORM_TITLE_MAP.DATE_CONFIG]: false,
@@ -148,10 +155,10 @@ const changeWidgetType = (widgetName: string) => {
     checkDefaultValidation();
 };
 
-// const checkFormDependencies = (changedFieldName: string):string[] => state.widgetConfigDependencies[changedFieldName] || [];
-
 onMounted(() => {
-    checkDefaultValidation();
+    if (widgetGenerateGetters.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT && UNSUPPORTED_CHARTS_IN_PIVOT.includes(widgetGenerateState.selectedWidgetName)) {
+        changeWidgetType('table');
+    } else checkDefaultValidation();
 });
 </script>
 

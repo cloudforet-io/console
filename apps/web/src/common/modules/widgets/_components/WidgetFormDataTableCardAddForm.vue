@@ -19,7 +19,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
 
-import { showInfoMessage } from '@/lib/helper/notice-alert-helper';
+import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
 import { useCostDataSourceFilterMenuItems } from '@/common/composables/data-source/use-cost-data-source-filter-menu-items';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -49,7 +49,7 @@ interface Props {
     /* Validation */
     formInvalid: boolean;
 }
-const MAX_GROUP_BY_COUNT = 3;
+const MAX_GROUP_BY_COUNT = 5;
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:filter', value: Record<string, string[]>): void;
     (e: 'update:selected-group-by-items', value: any[]): void;
@@ -168,7 +168,7 @@ const handleClickTimeDiffDate = (timeDiffDate: string) => {
 const handleUpdateSelectedGroupBy = (selectedItem: SelectDropdownMenuItem, isSelected: boolean) => {
     if (isSelected && (state.proxySelectedGroupByItems.length > MAX_GROUP_BY_COUNT)) {
         state.proxySelectedGroupByItems = state.proxySelectedGroupByItems.filter((d) => d.name !== selectedItem.name);
-        showInfoMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.ALT_E_ADD_GROUP_BY'), '');
+        showErrorMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.ALT_E_ADD_GROUP_BY'), '');
     }
 };
 

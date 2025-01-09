@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, computed } from 'vue';
+import { reactive, computed, onMounted } from 'vue';
 
 import {
     PPaneLayout, PHeadingLayout, PHeading, PButton, PDataTable, PBadge, PIconButton, PLink,
@@ -56,6 +56,10 @@ const state = reactive({
             return acc;
         }, {} as Record<string, any>);
     }),
+});
+
+onMounted(() => {
+    if (!taskCategoryStore.state.loading) taskCategoryStore.list();
 });
 
 </script>

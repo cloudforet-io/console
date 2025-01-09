@@ -14,8 +14,11 @@ const props = defineProps<{
     label?: string;
     menu?: DataSelectorItem[];
     handler?: MenuAttachHandler<DataSelectorItem>;
+    showSelectMarker?: boolean;
+    multiSelectable?: boolean;
 }>();
 const emit = defineEmits<{(e: 'update:selected', value: DataSelectorItem[]): void;
+    (e: 'update:search-text', value: string): void;
 }>();
 
 const searchText = ref('');
@@ -38,6 +41,7 @@ const {
 });
 const handleUpdateSearchText = debounce((text: string) => {
     searchText.value = text;
+    emit('update:search-text', searchText.value);
     reloadMenu();
 }, 200);
 
@@ -72,6 +76,8 @@ watch([() => props.menu, () => props.handler], () => {
                             :search-text="searchText"
                             searchable
                             :selected="selected"
+                            :show-select-marker="props.showSelectMarker"
+                            :multi-selectable="props.multiSelectable"
                             @click-show-more="showMoreMenu()"
                             @update:search-text="handleUpdateSearchText"
                             @update:selected="handleUpdateSelected"

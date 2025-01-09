@@ -278,6 +278,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 CONCAT: cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.CONCAT),
                 QUERY: cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.QUERY),
                 EVAL: cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.EVAL),
+                AGGREGATE: cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.AGGREGATE),
                 PIVOT: cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT),
                 ADD_LABELS: cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.ADD_LABELS),
                 VALUE_MAPPING: cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.VALUE_MAPPING),
@@ -314,7 +315,14 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                         vars: dashboardDetailGetters.dashboardInfo?.vars || {},
                     });
                     if (state.widget?.state === 'ACTIVE') {
-                        await actions.updateWidget({ state: 'INACTIVE' });
+                        await actions.updateWidget({
+                            state: 'INACTIVE',
+                            options: {
+                                widgetHeader: {
+                                    ...state.widget?.options?.widgetHeader,
+                                },
+                            },
+                        });
                     }
                 }
                 state.dataTables = state.dataTables.map((dataTable) => (dataTable.data_table_id === result.data_table_id ? result : dataTable));

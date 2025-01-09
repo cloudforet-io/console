@@ -19,7 +19,6 @@ const pieChart: WidgetConfig = {
                 dataTarget: 'labels_info',
                 defaultMaxCount: 10,
                 max: 15,
-                defaultIndex: 0,
             },
         },
         pieChartType: {

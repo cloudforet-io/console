@@ -1,6 +1,6 @@
-export default {
+module.exports = {
     root: false,
-    extends: ["custom"],
+    extends: ['custom'],
     rules: {
         // eslint-plugin-import rules
         'import/order': [

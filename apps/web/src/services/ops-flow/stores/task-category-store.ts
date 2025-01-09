@@ -47,18 +47,8 @@ export const useTaskCategoryStore = defineStore('task-category', () => {
 
     const getters: UseTaskCategoryStoreGetters = {
         loading: computed<boolean>(() => state.loading),
-        taskCategories: computed<TaskCategoryModel[]>(() => {
-            if (state.items === undefined) {
-                actions.list();
-            }
-            return state.items?.filter((item) => item.state !== 'DELETED') ?? [];
-        }),
-        taskCategoriesIncludingDeleted: computed<TaskCategoryModel[]>(() => {
-            if (state.items === undefined) {
-                actions.list();
-            }
-            return state.items ?? [];
-        }),
+        taskCategories: computed<TaskCategoryModel[]>(() => state.items?.filter((item) => item.state !== 'DELETED') ?? []),
+        taskCategoriesIncludingDeleted: computed<TaskCategoryModel[]>(() => state.items ?? []),
     } as unknown as UseTaskCategoryStoreGetters; // HACK: to avoid type error
 
     const fetchList = getCancellableFetcher<TaskCategoryListParameters, ListResponse<TaskCategoryModel>>(SpaceConnector.clientV2.opsflow.taskCategory.list);

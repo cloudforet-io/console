@@ -1,4 +1,4 @@
-import { reactive, computed } from 'vue';
+import { reactive, computed, onMounted } from 'vue';
 
 import { isEmpty, isEqual } from 'lodash';
 import { defineStore } from 'pinia';
@@ -25,6 +25,7 @@ import {
     useTaskFieldMetadataStore,
 } from '@/services/ops-flow/task-fields-configuration/stores/use-task-field-metadata-store';
 import type { DefaultTaskFieldId } from '@/services/ops-flow/task-fields-configuration/types/task-field-type-metadata-type';
+import type { References } from '@/services/ops-flow/task-fields-form/types/task-field-form-type';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
@@ -59,6 +60,7 @@ interface UseTaskContentFormStoreGetters {
     isFieldValid: boolean;
     isAllValid: boolean;
     isEditable: boolean;
+    references: References;
 }
 export const useTaskContentFormStore = defineStore('task-content-form', () => {
     const taskCategoryStore = useTaskCategoryStore();
@@ -100,15 +102,9 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
             return isViewMode ? fields : fields.filter((f) => f.is_primary || f.is_required);
         }),
         defaultFields: computed<TaskField[]>(() => {
-            const scope = state.currentTaskType?.scope;
-            switch (scope) {
-            case 'WORKSPACE':
-                return taskFieldMetadataStore.getters.workspaceScopeDefaultFields;
-            case 'PROJECT':
-                return taskFieldMetadataStore.getters.projectScopeDefaultFields;
-            default:
-                return taskFieldMetadataStore.getters.workspaceScopeDefaultFields;
-            }
+            const projectRequired = state.currentTaskType?.require_project;
+            if (projectRequired) return taskFieldMetadataStore.getters.projectScopeDefaultFields;
+            return taskFieldMetadataStore.getters.workspaceScopeDefaultFields;
         }),
         isDefaultFieldValid: computed<boolean>(() => {
             if (state.mode === 'view') return state.defaultDataValidationMap[DEFAULT_FIELD_ID_MAP.title] ?? true;
@@ -127,6 +123,12 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
             if (userStore.getters.isDomainAdmin) return true;
             // if (state.originTask.created_by === userStore.state.userId) return true;
             return false;
+        }),
+        references: computed<References>(() => {
+            const projectRequired = state.currentTaskType?.require_project;
+            return {
+                project_id: projectRequired ? state.defaultData[DEFAULT_FIELD_ID_MAP.project] : '*',
+            };
         }),
     } as unknown as UseTaskContentFormStoreGetters; // HACK: to avoid type error
 
@@ -206,7 +208,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
             state.defaultData = {
                 [DEFAULT_FIELD_ID_MAP.title]: task.name,
                 [DEFAULT_FIELD_ID_MAP.description]: task.description,
-                [DEFAULT_FIELD_ID_MAP.project]: task.project_id ? [task.project_id] : undefined,
+                [DEFAULT_FIELD_ID_MAP.project]: task.project_id,
             };
             state.data = task.data ?? {};
             state.fileIds = task.files?.map((f) => f.file_id) ?? [];
@@ -235,8 +237,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
                     assignee: state.assignee || undefined,
                     data: isEmpty(state.data) ? undefined : state.data,
                     files: state.fileIds,
-                    project_id: state.defaultData[DEFAULT_FIELD_ID_MAP.project]?.[0],
-                    resource_group: state.currentTaskType.scope,
+                    project_id: state.currentTaskType.require_project ? state.defaultData[DEFAULT_FIELD_ID_MAP.project] : '*',
                 });
                 showSuccessMessage(i18n.t('OPSFLOW.ALT_S_CREATE_TARGET', { target: taskManagementTemplateStore.templates.task }), '');
                 state.createTaskLoading = false;
@@ -264,6 +265,9 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         },
     };
 
+    onMounted(() => {
+        if (!taskCategoryStore.state.loading) taskCategoryStore.list();
+    });
 
 
     return {

@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, reactive, watch, toRef, ref,
+} from 'vue';
+
+import { isEqual } from 'lodash';
 
 import {
     PButton,
@@ -13,7 +17,7 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 
 import { SpaceRouter } from '@/router';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
-import type { ResourceGroupType } from '@/schema/_common/type';
+import type { ContentsType, ResourceGroupType } from '@/schema/_common/type';
 import type { PostUpdateParameters } from '@/schema/board/post/api-verbs/update';
 import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
@@ -25,8 +29,8 @@ import { useUserStore } from '@/store/user/user-store';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import { emptyHtmlRegExp } from '@/common/components/editor/extensions/image/helper';
-import type { Attachment } from '@/common/components/editor/extensions/image/type';
 import TextEditor from '@/common/components/editor/TextEditor.vue';
+import { useEditorContentTransformer } from '@/common/composables/editor-content-transformer';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFileUploader } from '@/common/composables/file-uploader';
 import { useFormValidator } from '@/common/composables/form-validator';
@@ -59,7 +63,7 @@ const storeState = reactive({
 const state = reactive({
     isPinned: false,
     isPopup: false,
-    attachments: [] as Attachment[],
+    fileIds: [] as string[],
 });
 const workspaceState = reactive({
     selectedItems: [] as WorkspaceDropdownMenuItem[],
@@ -92,18 +96,32 @@ const {
     },
 });
 
+const contentsType = ref<ContentsType>('markdown');
+const resourceGroup = 'DOMAIN';
+const { fileUploader } = useFileUploader({ resourceGroup });
+const {
+    contents: uploadContents,
+    editorContents,
+} = useEditorContentTransformer({
+    contentsType,
+    resourceGroup,
+    fileIds: toRef(state, 'fileIds'), // auto update to state.fileIds
+    contents,
+});
+watch(uploadContents, (d) => {
+    setForm('contents', d);
+});
 const formData = computed<Omit<PostUpdateParameters, 'post_id'>>(() => ({
     title: noticeTitle.value,
     writer: writerName.value,
     contents: contents.value,
-    files: state.attachments.map(({ fileId }) => fileId) as string[],
+    files: state.fileIds,
     options: {
         is_pinned: state.isPinned,
         is_popup: state.isPopup,
     },
 }));
 
-const { fileUploader } = useFileUploader();
 const { getProperRouteLocation } = useProperRouteLocation();
 
 
@@ -136,8 +154,19 @@ const handleCreateNotice = async () => {
 };
 const handleEditNotice = async () => {
     try {
+        const originData = noticeDetailState.post;
+        if (!originData) throw new Error('Origin data is not found');
+        const postData: Omit<PostUpdateParameters, 'post_id'> = {};
+        if (originData.title !== formData.value.title) postData.title = formData.value.title;
+        if (originData.writer !== formData.value.writer) postData.writer = formData.value.writer;
+        if (originData.contents !== formData.value.contents) postData.contents = formData.value.contents;
+        if (!isEqual(originData.files, formData.value.files)) {
+            postData.files = formData.value.files?.filter((f) => !!f);
+        }
+        if (!isEqual(originData.options, formData.value.options)) postData.options = formData.value.options;
+
         await noticeDetailStore.updateNoticePost({
-            ...formData.value,
+            ...postData,
             workspaces: workspaceState.selectedRadioIdx === 0 ? [] : workspaceState.selectedItems.map((item) => item.name),
         });
         showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_UPDATE_NOTICE'), '');
@@ -153,10 +182,11 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
     // INIT STATES
     state.isPinned = notice?.options?.is_pinned ?? false;
     state.isPopup = notice?.options?.is_popup ?? false;
-    state.attachments = notice?.files?.map((file) => ({ fileId: file.file_id, downloadUrl: file.download_url ?? '' })) ?? [];
+    state.fileIds = notice?.files?.map((file) => file.file_id) ?? [];
     setForm('writerName', notice?.writer ?? storeState.userName);
     setForm('noticeTitle', notice?.title ?? '');
     setForm('contents', notice?.contents ?? '');
+    contentsType.value = notice?.contents_type ?? 'markdown';
 
     if (notice?.workspaces?.includes('*')) {
         workspaceState.selectedRadioIdx = 0;
@@ -240,11 +270,11 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
                                :invalid-text="invalidTexts.contents"
                 >
                     <template #default="{invalid}">
-                        <text-editor :value="contents"
-                                     :attachments.sync="state.attachments"
+                        <text-editor :value="editorContents"
                                      :image-uploader="fileUploader"
                                      :invalid="invalid"
-                                     @update:value="(d) => setForm('contents', d)"
+                                     :contents-type="contentsType"
+                                     @update:value="editorContents = $event"
                         />
                     </template>
                 </p-field-group>

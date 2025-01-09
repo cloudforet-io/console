@@ -253,6 +253,7 @@ onUnmounted(() => {
                 @apply block;
                 margin-right: 0.125rem;
                 margin-left: auto;
+                flex-shrink: 0;
                 &:hover {
                     transform: scale(1.3);
                 }

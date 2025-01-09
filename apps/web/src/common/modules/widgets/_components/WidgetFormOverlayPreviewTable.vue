@@ -6,6 +6,7 @@ import {
 
 import { useQuery } from '@tanstack/vue-query';
 import bytes from 'bytes';
+import { sortBy } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -14,7 +15,6 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
 import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { Page } from '@/schema/_common/type';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { DataTableLoadParameters } from '@/schema/dashboard/public-data-table/api-verbs/load';
@@ -34,6 +34,7 @@ import {
 } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
+import type { WidgetLoadResponse } from '@/common/modules/widgets/types/widget-data-type';
 import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
 
 import { gray, white } from '@/styles/colors';
@@ -50,12 +51,8 @@ interface PreviewTableField {
     type: 'LABEL' | 'DATA' | 'DIVIDER';
     name: string;
     sortKey?: string;
+    reference?: 'project'|'workspace'|'region'|'serviceAccount';
 }
-
-type DataTableLoadData = ListResponse<{
-    [key: string]: string|number;
-}>;
-
 
 type DataTableModel = PublicDataTableModel|PrivateDataTableModel;
 
@@ -78,11 +75,12 @@ const storeState = reactive({
 });
 
 const state = reactive({
-    data: computed<DataTableLoadData | null>(() => queryResult?.data?.value || null),
+    data: computed<WidgetLoadResponse | null>(() => queryResult?.data?.value || null),
     labelFields: computed<string[]>(() => (dataTableLoading.value === true ? [] : sortWidgetTableFields(Object.keys(storeState.selectedDataTable?.labels_info ?? {})))),
     dataFields: computed<string[]>(() => (dataTableLoading.value === true ? [] : sortWidgetTableFields(Object.keys(storeState.selectedDataTable?.data_info ?? {})))),
     dataInfo: computed<DataInfo|undefined>(() => storeState.selectedDataTable?.data_info),
     isPivot: computed<boolean>(() => storeState.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
+    pivotColumn: computed<string|undefined>(() => storeState.selectedDataTable?.options?.[DATA_TABLE_OPERATOR.PIVOT]?.fields?.column),
     isAutoTypeColumnPivot: computed<boolean>(() => state.isPivot && !!storeState.selectedDataTable?.options?.[DATA_TABLE_OPERATOR.PIVOT]?.limit),
     // pivotSortKeys: computed<string[]>(() => (state.isPivot ? storeState.selectedDataTable?.sort_keys ?? [] : [])),
     fields: computed<PreviewTableField[]>(() => {
@@ -93,10 +91,25 @@ const state = reactive({
             }];
         }
 
-        // const sortBySortKeys = (targetArray: string[]): string[] => sortBy(targetArray, (item) => {
-        //     const index = state.pivotSortKeys.indexOf(item);
-        //     return index === -1 ? Infinity : index;
-        // });
+        const dataFields: PreviewTableField[] = [];
+        if (state.isPivot) {
+            const headers = state.data.order ?? [];
+            sortBy(state.dataFields, (field) => {
+                const index = headers.indexOf(field);
+                return index === -1 ? Infinity : index;
+            }).forEach((field) => {
+                dataFields.push({
+                    name: field,
+                    type: 'DATA',
+                    reference: state.pivotColumn,
+                });
+            });
+        } else {
+            dataFields.push(...state.dataFields.map((key) => ({
+                type: 'DATA',
+                name: key,
+            })));
+        }
 
         return [
             ...state.labelFields.map((key) => ({
@@ -117,10 +130,7 @@ const state = reactive({
                 type: 'DIVIDER',
                 name: '',
             },
-            ...state.dataFields.map((key) => ({
-                type: 'DATA',
-                name: key,
-            })),
+            ...dataFields,
         ];
     }),
     isSeparatedDataTable: computed(() => !Object.keys(storeState.selectedDataTable?.labels_info ?? {}).includes('Date')),
@@ -204,7 +214,8 @@ const getValue = (item, field: PreviewTableField) => {
     if (field.type === 'LABEL' && Object.keys(REFERENCE_FIELD_MAP).includes(field.name)) {
         const referenceKey = REFERENCE_FIELD_MAP[field.name];
         const referenceValueKey = item[field.name];
-        return storeState[referenceKey][referenceValueKey]?.label || storeState[referenceKey][referenceValueKey]?.name || referenceValueKey || '-';
+        const referenceItem = storeState[referenceKey]?.[referenceValueKey];
+        return referenceItem?.label || referenceItem?.name || referenceValueKey || '-';
     }
     if (field.type === 'DATA') {
         return itemValue ? valueFormatter(itemValue, field) : '-';
@@ -212,14 +223,23 @@ const getValue = (item, field: PreviewTableField) => {
     return item[field.name] || '-';
 };
 
-const getSortIcon = (field: PreviewTableField) => {
-    if (field.type === 'LABEL') {
-        if (!state.sortBy.some((d) => d.key === field.sortKey || d.key === field.name)) {
-            return 'ic_caret-down';
-        }
-        return state.sortBy[0]?.desc ? 'ic_caret-down-filled' : 'ic_caret-up-filled';
+const getFieldName = (field: PreviewTableField) => {
+    if (field.type === 'DATA' && !!field.reference && Object.keys(REFERENCE_FIELD_MAP).includes(field.reference)) {
+        const referenceKey = REFERENCE_FIELD_MAP[field.reference];
+        const refernceItem = storeState[referenceKey]?.[field.name];
+        return refernceItem?.label || refernceItem?.name || field.name;
     }
-    return '';
+    return field.name;
+};
+
+const getSortIcon = (field: PreviewTableField) => {
+    // if (field.type === 'LABEL') {
+    if (!state.sortBy.some((d) => d.key === field.sortKey || d.key === field.name)) {
+        return 'ic_caret-down';
+    }
+    return state.sortBy[0]?.desc ? 'ic_caret-down-filled' : 'ic_caret-up-filled';
+    // }
+    // return '';
 };
 
 // const getTimeDiffSubText = (field: PreviewTableField): string => {
@@ -230,10 +250,10 @@ const getSortIcon = (field: PreviewTableField) => {
 //     return `( ${value} ${key} )`;
 // };
 
-const fetchWidgetData = async (params: DataTableLoadParameters): Promise<DataTableLoadData> => {
+const fetchWidgetData = async (params: DataTableLoadParameters): Promise<WidgetLoadResponse> => {
     const defaultFetcher = storeState.selectedDataTableId?.startsWith('private')
-        ? SpaceConnector.clientV2.dashboard.privateDataTable.load<DataTableLoadParameters, DataTableLoadData>
-        : SpaceConnector.clientV2.dashboard.publicDataTable.load<DataTableLoadParameters, DataTableLoadData>;
+        ? SpaceConnector.clientV2.dashboard.privateDataTable.load<DataTableLoadParameters, WidgetLoadResponse>
+        : SpaceConnector.clientV2.dashboard.publicDataTable.load<DataTableLoadParameters, WidgetLoadResponse>;
     const res = await defaultFetcher(params);
     return res;
 };
@@ -330,12 +350,11 @@ onUnmounted(() => {
                         <span v-else
                               :class="{'th-contents': true, 'data-field': field.type === 'DATA'}"
                         >
-                            {{ field.name }}
+                            {{ getFieldName(field) }}
                             <!--                            <span v-if="state.dataInfo?.[field.name]?.timediff"-->
                             <!--                                  class="timediff-sub-text"-->
                             <!--                            >{{ getTimeDiffSubText(field) }}</span>-->
-                            <p-i v-if="field.type === 'LABEL'"
-                                 :name="getSortIcon(field)"
+                            <p-i :name="getSortIcon(field)"
                                  class="sort-icon"
                                  @click="handleClickSort(field.name)"
                             />
@@ -428,11 +447,6 @@ onUnmounted(() => {
         .sort-icon {
             @apply text-gray-500 float-right my-px;
             &:hover { cursor: pointer; }
-        }
-        &:last-child {
-            .th-contents:not(.has-icon) {
-                padding-right: 1rem;
-            }
         }
     }
 

@@ -46,7 +46,7 @@ export const useTaskFieldsConfiguration = () => {
                 name: field.name,
                 is_required: false,
                 selection_type: DEFAULT_SELECTION_TYPE_MAP[field.type],
-                is_primary: false,
+                is_primary: true,
                 options: {},
             } as MutableTaskField]);
         },

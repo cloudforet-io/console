@@ -26,7 +26,7 @@ const taskTypeFields = computed<DataTableField[]>(() => [
         width: '20%',
     },
     {
-        name: 'scope',
+        name: 'require_project',
         label: _i18n.t('OPSFLOW.SCOPE') as string,
         width: '12%',
     },
@@ -82,11 +82,11 @@ const taskTypeFields = computed<DataTableField[]>(() => [
                       :items="taskCategoryPageGetters.taskTypes"
                       :fields="taskTypeFields"
         >
-            <template #col-scope-format="{ value }">
-                <p-badge :style-type="value === 'WORKSPACE' ? 'secondary1' : 'primary'"
+            <template #col-require_project-format="{ value }">
+                <p-badge :style-type="value ? 'primary' : 'secondary1'"
                          badge-type="solid-outline"
                 >
-                    {{ $t(`OPSFLOW.${value ?? 'WORKSPACE'}`) }}
+                    {{ $t(`OPSFLOW.${value ? 'PROJECT' : 'WORKSPACE'}`) }}
                 </p-badge>
             </template>
             <template #col-buttons-format="{ item }">

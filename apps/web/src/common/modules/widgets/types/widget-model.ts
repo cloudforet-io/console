@@ -75,8 +75,12 @@ export interface QueryOptions {
 }
 
 export interface AggregateOptions {
-    data_table_id: string;
+    data_table_id?: string;
     group_by: string[];
+    function: AggregateFunction;
+}
+export interface AggregateFunction {
+    [key: string]: 'sum'|'max'|'min'|'mean';
 }
 
 export interface EvalOptions {

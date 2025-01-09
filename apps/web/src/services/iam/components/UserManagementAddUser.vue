@@ -146,6 +146,7 @@ const clickOutside = () => {
 const handleSelectMenuItem = async (menuItem: AddModalMenuItem) => {
     if (!state.selectedItems.some((item) => item.name === menuItem.name)) {
         state.selectedItems.unshift(menuItem);
+        emit('change-input', { userList: state.selectedItems });
     }
     hideMenu();
     resetValidationState();

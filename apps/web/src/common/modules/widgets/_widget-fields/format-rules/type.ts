@@ -16,6 +16,7 @@ export interface FormatRulesValue {
 export interface FormatRulesOptions {
     useField?: boolean;
     dataTarget?: FieldDataTargetType;
+    dependentField?: string; // groupBy field, xAxis field, yAxis field.. etc.
     formatRulesType: FormatRulesType;
     description?: string;
     baseColor?: string;

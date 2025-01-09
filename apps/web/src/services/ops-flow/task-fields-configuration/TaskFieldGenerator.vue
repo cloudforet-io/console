@@ -57,7 +57,7 @@ const taskManagementTemplateStore = useTaskManagementTemplateStore();
 const fieldMetadata = computed<TaskFieldTypeMetadata>(() => taskFieldMetadataStoreGetters.taskFieldTypeMetadataMap[props.field.field_type]);
 const optionsComponent = computed<ReturnType<typeof defineAsyncComponent>|undefined>(() => COMPONENT_MAP[props.field.field_type]);
 
-const isDefaultField = computed(() => !!DEFAULT_FIELD_ID_MAP[props.field.field_id]);
+const isDefaultField = computed(() => Object.values(DEFAULT_FIELD_ID_MAP).includes(props.field.field_id));
 
 /* input type */
 const inputTypes = computed<{ name: string; label: string; }[]>(() => [
@@ -136,7 +136,7 @@ const handleRequiredChange = (value: boolean) => {
 };
 
 /* other field properties */
-const isPrimary = ref<boolean>(false);
+const isPrimary = ref<boolean>(true);
 const isFolded = ref<boolean>(false);
 
 /* validation */
@@ -207,7 +207,7 @@ onBeforeMount(() => {
     options.value = props.field.options ?? {};
     isOptionsValid.value = false;
     isRequired.value = props.field.is_required ?? isDefaultField.value;
-    isPrimary.value = props.field.is_required ? true : (props.field.is_primary ?? isDefaultField.value);
+    isPrimary.value = props.field.is_primary ?? true;
     isFolded.value = isDefaultField.value;
     jsonCode.value = JSON.stringify(props.field);
 });

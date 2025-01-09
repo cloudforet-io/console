@@ -99,6 +99,11 @@ const handleClickContinue = async () => {
             if (widgetGenerateState.widget?.state === 'ACTIVE') {
                 _updateParams.state = 'INACTIVE';
             }
+            if (widgetGenerateState.widget?.options?.widgetHeader) {
+                _updateParams.options = {
+                    widgetHeader: widgetGenerateState.widget?.options?.widgetHeader,
+                };
+            }
             await widgetGenerateStore.updateWidget(_updateParams);
         }
         widgetGenerateStore.setOverlayStep(2);

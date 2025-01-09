@@ -113,7 +113,7 @@ export const downloadExcelByExportFetcher = async (excelExportFetcher:() => Prom
     try {
         const exportResponse:ExportResponse = await excelExportFetcher();
         if (exportResponse) {
-            await downloadByFileUrl(exportResponse.download_url);
+            await downloadByFileUrl(`${exportResponse.download_url}?token=${SpaceConnector.getAccessToken()}`);
             setTimeout(() => {
                 showSuccessMessage(i18n.t('COMMON.EXCEL.ALT_S_DOWNLOAD_SUCCESS'), '');
             }, 500);
