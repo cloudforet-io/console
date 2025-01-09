@@ -49,6 +49,7 @@ interface ServiceFormStoreState {
     eventRuleScopeModalVisible: boolean;
     showEventRuleFormCard: boolean;
     isEventRuleEditMode: boolean;
+    eventRuleInfoLoading: boolean;
 }
 interface ServiceFormStoreGetters {
     serviceInfo: ComputedRef<Service>;
@@ -79,6 +80,7 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
         eventRuleScopeModalVisible: false,
         showEventRuleFormCard: false,
         isEventRuleEditMode: false,
+        eventRuleInfoLoading: false,
     });
 
     const getters = reactive<ServiceFormStoreGetters>({
@@ -156,6 +158,13 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
             state.showEventRuleFormCard = false;
             state.isEventRuleEditMode = false;
         },
+        initEscalationPolicyState() {
+            state.eventRuleList = [];
+            state.eventRuleInfo = {} as EventRuleModel;
+            state.eventRuleScopeModalVisible = false;
+            state.showEventRuleFormCard = false;
+            state.isEventRuleEditMode = false;
+        },
         async fetchServiceDetailData(id: string) {
             state.loading = true;
             try {
@@ -218,12 +227,14 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
             }
         },
         async fetchEventRuleInfo(params: EventRuleGetParameters) {
+            state.eventRuleInfoLoading = true;
             try {
                 state.eventRuleInfo = await SpaceConnector.clientV2.alertManager.eventRule.get<EventRuleGetParameters, EventRuleModel>(params);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.eventRuleInfo = {} as EventRuleModel;
-                throw e;
+            } finally {
+                state.eventRuleInfoLoading = false;
             }
         },
     };

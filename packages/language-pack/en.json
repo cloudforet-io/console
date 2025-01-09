@@ -200,6 +200,7 @@
 			"CREATE_TITLE": "Create Notifications",
 			"CUSTOM": "Custom",
 			"DAY": "Day",
+			"FAILURE": "Failure",
 			"FRIDAY": "Friday",
 			"HIGH_NOTIFICATIONS_ONLY": "High Urgency Notifications Only",
 			"MODAL_DELETE_BUTTON": "Delete this Notification",

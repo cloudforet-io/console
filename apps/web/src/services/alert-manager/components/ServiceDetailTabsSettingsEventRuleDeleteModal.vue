@@ -44,16 +44,13 @@ const handleConfirm = async () => {
         await SpaceConnector.clientV2.alertManager.eventRule.delete<EventRuleDeleteParameters>({
             event_rule_id: storeState.eventRuleInfo.event_rule_id,
         });
+        await replaceUrlQuery({
+            webhookId: undefined,
+            eventRuleId: undefined,
+        });
         await serviceDetailPageStore.fetchEventRuleList({
             service_id: storeState.serviceId,
         });
-        if (storeState.eventRuleList.length) {
-            const scope = storeState.eventRuleList[0].webhook_id || 'global';
-            await replaceUrlQuery({
-                webhookId: scope,
-                eventRuleId: storeState.eventRuleList[0].event_rule_id,
-            });
-        }
     } catch (e) {
         ErrorHandler.handleError(e, true);
     } finally {

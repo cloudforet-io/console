@@ -37,14 +37,6 @@ import {
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
 import type { EventRuleActionsItemValueType, EventRuleActionsItemType } from '@/services/alert-manager/types/alert-manager-type';
 
-interface Props {
-    loading: boolean;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    loading: true,
-});
-
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
@@ -59,6 +51,7 @@ const storeState = reactive({
     cloudServiceType: computed<CloudServiceTypeReferenceMap>(() => allReferenceGetters.cloudServiceType),
     escalationPolicy: computed<EscalationPolicyReferenceMap>(() => allReferenceGetters.escalationPolicy),
     eventRuleInfo: computed<EventRuleModel>(() => serviceDetailPageState.eventRuleInfo),
+    eventRuleInfoLoading: computed<boolean>(() => serviceDetailPageState.eventRuleInfoLoading),
 });
 const state = reactive({
     actionSetting: getActionSettingI18n(),
@@ -149,7 +142,7 @@ const handleDeleteEventRule = () => {
 
 <template>
     <p-data-loader class="service-detail-tabs-settings-event-rule-card"
-                   :loading="props.loading"
+                   :loading="storeState.eventRuleInfoLoading"
                    :data="storeState.eventRuleInfo"
     >
         <p-card :header="$t('ALERT_MANAGER.EVENT_RULE.TITLE')">
@@ -159,7 +152,7 @@ const handleDeleteEventRule = () => {
                     <div v-if="hasReadWriteAccess"
                          class="flex items-center gap-2"
                     >
-                        <p-icon-button name="ic_edit"
+                        <p-icon-button name="ic_edit-text"
                                        style-type="transparent"
                                        @click="handleEditEventRule"
                         />
