@@ -14,3 +14,8 @@ export type WebhookRequestType = {
     total: number;
     error: number;
 };
+
+export type WebhookMessageFormatType = {
+    from: string;
+    to: string;
+};

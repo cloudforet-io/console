@@ -177,6 +177,7 @@ watch(() => storeState.alertInfo, async (alertInfo) => {
         </div>
         <p-data-loader :loading="state.loading"
                        :data="state.slicedHistoryList"
+                       class="min-h-10"
         >
             <template v-if="state.slicedHistoryList.length > 0">
                 <p-divider />
