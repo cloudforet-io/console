@@ -43,6 +43,7 @@ const handleClickAddRule = () => {
 };
 
 const fetchEventRuleInfo = async () => {
+    console.log('fetchEventRuleInfo', route.query?.eventRuleId);
     state.eventRuleInfoLoading = true;
     try {
         await serviceDetailPageStore.fetchEventRuleInfo({
@@ -54,6 +55,7 @@ const fetchEventRuleInfo = async () => {
 };
 
 watch(() => route.query?.eventRuleId, (eventRuleId) => {
+    console.log({ eventRuleId });
     if (eventRuleId) {
         fetchEventRuleInfo();
     }
@@ -77,7 +79,7 @@ watch(() => storeState.serviceId, async (id) => {
                        :data="!storeState.showEventRuleFormCard ? storeState.items : true"
                        class="loader"
         >
-            <div class="content-wrapper flex gap-1">
+            <div class="content-wrapper flex gap-6">
                 <service-detail-tabs-settings-event-rule-sidebar :hide-sidebar.sync="state.hideSidebar"
                                                                  :items="storeState.items"
                 />

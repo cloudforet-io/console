@@ -103,3 +103,7 @@ export type EventRuleActionsUrgencyRadioType = {
     label: TranslateResult;
     name: EventRuleUrgencyType | 'NO_SET';
 };
+export type EventRuleActionsTempAssetRadioType = {
+    label: TranslateResult;
+    name: 'CREATE' | 'DO_NOT_CREATE';
+};

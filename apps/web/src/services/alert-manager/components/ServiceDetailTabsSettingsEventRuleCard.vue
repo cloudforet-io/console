@@ -73,6 +73,7 @@ const state = reactive({
             'add_additional_info',
         ];
 
+        console.log(storeState.eventRuleInfo);
         if (storeState.eventRuleInfo.actions) {
             actionOrder.forEach((actionKey) => {
                 const actionValue = storeState.eventRuleInfo.actions[actionKey];
@@ -101,6 +102,11 @@ const state = reactive({
                                 value: matchAssetValue.rule,
                             });
                         }
+                        result[type].push({
+                            label: i18n.t('ALERT_MANAGER.EVENT_RULE.TEMP_ASSET'),
+                            name: 'create_temporary_asset',
+                            value: matchAssetValue.create_temporary_asset ? i18n.t('ALERT_MANAGER.CREATE') : i18n.t('ALERT_MANAGER.EVENT_RULE.DO_NOT_CREATE'),
+                        });
                     } else if (actionKey === 'add_additional_info') {
                         result[type].push({
                             label: i18n.t('ALERT_MANAGER.ALERTS.ADDITIONAL_INFO'),
@@ -182,18 +188,10 @@ const handleDeleteEventRule = () => {
                             />
                             <p-field-group class="input-form scope">
                                 <div class="flex items-center gap-1 text-label-md">
-                                    <span class="text-label-lg text-gray-500">{{ $t('ALERT_MANAGER.EVENT_RULE.WEBHOOK_SCOPE') }}: </span>
-                                    <p v-if="storeState.eventRuleInfo.scope === EVENT_RULE_SCOPE.GLOBAL"
-                                       class="scope-wrapper"
-                                    >
-                                        <p-i name="ic_globe-filled"
-                                             height="1rem"
-                                             width="1rem"
-                                             color="inherit"
-                                        />
-                                        <span>{{ $t('ALERT_MANAGER.EVENT_RULE.GLOBAL') }}</span>
-                                    </p>
-                                    <p v-else
+                                    <span class="text-label-lg text-gray-500">
+                                        {{ storeState.eventRuleInfo.scope === EVENT_RULE_SCOPE.GLOBAL ? $t('ALERT_MANAGER.EVENT_RULE.GLOBAL_SCOPE') : $t('ALERT_MANAGER.EVENT_RULE.WEBHOOK_SCOPE') }}
+                                    </span>
+                                    <p v-if="storeState.eventRuleInfo.scope !== EVENT_RULE_SCOPE.GLOBAL"
                                        class="scope-wrapper"
                                     >
                                         <p-lazy-img :src="getWebhookIcon()"
@@ -202,7 +200,7 @@ const handleDeleteEventRule = () => {
                                                     height="1rem"
                                                     class="icon"
                                         />
-                                        <span>{{ storeState.webhook[storeState.eventRuleInfo.webhook_id]?.label }}</span>
+                                        <span>: {{ storeState.webhook[storeState.eventRuleInfo.webhook_id]?.label }}</span>
                                     </p>
                                 </div>
                             </p-field-group>
