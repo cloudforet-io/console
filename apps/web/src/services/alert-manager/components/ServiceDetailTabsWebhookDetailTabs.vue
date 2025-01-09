@@ -7,14 +7,16 @@ import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PHeadingLayout, PTab, PHeading, PDefinitionTable, PStatus, PLazyImg, PMarkdown, PBadge, PDataTable,
+    PHeadingLayout, PTab, PHeading, PDefinitionTable, PStatus, PLazyImg, PMarkdown, PBadge, PDataTable, PButton,
 } from '@cloudforet/mirinae';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { WebhookGetParameters } from '@/schema/alert-manager/webhook/api-verbs/get';
 import type { WebhookListErrorSParameters } from '@/schema/alert-manager/webhook/api-verbs/list-errors';
+import type { WebhookUpdateMessageFormatParameters } from '@/schema/alert-manager/webhook/api-verbs/update-message-format';
 import type { WebhookModel, WebhookListErrorsModel } from '@/schema/alert-manager/webhook/model';
+import type { WebhookMessageFormatType } from '@/schema/alert-manager/webhook/type';
 import type { PluginGetParameters } from '@/schema/repository/plugin/api-verbs/get';
 import type { PluginModel } from '@/schema/repository/plugin/model';
 import type { RepositoryListParameters } from '@/schema/repository/repository/api-verbs/list';
@@ -26,12 +28,14 @@ import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-servi
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import TagsOverlay from '@/common/modules/tags/tags-panel/modules/TagsOverlay.vue';
+import { sortTableItems } from '@/common/utils/table-sort';
 
 import { alertManagerStateFormatter } from '@/services/alert-manager/composables/refined-table-data';
 import { WEBHOOK_DETAIL_TABS } from '@/services/alert-manager/constants/common-constant';
 import {
     WEBHOOK_DEFINITION_FIELDS,
-    WEBHOOK_ERROR_LIST_TABLE_FIELDS,
+    WEBHOOK_ERROR_LIST_TABLE_FIELDS, WEBHOOK_MESSAGE_TABLE_FIELDS,
 } from '@/services/alert-manager/constants/webhook-table-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
 import type { WebhookDetailTabsType } from '@/services/alert-manager/types/alert-manager-type';
@@ -53,11 +57,15 @@ const tabState = reactive({
         const defaultTabs: TabItem[] = [
             { label: i18n.t('ALERT_MANAGER.ALERTS.DETAILS'), name: WEBHOOK_DETAIL_TABS.DETAIL },
         ];
-        if (state.selectedPlugin?.docs && !isEmpty(state.selectedPlugin?.docs)) {
+        if (state.selectedPlugin?.docs && !isEmpty(state.selectedPlugin.docs)) {
             defaultTabs.push({ label: i18n.t('ALERT_MANAGER.WEBHOOK.HELP'), name: WEBHOOK_DETAIL_TABS.HELP });
         }
-        defaultTabs.push({ label: i18n.t('ALERT_MANAGER.WEBHOOK.ERROR'), name: WEBHOOK_DETAIL_TABS.ERROR });
-        return defaultTabs;
+        const additionalTabs: TabItem[] = [
+            { label: i18n.t('ALERT_MANAGER.WEBHOOK.ERROR'), name: WEBHOOK_DETAIL_TABS.ERROR },
+            { label: i18n.t('ALERT_MANAGER.WEBHOOK.MESSAGE'), name: WEBHOOK_DETAIL_TABS.MESSAGE },
+        ];
+
+        return [...defaultTabs, ...additionalTabs];
     }),
     activeWebhookDetailTab: WEBHOOK_DETAIL_TABS.DETAIL as WebhookDetailTabsType,
 });
@@ -72,22 +80,63 @@ const state = reactive({
     }))),
     errorTotalCount: 0,
 });
+const messageState = reactive({
+    loading: false,
+    formatList: [] as WebhookMessageFormatType[],
+    editFormVisible: false,
+    sortBy: 'created_at',
+    sortDesc: true,
+    formats: {},
+});
 
-const fetchWebhookDetail = async (selectedId: string) => {
+const handleEditMessageFormat = (value) => {
+    messageState.editFormVisible = value;
+};
+const handleChangeMessageSort = (sortBy, sortDesc) => {
+    messageState.sortBy = sortBy;
+    messageState.sortDesc = sortDesc;
+    messageState.formatList = sortTableItems<WebhookMessageFormatType>(messageState.formatList, sortBy, sortDesc);
+};
+
+const fetchWebhookDetail = async () => {
+    if (!storeState.selectedWebhookId) return;
     try {
         state.webhookInfo = await SpaceConnector.clientV2.alertManager.webhook.get<WebhookGetParameters, WebhookModel>({
-            webhook_id: selectedId,
+            webhook_id: storeState.selectedWebhookId,
         });
+        if (state.webhookInfo.message_formats.length) {
+            messageState.formatList = state.webhookInfo.message_formats || [];
+            messageState.formats = state.webhookInfo.message_formats.map((i) => ({ [i.from]: i.to })).reduce((acc, cur) => ({ ...acc, ...cur }), {});
+        }
     } catch (e) {
         ErrorHandler.handleError(e);
         state.webhookInfo = {} as WebhookModel;
     }
 };
-const fetchWebhookErrorList = async (selectedId: string) => {
+const getRepositoryID = async () => {
+    const res = await SpaceConnector.clientV2.repository.repository.list<RepositoryListParameters, ListResponse<RepositoryModel>>({
+        repository_type: 'remote',
+    });
+    return res.results ? res.results[0].repository_id : '';
+};
+const fetchPluginInfo = async () => {
+    try {
+        const repositoryId = await getRepositoryID();
+        state.selectedPlugin = await SpaceConnector.clientV2.repository.plugin.get<PluginGetParameters, PluginModel>({
+            repository_id: repositoryId,
+            plugin_id: state.webhookInfo.plugin_info?.plugin_id,
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.selectedPlugin = {} as PluginModel;
+    }
+};
+const fetchWebhookErrorList = async () => {
+    if (!storeState.selectedWebhookId) return;
     state.errorListLoading = true;
     try {
         const { results, total_count } = await SpaceConnector.clientV2.alertManager.webhook.listErrors<WebhookListErrorSParameters, ListResponse<WebhookListErrorsModel>>({
-            webhook_id: selectedId,
+            webhook_id: storeState.selectedWebhookId,
         });
         state.errorList = results || [];
         state.errorTotalCount = total_count || 0;
@@ -99,33 +148,34 @@ const fetchWebhookErrorList = async (selectedId: string) => {
         state.errorListLoading = false;
     }
 };
-const getRepositoryID = async () => {
-    const res = await SpaceConnector.clientV2.repository.repository.list<RepositoryListParameters, ListResponse<RepositoryModel>>({
-        repository_type: 'remote',
-    });
-    return res.results ? res.results[0].repository_id : '';
-};
-const fetchPluginInfo = async (pluginId: string) => {
+const fetchMessageUpdate = async (tags) => {
+    messageState.loading = true;
     try {
-        const repositoryId = await getRepositoryID();
-        state.selectedPlugin = await SpaceConnector.clientV2.repository.plugin.get<PluginGetParameters, PluginModel>({
-            repository_id: repositoryId,
-            plugin_id: pluginId,
+        await SpaceConnector.clientV2.alertManager.webhook.updateMessageFormat<WebhookUpdateMessageFormatParameters, WebhookModel>({
+            webhook_id: state.webhookInfo.webhook_id,
+            message_formats: Object.entries(tags).map(([key, value]) => ({
+                from: key,
+                to: value,
+            })) as WebhookMessageFormatType[],
         });
+        await handleEditMessageFormat(false);
+        await fetchWebhookDetail();
     } catch (e) {
-        ErrorHandler.handleError(e);
-        state.selectedPlugin = {} as PluginModel;
+        ErrorHandler.handleError(e, true);
+    } finally {
+        messageState.loading = false;
     }
 };
 
-watch(() => state.webhookInfo.plugin_info?.plugin_id, async (pluginId) => {
-    if (!pluginId) return;
-    await fetchPluginInfo(pluginId);
-}, { immediate: true });
-watch(() => storeState.selectedWebhookId, async (selectedId) => {
-    if (!selectedId) return;
-    await fetchWebhookDetail(selectedId);
-    await fetchWebhookErrorList(selectedId);
+watch(() => tabState.activeWebhookDetailTab, (activeTab) => {
+    if (activeTab === WEBHOOK_DETAIL_TABS.ERROR) {
+        fetchWebhookErrorList();
+    }
+});
+watch(() => storeState.selectedWebhookId, async () => {
+    await fetchWebhookDetail();
+    if (!state.webhookInfo.plugin_info?.plugin_id) return;
+    await fetchPluginInfo();
 }, { immediate: true });
 </script>
 
@@ -141,7 +191,7 @@ watch(() => storeState.selectedWebhookId, async (selectedId) => {
             <div>
                 <p-heading-layout>
                     <template #heading>
-                        <p-heading class="pt-8 px-4 pb-4"
+                        <p-heading class="heading"
                                    heading-type="sub"
                                    :title="$t('ALERT_MANAGER.WEBHOOK.BASE_INFO_TITLE')"
                         />
@@ -174,7 +224,7 @@ watch(() => storeState.selectedWebhookId, async (selectedId) => {
         <template v-if="tabState.activeWebhookDetailTab === WEBHOOK_DETAIL_TABS.HELP"
                   #help
         >
-            <div class="pt-8 pr-4 pl-4">
+            <div class="heading">
                 <div class="flex gap-4">
                     <p-lazy-img :src="state.selectedPlugin ? state.selectedPlugin.tags?.icon : 'ic_webhook'"
                                 error-icon="ic_webhook"
@@ -216,7 +266,7 @@ watch(() => storeState.selectedWebhookId, async (selectedId) => {
                                    use-total-count
                                    :total-count="state.errorTotalCount"
                                    heading-type="sub"
-                                   class="pt-8 px-4 pb-4"
+                                   class="heading"
                         />
                     </template>
                 </p-heading-layout>
@@ -230,11 +280,54 @@ watch(() => storeState.selectedWebhookId, async (selectedId) => {
                 </p-data-table>
             </div>
         </template>
+        <template v-if="tabState.activeWebhookDetailTab === WEBHOOK_DETAIL_TABS.MESSAGE"
+                  #message
+        >
+            <div>
+                <p-heading-layout class="heading">
+                    <template #heading>
+                        <p-heading :title="$t('ALERT_MANAGER.WEBHOOK.MSG_FORMAT')"
+                                   use-total-count
+                                   :total-count="messageState.formatList.length"
+                                   heading-type="sub"
+                        />
+                    </template>
+                    <template #extra>
+                        <p-button style-type="secondary"
+                                  icon-left="ic_edit"
+                                  @click="handleEditMessageFormat(true)"
+                        >
+                            {{ $t('COMMON.TAGS.EDIT') }}
+                        </p-button>
+                    </template>
+                </p-heading-layout>
+                <p-data-table :fields="WEBHOOK_MESSAGE_TABLE_FIELDS"
+                              :items="messageState.formatList"
+                              :sort-by="messageState.sortBy"
+                              :sort-desc="messageState.sortDesc"
+                              sortable
+                              beautify-text
+                              @changeSort="handleChangeMessageSort"
+                />
+                <transition name="slide-up">
+                    <tags-overlay v-if="messageState.editFormVisible"
+                                  :title="$t('ALERT_MANAGER.WEBHOOK.MSG_FORMAT')"
+                                  :tags="messageState.formats"
+                                  :loading="messageState.loading"
+                                  @close="handleEditMessageFormat(false)"
+                                  @update="fetchMessageUpdate"
+                    />
+                </transition>
+            </div>
+        </template>
     </p-tab>
 </template>
 
 <style scoped lang="postcss">
 .service-detail-tabs-webhook-detail-tabs {
+    .heading {
+        @apply pt-8 px-4 pb-4;
+    }
     .col-type {
         .name {
             margin-top: -0.125rem;
