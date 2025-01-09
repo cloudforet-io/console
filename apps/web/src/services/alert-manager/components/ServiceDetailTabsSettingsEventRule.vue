@@ -85,6 +85,7 @@ watch(() => storeState.serviceId, async (id) => {
     <div class="service-detail-tabs-settings-event-rule pt-6 pb-10">
         <p-data-loader :loading="state.loading"
                        :data="!storeState.showEventRuleFormCard ? storeState.items : true"
+                       class="loader"
         >
             <div class="content-wrapper flex gap-1">
                 <service-detail-tabs-settings-event-rule-sidebar :hide-sidebar.sync="state.hideSidebar"
@@ -127,6 +128,9 @@ watch(() => storeState.serviceId, async (id) => {
 
 <style scoped lang="postcss">
 .service-detail-tabs-settings-event-rule {
+    .loader {
+        min-height: 23.125rem;
+    }
     .content-wrapper {
         align-items: flex-start;
     }
