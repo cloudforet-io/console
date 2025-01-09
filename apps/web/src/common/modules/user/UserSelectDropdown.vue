@@ -167,7 +167,7 @@ const menuItemsHandler = (): AutocompleteHandler => async (keyword: string, page
             }
             return {
                 results: _slicedItems,
-                more: pageLimit <= _slicedItems.length - 1 && _totalCount < items.length,
+                more: pageLimit <= _slicedItems.length && _totalCount < items.length,
             };
         });
     }
@@ -178,7 +178,7 @@ const menuItemsHandler = (): AutocompleteHandler => async (keyword: string, page
         if (i !== resultIndex) return { results: [], title: c.title };
         return {
             results: _slicedItems,
-            more: pageLimit <= _slicedItems.length - 1 && _totalCount < items.length,
+            more: pageLimit <= _slicedItems.length && _totalCount < items.length,
         };
     });
 };
