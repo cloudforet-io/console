@@ -272,7 +272,7 @@
 			"USER": "사용자",
 			"USER_GROUP": "사용자 그룹",
 			"VALIDATION_KEY": "대문자, 숫자, 하이픈만 허용됩니다.",
-			"VALIDATION_KEY_HYPHEN": "첫 글자로 하이픈은 사용할 수 없습니다.",
+			"VALIDATION_KEY_HYPHEN": "첫 번째와 마지막 문자는 하이픈을 사용할 수 없습니다.",
 			"VALIDATION_KEY_UNIQUE": "동일한 이름의 키가 이미 존재합니다. ",
 			"VALIDATION_NAME_UNIQUE": "동일한 이름의 서비스가 이미 존재합니다.",
 			"VIEW_ALL_OPEN_ALERTS": "오픈된 얼럿 모두 보기",
