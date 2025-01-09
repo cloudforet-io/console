@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
-import { useRoute } from 'vue-router/composables';
+import {
+    computed, onUnmounted, reactive, watch,
+} from 'vue';
 
 import { PButton, PDataLoader } from '@cloudforet/mirinae';
 
@@ -20,8 +21,6 @@ import { useServiceDetailPageStore } from '@/services/alert-manager/stores/servi
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 
-const route = useRoute();
-
 const storeState = reactive({
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
     modalVisible: computed<boolean>(() => serviceDetailPageState.eventRuleScopeModalVisible),
@@ -32,7 +31,6 @@ const storeState = reactive({
 });
 const state = reactive({
     loading: true,
-    eventRuleInfoLoading: false,
     selectedScope: EVENT_RULE_SCOPE.GLOBAL,
     selectedWebhook: '',
     hideSidebar: false,
@@ -42,22 +40,6 @@ const handleClickAddRule = () => {
     serviceDetailPageStore.setEventRuleScopeModalVisible(true);
 };
 
-const fetchEventRuleInfo = async () => {
-    state.eventRuleInfoLoading = true;
-    try {
-        await serviceDetailPageStore.fetchEventRuleInfo({
-            event_rule_id: route.query?.eventRuleId as string,
-        });
-    } finally {
-        state.eventRuleInfoLoading = false;
-    }
-};
-
-watch(() => route.query?.eventRuleId, (eventRuleId) => {
-    if (eventRuleId) {
-        fetchEventRuleInfo();
-    }
-}, { immediate: true });
 watch(() => storeState.serviceId, async (id) => {
     if (!id) return;
     try {
@@ -69,6 +51,10 @@ watch(() => storeState.serviceId, async (id) => {
         state.loading = false;
     }
 }, { immediate: true });
+
+onUnmounted(() => {
+    serviceDetailPageStore.initEscalationPolicyState();
+});
 </script>
 
 <template>
@@ -85,11 +71,9 @@ watch(() => storeState.serviceId, async (id) => {
                                                                    :selected-webhook="storeState.isEventRuleEditMode ? storeState.eventRuleInfo.webhook_id : state.selectedWebhook"
                                                                    :selected-scope="storeState.isEventRuleEditMode ? storeState.eventRuleInfo.scope : state.selectedScope"
                                                                    class="flex-1"
-                                                                   @confirm="fetchEventRuleInfo()"
                 />
                 <service-detail-tabs-settings-event-rule-card v-else-if="storeState.eventRuleInfo.event_rule_id"
                                                               class="flex-1"
-                                                              :loading="state.eventRuleInfoLoading"
                 />
             </div>
             <template #no-data>
