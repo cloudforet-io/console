@@ -200,6 +200,7 @@
 			"CREATE_TITLE": "알림 생성",
 			"CUSTOM": "기간 선택",
 			"DAY": "일",
+			"FAILURE": "실패",
 			"FRIDAY": "금요일",
 			"HIGH_NOTIFICATIONS_ONLY": "긴급 알림만 받기",
 			"MODAL_DELETE_BUTTON": "알림 삭제",

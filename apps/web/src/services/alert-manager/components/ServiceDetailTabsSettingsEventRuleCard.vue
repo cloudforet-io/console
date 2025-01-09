@@ -152,7 +152,7 @@ const handleDeleteEventRule = () => {
                     <div v-if="hasReadWriteAccess"
                          class="flex items-center gap-2"
                     >
-                        <p-icon-button name="ic_edit"
+                        <p-icon-button name="ic_edit-text"
                                        style-type="transparent"
                                        @click="handleEditEventRule"
                         />

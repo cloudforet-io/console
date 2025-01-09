@@ -200,6 +200,7 @@
 			"CREATE_TITLE": "通知を作成",
 			"CUSTOM": "カスタム",
 			"DAY": "日",
+			"FAILURE": "失敗",
 			"FRIDAY": "金曜日",
 			"HIGH_NOTIFICATIONS_ONLY": "緊急度の高い通知のみ",
 			"MODAL_DELETE_BUTTON": "通知を削除",
