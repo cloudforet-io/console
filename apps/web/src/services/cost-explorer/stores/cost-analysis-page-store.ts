@@ -35,8 +35,6 @@ import type {
     DisplayDataType,
 } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
-
-
 const getRefinedFilters = (consoleFilters?: ConsoleFilter[]): Record<string, string[]> => {
     if (!consoleFilters || isEmpty(consoleFilters)) return {};
     const result: Record<string, string[]> = {};

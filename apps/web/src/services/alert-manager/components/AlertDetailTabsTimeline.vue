@@ -6,7 +6,7 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButton, PButtonModal, PCodeEditor, PToolbox, PHeading, PHeadingLayout, PDataLoader, PDivider, PSelectStatus, PTextButton,
+    PButton, PToolbox, PHeading, PHeadingLayout, PDataLoader, PDivider, PSelectStatus, PTextButton,
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -19,12 +19,10 @@ import { i18n } from '@/translations';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 
-import { copyAnyData } from '@/lib/helper/copy-helper';
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
 import VerticalTimelineItem from '@/common/components/vertical-timeline/VerticalTimelineItem.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import AlertDetailTabsTimelineModal from '@/services/alert-manager/components/AlertDetailTabsTimelineModal.vue';
 import { useAlertDetailPageStore } from '@/services/alert-manager/stores/alert-detail-page-store';
 import type { AlertFilterType } from '@/services/alert-manager/types/alert-manager-type';
 
@@ -55,15 +53,19 @@ const state = reactive({
             _list = state.historyList;
         }
         if (filterState.selectedAction !== 'ALL') {
-            _list = state.historyList.filter((item) => item.action === filterState.selectedAction);
+            if (filterState.selectedAction === 'NOTIFIED') {
+                _list = state.historyList.filter((item) => item.action === ALERT_HISTORY_ACTION.NOTIFIED_FAILURE || item.action === ALERT_HISTORY_ACTION.NOTIFIED_SUCCESS);
+            } else {
+                _list = state.historyList.filter((item) => item.action === filterState.selectedAction);
+            }
         }
         return _list.slice(0, state.pageStart * state.pageLimit);
     }),
     pageStart: 1,
     pageLimit: 10,
-    selectedItem: {} as any,
+    selectedItem: {} as AlertHistoryModel,
     modalVisible: false,
-    isAlertVisible: false,
+    modalType: ALERT_HISTORY_ACTION.EVENT_PUSHED as AlertHistoryActionType,
 });
 const filterState = reactive({
     statusFields: computed<AlertFilterType[]>(() => ([
@@ -71,7 +73,7 @@ const filterState = reactive({
         { label: i18n.t('ALERT_MANAGER.ALERTS.TRIGGERED'), name: ALERT_HISTORY_ACTION.TRIGGERED },
         { label: i18n.t('ALERT_MANAGER.ALERTS.ACKNOWLEDGED'), name: ALERT_HISTORY_ACTION.ACKNOWLEDGED },
         { label: i18n.t('ALERT_MANAGER.ALERTS.RESOLVED'), name: ALERT_HISTORY_ACTION.RESOLVED },
-        { label: i18n.t('ALERT_MANAGER.ALERTS.NOTIFIED'), name: ALERT_HISTORY_ACTION.NOTIFIED },
+        { label: i18n.t('ALERT_MANAGER.ALERTS.NOTIFIED'), name: 'NOTIFIED' },
         { label: i18n.t('ALERT_MANAGER.ALERTS.EVENT_PUSHED'), name: ALERT_HISTORY_ACTION.EVENT_PUSHED },
     ])),
     selectedAction: 'ALL',
@@ -89,7 +91,7 @@ const getItemInfo = (item: AlertHistoryActionType): HistoryItemInfo => {
     if (item === ALERT_HISTORY_ACTION.TRIGGERED) styleType = 'red';
     if (item === ALERT_HISTORY_ACTION.ACKNOWLEDGED) styleType = 'violet';
     if (item === ALERT_HISTORY_ACTION.RESOLVED) styleType = 'green';
-    if (item === ALERT_HISTORY_ACTION.NOTIFIED) styleType = 'yellow';
+    if (item === ALERT_HISTORY_ACTION.NOTIFIED_FAILURE || item === ALERT_HISTORY_ACTION.NOTIFIED_SUCCESS) styleType = 'yellow';
     if (item === ALERT_HISTORY_ACTION.EVENT_PUSHED) styleType = 'gray';
     return {
         title: item.toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase()),
@@ -97,11 +99,9 @@ const getItemInfo = (item: AlertHistoryActionType): HistoryItemInfo => {
     };
 };
 
-const handleCloseModal = () => {
-    state.modalVisible = false;
-};
-const handleClickHistoryItem = (item: AlertHistoryModel) => {
+const handleClickHistoryItem = (item: AlertHistoryModel, action: AlertHistoryActionType) => {
     state.modalVisible = true;
+    state.modalType = action;
     state.selectedItem = item;
 };
 const handleSelectAction = (value: string) => {
@@ -116,16 +116,12 @@ const handleClickShowMore = async () => {
     state.pageStart += 1;
 };
 
-const handleClickCopy = () => {
-    copyAnyData(state.selectedItem);
-    showSuccessMessage(i18n.t('ALERT_MANAGER.ALERTS.COPIED'), '');
-};
-
 const fetchHistoryList = async () => {
     state.loading = true;
     try {
         const { results } = await SpaceConnector.clientV2.alertManager.alert.history<AlertHistoryParameters, ListResponse<AlertHistoryModel>>({
             alert_id: storeState.alertInfo.alert_id,
+            include_details: true,
         });
         state.historyList = results || [];
     } catch (e: any) {
@@ -195,10 +191,12 @@ watch(() => storeState.alertInfo, async (alertInfo) => {
                                 {{ $t('ALERT_MANAGER.ALERTS.CREATED_BY', { user: getCreatedByNames(item.created_by) }) }}
                             </span>
                         </template>
-                        <p-text-button v-if="item.action === ALERT_HISTORY_ACTION.EVENT_PUSHED"
+                        <p-text-button v-if="item.action === ALERT_HISTORY_ACTION.EVENT_PUSHED
+                                           || item.action === ALERT_HISTORY_ACTION.NOTIFIED_FAILURE
+                                           || item.action === ALERT_HISTORY_ACTION.NOTIFIED_SUCCESS"
                                        style-type="highlight"
                                        size="md"
-                                       @click="handleClickHistoryItem(item)"
+                                       @click="handleClickHistoryItem(item, item.action)"
                         >
                             {{ item.description }}
                         </p-text-button>
@@ -227,36 +225,11 @@ watch(() => storeState.alertInfo, async (alertInfo) => {
                 {{ $t('ALERT_MANAGER.SHOW_MORE') }}
             </p-button>
         </div>
-        <p-button-modal v-if="state.modalVisible"
-                        :header-title="$t('ALERT_MANAGER.ALERTS.EVENT_DETAILS')"
-                        size="lg"
-                        hide-footer-close-button
-                        :visible.sync="state.modalVisible"
-                        @confirm="handleCloseModal"
-        >
-            <template #body>
-                <div class="event-detail-modal-content">
-                    <p-code-editor :code="state.selectedItem"
-                                   class="code-block"
-                                   read-only
-                                   folded
-                    />
-                </div>
-            </template>
-            <template #footer-extra>
-                <div class="footer-extra">
-                    <p-button style-type="tertiary"
-                              icon-left="ic_copy"
-                              @click="handleClickCopy"
-                    >
-                        {{ $t('ALERT_MANAGER.ALERTS.COPY_ALL') }}
-                    </p-button>
-                </div>
-            </template>
-            <template #confirm-button>
-                {{ $t('ALERT_MANAGER.ALERTS.OK') }}
-            </template>
-        </p-button-modal>
+        <alert-detail-tabs-timeline-modal v-if="state.modalVisible"
+                                          :visible.sync="state.modalVisible"
+                                          :type="state.modalType"
+                                          :history="state.selectedItem"
+        />
     </section>
 </template>
 

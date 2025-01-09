@@ -3,7 +3,11 @@ import type { TranslateResult } from 'vue-i18n';
 import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-schema-form/type';
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
-import type { AlertStatusType, AlertUrgencyType } from '@/schema/alert-manager/alert/type';
+import type {
+    AlertHistoryNotificationChannelInfoType,
+    AlertStatusType,
+    AlertUrgencyType,
+} from '@/schema/alert-manager/alert/type';
 import type {
     EventRuleConditionsPolicyType,
     EventRuleConditionsKeyType,
@@ -40,6 +44,9 @@ export type AlertUrgencyRadioType = {
 export type AlertManagementTableHandlerType = {
     keyItemSets: KeyItemSet[],
     valueHandlerMap: ValueHandlerMap
+};
+export type AlertHistoryNotificationItemType = Partial<AlertHistoryNotificationChannelInfoType> & {
+    type: string;
 };
 
 export type createHeaderInfoByStep = {
