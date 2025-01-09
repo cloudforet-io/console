@@ -18,7 +18,7 @@ export const ALERT_MANAGEMENT_TABLE_FIELDS: DataTableFieldType[] = [
     { name: 'urgency', label: 'Urgency' },
     { name: 'labels', label: 'Label' },
     { name: 'triggered_by', label: 'Triggered by' },
-    { name: 'duration', label: 'Duration' },
+    { name: 'duration', label: 'Duration', sortable: false },
     { name: 'created_at', label: 'Created' },
 ];
 export const ALERT_MANAGEMENT_TABLE_HANDLER: AlertManagementTableHandlerType = {

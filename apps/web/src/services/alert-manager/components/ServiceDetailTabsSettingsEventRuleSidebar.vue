@@ -208,22 +208,18 @@ const handleSearchInput = (value: string) => {
     });
 };
 
-watch([() => storeState.showEventRuleFormCard, () => storeState.isEventRuleEditMode], ([showEventRuleFormCard, isEventRuleEditMode]) => {
-    if (!showEventRuleFormCard && !isEventRuleEditMode) {
-        initSidebar();
-    }
-});
 watch([() => storeState.eventRuleInfo.event_rule_id, () => route.query?.eventRuleId], ([dataId, routeId]) => {
     state.selectedTreeId = routeId as string;
     if (routeId && dataId) {
         const scope = storeState.eventRuleInfo.webhook_id || 'global';
         updateTreeDisplayMap(scope, true);
+        serviceDetailPageStore.setShowEventRuleFormCard(false);
     }
 }, { immediate: true });
 watch(() => state.filteredItems, (items) => {
     if (!items.length) return;
     initSidebar();
-}, { immediate: true });
+});
 </script>
 
 <template>

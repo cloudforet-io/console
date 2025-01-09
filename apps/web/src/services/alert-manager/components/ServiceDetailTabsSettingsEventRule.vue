@@ -7,8 +7,6 @@ import { PButton, PDataLoader } from '@cloudforet/mirinae';
 import { EVENT_RULE_SCOPE } from '@/schema/alert-manager/event-rule/constant';
 import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
 
-import { replaceUrlQuery } from '@/lib/router-query-string';
-
 import ServiceDetailTabsSettingsEventRuleCard
     from '@/services/alert-manager/components/ServiceDetailTabsSettingsEventRuleCard.vue';
 import ServiceDetailTabsSettingsEventRuleFormCard
@@ -58,16 +56,8 @@ const fetchEventRuleInfo = async () => {
 watch(() => route.query?.eventRuleId, (eventRuleId) => {
     if (eventRuleId) {
         fetchEventRuleInfo();
-        serviceDetailPageStore.setShowEventRuleFormCard(false);
     }
 }, { immediate: true });
-watch(() => storeState.items, (items) => {
-    if (!items.length) return;
-    replaceUrlQuery({
-        webhookId: items[0].webhook_id || 'global',
-        eventRuleId: items[0].event_rule_id,
-    });
-});
 watch(() => storeState.serviceId, async (id) => {
     if (!id) return;
     try {
@@ -87,7 +77,7 @@ watch(() => storeState.serviceId, async (id) => {
                        :data="!storeState.showEventRuleFormCard ? storeState.items : true"
                        class="loader"
         >
-            <div class="content-wrapper flex gap-1">
+            <div class="content-wrapper flex gap-6">
                 <service-detail-tabs-settings-event-rule-sidebar :hide-sidebar.sync="state.hideSidebar"
                                                                  :items="storeState.items"
                 />
@@ -95,6 +85,7 @@ watch(() => storeState.serviceId, async (id) => {
                                                                    :selected-webhook="storeState.isEventRuleEditMode ? storeState.eventRuleInfo.webhook_id : state.selectedWebhook"
                                                                    :selected-scope="storeState.isEventRuleEditMode ? storeState.eventRuleInfo.scope : state.selectedScope"
                                                                    class="flex-1"
+                                                                   @confirm="fetchEventRuleInfo()"
                 />
                 <service-detail-tabs-settings-event-rule-card v-else-if="storeState.eventRuleInfo.event_rule_id"
                                                               class="flex-1"
@@ -129,7 +120,7 @@ watch(() => storeState.serviceId, async (id) => {
 <style scoped lang="postcss">
 .service-detail-tabs-settings-event-rule {
     .loader {
-        min-height: 23.125rem;
+        min-height: 14rem;
     }
     .content-wrapper {
         align-items: flex-start;

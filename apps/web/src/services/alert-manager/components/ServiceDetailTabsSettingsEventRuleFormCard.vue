@@ -49,6 +49,8 @@ const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 
+const emit = defineEmits<{(e: 'confirm'): void}>();
+
 const storeState = reactive({
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
     isEventRuleEditMode: computed<boolean>(() => serviceDetailPageState.isEventRuleEditMode),
@@ -188,11 +190,15 @@ const handleAddButton = async () => {
         await serviceDetailPageStore.fetchEventRuleList({
             service_id: storeState.serviceId,
         });
+        if (storeState.isEventRuleEditMode) {
+            emit('confirm');
+        } else {
+            await replaceUrlQuery({
+                webhookId: response.webhook_id || 'global',
+                eventRuleId: response.event_rule_id,
+            });
+        }
         await handleDeleteForm();
-        await replaceUrlQuery({
-            webhookId: response.webhook_id || 'global',
-            eventRuleId: response.event_rule_id,
-        });
     } finally {
         state.loading = false;
     }
