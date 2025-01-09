@@ -300,6 +300,7 @@
 			"HELP": "가이드",
 			"LABEL_NAME": "이름",
 			"LABEL_STATE": "상태",
+			"MESSAGE": "메시지",
 			"MODAL_DELETE_BUTTON": "삭제",
 			"MODAL_DELETE_CONTENT_1": "이 웹훅으로 더 이상 이벤트를 수신할 수 없으며, 이 작업은 취소 할 수 없습니다.",
 			"MODAL_DELETE_CONTENT_2": "확인을 위해 {webhookName} 을 입력해주세요.",

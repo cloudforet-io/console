@@ -18,6 +18,7 @@ export const WEBHOOK_DETAIL_TABS = {
     DETAIL: 'detail',
     HELP: 'help',
     ERROR: 'error',
+    MESSAGE: 'message',
 } as const;
 
 export const ALERT_MANAGER_STATE_COLOR = {

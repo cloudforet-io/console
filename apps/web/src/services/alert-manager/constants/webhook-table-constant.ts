@@ -40,3 +40,8 @@ export const WEBHOOK_ERROR_LIST_TABLE_FIELDS: DataTableFieldType[] = [
     { name: 'message', label: 'Error Message' },
     { name: 'created_at', label: 'Created' },
 ];
+
+export const WEBHOOK_MESSAGE_TABLE_FIELDS: DataTableFieldType[] = [
+    { name: 'from', label: 'From' },
+    { name: 'to', label: 'To' },
+];
