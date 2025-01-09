@@ -223,7 +223,7 @@ watch([() => storeState.eventRuleInfo.event_rule_id, () => route.query?.eventRul
 watch(() => state.filteredItems, (items) => {
     if (!items.length) return;
     initSidebar();
-}, { immediate: true });
+});
 </script>
 
 <template>
