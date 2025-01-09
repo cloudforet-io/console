@@ -53,6 +53,7 @@ const state = reactive({
         },
     ])),
     selectedRadioIdx: 0,
+    selectedMemberIds: [] as string[],
     selectedMemberItems: {} as Record<MembersType, string[]>,
     isSchemaDataValid: false,
     isMemberDataValid: computed<boolean>(() => {
@@ -98,6 +99,7 @@ const handleScheduleForm = (form: ScheduleSettingFormType) => {
 };
 const handleChangeRadio = () => {
     state.selectedMemberItems = {};
+    state.selectedMemberIds = [];
 };
 
 watch([() => name.value, () => state.scheduleForm, () => state.selectedRadioIdx, () => state.selectedMemberItems, () => state.schemaForm], (
@@ -174,6 +176,7 @@ watch([() => name.value, () => state.scheduleForm, () => state.selectedRadioIdx,
                                           selection-type="multiple"
                                           appearance-type="stack"
                                           use-fixed-menu-style
+                                          :selected-ids.sync="state.selectedMemberIds"
                                           :user-pool="storeState.createdServiceMembers?.USER || []"
                                           :user-group-pool="storeState.createdServiceMembers?.USER_GROUP || []"
                                           :show-category-title="false"
