@@ -1,7 +1,5 @@
 import type { Tags } from '@/schema/_common/model';
-import type {
-    WebhookPluginInfoType, WebhookRequestType, WebhookStateType, WebhookMessageFormatType,
-} from '@/schema/alert-manager/webhook/type';
+import type { WebhookPluginInfoType, WebhookRequestType, WebhookStateType } from '@/schema/alert-manager/webhook/type';
 
 export interface WebhookModel {
     webhook_id: string;
@@ -10,7 +8,6 @@ export interface WebhookModel {
     access_key: string;
     webhook_url: string;
     plugin_info: WebhookPluginInfoType;
-    message_formats: WebhookMessageFormatType[];
     tags: Tags;
     requests: WebhookRequestType;
     service_id: string;

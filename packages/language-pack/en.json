@@ -300,7 +300,6 @@
 			"HELP": "Help",
 			"LABEL_NAME": "Name",
 			"LABEL_STATE": "State",
-			"MESSAGE": "Message",
 			"MODAL_DELETE_BUTTON": "Delete this webhook",
 			"MODAL_DELETE_CONTENT_1": "You can no longer receive events with this webhook, and this action cannot be undone.",
 			"MODAL_DELETE_CONTENT_2": "Type {webhookName} to Confirm.",
