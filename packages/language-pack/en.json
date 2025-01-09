@@ -272,7 +272,7 @@
 			"USER": "User",
 			"USER_GROUP": "User Group",
 			"VALIDATION_KEY": "Only uppercase letters, numbers, and hyphens are allowed.",
-			"VALIDATION_KEY_HYPHEN": "The first character cannot be a hyphen.",
+			"VALIDATION_KEY_HYPHEN": "The first and last characters cannot be hyphens.",
 			"VALIDATION_KEY_UNIQUE": "A service with this key name already exists.",
 			"VALIDATION_NAME_UNIQUE": "A service with this name already exists.",
 			"VIEW_ALL_OPEN_ALERTS": "View all open alerts",
