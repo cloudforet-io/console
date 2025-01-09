@@ -300,7 +300,6 @@
 			"HELP": "ヘルプ",
 			"LABEL_NAME": "名前",
 			"LABEL_STATE": "状態",
-			"MESSAGE": "メッセージ",
 			"MODAL_DELETE_BUTTON": "削除",
 			"MODAL_DELETE_CONTENT_1": "このウェプフクでこれ以上イベントを受信することができず、この作業は取り消すことができません。",
 			"MODAL_DELETE_CONTENT_2": "確認のため、{webhookName}を入力してください。",
