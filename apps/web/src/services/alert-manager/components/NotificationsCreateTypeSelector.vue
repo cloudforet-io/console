@@ -1,13 +1,10 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PSelectCard, PLazyImg, PDataLoader,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { NotificationProtocolListParameters } from '@/schema/alert-manager/notification-protocol/api-verbs/list';
 import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
 import { i18n } from '@/translations';
 
@@ -16,24 +13,22 @@ import type { PluginReferenceMap } from '@/store/reference/plugin-reference-stor
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
 import { useServiceCreateFormStore } from '@/services/alert-manager/stores/service-create-form-store';
 import type { ProtocolCardItemType } from '@/services/alert-manager/types/alert-manager-type';
 
 const serviceCreateFormStore = useServiceCreateFormStore();
+const serviceCreateFormState = serviceCreateFormStore.state;
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 
 const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
+    protocolList: computed<NotificationProtocolModel[]>(() => serviceCreateFormState.protocolList),
 });
 const state = reactive({
     loading: true,
-    protocolList: [] as NotificationProtocolModel[],
     protocolCardList: computed<ProtocolCardItemType[]>(() => [
-        ...state.protocolList.map((item) => ({
+        ...storeState.protocolList.map((item) => ({
             ...item,
             icon: storeState.plugins[item.plugin_info.plugin_id]?.icon || '',
         })),
@@ -50,21 +45,13 @@ const handleSelectProtocol = () => {
     serviceCreateFormStore.setSelectedProtocol(state.selectedProtocol);
 };
 
-const fetchNotificationProtocolList = async () => {
+onMounted(async () => {
     state.loading = true;
     try {
-        const { results } = await SpaceConnector.clientV2.alertManager.notificationProtocol.list<NotificationProtocolListParameters, ListResponse<NotificationProtocolModel>>();
-        state.protocolList = results || [];
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.protocolList = [];
+        await serviceCreateFormStore.fetchNotificationProtocolList();
     } finally {
         state.loading = false;
     }
-};
-
-onMounted(() => {
-    fetchNotificationProtocolList();
 });
 </script>
 

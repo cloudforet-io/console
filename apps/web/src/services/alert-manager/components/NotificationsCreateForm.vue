@@ -3,12 +3,16 @@ import { useWindowSize } from '@vueuse/core';
 import { computed, reactive, watch } from 'vue';
 
 import {
-    PFieldGroup, PLazyImg, PTextInput, PRadioGroup, PRadio, PPaneLayout, PJsonSchemaForm, screens,
+    PFieldGroup, PLazyImg, PTextInput, PRadioGroup, PRadio, PPaneLayout, PJsonSchemaForm, screens, PI, PSelectDropdown,
 } from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
+import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
 import type { MembersType } from '@/schema/alert-manager/service/type';
 import { i18n } from '@/translations';
 
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
@@ -21,17 +25,22 @@ import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 import { useServiceCreateFormStore } from '@/services/alert-manager/stores/service-create-form-store';
 import type { CreatedNotificationInfoType, UserRadioType, ProtocolCardItemType } from '@/services/alert-manager/types/alert-manager-type';
 
+
 const serviceCreateFormStore = useServiceCreateFormStore();
 const serviceCreateFormState = serviceCreateFormStore.state;
 const userStore = useUserStore();
 const userState = userStore.state;
+const allReferenceStore = useAllReferenceStore();
+const allReferenceGetters = allReferenceStore.getters;
 
 const { width } = useWindowSize();
 
 const storeState = reactive({
     language: computed<string|undefined>(() => userState.language),
+    plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
     createdServiceMembers: computed<Record<MembersType, string[]>>(() => serviceCreateFormState.createdService.members),
     selectedProtocolType: computed<ProtocolCardItemType>(() => serviceCreateFormState.selectedProtocol),
+    protocolList: computed<NotificationProtocolModel[]>(() => serviceCreateFormState.protocolList),
 });
 const state = reactive({
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
@@ -55,6 +64,11 @@ const state = reactive({
     selectedRadioIdx: 0,
     selectedMemberIds: [] as string[],
     selectedMemberItems: {} as Record<MembersType, string[]>,
+    notificationChannelList: computed<SelectDropdownMenuItem[]>(() => storeState.protocolList.map((i) => ({
+        name: i.protocol_id,
+        label: i.name,
+    }))),
+    selectedNotificationChannelIds: [],
     isSchemaDataValid: false,
     isMemberDataValid: computed<boolean>(() => {
         if (state.selectedRadioIdx === 0) {
@@ -88,6 +102,14 @@ const {
     },
 });
 
+const getPluginIcon = (id: string): string => {
+    const item = storeState.protocolList.find((i) => i.protocol_id === id);
+    if (!item) return '';
+    return storeState.plugins[item.plugin_info.plugin_id]?.icon || '';
+};
+const handleSelectDropdownItem = (ids: SelectDropdownMenuItem[]) => {
+    state.selectedNotificationChannelIds = ids.map((i) => i.name);
+};
 const handleFormattedSelectedIds = (value: Record<MembersType, string[]>) => {
     state.selectedMemberItems = value;
 };
@@ -184,6 +206,39 @@ watch([() => name.value, () => state.scheduleForm, () => state.selectedRadioIdx,
                                           :show-user-list="state.selectedRadioIdx === 2"
                                           @formatted-selected-ids="handleFormattedSelectedIds"
                     />
+                    <p-field-group required>
+                        <template #label>
+                            <p class="extra-label inline-flex items-center gap-1">
+                                <p-i name="ic_subdirectory-arrow-right"
+                                     width="1rem"
+                                     height="1rem"
+                                     color="inherit"
+                                />
+                                <span class="ml-1">{{ $t('ALERT_MANAGER.NOTIFICATIONS.NOTIFICATION_CHANNEL') }}</span>
+                                <span class="text-label-sm text-gray-500 font-normal">({{ $t('ALERT_MANAGER.NOTIFICATIONS.OPTIONAL') }})</span>
+                            </p>
+                        </template>
+                        <p-select-dropdown :menu="state.notificationChannelList"
+                                           use-fixed-menu-style
+                                           multi-selectable
+                                           is-filterable
+                                           show-select-marker
+                                           appearance-type="stack"
+                                           :selected="state.selectedNotificationChannelIds"
+                                           class="pl-6 mt-1"
+                                           @update:selected="handleSelectDropdownItem"
+                        >
+                            <template #menu-item--format="{ item }">
+                                <div class="flex items-center gap-1">
+                                    <p-lazy-img :src="assetUrlConverter(getPluginIcon(item.name))"
+                                                width="1.25rem"
+                                                height="1.25rem"
+                                    />
+                                    <span>{{ item.label }}</span>
+                                </div>
+                            </template>
+                        </p-select-dropdown>
+                    </p-field-group>
                 </div>
             </template>
         </p-field-group>
@@ -194,14 +249,12 @@ watch([() => name.value, () => state.scheduleForm, () => state.selectedRadioIdx,
                             uniform-width
                             @validate="handleSchemaValidate"
         />
-        <div class="pt-2">
-            <p-pane-layout class="pt-8 px-4 pb-4">
-                <p class="pb-4 text-display-md">
-                    {{ $t('ALERT_MANAGER.NOTIFICATIONS.SCHEDULE') }}
-                </p>
-                <schedule-setting-form @update-form="handleScheduleForm" />
-            </p-pane-layout>
-        </div>
+        <p-pane-layout class="pt-8 px-4 pb-4">
+            <p class="pb-4 text-display-md">
+                {{ $t('ALERT_MANAGER.NOTIFICATIONS.SCHEDULE') }}
+            </p>
+            <schedule-setting-form @update-form="handleScheduleForm" />
+        </p-pane-layout>
     </div>
 </template>
 
