@@ -122,7 +122,6 @@ const convertGNBMenuToMenuItem = (menuList: DisplayMenu[], menuType: ContextMenu
                 ...menu,
                 name: menu.id,
                 type: menuType,
-                disabled: menuType === 'header' && menu.id.includes('cost'),
             });
         }
     });
@@ -135,7 +134,7 @@ const removeCostExplorerFromMenuList = (list: GNBMenuType[]) => {
         list.push({
             ...item,
             disabled: true,
-            subMenuList: [],
+            subMenuList: [{} as DisplayMenu],
         });
     }
     return list;
