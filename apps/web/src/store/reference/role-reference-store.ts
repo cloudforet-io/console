@@ -62,10 +62,8 @@ export const useRoleReferenceStore = defineStore('reference-role', () => {
         let res: ListResponse<RoleModel|BasicRoleModel> | undefined;
         try {
             if (appContextStore.getters.isUserMode) {
-                console.log('here1');
                 res = await SpaceConnector.clientV2.identity.role.listBasicRole<RoleListBasicRoleParameters, ListResponse<BasicRoleModel>>(params);
             } else {
-                console.log('here2');
                 res = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>(params);
             }
         } catch (e) {

@@ -10,7 +10,6 @@ import type { MembersType } from '@/schema/identity/user-group/type';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { RoleBindingReferenceMap } from '@/store/reference/role-binding-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -31,7 +30,6 @@ const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 
 const storeState = reactive({
-    roleBindingReferenceMap: computed<RoleBindingReferenceMap>(() => allReferenceGetters.role_binding),
     userReferenceMap: computed<UserReferenceMap>(() => allReferenceGetters.user),
 });
 
@@ -44,8 +42,8 @@ const state = reactive({
 });
 
 /* Watcher */
-watch(() => storeState.roleBindingReferenceMap, (roleBindingStore) => {
-    state.userPool = Object.values(roleBindingStore).map((roleBinding) => roleBinding.data.user_id);
+watch(() => storeState.userReferenceMap, (userReferenceStore) => {
+    state.userPool = Object.keys(userReferenceStore);
 }, { deep: true, immediate: true });
 
 watch(() => userGroupPageGetters.selectedUserGroups, (nv_selected_user_group) => {
@@ -109,7 +107,6 @@ const fetchAddUsers = async (params: UserGroupAddUsersParameters) => {
                 <user-select-dropdown show-user-list
                                       :show-user-group-list="false"
                                       :show-category-title="false"
-                                      :user-pool="state.userPool"
                                       appearance-type="stack"
                                       selection-type="multiple"
                                       use-fixed-menu-style

@@ -135,12 +135,12 @@ const getAfterCallApiMap = () => ({
     '/identity/role-binding/create': () => {
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();
-        allReferenceStore.load('role_binding', { force: true });
+        allReferenceStore.load('user', { force: true });
     },
     '/identity/role-binding/delete': () => {
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();
-        allReferenceStore.load('role_binding', { force: true });
+        allReferenceStore.load('user', { force: true });
     },
     '/inventory/region/create': (data) => {
         useAllReferenceStore(pinia);
