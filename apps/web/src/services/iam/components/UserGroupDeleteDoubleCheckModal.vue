@@ -3,8 +3,6 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { reduce } from 'lodash';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PDataTable, PButtonModal, PBadge } from '@cloudforet/mirinae';
 
@@ -116,7 +114,7 @@ watch([() => storeState.serviceList, () => storeState.selectedUserGroupList], ([
         });
         if (list.length > 0) {
             tableState.filteredItems = Object.values(
-                reduce(list, (acc, cur) => {
+                list.reduce((acc, cur) => {
                     if (!acc[cur.user_group]) {
                         acc[cur.user_group] = {
                             user_group: cur.user_group,
@@ -125,6 +123,9 @@ watch([() => storeState.serviceList, () => storeState.selectedUserGroupList], ([
                         };
                     }
                     if (cur.service !== undefined) {
+                        if (!Array.isArray(acc[cur.user_group].service)) {
+                            acc[cur.user_group].service = [];
+                        }
                         acc[cur.user_group].service.push(cur.service);
                     }
                     return acc;
