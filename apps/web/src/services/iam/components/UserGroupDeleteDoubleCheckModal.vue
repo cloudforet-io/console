@@ -3,8 +3,6 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { reduce } from 'lodash';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PDataTable, PButtonModal, PBadge } from '@cloudforet/mirinae';
 
@@ -116,15 +114,19 @@ watch([() => storeState.serviceList, () => storeState.selectedUserGroupList], ([
         });
         if (list.length > 0) {
             tableState.filteredItems = Object.values(
-                reduce(list, (acc, cur) => {
+                list.reduce((acc, cur) => {
                     if (!acc[cur.user_group]) {
+                        // 초기 객체 생성 시 정확한 구조 설정
                         acc[cur.user_group] = {
                             user_group: cur.user_group,
-                            service: [],
+                            service: [], // 항상 빈 배열로 초기화
                             description: cur.description,
                         };
                     }
                     if (cur.service !== undefined) {
+                        if (!Array.isArray(acc[cur.user_group].service)) {
+                            acc[cur.user_group].service = [];
+                        }
                         acc[cur.user_group].service.push(cur.service);
                     }
                     return acc;
