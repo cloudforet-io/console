@@ -6,4 +6,5 @@ export interface UserChannelUpdateParameters {
     name?: string;
     schedule?: UserChannelScheduleInfoType;
     tags?: Tags;
+    data?: Record<string, any>;
 }

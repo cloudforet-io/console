@@ -4,11 +4,16 @@ import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { UserChannelUpdateParameters } from '@/schema/alert-manager/user-channel/api-verbs/update';
+import type { UserChannelModel } from '@/schema/alert-manager/user-channel/model';
 import type { NotificationLevel } from '@/schema/notification/notification/type';
 import type { ProjectChannelUpdateParameters } from '@/schema/notification/project-channel/api-verbs/update';
-import type { UserChannelUpdateParameters } from '@/schema/notification/user-channel/api-verbs/update';
+import type { UserChannelUpdateParameters as UserChannelUpdateParametersV1 } from '@/schema/notification/user-channel/api-verbs/update';
 import { i18n } from '@/translations';
 
+import { useDomainStore } from '@/store/domain/domain-store';
+
+import config from '@/lib/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -23,6 +28,10 @@ interface NotificationItemState<Data> {
 type Emit<Data> = {
     (event: 'edit', value?: Data): void;
 };
+
+const domainStore = useDomainStore();
+const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainStore.state.domainId);
+
 export const useNotificationItem = <Data>(_state: NotificationItemState<Data>, emit: Emit<Data>) => {
     const state = reactive({
         isEditMode: _state.isEditMode,
@@ -50,15 +59,29 @@ export const useNotificationItem = <Data>(_state: NotificationItemState<Data>, e
         emit('edit', value);
     };
 
-    const updateUserChannel = async <Key extends keyof UserChannelUpdateParameters = 'name'|'data'>(paramKey: Key, paramValue: UserChannelUpdateParameters[Key]) => {
+    const updateUserChannel = async <Key extends keyof (Partial<UserChannelUpdateParametersV1>
+        &Partial<UserChannelUpdateParameters>) = 'name'|'data'|'schedule'>(paramKey: Key, paramValue: (Partial<UserChannelUpdateParametersV1> & Partial<UserChannelUpdateParameters>)[Key]) => {
         try {
             if (!state.userChannelId) throw new Error('userChannelId is undefined');
-            const param: UserChannelUpdateParameters = {
+            const paramV1: UserChannelUpdateParametersV1 = {
                 user_channel_id: state.userChannelId,
             };
-            if (paramKey === 'name') param.name = paramValue as string;
-            else if (paramKey === 'data') param.data = paramValue as object;
-            await SpaceConnector.clientV2.notification.userChannel.update<UserChannelUpdateParameters>(param);
+            const param: UserChannelUpdateParameters = {
+                channel_id: state.userChannelId,
+            };
+            if (paramKey === 'name') {
+                paramV1.name = paramValue as string;
+                param.name = paramValue as string;
+            } else if (paramKey === 'data') {
+                paramV1.data = paramValue as object;
+                param.data = paramValue as object;
+            } else if (paramKey === 'schedule') {
+                param.schedule = paramValue;
+            }
+            const fetcher = isAlertManagerVersionV2
+                ? SpaceConnector.clientV2.alertManager.userChannel.update<UserChannelUpdateParameters, UserChannelModel>(param)
+                : SpaceConnector.clientV2.notification.userChannel.update<UserChannelUpdateParametersV1>(paramV1);
+            await fetcher;
             showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_USER_CHANNEL'), '');
             state.isEditMode = false;
             emit('edit', undefined);
