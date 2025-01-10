@@ -8,7 +8,7 @@ import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-ut
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PHeadingLayout, PHeading, PButton, PToolboxTable, PBadge,
+    PHeadingLayout, PHeading, PButton, PToolboxTable, PBadge, PLazyImg,
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -26,6 +26,8 @@ import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
+
+import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
@@ -76,6 +78,7 @@ const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
 });
 
+
 const tableState = reactive({
     fields: computed(() => [
         { name: 'name', label: 'Name' },
@@ -108,7 +111,11 @@ const tableState = reactive({
 const state = reactive({
     loading: false,
     channelName: '',
-    protocolIcon: '',
+    protocolList: computed<{ icon: string; label: string; value: string; }[]>(() => userGroupPageState.protocolList.map((protocol) => ({
+        icon: storeState.plugins[protocol.plugin_info.plugin_id]?.icon || '',
+        label: protocol.name,
+        value: protocol.protocol_id,
+    }))),
 });
 
 const totalCount = ref(0);
@@ -170,8 +177,6 @@ const handleUpdateModal = async (modalType: string) => {
                 });
 
                 if (protocolResult && storeState.plugins[protocolResult.plugin_info.plugin_id] !== undefined) {
-                    state.protocolIcon = storeState.plugins[protocolResult.plugin_info.plugin_id]?.icon || '';
-
                     notificationChannelCreateFormStore.$patch((_state) => {
                         _state.state.selectedProtocol.protocol_id = protocol_id;
                         _state.state.selectedProtocol.icon = storeState.plugins[protocolResult.plugin_info.plugin_id]?.icon || '';
@@ -353,9 +358,23 @@ onMounted(async () => {
                          @refresh="handleChange()"
         >
             <template #col-channel_id-format="{value}">
-                {{
-                    userGroupPageState.protocolList?.filter(protocol => protocol.protocol_id === value)[0]?.name
-                }}
+                <div v-for="(protocol, idx) in state.protocolList"
+                     :key="`${protocol}-${idx}`"
+                >
+                    <div v-if="protocol.value === value"
+                         class="flex items-center gap-2"
+                    >
+                        <p-lazy-img :src="assetUrlConverter(protocol.icon)"
+                                    width="1rem"
+                                    height="1rem"
+                                    error-icon="ic_notification-protocol_envelope"
+                        />
+                        <p>{{ protocol.label }}</p>
+                    </div>
+                </div>
+                <!--                {{-->
+                <!--                    userGroupPageState.protocolList?.filter(protocol => protocol.protocol_id === value)[0]?.name-->
+                <!--                }}-->
             </template>
             <template #col-schedule-format="{value}">
                 <p-badge v-if="value === USER_GROUP_CHANNEL_SCHEDULE_TYPE.CUSTOM"
