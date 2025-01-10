@@ -54,9 +54,7 @@ const state = reactive({
         }
         if (filterState.selectedAction !== 'ALL') {
             if (filterState.selectedAction === 'NOTIFIED') {
-                _list = state.historyList.filter((item) => item.action === ALERT_HISTORY_ACTION.NOTIFIED_FAILURE
-                    || item.action === ALERT_HISTORY_ACTION.NOTIFIED_SUCCESS
-                    || item.action === ALERT_HISTORY_ACTION.NOTIFIED_SKIPPED);
+                _list = state.historyList.filter((item) => item.action === ALERT_HISTORY_ACTION.NOTIFIED_FAILURE || item.action === ALERT_HISTORY_ACTION.NOTIFIED_SUCCESS);
             } else {
                 _list = state.historyList.filter((item) => item.action === filterState.selectedAction);
             }
@@ -93,7 +91,7 @@ const getItemInfo = (item: AlertHistoryActionType): HistoryItemInfo => {
     if (item === ALERT_HISTORY_ACTION.TRIGGERED) styleType = 'red';
     if (item === ALERT_HISTORY_ACTION.ACKNOWLEDGED) styleType = 'violet';
     if (item === ALERT_HISTORY_ACTION.RESOLVED) styleType = 'green';
-    if (item === ALERT_HISTORY_ACTION.NOTIFIED_FAILURE || item === ALERT_HISTORY_ACTION.NOTIFIED_SUCCESS || item === ALERT_HISTORY_ACTION.NOTIFIED_SKIPPED) styleType = 'yellow';
+    if (item === ALERT_HISTORY_ACTION.NOTIFIED_FAILURE || item === ALERT_HISTORY_ACTION.NOTIFIED_SUCCESS) styleType = 'yellow';
     if (item === ALERT_HISTORY_ACTION.EVENT_PUSHED) styleType = 'gray';
     return {
         title: item.toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase()),
