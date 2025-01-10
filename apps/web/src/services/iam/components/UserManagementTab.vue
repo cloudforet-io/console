@@ -311,7 +311,7 @@ watch(() => userPageState.selectedIndices[0], (index) => {
                         <div v-else />
                     </template>
                     <template #col-tags-format="{value}">
-                        <template v-if="!!Object.keys(value).length">
+                        <template v-if="value !== undefined && Object.keys(value).length > 0">
                             <p-badge v-for="([key, val], idx) in Object.entries(value)"
                                      :key="`${key}-${val}-${idx}`"
                                      badge-type="subtle"
