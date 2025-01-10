@@ -187,16 +187,16 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
         },
         async updateServiceDetailData({ name, description }: { name: string, description: string }) {
             try {
-                state.serviceInfo = await SpaceConnector.clientV2.alertManager.service.update<ServiceUpdateParameters, ServiceModel>({
+                await SpaceConnector.clientV2.alertManager.service.update<ServiceUpdateParameters, ServiceModel>({
                     service_id: getters.serviceInfo.service_id,
                     name,
                     description,
                 });
                 showSuccessMessage(i18n.t('ALERT_MANAGER.SERVICE.ALT_S_UPDATE_SERVICE'), '');
-                await allReferenceStore.sync('service', state.serviceInfo);
             } catch (e) {
                 ErrorHandler.handleError(e, true);
                 state.serviceInfo = {} as ServiceModel;
+                throw e;
             }
         },
         async deleteServiceDetailData() {
