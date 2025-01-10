@@ -186,9 +186,16 @@ watch([() => storeState.serviceList, () => storeState.selectedUsers], ([nv_servi
             state.filteredUniqueItems = Object.values(list.reduce((acc, cur) => {
                 if (!acc[cur.user_id]) {
                     const { user_id, ...rest } = cur;
-                    acc[cur.user_id] = { user_id, service: [], ...rest };
+                    acc[cur.user_id] = {
+                        user_id,
+                        service: [],
+                        ...rest,
+                    };
                 }
                 if (cur.service !== undefined) {
+                    if (!Array.isArray(acc[cur.user_id].service)) {
+                        acc[cur.user_id].service = [];
+                    }
                     acc[cur.user_id].service.push(cur.service);
                 }
                 return acc;
