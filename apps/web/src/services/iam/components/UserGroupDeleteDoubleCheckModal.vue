@@ -116,10 +116,9 @@ watch([() => storeState.serviceList, () => storeState.selectedUserGroupList], ([
             tableState.filteredItems = Object.values(
                 list.reduce((acc, cur) => {
                     if (!acc[cur.user_group]) {
-                        // 초기 객체 생성 시 정확한 구조 설정
                         acc[cur.user_group] = {
                             user_group: cur.user_group,
-                            service: [], // 항상 빈 배열로 초기화
+                            service: [],
                             description: cur.description,
                         };
                     }
