@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PButtonModal } from '@cloudforet/mirinae';
+import { PButtonModal, PDefinitionTable } from '@cloudforet/mirinae';
+import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
 
 import { i18n } from '@/translations';
 
@@ -13,6 +14,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
+import type { Service } from '@/services/alert-manager/types/alert-manager-type';
 
 interface Props {
     visible: boolean;
@@ -23,6 +25,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const serviceDetailPageStore = useServiceDetailPageStore();
+const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const router = useRouter();
 
@@ -30,9 +33,20 @@ const { getProperRouteLocation } = useProperRouteLocation();
 
 const emit = defineEmits<{(e: 'update:visible'): void; }>();
 
+const storeState = reactive({
+    service: computed<Service>(() => serviceDetailPageGetters.serviceInfo),
+});
 const state = reactive({
     loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
+    fields: computed<DefinitionField[]>(() => [
+        { name: 'alerts', label: i18n.t('ALERT_MANAGER.ALERTS.TITLE') },
+        { name: 'webhook', label: i18n.t('ALERT_MANAGER.WEBHOOK.TITLE') },
+    ]),
+    data: computed(() => ({
+        alerts: storeState.service.alerts.TOTAL.HIGH + storeState.service.alerts.TOTAL.LOW,
+        webhook: storeState.service.webhooks?.length || 0,
+    })),
 });
 const handleConfirm = async () => {
     state.loading = true;
@@ -62,5 +76,26 @@ const handleClose = () => {
                     @confirm="handleConfirm"
                     @cancel="handleClose"
                     @close="handleClose"
-    />
+    >
+        <template #body>
+            <div class="flex flex-col gap-2 pt-4 pb-2">
+                <span>{{ $t('ALERT_MANAGER.SERVICE.MODAL_DELETE_DESC') }}</span>
+                <p-definition-table :fields="state.fields"
+                                    :data="state.data"
+                                    :skeleton-rows="2"
+                                    class="definition-table"
+                                    custom-key-width="50%"
+                                    disable-copy
+                />
+            </div>
+        </template>
+    </p-button-modal>
 </template>
+
+<style scoped lang="postcss">
+.service-detail-delete-modal {
+    .definition-table {
+        min-height: unset;
+    }
+}
+</style>
