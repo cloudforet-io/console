@@ -7,8 +7,8 @@
                 <slot />
             </div>
         </div>
-        <p-collapsible-toggle
-            v-model="proxyIsCollapsed"
+        <p-collapsible-toggle v-if="isOverflow"
+                              v-model="proxyIsCollapsed"
         />
     </div>
 </template>
@@ -42,12 +42,15 @@ export default defineComponent({
         const state = reactive({
             fakeTextRef: null as null | HTMLElement,
             proxyIsCollapsed: useProxyValue('isCollapsed', props, emit),
-
+            applyEl: null as null | HTMLElement,
+            applyedBeforeStyle: null as null | CSSStyleDeclaration,
+            isOverflow: false,
         });
+        const hiddenNodesMap = new Map<Node, string>();
 
-        const checkElement = (element: HTMLElement) => {
+
+        const checkElement = (element: HTMLElement) : number => {
             const totalHeight = element.scrollHeight || element.getBoundingClientRect().height;
-            console.log(element.getBoundingClientRect());
 
             if (totalHeight === 0) {
                 console.warn('Element is not rendered or empty:', element);
@@ -64,67 +67,46 @@ export default defineComponent({
             }
 
             const lineCount = Math.round(totalHeight / lineHeight);
-            console.log(`totalHeight: ${totalHeight}, lineHeight: ${lineHeight}, lineCount: ${lineCount}`);
             return lineCount;
         };
 
-        // const trunkedText = (node: Node, lineClamp: number) => {
-        //     if (!node) return;
-        //     for (const child of node.childNodes) {
-        //         if (child.nodeType === Node.TEXT_NODE) {
-        //             // const span = document.createElement('span');
-        //             // span.textContent = child.textContent.trim();
-        //             // span.style.display = 'inline';
-        //             // span.style.whiteSpace = 'pre-wrap';
-        //             // span.style.position = 'absolute';
-        //             // span.style.visibility = 'hidden';
-        //             // span.style.top = '0';
-        //             // span.style.left = '0';
-        //             //
-        //             // const parentPosition = child.parentElement!.style.position;
-        //             // child.parentElement!.style.position = 'relative';
-        //             // child.parentElement!.appendChild(span);
-        //
-        //             // checkElement(span);
-        //             // child.parentElement!.style.position = parentPosition;
-        //             // span.remove();
-        //             checkElement(child.parentElement as HTMLElement);
-        //         } else if (child.nodeType === Node.ELEMENT_NODE) {
-        //             trunkedText(child, lineClamp);
-        //         }
-        //     }
-        // };
-
         const trunkedText = (node: Node, lineClamp: number) => {
             if (!node) return;
-            console.log(lineClamp);
             const queue: Node[] = [node];
-
+            let remainingLine = lineClamp;
+            console.log(queue);
             while (queue.length > 0) {
                 const currentNode = queue.shift();
                 // eslint-disable-next-line no-continue
                 if (!currentNode) continue;
-
+                // TODO 해당 노드 보다 랜더링상 아래에 위치하는 노드는 모두 hidden 처리해야함.
                 // eslint-disable-next-line no-restricted-syntax
                 for (const child of currentNode.childNodes) {
-                    console.log(child);
+                    if (remainingLine <= 0) {
+                        hideNode(child);
+                        // eslint-disable-next-line no-continue
+                        continue;
+                    }
+
+
                     if (child.nodeType === Node.TEXT_NODE) {
+                        console.log(child);
                         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                         const displayStyle = window.getComputedStyle(child.parentElement!).display;
 
                         if (displayStyle === 'inline') {
                             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                            checkElement(child.parentElement!);
-                        } else {
-                            const span = document.createElement('span');
-                            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                            span.textContent = child.textContent!;
-                            span.style.position = 'absolute';
-                            span.style.top = '0';
-                            span.style.left = '0';
-                            span.style.width = '100%';
-                            span.style.height = 'fit-content';
+                            const res = checkElement(child.parentElement!);
+                            console.log(res);
 
+                            if (remainingLine < res) {
+                                state.isOverflow = true;
+                                lineClampStyle(child.parentElement as HTMLElement, lineClamp);
+                            }
+                            remainingLine -= res;
+                        } else {
+                            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                            const span = createSpanElement(child.textContent!);
                             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                             const parentPosition = child.parentElement!.style.position;
                             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -132,16 +114,79 @@ export default defineComponent({
                             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                             child.parentElement!.appendChild(span);
 
-                            checkElement(span);
+                            const res = checkElement(span);
+                            console.log(res);
                             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                             child.parentElement!.style.position = parentPosition;
                             span.remove();
+                            if (remainingLine < res) {
+                                state.isOverflow = true;
+                                lineClampStyle(child.parentElement as HTMLElement, lineClamp);
+                            }
+                            remainingLine -= res;
                         }
                     } else if (child.nodeType === Node.ELEMENT_NODE) {
                         queue.push(child);
                     }
                 }
             }
+        };
+
+        const showNode = (node: Node) => {
+            if (node instanceof HTMLElement) {
+                const originalDisplay = hiddenNodesMap.get(node);
+                if (originalDisplay !== undefined) {
+                    node.style.display = originalDisplay; // 원래 display 값 복원
+                }
+            } else if (node.parentElement) {
+                const originalDisplay = hiddenNodesMap.get(node.parentElement);
+                if (originalDisplay !== undefined) {
+                    node.parentElement.style.display = originalDisplay; // 부모의 원래 display 값 복원
+                }
+            }
+        };
+
+        const hideNode = (node: Node) => {
+            if (node instanceof HTMLElement) {
+                hiddenNodesMap.set(node, node.style.display); // 기존 display 값을 저장
+                node.style.display = 'none';
+            } else if (node.parentElement) {
+                hiddenNodesMap.set(node.parentElement, node.parentElement.style.display); // 부모의 display 값을 저장
+                node.parentElement.style.display = 'none';
+            }
+        };
+
+        const createSpanElement = (text: string) => {
+            const span = document.createElement('span');
+            span.textContent = text;
+            span.style.position = 'absolute';
+            span.style.top = '0';
+            span.style.left = '0';
+            span.style.width = '100%';
+            span.style.height = 'fit-content';
+            return span;
+        };
+
+        const lineClampStyle = (element: HTMLElement, lineClamp: number) => {
+            state.applyEl = element;
+            state.applyedBeforeStyle = {
+                display: element.style.display,
+                webkitBoxOrient: element.style.webkitBoxOrient,
+                webkitLineClamp: element.style.webkitLineClamp,
+                overflow: element.style.overflow,
+            };
+            element.style.display = '-webkit-box';
+            element.style.webkitBoxOrient = 'vertical';
+            element.style.webkitLineClamp = `${lineClamp}`;
+            element.style.overflow = 'hidden';
+        };
+
+        const clearClampStyle = () => {
+            if (!state.applyEl || !state.applyedBeforeStyle) return;
+            state.applyEl.style.display = 'unset';
+            state.applyEl.style.webkitBoxOrient = 'unset';
+            state.applyEl.style.webkitLineClamp = 'unset';
+            state.applyEl.style.overflow = 'unset';
         };
 
         onMounted(() => {
@@ -154,10 +199,17 @@ export default defineComponent({
         onUpdated(() => {
             if (!state.fakeTextRef) return;
             nextTick(() => {
-                trunkedText(state.fakeTextRef, props.lineClamp);
+                clearClampStyle();
+                // eslint-disable-next-line no-restricted-syntax
+                for (const node of hiddenNodesMap.keys()) {
+                    showNode(node);
+                }
+                hiddenNodesMap.clear(); // 사용한 후 맵 초기화
+                if (state.proxyIsCollapsed) {
+                    trunkedText(state.fakeTextRef, props.lineClamp);
+                }
             });
         });
-
         return {
             ...toRefs(state),
         };

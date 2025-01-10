@@ -31,6 +31,7 @@ export default defineComponent({
         const isCollapsed = ref(true);
         const isOverflowed = ref(false);
 
+
         const calculateClamp = () => {
             const content = contentRef.value;
             if (!content) return;
@@ -46,9 +47,27 @@ export default defineComponent({
                     const parent = node.parentElement;
                     if (!parent) return true;
 
+                    const span = document.createElement('span');
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    span.textContent = node.textContent!;
+                    span.style.position = 'absolute';
+                    span.style.top = '0';
+                    span.style.left = '0';
+                    span.style.width = '100%';
+                    span.style.height = 'fit-content';
+
+                    const parentPosition = parent.style.position;
+                    parent.style.position = 'relative';
+                    parent.appendChild(span);
+
+
                     const parentStyle = window.getComputedStyle(parent);
                     const parentLineHeight = parseFloat(parentStyle.lineHeight);
                     const parentHeight = parent.scrollHeight;
+
+                    console.log(parentHeight, parentLineHeight, remainingHeight);
+                    parent.style.position = parentPosition;
+                    span.remove();
 
                     if (remainingHeight <= 0) {
                         parent.style.display = 'none'; // Hide this parent element
