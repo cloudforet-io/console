@@ -3,10 +3,13 @@ import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { PTableCheckModal, PLazyImg, PStatus } from '@cloudforet/mirinae';
+import {
+    PTableCheckModal, PLazyImg, PStatus, PI,
+} from '@cloudforet/mirinae';
 
 import type { ServiceChannelDisableParameters } from '@/schema/alert-manager/service-channel/api-verbs/disable';
 import type { ServiceChannelEnableParameters } from '@/schema/alert-manager/service-channel/api-verbs/enable';
+import { SERVICE_CHANNEL_FORWARD_TYPE } from '@/schema/alert-manager/service-channel/constants';
 import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
 import { WEBHOOK_STATE } from '@/schema/alert-manager/webhook/constants';
 import { i18n } from '@/translations';
@@ -32,10 +35,10 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const serviceDetailPageStore = useServiceDetailPageStore();
-const serviceDetailPageState = serviceDetailPageStore.state;
+const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const storeState = reactive({
-    notificationProtocolList: computed<ProtocolCardItemType[]>(() => serviceDetailPageState.notificationProtocolList),
+    notificationProtocolList: computed<ProtocolCardItemType[]>(() => serviceDetailPageGetters.notificationProtocolList),
 });
 
 const emit = defineEmits<{(e: 'close'): void;
@@ -55,10 +58,16 @@ const state = reactive({
 
 const getProtocolInfo = (id: string): ProtocolInfo => {
     if (id === 'forward') {
-        return {
-            name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.ASSOCIATED_MEMBER'),
-            icon: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/notifications_member.svg',
-        };
+        if (props.selectedItem?.data?.FORWARD_TYPE === SERVICE_CHANNEL_FORWARD_TYPE.ALL_MEMBER) {
+            return { name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.NOTIFY_TO_ALL_MEMBER') };
+        }
+        if (props.selectedItem?.data?.FORWARD_TYPE === SERVICE_CHANNEL_FORWARD_TYPE.USER_GROUP) {
+            return { name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.NOTIFY_TO_USER_GROUP') };
+        }
+        if (props.selectedItem?.data?.FORWARD_TYPE === SERVICE_CHANNEL_FORWARD_TYPE.USER) {
+            return { name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.NOTIFY_TO_USER') };
+        }
+        return { name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.ASSOCIATED_MEMBER') };
     }
     const protocol = storeState.notificationProtocolList.find((item) => item.protocol_id === id);
     return {
@@ -108,10 +117,15 @@ const handleConfirm = async () => {
         </template>
         <template #col-protocol_id-format="{value}">
             <div class="flex items-center gap-2">
-                <p-lazy-img :src="assetUrlConverter(getProtocolInfo(value).icon)"
+                <p-i v-if="value === 'forward'"
+                     name="ic_notification-protocol_users"
+                     width="1rem"
+                     height="1rem"
+                />
+                <p-lazy-img v-else
+                            :src="assetUrlConverter(getProtocolInfo(value).icon)"
                             width="1rem"
                             height="1rem"
-                            class="service-img"
                 />
                 <span>{{ getProtocolInfo(value).name }}</span>
             </div>

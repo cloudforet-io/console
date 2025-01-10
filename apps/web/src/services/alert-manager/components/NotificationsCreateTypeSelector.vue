@@ -2,7 +2,7 @@
 import { computed, onMounted, reactive } from 'vue';
 
 import {
-    PSelectCard, PLazyImg, PDataLoader,
+    PSelectCard, PLazyImg, PDataLoader, PI,
 } from '@cloudforet/mirinae';
 
 import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
@@ -71,7 +71,13 @@ onMounted(async () => {
                            @change="handleSelectProtocol"
             >
                 <div class="card-item">
-                    <p-lazy-img :src="assetUrlConverter(item.icon || '')"
+                    <p-i v-if="item.protocol_id === 'forward'"
+                         name="ic_notification-protocol_users"
+                         width="2.5rem"
+                         height="2.5rem"
+                    />
+                    <p-lazy-img v-else
+                                :src="assetUrlConverter(item.icon || '')"
                                 width="2.5rem"
                                 height="2.5rem"
                                 class="image"

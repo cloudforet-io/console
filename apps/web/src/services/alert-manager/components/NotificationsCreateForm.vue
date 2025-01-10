@@ -3,7 +3,7 @@ import { useWindowSize } from '@vueuse/core';
 import { computed, reactive, watch } from 'vue';
 
 import {
-    PFieldGroup, PLazyImg, PTextInput, PRadioGroup, PRadio, PPaneLayout, PJsonSchemaForm, screens, PI, PSelectDropdown,
+    PFieldGroup, PLazyImg, PTextInput, PRadioGroup, PRadio, PPaneLayout, PJsonSchemaForm, screens, PI, PSelectDropdown, PTag,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
@@ -24,7 +24,6 @@ import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
 import { useServiceCreateFormStore } from '@/services/alert-manager/stores/service-create-form-store';
 import type { CreatedNotificationInfoType, UserRadioType, ProtocolCardItemType } from '@/services/alert-manager/types/alert-manager-type';
-
 
 const serviceCreateFormStore = useServiceCreateFormStore();
 const serviceCreateFormState = serviceCreateFormStore.state;
@@ -107,9 +106,6 @@ const getPluginIcon = (id: string): string => {
     if (!item) return '';
     return storeState.plugins[item.plugin_info.plugin_id]?.icon || '';
 };
-const handleSelectDropdownItem = (ids: SelectDropdownMenuItem[]) => {
-    state.selectedNotificationChannelIds = ids.map((i) => i.name);
-};
 const handleFormattedSelectedIds = (value: Record<MembersType, string[]>) => {
     state.selectedMemberItems = value;
 };
@@ -123,9 +119,12 @@ const handleChangeRadio = () => {
     state.selectedMemberItems = {};
     state.selectedMemberIds = [];
 };
+const handleTagDelete = (idx: number) => {
+    state.selectedNotificationChannelIds.splice(idx, 1);
+};
 
-watch([() => name.value, () => state.scheduleForm, () => state.selectedRadioIdx, () => state.selectedMemberItems, () => state.schemaForm], (
-    [nameVal, scheduleForm, selectedRadioIdx, selectedMemberItems, schemaForm],
+watch([() => name.value, () => state.scheduleForm, () => state.selectedRadioIdx, () => state.selectedMemberItems, () => state.schemaForm, () => state.selectedNotificationChannelIds], (
+    [nameVal, scheduleForm, selectedRadioIdx, selectedMemberItems, schemaForm, selectedNotificationChannelIds],
 ) => {
     emit(
         'change-form',
@@ -136,6 +135,7 @@ watch([() => name.value, () => state.scheduleForm, () => state.selectedRadioIdx,
                 FORWARD_TYPE: state.radioMenuList[selectedRadioIdx].name,
                 USER_GROUP: selectedRadioIdx === 1 ? selectedMemberItems.USER_GROUP : undefined,
                 USER: selectedRadioIdx === 2 ? selectedMemberItems.USER : undefined,
+                PROTOCOL: selectedNotificationChannelIds.map((i) => i.name),
             },
         },
         isAllValid.value && (state.isForwardTypeProtocol ? state.isMemberDataValid : state.isSchemaDataValid),
@@ -148,7 +148,13 @@ watch([() => name.value, () => state.scheduleForm, () => state.selectedRadioIdx,
         <div v-if="storeState.selectedProtocolType"
              class="protocol-item"
         >
-            <p-lazy-img :src="assetUrlConverter(storeState.selectedProtocolType?.icon || '')"
+            <p-i v-if="storeState.selectedProtocolType.protocol_id === 'forward'"
+                 name="ic_notification-protocol_users"
+                 width="4rem"
+                 height="4rem"
+            />
+            <p-lazy-img v-else
+                        :src="assetUrlConverter(storeState.selectedProtocolType?.icon || '')"
                         width="4rem"
                         height="4rem"
                         error-icon="ic_webhook"
@@ -163,9 +169,9 @@ watch([() => name.value, () => state.scheduleForm, () => state.selectedRadioIdx,
             </div>
         </div>
         <p-field-group :label="$t('ALERT_MANAGER.NOTIFICATIONS.CHANNEL_NAME')"
-                       class="pt-2"
                        :invalid="invalidState.name"
                        required
+                       class="field-group"
         >
             <template #default="{invalid}">
                 <p-text-input :value="name"
@@ -176,72 +182,85 @@ watch([() => name.value, () => state.scheduleForm, () => state.selectedRadioIdx,
                 />
             </template>
         </p-field-group>
-        <p-field-group v-if="state.isForwardTypeProtocol"
-                       :label="$t('ALERT_MANAGER.NOTIFICATIONS.USER')"
-                       required
+        <div v-if="state.isForwardTypeProtocol"
+             class="flex flex-col gap-6 mb-2"
         >
-            <template #default>
-                <div class="flex flex-col mt-1 gap-2">
-                    <p-radio-group :direction="state.isMobileSize ? 'vertical' : 'horizontal'">
-                        <p-radio v-for="(item, idx) in state.radioMenuList"
-                                 :key="`notification-scope-${idx}`"
-                                 v-model="state.selectedRadioIdx"
-                                 :value="idx"
-                                 @change="handleChangeRadio"
-                        >
-                            <span class="radio-item">
-                                {{ item.label }}
-                            </span>
-                        </p-radio>
-                    </p-radio-group>
-                    <user-select-dropdown v-if="state.selectedRadioIdx !== 0"
-                                          selection-type="multiple"
-                                          appearance-type="stack"
-                                          use-fixed-menu-style
-                                          :selected-ids.sync="state.selectedMemberIds"
-                                          :user-pool="storeState.createdServiceMembers?.USER || []"
-                                          :user-group-pool="storeState.createdServiceMembers?.USER_GROUP || []"
-                                          :show-category-title="false"
-                                          :show-user-group-list="state.selectedRadioIdx === 1"
-                                          :show-user-list="state.selectedRadioIdx === 2"
-                                          @formatted-selected-ids="handleFormattedSelectedIds"
-                    />
-                    <p-field-group required>
-                        <template #label>
-                            <p class="extra-label inline-flex items-center gap-1">
-                                <p-i name="ic_subdirectory-arrow-right"
-                                     width="1rem"
-                                     height="1rem"
-                                     color="inherit"
+            <p-field-group :label="$t('ALERT_MANAGER.NOTIFICATIONS.TARGET')"
+                           required
+                           class="field-group"
+            >
+                <template #default>
+                    <div class="flex flex-col mt-1 gap-2">
+                        <p-radio-group :direction="state.isMobileSize ? 'vertical' : 'horizontal'">
+                            <p-radio v-for="(item, idx) in state.radioMenuList"
+                                     :key="`notification-scope-${idx}`"
+                                     v-model="state.selectedRadioIdx"
+                                     :value="idx"
+                                     @change="handleChangeRadio"
+                            >
+                                <span class="radio-item">
+                                    {{ item.label }}
+                                </span>
+                            </p-radio>
+                        </p-radio-group>
+                        <user-select-dropdown v-if="state.selectedRadioIdx !== 0"
+                                              selection-type="multiple"
+                                              appearance-type="stack"
+                                              use-fixed-menu-style
+                                              :selected-ids.sync="state.selectedMemberIds"
+                                              :user-pool="storeState.createdServiceMembers?.USER || []"
+                                              :user-group-pool="storeState.createdServiceMembers?.USER_GROUP || []"
+                                              :show-category-title="false"
+                                              :show-user-group-list="state.selectedRadioIdx === 1"
+                                              :show-user-list="state.selectedRadioIdx === 2"
+                                              @formatted-selected-ids="handleFormattedSelectedIds"
+                        />
+                    </div>
+                </template>
+            </p-field-group>
+            <p-field-group :label="$t('ALERT_MANAGER.NOTIFICATIONS.NOTIFICATION_CHANNEL')"
+                           class="field-group"
+            >
+                <template #default>
+                    <p-select-dropdown :menu="state.notificationChannelList"
+                                       use-fixed-menu-style
+                                       multi-selectable
+                                       is-filterable
+                                       show-select-marker
+                                       appearance-type="stack"
+                                       :selected.sync="state.selectedNotificationChannelIds"
+                    >
+                        <template #menu-item--format="{ item }">
+                            <div class="flex items-center gap-1">
+                                <p-lazy-img :src="assetUrlConverter(getPluginIcon(item.name))"
+                                            width="1.25rem"
+                                            height="1.25rem"
                                 />
-                                <span class="ml-1">{{ $t('ALERT_MANAGER.NOTIFICATIONS.NOTIFICATION_CHANNEL') }}</span>
-                                <span class="text-label-sm text-gray-500 font-normal">({{ $t('ALERT_MANAGER.NOTIFICATIONS.OPTIONAL') }})</span>
-                            </p>
+                                <span>{{ item.label }}</span>
+                            </div>
                         </template>
-                        <p-select-dropdown :menu="state.notificationChannelList"
-                                           use-fixed-menu-style
-                                           multi-selectable
-                                           is-filterable
-                                           show-select-marker
-                                           appearance-type="stack"
-                                           :selected="state.selectedNotificationChannelIds"
-                                           class="pl-6 mt-1"
-                                           @update:selected="handleSelectDropdownItem"
-                        >
-                            <template #menu-item--format="{ item }">
-                                <div class="flex items-center gap-1">
-                                    <p-lazy-img :src="assetUrlConverter(getPluginIcon(item.name))"
-                                                width="1.25rem"
-                                                height="1.25rem"
-                                    />
-                                    <span>{{ item.label }}</span>
-                                </div>
-                            </template>
-                        </p-select-dropdown>
-                    </p-field-group>
-                </div>
-            </template>
-        </p-field-group>
+                        <template #dropdown-button>
+                            <div v-if="state.selectedNotificationChannelIds.length > 0"
+                                 class="flex flex-wrap py-1 gap-y-2"
+                            >
+                                <p-tag v-for="(item, idx) in state.selectedNotificationChannelIds"
+                                       :key="item.name"
+                                       @delete="handleTagDelete(idx)"
+                                >
+                                    <div class="flex items-center gap-1">
+                                        <p-lazy-img :src="assetUrlConverter(getPluginIcon(item.name))"
+                                                    width="1rem"
+                                                    height="1rem"
+                                        />
+                                        <span>{{ item.label }}</span>
+                                    </div>
+                                </p-tag>
+                            </div>
+                        </template>
+                    </p-select-dropdown>
+                </template>
+            </p-field-group>
+        </div>
         <p-json-schema-form v-else
                             :form-data.sync="state.schemaForm"
                             :schema="storeState.selectedProtocolType?.plugin_info?.metadata.data.schema"
@@ -260,15 +279,19 @@ watch([() => name.value, () => state.scheduleForm, () => state.selectedRadioIdx,
 
 <style lang="postcss" scoped>
 .notification-schedule-form {
+    @apply flex flex-col gap-6;
     .protocol-item {
         @apply flex items-center w-full;
-        margin-bottom: 1.5rem;
+        margin-bottom: 0.5rem;
         gap: 1rem;
         .info {
             @apply flex flex-col;
             gap: 0.125rem;
             flex: 1;
         }
+    }
+    .field-group {
+        margin-bottom: 0;
     }
 }
 </style>

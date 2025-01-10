@@ -4,7 +4,7 @@ import type { TranslateResult } from 'vue-i18n';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PHeadingLayout, PTab, PHeading, PDefinitionTable, PStatus, PLazyImg, PBadge,
+    PHeadingLayout, PTab, PHeading, PDefinitionTable, PStatus, PLazyImg, PBadge, PI,
 } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
@@ -51,7 +51,7 @@ const tabState = reactive({
 });
 const storeState = reactive({
     selectedNotificationId: computed<string|undefined>(() => serviceDetailPageState.selectedNotificationId),
-    notificationProtocolList: computed<ProtocolCardItemType[]>(() => serviceDetailPageState.notificationProtocolList),
+    notificationProtocolList: computed<ProtocolCardItemType[]>(() => serviceDetailPageGetters.notificationProtocolList),
     userGroup: computed<UserGroupReferenceMap>(() => serviceDetailPageGetters.userGroupReferenceMap),
 });
 const state = reactive({
@@ -88,10 +88,16 @@ const state = reactive({
 
 const getProtocolInfo = (id: string): ProtocolInfo => {
     if (id === 'forward') {
-        return {
-            name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.ASSOCIATED_MEMBER'),
-            icon: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/notifications_member.svg',
-        };
+        if (state.notificationInfo.data?.FORWARD_TYPE === SERVICE_CHANNEL_FORWARD_TYPE.ALL_MEMBER) {
+            return { name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.NOTIFY_TO_ALL_MEMBER') };
+        }
+        if (state.notificationInfo.data?.FORWARD_TYPE === SERVICE_CHANNEL_FORWARD_TYPE.USER_GROUP) {
+            return { name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.NOTIFY_TO_USER_GROUP') };
+        }
+        if (state.notificationInfo.data?.FORWARD_TYPE === SERVICE_CHANNEL_FORWARD_TYPE.USER) {
+            return { name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.NOTIFY_TO_USER') };
+        }
+        return { name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.ASSOCIATED_MEMBER') };
     }
     const protocol = storeState.notificationProtocolList.find((item) => item.protocol_id === id);
     return {
@@ -190,7 +196,13 @@ watch(() => storeState.selectedNotificationId, async (selectedId) => {
                 </template>
                 <template #data-protocol_id="{value}">
                     <div class="inline-flex items-center gap-2">
-                        <p-lazy-img :src="assetUrlConverter(getProtocolInfo(value).icon)"
+                        <p-i v-if="value === 'forward'"
+                             name="ic_notification-protocol_users"
+                             width="1rem"
+                             height="1rem"
+                        />
+                        <p-lazy-img v-else
+                                    :src="assetUrlConverter(getProtocolInfo(value).icon)"
                                     width="1rem"
                                     height="1rem"
                                     class="service-img"

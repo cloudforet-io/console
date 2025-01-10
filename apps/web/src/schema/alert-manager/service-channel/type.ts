@@ -14,6 +14,7 @@ export type ServiceChannelDataType = {
     FORWARD_TYPE: ServiceChannelForwardType;
     USER?: string[];
     USER_GROUP?: string[];
+    PROTOCOL?: string[];
 };
 
 export type ServiceChannelScheduleDayType = {
