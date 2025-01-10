@@ -112,7 +112,7 @@ const saveChangedSchedule = async () => {
     else if (!isAlertManagerVersionV2) {
         await setUserChannelSchedule();
     } else {
-        updateUserChannel('schedule', state.scheduleSettingFormType);
+        await updateUserChannel('schedule', state.scheduleSettingFormType);
     }
 };
 
