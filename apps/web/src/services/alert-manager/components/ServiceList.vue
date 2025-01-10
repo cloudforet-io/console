@@ -125,6 +125,7 @@ onMounted(async () => {
         <p-data-loader :loading="state.loading"
                        :data="state.serviceList"
                        loader-backdrop-color="transparent"
+                       class="loader-wrapper"
         >
             <div class="flex flex-col gap-4">
                 <service-list-content :list="state.alertServiceList"
@@ -162,3 +163,11 @@ onMounted(async () => {
         </p-data-loader>
     </div>
 </template>
+
+<style scoped lang="postcss">
+.service-list {
+    .loader-wrapper {
+        min-height: 13.75rem;
+    }
+}
+</style>

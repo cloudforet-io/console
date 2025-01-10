@@ -7,6 +7,8 @@ import { PButtonModal } from '@cloudforet/mirinae';
 import type { EventRuleDeleteParameters } from '@/schema/alert-manager/event-rule/api-verbs/delete';
 import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
 
+import { replaceUrlQuery } from '@/lib/router-query-string';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -30,6 +32,7 @@ const emit = defineEmits<{(e: 'update:visible'): void;
 const storeState = reactive({
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
     eventRuleInfo: computed<EventRuleModel>(() => serviceDetailPageState.eventRuleInfo),
+    eventRuleList: computed<EventRuleModel[]>(() => serviceDetailPageState.eventRuleList),
 });
 const state = reactive({
     loading: false,
@@ -40,6 +43,10 @@ const handleConfirm = async () => {
     try {
         await SpaceConnector.clientV2.alertManager.eventRule.delete<EventRuleDeleteParameters>({
             event_rule_id: storeState.eventRuleInfo.event_rule_id,
+        });
+        await replaceUrlQuery({
+            webhookId: undefined,
+            eventRuleId: undefined,
         });
         await serviceDetailPageStore.fetchEventRuleList({
             service_id: storeState.serviceId,

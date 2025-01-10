@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
-import { useRoute } from 'vue-router/composables';
+import {
+    computed, onUnmounted, reactive, watch,
+} from 'vue';
 
 import { PButton, PDataLoader } from '@cloudforet/mirinae';
 
 import { EVENT_RULE_SCOPE } from '@/schema/alert-manager/event-rule/constant';
 import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
-
-import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import ServiceDetailTabsSettingsEventRuleCard
     from '@/services/alert-manager/components/ServiceDetailTabsSettingsEventRuleCard.vue';
@@ -22,8 +21,6 @@ import { useServiceDetailPageStore } from '@/services/alert-manager/stores/servi
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 
-const route = useRoute();
-
 const storeState = reactive({
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
     modalVisible: computed<boolean>(() => serviceDetailPageState.eventRuleScopeModalVisible),
@@ -34,7 +31,6 @@ const storeState = reactive({
 });
 const state = reactive({
     loading: true,
-    eventRuleInfoLoading: false,
     selectedScope: EVENT_RULE_SCOPE.GLOBAL,
     selectedWebhook: '',
     hideSidebar: false,
@@ -44,30 +40,6 @@ const handleClickAddRule = () => {
     serviceDetailPageStore.setEventRuleScopeModalVisible(true);
 };
 
-const fetchEventRuleInfo = async () => {
-    state.eventRuleInfoLoading = true;
-    try {
-        await serviceDetailPageStore.fetchEventRuleInfo({
-            event_rule_id: route.query?.eventRuleId as string,
-        });
-    } finally {
-        state.eventRuleInfoLoading = false;
-    }
-};
-
-watch(() => route.query?.eventRuleId, (eventRuleId) => {
-    if (eventRuleId) {
-        fetchEventRuleInfo();
-        serviceDetailPageStore.setShowEventRuleFormCard(false);
-    }
-}, { immediate: true });
-watch(() => storeState.items, (items) => {
-    if (!items.length) return;
-    replaceUrlQuery({
-        webhookId: items[0].webhook_id || 'global',
-        eventRuleId: items[0].event_rule_id,
-    });
-});
 watch(() => storeState.serviceId, async (id) => {
     if (!id) return;
     try {
@@ -79,14 +51,19 @@ watch(() => storeState.serviceId, async (id) => {
         state.loading = false;
     }
 }, { immediate: true });
+
+onUnmounted(() => {
+    serviceDetailPageStore.initEscalationPolicyState();
+});
 </script>
 
 <template>
     <div class="service-detail-tabs-settings-event-rule pt-6 pb-10">
         <p-data-loader :loading="state.loading"
                        :data="!storeState.showEventRuleFormCard ? storeState.items : true"
+                       class="loader"
         >
-            <div class="content-wrapper flex gap-1">
+            <div class="content-wrapper flex gap-6">
                 <service-detail-tabs-settings-event-rule-sidebar :hide-sidebar.sync="state.hideSidebar"
                                                                  :items="storeState.items"
                 />
@@ -97,7 +74,6 @@ watch(() => storeState.serviceId, async (id) => {
                 />
                 <service-detail-tabs-settings-event-rule-card v-else-if="storeState.eventRuleInfo.event_rule_id"
                                                               class="flex-1"
-                                                              :loading="state.eventRuleInfoLoading"
                 />
             </div>
             <template #no-data>
@@ -127,6 +103,9 @@ watch(() => storeState.serviceId, async (id) => {
 
 <style scoped lang="postcss">
 .service-detail-tabs-settings-event-rule {
+    .loader {
+        min-height: 14rem;
+    }
     .content-wrapper {
         align-items: flex-start;
     }

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { reactive, watch } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal } from '@cloudforet/mirinae';
@@ -8,6 +8,9 @@ import type { UserGroupAddUsersParameters } from '@/schema/identity/user-group/a
 import type { UserGroupModel } from '@/schema/identity/user-group/model';
 import type { MembersType } from '@/schema/identity/user-group/type';
 import { i18n } from '@/translations';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -23,14 +26,26 @@ const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 const userGroupPageGetters = userGroupPageStore.getters;
 
+const allReferenceStore = useAllReferenceStore();
+const allReferenceGetters = allReferenceStore.getters;
+
+const storeState = reactive({
+    userReferenceMap: computed<UserReferenceMap>(() => allReferenceGetters.user),
+});
+
 const state = reactive({
     loading: false,
     selectedUserIds: undefined,
     excludedSelectedIds: [],
     formattedMemberItems: {} as Record<MembersType, string[]>,
+    userPool: [] as string[],
 });
 
 /* Watcher */
+watch(() => storeState.userReferenceMap, (userReferenceStore) => {
+    state.userPool = Object.keys(userReferenceStore);
+}, { deep: true, immediate: true });
+
 watch(() => userGroupPageGetters.selectedUserGroups, (nv_selected_user_group) => {
     if (nv_selected_user_group.length === 1 && nv_selected_user_group[0].users) {
         state.excludedSelectedIds = nv_selected_user_group[0].users;

@@ -10,6 +10,7 @@ export type UserChannelScheduleDayType = {
 };
 export type UserChannelScheduleInfoType = {
     SCHEDULE_TYPE: UserChannelScheduleType;
+    TIMEZONE: string;
     MON: UserChannelScheduleDayType;
     TUE: UserChannelScheduleDayType;
     WED: UserChannelScheduleDayType;

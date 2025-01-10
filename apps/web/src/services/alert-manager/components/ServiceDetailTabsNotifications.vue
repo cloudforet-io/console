@@ -15,14 +15,20 @@ import {
     PLazyImg,
     PSelectDropdown,
     PHeadingLayout,
+    PI,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ServiceChannelListParameters } from '@/schema/alert-manager/service-channel/api-verbs/list';
-import { SERVICE_CHANNEL_STATE, SERVICE_CHANNEL_TYPE } from '@/schema/alert-manager/service-channel/constants';
+import {
+    SERVICE_CHANNEL_FORWARD_TYPE,
+    SERVICE_CHANNEL_STATE,
+    SERVICE_CHANNEL_TYPE,
+} from '@/schema/alert-manager/service-channel/constants';
 import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
+import type { ServiceChannelDataType } from '@/schema/alert-manager/service-channel/type';
 import type { ServiceModel } from '@/schema/alert-manager/service/model';
 import { i18n, i18n as _i18n } from '@/translations';
 
@@ -108,7 +114,7 @@ const tableState = reactive({
 const storeState = reactive({
     timezone: computed<string>(() => serviceDetailPageGetters.timezone),
     service: computed<ServiceModel>(() => serviceDetailPageState.serviceInfo),
-    notificationProtocolList: computed<ProtocolCardItemType[]>(() => serviceDetailPageState.notificationProtocolList),
+    notificationProtocolList: computed<ProtocolCardItemType[]>(() => serviceDetailPageGetters.notificationProtocolList),
 });
 const state = reactive({
     loading: false,
@@ -136,12 +142,18 @@ const notificationsListApiQueryHelper = new ApiQueryHelper().setSort('created_at
 const queryTagHelper = useQueryTags({ keyItemSets: NOTIFICATION_MANAGEMENT_TABLE_KEY_ITEMS_SETS });
 const { queryTags } = queryTagHelper;
 
-const getProtocolInfo = (id: string): ProtocolInfo => {
+const getProtocolInfo = (id: string, data?: ServiceChannelDataType): ProtocolInfo => {
     if (id === 'forward') {
-        return {
-            name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.ASSOCIATED_MEMBER'),
-            icon: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/notifications_member.svg',
-        };
+        if (data?.FORWARD_TYPE === SERVICE_CHANNEL_FORWARD_TYPE.ALL_MEMBER) {
+            return { name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.NOTIFY_TO_ALL_MEMBER') };
+        }
+        if (data?.FORWARD_TYPE === SERVICE_CHANNEL_FORWARD_TYPE.USER_GROUP) {
+            return { name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.NOTIFY_TO_USER_GROUP') };
+        }
+        if (data?.FORWARD_TYPE === SERVICE_CHANNEL_FORWARD_TYPE.USER) {
+            return { name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.NOTIFY_TO_USER') };
+        }
+        return { name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.ASSOCIATED_MEMBER') };
     }
     const protocol = storeState.notificationProtocolList.find((item) => item.protocol_id === id);
     return {
@@ -280,14 +292,19 @@ onUnmounted(() => {
                     v-bind="alertManagerStateFormatter(value)"
                 />
             </template>
-            <template #col-protocol_id-format="{value}">
+            <template #col-protocol_id-format="{value, item}">
                 <div class="col-channel">
-                    <p-lazy-img :src="assetUrlConverter(getProtocolInfo(value).icon)"
+                    <p-i v-if="value === 'forward'"
+                         name="ic_notification-protocol_users"
+                         width="1rem"
+                         height="1rem"
+                    />
+                    <p-lazy-img v-else
+                                :src="assetUrlConverter(getProtocolInfo(value).icon)"
                                 width="1rem"
                                 height="1rem"
-                                class="service-img"
                     />
-                    <span>{{ getProtocolInfo(value).name }}</span>
+                    <span>{{ getProtocolInfo(value, item.data).name }}</span>
                 </div>
             </template>
         </p-toolbox-table>

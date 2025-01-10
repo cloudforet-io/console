@@ -5,7 +5,7 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButton, PI,
+    PButton, PI, PBadge,
 } from '@cloudforet/mirinae';
 
 
@@ -13,20 +13,26 @@ import type { ProjectChannelSetScheduleParameters } from '@/schema/notification/
 import type { UserChannelSetScheduleParameters } from '@/schema/notification/user-channel/api-verbs/set-schedule';
 import { i18n } from '@/translations';
 
+import { useDomainStore } from '@/store/domain/domain-store';
 import { useUserStore } from '@/store/user/user-store';
 
+import config from '@/lib/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
+import type { ScheduleSettingFormType } from '@/common/components/schedule-setting-form/schedule-setting-form';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { utcToTimezoneFormatter } from '@/services/iam/helpers/user-notification-timezone-helper';
 import NotificationAddSchedule from '@/services/my-page/components/NotificationAddSchedule.vue';
 import { useNotificationItem } from '@/services/my-page/composables/notification-item';
 import type { NotificationAddFormSchedulePayload } from '@/services/my-page/types/notification-add-form-type';
-import type { NotiChannelItem } from '@/services/my-page/types/notification-channel-item-type';
+import type { NotiChannelItemV1, NotiChannelItem } from '@/services/my-page/types/notification-channel-item-type';
+
+const domainStore = useDomainStore();
+const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainStore.state.domainId);
 
 const props = withDefaults(defineProps<{
-    channelData: NotiChannelItem;
+    channelData: Partial<NotiChannelItem> & Partial<NotiChannelItemV1>;
     projectId?: string;
     disableEdit?: boolean;
 }>(), {
@@ -46,21 +52,28 @@ const state = reactive({
     isScheduleValid: false,
     displayStartHour: computed(() => utcToTimezoneFormatter((props.channelData.schedule?.start_hour || 0), timezoneForFormatter)),
     displayEndHour: computed(() => utcToTimezoneFormatter((props.channelData.schedule?.end_hour || 0), timezoneForFormatter)),
+    scheduleSettingFormType: {} as ScheduleSettingFormType,
 });
 const {
     state: notificationItemState,
     cancelEdit,
     startEdit,
+    updateUserChannel,
 } = useNotificationItem<undefined>({
-    userChannelId: props.channelData.user_channel_id,
-    projectChannelId: props.channelData.project_channel_id,
+    userChannelId: isAlertManagerVersionV2 ? props.channelData.channel_id : props.channelData.user_channel_id,
+    projectChannelId: isAlertManagerVersionV2 ? '' : props.channelData.project_channel_id,
     isEditMode: false,
 }, emit);
 
-const onChangeSchedule = async (value: NotificationAddFormSchedulePayload) => {
+const onChangeScheduleV1 = async (value: NotificationAddFormSchedulePayload) => {
     state.scheduleModeForEdit = value.is_scheduled;
     state.scheduleForEdit = value.schedule;
     state.isScheduleValid = value.isScheduleValid;
+};
+
+const onChangeSchedule = async (scheduleSettingFormType: ScheduleSettingFormType) => {
+    state.scheduleSettingFormType = scheduleSettingFormType;
+    state.isScheduleValid = true;
 };
 
 const setUserChannelSchedule = async () => {
@@ -96,7 +109,11 @@ const setProjectChannelSchedule = async () => {
 
 const saveChangedSchedule = async () => {
     if (props.projectId) await setProjectChannelSchedule();
-    else await setUserChannelSchedule();
+    else if (!isAlertManagerVersionV2) {
+        await setUserChannelSchedule();
+    } else {
+        updateUserChannel('schedule', state.scheduleSettingFormType);
+    }
 };
 
 const onClickSave = async () => {
@@ -104,6 +121,39 @@ const onClickSave = async () => {
     emit('change');
 };
 
+const SCHEDULE_TYPE_OPTIONS = {
+    ALL_DAY: 'Every Day',
+    CUSTOM: 'Custom',
+    WEEK_DAY: 'Weekdays',
+    WEEKEND: 'Weekend',
+};
+const getScheduleInfo = (schedule: ScheduleSettingFormType) => {
+    const { SCHEDULE_TYPE } = schedule;
+    let styleType: string;
+    let label;
+    switch (SCHEDULE_TYPE) {
+    case 'ALL_DAY':
+        styleType = 'indigo500';
+        label = SCHEDULE_TYPE_OPTIONS.ALL_DAY;
+        break;
+    case 'CUSTOM':
+        styleType = 'coral500';
+        label = SCHEDULE_TYPE_OPTIONS.CUSTOM;
+        break;
+    case 'WEEK_DAY':
+        styleType = 'secondary1';
+        label = SCHEDULE_TYPE_OPTIONS.WEEK_DAY;
+        break;
+    default:
+        styleType = 'gray900';
+        label = SCHEDULE_TYPE_OPTIONS.WEEKEND;
+        break;
+    }
+    return {
+        styleType,
+        label,
+    };
+};
 </script>
 
 <template>
@@ -118,6 +168,7 @@ const onClickSave = async () => {
         >
             <notification-add-schedule :schedule="props.channelData.schedule"
                                        :is-scheduled="props.channelData.is_scheduled"
+                                       @changeV1="onChangeScheduleV1"
                                        @change="onChangeSchedule"
             />
             <div class="button-group">
@@ -140,13 +191,24 @@ const onClickSave = async () => {
         <div v-else
              class="content"
         >
-            <p v-if="Array.isArray(props.channelData.schedule?.day_of_week)">
-                <span v-for="day in props.channelData.schedule.day_of_week"
-                      :key="day"
-                > {{ day }}</span><br>
-                {{ state.displayStartHour }}:00 ~ {{ state.displayEndHour }}:00
-            </p>
-            <span v-else>{{ $t('IDENTITY.USER.NOTIFICATION.FORM.ALL_TIME') }}</span>
+            <div v-if="!isAlertManagerVersionV2">
+                <p v-if="Array.isArray(props.channelData.schedule?.day_of_week)">
+                    <span v-for="day in props.channelData.schedule?.day_of_week"
+                          :key="day"
+                    > {{ day }}</span><br>
+                    {{ state.displayStartHour }}:00 ~ {{ state.displayEndHour }}:00
+                </p>
+                <span v-else>{{ $t('IDENTITY.USER.NOTIFICATION.FORM.ALL_TIME') }}</span>
+            </div>
+            <div v-else-if="isAlertManagerVersionV2">
+                <div class="inline-flex items-center gap-2">
+                    <p-badge badge-type="solid-outline"
+                             :style-type="getScheduleInfo(props.channelData.schedule).styleType"
+                    >
+                        {{ getScheduleInfo(props.channelData.schedule).label }}
+                    </p-badge>
+                </div>
+            </div>
             <button class="edit-button"
                     :class="{'edit-disable': props.disableEdit}"
                     @click="startEdit('schedule')"

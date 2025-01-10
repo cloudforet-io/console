@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive, onMounted } from 'vue';
+import {
+    computed, reactive, onMounted, watch,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { range } from 'lodash';
@@ -11,9 +13,14 @@ import {
 import type { ChannelSchedule, ChannelScheduleDayOfWeek } from '@/schema/notification/type';
 import { i18n } from '@/translations';
 
+import { useDomainStore } from '@/store/domain/domain-store';
 import { useUserStore } from '@/store/user/user-store';
 
+import config from '@/lib/config';
+
 import InfoMessage from '@/common/components/guidance/InfoMessage.vue';
+import type { ScheduleSettingFormType } from '@/common/components/schedule-setting-form/schedule-setting-form';
+import ScheduleSettingForm from '@/common/components/schedule-setting-form/ScheduleSettingForm.vue';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import {
@@ -28,18 +35,23 @@ const END_TIME_LIST = range(1, 25);
 const props = withDefaults(defineProps<{
     isScheduledValid?: boolean;
     isScheduled?: boolean;
-    schedule?: ChannelSchedule;
+    schedule?: Partial<ChannelSchedule> & Partial<ScheduleSettingFormType>;
 }>(), {
     isScheduledValid: true,
     isScheduled: false,
     schedule: undefined,
 });
 
-const emit = defineEmits<{(event: 'change', payload: NotificationAddFormSchedulePayload): void;
+const emit = defineEmits<{(event: 'changeV1', payload: NotificationAddFormSchedulePayload): void;
+  (event: 'change', payload: ScheduleSettingFormType): void;
 }>();
 
+
 const userStore = useUserStore();
+const domainStore = useDomainStore();
 const timezone = computed<string|undefined>(() => userStore.state.timezone);
+
+const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainStore.state.domainId);
 
 /* constants */
 const WEEK_DAYS = [
@@ -92,25 +104,46 @@ const state = reactive({
     }]),
     proxyIsScheduled: props.isScheduled ? props.isScheduled : false,
     proxyIsScheduledValid: computed<boolean>(() => !state.proxyIsScheduled || (!invalidState.daysOfWeek && !invalidState.timePeriod)),
+    scheduleSettingTypeData: {
+        SCHEDULE_TYPE: 'WEEK_DAY',
+        TIMEZONE: 'UTC',
+        MON: {
+            is_scheduled: true,
+        },
+        TUE: {
+            is_scheduled: true,
+        },
+        WED: {
+            is_scheduled: true,
+        },
+        THU: {
+            is_scheduled: true,
+        },
+        FRI: {
+            is_scheduled: true,
+        },
+    } as ScheduleSettingFormType,
 });
 
 const emitChange = () => {
-    if (state.proxyIsScheduled) {
-        emit('change', {
-            schedule: {
-                day_of_week: daysOfWeek.value,
-                start_hour: timePeriod.value.startHour,
-                end_hour: timePeriod.value.endHour,
-            },
-            is_scheduled: state.proxyIsScheduled,
-            isScheduleValid: state.proxyIsScheduledValid,
-        });
-    } else {
-        emit('change', {
-            schedule: {},
-            is_scheduled: state.proxyIsScheduled,
-            isScheduleValid: state.proxyIsScheduledValid,
-        });
+    if (!isAlertManagerVersionV2) {
+        if (state.proxyIsScheduled) {
+            emit('changeV1', {
+                schedule: {
+                    day_of_week: daysOfWeek.value,
+                    start_hour: timePeriod.value.startHour,
+                    end_hour: timePeriod.value.endHour,
+                },
+                is_scheduled: state.proxyIsScheduled,
+                isScheduleValid: state.proxyIsScheduledValid,
+            });
+        } else {
+            emit('changeV1', {
+                schedule: {},
+                is_scheduled: state.proxyIsScheduled,
+                isScheduleValid: state.proxyIsScheduledValid,
+            });
+        }
     }
 };
 
@@ -134,6 +167,17 @@ const handleSelectEndHour = (endHour: number) => {
     emitChange();
 };
 
+const handleScheduleForm = (scheduleSettingFormType: ScheduleSettingFormType) => {
+    state.scheduleSettingTypeData = scheduleSettingFormType;
+    emit('change', scheduleSettingFormType);
+};
+
+watch(() => props.schedule, (schedule) => {
+    if (schedule) {
+        state.scheduleSettingTypeData = schedule;
+    }
+}, { deep: true, immediate: true });
+
 onMounted(() => {
     resetAll();
 });
@@ -141,57 +185,64 @@ onMounted(() => {
 
 <template>
     <div>
-        <p-radio-group>
-            <p-radio v-for="(item, i) in state.scheduleMode"
-                     :key="i"
-                     :selected="item.value"
-                     :value="state.proxyIsScheduled"
-                     @click="handleScheduleMode(item.value)"
+        <div v-if="!isAlertManagerVersionV2">
+            <p-radio-group>
+                <p-radio v-for="(item, i) in state.scheduleMode"
+                         :key="i"
+                         :selected="item.value"
+                         :value="state.proxyIsScheduled"
+                         @click="handleScheduleMode(item.value)"
+                >
+                    <span class="radio-label"
+                          @click="handleScheduleMode(item.value)"
+                    >{{ item.label }}</span>
+                </p-radio>
+            </p-radio-group>
+            <article v-if="state.proxyIsScheduled"
+                     class="schedule-wrapper"
             >
-                <span class="radio-label"
-                      @click="handleScheduleMode(item.value)"
-                >{{ item.label }}</span>
-            </p-radio>
-        </p-radio-group>
-        <article v-if="state.proxyIsScheduled"
-                 class="schedule-wrapper"
-        >
-            <info-message style-type="secondary"
-                          :message="$t('IDENTITY.USER.NOTIFICATION.FORM.SCHEDULE_INFO_MSG')"
-                          block
+                <info-message style-type="secondary"
+                              :message="$t('IDENTITY.USER.NOTIFICATION.FORM.SCHEDULE_INFO_MSG')"
+                              block
+                />
+                <h5 class="setting">
+                    {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SETTING') }}
+                </h5>
+                <p-select-button v-for="day in WEEK_DAYS"
+                                 :key="day.value"
+                                 :selected="daysOfWeek"
+                                 multi-selectable
+                                 :value="day.value"
+                                 class="select-button-wrapper"
+                                 @change="handleSelectDay"
+                >
+                    {{ day.label }}
+                </p-select-button>
+                <div class="dropdown-wrapper">
+                    <p-select-dropdown :selected="timePeriod.startHour"
+                                       :menu="START_TIME_MENU"
+                                       :invalid="invalidState.timePeriod"
+                                       class="dropdown"
+                                       use-fixed-menu-style
+                                       @select="handleSelectStartHour"
+                    />
+                    <span class="text">{{ $t('IDENTITY.USER.NOTIFICATION.FORM.TO') }}</span>
+                    <p-select-dropdown :selected="timePeriod.endHour"
+                                       :menu="END_TIME_MENU"
+                                       :invalid="invalidState.timePeriod"
+                                       class="dropdown"
+                                       use-fixed-menu-style
+                                       @select="handleSelectEndHour"
+                    />
+                    <span class="timezone-text">{{ $t('COMMON.PROFILE.TIMEZONE') }}: {{ timezone }}</span>
+                </div>
+            </article>
+        </div>
+        <div v-else>
+            <schedule-setting-form :schedule-form="state.scheduleSettingTypeData"
+                                   @update-form="handleScheduleForm"
             />
-            <h5 class="setting">
-                {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SETTING') }}
-            </h5>
-            <p-select-button v-for="day in WEEK_DAYS"
-                             :key="day.value"
-                             :selected="daysOfWeek"
-                             multi-selectable
-                             :value="day.value"
-                             class="select-button-wrapper"
-                             @change="handleSelectDay"
-            >
-                {{ day.label }}
-            </p-select-button>
-            <div class="dropdown-wrapper">
-                <p-select-dropdown :selected="timePeriod.startHour"
-                                   :menu="START_TIME_MENU"
-                                   :invalid="invalidState.timePeriod"
-                                   class="dropdown"
-                                   use-fixed-menu-style
-                                   @select="handleSelectStartHour"
-                />
-                <span class="text">{{ $t('IDENTITY.USER.NOTIFICATION.FORM.TO') }}</span>
-                <p-select-dropdown :selected="timePeriod.endHour"
-                                   :menu="END_TIME_MENU"
-                                   :invalid="invalidState.timePeriod"
-                                   class="dropdown"
-                                   use-fixed-menu-style
-                                   @select="handleSelectEndHour"
-                />
-                <span class="timezone-text">{{ $t('COMMON.PROFILE.TIMEZONE') }}: {{ timezone }}</span>
-            </div>
-        </article>
+        </div>
     </div>
 </template>
 

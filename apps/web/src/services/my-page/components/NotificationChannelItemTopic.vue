@@ -20,11 +20,11 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import NotificationAddTopic from '@/services/my-page/components/NotificationAddTopic.vue';
 import { useNotificationItem } from '@/services/my-page/composables/notification-item';
 import type { NotificationAddFormTopicPayload } from '@/services/my-page/types/notification-add-form-type';
-import type { NotiChannelItem } from '@/services/my-page/types/notification-channel-item-type';
+import type { NotiChannelItemV1 } from '@/services/my-page/types/notification-channel-item-type';
 
 
 const props = withDefaults(defineProps<{
-    channelData: NotiChannelItem;
+    channelData: Partial<NotiChannelItemV1>;
     projectId?: string;
     disableEdit?: boolean;
 }>(), {

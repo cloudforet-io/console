@@ -15,25 +15,31 @@ import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-s
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { Tags } from '@/schema/_common/model';
+import type { NotificationProtocolListParameters } from '@/schema/alert-manager/notification-protocol/api-verbs/list';
+import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
+import type { UserChannelListParameters } from '@/schema/alert-manager/user-channel/api-verbs/list';
+import type { UserChannelModel } from '@/schema/alert-manager/user-channel/model';
 import type { ProjectChannelListParameters } from '@/schema/notification/project-channel/api-verbs/list';
 import type { ProjectChannelModel } from '@/schema/notification/project-channel/model';
 import type { ProtocolListParameters } from '@/schema/notification/protocol/api-verbs/list';
 import type { ProtocolModel } from '@/schema/notification/protocol/model';
-import type { UserChannelListParameters } from '@/schema/notification/user-channel/api-verbs/list';
-import type { UserChannelModel } from '@/schema/notification/user-channel/model';
+import type { UserChannelListParameters as UserChannelListParametersV1 } from '@/schema/notification/user-channel/api-verbs/list';
+import type { UserChannelModel as UserChannelModelV1 } from '@/schema/notification/user-channel/model';
 import { i18n } from '@/translations';
 
+import { useDomainStore } from '@/store/domain/domain-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
+import config from '@/lib/config';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import NotificationChannelItem from '@/services/my-page/components/NotificationChannelItem.vue';
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
-import type { NotiChannelItem } from '@/services/my-page/types/notification-channel-item-type';
+import type { NotiChannelItem, NotiChannelItemV1 } from '@/services/my-page/types/notification-channel-item-type';
 import { PROJECT_ROUTE_V1 } from '@/services/project-v1/routes/route-constant';
 
 interface EnrichedProtocolItem extends ProtocolModel {
@@ -46,6 +52,7 @@ interface EnrichedProtocolItem extends ProtocolModel {
 }
 const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
+const domainStore = useDomainStore();
 
 const props = withDefaults(defineProps<{
     projectId?: string;
@@ -59,7 +66,7 @@ const state = reactive({
     loading: true,
     channelLoading: true,
     userId: computed<string|undefined>(() => (route.params.userId ? decodeURIComponent(route.params.userId) : userStore.state.userId)),
-    channelList: [] as NotiChannelItem[],
+    channelList: [] as NotiChannelItemV1[]|NotiChannelItem[],
     protocolResp: [] as ProtocolModel[],
     defaultProtocolResp: computed<ProtocolModel[]>(() => state.protocolResp.filter((d) => d.protocol_type !== 'INTERNAL')),
     associatedMemberProtocol: computed<EnrichedProtocolItem>(() => (
@@ -92,16 +99,22 @@ const createProtocolItem = (d) => {
 };
 
 const apiQuery = new ApiQueryHelper();
+
+const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainStore.state.domainId);
+
 const listProtocol = async () => {
     try {
         state.loading = true;
-        if (props.projectId) {
+        if (!isAlertManagerVersionV2 && props.projectId) {
             apiQuery.setFilters([])
                 .setSort('protocol_type');
-        } else {
+        } else if (!isAlertManagerVersionV2) {
             apiQuery.setFilters([{ k: 'protocol_type', o: '=', v: 'EXTERNAL' }]);
         }
-        const res = await SpaceConnector.clientV2.notification.protocol.list<ProtocolListParameters, ListResponse<ProtocolModel>>({
+        const fetcher = isAlertManagerVersionV2
+            ? SpaceConnector.clientV2.alertManager.notificationProtocol.list<NotificationProtocolListParameters, ListResponse<NotificationProtocolModel>>
+            : SpaceConnector.clientV2.notification.protocol.list<ProtocolListParameters, ListResponse<ProtocolModel>>;
+        const res = await fetcher({
             query: apiQuery.data,
         });
         state.protocolResp = res.results ?? [];
@@ -113,12 +126,12 @@ const listProtocol = async () => {
     }
 };
 
-const injectProtocolName = (channel: UserChannelModel|ProjectChannelModel): string => {
+const injectProtocolName = (channel: UserChannelModel|UserChannelModelV1|ProjectChannelModel): string => {
     const protocolInfoOfChannel = state.protocolResp.find((i) => i.protocol_id === channel.protocol_id);
     if (protocolInfoOfChannel) return protocolInfoOfChannel.name;
     return channel.name;
 };
-const injectProtocolSchema = (channel: UserChannelModel|ProjectChannelModel): JsonSchema => {
+const injectProtocolSchema = (channel: UserChannelModel|UserChannelModelV1|ProjectChannelModel): JsonSchema => {
     const protocolInfoOfChannel = state.protocolResp.find((i) => i.protocol_id === channel.protocol_id);
     if (protocolInfoOfChannel?.plugin_info.metadata.data === undefined) return {};
     return protocolInfoOfChannel.plugin_info.metadata.data.schema;
@@ -129,7 +142,10 @@ const listUserChannel = async () => {
     try {
         state.channelLoading = true;
         channelApiQuery.setFilters([{ k: 'user_id', v: state.userId, o: '=' }]);
-        const res = await SpaceConnector.clientV2.notification.userChannel.list<UserChannelListParameters, ListResponse<UserChannelModel>>({
+        const fetcher = isAlertManagerVersionV2
+            ? SpaceConnector.clientV2.alertManager.userChannel.list<UserChannelListParameters, ListResponse<UserChannelModel>>
+            : SpaceConnector.clientV2.notification.userChannel.list<UserChannelListParametersV1, ListResponse<UserChannelModelV1>>;
+        const res = await fetcher({
             query: channelApiQuery.data,
         });
         state.channelList = res.results?.map((d) => ({
@@ -166,7 +182,7 @@ const listProjectChannel = async () => {
 };
 
 const listChannel = async () => {
-    if (props.projectId) await listProjectChannel();
+    if (!isAlertManagerVersionV2 && props.projectId) await listProjectChannel();
     else await listUserChannel();
 };
 
@@ -221,7 +237,9 @@ onActivated(async () => {
                         </router-link>
                     </ul>
                 </div>
-                <div class="associated-member-item-wrapper">
+                <div v-if="!isAlertManagerVersionV2"
+                     class="associated-member-item-wrapper"
+                >
                     <ul v-for="item in state.associatedMemberProtocol"
                         :key="item.protocol_id"
                         class="associated-member-item"

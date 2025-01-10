@@ -6,11 +6,12 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PFieldTitle, PIconButton, PLazyImg, PDivider, PTextButton, PDataLoader,
+    PFieldTitle, PIconButton, PLazyImg, PDivider, PTextButton, PDataLoader, PI,
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ServiceChannelListParameters } from '@/schema/alert-manager/service-channel/api-verbs/list';
+import { SERVICE_CHANNEL_TYPE } from '@/schema/alert-manager/service-channel/constants';
 import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
@@ -28,14 +29,13 @@ const rowItemsWrapperRef = ref<null | HTMLElement>(null);
 const itemEl = ref<null | HTMLElement>(null);
 
 const serviceDetailPageStore = useServiceDetailPageStore();
-const serviceDetailPageState = serviceDetailPageStore.state;
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const { width: rowItemsWrapperWidth } = useElementSize(rowItemsWrapperRef);
 
 const storeState = reactive({
     serviceId: computed<string>(() => serviceDetailPageGetters.serviceInfo.service_id),
-    notificationProtocolList: computed<ProtocolCardItemType[]>(() => serviceDetailPageState.notificationProtocolList),
+    notificationProtocolList: computed<ProtocolCardItemType[]>(() => serviceDetailPageGetters.notificationProtocolList),
 });
 const state = reactive({
     loading: true,
@@ -115,11 +115,15 @@ watch(() => storeState.serviceId, (serviceId) => {
                          class="item"
                     >
                         <div class="image-wrapper">
-                            <p-lazy-img :src="getPluginIcon(item.protocol_id)"
+                            <p-i v-if="item.channel_type === SERVICE_CHANNEL_TYPE.FORWARD"
+                                 name="ic_notification-protocol_users"
+                                 width="1.25rem"
+                                 height="1.25rem"
+                            />
+                            <p-lazy-img v-else
+                                        :src="getPluginIcon(item.protocol_id)"
                                         width="1.25rem"
                                         height="1.25rem"
-                                        error-icon="ic_notification-protocol_envelope"
-                                        class="image"
                             />
                         </div>
                         <p class="text-label-md leading-8 flex-1 truncate">

@@ -7,12 +7,12 @@ import { mapValues } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButtonModal, PFieldGroup, PTextInput, PRadio, PRadioGroup, PPaneLayout, PLazyImg, PJsonSchemaForm,
+    PButtonModal, PFieldGroup, PTextInput, PRadio, PRadioGroup, PPaneLayout, PLazyImg, PJsonSchemaForm, PI,
 } from '@cloudforet/mirinae';
 import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-schema-form/type';
 
 import type { ServiceChannelUpdateParameters } from '@/schema/alert-manager/service-channel/api-verbs/update';
-import { SERVICE_CHANNEL_TYPE } from '@/schema/alert-manager/service-channel/constants';
+import { SERVICE_CHANNEL_FORWARD_TYPE, SERVICE_CHANNEL_TYPE } from '@/schema/alert-manager/service-channel/constants';
 import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
 import type { MembersType } from '@/schema/alert-manager/service/type';
 import { i18n } from '@/translations';
@@ -40,7 +40,6 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const serviceDetailPageStore = useServiceDetailPageStore();
-const serviceDetailPageState = serviceDetailPageStore.state;
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const emit = defineEmits<{(e: 'close'): void;
@@ -49,7 +48,7 @@ const emit = defineEmits<{(e: 'close'): void;
 
 const storeState = reactive({
     serviceMember: computed<Record<MembersType, string[]>>(() => serviceDetailPageGetters.serviceInfo?.members || []),
-    notificationProtocolList: computed<ProtocolCardItemType[]>(() => serviceDetailPageState.notificationProtocolList),
+    notificationProtocolList: computed<ProtocolCardItemType[]>(() => serviceDetailPageGetters.notificationProtocolList),
     language: computed<string>(() => serviceDetailPageGetters.language),
 });
 const state = reactive({
@@ -109,10 +108,16 @@ const {
 
 const getProtocolInfo = (id: string): ProtocolInfo => {
     if (id === 'forward') {
-        return {
-            name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.ASSOCIATED_MEMBER'),
-            icon: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/notifications_member.svg',
-        };
+        if (props.selectedItem?.data?.FORWARD_TYPE === SERVICE_CHANNEL_FORWARD_TYPE.ALL_MEMBER) {
+            return { name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.NOTIFY_TO_ALL_MEMBER') };
+        }
+        if (props.selectedItem?.data?.FORWARD_TYPE === SERVICE_CHANNEL_FORWARD_TYPE.USER_GROUP) {
+            return { name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.NOTIFY_TO_USER_GROUP') };
+        }
+        if (props.selectedItem?.data?.FORWARD_TYPE === SERVICE_CHANNEL_FORWARD_TYPE.USER) {
+            return { name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.NOTIFY_TO_USER') };
+        }
+        return { name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.ASSOCIATED_MEMBER') };
     }
     const protocol = storeState.notificationProtocolList.find((item) => item.protocol_id === id);
     const schema = protocol?.plugin_info?.metadata.data.schema || {};
@@ -191,10 +196,15 @@ watch(() => props.selectedItem, (selectedItem) => {
                         {{ $t('ALERT_MANAGER.NOTIFICATIONS.BASE_INFO_TITLE') }}
                     </p>
                     <div class="bg-gray-100 inline-flex w-full items-center mb-4 py-2 px-4 gap-2 rounded-md">
-                        <p-lazy-img :src="assetUrlConverter(getProtocolInfo(props.selectedItem.protocol_id).icon)"
+                        <p-i v-if="props.selectedItem.protocol_id === 'forward'"
+                             name="ic_notification-protocol_users"
+                             width="3rem"
+                             height="3rem"
+                        />
+                        <p-lazy-img v-else
+                                    :src="assetUrlConverter(getProtocolInfo(props.selectedItem.protocol_id).icon)"
                                     width="3rem"
                                     height="3rem"
-                                    class="service-img"
                         />
                         <span>{{ getProtocolInfo(props.selectedItem.protocol_id).name }}</span>
                     </div>

@@ -188,11 +188,13 @@ const handleAddButton = async () => {
         await serviceDetailPageStore.fetchEventRuleList({
             service_id: storeState.serviceId,
         });
+        if (!storeState.isEventRuleEditMode) {
+            await replaceUrlQuery({
+                webhookId: response.webhook_id || 'global',
+                eventRuleId: response.event_rule_id,
+            });
+        }
         await handleDeleteForm();
-        await replaceUrlQuery({
-            webhookId: response.webhook_id || 'global',
-            eventRuleId: response.event_rule_id,
-        });
     } finally {
         state.loading = false;
     }

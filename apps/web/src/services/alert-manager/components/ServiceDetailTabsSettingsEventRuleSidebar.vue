@@ -165,7 +165,6 @@ const state = reactive({
 });
 
 const initSidebar = async () => {
-    if (route.query?.eventRuleId) return;
     state.selectedTreeId = state.filteredItems[0].event_rule_id;
     const scope = state.filteredItems[0].webhook_id || 'global';
     await updateTreeDisplayMap(scope, true);
@@ -179,13 +178,6 @@ const updateTreeDisplayMap = (id: string, isOpen: boolean) => {
     displayMap[id] = { isOpen };
 
     state.treeDisplayMap = displayMap;
-};
-const handleClickItem = (value: TreeNode) => {
-    if (value.depth === 0) {
-        updateTreeDisplayMap(value.id, !state.treeDisplayMap[value.id].isOpen);
-    } else {
-        state.selectedTreeId = value.id;
-    }
 };
 const getWebhookIcon = (id: string): string|undefined => {
     const webhook = storeState.webhook[id].data;
@@ -207,22 +199,37 @@ const handleSearchInput = (value: string) => {
         }
     });
 };
-
-watch([() => storeState.showEventRuleFormCard, () => storeState.isEventRuleEditMode], ([showEventRuleFormCard, isEventRuleEditMode]) => {
-    if (!showEventRuleFormCard && !isEventRuleEditMode) {
-        initSidebar();
+const handleClickItem = (value: TreeNode) => {
+    if (value.depth === 0) {
+        updateTreeDisplayMap(value.id, !state.treeDisplayMap[value.id].isOpen);
+    } else {
+        state.selectedTreeId = value.id;
     }
-});
-watch([() => storeState.eventRuleInfo.event_rule_id, () => route.query?.eventRuleId], ([dataId, routeId]) => {
-    state.selectedTreeId = routeId as string;
-    if (routeId && dataId) {
-        const scope = storeState.eventRuleInfo.webhook_id || 'global';
-        updateTreeDisplayMap(scope, true);
+};
+const fetchAndSetEventRuleInfo = async (eventRuleId: string) => {
+    if (!eventRuleId) {
+        state.selectedTreeId = undefined;
+        return;
+    }
+    await serviceDetailPageStore.fetchEventRuleInfo({ event_rule_id: eventRuleId });
+    state.selectedTreeId = storeState.eventRuleInfo.event_rule_id;
+    const scope = storeState.eventRuleInfo.webhook_id || 'global';
+    await updateTreeDisplayMap(scope, true);
+};
+
+watch([() => storeState.isEventRuleEditMode, () => storeState.showEventRuleFormCard], async ([isEventRuleEditMode, showEventRuleFormCard]) => {
+    if (showEventRuleFormCard || !isEventRuleEditMode) return;
+    await fetchAndSetEventRuleInfo(route.query?.eventRuleId as string);
+}, { immediate: true });
+watch(() => route.query?.eventRuleId, async (eventRuleId) => {
+    await fetchAndSetEventRuleInfo(eventRuleId as string);
+    if (eventRuleId) {
+        await serviceDetailPageStore.setShowEventRuleFormCard(false);
     }
 }, { immediate: true });
-watch(() => state.filteredItems, (items) => {
-    if (!items.length) return;
-    initSidebar();
+watch([() => props.items.length, () => storeState.showEventRuleFormCard], async ([itemLength, showEventRuleFormCard]) => {
+    if (itemLength === 0 || showEventRuleFormCard || route.query?.eventRuleId) return;
+    await initSidebar();
 }, { immediate: true });
 </script>
 

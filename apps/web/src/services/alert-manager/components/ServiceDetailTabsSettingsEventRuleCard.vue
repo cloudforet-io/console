@@ -24,6 +24,8 @@ import type { PluginReferenceMap } from '@/store/reference/plugin-reference-stor
 import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
 import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
+
 import { gray } from '@/styles/colors';
 
 import ServiceDetailTabsSettingsEventRuleDeleteModal
@@ -35,18 +37,12 @@ import {
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
 import type { EventRuleActionsItemValueType, EventRuleActionsItemType } from '@/services/alert-manager/types/alert-manager-type';
 
-interface Props {
-    loading: boolean;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    loading: true,
-});
-
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
+
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const storeState = reactive({
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
@@ -55,6 +51,7 @@ const storeState = reactive({
     cloudServiceType: computed<CloudServiceTypeReferenceMap>(() => allReferenceGetters.cloudServiceType),
     escalationPolicy: computed<EscalationPolicyReferenceMap>(() => allReferenceGetters.escalationPolicy),
     eventRuleInfo: computed<EventRuleModel>(() => serviceDetailPageState.eventRuleInfo),
+    eventRuleInfoLoading: computed<boolean>(() => serviceDetailPageState.eventRuleInfoLoading),
 });
 const state = reactive({
     actionSetting: getActionSettingI18n(),
@@ -101,6 +98,11 @@ const state = reactive({
                                 value: matchAssetValue.rule,
                             });
                         }
+                        result[type].push({
+                            label: i18n.t('ALERT_MANAGER.EVENT_RULE.TEMP_ASSET'),
+                            name: 'create_temporary_asset',
+                            value: matchAssetValue.create_temporary_asset ? i18n.t('ALERT_MANAGER.CREATE') : i18n.t('ALERT_MANAGER.EVENT_RULE.DO_NOT_CREATE'),
+                        });
                     } else if (actionKey === 'add_additional_info') {
                         result[type].push({
                             label: i18n.t('ALERT_MANAGER.ALERTS.ADDITIONAL_INFO'),
@@ -140,15 +142,17 @@ const handleDeleteEventRule = () => {
 
 <template>
     <p-data-loader class="service-detail-tabs-settings-event-rule-card"
-                   :loading="props.loading"
+                   :loading="storeState.eventRuleInfoLoading"
                    :data="storeState.eventRuleInfo"
     >
         <p-card :header="$t('ALERT_MANAGER.EVENT_RULE.TITLE')">
             <template #header>
                 <div class="flex items-center justify-between">
                     <span class="font-bold">{{ $t('ALERT_MANAGER.EVENT_RULE.TITLE') }}</span>
-                    <div class="flex items-center gap-2">
-                        <p-icon-button name="ic_edit"
+                    <div v-if="hasReadWriteAccess"
+                         class="flex items-center gap-2"
+                    >
+                        <p-icon-button name="ic_edit-text"
                                        style-type="transparent"
                                        @click="handleEditEventRule"
                         />
@@ -182,18 +186,10 @@ const handleDeleteEventRule = () => {
                             />
                             <p-field-group class="input-form scope">
                                 <div class="flex items-center gap-1 text-label-md">
-                                    <span class="text-label-lg text-gray-500">{{ $t('ALERT_MANAGER.EVENT_RULE.WEBHOOK_SCOPE') }}: </span>
-                                    <p v-if="storeState.eventRuleInfo.scope === EVENT_RULE_SCOPE.GLOBAL"
-                                       class="scope-wrapper"
-                                    >
-                                        <p-i name="ic_globe-filled"
-                                             height="1rem"
-                                             width="1rem"
-                                             color="inherit"
-                                        />
-                                        <span>{{ $t('ALERT_MANAGER.EVENT_RULE.GLOBAL') }}</span>
-                                    </p>
-                                    <p v-else
+                                    <span class="text-label-lg text-gray-500">
+                                        {{ storeState.eventRuleInfo.scope === EVENT_RULE_SCOPE.GLOBAL ? $t('ALERT_MANAGER.EVENT_RULE.GLOBAL_SCOPE') : $t('ALERT_MANAGER.EVENT_RULE.WEBHOOK_SCOPE') }}
+                                    </span>
+                                    <p v-if="storeState.eventRuleInfo.scope !== EVENT_RULE_SCOPE.GLOBAL"
                                        class="scope-wrapper"
                                     >
                                         <p-lazy-img :src="getWebhookIcon()"
@@ -202,7 +198,7 @@ const handleDeleteEventRule = () => {
                                                     height="1rem"
                                                     class="icon"
                                         />
-                                        <span>{{ storeState.webhook[storeState.eventRuleInfo.webhook_id]?.label }}</span>
+                                        <span>: {{ storeState.webhook[storeState.eventRuleInfo.webhook_id]?.label }}</span>
                                     </p>
                                 </div>
                             </p-field-group>

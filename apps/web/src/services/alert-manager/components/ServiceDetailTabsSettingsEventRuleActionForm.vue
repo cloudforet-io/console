@@ -52,6 +52,7 @@ import type {
     EventRuleActionsToggleType,
     EventRuleActionsUrgencyRadioType,
     EventRuleSettingsType,
+    EventRuleActionsTempAssetRadioType,
 } from '@/services/alert-manager/types/alert-manager-type';
 
 const allReferenceStore = useAllReferenceStore();
@@ -86,7 +87,7 @@ const state = reactive({
         ],
         asset: [
             {
-                label: i18n.t('ALERT_MANAGER.EVENT_RULE.CREATE_TEMP_ASSET'),
+                label: i18n.t('ALERT_MANAGER.EVENT_RULE.MATCH_ASSET'),
                 name: 'match_asset',
             },
         ],
@@ -127,6 +128,10 @@ const state = reactive({
         { label: i18n.t('ALERT_MANAGER.EVENT_RULE.HIGH'), name: EVENT_RULE_URGENCY.HIGH },
         { label: i18n.t('ALERT_MANAGER.EVENT_RULE.LOW'), name: EVENT_RULE_URGENCY.LOW },
     ]),
+    tempAssetRadioMenuList: computed<EventRuleActionsTempAssetRadioType[]>(() => [
+        { label: i18n.t('ALERT_MANAGER.CREATE'), name: 'CREATE' },
+        { label: i18n.t('ALERT_MANAGER.EVENT_RULE.DO_NOT_CREATE'), name: 'DO_NOT_CREATE' },
+    ]),
     escalationPolicyDropdownList: [] as SelectDropdownMenuItem[],
 });
 const formState = reactive({
@@ -135,6 +140,7 @@ const formState = reactive({
     selectedAssetList: [] as SelectDropdownMenuItem[],
     selectedStatusRadio: ALERT_STATUS.IGNORED as AlertStatusType,
     selectedUrgencyRadio: EVENT_RULE_URGENCY.HIGH as EventRuleUrgencyType,
+    selectedTempAssetRadio: 'CREATE',
     selectedEscalationPolicyId: '',
     labels: [] as InputItem[],
     additionalInfoTags: [{ key: '', value: '' }] as TagItem[],
@@ -148,6 +154,7 @@ const initializeState = (): void => {
     formState.rule = { key: '', value: '' };
     formState.selectedStatusRadio = ALERT_STATUS.IGNORED;
     formState.selectedUrgencyRadio = EVENT_RULE_URGENCY.HIGH;
+    formState.selectedTempAssetRadio = 'CREATE';
     formState.selectedEscalationPolicyId = '';
     formState.labels = [];
     formState.additionalInfoTags = [{ key: '', value: '' }];
@@ -163,7 +170,7 @@ const updateStateFromEventRuleInfo = (): void => {
         formState.selectedServiceId = actions.change_service;
     }
 
-    if (actions.match_asset?.create_temporary_asset) {
+    if (actions.match_asset) {
         formState.selectedActions.match_asset = {
             asset_types: [],
             rule: {},
@@ -177,6 +184,7 @@ const updateStateFromEventRuleInfo = (): void => {
             name: type,
             label: storeState.cloudServiceType[type]?.label || '',
         }));
+        formState.selectedTempAssetRadio = actions.match_asset.create_temporary_asset ? 'CREATE' : 'DO_NOT_CREATE';
     }
 
     if (actions.change_title) formState.selectedActions.change_title = actions.change_title;
@@ -219,10 +227,6 @@ const handleUpdateValue = (action: string, value: boolean) => {
         };
 
         _actions[action] = actionDefaults[action] ?? '';
-    } else if (action === 'match_asset') {
-        _actions[action] = { create_temporary_asset: false };
-        formState.selectedAssetList = [];
-        formState.rule = { key: '', value: '' };
     } else {
         delete _actions[action];
     }
@@ -283,7 +287,7 @@ watch(() => formState, () => {
             return acc;
         }, {} as EventRuleActionsType);
 
-    if (_actions.match_asset?.create_temporary_asset) {
+    if (_actions.match_asset) {
         if (formState.rule.value && formState.rule.key) {
             _actions.match_asset = {
                 ..._actions.match_asset,
@@ -296,6 +300,7 @@ watch(() => formState, () => {
                 asset_types: formState.selectedAssetList.map((item) => item.name),
             };
         }
+        _actions.match_asset.create_temporary_asset = formState.selectedTempAssetRadio === 'CREATE';
     }
 
     const validAdditionalInfoTags = formState.additionalInfoTags.filter(
@@ -340,8 +345,10 @@ watch(() => storeState.service.service_id, (id) => {
                                class="field-group flex flex-col"
                 >
                     <div class="flex items-start w-full">
-                        <div class="toggle-wrapper flex items-center gap-2 mr-2">
-                            <p-toggle-button :value="!!formState.selectedActions[action.name]"
+                        <div class="toggle-wrapper flex items-center gap-2 mr-2"
+                             :class="{'match-asset': action.name === 'match_asset'}"
+                        >
+                            <p-toggle-button :value="formState.selectedActions[action.name] !== undefined"
                                              @update:value="handleUpdateValue(action.name, $event)"
                             />
                             <p-field-title font-weight="regular">
@@ -361,7 +368,7 @@ watch(() => storeState.service.service_id, (id) => {
                                                    @update:selected="handleSelectAction(action.name, $event)"
                                 />
                                 <p class="text-label-md pl-1">
-                                    <span class="text-gray-500">{{ $t('ALERT_MANAGER.EVENT_RULE.CURRENT_SERVICE') }}</span>
+                                    <span class="mr-1 text-gray-500">{{ $t('ALERT_MANAGER.EVENT_RULE.CURRENT_SERVICE') }}</span>
                                     <p-link action-icon="internal-link"
                                             new-tab
                                             highlight
@@ -423,7 +430,7 @@ watch(() => storeState.service.service_id, (id) => {
                             </p-radio-group>
                         </div>
                     </div>
-                    <div v-if="action.name === 'match_asset' && formState.selectedActions[action.name]?.create_temporary_asset">
+                    <div v-if="action.name === 'match_asset' && formState.selectedActions[action.name]">
                         <div class="field-group flex items-center mt-3">
                             <p-field-title font-weight="regular"
                                            class="field-title toggle-wrapper"
@@ -481,6 +488,25 @@ watch(() => storeState.service.service_id, (id) => {
                                     />
                                 </p-field-group>
                             </div>
+                        </div>
+                        <div class="field-group flex items-center">
+                            <p-field-title font-weight="regular"
+                                           class="field-title toggle-wrapper"
+                            >
+                                {{ $t('ALERT_MANAGER.EVENT_RULE.TEMP_ASSET') }}
+                                <span class="text-gray-500">({{ $t('ALERT_MANAGER.EVENT_RULE.OPTIONAL') }})</span>
+                            </p-field-title>
+                            <p-radio-group>
+                                <p-radio v-for="(item, statusIdx) in state.tempAssetRadioMenuList"
+                                         :key="`change-temp-asset-${statusIdx}`"
+                                         v-model="formState.selectedTempAssetRadio"
+                                         :value="item.name"
+                                >
+                                    <span class="radio-item">
+                                        {{ item.label }}
+                                    </span>
+                                </p-radio>
+                            </p-radio-group>
                         </div>
                     </div>
                 </p-field-group>
@@ -591,6 +617,10 @@ watch(() => storeState.service.service_id, (id) => {
         .toggle-wrapper {
             min-width: 12.5rem;
             height: 2rem;
+            &.match-asset {
+                @apply w-full;
+                min-width: unset;
+            }
         }
         .input-wrapper {
             width: calc(100% - 12.5rem);

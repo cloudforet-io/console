@@ -10,7 +10,7 @@ import { useNotificationItem } from '@/services/my-page/composables/notification
 import type { NotiChannelItem } from '@/services/my-page/types/notification-channel-item-type';
 
 const props = withDefaults(defineProps<{
-    channelData: NotiChannelItem;
+    channelData: Partial<NotiChannelItem>;
     projectId?: string;
     disableEdit?: boolean;
 }>(), {

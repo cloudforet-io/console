@@ -119,7 +119,7 @@ const handleGoBackButton = () => {
                         </template>
                     </p-heading>
                 </template>
-                <template v-if="!state.isSettingMode && storeState.eventRuleList.length > 0"
+                <template v-if="hasReadWriteAccess && !state.isSettingMode && storeState.eventRuleList.length > 0"
                           #extra
                 >
                     <p-button icon-left="ic_plus_bold"
