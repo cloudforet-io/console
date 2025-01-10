@@ -188,7 +188,6 @@ const deleteUserChannel = async () => {
                 user_channel_id: state.userChannelId,
             });
         await fetcher;
-        console.log('here');
         showSuccessMessage(i18n.t('MY_PAGE.NOTIFICATION.ALT_S_DELETE_USER_CHANNEL'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('MY_PAGE.NOTIFICATION.ALT_E_DELETE_USER_CHANNEL'));
