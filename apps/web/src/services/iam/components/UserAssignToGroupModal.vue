@@ -96,6 +96,7 @@ watch([() => userPageGetters.selectedUsers, () => userPageState.users], ([nv_sel
                 </span>
                 <user-select-dropdown :show-user-list="false"
                                       show-user-group-list
+                                      :show-category-title="false"
                                       appearance-type="stack"
                                       selection-type="multiple"
                                       use-fixed-menu-style
