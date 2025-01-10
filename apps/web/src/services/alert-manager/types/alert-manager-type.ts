@@ -70,7 +70,7 @@ export type UserRadioType = {
 };
 export type ProtocolInfo = {
     name: string|TranslateResult;
-    icon: string;
+    icon?: string;
     schema?: JsonSchema;
 };
 export type NotificationsModalType = 'UPDATE' | 'ENABLE' | 'DISABLE' | 'DELETE';

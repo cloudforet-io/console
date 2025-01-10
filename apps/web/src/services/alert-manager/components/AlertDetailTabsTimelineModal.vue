@@ -110,10 +110,15 @@ const handleClickCopy = () => {
                     </template>
                     <template #col-name-format="{value, item}">
                         <div class="flex items-center gap-1">
-                            <p-lazy-img :src="assetUrlConverter(storeState.pluginInfo[item.plugin_id]?.icon || '')"
+                            <p-i v-if="item.type !== 'service_channels'"
+                                 name="ic_notification-protocol_users"
+                                 width="1rem"
+                                 height="1rem"
+                            />
+                            <p-lazy-img v-else
+                                        :src="assetUrlConverter(storeState.pluginInfo[item.plugin_id]?.icon || '')"
                                         width="1rem"
                                         height="1rem"
-                                        class="service-img"
                             />
                             <span>{{ value }}</span>
                         </div>

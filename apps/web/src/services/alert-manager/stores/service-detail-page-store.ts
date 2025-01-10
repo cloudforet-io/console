@@ -40,7 +40,7 @@ interface ServiceFormStoreState {
     loading: boolean;
     currentTab?: ServiceDetailTabsType;
     serviceInfo: ServiceModel;
-    notificationProtocolList: ProtocolCardItemType[];
+    notificationProtocolListData: NotificationProtocolModel[];
     selectedWebhookId?: string;
     selectedNotificationId?: string;
     selectedEscalationPolicyId?: string;
@@ -59,6 +59,7 @@ interface ServiceFormStoreGetters {
     serviceReferenceMap: ComputedRef<ServiceReferenceMap>;
     timezone: ComputedRef<string>;
     language: ComputedRef<string>;
+    notificationProtocolList: ComputedRef<ProtocolCardItemType[]>;
 }
 
 export const useServiceDetailPageStore = defineStore('page-service-detail', () => {
@@ -71,7 +72,7 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
         loading: false,
         currentTab: undefined,
         serviceInfo: {} as ServiceModel,
-        notificationProtocolList: [],
+        notificationProtocolListData: [],
         selectedWebhookId: undefined,
         selectedNotificationId: undefined,
         selectedEscalationPolicyId: undefined,
@@ -117,6 +118,10 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
         serviceReferenceMap: computed(() => allReferenceGetters.service),
         timezone: computed(() => userState.timezone || 'UTC'),
         language: computed(() => userStore.state.language || 'en'),
+        notificationProtocolList: computed(() => state.notificationProtocolListData.map((i) => ({
+            ...i,
+            icon: getters.pluginsReferenceMap[i.plugin_info.plugin_id]?.icon || '',
+        }))),
     });
 
     const mutations = {
@@ -148,7 +153,7 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
             state.loading = false;
             state.currentTab = undefined;
             state.serviceInfo = {} as ServiceModel;
-            state.notificationProtocolList = [];
+            state.notificationProtocolListData = [];
             state.selectedWebhookId = undefined;
             state.selectedNotificationId = undefined;
             state.selectedEscalationPolicyId = undefined;
@@ -182,16 +187,16 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
         },
         async updateServiceDetailData({ name, description }: { name: string, description: string }) {
             try {
-                state.serviceInfo = await SpaceConnector.clientV2.alertManager.service.update<ServiceUpdateParameters, ServiceModel>({
+                await SpaceConnector.clientV2.alertManager.service.update<ServiceUpdateParameters, ServiceModel>({
                     service_id: getters.serviceInfo.service_id,
                     name,
                     description,
                 });
                 showSuccessMessage(i18n.t('ALERT_MANAGER.SERVICE.ALT_S_UPDATE_SERVICE'), '');
-                await allReferenceStore.sync('service', state.serviceInfo);
             } catch (e) {
                 ErrorHandler.handleError(e, true);
                 state.serviceInfo = {} as ServiceModel;
+                throw e;
             }
         },
         async deleteServiceDetailData() {
@@ -207,13 +212,10 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
         async fetchNotificationProtocolList() {
             try {
                 const { results } = await SpaceConnector.clientV2.alertManager.notificationProtocol.list<NotificationProtocolListParameters, ListResponse<NotificationProtocolModel>>();
-                state.notificationProtocolList = (results || []).map((i) => ({
-                    ...i,
-                    icon: getters.pluginsReferenceMap[i.plugin_info.plugin_id || '']?.icon || '',
-                }));
+                state.notificationProtocolListData = results || [];
             } catch (e) {
                 ErrorHandler.handleError(e);
-                state.notificationProtocolList = [];
+                state.notificationProtocolListData = [];
             }
         },
         async fetchEventRuleList(params?: EventRuleListParameters) {

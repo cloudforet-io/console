@@ -66,6 +66,7 @@ const handleConfirm = async () => {
             name: name.value,
             description: description.value || ' ',
         });
+        await serviceDetailPageStore.fetchServiceDetailData(storeState.service.service_id);
     } finally {
         state.loading = false;
         handleClose();
