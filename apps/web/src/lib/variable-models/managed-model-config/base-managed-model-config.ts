@@ -18,6 +18,7 @@ import ProjectGroupVariableModel from '@/lib/variable-models/managed-model/resou
 import ProjectVariableModel from '@/lib/variable-models/managed-model/resource-model/project-variable-model';
 import ProviderVariableModel from '@/lib/variable-models/managed-model/resource-model/provider-variable-model';
 import RegionVariableModel from '@/lib/variable-models/managed-model/resource-model/region-variable-model';
+import RoleBindingVariableModel from '@/lib/variable-models/managed-model/resource-model/role-binding-variable-model';
 import RoleVariableModel from '@/lib/variable-models/managed-model/resource-model/role-variable-model';
 import SecretVariableModel from '@/lib/variable-models/managed-model/resource-model/secret-variable-model';
 import ServiceAccountVariableModel from '@/lib/variable-models/managed-model/resource-model/service-account-variable-model';
@@ -56,6 +57,7 @@ const RESOURCE_VARIABLE_MODELS = {
     unified_cost: UnifiedCostVariableModel,
     metric_data: MetricDataVariableModel,
     role: RoleVariableModel,
+    role_binding: RoleBindingVariableModel,
     service: ServiceVariableModel,
 } as const;
 const CUSTOM_RESOURCE_VARIABLE_MODELS = {
