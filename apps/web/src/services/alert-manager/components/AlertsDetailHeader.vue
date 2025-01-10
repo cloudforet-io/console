@@ -51,10 +51,11 @@ const modalState = reactive({
 
 const handleRouteBackButton = () => {
     const serviceId = route.params?.serviceId;
-    const location = serviceId
-        ? { name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME, params: { serviceId } }
-        : { name: ALERT_MANAGER_ROUTE.ALERTS._NAME };
-    router.push(getProperRouteLocation(location));
+    if (serviceId) {
+        router.go(-1);
+    } else {
+        router.push(getProperRouteLocation({ name: ALERT_MANAGER_ROUTE.ALERTS._NAME }));
+    }
 };
 const handleSelectDropdownMenu = (type: ModalType) => {
     modalState.modalVisible = true;

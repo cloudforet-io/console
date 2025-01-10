@@ -6,10 +6,12 @@ import {
 import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PHeadingLayout, PTab, PHeading, PDefinitionTable, PStatus, PLazyImg, PMarkdown, PBadge, PDataTable, PButton,
+    PHeadingLayout, PTab, PHeading, PDefinitionTable, PStatus, PLazyImg, PMarkdown, PBadge, PDataTable, PButton, PToolboxTable,
 } from '@cloudforet/mirinae';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
+import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { WebhookGetParameters } from '@/schema/alert-manager/webhook/api-verbs/get';
@@ -29,6 +31,7 @@ import type { PluginReferenceMap } from '@/store/reference/plugin-reference-stor
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
+import { useQueryTags } from '@/common/composables/query-tags';
 import TagsOverlay from '@/common/modules/tags/tags-panel/modules/TagsOverlay.vue';
 import { sortTableItems } from '@/common/utils/table-sort';
 
@@ -36,7 +39,7 @@ import { alertManagerStateFormatter } from '@/services/alert-manager/composables
 import { WEBHOOK_DETAIL_TABS } from '@/services/alert-manager/constants/common-constant';
 import {
     WEBHOOK_DEFINITION_FIELDS,
-    WEBHOOK_ERROR_LIST_TABLE_FIELDS, WEBHOOK_MESSAGE_TABLE_FIELDS,
+    WEBHOOK_ERROR_TABLE_FIELDS, WEBHOOK_ERROR_TABLE_KEY_ITEM_SETS, WEBHOOK_MESSAGE_TABLE_FIELDS,
 } from '@/services/alert-manager/constants/webhook-table-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
 import type { WebhookDetailTabsType } from '@/services/alert-manager/types/alert-manager-type';
@@ -52,6 +55,7 @@ const { hasReadWriteAccess } = usePageEditableStatus();
 const storeState = reactive({
     cloudServiceTypeInfo: computed<CloudServiceTypeReferenceMap>(() => allReferenceGetters.cloudServiceType),
     language: computed<string>(() => serviceDetailPageGetters.language),
+    timezone: computed<string>(() => serviceDetailPageGetters.timezone),
     plugins: computed<PluginReferenceMap>(() => serviceDetailPageGetters.pluginsReferenceMap),
     selectedWebhookId: computed<string|undefined>(() => serviceDetailPageState.selectedWebhookId),
 });
@@ -92,6 +96,11 @@ const messageState = reactive({
     formats: {},
 });
 
+const errorListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
+    .setPage(1, 15);
+const queryTagHelper = useQueryTags({ keyItemSets: WEBHOOK_ERROR_TABLE_KEY_ITEM_SETS });
+const { queryTags } = queryTagHelper;
+
 const handleEditMessageFormat = (value) => {
     messageState.editFormVisible = value;
 };
@@ -99,6 +108,12 @@ const handleChangeMessageSort = (sortBy, sortDesc) => {
     messageState.sortBy = sortBy;
     messageState.sortDesc = sortDesc;
     messageState.formatList = sortTableItems<WebhookMessageFormatType>(messageState.formatList, sortBy, sortDesc);
+};
+const handleChange = async (options: any = {}) => {
+    if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
+    if (options.pageStart !== undefined) errorListApiQueryHelper.setPageStart(options.pageStart);
+    if (options.pageLimit !== undefined) errorListApiQueryHelper.setPageLimit(options.pageLimit);
+    await fetchWebhookErrorList();
 };
 
 const fetchWebhookDetail = async () => {
@@ -138,8 +153,12 @@ const fetchWebhookErrorList = async () => {
     if (!storeState.selectedWebhookId) return;
     state.errorListLoading = true;
     try {
+        errorListApiQueryHelper.setFilters([
+            ...queryTagHelper.filters.value,
+        ]);
         const { results, total_count } = await SpaceConnector.clientV2.alertManager.webhook.listErrors<WebhookListErrorSParameters, ListResponse<WebhookListErrorsModel>>({
             webhook_id: storeState.selectedWebhookId,
+            query: errorListApiQueryHelper.data,
         });
         state.errorList = results || [];
         state.errorTotalCount = total_count || 0;
@@ -269,18 +288,29 @@ watch(() => storeState.selectedWebhookId, async () => {
                                    use-total-count
                                    :total-count="state.errorTotalCount"
                                    heading-type="sub"
-                                   class="heading"
+                                   class="heading error"
                         />
                     </template>
                 </p-heading-layout>
-                <p-data-table :items="state.refinedErrorList"
-                              :fields="WEBHOOK_ERROR_LIST_TABLE_FIELDS"
-                              :loading="state.errorListLoading"
+                <p-toolbox-table searchable
+                                 search-type="query"
+                                 sort-by="created_at"
+                                 :query-tags="queryTags"
+                                 :loading="state.errorListLoading"
+                                 :total-count="state.errorTotalCount"
+                                 :fields="WEBHOOK_ERROR_TABLE_FIELDS"
+                                 :items="state.refinedErrorList"
+                                 class="border-none"
+                                 @change="handleChange"
+                                 @refresh="fetchWebhookErrorList"
                 >
+                    <template #col-created_at-format="{ value }">
+                        {{ iso8601Formatter(value, storeState.timezone) }}
+                    </template>
                     <template #col-message-format="{ value }">
                         {{ value }}
                     </template>
-                </p-data-table>
+                </p-toolbox-table>
             </div>
         </template>
         <template v-if="tabState.activeWebhookDetailTab === WEBHOOK_DETAIL_TABS.MESSAGE"
@@ -332,6 +362,9 @@ watch(() => storeState.selectedWebhookId, async () => {
 .service-detail-tabs-webhook-detail-tabs {
     .heading {
         @apply pt-8 px-4 pb-4;
+        &.error {
+            @apply pb-0;
+        }
     }
     .col-type {
         .name {

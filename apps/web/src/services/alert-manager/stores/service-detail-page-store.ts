@@ -203,6 +203,7 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
             try {
                 await SpaceConnector.clientV2.alertManager.service.delete<ServiceDeleteParameters>({
                     service_id: getters.serviceInfo.service_id,
+                    force: true,
                 });
             } catch (e) {
                 ErrorHandler.handleError(e, true);
