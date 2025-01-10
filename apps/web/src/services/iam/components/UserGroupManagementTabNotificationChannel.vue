@@ -372,9 +372,6 @@ onMounted(async () => {
                         <p>{{ protocol.label }}</p>
                     </div>
                 </div>
-                <!--                {{-->
-                <!--                    userGroupPageState.protocolList?.filter(protocol => protocol.protocol_id === value)[0]?.name-->
-                <!--                }}-->
             </template>
             <template #col-schedule-format="{value}">
                 <p-badge v-if="value === USER_GROUP_CHANNEL_SCHEDULE_TYPE.CUSTOM"
