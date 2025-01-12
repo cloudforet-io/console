@@ -1,180 +1,127 @@
 <template>
-    <div class="collapsible-panel">
-        <div ref="contentRef"
-             class="content"
+    <div class="p-collapsible-panel-v3">
+        <!-- 슬롯 콘텐츠 -->
+        <div ref="slotContentRef"
+             class="text-content"
+             :class="{ collapsed: proxyIsCollapsed }"
         >
             <slot />
         </div>
-        <button v-if="isOverflowed"
-                @click="toggleCollapse"
-        >
-            {{ isCollapsed ? "펼치기" : "접기" }}
-        </button>
+
+        <!-- 토글 버튼 -->
+        <p-collapsible-toggle v-if="isOverflow"
+                              v-model="proxyIsCollapsed"
+        />
     </div>
 </template>
 
 <script lang="ts">
 import {
-    defineComponent, ref, onMounted, watch, nextTick,
+    defineComponent, nextTick, onMounted, reactive, ref, watch,
 } from 'vue';
 
+import PCollapsibleToggle from '@/data-display/collapsible/collapsible-toggle/PCollapsibleToggle.vue';
+import { useProxyValue } from '@/hooks';
+
 export default defineComponent({
-    name: 'CollapsiblePanelV3',
+    name: 'PCollapsiblePanelV3',
+    components: { PCollapsibleToggle },
     props: {
-        lineClamp: {
-            type: Number,
-            required: true,
-        },
+        isCollapsed: { type: Boolean, default: true },
+        lineClamp: { type: Number, default: 2 },
     },
-    setup(props) {
-        const contentRef = ref<HTMLElement | null>(null);
-        const isCollapsed = ref(true);
-        const isOverflowed = ref(false);
+    setup(props, { emit }) {
+        const slotContentRef = ref<HTMLElement | null>(null);
+        const proxyIsCollapsed = useProxyValue('isCollapsed', props, emit);
 
-
-        const calculateClamp = () => {
-            const content = contentRef.value;
-            if (!content) return;
-
-            const computedStyle = window.getComputedStyle(content);
-            const lineHeight = parseFloat(computedStyle.lineHeight);
-            const maxHeight = props.lineClamp * lineHeight;
-            let remainingHeight = maxHeight;
-
-            // Traverse child nodes and apply clamp
-            const traverseNodes = (node: Node): boolean => {
-                if (node.nodeType === Node.TEXT_NODE) {
-                    const parent = node.parentElement;
-                    if (!parent) return true;
-
-                    const span = document.createElement('span');
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    span.textContent = node.textContent!;
-                    span.style.position = 'absolute';
-                    span.style.top = '0';
-                    span.style.left = '0';
-                    span.style.width = '100%';
-                    span.style.height = 'fit-content';
-
-                    const parentPosition = parent.style.position;
-                    parent.style.position = 'relative';
-                    parent.appendChild(span);
-
-
-                    const parentStyle = window.getComputedStyle(parent);
-                    const parentLineHeight = parseFloat(parentStyle.lineHeight);
-                    const parentHeight = parent.scrollHeight;
-
-                    console.log(parentHeight, parentLineHeight, remainingHeight);
-                    parent.style.position = parentPosition;
-                    span.remove();
-
-                    if (remainingHeight <= 0) {
-                        parent.style.display = 'none'; // Hide this parent element
-                        return false;
-                    } if (parentHeight > remainingHeight) {
-                        // Clamp this parent element
-                        parent.style.display = '-webkit-box';
-                        parent.style.webkitBoxOrient = 'vertical';
-                        parent.style.webkitLineClamp = `${Math.floor(
-                            remainingHeight / parentLineHeight,
-                        )}`;
-                        parent.style.overflow = 'hidden';
-                        remainingHeight = 0; // Fully consumed
-                        return false;
-                    }
-                    remainingHeight -= parentHeight;
-                }
-
-                // Traverse child nodes
-                // eslint-disable-next-line no-restricted-syntax
-                for (const child of Array.from(node.childNodes)) {
-                    if (!traverseNodes(child)) return false;
-                }
-                return true;
-            };
-
-            if (content.scrollHeight > maxHeight) {
-                isOverflowed.value = true;
-                traverseNodes(content);
-            } else {
-                isOverflowed.value = false;
-            }
-        };
-
-        const removeClamp = () => {
-            const content = contentRef.value;
-            if (!content) return;
-
-            // Reset styles
-            content.style.display = '';
-            content.style.webkitBoxOrient = '';
-            content.style.webkitLineClamp = '';
-            content.style.overflow = '';
-
-            // Reset styles for all child nodes
-            const resetChildStyles = (node: Node) => {
-                if (node.nodeType === Node.ELEMENT_NODE) {
-                    const element = node as HTMLElement;
-                    element.style.display = '';
-                    element.style.webkitBoxOrient = '';
-                    element.style.webkitLineClamp = '';
-                    element.style.overflow = '';
-                }
-                // eslint-disable-next-line no-restricted-syntax
-                for (const child of Array.from(node.childNodes)) {
-                    resetChildStyles(child);
-                }
-            };
-            resetChildStyles(content);
-        };
-
-        const toggleCollapse = () => {
-            isCollapsed.value = !isCollapsed.value;
-
-            if (!isCollapsed.value) {
-                removeClamp();
-            } else {
-                calculateClamp();
-            }
-        };
-
-        onMounted(() => {
-            nextTick(() => calculateClamp());
+        const state = reactive({
+            isOverflow: false,
+            truncatedText: '',
         });
 
-        watch(() => props.lineClamp, () => {
-            if (isCollapsed.value) {
-                calculateClamp();
+        const calculateLines = (text: string, width: number, lineHeight: number, font: string) => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return { lines: 0, truncatedText: text };
+
+            ctx.font = font;
+
+            const words = text.split(' ');
+            let line = '';
+            const lines: string[] = [];
+            let currentHeight = lineHeight;
+
+            // eslint-disable-next-line no-restricted-syntax
+            for (const word of words) {
+                const testLine = `${line + word} `;
+                const metrics = ctx.measureText(testLine);
+                console.log(metrics.width);
+                console.log(width);
+                if (metrics.width > width) {
+                    lines.push(line.trim());
+                    line = `${word} `;
+                    console.log(line);
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    currentHeight += lineHeight;
+
+                    if (lines.length >= props.lineClamp) {
+                        lines.push(`${line.trim()}...`);
+                        return { lines: props.lineClamp, truncatedText: lines.join(' ') };
+                    }
+                } else {
+                    line = testLine;
+                }
             }
+
+            lines.push(line.trim());
+            return { lines: lines.length, truncatedText: text };
+        };
+
+        const updateTruncatedText = () => {
+            const slotEl = slotContentRef.value;
+            if (!slotEl) return;
+
+            const text = slotEl.textContent?.trim() || '';
+            const computedStyle = window.getComputedStyle(slotEl);
+            const font = `${computedStyle.fontSize} ${computedStyle.fontFamily}`;
+            const lineHeight = parseFloat(computedStyle.lineHeight);
+            const width = slotEl.clientWidth;
+
+            const { lines, truncatedText } = calculateLines(text, width, lineHeight, font);
+            state.isOverflow = lines > props.lineClamp;
+            state.truncatedText = truncatedText;
+        };
+
+        watch(proxyIsCollapsed, (collapsed) => {
+            if (collapsed) {
+                nextTick(updateTruncatedText);
+            }
+        });
+
+        onMounted(() => {
+            nextTick(updateTruncatedText);
         });
 
         return {
-            contentRef,
-            isCollapsed,
-            isOverflowed,
-            toggleCollapse,
+            slotContentRef,
+            proxyIsCollapsed,
+            ...state,
         };
     },
 });
 </script>
 
-<style scoped>
-.collapsible-panel {
-    position: relative;
-}
+<style lang="postcss">
+.p-collapsible-panel-v2 {
+    width: 100%;
+    .text-content {
+        width: 100%;
+        overflow: hidden;
 
-.content {
-    position: relative;
-}
-
-button {
-    margin-top: 8px;
-    cursor: pointer;
-    background: none;
-    border: none;
-    color: #007bff;
-    font-size: 14px;
-    text-decoration: underline;
+        &.collapsed {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+        }
+    }
 }
 </style>

@@ -33,6 +33,10 @@ export default defineComponent({
         event: 'update:isCollapsed',
     },
     props: {
+        isCollapsed: {
+            type: Boolean,
+            default: true,
+        },
         lineClamp: {
             type: Number,
             default: 2,
@@ -50,14 +54,16 @@ export default defineComponent({
 
 
         const checkElement = (element: HTMLElement) : number => {
-            const totalHeight = element.scrollHeight || element.getBoundingClientRect().height;
+            const computedStyle = window.getComputedStyle(element);
+            const paddingTop = parseFloat(computedStyle.paddingTop) || 0;
+            const paddingBottom = parseFloat(computedStyle.paddingBottom) || 0;
+            const totalHeight = (element.scrollHeight || element.getBoundingClientRect().height) - paddingTop - paddingBottom;
 
             if (totalHeight === 0) {
                 console.warn('Element is not rendered or empty:', element);
                 return 0;
             }
 
-            const computedStyle = window.getComputedStyle(element);
             let lineHeight = parseFloat(computedStyle.lineHeight);
 
             // eslint-disable-next-line no-restricted-globals
@@ -74,6 +80,7 @@ export default defineComponent({
             if (!node) return;
             const queue: Node[] = [node];
             let remainingLine = lineClamp;
+            let isFirstLine = true;
             console.log(queue);
             while (queue.length > 0) {
                 const currentNode = queue.shift();
@@ -88,7 +95,6 @@ export default defineComponent({
                         continue;
                     }
 
-
                     if (child.nodeType === Node.TEXT_NODE) {
                         console.log(child);
                         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -99,8 +105,12 @@ export default defineComponent({
                             const res = checkElement(child.parentElement!);
                             console.log(res);
 
-                            if (remainingLine < res) {
-                                state.isOverflow = true;
+                            if (remainingLine <= res) {
+                                if (isFirstLine && props.lineClamp === 1 && res === 1) {
+                                    state.isOverflow = false;
+                                } else {
+                                    state.isOverflow = true;
+                                }
                                 lineClampStyle(child.parentElement as HTMLElement, lineClamp);
                             }
                             remainingLine -= res;
@@ -119,12 +129,19 @@ export default defineComponent({
                             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                             child.parentElement!.style.position = parentPosition;
                             span.remove();
-                            if (remainingLine < res) {
-                                state.isOverflow = true;
+                            if (remainingLine <= res) {
+                                if (isFirstLine && props.lineClamp === 1 && res === 1) {
+                                    state.isOverflow = false;
+                                } else {
+                                    state.isOverflow = true;
+                                }
+
                                 lineClampStyle(child.parentElement as HTMLElement, lineClamp);
                             }
                             remainingLine -= res;
                         }
+
+                        isFirstLine = false;
                     } else if (child.nodeType === Node.ELEMENT_NODE) {
                         queue.push(child);
                     }
@@ -164,6 +181,13 @@ export default defineComponent({
             span.style.left = '0';
             span.style.width = '100%';
             span.style.height = 'fit-content';
+            span.style.visibility = 'hidden';
+            span.style.lineHeight = 'inherit';
+            span.style.fontStyle = 'inherit';
+            span.style.fontWeight = 'inherit';
+            span.style.paddingLeft = 'inherit';
+            span.style.paddingRight = 'inherit';
+            span.style.wordBreak = 'inherit';
             return span;
         };
 
@@ -192,7 +216,9 @@ export default defineComponent({
         onMounted(() => {
             if (!state.fakeTextRef) return;
             nextTick(() => {
-                trunkedText(state.fakeTextRef, props.lineClamp);
+                if (state.proxyIsCollapsed) {
+                    trunkedText(state.fakeTextRef, props.lineClamp);
+                }
             });
         });
 
@@ -228,10 +254,8 @@ export default defineComponent({
 
     .panel-contents {
         width: 100%;
-        height: 100%;
         .text {
             width: 100%;
-            height: 100%;
         }
     }
 }
