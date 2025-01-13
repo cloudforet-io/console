@@ -19,12 +19,13 @@ jobs:
       (github.event_name == 'pull_request' && (github.base_ref == 'master' || github.base_ref == 'develop') && !contains(github.event.pull_request.body, '- [x] Previously reviewed in feature branch, no further review needed'))
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       
       - name: Pick Random Reviewer and Add Comment
         id: pick_random_reviewer 
         uses: actions/github-script@v6
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const group1 = JSON.parse(process.env.GROUP1);
             const group2 = JSON.parse(process.env.GROUP2);
