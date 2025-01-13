@@ -8,8 +8,8 @@ on:
   workflow_dispatch:
 
 env:
-  GROUP1: ${{ vars.GROUP1 }}
-  GROUP2: ${{ vars.GROUP2 }}
+  GROUP1: '["WANZARGEN", "sulmoJ", "skdud4659", "piggggggggy"]'
+  GROUP2: '["kkdy21", "seungyeoneeee", "Hansoo-mzc"]'
 
 jobs:
   pick-random-reviwer:
