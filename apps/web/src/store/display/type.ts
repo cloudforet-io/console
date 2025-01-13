@@ -29,6 +29,7 @@ export interface DisplayStoreState {
     uncheckedNotificationCount?: number;
     uncheckedNoticeCount: number,
     isSignInFailed: boolean;
+    signInFailedMessage: string;
     visibleMobileGuideModal: boolean;
     gnbNotificationLastReadTime: string;
 }

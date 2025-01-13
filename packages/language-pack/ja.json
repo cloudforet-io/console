@@ -1444,6 +1444,7 @@
 			"PASSWORD_REQUIRED": "パスワードを入力してください",
 			"ROOT_ACCOUNT": "管理者アカウントでログイン",
 			"SIGN_IN": "ログイン",
+			"SIGN_IN_BLOCK_MESSAGE": "パスワードの入力回数が多すぎるため、アカウントが一時的にロックされました。管理者にお問い合わせください。",
 			"SIGN_IN_FOR_ROOT_ACCOUNT": "Root accountでログイン",
 			"TITLE": "最も簡単に使えるマルチクラウドサービススペースワン",
 			"USER_ID": "ユーザー名",
