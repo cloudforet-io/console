@@ -51,3 +51,4 @@ jobs:
         with:
           reviewers: ${{ steps.pick_random_reviewer.outputs.reviewer1 }},${{ steps.pick_random_reviewer.outputs.reviewer2 }}
           token: ${{ secrets.GITHUB_TOKEN }}
+          
