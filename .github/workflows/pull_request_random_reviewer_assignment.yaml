@@ -3,8 +3,10 @@ name: "[Pull Request] Pick Random Reviwer"
 on:
   issue_comment:
     types: [created]
-  pull_request:
-    types: [opened, reopened]
+  pull_request_target:
+      types: 
+        - opened
+        - reopened
   workflow_dispatch:
 
 
