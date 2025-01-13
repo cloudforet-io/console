@@ -21,9 +21,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       
-      - name: pick_random_reviewer
+      - name: Pick Random Reviewer and Add Comment
         id: pick_random_reviewer 
-        uses: actions/github-script@v3
+        uses: actions/github-script@v6
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
@@ -36,21 +36,14 @@ jobs:
             console.log('randomReviewer1:', randomReviewer1, 'randomReviewer2:', randomReviewer2);
             
             const comment = `🎉 @${randomReviewer1} and @${randomReviewer2} have been randomly selected as the reviewers! Please review. 🙏`
-            core.setOutput('comment', comment) 
-            core.setOutput('reviewer1', randomReviewer1) 
-            core.setOutput('reviewer2', randomReviewer2) 
-      
-      - name: Comment on PR
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const commentBody = ${{ steps.pick_random_reviewer.outputs.comment }}
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: commentBody
+              body: comment
             })
+            core.setOutput('reviewer1', randomReviewer1) 
+            core.setOutput('reviewer2', randomReviewer2) 
       
       - name: Add Pull Request Reviewer
         uses: madrapps/add-reviewers@v1
