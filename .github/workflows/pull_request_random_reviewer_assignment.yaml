@@ -52,3 +52,4 @@ jobs:
               pull_number: context.payload.pull_request.number,
               reviewers: [randomReviewer1, randomReviewer2],
             });
+            
