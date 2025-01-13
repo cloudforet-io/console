@@ -1,7 +1,7 @@
 <template>
     <div class="p-collapsible-panel-v2">
         <div class="panel-contents">
-            <div ref="fakeTextRef"
+            <div ref="contentRef"
                  class="text"
             >
                 <slot />
@@ -15,7 +15,7 @@
 
 <script lang="ts">
 import {
-    defineComponent, nextTick, onMounted, onUpdated, reactive, toRefs,
+    defineComponent, nextTick, onMounted, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
 
 
@@ -44,16 +44,17 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         const state = reactive({
-            fakeTextRef: null as null | HTMLElement,
+            contentRef: null as null | HTMLElement,
             proxyIsCollapsed: useProxyValue('isCollapsed', props, emit),
-            applyEl: null as null | HTMLElement,
-            applyedBeforeStyle: null as null | CSSStyleDeclaration,
+            clampedElement: null as null | HTMLElement,
+            originalStyles: null as null | CSSStyleDeclaration,
             isOverflow: false,
+            isClampApplied: false,
+            hiddenNodesMap: new Map<Node, string>(),
         });
-        const hiddenNodesMap = new Map<Node, string>();
 
 
-        const checkElement = (element: HTMLElement) : number => {
+        const calculateLineCount = (element: HTMLElement) : number => {
             const computedStyle = window.getComputedStyle(element);
             const paddingTop = parseFloat(computedStyle.paddingTop) || 0;
             const paddingBottom = parseFloat(computedStyle.paddingBottom) || 0;
@@ -78,45 +79,49 @@ export default defineComponent({
 
         const trunkedText = (node: Node, lineClamp: number) => {
             if (!node) return;
-            const queue: Node[] = [node];
+            const stack: Node[] = [node];
             let remainingLine = lineClamp;
             let isFirstLine = true;
-            console.log(queue);
-            while (queue.length > 0) {
-                const currentNode = queue.shift();
+            console.log(stack);
+            while (stack.length > 0) {
+                const currentNode = stack.pop();
+                console.log(currentNode);
                 // eslint-disable-next-line no-continue
                 if (!currentNode) continue;
-                // TODO 해당 노드 보다 랜더링상 아래에 위치하는 노드는 모두 hidden 처리해야함.
-                // eslint-disable-next-line no-restricted-syntax
-                for (const child of currentNode.childNodes) {
-                    if (remainingLine <= 0) {
-                        hideNode(child);
+
+                if (remainingLine <= 0) {
+                    hideNode(currentNode);
+                    if (state.isOverflow) {
                         // eslint-disable-next-line no-continue
                         continue;
                     }
+                }
 
+                const children = Array.from(currentNode.childNodes).reverse();
+                // eslint-disable-next-line no-restricted-syntax
+                for (const child of children) {
                     if (child.nodeType === Node.TEXT_NODE) {
-                        console.log(child);
+                        if (!child.textContent?.trim()) {
+                            // eslint-disable-next-line no-continue
+                            continue;
+                        }
+                        // console.log(child);
                         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                         const displayStyle = window.getComputedStyle(child.parentElement!).display;
 
                         if (displayStyle === 'inline') {
                             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                            const res = checkElement(child.parentElement!);
+                            const res = calculateLineCount(child.parentElement!);
                             console.log(res);
 
                             if (remainingLine <= res) {
-                                if (isFirstLine && props.lineClamp === 1 && res === 1) {
-                                    state.isOverflow = false;
-                                } else {
-                                    state.isOverflow = true;
-                                }
-                                lineClampStyle(child.parentElement as HTMLElement, lineClamp);
+                                processLineClamp(child.parentElement as HTMLElement, lineClamp, isFirstLine, res);
                             }
                             remainingLine -= res;
+                            isFirstLine = false;
                         } else {
                             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                            const span = createSpanElement(child.textContent!);
+                            const span = createHiddenSpan(child.textContent!);
                             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                             const parentPosition = child.parentElement!.style.position;
                             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -124,56 +129,62 @@ export default defineComponent({
                             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                             child.parentElement!.appendChild(span);
 
-                            const res = checkElement(span);
+                            const res = calculateLineCount(span);
                             console.log(res);
                             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                             child.parentElement!.style.position = parentPosition;
                             span.remove();
                             if (remainingLine <= res) {
-                                if (isFirstLine && props.lineClamp === 1 && res === 1) {
-                                    state.isOverflow = false;
-                                } else {
-                                    state.isOverflow = true;
-                                }
-
-                                lineClampStyle(child.parentElement as HTMLElement, lineClamp);
+                                processLineClamp(child.parentElement as HTMLElement, lineClamp, isFirstLine, res);
                             }
                             remainingLine -= res;
+                            isFirstLine = false;
                         }
-
-                        isFirstLine = false;
                     } else if (child.nodeType === Node.ELEMENT_NODE) {
-                        queue.push(child);
+                        stack.push(child);
                     }
                 }
             }
         };
 
-        const showNode = (node: Node) => {
+        const processLineClamp = (element : HTMLElement, lineClamp : number, isFirstLine: boolean, res : number) => {
+            if (isFirstLine && lineClamp === 1 && res === 1) {
+                state.isOverflow = false;
+            } else {
+                state.isOverflow = true;
+            }
+            // isClampStarted는 clamp가 상위에서 되었는지 판단할때 사용 - 재귀적으로 돌 때문
+            if (!state.isClampApplied) {
+                applyClampStyle(element, lineClamp);
+                state.isClampApplied = true;
+            }
+        };
+
+        const restoreNode = (node: Node) => {
             if (node instanceof HTMLElement) {
-                const originalDisplay = hiddenNodesMap.get(node);
+                const originalDisplay = state.hiddenNodesMap.get(node);
                 if (originalDisplay !== undefined) {
-                    node.style.display = originalDisplay; // 원래 display 값 복원
+                    node.style.display = originalDisplay;
                 }
             } else if (node.parentElement) {
-                const originalDisplay = hiddenNodesMap.get(node.parentElement);
+                const originalDisplay = state.hiddenNodesMap.get(node.parentElement);
                 if (originalDisplay !== undefined) {
-                    node.parentElement.style.display = originalDisplay; // 부모의 원래 display 값 복원
+                    node.parentElement.style.display = originalDisplay;
                 }
             }
         };
 
         const hideNode = (node: Node) => {
             if (node instanceof HTMLElement) {
-                hiddenNodesMap.set(node, node.style.display); // 기존 display 값을 저장
+                state.hiddenNodesMap.set(node, node.style.display);
                 node.style.display = 'none';
             } else if (node.parentElement) {
-                hiddenNodesMap.set(node.parentElement, node.parentElement.style.display); // 부모의 display 값을 저장
+                state.hiddenNodesMap.set(node.parentElement, node.parentElement.style.display);
                 node.parentElement.style.display = 'none';
             }
         };
 
-        const createSpanElement = (text: string) => {
+        const createHiddenSpan = (text: string) => {
             const span = document.createElement('span');
             span.textContent = text;
             span.style.position = 'absolute';
@@ -191,9 +202,9 @@ export default defineComponent({
             return span;
         };
 
-        const lineClampStyle = (element: HTMLElement, lineClamp: number) => {
-            state.applyEl = element;
-            state.applyedBeforeStyle = {
+        const applyClampStyle = (element: HTMLElement, lineClamp: number) => {
+            state.clampedElement = element;
+            state.originalStyles = {
                 display: element.style.display,
                 webkitBoxOrient: element.style.webkitBoxOrient,
                 webkitLineClamp: element.style.webkitLineClamp,
@@ -205,37 +216,52 @@ export default defineComponent({
             element.style.overflow = 'hidden';
         };
 
-        const clearClampStyle = () => {
-            if (!state.applyEl || !state.applyedBeforeStyle) return;
-            state.applyEl.style.display = 'unset';
-            state.applyEl.style.webkitBoxOrient = 'unset';
-            state.applyEl.style.webkitLineClamp = 'unset';
-            state.applyEl.style.overflow = 'unset';
+        const resetClampStyle = () => {
+            if (!state.clampedElement || !state.originalStyles) return;
+            state.clampedElement.style.display = 'unset';
+            state.clampedElement.style.webkitBoxOrient = 'unset';
+            state.clampedElement.style.webkitLineClamp = 'unset';
+            state.clampedElement.style.overflow = 'unset';
+        };
+
+        const resetNodeStylesAndVisibility = () => {
+            state.isClampApplied = false;
+            resetClampStyle();
+            // eslint-disable-next-line no-restricted-syntax
+            for (const node of state.hiddenNodesMap.keys()) {
+                restoreNode(node);
+            }
+            state.hiddenNodesMap.clear();
+        };
+
+        const updateClamping = () => {
+            nextTick(() => {
+                if (!state.contentRef) return;
+                if (props.lineClamp < 0) return;
+                trunkedText(state.contentRef, props.lineClamp);
+                if (!state.proxyIsCollapsed) {
+                    resetNodeStylesAndVisibility();
+                }
+            });
         };
 
         onMounted(() => {
-            if (!state.fakeTextRef) return;
-            nextTick(() => {
-                if (state.proxyIsCollapsed) {
-                    trunkedText(state.fakeTextRef, props.lineClamp);
-                }
-            });
+            window.addEventListener('resize', updateClamping);
+            updateClamping();
         });
 
-        onUpdated(() => {
-            if (!state.fakeTextRef) return;
-            nextTick(() => {
-                clearClampStyle();
-                // eslint-disable-next-line no-restricted-syntax
-                for (const node of hiddenNodesMap.keys()) {
-                    showNode(node);
-                }
-                hiddenNodesMap.clear(); // 사용한 후 맵 초기화
-                if (state.proxyIsCollapsed) {
-                    trunkedText(state.fakeTextRef, props.lineClamp);
-                }
-            });
+        onUnmounted(() => {
+            window.removeEventListener('resize', updateClamping);
         });
+
+        watch(() => state.proxyIsCollapsed, () => {
+            updateClamping();
+        });
+
+        watch(() => state.contentRef, () => {
+            updateClamping();
+        });
+
         return {
             ...toRefs(state),
         };
