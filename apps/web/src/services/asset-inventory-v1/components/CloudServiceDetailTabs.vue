@@ -15,8 +15,10 @@ import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service
 import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import { i18n } from '@/translations';
 
+import { useDomainStore } from '@/store/domain/domain-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
+import config from '@/lib/config';
 import type { Reference } from '@/lib/reference/type';
 
 
@@ -26,6 +28,7 @@ import type { MonitoringProps, MonitoringResourceType } from '@/common/modules/m
 
 import CloudServiceAdmin
     from '@/services/asset-inventory-v1/components/CloudServiceAdmin.vue';
+import CloudServiceAlertsTab from '@/services/asset-inventory-v1/components/CloudServiceAlertsTab.vue';
 import CloudServiceDetail
     from '@/services/asset-inventory-v1/components/CloudServiceDetail.vue';
 import CloudServiceMultipleSelectedData
@@ -51,6 +54,8 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const domainStore = useDomainStore();
+const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainStore.state.domainId);
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
@@ -71,6 +76,9 @@ const singleItemTabState = reactive({
                 { name: 'monitoring', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_MONITORING') },
                 { name: 'log', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_LOG') },
             );
+        }
+        if (isAlertManagerVersionV2) {
+            defaultTabs.push({ name: 'alerts', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_ALERTS') });
         }
         return defaultTabs;
     }),
@@ -162,6 +170,11 @@ const monitoringState: MonitoringProps = reactive({
         </template>
         <template #monitoring>
             <monitoring :resources="monitoringState.resources" />
+        </template>
+        <template #alerts>
+            <cloud-service-alerts-tab
+                :cloud-service-id="tableState.selectedCloudServiceIds[0]"
+            />
         </template>
     </p-tab>
     <p-tab v-else-if="props.selectedIndex > 1"
