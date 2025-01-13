@@ -101,6 +101,7 @@ const signIn = async () => {
                 },
             });
         } else {
+            displayStore.setSignInFailedMessage(e.message);
             ErrorHandler.handleError(e);
             displayStore.setIsSignInFailed(true);
         }

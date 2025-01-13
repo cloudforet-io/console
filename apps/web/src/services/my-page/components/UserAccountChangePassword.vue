@@ -116,6 +116,7 @@ watch(() => props.certifiedPassword, (certifiedPassword) => {
     >
         <div v-if="props.readonlyMode">
             <p-definition-table style-type="white"
+                                disable-copy
                                 :fields="state.fields"
                                 :data="state.data"
             />
