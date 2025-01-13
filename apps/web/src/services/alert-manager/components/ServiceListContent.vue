@@ -145,19 +145,8 @@ const handleClickEscalationPolicy = (id: string, escalationPolicyId: string) => 
                     </div>
                     <div class="contents">
                         <div class="inner">
-                            <div v-if="props.type === 'alert'"
-                                 class="flex flex-col gap-3"
-                            >
-                                <div class="alerts">
-                                    <p class="title text-gray-700">
-                                        {{ $t('ALERT_MANAGER.SERVICE.OPEN_ALERTS') }}
-                                    </p>
-                                    <p class="text-display-md font-medium">
-                                        {{ (item?.alerts.TRIGGERED?.HIGH || 0) + (item?.alerts.TRIGGERED?.LOW || 0)
-                                            + (item?.alerts.ACKNOWLEDGED?.HIGH || 0) + (item?.alerts.ACKNOWLEDGED?.LOW || 0) }}
-                                    </p>
-                                </div>
-                                <div class="flex justify-between pl-2 pr-2">
+                            <div v-if="props.type === 'alert'">
+                                <div class="flex justify-between">
                                     <div class="alerts triggered text-red-500">
                                         <p class="title">
                                             {{ $t('ALERT_MANAGER.ALERTS.TRIGGERED') }}
