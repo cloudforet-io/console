@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PI, PTextInput, PFieldGroup, PButton, PBadge,
+    PI, PTextInput, PFieldGroup, PButton, PBadge, PDefinitionTable,
 } from '@cloudforet/mirinae';
 
 import type { AuthType } from '@/schema/identity/user/type';
@@ -22,6 +22,11 @@ import { MODAL_TYPE } from '@/common/modules/modals/notification-email-modal/typ
 
 import UserAccountModuleContainer from '@/services/my-page/components/UserAccountModuleContainer.vue';
 
+interface Props {
+    readonlyMode?: boolean;
+}
+
+const props = defineProps<Props>();
 
 const userStore = useUserStore();
 const state = reactive({
@@ -31,6 +36,16 @@ const state = reactive({
     loading: false,
     isModalVisible: false,
     modalType: '',
+    // Read Only Mode
+    fields: computed(() => [
+        {
+            label: i18n.t('IDENTITY.USER.NOTIFICATION_EMAIL.TITLE'),
+            name: 'email',
+        },
+    ]),
+    data: computed(() => ({
+        email: notificationEmail.value,
+    })),
 });
 const {
     forms: {
@@ -106,10 +121,18 @@ watch(() => userStore.state.email, (value) => {
                 </div>
             </div>
         </template>
-        <span class="help-text">
+
+        <p class="help-text">
             {{ $t('IDENTITY.USER.NOTIFICATION_EMAIL.HELP_TEXT') }}
-        </span>
-        <form class="form"
+        </p>
+        <div v-if="props.readonlyMode">
+            <p-definition-table style-type="white"
+                                :fields="state.fields"
+                                :data="state.data"
+            />
+        </div>
+        <form v-else
+              class="form"
               onsubmit="return false"
         >
             <p-field-group
@@ -165,6 +188,7 @@ watch(() => userStore.state.email, (value) => {
 .notification-email-wrapper {
     .headline-wrapper {
         @apply flex items-center;
+        padding: 0 1rem;
         margin-bottom: 1.625rem;
         .form-title {
             @apply text-display-md;
@@ -176,11 +200,13 @@ watch(() => userStore.state.email, (value) => {
     }
     .help-text {
         @apply text-paragraph-md;
+        padding: 0 1rem;
+        margin-bottom: 1rem;
     }
     .form {
         @apply flex items-start;
         max-width: 33.625rem;
-        margin-top: 1rem;
+        padding: 0 1rem;
 
         .icon-edit {
             margin-right: 0.375rem;
@@ -206,5 +232,10 @@ watch(() => userStore.state.email, (value) => {
         margin-top: 0.25rem;
         margin-left: 0.5rem;
     }
+}
+
+/* custom design-system component - p-definition-table */
+:deep(.p-definition-table) {
+    min-height: unset;
 }
 </style>
