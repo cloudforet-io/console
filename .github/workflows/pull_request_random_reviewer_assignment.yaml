@@ -25,7 +25,6 @@ jobs:
         id: pick_random_reviewer 
         uses: actions/github-script@v6
         with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
             const group1 = JSON.parse(process.env.GROUP1);
             const group2 = JSON.parse(process.env.GROUP2);
