@@ -6,7 +6,6 @@ on:
   pull_request_target:
       types: 
         - opened
-        - reopened
   workflow_dispatch:
 
 
@@ -15,7 +14,7 @@ jobs:
     if: >
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/review-request')) ||
-      (github.event_name == 'pull_request' && (github.base_ref == 'master' || github.base_ref == 'develop') && !contains(github.event.pull_request.body, '- [x] Previously reviewed in feature branch, no further review needed'))
+      (github.event_name == 'pull_request_target' && (github.base_ref == 'master' || github.base_ref == 'develop') && !contains(github.event.pull_request.body, '- [x] Previously reviewed in feature branch, no further review needed'))
     runs-on: ubuntu-latest
     env:
       GROUP1: '["WANZARGEN", "sulmoJ", "skdud4659", "piggggggggy"]'
