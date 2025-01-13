@@ -6,7 +6,10 @@ export const generatePassword = () => {
     let randomPassword = '';
 
     do {
-        randomPassword = Array.from({ length: 12 }, () => allCharacters[Math.floor(Math.random() * allCharacters.length)]).join('');
+        randomPassword = Array.from({ length: 12 }, () => {
+            const randomIndex = window.crypto.getRandomValues(new Uint32Array(1))[0] % allCharacters.length;
+            return allCharacters[randomIndex];
+        }).join('');
     } while (!regex.test(randomPassword));
 
     return randomPassword;
