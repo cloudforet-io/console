@@ -36,6 +36,7 @@ jobs:
             const randomReviewer2 = group2[Math.floor(Math.random() * group2.length)];
             console.log('randomReviewer1:', randomReviewer1, 'randomReviewer2:', randomReviewer2);
             
+            // Add comment
             const comment = `🎉 @${randomReviewer1} and @${randomReviewer2} have been randomly selected as the reviewers! Please review. 🙏`
             github.rest.issues.createComment({
               issue_number: context.issue.number,
@@ -43,12 +44,12 @@ jobs:
               repo: context.repo.repo,
               body: comment
             })
-            core.setOutput('reviewer1', randomReviewer1) 
-            core.setOutput('reviewer2', randomReviewer2) 
+            
+            // Add reviewers
+            await github.rest.pulls.requestReviewers({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              reviewers: reviewers,
+            });
       
-      - name: Add Pull Request Reviewer
-        uses: madrapps/add-reviewers@v1
-        with:
-          reviewers: ${{ steps.pick_random_reviewer.outputs.reviewer1 }},${{ steps.pick_random_reviewer.outputs.reviewer2 }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          
