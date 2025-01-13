@@ -1378,6 +1378,7 @@
 			"CONFIRM_PASSWORD": "パスワード確認",
 			"CURRENT_PASSWORD": "現在のパスワード",
 			"CURRENT_PASSWORD_INVALID": "",
+			"EDIT_ACCOUNT_INFO": "",
 			"EMAIL": "メールアドレス",
 			"EMAIL_REQUIRED": "メールアドレスを入力してください",
 			"GROUP": "グループ/会社",

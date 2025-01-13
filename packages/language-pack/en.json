@@ -1378,6 +1378,7 @@
 			"CONFIRM_PASSWORD": "Confirm Password",
 			"CURRENT_PASSWORD": "Current Password",
 			"CURRENT_PASSWORD_INVALID": "Invalid password entered.",
+			"EDIT_ACCOUNT_INFO": "Edit Account Info",
 			"EMAIL": "E-mail",
 			"EMAIL_REQUIRED": "Please enter email",
 			"GROUP": "Group/Company",

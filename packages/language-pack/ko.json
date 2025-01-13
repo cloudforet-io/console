@@ -1378,6 +1378,7 @@
 			"CONFIRM_PASSWORD": "비밀번호 확인",
 			"CURRENT_PASSWORD": "현재 비밀번호",
 			"CURRENT_PASSWORD_INVALID": "",
+			"EDIT_ACCOUNT_INFO": "",
 			"EMAIL": "이메일",
 			"EMAIL_REQUIRED": "이메일을 입력해주세요.",
 			"GROUP": "소속",
