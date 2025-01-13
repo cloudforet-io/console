@@ -143,6 +143,7 @@ const handleClickResetPassword = async () => {
                                   appearance-type="masking"
                                   :invalid="invalid"
                                   block
+                                  skip-mask-toggle-tab-index
                                   @update:value="checkPassword"
                                   @keydown.prevent.enter="signIn"
                     />
