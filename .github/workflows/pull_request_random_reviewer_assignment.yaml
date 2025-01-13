@@ -1,0 +1,53 @@
+name: "[Pull Request] Pick Random Reviwer"
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request:
+    types: [opened]
+  workflow_dispatch:
+
+env:
+  GROUP1: ${{ vars.GROUP1 }}
+  GROUP2: ${{ vars.GROUP2 }}
+
+jobs:
+  pick-random-reviwer:
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/review-request')) ||
+      (github.event_name == 'pull_request' && (github.base_ref == 'master' || github.base_ref == 'develop') && !contains(github.event.pull_request.body, '- [x] Previously reviewed in feature branch, no further review needed'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: pick_random_reviewer
+        id: pick_random_reviwer 
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const group1 = JSON.parse(process.env.GROUP1);
+            const group2 = JSON.parse(process.env.GROUP2);
+            
+            const randomReviewer1 = group1[Math.floor(Math.random() * group1.length)];
+            const randomReviewer2 = group2[Math.floor(Math.random() * group2.length)];
+            
+            const comment = `🎉 @${randomReviewer1} and @${randomReviewer2} have been randomly selected as the reviewers! Please review. 🙏`
+            core.setOutput('comment', comment) 
+            core.setOutput('reviewer1', randomReviewer1) 
+            core.setOutput('reviewer2', randomReviewer2) 
+      
+      - name: comment PR
+        uses: mshick/add-pr-comment@v1
+        with:
+          # get output ${{ steps.[step-id].outputs.[output-id] }}
+          message: ${{ steps.pick_random_reviewer.outputs.comment }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token-user-login: 'github-actions[bot]'
+      
+      - name: Add Pull Request Reviewer
+        uses: madrapps/add-reviewers@v1
+        with:
+          reviewers: ${{ steps.pick_random_reviewer.outputs.reviewer }}
+          token: ${{ secrets.GITHUB_TOKEN }}
