@@ -5987,7 +5987,8 @@ TextProperty.prototype.completeTextData = function (documentData) {
         letterData = letters[i];
         if (currentInd != letterData.anIndexes[j]) { // eslint-disable-line eqeqeq
           currentInd = letterData.anIndexes[j];
-          newInd = indexes.splice(Math.floor(Math.random() * indexes.length), 1)[0];
+          var randomValue = window.crypto.getRandomValues(new Uint32Array(1))[0] / (0xffffffff + 1);
+          newInd = indexes.splice(Math.floor(randomValue * indexes.length), 1)[0];
         }
         letterData.anIndexes[j] = newInd;
       }
@@ -13576,7 +13577,24 @@ var ExpressionManager = (function () {
     var velocityAtTime;
 
     var scoped_bm_rt;
-    var expression_function = eval('[function _expression_function(){' + val + ';scoped_bm_rt=$bm_rt}]')[0]; // eslint-disable-line no-eval
+    var expression_function;
+    try {
+      if (!/^[0-9+\-*/\s;]+$/.test(val)) {
+        throw new Error('Invalid characters in function definition');
+      }
+
+      expression_function = new Function(`
+        return function _expression_function(){
+            ${val};
+            scoped_bm_rt = $bm_rt;
+        };
+    `)();
+
+      expression_function();
+    } catch (error) {
+      console.error('Error creating function:', error);
+      expression_function = null;
+    }
     var numKeys = property.kf ? data.k.length : 0;
 
     var active = !this.data || this.data.hd !== true;
