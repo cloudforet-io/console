@@ -25,16 +25,20 @@ RUN npx turbo build --filter=web... --output-logs=new-only --summarize
 
 FROM nginx:1.21.6-alpine AS runner
 
-# Non-root user
-USER 1001
-
 ENV PORT 80
 ENV ROOT_PATH /var/www
 ENV LOG_PATH /var/log/cloudforet
 ENV NGINX_CONF_PATH /etc/nginx/conf.d
 
+# Non-root user
+USER root
+
+# Create directory and set ownership with root privileges
 RUN mkdir -p ${LOG_PATH}/nginx && \
     chown -R 1001:1001 ${LOG_PATH}
+
+# Switch back to non-root user
+USER 1001
 
 RUN rm /etc/nginx/conf.d/default.conf
 COPY apps/web/pkg/proxy.conf ${NGINX_CONF_PATH}/proxy.conf
