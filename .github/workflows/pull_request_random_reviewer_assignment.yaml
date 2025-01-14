@@ -62,7 +62,7 @@ jobs:
               pull_number: context.payload.pull_request.number,
               reviewers: [`${{ steps.pick_random_reviewer.outputs.randomReviewer1 }}`, `${{ steps.pick_random_reviewer.outputs.randomReviewer2 }}`]
             });
-            if (addReviewersResponse.status === 201) {
+            if (addReviewersResponse.status === 200) {
               core.setOutput('reviewersAdded', 'true');
             }
 
