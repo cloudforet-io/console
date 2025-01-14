@@ -34,7 +34,7 @@ const storeState = reactive({
 const state = reactive({
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
     loading: true,
-    selectedScope: EVENT_RULE_SCOPE.GLOBAL,
+    selectedScope: EVENT_RULE_SCOPE.WEBHOOK,
     selectedWebhook: '',
     hideSidebar: false,
 });
