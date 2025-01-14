@@ -1,13 +1,19 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import { computed, reactive } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButton, PFieldGroup, PTextInput, PFieldTitle, PDefinitionTable,
+    PButton, PFieldGroup, PTextInput, PFieldTitle,
 } from '@cloudforet/mirinae';
 
-import type { UpdatePasswordParameters } from '@/schema/identity/user-profile/api-verbs/update-password';
+import type { TokenIssueParameters } from '@/schema/identity/token/api-verbs/issue';
+import type { TokenIssueModel } from '@/schema/identity/token/model';
+import type { UserProfileUpdateParameters } from '@/schema/identity/user-profile/api-verbs/update';
 import { i18n } from '@/translations';
+
+import { useDomainStore } from '@/store/domain/domain-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import {
@@ -22,30 +28,16 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import UserAccountModuleContainer
     from '@/services/my-page/components/UserAccountModuleContainer.vue';
 
-interface Props {
-    readonlyMode?: boolean;
-    certifiedPassword: string;
-}
 
-const props = defineProps<Props>();
-
+const domainStore = useDomainStore();
+const userStore = useUserStore();
 const state = reactive({
-    loading: false,
-    currentPassword: '',
-    // Read Only Mode
-    fields: computed(() => [
-        {
-            label: i18n.t('COMMON.PROFILE.PASSWORD'),
-            name: 'password',
-        },
-    ]),
-    data: computed(() => ({
-        password: '****************',
-    })),
+    userId: computed<string|undefined>(() => userStore.state.userId),
+    isCheckedToken: false,
 });
-
 const {
     forms: {
+        currentPassword,
         password,
         passwordCheck,
     },
@@ -53,6 +45,7 @@ const {
     invalidState,
     invalidTexts,
 } = useFormValidator({
+    currentPassword: '',
     password: '',
     passwordCheck: '',
 }, {
@@ -69,29 +62,53 @@ const {
         return '';
     },
 });
+const validationState = reactive({
+    isCurrentPasswordValid: undefined as undefined | boolean,
+    currentPasswordInvalidText: '' as TranslateResult,
+});
 
 /*  Components */
 const resetPasswordForm = () => {
     setForm({
+        currentPassword: '',
         password: '',
         passwordCheck: '',
     });
 };
 const handleClickPasswordConfirm = async () => {
-    const userParam: UpdatePasswordParameters = {
-        new_password: password.value,
-        current_password: state.currentPassword,
+    const userParam: UserProfileUpdateParameters = {
+        password: password.value,
     };
     await updateUser(userParam);
     resetPasswordForm();
 };
 
 /* API */
-const updateUser = async (userParam: UpdatePasswordParameters) => {
-    state.loading = true;
+const checkCurrentPassword = async () => {
     try {
-        await SpaceConnector.clientV2.identity.userProfile.updatePassword<UpdatePasswordParameters>(userParam);
-        state.currentPassword = userParam.new_password;
+        const response = await SpaceConnector.clientV2.identity.token.issue<TokenIssueParameters, TokenIssueModel>({
+            domain_id: domainStore.state.domainId,
+            auth_type: 'LOCAL',
+            credentials: {
+                user_id: state.userId,
+                password: currentPassword.value,
+            },
+        }, { skipAuthRefresh: true });
+        if (response.access_token !== '' && response.refresh_token !== '') {
+            state.isCheckedToken = true;
+        }
+        validationState.isCurrentPasswordValid = false;
+        validationState.currentPasswordInvalidText = '';
+    } catch (e) {
+        validationState.isCurrentPasswordValid = true;
+        validationState.currentPasswordInvalidText = i18n.t('AUTH.PASSWORD.RESET.NOT_MATCHING');
+    }
+};
+const updateUser = async (userParam: UserProfileUpdateParameters) => {
+    try {
+        await checkCurrentPassword();
+        if (!state.isCheckedToken) return;
+        await userStore.updateUser(userParam);
         showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '');
     } catch (e: any) {
         if (e.code === 'ERROR_PASSWORD_NOT_CHANGED') {
@@ -99,32 +116,35 @@ const updateUser = async (userParam: UpdatePasswordParameters) => {
         } else {
             showErrorMessage(i18n.t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'), e);
         }
-    } finally {
-        state.loading = false;
     }
 };
-
-watch(() => props.certifiedPassword, (certifiedPassword) => {
-    state.currentPassword = certifiedPassword;
-});
-
 </script>
 
 <template>
     <user-account-module-container
         :title="$t('COMMON.PROFILE.PASSWORD')"
     >
-        <div v-if="props.readonlyMode">
-            <p-definition-table style-type="white"
-                                disable-copy
-                                :fields="state.fields"
-                                :data="state.data"
-            />
-        </div>
-        <div v-else
-             class="change-password-wrapper"
-        >
+        <div class="change-password-wrapper">
             <form class="form">
+                <div class="input-form-wrapper">
+                    <p-field-title class="field-title"
+                                   :label="$t('COMMON.PROFILE.CURRENT_PASSWORD')"
+                                   required
+                    />
+                    <p-field-group :invalid="validationState.isCurrentPasswordValid"
+                                   :invalid-text="validationState.currentPasswordInvalidText"
+                                   class="input-form"
+                    >
+                        <template #default="{invalid}">
+                            <p-text-input :value="currentPassword"
+                                          type="password"
+                                          class="text-input"
+                                          :invalid="invalid"
+                                          @update:value="setForm('currentPassword', $event)"
+                            />
+                        </template>
+                    </p-field-group>
+                </div>
                 <div class="input-form-wrapper">
                     <p-field-title class="field-title"
                                    :label="$t('COMMON.PROFILE.NEW_PASSWORD')"
@@ -166,8 +186,7 @@ watch(() => props.certifiedPassword, (certifiedPassword) => {
             </form>
             <div class="save-button">
                 <p-button style-type="primary"
-                          :disabled="password === '' || passwordCheck === ''"
-                          :loading="state.loading"
+                          :disabled="currentPassword === '' || password === '' || passwordCheck === ''"
                           @click="handleClickPasswordConfirm"
                 >
                     {{ $t('MY_PAGE.ACCOUNT.SAVE_CHANGES') }}
@@ -179,8 +198,7 @@ watch(() => props.certifiedPassword, (certifiedPassword) => {
 
 <style lang="postcss" scoped>
 .change-password-wrapper {
-    padding: 0 1rem;
-    max-width: 35.5rem;
+    max-width: 33.5rem;
     .input-form-wrapper {
         @apply flex flex-wrap justify-between;
         .field-title {
@@ -205,10 +223,5 @@ watch(() => props.certifiedPassword, (certifiedPassword) => {
 .save-button {
     display: flex;
     margin-top: 0.5rem;
-}
-
-/* custom design-system component - p-definition-table */
-:deep(.p-definition-table) {
-    min-height: unset;
 }
 </style>

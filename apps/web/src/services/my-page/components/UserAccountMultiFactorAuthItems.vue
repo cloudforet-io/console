@@ -17,12 +17,6 @@ import { postUserProfileDisableMfa } from '@/lib/helper/multi-factor-auth-helper
 import { MULTI_FACTOR_AUTH_ITEMS } from '@/services/my-page/constants/multi-factor-auth-constants';
 import { useMultiFactorAuthStore } from '@/services/my-page/stores/multi-factor-auth-store';
 
-interface Props {
-    readonlyMode?: boolean;
-}
-
-const props = defineProps<Props>();
-
 const multiFactorAuthStore = useMultiFactorAuthStore();
 const multiFactorAuthState = multiFactorAuthStore.state;
 const userStore = useUserStore();
@@ -98,8 +92,6 @@ watch(() => multiFactorAuthState.modalVisible, (modalVisible) => {
                     <div class="toggle-wrapper">
                         <div class="toggle-inner">
                             <p-toggle-button :value="storeState.enableMfaMap[item.type]"
-                                             :read-only="props.readonlyMode"
-                                             :show-state-text="props.readonlyMode"
                                              @change-toggle="handleChangeToggle(item.type, $event)"
                             />
                             <p class="title">
@@ -124,7 +116,6 @@ watch(() => multiFactorAuthState.modalVisible, (modalVisible) => {
                       class="re-sync-button"
                       style-type="tertiary"
                       size="sm"
-                      :readonly="props.readonlyMode"
                       @click="handleClickReSyncButton(item.type)"
             >
                 {{ $t('MY_PAGE.MFA.RESYNC') }}

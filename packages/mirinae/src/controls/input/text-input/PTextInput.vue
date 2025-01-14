@@ -77,8 +77,6 @@
                       size="sm"
                       style-type="transparent"
                       :disabled="disabled"
-                      :tabindex="skipMaskToggleTabIndex ? -1 : undefined"
-                      :aria-hidden="skipMaskToggleTabIndex ? true : undefined"
                       @click.stop.prevent="handleTogglePassword"
             >
                 {{ !proxyShowPassword ? $t('COMPONENT.TEXT_INPUT.HIDE') : $t('COMPONENT.TEXT_INPUT.SHOW') }}
@@ -169,7 +167,6 @@ interface TextInputProps {
     showPassword: boolean;
     appearanceType?: InputAppearanceType;
     pageSize?: number;
-    skipMaskToggleTabIndex?: boolean;
 }
 
 export default defineComponent<TextInputProps>({
@@ -277,10 +274,6 @@ export default defineComponent<TextInputProps>({
         pageSize: {
             type: Number,
             default: undefined,
-        },
-        skipMaskToggleTabIndex: {
-            type: Boolean,
-            default: false,
         },
     },
 

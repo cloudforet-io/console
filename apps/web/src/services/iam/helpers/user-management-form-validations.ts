@@ -47,21 +47,14 @@ export const checkEmailFormat = (userID: string) => {
         isValid: true,
         invalidText: '' as TranslateResult,
     };
-
-    // RFC 5321
-    if (userID.length > 320) {
-        validation.isValid = false;
-        validation.invalidText = i18n.t('IAM.USER.FORM.EMAIL_INVALID');
-        return validation;
-    }
-
-    const emailCheckRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const emailCheckRegex = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
     if (!emailCheckRegex.test(userID)) {
         validation.isValid = false;
         validation.invalidText = i18n.t('IAM.USER.FORM.EMAIL_INVALID');
     }
     return validation;
 };
+
 export const checkEmptyValue = async (valueForCheck: string) => {
     const validation = {
         isValid: true,

@@ -6,12 +6,6 @@ import UserAccountMultiFactorAuthFormModal from '@/services/my-page/components/U
 import UserAccountMultiFactorAuthItems from '@/services/my-page/components/UserAccountMultiFactorAuthItems.vue';
 import { useMultiFactorAuthStore } from '@/services/my-page/stores/multi-factor-auth-store';
 
-interface Props {
-    readonlyMode?: boolean;
-}
-
-const props = defineProps<Props>();
-
 const multiFactorAuthStore = useMultiFactorAuthStore();
 const multiFactorAuthState = multiFactorAuthStore.state;
 
@@ -31,7 +25,7 @@ onUnmounted(() => {
                 </p>
             </div>
         </template>
-        <user-account-multi-factor-auth-items :readonly-mode="props.readonlyMode" />
+        <user-account-multi-factor-auth-items />
         <user-account-multi-factor-auth-form-modal v-if="multiFactorAuthState.modalVisible" />
     </user-account-module-container>
 </template>
@@ -39,7 +33,6 @@ onUnmounted(() => {
 <style lang="postcss" scoped>
 .user-account-multi-factor-auth {
     @apply flex flex-col;
-    padding: 1.5rem 1rem 2.5rem;
     gap: 1.5rem;
     .headline-wrapper {
         @apply flex items-center;

@@ -264,9 +264,6 @@ export const PasswordType: Story = {
                 <p class="text-label-lg font-bold my-3">With 'password' input type, with 'masking' appearance type</p>
                 <p-text-input value="password" type="password" appearance-type="masking" />
                 <br/>
-                <p class="text-label-lg font-bold my-3">With 'password' input type, with 'masking' appearance type, with \`skipMaskToggleTabIndex\` true</p>
-                <p-text-input value="password" type="password" appearance-type="masking" skip-mask-toggle-tab-index />
-                <br/>
                 <p class="text-label-lg font-bold my-3">With 'password' input type, with 'masking' appearance type, with \`showPassword\` false</p>
                 <p-text-input value="password" type="password" appearance-type="masking" :show-password="false" />
                 <br/>

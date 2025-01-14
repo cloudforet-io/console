@@ -1,12 +1,8 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { debounce } from 'lodash';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import {
-    PHeadingLayout, PPaneLayout, PLazyImg, PAvatar, PButton, PHeading, PButtonModal, PFieldGroup, PTextInput,
+    PHeading, PPaneLayout, PLazyImg, PAvatar,
 } from '@cloudforet/mirinae';
 
 import DomainAdminImage from '@/assets/images/role/img_avatar_admin.png';
@@ -16,12 +12,8 @@ import WorkspaceMemberImage from '@/assets/images/role/img_avatar_workspace-memb
 import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleType } from '@/schema/identity/role/type';
-import type { TokenIssueParameters } from '@/schema/identity/token/api-verbs/issue';
-import type { TokenIssueModel } from '@/schema/identity/token/model';
 import type { AuthType } from '@/schema/identity/user/type';
-import { i18n } from '@/translations';
 
-import { useDomainStore } from '@/store/domain/domain-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import config from '@/lib/config';
@@ -32,9 +24,6 @@ import UserAccountMultiFactorAuth from '@/services/my-page/components/UserAccoun
 import UserAccountNotificationEmail from '@/services/my-page/components/UserAccountNotificationEmail.vue';
 
 
-
-
-const domainStore = useDomainStore();
 const userStore = useUserStore();
 const storeState = reactive({
     authType: computed<AuthType|undefined>(() => userStore.state.authType),
@@ -58,95 +47,14 @@ const state = reactive({
         if (storeState.currentRoleType === ROLE_TYPE.WORKSPACE_MEMBER) return 'Workspace Member';
         return 'User';
     }),
-    readonlyMode: computed(() => {
-        const isLocalUser = storeState.authType === 'LOCAL';
-        return isLocalUser ? !passwordFormState.isPasswordChecked : false;
-    }),
 });
-
-const passwordFormState = reactive({
-    isPasswordChecked: false,
-    passwordCheckModalVisible: false,
-    password: '',
-    certifiedPassword: '',
-    loading: false,
-    userId: computed<string|undefined>(() => userStore.state.userId),
-    isTokenChecked: undefined as boolean|undefined,
-    invalidText: '',
-});
-
-const passwordCheckFecher = getCancellableFetcher(SpaceConnector.clientV2.identity.token.issue);
-const handleChangePassword = debounce(async () => {
-    if (!passwordFormState.password) {
-        passwordFormState.isTokenChecked = undefined;
-        passwordFormState.invalidText = '';
-        return;
-    }
-    passwordFormState.loading = true;
-    try {
-        const result = await passwordCheckFecher<TokenIssueParameters, TokenIssueModel>({
-            domain_id: domainStore.state.domainId,
-            auth_type: 'LOCAL',
-            credentials: {
-                user_id: passwordFormState.userId,
-                password: passwordFormState.password,
-            },
-        }, { skipAuthRefresh: true });
-        if (result.status === 'succeed') {
-            if (!!result.response.access_token && !!result.response.refresh_token) {
-                passwordFormState.certifiedPassword = passwordFormState.password;
-                passwordFormState.isTokenChecked = true;
-                passwordFormState.invalidText = '';
-            } else {
-                passwordFormState.isTokenChecked = false;
-                passwordFormState.invalidText = i18n.t('COMMON.PROFILE.CURRENT_PASSWORD_INVALID');
-            }
-        }
-    } catch (e: any) {
-        if (e.message.startsWith(' MFA is required.')) { // MFA activated CASE
-            passwordFormState.certifiedPassword = passwordFormState.password;
-            passwordFormState.isTokenChecked = true;
-            passwordFormState.invalidText = '';
-        } else {
-            passwordFormState.isTokenChecked = false;
-            passwordFormState.invalidText = i18n.t('COMMON.PROFILE.CURRENT_PASSWORD_INVALID');
-        }
-    } finally {
-        passwordFormState.loading = false;
-    }
-}, 800);
-
-const handleConfirmPasswordCheckModal = () => {
-    passwordFormState.isPasswordChecked = true;
-    passwordFormState.passwordCheckModalVisible = false;
-};
-const handleOpenPasswordCheckModal = () => {
-    passwordFormState.passwordCheckModalVisible = true;
-};
-const handleClickCancel = () => {
-    passwordFormState.passwordCheckModalVisible = false;
-    passwordFormState.password = '';
-    passwordFormState.certifiedPassword = '';
-    passwordFormState.isTokenChecked = undefined;
-    passwordFormState.invalidText = '';
-};
-
 </script>
 
 <template>
     <section class="user-account-page">
-        <p-heading-layout class="mb-6">
-            <template #heading>
-                <p-heading :title="$t('MY_PAGE.ACCOUNT.ACCOUNT_N_PROFILE')" />
-            </template>
-            <template #extra>
-                <p-button v-if="!passwordFormState.isPasswordChecked"
-                          @click="handleOpenPasswordCheckModal"
-                >
-                    {{ $t('COMMON.PROFILE.EDIT_ACCOUNT_INFO') }}
-                </p-button>
-            </template>
-        </p-heading-layout>
+        <p-heading class="mb-6"
+                   :title="$t('MY_PAGE.ACCOUNT.ACCOUNT_N_PROFILE')"
+        />
         <div class="contents-wrapper">
             <p-pane-layout class="role-card-content">
                 <div class="icon-wrapper">
@@ -166,48 +74,12 @@ const handleClickCancel = () => {
                 </span>
             </p-pane-layout>
             <div class="user-account-wrapper">
-                <user-account-base-information :readonly-mode="state.readonlyMode" />
-                <user-account-change-password v-if="storeState.authType === 'LOCAL'"
-                                              :readonly-mode="state.readonlyMode"
-                                              :certified-password="passwordFormState.certifiedPassword"
-                />
-                <user-account-notification-email v-if="state.smtpEnabled && (storeState.authType === 'LOCAL' || storeState.authType === 'EXTERNAL')"
-                                                 :readonly-mode="state.readonlyMode"
-                />
-                <user-account-multi-factor-auth :readonly-mode="state.readonlyMode" />
+                <user-account-base-information />
+                <user-account-change-password v-if="storeState.authType === 'LOCAL'" />
+                <user-account-notification-email v-if="state.smtpEnabled && (storeState.authType === 'LOCAL' || storeState.authType === 'EXTERNAL')" />
+                <user-account-multi-factor-auth />
             </div>
         </div>
-        <p-button-modal :header-title="$t('COMMON.PROFILE.PASSWORD_CHECK_TITLE')"
-                        :visible.sync="passwordFormState.passwordCheckModalVisible"
-                        :loading="passwordFormState.loading"
-                        :disabled="!passwordFormState.isTokenChecked"
-                        size="sm"
-                        @confirm="handleConfirmPasswordCheckModal"
-                        @cancel="handleClickCancel"
-                        @close="handleClickCancel"
-        >
-            <template #body>
-                <div class="modal-content-wrapper">
-                    <p-field-group :label="$t('COMMON.PROFILE.CURRENT_PASSWORD')"
-                                   required
-                                   :invalid="passwordFormState.isTokenChecked === false"
-                                   :invalid-text="passwordFormState.invalidText"
-                    >
-                        <template #default="{invalid}">
-                            <p-text-input v-model="passwordFormState.password"
-                                          type="password"
-                                          placeholder="Password"
-                                          appearance-type="masking"
-                                          :readonly="passwordFormState.loading"
-                                          :invalid="invalid"
-                                          block
-                                          @update:value="handleChangePassword"
-                            />
-                        </template>
-                    </p-field-group>
-                </div>
-            </template>
-        </p-button-modal>
     </section>
 </template>
 
@@ -243,9 +115,6 @@ const handleClickCancel = () => {
             }
         }
     }
-}
-.modal-content-wrapper {
-    height: 8.75rem;
 }
 
 /* custom design-system component - p-lazy-img */

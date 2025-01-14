@@ -28,13 +28,14 @@ export default class ServiceAPI {
         this.setAxiosInterceptors();
     }
 
-    private handleResponseError = async (error: AxiosError): Promise<void> => {
+    private handleResponseError = (error: AxiosError): void => {
         const status = error.response?.status;
         if (status === 400) {
             throw new BadRequestError(error);
         } else if (status === 401) {
-            const res = await this.tokenApi.refreshAccessToken();
-            if (!res) throw new AuthenticationError(error);
+            this.tokenApi.refreshAccessToken().then((res) => {
+                if (!res) throw new AuthenticationError(error);
+            });
         } else if (status === 403) {
             throw new AuthorizationError(error);
         } else if (status === 404) {

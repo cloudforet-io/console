@@ -1,24 +1,12 @@
 /* eslint-disable no-await-in-loop */
 import { test, expect } from '@playwright/test';
-import { v4 as uuidv4 } from 'uuid';
+
 
 // getRandomIndexExceptFirst: 1 ~ (count - 1)
-const getRandomIndexExceptFirst = (count: number): number => {
-    if (count <= 1) throw new Error('Count must be greater than 1');
-
-    const uuid = uuidv4().replace(/-/g, '');
-    const randomValue = parseInt(uuid.slice(0, 8), 16);
-    return (randomValue % (count - 1)) + 1;
-};
+const getRandomIndexExceptFirst = (count: number) => Math.floor(Math.random() * (count - 1)) + 1;
 
 // getRandomIndexInRange: 0 ~ (count - 1)
-const getRandomIndexInRange = (count: number): number => {
-    if (count <= 0) throw new Error('Count must be greater than 0');
-
-    const uuid = uuidv4().replace(/-/g, '');
-    const randomValue = parseInt(uuid.slice(0, 8), 16);
-    return randomValue % count;
-};
+const getRandomIndexInRange = (count: number) => Math.floor(Math.random() * count);
 
 const checkApiCall = async (page: any, url: string) => {
     const response = await page.waitForResponse(`${process.env.APIURL as string}${url}`);

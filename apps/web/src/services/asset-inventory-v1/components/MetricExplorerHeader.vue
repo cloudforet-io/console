@@ -142,22 +142,19 @@ const openNameFormModal = (modalType: string) => {
 };
 const getDuplicatedMetricName = (name: string): string => {
     let _name = name;
+    const _regex = /^(.*?)\s*copy(\s+(\d+))?$/i;
 
     while (state.existingMetricNameList.includes(_name)) {
-        const trimmedName = _name.trim();
-
-        if (trimmedName.endsWith(' copy')) {
-            _name = `${trimmedName} 2`;
-        } else if (trimmedName.match(/ copy \d+$/)) {
-            const lastSpaceIndex = trimmedName.lastIndexOf(' ');
-            const baseName = trimmedName.slice(0, lastSpaceIndex);
-            const number = parseInt(trimmedName.slice(lastSpaceIndex + 1));
-            _name = `${baseName} ${number + 1}`;
+        const match = _regex.exec(_name);
+        if (match) {
+            const baseName = match[1];
+            const numberStr = match[3];
+            const newNumber = numberStr ? parseInt(numberStr) + 1 : 2;
+            _name = `${baseName} copy ${newNumber}`;
         } else {
             _name = `${_name} copy`;
         }
     }
-
     return _name;
 };
 

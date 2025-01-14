@@ -110,7 +110,6 @@ export const useDisplayStore = defineStore('display-store', () => {
         uncheckedNotificationCount: 0,
         uncheckedNoticeCount: 0,
         isSignInFailed: false,
-        signInFailedMessage: '',
         visibleMobileGuideModal: false,
         gnbNotificationLastReadTime: '',
     });
@@ -156,7 +155,6 @@ export const useDisplayStore = defineStore('display-store', () => {
     const setIsInitialized = (val: boolean) => { state.isInitialized = val; };
     const setUncheckedNotificationCount = (val: number) => { state.uncheckedNotificationCount = val; };
     const setIsSignInFailed = (val: boolean) => { state.isSignInFailed = val; };
-    const setSignInFailedMessage = (val: string) => { state.signInFailedMessage = val; };
     const setVisibleMobileGuideModal = (val: boolean) => { state.visibleMobileGuideModal = val; };
     const setGnbNotificationLastReadTime = (val: string) => {
         state.gnbNotificationLastReadTime = val;
@@ -168,7 +166,6 @@ export const useDisplayStore = defineStore('display-store', () => {
         setIsInitialized,
         setUncheckedNotificationCount,
         setIsSignInFailed,
-        setSignInFailedMessage,
         setVisibleMobileGuideModal,
         setGnbNotificationLastReadTime,
     };

@@ -12,7 +12,7 @@
                 <div v-if="showErrorMessage"
                      class="error-msg-box"
                 >
-                    <span class="error-msg">{{ errorMessage }}</span>
+                    <span class="error-msg">{{ $t('COMMON.SIGN_IN.ALT_E_SIGN_IN') }}</span>
                     <p-i name="ic_close"
                          width="1.5rem"
                          height="1.5rem"
@@ -38,8 +38,6 @@ import { useRoute, useRouter } from 'vue-router/composables';
 import {
     PI, screens,
 } from '@cloudforet/mirinae';
-
-import { i18n } from '@/translations';
 
 import { useDisplayStore } from '@/store/display/display-store';
 import { useDomainStore } from '@/store/domain/domain-store';
@@ -69,15 +67,6 @@ export default {
         const state = reactive({
             symbolImage: computed<string|undefined>(() => domainStore.getters.domainSymbolImage),
             isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
-            errorMessage: computed<string>(() => {
-                const signInBlockMessage = i18n.t('COMMON.SIGN_IN.SIGN_IN_BLOCK_MESSAGE');
-                const basicMessage = i18n.t('COMMON.SIGN_IN.ALT_E_SIGN_IN');
-                const signInAPIErrorMessage = displayStore.state.signInFailedMessage;
-                if (signInAPIErrorMessage.includes('Login is blocked')) {
-                    return signInBlockMessage;
-                }
-                return basicMessage;
-            }),
         });
 
         /* event */
@@ -136,9 +125,9 @@ export default {
                 display: flex;
                 justify-content: space-between;
                 right: 0;
-                top: -0.5rem;
+                bottom: 0;
                 left: 0;
-                min-height: 2.25rem;
+                height: 2.25rem;
                 padding: 0.5rem;
 
                 .error-msg {
