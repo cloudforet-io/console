@@ -51,6 +51,7 @@ export const getTextInputArgs = (): Args => {
         rightExtraSlot: '',
         inputRightSlot: '',
         rightEdgeSlot: '',
+        hideSpinButton: false,
     };
 };
 
@@ -215,6 +216,21 @@ export const getTextInputArgTypes = (): ArgTypes => {
                 },
             },
             control: 'object',
+        },
+        hideSpinButton: {
+            name: 'hideSpinButton',
+            type: { name: 'boolean' },
+            description: 'Whether to hide spin button at number type or not.',
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'false',
+                },
+            },
+            control: 'boolean',
         },
         visibleMenu: {
             name: 'visibleMenu',
