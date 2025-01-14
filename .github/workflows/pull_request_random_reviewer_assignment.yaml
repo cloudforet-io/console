@@ -78,3 +78,32 @@ jobs:
               labels: ['pending/review']
             });
             
+
+      
+      - name: Check if the PR author is an organization member and add as assignee
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const prAuthor = context.payload.pull_request.user.login;
+            const org = context.repo.owner;
+            const prNumber = context.payload.pull_request.number;
+
+            // Check if the PR author is a member of the organization
+            try {
+              await github.rest.orgs.checkMembershipForUser({
+                org,
+                username: prAuthor
+              });
+
+              // If the check doesn't throw an error, the user is a member
+              // Add the PR author as an assignee
+              await github.rest.issues.addAssignees({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                assignees: [prAuthor]
+              });
+            } catch (error) {
+              // If the user is not a member, or any other error occurs, do nothing
+              console.log(`User ${prAuthor} is not a member of the org, or an error occurred: ${error.message}`);
+            }
