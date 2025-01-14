@@ -354,6 +354,22 @@ export const getTextInputArgTypes = (): ArgTypes => {
             },
             control: { type: 'number', min: 0 },
         },
+        skipMaskToggleTabIndex: {
+            name: 'skipMaskToggleTabIndex',
+            type: { name: 'boolean' },
+            description: 'Whether to skip tab indexing of show/hide toggle button(password type and masking appearanceType) or not.',
+            defaultValue: false,
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'true',
+                },
+            },
+            control: 'boolean',
+        },
         // attrs
         inputAttrs: {
             name: 'all input attributes',

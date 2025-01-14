@@ -14,6 +14,8 @@ import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-r
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { ReferenceMap } from '@/store/reference/type';
 
+import getRandomId from '@/lib/random-id-generator';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { indigo, peacock } from '@/styles/colors';
@@ -109,7 +111,7 @@ const state = reactive({
         if (props.multiSelectable) return PCheckbox;
         return PRadio;
     }),
-    contextKey: Math.floor(Math.random() * Date.now()),
+    contextKey: getRandomId(),
 });
 const projectTreeHelper = useProjectTree();
 
@@ -246,7 +248,7 @@ const handleUpdateVisibleMenu = (value: boolean) => {
 
 const refreshProjectTree = async () => {
     await allReferenceStore.load('project', { force: true });
-    state.contextKey = Math.floor(Math.random() * Date.now());
+    state.contextKey = getRandomId();
 };
 
 const handleClickCreateButton = () => {
