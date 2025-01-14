@@ -90,7 +90,7 @@ const updateStateFromEventRuleInfo = (): void => {
     }
     if (actions.merge_asset_labels) {
         state.selectedActions.merge_asset_labels = true;
-        state.period = Number(actions.merge_asset_labels);
+        state.period = Number(actions.merge_asset_labels.period);
     }
 };
 const handleUpdateToggle = (action: string, value: boolean) => {

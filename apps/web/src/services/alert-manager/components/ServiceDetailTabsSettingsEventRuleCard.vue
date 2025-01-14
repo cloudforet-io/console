@@ -15,7 +15,10 @@ import {
     EVENT_RULE_URGENCY,
 } from '@/schema/alert-manager/event-rule/constant';
 import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
-import type { EventRuleActionsMatchAssetType, EventRuleActionsType } from '@/schema/alert-manager/event-rule/type';
+import type {
+    EventRuleActionsMatchAssetType, EventRuleActionsType,
+    EventRuleActionsMergeAssetLabelsType,
+} from '@/schema/alert-manager/event-rule/type';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -66,6 +69,7 @@ const state = reactive({
         const actionOrder: (keyof EventRuleActionsType)[] = [
             'change_service',
             'match_asset',
+            'merge_asset_labels',
             'change_title',
             'change_status',
             'change_urgency',
@@ -107,6 +111,15 @@ const state = reactive({
                             name: 'create_temporary_asset',
                             value: matchAssetValue.create_temporary_asset ? i18n.t('ALERT_MANAGER.CREATE') : i18n.t('ALERT_MANAGER.EVENT_RULE.DO_NOT_CREATE'),
                         });
+                    } else if (actionKey === 'merge_asset_labels' && typeof actionValue === 'object') {
+                        const matchAssetValue = actionValue as EventRuleActionsMergeAssetLabelsType;
+                        if (matchAssetValue.period) {
+                            result[type].push({
+                                label: i18n.t('ALERT_MANAGER.EVENT_RULE.LABEL_PERIOD'),
+                                name: 'merge_asset_labels',
+                                value: matchAssetValue.period,
+                            });
+                        }
                     } else if (actionKey === 'add_additional_info') {
                         result[type].push({
                             label: i18n.t('ALERT_MANAGER.ALERTS.ADDITIONAL_INFO'),
@@ -307,8 +320,8 @@ const handleDeleteEventRule = () => {
                                                 {{ storeState.service[action.value]?.label || action.value }}
                                             </template>
                                             <template v-else-if="action.name === 'rule'">
-                                                <span class="font-bold">{{ Object.keys(action.value)[0] }}: </span>
-                                                <span>{{ Object.values(action.value)[0] }}</span>
+                                                <span class="font-bold">{{ action.value.source }}: </span>
+                                                <span>{{ action.value.target }}</span>
                                             </template>
                                             <template v-else-if="action.name === 'change_urgency'">
                                                 {{ action.value === EVENT_RULE_URGENCY.HIGH ? $t('ALERT_MANAGER.EVENT_RULE.HIGH') : $t('ALERT_MANAGER.EVENT_RULE.LOW') }}
