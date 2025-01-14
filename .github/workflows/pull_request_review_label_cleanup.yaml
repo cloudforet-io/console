@@ -1,0 +1,31 @@
+name: "[Pull Request] Review Label Cleanup"
+
+on:
+  pull_request_target:
+    types: [closed]
+
+jobs:
+  cleanup-labels:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Remove review labels
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const issue_number = context.payload.pull_request.number;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const labelsToRemove = ['pending/review', 'approved/review', 'changes_requested/review'];
+
+            for (const label of labelsToRemove) {
+              await github.rest.issues.removeLabel({
+                owner,
+                repo,
+                issue_number,
+                name: label
+              }).catch(error => {
+                if (error.status !== 404) {
+                  throw error;
+                }
+              });
+            }
