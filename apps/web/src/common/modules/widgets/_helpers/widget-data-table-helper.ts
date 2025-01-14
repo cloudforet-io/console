@@ -3,22 +3,36 @@ import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/
 
 import type { DataTableOptions } from '@/common/modules/widgets/types/widget-model';
 
-export const getDuplicatedDataTableName = (name: string, dataTables: Partial<PublicDataTableModel | PrivateDataTableModel>[]): string => {
+export const getDuplicatedDataTableName = (
+    name: string,
+    dataTables: Partial<PublicDataTableModel | PrivateDataTableModel>[],
+): string => {
     let _name = name;
-    const _regex = /^(.*?)\s*\((\d+)\)$/i;
     const dataTableNames = dataTables.map((dataTable) => dataTable.name);
 
     while (dataTableNames.includes(_name)) {
-        const match = _regex.exec(_name);
-        if (match) {
-            const baseName = match[1];
-            const numberStr = match[2];
-            const newNumber = numberStr ? parseInt(numberStr) + 1 : 2;
-            _name = `${baseName} (${newNumber})`;
+        const lastOpenParenIndex = _name.lastIndexOf('(');
+        const lastCloseParenIndex = _name.lastIndexOf(')');
+
+        if (
+            lastOpenParenIndex !== -1
+            && lastCloseParenIndex === _name.length - 1
+            && lastOpenParenIndex < lastCloseParenIndex
+        ) {
+            const baseName = _name.slice(0, lastOpenParenIndex).trim();
+            const numberStr = _name.slice(lastOpenParenIndex + 1, lastCloseParenIndex);
+            const number = parseInt(numberStr);
+
+            if (!Number.isNaN(number)) {
+                _name = `${baseName} (${number + 1})`;
+            } else {
+                _name = `${_name} (2)`;
+            }
         } else {
             _name = `${_name} (2)`;
         }
     }
+
     return _name;
 };
 
