@@ -28,7 +28,6 @@ jobs:
         id: pick_random_reviewer 
         uses: actions/github-script@v6
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const group1 = JSON.parse(process.env.GROUP1).filter(user => user !== context.payload.pull_request.user.login);
             const group2 = JSON.parse(process.env.GROUP2).filter(user => user !== context.payload.pull_request.user.login);
@@ -44,7 +43,6 @@ jobs:
       - name: Add Comment
         uses: actions/github-script@v6
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             github.rest.issues.createComment({
               issue_number: context.issue.number,
@@ -57,7 +55,6 @@ jobs:
         id: add_reviewers
         uses: actions/github-script@v6
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const addReviewersResponse = await github.rest.pulls.requestReviewers({
               owner: context.repo.owner,
@@ -73,7 +70,6 @@ jobs:
         if: steps.add_reviewers.outputs.reviewers_added == 'true'
         uses: actions/github-script@v6
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             github.rest.issues.addLabels({
               pull_number: context.payload.pull_request.number,
