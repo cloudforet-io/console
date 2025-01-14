@@ -41,7 +41,6 @@ jobs:
               }
             }
 
-
             // Remove 'pending/review' label if it exists and the review state is not 'pending'
             if (hasPendingReview && reviewState !== 'pending') {
               await github.rest.issues.removeLabel({
