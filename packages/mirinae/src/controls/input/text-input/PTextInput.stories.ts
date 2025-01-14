@@ -56,6 +56,7 @@ const Template: Story = {
                         :show-password="showPassword"
                         :appearance-type="appearanceType"
                         :page-size="pageSize"
+                        :hide-spin-button="hideSpinButton"
             >
                 <template v-if="inputRightSlot" #input-right>
                     <span v-html="inputRightSlot"></span>
