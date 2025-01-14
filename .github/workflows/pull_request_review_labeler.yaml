@@ -1,0 +1,59 @@
+name: "[Pull Request] Review Labeler"
+
+on:
+  pull_request_review:
+    types: [submitted, edited, dismissed]
+  pull_request_target:
+    types: [synchronize]
+
+jobs:
+  update-labels:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add or remove labels based on review state
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const { data: currentLabels } = await github.rest.issues.listLabelsOnIssue({
+              owner,
+              repo,
+              issue_number: prNumber
+            });
+
+            const hasPendingReview = currentLabels.some(label => label.name === 'pending/review');
+            const reviewState = context.payload.review.state;
+
+            // Remove 'pending/review' label if it exists and the review state is not 'pending'
+            if (hasPendingReview && reviewState !== 'pending') {
+              await github.rest.issues.removeLabel({
+                owner,
+                repo,
+                issue_number: prNumber,
+                name: 'pending/review'
+              });
+            }
+
+            // Add 'approved/review' or 'changes_requested/review' label based on review state
+            if (reviewState === 'approved' || reviewState === 'changes_requested') {
+              const labelToAdd = reviewState === 'approved' ? 'approved/review' : 'changes_requested/review';
+              await github.rest.issues.addLabels({
+                owner,
+                repo,
+                issue_number: prNumber,
+                labels: [labelToAdd]
+              });
+            }
+
+            // Re-add 'pending/review' label if PR is synchronized and no reviews are pending
+            if (context.eventName === 'pull_request_target' && context.payload.action === 'synchronize' && !hasPendingReview) {
+              await github.rest.issues.addLabels({
+                owner,
+                repo,
+                issue_number: prNumber,
+                labels: ['pending/review']
+              });
+            }
+              
