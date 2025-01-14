@@ -35,9 +35,6 @@ RUN mkdir -p ${LOG_PATH}/nginx && \
     rm /etc/nginx/conf.d/default.conf && \
     chown -R 1001:1001 ${LOG_PATH}
 
-# Switch to non-root user
-USER 1001
-
 # Copy NGINX configuration and application files
 COPY apps/web/pkg/proxy.conf ${NGINX_CONF_PATH}/proxy.conf
 COPY --from=installer /app/apps/web/dist/. ${ROOT_PATH}/
@@ -48,6 +45,9 @@ RUN chown -R 1001:1001 ${ROOT_PATH} ${NGINX_CONF_PATH}
 # Create symbolic links for logs
 RUN ln -sf /dev/stdout ${LOG_PATH}/nginx/spaceone-access.log && \
     ln -sf /dev/stderr ${LOG_PATH}/nginx/spaceone-error.log
+
+# Switch to non-root user for runtime
+USER 1001
 
 # Expose port and start NGINX
 EXPOSE ${PORT}
