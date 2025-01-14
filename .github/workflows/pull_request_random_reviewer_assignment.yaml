@@ -8,21 +8,23 @@ on:
         - opened
   workflow_dispatch:
 
-
 jobs:
   pick-random-reviwer:
     if: >
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/review-request')) ||
       (github.event_name == 'pull_request_target' && (github.base_ref == 'master' || github.base_ref == 'develop') && !contains(github.event.pull_request.body, '- [x] Previously reviewed in feature branch, no further review needed'))
+    
     runs-on: ubuntu-latest
+    
     env:
       GROUP1: '["WANZARGEN", "sulmoJ", "skdud4659", "piggggggggy"]'
       GROUP2: '["kkdy21", "seungyeoneeee", "Hansoo-mzc"]'
+    
     steps:
       - uses: actions/checkout@v3
       
-      - name: Pick Random Reviewer and Add Comment
+      - name: Pick Random Reviewer
         id: pick_random_reviewer 
         uses: actions/github-script@v6
         with:
@@ -35,20 +37,44 @@ jobs:
             const randomReviewer1 = group1[Math.floor(Math.random() * group1.length)];
             const randomReviewer2 = group2[Math.floor(Math.random() * group2.length)];
             console.log('randomReviewer1:', randomReviewer1, 'randomReviewer2:', randomReviewer2);
-            
-            // Add comment
-            const comment = `🎉 @${randomReviewer1} and @${randomReviewer2} have been randomly selected as the reviewers! Please review. 🙏`
+
+            core.setOutput('randomReviewer1', randomReviewer1);
+            core.setOutput('randomReviewer2', randomReviewer2);
+
+      - name: Add Comment
+        uses: actions/github-script@v6
+        with:
+          script: |
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: comment
-            })
-            
-            // Add reviewers
-            await github.rest.pulls.requestReviewers({
+              body: `🎉 @${{ steps.pick_random_reviewer.outputs.randomReviewer1 }} and @${{ steps.pick_random_reviewer.outputs.randomReviewer2 }} have been randomly selected as the reviewers! Please review. 🙏`
+            });
+      
+      - name: Add Reviewers
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const addReviewersResponse = await github.rest.pulls.requestReviewers({
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: context.payload.pull_request.number,
-              reviewers: [randomReviewer1, randomReviewer2],
+              reviewers: [`${{ steps.pick_random_reviewer.outputs.randomReviewer1 }}`, `${{ steps.pick_random_reviewer.outputs.randomReviewer2 }}`]
             });
+            if (addReviewersResponse.status === 201) {
+              core.setOutput('reviewersAdded', 'true');
+            }
+
+      - name: Add Label
+        if: steps.pick_random_reviewer.outputs.reviewersAdded == 'true'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['review: waiting']
+            });
+            
