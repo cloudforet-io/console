@@ -44,6 +44,7 @@ jobs:
       - name: Add Comment
         uses: actions/github-script@v6
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             github.rest.issues.createComment({
               issue_number: context.issue.number,
@@ -56,28 +57,26 @@ jobs:
         id: add_reviewers
         uses: actions/github-script@v6
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            try {
-              const addReviewersResponse = await github.rest.pulls.requestReviewers({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: context.payload.pull_request.number,
-                reviewers: [`${{ steps.pick_random_reviewer.outputs.randomReviewer1 }}`, `${{ steps.pick_random_reviewer.outputs.randomReviewer2 }}`]
-              });
-              console.log('addReviewersResponse:', addReviewersResponse);
+            const addReviewersResponse = await github.rest.pulls.requestReviewers({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              reviewers: [`${{ steps.pick_random_reviewer.outputs.randomReviewer1 }}`, `${{ steps.pick_random_reviewer.outputs.randomReviewer2 }}`]
+            });
+            if (addReviewersResponse.status === 201) {
               core.setOutput('reviewers_added', 'true');
-            } catch (error) {
-              console.error('addReviewersError:', error);
-              core.setOutput('reviewers_added', 'false');
             }
 
       - name: Add Label
         if: steps.add_reviewers.outputs.reviewers_added == 'true'
         uses: actions/github-script@v6
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             github.rest.issues.addLabels({
-              issue_number: context.issue.number,
+              issue_number: context.payload.pull_request.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               labels: ['review: waiting']
