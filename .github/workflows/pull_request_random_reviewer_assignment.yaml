@@ -30,8 +30,8 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const group1 = JSON.parse(process.env.GROUP1);
-            const group2 = JSON.parse(process.env.GROUP2);
+            const group1 = JSON.parse(process.env.GROUP1).filter(user => user !== context.payload.pull_request.user.login);
+            const group2 = JSON.parse(process.env.GROUP2).filter(user => user !== context.payload.pull_request.user.login);
             console.log('group1:', group1, 'group2:', group2);
             
             const randomReviewer1 = group1[Math.floor(Math.random() * group1.length)];
@@ -77,4 +77,5 @@ jobs:
               repo: context.repo.repo,
               labels: ['review: waiting']
             });
+
             
