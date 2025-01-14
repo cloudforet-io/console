@@ -135,6 +135,41 @@ export const Template3: Story = {
         },
     }),
 };
+export const Template5: Story = {
+    render: (args, { argTypes }) => ({
+        props: Object.keys(argTypes),
+        i18n: I18nConnector.i18n,
+        components: { PCollapsiblePanelV2, PLink, PToolboxTable },
+        template: `
+            <div class="h-full w-full overflow p-8">
+                <p-collapsible-panel-v2
+                    v-model="proxyIsCollapsed"
+                    @update:isCollapsed="onUpdateIsCollapsed"
+                    :line-clamp="1"
+                >
+                  <div>  
+                    <span>spanTest1
+                        <span>spanTest2</span>
+                        <span>spanTest3</span>
+                        <div class="test">
+                          <span>grrgeg</span>
+                        </div>
+                    </span>
+                  </div>
+                </p-collapsible-panel-v2>
+            </div>
+        `,
+        setup(props, { emit }) {
+            const state = reactive({
+                proxyIsCollapsed: useProxyValue('isCollapsed', props, emit),
+                contents: faker.lorem.sentence(40),
+            });
+            return {
+                ...toRefs(state),
+            };
+        },
+    }),
+};
 
 export const Template4: Story = {
     render: (args, { argTypes }) => ({

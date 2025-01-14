@@ -82,10 +82,11 @@ export default defineComponent({
             const stack: Node[] = [node];
             let remainingLine = lineClamp;
             let isFirstLine = true;
-            console.log(stack);
+            // console.log(stack);
+            let stackText = '';
             while (stack.length > 0) {
                 const currentNode = stack.pop();
-                console.log(currentNode);
+                // console.log(currentNode);
                 // eslint-disable-next-line no-continue
                 if (!currentNode) continue;
 
@@ -97,53 +98,54 @@ export default defineComponent({
                     }
                 }
 
-                const children = Array.from(currentNode.childNodes).reverse();
                 // eslint-disable-next-line no-restricted-syntax
-                for (const child of children) {
-                    if (child.nodeType === Node.TEXT_NODE) {
-                        if (!child.textContent?.trim()) {
-                            // eslint-disable-next-line no-continue
-                            continue;
-                        }
-                        // console.log(child);
+                if (currentNode.nodeType === Node.TEXT_NODE) {
+                    if (!currentNode.textContent?.trim()) {
+                        // eslint-disable-next-line no-continue
+                        continue;
+                    }
+                    // console.log(currentNode);
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    const displayStyle = window.getComputedStyle(currentNode.parentElement!).display;
+
+                    if (displayStyle === 'inline') {
                         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                        const displayStyle = window.getComputedStyle(child.parentElement!).display;
+                        const res = calculateLineCount(currentNode.parentElement!);
+                        // console.log(res);
 
-                        if (displayStyle === 'inline') {
+                        if (remainingLine <= res) {
+                            processLineClamp(currentNode.parentElement as HTMLElement, lineClamp, isFirstLine, res);
+                        }
+                        remainingLine -= res;
+                        isFirstLine = false;
+                        stackText += currentNode.textContent;
+                    } else {
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                        const span = createHiddenSpan(currentNode.textContent!);
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                        const parentPosition = currentNode.parentElement!.style.position;
                             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                            const res = calculateLineCount(child.parentElement!);
-                            console.log(res);
-
-                            if (remainingLine <= res) {
-                                processLineClamp(child.parentElement as HTMLElement, lineClamp, isFirstLine, res);
-                            }
-                            remainingLine -= res;
-                            isFirstLine = false;
-                        } else {
+                            currentNode.parentElement!.style.position = 'relative';
                             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                            const span = createHiddenSpan(child.textContent!);
-                            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                            const parentPosition = child.parentElement!.style.position;
-                            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                            child.parentElement!.style.position = 'relative';
-                            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                            child.parentElement!.appendChild(span);
+                            currentNode.parentElement!.appendChild(span);
 
                             const res = calculateLineCount(span);
-                            console.log(res);
+                            // console.log(res);
                             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                            child.parentElement!.style.position = parentPosition;
+                            currentNode.parentElement!.style.position = parentPosition;
                             span.remove();
                             if (remainingLine <= res) {
-                                processLineClamp(child.parentElement as HTMLElement, lineClamp, isFirstLine, res);
+                                processLineClamp(currentNode.parentElement as HTMLElement, lineClamp, isFirstLine, res);
                             }
                             remainingLine -= res;
                             isFirstLine = false;
-                        }
-                    } else if (child.nodeType === Node.ELEMENT_NODE) {
-                        stack.push(child);
                     }
+                } else if (currentNode.nodeType === Node.ELEMENT_NODE) {
+                    const children = Array.from(currentNode.childNodes).reverse();
+                    stack.push(...children);
                 }
+
+                console.log(stackText);
             }
         };
 
@@ -166,11 +168,6 @@ export default defineComponent({
                 if (originalDisplay !== undefined) {
                     node.style.display = originalDisplay;
                 }
-            } else if (node.parentElement) {
-                const originalDisplay = state.hiddenNodesMap.get(node.parentElement);
-                if (originalDisplay !== undefined) {
-                    node.parentElement.style.display = originalDisplay;
-                }
             }
         };
 
@@ -178,9 +175,6 @@ export default defineComponent({
             if (node instanceof HTMLElement) {
                 state.hiddenNodesMap.set(node, node.style.display);
                 node.style.display = 'none';
-            } else if (node.parentElement) {
-                state.hiddenNodesMap.set(node.parentElement, node.parentElement.style.display);
-                node.parentElement.style.display = 'none';
             }
         };
 
@@ -218,15 +212,16 @@ export default defineComponent({
 
         const resetClampStyle = () => {
             if (!state.clampedElement || !state.originalStyles) return;
-            state.clampedElement.style.display = 'unset';
-            state.clampedElement.style.webkitBoxOrient = 'unset';
-            state.clampedElement.style.webkitLineClamp = 'unset';
-            state.clampedElement.style.overflow = 'unset';
+            state.clampedElement.style.display = state.originalStyles.display || 'unset';
+            state.clampedElement.style.webkitBoxOrient = state.originalStyles.webkitBoxOrient || 'unset';
+            state.clampedElement.style.webkitLineClamp = state.originalStyles.webkitLineClamp || 'unset';
+            state.clampedElement.style.overflow = state.originalStyles.overflow || 'unset';
         };
 
         const resetNodeStylesAndVisibility = () => {
             state.isClampApplied = false;
             resetClampStyle();
+
             // eslint-disable-next-line no-restricted-syntax
             for (const node of state.hiddenNodesMap.keys()) {
                 restoreNode(node);
@@ -238,6 +233,7 @@ export default defineComponent({
             nextTick(() => {
                 if (!state.contentRef) return;
                 if (props.lineClamp < 0) return;
+                resetNodeStylesAndVisibility();
                 trunkedText(state.contentRef, props.lineClamp);
                 if (!state.proxyIsCollapsed) {
                     resetNodeStylesAndVisibility();
