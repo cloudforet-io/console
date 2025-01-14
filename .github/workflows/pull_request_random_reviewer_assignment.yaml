@@ -53,21 +53,26 @@ jobs:
             });
       
       - name: Add Reviewers
+        id: add_reviewers
         uses: actions/github-script@v6
         with:
           script: |
-            const addReviewersResponse = await github.rest.pulls.requestReviewers({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.payload.pull_request.number,
-              reviewers: [`${{ steps.pick_random_reviewer.outputs.randomReviewer1 }}`, `${{ steps.pick_random_reviewer.outputs.randomReviewer2 }}`]
-            });
-            if (addReviewersResponse.status === 200) {
-              core.setOutput('reviewersAdded', 'true');
+            try {
+              const addReviewersResponse = await github.rest.pulls.requestReviewers({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.payload.pull_request.number,
+                reviewers: [`${{ steps.pick_random_reviewer.outputs.randomReviewer1 }}`, `${{ steps.pick_random_reviewer.outputs.randomReviewer2 }}`]
+              });
+              console.log('addReviewersResponse:', addReviewersResponse);
+              core.setOutput('reviewers_added', 'true');
+            } catch (error) {
+              console.error('addReviewersError:', error);
+              core.setOutput('reviewers_added', 'false');
             }
 
       - name: Add Label
-        if: steps.pick_random_reviewer.outputs.reviewersAdded == 'true'
+        if: steps.add_reviewers.outputs.reviewers_added == 'true'
         uses: actions/github-script@v6
         with:
           script: |
