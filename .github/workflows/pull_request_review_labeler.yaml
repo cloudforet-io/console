@@ -4,7 +4,7 @@ on:
   pull_request_review:
     types: [submitted, edited, dismissed]
   pull_request_target:
-    types: [synchronize]
+    types: [synchronize, reopened]
 
 jobs:
   update-labels:
@@ -48,7 +48,7 @@ jobs:
             }
 
             // Re-add 'pending/review' label if PR is synchronized and no reviews are pending
-            if (context.eventName === 'pull_request_target' && context.payload.action === 'synchronize' && !hasPendingReview) {
+            if (context.eventName === 'pull_request_target' && !hasPendingReview) {
               await github.rest.issues.addLabels({
                 owner,
                 repo,
@@ -57,4 +57,3 @@ jobs:
               });
             }
               
-            
