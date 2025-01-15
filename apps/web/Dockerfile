@@ -24,20 +24,20 @@ FROM nginx:1.21.6-alpine AS runner
 # Environment variables
 ENV PORT 80
 ENV ROOT_PATH /var/www
-ENV LOG_PATH /var/log/nginx
+ENV LOG_PATH /var/log/cloudforet
 ENV NGINX_CONF_PATH /etc/nginx/conf.d
 
 # Root user for setup
 USER root
 
-# Create directories and set ownership/permissions
-RUN mkdir -p ${LOG_PATH} /var/cache/nginx && \
-    chown -R 1001:1001 ${LOG_PATH} /var/cache/nginx && \
+# Create directories and set permissions
+RUN mkdir -p ${LOG_PATH}/nginx /var/cache/nginx && \
+    chown -R 1001:1001 ${LOG_PATH} && \
     chmod -R 755 ${LOG_PATH} /var/cache/nginx
 
 # Redirect logs to stdout and stderr
-RUN ln -sf /dev/stdout ${LOG_PATH}/spaceone-access.log && \
-    ln -sf /dev/stderr ${LOG_PATH}/spaceone-error.log
+RUN ln -sf /dev/stdout ${LOG_PATH}/nginx/spaceone-access.log && \
+    ln -sf /dev/stderr ${LOG_PATH}/nginx/spaceone-error.log
 
 # Remove default NGINX configuration
 RUN rm /etc/nginx/conf.d/default.conf
