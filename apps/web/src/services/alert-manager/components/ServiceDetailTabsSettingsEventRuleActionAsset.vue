@@ -86,7 +86,7 @@ const state = reactive({
         match_asset: false,
         merge_asset_labels: false,
     },
-    rule: { source: 'resource', target: 'resource.resource_id' },
+    rule: { key: 'resources' },
     selectedProvider: [] as DataSelectorItem[],
     selectedAssetList: [] as DataSelectorItem[],
     provider: [] as DataSelectorItem[],
@@ -102,8 +102,7 @@ const updateStateFromEventRuleInfo = (): void => {
     if (actions.match_asset) {
         state.selectedActions.match_asset = true;
         state.rule = {
-            source: actions.match_asset?.rule?.source || '',
-            target: actions.match_asset?.rule?.target || '',
+            key: actions.match_asset?.rule?.key || 'resources',
         };
         state.selectedTempAssetRadio = actions.match_asset.create_temporary_asset ? 'CREATE' : 'DO_NOT_CREATE';
         const assetTypes = actions.match_asset?.asset_types || [];
@@ -141,7 +140,7 @@ const handleUpdateToggle = (action: string, value: boolean) => {
     state.selectedActions[action] = value;
     if (value) {
         if (action === 'match_asset') {
-            state.rule = { source: 'resource', target: 'resource.resource_id' };
+            state.rule = { key: 'resources' };
             state.selectedProvider = [];
             state.selectedAssetList = [];
             state.selectedTempAssetRadio = 'CREATE';
@@ -279,18 +278,11 @@ watch(() => storeState.isEventRuleEditMode, (isEditMode) => {
                                 >
                                     {{ $t('ALERT_MANAGER.EVENT_RULE.POLICY') }}
                                 </p-field-title>
-                                <div class="flex flex-1 gap-2 items-center">
-                                    <p-field-group class="input-box">
-                                        <p-text-input v-model="state.rule.source"
-                                                      block
-                                        />
-                                    </p-field-group>
-                                    <p-field-group class="input-box">
-                                        <p-text-input v-model="state.rule.target"
-                                                      block
-                                        />
-                                    </p-field-group>
-                                </div>
+                                <p-field-group class="input-box">
+                                    <p-text-input v-model="state.rule.key"
+                                                  block
+                                    />
+                                </p-field-group>
                             </div>
                             <div class="field-group flex items-center">
                                 <p-field-title font-weight="regular"
