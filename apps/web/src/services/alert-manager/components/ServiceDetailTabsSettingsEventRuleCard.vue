@@ -451,6 +451,7 @@ const handleDeleteEventRule = () => {
     }
 }
 
+/* custom design-system component - p-field-group */
 :deep(.p-card > header) {
     @apply bg-gray-200;
 }
