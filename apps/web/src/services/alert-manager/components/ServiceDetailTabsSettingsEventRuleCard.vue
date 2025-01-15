@@ -320,8 +320,7 @@ const handleDeleteEventRule = () => {
                                                 {{ storeState.service[action.value]?.label || action.value }}
                                             </template>
                                             <template v-else-if="action.name === 'rule'">
-                                                <span class="font-bold">{{ action.value.source }}: </span>
-                                                <span>{{ action.value.target }}</span>
+                                                <span>{{ action.value.key || '--' }}</span>
                                             </template>
                                             <template v-else-if="action.name === 'change_urgency'">
                                                 {{ action.value === EVENT_RULE_URGENCY.HIGH ? $t('ALERT_MANAGER.EVENT_RULE.HIGH') : $t('ALERT_MANAGER.EVENT_RULE.LOW') }}

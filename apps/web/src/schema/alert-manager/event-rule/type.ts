@@ -15,8 +15,7 @@ export type EventRuleConditionsType = {
 };
 
 export type EventRuleActionsMatchAssetRuleType = {
-    source?: string,
-    target?: string,
+    key?: string,
 };
 export type EventRuleActionsMatchAssetType = {
     rule?: EventRuleActionsMatchAssetRuleType;
