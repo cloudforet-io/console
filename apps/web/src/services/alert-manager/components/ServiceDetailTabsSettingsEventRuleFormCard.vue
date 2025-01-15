@@ -109,8 +109,14 @@ const state = reactive({
                 const matchAssetValid = state.actions.match_asset.asset_types.length > 0 && !isEmpty(state.actions.match_asset.rule);
                 if (!matchAssetValid) return false;
             }
+            if (state.actions.merge_asset_labels?.period !== undefined) {
+                return state.actions.merge_asset_labels?.period !== '';
+            }
             if (state.actions.change_title !== undefined) {
                 return state.actions.change_title !== '';
+            }
+            if (state.actions.change_escalation_policy !== undefined) {
+                return state.actions.change_escalation_policy !== '';
             }
         }
 

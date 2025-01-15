@@ -187,7 +187,7 @@
 			"SIDE_BAR_TITLE": "규칙 설정 목록",
 			"STOP_PROCESSING": "작업 중지",
 			"TEMP_ASSET": "임시 자산",
-			"TEMP_ASSET_DESC": "",
+			"TEMP_ASSET_DESC": "이 설정을 활성화하면 임시 에셋이 생성됩니다.",
 			"THEN_STOP_PROCESSING": "이후 작업 실행하지 않기",
 			"TITLE": "이벤트 규칙",
 			"TRUE": "True",

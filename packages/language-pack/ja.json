@@ -187,7 +187,7 @@
 			"SIDE_BAR_TITLE": "ルール設定の一覧",
 			"STOP_PROCESSING": "作業を停止する",
 			"TEMP_ASSET": "一時的なアセット",
-			"TEMP_ASSET_DESC": "",
+			"TEMP_ASSET_DESC": "この設定を有効にすると、一時的なアセットが作成されます.",
 			"THEN_STOP_PROCESSING": "その後、作業は停止する",
 			"TITLE": "イベントルール",
 			"TRUE": "True",

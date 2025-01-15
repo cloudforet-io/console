@@ -14,8 +14,12 @@ export type EventRuleConditionsType = {
     operator: EventRuleConditionsOperatorType;
 };
 
+export type EventRuleActionsMatchAssetRuleType = {
+    source?: string,
+    target?: string,
+};
 export type EventRuleActionsMatchAssetType = {
-    rule?: Record<string, string | number | boolean>;
+    rule?: EventRuleActionsMatchAssetRuleType;
     asset_types?: string[];
     create_temporary_asset?: boolean;
 };
@@ -36,7 +40,7 @@ export type EventRuleActionsType = {
     change_escalation_policy?: string;
     add_additional_info?: object;
     change_status?: AlertStatusType;
-    set_labels: string[];
+    set_labels?: string[];
 };
 
 export type EventRuleOptions = {
