@@ -114,22 +114,27 @@ const getScheduleInfo = (schedule: ServiceChannelScheduleInfoType): ScheduleInfo
         styleType: '', value: '' as TranslateResult, days: [] as TranslateResult[], time: '',
     };
 
+    const formatTime = (time: number | undefined, defaultTime: number): string => `${String(time ?? defaultTime).padStart(2, '0')}:00`;
+
     Object.entries(schedule).forEach(([day, s]) => {
-        if (day === 'SCHEDULE_TYPE') return;
+        if (day === 'SCHEDULE_TYPE' || day === 'TIMEZONE') return;
+
         const scheduleDay = s as ServiceChannelScheduleDayType;
-        if (scheduleDay) {
-            const startTime = `${String(scheduleDay?.start || 0).padStart(2, '0')}:00`;
-            const endTime = `${String(scheduleDay?.end || 0).padStart(2, '0')}:00`;
-            if (schedule.SCHEDULE_TYPE === 'WEEK_DAY') {
-                scheduleInfo.days = Object.values(state.dayMapping).slice(0, 5).map((d) => d as TranslateResult);
-            } else if (schedule.SCHEDULE_TYPE === 'ALL_DAY') {
-                scheduleInfo.days = Object.values(state.dayMapping).map((d) => d as TranslateResult);
-            } else if (scheduleDay?.is_scheduled) {
-                scheduleInfo.days.push(state.dayMapping[day]);
-            }
+        if (!scheduleDay) return;
+
+        const startTime = formatTime(scheduleDay.start, 0);
+        const endTime = formatTime(scheduleDay.end, 24);
+        if (schedule.SCHEDULE_TYPE === 'WEEK_DAY') {
+            scheduleInfo.days = Object.values(state.dayMapping).slice(0, 5).map((d) => d as TranslateResult);
             if (scheduleDay?.is_scheduled) {
                 scheduleInfo.time = `${startTime} ~ ${endTime}`;
             }
+        } else if (schedule.SCHEDULE_TYPE === 'ALL_DAY') {
+            scheduleInfo.days = Object.values(state.dayMapping).map((d) => d as TranslateResult);
+            scheduleInfo.time = `${startTime} ~ ${endTime}`;
+        } else if (scheduleDay?.is_scheduled) {
+            scheduleInfo.days.push(state.dayMapping[day]);
+            scheduleInfo.time = `${startTime} ~ ${endTime}`;
         }
     });
 

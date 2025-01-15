@@ -5,8 +5,11 @@ import { computed, reactive } from 'vue';
 import {
     PButton, PRadio, PSelectDropdown, PTextInput, PIconButton, PDivider, screens,
 } from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
+import { ALERT_SEVERITY } from '@/schema/alert-manager/alert/constants';
 import { EVENT_RULE_CONDITIONS_POLICY } from '@/schema/alert-manager/event-rule/constant';
+import type { EventRuleConditionsType } from '@/schema/alert-manager/event-rule/type';
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -19,7 +22,7 @@ import type {
 
 interface Props {
     conditionsPolicy?: string;
-    conditions?: any[]; // HACK: set type
+    conditions?: EventRuleConditionsType[];
     projectId?: string;
 }
 const props = withDefaults(defineProps<Props>(), {
@@ -46,24 +49,6 @@ const state = reactive({
             label: i18n.t('ALERT_MANAGER.EVENT_RULE.ANY'),
         },
     ])),
-    operators: computed<EventRuleConditionOperatorsType[]>(() => ([
-        {
-            name: 'contain',
-            label: i18n.t('ALERT_MANAGER.EVENT_RULE.CONTAINS'),
-        },
-        {
-            name: 'not_contain',
-            label: i18n.t('ALERT_MANAGER.EVENT_RULE.DOES_NOT_CONTAIN'),
-        },
-        {
-            name: 'eq',
-            label: i18n.t('ALERT_MANAGER.EVENT_RULE.EQUALS'),
-        },
-        {
-            name: 'not',
-            label: i18n.t('ALERT_MANAGER.EVENT_RULE.DOES_NOT_EQUAL'),
-        },
-    ])),
     proxyConditionsPolicy: useProxyValue('conditionsPolicy', props, emit),
     proxyConditions: useProxyValue('conditions', props, emit),
     conditionKeys: computed<EventRuleConditionKeyType[]>(() => ([
@@ -71,19 +56,70 @@ const state = reactive({
         { name: 'description', label: i18n.t('ALERT_MANAGER.EVENT_RULE.LABEL_DESC') },
         { name: 'rule', label: i18n.t('ALERT_MANAGER.EVENT_RULE.LABEL_RULE') },
         { name: 'severity', label: i18n.t('ALERT_MANAGER.EVENT_RULE.LABEL_SEVERITY') },
-        { name: 'account', label: i18n.t('ALERT_MANAGER.EVENT_RULE.LABEL_ACCOUNT') },
         { name: 'additional_info', label: i18n.t('ALERT_MANAGER.EVENT_RULE.LABEL_ADDITIONAL_INFO') },
         { name: 'labels', label: i18n.t('ALERT_MANAGER.EVENT_RULE.LABEL_LABELS') },
-        { name: 'period', label: i18n.t('ALERT_MANAGER.EVENT_RULE.LABEL_PERIOD') },
     ])),
+    severityDropdownList: computed<SelectDropdownMenuItem[]>(() => [
+        { name: ALERT_SEVERITY.CRITICAL, label: i18n.t('ALERT_MANAGER.ALERTS.CRITICAL') },
+        { name: ALERT_SEVERITY.ERROR, label: i18n.t('ALERT_MANAGER.ALERTS.ERROR') },
+        { name: ALERT_SEVERITY.WARNING, label: i18n.t('ALERT_MANAGER.ALERTS.WARNING') },
+        { name: ALERT_SEVERITY.INFO, label: i18n.t('ALERT_MANAGER.ALERTS.INFO') },
+    ]),
 });
 
-/* event */
+const getDropdownMenu = (key: string): EventRuleConditionOperatorsType[] => {
+    const _labels = {
+        contain: i18n.t('ALERT_MANAGER.EVENT_RULE.CONTAINS'),
+        notContain: i18n.t('ALERT_MANAGER.EVENT_RULE.DOES_NOT_CONTAIN'),
+        equals: i18n.t('ALERT_MANAGER.EVENT_RULE.EQUALS'),
+        notEquals: i18n.t('ALERT_MANAGER.EVENT_RULE.DOES_NOT_EQUAL'),
+        atLeast: i18n.t('ALERT_MANAGER.EVENT_RULE.AT_LEAST'),
+    };
+
+    const defaultMenu: EventRuleConditionOperatorsType[] = [
+        { name: 'contain', label: _labels.contain },
+        { name: 'not_contain', label: _labels.notContain },
+        { name: 'eq', label: _labels.equals },
+        { name: 'not', label: _labels.notEquals },
+    ];
+
+    if (key === 'labels') {
+        return [
+            ...defaultMenu,
+            { name: 'size_gte', label: _labels.atLeast },
+        ];
+    }
+
+    if (key === 'severity') {
+        return [
+            { name: 'eq', label: _labels.equals },
+            { name: 'not', label: _labels.notEquals },
+        ];
+    }
+
+    return defaultMenu;
+};
+const handleChangeKey = (key: string, subKey: string) => {
+    const conditionIdx = state.proxyConditions.findIndex((i) => i.key === key && i.subKey === subKey);
+    if (conditionIdx === -1) return;
+
+    if (key === 'severity') {
+        state.proxyConditions[conditionIdx].operator = 'eq';
+        state.proxyConditions[conditionIdx].value = ALERT_SEVERITY.CRITICAL;
+        return;
+    }
+
+    if (key.includes('additional_info')) {
+        state.proxyConditions[conditionIdx].subKey = '';
+    }
+    state.proxyConditions[conditionIdx].value = '';
+};
 const handleClickAddButton = () => {
     state.proxyConditions.push({
         key: 'title',
         value: '',
         operator: 'contain',
+        subKey: '',
     });
 };
 const handleClickDelete = (idx) => {
@@ -119,21 +155,44 @@ const handleClickDelete = (idx) => {
                  :key="`condition-${idx}`"
                  class="flex gap-2"
             >
-                <div class="left-part">
+                <div class="left-part"
+                     :class="{'additional-info': condition.key.includes('additional_info')}"
+                >
                     <p-select-dropdown :selected.sync="condition.key"
                                        class="input"
                                        :menu="state.conditionKeys"
                                        use-fixed-menu-style
                                        is-fixed-width
+                                       @update:selected="handleChangeKey(condition.key, condition.subKey)"
+                    />
+                    <p-text-input v-if="condition.key.includes('additional_info')"
+                                  v-model="condition.subKey"
+                                  class="input"
                     />
                     <div class="left-part">
                         <p-select-dropdown class="input"
-                                           :menu="state.operators"
+                                           :menu="getDropdownMenu(condition.key)"
                                            :selected.sync="condition.operator"
                                            use-fixed-menu-style
                                            is-fixed-width
                         />
-                        <p-text-input v-model="condition.value"
+                        <div v-if="condition.key === 'labels' && condition.operator === 'size_gte'"
+                             class="input"
+                        >
+                            <p-text-input v-model="condition.value"
+                                          type="number"
+                                          block
+                            />
+                        </div>
+                        <p-select-dropdown v-else-if="condition.key === 'severity'"
+                                           class="input"
+                                           :menu="state.severityDropdownList"
+                                           :selected.sync="condition.value"
+                                           use-fixed-menu-style
+                                           is-fixed-width
+                        />
+                        <p-text-input v-else
+                                      v-model="condition.value"
                                       class="input"
                         />
                     </div>
@@ -169,6 +228,11 @@ const handleClickDelete = (idx) => {
             width: inherit;
             flex-basis: 0;
             flex-grow: 1;
+        }
+        &.additional-info {
+            .input {
+                min-width: calc((100% - 1rem) / 4);
+            }
         }
     }
     &.is-mobile {

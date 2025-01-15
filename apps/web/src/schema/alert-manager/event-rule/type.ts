@@ -6,18 +6,26 @@ export type EventRuleUrgencyType = typeof EVENT_RULE_URGENCY[keyof typeof EVENT_
 export type EventRuleScopeType = typeof EVENT_RULE_SCOPE[keyof typeof EVENT_RULE_SCOPE];
 
 export type EventRuleConditionsKeyType = 'title' | 'description' | 'rule' | 'severity' | 'account' | 'additional_info' | 'labels' | 'period';
-export type EventRuleConditionsOperatorType = 'eq' | 'contain' | 'not' | 'not_contain';
+export type EventRuleConditionsOperatorType = 'eq' | 'contain' | 'not' | 'not_contain' | 'size_gte';
 
 export type EventRuleConditionsType = {
-    key: EventRuleConditionsKeyType;
-    value: string;
+    key: EventRuleConditionsKeyType|string;
+    value: any;
     operator: EventRuleConditionsOperatorType;
 };
 
+export type EventRuleActionsMatchAssetRuleType = {
+    source?: string,
+    target?: string,
+};
 export type EventRuleActionsMatchAssetType = {
-    rule?: Record<string, string | number | boolean>;
+    rule?: EventRuleActionsMatchAssetRuleType;
     asset_types?: string[];
     create_temporary_asset?: boolean;
+};
+
+export type EventRuleActionsMergeAssetLabelsType = {
+    period?: number
 };
 
 export type EventRuleActionsType = {
@@ -25,13 +33,14 @@ export type EventRuleActionsType = {
     change_service?: string;
     // asset settings
     match_asset?: EventRuleActionsMatchAssetType;
+    merge_asset_labels?: EventRuleActionsMergeAssetLabelsType;
     // alert settings
     change_title?: string;
     change_urgency?: EventRuleUrgencyType;
     change_escalation_policy?: string;
     add_additional_info?: object;
     change_status?: AlertStatusType;
-    set_labels: string[];
+    set_labels?: string[];
 };
 
 export type EventRuleOptions = {
