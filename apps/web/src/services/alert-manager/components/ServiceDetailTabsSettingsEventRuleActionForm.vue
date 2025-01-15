@@ -13,7 +13,6 @@ import ServiceDetailTabsSettingsEventRuleActionService
     from '@/services/alert-manager/components/ServiceDetailTabsSettingsEventRuleActionService.vue';
 
 const emit = defineEmits<{(e: 'change-form', form: EventRuleActionsType): void}>();
-
 const state = reactive({
     serviceSettings: {
         change_service: undefined,

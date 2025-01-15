@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useWindowSize } from '@vueuse/core';
 import { computed, reactive, watch } from 'vue';
 
 import {
@@ -6,7 +7,7 @@ import {
     PFieldTitle,
     PLink,
     PSelectDropdown,
-    PToggleButton,
+    PToggleButton, screens,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
@@ -30,6 +31,8 @@ const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 
+const { width } = useWindowSize();
+
 const emit = defineEmits<{(e: 'change-form', form: EventRuleActionsType): void}>();
 
 const storeState = reactive({
@@ -42,6 +45,7 @@ const storeState = reactive({
     }))),
 });
 const state = reactive({
+    isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
     actions: computed<EventRuleActionsToggleType[]>(() => ([
         {
             label: i18n.t('ALERT_MANAGER.EVENT_RULE.CHANGE_SERVICE'),
@@ -79,7 +83,9 @@ watch(() => storeState.isEventRuleEditMode, (isEditMode) => {
 </script>
 
 <template>
-    <div class="service-detail-tabs-settings-event-rule-action-service-form">
+    <div class="service-detail-tabs-settings-event-rule-action-service-form"
+         :class="{ 'is-mobile': state.isMobileSize }"
+    >
         <p-field-title :label="$t('ALERT_MANAGER.EVENT_RULE.SERVICE_SETTINGS')"
                        size="lg"
                        required
@@ -90,7 +96,7 @@ watch(() => storeState.isEventRuleEditMode, (isEditMode) => {
                            :key="`action-${actionIdx}`"
                            class="field-group flex flex-col"
             >
-                <div class="flex items-start w-full">
+                <div class="contents-wrapper">
                     <div class="toggle-wrapper flex items-center gap-2 mr-2">
                         <p-toggle-button :value="!!state.selectedServiceId"
                                          @change-toggle="handleUpdateToggle(action.name, $event)"
@@ -141,6 +147,9 @@ watch(() => storeState.isEventRuleEditMode, (isEditMode) => {
     }
     .field-group {
         margin-bottom: 0;
+        .contents-wrapper {
+            @apply flex items-start w-full;
+        }
     }
     .toggle-wrapper {
         min-width: 12.5rem;
@@ -148,6 +157,28 @@ watch(() => storeState.isEventRuleEditMode, (isEditMode) => {
     }
     .input-wrapper {
         width: calc(100% - 12.5rem);
+    }
+    &.is-mobile {
+        .field-title {
+            @apply flex;
+            padding-top: 0.375rem;
+            padding-bottom: 0.375rem;
+        }
+        .field-group {
+            @apply flex flex-col;
+            margin-bottom: 0;
+            .contents-wrapper {
+                @apply flex flex-col;
+            }
+        }
+        .toggle-wrapper {
+            min-width: 12.5rem;
+            height: 2rem;
+        }
+        .input-wrapper {
+            @apply flex flex-col;
+            width: 100%;
+        }
     }
 }
 </style>

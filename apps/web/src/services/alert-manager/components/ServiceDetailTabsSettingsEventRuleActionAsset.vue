@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useWindowSize } from '@vueuse/core';
 import { computed, reactive, watch } from 'vue';
 
 import {
@@ -9,7 +10,7 @@ import {
     PRadioGroup,
     PBadge,
     PSelectDropdown, PTextInput,
-    PToggleButton,
+    PToggleButton, screens,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
@@ -36,6 +37,8 @@ const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 
+const { width } = useWindowSize();
+
 const emit = defineEmits<{(e: 'change-form', form: EventRuleActionsType): void}>();
 
 const storeState = reactive({
@@ -48,6 +51,7 @@ const storeState = reactive({
     }))),
 });
 const state = reactive({
+    isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
     actions: computed<EventRuleActionsToggleType[]>(() => ([
         {
             label: i18n.t('ALERT_MANAGER.EVENT_RULE.MATCH_ASSET'),
@@ -134,7 +138,9 @@ watch(() => storeState.isEventRuleEditMode, (isEditMode) => {
 </script>
 
 <template>
-    <div class="service-detail-tabs-settings-event-rule-action-asset-form">
+    <div class="service-detail-tabs-settings-event-rule-action-asset-form"
+         :class="{ 'is-mobile': state.isMobileSize }"
+    >
         <p-field-title :label="$t('ALERT_MANAGER.EVENT_RULE.ASSET_SETTINGS')"
                        size="lg"
                        required
@@ -146,9 +152,7 @@ watch(() => storeState.isEventRuleEditMode, (isEditMode) => {
                            class="field-group flex flex-col"
             >
                 <div class="flex flex-col w-full">
-                    <div class="toggle-wrapper flex items-center gap-2 mr-2"
-                         :class="{'match-asset': action.name === 'match_asset'}"
-                    >
+                    <div class="toggle-wrapper flex items-center gap-2 mr-2">
                         <p-toggle-button :value="state.selectedActions[action.name]"
                                          @update:value="handleUpdateToggle(action.name, $event)"
                         />
@@ -157,7 +161,9 @@ watch(() => storeState.isEventRuleEditMode, (isEditMode) => {
                         </p-field-title>
                     </div>
                     <div v-if="state.selectedActions[action.name]">
-                        <div v-if="action.name === 'match_asset'">
+                        <div v-if="action.name === 'match_asset'"
+                             class="match-asset-wrapper pr-3 pl-3"
+                        >
                             <div class="field-group flex items-center mt-3">
                                 <p-field-title font-weight="regular"
                                                class="field-title toggle-wrapper"
@@ -247,7 +253,7 @@ watch(() => storeState.isEventRuleEditMode, (isEditMode) => {
                             </div>
                         </div>
                         <div v-if="action.name === 'merge_asset_labels'"
-                             class="field-group flex items-center pt-3"
+                             class="field-group flex items-center pt-3 pr-3 pl-3"
                         >
                             <p-field-title font-weight="regular"
                                            class="field-title toggle-wrapper"
@@ -291,6 +297,13 @@ watch(() => storeState.isEventRuleEditMode, (isEditMode) => {
         padding-top: 0.375rem;
         padding-bottom: 0.375rem;
     }
+    .match-asset-wrapper {
+        .field-group {
+            & + .field-group {
+                @apply border-gray-150;
+            }
+        }
+    }
     .field-group {
         margin-bottom: 0;
         & + .field-group {
@@ -318,6 +331,31 @@ watch(() => storeState.isEventRuleEditMode, (isEditMode) => {
     .toggle-wrapper {
         min-width: 12.5rem;
         height: 2rem;
+    }
+    &.is-mobile {
+        .field-title {
+            @apply flex;
+            padding-top: 0.375rem;
+            padding-bottom: 0.375rem;
+        }
+        .field-group {
+            @apply flex flex-col;
+            margin-bottom: 0;
+            & + .field-group {
+                @apply mt-3 pt-3 border-t border-gray-200;
+            }
+            .asset-dropdown {
+                @apply relative;
+                .dropdown-button-wrapper {
+                    @apply absolute;
+                    width: 100%;
+                }
+            }
+        }
+        .toggle-wrapper {
+            min-width: 12.5rem;
+            height: 2rem;
+        }
     }
 }
 </style>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useWindowSize } from '@vueuse/core';
 import { computed, reactive, watch } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -11,7 +12,7 @@ import {
     PRadioGroup,
     PSelectDropdown,
     PTextInput,
-    PToggleButton,
+    PToggleButton, screens,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import type { InputItem } from '@cloudforet/mirinae/types/controls/input/text-input/type';
@@ -44,6 +45,8 @@ import type {
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 
+const { width } = useWindowSize();
+
 const emit = defineEmits<{(e: 'change-form', form: EventRuleActionsType): void}>();
 
 const storeState = reactive({
@@ -52,6 +55,7 @@ const storeState = reactive({
     eventRuleInfo: computed<EventRuleModel>(() => serviceDetailPageState.eventRuleInfo),
 });
 const state = reactive({
+    isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
     actions: computed<EventRuleActionsToggleType[]>(() => ([
         {
             label: i18n.t('ALERT_MANAGER.EVENT_RULE.CHANGE_TITLE'),
@@ -240,7 +244,9 @@ watch(() => storeState.service.service_id, (id) => {
 </script>
 
 <template>
-    <div class="service-detail-tabs-settings-event-rule-action-alert-form">
+    <div class="service-detail-tabs-settings-event-rule-action-alert-form"
+         :class="{ 'is-mobile': state.isMobileSize }"
+    >
         <p-field-title :label="$t('ALERT_MANAGER.EVENT_RULE.ALERT_SETTINGS')"
                        size="lg"
                        required
@@ -251,7 +257,7 @@ watch(() => storeState.service.service_id, (id) => {
                            :key="`action-${actionIdx}`"
                            class="field-group flex flex-col"
             >
-                <div class="flex items-start w-full">
+                <div class="contents-wrapper">
                     <div class="toggle-wrapper flex items-center gap-2 mr-2">
                         <p-toggle-button :value="state.selectedActions[action.name]"
                                          @update:value="handleUpdateToggle(action.name, $event)"
@@ -268,7 +274,7 @@ watch(() => storeState.service.service_id, (id) => {
                                       block
                         />
                         <div v-if="action.name === 'change_status'"
-                             class="field-title flex gap-2"
+                             class="field-title change-status flex gap-2"
                         >
                             <p-select-dropdown :menu="state.statusDropdownList"
                                                use-fixed-menu-style
@@ -322,7 +328,7 @@ watch(() => storeState.service.service_id, (id) => {
                         </span>
                     </div>
                 </div>
-                <div class="pl-3">
+                <div class="additional-info-wrapper pl-3 pr-3">
                     <p-field-group v-for="(item, adIdx) in state.additionalActions"
                                    :key="`additional-action-${adIdx}`"
                                    class="field-group flex items-start"
@@ -348,12 +354,14 @@ watch(() => storeState.service.service_id, (id) => {
                                 >
                                     <p-field-group class="input-box">
                                         <p-text-input :value="tag.key"
+                                                      :style="state.isMobileSize ? 'width: 6rem' : ''"
                                                       block
                                                       @update:value="handleInputTagKey(tagIdx, ...arguments)"
                                         />
                                     </p-field-group>
                                     <p-field-group class="input-box">
                                         <p-text-input :value="tag.value"
+                                                      :style="state.isMobileSize ? 'width: 6rem' : ''"
                                                       block
                                                       @update:value="handleInputTagValue(tagIdx, ...arguments)"
                                         />
@@ -381,6 +389,13 @@ watch(() => storeState.service.service_id, (id) => {
 
 <style scoped lang="postcss">
 .service-detail-tabs-settings-event-rule-action-alert-form {
+    .additional-info-wrapper {
+        .field-group {
+            & + .field-group {
+                @apply border-gray-150;
+            }
+        }
+    }
     .field-group {
         margin-bottom: 0;
         & + .field-group {
@@ -389,6 +404,9 @@ watch(() => storeState.service.service_id, (id) => {
         .input-box {
             @apply inline-block flex-1;
             margin-bottom: 0;
+        }
+        .contents-wrapper {
+            @apply flex items-start w-full;
         }
     }
     .field-title {
@@ -403,6 +421,34 @@ watch(() => storeState.service.service_id, (id) => {
         width: calc(100% - 12.5rem);
         .status-dropdown {
             min-width: 10.375rem;
+        }
+    }
+    &.is-mobile {
+        .field-group {
+            @apply flex flex-col;
+            margin-bottom: 0;
+            & + .field-group {
+                @apply mt-3 pt-3 border-t border-gray-200;
+            }
+            .contents-wrapper {
+                @apply flex flex-col;
+            }
+        }
+        .field-title {
+            @apply flex;
+            padding-top: 0.375rem;
+            padding-bottom: 0.375rem;
+            &.change-status {
+                @apply flex flex-col;
+            }
+        }
+        .toggle-wrapper {
+            min-width: 12.5rem;
+            height: 2rem;
+        }
+        .input-wrapper {
+            @apply flex flex-col;
+            width: 100%;
         }
     }
 }
