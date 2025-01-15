@@ -51,16 +51,15 @@ const handleUpdateSelected = (items: DataSelectorItem[]) => {
     emit('update:selected', selected.value);
 };
 
-watch(() => props.selected, () => {
-    selected.value = props.selected ? props.selected : [];
+watch([() => props.menu, () => props.handler, () => props.selected], () => {
+    if (!props.selected || props.selected?.length === 0) {
+        selected.value = [];
+    } else {
+        selected.value = props.selected ?? [];
+    }
     emit('update:selected', selected.value);
     initiateMenu();
 }, { immediate: true });
-watch([() => props.menu, () => props.handler], () => {
-    selected.value = [];
-    emit('update:selected', selected.value);
-    initiateMenu();
-});
 </script>
 
 <template>

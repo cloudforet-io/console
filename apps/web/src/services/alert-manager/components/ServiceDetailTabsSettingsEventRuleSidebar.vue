@@ -297,7 +297,7 @@ watch(() => state.isMobileSize, (isMobileSize) => {
                                  :class="{ 'is-selected': state.selectedTreeId === item.id }"
                                  @click.stop="handleClickItem(item)"
                             >
-                                <div class="flex items-center gap-1 pl-8">
+                                <div class="flex items-center gap-1 pl-8 w-full">
                                     <p-badge style-type="gray500"
                                              badge-type="solid-outline"
                                     >
