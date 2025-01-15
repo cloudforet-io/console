@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import { useWindowSize } from '@vueuse/core';
 import {
     computed, onUnmounted, reactive, watch,
 } from 'vue';
 
-import { PButton, PDataLoader } from '@cloudforet/mirinae';
+import { PButton, PDataLoader, screens } from '@cloudforet/mirinae';
 
 import { EVENT_RULE_SCOPE } from '@/schema/alert-manager/event-rule/constant';
 import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
@@ -20,6 +21,7 @@ import { useServiceDetailPageStore } from '@/services/alert-manager/stores/servi
 
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
+const { width } = useWindowSize();
 
 const storeState = reactive({
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
@@ -30,6 +32,7 @@ const storeState = reactive({
     eventRuleInfo: computed<EventRuleModel>(() => serviceDetailPageState.eventRuleInfo),
 });
 const state = reactive({
+    isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
     loading: true,
     selectedScope: EVENT_RULE_SCOPE.GLOBAL,
     selectedWebhook: '',
@@ -58,13 +61,14 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="service-detail-tabs-settings-event-rule pt-6 pb-10">
+    <div class="service-detail-tabs-settings-event-rule pt-6 pb-10 relative">
         <p-data-loader :loading="state.loading"
                        :data="!storeState.showEventRuleFormCard ? storeState.items : true"
                        class="loader"
         >
             <div class="content-wrapper flex gap-6">
-                <service-detail-tabs-settings-event-rule-sidebar :hide-sidebar.sync="state.hideSidebar"
+                <service-detail-tabs-settings-event-rule-sidebar v-if="!state.isMobileSize"
+                                                                 :hide-sidebar.sync="state.hideSidebar"
                                                                  :items="storeState.items"
                 />
                 <service-detail-tabs-settings-event-rule-form-card v-if="storeState.showEventRuleFormCard"
@@ -93,6 +97,10 @@ onUnmounted(() => {
                 </div>
             </template>
         </p-data-loader>
+        <service-detail-tabs-settings-event-rule-sidebar v-if="state.isMobileSize"
+                                                         :hide-sidebar.sync="state.hideSidebar"
+                                                         :items="storeState.items"
+        />
         <service-detail-tabs-settings-event-rule-scope-modal v-if="storeState.modalVisible"
                                                              :visible="storeState.modalVisible"
                                                              :scope.sync="state.selectedScope"

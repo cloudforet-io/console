@@ -1,8 +1,9 @@
 <script lang="ts" setup>
+import { useWindowSize } from '@vueuse/core';
 import { computed, reactive } from 'vue';
 
 import {
-    PButton, PRadio, PSelectDropdown, PTextInput, PIconButton, PDivider,
+    PButton, PRadio, PSelectDropdown, PTextInput, PIconButton, PDivider, screens,
 } from '@cloudforet/mirinae';
 
 import { EVENT_RULE_CONDITIONS_POLICY } from '@/schema/alert-manager/event-rule/constant';
@@ -31,7 +32,10 @@ const emit = defineEmits<{(e: 'update:conditions-policy'): void;
     (e: 'update:conditions'): void;
 }>();
 
+const { width } = useWindowSize();
+
 const state = reactive({
+    isMobileSize: computed(() => width.value < screens.mobile.max),
     conditionsPolicies: computed<EventRuleConditionPolicyButtonType[]>(() => ([
         {
             name: EVENT_RULE_CONDITIONS_POLICY.ALL,
@@ -90,8 +94,10 @@ const handleClickDelete = (idx) => {
 </script>
 
 <template>
-    <section class="service-detail-tabs-settings-event-rule-condition-form">
-        <div class="flex items-center text-label-md pt-3 pb-6">
+    <section class="service-detail-tabs-settings-event-rule-condition-form"
+             :class="{ 'is-mobile': state.isMobileSize }"
+    >
+        <div class="policy-wrapper">
             <p-radio v-for="policy in state.conditionsPolicies"
                      :key="policy.name"
                      v-model="state.proxyConditionsPolicy"
@@ -105,7 +111,7 @@ const handleClickDelete = (idx) => {
                     </span>
                 </p>
             </p-radio>
-            <span class="ml-5 text-gray-500">{{ $t('ALERT_MANAGER.EVENT_RULE.OF_THE_FOLLOWING_ARE_MET') }}</span>
+            <span class="m  l-5 text-gray-500">{{ $t('ALERT_MANAGER.EVENT_RULE.OF_THE_FOLLOWING_ARE_MET') }}</span>
         </div>
         <p-divider v-if="state.proxyConditions.length > 0" />
         <div class="flex flex-col gap-2 pt-6 pb-3">
@@ -151,6 +157,9 @@ const handleClickDelete = (idx) => {
 
 <style lang="postcss" scoped>
 .service-detail-tabs-settings-event-rule-condition-form {
+    .policy-wrapper {
+        @apply flex items-center text-label-md pt-3 pb-6;
+    }
     .left-part {
         @apply flex w-full justify-between gap-2;
         flex-grow: 1;
@@ -160,6 +169,14 @@ const handleClickDelete = (idx) => {
             width: inherit;
             flex-basis: 0;
             flex-grow: 1;
+        }
+    }
+    &.is-mobile {
+        .policy-wrapper {
+            @apply flex flex-col gap-2 items-start;
+        }
+        .left-part {
+            @apply flex flex-col;
         }
     }
 }

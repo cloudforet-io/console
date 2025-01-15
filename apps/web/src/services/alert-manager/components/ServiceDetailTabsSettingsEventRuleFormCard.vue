@@ -1,11 +1,23 @@
 <script setup lang="ts">
+import { useWindowSize } from '@vueuse/core';
 import { computed, reactive, watch } from 'vue';
 
 import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PCard, PFieldTitle, PFieldGroup, PTextInput, PDivider, PLazyImg, PI, PSelectButton, PIconButton, PCheckbox, PButton,
+    PCard,
+    PFieldTitle,
+    PFieldGroup,
+    PTextInput,
+    PDivider,
+    PLazyImg,
+    PI,
+    PSelectButton,
+    PIconButton,
+    PCheckbox,
+    PButton,
+    screens,
 } from '@cloudforet/mirinae';
 
 import type { EventRuleCreateParameters } from '@/schema/alert-manager/event-rule/api-verbs/create';
@@ -48,6 +60,7 @@ const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
+const { width } = useWindowSize();
 
 const storeState = reactive({
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
@@ -57,6 +70,7 @@ const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
 });
 const state = reactive({
+    isMobileSize: computed(() => width.value < screens.mobile.max),
     loading: false,
     conditionPolicy: computed<EventRuleConditionPolicyButtonType[]>(() => [
         { name: EVENT_RULE_CONDITIONS_POLICY.ALWAYS, label: i18n.t('ALERT_MANAGER.EVENT_RULE.ALWAYS') },
@@ -237,6 +251,7 @@ watch(() => storeState.isEventRuleEditMode, (isEventRuleEditMode) => {
     <p-card style-type="indigo400"
             :header="$t('ALERT_MANAGER.EVENT_RULE.CREATE_FORM_TITLE')"
             class="service-detail-tabs-settings-event-rule-form-card"
+            :class="{ 'is-mobile': state.isMobileSize }"
     >
         <template #header>
             <div class="flex items-center justify-between">
@@ -266,7 +281,7 @@ watch(() => storeState.isEventRuleEditMode, (isEventRuleEditMode) => {
                             <template #default="{ invalid }">
                                 <p-text-input :value="name"
                                               :invalid="invalid"
-                                              block
+                                              :block="!state.isMobileSize"
                                               @update:value="setForm('name', $event)"
                                 />
                             </template>
@@ -280,7 +295,7 @@ watch(() => storeState.isEventRuleEditMode, (isEventRuleEditMode) => {
                                        required
                         />
                         <p-field-group class="input-form">
-                            <div class="flex items-center gap-1 text-label-md">
+                            <div class="input-form-contents">
                                 <span class="text-label-lg text-gray-500">{{ $t('ALERT_MANAGER.EVENT_RULE.WEBHOOK_SCOPE') }}: </span>
                                 <p v-if="props.selectedScope === EVENT_RULE_SCOPE.GLOBAL"
                                    class="scope-wrapper"
@@ -394,6 +409,9 @@ watch(() => storeState.isEventRuleEditMode, (isEventRuleEditMode) => {
                 .input-form {
                     @apply flex-1;
                     margin-bottom: 0;
+                    .input-form-contents {
+                        @apply flex items-center gap-1 text-label-md;
+                    }
                     .scope-wrapper {
                         @apply flex items-center gap-1;
                     }
@@ -405,6 +423,34 @@ watch(() => storeState.isEventRuleEditMode, (isEventRuleEditMode) => {
         }
         .border-section {
             @apply border-4 border-gray-100 rounded-xl;
+        }
+    }
+    &.is-mobile {
+        @apply flex flex-col;
+        .content-wrapper {
+            padding: 1.25rem 1.125rem 1.75rem;
+            .form-wrapper {
+                @apply flex flex-col gap-3;
+                .field-title {
+                    width: 15rem;
+                }
+                .input-form-wrapper {
+                    @apply flex flex-col items-start;
+                    .input-form {
+                        @apply flex-1;
+                        margin-bottom: 0;
+                        .scope-wrapper {
+                            @apply flex items-center gap-1;
+                        }
+                    }
+                }
+                .divider {
+                    margin-top: 0.25rem;
+                }
+            }
+            .border-section {
+                @apply border-4 border-gray-100 rounded-xl;
+            }
         }
     }
 }

@@ -26,8 +26,8 @@ import { useServiceDetailPageStore } from '@/services/alert-manager/stores/servi
 import type { TreeNode, TreeDisplayMap } from '@/services/project/tree/type';
 
 interface Props {
-    hideSidebar: boolean;
-    items: EventRuleModel[];
+  hideSidebar: boolean;
+  items: EventRuleModel[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -231,13 +231,26 @@ watch([() => props.items.length, () => storeState.showEventRuleFormCard], async 
     if (itemLength === 0 || showEventRuleFormCard || route.query?.eventRuleId) return;
     await initSidebar();
 }, { immediate: true });
+watch(() => state.isMobileSize, (isMobileSize) => {
+    if (!isMobileSize) state.proxyHideSidebar = false;
+}, { immediate: true });
 </script>
 
 <template>
     <div class="service-detail-tabs-settings-event-rule-side-bar"
-         :class="{ 'hidden': state.proxyHideSidebar }"
+         :class="{ 'hidden': state.proxyHideSidebar && state.isMobileSize, 'mobile-opened': !state.proxyHideSidebar && state.isMobileSize }"
     >
         <p-pane-layout class="sidebar p-4">
+            <div v-if="state.isMobileSize"
+                 class="resizer"
+                 @click="clickResizer"
+            >
+                <p-i width="1.5rem"
+                     height="1.5rem"
+                     :name="state.proxyHideSidebar ? 'ic_chevron-right' : 'ic_chevron-left'"
+                     color="inherit"
+                />
+            </div>
             <div v-if="!state.proxyHideSidebar"
                  class="sidebar-inner flex flex-col gap-4"
             >
@@ -288,16 +301,6 @@ watch([() => props.items.length, () => storeState.showEventRuleFormCard], async 
                 </span>
             </div>
         </p-pane-layout>
-        <div v-if="state.isMobileSize"
-             class="resizer"
-             @click="clickResizer"
-        >
-            <p-i width="1.5rem"
-                 height="1.5rem"
-                 :name="state.proxyHideSidebar ? 'ic_chevron-right' : 'ic_chevron-left'"
-                 color="inherit"
-            />
-        </div>
     </div>
 </template>
 
@@ -309,31 +312,45 @@ watch([() => props.items.length, () => storeState.showEventRuleFormCard], async 
         width: 15rem;
         min-height: 23.125rem;
         padding: 0;
-        z-index: 1;
+        z-index: 2;
         transition: width 0.3s ease;
         .sidebar-inner {
             width: 15rem;
             padding: 1rem;
             transition: width 0.3s ease;
         }
-    }
-    .resizer {
-        @apply flex items-center justify-center bg-white border border-gray-300 cursor-pointer;
-        margin-left: -0.25rem;
-        margin-top: 0.75rem;
-        width: 1.5rem;
-        height: 1.5rem;
-        border-top-right-radius: 50%;
-        border-bottom-right-radius: 50%;
-        border-left: none;
-        &:hover {
-            @apply bg-blue-200;
+        .resizer {
+            @apply flex items-center justify-center bg-white border border-gray-300 cursor-pointer;
+            margin-left: -0.25rem;
+            margin-top: 0.75rem;
+            width: 1.5rem;
+            height: 1.5rem;
+            border-top-right-radius: 50%;
+            border-bottom-right-radius: 50%;
+            border-left: none;
+            z-index: 1;
+            &:hover {
+                @apply bg-blue-200;
+            }
         }
     }
     &.hidden {
+        position: absolute;
+        top: 23.5px;
+        left: -1.5rem;
+        z-index: 1000;
         .sidebar {
             @apply border-r-0;
-            width: 0.063rem;
+            width: 0;
+        }
+    }
+    &.mobile-opened {
+        position: absolute;
+        top: 23.5px;
+        left: -1.5rem;
+        z-index: 1000;
+        .resizer {
+            margin-left: 14.9rem;
         }
     }
 }
