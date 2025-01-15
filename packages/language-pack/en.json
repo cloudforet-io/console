@@ -177,6 +177,7 @@
 			"OPTIONAL": "optional",
 			"OR": "(Or)",
 			"POLICY": "Match Policy",
+			"PROVIDER": "Provider",
 			"RULES_ON_THIS_PROJECT": "Rules on This Service",
 			"SAVE": "Save",
 			"SELECT": "Select",
