@@ -160,6 +160,7 @@
 			"LABEL_SCOPE": "選択されたイベントルールのスコープ",
 			"LABEL_SEVERITY": "緊急度",
 			"LABEL_TITLE": "タイトル",
+			"LESS_THAN_EQUAL": "",
 			"LOW": "低い",
 			"MATCH_ASSET": "アセットをマッピングする",
 			"MAX": "最大",

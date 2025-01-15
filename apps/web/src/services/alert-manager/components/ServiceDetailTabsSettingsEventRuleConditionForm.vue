@@ -74,6 +74,7 @@ const getDropdownMenu = (key: string): EventRuleConditionOperatorsType[] => {
         equals: i18n.t('ALERT_MANAGER.EVENT_RULE.EQUALS'),
         notEquals: i18n.t('ALERT_MANAGER.EVENT_RULE.DOES_NOT_EQUAL'),
         atLeast: i18n.t('ALERT_MANAGER.EVENT_RULE.AT_LEAST'),
+        lessThan: i18n.t('ALERT_MANAGER.EVENT_RULE.LESS_THAN_EQUAL'),
     };
 
     const defaultMenu: EventRuleConditionOperatorsType[] = [
@@ -87,6 +88,7 @@ const getDropdownMenu = (key: string): EventRuleConditionOperatorsType[] => {
         return [
             ...defaultMenu,
             { name: 'size_gte', label: _labels.atLeast },
+            { name: 'size_lte', label: _labels.lessThan },
         ];
     }
 
@@ -176,11 +178,13 @@ const handleClickDelete = (idx) => {
                                            use-fixed-menu-style
                                            is-fixed-width
                         />
-                        <div v-if="condition.key === 'labels' && condition.operator === 'size_gte'"
+                        <div v-if="condition.key === 'labels' && (condition.operator === 'size_gte' || condition.operator === 'size_lte')"
                              class="input"
                         >
                             <p-text-input v-model="condition.value"
                                           type="number"
+                                          :min="0"
+                                          :max="100"
                                           block
                             />
                         </div>
