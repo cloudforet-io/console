@@ -6,7 +6,7 @@ export type EventRuleUrgencyType = typeof EVENT_RULE_URGENCY[keyof typeof EVENT_
 export type EventRuleScopeType = typeof EVENT_RULE_SCOPE[keyof typeof EVENT_RULE_SCOPE];
 
 export type EventRuleConditionsKeyType = 'title' | 'description' | 'rule' | 'severity' | 'account' | 'additional_info' | 'labels' | 'period';
-export type EventRuleConditionsOperatorType = 'eq' | 'contain' | 'not' | 'not_contain' | 'size_gte';
+export type EventRuleConditionsOperatorType = 'eq' | 'contain' | 'not' | 'not_contain' | 'size_gte' | 'size_lte';
 
 export type EventRuleConditionsType = {
     key: EventRuleConditionsKeyType|string;

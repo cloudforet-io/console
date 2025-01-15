@@ -160,6 +160,7 @@
 			"LABEL_SCOPE": "Selected Event Rule Scope",
 			"LABEL_SEVERITY": "Severity",
 			"LABEL_TITLE": "Title",
+			"LESS_THAN_EQUAL": "less than or equals",
 			"LOW": "Low",
 			"MATCH_ASSET": "Match Asset",
 			"MAX": "Max",

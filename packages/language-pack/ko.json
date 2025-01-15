@@ -160,6 +160,7 @@
 			"LABEL_SCOPE": "선택된 이벤트 규칙 범위",
 			"LABEL_SEVERITY": "심각도",
 			"LABEL_TITLE": "제목",
+			"LESS_THAN_EQUAL": "",
 			"LOW": "낮음",
 			"MATCH_ASSET": "자산 매핑",
 			"MAX": "최대",
