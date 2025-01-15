@@ -373,7 +373,9 @@ watch(() => route.query, async (query) => {
                 <span>{{ getCreatedByNames(value) }}</span>
             </template>
             <template #col-duration-format="{ item }">
-                <span>{{ calculateTime(item?.created_at, storeState.timezone) }}</span>
+                <span>{{ item.status === ALERT_STATUS.RESOLVED
+                    ? calculateTime(item?.resolved_at, storeState.timezone)
+                    : calculateTime(item?.created_at, storeState.timezone) }}</span>
             </template>
         </p-toolbox-table>
         <custom-field-modal :visible="state.visibleCustomFieldModal"
