@@ -31,8 +31,11 @@ const storeState = reactive({
 const state = reactive({
     alertStatus: 'TRIGGERED',
     alertUrgency: 'HIGH',
-    duration: computed<string>(() => calculateTime(storeState.alertInfo?.created_at, storeState.timezone)),
-
+    duration: computed<string>(() => (
+        storeState.alertInfo.status === ALERT_STATUS.RESOLVED
+            ? calculateTime(storeState.alertInfo?.resolved_at, storeState.timezone)
+            : calculateTime(storeState.alertInfo?.created_at, storeState.timezone)
+    )),
     alertStateList: computed<SelectDropdownMenuItem[]>(() => ([
         { name: ALERT_STATUS.TRIGGERED, label: i18n.t('ALERT_MANAGER.ALERTS.TRIGGERED') },
         { name: ALERT_STATUS.ACKNOWLEDGED, label: i18n.t('ALERT_MANAGER.ALERTS.ACKNOWLEDGED') },

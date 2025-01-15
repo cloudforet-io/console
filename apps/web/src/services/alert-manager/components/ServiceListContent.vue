@@ -145,8 +145,10 @@ const handleClickEscalationPolicy = (id: string, escalationPolicyId: string) => 
                     </div>
                     <div class="contents">
                         <div class="inner">
-                            <div v-if="props.type === 'alert'">
-                                <div class="flex justify-between">
+                            <div v-if="props.type === 'alert'"
+                                 class="my-2"
+                            >
+                                <div class="flex justify-between px-2">
                                     <div class="alerts triggered text-red-500">
                                         <p class="title">
                                             {{ $t('ALERT_MANAGER.ALERTS.TRIGGERED') }}
@@ -161,7 +163,7 @@ const handleClickEscalationPolicy = (id: string, escalationPolicyId: string) => 
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="alerts acknowledged text-gray-600">
+                                    <div class="alerts acknowledged text-gray-700">
                                         <p class="title">
                                             {{ $t('ALERT_MANAGER.ALERTS.ACKNOWLEDGED') }}
                                         </p>
@@ -174,7 +176,7 @@ const handleClickEscalationPolicy = (id: string, escalationPolicyId: string) => 
                                 </div>
                             </div>
                             <div v-else
-                                 class="flex pt-3 pb-3"
+                                 class="flex pt-1 pb-2"
                             >
                                 <div class="flex items-center gap-2 text-green-600">
                                     <p-i name="ic_check_healthy"
@@ -220,7 +222,7 @@ const handleClickEscalationPolicy = (id: string, escalationPolicyId: string) => 
                                 </div>
                                 <div class="flex flex-col gap-1 items-end">
                                     <p class="title">
-                                        {{ $t('ALERT_MANAGER.ESCALATION_POLICY.TITLE', { cnt: 11 }) }}
+                                        {{ $t('ALERT_MANAGER.SERVICE.DEFAULT_ESCALATION_POLICY', { cnt: 11 }) }}
                                     </p>
                                     <p-text-button @click.stop="handleClickEscalationPolicy(item.service_id, item.escalation_policy_id)">
                                         <p class="truncate text-blue-700 pr-1 pl-1">
@@ -311,7 +313,7 @@ const handleClickEscalationPolicy = (id: string, escalationPolicyId: string) => 
                     &.acknowledged {
                         padding-left: 1rem;
                         &::before {
-                            @apply absolute bg-gray-300 h-11;
+                            @apply absolute bg-gray-400 h-11;
                             content: '';
                             width: 0.063rem;
                             top: calc(50% - 1.375rem);
