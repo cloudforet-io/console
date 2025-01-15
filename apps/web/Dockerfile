@@ -30,10 +30,11 @@ ENV NGINX_CONF_PATH /etc/nginx/conf.d
 # Root user for setup
 USER root
 
-# Perform all root-level operations in one RUN command
+# Perform all root-level operations
 RUN mkdir -p ${LOG_PATH}/nginx && \
+    mkdir -p /var/cache/nginx && \
     rm /etc/nginx/conf.d/default.conf && \
-    chown -R 1001:1001 ${LOG_PATH}
+    chown -R 1001:1001 ${LOG_PATH} /var/cache/nginx
 
 # Copy NGINX configuration and application files
 COPY apps/web/pkg/proxy.conf ${NGINX_CONF_PATH}/proxy.conf
