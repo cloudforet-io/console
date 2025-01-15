@@ -253,6 +253,7 @@
 			"CREATE_SERVICE_DESC": "모니터링, 장애 대응 관리, 수동으로 얼럿을 생성할 수 있도록 기술 스택의 특정 구성 요소를 명확히 식별할 수 있는 서비스 이름을 설정하세요.",
 			"CREATE_SERVICE_TITLE": "새로운 서비스 생성",
 			"CREATE_WEBHOOK_TITLE": "신규 웹훅 생성",
+			"DEFAULT_ESCALATION_POLICY": "",
 			"DETAILS": "상세 정보",
 			"EMPTY_MEMBER": "서비스 멤버가 없습니다.",
 			"GO_BACK": "뒤로가기",
