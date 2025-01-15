@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
 import { computed, reactive, watch } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import { cloneDeep } from 'lodash';
 
@@ -45,11 +46,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { gray } from '@/styles/colors';
 
-import { getActionSettingTypeI18n } from '@/services/alert-manager/composables/event-rule-action-data';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
 import type {
-    EscalationPolicyRadioType,
     EventRuleActionsToggleType,
     EventRuleActionsUrgencyRadioType,
     EventRuleSettingsType,
@@ -80,7 +79,16 @@ const storeState = reactive({
 });
 const state = reactive({
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
-    actionSettingType: getActionSettingTypeI18n(),
+    actionSettingType: computed<Record<string, TranslateResult>>(() => {
+        const additionalTypes = {
+            asset: i18n.t('ALERT_MANAGER.EVENT_RULE.ASSET_SETTINGS'),
+            alert: i18n.t('ALERT_MANAGER.EVENT_RULE.ALERT_SETTINGS'),
+        };
+        return {
+            service: i18n.t('ALERT_MANAGER.EVENT_RULE.SERVICE_SETTINGS'),
+            ...!formState.selectedActions.change_service ? additionalTypes : {},
+        };
+    }),
     actions: computed<Record<EventRuleSettingsType, EventRuleActionsToggleType[]>>(() => ({
         service: [
             {
@@ -92,6 +100,10 @@ const state = reactive({
             {
                 label: i18n.t('ALERT_MANAGER.EVENT_RULE.MATCH_ASSET'),
                 name: 'match_asset',
+            },
+            {
+                label: i18n.t('ALERT_MANAGER.EVENT_RULE.MERGE_ASSET_LABELS'),
+                name: 'merge_asset_labels',
             },
         ],
         alert: [
@@ -123,9 +135,11 @@ const state = reactive({
             name: 'add_additional_info',
         },
     ])),
-    statusRadioMenuList: computed<EscalationPolicyRadioType[]>(() => [
-        { label: i18n.t('ALERT_MANAGER.ALERTS.IGNORED'), name: ALERT_STATUS.IGNORED },
+    statusDropdownList: computed<SelectDropdownMenuItem[]>(() => [
         { label: i18n.t('ALERT_MANAGER.ALERTS.TRIGGERED'), name: ALERT_STATUS.TRIGGERED },
+        { label: i18n.t('ALERT_MANAGER.ALERTS.ACKNOWLEDGED'), name: ALERT_STATUS.ACKNOWLEDGED },
+        { label: i18n.t('ALERT_MANAGER.ALERTS.RESOLVED'), name: ALERT_STATUS.RESOLVED },
+        { label: i18n.t('ALERT_MANAGER.ALERTS.IGNORED'), name: ALERT_STATUS.IGNORED },
     ]),
     urgencyRadioMenuList: computed<EventRuleActionsUrgencyRadioType[]>(() => [
         { label: i18n.t('ALERT_MANAGER.EVENT_RULE.HIGH'), name: EVENT_RULE_URGENCY.HIGH },
@@ -141,7 +155,7 @@ const formState = reactive({
     selectedActions: {} as EventRuleActionsType,
     selectedServiceId: storeState.service.service_id,
     selectedAssetList: [] as SelectDropdownMenuItem[],
-    selectedStatusRadio: ALERT_STATUS.IGNORED as AlertStatusType,
+    selectedStatus: ALERT_STATUS.TRIGGERED as AlertStatusType,
     selectedUrgencyRadio: EVENT_RULE_URGENCY.HIGH as EventRuleUrgencyType,
     selectedTempAssetRadio: 'CREATE',
     selectedEscalationPolicyId: '',
@@ -155,7 +169,7 @@ const initializeState = (): void => {
     formState.selectedServiceId = storeState.service.service_id;
     formState.selectedAssetList = [];
     formState.rule = { key: '', value: '' };
-    formState.selectedStatusRadio = ALERT_STATUS.IGNORED;
+    formState.selectedStatus = ALERT_STATUS.IGNORED;
     formState.selectedUrgencyRadio = EVENT_RULE_URGENCY.HIGH;
     formState.selectedTempAssetRadio = 'CREATE';
     formState.selectedEscalationPolicyId = '';
@@ -193,7 +207,7 @@ const updateStateFromEventRuleInfo = (): void => {
     if (actions.change_title) formState.selectedActions.change_title = actions.change_title;
     if (actions.change_status) {
         formState.selectedActions.change_status = actions.change_status;
-        formState.selectedStatusRadio = actions.change_status;
+        formState.selectedStatus = actions.change_status;
     }
     if (actions.change_urgency) {
         formState.selectedActions.change_urgency = actions.change_urgency;
@@ -227,6 +241,7 @@ const handleUpdateValue = (action: string, value: boolean) => {
                 rule: {},
                 create_temporary_asset: true,
             },
+            merge_asset_labels: 10,
         };
 
         _actions[action] = actionDefaults[action] ?? '';
@@ -395,19 +410,13 @@ watch(() => storeState.service.service_id, (id) => {
                             <div v-if="action.name === 'change_status'"
                                  class="field-title change-status flex gap-2"
                             >
-                                <p-radio-group>
-                                    <p-radio v-for="(item, statusIdx) in state.statusRadioMenuList"
-                                             :key="`change-status-${statusIdx}`"
-                                             v-model="formState.selectedStatusRadio"
-                                             :value="item.name"
-                                             @change="handleSelectAction(action.name, $event)"
-                                    >
-                                        <span class="radio-item">
-                                            {{ item.label }}
-                                        </span>
-                                    </p-radio>
-                                </p-radio-group>
-                                <p v-if="formState.selectedStatusRadio === ALERT_STATUS.IGNORED"
+                                <p-select-dropdown :menu="state.statusDropdownList"
+                                                   use-fixed-menu-style
+                                                   class="status-dropdown"
+                                                   :selected.sync="formState.selectedStatus"
+                                                   @update:selected="handleSelectAction(action.name, $event)"
+                                />
+                                <p v-if="formState.selectedStatus === ALERT_STATUS.IGNORED"
                                    class="flex items-center gap-1 text-gray-500 text-label-sm"
                                 >
                                     <p-i name="ic_warning-filled"
@@ -434,85 +443,129 @@ watch(() => storeState.service.service_id, (id) => {
                             </p-radio-group>
                         </div>
                     </div>
-                    <div v-if="action.name === 'match_asset' && formState.selectedActions[action.name]">
-                        <div class="field-group flex items-center mt-3">
-                            <p-field-title font-weight="regular"
-                                           class="field-title toggle-wrapper"
-                            >
-                                {{ $t('ALERT_MANAGER.EVENT_RULE.ASSET_TYPE') }}
-                            </p-field-title>
-                            <p-select-dropdown :menu="storeState.cloudServiceTypeDropdownList"
-                                               use-fixed-menu-style
-                                               block
-                                               class="asset-dropdown"
-                                               multi-selectable
-                                               show-delete-all-button
-                                               :selected.sync="formState.selectedAssetList"
-                            >
-                                <template #dropdown-button>
-                                    <div v-if="formState.selectedAssetList.length > 0"
-                                         class="dropdown-button-wrapper flex gap-1"
-                                    >
-                                        <p class="flex-1 truncate">
-                                            <span v-for="(asset, assetIdx) in formState.selectedAssetList"
-                                                  :key="`selected-asset-${assetIdx}`"
-                                            >
-                                                {{ asset.label }}
-                                                <span v-if="assetIdx !== formState.selectedAssetList.length - 1">, </span>
-                                            </span>
-                                        </p>
-                                        <p-badge v-if="formState.selectedAssetList.length > 1"
-                                                 style-type="blue200"
-                                                 badge-type="subtle"
+                    <div v-if="formState.selectedActions[action.name]">
+                        <div v-if="action.name === 'match_asset'">
+                            <div class="field-group flex items-center mt-3">
+                                <p-field-title font-weight="regular"
+                                               class="field-title toggle-wrapper"
+                                >
+                                    {{ $t('ALERT_MANAGER.EVENT_RULE.ASSET_TYPE') }}
+                                </p-field-title>
+                                <p-select-dropdown :menu="storeState.cloudServiceTypeDropdownList"
+                                                   use-fixed-menu-style
+                                                   block
+                                                   class="asset-dropdown"
+                                                   multi-selectable
+                                                   show-delete-all-button
+                                                   :selected.sync="formState.selectedAssetList"
+                                >
+                                    <template #dropdown-button>
+                                        <div v-if="formState.selectedAssetList.length > 0"
+                                             class="dropdown-button-wrapper flex gap-1"
                                         >
-                                            + {{ formState.selectedAssetList.length - 1 }}
-                                        </p-badge>
-                                    </div>
-                                    <span v-else
-                                          class="text-gray-600"
-                                    >{{ $t('ALERT_MANAGER.EVENT_RULE.SELECT') }}</span>
-                                </template>
-                            </p-select-dropdown>
-                        </div>
-                        <div class="field-group flex items-center">
-                            <p-field-title font-weight="regular"
-                                           class="field-title toggle-wrapper"
-                            >
-                                {{ $t('ALERT_MANAGER.EVENT_RULE.POLICY') }}
-                            </p-field-title>
-                            <div class="flex flex-1 gap-2 items-center">
-                                <p-field-group class="input-box">
-                                    <p-text-input v-model="formState.rule.key"
-                                                  :style="state.isMobileSize ? 'width: 6rem' : ''"
-                                                  block
-                                    />
-                                </p-field-group>
-                                <p-field-group class="input-box">
-                                    <p-text-input v-model="formState.rule.value"
-                                                  :style="state.isMobileSize ? 'width: 6rem' : ''"
-                                                  block
-                                    />
-                                </p-field-group>
+                                            <p class="flex-1 truncate">
+                                                <span v-for="(asset, assetIdx) in formState.selectedAssetList"
+                                                      :key="`selected-asset-${assetIdx}`"
+                                                >
+                                                    {{ asset.label }}
+                                                    <span v-if="assetIdx !== formState.selectedAssetList.length - 1">, </span>
+                                                </span>
+                                            </p>
+                                            <p-badge v-if="formState.selectedAssetList.length > 1"
+                                                     style-type="blue200"
+                                                     badge-type="subtle"
+                                            >
+                                                + {{ formState.selectedAssetList.length - 1 }}
+                                            </p-badge>
+                                        </div>
+                                        <span v-else
+                                              class="text-gray-600"
+                                        >{{ $t('ALERT_MANAGER.EVENT_RULE.SELECT') }}</span>
+                                    </template>
+                                </p-select-dropdown>
+                            </div>
+                            <div class="field-group flex items-center">
+                                <p-field-title font-weight="regular"
+                                               class="field-title toggle-wrapper"
+                                >
+                                    {{ $t('ALERT_MANAGER.EVENT_RULE.POLICY') }}
+                                </p-field-title>
+                                <div class="flex flex-1 gap-2 items-center">
+                                    <p-field-group class="input-box">
+                                        <p-text-input v-model="formState.rule.key"
+                                                      placeholder="resource"
+                                                      block
+                                        />
+                                    </p-field-group>
+                                    <p-field-group class="input-box">
+                                        <p-text-input v-model="formState.rule.value"
+                                                      placeholder="resource.resource_id"
+                                                      block
+                                        />
+                                    </p-field-group>
+                                </div>
+                            </div>
+                            <div class="field-group flex items-center">
+                                <p-field-title font-weight="regular"
+                                               class="field-title toggle-wrapper"
+                                >
+                                    {{ $t('ALERT_MANAGER.EVENT_RULE.TEMP_ASSET') }}
+                                    <span class="text-gray-500">({{ $t('ALERT_MANAGER.EVENT_RULE.OPTIONAL') }})</span>
+                                </p-field-title>
+                                <div class="flex-1 flex items-center">
+                                    <p-radio-group class="flex-1">
+                                        <p-radio v-for="(item, statusIdx) in state.tempAssetRadioMenuList"
+                                                 :key="`change-temp-asset-${statusIdx}`"
+                                                 v-model="formState.selectedTempAssetRadio"
+                                                 :value="item.name"
+                                        >
+                                            <span class="radio-item">
+                                                {{ item.label }}
+                                            </span>
+                                        </p-radio>
+                                    </p-radio-group>
+                                    <p class="flex-1 flex items-center gap-1 text-gray-500 text-label-sm">
+                                        <p-i name="ic_warning-filled"
+                                             width="1rem"
+                                             height="1rem"
+                                             :color="gray[500]"
+                                        />
+                                        <span>{{ $t('ALERT_MANAGER.EVENT_RULE.TEMP_ASSET_DESC') }}</span>
+                                    </p>
+                                </div>
                             </div>
                         </div>
-                        <div class="field-group flex items-center">
+                        <div v-if="action.name === 'merge_asset_labels'"
+                             class="field-group flex items-center pt-3"
+                        >
                             <p-field-title font-weight="regular"
                                            class="field-title toggle-wrapper"
                             >
-                                {{ $t('ALERT_MANAGER.EVENT_RULE.TEMP_ASSET') }}
-                                <span class="text-gray-500">({{ $t('ALERT_MANAGER.EVENT_RULE.OPTIONAL') }})</span>
+                                {{ $t('ALERT_MANAGER.EVENT_RULE.LABEL_PERIOD') }}
                             </p-field-title>
-                            <p-radio-group>
-                                <p-radio v-for="(item, statusIdx) in state.tempAssetRadioMenuList"
-                                         :key="`change-temp-asset-${statusIdx}`"
-                                         v-model="formState.selectedTempAssetRadio"
-                                         :value="item.name"
-                                >
-                                    <span class="radio-item">
-                                        {{ item.label }}
-                                    </span>
-                                </p-radio>
-                            </p-radio-group>
+                            <div class="flex items-center flex-1 gap-3">
+                                <p-field-group class="input-box">
+                                    <p-text-input v-if="action.name === 'merge_asset_labels'"
+                                                  type="number"
+                                                  block
+                                                  class="merge-asset-labels"
+                                                  :value="formState.selectedActions[action.name]"
+                                                  @update:value="handleSelectAction(action.name, $event)"
+                                    >
+                                        <template #right-edge>
+                                            <span class="unit">{{ $t('ALERT_MANAGER.EVENT_RULE.MINUTE') }}</span>
+                                        </template>
+                                    </p-text-input>
+                                </p-field-group>
+                                <p class="inline-flex items-center gap-1 px-1 text-label-sm text-gray-500">
+                                    <p-i name="ic_info-circle"
+                                         width="1rem"
+                                         height="1rem"
+                                         :color="gray[500]"
+                                    />
+                                    <span>{{ $t('ALERT_MANAGER.EVENT_RULE.MIN') }} 0 ~ {{ $t('ALERT_MANAGER.EVENT_RULE.MAX') }} 1440</span>
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </p-field-group>
@@ -633,6 +686,9 @@ watch(() => storeState.service.service_id, (id) => {
         }
         .input-wrapper {
             width: calc(100% - 12.5rem);
+            .status-dropdown {
+                min-width: 10.375rem;
+            }
         }
         .asset-dropdown {
             @apply relative;
@@ -644,6 +700,13 @@ watch(() => storeState.service.service_id, (id) => {
         .input-box {
             @apply inline-block flex-1;
             margin-bottom: 0;
+            .merge-asset-labels {
+                .unit {
+                    @apply text-label-md text-gray-400;
+                    margin-top: -0.125rem;
+                    line-height: 1rem;
+                }
+            }
         }
     }
     .is-mobile {
