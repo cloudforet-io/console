@@ -24,28 +24,29 @@ FROM nginx:1.21.6-alpine AS runner
 # Environment variables
 ENV PORT 80
 ENV ROOT_PATH /var/www
-ENV LOG_PATH /var/log/cloudforet
+ENV LOG_PATH /var/log/nginx
 ENV NGINX_CONF_PATH /etc/nginx/conf.d
 
 # Root user for setup
 USER root
 
 # Perform all root-level operations
-RUN mkdir -p ${LOG_PATH}/nginx && \
+RUN mkdir -p ${LOG_PATH} && \
     mkdir -p /var/cache/nginx && \
     rm /etc/nginx/conf.d/default.conf && \
     chown -R 1001:1001 ${LOG_PATH} /var/cache/nginx
 
 # Copy NGINX configuration and application files
 COPY apps/web/pkg/proxy.conf ${NGINX_CONF_PATH}/proxy.conf
+COPY apps/web/pkg/nginx.conf /etc/nginx/nginx.conf
 COPY --from=installer /app/apps/web/dist/. ${ROOT_PATH}/
 
 # Set ownership of application files and configuration
 RUN chown -R 1001:1001 ${ROOT_PATH} ${NGINX_CONF_PATH}
 
 # Create symbolic links for logs
-RUN ln -sf /dev/stdout ${LOG_PATH}/nginx/spaceone-access.log && \
-    ln -sf /dev/stderr ${LOG_PATH}/nginx/spaceone-error.log
+RUN ln -sf /dev/stdout ${LOG_PATH}/spaceone-access.log && \
+    ln -sf /dev/stderr ${LOG_PATH}/spaceone-error.log
 
 # Switch to non-root user for runtime
 USER 1001
