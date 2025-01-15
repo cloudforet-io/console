@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    ref, onMounted, toRef, watch,
+    ref, toRef, watch,
 } from 'vue';
 
 import { debounce } from 'lodash';
@@ -16,6 +16,7 @@ const props = defineProps<{
     handler?: MenuAttachHandler<DataSelectorItem>;
     showSelectMarker?: boolean;
     multiSelectable?: boolean;
+    selected?: DataSelectorItem[];
 }>();
 const emit = defineEmits<{(e: 'update:selected', value: DataSelectorItem[]): void;
     (e: 'update:search-text', value: string): void;
@@ -50,17 +51,15 @@ const handleUpdateSelected = (items: DataSelectorItem[]) => {
     emit('update:selected', selected.value);
 };
 
-onMounted(() => {
-    selected.value = [];
+watch([() => props.menu, () => props.handler, () => props.selected], () => {
+    if (!props.selected || props.selected?.length === 0) {
+        selected.value = [];
+    } else {
+        selected.value = props.selected ?? [];
+    }
     emit('update:selected', selected.value);
     initiateMenu();
-});
-
-watch([() => props.menu, () => props.handler], () => {
-    selected.value = [];
-    emit('update:selected', selected.value);
-    initiateMenu();
-});
+}, { immediate: true });
 </script>
 
 <template>

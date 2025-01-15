@@ -11,8 +11,8 @@ import {
     PBadge,
     PSelectDropdown, PTextInput,
     PToggleButton, screens,
+    PButton,
 } from '@cloudforet/mirinae';
-import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
 import type {
@@ -22,7 +22,10 @@ import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
+import DataSelector from '@/common/components/select/DataSelector.vue';
+import type { DataSelectorItem } from '@/common/components/select/type';
 
 import { gray } from '@/styles/colors';
 
@@ -43,12 +46,9 @@ const emit = defineEmits<{(e: 'change-form', form: EventRuleActionsType): void}>
 
 const storeState = reactive({
     cloudServiceType: computed<CloudServiceTypeReferenceMap>(() => allReferenceGetters.cloudServiceType),
+    provider: computed<ProviderReferenceMap>(() => allReferenceGetters.provider),
     isEventRuleEditMode: computed<boolean>(() => serviceDetailPageState.isEventRuleEditMode),
     eventRuleInfo: computed<EventRuleModel>(() => serviceDetailPageState.eventRuleInfo),
-    cloudServiceTypeDropdownList: computed<SelectDropdownMenuItem[]>(() => Object.values(allReferenceGetters.cloudServiceType).map((i) => ({
-        name: i.key,
-        label: i.label,
-    }))),
 });
 const state = reactive({
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
@@ -66,12 +66,31 @@ const state = reactive({
         { label: i18n.t('ALERT_MANAGER.CREATE'), name: 'CREATE' },
         { label: i18n.t('ALERT_MANAGER.EVENT_RULE.DO_NOT_CREATE'), name: 'DO_NOT_CREATE' },
     ]),
+    providerDropdownList: computed<DataSelectorItem[]|undefined>(() => Object.values(allReferenceGetters.provider).map((i) => ({
+        name: i.key,
+        label: i.label,
+        imageUrl: i.icon,
+        data: i.data,
+    }))),
+    cloudServiceTypeDropdownList: computed<DataSelectorItem[]|undefined>(() => {
+        if (!state.selectedProvider.length) return [];
+        const _types = Object.values(allReferenceGetters.cloudServiceType).map((i) => ({
+            name: i.key,
+            label: i.label,
+            data: i.data,
+        }));
+        return state.selectedProvider[0]?.name ? _types.filter((i) => i.data.provider === state.selectedProvider[0].name) : _types;
+    }),
+    visibleAssetDropdownMenu: false,
     selectedActions: {
         match_asset: false,
         merge_asset_labels: false,
     },
     rule: { source: 'resource', target: 'resource.resource_id' },
-    selectedAssetList: [] as SelectDropdownMenuItem[],
+    selectedProvider: [] as DataSelectorItem[],
+    selectedAssetList: [] as DataSelectorItem[],
+    provider: [] as DataSelectorItem[],
+    assetList: [] as DataSelectorItem[],
     selectedTempAssetRadio: 'CREATE',
     period: 10,
 });
@@ -86,22 +105,44 @@ const updateStateFromEventRuleInfo = (): void => {
             source: actions.match_asset?.rule?.source || '',
             target: actions.match_asset?.rule?.target || '',
         };
-        state.selectedAssetList = (actions.match_asset?.asset_types || []).map((type) => ({
+        state.selectedTempAssetRadio = actions.match_asset.create_temporary_asset ? 'CREATE' : 'DO_NOT_CREATE';
+        const assetTypes = actions.match_asset?.asset_types || [];
+        const provider = storeState.cloudServiceType[assetTypes[0]]?.data?.provider;
+        state.selectedProvider = [
+            {
+                name: storeState.provider[provider]?.key,
+                label: storeState.provider[provider]?.label,
+            },
+        ];
+        state.selectedAssetList = assetTypes.map((type) => ({
             name: type,
             label: storeState.cloudServiceType[type]?.label || '',
         }));
-        state.selectedTempAssetRadio = actions.match_asset.create_temporary_asset ? 'CREATE' : 'DO_NOT_CREATE';
     }
     if (actions.merge_asset_labels) {
         state.selectedActions.merge_asset_labels = true;
         state.period = Number(actions.merge_asset_labels.period);
     }
 };
+
+const handleSelectProvider = (provider: DataSelectorItem[]) => {
+    if (!provider.length) return;
+    state.selectedProvider = provider;
+    state.selectedAssetList = [];
+};
+const handleSelectAsset = (asset: DataSelectorItem[]) => {
+    if (!asset.length) return;
+    state.selectedAssetList = asset;
+};
+const handleClickDoneButton = () => {
+    state.visibleAssetDropdownMenu = false;
+};
 const handleUpdateToggle = (action: string, value: boolean) => {
     state.selectedActions[action] = value;
     if (value) {
         if (action === 'match_asset') {
             state.rule = { source: 'resource', target: 'resource.resource_id' };
+            state.selectedProvider = [];
             state.selectedAssetList = [];
             state.selectedTempAssetRadio = 'CREATE';
         }
@@ -170,14 +211,43 @@ watch(() => storeState.isEventRuleEditMode, (isEditMode) => {
                                 >
                                     {{ $t('ALERT_MANAGER.EVENT_RULE.ASSET_TYPE') }}
                                 </p-field-title>
-                                <p-select-dropdown :menu="storeState.cloudServiceTypeDropdownList"
+                                <p-select-dropdown :menu="state.providerDropdownList"
+                                                   :visible-menu.sync="state.visibleAssetDropdownMenu"
                                                    use-fixed-menu-style
                                                    block
                                                    class="asset-dropdown"
                                                    multi-selectable
                                                    show-delete-all-button
-                                                   :selected.sync="state.selectedAssetList"
                                 >
+                                    <template #menu-menu>
+                                        <div class="flex flex-col">
+                                            <div class="flex">
+                                                <div class="selector">
+                                                    <data-selector :label="$t('ALERT_MANAGER.EVENT_RULE.PROVIDER')"
+                                                                   :menu="state.providerDropdownList"
+                                                                   :selected="state.selectedProvider"
+                                                                   @update:selected="handleSelectProvider"
+                                                    />
+                                                </div>
+                                                <div class="selector">
+                                                    <data-selector :label="$t('ALERT_MANAGER.EVENT_RULE.ASSET_TYPE')"
+                                                                   :menu="state.cloudServiceTypeDropdownList"
+                                                                   multi-selectable
+                                                                   show-select-marker
+                                                                   :selected="state.selectedAssetList"
+                                                                   @update:selected="handleSelectAsset"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div class="flex justify-end py-3 px-3 border-t border-gray-200">
+                                                <p-button style-type="substitutive"
+                                                          @click="handleClickDoneButton"
+                                                >
+                                                    <span>{{ $t('ALERT_MANAGER.DONE') }}</span>
+                                                </p-button>
+                                            </div>
+                                        </div>
+                                    </template>
                                     <template #dropdown-button>
                                         <div v-if="state.selectedAssetList.length > 0"
                                              class="dropdown-button-wrapper flex gap-1"
@@ -314,6 +384,15 @@ watch(() => storeState.isEventRuleEditMode, (isEditMode) => {
             .dropdown-button-wrapper {
                 @apply absolute;
                 max-width: calc(100% - 4.5rem);
+            }
+            .selector {
+                @apply flex flex-col flex-1 border-r border-gray-200;
+                gap: 0.5rem;
+                width: 16rem;
+                padding: 0.75rem 0;
+                &:last-child {
+                    @apply border-r-0;
+                }
             }
         }
         .input-box {

@@ -171,6 +171,7 @@ const {
     name: '',
 }, {
     name(value: string) {
+        if (value === storeState.eventRuleInfo.name) return '';
         const duplicatedName = Object.values(storeState.eventRuleList)?.find((item) => item.name === value);
         if (duplicatedName) {
             return i18n.t('ALERT_MANAGER.EVENT_RULE.VALIDATION_NAME_UNIQUE');
