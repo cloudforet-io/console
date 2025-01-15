@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useWindowSize } from '@vueuse/core';
 import { computed, reactive, watch } from 'vue';
 
 import { cloneDeep } from 'lodash';
@@ -17,7 +18,7 @@ import {
     PRadioGroup,
     PSelectDropdown,
     PTextInput,
-    PToggleButton,
+    PToggleButton, screens,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import type { InputItem } from '@cloudforet/mirinae/types/controls/input/text-input/type';
@@ -59,6 +60,7 @@ const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
+const { width } = useWindowSize();
 
 const emit = defineEmits<{(e: 'change-form', form: EventRuleActionsType): void}>();
 
@@ -77,6 +79,7 @@ const storeState = reactive({
     }))),
 });
 const state = reactive({
+    isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
     actionSettingType: getActionSettingTypeI18n(),
     actions: computed<Record<EventRuleSettingsType, EventRuleActionsToggleType[]>>(() => ({
         service: [
@@ -333,6 +336,7 @@ watch(() => storeState.service.service_id, (id) => {
         <div v-for="(type, idx) in Object.values(state.actionSettingType)"
              :key="`action-setting-type-${idx}`"
              class="action-wrapper flex flex-col gap-2 p-3 border-t-4 border-b-4 border-gray-100 rounded-xl"
+             :class="{ 'is-mobile': state.isMobileSize }"
         >
             <p-field-title :label="type"
                            size="lg"
@@ -344,7 +348,7 @@ watch(() => storeState.service.service_id, (id) => {
                                :key="`action-${actionIdx}`"
                                class="field-group flex flex-col"
                 >
-                    <div class="flex items-start w-full">
+                    <div class="contents-wrapper">
                         <div class="toggle-wrapper flex items-center gap-2 mr-2"
                              :class="{'match-asset': action.name === 'match_asset'}"
                         >
@@ -389,7 +393,7 @@ watch(() => storeState.service.service_id, (id) => {
                                           @update:value="handleSelectAction(action.name, $event)"
                             />
                             <div v-if="action.name === 'change_status'"
-                                 class="field-title flex gap-2"
+                                 class="field-title change-status flex gap-2"
                             >
                                 <p-radio-group>
                                     <p-radio v-for="(item, statusIdx) in state.statusRadioMenuList"
@@ -479,11 +483,13 @@ watch(() => storeState.service.service_id, (id) => {
                             <div class="flex flex-1 gap-2 items-center">
                                 <p-field-group class="input-box">
                                     <p-text-input v-model="formState.rule.key"
+                                                  :style="state.isMobileSize ? 'width: 6rem' : ''"
                                                   block
                                     />
                                 </p-field-group>
                                 <p-field-group class="input-box">
                                     <p-text-input v-model="formState.rule.value"
+                                                  :style="state.isMobileSize ? 'width: 6rem' : ''"
                                                   block
                                     />
                                 </p-field-group>
@@ -614,6 +620,9 @@ watch(() => storeState.service.service_id, (id) => {
             padding-top: 0.375rem;
             padding-bottom: 0.375rem;
         }
+        .contents-wrapper {
+            @apply flex items-start w-full;
+        }
         .toggle-wrapper {
             min-width: 12.5rem;
             height: 2rem;
@@ -635,6 +644,45 @@ watch(() => storeState.service.service_id, (id) => {
         .input-box {
             @apply inline-block flex-1;
             margin-bottom: 0;
+        }
+    }
+    .is-mobile {
+        .field-group {
+            @apply flex flex-col;
+            margin-bottom: 0;
+            & + .field-group {
+                @apply mt-3 pt-3 border-t border-gray-200;
+            }
+        }
+        .field-title {
+            @apply flex;
+            padding-top: 0.375rem;
+            padding-bottom: 0.375rem;
+        }
+        .change-status {
+            @apply flex flex-col;
+        }
+        .input-wrapper {
+            @apply flex flex-col;
+            width: 100%;
+        }
+        .asset-dropdown {
+            @apply relative;
+            .dropdown-button-wrapper {
+                @apply absolute;
+                width: 100%;
+            }
+        }
+        .contents-wrapper {
+            @apply flex flex-col;
+        }
+        .toggle-wrapper {
+            min-width: 12.5rem;
+            height: 2rem;
+            &.match-asset {
+                @apply w-full;
+                min-width: unset;
+            }
         }
     }
 }

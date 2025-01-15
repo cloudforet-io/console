@@ -1,10 +1,11 @@
 <script setup lang="ts">
+import { useWindowSize } from '@vueuse/core';
 import { computed, reactive } from 'vue';
 
 import { isEmpty } from 'lodash';
 
 import {
-    PCard, PFieldTitle, PFieldGroup, PDataLoader, PDivider, PLazyImg, PI, PIconButton,
+    PCard, PFieldTitle, PFieldGroup, PDataLoader, PDivider, PLazyImg, PI, PIconButton, screens,
 } from '@cloudforet/mirinae';
 
 import { ALERT_STATUS } from '@/schema/alert-manager/alert/constants';
@@ -42,6 +43,8 @@ const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 
+const { width } = useWindowSize();
+
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const storeState = reactive({
@@ -54,6 +57,7 @@ const storeState = reactive({
     eventRuleInfoLoading: computed<boolean>(() => serviceDetailPageState.eventRuleInfoLoading),
 });
 const state = reactive({
+    isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
     actionSetting: getActionSettingI18n(),
     actionSettingType: getActionSettingTypeI18n(),
     actions: computed<EventRuleActionsItemType>(() => {
@@ -144,6 +148,7 @@ const handleDeleteEventRule = () => {
     <p-data-loader class="service-detail-tabs-settings-event-rule-card"
                    :loading="storeState.eventRuleInfoLoading"
                    :data="storeState.eventRuleInfo"
+                   :class="{ 'is-mobile': state.isMobileSize }"
     >
         <p-card :header="$t('ALERT_MANAGER.EVENT_RULE.TITLE')">
             <template #header>
@@ -163,9 +168,9 @@ const handleDeleteEventRule = () => {
                     </div>
                 </div>
             </template>
-            <div class="flex flex-col gap-4 py-1 px-4">
+            <div class="form">
                 <div class="form-wrapper">
-                    <div class="flex flex-col gap-1">
+                    <div class="form-wrapper-inside">
                         <div class="input-form-wrapper">
                             <p-field-title :label="$t('ALERT_MANAGER.EVENT_RULE.LABEL_NAME')"
                                            size="lg"
@@ -369,53 +374,85 @@ const handleDeleteEventRule = () => {
 
 <style scoped>
 .service-detail-tabs-settings-event-rule-card {
-    .form-wrapper {
-        @apply flex flex-col;
-        .input-form-wrapper {
-            @apply flex items-center gap-2;
-            .input-form {
-                margin-bottom: 0;
-                &:not(.scope) {
-                    @apply text-blue-800;
-                }
-                .scope-wrapper {
-                    @apply flex items-center gap-1;
-                }
-            }
-        }
-        .field-title {
-            padding-top: 0.375rem;
-            padding-bottom: 0.375rem;
-        }
-        .border-section {
-            @apply flex flex-col border-4 border-gray-100 rounded-xl mt-1 py-2 px-4;
-            .settings-wrapper {
-                .settings-section {
-                    @apply flex flex-col;
-                }
-                & + .settings-wrapper {
-                    margin-top: 0.5rem;
+    .form {
+        @apply flex flex-col gap-4 py-1 px-4;
+        .form-wrapper {
+            @apply flex flex-col gap-1;
+            .input-form-wrapper {
+                @apply flex items-center gap-2;
+                .input-form {
+                    margin-bottom: 0;
+                    &:not(.scope) {
+                        @apply text-blue-800;
+                    }
+                    .scope-wrapper {
+                        @apply flex items-center gap-1;
+                    }
                 }
             }
-        }
-        .help-text {
-            @apply text-gray-900;
-        }
-        .divider {
-            margin-top: 0.5rem;
-            &.option {
-                margin-bottom: 0.5rem;
+            .field-title {
+                padding-top: 0.375rem;
+                padding-bottom: 0.375rem;
             }
-        }
+            .border-section {
+                @apply flex flex-col border-4 border-gray-100 rounded-xl mt-1 py-2 px-4;
+                .settings-wrapper {
+                    .settings-section {
+                        @apply flex flex-col;
+                    }
+                    & + .settings-wrapper {
+                        margin-top: 0.5rem;
+                    }
+                }
+            }
+            .help-text {
+                @apply text-gray-900;
+            }
+            .divider {
+                margin-top: 0.5rem;
+                &.option {
+                    margin-bottom: 0.5rem;
+                }
+            }
 
-        .action-list {
-            @apply flex pt-0.5 pb-0.5 gap-1;
-            .dot {
-                @apply flex items-center justify-center;
-                width: 1.5rem;
-                height: 1.5rem;
+            .action-list {
+                @apply flex pt-0.5 pb-0.5 gap-1;
+                .dot {
+                    @apply flex items-center justify-center;
+                    width: 1.5rem;
+                    height: 1.5rem;
+                }
             }
         }
     }
+    &.is-mobile {
+        @apply flex flex-col;
+        .form {
+            @apply flex flex-col gap-4 py-1 px-4;
+            .form-wrapper {
+                @apply flex flex-col;
+                .form-wrapper-inside {
+                    @apply flex flex-col gap-4;
+                    .input-form-wrapper {
+                        @apply flex flex-col items-start gap-2;
+                        .input-form {
+                            margin-bottom: 0;
+                            &:not(.scope) {
+                                @apply text-blue-800;
+                            }
+                            .scope-wrapper {
+                                @apply flex items-center gap-1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/* custom design-system component - p-field-group */
+:deep(.p-card > header) {
+    @apply bg-gray-200;
 }
 </style>
