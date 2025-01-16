@@ -410,6 +410,9 @@ const handleDeleteEventRule = () => {
             }
             .border-section {
                 @apply flex flex-col border-4 border-gray-100 rounded-xl mt-1 py-2 px-4;
+                .condition-list {
+                    @apply flex flex-row gap-3;
+                }
                 .settings-wrapper {
                     .settings-section {
                         @apply flex flex-col;
@@ -470,7 +473,7 @@ const handleDeleteEventRule = () => {
                 }
                 .border-section {
                     .condition-list {
-                        @apply flex gap-3;
+                        @apply flex flex-row;
                     }
                 }
                 .action-list {
