@@ -17,6 +17,8 @@ import type { AlertHistoryActionType } from '@/schema/alert-manager/alert/type';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { AppReferenceMap } from '@/store/reference/app-reference-store';
+import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 
 import VerticalTimelineItem from '@/common/components/vertical-timeline/VerticalTimelineItem.vue';
@@ -41,6 +43,8 @@ const storeState = reactive({
     alertInfo: computed<AlertModel>(() => alertDetailPageState.alertInfo),
     timezone: computed<string>(() => alertDetailPageGetters.timezone),
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
+    app: computed<AppReferenceMap>(() => allReferenceGetters.app),
+    user: computed<UserReferenceMap>(() => allReferenceGetters.user),
 });
 const state = reactive({
     loading: true,
@@ -86,7 +90,10 @@ const getCreatedByNames = (createdBy: string): string => {
     if (createdBy.includes('webhook')) {
         return storeState.webhook[createdBy].label || createdBy;
     }
-    return createdBy;
+    if (createdBy.includes('app')) {
+        return storeState.app[createdBy].label || createdBy;
+    }
+    return storeState.user[createdBy].name ? `${storeState.user[createdBy].name} (${storeState.user[createdBy].key})` : storeState.user[createdBy].key;
 };
 const getItemInfo = (item: AlertHistoryActionType): HistoryItemInfo => {
     let styleType: string|undefined;

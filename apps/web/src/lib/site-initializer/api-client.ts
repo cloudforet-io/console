@@ -334,6 +334,16 @@ const getAfterCallApiMap = () => ({
         const allReferenceStore = useAllReferenceStore();
         allReferenceStore.sync('workspace', data);
     },
+    '/identity/app/create': () => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.load('app', { force: true });
+    },
+    '/identity/app/delete': () => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.load('app', { force: true });
+    },
     '/alert-manager/service/create': () => {
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();

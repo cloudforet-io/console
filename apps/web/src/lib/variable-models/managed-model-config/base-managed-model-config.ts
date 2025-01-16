@@ -7,6 +7,7 @@ import AssetDefaultFieldVariableModel from '@/lib/variable-models/managed-model/
 import CostDefaultDataTypeVariableModel from '@/lib/variable-models/managed-model/enum-model/cost-default-data-type-variable-model';
 import CostDefaultFieldVariableModel from '@/lib/variable-models/managed-model/enum-model/cost-default-field-variable-model';
 import GranularityVariableModel from '@/lib/variable-models/managed-model/enum-model/granularity-variable-model';
+import AppVariableModel from '@/lib/variable-models/managed-model/resource-model/app-variable-model';
 import CloudServiceQuerySetVariableModel from '@/lib/variable-models/managed-model/resource-model/cloud-service-query-set-variable-model';
 import CloudServiceTypeVariableModel from '@/lib/variable-models/managed-model/resource-model/cloud-service-type-variable-model';
 import CloudServiceVariableModel from '@/lib/variable-models/managed-model/resource-model/cloud-service-variable-model';
@@ -57,6 +58,7 @@ const RESOURCE_VARIABLE_MODELS = {
     metric_data: MetricDataVariableModel,
     role: RoleVariableModel,
     service: ServiceVariableModel,
+    app: AppVariableModel,
 } as const;
 const CUSTOM_RESOURCE_VARIABLE_MODELS = {
     cost_additional_info_key: CostAdditionalInfoKeyVariableModel,

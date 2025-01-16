@@ -2,6 +2,7 @@ import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
+import { useAppReferenceStore } from '@/store/reference/app-reference-store';
 import { useCloudServiceTypeReferenceStore } from '@/store/reference/cloud-service-type-reference-store';
 import { useCloudServiceQuerySetReferenceStore } from '@/store/reference/cloue-service-query-set-reference-store';
 import { useCollectorReferenceStore } from '@/store/reference/collector-reference-store';
@@ -45,6 +46,7 @@ export type ReferenceType = Extract<ManagedVariableModelKey,
     | 'namespace'
     | 'metric'
     | 'service'
+    | 'app'
 >;
 export type AllReferenceTypeInfo = Record<ReferenceType, ReferenceTypeInfo>;
 
@@ -68,6 +70,7 @@ export const useAllReferenceTypeInfoStore = defineStore('all-reference-type-info
     const namespaceReferenceStore = useNamespaceReferenceStore();
     const metricReferenceStore = useMetricReferenceStore();
     const serviceReferenceStore = useServiceReferenceStore();
+    const appReferenceStore = useAppReferenceStore();
 
     const getters = reactive({
         allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => ({
@@ -90,6 +93,7 @@ export const useAllReferenceTypeInfoStore = defineStore('all-reference-type-info
             namespace: namespaceReferenceStore.getters.namespaceTypeInfo,
             metric: metricReferenceStore.getters.metricTypeInfo,
             service: serviceReferenceStore.getters.serviceTypeInfo,
+            app: appReferenceStore.getters.appTypeInfo,
         })),
     });
 
