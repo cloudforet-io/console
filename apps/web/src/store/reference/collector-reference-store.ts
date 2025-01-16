@@ -63,7 +63,7 @@ export const useCollectorReferenceStore = defineStore('reference-collector', () 
         const referenceMap: CollectorReferenceMap = {};
         try {
             const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainStore.state.domainId);
-            const collectorFetcher = isAlertManagerVersionV2 ? SpaceConnector.clientV2.inventoryV2.collector.list : SpaceConnector.clientV2.inventory.collector.list;
+            const collectorFetcher = !isAlertManagerVersionV2 ? SpaceConnector.clientV2.inventoryV2.collector.list : SpaceConnector.clientV2.inventory.collector.list;
 
             const response = await collectorFetcher<CollectorListParameters, ListResponse<CollectorModel>>({
                 query: {
