@@ -391,15 +391,15 @@ watch(() => storeState.isEventRuleEditMode, (isEditMode) => {
         }
         .merge-asset {
             @apply flex items-center flex-1 gap-3;
-            .input-box {
-                @apply inline-block flex-1;
-                margin-bottom: 0;
-                .merge-asset-labels {
-                    .unit {
-                        @apply text-label-md text-gray-400;
-                        margin-top: -0.125rem;
-                        line-height: 1rem;
-                    }
+        }
+        .input-box {
+            @apply inline-block flex-1;
+            margin-bottom: 0;
+            .merge-asset-labels {
+                .unit {
+                    @apply text-label-md text-gray-400;
+                    margin-top: -0.125rem;
+                    line-height: 1rem;
                 }
             }
         }
