@@ -303,7 +303,7 @@ watch(() => state.isMobileSize, (isMobileSize) => {
                                     >
                                         {{ itemIdx + 1 }}
                                     </p-badge>
-                                    <span class="truncate">{{ item.data.name }}</span>
+                                    <span class="truncate max-w-36">{{ item.data.name }}</span>
                                     <p-i v-if="state.isEditMode"
                                          name="ic_drag-handle"
                                          width="1rem"
