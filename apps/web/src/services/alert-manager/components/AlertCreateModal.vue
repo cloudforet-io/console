@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -19,15 +20,18 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { useAlertPageStore } from '@/services/alert-manager/stores/alert-page-store';
 import type { AlertUrgencyRadioType } from '@/services/alert-manager/types/alert-manager-type';
 
 interface Props {
     visible: boolean;
+    serviceId?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
+    serviceId: undefined,
 });
 
 const alertPageStore = useAlertPageStore();
@@ -36,6 +40,8 @@ const alertPageGetters = alertPageStore.getters;
 
 const emit = defineEmits<{(e: 'update:visible'): void; }>();
 
+const route = useRoute();
+
 const storeState = reactive({
     serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => alertPageGetters.serviceDropdownList),
     alertListParams: computed<AlertListParameters|undefined>(() => alertPageState.alertListParams),
@@ -43,8 +49,9 @@ const storeState = reactive({
 const state = reactive({
     loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
+    isServicePage: route.name === ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME,
 
-    selectedServiceId: '',
+    selectedServiceId: props.serviceId || '',
     radioMenuList: computed<AlertUrgencyRadioType[]>(() => [
         {
             label: i18n.t('ALERT_MANAGER.ALERTS.HIGH'),
@@ -147,6 +154,7 @@ const handleConfirm = async () => {
                     <p-select-dropdown :menu="storeState.serviceDropdownList"
                                        use-fixed-menu-style
                                        block
+                                       :disabled="props.serviceId !== undefined"
                                        show-delete-all-button
                                        :selected.sync="state.selectedServiceId"
                     />
