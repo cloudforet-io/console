@@ -64,6 +64,7 @@ export default defineComponent({
             hiddenNodesMap: new Map<Node, string>(),
         });
 
+        /* eslint-disable @typescript-eslint/no-non-null-assertion, no-continue, no-restricted-syntax */
         /* util */
         const checkTextOverflow = () => {
             if (!state.fakeTextRef) return;
@@ -102,7 +103,6 @@ export default defineComponent({
             const totalHeight = (element.scrollHeight || element.getBoundingClientRect().height) - paddingTop - paddingBottom;
 
             if (totalHeight === 0) {
-                console.warn('Element is not rendered or empty:', element);
                 return 0;
             }
 
@@ -127,58 +127,41 @@ export default defineComponent({
             while (stack.length > 0) {
                 const currentNode = stack.pop();
                 console.log(currentNode);
-                // eslint-disable-next-line no-continue
                 if (!currentNode) continue;
 
                 if (remainingLine <= 0) {
                     hideNode(currentNode);
                     if (state.isOverflow) {
-                        // eslint-disable-next-line no-continue
                         continue;
                     }
                 }
 
-                // eslint-disable-next-line no-restricted-syntax
                 if (currentNode.nodeType === Node.TEXT_NODE) {
                     if (!currentNode.textContent?.trim()) {
-                        // eslint-disable-next-line no-continue
                         continue;
                     }
                     // console.log(currentNode);
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    const displayStyle = window.getComputedStyle(currentNode.parentElement!).display;
+                    const parentElement = currentNode.parentElement!;
+                    const displayStyle = window.getComputedStyle(parentElement!).display;
+                    let contentLineCount = 0;
 
                     if (displayStyle === 'inline') {
-                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                        const res = calculateLineCount(currentNode.parentElement!);
-                        console.log(res);
-
-                        if (remainingLine <= res) {
-                            processLineClamp(currentNode.parentElement as HTMLElement, lineClamp, isFirstLine, res);
-                        }
-                        remainingLine -= res;
-                        isFirstLine = false;
+                        contentLineCount = calculateLineCount(parentElement!);
                     } else {
-                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                         const span = createHiddenSpan(currentNode.textContent!);
-                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                        const parentPosition = currentNode.parentElement!.style.position;
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              currentNode.parentElement!.style.position = 'relative';
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              currentNode.parentElement!.appendChild(span);
+                        const parentPosition = parentElement!.style.position;
+                        parentElement!.style.position = 'relative';
+                        parentElement!.appendChild(span);
 
-              const res = calculateLineCount(span);
-              console.log(res);
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              currentNode.parentElement!.style.position = parentPosition;
-              span.remove();
-              if (remainingLine <= res) {
-                  processLineClamp(currentNode.parentElement as HTMLElement, lineClamp, isFirstLine, res);
-              }
-              remainingLine -= res;
-              isFirstLine = false;
+                        contentLineCount = calculateLineCount(span);
+                        parentElement!.style.position = parentPosition;
+                        span.remove();
                     }
+                    if (remainingLine <= contentLineCount) {
+                        processLineClamp(parentElement as HTMLElement, lineClamp, isFirstLine, contentLineCount);
+                    }
+                    remainingLine -= contentLineCount;
+                    isFirstLine = false;
                 } else if (currentNode.nodeType === Node.ELEMENT_NODE) {
                     const children = Array.from(currentNode.childNodes).reverse();
                     stack.push(...children);
@@ -192,7 +175,7 @@ export default defineComponent({
             } else {
                 state.isOverflow = true;
             }
-            // isClampStarted는 clamp가 상위에서 되었는지 판단할때 사용 - 재귀적으로 돌 때문
+            // isClampStarted is used to determine if the clamp has been applied at a higher level - because it operates recursively
             if (!state.isClampApplied) {
                 applyClampStyle(element, lineClamp);
                 state.isClampApplied = true;
@@ -236,7 +219,7 @@ export default defineComponent({
         const resetNodeStylesAndVisibility = () => {
             state.isClampApplied = false;
             resetClampStyle();
-            // eslint-disable-next-line no-restricted-syntax
+
             for (const node of state.hiddenNodesMap.keys()) {
                 restoreNode(node);
             }
