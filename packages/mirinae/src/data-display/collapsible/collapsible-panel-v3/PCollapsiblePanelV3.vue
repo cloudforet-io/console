@@ -1,15 +1,19 @@
 <template>
-    <div class="p-collapsible-panel-v3">
-        <!-- 슬롯 콘텐츠 -->
-        <div ref="slotContentRef"
-             class="text-content"
-             :class="{ collapsed: proxyIsCollapsed }"
-        >
-            <slot />
+    <div class="p-collapsible-panel">
+        <div class="panel-contents">
+            <div ref="fakeTextRef"
+                 class="text fake"
+                 :style="{'-webkit-line-clamp': lineClamp}"
+            >
+                <slot />
+            </div>
+            <div ref="contentRef"
+                 class="text"
+            >
+                <slot v-if="recursive || (lineClamp !== 0 || !proxyIsCollapsed)" />
+            </div>
         </div>
-
-        <!-- 토글 버튼 -->
-        <p-collapsible-toggle v-if="isOverflow"
+        <p-collapsible-toggle v-if="lineClamp === 0 || isOverflow"
                               v-model="proxyIsCollapsed"
         />
     </div>
@@ -17,110 +21,294 @@
 
 <script lang="ts">
 import {
-    defineComponent, nextTick, onMounted, reactive, ref, watch,
+    defineComponent, nextTick, onMounted, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
 
 import PCollapsibleToggle from '@/data-display/collapsible/collapsible-toggle/PCollapsibleToggle.vue';
 import { useProxyValue } from '@/hooks';
 
+const PAD = 2;
+
 export default defineComponent({
-    name: 'PCollapsiblePanelV3',
+    name: 'PCollapsiblePanel',
     components: { PCollapsibleToggle },
+    model: {
+        prop: 'isCollapsed',
+        event: 'update:isCollapsed',
+    },
     props: {
-        isCollapsed: { type: Boolean, default: true },
-        lineClamp: { type: Number, default: 2 },
+    /* collapsible props */
+        isCollapsed: {
+            type: Boolean,
+            default: true,
+        },
+        /* collapsible panel props */
+        lineClamp: {
+            type: Number,
+            default: 2,
+        },
+        recursive: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }) {
-        const slotContentRef = ref<HTMLElement | null>(null);
-        const proxyIsCollapsed = useProxyValue('isCollapsed', props, emit);
-
         const state = reactive({
+            proxyIsCollapsed: useProxyValue('isCollapsed', props, emit),
+            fakeTextRef: null as null|HTMLElement,
+            contentRef: null as null|HTMLElement,
             isOverflow: false,
-            truncatedText: '',
+            clampedElement: null as null|HTMLElement,
+            originalStyles: null as null | CSSStyleDeclaration,
+            isClampApplied: false,
+            hiddenNodesMap: new Map<Node, string>(),
         });
 
-        const calculateLines = (text: string, width: number, lineHeight: number, font: string) => {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            if (!ctx) return { lines: 0, truncatedText: text };
+        /* util */
+        const checkTextOverflow = () => {
+            if (!state.fakeTextRef) return;
+            state.isOverflow = state.fakeTextRef.scrollHeight > state.fakeTextRef.clientHeight + PAD;
+        };
 
-            ctx.font = font;
+        const resetClampStyle = () => {
+            if (!state.clampedElement || !state.originalStyles) return;
+            state.clampedElement.style.display = state.originalStyles.display || '';
+            state.clampedElement.style.webkitBoxOrient = state.originalStyles.webkitBoxOrient || '';
+            state.clampedElement.style.webkitLineClamp = state.originalStyles.webkitLineClamp || '';
+            state.clampedElement.style.overflow = state.originalStyles.overflow || '';
+            state.clampedElement.style.textOverflow = state.originalStyles.textOverflow || '';
+        };
 
-            const words = text.split(' ');
-            let line = '';
-            const lines: string[] = [];
-            let currentHeight = lineHeight;
+        const applyClampStyle = (element: HTMLElement, lineClamp: number) => {
+            state.clampedElement = element;
+            state.originalStyles = {
+                display: element.style.display,
+                webkitBoxOrient: element.style.webkitBoxOrient,
+                webkitLineClamp: element.style.webkitLineClamp,
+                overflow: element.style.overflow,
+            };
+            element.style.display = '-webkit-box';
+            element.style.webkitBoxOrient = 'vertical';
+            element.style.webkitLineClamp = `${lineClamp}`;
+            element.style.overflow = 'hidden';
+            element.style.textOverflow = 'ellipsis';
+        };
 
-            // eslint-disable-next-line no-restricted-syntax
-            for (const word of words) {
-                const testLine = `${line + word} `;
-                const metrics = ctx.measureText(testLine);
-                console.log(metrics.width);
-                console.log(width);
-                if (metrics.width > width) {
-                    lines.push(line.trim());
-                    line = `${word} `;
-                    console.log(line);
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                    currentHeight += lineHeight;
 
-                    if (lines.length >= props.lineClamp) {
-                        lines.push(`${line.trim()}...`);
-                        return { lines: props.lineClamp, truncatedText: lines.join(' ') };
+        const calculateLineCount = (element: HTMLElement) : number => {
+            const computedStyle = window.getComputedStyle(element);
+            const paddingTop = parseFloat(computedStyle.paddingTop) || 0;
+            const paddingBottom = parseFloat(computedStyle.paddingBottom) || 0;
+            const totalHeight = (element.scrollHeight || element.getBoundingClientRect().height) - paddingTop - paddingBottom;
+
+            if (totalHeight === 0) {
+                console.warn('Element is not rendered or empty:', element);
+                return 0;
+            }
+
+            let lineHeight = parseFloat(computedStyle.lineHeight);
+
+            // eslint-disable-next-line no-restricted-globals
+            if (isNaN(lineHeight)) {
+                const fontSize = parseFloat(computedStyle.fontSize);
+                lineHeight = fontSize * 1.2;
+            }
+
+            const lineCount = Math.round(totalHeight / lineHeight);
+            return lineCount;
+        };
+
+        const trunkedText = (node: Node, lineClamp: number) => {
+            if (!node) return;
+            const stack: Node[] = [node];
+            let remainingLine = lineClamp;
+            let isFirstLine = true;
+            console.log(stack);
+            while (stack.length > 0) {
+                const currentNode = stack.pop();
+                console.log(currentNode);
+                // eslint-disable-next-line no-continue
+                if (!currentNode) continue;
+
+                if (remainingLine <= 0) {
+                    hideNode(currentNode);
+                    if (state.isOverflow) {
+                        // eslint-disable-next-line no-continue
+                        continue;
                     }
-                } else {
-                    line = testLine;
+                }
+
+                // eslint-disable-next-line no-restricted-syntax
+                if (currentNode.nodeType === Node.TEXT_NODE) {
+                    if (!currentNode.textContent?.trim()) {
+                        // eslint-disable-next-line no-continue
+                        continue;
+                    }
+                    // console.log(currentNode);
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    const displayStyle = window.getComputedStyle(currentNode.parentElement!).display;
+
+                    if (displayStyle === 'inline') {
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                        const res = calculateLineCount(currentNode.parentElement!);
+                        console.log(res);
+
+                        if (remainingLine <= res) {
+                            processLineClamp(currentNode.parentElement as HTMLElement, lineClamp, isFirstLine, res);
+                        }
+                        remainingLine -= res;
+                        isFirstLine = false;
+                    } else {
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                        const span = createHiddenSpan(currentNode.textContent!);
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                        const parentPosition = currentNode.parentElement!.style.position;
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              currentNode.parentElement!.style.position = 'relative';
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              currentNode.parentElement!.appendChild(span);
+
+              const res = calculateLineCount(span);
+              console.log(res);
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              currentNode.parentElement!.style.position = parentPosition;
+              span.remove();
+              if (remainingLine <= res) {
+                  processLineClamp(currentNode.parentElement as HTMLElement, lineClamp, isFirstLine, res);
+              }
+              remainingLine -= res;
+              isFirstLine = false;
+                    }
+                } else if (currentNode.nodeType === Node.ELEMENT_NODE) {
+                    const children = Array.from(currentNode.childNodes).reverse();
+                    stack.push(...children);
                 }
             }
-
-            lines.push(line.trim());
-            return { lines: lines.length, truncatedText: text };
         };
 
-        const updateTruncatedText = () => {
-            const slotEl = slotContentRef.value;
-            if (!slotEl) return;
-
-            const text = slotEl.textContent?.trim() || '';
-            const computedStyle = window.getComputedStyle(slotEl);
-            const font = `${computedStyle.fontSize} ${computedStyle.fontFamily}`;
-            const lineHeight = parseFloat(computedStyle.lineHeight);
-            const width = slotEl.clientWidth;
-
-            const { lines, truncatedText } = calculateLines(text, width, lineHeight, font);
-            state.isOverflow = lines > props.lineClamp;
-            state.truncatedText = truncatedText;
-        };
-
-        watch(proxyIsCollapsed, (collapsed) => {
-            if (collapsed) {
-                nextTick(updateTruncatedText);
+        const processLineClamp = (element : HTMLElement, lineClamp : number, isFirstLine: boolean, res : number) => {
+            if (isFirstLine && lineClamp === 1 && res === 1) {
+                state.isOverflow = false;
+            } else {
+                state.isOverflow = true;
             }
-        });
+            // isClampStarted는 clamp가 상위에서 되었는지 판단할때 사용 - 재귀적으로 돌 때문
+            if (!state.isClampApplied) {
+                applyClampStyle(element, lineClamp);
+                state.isClampApplied = true;
+            }
+        };
+
+        const restoreNode = (node: Node) => {
+            if (node instanceof HTMLElement) {
+                const originalDisplay = state.hiddenNodesMap.get(node);
+                if (originalDisplay !== undefined) {
+                    node.style.display = originalDisplay;
+                }
+            }
+        };
+
+        const hideNode = (node: Node) => {
+            if (node instanceof HTMLElement) {
+                state.hiddenNodesMap.set(node, node.style.display);
+                node.style.display = 'none';
+            }
+        };
+
+        const createHiddenSpan = (text: string) => {
+            const span = document.createElement('span');
+            span.textContent = text;
+            span.style.position = 'absolute';
+            span.style.top = '0';
+            span.style.left = '0';
+            span.style.width = '100%';
+            span.style.height = 'fit-content';
+            span.style.visibility = 'hidden';
+            span.style.lineHeight = 'inherit';
+            span.style.fontStyle = 'inherit';
+            span.style.fontWeight = 'inherit';
+            span.style.paddingLeft = 'inherit';
+            span.style.paddingRight = 'inherit';
+            span.style.wordBreak = 'inherit';
+            return span;
+        };
+
+        const resetNodeStylesAndVisibility = () => {
+            state.isClampApplied = false;
+            resetClampStyle();
+            // eslint-disable-next-line no-restricted-syntax
+            for (const node of state.hiddenNodesMap.keys()) {
+                restoreNode(node);
+            }
+            state.hiddenNodesMap.clear();
+        };
+
+        const updateClamping = () => {
+            nextTick(() => {
+                if (!state.contentRef) return;
+                if (props.lineClamp < 0) return;
+                resetNodeStylesAndVisibility();
+
+                if (props.recursive) {
+                    trunkedText(state.contentRef, props.lineClamp);
+                    if (!state.proxyIsCollapsed) {
+                        resetNodeStylesAndVisibility();
+                    }
+                } else {
+                    checkTextOverflow();
+                    if (state.isOverflow && state.proxyIsCollapsed && props.lineClamp >= 0) {
+                        applyClampStyle(state.contentRef, props.lineClamp);
+                    }
+                }
+            });
+        };
 
         onMounted(() => {
-            nextTick(updateTruncatedText);
+            window.addEventListener('resize', updateClamping);
+            updateClamping();
+        });
+
+        onUnmounted(() => {
+            window.removeEventListener('resize', updateClamping);
+        });
+
+        watch(() => state.proxyIsCollapsed, () => {
+            updateClamping();
+        });
+
+        watch(() => state.contentRef, () => {
+            updateClamping();
         });
 
         return {
-            slotContentRef,
-            proxyIsCollapsed,
-            ...state,
+            ...toRefs(state),
         };
     },
 });
 </script>
 
 <style lang="postcss">
-.p-collapsible-panel-v2 {
+.p-collapsible-panel {
     width: 100%;
-    .text-content {
-        width: 100%;
-        overflow: hidden;
-
-        &.collapsed {
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
+    padding: 0.625rem;
+    font-size: inherit;
+    line-height: 1.25;
+    font-style: inherit;
+    font-weight: inherit;
+    .panel-contents {
+        position: relative;
+        word-break: break-word;
+        .text {
+            &.fake {
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                position: absolute;
+                visibility: hidden;
+                top: 0;
+                left: 0;
+            }
         }
     }
 }
