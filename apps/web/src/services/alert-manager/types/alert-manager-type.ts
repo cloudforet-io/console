@@ -47,6 +47,8 @@ export type AlertManagementTableHandlerType = {
 };
 export type AlertHistoryNotificationItemType = Partial<AlertHistoryNotificationChannelInfoType> & {
     type: string;
+    id: string;
+    targetId?: string;
 };
 
 export type createHeaderInfoByStep = {

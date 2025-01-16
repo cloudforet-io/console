@@ -8,7 +8,7 @@ import { isEmpty } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PHeadingLayout, PTab, PHeading, PDefinitionTable, PStatus, PLazyImg, PMarkdown, PBadge, PDataTable, PButton, PToolboxTable,
+    PHeadingLayout, PTab, PHeading, PDefinitionTable, PStatus, PLazyImg, PMarkdown, PBadge, PDataTable, PButton, PToolboxTable, PTextButton,
 } from '@cloudforet/mirinae';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 import { iso8601Formatter } from '@cloudforet/utils';
@@ -309,6 +309,13 @@ watch(() => storeState.selectedWebhookId, async () => {
                     </template>
                     <template #col-message-format="{ value }">
                         {{ value }}
+                    </template>
+                    <template #col-show_button-format>
+                        <p-text-button style-type="highlight"
+                                       @click="handleRouteDetail"
+                        >
+                            {{ $t('ALERT_MANAGER.WEBHOOK.SHOW_ALL') }}
+                        </p-text-button>
                     </template>
                 </p-toolbox-table>
             </div>
