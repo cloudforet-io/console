@@ -1,8 +1,7 @@
 ### To Reviewers
-- [ ] Self-reviewed (coding conventions, bug-free, functionality verified, tests checked, documentation updated)
-- [ ] Minor change, review optional (`style`, `chore`, `ci`, straightforward changes, etc.)
+- [ ] Minor change, self-reviewed (`style`, `chore`, `ci`, `test`, `docs`)
 - [ ] Previously reviewed in feature branch, no further review needed
-- [ ] Need review or discussion
+- [ ] Self-merge allowed for solo developers or urgent changes 
 
 ### Description (optional)
 

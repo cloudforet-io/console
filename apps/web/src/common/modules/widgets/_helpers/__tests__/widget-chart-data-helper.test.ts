@@ -12,7 +12,8 @@ const getMockSubData = (length = 10, year = 2023): SubData[] => {
     return range(length).map(() => {
         const refinedMonth = month < 10 ? `0${month}` : month;
         month += 1;
-        return { date: `${year}-${refinedMonth}`, value: Math.random() * 100 };
+        const randomValue = window.crypto.getRandomValues(new Uint32Array(1))[0] / 0xffffffff * 100;
+        return { date: `${year}-${refinedMonth}`, value: randomValue };
     });
 };
 interface MockData {

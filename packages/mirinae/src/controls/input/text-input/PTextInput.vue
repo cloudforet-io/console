@@ -1,7 +1,7 @@
 <template>
     <div v-on-click-outside="() => hideMenu(false)"
          class="p-text-input"
-         :class="{block, focused: isInputFocused, [size]: true}"
+         :class="{block, focused: isInputFocused, [size]: true, 'hide-spin-button': hideSpinButton}"
     >
         <div ref="targetRef"
              class="input-container"
@@ -77,6 +77,8 @@
                       size="sm"
                       style-type="transparent"
                       :disabled="disabled"
+                      :tabindex="skipMaskToggleTabIndex ? -1 : undefined"
+                      :aria-hidden="skipMaskToggleTabIndex ? true : undefined"
                       @click.stop.prevent="handleTogglePassword"
             >
                 {{ !proxyShowPassword ? $t('COMPONENT.TEXT_INPUT.HIDE') : $t('COMPONENT.TEXT_INPUT.SHOW') }}
@@ -167,6 +169,8 @@ interface TextInputProps {
     showPassword: boolean;
     appearanceType?: InputAppearanceType;
     pageSize?: number;
+    skipMaskToggleTabIndex?: boolean;
+    hideSpinButton?: boolean;
 }
 
 export default defineComponent<TextInputProps>({
@@ -229,6 +233,10 @@ export default defineComponent<TextInputProps>({
             type: Array as PropType<InputItem[]>,
             default: () => [],
         },
+        hideSpinButton: {
+            type: Boolean,
+            default: false,
+        },
         /* context menu fixed style props */
         visibleMenu: {
             type: Boolean,
@@ -274,6 +282,10 @@ export default defineComponent<TextInputProps>({
         pageSize: {
             type: Number,
             default: undefined,
+        },
+        skipMaskToggleTabIndex: {
+            type: Boolean,
+            default: false,
         },
     },
 
@@ -643,6 +655,18 @@ export default defineComponent<TextInputProps>({
         .delete-all-icon {
             @apply text-gray-400 cursor-pointer;
             flex-shrink: 0;
+        }
+    }
+    &.hide-spin-button {
+        input[type="number"] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
         }
     }
     .p-context-menu {
