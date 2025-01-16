@@ -16,6 +16,7 @@ export interface AlertListParameters {
     resources?: AlertResourcesType[];
     triggered_type?: AlertTriggeredType;
     triggered_by?: string;
+    asset_id?: string;
     webhook_id?: string;
     escalation_policy_id?: string;
     service_id?: string;

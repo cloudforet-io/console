@@ -1,18 +1,32 @@
 <script setup lang="ts">
+import { useWindowSize } from '@vueuse/core';
 import { computed, reactive, watch } from 'vue';
 
 import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PCard, PFieldTitle, PFieldGroup, PTextInput, PDivider, PLazyImg, PI, PSelectButton, PIconButton, PCheckbox, PButton,
+    PCard,
+    PFieldTitle,
+    PFieldGroup,
+    PTextInput,
+    PDivider,
+    PLazyImg,
+    PI,
+    PSelectButton,
+    PIconButton,
+    PCheckbox,
+    PButton,
+    screens,
 } from '@cloudforet/mirinae';
 
 import type { EventRuleCreateParameters } from '@/schema/alert-manager/event-rule/api-verbs/create';
 import type { EventRuleUpdateParameters } from '@/schema/alert-manager/event-rule/api-verbs/update';
 import { EVENT_RULE_CONDITIONS_POLICY, EVENT_RULE_SCOPE } from '@/schema/alert-manager/event-rule/constant';
 import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
-import type { EventRuleScopeType, EventRuleConditionsPolicyType, EventRuleActionsType } from '@/schema/alert-manager/event-rule/type';
+import type {
+    EventRuleScopeType, EventRuleConditionsPolicyType, EventRuleActionsType,
+} from '@/schema/alert-manager/event-rule/type';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -32,7 +46,10 @@ import ServiceDetailTabsSettingsEventRuleActionForm
 import ServiceDetailTabsSettingsEventRuleConditionForm
     from '@/services/alert-manager/components/ServiceDetailTabsSettingsEventRuleConditionForm.vue';
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
-import type { EventRuleConditionPolicyButtonType } from '@/services/alert-manager/types/alert-manager-type';
+import type {
+    EventRuleConditionPolicyButtonType,
+    EventRuleConditionsDataType,
+} from '@/services/alert-manager/types/alert-manager-type';
 
 interface Props {
     selectedWebhook: string;
@@ -48,15 +65,18 @@ const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
+const { width } = useWindowSize();
 
 const storeState = reactive({
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
     isEventRuleEditMode: computed<boolean>(() => serviceDetailPageState.isEventRuleEditMode),
     eventRuleInfo: computed<EventRuleModel>(() => serviceDetailPageState.eventRuleInfo),
+    eventRuleList: computed<EventRuleModel[]>(() => serviceDetailPageState.eventRuleList),
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
     plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
 });
 const state = reactive({
+    isMobileSize: computed(() => width.value < screens.mobile.max),
     loading: false,
     conditionPolicy: computed<EventRuleConditionPolicyButtonType[]>(() => [
         { name: EVENT_RULE_CONDITIONS_POLICY.ALWAYS, label: i18n.t('ALERT_MANAGER.EVENT_RULE.ALWAYS') },
@@ -64,20 +84,23 @@ const state = reactive({
     ]),
     selectedPolicyButton: EVENT_RULE_CONDITIONS_POLICY.ALWAYS as EventRuleConditionsPolicyType,
     conditionsPolicy: 'ALL' as EventRuleConditionsPolicyType,
-    conditions: [
-        {
-            key: 'title',
-            value: '',
-            operator: 'contain',
-        },
-    ],
+    conditions: [] as EventRuleConditionsDataType[],
     stopProcessing: false,
     actions: undefined as EventRuleActionsType|undefined,
     isAllValid: computed<boolean>(() => {
-        if (!isAllValid.value) return false;
+        if (name.value === '') return false;
 
         if (state.selectedPolicyButton !== EVENT_RULE_CONDITIONS_POLICY.ALWAYS) {
-            const areConditionsValid = state.conditions.every((condition) => condition.value.trim() !== '');
+            const areConditionsValid = state.conditions.every((condition) => {
+                if (condition.key.includes('additional_info')) {
+                    return condition.subKey?.trim() && condition.value?.trim();
+                }
+
+                if (condition.key === 'severity') return true;
+
+                return condition.value.trim() !== '';
+            });
+
             if (!areConditionsValid) return false;
         }
 
@@ -86,8 +109,14 @@ const state = reactive({
                 const matchAssetValid = state.actions.match_asset.asset_types.length > 0 && !isEmpty(state.actions.match_asset.rule);
                 if (!matchAssetValid) return false;
             }
+            if (state.actions.merge_asset_labels?.period !== undefined) {
+                return state.actions.merge_asset_labels?.period !== '';
+            }
             if (state.actions.change_title !== undefined) {
                 return state.actions.change_title !== '';
+            }
+            if (state.actions.change_escalation_policy !== undefined) {
+                return state.actions.change_escalation_policy !== '';
             }
         }
 
@@ -98,7 +127,27 @@ const state = reactive({
         scope: props.selectedScope || EVENT_RULE_SCOPE.GLOBAL,
         conditions: state.selectedPolicyButton === EVENT_RULE_CONDITIONS_POLICY.ALWAYS
             ? undefined
-            : state.conditions,
+            : state.conditions.map((i) => {
+                if (i.key.includes('additional_info')) {
+                    return {
+                        key: `additional_info.${i.subKey}`,
+                        value: i.value,
+                        operator: i.operator,
+                    };
+                }
+                if (i.key === 'labels') {
+                    return {
+                        key: i.key,
+                        value: Number(i.value),
+                        operator: i.operator,
+                    };
+                }
+                return {
+                    key: i.key,
+                    value: i.value,
+                    operator: i.operator,
+                };
+            }),
         conditions_policy: state.selectedPolicyButton === EVENT_RULE_CONDITIONS_POLICY.ALWAYS
             ? EVENT_RULE_CONDITIONS_POLICY.ALWAYS
             : state.conditionsPolicy,
@@ -118,24 +167,28 @@ const {
     setForm,
     invalidState,
     invalidTexts,
-    isAllValid,
 } = useFormValidator({
-    name: 'Event_Rule_Name',
+    name: '',
 }, {
     name(value: string) {
-        if (!value) return i18n.t('ALERT_MANAGER.EVENT_RULE.NAME_REQUIRED');
+        if (value === storeState.eventRuleInfo.name) return '';
+        const duplicatedName = Object.values(storeState.eventRuleList)?.find((item) => item.name === value);
+        if (duplicatedName) {
+            return i18n.t('ALERT_MANAGER.EVENT_RULE.VALIDATION_NAME_UNIQUE');
+        }
         return '';
     },
 });
 
 const initializeState = () => {
-    setForm('name', 'Event_Rule_Name');
+    setForm('name', '');
     state.selectedPolicyButton = EVENT_RULE_CONDITIONS_POLICY.ALWAYS;
     state.conditionsPolicy = 'ALL';
     state.conditions = [{
         key: 'title',
         value: '',
         operator: 'contain',
+        subKey: '',
     }];
     state.stopProcessing = false;
 };
@@ -143,7 +196,7 @@ const initializeState = () => {
 const updateStateFromEventRuleInfo = () => {
     const eventRuleInfo = storeState.eventRuleInfo;
 
-    setForm('name', eventRuleInfo.name || 'Event_Rule_Name');
+    setForm('name', eventRuleInfo.name || '');
     state.selectedPolicyButton = eventRuleInfo.conditions_policy === EVENT_RULE_CONDITIONS_POLICY.ALWAYS
         ? EVENT_RULE_CONDITIONS_POLICY.ALWAYS
         : EVENT_RULE_CONDITIONS_POLICY.ANY;
@@ -152,6 +205,7 @@ const updateStateFromEventRuleInfo = () => {
         key: 'title',
         value: '',
         operator: 'contain',
+        subKey: '',
     }];
     state.stopProcessing = eventRuleInfo.options?.stop_processing || false;
 };
@@ -174,6 +228,7 @@ const handleSelectPolicyButton = () => {
             key: 'title',
             value: '',
             operator: 'contain',
+            subKey: '',
         },
     ];
 };
@@ -237,6 +292,7 @@ watch(() => storeState.isEventRuleEditMode, (isEventRuleEditMode) => {
     <p-card style-type="indigo400"
             :header="$t('ALERT_MANAGER.EVENT_RULE.CREATE_FORM_TITLE')"
             class="service-detail-tabs-settings-event-rule-form-card"
+            :class="{ 'is-mobile': state.isMobileSize }"
     >
         <template #header>
             <div class="flex items-center justify-between">
@@ -266,7 +322,7 @@ watch(() => storeState.isEventRuleEditMode, (isEventRuleEditMode) => {
                             <template #default="{ invalid }">
                                 <p-text-input :value="name"
                                               :invalid="invalid"
-                                              block
+                                              :block="!state.isMobileSize"
                                               @update:value="setForm('name', $event)"
                                 />
                             </template>
@@ -280,7 +336,7 @@ watch(() => storeState.isEventRuleEditMode, (isEventRuleEditMode) => {
                                        required
                         />
                         <p-field-group class="input-form">
-                            <div class="flex items-center gap-1 text-label-md">
+                            <div class="input-form-contents">
                                 <span class="text-label-lg text-gray-500">{{ $t('ALERT_MANAGER.EVENT_RULE.WEBHOOK_SCOPE') }}: </span>
                                 <p v-if="props.selectedScope === EVENT_RULE_SCOPE.GLOBAL"
                                    class="scope-wrapper"
@@ -394,6 +450,9 @@ watch(() => storeState.isEventRuleEditMode, (isEventRuleEditMode) => {
                 .input-form {
                     @apply flex-1;
                     margin-bottom: 0;
+                    .input-form-contents {
+                        @apply flex items-center gap-1 text-label-md;
+                    }
                     .scope-wrapper {
                         @apply flex items-center gap-1;
                     }
@@ -405,6 +464,34 @@ watch(() => storeState.isEventRuleEditMode, (isEventRuleEditMode) => {
         }
         .border-section {
             @apply border-4 border-gray-100 rounded-xl;
+        }
+    }
+    &.is-mobile {
+        @apply flex flex-col;
+        .content-wrapper {
+            padding: 1.25rem 1.125rem 1.75rem;
+            .form-wrapper {
+                @apply flex flex-col gap-3;
+                .field-title {
+                    width: 15rem;
+                }
+                .input-form-wrapper {
+                    @apply flex flex-col items-start;
+                    .input-form {
+                        @apply flex-1;
+                        margin-bottom: 0;
+                        .scope-wrapper {
+                            @apply flex items-center gap-1;
+                        }
+                    }
+                }
+                .divider {
+                    margin-top: 0.25rem;
+                }
+            }
+            .border-section {
+                @apply border-4 border-gray-100 rounded-xl;
+            }
         }
     }
 }

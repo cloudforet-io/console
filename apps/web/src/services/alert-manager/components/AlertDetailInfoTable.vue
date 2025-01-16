@@ -180,8 +180,10 @@ const getAssetInfo = (assetId: string) => {
                 <span v-else>--</span>
             </template>
             <template #data-labels="{ value }">
-                <div class="flex gap-2">
-                    <div v-if="value.length > 0">
+                <div>
+                    <div v-if="value.length > 0"
+                         class="flex gap-2"
+                    >
                         <p-badge v-for="(item, idx) in value"
                                  :key="`labels-${idx}`"
                                  badge-type="subtle"

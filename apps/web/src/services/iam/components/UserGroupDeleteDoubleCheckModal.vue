@@ -161,7 +161,7 @@ watch([() => storeState.serviceList, () => storeState.selectedUserGroupList], ([
                             >
                                 {{ service }}
                             </p-badge>
-                            <p-badge v-else-if="i >= 3"
+                            <p-badge v-else-if="i === 3"
                                      badge-type="blue700"
                                      shape="round"
                             >

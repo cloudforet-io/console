@@ -122,10 +122,8 @@ const fetchWebhookDetail = async () => {
         state.webhookInfo = await SpaceConnector.clientV2.alertManager.webhook.get<WebhookGetParameters, WebhookModel>({
             webhook_id: storeState.selectedWebhookId,
         });
-        if (state.webhookInfo.message_formats.length) {
-            messageState.formatList = state.webhookInfo.message_formats || [];
-            messageState.formats = state.webhookInfo.message_formats.map((i) => ({ [i.from]: i.to })).reduce((acc, cur) => ({ ...acc, ...cur }), {});
-        }
+        messageState.formatList = state.webhookInfo.message_formats || [];
+        messageState.formats = state.webhookInfo.message_formats?.map((i) => ({ [i.from]: i.to })).reduce((acc, cur) => ({ ...acc, ...cur }), {});
     } catch (e) {
         ErrorHandler.handleError(e);
         state.webhookInfo = {} as WebhookModel;
@@ -196,13 +194,15 @@ watch(() => tabState.activeWebhookDetailTab, (activeTab) => {
 });
 watch(() => storeState.selectedWebhookId, async () => {
     await fetchWebhookDetail();
+    if (isEmpty(state.webhookInfo)) return;
+    await fetchWebhookErrorList();
     if (!state.webhookInfo.plugin_info?.plugin_id) return;
     await fetchPluginInfo();
 }, { immediate: true });
 </script>
 
 <template>
-    <p-tab :key="`webhook-detail-tabs-${tabState.webhookDetailTabs.length}`"
+    <p-tab :key="`webhook-detail-tabs-${tabState.webhookDetailTabs?.length}`"
            :tabs="tabState.webhookDetailTabs"
            :active-tab.sync="tabState.activeWebhookDetailTab"
            class="service-detail-tabs-webhook-detail-tabs"
@@ -321,7 +321,7 @@ watch(() => storeState.selectedWebhookId, async () => {
                     <template #heading>
                         <p-heading :title="$t('ALERT_MANAGER.WEBHOOK.MSG_FORMAT')"
                                    use-total-count
-                                   :total-count="messageState.formatList.length"
+                                   :total-count="messageState.formatList?.length"
                                    heading-type="sub"
                         />
                     </template>

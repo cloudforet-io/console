@@ -7,12 +7,13 @@ import { useRoute } from 'vue-router/composables';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PToolboxTable, PSelectDropdown, PLink, PBadge, PI, PSelectStatus, PDivider,
 } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
-import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
+import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import { ALERT_STATUS, ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
@@ -110,6 +111,33 @@ const filterQueryHelper = new QueryHelper();
 const queryTagHelper = useQueryTags({ keyItemSets: ALERT_MANAGEMENT_TABLE_HANDLER.keyItemSets });
 const { queryTags } = queryTagHelper;
 
+
+const labelMenuItemsHandler = (): AutocompleteHandler => async (inputText: string, pageStart = 1, pageLimit = 10) => {
+    try {
+        const { results } = await SpaceConnector.client.addOns.autocomplete.distinct({
+            resource_type: 'alert_manager.Alert',
+            options: { limit: pageLimit },
+            distinct_key: 'labels',
+        });
+        const refinedMenuItems = (results ?? []).map((i) => ({
+            label: i.name,
+            name: i.key,
+        }));
+        const totalCount = pageStart - 1 + Number(pageLimit);
+        const slicedResults = refinedMenuItems?.slice(pageStart - 1, totalCount);
+
+        return {
+            results: slicedResults,
+            more: totalCount < refinedMenuItems.length,
+        };
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return {
+            results: [],
+            more: false,
+        };
+    }
+};
 const getCreatedByNames = (id: string): string => {
     if (id.includes('webhook')) {
         return storeState.webhook[id].label || id;
@@ -283,7 +311,7 @@ watch(() => route.query, async (query) => {
                                        @update:selected="handleSelectServiceDropdownItem"
                     />
                     <p-select-dropdown :selection-label="$t('ALERT_MANAGER.ALERTS.LABEL')"
-                                       :handler="filterState.labelHandler"
+                                       :handler="labelMenuItemsHandler()"
                                        style-type="rounded"
                                        appearance-type="stack"
                                        show-delete-all-button
@@ -373,7 +401,9 @@ watch(() => route.query, async (query) => {
                 <span>{{ getCreatedByNames(value) }}</span>
             </template>
             <template #col-duration-format="{ item }">
-                <span>{{ calculateTime(item?.created_at, storeState.timezone) }}</span>
+                <span>{{ item.status === ALERT_STATUS.RESOLVED
+                    ? calculateTime(item?.resolved_at, storeState.timezone)
+                    : calculateTime(item?.created_at, storeState.timezone) }}</span>
             </template>
         </p-toolbox-table>
         <custom-field-modal :visible="state.visibleCustomFieldModal"

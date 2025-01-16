@@ -1,10 +1,11 @@
 <script setup lang="ts">
+import { useWindowSize } from '@vueuse/core';
 import { computed, reactive } from 'vue';
 
 import { isEmpty } from 'lodash';
 
 import {
-    PCard, PFieldTitle, PFieldGroup, PDataLoader, PDivider, PLazyImg, PI, PIconButton,
+    PCard, PFieldTitle, PFieldGroup, PDataLoader, PDivider, PLazyImg, PI, PIconButton, screens,
 } from '@cloudforet/mirinae';
 
 import { ALERT_STATUS } from '@/schema/alert-manager/alert/constants';
@@ -14,7 +15,10 @@ import {
     EVENT_RULE_URGENCY,
 } from '@/schema/alert-manager/event-rule/constant';
 import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
-import type { EventRuleActionsMatchAssetType, EventRuleActionsType } from '@/schema/alert-manager/event-rule/type';
+import type {
+    EventRuleActionsMatchAssetType, EventRuleActionsType,
+    EventRuleActionsMergeAssetLabelsType,
+} from '@/schema/alert-manager/event-rule/type';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -42,6 +46,8 @@ const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 
+const { width } = useWindowSize();
+
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const storeState = reactive({
@@ -54,6 +60,7 @@ const storeState = reactive({
     eventRuleInfoLoading: computed<boolean>(() => serviceDetailPageState.eventRuleInfoLoading),
 });
 const state = reactive({
+    isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
     actionSetting: getActionSettingI18n(),
     actionSettingType: getActionSettingTypeI18n(),
     actions: computed<EventRuleActionsItemType>(() => {
@@ -62,6 +69,7 @@ const state = reactive({
         const actionOrder: (keyof EventRuleActionsType)[] = [
             'change_service',
             'match_asset',
+            'merge_asset_labels',
             'change_title',
             'change_status',
             'change_urgency',
@@ -103,6 +111,15 @@ const state = reactive({
                             name: 'create_temporary_asset',
                             value: matchAssetValue.create_temporary_asset ? i18n.t('ALERT_MANAGER.CREATE') : i18n.t('ALERT_MANAGER.EVENT_RULE.DO_NOT_CREATE'),
                         });
+                    } else if (actionKey === 'merge_asset_labels' && typeof actionValue === 'object') {
+                        const matchAssetValue = actionValue as EventRuleActionsMergeAssetLabelsType;
+                        if (matchAssetValue.period) {
+                            result[type].push({
+                                label: i18n.t('ALERT_MANAGER.EVENT_RULE.LABEL_PERIOD'),
+                                name: 'merge_asset_labels',
+                                value: matchAssetValue.period,
+                            });
+                        }
                     } else if (actionKey === 'add_additional_info') {
                         result[type].push({
                             label: i18n.t('ALERT_MANAGER.ALERTS.ADDITIONAL_INFO'),
@@ -144,6 +161,7 @@ const handleDeleteEventRule = () => {
     <p-data-loader class="service-detail-tabs-settings-event-rule-card"
                    :loading="storeState.eventRuleInfoLoading"
                    :data="storeState.eventRuleInfo"
+                   :class="{ 'is-mobile': state.isMobileSize }"
     >
         <p-card :header="$t('ALERT_MANAGER.EVENT_RULE.TITLE')">
             <template #header>
@@ -163,9 +181,9 @@ const handleDeleteEventRule = () => {
                     </div>
                 </div>
             </template>
-            <div class="flex flex-col gap-4 py-1 px-4">
+            <div class="form">
                 <div class="form-wrapper">
-                    <div class="flex flex-col gap-1">
+                    <div class="form-wrapper-inside">
                         <div class="input-form-wrapper">
                             <p-field-title :label="$t('ALERT_MANAGER.EVENT_RULE.LABEL_NAME')"
                                            size="lg"
@@ -242,7 +260,7 @@ const handleDeleteEventRule = () => {
                         <div class="border-section">
                             <div v-for="(condition, idx) in storeState.eventRuleInfo.conditions"
                                  :key="`action-${idx}`"
-                                 class="action-list"
+                                 class="condition-list"
                             >
                                 <div class="dot">
                                     <p-i name="ic_dot"
@@ -288,22 +306,23 @@ const handleDeleteEventRule = () => {
                                      :key="`action-${actionIdx}`"
                                      class="action-list"
                                 >
-                                    <div class="dot">
-                                        <p-i name="ic_dot"
-                                             width="0.25rem"
-                                             height="0.25rem"
-                                             color="inherit"
-                                        />
+                                    <div class="action">
+                                        <div class="dot">
+                                            <p-i name="ic_dot"
+                                                 width="0.25rem"
+                                                 height="0.25rem"
+                                                 color="inherit"
+                                            />
+                                        </div>
+                                        <span class="text-label-md text-gray-700">{{ action.label }}</span>
                                     </div>
                                     <p>
-                                        <span class="text-label-md text-gray-700">{{ action.label }}</span>
-                                        <span class="text-paragraph-md text-blue-800 ml-2">
+                                        <span class="action-paragraph">
                                             <template v-if="action.name === 'change_service'">
                                                 {{ storeState.service[action.value]?.label || action.value }}
                                             </template>
                                             <template v-else-if="action.name === 'rule'">
-                                                <span class="font-bold">{{ Object.keys(action.value)[0] }}: </span>
-                                                <span>{{ Object.values(action.value)[0] }}</span>
+                                                <span>{{ action.value.key || '--' }}</span>
                                             </template>
                                             <template v-else-if="action.name === 'change_urgency'">
                                                 {{ action.value === EVENT_RULE_URGENCY.HIGH ? $t('ALERT_MANAGER.EVENT_RULE.HIGH') : $t('ALERT_MANAGER.EVENT_RULE.LOW') }}
@@ -342,18 +361,18 @@ const handleDeleteEventRule = () => {
                                        class="divider option"
                             />
                             <div class="action-list">
-                                <div class="dot">
-                                    <p-i name="ic_dot"
-                                         width="0.25rem"
-                                         height="0.25rem"
-                                         color="inherit"
-                                    />
-                                </div>
-                                <p>
+                                <div class="action">
+                                    <div class="dot">
+                                        <p-i name="ic_dot"
+                                             width="0.25rem"
+                                             height="0.25rem"
+                                             color="inherit"
+                                        />
+                                    </div>
                                     <span class="text-label-md text-gray-700">{{ $t('ALERT_MANAGER.EVENT_RULE.THEN_STOP_PROCESSING') }}</span>
-                                    <span class="text-paragraph-md text-blue-800 ml-2">
-                                        {{ storeState.eventRuleInfo?.options?.stop_processing ? $t('ALERT_MANAGER.EVENT_RULE.TRUE') : $t('ALERT_MANAGER.EVENT_RULE.FALSE') }}
-                                    </span>
+                                </div>
+                                <p class="text-paragraph-md text-blue-800 ml-2">
+                                    {{ storeState.eventRuleInfo?.options?.stop_processing ? $t('ALERT_MANAGER.EVENT_RULE.TRUE') : $t('ALERT_MANAGER.EVENT_RULE.FALSE') }}
                                 </p>
                             </div>
                         </div>
@@ -369,53 +388,113 @@ const handleDeleteEventRule = () => {
 
 <style scoped>
 .service-detail-tabs-settings-event-rule-card {
-    .form-wrapper {
-        @apply flex flex-col;
-        .input-form-wrapper {
-            @apply flex items-center gap-2;
-            .input-form {
-                margin-bottom: 0;
-                &:not(.scope) {
-                    @apply text-blue-800;
-                }
-                .scope-wrapper {
-                    @apply flex items-center gap-1;
-                }
-            }
-        }
-        .field-title {
-            padding-top: 0.375rem;
-            padding-bottom: 0.375rem;
-        }
-        .border-section {
-            @apply flex flex-col border-4 border-gray-100 rounded-xl mt-1 py-2 px-4;
-            .settings-wrapper {
-                .settings-section {
-                    @apply flex flex-col;
-                }
-                & + .settings-wrapper {
-                    margin-top: 0.5rem;
+    .form {
+        @apply flex flex-col gap-4 py-1 px-4;
+        .form-wrapper {
+            @apply flex flex-col gap-1;
+            .input-form-wrapper {
+                @apply flex items-center gap-2;
+                .input-form {
+                    margin-bottom: 0;
+                    &:not(.scope) {
+                        @apply text-blue-800;
+                    }
+                    .scope-wrapper {
+                        @apply flex items-center gap-1;
+                    }
                 }
             }
-        }
-        .help-text {
-            @apply text-gray-900;
-        }
-        .divider {
-            margin-top: 0.5rem;
-            &.option {
-                margin-bottom: 0.5rem;
+            .field-title {
+                padding-top: 0.375rem;
+                padding-bottom: 0.375rem;
             }
-        }
+            .border-section {
+                @apply flex flex-col border-4 border-gray-100 rounded-xl mt-1 py-2 px-4;
+                .condition-list {
+                    @apply flex flex-row gap-3;
+                }
+                .settings-wrapper {
+                    .settings-section {
+                        @apply flex flex-col;
+                    }
+                    & + .settings-wrapper {
+                        margin-top: 0.5rem;
+                    }
+                }
+            }
+            .help-text {
+                @apply text-gray-900;
+            }
+            .divider {
+                margin-top: 0.5rem;
+                &.option {
+                    margin-bottom: 0.5rem;
+                }
+            }
 
-        .action-list {
-            @apply flex pt-0.5 pb-0.5 gap-1;
-            .dot {
-                @apply flex items-center justify-center;
-                width: 1.5rem;
-                height: 1.5rem;
+            .action-list {
+                @apply flex pt-0.5 pb-0.5 gap-1 items-center;
+                .dot {
+                    @apply flex items-center justify-center;
+                    width: 1.5rem;
+                    height: 1.5rem;
+                }
+                .action {
+                    @apply flex items-center;
+                }
+                p {
+                    .action-paragraph {
+                        @apply text-paragraph-md text-blue-800 ml-2;
+                    }
+                }
             }
         }
     }
+    &.is-mobile {
+        @apply flex flex-col;
+        .form {
+            @apply flex flex-col gap-4 py-1 px-4;
+            .form-wrapper {
+                @apply flex flex-col;
+                .form-wrapper-inside {
+                    @apply flex flex-col gap-4;
+                    .input-form-wrapper {
+                        @apply flex flex-col items-start gap-2;
+                        .input-form {
+                            margin-bottom: 0;
+                            &:not(.scope) {
+                                @apply text-blue-800;
+                            }
+                            .scope-wrapper {
+                                @apply flex items-center gap-1;
+                            }
+                        }
+                    }
+                }
+                .border-section {
+                    .condition-list {
+                        @apply flex flex-row;
+                    }
+                }
+                .action-list {
+                    @apply flex flex-col items-start;
+                    .action {
+                        @apply flex items-center;
+                    }
+                    p {
+                        @apply ml-6;
+                        .action-paragraph {
+                            @apply ml-0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/* custom design-system component - p-field-group */
+:deep(.p-card > header) {
+    @apply bg-gray-200;
 }
 </style>

@@ -11,7 +11,7 @@ import type {
 import type {
     EventRuleConditionsPolicyType,
     EventRuleConditionsKeyType,
-    EventRuleConditionsOperatorType, EventRuleUrgencyType,
+    EventRuleConditionsOperatorType, EventRuleUrgencyType, EventRuleConditionsType,
 } from '@/schema/alert-manager/event-rule/type';
 import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
 import type { ServiceChannelDataType, ServiceChannelScheduleInfoType } from '@/schema/alert-manager/service-channel/type';
@@ -113,4 +113,7 @@ export type EventRuleActionsUrgencyRadioType = {
 export type EventRuleActionsTempAssetRadioType = {
     label: TranslateResult;
     name: 'CREATE' | 'DO_NOT_CREATE';
+};
+export type EventRuleConditionsDataType = EventRuleConditionsType & {
+    subKey?: string;
 };

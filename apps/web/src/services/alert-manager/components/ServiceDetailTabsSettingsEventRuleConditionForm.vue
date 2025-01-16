@@ -1,11 +1,15 @@
 <script lang="ts" setup>
+import { useWindowSize } from '@vueuse/core';
 import { computed, reactive } from 'vue';
 
 import {
-    PButton, PRadio, PSelectDropdown, PTextInput, PIconButton, PDivider,
+    PButton, PRadio, PSelectDropdown, PTextInput, PIconButton, PDivider, screens,
 } from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
+import { ALERT_SEVERITY } from '@/schema/alert-manager/alert/constants';
 import { EVENT_RULE_CONDITIONS_POLICY } from '@/schema/alert-manager/event-rule/constant';
+import type { EventRuleConditionsType } from '@/schema/alert-manager/event-rule/type';
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -18,7 +22,7 @@ import type {
 
 interface Props {
     conditionsPolicy?: string;
-    conditions?: any[]; // HACK: set type
+    conditions?: EventRuleConditionsType[];
     projectId?: string;
 }
 const props = withDefaults(defineProps<Props>(), {
@@ -31,7 +35,10 @@ const emit = defineEmits<{(e: 'update:conditions-policy'): void;
     (e: 'update:conditions'): void;
 }>();
 
+const { width } = useWindowSize();
+
 const state = reactive({
+    isMobileSize: computed(() => width.value < screens.mobile.max),
     conditionsPolicies: computed<EventRuleConditionPolicyButtonType[]>(() => ([
         {
             name: EVENT_RULE_CONDITIONS_POLICY.ALL,
@@ -42,24 +49,6 @@ const state = reactive({
             label: i18n.t('ALERT_MANAGER.EVENT_RULE.ANY'),
         },
     ])),
-    operators: computed<EventRuleConditionOperatorsType[]>(() => ([
-        {
-            name: 'contain',
-            label: i18n.t('ALERT_MANAGER.EVENT_RULE.CONTAINS'),
-        },
-        {
-            name: 'not_contain',
-            label: i18n.t('ALERT_MANAGER.EVENT_RULE.DOES_NOT_CONTAIN'),
-        },
-        {
-            name: 'eq',
-            label: i18n.t('ALERT_MANAGER.EVENT_RULE.EQUALS'),
-        },
-        {
-            name: 'not',
-            label: i18n.t('ALERT_MANAGER.EVENT_RULE.DOES_NOT_EQUAL'),
-        },
-    ])),
     proxyConditionsPolicy: useProxyValue('conditionsPolicy', props, emit),
     proxyConditions: useProxyValue('conditions', props, emit),
     conditionKeys: computed<EventRuleConditionKeyType[]>(() => ([
@@ -67,19 +56,72 @@ const state = reactive({
         { name: 'description', label: i18n.t('ALERT_MANAGER.EVENT_RULE.LABEL_DESC') },
         { name: 'rule', label: i18n.t('ALERT_MANAGER.EVENT_RULE.LABEL_RULE') },
         { name: 'severity', label: i18n.t('ALERT_MANAGER.EVENT_RULE.LABEL_SEVERITY') },
-        { name: 'account', label: i18n.t('ALERT_MANAGER.EVENT_RULE.LABEL_ACCOUNT') },
         { name: 'additional_info', label: i18n.t('ALERT_MANAGER.EVENT_RULE.LABEL_ADDITIONAL_INFO') },
         { name: 'labels', label: i18n.t('ALERT_MANAGER.EVENT_RULE.LABEL_LABELS') },
-        { name: 'period', label: i18n.t('ALERT_MANAGER.EVENT_RULE.LABEL_PERIOD') },
     ])),
+    severityDropdownList: computed<SelectDropdownMenuItem[]>(() => [
+        { name: ALERT_SEVERITY.CRITICAL, label: i18n.t('ALERT_MANAGER.ALERTS.CRITICAL') },
+        { name: ALERT_SEVERITY.ERROR, label: i18n.t('ALERT_MANAGER.ALERTS.ERROR') },
+        { name: ALERT_SEVERITY.WARNING, label: i18n.t('ALERT_MANAGER.ALERTS.WARNING') },
+        { name: ALERT_SEVERITY.INFO, label: i18n.t('ALERT_MANAGER.ALERTS.INFO') },
+    ]),
 });
 
-/* event */
+const getDropdownMenu = (key: string): EventRuleConditionOperatorsType[] => {
+    const _labels = {
+        contain: i18n.t('ALERT_MANAGER.EVENT_RULE.CONTAINS'),
+        notContain: i18n.t('ALERT_MANAGER.EVENT_RULE.DOES_NOT_CONTAIN'),
+        equals: i18n.t('ALERT_MANAGER.EVENT_RULE.EQUALS'),
+        notEquals: i18n.t('ALERT_MANAGER.EVENT_RULE.DOES_NOT_EQUAL'),
+        atLeast: i18n.t('ALERT_MANAGER.EVENT_RULE.AT_LEAST'),
+        lessThan: i18n.t('ALERT_MANAGER.EVENT_RULE.LESS_THAN_EQUAL'),
+    };
+
+    const defaultMenu: EventRuleConditionOperatorsType[] = [
+        { name: 'contain', label: _labels.contain },
+        { name: 'not_contain', label: _labels.notContain },
+        { name: 'eq', label: _labels.equals },
+        { name: 'not', label: _labels.notEquals },
+    ];
+
+    if (key === 'labels') {
+        return [
+            ...defaultMenu,
+            { name: 'size_gte', label: _labels.atLeast },
+            { name: 'size_lte', label: _labels.lessThan },
+        ];
+    }
+
+    if (key === 'severity') {
+        return [
+            { name: 'eq', label: _labels.equals },
+            { name: 'not', label: _labels.notEquals },
+        ];
+    }
+
+    return defaultMenu;
+};
+const handleChangeKey = (key: string, subKey: string) => {
+    const conditionIdx = state.proxyConditions.findIndex((i) => i.key === key && i.subKey === subKey);
+    if (conditionIdx === -1) return;
+
+    if (key === 'severity') {
+        state.proxyConditions[conditionIdx].operator = 'eq';
+        state.proxyConditions[conditionIdx].value = ALERT_SEVERITY.CRITICAL;
+        return;
+    }
+
+    if (key.includes('additional_info')) {
+        state.proxyConditions[conditionIdx].subKey = '';
+    }
+    state.proxyConditions[conditionIdx].value = '';
+};
 const handleClickAddButton = () => {
     state.proxyConditions.push({
         key: 'title',
         value: '',
         operator: 'contain',
+        subKey: '',
     });
 };
 const handleClickDelete = (idx) => {
@@ -90,8 +132,10 @@ const handleClickDelete = (idx) => {
 </script>
 
 <template>
-    <section class="service-detail-tabs-settings-event-rule-condition-form">
-        <div class="flex items-center text-label-md pt-3 pb-6">
+    <section class="service-detail-tabs-settings-event-rule-condition-form"
+             :class="{ 'is-mobile': state.isMobileSize }"
+    >
+        <div class="policy-wrapper">
             <p-radio v-for="policy in state.conditionsPolicies"
                      :key="policy.name"
                      v-model="state.proxyConditionsPolicy"
@@ -105,7 +149,7 @@ const handleClickDelete = (idx) => {
                     </span>
                 </p>
             </p-radio>
-            <span class="ml-5 text-gray-500">{{ $t('ALERT_MANAGER.EVENT_RULE.OF_THE_FOLLOWING_ARE_MET') }}</span>
+            <span class="m  l-5 text-gray-500">{{ $t('ALERT_MANAGER.EVENT_RULE.OF_THE_FOLLOWING_ARE_MET') }}</span>
         </div>
         <p-divider v-if="state.proxyConditions.length > 0" />
         <div class="flex flex-col gap-2 pt-6 pb-3">
@@ -113,21 +157,46 @@ const handleClickDelete = (idx) => {
                  :key="`condition-${idx}`"
                  class="flex gap-2"
             >
-                <div class="left-part">
+                <div class="left-part"
+                     :class="{'additional-info': condition.key.includes('additional_info')}"
+                >
                     <p-select-dropdown :selected.sync="condition.key"
                                        class="input"
                                        :menu="state.conditionKeys"
                                        use-fixed-menu-style
                                        is-fixed-width
+                                       @update:selected="handleChangeKey(condition.key, condition.subKey)"
+                    />
+                    <p-text-input v-if="condition.key.includes('additional_info')"
+                                  v-model="condition.subKey"
+                                  class="input"
                     />
                     <div class="left-part">
                         <p-select-dropdown class="input"
-                                           :menu="state.operators"
+                                           :menu="getDropdownMenu(condition.key)"
                                            :selected.sync="condition.operator"
                                            use-fixed-menu-style
                                            is-fixed-width
                         />
-                        <p-text-input v-model="condition.value"
+                        <div v-if="condition.key === 'labels' && (condition.operator === 'size_gte' || condition.operator === 'size_lte')"
+                             class="input"
+                        >
+                            <p-text-input v-model="condition.value"
+                                          type="number"
+                                          :min="0"
+                                          :max="100"
+                                          block
+                            />
+                        </div>
+                        <p-select-dropdown v-else-if="condition.key === 'severity'"
+                                           class="input"
+                                           :menu="state.severityDropdownList"
+                                           :selected.sync="condition.value"
+                                           use-fixed-menu-style
+                                           is-fixed-width
+                        />
+                        <p-text-input v-else
+                                      v-model="condition.value"
                                       class="input"
                         />
                     </div>
@@ -151,6 +220,9 @@ const handleClickDelete = (idx) => {
 
 <style lang="postcss" scoped>
 .service-detail-tabs-settings-event-rule-condition-form {
+    .policy-wrapper {
+        @apply flex items-center text-label-md pt-3 pb-6;
+    }
     .left-part {
         @apply flex w-full justify-between gap-2;
         flex-grow: 1;
@@ -160,6 +232,19 @@ const handleClickDelete = (idx) => {
             width: inherit;
             flex-basis: 0;
             flex-grow: 1;
+        }
+        &.additional-info {
+            .input {
+                min-width: calc((100% - 1rem) / 4);
+            }
+        }
+    }
+    &.is-mobile {
+        .policy-wrapper {
+            @apply flex flex-col gap-2 items-start;
+        }
+        .left-part {
+            @apply flex flex-col;
         }
     }
 }

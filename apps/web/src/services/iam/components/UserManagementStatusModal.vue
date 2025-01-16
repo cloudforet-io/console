@@ -237,7 +237,7 @@ watch([() => storeState.serviceList, () => storeState.selectedUsers], ([nv_servi
                             >
                                 {{ service }}
                             </p-badge>
-                            <p-badge v-else-if="i >= 3"
+                            <p-badge v-else-if="i === 3"
                                      badge-type="blue300"
                                      shape="round"
                             >
@@ -260,7 +260,7 @@ watch([() => storeState.serviceList, () => storeState.selectedUsers], ([nv_servi
                             >
                                 {{ userGroup.name }}
                             </p-badge>
-                            <p-badge v-else-if="i >= 3"
+                            <p-badge v-else-if="i === 3"
                                      badge-type="blue300"
                                      shape="round"
                             >

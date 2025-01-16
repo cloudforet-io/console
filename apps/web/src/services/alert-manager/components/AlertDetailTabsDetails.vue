@@ -17,7 +17,7 @@ const storeState = reactive({
     alertInfo: computed<AlertModel>(() => alertDetailPageState.alertInfo),
 });
 const state = reactive({
-    data: computed<Record<string, any>>(() => alertDetailPageState.alertInfo?.additional_info) || {},
+    data: computed<Record<string, any>>(() => storeState.alertInfo?.additional_info) || {},
     fields: computed<DefinitionField[]>(() => map(state.data, (d, k) => ({ name: k, label: k })).sort((a, b) => a.label.localeCompare(b.label))),
 });
 
@@ -33,7 +33,7 @@ const state = reactive({
             </template>
         </p-heading-layout>
         <p-definition-table :fields="state.fields"
-                            :data="storeState.alertInfo"
+                            :data="state.data"
                             :skeleton-rows="5"
                             block
         />
