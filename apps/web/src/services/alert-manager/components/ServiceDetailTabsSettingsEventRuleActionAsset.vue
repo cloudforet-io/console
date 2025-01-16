@@ -281,6 +281,7 @@ watch(() => storeState.isEventRuleEditMode, (isEditMode) => {
                                 <p-field-group class="input-box">
                                     <p-text-input v-model="state.rule.key"
                                                   block
+                                                  :style="state.isMobileSize ? 'width: 200px;': ''"
                                     />
                                 </p-field-group>
                             </div>
@@ -291,7 +292,7 @@ watch(() => storeState.isEventRuleEditMode, (isEditMode) => {
                                     {{ $t('ALERT_MANAGER.EVENT_RULE.TEMP_ASSET') }}
                                     <span class="text-gray-500">({{ $t('ALERT_MANAGER.EVENT_RULE.OPTIONAL') }})</span>
                                 </p-field-title>
-                                <div class="flex-1 flex items-center">
+                                <div class="temp-asset-group">
                                     <p-radio-group class="flex-1">
                                         <p-radio v-for="(item, statusIdx) in state.tempAssetRadioMenuList"
                                                  :key="`change-temp-asset-${statusIdx}`"
@@ -303,7 +304,7 @@ watch(() => storeState.isEventRuleEditMode, (isEditMode) => {
                                             </span>
                                         </p-radio>
                                     </p-radio-group>
-                                    <p class="flex-1 flex items-center gap-1 text-gray-500 text-label-sm">
+                                    <p class="temp-asset-desc">
                                         <p-i name="ic_warning-filled"
                                              width="1rem"
                                              height="1rem"
@@ -315,14 +316,14 @@ watch(() => storeState.isEventRuleEditMode, (isEditMode) => {
                             </div>
                         </div>
                         <div v-if="action.name === 'merge_asset_labels'"
-                             class="field-group flex items-center pt-3 pr-3 pl-3"
+                             class="field-group flex items-center pt-3 pr-3 pl-3 merge-asset-wrapper"
                         >
                             <p-field-title font-weight="regular"
                                            class="field-title toggle-wrapper"
                             >
                                 {{ $t('ALERT_MANAGER.EVENT_RULE.LABEL_PERIOD') }}
                             </p-field-title>
-                            <div class="flex items-center flex-1 gap-3">
+                            <div class="merge-asset">
                                 <p-field-group class="input-box">
                                     <p-text-input v-model="state.period"
                                                   type="number"
@@ -330,6 +331,7 @@ watch(() => storeState.isEventRuleEditMode, (isEditMode) => {
                                                   :min="0"
                                                   :max="1440"
                                                   class="merge-asset-labels"
+                                                  :style="state.isMobileSize ? 'width: 200px;': ''"
                                     >
                                         <template #right-edge>
                                             <span class="unit">{{ $t('ALERT_MANAGER.EVENT_RULE.MINUTE') }}</span>
@@ -387,14 +389,17 @@ watch(() => storeState.isEventRuleEditMode, (isEditMode) => {
                 }
             }
         }
-        .input-box {
-            @apply inline-block flex-1;
-            margin-bottom: 0;
-            .merge-asset-labels {
-                .unit {
-                    @apply text-label-md text-gray-400;
-                    margin-top: -0.125rem;
-                    line-height: 1rem;
+        .merge-asset {
+            @apply flex items-center flex-1 gap-3;
+            .input-box {
+                @apply inline-block flex-1;
+                margin-bottom: 0;
+                .merge-asset-labels {
+                    .unit {
+                        @apply text-label-md text-gray-400;
+                        margin-top: -0.125rem;
+                        line-height: 1rem;
+                    }
                 }
             }
         }
@@ -402,6 +407,12 @@ watch(() => storeState.isEventRuleEditMode, (isEditMode) => {
     .toggle-wrapper {
         min-width: 12.5rem;
         height: 2rem;
+    }
+    .temp-asset-group {
+        @apply flex-1 flex items-center;
+        .temp-asset-desc {
+            @apply flex-1 flex items-center gap-1 text-gray-500 text-label-sm;
+        }
     }
     &.is-mobile {
         .field-title {
@@ -426,6 +437,18 @@ watch(() => storeState.isEventRuleEditMode, (isEditMode) => {
         .toggle-wrapper {
             min-width: 12.5rem;
             height: 2rem;
+        }
+        .temp-asset-group {
+            @apply flex-col items-start;
+            .temp-asset-desc {
+                @apply mt-2;
+            }
+        }
+        .merge-asset-wrapper {
+            @apply items-start;
+            .merge-asset {
+                @apply flex-col items-start;
+            }
         }
     }
 }

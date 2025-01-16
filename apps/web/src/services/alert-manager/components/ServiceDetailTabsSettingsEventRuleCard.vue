@@ -260,7 +260,7 @@ const handleDeleteEventRule = () => {
                         <div class="border-section">
                             <div v-for="(condition, idx) in storeState.eventRuleInfo.conditions"
                                  :key="`action-${idx}`"
-                                 class="action-list"
+                                 class="condition-list"
                             >
                                 <div class="dot">
                                     <p-i name="ic_dot"
@@ -306,16 +306,18 @@ const handleDeleteEventRule = () => {
                                      :key="`action-${actionIdx}`"
                                      class="action-list"
                                 >
-                                    <div class="dot">
-                                        <p-i name="ic_dot"
-                                             width="0.25rem"
-                                             height="0.25rem"
-                                             color="inherit"
-                                        />
+                                    <div class="action">
+                                        <div class="dot">
+                                            <p-i name="ic_dot"
+                                                 width="0.25rem"
+                                                 height="0.25rem"
+                                                 color="inherit"
+                                            />
+                                        </div>
+                                        <span class="text-label-md text-gray-700">{{ action.label }}</span>
                                     </div>
                                     <p>
-                                        <span class="text-label-md text-gray-700">{{ action.label }}</span>
-                                        <span class="text-paragraph-md text-blue-800 ml-2">
+                                        <span class="action-paragraph">
                                             <template v-if="action.name === 'change_service'">
                                                 {{ storeState.service[action.value]?.label || action.value }}
                                             </template>
@@ -359,18 +361,18 @@ const handleDeleteEventRule = () => {
                                        class="divider option"
                             />
                             <div class="action-list">
-                                <div class="dot">
-                                    <p-i name="ic_dot"
-                                         width="0.25rem"
-                                         height="0.25rem"
-                                         color="inherit"
-                                    />
-                                </div>
-                                <p>
+                                <div class="action">
+                                    <div class="dot">
+                                        <p-i name="ic_dot"
+                                             width="0.25rem"
+                                             height="0.25rem"
+                                             color="inherit"
+                                        />
+                                    </div>
                                     <span class="text-label-md text-gray-700">{{ $t('ALERT_MANAGER.EVENT_RULE.THEN_STOP_PROCESSING') }}</span>
-                                    <span class="text-paragraph-md text-blue-800 ml-2">
-                                        {{ storeState.eventRuleInfo?.options?.stop_processing ? $t('ALERT_MANAGER.EVENT_RULE.TRUE') : $t('ALERT_MANAGER.EVENT_RULE.FALSE') }}
-                                    </span>
+                                </div>
+                                <p class="text-paragraph-md text-blue-800 ml-2">
+                                    {{ storeState.eventRuleInfo?.options?.stop_processing ? $t('ALERT_MANAGER.EVENT_RULE.TRUE') : $t('ALERT_MANAGER.EVENT_RULE.FALSE') }}
                                 </p>
                             </div>
                         </div>
@@ -408,6 +410,9 @@ const handleDeleteEventRule = () => {
             }
             .border-section {
                 @apply flex flex-col border-4 border-gray-100 rounded-xl mt-1 py-2 px-4;
+                .condition-list {
+                    @apply flex flex-row gap-3;
+                }
                 .settings-wrapper {
                     .settings-section {
                         @apply flex flex-col;
@@ -428,11 +433,19 @@ const handleDeleteEventRule = () => {
             }
 
             .action-list {
-                @apply flex pt-0.5 pb-0.5 gap-1;
+                @apply flex pt-0.5 pb-0.5 gap-1 items-center;
                 .dot {
                     @apply flex items-center justify-center;
                     width: 1.5rem;
                     height: 1.5rem;
+                }
+                .action {
+                    @apply flex items-center;
+                }
+                p {
+                    .action-paragraph {
+                        @apply text-paragraph-md text-blue-800 ml-2;
+                    }
                 }
             }
         }
@@ -455,6 +468,23 @@ const handleDeleteEventRule = () => {
                             .scope-wrapper {
                                 @apply flex items-center gap-1;
                             }
+                        }
+                    }
+                }
+                .border-section {
+                    .condition-list {
+                        @apply flex flex-row;
+                    }
+                }
+                .action-list {
+                    @apply flex flex-col items-start;
+                    .action {
+                        @apply flex items-center;
+                    }
+                    p {
+                        @apply ml-6;
+                        .action-paragraph {
+                            @apply ml-0;
                         }
                     }
                 }
