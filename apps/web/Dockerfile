@@ -25,6 +25,10 @@ RUN npx turbo build --filter=web... --output-logs=new-only --summarize
 
 FROM nginx:1.21.6-alpine AS runner
 
+## setting CAP_NET_BIND_SERVICE to allow nginx to bind to port 80
+RUN apk add --no-cache libcap
+RUN setcap 'cap_net_bind_service=+ep' /usr/sbin/nginx
+
 ENV PORT 80
 ENV ROOT_PATH /var/www
 ENV LOG_PATH /var/log/cloudforet
