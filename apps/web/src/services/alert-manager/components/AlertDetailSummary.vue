@@ -13,7 +13,7 @@ import { i18n } from '@/translations';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
-import { red } from '@/styles/colors';
+import { gray, red } from '@/styles/colors';
 
 import { calculateTime } from '@/services/alert-manager/composables/alert-table-data';
 import { useAlertDetailPageStore } from '@/services/alert-manager/stores/alert-detail-page-store';
@@ -113,7 +113,7 @@ watch(() => alertDetailPageState.alertInfo, (alertInfo) => {
                              width="1em"
                              height="1em"
                              class="mr-2"
-                             :color="red[200]"
+                             :color="gray[200]"
                         />
                         <span>{{ state.alertUrgencyList.find(d => d.name === state.alertUrgency)?.label }}</span>
                     </span>

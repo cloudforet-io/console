@@ -24,7 +24,7 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
-import { red } from '@/styles/colors';
+import { gray, red } from '@/styles/colors';
 
 import {
     alertStatusBadgeStyleTypeFormatter,
@@ -205,7 +205,7 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
                             <p-i name="ic_warning-filled"
                                  width="0.75rem"
                                  height="0.75rem"
-                                 :color="red[200]"
+                                 :color="gray[200]"
                             />
                             <p class="flex gap-1 text-gray-700">
                                 <span>{{ $t('ALERT_MANAGER.ALERTS.LOW') }}:</span>
@@ -267,7 +267,7 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
                             <p-i :name="value === ALERT_URGENCY.HIGH ? 'ic_error-filled' : 'ic_warning-filled'"
                                  width="1rem"
                                  height="1rem"
-                                 :color="value === ALERT_URGENCY.HIGH ? red[400] : red[200]"
+                                 :color="value === ALERT_URGENCY.HIGH ? red[400] : gray[200]"
                             />
                             <span>{{ tableState.urgencyLabels[value] }}</span>
                         </div>
