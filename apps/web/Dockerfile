@@ -23,15 +23,15 @@ ENV FORCE_COLOR=1
 
 RUN npx turbo build --filter=web... --output-logs=new-only --summarize
 
-FROM nginx AS runner
+FROM nginx:1.21.6-alpine AS runner
+
+# create non-root (nginx) user
+RUN addgroup -S nginx && adduser -S nginx -G nginx
 
 ENV PORT 80
 ENV ROOT_PATH /var/www
 ENV LOG_PATH /var/log/cloudforet
 ENV NGINX_CONF_PATH /etc/nginx/conf.d
-
-# create non-root (nginx) user
-RUN addgroup -S nginx && adduser -S nginx -G nginx
 
 RUN mkdir -p ${LOG_PATH}/nginx /var/cache/nginx && \
     chown -R nginx:nginx ${LOG_PATH}/nginx /var/cache/nginx
