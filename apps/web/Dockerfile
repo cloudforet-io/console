@@ -34,10 +34,11 @@ ENV ROOT_PATH /var/www
 ENV LOG_PATH /var/log/cloudforet
 ENV NGINX_CONF_PATH /etc/nginx/conf.d
 
-RUN mkdir -p ${LOG_PATH}/nginx /var/cache/nginx && \
-    chown -R nginx:nginx ${LOG_PATH}/nginx /var/cache/nginx
+RUN mkdir -p ${LOG_PATH}/nginx /var/cache/nginx /var/run/nginx && \
+    chown -R nginx:nginx ${LOG_PATH}/nginx /var/cache/nginx /var/run/nginx
 
 RUN rm /etc/nginx/conf.d/default.conf
+COPY apps/web/pkg/nginx.conf /etc/nginx/nginx.conf
 COPY apps/web/pkg/proxy.conf ${NGINX_CONF_PATH}/proxy.conf
 
 # forward request and error logs to docker log collector
@@ -45,10 +46,6 @@ RUN ln -sf /dev/stdout ${LOG_PATH}/nginx/spaceone-access.log \
     && ln -sf /dev/stderr ${LOG_PATH}/nginx/spaceone-error.log
 
 COPY --from=installer /app/apps/web/dist/. ${ROOT_PATH}/
-
-# Enable only for turbo debugging purposes
-#RUN mkdir -p ${LOG_PATH}/turbo
-#COPY --from=installer /app/.turbo/runs/. ${LOG_PATH}/turbo
 
 # Change ownership of application files and settings
 RUN chown -R nginx:nginx ${ROOT_PATH} ${NGINX_CONF_PATH}
