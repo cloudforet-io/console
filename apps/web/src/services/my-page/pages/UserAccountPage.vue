@@ -140,7 +140,7 @@ const handleClickCancel = () => {
                 <p-heading :title="$t('MY_PAGE.ACCOUNT.ACCOUNT_N_PROFILE')" />
             </template>
             <template #extra>
-                <p-button v-if="!passwordFormState.isPasswordChecked"
+                <p-button v-if="!passwordFormState.isPasswordChecked && storeState.authType === 'LOCAL'"
                           @click="handleOpenPasswordCheckModal"
                 >
                     {{ $t('COMMON.PROFILE.EDIT_ACCOUNT_INFO') }}
