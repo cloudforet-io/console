@@ -85,8 +85,12 @@ const tabState = reactive({
     }),
     webhookErrorTableFields: computed<DataTableFieldType[]>(() => ([
         { name: 'created_at', label: 'Created', width: '11rem' },
-        { name: 'message', label: 'Error Message', width: `${width.value - EXTRA_WIDTH}px` },
-        { name: 'show_button', label: ' ', width: '6.625rem' },
+        {
+            name: 'message', label: 'Error Message', width: `${width.value - EXTRA_WIDTH}px`, sortable: false,
+        },
+        {
+            name: 'show_button', label: ' ', width: '6.625rem', sortable: false,
+        },
     ])),
     activeWebhookDetailTab: WEBHOOK_DETAIL_TABS.DETAIL as WebhookDetailTabsType,
 });
@@ -130,6 +134,7 @@ const handleChangeMessageSort = (sortBy, sortDesc) => {
     messageState.formatList = sortTableItems<WebhookMessageFormatType>(messageState.formatList, sortBy, sortDesc);
 };
 const handleChange = async (options: any = {}) => {
+    if (options.sortBy !== undefined) errorListApiQueryHelper.setSort(options.sortBy, options.sortDesc);
     if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
     if (options.pageStart !== undefined) errorListApiQueryHelper.setPageStart(options.pageStart);
     if (options.pageLimit !== undefined) errorListApiQueryHelper.setPageLimit(options.pageLimit);
@@ -314,6 +319,7 @@ watch(() => storeState.selectedWebhookId, async () => {
                 </p-heading-layout>
                 <p-toolbox-table ref="errorTableRef"
                                  searchable
+                                 sortable
                                  search-type="query"
                                  sort-by="created_at"
                                  :query-tags="queryTags"
