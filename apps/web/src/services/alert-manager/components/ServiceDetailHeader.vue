@@ -18,11 +18,9 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 
 import { gray } from '@/styles/colors';
 
-import AlertCreateModal from '@/services/alert-manager/components/AlertCreateModal.vue';
 import ServiceDetailDeleteModal from '@/services/alert-manager/components/ServiceDetailDeleteModal.vue';
 import ServiceDetailEditModal from '@/services/alert-manager/components/ServiceDetailEditModal.vue';
 import ServiceDetailMemberModal from '@/services/alert-manager/components/ServiceDetailMemberModal.vue';
-import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/constants/common-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
 import type { Service } from '@/services/alert-manager/types/alert-manager-type';
@@ -121,18 +119,10 @@ const handleGoBackButton = () => {
                         </template>
                     </p-heading>
                 </template>
-                <template v-if="hasReadWriteAccess"
+                <template v-if="hasReadWriteAccess && !state.isSettingMode && storeState.eventRuleList.length > 0"
                           #extra
                 >
-                    <p-button v-if="route.query?.tab === SERVICE_DETAIL_TABS.ALERTS"
-                              icon-left="ic_plus_bold"
-                              class="self-start mx-auto"
-                              @click="handleActionModal('alert')"
-                    >
-                        {{ $t('ALERT_MANAGER.CREATE') }}
-                    </p-button>
-                    <p-button v-if="route.query?.tab === SERVICE_DETAIL_TABS.SETTINGS && !state.isSettingMode && storeState.eventRuleList.length > 0"
-                              icon-left="ic_plus_bold"
+                    <p-button icon-left="ic_plus_bold"
                               class="self-start mx-auto"
                               @click="handleClickAddRule"
                     >
@@ -184,10 +174,6 @@ const handleGoBackButton = () => {
             />
             <service-detail-member-modal v-if="modalState.type === 'member'"
                                          :visible.sync="modalState.modalVisible"
-            />
-            <alert-create-modal v-if="modalState.type === 'alert'"
-                                :service-id="storeState.serviceInfo.service_id"
-                                :visible.sync="modalState.modalVisible"
             />
         </div>
     </div>
