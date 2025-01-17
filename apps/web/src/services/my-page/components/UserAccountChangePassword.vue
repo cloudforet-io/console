@@ -182,7 +182,8 @@ watch(() => props.certifiedPassword, (certifiedPassword) => {
     padding: 0 1rem;
     max-width: 35.5rem;
     .input-form-wrapper {
-        @apply flex flex-wrap justify-between;
+        @apply flex flex-wrap items-center justify-between;
+        margin-bottom: 1rem;
         .field-title {
             min-width: 7.75rem;
             flex-shrink: 1;
@@ -210,5 +211,10 @@ watch(() => props.certifiedPassword, (certifiedPassword) => {
 /* custom design-system component - p-definition-table */
 :deep(.p-definition-table) {
     min-height: unset;
+}
+
+/* custom design-system component - p-field-group */
+:deep(.p-field-group) {
+    margin-bottom: unset;
 }
 </style>
