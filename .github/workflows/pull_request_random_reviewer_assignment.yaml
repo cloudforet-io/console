@@ -62,7 +62,6 @@ jobs:
               reviewers: [`${{ steps.pick_random_reviewer.outputs.randomReviewer1 }}`, `${{ steps.pick_random_reviewer.outputs.randomReviewer2 }}`]
             });
 
-      
       - name: Check if the PR author is an organization member and add as assignee
         uses: actions/github-script@v6
         with:
