@@ -69,13 +69,17 @@ const state = reactive({
             name: 'language',
         },
     ]),
-    data: computed(() => ({
-        id: state.userId,
-        name: userStore.state.name,
-        admin_role: state.roleType,
-        timezone: userStore.state.timezone,
-        language: userStore.state.language,
-    })),
+    data: computed(() => {
+        const timezone = state.timezones.find((d) => d.name === userStore.state.timezone)?.label || userStore.state.timezone;
+        const language = state.languages.find((d) => d.name === userStore.state.language)?.label || userStore.state.language;
+        return {
+            id: state.userId,
+            name: userStore.state.name,
+            admin_role: state.roleType,
+            timezone,
+            language,
+        };
+    }),
 });
 const formState = reactive({
     userName: '' as string | undefined,
