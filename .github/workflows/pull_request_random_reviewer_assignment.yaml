@@ -10,7 +10,9 @@ on:
 
 jobs:
   pick-random-reviewer:
-    if: contains(github.event.pull_request.labels.*.name, 'self_approved/review')
+    if: |
+      github.repository_owner == 'cloudforet-io' && 
+      contains(github.event.pull_request.labels.*.name, 'self_approved/review')
     
     runs-on: ubuntu-latest
     
