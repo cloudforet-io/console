@@ -93,7 +93,10 @@ const getCreatedByNames = (createdBy: string): string => {
     if (createdBy.includes('app')) {
         return storeState.app[createdBy].label || createdBy;
     }
-    return storeState.user[createdBy].name ? `${storeState.user[createdBy].name} (${storeState.user[createdBy].key})` : storeState.user[createdBy].key;
+    if (createdBy.includes('SYSTEM')) {
+        return createdBy;
+    }
+    return storeState.user[createdBy]?.name ? `${storeState.user[createdBy]?.name} (${storeState.user[createdBy]?.key})` : storeState.user[createdBy]?.key;
 };
 const getItemInfo = (item: AlertHistoryActionType): HistoryItemInfo => {
     let styleType: string|undefined;

@@ -190,13 +190,7 @@ const handleClickCopy = () => {
                         </template>
                         <template #col-name-format="{value, item}">
                             <div class="flex items-center gap-1">
-                                <p-i v-if="!item.plugin_id"
-                                     name="ic_notification-protocol_users"
-                                     width="1rem"
-                                     height="1rem"
-                                />
-                                <p-lazy-img v-else
-                                            :src="assetUrlConverter(storeState.pluginInfo[item.plugin_id]?.icon || '')"
+                                <p-lazy-img :src="assetUrlConverter(storeState.pluginInfo[item.plugin_id]?.icon || '')"
                                             width="1rem"
                                             height="1rem"
                                 />
