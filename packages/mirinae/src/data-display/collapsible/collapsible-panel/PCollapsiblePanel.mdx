@@ -7,6 +7,16 @@ import * as PCollapsiblePanelStories from './PCollapsiblePanel.stories';
 <Meta of={PCollapsiblePanelStories} />
 
 # Collapsible Panel
+Collapsible Panel is a component that can be expanded or collapsed.
+
+<br/>
+<br/>
+
+# Types
+There are two types based on behavior:
+- [simpleClamp](#line-clamp)
+- [recursive](#recursive)
+
 <br/>
 <br/>
 
@@ -18,6 +28,44 @@ import * as PCollapsiblePanelStories from './PCollapsiblePanel.stories';
 
 ## Line Clamp
 <Canvas of={PCollapsiblePanelStories.LineClamp} />
+
+<br/>
+<br/>
+
+# Recursive
+```recursive (Boolean)```
+
+This prop controls the text clamping (truncation) method. <br/>
+When set to `true`, text clamping is applied recursively to nested elements, <br/>
+**treating text within both inline and block elements as a single line.** <br/>
+When set to `false`, text clamping only applies to the top-level element, improving performance.
+
+**Tip**: Use `recursive: true` when dealing with nested text structures or multi-level elements to enforce text length constraints.
+**Motivation**: The simple clamping method had issues where clamping was not applied properly when multiple nested child elements were present.
+
+<br/>
+
+## Recursive Basic
+<Canvas of={PCollapsiblePanelStories.RecursiveBasic} />
+
+<br/>
+<br/>
+
+## Multi Elements
+<Canvas of={PCollapsiblePanelStories.MultiElements} />
+
+<br/>
+<br/>
+
+## Multi Inline Elements
+<Canvas of={PCollapsiblePanelStories.MultiInlineElements} />
+
+<br/>
+<br/>
+
+## Advanced
+With PLink
+<Canvas of={PCollapsiblePanelStories.Advance} />
 
 <br/>
 <br/>

@@ -33,7 +33,7 @@ export const useRecursiveTextClamper = (lineClamp : number):TextClamper => {
             lineHeight = fontSize * 1.2;
         }
 
-        const lineCount = Math.round(totalHeight / lineHeight);
+        const lineCount = Math.floor(totalHeight / lineHeight);
         return lineCount;
     };
 

@@ -6,8 +6,6 @@ export { default as PCard } from './data-display/cards/card/PCard.vue';
 export { default as PListCard } from './data-display/cards/list-card/PListCard.vue';
 export { default as PCollapsibleList } from './data-display/collapsible/collapsible-list/PCollapsibleList.vue';
 export { default as PCollapsiblePanel } from './data-display/collapsible/collapsible-panel/PCollapsiblePanel.vue';
-export { default as PCollapsiblePanelV2 } from './data-display/collapsible/collapsible-panel-v2/PCollapsiblePanelV2.vue';
-export { default as PCollapsiblePanelV3 } from './data-display/collapsible/collapsible-panel-v3/PCollapsiblePanelV3.vue';
 export { default as PCollapsibleToggle } from './data-display/collapsible/collapsible-toggle/PCollapsibleToggle.vue';
 export { default as PDynamicField } from './data-display/dynamic/dynamic-field/PDynamicField.vue';
 export { default as PDynamicLayout } from './data-display/dynamic/dynamic-layout/PDynamicLayout.vue';

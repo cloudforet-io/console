@@ -28,7 +28,7 @@ import {
 import {
     useRecursiveTextClamper,
     useSimpleTextClamper,
-} from '@/data-display/collapsible/collapsible-panel/composables/useTruncation';
+} from '@/data-display/collapsible/collapsible-panel/composables/use-text-clamper';
 import PCollapsibleToggle from '@/data-display/collapsible/collapsible-toggle/PCollapsibleToggle.vue';
 import { useProxyValue } from '@/hooks';
 
@@ -53,7 +53,7 @@ export default defineComponent({
         },
         recursive: {
             type: Boolean,
-            default: true,
+            default: false,
         },
     },
     setup(props, { emit }) {
@@ -69,9 +69,9 @@ export default defineComponent({
         const updateClamping = () => {
             nextTick(() => {
                 if (props.recursive) {
-                    recursiveTextClamper.runTextClamper(state.proxyIsCollapsed, state.contentRef, state.fakeTextRef);
+                    recursiveTextClamper.runTextClamper(state.proxyIsCollapsed, state.contentRef);
                 } else {
-                    simpleTextClamper.runTextClamper(state.proxyIsCollapsed, state.contentRef);
+                    simpleTextClamper.runTextClamper(state.proxyIsCollapsed, state.contentRef, state.fakeTextRef);
                 }
             });
         };
