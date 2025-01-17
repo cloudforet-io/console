@@ -14,11 +14,8 @@ export type EventRuleConditionsType = {
     operator: EventRuleConditionsOperatorType;
 };
 
-export type EventRuleActionsMatchAssetRuleType = {
-    key?: string,
-};
 export type EventRuleActionsMatchAssetType = {
-    rule?: EventRuleActionsMatchAssetRuleType;
+    key?: string;
     asset_types?: string[];
     create_temporary_asset?: boolean;
 };

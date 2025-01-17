@@ -16,7 +16,7 @@ export const ALERT_MANAGEMENT_TABLE_FIELDS: DataTableFieldType[] = [
     { name: 'title', label: 'Title', width: '20rem' },
     { name: 'status', label: 'Status' },
     { name: 'urgency', label: 'Urgency' },
-    { name: 'labels', label: 'Label' },
+    { name: 'labels', label: 'Labels' },
     { name: 'triggered_by', label: 'Triggered by' },
     { name: 'duration', label: 'Duration', sortable: false },
     { name: 'created_at', label: 'Created' },
@@ -26,7 +26,7 @@ export const ALERT_MANAGEMENT_TABLE_HANDLER: AlertManagementTableHandlerType = {
         title: 'Properties',
         items: [
             { name: 'title', label: 'Title' },
-            { name: 'labels', label: 'Label' },
+            { name: 'labels', label: 'Labels' },
             { name: 'triggered_by', label: 'Triggered by' },
         ],
     }],
@@ -41,7 +41,7 @@ export const ALERT_EXCEL_FIELDS: ExcelDataField[] = [
     { key: 'title', name: 'Title' },
     { key: 'status', name: 'Status' },
     { key: 'urgency', name: 'Urgency' },
-    { key: 'labels', name: 'Label' },
+    { key: 'labels', name: 'Labels' },
     { key: 'triggered_by', name: 'Triggered by' },
     { key: 'created_at', name: 'Created' },
 ];
@@ -49,6 +49,7 @@ export const ALERT_EXCEL_FIELDS: ExcelDataField[] = [
 export const ALERT_CHANNEL_TABLE_FIELDS: DataTableFieldType[] = [
     { name: 'type', label: 'Type' },
     { name: 'name', label: 'Name' },
+    { name: 'target', label: 'Target' },
     { name: 'state', label: 'State' },
     { name: 'error_message', label: 'Message' },
 ];

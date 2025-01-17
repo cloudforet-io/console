@@ -25,7 +25,7 @@ import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-const
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
 import type { Service } from '@/services/alert-manager/types/alert-manager-type';
 
-type ModalType = 'edit' | 'delete' | 'member';
+type ModalType = 'edit' | 'delete' | 'member' | 'alert';
 
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
