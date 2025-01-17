@@ -131,7 +131,7 @@ const handleCloseModal = () => {
 };
 const handleClickCopy = () => {
     copyAnyData(props.history);
-    showSuccessMessage(i18n.t('ALERT_MANAGER.ALERTS.COPIED'), '');
+    showSuccessMessage(i18n.t('ALERT_MANAGER.COPIED'), '');
 };
 </script>
 
@@ -241,12 +241,12 @@ const handleClickCopy = () => {
                           icon-left="ic_copy"
                           @click="handleClickCopy"
                 >
-                    {{ $t('ALERT_MANAGER.ALERTS.COPY_ALL') }}
+                    {{ $t('ALERT_MANAGER.COPY_ALL') }}
                 </p-button>
             </div>
         </template>
         <template #confirm-button>
-            {{ $t('ALERT_MANAGER.ALERTS.OK') }}
+            {{ $t('ALERT_MANAGER.OK') }}
         </template>
     </p-button-modal>
 </template>

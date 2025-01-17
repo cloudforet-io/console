@@ -8,7 +8,7 @@ import { isEmpty } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PHeadingLayout, PTab, PHeading, PDefinitionTable, PStatus, PLazyImg, PMarkdown, PBadge, PDataTable, PButton, PToolboxTable, PTextButton,
+    PHeadingLayout, PTab, PHeading, PDefinitionTable, PStatus, PLazyImg, PMarkdown, PBadge, PDataTable, PButton, PToolboxTable,
 } from '@cloudforet/mirinae';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 import { iso8601Formatter } from '@cloudforet/utils';
@@ -35,6 +35,8 @@ import { useQueryTags } from '@/common/composables/query-tags';
 import TagsOverlay from '@/common/modules/tags/tags-panel/modules/TagsOverlay.vue';
 import { sortTableItems } from '@/common/utils/table-sort';
 
+import ServiceDetailTabsWebhookDetailRawDataModal
+    from '@/services/alert-manager/components/ServiceDetailTabsWebhookDetailRawDataModal.vue';
 import { alertManagerStateFormatter } from '@/services/alert-manager/composables/refined-table-data';
 import { WEBHOOK_DETAIL_TABS } from '@/services/alert-manager/constants/common-constant';
 import {
@@ -78,6 +80,8 @@ const tabState = reactive({
 });
 const state = reactive({
     webhookInfo: {} as WebhookModel,
+    rawDataModalVisible: false,
+    rawData: {} as Record<string, any>,
     selectedPlugin: {} as PluginModel,
     errorListLoading: false,
     errorList: [] as WebhookListErrorsModel[],
@@ -101,6 +105,10 @@ const errorListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
 const queryTagHelper = useQueryTags({ keyItemSets: WEBHOOK_ERROR_TABLE_KEY_ITEM_SETS });
 const { queryTags } = queryTagHelper;
 
+const handleClickShowRawData = (item) => {
+    state.rawDataModalVisible = true;
+    state.rawData = item.raw_data;
+};
 const handleEditMessageFormat = (value) => {
     messageState.editFormVisible = value;
 };
@@ -310,14 +318,19 @@ watch(() => storeState.selectedWebhookId, async () => {
                     <template #col-message-format="{ value }">
                         {{ value }}
                     </template>
-                    <template #col-show_button-format>
-                        <p-text-button style-type="highlight"
-                                       @click="handleRouteDetail"
+                    <template #col-show_button-format="{ item }">
+                        <p-button style-type="tertiary"
+                                  size="sm"
+                                  class="ml-2.5"
+                                  @click="handleClickShowRawData(item)"
                         >
                             {{ $t('ALERT_MANAGER.WEBHOOK.SHOW_ALL') }}
-                        </p-text-button>
+                        </p-button>
                     </template>
                 </p-toolbox-table>
+                <service-detail-tabs-webhook-detail-raw-data-modal :visible.sync="state.rawDataModalVisible"
+                                                                   :raw-data="state.rawData"
+                />
             </div>
         </template>
         <template v-if="tabState.activeWebhookDetailTab === WEBHOOK_DETAIL_TABS.MESSAGE"
