@@ -5,7 +5,7 @@
                  class="text fake"
                  :style="{'-webkit-line-clamp': lineClamp}"
             >
-                <slot />
+                <slot v-if="!recursive" />
             </div>
             <div ref="contentRef"
                  class="text"
