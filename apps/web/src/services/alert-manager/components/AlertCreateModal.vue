@@ -3,13 +3,13 @@ import { computed, reactive } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import type { Query } from '@cloudforet/core-lib/space-connector/type';
 import {
     PButtonModal, PFieldGroup, PTextInput, PTextarea, PSelectDropdown, PRadioGroup, PRadio,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { AlertCreateParameters } from '@/schema/alert-manager/alert/api-verbs/create';
-import type { AlertListParameters } from '@/schema/alert-manager/alert/api-verbs/list';
 import { ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
 import { i18n } from '@/translations';
@@ -44,7 +44,7 @@ const route = useRoute();
 
 const storeState = reactive({
     serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => alertPageGetters.serviceDropdownList),
-    alertListParams: computed<AlertListParameters|undefined>(() => alertPageState.alertListParams),
+    alertListQuery: computed<Query|undefined>(() => alertPageState.alertListQuery),
 });
 const state = reactive({
     loading: false,
@@ -95,7 +95,9 @@ const handleConfirm = async () => {
             urgency: state.radioMenuList[state.selectedRadioIdx].name,
         });
         showSuccessMessage(i18n.t('ALERT_MANAGER.ALERTS.ALT_S_CREATE'), '');
-        await alertPageStore.fetchAlertsList(storeState.alertListParams);
+        await alertPageStore.fetchAlertsList({
+            query: storeState.alertListQuery,
+        });
     } catch (e) {
         ErrorHandler.handleError(e, true);
     } finally {

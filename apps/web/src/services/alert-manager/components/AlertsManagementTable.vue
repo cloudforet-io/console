@@ -26,6 +26,7 @@ import { useUserStore } from '@/store/user/user-store';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
+import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
@@ -66,6 +67,10 @@ const storeState = reactive({
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo?.service_id),
     totalCount: computed<number>(() => alertPageState.totalAlertCount),
     alertList: computed<AlertModel[]>(() => alertPageState.alertList),
+    selectedServiceId: computed<string>(() => alertPageState.selectedServiceId),
+    selectedStatus: computed<string>(() => alertPageState.selectedStatus),
+    selectedUrgency: computed<string>(() => alertPageState.selectedUrgency),
+    selectedSearchFilter: computed<string[]|undefined>(() => alertPageState.selectedSearchFilter),
     timezone: computed<string>(() => userState.timezone || ''),
 });
 const state = reactive({
@@ -84,7 +89,6 @@ const state = reactive({
 });
 const filterState = reactive({
     serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => alertPageGetters.serviceDropdownList),
-    selectedServiceId: '',
     statusFields: computed<AlertFilterType[]>(() => ([
         { label: i18n.t('ALERT_MANAGER.ALERTS.OPEN'), name: ALERT_STATUS_FILTERS.OPEN },
         { label: i18n.t('ALERT_MANAGER.ALERTS.TRIGGERED'), name: ALERT_STATUS_FILTERS.TRIGGERED },
@@ -93,13 +97,11 @@ const filterState = reactive({
         { label: i18n.t('ALERT_MANAGER.ALERTS.IGNORED'), name: ALERT_STATUS_FILTERS.IGNORED },
         { label: i18n.t('ALERT_MANAGER.ALERTS.ALL'), name: 'ALL' },
     ])),
-    selectedStatusFilter: 'OPEN',
     urgencyFields: computed<SelectDropdownMenuItem[]>(() => ([
         { label: i18n.t('ALERT_MANAGER.ALERTS.ALL'), name: 'ALL' },
         { label: i18n.t('ALERT_MANAGER.ALERTS.HIGH'), name: ALERT_URGENCY.HIGH },
         { label: i18n.t('ALERT_MANAGER.ALERTS.LOW'), name: ALERT_URGENCY.LOW },
     ])),
-    selectedUrgencyFilter: 'ALL',
     labelHandler: computed(() => makeDistinctValueHandler('alert_manager.Alert', 'labels')),
     selectedLabels: [] as SelectDropdownMenuItem[],
 });
@@ -152,21 +154,28 @@ const handleSelectLabelsItem = (value: SelectDropdownMenuItem[]) => {
     filterState.selectedLabels = value;
     fetchAlertsList();
 };
-const handleSelectServiceDropdownItem = (id: string) => {
-    filterState.selectedServiceId = id;
-    fetchAlertsList();
+const handleSelectServiceDropdownItem = async (id: string) => {
+    await alertPageStore.setSelectedServiceId(id);
+    await replaceUrlQuery('serviceId', id);
+    await fetchAlertsList();
 };
-const handleSelectFilter = (type: 'status' | 'urgency', value: string) => {
+const handleSelectFilter = async (type: 'status' | 'urgency', value: string) => {
     if (type === 'status') {
-        filterState.selectedStatusFilter = value;
+        await alertPageStore.setSelectedStatus(value);
+        await replaceUrlQuery('status', value);
     } else {
-        filterState.selectedUrgencyFilter = value;
+        await alertPageStore.setSelectedUrgency(value);
+        await replaceUrlQuery('urgency', value);
     }
-    fetchAlertsList();
+    await fetchAlertsList();
 };
 const handleChange = async (options: any = {}) => {
     if (options.sortBy !== undefined) alertListApiQueryHelper.setSort(options.sortBy, options.sortDesc);
-    if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
+    if (options.queryTags !== undefined) {
+        queryTagHelper.setQueryTags(options.queryTags);
+        await replaceUrlQuery('filters', queryTagHelper.getURLQueryStringFilters());
+        await alertPageStore.setSelectedSearchFilter(queryTagHelper.getURLQueryStringFilters());
+    }
     if (options.pageStart !== undefined) alertListApiQueryHelper.setPageStart(options.pageStart);
     if (options.pageLimit !== undefined) alertListApiQueryHelper.setPageLimit(options.pageLimit);
     await fetchAlertsList();
@@ -195,13 +204,13 @@ const handleExportToExcel = async () => {
 const fetchAlertsList = async () => {
     try {
         filterQueryHelper.setFilters([]);
-        if (filterState.selectedStatusFilter === ALERT_STATUS_FILTERS.OPEN) {
+        if (storeState.selectedStatus === ALERT_STATUS_FILTERS.OPEN) {
             filterQueryHelper.addFilter({ k: 'status', v: [ALERT_STATUS_FILTERS.TRIGGERED, ALERT_STATUS_FILTERS.ACKNOWLEDGED], o: '=' });
-        } else if (filterState.selectedStatusFilter !== 'ALL') {
-            filterQueryHelper.addFilter({ k: 'status', v: filterState.selectedStatusFilter, o: '=' });
+        } else if (storeState.selectedStatus !== 'ALL') {
+            filterQueryHelper.addFilter({ k: 'status', v: storeState.selectedStatus, o: '=' });
         }
-        if (filterState.selectedUrgencyFilter !== 'ALL') {
-            filterQueryHelper.addFilter({ k: 'urgency', v: filterState.selectedUrgencyFilter, o: '=' });
+        if (storeState.selectedUrgency !== 'ALL') {
+            filterQueryHelper.addFilter({ k: 'urgency', v: storeState.selectedUrgency, o: '=' });
         }
         if (filterState.selectedLabels.length > 0) {
             filterQueryHelper.addFilter({ k: 'labels', v: filterState.selectedLabels.map((i) => i.name), o: '=' });
@@ -209,8 +218,8 @@ const fetchAlertsList = async () => {
 
         if (state.isServicePage) {
             filterQueryHelper.addFilter({ k: 'service_id', v: storeState.serviceId, o: '=' });
-        } else if (filterState.selectedServiceId) {
-            filterQueryHelper.addFilter({ k: 'service_id', v: filterState.selectedServiceId, o: '=' });
+        } else if (storeState.selectedServiceId) {
+            filterQueryHelper.addFilter({ k: 'service_id', v: storeState.selectedServiceId, o: '=' });
         }
 
         alertListApiQueryHelper.setFilters([
@@ -221,7 +230,7 @@ const fetchAlertsList = async () => {
         const params = {
             query: alertListApiQueryHelper.data,
         };
-        await alertPageStore.setAlertListParams(params);
+        await alertPageStore.setAlertListQuery(alertListApiQueryHelper.data);
         await alertPageStore.fetchAlertsList(params);
     } catch (e) {
         ErrorHandler.handleError(e, true);
@@ -230,17 +239,23 @@ const fetchAlertsList = async () => {
 
 watch(() => storeState.serviceId, async (serviceId) => {
     if (state.isServicePage && serviceId) {
-        filterState.selectedServiceId = serviceId;
+        await alertPageStore.setSelectedServiceId(serviceId);
         await fetchAlertsList();
     }
 });
-watch(() => route.query, async (query) => {
-    const { serviceId, status, urgency } = query;
+
+(async () => {
+    const {
+        serviceId, status, urgency, filters,
+    } = route.query;
     if (!state.isServicePage) {
-        filterState.selectedServiceId = serviceId as string;
+        await alertPageStore.setSelectedServiceId(serviceId as string);
     }
-    filterState.selectedStatusFilter = status as string || 'OPEN';
-    filterState.selectedUrgencyFilter = urgency as string || 'ALL';
+    await alertPageStore.setSelectedStatus(status as string || 'OPEN');
+    await alertPageStore.setSelectedUrgency(urgency as string || 'ALL');
+    if (filters) {
+        await queryTagHelper.setURLQueryStringFilters(route.query.filters);
+    }
 
     try {
         state.loading = true;
@@ -248,7 +263,7 @@ watch(() => route.query, async (query) => {
     } finally {
         state.loading = false;
     }
-}, { immediate: true });
+})();
 </script>
 
 <template>
@@ -282,7 +297,7 @@ watch(() => route.query, async (query) => {
                                        :selection-label="$t('ALERT_MANAGER.ALERTS.LABEL_URGENCY')"
                                        style-type="rounded"
                                        use-fixed-menu-style
-                                       :selected="filterState.selectedUrgencyFilter"
+                                       :selected="storeState.selectedUrgency"
                                        class="service-dropdown"
                                        @update:selected="handleSelectFilter('urgency', $event)"
                     >
@@ -306,7 +321,7 @@ watch(() => route.query, async (query) => {
                                        show-delete-all-button
                                        selection-highlight
                                        use-fixed-menu-style
-                                       :selected="filterState.selectedServiceId"
+                                       :selected="storeState.selectedServiceId"
                                        class="service-dropdown"
                                        @update:selected="handleSelectServiceDropdownItem"
                     />
@@ -332,7 +347,7 @@ watch(() => route.query, async (query) => {
                         />
                         <p-select-status v-for="(item, idx) in filterState.statusFields"
                                          :key="idx"
-                                         :selected="filterState.selectedStatusFilter"
+                                         :selected="storeState.selectedStatus"
                                          :value="item.name"
                                          class="status"
                                          @change="handleSelectFilter('status', item.name)"

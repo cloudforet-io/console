@@ -15,9 +15,12 @@ import AlertDetailDeleteModal from '@/services/alert-manager/components/AlertDet
 import AlertDetailEditModal from '@/services/alert-manager/components/AlertDetailEditModal.vue';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { useAlertDetailPageStore } from '@/services/alert-manager/stores/alert-detail-page-store';
+import { useAlertPageStore } from '@/services/alert-manager/stores/alert-page-store';
 
 type ModalType = 'edit' | 'delete';
 
+const alertPageStore = useAlertPageStore();
+const alertPageState = alertPageStore.state;
 const alertDetailPageStore = useAlertDetailPageStore();
 const alertDetailPageState = alertDetailPageStore.state;
 
@@ -29,6 +32,10 @@ const { hasReadWriteAccess } = usePageEditableStatus();
 
 const storeState = reactive({
     alertInfo: computed<AlertModel>(() => alertDetailPageState.alertInfo),
+    selectedServiceId: computed<string>(() => alertPageState.selectedServiceId),
+    selectedStatus: computed<string>(() => alertPageState.selectedStatus),
+    selectedUrgency: computed<string>(() => alertPageState.selectedUrgency),
+    selectedSearchFilter: computed<string|undefined>(() => alertPageState.selectedSearchFilter),
 });
 const state = reactive({
     menuItems: computed<MenuItem[]>(() => [
@@ -54,7 +61,15 @@ const handleRouteBackButton = () => {
     if (serviceId) {
         router.go(-1);
     } else {
-        router.push(getProperRouteLocation({ name: ALERT_MANAGER_ROUTE.ALERTS._NAME }));
+        router.push(getProperRouteLocation({
+            name: ALERT_MANAGER_ROUTE.ALERTS._NAME,
+            query: {
+                serviceId: storeState.selectedServiceId,
+                status: storeState.selectedStatus,
+                urgency: storeState.selectedUrgency,
+                filters: storeState.selectedSearchFilter,
+            },
+        }));
     }
 };
 const handleSelectDropdownMenu = (type: ModalType) => {
